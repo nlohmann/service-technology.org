@@ -18,6 +18,7 @@
 
 package hub.top.uma;
 
+import java.util.Collection;
 import java.util.HashMap;
 import com.google.gwt.dev.util.collect.HashSet;
 import java.util.LinkedList;
@@ -192,6 +193,80 @@ public class DNodeSet {
       }
     if (b.isEvent) allEvents.remove(b);
     else allConditions.remove(b);
+  }
+  
+  public void removeAll(Collection<DNode> nodes) {
+    HashSet<DNode> touched = new HashSet<DNode>();
+    
+    for (DNode n : nodes) {
+      if (n.pre != null) {
+        for (DNode pre : n.pre) {
+          if (pre == null) continue;
+          for (int i=0; i<pre.post.length; i++) {
+            if (pre.post[i] == n) {
+              pre.post[i] = null;
+            }
+            touched.add(pre);
+          }
+        }
+      }
+      
+      if (n.post != null) {
+        for (DNode post : n.post) {
+          if (post == null) continue;
+          for (int i=0; i<post.pre.length; i++) {
+            if (post.pre[i] == n) {
+              post.pre[i] = null;
+            }
+            touched.add(post);
+          }
+        }
+      }
+      
+      if (n.isEvent) allEvents.remove(n);
+      else allConditions.remove(n);
+    }
+    
+    touched.removeAll(nodes);
+    
+    for (DNode n : touched) {
+      
+      if (n.pre != null) {
+        int preCount = 0;
+        for (DNode pre : n.pre) {
+          if (pre != null) preCount++;
+        }
+        
+        DNode newPre[] = new DNode[preCount];
+        int newPrePos = 0;
+        for (DNode pre : n.pre) {
+          if (pre != null) {
+            newPre[newPrePos] = pre;
+            newPrePos++;
+          }
+        }
+        
+        n.pre = newPre;
+      }
+      
+      if (n.post != null) {
+        int postCount = 0;
+        for (DNode post : n.post) {
+          if (post != null) postCount++;
+        }
+        
+        DNode newPost[] = new DNode[postCount];
+        int newPostPos = 0;
+        for (DNode post : n.post) {
+          if (post != null) {
+            newPost[newPostPos] = post;
+            newPostPos++;
+          }
+        }
+        
+        n.post = newPost;
+      }
+    }
   }
 	  
 

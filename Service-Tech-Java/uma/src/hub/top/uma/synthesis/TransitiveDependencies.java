@@ -187,11 +187,44 @@ public class TransitiveDependencies {
   }
   
   /**
-   * @return The set of all implied conditions, i.e. for each condition b
+   * @param b
+   * @return {@code true} iff the condition b is implied, i.e. for each condition b
    * in this set exists a path that connects its pre-set with its post-set.
    * Important: there may be two conditions b1 and b2 that are implied because
    * b1 establishes the path for b2 and vice versa. To determine a maximal set
    * of implied conditions that can be removed, use {@link #getImpliedConditions_solutionLocal()}.
+   */
+  private boolean isImpliedCondition(DNode b) {
+    // compute for all pre-events e and all post-events f of 'b'
+    boolean each_f_dependsOn_e_without_b = true;
+    DNode e = b.pre[0];
+    for (DNode f : b.post) {
+      // whether there exists an alternative path from 'e' to 'f'
+      // we find this path by looking for a path from 'e' to a
+      // pre-condition 'c' of 'f' that is not 'b'
+      boolean f_dependsOn_e_without_b = false;
+      for (DNode c : f.pre) {
+        
+        if (c == b) continue;
+        // find the path from 'e' to 'c'
+        if ( dependsOn_compute(c, e) ) {
+          // found one, 'b' is implied
+          f_dependsOn_e_without_b = true;
+          break;
+        }
+      }
+      // didn't find any, 'b' is not implied
+      if (!f_dependsOn_e_without_b)
+        each_f_dependsOn_e_without_b = false;
+    }
+    
+    if (each_f_dependsOn_e_without_b) return true;
+    else return false;
+  }
+  
+  /**
+   * @return the set of all implied conditions as determined
+   * by {@link TransitiveDependencies#isImpliedCondition(DNode)}
    */
   public HashSet<DNode> getAllImpliedConditions() {
     HashSet<DNode> implied = new HashSet<DNode>();
@@ -202,30 +235,7 @@ public class TransitiveDependencies {
       if (b.isEvent || b.pre == null || b.pre.length == 0
           || b.post == null || b.post.length == 0) continue;
       
-      // compute for all pre-events e and all post-events f of 'b'
-      boolean each_f_dependsOn_e_without_b = true;
-      DNode e = b.pre[0];
-      for (DNode f : b.post) {
-        // whether there exists an alternative path from 'e' to 'f'
-        // we find this path by looking for a path from 'e' to a
-        // pre-condition 'c' of 'f' that is not 'b'
-        boolean f_dependsOn_e_without_b = false;
-        for (DNode c : f.pre) {
-          
-          if (c == b) continue;
-          // find the path from 'e' to 'c'
-          if ( dependsOn_compute(c, e) ) {
-            // found one, 'b' is implied
-            f_dependsOn_e_without_b = true;
-            break;
-          }
-        }
-        // didn't find any, 'b' is not implied
-        if (!f_dependsOn_e_without_b)
-          each_f_dependsOn_e_without_b = false;
-      }
-      
-      if (each_f_dependsOn_e_without_b)
+      if (isImpliedCondition(b))
         implied.add(b);
     }
     
@@ -336,9 +346,10 @@ public class TransitiveDependencies {
    * previous call of {@link #extendBranchingProcessWithNextEvents(Collection)}.
    */
   public void removeExtendedNodes() {
-    for (DNode d : extendedNodes) {
-      bp.remove(d);
-    }
+    //for (DNode d : extendedNodes) {
+    //  bp.remove(d);
+    //}
+    bp.removeAll(extendedNodes);
   }
   
   /**
@@ -429,8 +440,6 @@ public class TransitiveDependencies {
    */
   public HashSet<DNode> getImpliedConditions_solutionGlobal() {
     
-    HashSet<DNode> impliedCand = getAllImpliedConditions();
-    
     HashSet<DNode> implied = new HashSet<DNode>();
     
     
@@ -454,8 +463,8 @@ public class TransitiveDependencies {
 
         //if (nodes[i].id != id) continue;
         
-        //if (i % 100 == 0) Uma.out.print(i+" ");
-        //if (i % 1000 == 0) Uma.out.print("\n");
+        if (i % 400 == 0) Uma.out.print(i+" ");
+        if (i % 4000 == 0) Uma.out.print("\n");
         
         //DNode b = nodes[i];
         if (b.isEvent || b.pre == null || b.pre.length == 0
@@ -468,17 +477,17 @@ public class TransitiveDependencies {
           if (   bPrime.post != null && bPrime.post.length != 0
               && bPrime.pre != null && bPrime.pre.length != 0)
           {
-            if (!impliedCand.contains(bPrime)) {
+            if (!isImpliedCondition(bPrime)) {
               notImplied++;
             }
             total++;
           }
         }
         if (notImplied > 0) {
-          System.out.print(((float)notImplied/(float)total)+" ");
+          //System.out.print(((float)notImplied/(float)total)+" ");
           continue;
         } else {
-          System.out.print("- ");
+          //System.out.print("- ");
         }
         
         boolean each_bPrime_IsImplied = true;

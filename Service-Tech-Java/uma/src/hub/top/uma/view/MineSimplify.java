@@ -27,9 +27,7 @@ import hub.top.petrinet.Transition;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeRefold;
-import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys;
-import hub.top.uma.DotColors;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
 import hub.top.uma.synthesis.NetSynthesis;
@@ -55,21 +53,18 @@ import com.google.gwt.dev.util.collect.HashSet;
  */
 public class MineSimplify {
 
-  private String fileName_system_sysPath; 
+  protected String fileName_system_sysPath; 
   private String fileName_trace;
   
   private ISystemModel sysModel;
   private LinkedList<String[]> allTraces;
 
-  private ViewGeneration2 viewGen;                     // the class used to construct the log-induced branching prefix
+  protected ViewGeneration2 viewGen;                   // the class used to construct the log-induced branching prefix
   private DNodeRefold build = null;                    // the branching process of sysModel
   private HashMap<Place, Set<DNode>> place_conditions; // all conditions labeled with the given place
   
-  private PetriNet simplifiedNet;
-  private PetriNet originalNet;
-  
-  private float netComplexity_original;
-  private float netComplexity_simplified;
+  protected PetriNet simplifiedNet;
+  protected PetriNet originalNet;
   
   /**
    * Configuration for the simplification procedure in {@link MineSimplify}.
@@ -82,11 +77,16 @@ public class MineSimplify {
     public static final int REMOVE_IMPLIED_PRESERVE_CONNECTED = 3;
     
     public boolean unfold_refold = true; 
-    public int remove_implied = REMOVE_IMPLIED_PRESERVE_CONNECTED;
-    public boolean abstract_chains = true;
-    public boolean remove_flower_places = true;
+    public int remove_implied = REMOVE_IMPLIED_PRESERVE_ALL;
+    public boolean abstract_chains = false;
+    public boolean remove_flower_places = false;
     
     public Map<String, String> eventToTransition = new HashMap<String, String>();
+    
+    @Override
+    public String toString() {
+      return unfold_refold+" "+remove_implied+" "+abstract_chains+" "+remove_flower_places;
+    }
   }
   
   /**
@@ -98,6 +98,10 @@ public class MineSimplify {
    * complete and partial results collected throughout the computation process
    */
   public static class Result {
+    
+    public String netSize_original;
+    public String netSize_final;
+
     /**
      * places that could be identified in some situations as implied
      * and in other situations as not implied
@@ -113,7 +117,53 @@ public class MineSimplify {
      * places removed by {@link MineSimplify#removeImpliedPlaces(PetriNet, List)}
      */
     public LinkedList<Place> removedImpliedPlaces;
+    
+    protected long _time_start[] = new long[FINAL+1];
+    protected long _time_finish[] = new long[FINAL+1];
+    
+    protected float _complexity[] = new float[FINAL+1];
+    protected String _net_size[] = new String[FINAL+1];
+    
+    protected PetriNet[] _nets = new PetriNet[FINAL+1];
+
+    public static final int ORIGINAL = 0;
+    public static final int STEP_UNFOLD = 1;
+    public static final int STEP_EQUIV = 2;
+    public static final int STEP_IMPLIED = 3;
+    public static final int STEP_FOLD = 4;
+    public static final int STEP_CHAINS = 5;
+    public static final int STEP_FLOWER = 6;
+    public static final int FINAL = 7;
+        
+    public long getRuntime(int step) {
+      return _time_finish[step]-_time_start[step];
+    }
+    
+    @Override
+    public String toString() {
+      String result_string = "";
+      
+      result_string += "original net: "+netSize_original+" , complexity: "+_complexity[Result.ORIGINAL]+"\n";
+      result_string += "build BP(L): "+getRuntime(Result.STEP_UNFOLD)+" , BP: "+_net_size[Result.STEP_UNFOLD]+"\n";
+      result_string += "folding relation: "+getRuntime(Result.STEP_EQUIV)+getRuntime(Result.STEP_FOLD)+" , net: "+_net_size[Result.STEP_FOLD]+" , complexity: "+_complexity[Result.STEP_FOLD]+"\n";
+      result_string += "implied places: "+getRuntime(Result.STEP_IMPLIED)+" , net: "+_net_size[Result.STEP_IMPLIED]+" , complexity: "+_complexity[Result.STEP_IMPLIED]+"\n";
+      result_string += "chains: "+getRuntime(Result.STEP_CHAINS)+" , net: "+_net_size[Result.STEP_CHAINS]+" , complexity: "+_complexity[Result.STEP_CHAINS]+"\n";
+      result_string += "flower places: "+getRuntime(Result.STEP_FLOWER)+" , net: "+_net_size[Result.STEP_FLOWER]+" , complexity: "+_complexity[Result.STEP_FLOWER]+"\n";
+      result_string += "total time: "+getRuntime(Result.FINAL)+" , simplified net: "+netSize_final+" , complexity: "+_complexity[Result.FINAL]+"\n";
+      result_string += "threshold: "+simplestThreshold;
+      result_string += "\n";
+      
+      result_string += "removed implied places:\n";
+      for (Place p : this.removedImpliedPlaces) {
+        result_string += p.toString()+"\n";
+      }
+      
+      return result_string;
+    }
+    
   }
+  
+
   
   /**
    * complete and partial results collected throughout the computation process
@@ -203,25 +253,47 @@ public class MineSimplify {
     }
   }
   
-  long _time_start;
-  long _time_finish;
-  
   
   public boolean run() throws InvalidModelException {
     
-    _time_start = System.currentTimeMillis();
+    Uma.out.println("Simplifying "+fileName_system_sysPath+"...");
+    Uma.out.println("Configuration: "+config);
     
+    result._time_start[Result.FINAL] = System.currentTimeMillis();
+    
+    // execute the simplification algorithm
     simplifiedNet = simplifyModel(sysModel, allTraces, config);
     if (simplifiedNet == null)
       return false;
-    
+
+    // some statistics
     if (sysModel instanceof PetriNet) {
-      netComplexity_original = complexitySimple((PetriNet)sysModel);
+      result._complexity[Result.ORIGINAL] = complexitySimple((PetriNet)sysModel);
+      result._net_size[Result.ORIGINAL] = ((PetriNet)sysModel).getInfo(true);
+      result.netSize_original = ((PetriNet)sysModel).getInfo(false);
+      result._nets[Result.ORIGINAL] = (PetriNet)sysModel;
+    } else {
+      result._complexity[Result.ORIGINAL] = Float.MAX_VALUE;
+      result._net_size[Result.ORIGINAL] = "0;0;0";
+      result.netSize_original = "<unknown>";
+      result._nets[Result.ORIGINAL] = new PetriNet();
     }
-    _time_finish = System.currentTimeMillis();
+    result._time_finish[Result.FINAL] = System.currentTimeMillis();
+
+    result._complexity[Result.FINAL] = complexitySimple(simplifiedNet);
+    result._net_size[Result.FINAL] = simplifiedNet.getInfo(true);
+    result.netSize_final = simplifiedNet.getInfo(false);
+    result._nets[Result.FINAL] = simplifiedNet;
     
-    netComplexity_simplified = complexitySimple(simplifiedNet);
-    Uma.out.println("finished in "+(_time_finish-_time_start)+"ms, complexity: "+netComplexity_simplified);
+    // print statistics result
+    Uma.out.println("finished in "+result.getRuntime(Result.FINAL)+"ms, complexity went from "+result._complexity[Result.ORIGINAL]+" to  "+result._complexity[Result.FINAL]);
+    
+    ViewGeneration3 v = new ViewGeneration3(simplifiedNet);
+    int failed = 0;
+    for (String[] trace : allTraces) {
+      if (!v.validateTrace(trace)) failed++;
+    }
+    if (failed > 0) System.err.println(fileName_system_sysPath+" cannot replay "+failed+" traces");
     
     
     return true;
@@ -232,39 +304,6 @@ public class MineSimplify {
     int arcNum = net.getArcs().size();
     
     return (float)arcNum/(float)nodeNum;
-  }
-  
-  public String generateCSVString() {
-    String result_string = "";
-    result_string += originalNet.getInfo()+";"+(int)(netComplexity_original*100)+";";
-    result_string += _size_bp+";"+(_time_buildBP_finish - _time_buildBP_start)+";";
-    result_string += _size_fold+";"+(int)(_comp_fold*100)+";"+(_time_equiv_finish - _time_equiv_start)+";";
-    result_string += _size_implied+";"+(int)(_comp_implied*100)+";"+(_time_implied_finish - _time_implied_start)+";";
-    result_string += _size_chain+";"+(int)(_comp_chain*100)+";"+(_time_chain_finish - _time_chain_start)+";";
-    result_string += simplifiedNet.getInfo()+";"+(int)(netComplexity_simplified*100)+";"+(_time_chain_finish - _time_chain_start)+";";
-    result_string += "\n";
-    return result_string;
-  }
-  
-  public String generateResultsFile() {
-    String result_string = "";
-    
-    
-    if (originalNet != null)
-      result_string += "original net: "+originalNet.getInfo()+" , complexity: "+netComplexity_original+"\n";
-    else
-      result_string += "original net: <unknown> , complexity:  <unknown>\n";
-    result_string += "build BP(L): "+(_time_buildBP_finish - _time_buildBP_start)+" , BP: "+_size_bp+"\n";
-    result_string += "folding relation: "+(_time_equiv_finish - _time_equiv_start)+" , net: "+_size_fold+" , complexity: "+_comp_fold+"\n";
-    result_string += "implied places: "+(_time_implied_finish - _time_implied_start)+" , net: "+_size_implied+" , complexity: "+_comp_implied+"\n";
-    result_string += "chains: "+(_time_chain_finish - _time_chain_start)+" , net: "+_size_chain+" , complexity: "+_comp_chain+"\n";
-    result_string += "total time: "+(_time_finish - _time_start)+" , simplified net: "+simplifiedNet.getInfo()+" , complexity: "+netComplexity_simplified+"\n";
-    result_string += "threshold: "+simplestThreshold;
-    result_string += "\n";
-    
-    result_string += generateCSVString();
-    
-    return result_string;
   }
   
   /**
@@ -285,13 +324,17 @@ public class MineSimplify {
     return build;
   }
   
+  public List<String[]> getTraces() {
+    return allTraces;
+  }
+  
   /**
    * Write results to files. Requires that this simplification object was
    * instantiated with {@link MineSimplify#MineSimplify(String, String)}.
    *   
    * @throws IOException
    */
-  public void writeResults() throws IOException {
+  public synchronized void writeResults() throws IOException {
     
     if (simplifiedNet == null)
       return;
@@ -303,12 +346,15 @@ public class MineSimplify {
     PetriNetIO.writeToFile(simplifiedNet, targetPath_lola, PetriNetIO.FORMAT_LOLA, 0);
     
     String targetPath_result = fileName_system_sysPath+".simplified.result.txt";
-    writeFile(targetPath_result, generateResultsFile());
+    writeFile(targetPath_result, result.toString(), false);
     
-    PetriNet bp = NetSynthesis.convertToPetriNet(_debug_lastViewBuild, _debug_lastViewBuild.getBranchingProcess().getAllNodes(), false);
+    PetriNet bp = NetSynthesis.convertToPetriNet(debug._lastViewBuild, debug._lastViewBuild.getBranchingProcess().getAllNodes(), false);
     
     String targetPath_bp = fileName_system_sysPath+".bp.lola";
     PetriNetIO.writeToFile(bp, targetPath_bp, PetriNetIO.FORMAT_LOLA, 0);
+    
+    String targetPath_bp2 = fileName_system_sysPath+".bp.dot";
+    writeFile(targetPath_bp2, bp.toDot(), false);
   }
   
   /**
@@ -318,8 +364,8 @@ public class MineSimplify {
    * @param contents
    * @throws IOException
    */
-  private void writeFile(String fileName, String contents) throws IOException {
-    FileWriter fstream = new FileWriter(fileName);
+  protected static void writeFile(String fileName, String contents, boolean append) throws IOException {
+    FileWriter fstream = new FileWriter(fileName, append);
     BufferedWriter out = new BufferedWriter(fstream);
     out.write(contents);
     out.close();
@@ -349,32 +395,38 @@ public class MineSimplify {
     }
 
     // step 2) find implied places
-    _time_implied_start = System.currentTimeMillis();
+    result._time_start[Result.STEP_IMPLIED] = System.currentTimeMillis();
     if (config.remove_implied != Configuration.REMOVE_IMPLIED_OFF) {
       assertBranchingProcess(net, sysModel, traces);
       HashSet<DNode> impliedConditions = findImpliedConditions();
       List<Place> impliedPlaces = getImpliedPlaces(net, place_conditions, impliedConditions);
       removeImpliedPlaces(net, impliedPlaces);
-      removeMaximalPlaces(net);
-      
-      _comp_implied = complexitySimple(net);
-      _size_implied = net.getInfo();
     }
-    _time_implied_finish = System.currentTimeMillis();
+    removeMaximalPlaces(net); // always remove maximal places
+    result._time_finish[Result.STEP_IMPLIED] = System.currentTimeMillis();
+    result._complexity[Result.STEP_IMPLIED] = complexitySimple(net);
+    result._net_size[Result.STEP_IMPLIED] = net.getInfo(true);
+    result._nets[Result.STEP_IMPLIED] = new PetriNet(net);
     
     // step 3) collapse chains of transitions
-    _time_chain_start = System.currentTimeMillis();
+    result._time_start[Result.STEP_CHAINS] = System.currentTimeMillis();
     if (config.abstract_chains) {
       while (collapseChains(net));
     }
-    _comp_chain = complexitySimple(net);
-    _size_chain = net.getInfo();
-
-    // step 3) remove flower places
+    result._time_finish[Result.STEP_CHAINS] = System.currentTimeMillis();
+    result._complexity[Result.STEP_CHAINS] = complexitySimple(net);
+    result._net_size[Result.STEP_CHAINS] = net.getInfo(true);
+    result._nets[Result.STEP_CHAINS] = new PetriNet(net);
+    
+    // step 4) remove flower places
+    result._time_start[Result.STEP_FLOWER] = System.currentTimeMillis();
     if (config.remove_flower_places) {
       removeFlowerPlaces(net, 0.05f);
     }
-    _time_chain_finish = System.currentTimeMillis();
+    result._time_finish[Result.STEP_FLOWER] = System.currentTimeMillis();
+    result._complexity[Result.STEP_FLOWER] = complexitySimple(net);
+    result._net_size[Result.STEP_FLOWER] = net.getInfo(true);
+    result._nets[Result.STEP_FLOWER] = new PetriNet(net);
     
     Uma.out.println("done");
     return net;
@@ -394,24 +446,25 @@ public class MineSimplify {
     DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
     build = Uma.initBuildPrefix_View(sys, 0);
 
-    _time_buildBP_start = System.currentTimeMillis();
-    //Uma.out.println("generating view for "+traces.size()+" traces...");
+    result._time_start[Result.STEP_UNFOLD] = System.currentTimeMillis();
+    Uma.out.println("generating view for "+traces.size()+" traces...");
     viewGen = new ViewGeneration2(build);
     for (String[] trace : traces) {
       viewGen.extendByTrace(trace, config.eventToTransition);
     }
     boolean printDetail = (build.getBranchingProcess().allConditions.size()
         +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
-    _time_buildBP_finish = System.currentTimeMillis();
-    _size_bp = build.getStatistics();
+    result._time_finish[Result.STEP_UNFOLD] = System.currentTimeMillis();
+    result._net_size[Result.STEP_UNFOLD] = build.getStatistics(true);
+    result._nets[Result.STEP_UNFOLD] = null;
     
     // viewGen.identifyFoldingRelation();
     //build.debugPrintCCpairs();
     
-    _time_equiv_start = System.currentTimeMillis();
+    result._time_start[Result.STEP_EQUIV] = System.currentTimeMillis();
+    
     if (printDetail) Uma.out.println("equivalence..");
     build.futureEquivalence();
-    
     //build.debug_printFoldingEquivalence();
     
     if (printDetail) Uma.out.println("join maximal..");
@@ -437,11 +490,13 @@ public class MineSimplify {
       //if (build.blockedFolding()) changed++;
     } while (changed > 0);
     
-    _time_equiv_finish = System.currentTimeMillis();
+    result._time_finish[Result.STEP_EQUIV] = System.currentTimeMillis();
+    result._net_size[Result.STEP_EQUIV] = build.getStatistics(true);
+    result._nets[Result.STEP_EQUIV] = null;
     
     //build.simplifyFoldingEquivalence();
     
-    _time_fold_start = System.currentTimeMillis();
+    result._time_start[Result.STEP_FOLD] = System.currentTimeMillis();
     if (printDetail) Uma.out.println("fold net..");
     NetSynthesis synth = new NetSynthesis(build);
     PetriNet net = synth.foldToNet_labeled(false);
@@ -454,11 +509,12 @@ public class MineSimplify {
       place_conditions.put(p, build.futureEquivalence().get(build.equivalentNode().get(b)));
     }
     
-    _time_fold_finish = System.currentTimeMillis();
-    _comp_fold = complexitySimple(net);
-    _size_fold = net.getInfo();
+    result._time_finish[Result.STEP_FOLD] = System.currentTimeMillis();
+    result._complexity[Result.STEP_FOLD] = complexitySimple(net);
+    result._net_size[Result.STEP_FOLD] = net.getInfo(true);
+    result._nets[Result.STEP_FOLD] = new PetriNet(net);
     
-    _debug_lastViewBuild = build;
+    debug._lastViewBuild = build;
 
     return net;
   }
@@ -476,18 +532,19 @@ public class MineSimplify {
   private void assertBranchingProcess(PetriNet net, ISystemModel sysModel, LinkedList<String[]> traces) throws InvalidModelException {
     if (build != null) return;
 
+    Uma.out.println("assert existence of branching process...");
+    
     DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
     build = Uma.initBuildPrefix_View(sys, 0);
 
-    _time_buildBP_start = System.currentTimeMillis();
-    //Uma.out.println("assert existence of branching process...");
+    result._time_start[Result.STEP_UNFOLD] = System.currentTimeMillis();
     viewGen = new ViewGeneration2(build);
     for (String[] trace : traces) {
       viewGen.extendByTrace(trace, config.eventToTransition);
     }
-    _time_buildBP_finish = System.currentTimeMillis();
-    _size_bp = build.getStatistics();
-    _debug_lastViewBuild = build;
+    result._time_finish[Result.STEP_UNFOLD] = System.currentTimeMillis();
+    result._net_size[Result.STEP_UNFOLD] = build.getStatistics(true);
+    debug._lastViewBuild = build;
     
     if (sysModel instanceof PetriNet) {
       // collect for each place of the net, all conditions that represent a token on the place
@@ -511,20 +568,20 @@ public class MineSimplify {
    */
   private HashSet<DNode> findImpliedConditions() {
     
-    boolean printDetail = (build.getBranchingProcess().allConditions.size()
-        +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
+    //boolean printDetail = (build.getBranchingProcess().allConditions.size()
+    //    +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
 
-    if (printDetail) Uma.out.println("transitive dependencies..");
+    Uma.out.println("transitive dependencies..");
     TransitiveDependencies dep = new TransitiveDependencies(build);
-    if (printDetail) Uma.out.println("find solution..");
     HashSet<DNode> impliedConditions;
     if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED) {
       // locally find all implied conditions, regardless of equivalence classes
-      System.out.println("finding all");
+      Uma.out.println("find solution..");
       impliedConditions = dep.getImpliedConditions_solutionLocal();
       //implied = dep.getAllImpliedConditions();
     } else if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_VISIBLE) {
       // find equivalence classes of implied conditions
+      Uma.out.println("find solution..");
       impliedConditions = dep.getImpliedConditions_solutionGlobal();
     } else if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_ALL) {
       // find equivalence classes of implied conditions ensuring that no
@@ -532,11 +589,14 @@ public class MineSimplify {
       
       // extend the branching process with events that are enabled, but
       // did not fire
-      List<DNode> extendedNodes = dep.extendBranchingProcessWithNextEvents(viewGen.visitedMarkings);
+      Uma.out.println("temporarily extend branching process..");
+      List<DNode> extendedNodes = dep.extendBranchingProcessWithNextEvents(viewGen.initialState.getAllVisitedMarkings());
       debug._extendedNodes = extendedNodes;
       // identify implied conditions in this branching process
+      Uma.out.println("find solution..");
       impliedConditions = dep.getImpliedConditions_solutionGlobal();
       // and remove the added events again
+      Uma.out.println("undo extension..");
       impliedConditions.removeAll(extendedNodes);
       dep.removeExtendedNodes();
     } else {
@@ -660,7 +720,7 @@ public class MineSimplify {
 
       if (!isSinglePost && !isSinglePre)
       {
-        Uma.out.println("removing implied place: "+p+" "+p.getPreSet()+" "+p.getPostSet());
+        //Uma.out.println("removing implied place: "+p+" "+p.getPreSet()+" "+p.getPostSet());
         net.removePlace(p);
         result.removedImpliedPlaces.add(p);
         debug._color_weak_impliedConditions(p);
@@ -700,7 +760,7 @@ public class MineSimplify {
           }
         }
         if (!isSinglePost) {
-          //Uma.out.println("removing terminal place: "+p);
+          //Uma.out.println("removing terminal place: "+p+" "+p.getPreSet());
           net.removePlace(p);
           result.removedMaximalPlaces.add(p);
         }
@@ -869,27 +929,27 @@ public class MineSimplify {
       if (   p.getIncoming().size() > net.getTransitions().size() * threshold
           && p.getOutgoing().size() > net.getTransitions().size() * threshold)
       {
-        Uma.out.println("flower place: "+p);
+        //Uma.out.println("flower place: "+p);
         
         HashSet<Transition> prePost = new HashSet<Transition>(p.getPreSet());
         prePost.retainAll(p.getPostSet());
         
         for (Transition t : prePost) {
           
-          Uma.out.println(t);
+          //Uma.out.println(t);
           if (t.getIncoming().size() > 1 && t.getOutgoing().size() > 1 ) {
-            Uma.out.println(t.getIncoming());
-            Uma.out.println(t.getOutgoing());
+            //Uma.out.println(t.getIncoming());
+            //Uma.out.println(t.getOutgoing());
             for (Arc a : t.getIncoming()) {
               if (a.getSource() == p) {
-                Uma.out.println("in "+a.getSource()+" --> "+a.getTarget()); 
+                //Uma.out.println("in "+a.getSource()+" --> "+a.getTarget()); 
                 net.removeArc(a); 
                 break; 
               }
             }
             for (Arc a : t.getOutgoing()) {
               if (a.getTarget() == p) { 
-                Uma.out.println("out "+a.getSource()+" --> "+a.getTarget()); 
+                //Uma.out.println("out "+a.getSource()+" --> "+a.getTarget()); 
                 net.removeArc(a); 
                 break; 
               }
@@ -906,10 +966,15 @@ public class MineSimplify {
   public class Debug {
     
     /**
+     * the last branching process that was constructed
+     */
+    public DNodeBP _lastViewBuild = null;
+    
+    /**
      * list of nodes that were added to the branching process to ensure that
      * only implied conditions that do not change the behavior get removed
      */
-    private List<DNode> _extendedNodes = new LinkedList<DNode>();
+    public List<DNode> _extendedNodes = new LinkedList<DNode>();
     
     /**
      * conditions of the branching process identified as implied conditions
@@ -1000,148 +1065,32 @@ public class MineSimplify {
   public Debug debug = new Debug();
   
   
-  // fields for recording times and sizes for benchmark experiments
-  private static DNodeBP _debug_lastViewBuild = null;
-  private static HashMap<Object, String> _debug_colorMap2;
-  
-  private long _time_buildBP_start;
-  private long _time_buildBP_finish;
-  
-  private long _time_equiv_start;
-  private long _time_equiv_finish;
-  
-  private long _time_implied_start;
-  private long _time_implied_finish;
 
-  private long _time_fold_start;
-  private long _time_fold_finish;
-
-  private long _time_chain_start;
-  private long _time_chain_finish;
-  
-  private float _comp_fold;
-  private float _comp_implied;
-  private float _comp_chain;
-  
-  private String _size_bp;
-  private String _size_fold;
-  private String _size_implied;
-  private String _size_chain;
   
   private static float simplestThreshold;
   
-  public static void simplify(String system, String log, boolean repeat) throws IOException, InvalidModelException {
-    simplify(system, log, repeat, new Configuration());
+  public static void simplify(String system, String log) throws IOException, InvalidModelException {
+    simplify(system, log, new Configuration());
   }
   
-  public static String simplify(String system, String log, boolean repeat, Configuration config) throws IOException, InvalidModelException {
+  public synchronized static void simplify(String system, String log, Configuration config) throws IOException, InvalidModelException {
     
-    MineSimplify bestSim = null;
+    MineSimplify sim = new MineSimplify(system, log, config);
+    sim.prepareModel();
+    sim.run();
     
-    long startTime = System.currentTimeMillis();
-    
-    for (int i=0; i<10; i++) {
-      
-      //DNodeBP.foldThreshold = (float)(i+1)/10;
-      
-      Uma.out.print(system+"... ");
-      MineSimplify sim = new MineSimplify(system, log, config);
-      sim.prepareModel();
-      sim.run();
-      
-      if (bestSim == null) {
-        bestSim = sim;
-        //simplestThreshold = DNodeBP.foldThreshold;
-        //if(!repeat) break;
-      } else {
-        if (complexitySimple(sim.getSimplifiedNet()) < complexitySimple(bestSim.getSimplifiedNet())) {
-          bestSim = sim;
-          //simplestThreshold = DNodeBP.foldThreshold;
-        }
-        
-        if (System.currentTimeMillis() - startTime > 1000*60*30) {
-          break;
-        }
-      }
-    }
-    bestSim.writeResults();
-    return bestSim.generateCSVString();
+    sim.writeResults();
+    Uma.out.println(sim.result.toString());
   }
   
-  public static void runExperiment(String path, Configuration config) throws IOException, InvalidModelException {
-    //DNodeBP.ignoreFoldThreshold = false;
+  public static void main(final String args[]) throws Exception {
     
-    StringBuilder sb = new StringBuilder();
-    
-    sb.append(simplify(path+"/a12f0n00.lola", path+"/a12f0n00.log.txt", true, config)); // F
-    sb.append(simplify(path+"/a12f0n05.lola", path+"/a12f0n05.log.txt", true, config)); // F
-    sb.append(simplify(path+"/a12f0n10.lola", path+"/a12f0n10.log.txt", true, config)); // F
-    sb.append(simplify(path+"/a12f0n20.lola", path+"/a12f0n20.log.txt", true, config)); // F
-    sb.append(simplify(path+"/a12f0n50.lola", path+"/a12f0n50.log.txt", true, config)); // F
-    
-    sb.append(simplify(path+"/a22f0n00.lola", path+"/a22f0n00.log.txt", true, config)); // F
-    sb.append(simplify(path+"/a22f0n05.lola", path+"/a22f0n05.log.txt", true, config)); // F
-    sb.append(simplify(path+"/a22f0n10.lola", path+"/a22f0n10.log.txt", false, config)); // slow
-    sb.append(simplify(path+"/a22f0n20.lola", path+"/a22f0n20.log.txt", false, config)); // slow
-    sb.append(simplify(path+"/a22f0n50.lola", path+"/a22f0n50.log.txt", false, config)); // slow
-    
-    sb.append(simplify(path+"/a32f0n00.lola", path+"/a32f0n00.log.txt", true, config));
-    sb.append(simplify(path+"/a32f0n05.lola", path+"/a32f0n05.log.txt", true, config)); // F
-    sb.append(simplify(path+"/a32f0n10.lola", path+"/a32f0n10.log.txt", false, config)); // slow 
-    sb.append(simplify(path+"/a32f0n20.lola", path+"/a32f0n20.log.txt", false, config)); // slow 
-    sb.append(simplify(path+"/a32f0n50.lola", path+"/a32f0n50.log.txt", false, config)); // slow
-    
-    //simplify(path+"/t32f0n05.lola", path+"/t32f0n05.log.txt", false, config); // slow
+      Configuration config = new Configuration();
+      config.unfold_refold = true;
+      config.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
+      config.abstract_chains = true;
+      config.remove_flower_places = false;
 
-    // AMC
-    sb.append(simplify(path+"/Aandoening_A.lola", path+"/Aandoening_A.log.txt", true, config)); // F
-    sb.append(simplify(path+"/Aandoening_B.lola", path+"/Aandoening_B.log.txt", true, config)); // F
-    sb.append(simplify(path+"/Aandoening_C.lola", path+"/Aandoening_C.log.txt", true, config)); // F
-    sb.append(simplify(path+"/AMC.lola", path+"/AMC.log.txt", true, config)); // F
-    
-    // Heusden
-    sb.append(simplify(path+"/Afschriften.lola", path+"/Afschriften.log.txt", true, config)); // F
-    sb.append(simplify(path+"/BezwaarWOZ_filtered_All.lola", path+"/BezwaarWOZ_filtered_All.log.txt", true, config)); // F
-
-    // Catharina
-    sb.append(simplify(path+"/Complications.filtered80.lola", path+"/Complications.filtered80.log.txt", true, config)); // F
+      simplify(args[0], args[1], config);
   }
-  
-  public static void main(String[] args) throws IOException, InvalidModelException {
-
-    Configuration c = new Configuration();
-    /*
-    c.unfold_refold = true;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_OFF;
-    c.abstract_chains = false;
-    c.remove_flower_places = false;
-    runExperiment("./examples/bpm11/exp1_foldRefold", c);
-
-    c.unfold_refold = true;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
-    c.abstract_chains = false;
-    c.remove_flower_places = false;
-    runExperiment("./examples/bpm11/exp2_foldRefold_implied", c);
-
-    c.unfold_refold = false;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
-    c.abstract_chains = false;
-    c.remove_flower_places = false;
-    runExperiment("./examples/bpm11/exp3_implied", c);
-
-    c.unfold_refold = true;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
-    c.abstract_chains = true;
-    c.remove_flower_places = false;
-    runExperiment("./examples/bpm11/exp4_foldRefold_implied_chains", c);
-    */
-    c.unfold_refold = true;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
-    c.abstract_chains = true;
-    c.remove_flower_places = true;
-    runExperiment("./examples/bpm11/exp5_complete", c);
-
-    Precision.main(null);
-  }
-  
 }

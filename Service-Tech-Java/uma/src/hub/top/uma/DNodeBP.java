@@ -2580,9 +2580,11 @@ public class DNodeBP {
    *    {@link #statistic_condNum}
    *    {@link #statistic_cutOffNum}
    *    {@link #statistic_eventNum}
+   * @param csvFormat print statistics in CSV file format for machine readable use in the
+   *                  order: "number of conditions; number of events; number of arcs"
    * @return a string representation of the statistics
    */
-  public String getStatistics() {
+  public String getStatistics(boolean csvFormat) {
     
     statistic_condNum = 0;
     statistic_eventNum = 0;
@@ -2602,8 +2604,10 @@ public class DNodeBP {
       
       statistic_arcNum += n.pre.length; 
     }
-    //return "|B|= "+statistic_condNum +" |E|= "+statistic_eventNum+" |E_cutOff|= "+statistic_cutOffNum+" |F|= "+statistic_arcNum;
-    return statistic_condNum +";"+statistic_eventNum+";"+statistic_arcNum;
+    if (csvFormat)
+      return statistic_condNum +";"+statistic_eventNum+";"+statistic_arcNum;
+    else
+      return "|B|= "+statistic_condNum +" |E|= "+statistic_eventNum+" |E_cutOff|= "+statistic_cutOffNum+" |F|= "+statistic_arcNum;
   }
   
   /**

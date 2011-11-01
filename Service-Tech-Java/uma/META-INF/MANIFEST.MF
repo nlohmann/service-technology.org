@@ -10,6 +10,6 @@ Export-Package: com.google.gwt.dev.util.collect,
  hub.top.uma.synthesis,
  hub.top.uma.view
 Bundle-Vendor: service-technology.org
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: hub.top.petrinet,
  org.antlr.runtime

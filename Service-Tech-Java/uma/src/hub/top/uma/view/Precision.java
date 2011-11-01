@@ -465,7 +465,7 @@ public class Precision {
        net.turnIntoLabeledNet();
        
        Precision precision = new Precision((PetriNet)net);
-       Precision2 precision2 = new Precision2((PetriNet)net);
+       Precision_ETC precision2 = new Precision_ETC((PetriNet)net);
        
        boolean failed1 = false;
        boolean failed2 = false;

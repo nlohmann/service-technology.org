@@ -153,11 +153,51 @@ public class UmaImpliedTest extends hub.top.test.TestCase {
 
     try {
       Configuration config = new Configuration();
-      config.abstract_chains = false;
+
       config.unfold_refold = true;
-      config.remove_flower_places = false;
       config.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
+      config.abstract_chains = false;      
+      config.remove_flower_places = false;
       
+      String model = "pn_ex_01_ilp.lola";
+      String log = "pn_ex_01_ilp.log.txt";
+      
+      MineSimplify simplify = new MineSimplify(testFileRoot+"/"+model, testFileRoot+"/"+log, config);
+      simplify.prepareModel();
+      simplify.run();
+
+      boolean implied[] = new boolean[2];
+      for (Place p : simplify.result.removedImpliedPlaces) {
+        if (p.getName().contains("P_14")) implied[0] = true;
+        if (p.getName().contains("P_4")) implied[1] = true;
+      }
+      
+      assertEquals(lastTest+": removed implied places", 2, simplify.result.removedImpliedPlaces.size());
+      for (int i=0; i<implied.length; i++) {
+        assertTrue(lastTest+": removed place "+i, implied[i]);
+      }
+      
+    } catch (InvalidModelException e) {
+      System.err.println("Invalid model: "+e);
+      assertTrue(lastTest, false);
+    } catch (IOException e) {
+      System.err.println("Couldn't read test file: "+e);
+      assertTrue(lastTest, false);
+    }
+  }
+  
+  @Test
+  public void testMineImplied_2c_visible() {
+    lastTest = "testMineImplied_2c_visible()";
+    System.out.println(lastTest);
+
+    try {
+      Configuration config = new Configuration();
+
+      config.unfold_refold = true;
+      config.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_VISIBLE;
+      config.abstract_chains = false;      
+      config.remove_flower_places = false;
       
       String model = "pn_ex_01_ilp.lola";
       String log = "pn_ex_01_ilp.log.txt";

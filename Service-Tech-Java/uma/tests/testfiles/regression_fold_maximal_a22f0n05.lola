@@ -1,0 +1,99 @@
+{
+  input file:
+  invocation:
+  net size:     |P|= 30  |P_in|= 0  |P_out|= 0  |T|= 22  |F|= 188
+}
+
+PLACE     P_29, P_4, P_16, P_21, P_23, P_24, P_3, P_15, P_6, P_14, P_28, P_12, P_2, P_30, P_8, P_5, P_10, P_9, P_27, P_25, P_26, P_13, P_1, P_17, P_19, P_11, P_20, P_22, P_18, P_7;
+
+MARKING
+  ;
+
+TRANSITION E+complete
+  CONSUME P_30:1, P_27:1, P_25:1, P_29:1, P_18:1, P_2:1, P_16:1, P_14:1, P_22:1, P_15:1, P_10:1, P_1:1;
+  PRODUCE P_9:1;
+
+TRANSITION e+complete
+  CONSUME P_17:1, P_2:1;
+  PRODUCE P_4:1, P_1:1, P_19:1, P_10:1, P_12:1, P_16:1, P_9:1, P_8:1;
+
+TRANSITION f+complete
+  CONSUME P_11:1, P_24:1, P_20:1, P_30:1, P_29:1, P_26:1;
+  PRODUCE P_3:1;
+
+TRANSITION o+complete
+  CONSUME;
+  PRODUCE P_25:1, P_2:1, P_14:1, P_18:1, P_22:1, P_15:1, P_16:1, P_27:1, P_10:1;
+
+TRANSITION S+complete
+  CONSUME;
+  PRODUCE P_30:1, P_23:1, P_13:1, P_9:1, P_21:1, P_22:1, P_20:1, P_19:1, P_24:1, P_1:1, P_8:1, P_29:1, P_11:1, P_3:1, P_26:1, P_5:1;
+
+TRANSITION v+complete
+  CONSUME;
+  PRODUCE P_15:1, P_30:1, P_2:1, P_10:1, P_27:1, P_26:1, P_25:1, P_29:1, P_24:1;
+
+TRANSITION p+complete
+  CONSUME;
+  PRODUCE P_23:1, P_7:1, P_16:1, P_12:1;
+
+TRANSITION t+complete
+  CONSUME P_8:1, P_9:1;
+  PRODUCE P_28:1, P_24:1, P_6:1;
+
+TRANSITION n+complete
+  CONSUME;
+  PRODUCE P_1:1, P_8:1, P_9:1;
+
+TRANSITION d+complete
+  CONSUME P_5:1, P_28:1, P_26:1;
+  PRODUCE P_16:1, P_26:1, P_4:1, P_12:1, P_28:1, P_20:1, P_24:1, P_11:1, P_1:1;
+
+TRANSITION b+complete
+  CONSUME P_30:1, P_24:1;
+  PRODUCE P_26:1, P_28:1, P_5:1, P_19:1;
+
+TRANSITION c+complete
+  CONSUME P_26:1, P_19:1, P_5:1, P_28:1;
+  PRODUCE P_17:1, P_2:1;
+
+TRANSITION h+complete
+  CONSUME P_3:1;
+  PRODUCE P_7:1, P_17:1, P_21:1;
+
+TRANSITION m+complete
+  CONSUME P_10:1, P_29:1, P_2:1, P_18:1, P_16:1, P_15:1, P_26:1, P_25:1, P_1:1, P_14:1, P_27:1, P_22:1;
+  PRODUCE P_26:1, P_29:1;
+
+TRANSITION i+complete
+  CONSUME P_26:1, P_23:1, P_13:1, P_11:1, P_21:1, P_29:1;
+  PRODUCE P_27:1;
+
+TRANSITION r+complete
+  CONSUME;
+  PRODUCE P_8:1, P_9:1, P_30:1;
+
+TRANSITION j+complete
+  CONSUME P_16:1, P_12:1, P_19:1, P_1:1, P_4:1;
+  PRODUCE P_1:1, P_27:1, P_18:1, P_15:1, P_16:1, P_14:1, P_10:1, P_2:1, P_25:1, P_22:1, P_30:1;
+
+TRANSITION u+complete
+  CONSUME P_6:1, P_28:1, P_24:1;
+  PRODUCE P_29:1, P_17:1, P_26:1, P_11:1, P_25:1;
+
+TRANSITION s+complete
+  CONSUME;
+  PRODUCE P_24:1, P_23:1, P_18:1, P_30:1, P_7:1, P_4:1;
+
+TRANSITION a+complete
+  CONSUME P_7:1, P_23:1;
+  PRODUCE P_28:1, P_20:1, P_14:1, P_4:1, P_24:1;
+
+TRANSITION g+complete
+  CONSUME;
+  PRODUCE P_21:1, P_29:1, P_13:1, P_26:1, P_11:1, P_23:1;
+
+TRANSITION k+complete
+  CONSUME P_13:1, P_23:1, P_21:1;
+  PRODUCE P_1:1, P_22:1, P_15:1, P_2:1, P_30:1, P_18:1, P_24:1, P_27:1, P_16:1, P_20:1, P_14:1, P_25:1, P_10:1, P_6:1;
+

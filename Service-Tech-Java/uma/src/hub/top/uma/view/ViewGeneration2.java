@@ -21,6 +21,8 @@ package hub.top.uma.view;
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.Place;
+import hub.top.petrinet.Transition;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeRefold;
@@ -41,15 +43,23 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Comparator;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.SortedSet;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
+
+import com.google.gwt.dev.util.collect.HashMap;
+import com.google.gwt.dev.util.collect.HashSet;
 
 public class ViewGeneration2 {
   
@@ -58,7 +68,28 @@ public class ViewGeneration2 {
   
   public Map<DNode, Integer> eventOccurrences;
   public Map<HashSet<DNode>, LinkedList<String[]>> equivalentTraces;
-  public Set<List<DNode>> visitedMarkings;
+  
+  public class State {
+    LinkedList<DNode> marking = new LinkedList<DNode>();
+    ArrayList<Short> action = new ArrayList<Short>();
+    ArrayList<State> succ = new ArrayList<State>();
+    int seen = 0;
+    
+    public List<List<DNode>> getAllVisitedMarkings() {
+      List<List<DNode>> result = new LinkedList<List<DNode>>();
+      LinkedList<State> stack = new LinkedList<State>();
+      stack.add(this);
+      while (!stack.isEmpty()) {
+        State s = stack.removeFirst();
+        result.add(s.marking);
+        for (State s2 : s.succ) {
+          stack.addFirst(s2);
+        }
+      }
+      return result;
+    }
+  }
+  public State initialState;
   
   /**
    * Standard constructor for view generation. The argument takes a branching
@@ -73,9 +104,23 @@ public class ViewGeneration2 {
     
     eventOccurrences = new HashMap<DNode, Integer>();
     equivalentTraces = new HashMap<HashSet<DNode>, LinkedList<String[]>>();
-    visitedMarkings = new HashSet<List<DNode>>();
+    initialState = new State();
+
+    for (DNode b : bp.initialCut) {
+      initialState.marking.add(b);
+    }
+    //Collections.sort(initialState.marking, dnode_id_comparator);
   }
   
+  private Comparator<DNode> dnode_id_comparator = new Comparator<DNode>() {
+
+    @Override
+    public int compare(DNode o1, DNode o2) {
+      if (o1.globalId < o2.globalId) return -1;
+      if (o1.globalId == o2.globalId) return 0;
+      return 1;
+    }
+  };
   
   /**
    * Extend the branching process by the partially ordered run of the given
@@ -91,14 +136,13 @@ public class ViewGeneration2 {
    */
   public boolean extendByTrace(String[] trace, Map<String, String> e2t) {
     Set<DNode> run = new HashSet<DNode>();
-    LinkedList<DNode> runCut = new LinkedList<DNode>();
     
     for (DNode b : bp.initialCut) {
       run.add(b);
-      runCut.add(b);
     }
-    
-    visitedMarkings.add(runCut);
+
+    State state = initialState;
+    state.seen++;
     
     for (int i = 0; i<trace.length; i++) {
       
@@ -106,8 +150,8 @@ public class ViewGeneration2 {
       if (e2t == null || !e2t.containsKey(trace[i])) eventName = trace[i];
       else eventName = e2t.get(trace[i]);
       
-      HashSet<DNode> enabledEvents = new HashSet<DNode>();
-      for (DNode b : runCut) {
+      SortedSet<DNode> existingEvents = new TreeSet<DNode>(dnode_id_comparator);
+      for (DNode b : state.marking) {
         if (b.post == null ) continue;
         for (DNode e : b.post) {
           
@@ -115,120 +159,125 @@ public class ViewGeneration2 {
           if (!build.getSystem().properNames[e.id].equals(eventName)) continue;
           //System.out.print(" yes ");
           
-          boolean isEnabled = true;
+          boolean alreadyExists = true;
           for (DNode ePre : e.pre) {
-            if (!runCut.contains(ePre)) { isEnabled = false; break; }
+            if (!state.marking.contains(ePre)) { alreadyExists = false; break; }
           }
-          if (isEnabled) enabledEvents.add(e);
+          if (alreadyExists) existingEvents.add(e);
         }
       }
-      
-      if (!enabledEvents.isEmpty()) {
+
+      State succState = null;
+      DNode fireEvent = null;
+      if (!existingEvents.isEmpty()) {
         
         // get one enabled event and fire it
-        DNode fireEvent = enabledEvents.iterator().next();
-        for (DNode b : fireEvent.pre) {
-          runCut.remove(b);
-        }
-        run.add(fireEvent);
-        if (fireEvent.post != null)
-          for (DNode b : fireEvent.post) {
-            run.add(b);
-            runCut.addLast(b);
-          }
-        
-        if (!eventOccurrences.containsKey(fireEvent))
-          eventOccurrences.put(fireEvent, 0);
-        eventOccurrences.put(fireEvent, eventOccurrences.get(fireEvent)+1);
-
-      } else {
-        
-        HashSet<DNode> fireableEvents = new HashSet<DNode>();
-        for (DNode e : build.getSystem().fireableEvents) {
-          if (build.getSystem().properNames[e.id].equals(eventName))
-            fireableEvents.add(e);
-        }
-        
-        DNodeBP.EnablingInfo enablingInfo = new DNodeBP.EnablingInfo();
-        
-        for (DNode e : fireableEvents) {
-          boolean isEnabled = true;
-          DNode loc[] = new DNode[e.pre.length];
-          for (int pre_index = 0; pre_index < e.pre.length; pre_index++) {
-            boolean endsWith_b = false;
-            for (DNode bCut : runCut) {
-              if (bCut.endsWith(e.pre[pre_index])) {
-                loc[pre_index] = bCut;
-                endsWith_b = true; 
-                break;
-              }
-            }
-            if (!endsWith_b) { isEnabled = false; break; }
-          }
-          if (isEnabled) {
-            enablingInfo.putEnabledEvent(e, loc);
+        fireEvent = existingEvents.iterator().next();
+        for (int s = 0; s < state.action.size(); s++) {
+          if (state.action.get(s) == fireEvent.id) {
+            succState = state.succ.get(s);
+            break;
           }
         }
-
-        if (enablingInfo.locations.size() > 0)
-        {
-          if (enablingInfo.locations.size() > 1) {
-            // we have several enabled events, issue a warning if there are
-            // two events that could occur at different locations
-            /*
-            DNode[] loc = enablingInfo.enablingLocation.get(0);
-            for (int j = 1; j<enablingInfo.enabledEvents.size(); j++) {
-              if (!Arrays.equals(loc, enablingInfo.enablingLocation.get(j))) {
-                System.out.println("Warning: could fire two different events "+
-                    enablingInfo.enabledEvents.get(0)+"@"+enablingInfo.enablingLocation.get(0)
-                    +" and "
-                    +enablingInfo.enabledEvents.get(j)+"@"+enablingInfo.enablingLocation.get(j));
-
-              }
-            } // end of warning
-            */
-          }
-          
-          Short eventId = enablingInfo.locations.keySet().iterator().next();
-          enablingInfo.locations.get(eventId)[0].reduce();
-          DNode[] events = enablingInfo.locations.get(eventId)[0].events;
-          DNode[] loc = enablingInfo.locations.get(eventId)[0].loc;
-          
-          DNode[] postConditions = bp.fire(events, loc);
-          if (postConditions != null && postConditions.length > 0) {
-            DNode newEvent = postConditions[0].pre[0];            
-
-            // update co-relation for all new post-conditions
-            //build.updateConcurrencyRelation(postConditions);
-            
-            // and set fields for the event
-            //build.setCurrentPrimeConfig(newEvent, true);
-            
-            for (DNode b : newEvent.pre) {
-              runCut.remove(b);
-            }
-            run.add(newEvent);
-            for (DNode b : postConditions) {
-              runCut.add(b);
-            }
-            
-            if (!eventOccurrences.containsKey(newEvent))
-              eventOccurrences.put(newEvent, 0);
-            eventOccurrences.put(newEvent, eventOccurrences.get(newEvent)+1);
-            
-            visitedMarkings.add(runCut);
-          } else {
-            System.out.println("fired event with empty post-set");
-          }
-        } else {
-          
-          System.out.println("could not fire "+eventName+" ("+trace[i]+")");
-          return false;
-        }
+        
       }
+        
+      if (succState == null) {
+        
+        if (fireEvent == null) {
+        
+          HashSet<DNode> matchingEvents = new HashSet<DNode>();
+          for (DNode e : build.getSystem().fireableEvents) {
+            if (build.getSystem().properNames[e.id].equals(eventName))
+              matchingEvents.add(e);
+          }
+          
+          EnablingInfo enablingInfo = getAllEnabledEvents(state.marking, matchingEvents);
+  
+          if (enablingInfo.locations.size() > 0)
+          {
+            if (enablingInfo.locations.size() > 1) {
+              // we have several enabled events, issue a warning if there are
+              // two events that could occur at different locations
+              /*
+              DNode[] loc = enablingInfo.enablingLocation.get(0);
+              for (int j = 1; j<enablingInfo.enabledEvents.size(); j++) {
+                if (!Arrays.equals(loc, enablingInfo.enablingLocation.get(j))) {
+                  System.out.println("Warning: could fire two different events "+
+                      enablingInfo.enabledEvents.get(0)+"@"+enablingInfo.enablingLocation.get(0)
+                      +" and "
+                      +enablingInfo.enabledEvents.get(j)+"@"+enablingInfo.enablingLocation.get(j));
+  
+                }
+              } // end of warning
+              */
+            }
+            
+            Short eventId = enablingInfo.locations.keySet().iterator().next();
+            enablingInfo.locations.get(eventId)[0].reduce();
+            DNode[] events = enablingInfo.locations.get(eventId)[0].events;
+            DNode[] loc = enablingInfo.locations.get(eventId)[0].loc;
+            
+            DNode[] postConditions = bp.fire(events, loc);
+            if (postConditions != null && postConditions.length > 0) {
+              fireEvent = postConditions[0].pre[0];            
+  
+              // update co-relation for all new post-conditions
+              //build.updateConcurrencyRelation(postConditions);
+              
+              // and set fields for the event
+              //build.setCurrentPrimeConfig(newEvent, true);
+  
+            } else {
+              System.out.println("fired event with empty post-set");
+            }
+          } else {
+            
+            System.out.println("could not fire "+eventName+" ("+trace[i]+")");
+            return false;
+          }
+        } // fireEvent == null
+        // we found the fireEvent that matches the current trace event
+        // now update the state information
+          
+        // compute successor marking
+        succState = new State();
+        succState.marking.addAll(state.marking);
+        
+        for (DNode b : fireEvent.pre) {
+          succState.marking.remove(b);
+        }
+        if (fireEvent.post != null) {
+          List<DNode> produced = new LinkedList<DNode>();
+          for (DNode b : fireEvent.post) {
+            produced.add(b);
+          }
+          //Collections.sort(produced, dnode_id_comparator);
+          for (DNode b : produced) {
+            succState.marking.addLast(b);
+          }
+        }
+        
+        // add state
+        state.action.add(fireEvent.id);
+        state.succ.add(succState);
+        
+        state = succState;
+      }
+      
+      run.add(fireEvent);
+      run.addAll(succState.marking);
+      
+      if (!eventOccurrences.containsKey(fireEvent))
+        eventOccurrences.put(fireEvent, 0);
+      eventOccurrences.put(fireEvent, eventOccurrences.get(fireEvent)+1);
+      
+      succState.seen++;
+      state = succState;
+
     } // for all events in the trace
     
-    HashSet<DNode> runCut_set = new HashSet<DNode>(runCut);
+    HashSet<DNode> runCut_set = new HashSet<DNode>(state.marking);
     
     boolean newCut = true;
     for (HashSet<DNode> cut : equivalentTraces.keySet()) {
@@ -245,6 +294,88 @@ public class ViewGeneration2 {
     
 
     return true;
+  }
+  
+  private EnablingInfo getAllEnabledEvents(List<DNode> marking, Collection<DNode> fireableEvents) {
+    DNodeBP.EnablingInfo enablingInfo = new DNodeBP.EnablingInfo();
+    
+    for (DNode e : fireableEvents) {
+      boolean isEnabled = true;
+      DNode loc[] = new DNode[e.pre.length];
+      for (int pre_index = 0; pre_index < e.pre.length; pre_index++) {
+        boolean endsWith_b = false;
+        for (DNode bCut : marking) {
+          if (bCut.endsWith(e.pre[pre_index])) {
+            loc[pre_index] = bCut;
+            endsWith_b = true; 
+            break;
+          }
+        }
+        if (!endsWith_b) { isEnabled = false; break; }
+      }
+      if (isEnabled) {
+        enablingInfo.putEnabledEvent(e, loc);
+      }
+    }
+    return enablingInfo;
+  }
+  
+  public double computePrecision_bp() {
+    
+    int escapedEdgesSum = 0;
+    int escapedEdgesSum_Weighted = 0;
+    
+    int enabledEventsSum = 0;
+    int enabledEventsSum_Weighted = 0;
+    
+    float unused_alt = 0;
+    
+    LinkedList<State> toVisit = new LinkedList<State>();
+    toVisit.add(initialState);
+    
+    int totalStates = 0;
+    while (!toVisit.isEmpty()) {
+      
+      State s = toVisit.removeFirst();
+      
+      Set<DNode> succEvents = new HashSet<DNode>();
+      
+      for (DNode b : s.marking) {
+        if (b.post == null) continue;
+        for (DNode e : b.post) {
+          boolean allInS = true;
+          for (DNode bPre : e.pre) {
+            if (!s.marking.contains(bPre)) {
+              allInS = false;
+              break;
+            }
+          }
+          if (allInS) {
+            succEvents.add(e);
+          }
+        }
+      }
+
+      int enabledEvents = succEvents.size();
+      int firedEvents = s.succ.size();
+      
+      enabledEventsSum += enabledEvents;
+      enabledEventsSum_Weighted += enabledEvents * s.seen;
+      
+      escapedEdgesSum += (enabledEvents - firedEvents);
+      escapedEdgesSum_Weighted += (enabledEvents - firedEvents) * s.seen;
+      
+      if (firedEvents == 0 && enabledEvents == 0) {
+      } else {
+        unused_alt += (float)firedEvents/(float)enabledEvents;
+      }
+      
+      toVisit.addAll(s.succ);
+      totalStates++;
+    }
+    
+    double etc_conformance_trace = 1.0f - ((double)escapedEdgesSum_Weighted / (double)enabledEventsSum_Weighted);
+    return etc_conformance_trace;
   }
   
   public LinkedList<String[]>[] accumulateEquivalentTraces(int maxClasses) {

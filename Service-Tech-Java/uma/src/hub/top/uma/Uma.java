@@ -198,7 +198,7 @@ public class Uma {
       out.close();
     }
     
-    System.out.println(build.getStatistics());
+    System.out.println(build.getStatistics(false));
   }
   
   public static void renderSystem(String fileName, int outputFormat) throws IOException {

@@ -94,6 +94,21 @@
 	   	  <test name="hub.top.uma.UmaFoldTest" todir="${test.basedir}" />
 	    </junit>
 		
+		<echo message="Running large JUnit tests in ${test.basedir}" />
+	    <junit fork="yes">
+	    	
+	      <!-- class path of the code to test and the Junit framework -->
+	      <classpath refid="classpath.test"/>
+
+		  <!-- JUnit: set output format -->
+	      <formatter type="xml" />
+    	  <formatter type="plain" />
+	    	
+	      <!-- JUnit: test cases to run -->
+    	  <sysproperty key="test.testFileRoot" path="${testfiles}"/>
+	   	  <test name="hub.top.uma.UmaFoldTest_Large" todir="${test.basedir}" />
+	    </junit>
+		
 		<!-- Cobertura: generate HTML coverage report -->
 		<echo message="Creating Cobertura report, using ${test.basedir}/cobertura.ser" />
 		<cobertura-report destdir="${dir.coveragereport.html}" format="html" srcdir="${src.coveragereport}"
@@ -111,7 +126,7 @@
 		
 		<antcall target="view-generation-binary" />
 		
-		<antcall target="clean" />
+		<!-- antcall target="clean" / -->
 	</target>
 	
 	<target name="view-generation-binary">

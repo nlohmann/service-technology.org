@@ -1,25 +1,17 @@
 package hub.top.uma;
 
-import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
 import hub.top.petrinet.Place;
-import hub.top.petrinet.Transition;
 import hub.top.petrinet.unfold.DNodeSys_OccurrenceNet;
 import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.synthesis.NetSynthesis;
-import hub.top.uma.synthesis.TransitiveDependencies;
 import hub.top.uma.view.MineSimplify;
-import hub.top.uma.view.ViewGeneration2;
 import hub.top.uma.view.MineSimplify.Configuration;
+import hub.top.uma.view.ViewGeneration2;
 
-import java.awt.List;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Set;
 
 import org.junit.Test;
 

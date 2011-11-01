@@ -76,8 +76,8 @@ public class FutureEquivalence implements Map<DNode, Set<DNode>> {
    */
   public void completeElementaryEquivalence(Iterable<DNode> allNodes) {
     
-    _debugPrintCutOffPairs();
-    System.out.println(elementary_ccPair.keySet());
+    //_debugPrintCutOffPairs();
+    //Uma.out.println(elementary_ccPair.keySet());
     
     // update the equivalence relation to point for each node to its canonic
     // equivalent node (i.e. the smallest node), and populate the equivalence classes
@@ -177,7 +177,7 @@ public class FutureEquivalence implements Map<DNode, Set<DNode>> {
    * @param to_be_equivalent
    */
   public void joinEquivalenceClasses(Collection<DNode> to_be_equivalent) {
-    System.out.println("join: "+to_be_equivalent);
+    //System.out.println("join: "+to_be_equivalent);
     
     // get for each node of 'to_be_equivalent' all its equivalent nodes
     // and put them in:

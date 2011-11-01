@@ -466,7 +466,7 @@ public class NetSynthesis {
       nodeMap.put(n.globalId, t);
     }
     
-    System.out.println(nodeMap);
+    //System.out.println("Node Map: "+nodeMap);
     
     for (DNode n : nodesToShow) {
       if (n.isEvent) {

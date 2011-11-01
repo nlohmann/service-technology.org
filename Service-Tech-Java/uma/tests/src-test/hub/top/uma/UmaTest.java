@@ -45,7 +45,8 @@ public class UmaTest extends hub.top.test.TestCase {
       //String targetPath_dot = testFileRoot+"/net_lexik.bp.dot";
       //writeFile(targetPath_dot, build.toDot());
       
-      assertTrue(lastTest+" "+build.getStatistics()+" == 10,14,3,24",
+      build.getStatistics(false);
+      assertTrue(lastTest+" "+build.getStatistics(false)+" == 10,14,3,24",
           build.statistic_eventNum == 10
           && build.statistic_condNum == 14
           && build.statistic_cutOffNum == 3
@@ -124,9 +125,9 @@ public class UmaTest extends hub.top.test.TestCase {
       while (build.step() > 0) {
       }
       
-      build.getStatistics();
+      build.getStatistics(false);
       
-      assertTrue(lastTest+" "+build.getStatistics()+" == 28,48,20,100",
+      assertTrue(lastTest+" "+build.getStatistics(false)+" == 28,48,20,100",
           build.statistic_eventNum == 28
           && build.statistic_condNum == 48
           && build.statistic_cutOffNum == 20
@@ -187,7 +188,7 @@ public class UmaTest extends hub.top.test.TestCase {
       while (build.step() > 0) {
       }
       
-      build.getStatistics();
+      build.getStatistics(false);
       
       assertTrue(lastTest, build.statistic_eventNum == 4
           && build.statistic_condNum == 10
@@ -219,7 +220,7 @@ public class UmaTest extends hub.top.test.TestCase {
       while (build.step() > 0) {
       }
       
-      build.getStatistics();
+      build.getStatistics(false);
       
       assertTrue(lastTest, build.statistic_eventNum == 2
           && build.statistic_condNum == 6
@@ -252,7 +253,7 @@ public class UmaTest extends hub.top.test.TestCase {
       while (build.step() > 0) {
       }
       
-      build.getStatistics();
+      build.getStatistics(false);
       
       assertTrue(lastTest, build.statistic_eventNum == 4
           && build.statistic_condNum == 10
@@ -307,7 +308,7 @@ public class UmaTest extends hub.top.test.TestCase {
       while (build.step() > 0) {
       }
       
-      build.getStatistics();
+      build.getStatistics(false);
       
       assertTrue(lastTest, build.statistic_eventNum == 4
           && build.statistic_condNum == 10
@@ -331,7 +332,7 @@ public class UmaTest extends hub.top.test.TestCase {
       while (build.step() > 0) {
       }
       
-      build.getStatistics();
+      build.getStatistics(false);
       
       assertTrue(lastTest, build.statistic_eventNum == 2
           && build.statistic_condNum == 6
@@ -362,7 +363,7 @@ public class UmaTest extends hub.top.test.TestCase {
       while (build.step() > 0) {
       }
       
-      build.getStatistics();
+      build.getStatistics(false);
       
       assertTrue(lastTest, build.statistic_eventNum == 21
           && build.statistic_condNum == 35
@@ -393,12 +394,12 @@ public class UmaTest extends hub.top.test.TestCase {
       while (build.step() > 0) {
       }
       
-      build.getStatistics();
+      build.getStatistics(false);
       
       //String targetPath_dot = testFileRoot+"/flood.bp.dot";
       //writeFile(targetPath_dot, build.toDot());
       
-      assertTrue(lastTest+" "+ build.getStatistics()+" == 13,19,2,39",
+      assertTrue(lastTest+" "+ build.getStatistics(false)+" == 13,19,2,39",
           build.statistic_eventNum == 13
           && build.statistic_condNum == 19
           && build.statistic_cutOffNum == 2

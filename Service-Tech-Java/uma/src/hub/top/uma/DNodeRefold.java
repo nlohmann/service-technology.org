@@ -409,10 +409,10 @@ public class DNodeRefold extends DNodeBP {
         print_count = 0;
       }
       
-      Uma.out.println("top: "+top);
+      //Uma.out.println("top: "+top);
       DNode d = top.iterator().next();
       top.remove(d);
-      Uma.out.println("removed "+d);
+      //Uma.out.println("removed "+d);
 
       to_join.clear();
       to_join.add(d);
@@ -431,7 +431,7 @@ public class DNodeRefold extends DNodeBP {
           dSucc.add(elementary_ccPair.get(e));
         }
       }
-      Uma.out.println("  has successors: "+dSucc);
+      //Uma.out.println("  has successors: "+dSucc);
       
       int joint_size = dCl.size();    //
       
@@ -443,7 +443,7 @@ public class DNodeRefold extends DNodeBP {
         if (d.isEvent != d2.isEvent) continue;
         if (futureEquivalence().areFoldingEquivalent(d, d2)) continue;
         
-        Uma.out.println("  comparing to "+d2);
+        //Uma.out.println("  comparing to "+d2);
         
         if (areConcurrent_struct(d, d2)) {
           //System.out.println("    are CONCURRENT, NOT joining");
@@ -465,7 +465,7 @@ public class DNodeRefold extends DNodeBP {
             d2Succ.add(elementary_ccPair.get(e2));
           }
         }
-        Uma.out.println("    has successors: "+d2Succ);
+        //Uma.out.println("    has successors: "+d2Succ);
         
         // Check if we can join the classes of 'd' and 'd2': this is possible
         // if each successor of the class of 'd' has an equivalent successor of
@@ -477,7 +477,7 @@ public class DNodeRefold extends DNodeBP {
           
           if (!d2Succ.contains(e)) {
             all_dSucc_HaveEquivalent = false;
-            Uma.out.println("    -> "+e+" not in post "+d2);
+            //Uma.out.println("    -> "+e+" not in post "+d2);
             break;
           }          
         }
@@ -487,7 +487,7 @@ public class DNodeRefold extends DNodeBP {
           
           if (!dSucc.contains(e2)) {
             all_dSucc_HaveEquivalent = false;
-            Uma.out.println("    -> "+e2+" not in post "+d);
+            //Uma.out.println("    -> "+e2+" not in post "+d);
             break;
           }          
         }
@@ -501,10 +501,10 @@ public class DNodeRefold extends DNodeBP {
         
         if (all_dSucc_HaveEquivalent && all_d2Succ_HaveEquivalent) {
           to_join.add(d2);
-          Uma.out.println("  JOINING "+d+" and "+d2);
+          //Uma.out.println("  JOINING "+d+" and "+d2);
           joint_size += d2Cl.size();    //
         } else {
-          Uma.out.println("  NOT joining "+d+" and "+d2);
+          //Uma.out.println("  NOT joining "+d+" and "+d2);
         }
         
         //if (!ignoreFoldThreshold && joint_size > foldThreshold * idFrequency[d.id]) break;      //
@@ -528,7 +528,7 @@ public class DNodeRefold extends DNodeBP {
         // join pre-conditions of previously joined events, and put the
         // pre-events of those conditions back into the queue 
         top.addAll(extendFutureEquivalence_backwards_conditions(joinedEvents));
-        System.out.println("----Joining events----");
+        //Uma.out.println("----Joining events----");
         joinedEvents.clear();
       }
     }
@@ -755,17 +755,23 @@ public class DNodeRefold extends DNodeBP {
       //float foldThreshold = .1f;                          //
       
       LinkedHashSet<DNode> top = new LinkedHashSet<DNode>();
-      for (DNode d : bp.getAllNodes()) {
-        if (d.isAnti) continue;
-        if ((d.post == null || d.post.length == 0) && d.pre != null) {
-          for (DNode e : d.pre)
+      for (DNode b : bp.getAllNodes()) {
+        if (b.isAnti) continue;
+        if (b.isEvent) continue;
+        if ((b.post == null || b.post.length == 0) && b.pre != null) {
+          for (DNode e : b.pre)
             top.add(e);
         }
       }
 
       LinkedList<DNode> to_join = new LinkedList<DNode>();
-      HashSet<DNode> dSucc = new HashSet<DNode>();
-      HashSet<DNode> d2Succ = new HashSet<DNode>();
+      HashSet<DNode> eSucc = new HashSet<DNode>();
+      HashSet<DNode> e2Succ = new HashSet<DNode>();
+      
+      // map to associate a post-condition of an event other post-conditions of
+      // merge events in case one of the post-conditions has an empty post-set and
+      // has not been considered as equivalent to other post-conditions yet
+      HashMap<DNode, HashSet<DNode> > postMerge = new HashMap<DNode, HashSet<DNode>>();
       
       //Uma.out.println("top: "+top);
       // reference locally
@@ -781,91 +787,128 @@ public class DNodeRefold extends DNodeBP {
         }
         
         //Uma.out.println("top: "+top);
-        DNode d = top.iterator().next();
-        top.remove(d);
-        //Uma.out.println("removed "+d);
+        DNode e = top.iterator().next();
+        top.remove(e);
+        //Uma.out.println("removed "+e);
 
         to_join.clear();
-        to_join.add(d);
+        to_join.add(e);
+        postMerge.clear();
 
-        Set<DNode> dCl = futureEquivalence().get(elementary_ccPair.get(d));
+        Set<DNode> eCl = futureEquivalence().get(elementary_ccPair.get(e));
 
         //if (!ignoreFoldThreshold && dCl.size() > idFrequency[d.id] * foldThreshold) continue;     //
         
         // collect the for each successor 'e' of each node in the class of 'd',
         // the canonical representative of 'e'
-        dSucc.clear();
-        for (DNode dPrime : dCl) {
-          if (dPrime.post == null) continue;
-          for (DNode e : dPrime.post) {
-            if (e.isAnti) continue;
-            dSucc.add(elementary_ccPair.get(e));
+        eSucc.clear();
+        for (DNode ePrime : eCl) {
+          if (ePrime.post == null) continue;
+          for (DNode b : ePrime.post) {
+            if (b.isAnti) continue;
+            eSucc.add(elementary_ccPair.get(b));
           }
         }
-        //Uma.out.println("  has successors: "+dSucc);
+        //Uma.out.println("  has successors: "+eSucc);
         
-        int joint_size = dCl.size();    //
+        int joint_size = eCl.size();    //
         
-        for (DNode d2 : futureEquivalence().keySet()) {
+        for (DNode e2 : futureEquivalence().keySet()) {
 
-          if (d == d2) continue;
-          if (d2.isAnti) continue;
-          if (d.id != d2.id) continue;
-          if (futureEquivalence().areFoldingEquivalent(d, d2)) continue;
+          if (e == e2) continue;
+          if (e2.isAnti) continue;
+          if (e.id != e2.id) continue;
+          if (futureEquivalence().areFoldingEquivalent(e, e2)) continue;
           
-          //Uma.out.println("  comparing to "+d2);
+          //Uma.out.println("  comparing to "+e2);
           
-          Set<DNode> d2Cl = futureEquivalence().get(elementary_ccPair.get(d2));
+          Set<DNode> e2Cl = futureEquivalence().get(elementary_ccPair.get(e2));
           
-          // collect the for each successor 'e2' of each node in the class of 'd2',
+          // collect for each successor 'e2' of each node in the class of 'd2',
           // the canonical representative of 'e2'
-          d2Succ.clear();
-          for (DNode d2Prime : d2Cl) {
-            if (d2Prime.post == null) continue;
-            for (DNode e2 : d2Prime.post) {
-              if (e2.isAnti) continue;
-              d2Succ.add(elementary_ccPair.get(e2));
+          e2Succ.clear();
+          for (DNode e2Prime : e2Cl) {
+            if (e2Prime.post == null) continue;
+            for (DNode b2 : e2Prime.post) {
+              if (b2.isAnti) continue;
+              e2Succ.add(elementary_ccPair.get(b2));
             }
           }
-          //Uma.out.println("    has successors: "+d2Succ);
+          //Uma.out.println("    has successors: "+e2Succ);
           
           // Check if we can join the classes of 'd' and 'd2': this is possible
           // if each successor of the class of 'd' has an equivalent successor of
           // the class of 'd2'. This is the case if each canonical representative
           // of a successor of 'd' is also a canonical representative of a 
           // successor of 'd2'.
-          boolean all_dSucc_HaveEquivalent = true;
-          for (DNode e : dSucc) {
-            if (!d2Succ.contains(e)) {
-              all_dSucc_HaveEquivalent = false;
-              //Uma.out.println("    -1-> "+e+" not in post "+d2);
-              //Uma.out.println("    -1-> "+DNode.toString(e.post));
-              break;
+          boolean all_eSucc_HaveEquivalent = true;
+          for (DNode b : eSucc) {
+            // allow to merge conditions if one of them has an empty post-set
+            if (!e2Succ.contains(b)) {
+              
+              if (b.post == null) {
+                // merging of 'e' and 'e2' could fail because 'b' has an empty post-set
+                // and hence is not equivalent to the post-conditions of 'e2', extend
+                // equivalence to post-conditions: find matching post-condition for 'b'
+                if (!postMerge.containsKey(b)) {
+                  postMerge.put(b, new HashSet<DNode>());
+                  postMerge.get(b).add(b);
+                }
+                for (DNode b2 : e2Succ) {
+                  if (b.id == b2.id) {
+                    postMerge.get(b).add(b2);
+                  }
+                }
+              } else {
+                // not equivalent: cannot merge 'e' and 'e2'
+                all_eSucc_HaveEquivalent = false;
+                //Uma.out.println("    -1-> "+b+" not in post "+e2);
+                //Uma.out.println("    -1-> "+DNode.toString(b.post));
+                break;
+              }
             }
           }
           
-          boolean all_d2Succ_HaveEquivalent = true;
-          for (DNode e2 : d2Succ) {
-            if (!dSucc.contains(e2)) {
-              all_dSucc_HaveEquivalent = false;
-              //Uma.out.println("    -2-> "+e2+" not in post "+d);
-              //Uma.out.println("    -2-> "+DNode.toString(e2.post));
-              break;
+          boolean all_e2Succ_HaveEquivalent = true;
+          for (DNode b2 : e2Succ) {
+            // allow to merge conditions if one of them has an empty post-set
+            if (!eSucc.contains(b2)) {
+              
+              if (b2.post == null) {
+                // merging of 'e' and 'e2' could fail because 'b2' has an empty post-set
+                // and hence is not equivalent to the post-conditions of 'e', extend
+                // equivalence to post-conditions: find matching post-condition of 'e' for 'b2'
+                for (DNode b : eSucc) {
+                  if (b.id == b2.id) {
+                    if (!postMerge.containsKey(b)) {
+                      postMerge.put(b, new HashSet<DNode>());
+                      postMerge.get(b).add(b);
+                    }
+                    postMerge.get(b).add(b2);
+                  }
+                }
+              } else {
+                // not equivalent: cannot merge 'e' and 'e2'
+                all_eSucc_HaveEquivalent = false;
+                //Uma.out.println("    -2-> "+b2+" not in post "+e);
+                //Uma.out.println("    -2-> "+DNode.toString(b2.post));
+                break;
+              }
             }
           }
           
           
-          if (dSucc.isEmpty() && !d2Succ.isEmpty() || !dSucc.isEmpty() && d2Succ.isEmpty()) {
-            all_dSucc_HaveEquivalent = false;
-            all_d2Succ_HaveEquivalent = false;
+          if (eSucc.isEmpty() && !e2Succ.isEmpty() || !eSucc.isEmpty() && e2Succ.isEmpty()) {
+            all_eSucc_HaveEquivalent = false;
+            all_e2Succ_HaveEquivalent = false;
           }
           
-          if (all_dSucc_HaveEquivalent && all_d2Succ_HaveEquivalent) {
-            to_join.add(d2);
-            //Uma.out.println("  JOINING "+d+" and "+d2);
-            joint_size += d2Cl.size();    //
+          if (all_eSucc_HaveEquivalent && all_e2Succ_HaveEquivalent) {
+            to_join.add(e2);
+            //Uma.out.println("  JOINING "+e+" and "+e2);
+            joint_size += e2Cl.size();    //
           } else {
-            //Uma.out.println("  NOT joining "+d+" and "+d2);
+            //Uma.out.println("  NOT joining "+e+" and "+e2);
           }
           
           //if (!ignoreFoldThreshold && joint_size > foldThreshold * idFrequency[d.id]) break;      //
@@ -877,21 +920,27 @@ public class DNodeRefold extends DNodeBP {
           
           // join the pre-set of all joined transitions
           LinkedList<DNode> preJoin = new LinkedList<DNode>();
-          for (int i=0; i<d.pre.length; i++) {
+          for (int i=0; i<e.pre.length; i++) {
             preJoin.clear();
-            for (DNode d2 : to_join) {
-              preJoin.add(elementary_ccPair.get(d2.pre[i]));
+            for (DNode e2 : to_join) {
+              preJoin.add(elementary_ccPair.get(e2.pre[i]));
               // and add the predecessors of the joined pre-sets to the queue 
-              if (d2.pre[i].pre != null) {
-                for (DNode e : d2.pre[i].pre) {
-                  top.add(e);
+              if (e2.pre[i].pre != null) {
+                for (DNode e3 : e2.pre[i].pre) {
+                  top.add(e3);
                 }
               }
             }
             futureEquivalence().joinEquivalenceClasses(preJoin);
           }
           
-          top.removeAll(futureEquivalence().get(elementary_ccPair.get(d)));
+          // join the post-set of the joined transitions that were not joined yet,
+          // e.g. because of conditions with empty post-sets
+          for (HashSet<DNode> postJoin : postMerge.values()) {
+            futureEquivalence().joinEquivalenceClasses(postJoin);
+          }
+          
+          top.removeAll(futureEquivalence().get(elementary_ccPair.get(e)));
         } 
       }
       return changed;
@@ -1199,7 +1248,7 @@ public class DNodeRefold extends DNodeBP {
     
     // update the equivalence classes as computed earlier
     for (Set<DNode> cl_new : equiv_to_set) {
-      Uma.out.println("splitting by successors: "+cl_new);
+      //Uma.out.println("splitting by successors: "+cl_new);
       futureEquivalence().splitFoldingEquivalence(cl_new);
     }
     
@@ -1255,7 +1304,7 @@ public class DNodeRefold extends DNodeBP {
     
     // update the equivalence classes as computed earlier
     for (Set<DNode> cl_new : equiv_to_set) {
-      Uma.out.println("splitting "+cl_new);
+      //Uma.out.println("splitting "+cl_new);
       futureEquivalence().splitFoldingEquivalence(cl_new);
     }
   }

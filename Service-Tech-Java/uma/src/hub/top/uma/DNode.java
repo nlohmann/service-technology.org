@@ -341,6 +341,7 @@ public class DNode {
    * @return a string representation of the given {@link DNode} array
    */
   public static String toString(DNode[] arr) {
+    if (arr == null) return "null";
     String result = "[";
     for (DNode d : arr) {
       result += d+", ";

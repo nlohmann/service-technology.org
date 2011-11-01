@@ -288,13 +288,13 @@ public class MineSimplify {
     // print statistics result
     Uma.out.println("finished in "+result.getRuntime(Result.FINAL)+"ms, complexity went from "+result._complexity[Result.ORIGINAL]+" to  "+result._complexity[Result.FINAL]);
     
-    ViewGeneration3 v = new ViewGeneration3(simplifiedNet);
-    int failed = 0;
-    for (String[] trace : allTraces) {
-      if (!v.validateTrace(trace)) failed++;
-    }
-    if (failed > 0) System.err.println(fileName_system_sysPath+" cannot replay "+failed+" traces");
-    
+//    ViewGeneration3 v = new ViewGeneration3(simplifiedNet);
+//    int failed = 0;
+//    for (String[] trace : allTraces) {
+//      if (!v.validateTrace(trace)) failed++;
+//    }
+//    if (failed > 0) System.err.println(fileName_system_sysPath+" cannot replay "+failed+" traces");
+//    
     
     return true;
   }

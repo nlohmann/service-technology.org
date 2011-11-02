@@ -241,7 +241,7 @@ public class ViewGeneration {
           DNode[] events = enablingInfo.locations.get(eventId)[0].events;
           DNode[] loc = enablingInfo.locations.get(eventId)[0].loc;
           
-          DNode[] postConditions = bp.fire(events, loc);
+          DNode[] postConditions = bp.fire(events, loc, false);
           if (postConditions != null && postConditions.length > 0) {
             DNode newEvent = postConditions[0].pre[0];            
 
@@ -304,7 +304,7 @@ public class ViewGeneration {
             tauEvent.addPostNode(bNew);
           }
           
-          DNode postConditions[] = bp.fire(tauEvent, cut);
+          DNode postConditions[] = bp.fire(tauEvent, cut, false);
           
           for (DNode b : cut) {
             runCut.remove(b);
@@ -366,7 +366,7 @@ public class ViewGeneration {
       DNode[] finalLoc = new DNode[runCut.size()];
       runCut.toArray(finalLoc);
       DNode.sortIDs(finalLoc);
-      DNode[] postConditions = bp.fire(uma_end_event, finalLoc);
+      DNode[] postConditions = bp.fire(uma_end_event, finalLoc, false);
       
       if (postConditions != null && postConditions.length > 0) {
         DNode newEvent = postConditions[0].pre[0];

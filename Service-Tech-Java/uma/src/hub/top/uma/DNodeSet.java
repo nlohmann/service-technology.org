@@ -18,8 +18,11 @@
 
 package hub.top.uma;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
+
 import com.google.gwt.dev.util.collect.HashSet;
 import java.util.LinkedList;
 
@@ -198,37 +201,57 @@ public class DNodeSet {
   public void removeAll(Collection<DNode> nodes) {
     HashSet<DNode> touched = new HashSet<DNode>();
     
-    for (DNode n : nodes) {
+    System.out.println("filling "+nodes.size()+"nodes into a hashtable");
+    HashSet<DNode> toRemove = new HashSet<DNode>(nodes);
+    
+    System.out.println("nulling");
+    for (DNode n : toRemove) {
       if (n.pre != null) {
         for (DNode pre : n.pre) {
           if (pre == null) continue;
+          if (toRemove.contains(pre)) continue;
+          
           for (int i=0; i<pre.post.length; i++) {
             if (pre.post[i] == n) {
               pre.post[i] = null;
+              break;
             }
-            touched.add(pre);
           }
+          touched.add(pre);
         }
       }
       
       if (n.post != null) {
         for (DNode post : n.post) {
           if (post == null) continue;
+          if (toRemove.contains(post)) continue;
+          
           for (int i=0; i<post.pre.length; i++) {
             if (post.pre[i] == n) {
               post.pre[i] = null;
+              break;
             }
-            touched.add(post);
           }
+          
+          touched.add(post);
         }
       }
-      
-      if (n.isEvent) allEvents.remove(n);
-      else allConditions.remove(n);
     }
     
-    touched.removeAll(nodes);
+    System.out.println("removing "+toRemove.size());
+    DNodeSetElement newConditions = new DNodeSetElement();
+    for (DNode b : allConditions) {
+      if (!toRemove.contains(b)) newConditions.add(b);
+    }
+    allConditions = newConditions;
     
+    DNodeSetElement newEvents = new DNodeSetElement();
+    for (DNode b : allEvents) {
+      if (!toRemove.contains(b)) newEvents.add(b);
+    }
+    allEvents = newEvents;
+    
+    System.out.println("clearing "+touched.size());
     for (DNode n : touched) {
       
       if (n.pre != null) {
@@ -532,31 +555,12 @@ public class DNodeSet {
 	 * 
 	 * @return an array with the new post-conditions
 	 */
-	public DNode[] fire(DNode ocletEvent, DNode[] fireLocation) {
+	public DNode[] fire(DNode ocletEvent, DNode[] fireLocation, boolean safe) {
 	  
 	  // FIXME: DNodeBP causes multiple occurrences of the same event
-	  HashSet<DNode> postFire = new HashSet<DNode>();
-	  for (DNode b : fireLocation) {
-	    if (b.post != null) {
-	      for (DNode e : b.post) {
-	        if (e.id == ocletEvent.id) postFire.add(e);
-	      }
-	    }
-	  }
-	  for (DNode e : postFire) {
-	    boolean containsAllPre = true;
-	    for (DNode b : fireLocation) {
-	      boolean found = false;
-	      for (DNode b2 : e.pre) {
-	        if (b2 == b) { found = true; break; }
-	      }
-	      if (!found) { containsAllPre = false; break; }
-	    }
-	    if (containsAllPre) {
-	      System.err.println("trying to fire existing event "+ocletEvent+" at "+DNode.toString(fireLocation));
-	      //return null;
-	    }
-	  }
+	  if (!safe && eventExistsAtLocation(ocletEvent.id, fireLocation)) {
+      System.err.println("trying to fire existing event "+ocletEvent+" at "+DNode.toString(fireLocation));
+    }
 
 		// instantiate the oclet event
 		DNode newEvent = new DNode(ocletEvent.id, fireLocation);
@@ -603,31 +607,12 @@ public class DNodeSet {
 	 * 
 	 * @return an array with the new post-conditions
 	 */
-	public DNode[] fire(DNode[] ocletEvents, DNode[] fireLocation) {
+	public DNode[] fire(DNode[] ocletEvents, DNode[] fireLocation, boolean safe) {
 	   
     // FIXME: DNodeBP causes multiple occurrences of the same event
-    HashSet<DNode> postFire = new HashSet<DNode>();
-    for (DNode b : fireLocation) {
-      if (b.post != null) {
-        for (DNode e : b.post) {
-          if (e.id == ocletEvents[0].id) postFire.add(e);
-        }
-      }
-    }
-    for (DNode e : postFire) {
-      boolean containsAllPre = true;
-      for (DNode b : fireLocation) {
-        boolean found = false;
-        for (DNode b2 : e.pre) {
-          if (b2 == b) { found = true; break; }
-        }
-        if (!found) { containsAllPre = false; break; }
-      }
-      if (containsAllPre) {
-        System.err.println("trying to fire existing events "+DNode.toString(ocletEvents)+" at "+DNode.toString(fireLocation));
-        //return null;
-      }
-    }
+	  if (!safe && eventExistsAtLocation(ocletEvents[0].id, fireLocation)) {
+	    System.err.println("trying to fire existing events "+DNode.toString(ocletEvents)+" at "+DNode.toString(fireLocation));
+	  }
 	  
 		// instantiate the oclet event
 		DNode newEvent = new DNode(ocletEvents[0].id, fireLocation);
@@ -689,6 +674,54 @@ public class DNodeSet {
 		newEvent.post = postConditions;
 		
 		return postConditions;
+	}
+	
+	public static boolean eventExistsAtLocation(short id, DNode[] fireLocation) {
+	  
+    for (int g=0; g<fireLocation.length; g++) {
+      if (fireLocation[g].post != null) {
+        
+        // check for each event in b's post-set that has the given id
+        // whether it consumes from the entire fireLocation. if yes, return false
+        for (DNode e : fireLocation[g].post) {
+          if (e.id == id) {
+
+            // found event e with same id, we could collect events in a set to
+            // prevent repeated execution of the subsequent loop, but creating
+            // and managing the set takes more time and resources than executing
+            // the loop several times
+            
+            boolean containsAllPre = true;
+
+            if (e.pre.length == fireLocation.length) {
+              // same number of conditions, arrays are ordered, so they must match exactly
+              for (int i=0; i<e.pre.length;i++) {
+                if (e.pre[i] != fireLocation[i]) { containsAllPre = false; break; }
+              }
+            } else {
+              // different number of conditions, arrays are ordered,
+              // allow to skip some conditions in fireLocation
+              int f=0;
+              for (int i=0; i<e.pre.length;i++) {
+                // move f to the condition in fireLocation with the same id as
+                // precondition pre[i]
+                while (e.pre[i].id < fireLocation[f].id && f < fireLocation.length) f++;
+                // moved out of array: not found
+                if (f == fireLocation.length) { containsAllPre = false; break; }
+  
+                // now e.pre[i].id >= fireLocation[f].id
+                // if e.pre[i].id == fireLocation[f].id, then this is the spot where it holds,
+                // if not then there is no other condition in fireLocation that equals e.pre[i]
+                if (e.pre[i] != fireLocation[f]) { containsAllPre = false; break; }
+              }
+            }
+            // event e has all pre-conditions in fireLocation
+            if (containsAllPre) return true;
+          }
+        }
+      }
+    }
+    return false;
 	}
 	
 	/**

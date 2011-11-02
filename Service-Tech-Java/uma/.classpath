@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="tests/src-test"/>
 	<classpathentry kind="lib" path="tests/libs-external/junit-4.8.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/hub.top.pnapi"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

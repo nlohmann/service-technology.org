@@ -103,12 +103,15 @@ public class DNode {
 	
 	@Override
 	public boolean equals(Object obj) {
+	  /*
 		if (!(obj instanceof DNode))
 			return false;
 		
 		DNode other = (DNode)obj;
 		return (this.id == other.id
 				&& pre.equals(other.pre));
+		*/
+	  return this == obj;
 	}
 	
 	/**
@@ -137,15 +140,40 @@ public class DNode {
 	 * @param d
 	 */
 	public void addPostNode(DNode d) {
-		if (post == null) {
+		if (post == null || post.length == 0) {
 			post = new DNode[1];
 			post[0] = d;
 		}
 		else {
+		  /*
 			DNode[] newPost = new DNode[post.length+1];
 			for (int i=0; i<post.length; i++) newPost[i] = post[i];
 			newPost[newPost.length-1] = d;
 			post = DNode.sortIDs(newPost);
+			*/
+		  int pos_min = 0;
+		  int pos_max = post.length;
+		  int mid = post.length;
+		  do {
+		    mid = (pos_min + pos_max) / 2;
+		    if (post[mid].id > d.id) {
+		      // mid is larger than d, d must be left of mid, search between min and mid
+		      pos_max = mid-1;
+		    } else {
+		      pos_min = mid+1;
+		    }
+		  } while (post[mid].id != d.id && pos_min < pos_max);
+		  if (post[mid].id < d.id) mid++;
+		  
+		  DNode[] newPost = new DNode[post.length+1];
+		  for (int i=0; i<mid; i++) {
+		    newPost[i] = post[i];
+		  }
+		  newPost[mid] = d;
+		  for (int i=mid+1,j=mid; j<post.length; i++,j++) {
+		    newPost[i] = post[j];
+		  }
+		  post = newPost;
 		}
 	}
 	

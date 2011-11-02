@@ -150,7 +150,7 @@ public class Precision {
         
         if (loc != null)
         {
-          DNode[] postConditions = bp.fire(events, loc);
+          DNode[] postConditions = bp.fire(events, loc, false);
           if (postConditions != null && postConditions.length > 0) {
             DNode newEvent = postConditions[0].pre[0];            
 

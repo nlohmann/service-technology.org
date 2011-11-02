@@ -1060,7 +1060,7 @@ public class DNodeBP {
 				if (e.isHot) {
 				  setHot = true;
 				}
-				postConditions = bp.fire(e, fireEvents.loc);
+				postConditions = bp.fire(e, fireEvents.loc, false);
 
 			} else {
 				DNode events[] = fireEvents.events;
@@ -1078,7 +1078,7 @@ public class DNodeBP {
 					  setHot = true;
 					}
 				}
-				postConditions = bp.fire(events, fireEvents.loc);
+				postConditions = bp.fire(events, fireEvents.loc, false);
 				
 				_debug_t2a_multi = true;
 			}

@@ -53,37 +53,13 @@ public class Precision_ETC {
     }
   }
   
-  private static class ProgressBar {
-    private int total;
-    private int current = 0;
-    private int step_width = 0;
-    public ProgressBar(int total, int step_width) {
-      this.total = total;
-      this.step_width = (step_width <= 0 ) ? 1 : step_width;
-    }
-    public String step() {
-      String ret = "";
-      current++;
-      if (current == total) return "100\n";
-      if (current % step_width == 0) {
-        ret += ".";
-        if ( (current / step_width) % 75 ==  0) {
-          ret += (current * 100 / total) + "\n";
-        }
-      }
-      return ret;
-    }
-  }
-  
+
   public Precision_ETC(PetriNet net, Collection<String[]> traces) {
     this(net);
-    
-    ProgressBar b = new ProgressBar(traces.size(), 1);
     
     int nonReplayedCases = 0;
     for (String[] trace : traces) {
       if (!extendByTrace(trace)) nonReplayedCases++;
-      //System.out.print(b.step());
     }
     if (nonReplayedCases > 0) System.out.println("[Uma/Precision_ETC] Warning: could not replay "+nonReplayedCases+" cases.");
   }

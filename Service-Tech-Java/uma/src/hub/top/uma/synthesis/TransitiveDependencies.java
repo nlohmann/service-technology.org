@@ -26,14 +26,12 @@ import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.FutureEquivalence;
 import hub.top.uma.Uma;
-import hub.top.uma.view.ViewGeneration2;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
@@ -150,21 +148,32 @@ public class TransitiveDependencies {
    */
   private boolean dependsOn_compute(DNode x, DNode y) {
     
+    if (depends_on_cache.containsKey(x) && depends_on_cache.get(x).contains(y)) {
+      return true;
+    }
+
+    if (!depends_on_cache.containsKey(x)) depends_on_cache.put(x, new HashSet<DNode>());
+
     if (x == y) return true;
     if (x.pre == null) return false;
     
     HashSet<DNode> queueContents = new HashSet<DNode>();
     LinkedList<DNode> queue = new LinkedList<DNode>();
     for (DNode d : x.pre) {
+      // d was added to the BP before y: d cannot depend on y
+      if (d.globalId < y.globalId) continue;
       queue.addLast(d);
       queueContents.add(d);
     }
     while (!queue.isEmpty()) {
       DNode d = queue.removeFirst();
+      depends_on_cache.get(x).add(d);
       queueContents.remove(d);
       if (d == y) return true;
       if (d.pre == null) continue;
       for (DNode d2 : d.pre) {
+        // d2 was added to the BP before y: d2 cannot depend on y
+        if (d2.globalId < y.globalId) continue;
         if (!queueContents.contains(d2)) {
           queue.addLast(d2);
           queueContents.add(d2);
@@ -173,6 +182,9 @@ public class TransitiveDependencies {
     }
     return false;
   }
+  
+  private HashMap<DNode, HashSet<DNode>> depends_on_cache = new HashMap<DNode, HashSet<DNode>>();
+  
   
   /**
    * Cached version of transitive dependencies. Looks up whether x depends on y
@@ -186,6 +198,7 @@ public class TransitiveDependencies {
     return transSucc[nodeIndex.get(y)][nodeIndex.get(x)];
   }
   
+
   /**
    * @param b
    * @return {@code true} iff the condition b is implied, i.e. for each condition b
@@ -275,6 +288,27 @@ public class TransitiveDependencies {
     return enablingInfo;
   }
   
+  private static class ProgressBar {
+    private int total;
+    private int current = 0;
+    private int step_width = 0;
+    public ProgressBar(int total, int step_width) {
+      this.total = total;
+      this.step_width = (step_width <= 0 ) ? 1 : step_width;
+    }
+    public String step() {
+      String ret = "";
+      current++;
+      if (current == total) return "100\n";
+      if (current % step_width == 0) {
+        ret += ".";
+        if ( (current / step_width) % 75 ==  0) {
+          ret += (current * 100 / total) + "\n";
+        }
+      }
+      return ret;
+    }
+  }
   
   private List<DNode> extendedNodes;
   
@@ -290,47 +324,36 @@ public class TransitiveDependencies {
     
     extendedNodes = new LinkedList<DNode>();
     
+    ProgressBar bar = new ProgressBar(visitedMarkings.size(), visitedMarkings.size()/1000);
+    
     for (Collection<DNode> runCut : visitedMarkings) {
       // for each marking visited for construcint the branching process
       DNodeSys sys = build.getSystem();
       
+      System.out.print(bar.step());
+      
       // find all transitions enabled in this marking
       DNodeBP.EnablingInfo enabled = getAllEnabledTransitions(sys.fireableEvents, runCut);
-      DNodeBP.EnablingQueue queue = build.new EnablingQueue();
-      queue.insertAll(enabled);
-
+      List<SyncInfo> queue = new LinkedList<DNodeBP.SyncInfo>();
+      for (SyncInfo[] sInfos : enabled.locations.values()) {
+        for (SyncInfo s : sInfos) {
+          if (s != null) {
+            s.reduce();
+            queue.add(s);
+          }
+        }
+      }
+      
       // and check for each enabled event...
-      while (queue.size() > 0) {
-        SyncInfo info = queue.removeFirst();
-        short id = info.events[0].id;
+      for (SyncInfo info : queue) {
         
         // whether there already exists an event  that represents this transition
         // get all all successor events with the same name as the transition
-        Set<DNode> firedEvents = new HashSet<DNode>();
-        for (DNode b : info.loc) {
-          if (b.post == null) break;
-          for (DNode e : b.post) {
-            if (e.id == id) firedEvents.add(e);
-          }
-        }
+        boolean alreadyFired = DNodeSet.eventExistsAtLocation(info.events[0].id, info.loc);
         
-        // and see if one of the events consumes from the enabling location
-        // of the event only
-        boolean alreadyFired = false;
-        for (DNode e : firedEvents) {
-          boolean all_pre_in_loc = true;
-          for (DNode b : e.pre) {
-            boolean b_in_loc = false;
-            for (int i=0; i<info.loc.length; i++) {
-              if (info.loc[i] == b) { b_in_loc = true; break; }
-            }
-            if (!b_in_loc) { all_pre_in_loc = false; break; }
-          }
-          if (all_pre_in_loc) { alreadyFired = true; break; }
-        }
         // no: add event to the branching process
         if (!alreadyFired) {
-          DNode post[] = bp.fire(info.events, info.loc);
+          DNode post[] = bp.fire(info.events, info.loc, true);
           
           // and remember the new nodes, so they can be removed later
           for (DNode b : post) extendedNodes.add(b);
@@ -380,8 +403,8 @@ public class TransitiveDependencies {
         if (b.isEvent || b.pre == null || b.pre.length == 0
             || b.post == null || b.post.length == 0) continue;
         
-        if (i % 100 == 0) Uma.out.print(i+" ");
-        if (i % 1000 == 0) Uma.out.print("\n");
+        if (i % 400 == 0) Uma.out.print(i+" ");
+        if (i % 4000 == 0) Uma.out.print("\n");
         
         // compute for all pre-events e and all post-events f of 'b'
         boolean each_f_dependsOn_e_without_b = true;

@@ -218,7 +218,7 @@ public class ViewGeneration2 {
             DNode[] events = enablingInfo.locations.get(eventId)[0].events;
             DNode[] loc = enablingInfo.locations.get(eventId)[0].loc;
             
-            DNode[] postConditions = bp.fire(events, loc);
+            DNode[] postConditions = bp.fire(events, loc, false);
             if (postConditions != null && postConditions.length > 0) {
               fireEvent = postConditions[0].pre[0];            
   

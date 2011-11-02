@@ -590,6 +590,7 @@ public class MineSimplify {
       // extend the branching process with events that are enabled, but
       // did not fire
       Uma.out.println("temporarily extend branching process..");
+      for (DNode d : build.getBranchingProcess().getAllNodes()) d._isNew = false;
       List<DNode> extendedNodes = dep.extendBranchingProcessWithNextEvents(viewGen.initialState.getAllVisitedMarkings());
       debug._extendedNodes = extendedNodes;
       // identify implied conditions in this branching process
@@ -597,7 +598,7 @@ public class MineSimplify {
       impliedConditions = dep.getImpliedConditions_solutionGlobal();
       // and remove the added events again
       Uma.out.println("undo extension..");
-      impliedConditions.removeAll(extendedNodes);
+      for (DNode e : extendedNodes) impliedConditions.remove(e);
       dep.removeExtendedNodes();
     } else {
       impliedConditions = new HashSet<DNode>();
@@ -991,7 +992,7 @@ public class MineSimplify {
     }
 
     private void _color_weak_impliedPlaces(HashSet<DNode> implied_local) {
-      List<Place> _removed_weak_impliedPlaces = new LinkedList<Place>();
+      Set<Place> _removed_weak_impliedPlaces = new HashSet<Place>();
       for (Place p : result.weak_impliedPlaces) {
         boolean isSinglePost = false;
         boolean isSinglePre = false;
@@ -999,17 +1000,25 @@ public class MineSimplify {
         // partition the net (by removing the last pre-place
         // or post-place of a transition)
         for (Transition t : p.getPreSet()) {
-          List<Place> t_post = t.getPostSet();
-          t_post.removeAll(_removed_weak_impliedPlaces);
-          if (t_post.size() == 1) {
+          int nonRemovedPost = 0;
+          // count how many post-places transition 't' still has
+          // which are not yet considered as implied places
+          for (Place t_post : t.getPostSet()) {
+            if (!_removed_weak_impliedPlaces.contains(t_post)) nonRemovedPost++;
+          }
+          if (nonRemovedPost <= 1) {
             isSinglePost = true;
             break;
           }
         }
         for (Transition t : p.getPostSet()) {
-          List<Place> t_pre = t.getPreSet();
-          t_pre.removeAll(_removed_weak_impliedPlaces);
-          if (t_pre.size() == 1) {
+          int nonRemovedPre = 0;
+          // count how many pre-places transition 't' still has
+          // which are not yet considered as implied places
+          for (Place t_pre : t.getPreSet()) {
+            if (!_removed_weak_impliedPlaces.contains(t_pre)) nonRemovedPre++;
+          }
+          if (nonRemovedPre <= 1) {
             isSinglePre = true;
             break;
           }
@@ -1086,9 +1095,9 @@ public class MineSimplify {
   public static void main(final String args[]) throws Exception {
     
       Configuration config = new Configuration();
-      config.unfold_refold = true;
+      config.unfold_refold = false;
       config.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
-      config.abstract_chains = true;
+      config.abstract_chains = false;
       config.remove_flower_places = false;
 
       simplify(args[0], args[1], config);

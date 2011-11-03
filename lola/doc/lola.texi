@@ -538,7 +538,7 @@ may be treated unfair. It removes a token from @samp{p1} and does not put tokens
 @cindex @code{ARRAY} sort
 @cindex @code{RECORD} sort
 
-Sorts represents domains for tokens on places. A sort name can be buit according to the general rules for building identifiers. The set of sorts is specified by the keyword @samp{SORTS}, followed by a list of sort definitions. Each definition consists of a sort name, a @samp{:}, and a sort description which ends with a @samp{;}. The following descriptions are available:
+Sorts represents domains for tokens on places. A sort name can be built according to the general rules for building identifiers. The set of sorts is specified by the keyword @samp{SORTS}, followed by a list of sort definitions. Each definition consists of a sort name, a @samp{=}, and a sort description which ends with a @samp{;}. The following descriptions are available:
 
 @itemize
 @item the description @samp{BOOLEAN} with values @samp{TRUE} and @samp{FALSE}; 

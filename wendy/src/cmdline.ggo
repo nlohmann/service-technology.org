@@ -40,6 +40,13 @@ option "og" -
   argoptional
   optional
 
+option "tg" -
+  "Test guidelines output."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
 option "sa" -
   "Service automaton output."
   string

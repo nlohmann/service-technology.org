@@ -24,7 +24,10 @@
 #include "PossibleSendEvents.h"
 #include "InterfaceMarking.h"
 #include "Label.h"
+#include "cmdline.h"
 #include "verbose.h"
+
+extern gengetopt_args_info args_info;
 
 
 /******************
@@ -70,8 +73,13 @@ PossibleSendEvents::PossibleSendEvents(const bool& allValues, const Label_ID& l)
     assert(bytes > 0);
     assert((allValues and l <= 1) or(not allValues and SENDING(l)));
 
-    // if allValues is set, initially all sending events are reachable
-    memset(storage, (allValues ? 255 : 0), bytes);
+    if(not args_info.tg_given){
+    	// if allValues is set, initially all sending events are reachable
+    	memset(storage, (allValues ? 255 : 0), bytes);
+    }
+    else {
+    	memset(storage, 0, bytes);
+    }
 
     // set one particular label to 1
     if (not allValues) {

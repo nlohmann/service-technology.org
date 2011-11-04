@@ -182,23 +182,35 @@ void Knowledge::initialize() {
         sequentializeReceivingEvents();
     }
 
-    if (args_info.ignoreUnreceivedMessages_flag) {
+    if (args_info.ignoreUnreceivedMessages_flag and not args_info.tg_given) {
         return;
     }
 
+
     // reduction rule: smart sending event
-    // create array of those sending events that are possible in _all_ markings of the current bubble
-    // initially, every sending event is possible
+    // OG: create array of those sending events that are possible in _all_ markings of the current bubble
+    // OG: initially, every sending event is possible
+    // TG: create array of those sending events that are possible in at least one marking of the current bubble
+    // TG: initially, none sending event is possible
     posSendEvents = new PossibleSendEvents(true, 1);
 
-    // traverse each marking of the current bubble
-    FOREACH(pos, bubble) {
-        // use boolean AND to detect which sending event is possible in each and every marking of the current bubble
-        *posSendEvents &= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
+    if(not args_info.tg_given){
+    	// traverse each marking of the current bubble
+    	FOREACH(pos, bubble) {
+    		// use boolean AND to detect which sending event is possible in each and every marking of the current bubble
+    		*posSendEvents &= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
+    	}
+    }
+    else{
+        // traverse each marking of the current bubble
+        FOREACH(pos, bubble) {
+            *posSendEvents |= *(InnerMarking::inner_markings[pos->first]->possibleSendEvents);
+        }
     }
 
     // create array to be used when traversing all events
     posSendEventsDecoded = posSendEvents->decode();
+
 }
 
 
@@ -216,7 +228,7 @@ void Knowledge::closure() {
         InnerMarking* m = InnerMarking::inner_markings[todo.popInner()];
 
         // check, if each sent message contained on the interface of this marking will ever be consumed
-        if (not args_info.ignoreUnreceivedMessages_flag and not m->sentMessagesConsumed(*current_interface)) {
+        if (not args_info.ignoreUnreceivedMessages_flag and not m->sentMessagesConsumed(*current_interface) and not args_info.tg_given) {
             is_sane = 0;
             if (not args_info.diagnose_given) {
                 return;

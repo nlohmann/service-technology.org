@@ -636,7 +636,7 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
         }
 
         // the deadlock is neither resolved nor a final marking
-        if (not resolved and not(InnerMarking::inner_markings[inner[i]]->is_final and interface[i]->unmarked())) {
+        if (not resolved and not(InnerMarking::inner_markings[inner[i]]->is_final and interface[i]->unmarked()) and not args_info.tg_given) {
             return false;
         }
     }

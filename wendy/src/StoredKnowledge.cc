@@ -80,6 +80,7 @@ StoredKnowledge::_stats::_stats()
 void StoredKnowledge::processSuccessor(const Knowledge* K,
                                        StoredKnowledge* const SK,
                                        const Label_ID& l) {
+
     // create a new knowledge for the given label
     Knowledge* K_new = new Knowledge(K, l);
 
@@ -109,6 +110,7 @@ void StoredKnowledge::processSuccessor(const Knowledge* K,
                 // the node was new and sane, so check its successors
                 processNode(K_new, SK_store);
             }
+
         } else {
             // we did not find new knowledge
             delete SK_new;
@@ -116,6 +118,7 @@ void StoredKnowledge::processSuccessor(const Knowledge* K,
 
         // the successors of the new knowledge have been calculated, so adjust lowlink value of SK
         SK->adjustLowlinkValue(SK_store, SK_store == SK_new);
+
     } else {
         // the node was not sane -- count it
         ++stats.builtInsaneNodes;
@@ -132,8 +135,9 @@ void StoredKnowledge::processSuccessor(const Knowledge* K,
  \note possible optimization: don't create a copy for the last label but use
        the object itself
  */
-void StoredKnowledge::processNode(const Knowledge* K, StoredKnowledge* const SK) {
+void StoredKnowledge::processNode(Knowledge* const K, StoredKnowledge* const SK) {
     // traverse the labels of the interface and process K's successors
+
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
 
         // reduction rule: send leads to insane node
@@ -176,6 +180,66 @@ void StoredKnowledge::processNode(const Knowledge* K, StoredKnowledge* const SK)
     }
 
     SK->evaluateKnowledge();
+
+    //for test guidelines: delete edges labeled with a sending message not weak receivable by the service
+    if(args_info.tg_given and SK != empty){// and SK->is_sane ){
+    	assert(SK->s_minMessages == NULL);
+
+    	K->setMinMessages();
+    	SK->s_minReceiveMessages = K->minReceiveMessages;
+    	SK->s_minSendMessages = K->minSendMessages;
+    	SK->s_minMessages = new uint8_t[Label::last_send - Label::first_send + 1];
+
+    	//init minMessages
+    	Label_ID current_pos;
+    	for(Label_ID l = Label::first_send; l < Label::last_send + 1; ++l){
+    		current_pos = l - Label::first_send;
+    		SK->s_minMessages[current_pos] = 0;
+    	}
+
+    	//calculate the maximum over minMessages of the successors
+    	bool hasSuccessors = false;
+
+    	for (Label_ID l = Label::first_receive; l < Label::last_send + 1; ++l) {
+    		if (SK->successors[l - 1] != NULL and SK->successors[l - 1] != empty and SK->successors[l - 1]->is_sane){
+    			assert(SK->successors[l - 1]->s_minMessages);
+
+    			hasSuccessors = true;
+    			for (Label_ID label = Label::first_send; label <  Label::last_send + 1; ++label) {
+    				current_pos = label - Label::first_send;
+    				if (SK->s_minMessages[current_pos] < SK->successors[l - 1]->s_minMessages[current_pos]){
+    					SK->s_minMessages[current_pos] = SK->successors[l - 1]->s_minMessages[current_pos];
+    				}
+    			}
+    		}
+    	}
+
+    	if (hasSuccessors){
+    		//calculate the minimum of the result of the previous loop and s_minSendMessages
+    		for(Label_ID l = Label::first_send; l < Label::last_send + 1; ++l){
+    			current_pos = l - Label::first_send;
+    			if(SK->s_minMessages[current_pos] > SK->s_minSendMessages[current_pos]){
+    				SK->s_minMessages[current_pos] = SK->s_minSendMessages[current_pos];
+    			}
+    		}
+    	}
+    	else {
+    		// in case of no successors s_minMessages = s_minSendMessages
+    		for(Label_ID l = Label::first_send; l < Label::last_send + 1; ++l){
+    			current_pos = l - Label::first_send;
+    			SK->s_minMessages[current_pos] = SK->s_minSendMessages[current_pos];
+    		}
+    	}
+
+    	//delete the edges labeled with a sending message not weak receivable at this point
+    	for (Label_ID l = Label::first_send; l < Label::last_send + 1; ++l) {
+    		current_pos = l - Label::first_send;
+    		if (SK->successors[l - 1] != NULL and SK->successors[l - 1]->is_sane and SK->successors[l-1]->s_minMessages[current_pos] > 0){
+    			//the message is not weak receivable
+    			SK->successors[l-1] = NULL;
+    		}
+    	}
+    }
 }
 
 
@@ -319,7 +383,11 @@ StoredKnowledge::StoredKnowledge(const Knowledge* K)
       inner(new InnerMarking_ID[sizeAllMarkings]),
       interface(new InterfaceMarking*[sizeAllMarkings]),
       // reserve and zero the necessary memory for the successors (fixed)
-      successors((StoredKnowledge**)calloc(Label::events, SIZEOF_VOIDP)) {
+      successors((StoredKnowledge**)calloc(Label::events, SIZEOF_VOIDP)),
+      s_minReceiveMessages(K->minReceiveMessages),
+      s_minSendMessages(K->minSendMessages),
+      s_minMessages(NULL),
+      s_id(K->my_id){
     assert(sizeAllMarkings > 0);
 
     // copy data structure to C-style arrays
@@ -1013,6 +1081,37 @@ void StoredKnowledge::output_dot(std::ostream& file) {
                         file << *(it->second[i]->interface[j]) << " (t)\\n";
                     }
                 }
+
+                if (args_info.tg_given){
+                	Label_ID current_pos;
+                	file << "R: [";
+                	for(Label_ID l1 = Label::first_receive; l1 < Label::last_receive + 1; ++l1){
+                		current_pos = l1 - Label::first_receive;
+                		assert(it->second[i]->s_minReceiveMessages != NULL);
+                		file << (int) it->second[i]->s_minReceiveMessages[current_pos] << ",";
+
+                	}
+                	file << " ]\\n";
+                	file << "S: [";
+                	for(Label_ID l1 = Label::first_send; l1 < Label::last_send + 1; ++l1){
+                		current_pos = l1 - Label::first_send;
+                		assert(it->second[i]->s_minSendMessages != NULL);
+                		file << (int) it->second[i]->s_minSendMessages[current_pos] << ",";
+
+                	}
+                	file << " ]\\n";
+                	file << "M: [";
+                	for(Label_ID l1 = Label::first_send; l1 < Label::last_send + 1; ++l1){
+                		current_pos = l1 - Label::first_send;
+                		assert(it->second[i]->s_minMessages != NULL);
+                		file << (int) it->second[i]->s_minMessages[current_pos] << ",";
+
+                	}
+                	file << " ]\\n";
+                	file << it->second[i]->s_id << "\\n";
+                }
+
+
 
                 file << "\"]\n";
 

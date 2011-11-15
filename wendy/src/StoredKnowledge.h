@@ -46,7 +46,7 @@ class StoredKnowledge {
         static void finalize();
 
         /// recursively calculate knowledge bubbles
-        static void processNode(const Knowledge*, StoredKnowledge* const);
+        static void processNode(Knowledge* const, StoredKnowledge* const);
 
         /// print a dot representation
         static void output_dot(std::ostream&);
@@ -197,4 +197,17 @@ class StoredKnowledge {
 
         /// the successors of this knowledge (length is fixed by the labels)
         StoredKnowledge** successors;
+
+        /// contains for each label how many send messages are pending at least in the channels
+        uint8_t* s_minSendMessages;
+
+        /// contains for each label how many receive messages are pending at least in the channels
+        uint8_t* s_minReceiveMessages;
+
+        /// contains for each label how minimal messages pending in the channels considering this node and all successors
+        uint8_t* s_minMessages;
+
+        uint8_t* s_sendSuccessors;
+
+        unsigned int s_id;
 };

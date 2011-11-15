@@ -26,6 +26,7 @@
 
 extern gengetopt_args_info args_info;
 
+unsigned int Knowledge:: maxid = 0;
 
 /***************
  * CONSTRUCTOR *
@@ -34,12 +35,14 @@ extern gengetopt_args_info args_info;
 Knowledge::Knowledge(InnerMarking_ID m)
     : is_sane(1), posSendEventsDecoded(NULL), size(1), bubble(), todo(),
       posSendEvents(NULL),
-      consideredReceivingEvents(Label::receive_events, false) {
+      consideredReceivingEvents(Label::receive_events, false),
+      minReceiveMessages(NULL), minSendMessages(NULL), my_id(maxid){
     // add this marking to the bubble and the todo queue
     InterfaceMarking* empty = new InterfaceMarking();
     bubble[m].push_back(empty);
     todo.push(m, empty);
 
+    ++maxid;
     // check if initial marking is already bad
     if (InnerMarking::inner_markings[m]->is_bad) {
         is_sane = 0;
@@ -58,10 +61,12 @@ Knowledge::Knowledge(InnerMarking_ID m)
 */
 Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
     : is_sane(1), posSendEventsDecoded(NULL), size(0), posSendEvents(NULL),
-      consideredReceivingEvents(Label::receive_events, false) {
+      consideredReceivingEvents(Label::receive_events, false),
+      minReceiveMessages(NULL), minSendMessages(NULL), my_id(maxid){
     // tau does not make sense here
     assert(not SILENT(label));
 
+    ++maxid;
     // CASE 1: we receive -- decrement interface markings
     if (RECEIVING(label)) {
         FOREACH(pos, parent->bubble) {
@@ -171,6 +176,64 @@ Knowledge::~Knowledge() {
 /********************
  * MEMBER FUNCTIONS *
  ********************/
+
+void Knowledge::setMinMessages(){
+	assert(Label::last_send - Label::first_send > 0);
+	assert(Label::last_receive - Label::first_receive > 0);
+	assert(minSendMessages == NULL);
+	assert(minReceiveMessages == NULL);
+
+	minSendMessages = new uint8_t[Label::last_send - Label::first_send + 1];
+	minReceiveMessages = new uint8_t[Label::last_receive - Label::first_receive + 1];
+
+	Label_ID current_pos;
+
+	//init minReceiveMessages
+	for(Label_ID l = Label::first_receive; l < Label::last_receive + 1; ++l){
+		current_pos = l - Label::first_receive;
+		minReceiveMessages[current_pos] = args_info.messagebound_arg + 1;
+	}
+
+	//calculate the minimal number for each receive message in the bubble
+	FOREACH(pos, bubble){
+		for (size_t i = 0; i < pos->second.size(); ++i) {
+			for(Label_ID l = Label::first_receive; l < Label::last_receive+1; ++l){
+				current_pos = l - Label::first_receive;
+				minReceiveMessages[current_pos] = pos->second[i]->getMin(minReceiveMessages[current_pos],l);
+			}
+		}
+	}
+
+	//init minSendMessages
+	for(Label_ID l = Label::first_send; l < Label::last_send + 1; ++l){
+		current_pos = l - Label::first_send;
+		minSendMessages[current_pos] = args_info.messagebound_arg + 1;
+	}
+
+	//calculate the minimal number for each send messages in the bubble
+	//(only the markings having the minimal receive messages are considered)
+	bool consider;
+	FOREACH(pos, bubble){
+		for (size_t i = 0; i < pos->second.size(); ++i) {
+			consider = true;
+			//do we need consider the current interface marking?
+			for(Label_ID l = Label::first_receive; l < Label::last_receive + 1; ++l){
+				current_pos = l - Label::first_receive;
+				if (not pos->second[i]->isEqual(minReceiveMessages[current_pos],l)){
+					consider = false;
+//					break;
+				}
+			}
+
+			if(consider){
+				for(Label_ID l = Label::first_send; l < Label::last_send + 1; ++l){
+					current_pos = l - Label::first_send;
+					minSendMessages[current_pos] = pos->second[i]->getMin(minSendMessages[current_pos],l);
+				}
+			}
+		}
+	}
+}
 
 /*!
  initialize current knowledge's member attributes appropriately

@@ -125,6 +125,12 @@ class InterfaceMarking {
         /// returns the hash value of this marking
         hash_t hash() const;
 
+        /// returns the minimum of value and the marking value for the given label
+        uint8_t getMin(const uint8_t value, const Label_ID&) const;
+
+        /// returns true if  value and value for the given label are equal
+        bool isEqual(const uint8_t& value, const Label_ID& label) const;
+
     private: /* member functions */
         /// returns the marking value for the given label
         uint8_t get(const Label_ID&) const;

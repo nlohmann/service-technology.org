@@ -45,6 +45,9 @@ class Knowledge {
         /// destructor
         ~Knowledge();
 
+        /// calculates the minimal number of messages pending in the channels
+        void setMinMessages();
+
     private: /* member functions */
         /// construct knowledge from a given knowledge and a label
         Knowledge(const Knowledge*, const Label_ID&);
@@ -77,6 +80,7 @@ class Knowledge {
         /// whether this knowledge is sane
         unsigned is_sane : 1;
 
+
     private: /* attributes */
         /// reduction rule: smart send events; array of sending events that are either possible or not
         char* posSendEventsDecoded;
@@ -87,6 +91,9 @@ class Knowledge {
         /// primary data structure
         Bubble bubble;
 
+        static unsigned int maxid;
+        unsigned int my_id;
+
         /// a queue of markings to be processed by closure()
         Queue todo;
 
@@ -96,4 +103,10 @@ class Knowledge {
         /// reduction rule: sequentialize receiving events; remember only those receiving events
         ///                 which are essential to resolve each and every waitstate
         std::vector<bool> consideredReceivingEvents;
+
+        /// contains for each label how many send messages are pending at least in the channels
+        uint8_t* minSendMessages;
+
+        /// contains for each label how many receive messages are pending at least in the channels
+        uint8_t* minReceiveMessages;
 };

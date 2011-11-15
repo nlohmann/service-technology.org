@@ -209,5 +209,5 @@ class StoredKnowledge {
 
         uint8_t* s_sendSuccessors;
 
-        unsigned int s_id;
+        //unsigned int s_id; //for test guidelines
 };

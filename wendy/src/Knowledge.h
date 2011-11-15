@@ -91,8 +91,8 @@ class Knowledge {
         /// primary data structure
         Bubble bubble;
 
-        static unsigned int maxid;
-        unsigned int my_id;
+        //static unsigned int maxid; //for test guidelines
+        //unsigned int my_id; //for test guidelines
 
         /// a queue of markings to be processed by closure()
         Queue todo;

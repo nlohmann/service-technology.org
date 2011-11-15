@@ -26,7 +26,7 @@
 
 extern gengetopt_args_info args_info;
 
-unsigned int Knowledge:: maxid = 0;
+//unsigned int Knowledge:: maxid = 0;
 
 /***************
  * CONSTRUCTOR *
@@ -36,13 +36,15 @@ Knowledge::Knowledge(InnerMarking_ID m)
     : is_sane(1), posSendEventsDecoded(NULL), size(1), bubble(), todo(),
       posSendEvents(NULL),
       consideredReceivingEvents(Label::receive_events, false),
-      minReceiveMessages(NULL), minSendMessages(NULL), my_id(maxid){
+      //my_id(maxid),
+      minReceiveMessages(NULL),
+      minSendMessages(NULL){
     // add this marking to the bubble and the todo queue
     InterfaceMarking* empty = new InterfaceMarking();
     bubble[m].push_back(empty);
     todo.push(m, empty);
 
-    ++maxid;
+    //++maxid;
     // check if initial marking is already bad
     if (InnerMarking::inner_markings[m]->is_bad) {
         is_sane = 0;
@@ -62,11 +64,13 @@ Knowledge::Knowledge(InnerMarking_ID m)
 Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
     : is_sane(1), posSendEventsDecoded(NULL), size(0), posSendEvents(NULL),
       consideredReceivingEvents(Label::receive_events, false),
-      minReceiveMessages(NULL), minSendMessages(NULL), my_id(maxid){
+      //my_id(maxid),
+      minReceiveMessages(NULL),
+      minSendMessages(NULL){
     // tau does not make sense here
     assert(not SILENT(label));
 
-    ++maxid;
+    //++maxid;
     // CASE 1: we receive -- decrement interface markings
     if (RECEIVING(label)) {
         FOREACH(pos, parent->bubble) {

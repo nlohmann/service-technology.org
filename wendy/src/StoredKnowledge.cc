@@ -384,10 +384,10 @@ StoredKnowledge::StoredKnowledge(const Knowledge* K)
       interface(new InterfaceMarking*[sizeAllMarkings]),
       // reserve and zero the necessary memory for the successors (fixed)
       successors((StoredKnowledge**)calloc(Label::events, SIZEOF_VOIDP)),
+      //s_id(K->my_id),
       s_minReceiveMessages(K->minReceiveMessages),
       s_minSendMessages(K->minSendMessages),
-      s_minMessages(NULL),
-      s_id(K->my_id){
+      s_minMessages(NULL){
     assert(sizeAllMarkings > 0);
 
     // copy data structure to C-style arrays
@@ -1108,7 +1108,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
 
                 	}
                 	file << " ]\\n";
-                	file << it->second[i]->s_id << "\\n";
+                	//file << it->second[i]->s_id << "\\n";
                 }
 
 

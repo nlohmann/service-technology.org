@@ -452,6 +452,14 @@ int main(int argc, char** argv) {
     }
 
     if (StoredKnowledge::root->is_sane or args_info.diagnose_given) {
+
+    	// test guidelines output
+    	if (args_info.tg_given) {
+    		std::string tg_filename = args_info.tg_arg ? args_info.tg_arg : filename + ".tg";
+    		Output output(tg_filename, "test guidelines");
+    		StoredKnowledge::output_og(output);
+    	}
+
         // operating guidelines output
         if (args_info.og_given) {
             std::string og_filename = args_info.og_arg ? args_info.og_arg : filename + ".og";

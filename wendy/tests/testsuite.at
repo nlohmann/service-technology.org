@@ -1317,6 +1317,22 @@ AT_CHECK([GREP -q "(w)" myCoffee.diag.dot])
 AT_KEYWORDS(diagnosis)
 AT_CLEANUP
 
+############################################################################
+AT_BANNER([Test Guidelines])
+############################################################################
+
+AT_SETUP([ICSOC 2011 (acyclic)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/tg_ICSOC2011_acyclic.* .])
+AT_CHECK([WENDY tg_ICSOC2011_acyclic.owfn --tg --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 20 knowledges reachable" stderr])
+AT_CHECK([WENDY2FIONA -i tg_ICSOC2011_acyclic.tg -o tg_ICSOC2011_acyclic.f.tg])
+AT_CHECK([WENDY2FIONA -i tg_ICSOC2011_acyclic.ref.tg -o tg_ICSOC2011_acyclic.ref.f.tg])
+AT_CHECK([FIONA -tequivalence tg_ICSOC2011_acyclic.f.tg tg_ICSOC2011_acyclic.ref.f.tg],0,ignore,ignore)
+AT_KEYWORDS(tg)
+AT_CLEANUP
+
+
 
 ############################################################################
 AT_BANNER([Integration into Mia])

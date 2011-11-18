@@ -55,8 +55,8 @@ TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
             moreThanOneFinalLiteral.owfn innerCyclicMPPacyclic.owfn \
             bug16258-1.owfn bug16258-2.owfn deliver_goods.owfn \
             bug17896.owfn \
-            LF_trueAnnotations.owfn
-
+            LF_trueAnnotations.owfn \
+            tg_ICSOC2011_acyclic.owfn tg_ICSOC2011_acyclic.ref.tg
 
 #-----------------------------------------#
 # Part 2: Exclusions for the Cover Script #

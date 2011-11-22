@@ -5,6 +5,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="tests/src-test"/>
 	<classpathentry kind="lib" path="tests/libs-external/junit-4.8.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/hub.top.pnapi"/>
+	<classpathentry kind="lib" path="libs-external/pnapi-java.jar"/>
+	<classpathentry kind="lib" path="libs-external/lpsolve55j.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

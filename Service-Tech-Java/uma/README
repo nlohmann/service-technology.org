@@ -16,6 +16,8 @@ PURPOSE
      * a compact representation of a system's state-space based on McMillan's
        technique of finite complete prefixes of Petri net unfoldings;
      * applicable to scenario-based models with history-based enabling conditions; 
+     * techniques to transform and change model structures based on their
+       unfoldings.
 
     UMA is platform independent and runs on all platforms with a Java runtime
     environment.

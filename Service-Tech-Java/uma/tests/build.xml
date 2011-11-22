@@ -55,23 +55,24 @@
          	debug="on" />
 	</target>
 	
-	<target name="prepare-cobertura">
+	<target name="prepare-cobertura" >
 	    <property name="myclasspath" refid="classpath.cobertura"/>
 	    <echo message="classpath= ${myclasspath}"/>
 		
 		<cobertura-instrument todir="${dir.test-instrument}" 
 				classpathref="classpath.cobertura" 
-				datafile="${cobertura.datafile}">
+				datafile="${cobertura.datafile}" >
 			<ignore regex="org.apache.log4j.*" />
 			<ignore regex="gnu.trove.*" />
 
+			<!-- TODO: this target fails when calling 'checkjar' because compiled.classes then refers to a jar file, not a directory -->
 		    <fileset dir="${compiled.classes}">
 		        <include name="hub/**/*.class"/>
 		    </fileset>
 		</cobertura-instrument>
 	</target>
 	
-	<target name="check" depends="build-test,prepare-cobertura">
+	<target name="check" depends="svn-clean,build-test,prepare-cobertura">
 		<echo message="Running JUnit tests in ${test.basedir}" />
 	    <junit fork="yes">
 	      <!-- class path for code coverage by cobertura -->

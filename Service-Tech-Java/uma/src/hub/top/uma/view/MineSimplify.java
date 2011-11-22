@@ -20,6 +20,7 @@ package hub.top.uma.view;
 
 import hub.top.petrinet.Arc;
 import hub.top.petrinet.ISystemModel;
+import hub.top.petrinet.Node;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
 import hub.top.petrinet.Place;
@@ -30,6 +31,7 @@ import hub.top.uma.DNodeRefold;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
+import hub.top.uma.synthesis.ImplicitPlaces;
 import hub.top.uma.synthesis.NetSynthesis;
 import hub.top.uma.synthesis.TransitiveDependencies;
 
@@ -72,20 +74,23 @@ public class MineSimplify {
   public static class Configuration {
     
     public static final int REMOVE_IMPLIED_OFF = 0;
-    public static final int REMOVE_IMPLIED_PRESERVE_ALL = 1;
-    public static final int REMOVE_IMPLIED_PRESERVE_VISIBLE = 2;
-    public static final int REMOVE_IMPLIED_PRESERVE_CONNECTED = 3;
+    public static final int REMOVE_ILP = 1;
+    public static final int REMOVE_IMPLIED_PRESERVE_ALL = 2;
+    public static final int REMOVE_IMPLIED_PRESERVE_VISIBLE = 3;
+    public static final int REMOVE_IMPLIED_PRESERVE_CONNECTED = 4;
+    public static final int REMOVE_IMPLIED_PRESERVE_CONNECTED2 = 5;
     
     public boolean unfold_refold = true; 
-    public int remove_implied = REMOVE_IMPLIED_PRESERVE_CONNECTED;
-    public boolean abstract_chains = true;
-    public boolean remove_flower_places = true;
+    public double filter_threshold = 0.05;
+    public int remove_implied = REMOVE_IMPLIED_PRESERVE_ALL;
+    public boolean abstract_chains = false;
+    public boolean remove_flower_places = false;
     
     public Map<String, String> eventToTransition = new HashMap<String, String>();
     
     @Override
     public String toString() {
-      return unfold_refold+" "+remove_implied+" "+abstract_chains+" "+remove_flower_places;
+      return unfold_refold+" "+filter_threshold+" "+remove_implied+" "+abstract_chains+" "+remove_flower_places;
     }
   }
   
@@ -118,6 +123,11 @@ public class MineSimplify {
      */
     public LinkedList<Place> removedImpliedPlaces;
     
+    /**
+     * mapping from nodes of the unfolding to nodes of the net
+     */
+    public HashMap<DNode, Node> d2n;
+    
     protected long _time_start[] = new long[FINAL+1];
     protected long _time_finish[] = new long[FINAL+1];
     
@@ -128,12 +138,13 @@ public class MineSimplify {
 
     public static final int ORIGINAL = 0;
     public static final int STEP_UNFOLD = 1;
-    public static final int STEP_EQUIV = 2;
-    public static final int STEP_IMPLIED = 3;
-    public static final int STEP_FOLD = 4;
-    public static final int STEP_CHAINS = 5;
-    public static final int STEP_FLOWER = 6;
-    public static final int FINAL = 7;
+    public static final int STEP_FILTER = 2;
+    public static final int STEP_EQUIV = 3;
+    public static final int STEP_IMPLIED = 4;
+    public static final int STEP_FOLD = 5;
+    public static final int STEP_CHAINS = 6;
+    public static final int STEP_FLOWER = 7;
+    public static final int FINAL = 8;
         
     public long getRuntime(int step) {
       return _time_finish[step]-_time_start[step];
@@ -153,10 +164,12 @@ public class MineSimplify {
       result_string += "threshold: "+simplestThreshold;
       result_string += "\n";
       
+
       result_string += "removed implied places:\n";
-      for (Place p : this.removedImpliedPlaces) {
-        result_string += p.toString()+"\n";
-      }
+      if (this.removedImpliedPlaces != null)
+        for (Place p : this.removedImpliedPlaces) {
+          result_string += p.toString()+"\n";
+        }
       
       return result_string;
     }
@@ -288,13 +301,14 @@ public class MineSimplify {
     // print statistics result
     Uma.out.println("finished in "+result.getRuntime(Result.FINAL)+"ms, complexity went from "+result._complexity[Result.ORIGINAL]+" to  "+result._complexity[Result.FINAL]);
     
-//    ViewGeneration3 v = new ViewGeneration3(simplifiedNet);
-//    int failed = 0;
-//    for (String[] trace : allTraces) {
-//      if (!v.validateTrace(trace)) failed++;
-//    }
-//    if (failed > 0) System.err.println(fileName_system_sysPath+" cannot replay "+failed+" traces");
-//    
+    /*
+    ViewGeneration3 v = new ViewGeneration3(simplifiedNet);
+    int failed = 0;
+    for (String[] trace : allTraces) {
+      if (!v.validateTrace(trace)) failed++;
+    }
+    if (failed > 0) System.err.println(fileName_system_sysPath+" cannot replay "+failed+"/"+allTraces.size()+" traces");
+    */
     
     return true;
   }
@@ -339,22 +353,27 @@ public class MineSimplify {
     if (simplifiedNet == null)
       return;
     
-    String targetPath_dot = fileName_system_sysPath+".simplified.dot";
-    PetriNetIO.writeToFile(simplifiedNet, targetPath_dot, PetriNetIO.FORMAT_DOT, 0);
-    
     String targetPath_lola = fileName_system_sysPath+".simplified.lola";
     PetriNetIO.writeToFile(simplifiedNet, targetPath_lola, PetriNetIO.FORMAT_LOLA, 0);
+
+    for (Transition t : simplifiedNet.getTransitions())
+      t.setName("");
+    for (Place p : simplifiedNet.getPlaces())
+      p.setName("");
+    
+    String targetPath_dot = fileName_system_sysPath+".simplified.dot";
+    PetriNetIO.writeToFile(simplifiedNet, targetPath_dot, PetriNetIO.FORMAT_DOT, 0);
     
     String targetPath_result = fileName_system_sysPath+".simplified.result.txt";
     writeFile(targetPath_result, result.toString(), false);
     
-    PetriNet bp = NetSynthesis.convertToPetriNet(debug._lastViewBuild, debug._lastViewBuild.getBranchingProcess().getAllNodes(), false);
+    //PetriNet bp = NetSynthesis.convertToPetriNet(debug._lastViewBuild, debug._lastViewBuild.getBranchingProcess().getAllNodes(), false);
     
-    String targetPath_bp = fileName_system_sysPath+".bp.lola";
-    PetriNetIO.writeToFile(bp, targetPath_bp, PetriNetIO.FORMAT_LOLA, 0);
+    //String targetPath_bp = fileName_system_sysPath+".bp.lola";
+    //PetriNetIO.writeToFile(bp, targetPath_bp, PetriNetIO.FORMAT_LOLA, 0);
     
     String targetPath_bp2 = fileName_system_sysPath+".bp.dot";
-    writeFile(targetPath_bp2, bp.toDot(), false);
+    writeFile(targetPath_bp2, build.toDot(debug._getColoringImplied()), false);
   }
   
   /**
@@ -397,10 +416,15 @@ public class MineSimplify {
     // step 2) find implied places
     result._time_start[Result.STEP_IMPLIED] = System.currentTimeMillis();
     if (config.remove_implied != Configuration.REMOVE_IMPLIED_OFF) {
-      assertBranchingProcess(net, sysModel, traces);
-      HashSet<DNode> impliedConditions = findImpliedConditions();
-      List<Place> impliedPlaces = getImpliedPlaces(net, place_conditions, impliedConditions);
-      removeImpliedPlaces(net, impliedPlaces);
+      
+      if (config.remove_implied == Configuration.REMOVE_ILP) {
+        ImplicitPlaces.findImplicitPlaces(net);
+      } else {
+        assertBranchingProcess(net, sysModel, traces);
+        HashSet<DNode> impliedConditions = findImpliedConditions();
+        List<Place> impliedPlaces = getImpliedPlaces(net, place_conditions, impliedConditions);
+        removeImpliedPlaces(net, impliedPlaces);
+      }
     }
     removeMaximalPlaces(net); // always remove maximal places
     result._time_finish[Result.STEP_IMPLIED] = System.currentTimeMillis();
@@ -461,6 +485,15 @@ public class MineSimplify {
     // viewGen.identifyFoldingRelation();
     //build.debugPrintCCpairs();
     
+    if (config.filter_threshold > 0) {
+      Uma.out.println("remove noise < "+config.filter_threshold+" ...");
+      result._time_start[Result.STEP_FILTER] = System.currentTimeMillis();
+      viewGen.removeNoise(config.filter_threshold);
+      result._time_finish[Result.STEP_FILTER] = System.currentTimeMillis();
+      result._net_size[Result.STEP_FILTER] = build.getStatistics(true);
+      result._nets[Result.STEP_FILTER] = null;
+    }
+    
     result._time_start[Result.STEP_EQUIV] = System.currentTimeMillis();
     
     if (printDetail) Uma.out.println("equivalence..");
@@ -508,6 +541,7 @@ public class MineSimplify {
       DNode b = synth.n2d.get(p);
       place_conditions.put(p, build.futureEquivalence().get(build.equivalentNode().get(b)));
     }
+    result.d2n = synth.d2n;
     
     result._time_finish[Result.STEP_FOLD] = System.currentTimeMillis();
     result._complexity[Result.STEP_FOLD] = complexitySimple(net);
@@ -574,6 +608,13 @@ public class MineSimplify {
     Uma.out.println("transitive dependencies..");
     TransitiveDependencies dep = new TransitiveDependencies(build);
     HashSet<DNode> impliedConditions;
+    if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED2) {
+      // locally find all implied conditions, regardless of equivalence classes
+      Uma.out.println("find solution..");
+      impliedConditions = dep.getAllImpliedConditions();
+      //implied = dep.getAllImpliedConditions();
+    }
+    else 
     if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED) {
       // locally find all implied conditions, regardless of equivalence classes
       Uma.out.println("find solution..");
@@ -597,9 +638,9 @@ public class MineSimplify {
       Uma.out.println("find solution..");
       impliedConditions = dep.getImpliedConditions_solutionGlobal();
       // and remove the added events again
-      Uma.out.println("undo extension..");
-      for (DNode e : extendedNodes) impliedConditions.remove(e);
-      dep.removeExtendedNodes();
+      //Uma.out.println("undo extension..");
+      //for (DNode e : extendedNodes) impliedConditions.remove(e);
+      //dep.removeExtendedNodes();
     } else {
       impliedConditions = new HashSet<DNode>();
       System.out.println("Error! Unknown mode for finding implied conditions: "+config.remove_implied);
@@ -626,14 +667,15 @@ public class MineSimplify {
     
     boolean findAllImplied;
     HashSet<DNode> implied_local;
-    if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED) {
+    if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED
+        || config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED2) {
       findAllImplied = false;
       implied_local = new HashSet<DNode>();
     } else {
       findAllImplied = true;
       
-      TransitiveDependencies dep = new TransitiveDependencies(build);
-      implied_local = dep.getImpliedConditions_solutionLocal();
+      //TransitiveDependencies dep = new TransitiveDependencies(build);
+      //implied_local = dep.getImpliedConditions_solutionLocal();
     }
     
     Uma.out.println("remove implied places..");
@@ -652,14 +694,14 @@ public class MineSimplify {
           // remove place only if every condition is implied
           if (!impliedConditions.contains(bPrime)) {
             place_p_isImplied = false;
-            
+/*
             // remember those places which could be removed when allowing
             // for a different setting
             for (DNode bPrime2 : place_conditions.get(p)) {
               if (implied_local.contains(bPrime2))
                 result.weak_impliedPlaces.add(p);
             }
-
+*/
             break;
           }
 
@@ -682,7 +724,7 @@ public class MineSimplify {
         impliedPlaces.add(p);
       }
     }
-    debug._color_weak_impliedPlaces(implied_local);
+    //debug._color_weak_impliedPlaces(implied_local);
     
     return impliedPlaces;
   }
@@ -1095,10 +1137,11 @@ public class MineSimplify {
   public static void main(final String args[]) throws Exception {
     
       Configuration config = new Configuration();
-      config.unfold_refold = false;
+      config.unfold_refold = true;
       config.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
-      config.abstract_chains = false;
+      config.abstract_chains = true;
       config.remove_flower_places = false;
+      config.filter_threshold = 0.30;//30;
 
       simplify(args[0], args[1], config);
   }

@@ -21,13 +21,11 @@ package hub.top.uma.view;
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
-import hub.top.petrinet.Place;
-import hub.top.petrinet.Transition;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeBP.EnablingInfo;
 import hub.top.uma.DNodeRefold;
 import hub.top.uma.DNodeSet;
-import hub.top.uma.DNodeBP.EnablingInfo;
 import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
@@ -42,20 +40,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.SortedSet;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.google.gwt.dev.util.collect.HashMap;
@@ -66,7 +61,7 @@ public class ViewGeneration2 {
   private DNodeRefold   build;
   private DNodeSet  bp;
   
-  public Map<DNode, Integer> eventOccurrences;
+  public Map<DNode, Integer> nodeOccurrences;
   public Map<HashSet<DNode>, LinkedList<String[]>> equivalentTraces;
   
   public class State {
@@ -102,7 +97,7 @@ public class ViewGeneration2 {
     this.build = build;
     this.bp = build.getBranchingProcess();
     
-    eventOccurrences = new HashMap<DNode, Integer>();
+    nodeOccurrences = new HashMap<DNode, Integer>();
     equivalentTraces = new HashMap<HashSet<DNode>, LinkedList<String[]>>();
     initialState = new State();
 
@@ -139,6 +134,11 @@ public class ViewGeneration2 {
     
     for (DNode b : bp.initialCut) {
       run.add(b);
+      
+      // count occurrences of conditions
+      if (!nodeOccurrences.containsKey(b))
+        nodeOccurrences.put(b, 0);
+      nodeOccurrences.put(b, nodeOccurrences.get(b)+1);
     }
 
     State state = initialState;
@@ -169,6 +169,7 @@ public class ViewGeneration2 {
 
       State succState = null;
       DNode fireEvent = null;
+      List<DNode> produced = null;
       if (!existingEvents.isEmpty()) {
         
         // get one enabled event and fire it
@@ -179,7 +180,10 @@ public class ViewGeneration2 {
             break;
           }
         }
-        
+        produced = new LinkedList<DNode>();
+        for (DNode b : fireEvent.post) {
+          produced.add(b);
+        }
       }
         
       if (succState == null) {
@@ -248,7 +252,7 @@ public class ViewGeneration2 {
           succState.marking.remove(b);
         }
         if (fireEvent.post != null) {
-          List<DNode> produced = new LinkedList<DNode>();
+          produced = new LinkedList<DNode>();
           for (DNode b : fireEvent.post) {
             produced.add(b);
           }
@@ -268,9 +272,16 @@ public class ViewGeneration2 {
       run.add(fireEvent);
       run.addAll(succState.marking);
       
-      if (!eventOccurrences.containsKey(fireEvent))
-        eventOccurrences.put(fireEvent, 0);
-      eventOccurrences.put(fireEvent, eventOccurrences.get(fireEvent)+1);
+      if (!nodeOccurrences.containsKey(fireEvent))
+        nodeOccurrences.put(fireEvent, 0);
+      nodeOccurrences.put(fireEvent, nodeOccurrences.get(fireEvent)+1);
+      
+      // count occurrences of conditions
+      for (DNode b : produced) {
+        if (!nodeOccurrences.containsKey(b))
+          nodeOccurrences.put(b, 0);
+        nodeOccurrences.put(b, nodeOccurrences.get(b)+1);
+      }
       
       succState.seen++;
       state = succState;
@@ -376,6 +387,36 @@ public class ViewGeneration2 {
     
     double etc_conformance_trace = 1.0f - ((double)escapedEdgesSum_Weighted / (double)enabledEventsSum_Weighted);
     return etc_conformance_trace;
+  }
+  
+  public void removeNoise(double threshold) {
+    
+    HashSet<DNode> noiseNodes = new HashSet<DNode>();
+    
+    for (DNode e : bp.allEvents) {
+      int maxPreOcc = 1;
+      int minPreOcc = Integer.MAX_VALUE;
+      for (DNode b : e.pre) {
+        if (nodeOccurrences.get(b) > maxPreOcc)
+          maxPreOcc = nodeOccurrences.get(b);
+        if (nodeOccurrences.get(b) < minPreOcc)
+          minPreOcc = nodeOccurrences.get(b);
+      }
+      
+      //System.out.print((double)nodeOccurrences.get(e) / maxPreOcc+" ");
+      
+      if (((double)nodeOccurrences.get(e) / minPreOcc) < threshold) {
+        noiseNodes.add(e);
+        for (DNode d : bp.getAllSuccessors(e)) {
+          noiseNodes.add(d);
+        }
+      }
+    }
+    
+    //System.out.println();
+    
+    Uma.out.println("removing "+noiseNodes.size()+"/"+(bp.allEvents.size()+bp.allConditions.size())+" nodes...");
+    bp.removeAll(noiseNodes);
   }
   
   public LinkedList<String[]>[] accumulateEquivalentTraces(int maxClasses) {

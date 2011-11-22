@@ -1,16 +1,11 @@
 package hub.top.uma.view;
 
-import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
-import hub.top.uma.DNodeBP;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
-import hub.top.uma.synthesis.NetSynthesis;
-import hub.top.uma.view.MineSimplify.Configuration;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 
 public class MineSimplifyExperiment extends MineSimplify {
   
@@ -24,6 +19,7 @@ public class MineSimplifyExperiment extends MineSimplify {
     switch (step) {
       case Result.ORIGINAL: return "org";
       case Result.STEP_UNFOLD: return "unf";
+      case Result.STEP_FILTER: return "filt";
       case Result.STEP_EQUIV: return "equ";
       case Result.STEP_FOLD: return "fold";
       case Result.STEP_IMPLIED: return "imp";
@@ -53,6 +49,7 @@ public class MineSimplifyExperiment extends MineSimplify {
       result_string += "P_"+s2n(Result.STEP_IMPLIED)+"1;T_"+s2n(Result.STEP_IMPLIED)+"1;F_"+s2n(Result.STEP_IMPLIED)+"1;c_"+s2n(Result.STEP_IMPLIED)+"1;";
       result_string += "P_"+s2n(Result.STEP_IMPLIED)+"2;T_"+s2n(Result.STEP_IMPLIED)+"2;F_"+s2n(Result.STEP_IMPLIED)+"2;c_"+s2n(Result.STEP_IMPLIED)+"2;";
       result_string += "P_"+s2n(Result.STEP_IMPLIED)+"3;T_"+s2n(Result.STEP_IMPLIED)+"3;F_"+s2n(Result.STEP_IMPLIED)+"3;c_"+s2n(Result.STEP_IMPLIED)+"3;";
+      result_string += "P_"+s2n(Result.STEP_IMPLIED)+"4;T_"+s2n(Result.STEP_IMPLIED)+"4;F_"+s2n(Result.STEP_IMPLIED)+"4;c_"+s2n(Result.STEP_IMPLIED)+"4;";
       result_string += "P_"+s2n(Result.STEP_FLOWER)+";T_"+s2n(Result.STEP_FLOWER)+";F_"+s2n(Result.STEP_FLOWER)+";c_"+s2n(Result.STEP_FLOWER)+";";
       
     } else if (type == ETYPE_ACCUMULATED) {
@@ -63,14 +60,12 @@ public class MineSimplifyExperiment extends MineSimplify {
       result_string += "prec_"+s2n(Result.STEP_FOLD)+";";
       result_string += "P_"+s2n(Result.STEP_IMPLIED)+"1;T_"+s2n(Result.STEP_IMPLIED)+"1;F_"+s2n(Result.STEP_IMPLIED)+"1;c_"+s2n(Result.STEP_IMPLIED)+"1;t_"+s2n(Result.STEP_IMPLIED)+"1;";
       result_string += "prec_"+s2n(Result.STEP_IMPLIED)+"1;";
-      result_string += "P_"+s2n(Result.STEP_IMPLIED)+"2;T_"+s2n(Result.STEP_IMPLIED)+"2;F_"+s2n(Result.STEP_IMPLIED)+"2;c_"+s2n(Result.STEP_IMPLIED)+"2;t_"+s2n(Result.STEP_IMPLIED)+"2;";
-      result_string += "prec_"+s2n(Result.STEP_IMPLIED)+"2;";
-      result_string += "P_"+s2n(Result.STEP_IMPLIED)+"3;T_"+s2n(Result.STEP_IMPLIED)+"3;F_"+s2n(Result.STEP_IMPLIED)+"3;c_"+s2n(Result.STEP_IMPLIED)+"3;t_"+s2n(Result.STEP_IMPLIED)+"3;";
-      result_string += "prec_"+s2n(Result.STEP_IMPLIED)+"3;";
       result_string += "P_"+s2n(Result.STEP_CHAINS)+";T_"+s2n(Result.STEP_CHAINS)+";F_"+s2n(Result.STEP_CHAINS)+";c_"+s2n(Result.STEP_CHAINS)+";t_"+s2n(Result.STEP_CHAINS)+";";
       result_string += "prec_"+s2n(Result.STEP_CHAINS)+";";
       result_string += "P_"+s2n(Result.STEP_FLOWER)+";T_"+s2n(Result.STEP_FLOWER)+";F_"+s2n(Result.STEP_FLOWER)+";c_"+s2n(Result.STEP_FLOWER)+";t_"+s2n(Result.STEP_FLOWER)+";";
       result_string += "prec_"+s2n(Result.STEP_FLOWER)+";";
+      result_string += "traces_rep;";
+      result_string += "traces_total;";
       result_string += "t_total";
     }
     
@@ -104,7 +99,7 @@ public class MineSimplifyExperiment extends MineSimplify {
     String result_string = model+";";
     
     for (int step=Result.ORIGINAL; step <= Result.FINAL; step++) {
-      result_string += result._net_size[step]+";"+(int)(result._complexity[step])+";"+result.getRuntime(step)+";";
+      result_string += result._net_size[step]+";"+c2s(result._complexity[step])+";"+result.getRuntime(step)+";";
     }
     result_string += "\n";
     
@@ -139,14 +134,17 @@ public class MineSimplifyExperiment extends MineSimplify {
     log(path+"/"+getLogFile(ETYPE_CONFIG), generateCompleteCSVString(sim.fileName_system_sysPath, sim.result));
   }
   
-  public static void runSingleExperiment_accumulated(String path, String system, String log) throws IOException, InvalidModelException {
+  public static void runSingleExperiment_accumulated(String path, String system, String log, int implied_mode) throws IOException, InvalidModelException {
     
-    System.out.println("====> accumulated: "+system);
+    Runtime r = Runtime.getRuntime();
+    
+    System.out.println("====> accumulated: "+system+" in "+implied_mode);
    
     StringBuilder sb = new StringBuilder();
     
-    sb.append(system.substring(0,system.lastIndexOf("."))+";");
-    
+    sb.append(system.substring(0,system.lastIndexOf("."))+"_"+implied_mode+";");
+
+    r.gc();
     MineSimplifyExperiment sim;
     Precision_ETC prec;
     Configuration c;
@@ -157,7 +155,9 @@ public class MineSimplifyExperiment extends MineSimplify {
     c.remove_implied = Configuration.REMOVE_IMPLIED_OFF;
     c.abstract_chains = false;
     c.remove_flower_places = false;
+    c.filter_threshold = 0.3;
     
+    r.gc();
     sim = new MineSimplifyExperiment(path+"/"+system, path+"/"+log, c);
     sim.prepareModel();
     sim.run();
@@ -172,52 +172,20 @@ public class MineSimplifyExperiment extends MineSimplify {
     // precision of the branching process
     sb.append(sim.viewGen.computePrecision_bp()+";");
     // refolded model
-    sb.append(sim.result._net_size[Result.FINAL]+";"+c2s(sim.result._complexity[Result.FINAL])+";"+sim.result.getRuntime(Result.STEP_FOLD)+";");
+    long refoldTime = sim.result.getRuntime(Result.STEP_UNFOLD)+sim.result.getRuntime(Result.STEP_EQUIV)+sim.result.getRuntime(Result.STEP_FOLD);
+    sb.append(sim.result._net_size[Result.FINAL]+";"+c2s(sim.result._complexity[Result.FINAL])+";"+refoldTime+";");
     prec = new Precision_ETC(sim.result._nets[Result.FINAL], sim.getTraces());
     prec.computePrecision();
     sb.append(prec.getPrecisionTrace()+";");
     
-    // Result.STEP_IMPLIED = REMOVE_IMPLIED_PRESERVE_ALL
     c = new Configuration();
     c.unfold_refold = true;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
-    c.abstract_chains = false;
-    c.remove_flower_places = false;
-    
-    sim = new MineSimplifyExperiment(path+"/"+system, path+"/"+log, c);
-    sim.prepareModel();
-    sim.run();
-    
-    sb.append(sim.result._net_size[Result.FINAL]+";"+c2s(sim.result._complexity[Result.FINAL])+";"+sim.result.getRuntime(Result.STEP_IMPLIED)+";");
-    prec = new Precision_ETC(sim.result._nets[Result.FINAL], sim.getTraces());
-    prec.computePrecision();
-    sb.append(prec.getPrecisionTrace()+";");
-    
-    // Result.STEP_IMPLIED = REMOVE_IMPLIED_PRESERVE_ALL
-    c = new Configuration();
-    c.unfold_refold = true;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_VISIBLE;
-    c.abstract_chains = false;
-    c.remove_flower_places = false;
-    
-    sim = new MineSimplifyExperiment(path+"/"+system, path+"/"+log, c);
-    sim.prepareModel();
-    sim.run();
-    
-    sb.append(sim.result._net_size[Result.FINAL]+";"+c2s(sim.result._complexity[Result.FINAL])+";"+sim.result.getRuntime(Result.STEP_IMPLIED)+";");
-    prec = new Precision_ETC(sim.result._nets[Result.FINAL], sim.getTraces());
-    prec.computePrecision();
-    sb.append(prec.getPrecisionTrace()+";");
-    
-    // Result.STEP_IMPLIED = REMOVE_IMPLIED_PRESERVE_CONNECTED
-    // Result.STEP_CHAINS
-    // Result.STEP_FLOWER
-    c = new Configuration();
-    c.unfold_refold = true;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED;
+    c.remove_implied = implied_mode;
     c.abstract_chains = true;
     c.remove_flower_places = true;
+    c.filter_threshold = 0.3;
     
+    r.gc();
     sim = new MineSimplifyExperiment(path+"/"+system, path+"/"+log, c);
     sim.prepareModel();
     sim.run();
@@ -236,6 +204,8 @@ public class MineSimplifyExperiment extends MineSimplify {
     prec = new Precision_ETC(sim.result._nets[Result.STEP_FLOWER], sim.getTraces());
     prec.computePrecision();
     sb.append(prec.getPrecisionTrace()+";");
+    sb.append(prec.getReplayedCases()+";");
+    sb.append(sim.getTraces().size()+";");
     
     sb.append(sim.result.getRuntime(Result.FINAL)+";");
     
@@ -245,6 +215,8 @@ public class MineSimplifyExperiment extends MineSimplify {
   }
   
   public static void runSingleExperiment_isolated(String path, String system, String log) throws IOException, InvalidModelException {
+    
+    Runtime r = Runtime.getRuntime();
     
     System.out.println("====> isolated: "+system);
     
@@ -257,11 +229,12 @@ public class MineSimplifyExperiment extends MineSimplify {
     
     // Result.STEP_FOLD
     c = new Configuration();
-    c.unfold_refold = true;
+    c.unfold_refold = false;
     c.remove_implied = Configuration.REMOVE_IMPLIED_OFF;
     c.abstract_chains = false;
     c.remove_flower_places = false;
     
+    r.gc();
     sim = new MineSimplifyExperiment(path+"/"+system, path+"/"+log, c);
     sim.prepareModel();
     sim.run();
@@ -272,10 +245,11 @@ public class MineSimplifyExperiment extends MineSimplify {
     // Result.STEP_IMPLIED = REMOVE_IMPLIED_PRESERVE_ALL
     c = new Configuration();
     c.unfold_refold = false;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
+    c.remove_implied = Configuration.REMOVE_IMPLIED_OFF;
     c.abstract_chains = false;
     c.remove_flower_places = false;
     
+    r.gc();
     sim = new MineSimplifyExperiment(path+"/"+system, path+"/"+log, c);
     sim.prepareModel();
     sim.run();
@@ -285,10 +259,11 @@ public class MineSimplifyExperiment extends MineSimplify {
     // Result.STEP_IMPLIED = REMOVE_IMPLIED_PRESERVE_VISIBLE
     c = new Configuration();
     c.unfold_refold = false;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_VISIBLE;
+    c.remove_implied = Configuration.REMOVE_IMPLIED_OFF;
     c.abstract_chains = false;
     c.remove_flower_places = false;
     
+    r.gc();
     sim = new MineSimplifyExperiment(path+"/"+system, path+"/"+log, c);
     sim.prepareModel();
     sim.run();
@@ -299,16 +274,31 @@ public class MineSimplifyExperiment extends MineSimplify {
     // Result.STEP_IMPLIED = REMOVE_IMPLIED_PRESERVE_CONNECTED
     c = new Configuration();
     c.unfold_refold = false;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED;
+    c.remove_implied = Configuration.REMOVE_IMPLIED_OFF;
     c.abstract_chains = false;
     c.remove_flower_places = false;
     
+    r.gc();
     sim = new MineSimplifyExperiment(path+"/"+system, path+"/"+log, c);
     sim.prepareModel();
     sim.run();
     
     sb.append(sim.result._net_size[Result.FINAL]+";"+c2s(sim.result._complexity[Result.FINAL])+";");
 
+    // Result.STEP_IMPLIED = REMOVE_IMPLIED_PRESERVE_CONNECTED2
+    c = new Configuration();
+    c.unfold_refold = false;
+    c.remove_implied = Configuration.REMOVE_ILP;
+    c.abstract_chains = false;
+    c.remove_flower_places = false;
+    
+    r.gc();
+    sim = new MineSimplifyExperiment(path+"/"+system, path+"/"+log, c);
+    sim.prepareModel();
+    sim.run();
+    
+    sb.append(sim.result._net_size[Result.FINAL]+";"+c2s(sim.result._complexity[Result.FINAL])+";");
+    
     // Result.STEP_FLOWER 
     c = new Configuration();
     c.unfold_refold = false;
@@ -316,6 +306,7 @@ public class MineSimplifyExperiment extends MineSimplify {
     c.abstract_chains = false;
     c.remove_flower_places = true;
     
+    r.gc();
     sim = new MineSimplifyExperiment(path+"/"+system, path+"/"+log, c);
     sim.prepareModel();
     sim.run();
@@ -350,7 +341,9 @@ public class MineSimplifyExperiment extends MineSimplify {
       runSingleExperiment_isolated(path, system, log);
       break;
     case ETYPE_ACCUMULATED:
-      runSingleExperiment_accumulated(path, system, log);
+      for (int mode=Configuration.REMOVE_ILP; mode <= Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED2; mode++) {
+        runSingleExperiment_accumulated(path, system, log, mode);
+      }
       break;
     }
     
@@ -434,11 +427,12 @@ public class MineSimplifyExperiment extends MineSimplify {
     runExperiment("./examples/bpm11/exp4_foldRefold_implied_chains", c);
     */
     c.unfold_refold = true;
-    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED;
-    c.abstract_chains = true;
-    c.remove_flower_places = true;
-    runExperiment("./examples/is11/exp5_complete", c, true, ETYPE_CONFIG);
-    runExperiment("./examples/is11/exp5_complete", null, false, ETYPE_ISOLATED);
+    c.remove_implied = Configuration.REMOVE_IMPLIED_OFF;
+    c.abstract_chains = false;
+    c.remove_flower_places = false;
+    c.filter_threshold = .10;
+    //runExperiment("./examples/is11/exp5_complete", c, false, ETYPE_CONFIG);
+    //runExperiment("./examples/is11/exp5_complete", null, false, ETYPE_ISOLATED);
     runExperiment("./examples/is11/exp5_complete", null, false, ETYPE_ACCUMULATED);
 
 

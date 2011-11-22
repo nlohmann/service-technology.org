@@ -324,13 +324,13 @@ public class TransitiveDependencies {
     
     extendedNodes = new LinkedList<DNode>();
     
-    ProgressBar bar = new ProgressBar(visitedMarkings.size(), visitedMarkings.size()/1000);
+    //ProgressBar bar = new ProgressBar(visitedMarkings.size(), visitedMarkings.size()/1000);
     
     for (Collection<DNode> runCut : visitedMarkings) {
       // for each marking visited for construcint the branching process
       DNodeSys sys = build.getSystem();
       
-      System.out.print(bar.step());
+      //System.out.print(bar.step());
       
       // find all transitions enabled in this marking
       DNodeBP.EnablingInfo enabled = getAllEnabledTransitions(sys.fireableEvents, runCut);
@@ -349,15 +349,14 @@ public class TransitiveDependencies {
         
         // whether there already exists an event  that represents this transition
         // get all all successor events with the same name as the transition
-        boolean alreadyFired = DNodeSet.eventExistsAtLocation(info.events[0].id, info.loc);
+        //boolean alreadyFired = DNodeSet.eventExistsAtLocation(info.events[0].id, info.loc);
         
         // no: add event to the branching process
-        if (!alreadyFired) {
-          DNode post[] = bp.fire(info.events, info.loc, true);
-          
-          // and remember the new nodes, so they can be removed later
-          for (DNode b : post) extendedNodes.add(b);
-          extendedNodes.add(post[0].pre[0]);
+        //if (!alreadyFired)
+        {
+          DNode newEvent = bp.fire_eventOnly(info.events, info.loc);
+         
+          extendedNodes.add(newEvent);
         }
       }
     }
@@ -403,8 +402,8 @@ public class TransitiveDependencies {
         if (b.isEvent || b.pre == null || b.pre.length == 0
             || b.post == null || b.post.length == 0) continue;
         
-        if (i % 400 == 0) Uma.out.print(i+" ");
-        if (i % 4000 == 0) Uma.out.print("\n");
+        //if (i % 400 == 0) Uma.out.print(i+" ");
+        //if (i % 4000 == 0) Uma.out.print("\n");
         
         // compute for all pre-events e and all post-events f of 'b'
         boolean each_f_dependsOn_e_without_b = true;
@@ -486,8 +485,8 @@ public class TransitiveDependencies {
 
         //if (nodes[i].id != id) continue;
         
-        if (i % 400 == 0) Uma.out.print(i+" ");
-        if (i % 4000 == 0) Uma.out.print("\n");
+        //if (i % 400 == 0) Uma.out.print(i+" ");
+        //if (i % 4000 == 0) Uma.out.print("\n");
         
         //DNode b = nodes[i];
         if (b.isEvent || b.pre == null || b.pre.length == 0

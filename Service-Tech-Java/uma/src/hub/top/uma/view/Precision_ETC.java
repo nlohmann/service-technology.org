@@ -77,7 +77,7 @@ public class Precision_ETC {
       totalCaseLength += trace.length;
       return true;
     } else {
-      System.out.println("could not replay: "+toString(trace));
+      //System.out.println("could not replay: "+toString(trace));
       return false;                   
     }
   }
@@ -228,7 +228,6 @@ public class Precision_ETC {
   private float etc_conformance_trace;
   
   private float unused_alternatives;
-  private float averageDeviation;
   
   private int numCases = 0;
   private int totalCaseLength = 0;
@@ -273,12 +272,11 @@ public class Precision_ETC {
     etc_conformance_trace = 1.0f - ((float)escapedEdgesSum_Weighted / (float)enabledEventsSum_Weighted);
 
     unused_alternatives = unused_alt / totalStates;
-    int avg_case_length = totalCaseLength/numCases;
-    averageDeviation = 1.0f;    
-    for (int i=0; i<avg_case_length; i++) {
-      averageDeviation *= unused_alternatives;
-    }
     
+  }
+  
+  public int getReplayedCases() {
+    return numCases;
   }
   
   public float getPrecisionGlobal() {
@@ -291,10 +289,6 @@ public class Precision_ETC {
 
   public float getUnusedAlternatives() {
     return unused_alternatives;
-  }
-  
-  public float getAverageDeviation() {
-    return averageDeviation;
   }
   
   public static void main(String[] args) throws Exception {

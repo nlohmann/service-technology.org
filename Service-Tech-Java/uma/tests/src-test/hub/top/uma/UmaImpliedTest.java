@@ -198,6 +198,7 @@ public class UmaImpliedTest extends hub.top.test.TestCase {
       config.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_VISIBLE;
       config.abstract_chains = false;      
       config.remove_flower_places = false;
+      config.filter_threshold = 0;
       
       String model = "pn_ex_01_ilp.lola";
       String log = "pn_ex_01_ilp.log.txt";
@@ -218,6 +219,52 @@ public class UmaImpliedTest extends hub.top.test.TestCase {
       for (int i=0; i<implied.length; i++) {
         assertTrue(lastTest+": removed place "+i, implied[i]);
       }
+      
+    } catch (InvalidModelException e) {
+      System.err.println("Invalid model: "+e);
+      assertTrue(lastTest, false);
+    } catch (IOException e) {
+      System.err.println("Couldn't read test file: "+e);
+      assertTrue(lastTest, false);
+    }
+  }
+  
+  @Test
+  public void testMineImplied_2d_visible_filter() {
+    lastTest = "testMineImplied_2c_visible()";
+    System.out.println(lastTest);
+
+    try {
+      Configuration config = new Configuration();
+
+      config.unfold_refold = true;
+      config.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_VISIBLE;
+      config.abstract_chains = false;      
+      config.remove_flower_places = false;
+      config.filter_threshold = 0.05;
+      
+      String model = "pn_ex_01_ilp.lola";
+      String log = "pn_ex_01_ilp.log.txt";
+      
+      MineSimplify simplify = new MineSimplify(testFileRoot+"/"+model, testFileRoot+"/"+log, config);
+      simplify.prepareModel();
+      simplify.run();
+
+      int implied[] = new int[4];
+      for (Place p : simplify.result.removedImpliedPlaces) {
+        if (p.getName().contains("P_5")) implied[0]++;
+        if (p.getName().contains("P_4")) implied[1]++;
+        if (p.getName().contains("P_7")) implied[2]++;
+        if (p.getName().contains("P_10")) implied[3]++;
+      }
+      
+      System.out.println(simplify.result.removedImpliedPlaces);
+      
+      assertEquals(lastTest+": removed implied places", 5, simplify.result.removedImpliedPlaces.size());
+      assertEquals(lastTest+": removed place P_5", 2, implied[0]);
+      assertEquals(lastTest+": removed place P_4", 1, implied[1]);
+      assertEquals(lastTest+": removed place P_7", 1, implied[2]);
+      assertEquals(lastTest+": removed place P_10", 1, implied[3]);
       
     } catch (InvalidModelException e) {
       System.err.println("Invalid model: "+e);

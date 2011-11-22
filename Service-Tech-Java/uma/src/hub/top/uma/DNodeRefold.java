@@ -777,14 +777,14 @@ public class DNodeRefold extends DNodeBP {
       // reference locally
       final Map<DNode, DNode> elementary_ccPair = futureEquivalence().getElementary_ccPair();
 
-      int print_count = 1;
+      //int print_count = 1;
       while (!top.isEmpty()) {
         
-        if ((print_count % 100) == 0) Uma.out.print(top.size()+" ");
-        if (print_count++ > 1000) {
-          Uma.out.print("\n");
-          print_count = 0;
-        }
+        //if ((print_count % 100) == 0) Uma.out.print(top.size()+" ");
+        //if (print_count++ > 1000) {
+        //  Uma.out.print("\n");
+        //  print_count = 0;
+        //}
         
         //Uma.out.println("top: "+top);
         DNode e = top.iterator().next();

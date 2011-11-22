@@ -18,13 +18,11 @@
 
 package hub.top.uma;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.LinkedList;
 
 import com.google.gwt.dev.util.collect.HashSet;
-import java.util.LinkedList;
 
 /**
  * A set of {@link DNode}s that represents a branching process.
@@ -197,14 +195,16 @@ public class DNodeSet {
     if (b.isEvent) allEvents.remove(b);
     else allConditions.remove(b);
   }
-  
+
+  /**
+   * Remove the 'nodes' from the node set.
+   * @param nodes
+   */
   public void removeAll(Collection<DNode> nodes) {
     HashSet<DNode> touched = new HashSet<DNode>();
     
-    System.out.println("filling "+nodes.size()+"nodes into a hashtable");
     HashSet<DNode> toRemove = new HashSet<DNode>(nodes);
     
-    System.out.println("nulling");
     for (DNode n : toRemove) {
       if (n.pre != null) {
         for (DNode pre : n.pre) {
@@ -238,7 +238,6 @@ public class DNodeSet {
       }
     }
     
-    System.out.println("removing "+toRemove.size());
     DNodeSetElement newConditions = new DNodeSetElement();
     for (DNode b : allConditions) {
       if (!toRemove.contains(b)) newConditions.add(b);
@@ -251,7 +250,6 @@ public class DNodeSet {
     }
     allEvents = newEvents;
     
-    System.out.println("clearing "+touched.size());
     for (DNode n : touched) {
       
       if (n.pre != null) {
@@ -544,6 +542,39 @@ public class DNodeSet {
 
     return predecessors;
   }
+  
+  /**
+   * @param d
+   * @return all transitive predecessors of 'd'
+   */
+  public HashSet<DNode> getAllSuccessors(DNode d) {
+    // the events of the configuration before 'cut'
+    HashSet<DNode> successors = new HashSet<DNode>();
+
+    // find all predecessor events of 'cut'
+    // by backwards breadth-first search from 'cut'
+    LinkedList<DNode> queue = new LinkedList<DNode>();
+    queue.add(d);
+    successors.add(d);
+    
+    // run breadth-first search
+    while (!queue.isEmpty()) {
+      
+      DNode first = queue.removeFirst();
+      
+      if (first.post == null) continue;
+      for (DNode post : first.post)
+      {
+        if (!successors.contains(post)) {
+          // only add to the queue if not queued already
+          queue.add(post);
+          successors.add(post);
+        }
+      } // all preconditions of the current event
+    } // breadth-first search
+
+    return successors;
+  }
 	
 	/**
 	 * Fire ocletEvent in this set at the given location. This
@@ -675,6 +706,34 @@ public class DNodeSet {
 		
 		return postConditions;
 	}
+	
+	/**
+   * Synchronously fire a set of ocletEvents in this set at
+   * the given location. This appends ONE new event with the
+   * same id as all ocletEvents to this set, post-conditions
+   * ARE NOT APPENDED. 
+   * 
+	 * @param ocletEvents
+	 * @param fireLocation
+	 * 
+	 * @param the new event
+	 */
+  public DNode fire_eventOnly(DNode[] ocletEvents, DNode[] fireLocation) {
+     
+    // instantiate the oclet event
+    DNode newEvent = new DNode(ocletEvents[0].id, fireLocation);
+    newEvent.isEvent = true;
+    allEvents.add(newEvent);
+    
+    // set post-node of conditions
+    for (DNode preNode : fireLocation) {
+      preNode.addPostNode(newEvent);
+      // remove pre-set of newEvent from the maxNodes
+      //maxNodes.remove(preNode);
+    }
+    
+    return newEvent;
+  }
 	
 	public static boolean eventExistsAtLocation(short id, DNode[] fireLocation) {
 	  

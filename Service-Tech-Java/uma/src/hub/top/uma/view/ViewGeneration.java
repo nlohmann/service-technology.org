@@ -421,8 +421,10 @@ public class ViewGeneration {
         }
       }
       
-      if (enabledEvents.isEmpty())
+      if (enabledEvents.isEmpty()) {
+        System.out.println("no enabled event");
         break;
+      }
       
       DNode[] toChoose = new DNode[enabledEvents.size()];
       enabledEvents.toArray(toChoose);

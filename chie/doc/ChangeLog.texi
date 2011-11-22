@@ -1,0 +1,12 @@
+@heading Version 1.0-unreleased
+@itemize
+@item first release of Chie
+@end itemize
+
+@heading Version 0.0 (2011-11-22)
+@itemize
+@item no actual version
+@item just needed to make NEWS and ChangeLog generation work
+@item remove after second version is ready
+@end itemize
+

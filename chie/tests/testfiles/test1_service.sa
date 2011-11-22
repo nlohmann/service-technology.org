@@ -1,0 +1,27 @@
+INTERFACE
+  INPUT
+    a, b, c, d;
+  OUTPUT
+    x, y, z;
+
+NODES
+  0 : INITIAL
+    TAU -> 1
+    TAU -> 2
+  1
+    a -> 3
+  2
+    b -> 4
+  3
+    x -> 5
+  4
+    y -> 6
+  5
+    d -> 7
+  6
+    d -> 8
+  7 : FINAL
+  8
+    z -> 6
+    c -> 7
+

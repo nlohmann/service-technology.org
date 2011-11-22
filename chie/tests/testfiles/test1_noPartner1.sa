@@ -1,0 +1,15 @@
+INTERFACE
+  INPUT
+    x, y, z;
+  OUTPUT
+    a, b, c, d;
+
+NODES
+  0 : INITIAL
+    a -> 1
+  1
+    x -> 2
+  2
+    d -> 3
+  3 : FINAL
+

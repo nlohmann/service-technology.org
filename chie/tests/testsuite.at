@@ -1,0 +1,45 @@
+AT_INIT
+AT_COLOR_TESTS
+
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([CHIE --help],0,ignore)
+AT_CHECK([CHIE --detailed-help],0,ignore)
+AT_CHECK([CHIE --full-help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([CHIE --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Parameters])
+############################################################################
+
+AT_SETUP([Piping from stdin])
+# AT_CHECK([cat myCoffee.owfn | CHIE],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Reading from file])
+# AT_CHECK([CHIE myCoffee.owfn],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Output to stderr])
+# AT_CHECK([CHIE myCoffee.owfn], 0, ignore, stderr)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Output to given file])
+# AT_CHECK([CHIE myCoffee.owfn], 0, ignore, stderr)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+

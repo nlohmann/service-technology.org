@@ -1,0 +1,75 @@
+# This is the only input file for gengetopt.
+
+# arguments for gengetopt ... what do they do?
+# --long-help: long usage line in help
+# --include-getopt: adds code for getopt_long in generated C file
+# --show-required: output of help will specify which options are mandatory
+# --unamed-opts=FILE: accept options without names
+# --no-handle-error: TODO
+# --conf-parser: TODO
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+description "About Chie:"
+purpose "This tool tests whether given service automata are valid test cases as conformance partner for a given service (also given as service automaton).\n\n  Report bugs to chie@service-technology.org.\n  Visit Chie's home page at http://service-technology.org/chie"
+
+section "Input/Output"
+sectiondesc="When called without an input file, Chie reads from the standard input stream. When called with input files, the first service automaton is assumed to be the service automaton of the service and all following files are assumed to be test cases. Results will be written to the standard output stream.\n"
+
+option "service" s
+  "Service automaton of the original service."
+  details="This option specifies the original service, so all files given as input files will be assumed to be test cases. Note that you have to use this parameter if you want to test from the standard input stream.\n"
+  string
+  typestr="FILENAME"
+  optional
+
+option "dot" -
+  "Whether to write dot output."
+  details="This option is used when Chie should write witness paths to a dot file.\n"
+  flag off
+  
+
+section "Configuration"
+sectiondesc="These options configure Chie.\n"
+
+option "config" c
+  "Read configuration from file."
+  details="If no file is given, Chie first tries to parse file `chie.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Chie was installed) and then from the current working directory. If neither file was found, the standard values are assumed.\n"
+  string
+  typestr="FILE"
+  optional
+
+option "tmpfile" -
+  "Set the path and name of temporary files."
+  details="The filename Chie should use to create temporary files (i.e., the output derived from Wendy). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/chie-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created will be kept after Chie terminates.\n"
+  flag off
+
+
+section "Debugging"
+sectiondesc="These options control how much debug output Chie creates.\n"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine Chie was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden
+
+option "stats" -
+  "Display time and memory consumption on termination."
+  details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
+  flag off
+  hidden
+

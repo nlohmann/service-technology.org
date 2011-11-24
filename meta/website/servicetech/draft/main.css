@@ -1,16 +1,17 @@
-﻿  body {
-    margin-top: 30px;
-    margin-bottom: 0px;
-    margin-left: 0px;
-    margin-right: 0px;
-    
-    padding: 0px 0px;
-    background: #aaa9a9;    
-    
-          font-family: 'Open Sans Condensed', 'Open sans', sans;
-    
-    
+﻿  html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
     }
+    
+    body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Open Sans Condensed', 'Open sans', sans;
+    height: 100%;
+    background: #aaa9a9;    
+    }
+    
 
 
  
@@ -18,15 +19,28 @@
   #mainframe {
     margin-left:auto;
     margin-right:auto;
-    margin-top: 0px;
     margin-bottom: 0px;
     width: 1024px;
-    height: 100%;
-    box-shadow: 0px 0px 6px #333; 
     background: white;
     border: 0px;
     padding: 0px 0px;
+    height: 100%;
     
+  }
+  
+  #shadowbox {
+    height: 100%;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    box-shadow: 0px 0px 16px #333; 
+  }
+  
+  #topspacer {
+    height: 0px;
+    padding: 0;
+    margin:0;
+    background: #aaa9a9;
   }
   
   #navigation {

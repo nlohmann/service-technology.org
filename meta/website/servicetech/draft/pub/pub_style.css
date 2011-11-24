@@ -1,256 +1,3 @@
-  body {
-    margin-top: 30px;
-    margin-bottom: 0px;
-    margin-left: 0px;
-    margin-right: 0px;
-    
-    padding: 0px 0px;
-    background: #aaa9a9;    
-    
-          font-family: 'Open Sans Condensed', 'Open sans', sans;
-    
-    
-    }
-
-
- 
-    
-  #mainframe {
-    margin-left:auto;
-    margin-right:auto;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    width: 1024px;
-    height: 100%;
-    box-shadow: 0px 0px 6px #333; 
-    background: white;
-    border: 0px;
-    padding: 0px 0px;
-    
-  }
-  
-  #navigation {
-    box-shadow: 0px 0px 2px #333; 
-    margin-bottom: 10px;
-    
-  }
-  
-  #header {
-    height: 102px;
-    background: white;
-    text-align: center;
-    padding-top: 30px;
-    padding-bottom: 8px; 
-  }
-  
-  #titlenav {
-    background: #444;
-    height: 55px;
-    position: relative;
-    
-    
-  }
-
-  #nav {
-      background: inherit;
-      position: absolute;
-      right: 20px;
-      top: 0;
-      bottom: 0;
-      margin: auto;
-    }
-  
-  #pagetitle {
-    background: inherit;
-    position: absolute;
-    left: 20px;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    padding-bottom: 5px;
-  }
-
-  
-  #tabs {
-    background: #eee;
-    padding-left: 0px;
-    padding-right: 60px;
-  }
-  
-  #content {
-  
-    background: white;
-    padding-left: 40px;
-    padding-right: 60px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    margin-top: 0px;
-    position: relative;
-  }
-  
-  #tabs ul {
-    list-style-type:none;
-    margin: 0;
-    padding:0;
-    overflow:hidden;
-  }
-  #tabs li {
-    float:left;
-  }
-  #tabs a {
-    margin-right: 1px;
-    display:block;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    text-transform: uppercase;
-    font-size: 14pt;
-    color: white;
-    text-decoration: none;
-        text-shadow: #333 0px 0px 2px;
-
-   }
-
-   #tabs a.current {
-       background:#444;
-   }
-   
-   #tabs a.ncurrent {
-      background:#666;
-   }
-   
-   #tabs a:hover {
-     background: #444;
-   }
-
-  #nav ul {
-    list-style-type:none;
-    margin:0;
-    padding:0;
-    overflow:hidden;
-  }
-  #nav li {
-    float:left;
-  }
-  #nav a {
-    display:block;
-    background-color: inherit;
-    line-height: 20px; 
-    text-transform: uppercase;
-    color: white;
-    text-decoration: none;
-    border-bottom:1px solid #fff; 
-    font-size: 14pt;
-        text-shadow: #333 0px 0px 2px;
-
-  }
-  
-  .seperator {
-    width: 2px;
-    height: 20px;
-    margin-left: 0px;
-    margin-right: 0px;
-    margin-top: 19px;
-    margin-bottom: 9px;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-bottom: 3px;
-    background: #555;
-    float: left;
-  }
-  
-
-   #nav a:link, #nav a:visited {
-    color: white;
-    text-decoration: none;
-   }
-
-
-   #nav a:hover {
-    color: #02aeed;
-    text-decoration: none;
-   }
-
-   #nav a:active {
-    text-decoration: none;
-    color: #02aeed;
-   
-   }
-  #nav a.current {
-    border-bottom:9px solid #02aeed; 
-    margin-left: 1px;
-    margin-right: 1px;
-    margin-top: 19px;
-    margin-bottom: 1px;
-    padding-left: 5px;
-    padding-right: 5px;
-    padding-bottom: 7px;
-  }
-
-  #nav a.ncurrent {
-    border-bottom:3px solid #02aeed; 
-    margin-left: 1px;
-    margin-right: 1px;
-    margin-top: 19px;
-    margin-bottom: 1px;
-    padding-bottom: 13px;
-    padding-left: 5px;
-    padding-right: 5px;
-    }
-  
-  
-  #content h2 {
-    text-shadow: #ccc 0px 0px 2px;
-    color: #444;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-  }
-  
-  #pagetitle h1 {
-    display: inline;
-    line-height: 50px; /* height of nav */
-    color: #02aeed;
-    font-size: 28pt;
-    font-weight: bold;
-    text-shadow: #333 0px 0px 2px;
-  }
-  
-  #pagetitle a:first-child {
-    color: white;
-    text-decoration: none;
-    font-weight: normal;
-  }
-  
-  #pagetitle a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  #pagetitle a:link, #pagetitle a:visited {
-    text-decoration: none;
-  }
-  
-  #pagetitle a:hover {
-    text-decoration: none;
-    color: #02aeed;
-  }
-  
-
-    #content p, #content div {
-      font-size: 14pt; 
-      color: #000; 
-      line-height: 24pt;
-      margin-top: 2px;
-      margin-left: 0px;
-      margin-right: 0px;
-      margin-bottom: 0px;
-    }
-    
-    
     p.leftcol {
       width: 290px;
       position: absolute;
@@ -439,50 +186,31 @@ code {
 padding-bottom: 2px;
 }
 
-.download_list {
-  float: left;
+.paper_list {
   padding-right: 20px;
 }
 
-.download_list ul {
+.paper_list ul {
 
     margin: 0px;
     padding: 0px;
     list-style-type: none;
-    padding-left: 72px;
-    margin-top: -20px;
+    padding-left: 0px;
+    margin-top: 20px;
  }
 
-.download_list li {
-    margin-bottom: 10px;
+.paper_list li {
+    margin-bottom: 20px;
     margin-top: 0px;
 }
 
-.download_list a {
+
+.paper_list a {
     padding-bottom: 0px;
-    padding-left: 28px;
-    line-height: 32px;
+    padding-left: 0px;
     padding-right: 1px;
-    background: url(../icons/dl-icon-small.png) no-repeat left;
 }
 
-.linux_header {
-     background: url(../osicons/tux-pd.png) no-repeat left;
-     padding-left: 72px;
-     line-height: 64px;
-  } 
-
-  .mac_header {
-     background: url(../osicons/apple-pd.png) no-repeat left;
-     padding-left: 72px;
-     line-height: 64px;
-  } 
-  
-  .windows_header {
-     background: url(../osicons/windows-pd.png) no-repeat left;
-     padding-left: 72px;
-     line-height: 64px;
-  } 
   
       img.portrait {
       border:1px solid #444;

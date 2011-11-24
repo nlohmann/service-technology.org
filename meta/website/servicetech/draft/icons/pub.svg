@@ -9,20 +9,20 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="366.05713"
-   height="480.34286"
+   width="285.97577"
+   height="242.04485"
    id="svg2"
    version="1.1"
    inkscape:version="0.48.1 "
-   sodipodi:docname="pdf-icon.svg"
-   inkscape:export-filename="C:\Users\suermeli\Desktop\website\servicetech\draft\icons\pdf-icon.png"
-   inkscape:export-xdpi="6.7451687"
-   inkscape:export-ydpi="6.7451687">
+   sodipodi:docname="pub.svg"
+   inkscape:export-filename="C:\Users\suermeli\Desktop\website\servicetech\draft\icons\pub.png"
+   inkscape:export-xdpi="6"
+   inkscape:export-ydpi="6">
   <defs
      id="defs4">
     <inkscape:path-effect
        effect="skeletal"
-       id="path-effect3003"
+       id="path-effect3009"
        is_visible="true"
        pattern="M 0,5 C 0,2.24 2.24,0 5,0 7.76,0 10,2.24 10,5 10,7.76 7.76,10 5,10 2.24,10 0,7.76 0,5 z"
        copytype="single_stretched"
@@ -36,7 +36,7 @@
        fuse_tolerance="0" />
     <inkscape:path-effect
        effect="skeletal"
-       id="path-effect2999"
+       id="path-effect2987"
        is_visible="true"
        pattern="M 0,5 C 0,2.24 2.24,0 5,0 7.76,0 10,2.24 10,5 10,7.76 7.76,10 5,10 2.24,10 0,7.76 0,5 z"
        copytype="single_stretched"
@@ -56,47 +56,67 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="-2.6957439"
-     inkscape:cy="258.88803"
+     inkscape:zoom="2.1273152"
+     inkscape:cx="136.48415"
+     inkscape:cy="116.02408"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
      inkscape:window-width="1600"
      inkscape:window-height="848"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
-     inkscape:window-maximized="1"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0">
+     inkscape:window-maximized="1">
     <sodipodi:guide
        orientation="1,0"
-       position="11.6,108.74283"
-       id="guide2985" />
+       position="250,8.3333333"
+       id="guide3783" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="98.484848,200"
+       id="guide3785" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="113.63636,50"
+       id="guide3787" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="-512.12121,200"
+       id="guide3791" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="24.253731,210.07463"
+       id="guide3793" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="-119.02985,24.626866"
+       id="guide3795" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="-7.8358209,60.074627"
+       id="guide3801" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="-170.89552,54.850746"
+       id="guide3803" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="-179.10448,205.22388"
+       id="guide3805" />
     <sodipodi:guide
        orientation="1,0"
-       position="354.45714,-111.25716"
-       id="guide2987" />
-    <sodipodi:guide
-       orientation="0,1"
-       position="-674.11429,468.74284"
-       id="guide2989" />
-    <sodipodi:guide
-       orientation="0,1"
-       position="120.17143,367.31427"
-       id="guide2991" />
-    <sodipodi:guide
-       orientation="0,1"
-       position="237.31428,11.599983"
-       id="guide2993" />
+       position="175,176.1194"
+       id="guide3825" />
     <sodipodi:guide
        orientation="1,0"
-       position="247.31428,315.8857"
-       id="guide2995" />
+       position="204.85075,154.10448"
+       id="guide3827" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -114,23 +134,18 @@
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-125.54286,-166.47647)">
+     transform="translate(-162.99697,-167.124)">
     <path
-       id="path3001"
-       style="fill:none;stroke:#444444;stroke-width:23.20000076;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 372.85714,178.07647 0,101.42857 107.14286,0 z m -235.71428,0 235.71428,0 L 480,279.50504 l 0,355.71428 -342.85714,0 z"
-       inkscape:connector-curvature="0" />
-    <text
-       xml:space="preserve"
-       style="font-size:54.45291138px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#444444;fill-opacity:1;stroke:none;font-family:Open Sans Condensed Light;-inkscape-font-specification:Open Sans Condensed Light"
-       x="266.83917"
-       y="604.64789"
-       id="text5211"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan5213"
-         x="266.83917"
-         y="604.64789"
-         style="font-size:98.01525116px;font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;fill:#444444;fill-opacity:1;font-family:Open Sans Extrabold;-inkscape-font-specification:'Open Sans Extrabold, Ultra-Bold'">PDF</tspan></text>
+       style="fill:#ffffff;stroke:#eeeeee;stroke-width:13.39999961999999900;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;fill-opacity:1"
+       d="m 172.69697,183.33357 c 39.10358,-7.52708 85.79444,-14.51656 125.60545,0 l 0,216.13528 c -39.81101,-14.51656 -86.50187,-6.98945 -125.60545,0 z"
+       id="path3007"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:#ffffff;stroke:#eeeeee;stroke-width:13.39999961999999900;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;fill-opacity:1"
+       d="m 314.30156,183.33357 c 39.10358,-14.51656 85.79444,-7.52709 125.60546,0 l 0,216.13527 c -39.81102,-6.98945 -86.50188,-14.51655 -125.60546,0 z"
+       id="path3007-9"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
   </g>
 </svg>

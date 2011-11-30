@@ -9,8 +9,9 @@
 	<classpathentry kind="lib" path="libs-external/org.eclipse.emf.ecore.xmi_2.5.0.v20100521-1846.jar"/>
 	<classpathentry kind="lib" path="tests/libs-external/junit-4.8.1.jar"/>
 	<classpathentry kind="lib" path="libs-external/antlr-runtime-3.2.jar"/>
-	<classpathentry kind="lib" path="libs-external/org.cpntools.accesscpn.model_1.0.3.jar"/>
-	<classpathentry kind="lib" path="libs-external/org.cpntools.accesscpn.model.exporter_1.0.3.jar"/>
-	<classpathentry kind="lib" path="libs-external/org.cpntools.accesscpn.model.importer_1.0.0.jar"/>
+	<classpathentry kind="lib" path="libs-external/org.cpntools.accesscpn.model.importer_2.0.2.jar"/>
+	<classpathentry kind="lib" path="libs-external/org.cpntools.accesscpn.engine.highlevel_2.0.2.jar"/>
+	<classpathentry kind="lib" path="libs-external/org.cpntools.accesscpn.model_2.0.2.jar"/>
+	<classpathentry kind="lib" path="libs-external/org.cpntools.accesscpn.model.exporter_2.0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

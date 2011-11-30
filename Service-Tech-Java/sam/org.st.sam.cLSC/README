@@ -14,22 +14,25 @@ PURPOSE
     
      * translating scenario-based specifications to Colored Petri Nets for
        distributed play-out
-     * ... 
+     * mining scenario-based specifications from logs
+     *
 
-    UMA is platform independent and runs on all platforms with a Java runtime
+    SAM is platform independent and runs on all platforms with a Java runtime
     environment.
 
 
 COPYRIGHT
-    Copyright (c) Dirk Fahland(1), Amir Kantor(2).
+    Copyright (c) Dirk Fahland(1), Amir Kantor(2), Shahar Maoz (2),
+    David Lo (3)
 
     (1) AIS Group, Eindhoven University of Technology / service-technology.org
     (2) Prof. Harel research lab at the Weizmann Institute of Science
+    (3) Singapore Management University
 
 
 AUTHORS
-    SAM is written and maintained by Dirk Fahland and Amir Kantor. See file
-    "AUTHORS" for more information.
+    SAM is written and maintained by Dirk Fahland, Amir Kantor, Shahar Maoz, and
+    David Lo. See file "AUTHORS" for more information.
 
 
 LICENSE

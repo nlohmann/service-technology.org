@@ -637,18 +637,8 @@ public class ExportToCPN {
                 .getSort().getText(), p2.getInitialMarking().getText(), p2,
                 subPageTrans.get(subPageName));
 
-          Arc a2 = toCPN.addArc(pg, p_ref, t, a.getHlinscription().getText());
 
-          boolean arcExists = false;
-          for (Arc p2_out : p2.getSourceArc()) {
-            if (p2_out.getTarget() == subPageTrans.get(subPageName)) {
-              arcExists = true;
-              break;
-            }
-          }
-          if (!arcExists)
-            toCPN.addArc(parentPage, p2, subPageTrans.get(subPageName), "");
-
+          toCPN.addArc(pg, p_ref, t, a.getHlinscription().getText());
           arc_toRemove.add(a);
         }
       }
@@ -683,18 +673,7 @@ public class ExportToCPN {
                 .getSort().getText(), p2.getInitialMarking().getText(), p2,
                 subPageTrans.get(subPageName));
 
-          Arc a2 = toCPN.addArc(pg, t, p_ref, a.getHlinscription().getText());
-
-          boolean arcExists = false;
-          for (Arc p2_in : p2.getTargetArc()) {
-            if (p2_in.getSource() == subPageTrans.get(subPageName)) {
-              arcExists = true;
-              break;
-            }
-          }
-          if (!arcExists)
-            toCPN.addArc(parentPage, subPageTrans.get(subPageName), p2, "");
-
+          toCPN.addArc(pg, t, p_ref, a.getHlinscription().getText());
           arc_toRemove.add(a);
         }
       }
@@ -716,7 +695,7 @@ public class ExportToCPN {
     }
 
     net.getPage().remove(oldPage);
-
+    
     for (Page pg : net.getPage()) {
       for (Arc a : pg.getArc()) {
         if (a.getSource().getPage() != a.getTarget().getPage()) {

@@ -14,7 +14,7 @@
 		<include name="src/org/st/scenarios/clsc/CLSC.g"/>
 	</fileset>
 	
-	<!-- generate LoLA parser files -->
+	<!-- generate CLSC parser files -->
 	<target name="parser_cLSC.dependencies" 
 			description="Check dependencies for generating Java class files from ANTLR parser description.">
 	    <condition property="updateParser_lola.notRequired">

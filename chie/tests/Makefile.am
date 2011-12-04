@@ -20,7 +20,7 @@
 # 3. Add these files (without path) to the `TESTFILES' list.
 # 4. Add the file to the SVN repository.
 
-TESTFILES = test1_service.sa test1_partner1.sa test1_partner2.sa \
+TESTFILES = test1_specification.sa test1_partner1.sa test1_partner2.sa \
 	    test1_noPartner1.sa test1_noPartner2.sa test1_noPartner3.sa
 
 

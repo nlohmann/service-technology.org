@@ -9,52 +9,33 @@
 using std::cerr;
 using std::endl;
 
-bool isConformancePartner(ServiceAutomaton & service, ServiceAutomaton & testCase)
+/*!
+ * \brief whether two service automata are conformance partners
+ */
+bool isConformancePartner(ServiceAutomaton & specification, ServiceAutomaton & testCase)
 {
   /*-------------------------------.
   | 1. calculate product automaton |
   `-------------------------------*/
 
-  ProductAutomaton productAutomaton;
-  createProductAutomaton(service, testCase, productAutomaton);
-
-  /*
-  cerr << "DEBUG: PA" << endl;
-  FOREACH(state, productAutomaton.states)
-  {
-    cerr << state->first << ": [";
-    cerr << state->second.internalState.first << "|" << state->second.internalState.second << "|{";
-    FOREACH(message, productAutomaton.channelStates[state->second.interfaceStateID])
-    {
-      cerr << (*message) << ",";
-    }
-    cerr << "}]" << endl;
-    FOREACH(succ, productAutomaton.transitions[state->first])
-    {
-      FOREACH(s, succ->second)
-      {
-        cerr << "  " << succ->first << " -> " << s->second << endl;
-      }
-    }
-  }
-  cerr << "DEBUG: FINISHED PA" << endl << endl;
-  //*/
-
+  ProductAutomaton productAutomaton; // resulting automaton
+  createProductAutomaton(specification, testCase, productAutomaton);
 
 
   /*--------------------------------------------------------.
   | 2. check strong receivability from service to test case |
   `--------------------------------------------------------*/
-  if(!checkStrongReceivability(service, testCase, productAutomaton))
+
+  if(!checkStrongReceivability(specification, testCase, productAutomaton))
   {
     return false; // TODO: generate more information here
   }
 
   /*------------------------------------------------------.
-  | 3. check weak receivability from test case to service |
+  | 3. check weak receivability from test case to specification |
   `------------------------------------------------------*/
 
-  if(!checkWeakReceivability(service, testCase, productAutomaton))
+  if(!checkWeakReceivability(specification, testCase, productAutomaton))
   {
     return false; // TODO: generate more information here
   }
@@ -67,7 +48,7 @@ bool isConformancePartner(ServiceAutomaton & service, ServiceAutomaton & testCas
   FOREACH(stateID, productAutomaton.noSuccessorStates) // iterate over all states without successors
   {
     InternalState & state = productAutomaton.states[*stateID].internalState;
-    if((service.finalStates.count(state.first) == 0) || // service state is no final state
+    if((specification.finalStates.count(state.first) == 0) || // specification state is no final state
        (testCase.finalStates.count(state.second) == 0)) // test case state is no final state
     {
       return false; // TODO: more information here
@@ -79,15 +60,27 @@ bool isConformancePartner(ServiceAutomaton & service, ServiceAutomaton & testCas
 }
 
 
-bool checkStrongReceivability(ServiceAutomaton & service, ServiceAutomaton & testCase, ProductAutomaton & productAutomaton)
+/*!
+ * \brief whether messages from the first automaton are strong receivable in the second automaton
+ */
+bool checkStrongReceivability(ServiceAutomaton & specification, ServiceAutomaton & testCase, ProductAutomaton & productAutomaton)
 {
   // get sending events
-  std::set<std::string> sendingEvents = service.getSendingEvents();
+  std::set<unsigned int> sendingEvents;
+
+  FOREACH(event, specification.isSendingEvent)
+  {
+    if(event->second)
+    {
+      sendingEvents.insert(productAutomaton.events2IDs[event->first]);
+    }
+  }
+
   // stack for DFS
   std::stack<unsigned int> dfsStack;
 
   // get states of product automaton holding states without successors in the service automaton
-  std::set<unsigned int> whiteNodes = productAutomaton.noServiceSuccessorStates;
+  std::set<unsigned int> whiteNodes = productAutomaton.noSpecificationSuccessorStates;
 
   // perform DFS on SCCs in these states
   while(whiteNodes.size() > 0) // while set of these states (= unvisited states) is not empty
@@ -97,7 +90,7 @@ bool checkStrongReceivability(ServiceAutomaton & service, ServiceAutomaton & tes
 
     while(dfsStack.size() > 0) // while stack not empty
     {
-      // get current state and remove it from dfs stack
+      // get current state and remove it from DFS stack
       unsigned int currentStateID = dfsStack.top();
       ProductState & currentState = productAutomaton.states[currentStateID];
       dfsStack.pop();
@@ -170,7 +163,7 @@ bool checkStrongReceivability(ServiceAutomaton & service, ServiceAutomaton & tes
         {
           if(successorNodes.size() == 0) // if we can not leave this SCC
           {
-            // we found a sending event of the service that is noch strong receivable
+            // we found a sending event of the service that is not strong receivable
             return false; // TODO: generate detailed information (e.g. for dot output) here
           }
           // we need to check our successors
@@ -190,29 +183,30 @@ bool checkStrongReceivability(ServiceAutomaton & service, ServiceAutomaton & tes
 }
 
 
-bool checkWeakReceivability(ServiceAutomaton & service, ServiceAutomaton & testCase, ProductAutomaton & productAutomaton)
+/*!
+ * \brief whether messages from the second automaton are weak receivable in the first automaton
+ */
+bool checkWeakReceivability(ServiceAutomaton & specification, ServiceAutomaton & testCase, ProductAutomaton & productAutomaton)
 {
   // initialisation
   std::set<unsigned int> whiteNodes = productAutomaton.noTestCaseSuccessorStates;
   std::queue<unsigned int> bfsQueue;
-  std::stack<unsigned int> dfsStack;
+  //std::stack<unsigned int> dfsStack;
   searchCache mustRemove, // node must remove these messages for weak receivability or pass them to parents
-              needToRemove, // "todo-list" for DFS
+              needToRemove, // "2do-list" for DFS
               canRemove, // positive results for DFS
               triedToRemove; // already performed DFS
-  std::map<std::string, unsigned int> event2IDs; // get sending event IDs
-  std::vector<std::string> sendingEvents; // store events by their index
+  std::set<unsigned int> sendingEvents; // sending events
   FOREACH(event, testCase.isSendingEvent)
   {
     if(event->second)
     {
-      event2IDs[event->first] = sendingEvents.size();
-      sendingEvents.push_back(event->first);
+      sendingEvents.insert(productAutomaton.events2IDs[event->first]);
     }
   }
 
   // store visited nodes for each root node
-  std::map<unsigned int, std::set<unsigned int> > blackNodes;
+  std::map<unsigned int, std::set<unsigned int> > blackNodes; // map: root -> visited nodes
 
   // perform BFS backwards
   while(whiteNodes.size() > 0)
@@ -224,11 +218,11 @@ bool checkWeakReceivability(ServiceAutomaton & service, ServiceAutomaton & testC
 
     // check own interface
     ChannelState & channelState = productAutomaton.channelStates[productAutomaton.states[rootNode].interfaceStateID];
-    for(int i = 0; i < sendingEvents.size(); ++i)
+    FOREACH(event, sendingEvents)
     {
-      if(channelState.count(sendingEvents[i]) > 0)
+      if(channelState.count(*event) > 0)
       {
-        mustRemove[rootNode].insert(i); // sending events on the interface must be removed
+        mustRemove[rootNode].insert(*event); // sending events on the interface must be removed
       }
     }
 
@@ -286,7 +280,7 @@ bool checkWeakReceivability(ServiceAutomaton & service, ServiceAutomaton & testC
             if(trans->second == currentStateID) // successor arc found
             {
               if((trans->first == SENDING) && // got to current state by sending a message
-                  (leftovers.count(event2IDs[transition->first]) > 0)) // and this message cannot be removed from here
+                  (leftovers.count(productAutomaton.events2IDs[transition->first]) > 0)) // and this message cannot be removed from here
               {
                 // must not use this arc for backtracking
                 break;
@@ -320,8 +314,14 @@ bool checkWeakReceivability(ServiceAutomaton & service, ServiceAutomaton & testC
   return true;
 }
 
+
+/*!
+ * \brief DFS routine used to check weak receivability
+ *
+ * \TODO rewrite from recursive to iterative and insert in function above
+ */
 void checkWeakReceivabilityDFS(unsigned int currentStateID, ProductAutomaton & productAutomaton,
-                               ServiceAutomaton & testCase, std::vector<std::string> & sendingEvents,
+                               ServiceAutomaton & testCase, std::set<unsigned int> & sendingEvents,
                                searchCache & needToRemove, searchCache & canRemove, searchCache & triedToRemove)
 {
   if(needToRemove.size() == triedToRemove.size())
@@ -336,7 +336,7 @@ void checkWeakReceivabilityDFS(unsigned int currentStateID, ProductAutomaton & p
     if(triedToRemove[currentStateID].count(*message) == 0) // not tried to remove this message, yet
     {
       triedToRemove[currentStateID].insert(*message); // now we will try
-      if(channelState.count(sendingEvents[*message]) > 0)
+      if(channelState.count(*message) > 0)
       {
         // message not removed from channel; need to delegate to child nodes
         leftovers.insert(*message);
@@ -354,7 +354,7 @@ void checkWeakReceivabilityDFS(unsigned int currentStateID, ProductAutomaton & p
     return; // we are finished for this node
   }
 
-  unsigned int currentTestCaseState = productAutomaton.states[currentStateID].internalState.second; // only service is allowed to do operations
+  unsigned int currentTestCaseState = productAutomaton.states[currentStateID].internalState.second; // only specification is allowed to do operations
   std::set<unsigned int> successors; // collect successors
   FOREACH(transition, productAutomaton.transitions[currentStateID]) // iterate over all successors
   {
@@ -365,21 +365,21 @@ void checkWeakReceivabilityDFS(unsigned int currentStateID, ProductAutomaton & p
       case INTERNAL:
         if(productAutomaton.states[trans->second].internalState.second == currentTestCaseState)
         {
-          // either service did a step or we are TAU-looping to this state again and will abort next iteration
+          // either specification did a step or we are TAU-looping to this state again and will abort next iteration
           successors.insert(trans->second);
         }
         break;
       case SENDING:
         if(!testCase.isSendingEvent[transition->first])
         {
-          // a sending step, but test case will only receive this message so service did a step
+          // a sending step, but test case will only receive this message so specification did a step
           successors.insert(trans->second);
         }
         break;
       case RECEIVING:
         if(testCase.isSendingEvent[transition->first])
         {
-          // a receiving step, but test case will only send this message so service did a step
+          // a receiving step, but test case will only send this message so specification did a step
           successors.insert(trans->second);
         }
         break;
@@ -404,7 +404,7 @@ void checkWeakReceivabilityDFS(unsigned int currentStateID, ProductAutomaton & p
     // collect results
     FOREACH(message, leftovers)
     {
-      if(canRemove[*successor].count(*message) > 0) // if successor coult remove this message
+      if(canRemove[*successor].count(*message) > 0) // if successor could remove this message
       {
         // than we also can
         canRemove[currentStateID].insert(*message);

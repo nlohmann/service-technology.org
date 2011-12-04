@@ -10,14 +10,14 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About Chie:"
-purpose "This tool tests whether given service automata are valid test cases as conformance partner for a given service (also given as service automaton).\n\n  Report bugs to chie@service-technology.org.\n  Visit Chie's home page at http://service-technology.org/chie"
+purpose "This tool tests whether given service automata are valid test cases as conformance partner for a given specification (also given as service automaton).\n\n  Report bugs to chie@service-technology.org.\n  Visit Chie's home page at http://service-technology.org/chie"
 
 section "Input/Output"
-sectiondesc="When called without an input file, Chie reads from the standard input stream. When called with input files, the first service automaton is assumed to be the service automaton of the service and all following files are assumed to be test cases. Results will be written to the standard output stream.\n"
+sectiondesc="When called without an input file, Chie reads from the standard input stream. When called with input files, the first service automaton is assumed to be the specification and all following files are assumed to be test cases. Results will be written to the standard output stream.\n"
 
-option "service" s
-  "Service automaton of the original service."
-  details="This option specifies the original service, so all files given as input files will be assumed to be test cases. Note that you have to use this parameter if you want to test from the standard input stream.\n"
+option "specification" s
+  "Service automaton of the specification."
+  details="This option specifies the specification, so all files given as input files will be assumed to be test cases. Note that you have to use this parameter if you want to test from the standard input stream.\n"
   string
   typestr="FILENAME"
   optional

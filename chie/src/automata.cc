@@ -4,43 +4,38 @@
 #include "util.h"
 #include "verbose.h"
 
-#include <iostream>
-using std::cerr;
-using std::endl;
 
-std::set<std::string> ServiceAutomaton::getSendingEvents()
-{
-  std::set<std::string> result;
-
-  FOREACH(event, isSendingEvent)
-  {
-    if(event->second)
-    {
-      result.insert(event->first);
-    }
-  }
-  return result;
-}
-
-
+/*!
+ * \brief get the ID of a channel state
+ */
 unsigned int getChannelStateID(ProductAutomaton & a, ChannelState & s)
 {
-  static unsigned int nextID = 1;
+  static unsigned int nextID = 1; // TODO: move to product automaton to allow resets
 
-  if(a.channelStateCache.count(s) > 0)
+  if(a.channelStateCache.count(s) > 0) // if this state is already known
   {
+    // return its ID
     return a.channelStateCache[s];
   }
 
+  // otherwise write it to the cache
   a.channelStates[nextID] = s;
   a.channelStateCache[s] = nextID;
 
+  // and return its ID
   return nextID++;
 }
 
+
+/*!
+ * \brief get the ID of a product automaton state
+ *
+ * \note Product automaton state has been split in internal state and channel state
+ *       in order to avoid creating the actual state object when calculating successors.
+ */
 unsigned int getStateID(ProductAutomaton & a, InternalState & s, unsigned int channelStateID)
 {
-  static unsigned int nextID = 2;
+  static unsigned int nextID = 2; // TODO: move to product automaton to allow resets
 
   if((a.stateCache.count(s) > 0) &&
      (a.stateCache[s].count(channelStateID) > 0)) // state already known
@@ -48,34 +43,59 @@ unsigned int getStateID(ProductAutomaton & a, InternalState & s, unsigned int ch
     return a.stateCache[s][channelStateID];
   }
 
+  // otherwise write state to the cache
   a.stateCache[s][channelStateID] = nextID;
   a.states[nextID] = ProductState(s, channelStateID);
 
+  // and return its ID
   return nextID++;
 }
 
+
+/*!
+ * \brief constructor
+ */
 ProductState::ProductState(InternalState & is, unsigned int iid) :
     internalState(is), interfaceStateID(iid), dfs(0), lowlink(0)
 {
 }
 
-// standard constructor
+/*!
+ * \brief standard constructor
+ */
 ProductState::ProductState()
 {
 }
 
-// copy constructor
+/*!
+ * \brief copy constructor
+ */
 ProductState::ProductState(const ProductState & cc) :
     internalState(cc.internalState), interfaceStateID(cc.interfaceStateID),
     dfs(cc.dfs), lowlink(cc.lowlink)
 {
 }
 
+
 /*!
+ * \brief create the product automaton of two service automata
+ *
+ * \param specification service automaton of the specification
+ * \param testCase service automaton of the test case
+ * \param result product automaton object the result will be written to
+ *
  * \note ID counters start at 1
  */
-void createProductAutomaton(ServiceAutomaton & serviceAutomaton, ServiceAutomaton & testCaseAutomaton, ProductAutomaton & result)
+void createProductAutomaton(ServiceAutomaton & specification, ServiceAutomaton & testCase, ProductAutomaton & result)
 {
+  // create event mapping
+  result.events.push_back("TAU");
+  FOREACH(event, specification.isSendingEvent)
+  {
+    result.events2IDs[event->first] = result.events.size();
+    result.events.push_back(event->first);
+  }
+
   // DFS stacks
   std::stack<unsigned int> toDoStack; // scheduled states
   std::stack<unsigned int> dfsStack; // actual DFS stack
@@ -84,7 +104,7 @@ void createProductAutomaton(ServiceAutomaton & serviceAutomaton, ServiceAutomato
   // state computing variables
   ChannelState channelState; // currently channel state
   unsigned int channelStateID = getChannelStateID(result, channelState); // ... and its ID
-  InternalState internalState(serviceAutomaton.initialState, testCaseAutomaton.initialState); // internal state
+  InternalState internalState(specification.initialState, testCase.initialState); // internal state
   ProductState * currentState = NULL; // resulting product state
   unsigned int currentStateID = 0; // ... and its ID
   TransitionType transitionType;
@@ -165,11 +185,11 @@ void createProductAutomaton(ServiceAutomaton & serviceAutomaton, ServiceAutomato
     tarjanStack.push_back(currentStateID);
 
     // "no successor" stuff
-    if(serviceAutomaton.noSuccessorStates.count(currentState->internalState.first) > 0) // if service automaton has no successor
+    if(specification.noSuccessorStates.count(currentState->internalState.first) > 0) // if service automaton has no successor
     {
-      result.noServiceSuccessorStates.insert(currentStateID); // add this state to the list
+      result.noSpecificationSuccessorStates.insert(currentStateID); // add this state to the list
     }
-    if(testCaseAutomaton.noSuccessorStates.count(currentState->internalState.second) > 0) // if test case automaton has no successor
+    if(testCase.noSuccessorStates.count(currentState->internalState.second) > 0) // if test case automaton has no successor
     {
       result.noTestCaseSuccessorStates.insert(currentStateID); // add this state to the list
     }
@@ -178,7 +198,7 @@ void createProductAutomaton(ServiceAutomaton & serviceAutomaton, ServiceAutomato
     bool successorFound = false; // check whether this state has a successor
 
     // successors when first automaton does a step
-    std::map<std::string, std::set<unsigned int> > successors = serviceAutomaton.stateSpace[currentState->internalState.first];
+    std::map<std::string, std::set<unsigned int> > successors = specification.stateSpace[currentState->internalState.first];
     FOREACH(succ, successors)
     {
       FOREACH(succ_, succ->second)
@@ -187,26 +207,26 @@ void createProductAutomaton(ServiceAutomaton & serviceAutomaton, ServiceAutomato
         channelState = result.channelStates[channelStateID = currentState->interfaceStateID];
         internalState = currentState->internalState;
 
-        if(serviceAutomaton.isSendingEvent.count(succ->first) == 0) // internal step
+        if(specification.isSendingEvent.count(succ->first) == 0) // internal step
         {
           internalState.first = *succ_;
           transitionType = INTERNAL;
         }
         else
         {
-          if(serviceAutomaton.isSendingEvent[succ->first]) // sending event
+          if(specification.isSendingEvent[succ->first]) // sending event
           {
             internalState.first = *succ_;
-            channelState.insert(succ->first);
+            channelState.insert(result.events2IDs[succ->first]);
             transitionType = SENDING;
           }
           else // receive event
           {
             // check, whether message is on the channel
-            if(channelState.count(succ->first) > 0)
+            if(channelState.count(result.events2IDs[succ->first]) > 0)
             {
               internalState.first = *succ_;
-              channelState.erase(channelState.find(succ->first)); // remove only one message
+              channelState.erase(channelState.find(result.events2IDs[succ->first])); // remove only one message
               transitionType = RECEIVING;
             }
             else
@@ -232,7 +252,7 @@ void createProductAutomaton(ServiceAutomaton & serviceAutomaton, ServiceAutomato
     }
 
     // successors when second automaton does a step
-    successors = testCaseAutomaton.stateSpace[currentState->internalState.second];
+    successors = testCase.stateSpace[currentState->internalState.second];
     FOREACH(succ, successors)
     {
       FOREACH(succ_, succ->second)
@@ -241,26 +261,26 @@ void createProductAutomaton(ServiceAutomaton & serviceAutomaton, ServiceAutomato
         channelState = result.channelStates[channelStateID = currentState->interfaceStateID];
         internalState = currentState->internalState;
 
-        if(testCaseAutomaton.isSendingEvent.count(succ->first) == 0) // internal step
+        if(testCase.isSendingEvent.count(succ->first) == 0) // internal step
         {
           internalState.second = *succ_;
           transitionType = INTERNAL;
         }
         else
         {
-          if(testCaseAutomaton.isSendingEvent[succ->first]) // sending event
+          if(testCase.isSendingEvent[succ->first]) // sending event
           {
             internalState.second = *succ_;
-            channelState.insert(succ->first);
+            channelState.insert(result.events2IDs[succ->first]);
             transitionType = SENDING;
           }
           else // receive event
           {
             // check, whether message is on the channel
-            if(channelState.count(succ->first) > 0)
+            if(channelState.count(result.events2IDs[succ->first]) > 0)
             {
               internalState.second = *succ_;
-              channelState.erase(channelState.find(succ->first)); // remove only one message
+              channelState.erase(channelState.find(result.events2IDs[succ->first])); // remove only one message
               transitionType = RECEIVING;
             }
             else

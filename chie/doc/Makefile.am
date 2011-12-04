@@ -5,7 +5,7 @@ info_TEXINFOS = chie.texi
 EXTRA_DIST = extra_man
 
 # the height of the README's ASCII art + URL + 3 spaces
-BANNERHEIGHT = 18
+BANNERHEIGHT = 10
 
 # the help option that should be used in the manual
 HELPOPTION = --detailed-help

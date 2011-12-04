@@ -24,22 +24,54 @@ AT_BANNER([Parameters])
 ############################################################################
 
 AT_SETUP([Piping from stdin])
-# AT_CHECK([cat myCoffee.owfn | CHIE],0,ignore, ignore)
+AT_CHECK([cp TESTFILES/test1_specification.sa TESTFILES/test1_partner1.sa .])
+AT_CHECK([cat test1_partner1.sa | CHIE -s test1_specification.sa],0,ignore, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
 AT_SETUP([Reading from file])
-# AT_CHECK([CHIE myCoffee.owfn],0,ignore, ignore)
+AT_CHECK([cp TESTFILES/test1_specification.sa TESTFILES/test1_partner1.sa .])
+AT_CHECK([CHIE test1_specification.sa test1_partner1.sa],0,ignore, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
 AT_SETUP([Output to stderr])
-# AT_CHECK([CHIE myCoffee.owfn], 0, ignore, stderr)
+AT_CHECK([cp TESTFILES/test1_specification.sa TESTFILES/test1_partner1.sa .])
+AT_CHECK([CHIE test1_specification.sa test1_partner1.sa], 0, ignore, stderr)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Output to given file])
+# AT_SETUP([Output to given file])
+# AT_CHECK([cp TESTFILES/test1_specification.sa TESTFILES/test1_partner1.sa .])
 # AT_CHECK([CHIE myCoffee.owfn], 0, ignore, stderr)
+# AT_KEYWORDS(infrastructure)
+# AT_CLEANUP
+
+AT_SETUP([Dot output])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
+
+############################################################################
+AT_BANNER([Error Cases])
+############################################################################
+
+############################################################################
+AT_BANNER([Regression Tests])
+############################################################################
+
+############################################################################
+AT_BANNER([Conformance Test])
+############################################################################
+
+AT_SETUP([Output to stderr])
+AT_CHECK([cp TESTFILES/test1_* .])
+AT_CHECK([CHIE test1_specification.sa test1_partner* test1_no*], 0, ignore, stderr)
+AT_CHECK([GREP -q "chie: test1_partner1.sa: YES" stderr])
+AT_CHECK([GREP -q "chie: test1_partner2.sa: YES" stderr])
+AT_CHECK([GREP -q "chie: test1_noPartner1.sa: NO" stderr])
+AT_CHECK([GREP -q "chie: test1_noPartner2.sa: NO" stderr])
+AT_CHECK([GREP -q "chie: test1_noPartner3.sa: NO" stderr])
+AT_KEYWORDS(core)
+AT_CLEANUP
+
 

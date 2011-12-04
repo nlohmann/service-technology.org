@@ -10,6 +10,7 @@
 #include <string>
 
 #include "sa-syntax.h"
+#include "verbose.h"
 
 extern int sa_yyerror(char const *msg);
 extern std::string sa_lastIdent;
@@ -29,14 +30,14 @@ number         [0-9]+
 <COMMENT>"}"                            { BEGIN(INITIAL);              }
 <COMMENT>[^}]*                          { /* do nothing */             }
 
-"NODES"                                 { return KEY_NODES;            }
-"INITIAL"                               { return KEY_INITIAL;          }
-"FINAL"                                 { return KEY_FINAL;            }
+"NODES"                                 { return NODES;            }
+"INITIAL"                               { return INITIAL_;          }
+"FINAL"                                 { return FINAL;            }
 
-"INTERFACE"                             { return KEY_INTERFACE;        }
-"INPUT"                                 { return KEY_INPUT;            }
-"OUTPUT"                                { return KEY_OUTPUT;           }
-"SYNCHRONOUS"                           { return KEY_SYNCHRONOUS;      }
+"INTERFACE"                             { return INTERFACE;        }
+"INPUT"                                 { return INPUT;            }
+"OUTPUT"                                { return OUTPUT;           }
+"SYNCHRONOUS"                           { return SYNCHRONOUS;      }
 
 ":"                                     { return COLON;                }
 ";"                                     { return SEMICOLON;            }
@@ -53,6 +54,6 @@ number         [0-9]+
 %%
 
 int sa_yyerror(char const *msg) {
-    fprintf(stderr, "%d: error near '%s': %s\n", sa_yylineno, sa_yytext, msg);
-    return EXIT_FAILURE;
+    abort(0, "%d: error near '%s': %s\n", sa_yylineno, sa_yytext, msg);
 }
+

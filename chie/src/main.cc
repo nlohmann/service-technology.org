@@ -56,7 +56,7 @@ extern FILE* sa_yyin;
 
 /// additional parser data
 // whether parsing the second automaton
-ServiceAutomaton * sa_serviceAutomaton = NULL;
+ServiceAutomaton * sa_specification = NULL;
 ServiceAutomaton * sa_result = NULL;
 
 
@@ -75,7 +75,7 @@ void evaluateParameters(int argc, char** argv) {
 
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0) {
-        abort(7, "invalid command-line parameter(s)");
+        abort(0, "invalid command-line parameter(s)");
     }
 
     // debug option
@@ -96,7 +96,7 @@ void evaluateParameters(int argc, char** argv) {
 
         // call the config file parser
         if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
-            abort(14, "error reading configuration file '%s'", args_info.config_arg);
+            abort(0, "error reading configuration file '%s'", args_info.config_arg);
         } else {
             status("using configuration file '%s'", args_info.config_arg);
         }
@@ -112,7 +112,7 @@ void evaluateParameters(int argc, char** argv) {
             params->initialize = 0;
             params->override = 0;
             if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
-                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
+                abort(0, "error reading configuration file '%s'", conf_filename.c_str());
             } else {
                 status("using configuration file '%s'", conf_filename.c_str());
             }
@@ -123,11 +123,11 @@ void evaluateParameters(int argc, char** argv) {
 
 
     // check input
-    if (!args_info.service_given) {
+    if (!args_info.specification_given) {
       // count input files
       switch(args_info.inputs_num) {
       case 0:
-        abort(0, "no service given");
+        abort(0, "no specification given");
       case 1:
         abort(0, "no test chase given");
       default: /* all is fine */ ;
@@ -166,9 +166,9 @@ int main(int argc, char** argv) {
     | 0. parse the command line parameters  |
     `--------------------------------------*/
     evaluateParameters(argc, argv);
-    // TODO: remove this (no tempfiles needed)
-    Output::setTempfileTemplate(args_info.tmpfile_arg);
-    Output::setKeepTempfiles(args_info.noClean_flag);
+    // no tempfiles needed
+    //Output::setTempfileTemplate(args_info.tmpfile_arg);
+    //Output::setKeepTempfiles(args_info.noClean_flag);
 
 
     /*---------------------------.
@@ -176,15 +176,15 @@ int main(int argc, char** argv) {
     `---------------------------*/
 
     // allocate resulting automaton
-    ServiceAutomaton service;
+    ServiceAutomaton specification;
 
     // open service automaton
-    if(args_info.service_given) // if service is specified by --service=foo.sa
+    if(args_info.specification_given) // if service is specified by --service=foo.sa
     {
       // open given automaton
-      sa_yyin = fopen(args_info.service_arg, "r");
+      sa_yyin = fopen(args_info.specification_arg, "r");
       if(!sa_yyin) {
-        abort(0, "failed to open '%s'", args_info.service_arg);
+        abort(0, "failed to open '%s'", args_info.specification_arg);
       }
     }
     else
@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
     }
 
     // set result pointer
-    sa_result = &service;
+    sa_result = &specification;
 
     // actual parsing
     sa_yyparse();
@@ -206,15 +206,17 @@ int main(int argc, char** argv) {
     fclose(sa_yyin);
 
     // set pointer for further parsing
-    sa_serviceAutomaton = sa_result;
+    sa_specification = sa_result;
 
 
     /*----------------------.
     | 2. process test cases |
     `----------------------*/
 
-    // if --service is given, the first file given is a test case
-    int i = (args_info.service_given ? 0 : 1);
+    message("Checking whether the given test cases are conformance partners for the given specification:");
+
+    // if --specification is given, the first file given is a test case
+    int i = (args_info.specification_given ? 0 : 1);
     do
     {
       // set input
@@ -234,8 +236,8 @@ int main(int argc, char** argv) {
       fclose(sa_yyin);
 
       // do the test
-      const char * result = (isConformancePartner(service, testCase) ? "a" : "NOT a"); // TODO: write proper output
-      message("%s is %s conformance partner for the given service", ((args_info.inputs_num == 0) ? "the serven read from the standard input stream" : args_info.inputs[i]), result);
+      const char * result = (isConformancePartner(specification, testCase) ? "YES" : "NO");
+      message("%s: %s", ((args_info.inputs_num == 0) ? "stdin" : args_info.inputs[i]), result);
     } while (++i < args_info.inputs_num);
 
     return EXIT_SUCCESS;

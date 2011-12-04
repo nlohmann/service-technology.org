@@ -3,16 +3,25 @@
 #include <string>
 #include "automata.h"
 
-extern char* sa_yytext;
+// generic bison/flex stuff
+extern char * sa_yytext;
 extern int sa_yylex();
 extern int sa_yyerror(char const *msg);
 
+// pointer to service automata
 extern ServiceAutomaton * sa_result;
-extern ServiceAutomaton * sa_serviceAutomaton;
+extern ServiceAutomaton * sa_specification;
 
+// whether we are handling input events
 bool inputEvents = true;
+
+// wheter node has successors
 bool hasSuccessors = false;
+
+// number of current node
 unsigned int currentNode;
+
+// last read ident
 std::string sa_lastIdent;
 %}
 
@@ -21,8 +30,8 @@ std::string sa_lastIdent;
 %token_table
 %defines
 
-%token KEY_NODES KEY_INITIAL KEY_FINAL
-%token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_SYNCHRONOUS
+%token NODES INITIAL_ FINAL
+%token INTERFACE INPUT OUTPUT SYNCHRONOUS
 %token COLON COMMA SEMICOLON IDENT ARROW NUMBER
 
 %union {
@@ -36,13 +45,13 @@ std::string sa_lastIdent;
 
 
 sa:
-  KEY_INTERFACE input output synchronous KEY_NODES nodes
+  INTERFACE input output synchronous NODES nodes
 ;
 
 
 input:
   /* empty */
-| KEY_INPUT
+| INPUT
   { inputEvents = true; }
   identlist SEMICOLON
 ;
@@ -50,7 +59,7 @@ input:
 
 output:
   /* empty */
-| KEY_OUTPUT
+| OUTPUT
   { inputEvents = false; }
   identlist SEMICOLON
 ;
@@ -58,7 +67,7 @@ output:
 
 synchronous:
   /* empty */
-| KEY_SYNCHRONOUS
+| SYNCHRONOUS
   { sa_yyerror("synchronous communication not supported"); }
   identlist SEMICOLON
 ;
@@ -68,19 +77,20 @@ identlist:
   /* empty */
 | IDENT
   {
-    if (sa_serviceAutomaton &&
-        (sa_serviceAutomaton->isSendingEvent.count(sa_lastIdent) > 0) &&
-        (sa_serviceAutomaton->isSendingEvent[sa_lastIdent] != inputEvents))
+    if (sa_specification && // pointer not NULL, i.e. we are parsing a test case
+        (sa_specification->isSendingEvent.count(sa_lastIdent) > 0) && // current ident is a communication event of the specification
+        (sa_specification->isSendingEvent[sa_lastIdent] != inputEvents)) // current ident is an event of the same type as the event of the specification
     {
+      // both service automata are sending or both are receiving this event
       sa_yyerror("channel type mismatch");
     }
     sa_result->isSendingEvent[sa_lastIdent] = !inputEvents;
   }
 | identlist COMMA IDENT
   {
-    if (sa_serviceAutomaton &&
-        (sa_serviceAutomaton->isSendingEvent.count(sa_lastIdent) > 0) &&
-        (sa_serviceAutomaton->isSendingEvent[sa_lastIdent] != inputEvents))
+    if (sa_specification && // see above
+        (sa_specification->isSendingEvent.count(sa_lastIdent) > 0) &&
+        (sa_specification->isSendingEvent[sa_lastIdent] != inputEvents))
     {
       sa_yyerror("channel type mismatch");
     }
@@ -113,11 +123,11 @@ node:
 
 annotation:
   /* empty */
-| COLON KEY_INITIAL
+| COLON INITIAL_
   { sa_result->initialState = currentNode; }
-| COLON KEY_FINAL
+| COLON FINAL
   { sa_result->finalStates.insert(currentNode); }
-| COLON KEY_INITIAL COMMA KEY_FINAL
+| COLON INITIAL_ COMMA FINAL
   { sa_result->finalStates.insert(sa_result->initialState = currentNode); }
 ;
 

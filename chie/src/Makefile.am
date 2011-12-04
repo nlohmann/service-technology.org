@@ -5,7 +5,7 @@ bin_PROGRAMS = chie
 chie_SOURCES = sa-syntax.yy sa-lexic.ll \
 		main.cc \
 		automata.cc automata.h \
-		conformanceCheck.cc conformacneCheck.h \
+		conformanceCheck.cc conformanceCheck.h \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \
                 Output.cc Output.h \

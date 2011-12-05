@@ -15,7 +15,10 @@
    height="423"
    id="svg8945"
    inkscape:version="0.48.1 "
-   sodipodi:docname="tux-pd.svg">
+   sodipodi:docname="tux-pd.svg"
+   inkscape:export-filename="C:\Users\suermeli\Desktop\website\servicetech\draft\osicons\tux-pd.png"
+   inkscape:export-xdpi="7.8699999"
+   inkscape:export-ydpi="7.8699999">
   <metadata
      id="metadata201">
     <rdf:RDF>
@@ -24,6 +27,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>

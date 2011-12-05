@@ -1,5 +1,5 @@
 ﻿
-    
+  
     
     p.leftcol {
       width: 290px;
@@ -275,3 +275,74 @@ padding-bottom: 2px;
      color: #444;
       }
     
+  tr:nth-child(2n) {  
+    background-color: #eee;
+  }
+
+  tr {  
+    background-color: #ddd;
+  }
+    
+  table {
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    border: 1px solid #eee;
+    text-align: center;
+    font-size: 14pt;
+  }
+  
+  th {
+    background: #ccc;
+  }
+  
+  th.windows-header, th.apple-header, th.linux-header {
+    font-size: 12pt;
+    font-weight: normal;
+    padding-top: 48px;
+    padding-bottom: 8px;
+    width: 100px;
+    line-height: 20px;
+    vertical-align: top;
+  }
+  
+  th.windows-header {
+    background: url(../osicons/windows-pd.png) no-repeat 50% 8px, #ccc;
+  }
+
+  th.apple-header {
+    background: url(../osicons/apple-pd.png) no-repeat 50% 8px, #ccc;
+  }
+
+  th.linux-header {
+    background: url(../osicons/tux-pd.png) no-repeat 50% 8px, #ccc;
+  }
+
+  
+  th.theader {
+    padding-left: 15px;
+    text-align: left;
+  }
+  
+  td {
+    padding: 0px;
+    line-height: 30pt;
+   }
+   
+   td.text {
+    text-align: left;
+    padding-left: 15px;
+   }
+   
+  #stable-versions a:link, #stable-versions a:visited {
+    display: block;
+    font-size: 0pt;
+    background: url(../icons/dl-icon-small.png) no-repeat center center;
+    border-bottom: 0px;
+   }
+   
+ #stable-versions a:hover {
+    background: url(../icons/dl-icon-small.png) no-repeat center center, #02aeed;
+    border-bottom: 0px;
+   }

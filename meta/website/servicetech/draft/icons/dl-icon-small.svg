@@ -9,12 +9,15 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="210mm"
-   height="297mm"
+   width="281.34616"
+   height="263.44647"
    id="svg3051"
    version="1.1"
    inkscape:version="0.48.1 "
-   sodipodi:docname="dl-icon-small.svg">
+   sodipodi:docname="dl-icon-small.svg"
+   inkscape:export-filename="C:\Users\suermeli\Desktop\website\servicetech\draft\icons\dl-icon-small.png"
+   inkscape:export-xdpi="6"
+   inkscape:export-ydpi="6">
   <defs
      id="defs3053">
     <filter
@@ -93,17 +96,21 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.7634324"
-     inkscape:cx="350"
-     inkscape:cy="520"
+     inkscape:zoom="0.4408581"
+     inkscape:cx="558.85651"
+     inkscape:cy="-181.13786"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1600"
-     inkscape:window-height="848"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1" />
+     inkscape:window-width="1920"
+     inkscape:window-height="1148"
+     inkscape:window-x="1272"
+     inkscape:window-y="152"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
   <metadata
      id="metadata3056">
     <rdf:RDF>
@@ -119,7 +126,8 @@
   <g
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     transform="translate(-209.32693,-400.63894)">
     <g
        id="g3030"
        transform="matrix(0.77973567,0,0,0.77973567,149.38487,129.0067)"

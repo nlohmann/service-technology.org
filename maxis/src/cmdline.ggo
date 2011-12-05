@@ -1,15 +1,16 @@
-args "--unamed-opts=FILES --include-getopt --show-required --no-handle-error"
+args "--long-help --include-getopt --show-required --no-handle-error --unamed-opts=FILES"
 
 purpose "Generating a Maximal Partner from an Operating Guideline for Services" 
 
 description "About Maxis:"
 
-section "Input / Output"
+section "Input/Output"
+sectiondesc="Maxis expects one input file of suffix `.og'.\n"
 
 option "output" o
-  "Output file. If no file is given, it will be written to standard out."
+  "Output filename of suffix `.m.sa'. If none is given, the output will be written to standard output.\n"
   string
-  typestr="OUTFILE"
+  typestr="FILENAME"
   optional
 
 option "ignoreEmptyNode" -
@@ -17,31 +18,34 @@ option "ignoreEmptyNode" -
   hidden
   flag off
 
-option "show-states" -
-  "State of input OGs will be noted at each state"
-  hidden
+option "stats" -
+  "Display time and memory consumption on termination."
+  details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
   flag off
-
-
-defgroup "Options" groupdesc="These options control how a maximal partner is calculated.\n" required
+  hidden
+    
+defgroup "Liberal Mode" 
+groupdesc="These option determines how a maximal partner is calculated from Operating Guidelines.\n" optional
 
 groupoption "liberal" l
-  "Calculate a set of satisfiable assignments for each Boolean formula:
-0 - as stated in the input file 
-1 - the least liberal (minimum)
-2 - the most liberal (maximum)\n"
-  group="Options"
+  "Calculate satisfiable assignments of formula:\n 0 - as stated in the input file \n 1 - as the least liberal (minimum) \n 2 - as the most liberal (maximum)\n"
+  group="Liberal Mode"
   values="0","1","2" enum
   default="0"
   typestr="MODE"
-  argoptional 
 
 
 section "Debugging"
-sectiondesc="These options control how much debug output the compilers create.\n"
+sectiondesc="These option determines how much debug output the compilers create.\n"
 
 option "verbose" v
   "Show verbose messages."
   details="Show verbose information reporting intermediate steps.\n"
   flag off
 
+option "debug" d
+  "Show debug messages."
+  details="Show debugged information reporting intermediate steps.\n"
+  hidden
+  flag off
+  

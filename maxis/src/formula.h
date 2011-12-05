@@ -25,7 +25,7 @@
 #include <iostream>
 
 
-// forward declartation
+// forward declaration
 class Literal;
 
 /*!

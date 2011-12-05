@@ -1,0 +1,17 @@
+{
+  generator:    Wendy 3.4-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   wendy wsfm2008.owfn --messagebound=2 --og=wsfm2008.og
+  events:       1 send, 0 receive, 0 synchronous
+  statistics:   3 nodes
+}
+
+INTERFACE
+  OUTPUT
+    g;
+
+NODES
+  36665104 : g
+    g -> 36679088
+  36673424 : final
+  36679088 : g
+    g -> 36673424

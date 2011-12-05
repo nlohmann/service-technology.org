@@ -124,7 +124,7 @@ Conjunction::Conjunction(Formula * left, Formula * right)
  */
 Conjunction::Conjunction(const Conjunction & cc)
 {
-  for(set<Formula*>::iterator f = cc.children_.begin(); 
+  for(set<Formula*>::iterator f = cc.children_.begin();
        f != cc.children_.end(); ++f)
   {
     children_.insert((*f)->clone());
@@ -202,7 +202,15 @@ Formula * Conjunction::dnf() const
   }
   
   if(disjunctions.empty()) // just literals
-    return clone();
+  {
+//	  if (literals.size()<=1)
+//	  { // e.g., a
+		  return clone();
+//	  } else {    // e.g., a * b
+//		    Formula * result = static_cast<Formula *>(new Conjunction(literals));
+//		    return result;
+//	  }
+  }
   
   set<set<Formula *> > disChildren;
   /// calculate cartesian product

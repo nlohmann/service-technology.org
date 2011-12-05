@@ -4,7 +4,7 @@ bin_PROGRAMS = maxis
 maxis_SOURCES = main.cc \
                     cmdline.c cmdline.h \
                     verbose.cc verbose.h \
-		    		syntax-og.yy lexic-og.ll \
+		    		syntax_og.yy lexer_og.ll \
 		    		formula.h formula.cc \
 		    		dnf.h  dnf.cc \
 		    		util.h

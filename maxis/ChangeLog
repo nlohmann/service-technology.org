@@ -1,6 +1,15 @@
-Maxis 0.1-unreleased
+Maxis 0.2-unreleased
 
-version 0.0 (27 May 2010)
+version 0.2 (05 Dec 2011)
 =========================
-Maxis is currently in its infant state. None of changelog is available.
 
+* implement liberal mode   
+
+* reorganize data structures   
+
+version 0.1 (27 May 2010)
+=========================
+
+* read input and write output files
+  
+* use GNU Build System : Autotools  

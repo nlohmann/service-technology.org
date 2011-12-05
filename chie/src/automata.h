@@ -118,11 +118,20 @@ struct ProductAutomaton
 
   // strongly connected components
   std::map<unsigned int, std::set<unsigned int> > SCCs;
+
+  // next channel state ID
+  unsigned int nextChannelStateID; // = 1
+
+  // next state ID
+  unsigned int nextStateID; // = 2
+
+  // node the problem occurs
+  unsigned int badNode;
 };
 
 
 // create the product automaton of two service automata
-void createProductAutomaton(ServiceAutomaton &, ServiceAutomaton &, ProductAutomaton &);
+bool createProductAutomaton(ServiceAutomaton &, ServiceAutomaton &, ProductAutomaton &);
 
 
 #endif /* DATASTRUCTURES_H_ */

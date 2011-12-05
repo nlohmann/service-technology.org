@@ -1,8 +1,12 @@
 #include <stack>
+#include <sstream>
 #include <vector>
 #include "automata.h"
 #include "util.h"
 #include "verbose.h"
+
+// message for verbose output
+extern std::string globalErrorMessage; // defined in main.cc
 
 
 /*!
@@ -10,8 +14,6 @@
  */
 unsigned int getChannelStateID(ProductAutomaton & a, ChannelState & s)
 {
-  static unsigned int nextID = 1; // TODO: move to product automaton to allow resets
-
   if(a.channelStateCache.count(s) > 0) // if this state is already known
   {
     // return its ID
@@ -19,11 +21,11 @@ unsigned int getChannelStateID(ProductAutomaton & a, ChannelState & s)
   }
 
   // otherwise write it to the cache
-  a.channelStates[nextID] = s;
-  a.channelStateCache[s] = nextID;
+  a.channelStates[a.nextChannelStateID] = s;
+  a.channelStateCache[s] = a.nextChannelStateID;
 
   // and return its ID
-  return nextID++;
+  return a.nextChannelStateID++;
 }
 
 
@@ -35,8 +37,6 @@ unsigned int getChannelStateID(ProductAutomaton & a, ChannelState & s)
  */
 unsigned int getStateID(ProductAutomaton & a, InternalState & s, unsigned int channelStateID)
 {
-  static unsigned int nextID = 2; // TODO: move to product automaton to allow resets
-
   if((a.stateCache.count(s) > 0) &&
      (a.stateCache[s].count(channelStateID) > 0)) // state already known
   {
@@ -44,11 +44,11 @@ unsigned int getStateID(ProductAutomaton & a, InternalState & s, unsigned int ch
   }
 
   // otherwise write state to the cache
-  a.stateCache[s][channelStateID] = nextID;
-  a.states[nextID] = ProductState(s, channelStateID);
+  a.stateCache[s][channelStateID] = a.nextStateID;
+  a.states[a.nextStateID] = ProductState(s, channelStateID);
 
   // and return its ID
-  return nextID++;
+  return a.nextStateID++;
 }
 
 
@@ -86,7 +86,7 @@ ProductState::ProductState(const ProductState & cc) :
  *
  * \note ID counters start at 1
  */
-void createProductAutomaton(ServiceAutomaton & specification, ServiceAutomaton & testCase, ProductAutomaton & result)
+bool createProductAutomaton(ServiceAutomaton & specification, ServiceAutomaton & testCase, ProductAutomaton & result)
 {
   // create event mapping
   result.events.push_back("TAU");
@@ -121,15 +121,6 @@ void createProductAutomaton(ServiceAutomaton & specification, ServiceAutomaton &
   {
     // get next state to process
     currentState = &result.states[currentStateID = toDoStack.top()];
-
-    /*
-    cerr << "current state: " << currentStateID << ": [" << currentState->internalState.first << "|" << currentState->internalState.second << "|{";
-    FOREACH(m, result.channelStates[currentState->interfaceStateID])
-    {
-      cerr << *m << ",";
-    }
-    cerr << "}]" << endl;
-    //*/
 
     if(currentState->dfs > 0) // state already seen
     {
@@ -307,8 +298,38 @@ void createProductAutomaton(ServiceAutomaton & specification, ServiceAutomaton &
 
     if(!successorFound)
     {
-      // no successor found
-      result.noSuccessorStates.insert(currentStateID);
+      bool cond1, cond2; // avoid counting twice
+      // no successor found, so both the specification automaton state and the test case automaton state must be final states
+      if((cond1 = (specification.finalStates.count(currentState->internalState.first) == 0)) || // specification state is no final state
+         (cond2 = (testCase.finalStates.count(currentState->internalState.second) == 0))) // test case state is no final state
+      {
+        result.badNode = currentStateID; // mark this state as bad node in product automaton
+
+        // generate error message
+        std::stringstream ss;
+        ss << "node " << currentStateID << " with specification state " << (currentState->internalState.first)
+           << " and test case state " << (currentState->internalState.second) << " has no successors but ";
+        if(cond1)
+        {
+          ss << "specification automaton";
+        }
+        if(cond1 && cond2)
+        {
+          ss << " and ";
+        }
+        if(cond2)
+        {
+          ss << "test case automaton";
+        }
+        ss << ((cond1 && cond2) ? " are" : " is") << " not in a final state";
+        globalErrorMessage = ss.str();
+
+        // return result
+        return false;
+      }
     }
   }
+
+  // finished building product automaton; no error occurred
+  return true;
 }

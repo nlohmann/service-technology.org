@@ -59,6 +59,9 @@ extern FILE* sa_yyin;
 ServiceAutomaton * sa_specification = NULL;
 ServiceAutomaton * sa_result = NULL;
 
+// global variable for verbose output
+std::string globalErrorMessage;
+
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
@@ -236,8 +239,12 @@ int main(int argc, char** argv) {
       fclose(sa_yyin);
 
       // do the test
-      const char * result = (isConformancePartner(specification, testCase) ? "YES" : "NO");
-      message("%s: %s", ((args_info.inputs_num == 0) ? "stdin" : args_info.inputs[i]), result);
+      bool result = isConformancePartner(specification, testCase);
+      message("%s: %s", ((args_info.inputs_num == 0) ? "stdin" : args_info.inputs[i]), (result ? "YES" : "NO"));
+      if(!result)
+      {
+        status(globalErrorMessage.c_str()); // give more information when --verbose is given
+      }
     } while (++i < args_info.inputs_num);
 
     return EXIT_SUCCESS;

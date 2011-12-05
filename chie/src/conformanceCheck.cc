@@ -3,60 +3,42 @@
 #include "util.h"
 #include <queue>
 #include <stack>
+#include <sstream>
+#include "cmdline.h"
 #include "verbose.h"
 
 #include <iostream>
 using std::cerr;
 using std::endl;
 
+// message for verbose output
+extern std::string globalErrorMessage; // defined in main.cc
+
+// used to determine whether to write dot output
+extern gengetopt_args_info args_info; // defined in main.cc
+
 /*!
  * \brief whether two service automata are conformance partners
  */
 bool isConformancePartner(ServiceAutomaton & specification, ServiceAutomaton & testCase)
 {
-  /*-------------------------------.
-  | 1. calculate product automaton |
-  `-------------------------------*/
+  // initialize resulting automaton
+  ProductAutomaton productAutomaton;
+  productAutomaton.nextChannelStateID = 1;
+  productAutomaton.nextStateID = 2;
 
-  ProductAutomaton productAutomaton; // resulting automaton
-  createProductAutomaton(specification, testCase, productAutomaton);
+  // build automaton and execute tests
+  bool result = (createProductAutomaton(specification, testCase, productAutomaton) && // build product automaton and check states without successors
+                 checkStrongReceivability(specification, testCase, productAutomaton) && // check strong receivability from service to test case
+                 checkWeakReceivability(specification, testCase, productAutomaton)); // check weak receivability from test case to specification
 
-
-  /*--------------------------------------------------------.
-  | 2. check strong receivability from service to test case |
-  `--------------------------------------------------------*/
-
-  if(!checkStrongReceivability(specification, testCase, productAutomaton))
+  if((!result) && (args_info.dot_given))
   {
-    return false; // TODO: generate more information here
+    // TODO: write dot output here
   }
 
-  /*------------------------------------------------------.
-  | 3. check weak receivability from test case to specification |
-  `------------------------------------------------------*/
-
-  if(!checkWeakReceivability(specification, testCase, productAutomaton))
-  {
-    return false; // TODO: generate more information here
-  }
-
-  /*-----------------------------------.
-  | 4. check states without successors |
-  `-----------------------------------*/
-
-  // TODO: could be done while creating product automaton
-  FOREACH(stateID, productAutomaton.noSuccessorStates) // iterate over all states without successors
-  {
-    InternalState & state = productAutomaton.states[*stateID].internalState;
-    if((specification.finalStates.count(state.first) == 0) || // specification state is no final state
-       (testCase.finalStates.count(state.second) == 0)) // test case state is no final state
-    {
-      return false; // TODO: more information here
-    }
-  }
-
-  // all tests passed
-  return true;
+  // return result
+  return result;
 }
 
 
@@ -164,7 +146,25 @@ bool checkStrongReceivability(ServiceAutomaton & specification, ServiceAutomaton
           if(successorNodes.size() == 0) // if we can not leave this SCC
           {
             // we found a sending event of the service that is not strong receivable
-            return false; // TODO: generate detailed information (e.g. for dot output) here
+            productAutomaton.badNode = currentStateID; // mark current state as bad node
+
+            // generate error message
+            std::stringstream ss;
+            ss << "message '";
+            FOREACH(event, sendingEvents)
+            {
+              if(channelState.count(*event) > 0)
+              {
+                ss << (productAutomaton.events[*event]);
+                break;
+              }
+            }
+            ss << "' sent by the specification can not be removed from state " << currentStateID
+               << " and is therefore not strong receivable";
+            globalErrorMessage = ss.str();
+
+            // return result
+            return false;
           }
           // we need to check our successors
           FOREACH(succ, successorNodes)
@@ -416,8 +416,17 @@ bool checkWeakReceivability(ServiceAutomaton & specification, ServiceAutomaton &
 
       if(!predecessorFound) // if no predecessor could be found to remove our leftovers
       {
-        // than each message left over is not weak receivable
-        return false; // TODO: more output here
+        // then each message left over is not weak receivable
+        productAutomaton.badNode = currentStateID; // mark current node as bad node
+
+        // generate error message
+        std::stringstream ss;
+        ss << " for message '" << (productAutomaton.events[*leftovers.begin()]) << "' sent by the test case and present in state "
+           << currentStateID << " no appropriate prefix path could be found, therefore this message is not weak receivable";
+        globalErrorMessage = ss.str();
+
+        // return result
+        return false;
       }
     }
   }

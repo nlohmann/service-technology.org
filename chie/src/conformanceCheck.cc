@@ -241,8 +241,120 @@ bool checkWeakReceivability(ServiceAutomaton & specification, ServiceAutomaton &
         needToRemove[currentStateID].insert(*message);
       }
 
-      // perform DFS trying to remove these messages
-      checkWeakReceivabilityDFS(currentStateID, productAutomaton, testCase, sendingEvents, needToRemove, canRemove, triedToRemove);
+
+      // BEGIN DFS
+      std::set<unsigned int> dfsSeenNodes;
+      std::stack<unsigned int> dfs2Do, dfsTrace;
+      dfs2Do.push(currentStateID);
+      std::map<unsigned int, std::set<unsigned int> > successors, dfsLeftovers; // successor and leftover cache
+
+      while(dfs2Do.size() > 0)
+      {
+        unsigned int dfsCurrentStateID = dfs2Do.top();
+
+        if(dfsSeenNodes.count(dfsCurrentStateID) == 0) // node not seen, yet
+        {
+          dfsSeenNodes.insert(dfsCurrentStateID); // mark node as seen
+          dfsTrace.push(dfsCurrentStateID); // do one DFS step
+
+          if(needToRemove[dfsCurrentStateID].size() == triedToRemove[dfsCurrentStateID].size()) // if everything is already done for this node
+          {
+            continue; // do not search twice
+          }
+
+          ChannelState & channelState = productAutomaton.channelStates[productAutomaton.states[dfsCurrentStateID].interfaceStateID]; // current interface
+          FOREACH(message, needToRemove[dfsCurrentStateID])
+          {
+            if(triedToRemove[dfsCurrentStateID].count(*message) == 0) // not tried to remove this message, yet
+            {
+              triedToRemove[dfsCurrentStateID].insert(*message); // now we will try
+              if(channelState.count(*message) > 0)
+              {
+                // message not removed from channel; need to delegate to child nodes
+                dfsLeftovers[dfsCurrentStateID].insert(*message);
+              }
+              else
+              {
+                // message cleared, whohoo
+                canRemove[dfsCurrentStateID].insert(*message);
+              }
+            }
+          }
+
+          if(dfsLeftovers[dfsCurrentStateID].size() == 0) // nothing to delegate to children
+          {
+            continue; // we are finished for this node
+          }
+
+          unsigned int currentTestCaseState = productAutomaton.states[dfsCurrentStateID].internalState.second; // only specification is allowed to do operations
+          FOREACH(transition, productAutomaton.transitions[dfsCurrentStateID]) // iterate over all successors
+          {
+            FOREACH(trans, transition->second)
+            {
+              switch(trans->first) // switch transition type
+              {
+              case INTERNAL:
+                if(productAutomaton.states[trans->second].internalState.second == currentTestCaseState)
+                {
+                  // either specification did a step or we are TAU-looping to this state again and will abort next iteration
+                  successors[dfsCurrentStateID].insert(trans->second);
+                }
+                break;
+              case SENDING:
+                if(!testCase.isSendingEvent[transition->first])
+                {
+                  // a sending step, but test case will only receive this message so specification did a step
+                  successors[dfsCurrentStateID].insert(trans->second);
+                }
+                break;
+              case RECEIVING:
+                if(testCase.isSendingEvent[transition->first])
+                {
+                  // a receiving step, but test case will only send this message so specification did a step
+                  successors[dfsCurrentStateID].insert(trans->second);
+                }
+                break;
+              default:
+                assert(false); // should not happen
+              }
+            }
+          }
+
+          // process all specification successors
+          FOREACH(successor, successors[dfsCurrentStateID])
+          {
+            // schedule leftovers for next DFS iteration
+            FOREACH(message, dfsLeftovers[dfsCurrentStateID])
+            {
+              needToRemove[*successor].insert(*message);
+              dfs2Do.push(*successor);
+            }
+          }
+        }
+        else // node already seen
+        {
+          dfs2Do.pop();
+          if(dfsTrace.top() == dfsCurrentStateID) // backtracking
+          {
+            dfsTrace.pop();
+            FOREACH(successor, successors[dfsCurrentStateID])
+            {
+              // collect results
+              FOREACH(message, dfsLeftovers[dfsCurrentStateID])
+              {
+                if(canRemove[*successor].count(*message) > 0) // if successor could remove this message
+                {
+                  // than we also can
+                  canRemove[dfsCurrentStateID].insert(*message);
+                }
+              }
+            }
+          }
+          // else reaching this node by a non-tree-arc; ignore
+        }
+      }
+      // END DFS
+
 
       // check "mustRemove"s
       std::set<unsigned int> leftovers;
@@ -312,103 +424,4 @@ bool checkWeakReceivability(ServiceAutomaton & specification, ServiceAutomaton &
 
   // all messages could be removed somehow; all messages are weak receivable
   return true;
-}
-
-
-/*!
- * \brief DFS routine used to check weak receivability
- *
- * \TODO rewrite from recursive to iterative and insert in function above
- */
-void checkWeakReceivabilityDFS(unsigned int currentStateID, ProductAutomaton & productAutomaton,
-                               ServiceAutomaton & testCase, std::set<unsigned int> & sendingEvents,
-                               searchCache & needToRemove, searchCache & canRemove, searchCache & triedToRemove)
-{
-  if(needToRemove.size() == triedToRemove.size())
-  {
-    return; // do not search twice
-  }
-
-  std::set<unsigned int> leftovers; // messages that can not be removed yet
-  ChannelState & channelState = productAutomaton.channelStates[productAutomaton.states[currentStateID].interfaceStateID]; // current interface
-  FOREACH(message, needToRemove[currentStateID])
-  {
-    if(triedToRemove[currentStateID].count(*message) == 0) // not tried to remove this message, yet
-    {
-      triedToRemove[currentStateID].insert(*message); // now we will try
-      if(channelState.count(*message) > 0)
-      {
-        // message not removed from channel; need to delegate to child nodes
-        leftovers.insert(*message);
-      }
-      else
-      {
-        // message cleared, whohoo
-        canRemove[currentStateID].insert(*message);
-      }
-    }
-  }
-
-  if(leftovers.size() == 0) // nothing to delegate to children
-  {
-    return; // we are finished for this node
-  }
-
-  unsigned int currentTestCaseState = productAutomaton.states[currentStateID].internalState.second; // only specification is allowed to do operations
-  std::set<unsigned int> successors; // collect successors
-  FOREACH(transition, productAutomaton.transitions[currentStateID]) // iterate over all successors
-  {
-    FOREACH(trans, transition->second)
-    {
-      switch(trans->first) // switch transition type
-      {
-      case INTERNAL:
-        if(productAutomaton.states[trans->second].internalState.second == currentTestCaseState)
-        {
-          // either specification did a step or we are TAU-looping to this state again and will abort next iteration
-          successors.insert(trans->second);
-        }
-        break;
-      case SENDING:
-        if(!testCase.isSendingEvent[transition->first])
-        {
-          // a sending step, but test case will only receive this message so specification did a step
-          successors.insert(trans->second);
-        }
-        break;
-      case RECEIVING:
-        if(testCase.isSendingEvent[transition->first])
-        {
-          // a receiving step, but test case will only send this message so specification did a step
-          successors.insert(trans->second);
-        }
-        break;
-      default:
-        assert(false); // should not happen
-      }
-    }
-  }
-
-  // process all service successors
-  FOREACH(successor, successors)
-  {
-    // schedule leftovers for next DFS iteration
-    FOREACH(message, leftovers)
-    {
-      needToRemove[*successor].insert(*message);
-    }
-
-    // recursive call
-    checkWeakReceivabilityDFS(*successor, productAutomaton, testCase, sendingEvents, needToRemove, canRemove, triedToRemove);
-
-    // collect results
-    FOREACH(message, leftovers)
-    {
-      if(canRemove[*successor].count(*message) > 0) // if successor could remove this message
-      {
-        // than we also can
-        canRemove[currentStateID].insert(*message);
-      }
-    }
-  }
 }

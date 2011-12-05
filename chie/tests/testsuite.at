@@ -63,7 +63,7 @@ AT_BANNER([Regression Tests])
 AT_BANNER([Conformance Test])
 ############################################################################
 
-AT_SETUP([Output to stderr])
+AT_SETUP([Test 1])
 AT_CHECK([cp TESTFILES/test1_* .])
 AT_CHECK([CHIE test1_specification.sa test1_partner* test1_no*], 0, ignore, stderr)
 AT_CHECK([GREP -q "chie: test1_partner1.sa: YES" stderr])

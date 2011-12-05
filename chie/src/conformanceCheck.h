@@ -16,7 +16,4 @@ bool checkStrongReceivability(ServiceAutomaton &, ServiceAutomaton &, ProductAut
 // whether messages from the second automaton are weak receivable in the first automaton
 bool checkWeakReceivability(ServiceAutomaton &, ServiceAutomaton &, ProductAutomaton &);
 
-// DFS routine used to check weak receivability
-void checkWeakReceivabilityDFS(unsigned int, ProductAutomaton &, ServiceAutomaton &, std::set<unsigned int> &, searchCache &, searchCache &, searchCache &);
-
 #endif /* CONFORMANCECHECK_H_ */

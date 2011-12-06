@@ -373,6 +373,7 @@ void add_extra_choices(unsigned int sourceNode, multimap<string, unsigned int> *
 	succ[node_index] = oldArcs;
 
   	// construct a TAU arc from a sourceNode to a new deadlock Node
+   	oldArcs.clear();
 	arcMap->insert( multimap<string, unsigned int>::value_type("TAU ", ++node_index) );
 	succ[node_index] = oldArcs;
 

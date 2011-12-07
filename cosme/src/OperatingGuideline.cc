@@ -227,7 +227,7 @@ bool OperatingGuideline::isMatching(Service& C) {
         }
         y = 0;
         for (label_index_t x = 0; x < C.marking(indexC)->outDegree(); x++) {
-            if (C.marking(indexC)->label(x) == 0) {
+            if (C.marking(indexC)->label(x) == 0) {           
                 todo.add(C.marking(indexC)->successor(x), indexB);
             } else {
                 while (y < this->marking(indexB)->outDegree()) {

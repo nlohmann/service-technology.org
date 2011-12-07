@@ -113,6 +113,10 @@ class OperatingGuideline {
     private:
 
         inline bool isStateMatching(og_service_index_t indexC, og_service_index_t indexB, Service& C) {
+        status("check A[%d], C[%d]", indexB, indexC);
+            if (C.marking(indexC)->label(0) == 0) {
+                return true;            
+            }
             if (this->marking(indexB)->TBit()) {
                 return true;
             }

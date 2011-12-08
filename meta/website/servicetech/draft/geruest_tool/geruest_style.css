@@ -125,7 +125,7 @@ background:
   
   #purpose_image {
     float: right;
-    margin-top: -10px;
+   
     margin-left: 30px;
     margin-right: 0px;
     margin-bottom: 20px;
@@ -143,6 +143,12 @@ background:
   padding: 0px;
  }
  
+ #quick_install ol, #required-tools ul {
+  margin:0px;
+  padding: 0px;
+  margin-left: 30px;
+  }
+ 
 code {
   background: #444;
   color: white;
@@ -150,6 +156,7 @@ code {
   padding-top: 2px;
   padding-bottom: 2px;
   padding-right: 2px;  
+  
  }
  
  code:before {
@@ -258,17 +265,6 @@ padding-bottom: 2px;
     
     }
     
-    #content h3 {
-      break-before: column;
-      break-after: avoid;
-      webkit-break-before: column;
-      webkit-break-after: avoid;
-      moz-break-before: column;
-      moz-break-after: avoid;
-     text-shadow: #ccc 0px 0px 2px;
-     text-transform: uppercase;
-     color: #444;
-      }
     
   tr:nth-child(2n) {  
     background-color: #eee;
@@ -318,7 +314,9 @@ padding-bottom: 2px;
   th.theader {
     padding-left: 15px;
     text-align: left;
-  }
+    text-transform: uppercase;
+    font-weight: normal;
+    }
   
   td {
     padding: 0px;

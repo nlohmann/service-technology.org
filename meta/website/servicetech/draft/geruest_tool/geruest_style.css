@@ -167,36 +167,6 @@ code:before
   padding-bottom: 2px;
 }
 
-.download_list 
-{
-  float: left;
-  width: 305px;
-}
-
-.download_list ul 
-{
-  margin: 0px;
-  padding: 0px;
-  list-style-type: none;
-  padding-left: 36px;
-  margin-top: -20px;
-}
-
-.download_list li 
-{
-  margin-bottom: 10px;
-  margin-top: 0px;
-}
-
-.download_list a 
-{
-  padding-bottom: 0px;
-  padding-left: 28px;
-  line-height: 32px;
-  padding-right: 1px;
-  background: url(../icons/dl-icon-small.png) no-repeat left;
-}
-
 .number-list ol 
 {
   list-style-position: outside;
@@ -223,29 +193,38 @@ code:before
 
 tr:nth-child(2n) 
 {  
-  background-color: #eee;
+  background-color: white;
 }
 
 tr 
 {  
-  background-color: #ddd;
+  background-color:  #FCFCFC;
 }
 
 table 
 {
   border-collapse: collapse;
+  box-shadow: 0px 0px 10px #efefef; 
+  border: 1px #efefef solid;
+  border-bottom: 3px #efefef solid;
+  margin: 20px;
 }
 
-th, td 
-{
-  border: 1px solid #eee;
+th {
+  border: 1px solid #efefef;
+  border-bottom: 6px solid #efefef;
   text-align: center;
   font-size: 19px;
+  background: #FCFCFC;
 }
 
-th 
+td 
 {
-  background: #ccc;
+  border: 1px solid #efefef;
+  text-align: center;
+  font-size: 19px;
+  padding: 0px;
+  line-height: 40px;
 }
 
 th.windows-header, th.apple-header, th.linux-header 
@@ -261,17 +240,17 @@ th.windows-header, th.apple-header, th.linux-header
 
 th.windows-header 
 {
-  background: url(../osicons/windows-pd.png) no-repeat 50% 8px, #ccc;
+  background: url(../osicons/windows-pd.png) no-repeat 50% 8px, #FCFCFC;
 }
 
 th.apple-header 
 {
-  background: url(../osicons/apple-pd.png) no-repeat 50% 8px, #ccc;
+  background: url(../osicons/apple-pd.png) no-repeat 50% 8px, #FCFCFC;
 }
 
 th.linux-header 
 {
-  background: url(../osicons/tux-pd.png) no-repeat 50% 8px, #ccc;
+  background: url(../osicons/tux-pd.png) no-repeat 50% 8px, #FCFCFC;
 }
 
 th.theader {
@@ -281,13 +260,18 @@ th.theader {
   font-weight: normal;
 }
 
-td {
-  padding: 0px;
-  line-height: 40px;
+
+td.text, td.immediate {
+  text-align: left;
 }
 
 td.text {
-  text-align: left;
+  padding-left: 40px;
+}
+
+td.immediate {
+  border-bottom: 3px solid #efefef;
+  border-top: 3px solid #efefef;
   padding-left: 15px;
 }
 

@@ -41,8 +41,6 @@ import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveProcessEditPart;
 import hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveSystemEditPart;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
-import hub.top.greta.cpn.AdaptiveSystemToCPN;
-import hub.top.greta.run.editors.AdaptiveSystemMultiEditor;
 
 import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.CanonicalConnectionEditPolicy;
@@ -80,12 +78,6 @@ public class AdaptiveProcessSimulationView {
 		AdaptiveSystem 	as = null;
 		AdaptiveProcess ap = null;
 		EditPart apE = null;
-		
-		// unwrap multipage editor
-		if (editor instanceof AdaptiveSystemMultiEditor) {
-			AdaptiveSystemMultiEditor me = (AdaptiveSystemMultiEditor)editor;
-			editor = me.getActiveEditor();
-		}
 		
 		if (editor instanceof AdaptiveSystemDiagramEditor) {
 			ed = (DiagramDocumentEditor)editor;

@@ -341,10 +341,15 @@ public class AdaptiveSystemToCPN {
     }
   }
 
-  public void exportNet() throws Exception {
-    System.out.println("writing");
-    DOMGenerator.export(net, "D://out.cpn");
-    System.out.println("done");
+  public void exportNet() {
+    try {
+      System.out.println("writing");
+      DOMGenerator.export(net, "D://out.cpn");
+      System.out.println("done");
+    } catch (Exception e) {
+      System.err.println("could not write debug file");
+      e.printStackTrace();
+    }
   }
 
   public void check() {

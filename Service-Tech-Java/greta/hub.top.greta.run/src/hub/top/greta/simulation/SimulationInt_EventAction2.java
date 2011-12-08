@@ -191,13 +191,8 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
               boolean allBindingsMatch = true;
               for (DNode c : e.pre) {
                 String place = system.getOriginalNode(c).getName();
-                System.out.println(place);
                 String placeName = AdaptiveSystemToCPN.getPlaceName(place);
-                System.out.println(placeName);
                 String token = AdaptiveSystemToCPN.getToken(place);
-                System.out.println(token);
-                
-                System.out.println(token+" <> "+toConsume.get(placeName)+" from "+placeName);
                 
                 if (!token.equals(toConsume.get(placeName))) {
                   allBindingsMatch = false;

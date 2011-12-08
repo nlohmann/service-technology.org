@@ -51,6 +51,17 @@ INSTALLATION (to be done)
     UMA uses some generated code. If you want to make changes to the source
     code, you might need the following tools to regenerate the code:
      * ???
+     
+    UMA uses some external libraries to run. The SVN repository sources do
+    not contain these external libraries. UMA's ant file is designed to
+    collect these libraries for you and place them at the right locations.
+    However, if this fails, you may have to obtain and places the following
+    libraries manually:
+    
+    * PNAPI/Java 
+      obtain the latest copy from svn://svn.gna.org/svn/service-tech/trunk,
+      there, run "ant jar" to generate the file ./build/pnapi-java.jar; put
+      this file to <uma-root>/libs-external/pnapi-java.jar
 
 
 DOCUMENTATION

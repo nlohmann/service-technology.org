@@ -8,8 +8,7 @@ Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Export-Package: hub.top.adaptiveSystem,
  hub.top.adaptiveSystem.impl,
- hub.top.adaptiveSystem.util,
- hub.top.adaptiveSystem.validation
+ hub.top.adaptiveSystem.util
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore;visibility:=reexport,
  org.eclipse.emf.ecore.xmi;visibility:=reexport

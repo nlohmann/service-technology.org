@@ -41,6 +41,7 @@ import hub.top.adaptiveSystem.Arc;
 import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
+import hub.top.greta.cpn.AdaptiveSystemToCPN;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -66,13 +67,15 @@ public class RunConfiguration {
 	protected AdaptiveSystem 	as;
 	protected AdaptiveProcess	initialState;
   protected boolean inWaitForUser;
+  
+  public AdaptiveSystemToCPN a2c;
 
-
-
-	public RunConfiguration(AdaptiveSystem as) {
+  public RunConfiguration(AdaptiveSystem as) {
 		this.as = as;
 		this.initialState = (AdaptiveProcess)EcoreUtil.copy(as.getAdaptiveProcess());
 		this.inWaitForUser = false;
+		
+		a2c = null;
 	}
 	
 	
@@ -199,4 +202,31 @@ public class RunConfiguration {
 		else
 			return false;
 	}
+	
+  public void createNewBridgeToCPN(AdaptiveSystem adaptiveSystem) {
+    try {
+      a2c = new AdaptiveSystemToCPN();
+      a2c.loadFunctionDefinitions(adaptiveSystem);
+      a2c.convertInitialRunToMarking(adaptiveSystem);
+      a2c.convertEventsToTransitions(adaptiveSystem);
+      a2c.check();
+      a2c.exportNet();
+    } catch (Exception e) {
+      System.err.println(e);
+      e.printStackTrace();
+    }
+  }
+  
+  public void terminateBridgeToCPN() {
+    try {
+      if (a2c != null) {
+        a2c.destroy();
+        a2c = null;
+      }
+    } catch (Exception e) {
+      System.err.println(e);
+      e.printStackTrace();
+    }
+  }
+	  
 }

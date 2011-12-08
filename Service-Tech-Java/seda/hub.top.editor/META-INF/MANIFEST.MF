@@ -15,5 +15,4 @@ Require-Bundle: org.eclipse.ui,
  hub.top.editor.resource;visibility:=reexport
 Eclipse-LazyStart: true
 Export-Package: hub.top.editor
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

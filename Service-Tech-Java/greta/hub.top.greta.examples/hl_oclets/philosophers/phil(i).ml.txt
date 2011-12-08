@@ -1,0 +1,5 @@
+fun left (phil: INT) = phil;
+
+fun right (phil: INT) = 
+if (phil <= 2) then phil+1
+else 1;

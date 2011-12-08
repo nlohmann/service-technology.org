@@ -50,6 +50,7 @@ import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 
+@Deprecated
 public class SimulationInt_EventAction extends SimulationInteractiveAction {
 
 	public static final String ID = "hub.top.GRETA.run.process";
@@ -76,7 +77,7 @@ public class SimulationInt_EventAction extends SimulationInteractiveAction {
    * @see hub.top.greta.simulation.SimulationInteractiveAction#extendAdaptiveProcess()
    */
   @Override
-	protected void extendAdaptiveProcess() {
+	protected void extendAdaptiveProcess(RunConfiguration rc) {
     ////System.out.println("step!");
     
     //cut is the list of markedConditions of adaptive process
@@ -105,7 +106,7 @@ public class SimulationInt_EventAction extends SimulationInteractiveAction {
    * @see hub.top.greta.simulation.SimulationInteractiveAction#fireSelectedEvent(hub.top.adaptiveSystem.Event)
    */
   @Override
-	protected void fireSelectedEvent(Event e) {
+	protected void fireSelectedEvent(RunConfiguration rc, Event e) {
     fireEvent(e);
     removeHighlightActivatedEvents();
     activatedEvents.clear();

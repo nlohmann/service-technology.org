@@ -595,4 +595,13 @@
          </partContribution>
       </contributionItemProvider>
    </extension>
+   <extension
+         point="org.eclipse.gmf.runtime.diagram.ui.layoutProviders">
+      <layoutProvider
+            class="org.eclipse.gmf.runtime.diagram.ui.providers.TopDownProvider">
+         <Priority
+               name="Medium">
+         </Priority>
+      </layoutProvider>
+   </extension>
 </plugin>

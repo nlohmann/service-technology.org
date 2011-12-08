@@ -21,5 +21,4 @@ Export-Package: hub.top.editor.eclipse,
  hub.top.editor.eclipse.ui,
  hub.top.editor.resource
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts

@@ -38,6 +38,7 @@
 package hub.top.greta.simulation;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -112,7 +113,7 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
     RunConfiguration rc = StartAction.getActiveRunConfiguration(simView.adaptiveSystem);
     if (rc == null) return;
     
-    extendAdaptiveProcess();
+    extendAdaptiveProcess(rc);
     rc.inWaitForUser = true;
     action.setEnabled(false);
   }
@@ -173,7 +174,7 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
           Event event = (Event) ((org.eclipse.gmf.runtime.notation.Node) eventEP.getModel()).getElement();
           if(!activatedEvents.isEmpty() && activatedEvents.contains(event)) {
 
-            fireSelectedEvent(event);
+            fireSelectedEvent(rc, event);
             eventEP.getViewer().deselect(eventEP);  // auto-deselect the fired transition
 
             rc.inWaitForUser = false;
@@ -211,14 +212,15 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
    * Extend the {@link hub.top.adaptiveSystem.AdaptiveProcess} by structures from
    * {@link Oclet}s.
    */
-  protected abstract void extendAdaptiveProcess();
+  protected abstract void extendAdaptiveProcess(RunConfiguration rc);
   
   /**
    * Fire the selected event in the {@link hub.top.adaptiveSystem.AdaptiveProcess}
+   * @param rc 
    * 
    * @param e
    */
-  protected abstract void fireSelectedEvent(Event e);
+  protected abstract void fireSelectedEvent(RunConfiguration rc, Event e);
   
   /**
    * Check whether the given list of preConditions have matching {@link Condition}s in
@@ -1128,7 +1130,7 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
    * 
    * @param cmdList
    */
-  protected void executeCommands(EList<Command> cmdList) {
+  protected void executeCommands(List<Command> cmdList) {
     CompoundCommand fireCmd = new CompoundCommand(cmdList);
     // and execute it in a transactional editing domain (for undo/redo)
     fireCmd.canExecute();

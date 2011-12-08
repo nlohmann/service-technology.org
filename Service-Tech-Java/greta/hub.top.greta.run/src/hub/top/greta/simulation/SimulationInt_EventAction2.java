@@ -41,22 +41,26 @@ import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Temp;
+import hub.top.greta.cpn.AdaptiveSystemToCPN;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeBP_Scenario;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys_AdaptiveSystem;
+import hub.top.uma.INameProcessor;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Options;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
+import org.cpntools.accesscpn.engine.highlevel.instance.Binding;
+import org.cpntools.accesscpn.engine.highlevel.instance.ValueAssignment;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CommandStack;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.edit.command.DeleteCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -68,11 +72,13 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
   // all events that were visited during nodeMatch()
   //protected HashSet<Event> checkedEvents = new HashSet<Event>();
 	//saves the activated normal oclets with all marked conditions in oclet, associated with matched adaptive process conditions
-	protected EList<EMap<Condition, Condition>> activatedNormalTransitions = new BasicEList<EMap<Condition, Condition>>();
+	protected List<Map<Condition, Condition>> activatedNormalTransitions = new LinkedList<Map<Condition, Condition>>();
 	//saves the activated anti oclets with all marked conditions in oclet, associated with matched adaptive process conditions
-	protected EList<EMap<Condition, Condition>> activatedAntiTransitions = new BasicEList<EMap<Condition, Condition>>();
+	protected List<Map<Condition, Condition>> activatedAntiTransitions = new LinkedList<Map<Condition, Condition>>();
 	// list of all currently enabled transitions in an oclet
-	protected EList<Event>activatedOcletTransitions = new BasicEList<Event>();
+	protected List<Event>activatedOcletTransitions = new LinkedList<Event>();
+	// HL enabling bindings for events
+	protected Map<Event, Binding> enablingBinding = new HashMap<Event, Binding>();
 
 	// list of all nodes to be deleted before the next extension
 	// this list is filled in the previous step with nodes that are not
@@ -95,7 +101,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
    * @see hub.top.greta.simulation.SimulationInteractiveAction#extendAdaptiveProcess()
    */
   @Override
-	protected void extendAdaptiveProcess() {
+	protected void extendAdaptiveProcess(RunConfiguration rc) {
     //System.out.println("step!");
     
     // some pre-processing to clear situation from previous step
@@ -114,7 +120,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     // transform current system model and process instance into Uma's input format
     // TODO: compute system when starting simulation, update adaptive process only
     try {
-      system = new DNodeSys_AdaptiveSystem(simView.adaptiveSystem);
+      system = new DNodeSys_AdaptiveSystem(simView.adaptiveSystem, INameProcessor.HLtoLL);
     } catch (InvalidModelException e) {
       MessageDialog.openError(this.workbenchWindow.getShell(), "Animated one step.", "Failed to animate. "+e.getMessage());
       return;
@@ -157,9 +163,69 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
       // we identify the fired events as the pre-events of the maximal conditions
       // of the current process instance as computed by Uma
       HashSet<DNode> firedEvents = new HashSet<DNode>();
+      Map<DNode, Binding> bp_enablingBinding = new HashMap<DNode, Binding>();
+      List<Binding> bindings = (rc.a2c != null) ? rc.a2c.enabledTransitions() : null;
+      
       for (DNode b : bps.getCurrentMaxNodes()) {
         if (b.pre == null || b.pre.length == 0) continue;
-        firedEvents.add(b.pre[0]);
+        
+        DNode e = b.pre[0];
+
+        boolean isHLenabled;
+        
+        if (rc.a2c == null) {
+          // this is a low-level specification, event is enabled
+          isHLenabled = true;
+        } else {
+          // this is a high-level specification, check enabling wrt data
+          isHLenabled = false;
+          
+          for (Binding bind : bindings) {
+            
+            Map<String, String> toConsume = rc.a2c.getSourceTokens(bind);
+            
+            if (bind.getTransitionInstance().getNode().getName().getText().equals(system.properNames[e.id])) {
+  
+              System.out.println(bind);
+              
+              boolean allBindingsMatch = true;
+              for (DNode c : e.pre) {
+                String place = system.getOriginalNode(c).getName();
+                System.out.println(place);
+                String placeName = AdaptiveSystemToCPN.getPlaceName(place);
+                System.out.println(placeName);
+                String token = AdaptiveSystemToCPN.getToken(place);
+                System.out.println(token);
+                
+                System.out.println(token+" <> "+toConsume.get(placeName)+" from "+placeName);
+                
+                if (!token.equals(toConsume.get(placeName))) {
+                  allBindingsMatch = false;
+                }
+              }
+              if (allBindingsMatch) {
+                
+                boolean alreadyBound = false;
+                for (DNode ePrime : bp_enablingBinding.keySet()) {
+                  if (e.id == ePrime.id) {
+                    if (bp_enablingBinding.get(ePrime) == bind) {
+                      alreadyBound = true;
+                    }
+                  }
+                }
+                
+                if (!alreadyBound) {
+                  bp_enablingBinding.put(e, bind); // remember the binding
+                  isHLenabled = true;
+                  break;
+                }
+              }
+            }
+          }
+        }
+        
+        if (isHLenabled)
+          firedEvents.add(e);
       }
       
       // determine for each fired event where it was fired and which
@@ -191,10 +257,25 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
           createArc(cond, event);
         }
         
+        // store the binding for this event
+        enablingBinding.put(event, bp_enablingBinding.get(e));
+
+        Map<String, String> tokens = null;
+        if (rc.a2c != null) // HL-specification: get resulting data values
+          tokens = rc.a2c.getResultingTokens(bp_enablingBinding.get(e)); 
+          
         // create corresponding post-conditions and arcs in the editor
         for (DNode b : e.post) {
+          
+          String conditionName = system.properNames[b.id];
+          
+          if (rc.a2c != null) { // HL-spec: put resulting conditions in right format
+            String token = tokens.get(conditionName);
+            conditionName = "("+conditionName+","+token+")";
+          }
+
           //System.out.println("   producing "+b);
-          Condition cond = createCondition(system.properNames[b.id], Temp.COLD, b.isAnti);
+          Condition cond = createCondition(conditionName, Temp.COLD, b.isAnti);
           createArc(event, cond);
         }
       } // finished displaying all fired events in the editor
@@ -212,9 +293,12 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
    * @see hub.top.greta.simulation.SimulationInteractiveAction#fireSelectedEvent(hub.top.adaptiveSystem.Event)
    */
   @Override
-	protected void fireSelectedEvent(Event e) {
+	protected void fireSelectedEvent(RunConfiguration rc, Event e) {
     fireEvent(e);
     removeHighlightActivatedEvents();
+    
+    if (rc.a2c != null)
+      rc.a2c.execute(enablingBinding.get(e));
 
     // remove all events that had been added temporarily to the process
     // instance to show enabling information
@@ -237,6 +321,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     // list of all currently enabled transitions in an oclet
     activatedEvents.clear();
     activatedOcletTransitions.clear();
+    enablingBinding.clear();
 	}
 	
   /**
@@ -247,7 +332,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
    */
   private void highlightActivatedEvents() {
     
-    EList<Command> cmdList = new BasicEList<Command>();
+    List<Command> cmdList = new LinkedList<Command>();
     
     // highlight all activated events in the adaptive process
     for (Event event : activatedEvents) {
@@ -272,7 +357,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
    */
   private void removeHighlightActivatedEvents() {
     
-    EList<Command> cmdList = new BasicEList<Command>();
+    List<Command> cmdList = new LinkedList<Command>();
     
     //after firing event reset values
     for(Event event : activatedEvents) {

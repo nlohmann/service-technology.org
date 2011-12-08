@@ -37,8 +37,13 @@ package hub.top.greta.simulation;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
+import hub.top.greta.cpn.AdaptiveSystemToCPN;
 import hub.top.greta.run.Activator;
 
+import org.cpntools.accesscpn.engine.Simulator;
+import org.cpntools.accesscpn.engine.SimulatorService;
+import org.cpntools.accesscpn.engine.highlevel.HighLevelSimulator;
+import org.cpntools.accesscpn.model.util.BuildCPNUtil;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
@@ -180,6 +185,12 @@ public class StartAction implements
 	private void startSimulation () {
 		createNewRunConfiguration(simView.adaptiveSystem);
 		
+		if (AdaptiveSystemToCPN.isHighLevelSpecification(simView.adaptiveSystem)) {
+		  simulationConfiguration.createNewBridgeToCPN(simView.adaptiveSystem);
+		} else {
+		  simulationConfiguration.terminateBridgeToCPN();
+		}
+
 		// notify all actions
 		simView.processViewEditor.getDiagramGraphicalViewer().deselectAll();
 		simView.processViewEditor.getDiagramGraphicalViewer().select(simView.apEditPart);
@@ -258,6 +269,7 @@ public class StartAction implements
 	 */
 	public static RunConfiguration createNewRunConfiguration(AdaptiveSystem as) {
 		simulationConfiguration = new RunConfiguration(as);
+		
 		return simulationConfiguration;
 	}
 

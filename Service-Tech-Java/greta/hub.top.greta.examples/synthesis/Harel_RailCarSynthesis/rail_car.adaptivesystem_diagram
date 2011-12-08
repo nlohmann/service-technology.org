@@ -1,0 +1,1503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:adaptiveSystem="adaptiveSystem" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.1/notation" xmi:id="_w9pJYIQmEd6pkP2XjVQF7w" type="AdaptiveSystem" name="rail_car.adaptivesystem_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_zr11AYQmEd6pkP2XjVQF7w" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_zsIv8IQmEd6pkP2XjVQF7w" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_WufqAIQoEd6pkP2XjVQF7w" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_WvGG8IQoEd6pkP2XjVQF7w" type="4001">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_WvGG8YQoEd6pkP2XjVQF7w" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_WvGG8oQoEd6pkP2XjVQF7w" type="4002">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_WvGG84QoEd6pkP2XjVQF7w" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_WvGG9IQoEd6pkP2XjVQF7w" type="4003"/>
+        <styles xmi:type="notation:ShapeStyle" xmi:id="_WufqAYQoEd6pkP2XjVQF7w"/>
+        <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_WuMvEIQoEd6pkP2XjVQF7w"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_WufqAoQoEd6pkP2XjVQF7w" x="30" y="29"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_YF0CQYQoEd6pkP2XjVQF7w" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_YF0CRIQoEd6pkP2XjVQF7w" type="4001">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_YF0CRYQoEd6pkP2XjVQF7w" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_YF0CRoQoEd6pkP2XjVQF7w" type="4002">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_YF0CR4QoEd6pkP2XjVQF7w" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_YF0CSIQoEd6pkP2XjVQF7w" type="4003"/>
+        <styles xmi:type="notation:ShapeStyle" xmi:id="_YF0CQoQoEd6pkP2XjVQF7w"/>
+        <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_YF0CQIQoEd6pkP2XjVQF7w"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_YF0CQ4QoEd6pkP2XjVQF7w" x="100" y="29"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_bWIjgYQoEd6pkP2XjVQF7w" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_bWIjhIQoEd6pkP2XjVQF7w" type="4001">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_bWIjhYQoEd6pkP2XjVQF7w" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_bWIjhoQoEd6pkP2XjVQF7w" type="4002">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_bWIjh4QoEd6pkP2XjVQF7w" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_bWIjiIQoEd6pkP2XjVQF7w" type="4003"/>
+        <styles xmi:type="notation:ShapeStyle" xmi:id="_bWIjgoQoEd6pkP2XjVQF7w"/>
+        <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_bWIjgIQoEd6pkP2XjVQF7w"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_bWIjg4QoEd6pkP2XjVQF7w" x="190" y="29"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_d6DRwYQoEd6pkP2XjVQF7w" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_d6DRxIQoEd6pkP2XjVQF7w" type="4001">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_d6DRxYQoEd6pkP2XjVQF7w" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_d6DRxoQoEd6pkP2XjVQF7w" type="4002">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_d6DRx4QoEd6pkP2XjVQF7w" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_d6DRyIQoEd6pkP2XjVQF7w" type="4003"/>
+        <styles xmi:type="notation:ShapeStyle" xmi:id="_d6DRwoQoEd6pkP2XjVQF7w"/>
+        <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_d6DRwIQoEd6pkP2XjVQF7w"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_d6DRw4QoEd6pkP2XjVQF7w" x="270" y="29"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_LsQmoIRfEd64RrlZ1NCuLQ" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_LtANgIRfEd64RrlZ1NCuLQ" type="4001">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_LtANgYRfEd64RrlZ1NCuLQ" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_LtJ-gIRfEd64RrlZ1NCuLQ" type="4002">
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_LtJ-gYRfEd64RrlZ1NCuLQ" y="5"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_LtJ-goRfEd64RrlZ1NCuLQ" type="4003"/>
+        <styles xmi:type="notation:ShapeStyle" xmi:id="_LsQmoYRfEd64RrlZ1NCuLQ"/>
+        <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_Lrz6sIRfEd64RrlZ1NCuLQ"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_LsQmooRfEd64RrlZ1NCuLQ" x="350" y="29"/>
+      </children>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_zsIv8YQmEd6pkP2XjVQF7w"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_zsIv8oQmEd6pkP2XjVQF7w"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_zr11AoQmEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:AdaptiveProcess" href="rail_car.adaptivesystem#_zr11AIQmEd6pkP2XjVQF7w"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_zr11A4QmEd6pkP2XjVQF7w" x="-405" y="60" width="614" height="614"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_0150YIQmEd6pkP2XjVQF7w" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_02C-UIQmEd6pkP2XjVQF7w" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_02C-UYQmEd6pkP2XjVQF7w" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_02MvUIQmEd6pkP2XjVQF7w" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_02V5QIQmEd6pkP2XjVQF7w" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_43sO0YQmEd6pkP2XjVQF7w" type="2005">
+          <children xmi:type="notation:Node" xmi:id="_43sO1IQmEd6pkP2XjVQF7w" type="4009">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_43sO1YQmEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_431YwIQmEd6pkP2XjVQF7w" type="4010">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_431YwYQmEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_43sO0oQmEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_43sO0IQmEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_43sO04QmEd6pkP2XjVQF7w" x="198" y="37"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_7EW6sYQmEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_7EW6tIQmEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_7EW6tYQmEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_7EgEoIQmEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_7EgEoYQmEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_7EgEooQmEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_7EW6soQmEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_7EW6sIQmEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7EW6s4QmEd6pkP2XjVQF7w" x="198" y="72"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_8GOAUYQmEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_8GOAVIQmEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_8GOAVYQmEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_8GOAVoQmEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_8GOAV4QmEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_8GOAWIQmEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_8GOAUoQmEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_8GOAUIQmEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8GOAU4QmEd6pkP2XjVQF7w" x="63" y="72"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_8udFAYQmEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_8umO8IQmEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_8umO8YQmEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_8umO8oQmEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_8umO84QmEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_8umO9IQmEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_8udFAoQmEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_8udFAIQmEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8udFA4QmEd6pkP2XjVQF7w" x="325" y="58"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_9ASF8YRUEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_9ASF9IRUEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_9ASF9YRUEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_9ASF9oRUEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_9ASF94RUEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_9ASF-IRUEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_9ASF8oRUEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_9ASF8IRUEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_9ASF84RUEd6pkP2XjVQF7w" x="198" y="7"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_02V5QYQmEd6pkP2XjVQF7w"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_02V5QoQmEd6pkP2XjVQF7w"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_02MvUYQmEd6pkP2XjVQF7w"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="rail_car.adaptivesystem#_0sgn0YQmEd6pkP2XjVQF7w"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_02MvUoQmEd6pkP2XjVQF7w" y="20" width="371" height="122"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_02V5Q4QmEd6pkP2XjVQF7w" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_02V5RoQmEd6pkP2XjVQF7w" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_AqutUIQnEd6pkP2XjVQF7w" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_Aq4eUIQnEd6pkP2XjVQF7w" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_Aq4eUYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_Aq4eUoQnEd6pkP2XjVQF7w" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_Aq4eU4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_AqutUYQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_AqIQYIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_AqutUoQnEd6pkP2XjVQF7w" x="255" y="13"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_CnJ9wYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_CnvzoIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_CnvzoYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_Cn5koIQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_Cn5koYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_Cn5kooQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_CnJ9woQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_CnJ9wIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_CnJ9w4QnEd6pkP2XjVQF7w" x="197" y="57"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_DAx-sYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_DAx-tIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_DAx-tYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_DAx-toQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_DAx-t4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_DAx-uIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_DAx-soQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_DAx-sIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DAx-s4QnEd6pkP2XjVQF7w" x="323" y="60"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_DwngMYQnEd6pkP2XjVQF7w" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_DwngNIQnEd6pkP2XjVQF7w" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_DwngNYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_DwngNoQnEd6pkP2XjVQF7w" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_DwngN4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_DwngMoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_DwngMIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DwngM4QnEd6pkP2XjVQF7w" x="255" y="88"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_Gh8YUYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_Gh8YVIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_Gh8YVYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_Gh8YVoQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_Gh8YV4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_Gh8YWIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_Gh8YUoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_Gh8YUIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Gh8YU4QnEd6pkP2XjVQF7w" x="197" y="131"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_G57agYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_G57ahIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_G57ahYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_G57ahoQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_G57ah4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_G57aiIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_G57agoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_G57agIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_G57ag4QnEd6pkP2XjVQF7w" x="323" y="135"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_JLEWsYQnEd6pkP2XjVQF7w" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_JLEWtIQnEd6pkP2XjVQF7w" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_JLEWtYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_JLEWtoQnEd6pkP2XjVQF7w" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_JLEWt4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_JLEWsoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_JLEWsIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_JLEWs4QnEd6pkP2XjVQF7w" x="135" y="176"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_KoWNAYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_KoWNBIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_KoWNBYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_KoWNBoQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_KoWNB4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_KoWNCIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_KoWNAoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_KoWNAIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_KoWNA4QnEd6pkP2XjVQF7w" x="55" y="213"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_LRxkgYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_LRxkhIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_LRxkhYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_LRxkhoQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_LRxkh4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_LRxkiIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_LRxkgoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_LRxkgIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_LRxkg4QnEd6pkP2XjVQF7w" x="197" y="218"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_NecQYYQnEd6pkP2XjVQF7w" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_NecQZIQnEd6pkP2XjVQF7w" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_NecQZYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_NecQZoQnEd6pkP2XjVQF7w" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_NecQZ4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_NecQYoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_NecQYIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_NecQY4QnEd6pkP2XjVQF7w" x="135" y="248"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_PM26AYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_PNArAIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_PNArAYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_PNArAoQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_PNArA4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_PNArBIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_PM26AoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_PM26AIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_PM26A4QnEd6pkP2XjVQF7w" x="197" y="283"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_PjXVgYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_PjXVhIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_PjXVhYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_PjXVhoQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_PjXVh4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_PjXViIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_PjXVgoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_PjXVgIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_PjXVg4QnEd6pkP2XjVQF7w" x="55" y="279"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_VIr_QYQnEd6pkP2XjVQF7w" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_VIr_RIQnEd6pkP2XjVQF7w" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_VIr_RYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_VIr_RoQnEd6pkP2XjVQF7w" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_VIr_R4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_VIr_QoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_VIr_QIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_VIr_Q4QnEd6pkP2XjVQF7w" x="130" y="313"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_W3Go4YQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_W3Go5IQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_W3Go5YQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_W3Go5oQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_W3Go54QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_W3Go6IQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_W3Go4oQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_W3Go4IQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_W3Go44QnEd6pkP2XjVQF7w" x="55" y="353"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_XiK_IYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_XiK_JIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_XiK_JYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_XiK_JoQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_XiK_J4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_XiK_KIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_XiK_IoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_XiK_IIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XiK_I4QnEd6pkP2XjVQF7w" x="197" y="358"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_02V5R4QmEd6pkP2XjVQF7w"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_02V5SIQmEd6pkP2XjVQF7w"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_02V5RIQmEd6pkP2XjVQF7w"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="rail_car.adaptivesystem#_01dIcIQmEd6pkP2XjVQF7w"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_02V5RYQmEd6pkP2XjVQF7w" y="142" width="371" height="404"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_0150YYQmEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="rail_car.adaptivesystem#_0sgn0IQmEd6pkP2XjVQF7w"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_0150YoQmEd6pkP2XjVQF7w" x="215" y="60" width="375" height="550"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_b5uOMYQnEd6pkP2XjVQF7w" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_b5uONIQnEd6pkP2XjVQF7w" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_b5uONYQnEd6pkP2XjVQF7w" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_b5uONoQnEd6pkP2XjVQF7w" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_b5uOOYQnEd6pkP2XjVQF7w" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_fI11kIQnEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_fI_mkIQnEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fI_mkYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_fI_mkoQnEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_fI_mk4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_fI_mlIQnEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_fI11kYQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_fIsroIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fI11koQnEd6pkP2XjVQF7w" x="399" y="10"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_gyMZAYQnEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_gyMZBIQnEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_gyMZBYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_gyMZBoQnEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_gyMZB4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_gyMZCIQnEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_gyMZAoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_gyMZAIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_gyMZA4QnEd6pkP2XjVQF7w" x="236" y="10"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_hkjqEIQnEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_hkjqE4QnEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_hkjqFIQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_hkjqFYQnEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_hkjqFoQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_hkjqF4QnEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_hkjqEYQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_hkagIIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_hkjqEoQnEd6pkP2XjVQF7w" x="76" y="10"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_rApxEYQnEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_rApxFIQnEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_rApxFYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_rApxFoQnEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_rApxF4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_rApxGIQnEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_rApxEoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_rApxEIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_rApxE4QnEd6pkP2XjVQF7w" x="398" y="142"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_s9OygYQnEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_s9OyhIQnEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_s9OyhYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_s9OyhoQnEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_s9Oyh4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_s9OyiIQnEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_s9OygoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_s9OygIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_s9Oyg4QnEd6pkP2XjVQF7w" x="235" y="139"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_tXmaUYQnEd6pkP2XjVQF7w" type="2005">
+          <children xmi:type="notation:Node" xmi:id="_tXmaVIQnEd6pkP2XjVQF7w" type="4009">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_tXmaVYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_tXmaVoQnEd6pkP2XjVQF7w" type="4010">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_tXmaV4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_tXmaUoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_tXmaUIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tXmaU4QnEd6pkP2XjVQF7w" x="320" y="53"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_wtlesYQnEd6pkP2XjVQF7w" type="2005">
+          <children xmi:type="notation:Node" xmi:id="_wtletIQnEd6pkP2XjVQF7w" type="4009">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wtletYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_wtuooIQnEd6pkP2XjVQF7w" type="4010">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wtuooYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_wtlesoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_wtlesIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_wtles4QnEd6pkP2XjVQF7w" x="158" y="87"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_b5uOOoQnEd6pkP2XjVQF7w"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_b5uOO4QnEd6pkP2XjVQF7w"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_b5uON4QnEd6pkP2XjVQF7w"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="rail_car.adaptivesystem#_b5HxQYQnEd6pkP2XjVQF7w"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_b5uOOIQnEd6pkP2XjVQF7w" y="20" width="445" height="192"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_b5uOPIQnEd6pkP2XjVQF7w" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_b53YIIQnEd6pkP2XjVQF7w" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_z669YYQnEd6pkP2XjVQF7w" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_z669ZIQnEd6pkP2XjVQF7w" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_z669ZYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_z669ZoQnEd6pkP2XjVQF7w" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_z669Z4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_z669YoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_z669YIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_z669Y4QnEd6pkP2XjVQF7w" x="312" y="18"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_179oEYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_179oFIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_179oFYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_179oFoQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_179oF4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_179oGIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_179oEoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_179oEIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_179oE4QnEd6pkP2XjVQF7w" x="238" y="60"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_2NZWUYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_2NZWVIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_2NZWVYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_2NZWVoQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_2NZWV4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_2NZWWIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_2NZWUoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_2NZWUIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_2NZWU4QnEd6pkP2XjVQF7w" x="398" y="55"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_4LdlgYQnEd6pkP2XjVQF7w" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_4LdlhIQnEd6pkP2XjVQF7w" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_4LdlhYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_4LdlhoQnEd6pkP2XjVQF7w" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_4Ldlh4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_4LdlgoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_4LdlgIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_4Ldlg4QnEd6pkP2XjVQF7w" x="311" y="93"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_5_iyQYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_5_iyRIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_5_iyRYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_5_iyRoQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_5_iyR4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_5_iySIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_5_iyQoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_5_iyQIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5_iyQ4QnEd6pkP2XjVQF7w" x="238" y="130"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_6TXGIYQnEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_6TXGJIQnEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_6TXGJYQnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_6TXGJoQnEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_6TXGJ4QnEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_6TXGKIQnEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_6TXGIoQnEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_6TXGIIQnEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_6TXGI4QnEd6pkP2XjVQF7w" x="398" y="130"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_b53YIYQnEd6pkP2XjVQF7w"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_b53YIoQnEd6pkP2XjVQF7w"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_b5uOPYQnEd6pkP2XjVQF7w"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="rail_car.adaptivesystem#_b5uOMIQnEd6pkP2XjVQF7w"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_b5uOPoQnEd6pkP2XjVQF7w" y="212" width="445" height="176"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_b5uOMoQnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="rail_car.adaptivesystem#_b5HxQIQnEd6pkP2XjVQF7w"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_b5uOM4QnEd6pkP2XjVQF7w" x="595" y="60" width="449" height="392"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_AsGw4IQoEd6pkP2XjVQF7w" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_AsGw44QoEd6pkP2XjVQF7w" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_AsGw5IQoEd6pkP2XjVQF7w" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_AsP60IQoEd6pkP2XjVQF7w" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_AsP604QoEd6pkP2XjVQF7w" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_DxGL4YQoEd6pkP2XjVQF7w" type="2005">
+          <children xmi:type="notation:Node" xmi:id="_DxPV0IQoEd6pkP2XjVQF7w" type="4009">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_DxPV0YQoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_DxPV0oQoEd6pkP2XjVQF7w" type="4010">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_DxPV04QoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_DxGL4oQoEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_DxGL4IQoEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DxGL44QoEd6pkP2XjVQF7w" x="80" y="54"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_EqnN0IQoEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_EqnN04QoEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_EqnN1IQoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_EqnN1YQoEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_EqnN1oQoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_EqnN14QoEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_EqnN0YQoEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_Eqdc0IQoEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_EqnN0oQoEd6pkP2XjVQF7w" x="80" y="109"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_GgCeYYQoEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_GgCeZIQoEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_GgCeZYQoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_GgCeZoQoEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_GgCeZ4QoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_GgCeaIQoEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_GgCeYoQoEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_GgCeYIQoEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GgCeY4QoEd6pkP2XjVQF7w" x="205" y="114"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_61__sYRUEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_61__tIRUEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_61__tYRUEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_61__toRUEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_61__t4RUEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_61__uIRUEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_61__soRUEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_61__sIRUEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_61__s4RUEd6pkP2XjVQF7w" x="79" y="12"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_AsP61IQoEd6pkP2XjVQF7w"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_AsP61YQoEd6pkP2XjVQF7w"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_AsP60YQoEd6pkP2XjVQF7w"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="rail_car.adaptivesystem#_Ar8_4YQoEd6pkP2XjVQF7w"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_AsP60oQoEd6pkP2XjVQF7w" y="20" width="452" height="146"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_AsP61oQoEd6pkP2XjVQF7w" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_AsP62YQoEd6pkP2XjVQF7w" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_HcFP4YQoEd6pkP2XjVQF7w" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_HcFP5IQoEd6pkP2XjVQF7w" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_HcFP5YQoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_HcFP5oQoEd6pkP2XjVQF7w" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_HcFP54QoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_HcFP4oQoEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_HcFP4IQoEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HcFP44QoEd6pkP2XjVQF7w" x="140" y="18"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_JEsMcYQoEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_JEsMdIQoEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_JEsMdYQoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_JEsMdoQoEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_JEsMd4QoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_JEsMeIQoEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_JEsMcoQoEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_JEsMcIQoEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_JEsMc4QoEd6pkP2XjVQF7w" x="80" y="73"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_J3zrcYQoEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_J3zrdIQoEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_J3zrdYQoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_J3zrdoQoEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_J3zrd4QoEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_J3zreIQoEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_J3zrcoQoEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_J3zrcIQoEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_J3zrc4QoEd6pkP2XjVQF7w" x="205" y="78"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_AsP62oQoEd6pkP2XjVQF7w"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_AsP624QoEd6pkP2XjVQF7w"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_AsP614QoEd6pkP2XjVQF7w"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="rail_car.adaptivesystem#_Ar8_4oQoEd6pkP2XjVQF7w"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_AsP62IQoEd6pkP2XjVQF7w" y="166" width="452" height="161"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_AsGw4YQoEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="rail_car.adaptivesystem#_Ar8_4IQoEd6pkP2XjVQF7w"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_AsGw4oQoEd6pkP2XjVQF7w" x="595" y="470" width="456" height="331"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_Iq8aQYQpEd6pkP2XjVQF7w" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_Iq8aRIQpEd6pkP2XjVQF7w" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_Iq8aRYQpEd6pkP2XjVQF7w" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_IrGLQIQpEd6pkP2XjVQF7w" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_IrGLQ4QpEd6pkP2XjVQF7w" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_KMP08YQpEd6pkP2XjVQF7w" type="2005">
+          <children xmi:type="notation:Node" xmi:id="_KMP09IQpEd6pkP2XjVQF7w" type="4009">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_KMP09YQpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_KMP09oQpEd6pkP2XjVQF7w" type="4010">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_KMP094QpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_KMP08oQpEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_KMP08IQpEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_KMP084QpEd6pkP2XjVQF7w" x="98" y="27"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_LmZewYQpEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_LmZexIQpEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_LmZexYQpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_LmZexoQpEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_LmZex4QpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_LmZeyIQpEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_LmZewoQpEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_LmZewIQpEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_LmZew4QpEd6pkP2XjVQF7w" x="99" y="58"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_x8LfUIRUEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_x8LfU4RUEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_x8LfVIRUEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_x8LfVYRUEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_x8LfVoRUEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_x8LfV4RUEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_x8LfUYRUEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_x8BuUIRUEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_x8LfUoRUEd6pkP2XjVQF7w" x="140" y="4"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_IrGLRIQpEd6pkP2XjVQF7w"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_IrGLRYQpEd6pkP2XjVQF7w"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_IrGLQYQpEd6pkP2XjVQF7w"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="rail_car.adaptivesystem#_IqfuUYQpEd6pkP2XjVQF7w"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_IrGLQoQpEd6pkP2XjVQF7w" y="20" width="196" height="90"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_IrGLRoQpEd6pkP2XjVQF7w" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_IrGLSYQpEd6pkP2XjVQF7w" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_MhHakYQpEd6pkP2XjVQF7w" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_MhHalIQpEd6pkP2XjVQF7w" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_MhHalYQpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_MhHaloQpEd6pkP2XjVQF7w" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_MhHal4QpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_MhHakoQpEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_MhHakIQpEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_MhHak4QpEd6pkP2XjVQF7w" x="99" y="13"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_Ne870YQpEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_Ne871IQpEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_Ne871YQpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_Ne871oQpEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_Ne8714QpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_Ne872IQpEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_Ne870oQpEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_Ne870IQpEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Ne8704QpEd6pkP2XjVQF7w" x="99" y="53"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_IrGLSoQpEd6pkP2XjVQF7w"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_IrGLS4QpEd6pkP2XjVQF7w"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_IrGLR4QpEd6pkP2XjVQF7w"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="rail_car.adaptivesystem#_Iq8aQIQpEd6pkP2XjVQF7w"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_IrGLSIQpEd6pkP2XjVQF7w" y="110" width="196" height="86"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_Iq8aQoQpEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="rail_car.adaptivesystem#_IqfuUIQpEd6pkP2XjVQF7w"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Iq8aQ4QpEd6pkP2XjVQF7w" x="225" y="925"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_V2pmkYQpEd6pkP2XjVQF7w" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_V2pmkoQpEd6pkP2XjVQF7w" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_V2pmk4QpEd6pkP2XjVQF7w" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_V2pmlIQpEd6pkP2XjVQF7w" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_V2pmlYQpEd6pkP2XjVQF7w" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_V2pmnYQpEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_V2pmnoQpEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_V2pmn4QpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_V2pmoIQpEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_V2pmoYQpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_V2pmooQpEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_V2pmo4QpEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_V2pmw4QpEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_V2pmpIQpEd6pkP2XjVQF7w" x="80" y="54"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_IUkk0IQtEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_IUkk04QtEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_IUkk1IQtEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_IUkk1YQtEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_IUkk1oQtEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_IUkk14QtEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_IUkk0YQtEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_IUaz0IQtEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_IUkk0oQtEd6pkP2XjVQF7w" x="225" y="68"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_OWENMYQtEd6pkP2XjVQF7w" type="2005">
+          <children xmi:type="notation:Node" xmi:id="_OWENNIQtEd6pkP2XjVQF7w" type="4009">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_OWENNYQtEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_OWENNoQtEd6pkP2XjVQF7w" type="4010">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_OWENN4QtEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_OWENMoQtEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_OWENMIQtEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_OWENM4QtEd6pkP2XjVQF7w" x="225" y="33"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_zhzZUYRUEd6pkP2XjVQF7w" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_zhzZVIRUEd6pkP2XjVQF7w" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_zhzZVYRUEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_zh8jQIRUEd6pkP2XjVQF7w" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_zh8jQYRUEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_zh8jQoRUEd6pkP2XjVQF7w" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_zhzZUoRUEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_zhzZUIRUEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_zhzZU4RUEd6pkP2XjVQF7w" x="225" y="3"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_V2pmpYQpEd6pkP2XjVQF7w"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_V2pmpoQpEd6pkP2XjVQF7w"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_V2pmp4QpEd6pkP2XjVQF7w"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="rail_car.adaptivesystem#_V2pmwYQpEd6pkP2XjVQF7w"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_V2pmqIQpEd6pkP2XjVQF7w" y="20" width="271" height="118"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_V2pmqYQpEd6pkP2XjVQF7w" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_V2pmqoQpEd6pkP2XjVQF7w" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_V2pmq4QpEd6pkP2XjVQF7w" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_V2pmrIQpEd6pkP2XjVQF7w" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_V2pmrYQpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_V2pmroQpEd6pkP2XjVQF7w" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_V2pmr4QpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_V2pmsIQpEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_V2pmx4QpEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_V2pmsYQpEd6pkP2XjVQF7w" x="140" y="13"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_V2pmsoQpEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_V2pms4QpEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_V2pmtIQpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_V2pmtYQpEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_V2pmtoQpEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_V2pmt4QpEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_V2pmuIQpEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_V2pmyIQpEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_V2pmuYQpEd6pkP2XjVQF7w" x="78" y="76"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_KWW2YYQtEd6pkP2XjVQF7w" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_KWW2ZIQtEd6pkP2XjVQF7w" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_KWW2ZYQtEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_KWW2ZoQtEd6pkP2XjVQF7w" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_KWW2Z4QtEd6pkP2XjVQF7w" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_KWW2aIQtEd6pkP2XjVQF7w" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_KWW2YoQtEd6pkP2XjVQF7w"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_KWW2YIQtEd6pkP2XjVQF7w"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_KWW2Y4QtEd6pkP2XjVQF7w" x="223" y="84"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_V2pmuoQpEd6pkP2XjVQF7w"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_V2pmu4QpEd6pkP2XjVQF7w"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_V2pmvIQpEd6pkP2XjVQF7w"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="rail_car.adaptivesystem#_V2pmxoQpEd6pkP2XjVQF7w"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_V2pmvYQpEd6pkP2XjVQF7w" y="138" width="271" height="130"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_V2pmvoQpEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="rail_car.adaptivesystem#_V2pmwIQpEd6pkP2XjVQF7w"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_V2pmv4QpEd6pkP2XjVQF7w" x="215" y="615" width="275" height="272"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_P8pdwIRfEd64RrlZ1NCuLQ" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_P9P6sIRfEd64RrlZ1NCuLQ" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_P9P6sYRfEd64RrlZ1NCuLQ" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_P9ZEoIRfEd64RrlZ1NCuLQ" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_P9i1oIRfEd64RrlZ1NCuLQ" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_VqUyQIRfEd64RrlZ1NCuLQ" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_VqUyQ4RfEd64RrlZ1NCuLQ" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_VqUyRIRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_VqUyRYRfEd64RrlZ1NCuLQ" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_VqUyRoRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_VqejQIRfEd64RrlZ1NCuLQ" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_VqUyQYRfEd64RrlZ1NCuLQ"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_VqLBQIRfEd64RrlZ1NCuLQ"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_VqUyQoRfEd64RrlZ1NCuLQ" x="55" y="48"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_WLHLIYRfEd64RrlZ1NCuLQ" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_WLHLJIRfEd64RrlZ1NCuLQ" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_WLHLJYRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_WLHLJoRfEd64RrlZ1NCuLQ" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_WLHLJ4RfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_WLHLKIRfEd64RrlZ1NCuLQ" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_WLHLIoRfEd64RrlZ1NCuLQ"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_WLHLIIRfEd64RrlZ1NCuLQ"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_WLHLI4RfEd64RrlZ1NCuLQ" x="110" y="48"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_P9i1oYRfEd64RrlZ1NCuLQ"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_P9i1ooRfEd64RrlZ1NCuLQ"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_P9ZEoYRfEd64RrlZ1NCuLQ"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="rail_car.adaptivesystem#_P053AYRfEd64RrlZ1NCuLQ"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_P9ZEooRfEd64RrlZ1NCuLQ" y="20" width="196" height="90"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_P9i1o4RfEd64RrlZ1NCuLQ" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_P9i1poRfEd64RrlZ1NCuLQ" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_UWlScIRfEd64RrlZ1NCuLQ" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_UWlSc4RfEd64RrlZ1NCuLQ" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_UWlSdIRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_UWucYIRfEd64RrlZ1NCuLQ" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_UWucYYRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_UWlScYRfEd64RrlZ1NCuLQ"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_UWbhcIRfEd64RrlZ1NCuLQ"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_UWlScoRfEd64RrlZ1NCuLQ" x="80" y="9"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_YXLaEIRfEd64RrlZ1NCuLQ" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_YXx3AIRfEd64RrlZ1NCuLQ" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_YXx3AYRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_YX7A8IRfEd64RrlZ1NCuLQ" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_YX7A8YRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_YX7A8oRfEd64RrlZ1NCuLQ" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_YXLaEYRfEd64RrlZ1NCuLQ"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_YWlkMIRfEd64RrlZ1NCuLQ"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_YXLaEoRfEd64RrlZ1NCuLQ" x="80" y="49"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_P9i1p4RfEd64RrlZ1NCuLQ"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_P9i1qIRfEd64RrlZ1NCuLQ"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_P9i1pIRfEd64RrlZ1NCuLQ"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="rail_car.adaptivesystem#_P8gT0IRfEd64RrlZ1NCuLQ"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_P9i1pYRfEd64RrlZ1NCuLQ" y="110" width="196" height="86"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_P8pdwYRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="rail_car.adaptivesystem#_P053AIRfEd64RrlZ1NCuLQ"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_P8pdwoRfEd64RrlZ1NCuLQ" x="435" y="925"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_wHso8IRfEd64RrlZ1NCuLQ" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_wHso8YRfEd64RrlZ1NCuLQ" type="4016"/>
+    <children xmi:type="notation:Node" xmi:id="_wHso8oRfEd64RrlZ1NCuLQ" type="4017"/>
+    <children xmi:type="notation:Node" xmi:id="_wHso84RfEd64RrlZ1NCuLQ" type="2003">
+      <children xmi:type="notation:Node" xmi:id="_wHso9IRfEd64RrlZ1NCuLQ" type="5002">
+        <children xmi:type="notation:Node" xmi:id="_wHso9YRfEd64RrlZ1NCuLQ" type="2005">
+          <children xmi:type="notation:Node" xmi:id="_wHso9oRfEd64RrlZ1NCuLQ" type="4009">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wHso94RfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_wHso-IRfEd64RrlZ1NCuLQ" type="4010">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wHso-YRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_wHso-oRfEd64RrlZ1NCuLQ"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_wH1y4oRfEd64RrlZ1NCuLQ"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_wHso-4RfEd64RrlZ1NCuLQ" x="98" y="27"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_wHso_IRfEd64RrlZ1NCuLQ" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_wHso_YRfEd64RrlZ1NCuLQ" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wHso_oRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_wHso_4RfEd64RrlZ1NCuLQ" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wHspAIRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_wHspAYRfEd64RrlZ1NCuLQ" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_wHspAoRfEd64RrlZ1NCuLQ"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_wH1y44RfEd64RrlZ1NCuLQ"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_wHspA4RfEd64RrlZ1NCuLQ" x="99" y="58"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_wHspBIRfEd64RrlZ1NCuLQ" type="2004">
+          <children xmi:type="notation:Node" xmi:id="_wHspBYRfEd64RrlZ1NCuLQ" type="4006">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wHspBoRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_wHspB4RfEd64RrlZ1NCuLQ" type="4007">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wHspCIRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_wHspCYRfEd64RrlZ1NCuLQ" type="4008"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_wHspCoRfEd64RrlZ1NCuLQ"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_wH1y5IRfEd64RrlZ1NCuLQ"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_wHspC4RfEd64RrlZ1NCuLQ" x="140" y="4"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_wHspDIRfEd64RrlZ1NCuLQ"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_wHspDYRfEd64RrlZ1NCuLQ"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_wHspDoRfEd64RrlZ1NCuLQ"/>
+      <element xmi:type="adaptiveSystem:PreNet" href="rail_car.adaptivesystem#_wH1y4YRfEd64RrlZ1NCuLQ"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_wHspD4RfEd64RrlZ1NCuLQ" y="20" width="196" height="90"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_wHspEIRfEd64RrlZ1NCuLQ" type="2006">
+      <children xmi:type="notation:Node" xmi:id="_wHspEYRfEd64RrlZ1NCuLQ" type="5003">
+        <children xmi:type="notation:Node" xmi:id="_wHspEoRfEd64RrlZ1NCuLQ" type="2008">
+          <children xmi:type="notation:Node" xmi:id="_wHspE4RfEd64RrlZ1NCuLQ" type="4014">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wHspFIRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_wHspFYRfEd64RrlZ1NCuLQ" type="4015">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wHspFoRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_wHspF4RfEd64RrlZ1NCuLQ"/>
+          <element xmi:type="adaptiveSystem:Event" href="rail_car.adaptivesystem#_wH1y6YRfEd64RrlZ1NCuLQ"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_wHspGIRfEd64RrlZ1NCuLQ" x="99" y="13"/>
+        </children>
+        <children xmi:type="notation:Node" xmi:id="_wHspGYRfEd64RrlZ1NCuLQ" type="2007">
+          <children xmi:type="notation:Node" xmi:id="_wHspGoRfEd64RrlZ1NCuLQ" type="4011">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wHspG4RfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_wHspHIRfEd64RrlZ1NCuLQ" type="4012">
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_wHspHYRfEd64RrlZ1NCuLQ" y="5"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_wHspHoRfEd64RrlZ1NCuLQ" type="4013"/>
+          <styles xmi:type="notation:ShapeStyle" xmi:id="_wHspH4RfEd64RrlZ1NCuLQ"/>
+          <element xmi:type="adaptiveSystem:Condition" href="rail_car.adaptivesystem#_wH1y6oRfEd64RrlZ1NCuLQ"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_wHspIIRfEd64RrlZ1NCuLQ" x="99" y="53"/>
+        </children>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_wHspIYRfEd64RrlZ1NCuLQ"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_wHspIoRfEd64RrlZ1NCuLQ"/>
+      </children>
+      <styles xmi:type="notation:ShapeStyle" xmi:id="_wHspI4RfEd64RrlZ1NCuLQ"/>
+      <element xmi:type="adaptiveSystem:DoNet" href="rail_car.adaptivesystem#_wH1y6IRfEd64RrlZ1NCuLQ"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_wHspJIRfEd64RrlZ1NCuLQ" y="110" width="196" height="86"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_wHspJYRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:Oclet" href="rail_car.adaptivesystem#_wH1y4IRfEd64RrlZ1NCuLQ"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_wHspJoRfEd64RrlZ1NCuLQ" x="10" y="925"/>
+  </children>
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_w9pJYYQmEd6pkP2XjVQF7w"/>
+  <element xmi:type="adaptiveSystem:AdaptiveSystem" href="rail_car.adaptivesystem#_w9MdcIQmEd6pkP2XjVQF7w"/>
+  <edges xmi:type="notation:Edge" xmi:id="_7dZFwIQmEd6pkP2XjVQF7w" type="3001" source="_43sO0YQmEd6pkP2XjVQF7w" target="_7EW6sYQmEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_7diPsIQmEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_7diPsYQmEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_7dZFwYQmEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_7dZFwoQmEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_7dGK0IQmEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_7dZFw4QmEd6pkP2XjVQF7w" points="[3, 19, -2, -41]$[3, 70, -2, 10]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_7eSdoIQmEd6pkP2XjVQF7w" id="(0.3,0.05)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_BobEoIQnEd6pkP2XjVQF7w" type="3002" source="_7EW6sYQmEd6pkP2XjVQF7w" target="_AqutUIQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_BpKrgIQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_BpKrgYQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_BobEoYQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_BobEooQnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_Bn0nsIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_BobEo4QnEd6pkP2XjVQF7w" points="[-2, 10, -59, -53]$[-2, 40, -59, -23]$[47, 59, -10, -4]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_B9umQYQnEd6pkP2XjVQF7w" type="3002" source="_8udFAYQmEd6pkP2XjVQF7w" target="_AqutUIQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_B9umRYQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_B9umRoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_B9umQoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_B9umQ4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_B9umQIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_B9umRIQnEd6pkP2XjVQF7w" points="[0, 10, 70, -67]$[0, 54, 70, -23]$[-60, 74, 10, -3]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_EjIiQYQnEd6pkP2XjVQF7w" type="3001" source="_AqutUIQnEd6pkP2XjVQF7w" target="_DAx-sYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_EjIiRYQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_EjIiRoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_EjIiQoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_EjIiQ4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_EjIiQIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_EjIiRIQnEd6pkP2XjVQF7w" points="[10, 2, -61, -52]$[71, 12, 0, -42]$[71, 37, 0, -17]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_EjIiR4QnEd6pkP2XjVQF7w" id="(0.4,0.9)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_FJR8QYQnEd6pkP2XjVQF7w" type="3001" source="_AqutUIQnEd6pkP2XjVQF7w" target="_CnJ9wYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_FJR8RYQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_FJR8RoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_FJR8QoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_FJR8Q4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_FJR8QIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_FJR8RIQnEd6pkP2XjVQF7w" points="[-10, 2, 48, -42]$[-58, 12, 0, -32]$[-58, 34, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_FouRUYQnEd6pkP2XjVQF7w" type="3002" source="_DAx-sYQnEd6pkP2XjVQF7w" target="_DwngMYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_FouRVYQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_FouRVoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_FouRUoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_FouRU4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_FouRUIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_FouRVIQnEd6pkP2XjVQF7w" points="[-10, 7, 53, -44]$[-71, 41, -8, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_F-oP4YQnEd6pkP2XjVQF7w" type="3002" source="_CnJ9wYQnEd6pkP2XjVQF7w" target="_DwngMYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_F-oP5YQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_F-oP5oQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_F-oP4oQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_F-oP44QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_F-oP4IQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_F-oP5IQnEd6pkP2XjVQF7w" points="[0, 10, -58, -21]$[0, 18, -58, -13]$[48, 29, -10, -2]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_HpeBEYQnEd6pkP2XjVQF7w" type="3001" source="_DwngMYQnEd6pkP2XjVQF7w" target="_G57agYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_HpeBFYQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_HpeBFoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_HpeBEoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_HpeBE4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_HpeBEIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_HpeBFIQnEd6pkP2XjVQF7w" points="[10, 2, -63, -45]$[73, 17, 0, -30]$[73, 37, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_H_OOoYQnEd6pkP2XjVQF7w" type="3001" source="_DwngMYQnEd6pkP2XjVQF7w" target="_Gh8YUYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_H_OOpYQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_H_OOpoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_H_OOooQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_H_OOo4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_H_OOoIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_H_OOpIQnEd6pkP2XjVQF7w" points="[-10, 2, 48, -41]$[-58, 14, 0, -29]$[-58, 33, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_JxXhsYQnEd6pkP2XjVQF7w" type="3002" source="_Gh8YUYQnEd6pkP2XjVQF7w" target="_JLEWsYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_JxXhtYQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_JxXhtoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_JxXhsoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_JxXhs4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_JxXhsIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_JxXhtIQnEd6pkP2XjVQF7w" points="[0, 10, 66, -41]$[0, 39, 66, -12]$[-52, 49, 14, -2]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_JxXht4QnEd6pkP2XjVQF7w" id="(0.35,0.8)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_KLJToYQnEd6pkP2XjVQF7w" type="3002" source="_8GOAUYQmEd6pkP2XjVQF7w" target="_JLEWsYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_KLJTpYQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_KLJTpoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_KLJTooQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_KLJTo4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_KLJToIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_KLJTpIQnEd6pkP2XjVQF7w" points="[0, 3, -74, -217]$[0, 143, -74, -77]$[64, 210, -10, -10]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_KLSdkIQnEd6pkP2XjVQF7w" id="(0.45,0.9)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_LqEIsYQnEd6pkP2XjVQF7w" type="3001" source="_JLEWsYQnEd6pkP2XjVQF7w" target="_LRxkgYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_LqEItYQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_LqEItoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_LqEIsoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_LqEIs4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_LqEIsIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_LqEItIQnEd6pkP2XjVQF7w" points="[17, 3, -52, -41]$[69, 11, 0, -33]$[69, 34, 0, -10]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_LqN5sIQnEd6pkP2XjVQF7w" id="(0.15,0.45)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_MgKDMYQnEd6pkP2XjVQF7w" type="3001" source="_JLEWsYQnEd6pkP2XjVQF7w" target="_KoWNAYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_MgKDNYQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_MgKDNoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_MgKDMoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_MgKDM4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_MgKDMIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_MgKDNIQnEd6pkP2XjVQF7w" points="[-10, 1, 63, -28]$[-73, 8, 0, -21]$[-73, 27, 0, -2]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_MgKDN4QnEd6pkP2XjVQF7w" id="(0.6,0.1)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_OTC9IYQnEd6pkP2XjVQF7w" type="3002" source="_KoWNAYQnEd6pkP2XjVQF7w" target="_NecQYYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_OTC9JYQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_OTC9JoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_OTC9IoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_OTC9I4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_OTC9IIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_OTC9JIQnEd6pkP2XjVQF7w" points="[0, 10, -75, -25]$[0, 21, -75, -14]$[65, 33, -10, -2]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_OvNUsYQnEd6pkP2XjVQF7w" type="3002" source="_LRxkgYQnEd6pkP2XjVQF7w" target="_NecQYYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_OvNUtYQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_OvNUtoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_OvNUsoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_OvNUs4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_OvNUsIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_OvNUtIQnEd6pkP2XjVQF7w" points="[0, 10, 62, -20]$[0, 22, 62, -8]$[-52, 29, 10, -1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_QN-YwIQnEd6pkP2XjVQF7w" type="3001" source="_NecQYYQnEd6pkP2XjVQF7w" target="_PjXVgYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_QN-YxIQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_QN-YxYQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_QN-YwYQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_QN-YwoQnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_QNYi4IQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_QN-Yw4QnEd6pkP2XjVQF7w" points="[-10, 1, 69, -24]$[-79, 11, 0, -14]$[-79, 21, 0, -4]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_QOIJwIQnEd6pkP2XjVQF7w" id="(0.45,0.2)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_Qmat8YQnEd6pkP2XjVQF7w" type="3001" source="_NecQYYQnEd6pkP2XjVQF7w" target="_PM26AYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_Qmat9YQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_Qmat9oQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_Qmat8oQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_Qmat84QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_Qmat8IQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Qmat9IQnEd6pkP2XjVQF7w" points="[16, 2, -52, -33]$[68, 7, 0, -28]$[68, 25, 0, -10]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Qmj34IQnEd6pkP2XjVQF7w" id="(0.2,0.5)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_V0f8YIQnEd6pkP2XjVQF7w" type="3002" source="_PjXVgYQnEd6pkP2XjVQF7w" target="_VIr_QYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_V0f8ZIQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_V0f8ZYQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_V0f8YYQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_V0f8YoQnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_V0WLYIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_V0f8Y4QnEd6pkP2XjVQF7w" points="[0, 4, -74, -24]$[0, 15, -74, -13]$[64, 26, -10, -2]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_V0f8ZoQnEd6pkP2XjVQF7w" id="(0.45,0.8)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_WPnyIYQnEd6pkP2XjVQF7w" type="3002" source="_PM26AYQnEd6pkP2XjVQF7w" target="_VIr_QYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_WPw8EIQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_WPw8EYQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_WPnyIoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_WPnyI4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_WPnyIIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_WPnyJIQnEd6pkP2XjVQF7w" points="[0, 10, 67, -20]$[0, 22, 67, -8]$[-57, 29, 10, -1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_X8sX8YQnEd6pkP2XjVQF7w" type="3001" source="_VIr_QYQnEd6pkP2XjVQF7w" target="_W3Go4YQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_X8sX9YQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_X8sX9oQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_X8sX8oQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_X8sX84QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_X8sX8IQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_X8sX9IQnEd6pkP2XjVQF7w" points="[-10, 2, 65, -38]$[-75, 16, 0, -24]$[-75, 30, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_YafuQYQnEd6pkP2XjVQF7w" type="3001" source="_VIr_QYQnEd6pkP2XjVQF7w" target="_XiK_IYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_YafuRYQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_YafuRoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_YafuQoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_YafuQ4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_YafuQIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_YafuRIQnEd6pkP2XjVQF7w" points="[10, 1, -57, -44]$[67, 7, 0, -38]$[67, 35, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_uW7wYYQnEd6pkP2XjVQF7w" type="3002" source="_fI11kIQnEd6pkP2XjVQF7w" target="_tXmaUYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_uW7wZYQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_uW7wZoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_uW7wYoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_uW7wY4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_uW7wYIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_uW7wZIQnEd6pkP2XjVQF7w" points="[0, 10, 79, -33]$[0, 32, 79, -11]$[-69, 42, 10, -1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_un6ysIQnEd6pkP2XjVQF7w" type="3002" source="_gyMZAYQnEd6pkP2XjVQF7w" target="_tXmaUYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_un6ytIQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_un6ytYQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_un6ysYQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_un6ysoQnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_unxowIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_un6ys4QnEd6pkP2XjVQF7w" points="[0, 10, -84, -33]$[0, 22, -84, -21]$[74, 41, -10, -2]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_u8yPcYQnEd6pkP2XjVQF7w" type="3001" source="_tXmaUYQnEd6pkP2XjVQF7w" target="_rApxEYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_u8yPdYQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_u8yPdoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_u8yPcoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_u8yPc4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_u8yPcIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_u8yPdIQnEd6pkP2XjVQF7w" points="[10, 2, -76, -85]$[78, 14, -8, -73]$[85, 77, -1, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_xb7LYYQnEd6pkP2XjVQF7w" type="3002" source="_hkjqEIQnEd6pkP2XjVQF7w" target="_wtlesYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_xb7LZYQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_xb7LZoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_xb7LYoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_xb7LY4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_xb7LYIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_xb7LZIQnEd6pkP2XjVQF7w" points="[0, 10, -71, -76]$[0, 62, -71, -24]$[70, 87, -1, 1]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_xb7LZ4QnEd6pkP2XjVQF7w" id="(0.05,0.35)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_yX0y8YQnEd6pkP2XjVQF7w" type="3001" source="_wtlesYQnEd6pkP2XjVQF7w" target="_s9OygYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_yX0y9YQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_yX0y9oQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_yX0y8oQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_yX0y84QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_yX0y8IQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_yX0y9IQnEd6pkP2XjVQF7w" points="[16, 2, -69, -39]$[85, 9, 0, -32]$[85, 31, 0, -10]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_yX0y94QnEd6pkP2XjVQF7w" id="(0.2,0.4)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_1SZGoYQnEd6pkP2XjVQF7w" type="3002" source="_rApxEYQnEd6pkP2XjVQF7w" target="_z669YYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_1SZGpYQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_1SZGpoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_1SZGooQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_1SZGo4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_1SZGoIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_1SZGpIQnEd6pkP2XjVQF7w" points="[0, 10, 86, -58]$[0, 45, 86, -23]$[-76, 65, 10, -3]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_1mqGcYQnEd6pkP2XjVQF7w" type="3002" source="_s9OygYQnEd6pkP2XjVQF7w" target="_z669YYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_1nP8UIQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_1nP8UYQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_1mqGcoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_1mqGc4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_1mqGcIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_1mqGdIQnEd6pkP2XjVQF7w" points="[0, 10, -77, -61]$[0, 43, -77, -28]$[67, 67, -10, -4]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_3avTMYQnEd6pkP2XjVQF7w" type="3001" source="_z669YYQnEd6pkP2XjVQF7w" target="_179oEYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_3avTNYQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_3avTNoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_3avTMoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_3avTM4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_3avTMIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_3avTNIQnEd6pkP2XjVQF7w" points="[-6, 1, 65, -39]$[-71, 14, 0, -26]$[-71, 37, 0, -3]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_3avTN4QnEd6pkP2XjVQF7w" id="(0.3,0.15)"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_3avTOIQnEd6pkP2XjVQF7w" id="(0.3,0.15)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_3y4GYYQnEd6pkP2XjVQF7w" type="3001" source="_z669YYQnEd6pkP2XjVQF7w" target="_2NZWUYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_3zejUIQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_3zejUYQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_3y4GYoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_3y4GY4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_3y4GYIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_3y4GZIQnEd6pkP2XjVQF7w" points="[10, 1, -76, -36]$[86, 7, 0, -30]$[86, 27, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_45qIQYQnEd6pkP2XjVQF7w" type="3002" source="_2NZWUYQnEd6pkP2XjVQF7w" target="_4LdlgYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_45qIRYQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_45qIRoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_45qIQoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_45qIQ4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_45qIQIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_45qIRIQnEd6pkP2XjVQF7w" points="[0, 10, 87, -28]$[0, 25, 87, -13]$[-77, 37, 10, -1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_5j1GoYQnEd6pkP2XjVQF7w" type="3002" source="_179oEYQnEd6pkP2XjVQF7w" target="_4LdlgYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_5j1GpYQnEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_5j1GpoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_5j1GooQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_5j1Go4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_5j1GoIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5j1GpIQnEd6pkP2XjVQF7w" points="[0, 10, -70, -25]$[0, 27, -70, -8]$[60, 34, -10, -1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_7BG88YQnEd6pkP2XjVQF7w" type="3001" source="_4LdlgYQnEd6pkP2XjVQF7w" target="_5_iyQYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_7BG89YQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_7BG89oQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_7BG88oQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_7BG884QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_7BG88IQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_7BG89IQnEd6pkP2XjVQF7w" points="[-16, 2, 60, -35]$[-76, 9, 0, -28]$[-76, 27, 0, -10]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_7BG894QnEd6pkP2XjVQF7w" id="(0.8,0.4)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_7Z_XAYQnEd6pkP2XjVQF7w" type="3001" source="_4LdlgYQnEd6pkP2XjVQF7w" target="_6TXGIYQnEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_7Z_XBYQnEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_7Z_XBoQnEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_7Z_XAoQnEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_7Z_XA4QnEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_7Z_XAIQnEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_7Z_XBIQnEd6pkP2XjVQF7w" points="[10, 1, -75, -42]$[85, 12, 0, -31]$[85, 27, 0, -16]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_7Z_XB4QnEd6pkP2XjVQF7w" id="(0.45,0.8)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_FgtIUYQoEd6pkP2XjVQF7w" type="3001" source="_DxGL4YQoEd6pkP2XjVQF7w" target="_EqnN0IQoEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_FgtIVYQoEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_FgtIVoQoEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_FgtIUoQoEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_FgtIU4QoEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_FgtIUIQoEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_FgtIVIQoEd6pkP2XjVQF7w" points="[-2, 10, 2, -46]$[-14, 57, -10, 1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_Iaq_EYQoEd6pkP2XjVQF7w" type="3002" source="_EqnN0IQoEd6pkP2XjVQF7w" target="_HcFP4YQoEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_Iaq_FYQoEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_Iaq_FoQoEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_Iaq_EoQoEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_Iaq_E4QoEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_Iaq_EIQoEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Iaq_FIQoEd6pkP2XjVQF7w" points="[0, 10, -60, -45]$[0, 33, -60, -22]$[50, 51, -10, -4]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_IxeVgYQoEd6pkP2XjVQF7w" type="3002" source="_GgCeYYQoEd6pkP2XjVQF7w" target="_HcFP4YQoEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_IxeVhYQoEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_IxeVhoQoEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_IxeVgoQoEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_IxeVg4QoEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_IxeVgIQoEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_IxeVhIQoEd6pkP2XjVQF7w" points="[0, 10, 65, -40]$[0, 33, 65, -17]$[-55, 47, 10, -3]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_KmmEEYQoEd6pkP2XjVQF7w" type="3001" source="_HcFP4YQoEd6pkP2XjVQF7w" target="_JEsMcYQoEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_KmmEFYQoEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_KmmEFoQoEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_KmmEEoQoEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_KmmEE4QoEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_KmmEEIQoEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_KmmEFIQoEd6pkP2XjVQF7w" points="[-10, 3, 50, -52]$[-60, 18, 0, -37]$[-60, 45, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_K8y9kYQoEd6pkP2XjVQF7w" type="3001" source="_HcFP4YQoEd6pkP2XjVQF7w" target="_J3zrcYQoEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_K8y9lYQoEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_K8y9loQoEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_K8y9koQoEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_K8y9k4QoEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_K8y9kIQoEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_K8y9lIQoEd6pkP2XjVQF7w" points="[16, 5, -55, -57]$[71, 20, 0, -42]$[71, 52, 0, -10]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_K88ukIQoEd6pkP2XjVQF7w" id="(0.2,0.4)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_oWZQ0IRUEd6pkP2XjVQF7w" type="3001" source="_OWENMYQtEd6pkP2XjVQF7w" target="_IUkk0IQtEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_oWZQ1IRUEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_oWZQ1YRUEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_oWZQ0YRUEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_oWZQ0oRUEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_O_yfoIQtEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_oWZQ04RUEd6pkP2XjVQF7w" points="[2, 10, 0, -34]$[0, 34, -2, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_oWZQ1oRUEd6pkP2XjVQF7w" type="3002" source="_V2pmnYQpEd6pkP2XjVQF7w" target="_V2pmq4QpEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_oWZQ2oRUEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_oWZQ24RUEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_oWZQ14RUEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_oWZQ2IRUEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_V2pmxYQpEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_oWZQ2YRUEd6pkP2XjVQF7w" points="[0, 10, -60, -55]$[0, 38, -60, -27]$[50, 61, -10, -4]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_oWZQ3IRUEd6pkP2XjVQF7w" type="3002" source="_IUkk0IQtEd6pkP2XjVQF7w" target="_V2pmq4QpEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_oWZQ4IRUEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_oWZQ4YRUEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_oWZQ3YRUEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_oWZQ3oRUEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_I1pRkIQtEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_oWZQ34RUEd6pkP2XjVQF7w" points="[0, 10, 85, -53]$[0, 49, 85, -14]$[-75, 61, 10, -2]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_oWjB0IRUEd6pkP2XjVQF7w" type="3001" source="_V2pmq4QpEd6pkP2XjVQF7w" target="_V2pmsoQpEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_oWjB1IRUEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_oWjB1YRUEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_oWjB0YRUEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_oWjB0oRUEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_V2pmyYQpEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_oWjB04RUEd6pkP2XjVQF7w" points="[-10, 3, 52, -60]$[-62, 16, 0, -47]$[-62, 53, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_oWjB1oRUEd6pkP2XjVQF7w" type="3001" source="_V2pmq4QpEd6pkP2XjVQF7w" target="_KWW2YYQtEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_oWjB2oRUEd6pkP2XjVQF7w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_oWjB24RUEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_oWjB14RUEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_oWjB2IRUEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_K8zLUIQtEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_oWjB2YRUEd6pkP2XjVQF7w" points="[10, 3, -73, -68]$[83, 21, 0, -50]$[83, 61, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_z8LBIYRUEd6pkP2XjVQF7w" type="3002" source="_zhzZUYRUEd6pkP2XjVQF7w" target="_OWENMYQtEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_z8LBJYRUEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_z8LBJoRUEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_z8LBIoRUEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_z8LBI4RUEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_z8LBIIRUEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_z8LBJIRUEd6pkP2XjVQF7w" points="[-10, -3, 40, 12]$[-44, -5, 6, 10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_8EOtYYRUEd6pkP2XjVQF7w" type="3002" source="_61__sYRUEd6pkP2XjVQF7w" target="_DxGL4YQoEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_8EOtZYRUEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_8EOtZoRUEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_8EOtYoRUEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_8EOtY4RUEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_8EOtYIRUEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_8EOtZIRUEd6pkP2XjVQF7w" points="[-2, 10, -3, -32]$[-9, 41, -10, -1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_9a8osYRUEd6pkP2XjVQF7w" type="3002" source="_9ASF8YRUEd6pkP2XjVQF7w" target="_43sO0YQmEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_9a8otYRUEd6pkP2XjVQF7w" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_9a8otoRUEd6pkP2XjVQF7w" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_9a8osoRUEd6pkP2XjVQF7w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_9a8os4RUEd6pkP2XjVQF7w"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_9a8osIRUEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_9a8otIRUEd6pkP2XjVQF7w" points="[-6, 10, 0, -13]$[-16, 21, -10, -2]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_YyAU4IRfEd64RrlZ1NCuLQ" type="3002" source="_VqUyQIRfEd64RrlZ1NCuLQ" target="_UWlScIRfEd64RrlZ1NCuLQ">
+    <children xmi:type="notation:Node" xmi:id="_YyTP0IRfEd64RrlZ1NCuLQ" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_YyTP0YRfEd64RrlZ1NCuLQ" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_YyAU4YRfEd64RrlZ1NCuLQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_YyAU4oRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_Yxjo8IRfEd64RrlZ1NCuLQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_YyAU44RfEd64RrlZ1NCuLQ" points="[6, 12, -26, -41]$[33, 63, 1, 10]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_YyTP0oRfEd64RrlZ1NCuLQ" id="(0.15,0.45)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_ZLLp4YRfEd64RrlZ1NCuLQ" type="3002" source="_WLHLIYRfEd64RrlZ1NCuLQ" target="_UWlScIRfEd64RrlZ1NCuLQ">
+    <children xmi:type="notation:Node" xmi:id="_ZLLp5YRfEd64RrlZ1NCuLQ" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_ZLLp5oRfEd64RrlZ1NCuLQ" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_ZLLp4oRfEd64RrlZ1NCuLQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_ZLLp44RfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_ZLLp4IRfEd64RrlZ1NCuLQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ZLLp5IRfEd64RrlZ1NCuLQ" points="[-9, 12, 28, -41]$[-39, 43, -2, -10]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_ZLLp54RfEd64RrlZ1NCuLQ" id="(0.9,0.4)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_ZzQ9kIRfEd64RrlZ1NCuLQ" type="3001" source="_UWlScIRfEd64RrlZ1NCuLQ" target="_YXLaEIRfEd64RrlZ1NCuLQ">
+    <children xmi:type="notation:Node" xmi:id="_ZzQ9lIRfEd64RrlZ1NCuLQ" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_ZzQ9lYRfEd64RrlZ1NCuLQ" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_ZzQ9kYRfEd64RrlZ1NCuLQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_ZzQ9koRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_Zy0RoIRfEd64RrlZ1NCuLQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ZzQ9k4RfEd64RrlZ1NCuLQ" points="[-2, 10, 0, -34]$[-6, 44, -4, 0]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_ZzaukIRfEd64RrlZ1NCuLQ" id="(0.2,0.55)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_wIlZwIRfEd64RrlZ1NCuLQ" type="3001" source="_KMP08YQpEd6pkP2XjVQF7w" target="_LmZewYQpEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_wIlZxIRfEd64RrlZ1NCuLQ" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_wIlZxYRfEd64RrlZ1NCuLQ" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_wIlZwYRfEd64RrlZ1NCuLQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_wIlZwoRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_L_4VwIQpEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_wIlZw4RfEd64RrlZ1NCuLQ" points="[1, 10, 0, -21]$[0, 21, -1, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_wIlZxoRfEd64RrlZ1NCuLQ" type="3002" source="_LmZewYQpEd6pkP2XjVQF7w" target="_MhHakYQpEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_wIlZyoRfEd64RrlZ1NCuLQ" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_wIlZy4RfEd64RrlZ1NCuLQ" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_wIlZx4RfEd64RrlZ1NCuLQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_wIlZyIRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_NAs5kIQpEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_wIlZyYRfEd64RrlZ1NCuLQ" points="[0, 10, 0, -35]$[0, 35, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_wIvKwIRfEd64RrlZ1NCuLQ" type="3002" source="_x8LfUIRUEd6pkP2XjVQF7w" target="_KMP08YQpEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_wIvKxIRfEd64RrlZ1NCuLQ" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_wIvKxYRfEd64RrlZ1NCuLQ" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_wIvKwYRfEd64RrlZ1NCuLQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_wIvKwoRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_yewA4IRUEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_wIvKw4RfEd64RrlZ1NCuLQ" points="[-10, 5, 32, -18]$[-32, 17, 10, -6]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_wIvKxoRfEd64RrlZ1NCuLQ" type="3001" source="_MhHakYQpEd6pkP2XjVQF7w" target="_Ne870YQpEd6pkP2XjVQF7w">
+    <children xmi:type="notation:Node" xmi:id="_wIvKyoRfEd64RrlZ1NCuLQ" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_wIvKy4RfEd64RrlZ1NCuLQ" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_wIvKx4RfEd64RrlZ1NCuLQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_wIvKyIRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_N9f5AIQpEd6pkP2XjVQF7w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_wIvKyYRfEd64RrlZ1NCuLQ" points="[0, 10, 0, -30]$[0, 30, 0, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_wIvKzIRfEd64RrlZ1NCuLQ" type="3001" source="_wHso9YRfEd64RrlZ1NCuLQ" target="_wHso_IRfEd64RrlZ1NCuLQ">
+    <children xmi:type="notation:Node" xmi:id="_wIvK0IRfEd64RrlZ1NCuLQ" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_wIvK0YRfEd64RrlZ1NCuLQ" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_wIvKzYRfEd64RrlZ1NCuLQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_wIvKzoRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_wH1y5YRfEd64RrlZ1NCuLQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_wIvKz4RfEd64RrlZ1NCuLQ" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_wIvK0oRfEd64RrlZ1NCuLQ" type="3002" source="_wHso_IRfEd64RrlZ1NCuLQ" target="_wHspEoRfEd64RrlZ1NCuLQ">
+    <children xmi:type="notation:Node" xmi:id="_wIvK1oRfEd64RrlZ1NCuLQ" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_wIvK14RfEd64RrlZ1NCuLQ" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_wIvK04RfEd64RrlZ1NCuLQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_wIvK1IRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_wH1y5oRfEd64RrlZ1NCuLQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_wIvK1YRfEd64RrlZ1NCuLQ" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_wIvK2IRfEd64RrlZ1NCuLQ" type="3002" source="_wHspBIRfEd64RrlZ1NCuLQ" target="_wHso9YRfEd64RrlZ1NCuLQ">
+    <children xmi:type="notation:Node" xmi:id="_wIvK3IRfEd64RrlZ1NCuLQ" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_wIvK3YRfEd64RrlZ1NCuLQ" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_wIvK2YRfEd64RrlZ1NCuLQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_wIvK2oRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:ArcToEvent" href="rail_car.adaptivesystem#_wH1y54RfEd64RrlZ1NCuLQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_wIvK24RfEd64RrlZ1NCuLQ" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_wI47wIRfEd64RrlZ1NCuLQ" type="3001" source="_wHspEoRfEd64RrlZ1NCuLQ" target="_wHspGYRfEd64RrlZ1NCuLQ">
+    <children xmi:type="notation:Node" xmi:id="_wI47xIRfEd64RrlZ1NCuLQ" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_wI47xYRfEd64RrlZ1NCuLQ" y="6"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_wI47wYRfEd64RrlZ1NCuLQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_wI47woRfEd64RrlZ1NCuLQ"/>
+    <element xmi:type="adaptiveSystem:ArcToCondition" href="rail_car.adaptivesystem#_wH1y64RfEd64RrlZ1NCuLQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_wI47w4RfEd64RrlZ1NCuLQ" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+</notation:Diagram>

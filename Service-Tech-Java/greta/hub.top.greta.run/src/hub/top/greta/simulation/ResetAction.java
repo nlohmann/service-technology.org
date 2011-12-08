@@ -37,6 +37,8 @@
 package hub.top.greta.simulation;
 
 
+import hub.top.greta.cpn.AdaptiveSystemToCPN;
+
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -115,6 +117,10 @@ public class ResetAction implements IWorkbenchWindowActionDelegate {
 		if (config != null) {
 			config.resetToInitial(simView.processViewEditor);
 			SimulationHelper.arrangeAllAdaptiveProcess(simView.processViewEditor.getEditingDomain(), simView.apEditPart, null);
+			
+			config.terminateBridgeToCPN();
+			if (AdaptiveSystemToCPN.isHighLevelSpecification(simView.adaptiveSystem))
+			  config.createNewBridgeToCPN(simView.adaptiveSystem);
 		} else {
 			MessageDialog.openError(shell,
 					"Could not reset simulation.",

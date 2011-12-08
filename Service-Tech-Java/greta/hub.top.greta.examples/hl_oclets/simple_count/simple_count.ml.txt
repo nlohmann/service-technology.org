@@ -1,0 +1,5 @@
+fun increment (value: INT) =
+value + 5;
+
+fun decrement (value: INT) =
+value - 2;

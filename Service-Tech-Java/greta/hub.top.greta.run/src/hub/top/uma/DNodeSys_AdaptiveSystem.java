@@ -68,7 +68,49 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	private Map<Node, DNode>     nodeEncoding;    // encoding of oclet Nodes as DNodes
 	private Map<DNode, Node>     nodeOrigin;      // inverse of #nodeEncoding
 	private Map<Oclet, DNodeSet> ocletEncoding;   // encoding of oclets to DNodeSets
+	
+	private INameProcessor   namePostProcessor; // post-processor for names of nodes
 
+/**
+   * Construct DNode representation of an {@link AdaptiveSystem}. Every event
+   * of an {@link Oclet}s contribution ({@link Oclet#getDoNet()}) becomes a
+   * {@link DNodeSys#fireableEvents}, every event of an {@link Oclet}s
+   * precondition ({@link Oclet#getPreNet()}) becomes a {@link DNodeSys#preConEvents).
+   * Pre- and post-conditions of these events are stored accordingly.
+   * 
+   * @param as
+   * @param namePostProcessor helper to change names of nodes before materializing strings
+   *                as identities, used to map a high-level oclet specification to a
+   *                low-level oclet specification
+   */
+	 public DNodeSys_AdaptiveSystem(AdaptiveSystem as, INameProcessor namePostProcessor) throws InvalidModelException {
+
+	    // initialize the standard data structures
+	    super();
+	    
+	    this.namePostProcessor = namePostProcessor;
+	    
+	    // create a name table initialize the translation tables
+	    buildNameTable(as);
+	    nodeEncoding = new HashMap<Node, DNode>(nodeNum);
+	    nodeOrigin = new HashMap<DNode, Node>(nodeNum);
+	    ocletEncoding = new HashMap<Oclet, DNodeSet>(as.getOclets().size());
+	    
+	    // then translate all oclets, first normal oclets, then anti-oclets
+	    for (Oclet o : as.getOclets())
+	      if (o.getOrientation() == Orientation.NORMAL)
+	        ocletEncoding.put(o, buildDNodeRepresentation(o));
+	    for (Oclet o : as.getOclets())
+	      if (o.getOrientation() == Orientation.ANTI)
+	        ocletEncoding.put(o, buildDNodeRepresentation(o));
+	    
+	    // and the adaptive process
+	    initialRun = buildDNodeRepresentation(as.getAdaptiveProcess());
+	    
+	    finalize_setPreConditions();
+	    finalize_initialRun();
+	    finalize_generateIndexes();
+	 }
 	
 	/**
 	 * Construct DNode representation of an {@link AdaptiveSystem}. Every event
@@ -80,30 +122,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	 * @param as
 	 */
 	public DNodeSys_AdaptiveSystem(AdaptiveSystem as) throws InvalidModelException {
-
-		// initialize the standard data structures
-		super();
-		
-		// create a name table initialize the translation tables
-		buildNameTable(as);
-		nodeEncoding = new HashMap<Node, DNode>(nodeNum);
-		nodeOrigin = new HashMap<DNode, Node>(nodeNum);
-		ocletEncoding = new HashMap<Oclet, DNodeSet>(as.getOclets().size());
-		
-		// then translate all oclets, first normal oclets, then anti-oclets
-		for (Oclet o : as.getOclets())
-		  if (o.getOrientation() == Orientation.NORMAL)
-		    ocletEncoding.put(o, buildDNodeRepresentation(o));
-	  for (Oclet o : as.getOclets())
-	    if (o.getOrientation() == Orientation.ANTI)
-	      ocletEncoding.put(o, buildDNodeRepresentation(o));
-	  
-		// and the adaptive process
-		initialRun = buildDNodeRepresentation(as.getAdaptiveProcess());
-		
-		finalize_setPreConditions();
-		finalize_initialRun();
-		finalize_generateIndexes();
+	  this(as, INameProcessor.IDENTITY);
 	}
 
 	/**
@@ -121,19 +140,22 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 		
 		// collect all names and assign each new name a new ID
 		for (Node n : as.getAdaptiveProcess().getNodes()) {
-			if (nameToID.get(n.getName()) == null)
-				nameToID.put(n.getName(), currentNameID++);
+		  String name = namePostProcessor.process(n.getName());
+			if (nameToID.get(name) == null)
+				nameToID.put(name, currentNameID++);
 			nodeNum++;
 		}
 		for (Oclet o : as.getOclets()) {
 			for (Node n : o.getPreNet().getNodes()) {
-				if (nameToID.get(n.getName()) == null)
-					nameToID.put(n.getName(), currentNameID++);
+			  String name = namePostProcessor.process(n.getName());
+				if (nameToID.get(name) == null)
+					nameToID.put(name, currentNameID++);
 				nodeNum++;
 			}
 			for (Node n : o.getDoNet().getNodes()) {
-				if (nameToID.get(n.getName()) == null)
-					nameToID.put(n.getName(), currentNameID++);
+			  String name = namePostProcessor.process(n.getName());
+				if (nameToID.get(name) == null)
+					nameToID.put(name, currentNameID++);
 				nodeNum++;
 			}
 		}
@@ -253,7 +275,8 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
       }
 			
 			// create new DNode d for Node n
-			DNode d = new DNode(nameToID.get(n.getName()), pre);
+      String name = namePostProcessor.process(n.getName());
+			DNode d = new DNode(nameToID.get(name), pre);
       //allNodes.add(d);
       
 			if (n instanceof Event) {

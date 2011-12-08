@@ -56,7 +56,7 @@ background:
     padding-bottom: 20px;
     padding-left: 85px;
     padding-right: 40px;
-    font-size: 18pt;
+    font-size: 24px;
         box-shadow: 0px 0px 4px #333; 
         -moz-border-radius: 4px;
 -webkit-border-radius:4px;
@@ -93,7 +93,7 @@ background:
     padding-bottom: 20px;
     padding-left: 85px;
     padding-right: 40px;
-    font-size: 18pt;
+    font-size: 24px;
         box-shadow: 0px 0px 4px #333; 
         -moz-border-radius: 4px;
 -webkit-border-radius:4px;
@@ -234,12 +234,7 @@ padding-bottom: 2px;
      line-height: 36px;
   } 
   
-      img.portrait {
-      border:1px solid #444;
-      box-shadow: 0px 0px 3px #333; 
-      margin-right: 4px;
-    }
-
+ 
     .number-list ol {
       list-style-position: outside;
       padding: 0;
@@ -290,7 +285,7 @@ padding-bottom: 2px;
   th, td {
     border: 1px solid #eee;
     text-align: center;
-    font-size: 14pt;
+    font-size: 19px;
   }
   
   th {
@@ -298,7 +293,7 @@ padding-bottom: 2px;
   }
   
   th.windows-header, th.apple-header, th.linux-header {
-    font-size: 12pt;
+    font-size: 16px;
     font-weight: normal;
     padding-top: 48px;
     padding-bottom: 8px;
@@ -327,7 +322,7 @@ padding-bottom: 2px;
   
   td {
     padding: 0px;
-    line-height: 30pt;
+    line-height: 40px;
    }
    
    td.text {
@@ -337,7 +332,7 @@ padding-bottom: 2px;
    
   #stable-versions a:link, #stable-versions a:visited {
     display: block;
-    font-size: 0pt;
+    font-size: 0px;
     background: url(../icons/dl-icon-small.png) no-repeat center center;
     border-bottom: 0px;
    }

@@ -1,7 +1,7 @@
 ﻿  html {
-    height: 100%;
     margin: 0;
     padding: 0;
+    height: 100%;
     }
     
     body {
@@ -20,7 +20,8 @@
     margin-left:auto;
     margin-right:auto;
     margin-bottom: 0px;
-    width: 1024px;
+    max-width: 1024px;
+    min-width: 690px;
     background: white;
     border: 0px;
     padding: 0px 0px;
@@ -121,7 +122,7 @@
     padding-top: 4px;
     padding-bottom: 4px;
     text-transform: uppercase;
-    font-size: 14pt;
+    font-size: 19px;
     color: white;
     text-decoration: none;
         text-shadow: #333 0px 0px 2px;
@@ -157,7 +158,7 @@
     color: white;
     text-decoration: none;
     border-bottom:1px solid #fff; 
-    font-size: 14pt;
+    font-size: 19px;
   }
   
   #people {
@@ -236,13 +237,18 @@
     color: #444;
     margin-bottom: 5px;
     text-transform: uppercase;
-  }
+    font-size: 29px;
+    }
+    
+  #content h3 {
+    font-size: 24px;
+  } 
   
   #pagetitle h1 {
     display: inline;
     line-height: 50px; /* height of nav */
     color: #02aeed;
-    font-size: 28pt;
+    font-size: 37px;
     font-weight: bold;
     text-shadow: #333 0px 0px 2px;
   }
@@ -270,11 +276,18 @@
   
 
     #content p, #content div {
-      font-size: 14pt; 
+      font-size: 19px; 
       color: #000; 
-      line-height: 24pt;
+      line-height: 32px;
       margin-top: 2px;
       margin-left: 0px;
       margin-right: 0px;
       margin-bottom: 0px;
+    }
+    
+    
+         img.portrait {
+      border:1px solid #444;
+      box-shadow: 0px 0px 3px #333; 
+      margin-right: 4px;
     }

@@ -45,7 +45,16 @@ public class SLog {
       for (XEvent xEvent : xTrace) {
         
         try {
-          SEvent event = new SEvent(xEvent);
+          SEvent event;
+          try {
+            event = new SEvent(xEvent);
+          } catch (Exception e) {
+
+            String name = xEvent.getAttributes().get("concept:name").toString();
+            String lifeCycle = xEvent.getAttributes().get("lifecycle:transition").toString();
+            //System.out.println(name+"+"+lifeCycle);
+            event = new SEvent(name+"+"+lifeCycle, "s", "0", "r", "0", "0");
+          }
           String name = event.getCharacter();
           if (!name2id.keySet().contains(name)) {
             allNamesOrdered.add(name);

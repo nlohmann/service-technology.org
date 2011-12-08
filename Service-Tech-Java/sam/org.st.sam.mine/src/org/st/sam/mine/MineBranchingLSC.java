@@ -5,11 +5,11 @@ import org.st.sam.log.SLogTree;
 public class MineBranchingLSC extends MineLSC {
   
   public MineBranchingLSC() {
-    super(MineLSC.MODE_BRANCHING);
+    super(Configuration.mineBranching());
   }
   
   public MineBranchingLSC(SLogTree tree) {
-    super(MineLSC.MODE_BRANCHING, tree);
+    super(Configuration.mineBranching(), tree);
   }
 
   public static void main(String args[]) throws Exception {

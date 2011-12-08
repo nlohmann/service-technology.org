@@ -18,10 +18,7 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     super(log, mergeTraces);
   }
   
-  public void continuesWith(SLogTreeNode n, short word[], List<SLogTreeNode[]> occurrences, List<SLogTreeNode[]> partialOccurrences, Set<Short> violators, Set<Short> stuck_at) {
-    Set<Short> visible = new HashSet<Short>();
-    for (short e : word) visible.add(e);
-    
+  public void continuesWith(SLogTreeNode n, short word[], Set<Short> visible, List<SLogTreeNode[]> occurrences, List<SLogTreeNode[]> partialOccurrences, Set<Short> violators, Set<Short> stuck_at) {
     SLogTreeNode[] occurrence = new SLogTreeNode[word.length]; 
     continuesWith(n, word, 0, visible, occurrence, occurrences, partialOccurrences, violators, stuck_at);
   }
@@ -110,6 +107,8 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     preChartCoverage_fail.clear();
     mainChartCoverage.clear();
     mainChartCoverage_partial.clear();
+    
+    scenarioCoverage.clear();
   }
   
   public int support(short[] word) {
@@ -128,20 +127,22 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     return support(word);
   }
   
-  public double confidence(short[] pre, short[] main, boolean markTree) {
+  private Map<SScenario, List<SLogTreeNode[]> > scenarioCoverage = new HashMap<SScenario, List<SLogTreeNode[]>>();
+  
+  public double confidence(SScenario s, boolean markTree) {
     int preMatch = 0;
     int mainMatch_pos = 0;
     int mainMatch_neg = 0;
     int mainMatch_weak_neg = 0;
     
     Set<Short> visible = new HashSet<Short>();
-    for (short e : pre) visible.add(e);
-    for (short e : main) visible.add(e);
+    for (short e : s.pre) visible.add(e);
+    for (short e : s.main) visible.add(e);
     
     for (SLogTreeNode n : nodes) {
-      if (n.id == pre[pre.length-1]) {
-        SLogTreeNode pre_occurrence[] = new SLogTreeNode[pre.length];
-        if (endsWith(n, pre, pre.length-1, visible, pre_occurrence)) {
+      if (n.id == s.pre[s.pre.length-1]) {
+        SLogTreeNode pre_occurrence[] = new SLogTreeNode[s.pre.length];
+        if (endsWith(n, s.pre, s.pre.length-1, visible, pre_occurrence)) {
           
           //preMatch += nodeCount.get(n);
           preMatch++;
@@ -153,10 +154,14 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
             }
           }
           
+          int this_mainMatch_pos = 0;
+          int this_mainMatch_neg = 0;
+          int this_mainMatch_weak_neg = 0;
+          
           boolean positive = false;
           boolean weakNegative = false;
           for (SLogTreeNode n2 : n.post) {
-            SLogTreeNode occurrence[] = new SLogTreeNode[main.length];
+            SLogTreeNode occurrence[] = new SLogTreeNode[s.main.length];
             
             // to store complete occurrences of the main-chart
             LinkedList<SLogTreeNode[]> occurrences = new LinkedList<SLogTreeNode[]>();
@@ -165,7 +170,7 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
             LinkedList<SLogTreeNode[]> partialOccurrences = new LinkedList<SLogTreeNode[]>();
             
             // get continuations with main-chart
-            continuesWith(n2, main, 0, visible, occurrence, occurrences, partialOccurrences, null, null);
+            continuesWith(n2, s.main, 0, visible, occurrence, occurrences, partialOccurrences, null, null);
             
             if (occurrences.size() > 0) {
               positive = true;
@@ -179,12 +184,24 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
               }
               
               //int total_occurrences = 0;
-              //for (SLogTreeNode[] o : occurrences) {
-              //  // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word
-              //  total_occurrences += nodeCount.get(o[o.length-1]);
-              //}
+              for (SLogTreeNode[] o : occurrences) {
+                // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word
+                //total_occurrences += nodeCount.get(o[o.length-1]);
+                if (markTree) {
+                  if (!scenarioCoverage.containsKey(s)) scenarioCoverage.put(s, new LinkedList<SLogTreeNode[]>());
+                  
+                  SLogTreeNode s_occ[] = new SLogTreeNode[s.pre.length+s.main.length];
+                  for (int i=0;i<s.pre.length;i++) {
+                    s_occ[i] = pre_occurrence[i];
+                  }
+                  for (int i=0;i<o.length;i++) {
+                    s_occ[s.pre.length+i] = o[i];
+                  }
+                  scenarioCoverage.get(s).add(s_occ);
+                }
+              }
               //mainMatch_pos += total_occurrences;
-              mainMatch_pos++;
+              this_mainMatch_pos++;
               
             } /*
               else if (partialOccurrences.size() > 0) {
@@ -222,8 +239,12 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
           
           if (!positive && !weakNegative) {
             //mainMatch_neg += nodeCount.get(n);
-            mainMatch_neg++;
+            this_mainMatch_neg++;
           }
+          
+          if (this_mainMatch_pos > 0) mainMatch_pos++;
+          if (this_mainMatch_neg > 0) mainMatch_neg++;
+          if (this_mainMatch_weak_neg > 0) mainMatch_weak_neg++;
         }
       }
     }
@@ -239,22 +260,45 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
   private Map<SLogTreeNode, Integer> preChartCoverage_fail = new HashMap<SLogTreeNode, Integer>();
   private Map<SLogTreeNode, Integer> mainChartCoverage_partial = new HashMap<SLogTreeNode, Integer>();
   
+  public double getCoverage() {
+
+    int coveredNodes = 0;
+    int totalNodes = 0;
+    
+    for (SLogTreeNode n : this.nodes) {
+      if (   preChartCoverage.containsKey(n) && preChartCoverage.get(n) > 0
+          || mainChartCoverage.containsKey(n) && mainChartCoverage.get(n) > 0)
+      {
+        coveredNodes += nodeCount.get(n);
+      }
+      totalNodes += nodeCount.get(n);
+    }
+    
+    return (double)coveredNodes/totalNodes;
+  }
+  
   public LinkedList<SLogTreeNode[]> countOccurrences(short word[], Set<Short> violators, Set<Short> stuck_at) {
+    Set<Short> visible = new HashSet<Short>();
+    for (short e : word) visible.add(e);
+    return countOccurrences(word, visible, violators, stuck_at);
+  }
+  
+  public LinkedList<SLogTreeNode[]> countOccurrences(short word[], Set<Short> visible, Set<Short> violators, Set<Short> stuck_at) {
     LinkedList<SLogTreeNode[]> occurrences = new LinkedList<SLogTreeNode[]>();
     
     for (SLogTreeNode n : nodes) {
       if (n.id == word[0]) {
         
         //System.out.println("  at "+n.globalID);
-        continuesWith(n, word, occurrences, null, violators, stuck_at);
+        continuesWith(n, word, visible, occurrences, null, violators, stuck_at);
         //System.out.println("  "+count);
-        
       }
     }
     
     return occurrences;
   }
 
+  /*
   @Override
   public String toDot(Map<Short, String> names) {
     StringBuilder sb = new StringBuilder();
@@ -301,5 +345,87 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     
     return sb.toString();
   }
+  */
   
+  public String toDot(Map<Short, String> names) {
+    StringBuilder sb = new StringBuilder();
+    
+    sb.append("digraph D {\n");
+    
+    sb.append("node [fontsize=8 fixedsize width=\".1\" height=\".1\" label=\"\" style=filled fillcolor=white];\n");
+    
+    for (SLogTreeNode n : nodes) {
+      if (!names.containsKey(n.id)) names.put(n.id, Short.toString(n.id));
+      
+      String fillColor = null;
+      
+      if (!preChartCoverage.containsKey(n)) {
+        if (mainChartCoverage.containsKey(n))
+          fillColor = "red";
+        else if (mainChartCoverage_partial.containsKey(n))
+          fillColor = "salmon";
+      } else {
+        if (!mainChartCoverage.containsKey(n) && !mainChartCoverage_partial.containsKey(n)) {
+          if (preChartCoverage_fail.containsKey(n))
+            fillColor = "orange";
+          else
+            fillColor = "lightblue";
+        } else if (mainChartCoverage.containsKey(n) || preChartCoverage.containsKey(n)) {
+          fillColor = "violet";
+        }
+      }
+
+      String fillString = "";
+      if (fillColor != null) fillString += "fillcolor="+fillColor+" style=filled";
+      
+      sb.append(n.globalID + " [ "+fillString+" ];\n");
+      for (SLogTreeNode n2 : n.post) {
+        sb.append(n.globalID + " -> "+n2.globalID+";\n");
+      }
+    }
+    sb.append("}\n");
+    
+    return sb.toString();
+  }
+  
+  public String toDot_ScenarioCoverage(Map<Short, String> names) {
+    StringBuilder sb = new StringBuilder();
+    
+    sb.append("digraph D {\n");
+    
+    //sb.append("node [fontsize=8 fixedsize width=\".1\" height=\".1\" label=\"\" style=filled fillcolor=white];\n");
+    sb.append("node [fontsize=8 fontname=\"Arial\"];\n");
+    sb.append("edge [fontsize=8 fontname=\"Arial\"];\n");
+    
+    for (SLogTreeNode n : nodes) {
+      
+      if (!names.containsKey(n.id)) names.put(n.id, Short.toString(n.id));
+
+      String nodeLabel = names.get(n.id);
+      sb.append(n.globalID+" [ label=\""+nodeLabel+"\" ];\n");
+      
+      for (SLogTreeNode n2 : n.post) {
+        sb.append(n.globalID + " -> "+n2.globalID+";\n");
+      }
+    }
+    
+    for (SScenario s : scenarioCoverage.keySet()) {
+      
+      Map<SLogTreeNode, Set<SLogTreeNode>> coveredEdges = new HashMap<SLogTreeNode, Set<SLogTreeNode>>();
+      
+      for (SLogTreeNode[] o : scenarioCoverage.get(s)) {
+        for (int i=0; i<o.length-1;i++) {
+          if (!coveredEdges.containsKey(o[i])) coveredEdges.put(o[i], new HashSet<SLogTreeNode>());
+          if (!coveredEdges.get(o[i]).contains(o[i+1])) {
+            sb.append(o[i].globalID + " -> "+o[i+1].globalID+"[color=\""+DotColors.colors[s.id%DotColors.colors.length]+"\" label=\""+s.id+"\"];\n");
+            coveredEdges.get(o[i]).add(o[i+1]);
+          }
+        }
+      }
+    }
+
+    sb.append("}\n");
+    
+    return sb.toString();
+  }
 }

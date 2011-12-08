@@ -23,11 +23,11 @@ public class CheckLSC {
   private String mscRenderer;
   private String dotRenderer;
   
-  private int mode = MineLSC.MODE_BRANCHING;
+  private int mode = MineLSC.Configuration.MODE_BRANCHING;
 
 
   public CheckLSC() throws IOException {
-    this(MineLSC.MODE_BRANCHING);
+    this(MineLSC.Configuration.MODE_BRANCHING);
   }
   
   public CheckLSC(int mode) throws FileNotFoundException, IOException {
@@ -104,7 +104,7 @@ public class CheckLSC {
     System.out.println("log contains "+xlog.size()+" traces");
     setSLog(new SLog(xlog));
     
-    boolean mergeTraces = (mode == MineLSC.MODE_BRANCHING) ? true : false;
+    boolean mergeTraces = (mode == MineLSC.Configuration.MODE_BRANCHING) ? true : false;
     
     tree = new MineBranchingTree(getSLog(), mergeTraces);
     SScenario s = getScenario(scenario);
@@ -120,7 +120,7 @@ public class CheckLSC {
     }
     
     LinkedList<SLogTreeNode[]> occ = tree.countOccurrences(word, null, null);
-    double conf = tree.confidence(s.pre, s.main, true);
+    double conf = tree.confidence(s, true);
     int total_occurrences = getTotalOccurrences(occ);
 
     

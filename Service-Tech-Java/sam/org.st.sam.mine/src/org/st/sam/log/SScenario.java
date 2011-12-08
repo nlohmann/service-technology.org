@@ -4,9 +4,13 @@ import java.util.Arrays;
 import com.google.gwt.dev.util.collect.HashSet;
 
 public class SScenario {
+  
+  private static int _scenarioCounter = 0;
 
   public short pre[];
   public short main[];
+  
+  public int id = _scenarioCounter++;
   
   public SScenario(short pre[], short main[]) {
     this.pre = pre;

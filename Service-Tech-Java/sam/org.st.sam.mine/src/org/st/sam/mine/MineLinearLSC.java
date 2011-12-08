@@ -5,11 +5,11 @@ import org.st.sam.log.SLogTree;
 public class MineLinearLSC extends MineLSC {
   
   public MineLinearLSC() {
-    super(MineLSC.MODE_LINEAR);
+    super(Configuration.mineLinear());
   }
   
   public MineLinearLSC(SLogTree tree) {
-    super(MineLSC.MODE_LINEAR, tree);
+    super(Configuration.mineLinear(), tree);
   }
 
   public static void main(String args[]) throws Exception {

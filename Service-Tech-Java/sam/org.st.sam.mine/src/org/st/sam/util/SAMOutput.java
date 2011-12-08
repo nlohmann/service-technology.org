@@ -50,12 +50,7 @@ public class SAMOutput {
     return lscString;
   }
   
-  public static String toMSCRenderer(String name, LSC l) {
-    StringBuilder sb = new StringBuilder();
-    
-    sb.append("# LSC\n");
-    sb.append("msc {\n");
-    
+  public static List<String> getComponents(LSC l) {
     List<String> components = new LinkedList<String>();
     
     for (LSCEvent e  : l.getPreChart()) {
@@ -66,8 +61,22 @@ public class SAMOutput {
       if (!components.contains(e.getCaller())) components.add(e.getCaller());
       if (!components.contains(e.getCallee())) components.add(e.getCallee());
     }
+    return components;
+  }
+  
+  public static int getMSCWitdth(List<String> components) {
+    return components.size()*128;
+  }
+  
+  public static String toMSCRenderer(String name, LSC l) {
+    StringBuilder sb = new StringBuilder();
     
-    sb.append("  width=\""+(components.size()*128)+"\";\n");
+    sb.append("# LSC\n");
+    sb.append("msc {\n");
+    
+    List<String> components = getComponents(l);
+    
+    sb.append("  width=\""+getMSCWitdth(components)+"\";\n");
 
     // list components:
     //  a,b,c;

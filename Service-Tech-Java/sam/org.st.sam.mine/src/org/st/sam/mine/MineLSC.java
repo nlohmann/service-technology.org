@@ -27,6 +27,35 @@ import org.st.sam.util.SAMOutput;
 
 public class MineLSC {
   
+  public static class Configuration {
+    public static final int MODE_BRANCHING = 0;
+    public static final int MODE_LINEAR = 1;
+
+    public int mode = MODE_BRANCHING;
+    public List<short[]> triggers = null;
+    public List<short[]> effects = null;
+    
+    public static Configuration mineBranching() {
+      Configuration c = new Configuration();
+      c.mode = MODE_BRANCHING;
+      return c;
+    }
+    
+    public static Configuration mineLinear() {
+      Configuration c = new Configuration();
+      c.mode = MODE_LINEAR;
+      return c;
+    }
+    
+    public static Configuration mineEffect(short[] trigger) {
+      Configuration c = new Configuration();
+      c.mode = MODE_BRANCHING;
+      c.triggers = new LinkedList<short[]>();
+      c.triggers.add(trigger);
+      return c;
+    }
+  }
+  
   public boolean OPTIONS_WEIGHTED_OCCURRENCE = true;
   
   private ArrayList<LSC> lscs;
@@ -34,17 +63,14 @@ public class MineLSC {
   
   private MineBranchingTree tree;
   
-  public static final int MODE_BRANCHING = 0;
-  public static final int MODE_LINEAR = 1;
+  private Configuration config;
   
-  private int mode = MODE_BRANCHING;
-  
-  public MineLSC(int mode) {
-    this(mode, null);
+  public MineLSC(Configuration config) {
+    this(config, null);
   }
 
-  public MineLSC(int mode, SLogTree supportedWords) {
-    this.mode = mode;
+  public MineLSC(Configuration config, SLogTree supportedWords) {
+    this.config = config;
     setSupportedWords(supportedWords);
   }
   
@@ -97,7 +123,7 @@ public class MineLSC {
     System.out.println("log contains "+xlog.size()+" traces");
     setSLog(new SLog(xlog));
     
-    boolean mergeTraces = (mode == MODE_BRANCHING) ? true : false;
+    boolean mergeTraces = (config.mode == Configuration.MODE_BRANCHING) ? true : false;
     
     tree = new MineBranchingTree(getSLog(), mergeTraces);
     
@@ -164,6 +190,27 @@ public class MineLSC {
             short[] pre = Arrays.copyOfRange(cand, 0, splitPos);
             short[] main = Arrays.copyOfRange(cand, splitPos, cand.length);
             
+            // trigger/effect mining: only check scenarios
+            // that have the matching trigger of effect
+            if (config.triggers != null) {
+              boolean not_looking_for_this = true;
+              for (short[] trigger : config.triggers)
+                if (Arrays.equals(pre, trigger)) {
+                  not_looking_for_this = false;
+                  break;
+                }
+              if (not_looking_for_this) continue;
+            }
+            if (config.effects != null) {
+              boolean not_looking_for_this = true;
+              for (short[] effect : config.effects)
+                if (Arrays.equals(main, effect)) {
+                  not_looking_for_this = false;
+                  break;
+                }
+              if (not_looking_for_this) continue;
+            }
+            
             LinkedList<short[]> mainCand_queue = new LinkedList<short[]>();
             mainCand_queue.add(main);
             
@@ -178,7 +225,7 @@ public class MineLSC {
               if (!l_test.isConnected()) continue;
               
               //System.out.println("check "+toString(pre)+" "+toString(main));
-              double c = skip ? 0 : tree.confidence(pre, main_cand, false);
+              double c = skip ? 0 : tree.confidence(s, false);
               
               if (c >= confidence) {
                 
@@ -193,7 +240,7 @@ public class MineLSC {
                   boolean s_weaker = false;
                   List<SScenario> toRemove = new LinkedList<SScenario>();
                   for (SScenario s2 : scenarios) {
-                    if (s.weakerThan(s2)
+                    if (s.weakerThan(s2) || implies(s2, s)
                         //&& l.getSupport() <= s2l.get(s2).getSupport() 
                         //&& l.getConfidence() <= s2l.get(s2).getConfidence()
                         )
@@ -202,7 +249,7 @@ public class MineLSC {
                       s_weaker = true;
                       break;
                     }
-                    if (s2.weakerThan(s)
+                    if (s2.weakerThan(s) || implies(s, s2)
                         //&& l.getSupport() >= s2l.get(s2).getSupport() 
                         //&& l.getConfidence() >= s2l.get(s2).getConfidence()
                         )
@@ -289,11 +336,16 @@ public class MineLSC {
     return ShortenedNames;
   }
   
+  public String getCoverageTree_current() {
+    return tree.toDot(getShortenedNames());
+  }
+  
+  
   public String getCoverageTreeGlobal() {
     
     tree.clearCoverageMarking();
     for (SScenario s : originalScenarios.values()) {
-      tree.confidence(s.pre, s.main, true);
+      tree.confidence(s, true);
     }
     return tree.toDot(getShortenedNames());
   }
@@ -301,7 +353,7 @@ public class MineLSC {
   public String getCoverageTreeFor(SScenario s) {
     
     tree.clearCoverageMarking();
-    double c = tree.confidence(s.pre, s.main, true);
+    double c = tree.confidence(s, true);
     System.out.println(s+" has confidence "+c);
     return tree.toDot(getShortenedNames());
   }
@@ -607,6 +659,8 @@ public class MineLSC {
     if (dot_count > 8000) { System.out.println(". "+words.nodes.size()+" "+toString(largestWord_checked)); dot_count = 0; }
     
     
+    Set<Short> visibleEvents = new HashSet<Short>(ev);
+    
     for (Short e : ev) {
       
       // count how often successor e already occurs in the word w
@@ -619,13 +673,13 @@ public class MineLSC {
       // it does: skip this successor (each event occurs only once)
       if (count > 0) {
         //mineSupportedWords_subwords(tree, minSupThreshold, word, ev, words, e);
-        continue;
+        //continue;
       }
       
       short[] nextWord = Arrays.copyOf(word, word.length+1);
       nextWord[word.length] = e;
       
-      List<SLogTreeNode[]> occ = tree.countOccurrences(nextWord, null, null);
+      List<SLogTreeNode[]> occ = tree.countOccurrences(nextWord, visibleEvents, null, null);
       int total_occurrences = getTotalOccurrences(occ);
       
       if (total_occurrences >= minSupThreshold) {

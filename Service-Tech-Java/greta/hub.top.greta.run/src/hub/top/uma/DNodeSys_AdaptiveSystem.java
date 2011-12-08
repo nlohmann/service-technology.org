@@ -140,20 +140,20 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 		
 		// collect all names and assign each new name a new ID
 		for (Node n : as.getAdaptiveProcess().getNodes()) {
-		  String name = namePostProcessor.process(n.getName());
+		  String name = namePostProcessor.process(n, n.getName());
 			if (nameToID.get(name) == null)
 				nameToID.put(name, currentNameID++);
 			nodeNum++;
 		}
 		for (Oclet o : as.getOclets()) {
 			for (Node n : o.getPreNet().getNodes()) {
-			  String name = namePostProcessor.process(n.getName());
+			  String name = namePostProcessor.process(n, n.getName());
 				if (nameToID.get(name) == null)
 					nameToID.put(name, currentNameID++);
 				nodeNum++;
 			}
 			for (Node n : o.getDoNet().getNodes()) {
-			  String name = namePostProcessor.process(n.getName());
+			  String name = namePostProcessor.process(n, n.getName());
 				if (nameToID.get(name) == null)
 					nameToID.put(name, currentNameID++);
 				nodeNum++;
@@ -275,7 +275,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
       }
 			
 			// create new DNode d for Node n
-      String name = namePostProcessor.process(n.getName());
+      String name = namePostProcessor.process(n, n.getName());
 			DNode d = new DNode(nameToID.get(name), pre);
       //allNodes.add(d);
       

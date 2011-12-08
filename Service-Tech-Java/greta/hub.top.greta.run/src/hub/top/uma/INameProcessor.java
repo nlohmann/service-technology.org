@@ -1,30 +1,34 @@
 package hub.top.uma;
 
+import hub.top.greta.cpn.AdaptiveSystemToCPN;
+
 public interface INameProcessor {
   
   public static final INameProcessor IDENTITY = new INameProcessor() {
-    public String process(String name) {
+    public String process(Object o, String name) {
       return name;
     }
   };
   
   public static final INameProcessor HLtoLL = new INameProcessor() {
     
-    public String process(String name) {
-      int lpar = name.indexOf('(');
-      if (lpar == -1) return name;
+    public String process(Object o, String name) {
       
-      String realName = name.substring(
-          name.indexOf('(')+1,
-          name.indexOf(','));
-      String parameter = name.substring(
-          name.indexOf(',')+1,
-          name.indexOf(')'));
+      if (o instanceof hub.top.adaptiveSystem.Condition) {
+        int lpar = name.indexOf('(');
+        if (lpar == -1) return name;
+        
+        return AdaptiveSystemToCPN.getPlaceName(name);
+        
+      } else if (o instanceof hub.top.adaptiveSystem.Event) {
+        
+        return AdaptiveSystemToCPN.getTransitionName(name);
+      }
       
-      return realName;
+      return name;
     }
   };
 
-  public String process(String name);
+  public String process(Object o, String name);
   
 }

@@ -6,7 +6,7 @@
       <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_D2mu8CASEeGum_P6cG40_A" source="_BfEP0CASEeGum_P6cG40_A" destination="_DNFQ0CASEeGum_P6cG40_A"/>
     </preNet>
     <doNet xmi:id="_AAmGsCASEeGum_P6cG40_A" name="do">
-      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_DNFQ0CASEeGum_P6cG40_A" name="count" preConditions="_BfEP0CASEeGum_P6cG40_A" postConditions="_EnGXwCASEeGum_P6cG40_A" enabled="true" incoming="_D2mu8CASEeGum_P6cG40_A" outgoing="_Gd128CASEeGum_P6cG40_A"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_DNFQ0CASEeGum_P6cG40_A" name="count[x &lt; 5]" preConditions="_BfEP0CASEeGum_P6cG40_A" postConditions="_EnGXwCASEeGum_P6cG40_A" incoming="_D2mu8CASEeGum_P6cG40_A" outgoing="_Gd128CASEeGum_P6cG40_A"/>
       <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_EnGXwCASEeGum_P6cG40_A" name="(p,increment(x))" preEvents="_DNFQ0CASEeGum_P6cG40_A" incoming="_Gd128CASEeGum_P6cG40_A"/>
       <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_Gd128CASEeGum_P6cG40_A" source="_DNFQ0CASEeGum_P6cG40_A" destination="_EnGXwCASEeGum_P6cG40_A"/>
     </doNet>
@@ -24,12 +24,14 @@
   </oclets>
   <adaptiveProcess xmi:id="_96GUQCAREeGum_P6cG40_A" name="ap">
     <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_-P1TsCAREeGum_P6cG40_A" name="(p,0)" token="1"/>
-    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_-qmwoSDAEeGw1rTgsFI3zQ" name="(q,17)" token="1" outgoing="_BH-K8CDBEeGw1rTgsFI3zQ"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_-qmwoSDAEeGw1rTgsFI3zQ" name="(q,17)" token="1" outgoing="_BH-K8CDBEeGw1rTgsFI3zQ _8DQYMCGiEeG-TL2b07N_PA"/>
     <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_BH-K8CDBEeGw1rTgsFI3zQ" source="_-qmwoSDAEeGw1rTgsFI3zQ"/>
     <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_BIPQsCDBEeGw1rTgsFI3zQ"/>
     <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_B6OuUCDBEeGw1rTgsFI3zQ"/>
     <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_B6el8CDBEeGw1rTgsFI3zQ"/>
     <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_CpfoECDBEeGw1rTgsFI3zQ"/>
     <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_CpvfsCDBEeGw1rTgsFI3zQ"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_8DQYMCGiEeG-TL2b07N_PA" source="_-qmwoSDAEeGw1rTgsFI3zQ"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_8DfBsCGiEeG-TL2b07N_PA"/>
   </adaptiveProcess>
 </adaptiveSystem:AdaptiveSystem>

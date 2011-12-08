@@ -20,7 +20,7 @@
       <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_MwFYgCp1Ed6ho6drrxRJ8g" name="(th,i)" preEvents="_MA2T8Cp1Ed6ho6drrxRJ8g" incoming="_Oca-gCp1Ed6ho6drrxRJ8g"/>
       <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_PiAtkCp1Ed6ho6drrxRJ8g" name="(fo,right(i))" preEvents="_MA2T8Cp1Ed6ho6drrxRJ8g" incoming="_QzqisCp1Ed6ho6drrxRJ8g"/>
       <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_VctPUMIHEd2bhqEfm1jXKA" name="(hl,i)" preEvents="_Jai0YGQuEd6BYe6q4zE4zA" postEvents="_XpFAQMIHEd2bhqEfm1jXKA" incoming="_KR1BsGQuEd6BYe6q4zE4zA" outgoing="_l5oUwMIHEd2bhqEfm1jXKA"/>
-      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_Jai0YGQuEd6BYe6q4zE4zA" name="tl" preConditions="_KiXYEGQuEd6BYe6q4zE4zA _N4yhUGQuEd6BYe6q4zE4zA" postConditions="_VctPUMIHEd2bhqEfm1jXKA" incoming="_LeQ_oGQuEd6BYe6q4zE4zA _O5UKMGQuEd6BYe6q4zE4zA" outgoing="_KR1BsGQuEd6BYe6q4zE4zA"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_Jai0YGQuEd6BYe6q4zE4zA" name="tl[i &lt;> 2]" preConditions="_KiXYEGQuEd6BYe6q4zE4zA _N4yhUGQuEd6BYe6q4zE4zA" postConditions="_VctPUMIHEd2bhqEfm1jXKA" incoming="_LeQ_oGQuEd6BYe6q4zE4zA _O5UKMGQuEd6BYe6q4zE4zA" outgoing="_KR1BsGQuEd6BYe6q4zE4zA"/>
       <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_mjpiIMIHEd2bhqEfm1jXKA" source="_XpFAQMIHEd2bhqEfm1jXKA" destination="_Y07IUMIHEd2bhqEfm1jXKA"/>
       <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_nMUrsMIHEd2bhqEfm1jXKA" source="_Y07IUMIHEd2bhqEfm1jXKA" destination="_abvVIMIHEd2bhqEfm1jXKA"/>
       <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_nkUU8MIHEd2bhqEfm1jXKA" source="_abvVIMIHEd2bhqEfm1jXKA" destination="_g4zfMMIHEd2bhqEfm1jXKA"/>

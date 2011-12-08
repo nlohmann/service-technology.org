@@ -5,7 +5,6 @@ import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Oclet;
-import hub.top.greta.run.Activator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,15 +33,11 @@ import org.cpntools.accesscpn.model.HLDeclaration;
 import org.cpntools.accesscpn.model.declaration.VariableDeclaration;
 import org.cpntools.accesscpn.model.exporter.DOMGenerator;
 import org.cpntools.accesscpn.model.util.BuildCPNUtil;
-import org.eclipse.core.internal.resources.Workspace;
-import org.eclipse.core.internal.resources.WorkspaceRoot;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
-import org.osgi.framework.Bundle;
 
 public class AdaptiveSystemToCPN {
   
@@ -168,6 +163,21 @@ public class AdaptiveSystemToCPN {
         name.lastIndexOf(')'));
     return token;
   }
+  
+  public static String getTransitionName(String name) {
+    if (name.indexOf('[') == -1) return name;
+    String transititionName = name.substring(0, name.indexOf('['));
+    return transititionName;
+  }
+  
+  public static String getTransitionGuard(String name) {
+    if (name.indexOf('[') == -1) return "";
+    String transititionGuard= name.substring(
+        name.indexOf('['),
+        name.lastIndexOf(']')+1);
+    return transititionGuard;
+  }
+
   
   public void loadFunctionDefinitions(AdaptiveSystem as) {
     org.eclipse.emf.common.util.URI ml = as.eResource().getURI().trimFileExtension().appendFileExtension("ml.txt");
@@ -307,7 +317,9 @@ public class AdaptiveSystemToCPN {
       String ocletName = ((Oclet)e.eContainer().eContainer()).getName();
       ocletName = ocletName.substring(0, ocletName.indexOf('('));
       
-      org.cpntools.accesscpn.model.Transition t = build.addTransition(eventPage, e.getName());
+      String transitionName = getTransitionName(e.getName());
+      String transitionGuard = getTransitionGuard(e.getName());
+      org.cpntools.accesscpn.model.Transition t = build.addTransition(eventPage, transitionName, transitionGuard);
       
       for (Condition c : e.getPreConditions()) {
         

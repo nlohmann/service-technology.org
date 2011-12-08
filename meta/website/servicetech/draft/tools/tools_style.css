@@ -1,204 +1,36 @@
-﻿    p.leftcol {
-      width: 290px;
-      position: absolute;
-      left: 0px;
-    }
-    
-    p.midcol {
-      width: 290px;
-      position: absolute;
-      left: 317px;
-    }    
-
-    p.rightcol {
-      width: 290px;
-      position: absolute;
-      right: 0px;
-    }
-
-    p.leftcol:first-line {
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    p.midcol:first-line {
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    p.rightcol:first-line {
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    
-  
-  #purpose_image {
-    float: right;
-    margin-top: -10px;
-    margin-left: 30px;
-    margin-right: 0px;
-    margin-bottom: 20px;
- 
- }
- 
- .clearspace {
-  clear: both; 
-  height: 20px;
- }
-  
- #quick_start ul {
-  list-style-type:none;
-  margin:0px;
-  padding: 0px;
- }
- 
-code {
-  background: #444;
-  color: white;
-  padding-left: 2px;
-  padding-top: 2px;
-  padding-bottom: 2px;
-  padding-right: 2px;  
- }
- 
- code:before {
-  content: "$";
-  color: #eee;
- }
- 
- #quick_start li {
- float: left;
- margin-right: 40px;
- }
- 
-
-#content a:link, #content a:visited {
-  color: inherit;
- text-decoration: none;
-  border-bottom: 2px solid #02aeed;
-}
-
-#content a:hover {
-  color: white;
-  background-color: #02aeed;
-  text-decoration: none;
-}
-
-.question:before {
-  content: "Q: ";
-  font-weight: bold;
-}
-
-.answer:before {
-  content: "A: ";
-  font-weight: bold;
-}
-
-.answer {
-padding-bottom: 2px;
-}
-
-.download_list {
-  float: left;
-  padding-right: 20px;
-}
-
-.download_list ul {
-
-    margin: 0px;
-    padding: 0px;
-    list-style-type: none;
-    padding-left: 72px;
-    margin-top: -20px;
- }
-
-.download_list li {
-    margin-bottom: 10px;
-    margin-top: 0px;
-}
-
-.download_list a {
-    padding-bottom: 0px;
-    padding-left: 28px;
-    line-height: 32px;
-    padding-right: 1px;
-    background: url(../icons/dl-icon-small.png) no-repeat left;
-}
-
-.linux_header {
-     background: url(../osicons/tux-pd.png) no-repeat left;
-     padding-left: 72px;
-     line-height: 64px;
-  } 
-
-  .mac_header {
-     background: url(../osicons/apple-pd.png) no-repeat left;
-     padding-left: 72px;
-     line-height: 64px;
-  } 
-  
-  .windows_header {
-     background: url(../osicons/windows-pd.png) no-repeat left;
-     padding-left: 72px;
-     line-height: 64px;
-  } 
-  
-      img.portrait {
-      border:1px solid #444;
-      box-shadow: 0px 0px 3px #333; 
-      margin-right: 4px;
-    }
-
-    .number-list ol {
-      list-style-position: outside;
-      padding: 0;
-      margin: 0;
-      margin-left: 20px;
-    }
-    
-    .number-list li {
-      padding: 0px;
-      margin-bottom: 20px;
-    }
-    
-    .threecolumns {
-      
-    column-count: 3;
-    column-gap: 10px;
-    -moz-column-count: 3;
-    -moz-column-gap: 10px;
-    -webkit-column-count: 3;
-    -webkit-column-gap: 10px;
-    
-    }
-    
-    
-    
-#tool-list li {
+﻿#tool-list li 
+{
   line-height: 32px;
 } 
 
-#tool-list, #tool-list ul {
+#tool-list, #tool-list ul 
+{
   list-style-type: none;
   padding: 0;
   margin: 0;
 }
 
-#tool-list {
+#tool-list 
+{
   margin-top: 20px;
 }
 
-#tool-list ul:first-child {
+#tool-list ul:first-child 
+{
   margin-bottom: 20px;
   text-transform: none;
   font-weight: normal;
 }
 
-#tool-list {
+#tool-list 
+{
   text-transform: uppercase;
   font-weight: bold;
 }
 
 
-#tool-list em:before {
+#tool-list em:before 
+{
   content: " — ";
 }
 

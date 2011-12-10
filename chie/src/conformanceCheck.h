@@ -8,7 +8,7 @@
 typedef std::map<unsigned int, std::set<unsigned int> > searchCache;
 
 // whether two service automata are conformance partners
-bool isConformancePartner(ServiceAutomaton &, ServiceAutomaton &);
+bool isConformancePartner(ServiceAutomaton &, ServiceAutomaton &, std::string);
 
 // whether messages from the first automaton are strong receivable in the second automaton
 bool checkStrongReceivability(ServiceAutomaton &, ServiceAutomaton &, ProductAutomaton &);

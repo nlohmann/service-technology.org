@@ -9,6 +9,7 @@ chie_SOURCES = sa-syntax.yy sa-lexic.ll \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \
                 Output.cc Output.h \
+		dot.h dot.cc \
 		util.h
 
 # the configuration files

@@ -161,6 +161,7 @@ void terminationHandler() {
 /// main-function
 int main(int argc, char** argv) {
     time_t start_time, end_time;
+    std::string dotFileName;
 
     // set the function to call on normal termination
     atexit(terminationHandler);
@@ -238,8 +239,23 @@ int main(int argc, char** argv) {
       // close input
       fclose(sa_yyin);
 
+
+      // generate filename for dot output
+      if(args_info.dot_given)
+      {
+        if(args_info.inputs_num == 0)
+        {
+          dotFileName = "stdin.dot";
+        }
+        else
+        {
+          dotFileName = args_info.inputs[i];
+          dotFileName += ".dot";
+        }
+      }
+
       // do the test
-      bool result = isConformancePartner(specification, testCase);
+      bool result = isConformancePartner(specification, testCase, dotFileName);
       message("%s: %s", ((args_info.inputs_num == 0) ? "stdin" : args_info.inputs[i]), (result ? "YES" : "NO"));
       if(!result)
       {

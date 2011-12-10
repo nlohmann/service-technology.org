@@ -298,10 +298,12 @@ bool createProductAutomaton(ServiceAutomaton & specification, ServiceAutomaton &
 
     if(!successorFound)
     {
-      bool cond1, cond2; // avoid counting twice
+      // avoid counting twice
+      bool cond1 = (specification.finalStates.count(currentState->internalState.first) == 0); // specification state is no final state
+      bool cond2 = (testCase.finalStates.count(currentState->internalState.second) == 0); // test case state is no final state
+
       // no successor found, so both the specification automaton state and the test case automaton state must be final states
-      if((cond1 = (specification.finalStates.count(currentState->internalState.first) == 0)) || // specification state is no final state
-         (cond2 = (testCase.finalStates.count(currentState->internalState.second) == 0))) // test case state is no final state
+      if(cond1 || cond2)
       {
         result.badNode = currentStateID; // mark this state as bad node in product automaton
 

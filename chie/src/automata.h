@@ -1,5 +1,5 @@
-#ifndef DATASTRUCTURES_H_
-#define DATASTRUCTURES_H_
+#ifndef AUTOMATA_H_
+#define AUTOMATA_H_
 
 #include <map>
 #include <set>
@@ -134,4 +134,4 @@ struct ProductAutomaton
 bool createProductAutomaton(ServiceAutomaton &, ServiceAutomaton &, ProductAutomaton &);
 
 
-#endif /* DATASTRUCTURES_H_ */
+#endif /* AUTOMATA_H_ */

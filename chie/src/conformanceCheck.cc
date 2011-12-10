@@ -6,6 +6,7 @@
 #include <sstream>
 #include "cmdline.h"
 #include "verbose.h"
+#include "dot.h"
 
 #include <iostream>
 using std::cerr;
@@ -20,7 +21,7 @@ extern gengetopt_args_info args_info; // defined in main.cc
 /*!
  * \brief whether two service automata are conformance partners
  */
-bool isConformancePartner(ServiceAutomaton & specification, ServiceAutomaton & testCase)
+bool isConformancePartner(ServiceAutomaton & specification, ServiceAutomaton & testCase, std::string dotFileName)
 {
   // initialize resulting automaton
   ProductAutomaton productAutomaton;
@@ -34,7 +35,8 @@ bool isConformancePartner(ServiceAutomaton & specification, ServiceAutomaton & t
 
   if((!result) && (args_info.dot_given))
   {
-    // TODO: write dot output here
+    // write dot output
+    writeToDotFile(productAutomaton, dotFileName);
   }
 
   // return result
@@ -64,6 +66,10 @@ bool checkStrongReceivability(ServiceAutomaton & specification, ServiceAutomaton
   // get states of product automaton holding states without successors in the service automaton
   std::set<unsigned int> whiteNodes = productAutomaton.noSpecificationSuccessorStates;
 
+  // further variables for DFS
+  unsigned int currentStateID; // ID of current state
+  bool sendingEventFound; // whether a sending event remains on the channel
+
   // perform DFS on SCCs in these states
   while(whiteNodes.size() > 0) // while set of these states (= unvisited states) is not empty
   {
@@ -73,7 +79,7 @@ bool checkStrongReceivability(ServiceAutomaton & specification, ServiceAutomaton
     while(dfsStack.size() > 0) // while stack not empty
     {
       // get current state and remove it from DFS stack
-      unsigned int currentStateID = dfsStack.top();
+      currentStateID = dfsStack.top();
       ProductState & currentState = productAutomaton.states[currentStateID];
       dfsStack.pop();
 
@@ -94,7 +100,7 @@ bool checkStrongReceivability(ServiceAutomaton & specification, ServiceAutomaton
       ChannelState & channelState = productAutomaton.channelStates[currentState.interfaceStateID];
 
       // check for sending events
-      bool sendingEventFound = false;
+      sendingEventFound = false;
       FOREACH(event, sendingEvents)
       {
         if(channelState.count(*event) > 0)

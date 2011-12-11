@@ -1,4 +1,4 @@
-SUBDIRS = src
+SUBDIRS = src 
 
 # tell aclocal about the macros in the "m4" folder
 ACLOCAL_AMFLAGS = -I m4 --install

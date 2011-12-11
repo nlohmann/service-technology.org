@@ -413,8 +413,8 @@ bool Conjunction::operator==(const Formula & other) const
 /*!
  * \brief whether (NOT this) implies (NOT the other formula)
  * 
- * (NOT this) is TRUE, if at least one child equals to FALSE,
- * so (NOT other) then also has to be TRUE. I.e. for all
+ * (NOT this) is true, if at least one child equals to false,
+ * so (NOT other) then also has to be true. I.e. for all
  * children f has to apply, that (NOT f) implies (NOT other),
  * i.e. f <= other.  
  */
@@ -778,7 +778,7 @@ Literal::Literal(bool constant)
   }
   else
   {
-    literal_ = "false"; 
+    literal_ = "false";
   }
 }
 
@@ -834,11 +834,11 @@ bool Literal::operator==(bool other) const
  * 
  * \pre   dnf() has been called before
  * 
- * ~TRUE -> ~other is TRUE (FALSE implies everything)
- * ~FALSE -> ~other is FALSE (TRUE implies nothing)
- * ~a -> ~b is TRUE iff a = b
- * ~a -> ~(x_1 * ... * x_2) is TRUE iff the exists an i with a = x_i. 
- * ~a -> ~(x_1 + ... + x_n) is FALSE (will not be needed, anyway)
+ * ~true -> ~other is true (false implies everything)
+ * ~false -> ~other is false (true implies nothing)
+ * ~a -> ~b is true iff a = b
+ * ~a -> ~(x_1 * ... * x_2) is true iff the exists an i with a = x_i.
+ * ~a -> ~(x_1 + ... + x_n) is false (will not be needed, anyway)
  */
 bool Literal::operator<=(const Formula & other) const
 {

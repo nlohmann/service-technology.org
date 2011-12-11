@@ -1,0 +1,18 @@
+{
+  generator:    Maxis 0.2-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   maxis --mp -o wsfm2008.mp.sa wsfm2008.og
+  events:       1 send, 0 receive, 0 synchronous
+  statistics:   3 output nodes [3 finals] generated from 3 input nodes
+}
+
+INTERFACE
+  OUTPUT
+    g;
+
+NODES
+  36665104 : INITIAL, FINAL
+    g -> 36679088
+  36673424 : FINAL
+  36679088 : FINAL
+    g -> 36673424
+

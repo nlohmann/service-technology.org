@@ -1,0 +1,15 @@
+INTERFACE
+  INPUT
+    g;
+  OUTPUT
+    ;
+  SYNCHRONOUS
+    ;
+
+NODES
+  0: INITIAL
+    g -> 1
+  1
+    g -> 2
+  2: FINAL
+

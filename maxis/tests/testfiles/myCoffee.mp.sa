@@ -1,0 +1,41 @@
+{
+  generator:    Maxis 0.2-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   maxis --mp -o myCoffee.mp.sa myCoffee.og
+  events:       3 send, 1 receive, 0 synchronous
+  statistics:   8 output nodes [8 finals] generated from 8 input nodes
+}
+
+INTERFACE
+  INPUT
+    B;
+  OUTPUT
+    C, E, T;
+
+NODES
+  0 : FINAL
+    B -> 0
+    C -> 0
+    E -> 0
+    T -> 0
+  2117920 : FINAL
+    B -> 0
+    C -> 2119264
+    T -> 2119840
+  2118800 : FINAL
+    B -> 0
+    E -> 2119264
+  2119264 : FINAL
+    B -> 2119360
+  2119360 : FINAL
+    B -> 0
+  2119840 : FINAL
+    B -> 2119360
+  2120368 : INITIAL, FINAL
+    B -> 0
+    C -> 2118800
+    E -> 2117920
+    T -> 2140656
+  2140656 : FINAL
+    B -> 0
+    E -> 2119840
+

@@ -1,3 +1,10 @@
+{
+  generator:    Maxis 0.2-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   maxis -l 1 -o problem_1.l1.m.sa problem_1.og
+  events:       0 send, 2 receive, 0 synchronous
+  statistics:   15 output nodes [4 finals] generated from 5 input nodes
+}
+
 INTERFACE
   INPUT
     x, y;

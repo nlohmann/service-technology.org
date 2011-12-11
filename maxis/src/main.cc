@@ -71,8 +71,6 @@ std::ostream* myOut = &cout;
 map<unsigned int, multimap<string, unsigned int> > succ;
 /// annotations of recent OG
 map<unsigned int, Formula *> formulae;
-/// satisfying assignments of recent OG
-map<unsigned int, Choice *> dnf_choices;
 /// input labels of recent OG
 set<string> inputs;
 /// output labels of recent OG
@@ -87,6 +85,8 @@ unsigned int * initialID = NULL;
 /***************************
  * Variables used by Maxis *
  ***************************/
+/// satisfying assignments of recent OG
+map<unsigned int, Choice *> dnf_choices;
 
 // verbose and debug flag
 dbg_flag verbose = off;
@@ -114,9 +114,9 @@ liberal liberal_flag = normal;
 void dumpTest() {
 
 	cout << PACKAGE << " : ---------" << endl;
-	cout << PACKAGE << " : succ " << endl;
+	cout << PACKAGE << " : succ : "  << endl;
 	for( map<unsigned int, multimap<string, unsigned int> >::iterator it=succ.begin(); it!=succ.end(); ++it) {
-		cout << it->first << "::" << endl;
+		cout << it->first << ":: " ;
 		multimap<string, unsigned int> element = it->second;
 		for( multimap<string, unsigned int>::iterator sit=element.begin(); sit!=element.end(); ++sit) {
 	       cout << sit->second << ", ";
@@ -125,18 +125,26 @@ void dumpTest() {
 	 }
 
      cout << PACKAGE << " : ---------" << endl;
-     cout << PACKAGE << " : Choice " << endl;
+     cout << PACKAGE << " : Choice : " << endl;
      for(map<unsigned int, Choice *>::iterator it=dnf_choices.begin(); it !=dnf_choices.end(); ++it)
      {
-    	 cout << it->first << ": " << endl;
+    	 cout << it->first << ":: ";
+    	 bool first = true;
     	 set< set<string> > choices = (it->second)->get_all_choices();
     	 for(set< set<string> >::iterator cit= choices.begin(); cit!= choices.end(); ++cit)  {
+    		 if (!first)
+    			 cout << ", ";
     		 set<string> ch = * cit;
-    		 cout << "[, ";
+    		 first = false;
+    		 cout << "[ ";
+    		 bool firstch = true;
     		 for(set<string>::iterator sit= ch.begin(); sit!= ch.end(); ++sit) {
-    			 cout << sit->data() << ", ";
+    			 if (!firstch)
+    				 cout << ", ";
+    			 cout << sit->data();
+    			 firstch = false;
     		 }
-    		 cout << "], ";
+    		 cout << " ]";
     	 }
     	 cout << endl;
      }
@@ -176,6 +184,12 @@ void evaluate_parameters(int argc, char** argv)
     if(args_info.verbose_flag) { verbose = on; }
     if(args_info.debug_flag) { debug = on; }
 
+    if (args_info.liberal_given and args_info.mp_given) {
+		message("ERROR : -l and -m are mutually exclusive! Please choose only one!");
+		status("terminated with failure!");
+		exit(EXIT_FAILURE);
+    }
+
 	if(args_info.liberal_given) {
 		switch (args_info.liberal_arg) {
 		   case 0 :  liberal_flag = normal;
@@ -195,16 +209,20 @@ void evaluate_parameters(int argc, char** argv)
 					  break;
 		}
 	} else {
-		liberal_flag = normal;
-		if (verbose == on) {
-			message("no input liberal mode. Now set to the default value '0'.");
- 		    message("compute a maximal partner as stated in the input file");
+		if  (args_info.mp_given) {
+		          if(verbose == on) {
+					message("generate a most permissive partner form the given input file.");
+		          }
+		} else {
+			message("ERROR : either -l or -m must be given!");
+			status("terminated with failure!");
+			exit(EXIT_FAILURE);
 		}
 	}
 
 	// if none of input OG files is given
 	if(args_info.inputs_num == 0) {
-		message("ERROR : an OG input file must be given");
+		message("ERROR : an OG input file (suffix .og) must be given");
 		status("terminated with failure!");
 		exit(EXIT_FAILURE);
 	}
@@ -224,8 +242,6 @@ void evaluate_parameters(int argc, char** argv)
 	}
 
 	free(params);
-
-//	cmdline_parser_free(&args_info);
 }
 
 /***********************
@@ -244,6 +260,15 @@ void parse_OG()
 
     // parsing OG
     yyparse();
+
+    // pre-processing data : a hack solution
+    for( std::map<unsigned int, Formula *>::iterator it=formulae.begin(); it!=formulae.end(); ++it )  {
+    	std::map<unsigned int, std::multimap<std::string, unsigned int> >::iterator succFound = succ.find(it->first);
+	    if (succFound == succ.end()) { // if succ not found, it is a leave node
+	    	std::multimap<std::string, unsigned int> empty_map;
+	    	succ[it->first] = empty_map;
+	    }
+    }
 }
 
 
@@ -380,13 +405,35 @@ void add_extra_choices(unsigned int sourceNode, multimap<string, unsigned int> *
 	// construct a TAU arc from a sourceNode to a new final Node
 	Choice * choice = dnf_choices[sourceNode];
 	std::set<std::string> ch;
-	ch.insert("final");
+
 	if (!choice->contains(ch)) { // check if there exists already a TAU arc to a final node
 		oldArcs.clear();
 		arcMap->insert( multimap<string, unsigned int>::value_type("TAU ", ++node_index) );
 		succ[node_index] = oldArcs;
 		finalIDs.insert(node_index);
 	}
+}
+
+/************************************************
+ * construct a most permissive partner from OGs *
+ ************************************************/
+void construct_most_permissive_partner()
+{
+//    finalIDs.clear();
+    number_of_nodes = formulae.size();
+
+    for( map<unsigned int, Formula *>::iterator it=formulae.begin(); it!=formulae.end(); ++it) {
+    	Formula *f = it->second;
+        //wrapper.insert(std::string("final"));
+        for(std::map<unsigned int, std::set<std::string> >::iterator lit = presentLabels.begin();
+        		lit != presentLabels.end(); ++lit) {
+            std::set<std::string> wrapper = lit->second;
+        	if (f->sat(wrapper)) {
+      	        finalIDs.insert(it->first);
+            }
+        }
+    }
+
 }
 
 /****************************************
@@ -399,10 +446,9 @@ void construct_maximal_partner()
 		dumpTest();
 	}
 
-    number_of_nodes = succ.size();
+    number_of_nodes = formulae.size();
 
-     for( map<unsigned int, Choice *>::iterator it=dnf_choices.begin(); it!=dnf_choices.end(); ++it)
-     {
+    for( map<unsigned int, Choice *>::iterator it=dnf_choices.begin(); it!=dnf_choices.end(); ++it) {
 	    unsigned int node = it->first;    // node id
     	Choice * chFormula = it->second;  // maximal partner choices
 
@@ -448,7 +494,15 @@ void construct_maximal_partner()
  ***************************************/
 void write_output_SA()
 {
-	bool initialState = false;
+    // write header information
+	(*myOut) << "{\n  generator:    " << PACKAGE_STRING  << " (" << CONFIG_BUILDSYSTEM ")"
+         << "\n  invocation:   " << invocation << "\n  events:       "
+         << outputs.size() << " send, "
+         << inputs.size() << " receive, "
+         << synchronous.size() << " synchronous"
+         << "\n  statistics:   " << succ.size() << " output nodes ["
+                                 << finalIDs.size() << " finals] generated from " << number_of_nodes << " input nodes";
+	(*myOut) << "\n}\n\n";
 
 	  (*myOut) << "INTERFACE" << endl;
 	  if(!inputs.empty()) {
@@ -477,39 +531,37 @@ void write_output_SA()
 
 	  (*myOut) << "\nNODES\n";
 
-	  for( map<unsigned int, multimap<string, unsigned int> >::iterator it=succ.begin(); it!=succ.end(); ++it)  {
-
-//	    if(args_info.show_states_given)
-//	    {
-//	      (*myOut) << "  { ";
-//	      for(unsigned int j = 0; j < ID2state[i->first].size(); ++j)
-//	      {
-//	        (*myOut) << ID2state[i->first][j] << " ";
-//	      }
-//	      (*myOut) << "}\n";
-//	    }
-
-	    (*myOut) << "  " << it->first; // << " : "; //it->second << "\n";
-
-	    // read a node, write corresponding node
-	    if ((*initialID) == (it->first)) {
-	      (*myOut) << " : INITIAL";
-	      initialState = true;
+	  for( map<unsigned int, multimap<string, unsigned int> >::iterator it=succ.begin();
+			  it!=succ.end(); ++it)  {
+/*
+	    if(args_info.show_states_given)	    {
+	      (*myOut) << "  { ";
+	      for(unsigned int j = 0; j < ID2state[i->first].size(); ++j)
+	      {
+	        (*myOut) << ID2state[i->first][j] << " ";
+	      }
+	      (*myOut) << "}\n";
 	    }
+*/
 
+	    (*myOut) << "  " << it->first;
+
+	    if ((*initialID) == (it->first)) {
+  	        (*myOut) << " : INITIAL";
+	    }
 
 	    set<unsigned int>::iterator finalFound = finalIDs.find(it->first);
 	    if (finalFound != finalIDs.end()) {
-	    	if ((*initialID) == (it->first))
-	    		(*myOut) << ", ";
-
-	    	(*myOut) << " : FINAL";
+	    	if ((*initialID) == (it->first)) {
+	    		(*myOut) << ", FINAL";
+	    	} else  {
+	    	     (*myOut) << " : FINAL";
+	    	}
 	    }
-
-
 	    (*myOut) << "\n";
 
-	    for(multimap<string, unsigned int>::iterator sit = succ[it->first].begin(); sit != succ[it->first].end(); ++sit) {
+	    for(multimap<string, unsigned int>::iterator sit = succ[it->first].begin();
+	    		sit != succ[it->first].end(); ++sit) {
 	    	(*myOut) << "    " << sit->first << " -> " << sit->second << "\n";
 	    }
 	  }
@@ -540,7 +592,6 @@ void generate_DNF_structure() {
    		   allow.insert(sit->first);
        }
 
-
 	   std::set<std::string> all = util::setUnion(inputs, outputs);
 	   Choice * ch = new Choice( dnf, allow, liberal_flag,  cout, debug );
 
@@ -556,7 +607,7 @@ void generate_DNF_structure() {
 }
 
 void terminationHandler() {
-    if (verbose == on) {
+    if (args_info.stats_flag) {
         message("runtime: %s%.2f sec%s.", _bold_, (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC, _c_);
         std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
         FILE* ps = popen(call.c_str(), "r");
@@ -571,26 +622,6 @@ void terminationHandler() {
 
 void finalize()
 {
-   	if (verbose == on ) {
-    		message("%d nodes in OG input file.", number_of_nodes);
-    		message("%d output nodes [%d final nodes] are generated.", succ.size(), finalIDs.size());
-     }
-    /*
-        if(initialID != NULL) ...
-
-        if (finalIDs.empty())
-        	if (verbose == on ) { message("there is no final state."); }
-        else {
-        	ostringstream oss;
-        	string delim = "";
-        	for (set<unsigned int>::iterator it=finalIDs.begin(); it!=finalIDs.end(); ++it) {
-        		oss << delim << *it;
-        		delim = ", ";
-        	}
-        	if (verbose == on ) { message("final states = [%s].", oss.str().c_str()); }
-        }
-    }
-    */
     /// clear maps
     succ.clear();
     formulae.clear();
@@ -636,22 +667,45 @@ int main(int argc, char** argv)
     if (verbose == on) { message("parsing an OG input file... "); }
     parse_OG();
 
-    // generate complete DNF structure
-    if (verbose == on) { message("generating DNF structure..."); }
-    generate_DNF_structure();
+    if  (args_info.liberal_given) {
 
+	     // generate complete DNF structure
+	     if (verbose == on) { message("generating DNF structure..."); }
+         generate_DNF_structure();
+
+        if (debug == on) {
+         	// dump all parsed variables to standard output
+    	    message("dumping all variables ... ");
+    	    //	dump();
+    	    dumpTest();
+        }
+
+        // construct a maximal partner
+        if (verbose == on) { message("constructing a maximal partner... "); }
+        construct_maximal_partner();
+
+	}  else {
+
+		// construct a most permissive partner
+        if (verbose == on) { message("constructing a most permissive partner... "); }
+        construct_most_permissive_partner();
+
+	}
+
+/*
     if (debug == on) {
-    	// dump all parsed variables to standard output
-    	message("dumping all variables ... ");
-    	//	dump();
-    	dumpTest();
-    }
-
-    // construct a maximal partner
-    if (verbose == on) { message("constructing a maximal partner... "); }
-    construct_maximal_partner();
-
-	// write output
+		cout << "==================" << endl;
+		cout << "formulae.size() = " << number_of_nodes << endl;
+		cout << "finalIDs.size() = " << finalIDs.size() << " :: ";
+	    for(std::set<unsigned int>::iterator finalFound = finalIDs.begin(); finalFound != finalIDs.end();
+	    		++finalFound) {
+	    	cout << *finalFound << ", ";
+	    }
+	    cout << endl;
+  	    dump();
+	}
+*/
+    // write output
     if (verbose == on) { message("writing an output service automaton..."); }
     write_output_SA();
 

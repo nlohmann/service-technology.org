@@ -8,7 +8,7 @@ section "Input/Output"
 sectiondesc="Maxis expects one input file of suffix `.og'.\n"
 
 option "output" o
-  "Output filename of suffix `.m.sa'. If none is given, the output will be written to standard output.\n"
+  "Output filename (of suffix `.m.sa' for a maximal partner and of suffix `.mp.sa' for a most permissive partner). If none is given, the output will be written to standard output.\n"
   string
   typestr="FILENAME"
   optional
@@ -25,7 +25,7 @@ option "stats" -
   hidden
     
 defgroup "Liberal Mode" 
-groupdesc="These option determines how a maximal partner is calculated from Operating Guidelines.\n" optional
+groupdesc="These two options are mutually exclusive and determine how a partner is calculated from Operating Guidelines.\n" optional
 
 groupoption "liberal" l
   "Calculate satisfiable assignments of formula:\n 0 - as stated in the input file \n 1 - as the least liberal (minimum) \n 2 - as the most liberal (maximum)\n"
@@ -34,6 +34,10 @@ groupoption "liberal" l
   default="0"
   typestr="MODE"
 
+option "mp" m
+  "Generate a most permissive partner from a given Operating Guidelines."
+  details="Generate a most permissive partner from a given Operating Guidelines by removing all annotations.\n"
+  flag off
 
 section "Debugging"
 sectiondesc="These option determines how much debug output the compilers create.\n"

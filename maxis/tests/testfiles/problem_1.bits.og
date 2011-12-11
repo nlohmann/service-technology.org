@@ -1,0 +1,28 @@
+{
+  generator:    Wendy 3.4-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   wendy -v bits.m.sa.owfn --og
+  events:       0 send, 2 receive, 0 synchronous
+  statistics:   4 nodes
+}
+
+INTERFACE
+  INPUT
+    y, x;
+
+NODES
+  38883072 :: F
+    y -> 38886688
+    x -> 38890288
+  38886688
+    y -> 0
+    x -> 38888256
+  38888256 :: F
+    y -> 0
+    x -> 0
+  38890288
+    y -> 38888256
+    x -> 0
+  0 :: T
+    y -> 0
+    x -> 0
+

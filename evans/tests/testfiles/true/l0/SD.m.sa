@@ -1,0 +1,51 @@
+{
+  generator:    Maxis 0.2-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   maxis --output=SD.m.sa --liberal=0 -v SD.og
+  events:       1 send, 1 receive, 0 synchronous
+  statistics:   16 output nodes [3 finals] generated from 4 input nodes
+}
+
+INTERFACE
+  INPUT
+    u;
+  OUTPUT
+    v;
+
+NODES
+  0
+    TAU  -> 28332401
+    TAU  -> 28332402
+    TAU  -> 28332403
+    TAU  -> 28332404
+    TAU  -> 28332405
+  28318544 : INITIAL
+    TAU  -> 28332406
+    TAU  -> 28332407
+    TAU  -> 28332408
+    TAU  -> 28332409
+    TAU  -> 28332410
+  28329840
+    TAU  -> 28332411
+  28332400
+    TAU  -> 28332412
+    u -> 0
+  28332401 : FINAL
+  28332402
+    u -> 0
+  28332403
+    v -> 0
+  28332404
+    TAU  -> 28332404
+  28332405
+  28332406 : FINAL
+  28332407
+    u -> 0
+  28332408
+    v -> 28329840
+  28332409
+    TAU  -> 28332409
+  28332410
+  28332411
+    u -> 28332400
+  28332412 : FINAL
+

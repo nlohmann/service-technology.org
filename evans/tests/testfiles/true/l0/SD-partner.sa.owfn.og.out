@@ -1,0 +1,6 @@
+digraph g1 {
+graph [fontname="Helvetica", label="OG of SD-partner.sa.owfn (parameters: -m1 -E)"];
+node [fontname="Helvetica" fontsize=10];
+edge [fontname="Helvetica" fontsize=10];
+p0 [label="#0", fontcolor=black, color=red, style=dashed];
+}

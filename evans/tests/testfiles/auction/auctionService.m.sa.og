@@ -1,0 +1,98 @@
+{
+  generator:    Wendy 3.4-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   wendy auctionService.m.sa.owfn --og -v
+  events:       3 send, 3 receive, 0 synchronous
+  statistics:   16 nodes
+}
+
+INTERFACE
+  INPUT
+    in.seller.auctionHouse.submit, in.buyer.auctionHouse.submit, in.auctionRegistrationService.auctionHouse.answer;
+  OUTPUT
+    out.auctionHouse.seller.answer, out.auctionHouse.buyer.answer, out.auctionHouse.auctionRegistrationService.process;
+
+NODES
+  11673920 : (in.auctionRegistrationService.auctionHouse.answer + in.buyer.auctionHouse.submit + in.seller.auctionHouse.submit) * (in.buyer.auctionHouse.submit + in.seller.auctionHouse.submit)
+    in.seller.auctionHouse.submit -> 11664432
+    in.buyer.auctionHouse.submit -> 11705488
+    in.auctionRegistrationService.auctionHouse.answer -> 11667680
+  11660336 : (out.auctionHouse.auctionRegistrationService.process + out.auctionHouse.buyer.answer + out.auctionHouse.seller.answer)
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    out.auctionHouse.seller.answer -> 11739312
+    out.auctionHouse.buyer.answer -> 11712704
+    out.auctionHouse.auctionRegistrationService.process -> 11712320
+  11664432 : (in.auctionRegistrationService.auctionHouse.answer + in.buyer.auctionHouse.submit) * in.buyer.auctionHouse.submit
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 11706400
+    in.auctionRegistrationService.auctionHouse.answer -> 11727296
+  11667680 : (in.buyer.auctionHouse.submit + in.seller.auctionHouse.submit)
+    in.seller.auctionHouse.submit -> 11727296
+    in.buyer.auctionHouse.submit -> 11667792
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+  11667792 : in.seller.auctionHouse.submit
+    in.seller.auctionHouse.submit -> 11660336
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+  11705488 : (in.auctionRegistrationService.auctionHouse.answer + in.seller.auctionHouse.submit) * in.seller.auctionHouse.submit
+    in.seller.auctionHouse.submit -> 11706400
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 11667792
+  11706400 : (in.auctionRegistrationService.auctionHouse.answer + out.auctionHouse.auctionRegistrationService.process) * out.auctionHouse.auctionRegistrationService.process
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 11660336
+    out.auctionHouse.auctionRegistrationService.process -> 11710032
+  11710032 : in.auctionRegistrationService.auctionHouse.answer
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 11712320
+  11710624 : final
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+  11712320 : (out.auctionHouse.buyer.answer + out.auctionHouse.seller.answer)
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    out.auctionHouse.seller.answer -> 11729072
+    out.auctionHouse.buyer.answer -> 11745488
+  11712704 : (out.auctionHouse.auctionRegistrationService.process + out.auctionHouse.seller.answer)
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    out.auctionHouse.seller.answer -> 11727728
+    out.auctionHouse.auctionRegistrationService.process -> 11745488
+  11727296 : in.buyer.auctionHouse.submit
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 11660336
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+  11727728 : out.auctionHouse.auctionRegistrationService.process
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 11710624
+  11729072 : out.auctionHouse.buyer.answer
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    out.auctionHouse.buyer.answer -> 11710624
+  11739312 : (out.auctionHouse.auctionRegistrationService.process + out.auctionHouse.buyer.answer)
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    out.auctionHouse.buyer.answer -> 11727728
+    out.auctionHouse.auctionRegistrationService.process -> 11729072
+  11745488 : out.auctionHouse.seller.answer
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    out.auctionHouse.seller.answer -> 11710624
+  0 : true
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 0

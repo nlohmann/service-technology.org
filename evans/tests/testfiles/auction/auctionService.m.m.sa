@@ -1,0 +1,184 @@
+{
+  generator:    Maxis 0.2-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   maxis --output=auctionService.m.m.sa --liberal=0 -v auctionService.m.sa.og
+  events:       3 send, 3 receive, 0 synchronous
+  statistics:   55 output nodes [2 finals] generated from 17 input nodes
+}
+
+INTERFACE
+  INPUT
+    in.auctionRegistrationService.auctionHouse.answer, in.buyer.auctionHouse.submit, in.seller.auctionHouse.submit;
+  OUTPUT
+    out.auctionHouse.auctionRegistrationService.process, out.auctionHouse.buyer.answer, out.auctionHouse.seller.answer;
+
+NODES
+  0
+    TAU  -> 11745489
+    TAU  -> 11745490
+    TAU  -> 11745491
+    TAU  -> 11745492
+    TAU  -> 11745493
+    TAU  -> 11745494
+    TAU  -> 11745495
+    TAU  -> 11745496
+    TAU  -> 11745497
+  11660336
+    TAU  -> 11745498
+    TAU  -> 11745499
+    TAU  -> 11745500
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.seller.auctionHouse.submit -> 0
+  11664432
+    TAU  -> 11745501
+    TAU  -> 11745502
+    in.seller.auctionHouse.submit -> 0
+  11667680
+    TAU  -> 11745503
+    TAU  -> 11745504
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+  11667792
+    TAU  -> 11745505
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    in.buyer.auctionHouse.submit -> 0
+  11673920 : INITIAL
+    TAU  -> 11745506
+    TAU  -> 11745507
+    TAU  -> 11745508
+    TAU  -> 11745509
+    TAU  -> 11745510
+  11705488
+    TAU  -> 11745511
+    TAU  -> 11745512
+    in.buyer.auctionHouse.submit -> 0
+  11706400
+    TAU  -> 11745513
+    TAU  -> 11745514
+    in.buyer.auctionHouse.submit -> 0
+    in.seller.auctionHouse.submit -> 0
+  11710032
+    TAU  -> 11745515
+    in.buyer.auctionHouse.submit -> 0
+    in.seller.auctionHouse.submit -> 0
+  11710624
+    TAU  -> 11745516
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.seller.auctionHouse.submit -> 0
+  11712320
+    TAU  -> 11745517
+    TAU  -> 11745518
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.seller.auctionHouse.submit -> 0
+  11712704
+    TAU  -> 11745519
+    TAU  -> 11745520
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.seller.auctionHouse.submit -> 0
+  11727296
+    TAU  -> 11745521
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    in.seller.auctionHouse.submit -> 0
+  11727728
+    TAU  -> 11745522
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.seller.auctionHouse.submit -> 0
+  11729072
+    TAU  -> 11745523
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.seller.auctionHouse.submit -> 0
+  11739312
+    TAU  -> 11745524
+    TAU  -> 11745525
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.seller.auctionHouse.submit -> 0
+  11745488
+    TAU  -> 11745526
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.seller.auctionHouse.submit -> 0
+  11745489 : FINAL
+  11745490
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+  11745491
+    in.buyer.auctionHouse.submit -> 0
+  11745492
+    in.seller.auctionHouse.submit -> 0
+  11745493
+    out.auctionHouse.auctionRegistrationService.process -> 0
+  11745494
+    out.auctionHouse.buyer.answer -> 0
+  11745495
+    out.auctionHouse.seller.answer -> 0
+  11745496
+    TAU  -> 11745496
+  11745497
+  11745498
+    out.auctionHouse.auctionRegistrationService.process -> 11712320
+  11745499
+    out.auctionHouse.buyer.answer -> 11712704
+  11745500
+    out.auctionHouse.seller.answer -> 11739312
+  11745501
+    in.auctionRegistrationService.auctionHouse.answer -> 11727296
+    in.buyer.auctionHouse.submit -> 11706400
+  11745502
+    in.buyer.auctionHouse.submit -> 11706400
+  11745503
+    in.buyer.auctionHouse.submit -> 11667792
+  11745504
+    in.seller.auctionHouse.submit -> 11727296
+  11745505
+    in.seller.auctionHouse.submit -> 11660336
+  11745506
+    in.auctionRegistrationService.auctionHouse.answer -> 11667680
+    in.buyer.auctionHouse.submit -> 11705488
+  11745507
+    in.auctionRegistrationService.auctionHouse.answer -> 11667680
+    in.seller.auctionHouse.submit -> 11664432
+  11745508
+    in.buyer.auctionHouse.submit -> 11705488
+  11745509
+    in.buyer.auctionHouse.submit -> 11705488
+    in.seller.auctionHouse.submit -> 11664432
+  11745510
+    in.seller.auctionHouse.submit -> 11664432
+  11745511
+    in.auctionRegistrationService.auctionHouse.answer -> 11667792
+    in.seller.auctionHouse.submit -> 11706400
+  11745512
+    in.seller.auctionHouse.submit -> 11706400
+  11745513
+    in.auctionRegistrationService.auctionHouse.answer -> 11660336
+    out.auctionHouse.auctionRegistrationService.process -> 11710032
+  11745514
+    out.auctionHouse.auctionRegistrationService.process -> 11710032
+  11745515
+    in.auctionRegistrationService.auctionHouse.answer -> 11712320
+  11745516 : FINAL
+  11745517
+    out.auctionHouse.buyer.answer -> 11745488
+  11745518
+    out.auctionHouse.seller.answer -> 11729072
+  11745519
+    out.auctionHouse.auctionRegistrationService.process -> 11745488
+  11745520
+    out.auctionHouse.seller.answer -> 11727728
+  11745521
+    in.buyer.auctionHouse.submit -> 11660336
+  11745522
+    out.auctionHouse.auctionRegistrationService.process -> 11710624
+  11745523
+    out.auctionHouse.buyer.answer -> 11710624
+  11745524
+    out.auctionHouse.auctionRegistrationService.process -> 11729072
+  11745525
+    out.auctionHouse.buyer.answer -> 11727728
+  11745526
+    out.auctionHouse.seller.answer -> 11710624
+

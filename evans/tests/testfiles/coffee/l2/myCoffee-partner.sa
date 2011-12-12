@@ -1,0 +1,11 @@
+INTERFACE
+  INPUT
+    B;
+  OUTPUT
+    C, E, T;
+
+NODES
+  8362240 : INITIAL
+    TAU  -> 8389874
+  8389874 : FINAL
+

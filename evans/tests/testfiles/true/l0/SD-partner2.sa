@@ -1,0 +1,18 @@
+INTERFACE
+  INPUT
+    u;
+  OUTPUT
+    v;
+  SYNCHRONOUS
+    ;
+
+NODES
+  10: INITIAL
+    TAU -> 13
+    u -> 11
+  11
+    v -> 12
+  12: FINAL
+  13
+    TAU -> 13
+

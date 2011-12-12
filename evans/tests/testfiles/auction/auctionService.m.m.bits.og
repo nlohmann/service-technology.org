@@ -1,0 +1,99 @@
+{
+  generator:    Wendy 3.4-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   wendy -v auctionService.m.m.sa.owfn --og
+  events:       3 send, 3 receive, 0 synchronous
+  statistics:   16 nodes
+}
+
+INTERFACE
+  INPUT
+    out.auctionHouse.seller.answer, out.auctionHouse.buyer.answer, out.auctionHouse.auctionRegistrationService.process;
+  OUTPUT
+    in.seller.auctionHouse.submit, in.buyer.auctionHouse.submit, in.auctionRegistrationService.auctionHouse.answer;
+
+NODES
+  29737296 :: S
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    in.seller.auctionHouse.submit -> 30104048
+    in.buyer.auctionHouse.submit -> 29804336
+    in.auctionRegistrationService.auctionHouse.answer -> 30115520
+  29804336 :: S
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    in.seller.auctionHouse.submit -> 30162608
+    in.auctionRegistrationService.auctionHouse.answer -> 30092576
+  30092576 :: S
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    in.seller.auctionHouse.submit -> 30116720
+  30095040 :: F
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 0
+  30095664
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 30095040
+    out.auctionHouse.auctionRegistrationService.process -> 0
+  30097904
+    out.auctionHouse.seller.answer -> 30095040
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 0
+  30102848 :: S
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 30116208
+  30104048 :: S
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    in.buyer.auctionHouse.submit -> 30162608
+    in.auctionRegistrationService.auctionHouse.answer -> 30115664
+  30115520 :: S
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    in.seller.auctionHouse.submit -> 30115664
+    in.buyer.auctionHouse.submit -> 30092576
+  30115664 :: S
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    in.buyer.auctionHouse.submit -> 30116720
+  30116208
+    out.auctionHouse.seller.answer -> 30095664
+    out.auctionHouse.buyer.answer -> 30097904
+    out.auctionHouse.auctionRegistrationService.process -> 0
+  30116720
+    out.auctionHouse.seller.answer -> 30181952
+    out.auctionHouse.buyer.answer -> 30184960
+    out.auctionHouse.auctionRegistrationService.process -> 30116208
+  30162608
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 30102848
+    in.auctionRegistrationService.auctionHouse.answer -> 30116720
+  30179120
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 30095040
+  30181952
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 30179120
+    out.auctionHouse.auctionRegistrationService.process -> 30095664
+  30184960
+    out.auctionHouse.seller.answer -> 30179120
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 30097904
+  0 :: T
+    out.auctionHouse.seller.answer -> 0
+    out.auctionHouse.buyer.answer -> 0
+    out.auctionHouse.auctionRegistrationService.process -> 0
+    in.seller.auctionHouse.submit -> 0
+    in.buyer.auctionHouse.submit -> 0
+    in.auctionRegistrationService.auctionHouse.answer -> 0
+

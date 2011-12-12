@@ -1,0 +1,76 @@
+{
+  generator:    Maxis 0.2-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   maxis --output=internal_match.m.m.sa --liberal=2 -v internal_match.m.sa.og
+  events:       0 send, 2 receive, 0 synchronous
+  statistics:   23 output nodes [13 finals] generated from 4 input nodes
+}
+
+INTERFACE
+  INPUT
+    a, b;
+
+NODES
+  0
+    TAU  -> 33627713
+    TAU  -> 33627714
+    TAU  -> 33627715
+    TAU  -> 33627716
+    TAU  -> 33627717
+    TAU  -> 33627718
+    TAU  -> 33627719
+    TAU  -> 33627720
+    TAU  -> 33627721
+  33623936 : INITIAL
+    TAU  -> 33627722
+    TAU  -> 33627723
+  33627520
+    TAU  -> 33627724
+    TAU  -> 33627725
+    TAU  -> 33627726
+    TAU  -> 33627727
+  33627712
+    TAU  -> 33627728
+    TAU  -> 33627729
+    TAU  -> 33627730
+    TAU  -> 33627731
+  33627713
+    a -> 0
+  33627714
+    a -> 0
+    b -> 0
+  33627715 : FINAL
+    a -> 0
+    b -> 0
+  33627716 : FINAL
+    a -> 0
+  33627717
+    b -> 0
+  33627718 : FINAL
+    b -> 0
+  33627719 : FINAL
+  33627720
+    TAU  -> 33627720
+  33627721
+  33627722
+    a -> 33627712
+    b -> 33627520
+  33627723 : FINAL
+    a -> 33627712
+    b -> 33627520
+  33627724 : FINAL
+    a -> 0
+    b -> 0
+  33627725 : FINAL
+    a -> 0
+  33627726 : FINAL
+    b -> 0
+  33627727 : FINAL
+  33627728 : FINAL
+    a -> 0
+    b -> 0
+  33627729 : FINAL
+    a -> 0
+  33627730 : FINAL
+    b -> 0
+  33627731 : FINAL
+

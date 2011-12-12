@@ -1,0 +1,25 @@
+{
+  generator:    Wendy 3.4-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   wendy SD.owfn --og -v
+  events:       1 send, 1 receive, 0 synchronous
+  statistics:   3 nodes
+}
+
+INTERFACE
+  INPUT
+    u;
+  OUTPUT
+    v;
+
+NODES
+  28318544 :: T
+    u -> 0
+    v -> 28329840
+  28329840
+    u -> 28332400
+  28332400 :: F
+    u -> 0
+  0 :: T
+    u -> 0
+    v -> 0
+

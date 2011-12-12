@@ -1,0 +1,17 @@
+INTERFACE
+  INPUT
+    u;
+  OUTPUT
+    v;
+
+NODES
+  0 : true : blue,
+  2 : ?u : blue,
+  3 : final : blue : finalnode;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 2 : !v,
+  2 -> 3 : ?u;

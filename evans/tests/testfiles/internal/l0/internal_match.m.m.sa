@@ -1,0 +1,42 @@
+{
+  generator:    Maxis 0.2-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   maxis --output=internal_match.m.m.sa --liberal=0 -v internal_match.m.sa.og
+  events:       0 send, 2 receive, 0 synchronous
+  statistics:   12 output nodes [3 finals] generated from 4 input nodes
+}
+
+INTERFACE
+  INPUT
+    a, b;
+
+NODES
+  0
+    TAU  -> 7006945
+    TAU  -> 7006946
+    TAU  -> 7006947
+    TAU  -> 7006948
+    TAU  -> 7006949
+  6952176
+    TAU  -> 7006950
+    a -> 0
+    b -> 0
+  6981440
+    TAU  -> 7006951
+    a -> 0
+    b -> 0
+  7006944 : INITIAL
+    TAU  -> 7006952
+  7006945
+    a -> 0
+  7006946
+    b -> 0
+  7006947 : FINAL
+  7006948
+    TAU  -> 7006948
+  7006949
+  7006950 : FINAL
+  7006951 : FINAL
+  7006952
+    a -> 6981440
+    b -> 6952176
+

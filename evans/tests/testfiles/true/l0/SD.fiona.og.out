@@ -1,0 +1,10 @@
+digraph g1 {
+graph [fontname="Helvetica", label="OG of SD.owfn (parameters: -m1 -E)"];
+node [fontname="Helvetica" fontsize=10];
+edge [fontname="Helvetica" fontsize=10];
+p0 [label="# 0\ntrue", fontcolor=black, color=blue];
+p0->p2 [label="!v", fontcolor=black, color=blue];
+p2 [label="# 2\n?u", fontcolor=black, color=blue];
+p2->p3 [label="?u", fontcolor=black, color=blue];
+p3 [label="# 3\nfinal", fontcolor=black, color=blue, peripheries=2];
+}

@@ -1,0 +1,53 @@
+{
+  generator:    Wendy 3.4-unreleased (x86_64-unknown-linux-gnu)
+  invocation:   wendy myCoffee.m.sa.owfn --og -v
+  events:       1 send, 3 receive, 0 synchronous
+  statistics:   8 nodes
+}
+
+INTERFACE
+  INPUT
+    T, E, C;
+  OUTPUT
+    B;
+
+NODES
+  29149104 : (C + E) * (E + T)
+    T -> 29146528
+    E -> 29131568
+    C -> 29150896
+  29130752 : final
+    T -> 0
+    E -> 0
+    C -> 0
+  29131568 : C * T
+    T -> 29141792
+    E -> 0
+    C -> 29132624
+  29132624 : B
+    T -> 0
+    E -> 0
+    C -> 0
+    B -> 29134832
+  29134832 : final
+    T -> 0
+    E -> 0
+    C -> 0
+  29141792 : B
+    T -> 0
+    E -> 0
+    C -> 0
+    B -> 29130752
+  29146528 : E
+    T -> 0
+    E -> 29141792
+    C -> 0
+  29150896 : E
+    T -> 0
+    E -> 29132624
+    C -> 0
+  0 : true
+    T -> 0
+    E -> 0
+    C -> 0
+    B -> 0

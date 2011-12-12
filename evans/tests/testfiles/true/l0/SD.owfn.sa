@@ -1,0 +1,16 @@
+INTERFACE
+  INPUT
+    v;
+  OUTPUT
+    u;
+  SYNCHRONOUS
+    ;
+
+NODES
+  0: INITIAL
+    TAU -> 0
+    v -> 1
+  1
+    u -> 2
+  2: FINAL
+

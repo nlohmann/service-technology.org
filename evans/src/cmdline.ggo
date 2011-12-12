@@ -1,0 +1,95 @@
+args "--long-help --include-getopt --show-required --no-handle-error --unamed-opts=FILES"
+
+purpose "Evans : synthesizing public view and representation of substitutable services." 
+
+description "About Evans:"
+
+section "Input/Output"
+sectiondesc="Evans expects one input file of  suffix `.owfn' or `.sa'. Evans is able to synthesize different public views (PV) and different operating guidelines (OG) from the given input file. If none is given as an output filename, the input filename's suffix is replaced by the respective suffix of respective option. Please note that all previous options are the by-product outputs of the next option in the list. When called without a specific output option, Evans produces all options available.\n"
+
+option "ogp" -
+  "generate an OG for all partners of the input (suffix `.og')."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional  
+
+option "pvp" -
+  "generate a PV for all partners of the input (suffix `.m.sa')."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+option "ogs" -
+  "generate an OG of all substitutable services of the input (suffix `.m.og')."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional  
+
+option "pvs" -
+  "generate a PV for all equivalent services of the input (suffix `.m.m.sa')."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+  
+option "eg" -
+  "generate an equivalence guidelines (EG) of the input (suffix `.m.m.sa.eg')."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional  
+
+section "Options"
+sectiondesc="These options determine how Evans generates the output.\n"
+
+option "messagebound" m
+  "Set the message bound."
+  details="The message bound sets the maximal number of messages per channel. Values within the range of 1..255 are allowed.\n"
+  int
+  typestr="BOUND"
+  default="1"
+  optional
+
+defgroup "Liberal Mode" 
+groupdesc="These option determines how a maximal partner is calculated.\n" optional
+
+groupoption "liberal" l
+  "Calculate satisfiable assignments of formula:\n 0 - as it is\n 1 - as the least liberal (minimum) \n 2 - as the most liberal (maximum)\n"
+  group="Liberal Mode"
+  values="0","1","2" enum
+  default="0"
+  typestr="MODE"
+  
+option "ignoreEmptyNode" -
+  "Nodes with ID '0' will be ignored. For evaluation purpose only."
+  hidden
+  flag off
+  
+ option "show-states" -
+  "State of input OGs will be noted at each state"
+  hidden
+  flag off
+
+option "stats" -
+  "Display time and memory consumption on termination."
+  details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
+  flag off
+  hidden
+
+          
+section "Debugging"
+sectiondesc="These option determines how much debug output the compilers create.\n"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+  
+option "debug" d
+  "Show debug messages."
+  details="Show debugged information reporting intermediate steps.\n"
+  hidden
+  flag off

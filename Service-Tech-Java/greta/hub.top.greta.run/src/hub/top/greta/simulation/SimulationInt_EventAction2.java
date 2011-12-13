@@ -102,7 +102,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
    */
   @Override
 	protected void extendAdaptiveProcess(RunConfiguration rc) {
-    //System.out.println("step!");
+    System.out.println("step!");
     
     // some pre-processing to clear situation from previous step
     
@@ -154,7 +154,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
 //      simulatioStepNum++;
 //    }
     
-    //System.out.println("fired "+eventNum+" events");
+    System.out.println("fired "+eventNum+" events");
 
     // visualize all fired events 
     if (eventNum > 0) {

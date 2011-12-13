@@ -219,7 +219,7 @@ public class ViewGeneration {
           for (int pre_index = 0; pre_index < e.pre.length; pre_index++) {
             boolean endsWith_b = false;
             for (DNode bCut : runCut) {
-              if (bCut.endsWith(e.pre[pre_index])) {
+              if (e.pre[pre_index].suffixOf(bCut)) {
                 loc[pre_index] = bCut;
                 endsWith_b = true; 
                 break;

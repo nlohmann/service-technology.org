@@ -53,6 +53,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import com.google.gwt.dev.util.collect.HashSet;
+
 /**
  * A {@link DNode} representation of an {@link AdaptiveSystem} consisting of
  * {@link Oclet}s used for constructing a McMillan prefix of this system. This
@@ -235,13 +237,13 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 			
 			int n_depth = depth.get(n);
 			
-			for (Node post : n.getPreSet()) {
+			for (Node pre : getPredecessors(n, false)) {
 
-	      Integer d = depth.get(post);
-				searchQueue.addLast(post);
+	      Integer d = depth.get(pre);
+				searchQueue.addLast(pre);
 
 				if (d == null || d <= n_depth) {
-					depth.put(post, n_depth+1);	// increment depth of node
+					depth.put(pre, n_depth+1);	// increment depth of node
 					// and remember maximum depth of a node
 					maxHistoryDepth = Math.max(n_depth+1, maxHistoryDepth);
 				}
@@ -263,9 +265,15 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 				continue;
 			
       // save the predecessors of node n in an array
-      DNode pre[] = new DNode[n.getPreSet().size()];
+			LinkedList<Node> n_pre_direct = getDirectPredecessors(n);
+      DNode pre[] = new DNode[n_pre_direct.size()];
       for (int i=0; i<pre.length; i++) {
-        pre[i] = nodeEncoding.get(n.getPreSet().get(i));
+        pre[i] = nodeEncoding.get(n_pre_direct.get(i));
+      }
+      LinkedList<Node> n_pre_trans = getPredecessors(n, true);
+      DNode preTrans[] = new DNode[n_pre_trans.size()];
+      for (int i=0; i<preTrans.length; i++) {
+        preTrans[i] = nodeEncoding.get(n_pre_trans.get(i));
       }
 			
 			// count all successors that will be translated to a DNode
@@ -276,8 +284,14 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 			
 			// create new DNode d for Node n
       String name = namePostProcessor.process(n, n.getName());
-			DNode d = new DNode(nameToID.get(name), pre);
+			DNode d;
+			if (preTrans.length == 0)
+			  d = new DNode(nameToID.get(name), pre);
+			else
+			  d = new DNodeTransitive(nameToID.get(name), pre, preTrans);
       //allNodes.add(d);
+			
+			System.out.println(d+" has predecessors "+DNode.toString(pre)+" and "+DNode.toString(preTrans));
       
 			if (n instanceof Event) {
 				d.isEvent = true;
@@ -286,6 +300,22 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 					fireableEvents.add(d);
 				else if (n.eContainer() instanceof PreNet)
 					preConEvents.add(d);
+				
+				// for each pre-condition 'b' of this event, store this event's id
+				// as the visible event that must not appear in the transitive history
+				// of 'b' when checking for enabled conditions
+				for (DNode b : pre) {
+				  if (!b.isEvent && b instanceof DNodeTransitive) {
+				    System.out.println("giving "+b+" visible event "+d);
+				    ((DNodeTransitive)b).visibleEvent = d.id;
+				  }
+				}
+        for (DNode b : preTrans) {
+          if (!b.isEvent && b instanceof DNodeTransitive) {
+            System.out.println("giving "+b+" visible event "+d);
+            ((DNodeTransitive)b).visibleEvent = d.id;
+          }
+        }
 			}
 			d.isAnti = isAnti;
 			d.isHot = (n.getTemp() == Temp.HOT); 
@@ -320,6 +350,42 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 		// return allNodes;
 		return maxNodes;
 	}
+	
+	private LinkedList<Node> getPredecessors(Node n, boolean indirectOnly) {
+	  LinkedList<Node> queue = new LinkedList<Node>();
+	  HashSet<Node> seen = new HashSet<Node>();
+	  LinkedList<Node> concretePred = new LinkedList<Node>();
+	  for (Node m : n.getPreSet()) {
+	    if (!indirectOnly || m.isAbstract()) {
+  	    queue.add(m);
+  	    seen.add(m);
+	    }
+	  }
+	  while (!queue.isEmpty()) {
+	    Node m = queue.removeFirst();
+	    if (!m.isAbstract()) {
+	      concretePred.add(m);
+	    } else {
+	      for (Node m2 : m.getPreSet()) {
+  	      if (!seen.contains(m2)) {
+  	        queue.addLast(m2);
+  	        seen.add(m2);
+  	      }
+	      }
+	    }
+	  }
+	  //System.out.println(n+" has predecessors "+concretePred+" "+indirectOnly);
+	  return concretePred;
+	}
+
+  private LinkedList<Node> getDirectPredecessors(Node n) {
+    LinkedList<Node> concretePred = new LinkedList<Node>();
+    for (Node m : n.getPreSet()) {
+      if (!m.isAbstract())
+        concretePred.add(m);
+    }
+    return concretePred;
+  }
 
 	/**
 	 * Translate an oclet into a {@link DNodeSet} of its {@link DNode}s.

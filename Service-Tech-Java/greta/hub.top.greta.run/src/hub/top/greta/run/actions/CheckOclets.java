@@ -295,6 +295,7 @@ public class CheckOclets extends Action implements
 		Shell shell = new Shell();
 		String ocletName = ((Oclet) ocletNode.eContainer().eContainer()).getName();
 		
+		/*
 		//4. abstract nodes in oclet are not allowed
 		if (ocletNode.isAbstract()) {
 			System.out.println("  not well formed - first occurrence of an abstract node.");
@@ -304,6 +305,7 @@ public class CheckOclets extends Action implements
 				"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one abstract node in oclet.");
 			return false;
 		}
+		*/
 		
 		if(ocletNode.eContainer() instanceof PreNet) {
 			if (ocletNode instanceof Condition) {

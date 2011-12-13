@@ -195,7 +195,7 @@ public class DNodeBP_Scenario extends DNodeRefold {
               for (DNode b : cutNodes)
               {
                 if (b.id == hist[iHist].id) {
-                  if (b.endsWith(hist[iHist])) {
+                  if (hist[iHist].suffixOf(b)) {
                     found = true;
                     break;
                   }

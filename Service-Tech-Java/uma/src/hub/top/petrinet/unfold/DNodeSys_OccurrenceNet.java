@@ -28,10 +28,11 @@ import hub.top.uma.InvalidModelException;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.gwt.dev.util.collect.HashSet;
 
 public class DNodeSys_OccurrenceNet extends DNodeSys {
   
@@ -106,58 +107,18 @@ public class DNodeSys_OccurrenceNet extends DNodeSys {
    */
   private LinkedList<DNode> translateToDNodes(PetriNet net) {
     LinkedList<DNode> allNodes = new LinkedList<DNode>();
-    LinkedList<Node> searchQueue = new LinkedList<Node>();
     
-    Map<Node, Integer> depth = new HashMap<Node, Integer>();
+    LinkedList<Node> buildQueue = new LinkedList<Node>();
     
-    HashSet<Node> nodes = new HashSet<Node>();
-    nodes.addAll(net.getPlaces());
-    nodes.addAll(net.getTransitions());
-    
-    // fill the queue with all maximal nodes of the occurrence net
-    for (Node n : nodes) {
-      if (n.getPostSet().isEmpty()) {
-        searchQueue.add(n);
-        
-        // we compute the length of the longest path that ends in an
-        // event, if this event has no predecessor, the corresponding
-        // path has length 0
-        depth.put(n, 0);
-      }
+    for (Node n : net.getPlaces()) {
+      if (n.getIncoming().size() == 0) buildQueue.add(n);
     }
-
-    // then do a breadth-first search on the structure of the oclet
-    // and add each visited node to the buildStack, the same node
-    // can be added multiple times
-    LinkedList<Node> buildStack = new LinkedList<Node>();
-    while (!searchQueue.isEmpty()) {
-      Node n = searchQueue.removeFirst();
-      
-      int n_depth = depth.get(n);
-      
-      for (Node post : n.getPreSet()) {
-
-        Integer d = depth.get(post);
-        searchQueue.addLast(post);
-
-        if (d == null || d <= n_depth) {
-          depth.put(post, n_depth+1); // increment depth of node
-          // and remember maximum depth of a node
-          maxHistoryDepth = Math.max(n_depth+1, maxHistoryDepth);
-        }
-      }
-      if (buildStack.contains(n)) buildStack.remove(n);
-      buildStack.addFirst(n);
+    for (Node n : net.getTransitions()) {
+      if (n.getIncoming().size() == 0) buildQueue.add(n);
     }
     
-    // the buildStack now contains the nodes of the Oclet such that
-    // for each Node in the stack, its predecessors in the graph are
-    // also predecessors in the stack
-    
-    // translate each node from the stack
-    
-    while (!buildStack.isEmpty()) {
-      Node n = buildStack.removeFirst();
+    nextnode: while (!buildQueue.isEmpty()) {
+      Node n = buildQueue.removeFirst();
       
       if (nodeEncoding.containsKey(n))  // node was already translated, skip
         continue;
@@ -166,13 +127,13 @@ public class DNodeSys_OccurrenceNet extends DNodeSys {
       DNode pre[] = new DNode[n.getPreSet().size()];
       for (int i=0; i<pre.length; i++) {
         pre[i] = nodeEncoding.get(n.getPreSet().get(i));
+        if (pre[i] == null) {
+          continue nextnode;
+        }
       }
       
       // count all successors that will be translated to a DNode
-      int postSize = 0; 
-      for (Node postNode : n.getPostSet()) {
-        if (depth.containsKey(postNode)) postSize++;
-      }
+      int postSize = n.getOutgoing().size();
       
       // create new DNode d for Node n
       DNode d = new DNode(nameToID.get(n.getName()), pre);
@@ -208,6 +169,11 @@ public class DNodeSys_OccurrenceNet extends DNodeSys {
       }
       nodeEncoding.put(n, d);   // store new pair
       nodeOrigin.put(d, n);     // and its reverse mapping
+      
+      for (Node m : n.getPostSet()) {
+        if (buildQueue.contains(m)) buildQueue.remove(m);
+        buildQueue.addLast(m);
+      }
     }
     return allNodes;
   }

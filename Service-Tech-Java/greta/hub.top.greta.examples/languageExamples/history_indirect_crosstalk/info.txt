@@ -1,0 +1,9 @@
+Example: history_indirect_crosstalk
+Author: dfahland
+
+Description: In this crosstalk specification, left and right
+communicate in rounds: request -> reply -> ack. If both, left and 
+right, request at the same time, crosstalk occurs and they have to 
+retry. Oclet prevent_crosstalk_left will disallow left from sending a
+request if crosstalk just occurred and crosstalk occurred some time 
+ago.

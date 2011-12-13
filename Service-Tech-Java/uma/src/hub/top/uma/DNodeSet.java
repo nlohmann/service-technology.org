@@ -416,7 +416,7 @@ public class DNodeSet {
       
 			// add all post-conditions to the prime-cut that are not consumed by successors
 			for (DNode post : first.post) {
-				if (!consumedConditions.contains(post))
+				if (!consumedConditions.contains(post) && !post.ignore)
 					postConditions.add(post);
 			}
 			

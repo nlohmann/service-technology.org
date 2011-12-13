@@ -82,7 +82,7 @@ public class OcletIO extends PetriNetIO {
     } else {
       return;
     }
-    writeFile(extFileName, contents);
+    writeFile(contents, extFileName);
   }
   
   public static String toDot(Oclet o) {
@@ -101,6 +101,7 @@ public class OcletIO extends PetriNetIO {
 
       // first print all places
       b.append("\n\n");
+      b.append("  label_"+oName+" [shape=none, label=\""+oName+"\"];\n");
       b.append("  node [shape=circle];\n");
       for (Place p : o.getPlaces()) {
         

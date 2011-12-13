@@ -1,0 +1,10 @@
+Example: history_indirect
+Author: dfahland
+
+Description: In this example, action r can only occur after y
+occurred. However, y does not have to be a direct predecessor of r. 
+Rather, there can be an arbitrary number of other events between y 
+and r. Once r occurred, another occurrence of y is needed to enable r 
+again.
+In contrast and because of oclet o3, y can occur at any time as soon 
+as there is some occurrence of y in the run.

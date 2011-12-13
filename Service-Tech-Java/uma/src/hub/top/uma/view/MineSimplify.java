@@ -82,9 +82,9 @@ public class MineSimplify {
     
     public boolean unfold_refold = true; 
     public double filter_threshold = 0.05;
-    public int remove_implied = REMOVE_IMPLIED_PRESERVE_ALL;
-    public boolean abstract_chains = false;
-    public boolean remove_flower_places = false;
+    public int remove_implied = REMOVE_IMPLIED_PRESERVE_VISIBLE;
+    public boolean abstract_chains = true;
+    public boolean remove_flower_places = true;
     
     public Map<String, String> eventToTransition = new HashMap<String, String>();
     

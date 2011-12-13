@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright (c) 2008, 2009. All rights reserved. Dirk Fahland. AGPL3.0
+ * Copyright (c) 2008-2011 All rights reserved. Dirk Fahland. AGPL3.0
  * 
  * ServiceTechnology.org - Uma, an Unfolding-based Model Analyzer
  * 
@@ -20,6 +20,10 @@ package hub.top.uma;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+
+import com.google.gwt.dev.util.collect.HashSet;
 
 /**
  * A node in a branching process. It has a name and possibly empty set of
@@ -49,6 +53,7 @@ public class DNode {
 	public boolean  isAnti = false;
 	public boolean  isHot = false;
 	public boolean  isImplied = false;  // event of an implied scenario
+	public boolean  ignore = false;
 	
 	/**
 	 * field set during construction of the branching process, a node is new
@@ -200,65 +205,87 @@ public class DNode {
       pre = DNode.sortIDs(newPre);
     }
   }
+  
+  /**
+   * @return the set of all (transitive) predecessor of this node 
+   */
+  public Set<DNode> getAllPredecessors() {
+    Set<DNode> config = new HashSet<DNode>();
+    LinkedList<DNode> queue = new LinkedList<DNode>();
+    queue.add(this);
+    config.add(this);
+    while (!queue.isEmpty()) {
+      DNode d = queue.removeFirst();
+      if (d.pre == null) continue;
+      for (DNode dPre : d.pre) {
+        if (!config.contains(dPre)) {
+          config.add(dPre);
+          queue.addLast(dPre);
+        }
+      }
+    }
+    return config;
+  }
 	
 	/**
-	 * Check whether this node's history contains a partial history that is
-	 * isomorphic to the entire history of the other node.
+	 * Check whether this node's history is a suffix of the history
+	 * of another node.
 	 * 
-	 * @param other
+	 * @param complete
 	 * @return
-	 * 		<code>true</code> iff other (and its predecessors) is a suffix
-	 * 		of this node (and its predecessors)
+	 * 		<code>true</code> iff this node (and its predecessors) is a suffix
+	 * 		of node complete (and its predecessors)
 	 */
-	public boolean endsWith(DNode other) {
-		if (this.id != other.id)
+	public boolean suffixOf(DNode complete) {
+	  DNode suffix = this;
+		if (complete.id != suffix.id)
 			return false;
 		// nodes have equal id
 		
-		if (other.pre == null)
-			// other has no predecessor, this ends with other
+		if (suffix.pre == null)
+			// suffix has no predecessor, this ends with other
 			return true;
 		// need to compare predecessors
 		
-		if (this.pre == null && other.pre != null)
-			// other has predecessors, this not
+		if (complete.pre == null && suffix.pre != null)
+			// suffix has predecessors, complete not
 			return false;
 		// both nodes have predecessors
 		
-		if (this.pre.length < other.pre.length)
-			// this cannot end with other: this node has too few predecessors
+		if (complete.pre.length < suffix.pre.length)
+			// complete cannot end with suffix: complete node has too few predecessors
 			return false;
 		
-		int i=0;	// index pointing at the current pre-node of this
-		// iterate over all pre-nodes of other to find a corresponding
-		// matching pre-node of this, pre-nodes are ordered by their ids
-		for (int j=0; j<other.pre.length && i<this.pre.length; j++) {
+		int i=0;	// index pointing at the current pre-node of complete
+		// iterate over all pre-nodes of suffix to find a corresponding
+		// matching pre-node of complete, pre-nodes are ordered by their ids
+		for (int j=0; j<suffix.pre.length && i<complete.pre.length; j++) {
 			// the IDs of the predecessors are ordered, increment i to find the
 			// predecessor 'i' of this node that has the same ID as the predecessor 'j'
 			// of the other node, move 'i' until the IDs are equal
-			// or id of 'i' is larger than id of 'j', in the latter case, this node
-			// has no matching predecessor 'i' for the predecessor 'j' of other 
-			while ( i < this.pre.length && this.pre[i].id < other.pre[j].id ) i++;
+			// or id of 'i' is larger than id of 'j', in the latter case, complete node
+			// has no matching predecessor 'i' for the predecessor 'j' of suffix 
+			while ( i < complete.pre.length && complete.pre[i].id < suffix.pre[j].id ) i++;
 			
-			if (i == this.pre.length)
-				// the ID of the j'th predecessor is higher than any ID of this node's
+			if (i == complete.pre.length)
+				// the ID of the j'th predecessor is higher than any ID of complete node's
 				// predecessors, no match
 				return false;
 			
-			// this.pre[i].id >= other.pre[j].id
-			if (this.pre[i].id == other.pre[j].id) {
+			// complete.pre[i].id >= suffix.pre[j].id
+			if (complete.pre[i].id == suffix.pre[j].id) {
 				
-				if (!this.pre[i].endsWith(other.pre[j]))
+				if (!suffix.pre[j].suffixOf(complete.pre[i]))
 					return false;	// not matching
 			} else {
 				// these nodes 'i' and 'j' have no matching IDs, as all predecessors
 				// are ordered by their IDs, there is no further predecessor 'i+k'
-				// of this node that can match 'j': this does not end with other
+				// of this node that can match 'j': complete does not end with suffix
 				return false;
 			}
 		}
-		// successfully found that for each pre-node X of other
-		// exists a pre-node of this that ends with X
+		// successfully found that for each pre-node X of suffix
+		// exists a pre-node of complete that ends with X
 		return true;
 	}
 	

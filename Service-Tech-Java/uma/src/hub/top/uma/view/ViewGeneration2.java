@@ -316,7 +316,7 @@ public class ViewGeneration2 {
       for (int pre_index = 0; pre_index < e.pre.length; pre_index++) {
         boolean endsWith_b = false;
         for (DNode bCut : marking) {
-          if (bCut.endsWith(e.pre[pre_index])) {
+          if (e.pre[pre_index].suffixOf(bCut)) {
             loc[pre_index] = bCut;
             endsWith_b = true; 
             break;
@@ -441,7 +441,7 @@ public class ViewGeneration2 {
     return accumulatedTraces;
   }
   
-  public void extendByTraces(LinkedList<String[]> traces) {
+  public void extendByTraces(Collection<String[]> traces) {
     for (String[] trace : traces) {
       extendByTrace(trace, null); 
     }

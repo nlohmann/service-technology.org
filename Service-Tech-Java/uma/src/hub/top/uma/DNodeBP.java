@@ -190,7 +190,7 @@ public class DNodeBP {
       if (getOptions().boundToCheck == 1) {
         if (existing.id == dSymm.id) {
           propertyCheck |= PROP_UNSAFE;
-          System.out.println("found two concurrent conditions with the same name: "+existing+", "+dSymm);
+          //System.out.println("found two concurrent conditions with the same name: "+existing+", "+dSymm);
         }
       }
     }
@@ -276,7 +276,11 @@ public class DNodeBP {
         // found k other concurrent conditions with the same id
         // bound violated
         propertyCheck |= PROP_UNSAFE;
-        System.out.println("conditions "+newNode+" has "+coNum+" concurrent conditions with the same name");
+        //System.out.println("conditions "+newNode+" has "+coNum+" concurrent conditions with the same name");
+        
+        // clear the new node from the co-relation
+        newNode.ignore = true;
+        newNode._isNew = false;
       }
     }
 	}
@@ -459,6 +463,7 @@ public class DNodeBP {
 
 		  // no event is enabled at an anti-condition
 		  if (cond.isAnti) continue;
+		  if (cond.ignore) continue;
 		  
       // check whether condition max has an id that also occurs in the preConditions
 		  Integer putIndex = preConIndex.get(cond.id);
@@ -473,7 +478,7 @@ public class DNodeBP {
 
       // check whether the branching process condition 'cond' ends with the
       // corresponding condition of 'preConditions' (based on the ID of 'cond')
-      if (!cond.endsWith(preConditions.conds[putIndex]))
+      if (!preConditions.conds[putIndex].suffixOf(cond))
         continue;   //no: skip
       
       // optimization: check whether 'cond' could in principle participate in a
@@ -879,7 +884,7 @@ public class DNodeBP {
 		for (DNode e : fireableEvents)
 		{
 		
-			// System.out.println("ENABLED "+e+" "+DNode.toString(e.pre)+":");
+			//System.out.println("ENABLED "+e+" "+DNode.toString(e.pre)+":");
 			LinkedList<DNode[]> cuts = findEnablingCuts(dNodeAS.eventPreSetAbstraction.get(e), co, null, e.isAnti);
 			//System.out.println("checking enabling locations...");
 			
@@ -950,7 +955,7 @@ public class DNodeBP {
   				for (DNode b : cutNodes)
   				{
   					if (b.id == e.pre[i].id) {
-  						if (b.endsWith(e.pre[i])) {
+  						if (e.pre[i].suffixOf(b)) {
   							// same ID and "endsWith"
   							loc[i] = b;	// found
   							break;
@@ -1289,7 +1294,7 @@ public class DNodeBP {
 				for (DNode b : cutNodes)
 				{
 					if (b.id == e.pre[i].id) {
-						if (b.endsWith(e.pre[i])) {
+						if (e.pre[i].suffixOf(b)) {
 							// same ID and "endsWith"
 							loc[i] = b;	// found
 							break;
@@ -1579,7 +1584,7 @@ public class DNodeBP {
 			if (cut[i].id < condition.id)
 				continue;
 			else if (cut[i].id == condition.id) {
-				if (cut[i].endsWith(condition))
+				if (condition.suffixOf(cut[i]))
 					satisfiedCount++;
 			} else
 				// cut nodes are ordered by their IDs, this ID is too large

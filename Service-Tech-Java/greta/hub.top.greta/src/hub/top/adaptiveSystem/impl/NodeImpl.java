@@ -221,11 +221,10 @@ public abstract class NodeImpl extends EObjectImpl implements Node {
 	 * <!-- begin-user-doc -->
 	 * abstract isn't settable in AdaptiveProcess
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
 	public boolean isAbstract() {
 		//START: Manja Wolf
-		if(eContainer instanceof AdaptiveProcess) unsetAbstract();
+		  //if(eContainer instanceof AdaptiveProcess) unsetAbstract();
 		//END: Manja Wolf
 		return abstract_;
 	}
@@ -242,7 +241,9 @@ public abstract class NodeImpl extends EObjectImpl implements Node {
 		boolean oldAbstractESet = abstractESet;
 		abstractESet = true;
 		//START: Manja Wolf
-		if(!(eContainer instanceof AdaptiveProcess) && abstract_) {
+		if (eContainer instanceof AdaptiveProcess) {
+		  unsetAbstract();
+		}	else if(abstract_) {
 			setName("");
 			setTemp(Temp.WITHOUT);
 		}

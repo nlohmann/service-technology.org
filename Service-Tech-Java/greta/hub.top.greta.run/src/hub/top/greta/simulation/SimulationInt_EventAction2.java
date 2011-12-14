@@ -223,6 +223,8 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
           firedEvents.add(e);
       }
       
+      System.out.println(bp_enablingBinding);
+      
       // determine for each fired event where it was fired and which
       // oclet events caused its occurrence
       for (DNode e : firedEvents) {

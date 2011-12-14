@@ -56,15 +56,24 @@ public class AdaptiveSystemToCPN {
 
     for (Oclet o : as.getOclets()) {
       // check oclet headers for well-formedness: NAME(v1:TYPE1,v2:TYPE2,...)
-      if (o.getName().indexOf('(') == -1) return false;
-      if (o.getName().lastIndexOf(')') <= o.getName().indexOf('(')) return false;
+      if (o.getName().indexOf('(') == -1) {
+        System.err.println("No HL-oclet specification: "+o.getName()+" has invalid parameters");
+        return false;
+      }
+      if (o.getName().lastIndexOf(')') <= o.getName().indexOf('(')) {
+        System.err.println("No HL-oclet specification: "+o.getName()+" has invalid parameters");
+        return false;
+      }
       
       String varDeclaration = o.getName().substring(o.getName().indexOf('(')+1,o.getName().lastIndexOf(')'));
       String varDeclarations[] = varDeclaration.split(",");
       
       for (String v : varDeclarations) {
         String v2[] = v.split(":");
-        if (v2.length != 2) return false;
+        if (v2.length != 2) {
+          System.err.println("No HL-oclet specification: "+o.getName()+" has invalid parameter specification: "+v);
+          return false;
+        }
       }
       
       // check conditions for well-formedness
@@ -75,6 +84,7 @@ public class AdaptiveSystemToCPN {
             getPlaceName(c.getName());
             getToken(c.getName());
           } catch (Exception ex) {
+            System.err.println("No HL-oclet specification: "+n.getName()+" in "+o.getName()+" (precondition) has invalid format");
             return false;
           }
         }
@@ -86,6 +96,7 @@ public class AdaptiveSystemToCPN {
             getPlaceName(c.getName());
             getToken(c.getName());
           } catch (Exception ex) {
+            System.err.println("No HL-oclet specification: "+n.getName()+" in "+o.getName()+" (contribution) has invalid format");
             return false;
           }
         }
@@ -99,6 +110,7 @@ public class AdaptiveSystemToCPN {
           getPlaceName(c.getName());
           getToken(c.getName());
         } catch (Exception ex) {
+          System.err.println("No HL-oclet specification: "+n.getName()+" in initial run has invalid format");
           return false;
         }
       }
@@ -188,7 +200,9 @@ public class AdaptiveSystemToCPN {
       File sys_file = new File(ws_file.getLocationURI());
       String def = readFromFile(sys_file);
       
-      build.declareMLFunction(net, def);
+      if (def.length() > 0) {
+        build.declareMLFunction(net, def);
+      }
       
     } catch (Exception e) {
       // TODO Auto-generated catch block

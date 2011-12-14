@@ -291,7 +291,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 			  d = new DNodeTransitive(nameToID.get(name), pre, preTrans);
       //allNodes.add(d);
 			
-			System.out.println(d+" has predecessors "+DNode.toString(pre)+" and "+DNode.toString(preTrans));
+			//System.out.println(d+" has predecessors "+DNode.toString(pre)+" and "+DNode.toString(preTrans));
       
 			if (n instanceof Event) {
 				d.isEvent = true;
@@ -306,13 +306,13 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 				// of 'b' when checking for enabled conditions
 				for (DNode b : pre) {
 				  if (!b.isEvent && b instanceof DNodeTransitive) {
-				    System.out.println("giving "+b+" visible event "+d);
+				    //System.out.println("giving "+b+" visible event "+d);
 				    ((DNodeTransitive)b).visibleEvent = d.id;
 				  }
 				}
         for (DNode b : preTrans) {
           if (!b.isEvent && b instanceof DNodeTransitive) {
-            System.out.println("giving "+b+" visible event "+d);
+            //System.out.println("giving "+b+" visible event "+d);
             ((DNodeTransitive)b).visibleEvent = d.id;
           }
         }

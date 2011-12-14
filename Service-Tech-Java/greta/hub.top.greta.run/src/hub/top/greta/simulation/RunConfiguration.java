@@ -205,8 +205,10 @@ public class RunConfiguration {
 	
   public void createNewBridgeToCPN(AdaptiveSystem adaptiveSystem) {
     try {
-      a2c = new AdaptiveSystemToCPN();
-      a2c.loadFunctionDefinitions(adaptiveSystem);
+      a2c = new AdaptiveSystemToCPN(adaptiveSystem);
+      // now read from the underlying .cpn file
+      //a2c.loadFunctionDefinitions(adaptiveSystem);
+      a2c.loadPlaceTypes(adaptiveSystem);
       a2c.convertInitialRunToMarking(adaptiveSystem);
       a2c.convertEventsToTransitions(adaptiveSystem);
       a2c.check();

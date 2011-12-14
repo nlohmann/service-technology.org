@@ -41,9 +41,9 @@ import org.eclipse.core.runtime.Path;
 
 public class AdaptiveSystemToCPN {
   
-  public AdaptiveSystemToCPN () throws Exception {
+  public AdaptiveSystemToCPN (AdaptiveSystem as) throws Exception {
     build = new BuildCPNUtil();
-    initialize();
+    initialize(as);
   }
   
   private final BuildCPNUtil build;
@@ -138,9 +138,14 @@ public class AdaptiveSystemToCPN {
     return file;
   }
   
-  public void initialize() throws Exception {
+  public void initialize(AdaptiveSystem as) throws Exception {
     
-    File file = getFile("./resource/sim_hl/basic.cpn");
+    org.eclipse.emf.common.util.URI ml = as.eResource().getURI()
+                  .trimFileExtension().appendFileExtension("cpn");
+    IPath ws_path = new Path(ml.toPlatformString(true));
+    IFile ws_file = ResourcesPlugin.getWorkspace().getRoot().getFile(ws_path);
+    
+    File file = new File(ws_file.getLocationURI());//getFile("./resource/sim_hl/basic.cpn");
     FileInputStream in = new FileInputStream(file);
     try {
       net = (org.cpntools.accesscpn.model.impl.PetriNetImpl)org.cpntools.accesscpn.model.importer.DOMParser.parse(in, "test");
@@ -189,8 +194,37 @@ public class AdaptiveSystemToCPN {
         name.lastIndexOf(']')+1);
     return transititionGuard;
   }
-
   
+  public void loadPlaceTypes(AdaptiveSystem as) {
+    org.eclipse.emf.common.util.URI ml = as.eResource().getURI().trimFileExtension().appendFileExtension("types.txt");
+    IPath ws_path = new Path(ml.toPlatformString(true));
+    IFile ws_file = ResourcesPlugin.getWorkspace().getRoot().getFile(ws_path);
+    
+    placeTypes = new HashMap<String, String>();
+    
+    try {
+      File sys_file = new File(ws_file.getLocationURI());
+      List<String> types = readLinesFromFile(sys_file);
+      
+      for (String type : types) {
+        try {
+          String v2[] = type.split(":");
+          placeTypes.put(v2[0],v2[1]);
+          System.out.println("[Greta] setting type "+v2[0]+":"+v2[1]);
+        } catch (Exception e) {
+          System.err.println("Failed to read type declaration: "+type);
+        }
+      }
+      
+    } catch (FileNotFoundException e) {
+      System.out.println("[Greta] Warning, did not find place-type specification file "+ws_file); 
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  /*
   public void loadFunctionDefinitions(AdaptiveSystem as) {
     org.eclipse.emf.common.util.URI ml = as.eResource().getURI().trimFileExtension().appendFileExtension("ml.txt");
     IPath ws_path = new Path(ml.toPlatformString(true));
@@ -208,7 +242,7 @@ public class AdaptiveSystemToCPN {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-  }
+  }*/
   
   /**
    * Read contents of a text file.
@@ -230,6 +264,28 @@ public class AdaptiveSystemToCPN {
       scanner.close();
     }
     return text.toString();
+  }
+  
+  /**
+   * Read contents of a text file.
+   * 
+   * @param fFileName
+   * @return
+   * @throws FileNotFoundException
+   */
+  private List<String> readLinesFromFile(final File fFile)
+      throws FileNotFoundException {
+    List<String> lines = new LinkedList<String>();
+
+    Scanner scanner = new Scanner(new FileInputStream(fFile));
+    try {
+      while (scanner.hasNextLine()) {
+        lines.add(scanner.nextLine());
+      }
+    } finally {
+      scanner.close();
+    }
+    return lines;
   }
 
   
@@ -260,9 +316,12 @@ public class AdaptiveSystemToCPN {
     return mark;
   }
   
+  private Map<String,String> placeTypes;
+  
   public void convertEventsToTransitions(AdaptiveSystem as) {
     
     List<Event> events = new LinkedList<Event>();
+    
     for (Oclet o : as.getOclets()) {
       
       String varDeclaration = o.getName().substring(o.getName().indexOf('(')+1,o.getName().indexOf(')'));
@@ -283,8 +342,9 @@ public class AdaptiveSystemToCPN {
           }
         }
         
-        if (!alreadyDeclared)
+        if (!alreadyDeclared) {
           build.declareVariable(net, v2[0], v2[1]);
+        }
 
       }
       
@@ -341,6 +401,8 @@ public class AdaptiveSystemToCPN {
         String placeName = getPlaceName(c.getName());
         String arcExpression = getToken(c.getName());
         
+        if (placeTypes.containsKey(placeName)) type = placeTypes.get(placeName);
+        
         if (!places.containsKey(placeName)) {
           String marking = getMarkingString(placeName);
           org.cpntools.accesscpn.model.Place p = build.addPlace(eventPage, placeName, type, marking);
@@ -355,6 +417,8 @@ public class AdaptiveSystemToCPN {
         String type = "INT";
         String placeName = getPlaceName(c.getName());
         String arcExpression = getToken(c.getName());
+        
+        if (placeTypes.containsKey(placeName)) type = placeTypes.get(placeName);
         
         if (!places.containsKey(placeName)) {
           String marking = getMarkingString(placeName);

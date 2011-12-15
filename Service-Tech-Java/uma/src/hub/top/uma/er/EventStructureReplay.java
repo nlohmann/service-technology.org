@@ -8,6 +8,7 @@ import hub.top.petrinet.Transition;
 import hub.top.scenario.OcletIO;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeSys;
+import hub.top.uma.er.EventStructure.EventCollection;
 import hub.top.uma.er.SynthesisFromES;
 import hub.top.uma.view.ViewGeneration2;
 
@@ -198,9 +199,13 @@ public class EventStructureReplay {
   }
   
   public void refineConflicts() {
+    refineConflicts(es.getAllEvents());
+  }
+  
+  public void refineConflicts(EventCollection forEvents) {
 
-    for (Event e : es.getAllEvents()) {
-      for (Event f : es.getAllEvents()) {
+    for (Event e : forEvents) {
+      for (Event f : forEvents) {
         if (areConcurrent(e, f)) {
           boolean overlap = false;
           for (Integer t_e : inTrace.get(e)) {
@@ -309,6 +314,8 @@ public class EventStructureReplay {
     while (changed) {
       changed = false;
       
+      EventCollection touched = new EventCollection();
+      
       for (Event e : es.getAllEvents()) {
         if (!singleEvents.contains(e)) continue;
         if (e.pre != null) {
@@ -326,7 +333,32 @@ public class EventStructureReplay {
               if (e.post != null)
                 for (DNode ePost : e.post)
                   es.setDependency((Event)f, (Event)ePost);
+              
+              touched.add(e);
+              touched.add((Event)f);
             }
+          }
+        }
+      }
+      refineConflicts(touched);
+      
+      Map<Event, List<Event>> mergeCandidates = new HashMap<Event, List<Event>>();
+      for (Event e : touched) {
+        if (!es.directConflict.containsKey(e)) continue;
+        List<Event> m = new LinkedList<Event>();
+        for (Event f : es.directConflict.get(e)) {
+          if (f.id != e.id) continue;
+          boolean haveSamePreEvent = false;
+          for (DNode ePre : e.pre) {
+            if (f.hasPred((Event)ePre)) {
+              haveSamePreEvent = true;
+              break;
+            }
+          }
+          if (!haveSamePreEvent) continue;
+          
+          for (DNode ePost : e.post) {
+            
           }
         }
       }
@@ -367,6 +399,7 @@ public class EventStructureReplay {
     replay.setSingleEvents();
     replay.getConcurrentEvents();
     replay.coarsenCausality();
+    //replay.refineConflicts();
     replay.es.removeTransitiveDependencies();
     OcletIO.writeFile(replay.es.toDot(replay.properNames), fileName_system_sysPath+"_es3.dot");
     

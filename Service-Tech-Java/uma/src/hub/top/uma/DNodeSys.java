@@ -168,7 +168,6 @@ public abstract class DNodeSys {
 		currentNameID = 0;
 		
 		maxHistoryDepth = -1;
-		DNode.translationTable = this;	// everything happens wrt. to this class
 		
 		fireableEvents = new DNodeSet.DNodeSetElement();
 		preConEvents = new DNodeSet.DNodeSetElement();
@@ -207,6 +206,7 @@ public abstract class DNodeSys {
 		for (Entry<String,Short> line : nameToID.entrySet()) {
 			properNames[line.getValue()] = line.getKey();
 		}
+    DNode.nameTranslationTable = this.properNames;  // everything happens wrt. to this class
 	}
 
 	/**

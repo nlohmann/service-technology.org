@@ -35,7 +35,7 @@ import com.google.gwt.dev.util.collect.HashSet;
 public class DNode {
 	
 	// global table for translating DNodes and IDs to the original model 
-	public static DNodeSys		translationTable;	
+	public static String		nameTranslationTable[];	
 	
 	// each node has a unique global ID, the global member idGen holds the
 	// next ID for the next new node
@@ -346,7 +346,7 @@ public class DNode {
 	 */
 	@Override
 	public String toString() {
-		return "'"+translationTable.properNames[this.id]+"' ("+this.id+")["+this.globalId+"]" + (isAnti ? "-" : ""); 
+		return "'"+nameTranslationTable[this.id]+"' ("+this.id+")["+this.globalId+"]" + (isAnti ? "-" : ""); 
 	}
 
   /*

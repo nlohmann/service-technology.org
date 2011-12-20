@@ -33,10 +33,11 @@ bool isConformancePartner(ServiceAutomaton & specification, ServiceAutomaton & t
                  checkStrongReceivability(specification, testCase, productAutomaton) && // check strong receivability from service to test case
                  checkWeakReceivability(specification, testCase, productAutomaton)); // check weak receivability from test case to specification
 
-  if((!result) && (args_info.dot_given))
+  if((args_info.dot_given) &&
+     ((args_info.printAll_given) || (!result)))
   {
     // write dot output
-    writeToDotFile(productAutomaton, dotFileName);
+    writeToDotFile(productAutomaton, dotFileName, !result);
   }
 
   // return result

@@ -68,13 +68,18 @@ std::map<unsigned int, unsigned int> getPathToBadNode(ProductAutomaton & a)
 /*!
  * \brief write automaton do dot file with given filename
  */
-void writeToDotFile(ProductAutomaton & a, std::string & fileName)
+void writeToDotFile(ProductAutomaton & a, std::string & fileName, bool writePath)
 {
   // variable(s) used later (do not allocate memory within loops)
   bool notFirst;
 
   // path to bad node
-  std::map<unsigned int, unsigned int> path = getPathToBadNode(a);
+  std::map<unsigned int, unsigned int> path;
+
+  if(writePath)
+  {
+    path = getPathToBadNode(a);
+  }
 
   // create output file
   Output out(fileName, "dot file");

@@ -5,6 +5,6 @@
 #include <string>
 
 // write automaton do dot file with given filename
-void writeToDotFile(ProductAutomaton &, std::string &);
+void writeToDotFile(ProductAutomaton &, std::string &, bool = true);
 
 #endif /* DOT_H_ */

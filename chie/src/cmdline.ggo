@@ -26,7 +26,13 @@ option "dot" -
   "Whether to write dot output."
   details="This option is used when Chie should write witness paths to a dot file.\n"
   flag off
-  
+
+option "printAll" -
+  "Whether also to write dot output for confirmed partners."
+  details="This option makes Chie print the product automaton for confirmed partners to a dot file.\n"
+  dependon="dot"
+  flag off
+
 
 section "Configuration"
 sectiondesc="These options configure Chie.\n"

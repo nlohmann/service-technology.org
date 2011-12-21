@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
@@ -145,9 +146,11 @@ public class EventImpl extends NodeImpl implements Event {
 	 * @generated
 	 */
 	public EList<Condition> getPreConditions() {
-		if (preConditions == null) {
-			preConditions = new EObjectWithInverseResolvingEList.ManyInverse<Condition>(Condition.class, this, AdaptiveSystemPackage.EVENT__PRE_CONDITIONS, AdaptiveSystemPackage.CONDITION__POST_EVENTS);
-		}
+		//if (preConditions == null) {
+		//	preConditions = new EObjectWithInverseResolvingEList.ManyInverse<Condition>(Condition.class, this, AdaptiveSystemPackage.EVENT__PRE_CONDITIONS, AdaptiveSystemPackage.CONDITION__POST_EVENTS);
+		//}
+	  preConditions = new BasicEList<Condition>();
+	  for (ArcToEvent a : getIncoming()) preConditions.add(a.getSource());
 		return preConditions;
 	}
 
@@ -157,9 +160,12 @@ public class EventImpl extends NodeImpl implements Event {
 	 * @generated
 	 */
 	public EList<Condition> getPostConditions() {
-		if (postConditions == null) {
-			postConditions = new EObjectWithInverseResolvingEList.ManyInverse<Condition>(Condition.class, this, AdaptiveSystemPackage.EVENT__POST_CONDITIONS, AdaptiveSystemPackage.CONDITION__PRE_EVENTS);
-		}
+		//if (postConditions == null) {
+		//	postConditions = new EObjectWithInverseResolvingEList.ManyInverse<Condition>(Condition.class, this, AdaptiveSystemPackage.EVENT__POST_CONDITIONS, AdaptiveSystemPackage.CONDITION__PRE_EVENTS);
+		//}
+	  postConditions = new BasicEList<Condition>();
+	  for (ArcToCondition a : getOutgoing()) postConditions.add(a.getDestination());
+	  
 		return postConditions;
 	}
 
@@ -237,10 +243,10 @@ public class EventImpl extends NodeImpl implements Event {
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case AdaptiveSystemPackage.EVENT__PRE_CONDITIONS:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getPreConditions()).basicAdd(otherEnd, msgs);
-			case AdaptiveSystemPackage.EVENT__POST_CONDITIONS:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getPostConditions()).basicAdd(otherEnd, msgs);
+//			case AdaptiveSystemPackage.EVENT__PRE_CONDITIONS:
+//				return ((InternalEList<InternalEObject>)(InternalEList<?>)getPreConditions()).basicAdd(otherEnd, msgs);
+//			case AdaptiveSystemPackage.EVENT__POST_CONDITIONS:
+//				return ((InternalEList<InternalEObject>)(InternalEList<?>)getPostConditions()).basicAdd(otherEnd, msgs);
 			case AdaptiveSystemPackage.EVENT__INCOMING:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIncoming()).basicAdd(otherEnd, msgs);
 			case AdaptiveSystemPackage.EVENT__OUTGOING:
@@ -257,10 +263,10 @@ public class EventImpl extends NodeImpl implements Event {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case AdaptiveSystemPackage.EVENT__PRE_CONDITIONS:
-				return ((InternalEList<?>)getPreConditions()).basicRemove(otherEnd, msgs);
-			case AdaptiveSystemPackage.EVENT__POST_CONDITIONS:
-				return ((InternalEList<?>)getPostConditions()).basicRemove(otherEnd, msgs);
+//			case AdaptiveSystemPackage.EVENT__PRE_CONDITIONS:
+//				return ((InternalEList<?>)getPreConditions()).basicRemove(otherEnd, msgs);
+//			case AdaptiveSystemPackage.EVENT__POST_CONDITIONS:
+//				return ((InternalEList<?>)getPostConditions()).basicRemove(otherEnd, msgs);
 			case AdaptiveSystemPackage.EVENT__INCOMING:
 				return ((InternalEList<?>)getIncoming()).basicRemove(otherEnd, msgs);
 			case AdaptiveSystemPackage.EVENT__OUTGOING:
@@ -302,14 +308,14 @@ public class EventImpl extends NodeImpl implements Event {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case AdaptiveSystemPackage.EVENT__PRE_CONDITIONS:
-				getPreConditions().clear();
-				getPreConditions().addAll((Collection<? extends Condition>)newValue);
-				return;
-			case AdaptiveSystemPackage.EVENT__POST_CONDITIONS:
-				getPostConditions().clear();
-				getPostConditions().addAll((Collection<? extends Condition>)newValue);
-				return;
+//			case AdaptiveSystemPackage.EVENT__PRE_CONDITIONS:
+//				getPreConditions().clear();
+//				getPreConditions().addAll((Collection<? extends Condition>)newValue);
+//				return;
+//			case AdaptiveSystemPackage.EVENT__POST_CONDITIONS:
+//				getPostConditions().clear();
+//				getPostConditions().addAll((Collection<? extends Condition>)newValue);
+//				return;
 			case AdaptiveSystemPackage.EVENT__ENABLED:
 				setEnabled(((Boolean)newValue).booleanValue());
 				return;

@@ -322,7 +322,7 @@ public class CheckOclets extends Action implements
 				}
 				//6. a preNet don't have conflicts, that means a condition has maximal one event in postEvents
 				if(((Condition) ocletNode).getPostEvents().size() > 1) {
-					System.out.println("  not well formed - preNet has at least one (forward-)conflict.");
+					System.out.println("  not well formed - preNet has at least one (forward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPostEvents());
 					MessageDialog.openInformation(
 						shell,
 						"AdaptiveSystem - check wellformedness of oclets",
@@ -331,7 +331,7 @@ public class CheckOclets extends Action implements
 				}
 				//6. an preNet don't have conflicts, that means a condition has maximal one event in preEvents
 				if(((Condition) ocletNode).getPreEvents().size() > 1) {
-					System.out.println("  not well formed - preNet has at least one (backward-)conflict.");
+					System.out.println("  not well formed - preNet has at least one (backward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPreEvents());
 					MessageDialog.openInformation(
 						shell,
 						"AdaptiveSystem - check wellformedness of oclets",
@@ -405,21 +405,21 @@ public class CheckOclets extends Action implements
 				}
 				//6. a doNet don't have conflicts, that means a condition has maximal one event in postEvents
 				if(((Condition) ocletNode).getPostEvents().size() > 1) {
-					System.out.println("  not well formed - preNet has at least one (forward-)conflict.");
+					System.out.println("  not well formed - preNet has at least one (forward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPostEvents());
 					MessageDialog.openInformation(
 						shell,
 						"AdaptiveSystem - check wellformedness of oclets",
 						"Oclet " + ocletName + " is not not used for execution of a step because it is wellformed. "+
-						"There is at least one (forward-)conflict in doNet on condition '"+ocletNode.getName()+"'.");
+						ocletNode.getName()+" has a (forward-)conflict in the contribution.");
 					return false;
 				}
 				//6. a doNet don't have conflicts, that means a condition has maximal one event in postEvents
 				if(((Condition) ocletNode).getPreEvents().size() > 1) {
-					System.out.println("  not well formed - preNet has at least one (backward-)conflict.");
+					System.out.println("  not well formed - doNet has at least one (backward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPreEvents());
 					MessageDialog.openInformation(
 						shell,
 						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not not used for execution of a step because it is wellformed. There is at least one (backward-)conflict in doNet.");
+						"Oclet " + ocletName + " is not not used for execution of a step because it is wellformed. "+ocletNode.getName()+" has a (backward-)conflict in the contribution.");
 					return false;
 				}
 			}
@@ -438,7 +438,7 @@ public class CheckOclets extends Action implements
 					for(Condition postCondition : ((Event) ocletNode).getPostConditions()) {
 						for(Condition postCondition2 : ((Event) ocletNode).getPostConditions()) {
 							if(!postCondition.equals(postCondition2) && postCondition.getName().equals(postCondition2.getName())) {
-								System.out.println("  not well formed - event " + ocletNode.getName() + " has two same labeled conditions in postSet.");
+								System.out.println("  not well formed - event " + ocletNode.getName() + " has two same labeled conditions ("+postCondition.getName()+") in postSet.");
 								MessageDialog.openInformation(
 										shell,
 										"AdaptiveSystem - check wellformedness of oclets",

@@ -128,24 +128,24 @@ public class ArcToConditionImpl extends ArcImpl implements ArcToCondition {
 	public void setSource(Event newSource) {
 		//Manja Wolf: START
 		//if arc deleted then delete destination and remove postSet and preSet of oldSource an oldDestination
-		Event oldSource = source;
-		if(newSource == null) {
-			if(getDestination() != null) {
-				//delete PostCondition on oldSource and automatic delete corresponding preEvent on destination.PreEvents 
-				if(oldSource != null && oldSource.getPostConditions() != null && oldSource.getPostConditions().contains(getDestination())) {
-					oldSource.getPostConditions().remove(getDestination());
-				}
-			}		
-		} else
-		//Set PostCondition-Attribute to destination of the Arc
-		//if source != null
-		//not used during delete - only for reorientation  
-		if(getDestination() != null) {
-			if(oldSource != null && oldSource.getPostConditions() != null && oldSource.getPostConditions().contains(getDestination())) {
-				oldSource.getPostConditions().remove(getDestination());
-			}
-			newSource.getPostConditions().add(getDestination());
-		}
+//		Event oldSource = source;
+//		if(newSource == null) {
+//			if(getDestination() != null) {
+//				//delete PostCondition on oldSource and automatic delete corresponding preEvent on destination.PreEvents 
+//				if(oldSource != null && oldSource.getPostConditions() != null && oldSource.getPostConditions().contains(getDestination())) {
+//					oldSource.getPostConditions().remove(getDestination());
+//				}
+//			}		
+//		} else
+//		//Set PostCondition-Attribute to destination of the Arc
+//		//if source != null
+//		//not used during delete - only for reorientation  
+//		if(getDestination() != null) {
+//			if(oldSource != null && oldSource.getPostConditions() != null && oldSource.getPostConditions().contains(getDestination())) {
+//				oldSource.getPostConditions().remove(getDestination());
+//			}
+//			newSource.getPostConditions().add(getDestination());
+//		}
 		//Manja Wolf: END
 		if (newSource != source) {
 			NotificationChain msgs = null;
@@ -209,16 +209,16 @@ public class ArcToConditionImpl extends ArcImpl implements ArcToCondition {
 	public void setDestination(Condition newDestination) {
 		//Manja Wolf: START
 		//Set preEvent to destination (condition) of the arc
-		Condition oldDestination = destination;
-		if(getSource() != null) {
-			if(oldDestination != null && oldDestination.getPreEvents() != null && oldDestination.getPreEvents().contains(getSource())) {
-				oldDestination.getPreEvents().remove(getSource());
-			}
-			//Set preEvent to destination (condition) of the arc and (automatically) postCondition to source (event) of the arc 
-			if(newDestination != null) {
-				newDestination.getPreEvents().add(getSource());
-			}
-		}
+//		Condition oldDestination = destination;
+//		if(getSource() != null) {
+//			if(oldDestination != null && oldDestination.getPreEvents() != null && oldDestination.getPreEvents().contains(getSource())) {
+//				oldDestination.getPreEvents().remove(getSource());
+//			}
+//			//Set preEvent to destination (condition) of the arc and (automatically) postCondition to source (event) of the arc 
+//			if(newDestination != null) {
+//				newDestination.getPreEvents().add(getSource());
+//			}
+//		}
 		//Manja Wolf: END
 		if (newDestination != destination) {
 			NotificationChain msgs = null;

@@ -42,6 +42,7 @@ import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Temp;
 import hub.top.greta.cpn.AdaptiveSystemToCPN;
+import hub.top.greta.run.actions.ActionHelper;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeBP_Scenario;
@@ -59,6 +60,8 @@ import java.util.Map;
 
 import org.cpntools.accesscpn.engine.highlevel.instance.Binding;
 import org.cpntools.accesscpn.engine.highlevel.instance.ValueAssignment;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CommandStack;
 import org.eclipse.emf.edit.command.DeleteCommand;
@@ -129,6 +132,13 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     Options o = new Options(system);
     o.configure_buildOnly();
     DNodeBP bp = new DNodeBP_Scenario(system, o);
+    
+    // print system for debugging purposes
+    //IPath dotPath = new Path(simView.adaptiveProcess.eResource().getURI().trimFileExtension().appendFileExtension("dot").toPlatformString(true));
+    //ActionHelper.writeFile(dotPath, system.toDot());
+    
+    //System.out.println(system.fireableEvents);
+    //System.out.println(bp.getBranchingProcess().initialConditions);
     
 // for debugging
 //    IEditorInput in = simView.processViewEditor.getEditorInput();

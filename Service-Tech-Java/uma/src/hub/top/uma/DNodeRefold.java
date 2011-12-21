@@ -716,8 +716,16 @@ public class DNodeRefold extends DNodeBP {
             break;
           }
         }
+        boolean isSinglePost = false;
+        for (DNode e : b.pre) {
+          if (e.post.length == 1) {
+            isSinglePost = true;
+            break;
+          }
+        }
         
         int sharedBy = 0;
+
         for (DNode e : b.post) {
           for (DNode ePrime : joinedEvents) {
             if (e == ePrime) sharedBy++;
@@ -727,7 +735,7 @@ public class DNodeRefold extends DNodeBP {
           System.out.println("shared: "+b);
         }
         
-        if (!isSinglePre && sharedBy <= 1) {
+        if (!isSinglePre && !isSinglePost && sharedBy <= 1) {
           //this.bp.remove(b);
           b.isImplied = true;
           System.out.println("non-joined: "+b);

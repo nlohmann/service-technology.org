@@ -31,12 +31,12 @@ public class Event extends DNode {
     this.isEvent = true;
   }
   
-  public Event(short id, Event pre) {
+  public Event(short id, DNode pre) {
     super(id, pre);
     this.isEvent = true;
   }
   
-  public Event(short id, Event pre[]) {
+  public Event(short id, DNode pre[]) {
     super(id, pre);
     this.isEvent = true;
   }

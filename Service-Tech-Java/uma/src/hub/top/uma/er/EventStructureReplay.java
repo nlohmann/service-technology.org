@@ -219,6 +219,10 @@ public class EventStructureReplay {
                 es.setDirectConflict(e, f);
           }
         }
+        if (es.inDirectConflict(e, f) && es.alreadyInConflict(e, f)) {
+          es.directConflict.get(e).remove(f);
+          es.directConflict.get(f).remove(e);
+        }
       }
     }
   }
@@ -229,7 +233,8 @@ public class EventStructureReplay {
   private int nodeNum;
   public HashSet<Short>       terminalNodes;
   
-  public static final String NAME_ARTIFICIAL_START = "start"; 
+  public static final String NAME_ARTIFICIAL_START = "start";
+  public static final String NAME_TAU = "tau"; 
   
   /**
    * Translate full strings of the Petri net to ids and fill
@@ -262,6 +267,8 @@ public class EventStructureReplay {
     
     if (!nameToID.containsKey(NAME_ARTIFICIAL_START))
       nameToID.put(NAME_ARTIFICIAL_START, currentNameID++);
+    if (!nameToID.containsKey(NAME_TAU))
+      nameToID.put(NAME_TAU, currentNameID++);
     
     properNames = new String[nameToID.size()];
     for (Entry<String,Short> line : nameToID.entrySet()) {
@@ -314,6 +321,7 @@ public class EventStructureReplay {
     while (changed) {
       changed = false;
       
+      EventCollection newNodes = new EventCollection();
       EventCollection touched = new EventCollection();
       
       for (Event e : es.getAllEvents()) {
@@ -322,46 +330,58 @@ public class EventStructureReplay {
           for (DNode f : e.pre) {
             if (!singleEvents.contains(f)) continue;
             
+            // f --> e
             if (co[f.id][e.id]) {
               es.removeDependency((Event)f, e);
               
               changed = true;
               
-              if (f.pre != null)
-                for (DNode fPre : f.pre)
-                  es.setDependency((Event)fPre, e);
-              if (e.post != null)
-                for (DNode ePost : e.post)
-                  es.setDependency((Event)f, (Event)ePost);
+              Event preNew = new Event(nameToID.get(NAME_TAU), 0);
+              Event postNew = new Event(nameToID.get(NAME_TAU), 0);
               
+              newNodes.add(preNew);
+              newNodes.add(postNew);
+              touched.add(preNew);
+              touched.add(postNew);
+              inTrace.put(preNew, new HashSet<Integer>());
+              inTrace.put(postNew, new HashSet<Integer>());
+              for (int i : inTrace.get(e)) {
+                inTrace.get(preNew).add(i);
+                inTrace.get(postNew).add(i);
+              }
+              for (int i : inTrace.get(f)) {
+                inTrace.get(preNew).add(i);
+                inTrace.get(postNew).add(i);
+              }
+
+              if (f.pre != null) {
+                DNode fPres[] = f.pre;
+                for (DNode fPre : fPres) {
+                  es.setDependency((Event)fPre, preNew);
+                  //es.removeDependency((Event)fPre, (Event)f);
+                }
+              }
+              if (e.post != null) {
+                DNode ePosts[] = e.post;
+                for (DNode ePost : ePosts) {
+                  es.setDependency(postNew, (Event)ePost);
+                  //es.removeDependency(e, (Event)ePost);
+                }
+              }
+              
+              es.setDependency(preNew, e);
+              es.setDependency(preNew, (Event)f);
+              es.setDependency(e, postNew);
+              es.setDependency((Event)f, postNew);
+
               touched.add(e);
               touched.add((Event)f);
             }
           }
         }
       }
+      for (Event e : newNodes) es.add(e);
       refineConflicts(touched);
-      
-      Map<Event, List<Event>> mergeCandidates = new HashMap<Event, List<Event>>();
-      for (Event e : touched) {
-        if (!es.directConflict.containsKey(e)) continue;
-        List<Event> m = new LinkedList<Event>();
-        for (Event f : es.directConflict.get(e)) {
-          if (f.id != e.id) continue;
-          boolean haveSamePreEvent = false;
-          for (DNode ePre : e.pre) {
-            if (f.hasPred((Event)ePre)) {
-              haveSamePreEvent = true;
-              break;
-            }
-          }
-          if (!haveSamePreEvent) continue;
-          
-          for (DNode ePost : e.post) {
-            
-          }
-        }
-      }
     }
   }
   
@@ -377,7 +397,7 @@ public class EventStructureReplay {
     //String fileName_trace  = "./examples/model_correction/a12f0n05_aligned_to_00.log.txt";
     
     String fileName_system_sysPath = "./examples/model_correction/a12f0n05_alpha.lola";
-    String fileName_trace  = "./examples/model_correction/a12f0n05_aligned.log_1.txt";
+    String fileName_trace  = "./examples/model_correction/a12f0n05_aligned.log.txt";
     
     PetriNet sysModel = PetriNetIO.readNetFromFile(fileName_system_sysPath);
     List<String[]> allTraces = ViewGeneration2.readTraces(fileName_trace);

@@ -381,6 +381,7 @@ public class CheckOclets extends Action implements
 		}
 		
 		if(ocletNode.eContainer() instanceof DoNet) {
+		  /*
 			//5. passive nodes in doNet are not allowed
 			if(ocletNode.getTemp().equals(Temp.WITHOUT)) {
 				System.out.println("  not well formed - first occurrence of an passive node in doNet.");
@@ -390,6 +391,7 @@ public class CheckOclets extends Action implements
 					"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is a passive node in doNet.");
 				return false;
 			}
+			*/
 			
 			if(ocletNode instanceof Condition) {
 				//3. conditions in doNet are not allowed to be minimal. A minimal condition has no preEvent.

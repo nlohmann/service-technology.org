@@ -1,0 +1,82 @@
+digraph BP {
+graph [fontname="Helvetica" nodesep=0.3 ranksep="0.2 equally" fontsize=10];
+node [fontname="Helvetica" fontsize=8 fixedsize width=".3" height=".3" label="" style=filled fillcolor=white];
+edge [fontname="Helvetica" fontsize=8 color=white arrowhead=none weight="20.0"];
+
+  n1_1 [shape=box ]
+  n1_1_l [shape=none];
+  n1_1_l -> n1_1 [headlabel="'x' (1)[1]"]
+  n1_0 -> n1_1 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  n1_0 [shape=circle ]
+  n1_0_l [shape=none];
+  n1_0_l -> n1_0 [headlabel="'p' (0)[0]"]
+
+
+  n4_4 [shape=box ]
+  n4_4_l [shape=none];
+  n4_4_l -> n4_4 [headlabel="'r' (4)[4]"]
+  n4_3 -> n4_4 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  n4_3 [shape=circle ]
+  n4_3_l [shape=none];
+  n4_3_l -> n4_3 [headlabel="'q' (2)[3]"]
+  n4_2 -> n4_3 [fontname="Helvetica" fontsize=8 arrowhead=normal color=grey style=dashed];
+  n4_2 [shape=circle ]
+  n4_2_l [shape=none];
+  n4_2_l -> n4_2 [headlabel="'q' (2)[2]"]
+  n4_1 -> n4_2 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  n4_1 [shape=box ]
+  n4_1_l [shape=none];
+  n4_1_l -> n4_1 [headlabel="'x' (1)[1]"]
+  n4_0 -> n4_1 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  n4_0 [shape=circle ]
+  n4_0_l [shape=none];
+  n4_0_l -> n4_0 [headlabel="'p' (0)[0]"]
+
+
+  n8_8 [shape=box ]
+  n8_8_l [shape=none];
+  n8_8_l -> n8_8 [headlabel="'y' (5)[8]"]
+  n8_7 -> n8_8 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  n8_6 -> n8_8 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  n8_7 [shape=circle ]
+  n8_7_l [shape=none];
+  n8_7_l -> n8_7 [headlabel="'p' (0)[7]"]
+  n8_1 -> n8_7 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  n8_6 [shape=circle ]
+  n8_6_l [shape=none];
+  n8_6_l -> n8_6 [headlabel="'q' (2)[6]"]
+  n8_5 -> n8_6 [fontname="Helvetica" fontsize=8 arrowhead=normal color=grey style=dashed];
+  n8_1 [shape=box ]
+  n8_1_l [shape=none];
+  n8_1_l -> n8_1 [headlabel="'x' (1)[1]"]
+  n8_0 -> n8_1 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  n8_5 [shape=circle ]
+  n8_5_l [shape=none];
+  n8_5_l -> n8_5 [headlabel="'q' (2)[5]"]
+  n8_4 -> n8_5 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  n8_0 [shape=circle ]
+  n8_0_l [shape=none];
+  n8_0_l -> n8_0 [headlabel="'p' (0)[0]"]
+  n8_4 [shape=box ]
+  n8_4_l [shape=none];
+  n8_4_l -> n8_4 [headlabel="'r' (4)[4]"]
+  n8_3 -> n8_4 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  n8_3 [shape=circle ]
+  n8_3_l [shape=none];
+  n8_3_l -> n8_3 [headlabel="'q' (2)[3]"]
+  n8_2 -> n8_3 [fontname="Helvetica" fontsize=8 arrowhead=normal color=grey style=dashed];
+  n8_2 [shape=circle ]
+  n8_2_l [shape=none];
+  n8_2_l -> n8_2 [headlabel="'q' (2)[2]"]
+  n8_1 -> n8_2 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+
+
+  n11_11 [shape=box ]
+  n11_11_l [shape=none];
+  n11_11_l -> n11_11 [headlabel="'s' (3)[11]"]
+  n11_10 -> n11_11 [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  n11_10 [shape=circle ]
+  n11_10_l [shape=none];
+  n11_10_l -> n11_10 [headlabel="'q' (2)[10]"]
+
+

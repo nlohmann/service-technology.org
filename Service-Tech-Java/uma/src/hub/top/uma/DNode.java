@@ -128,10 +128,10 @@ public class DNode {
 	 */
 	public boolean structuralEquals(DNode other) {
 	  if (this.id != other.id) return false;
-	  if (this.pre == null && other.pre == null) return true;
-	  if (this.pre == null && other.pre != null || this.pre != null && other.pre == null) return false;
-	  if (this.pre.length != other.pre.length) return false;
-	  for (int i=0; i<this.pre.length; i++) {
+	  int this_pre_length = (this.pre == null) ? 0 : this.pre.length;
+	  int other_pre_length = (other.pre == null) ? 0 : other.pre.length;
+	  if (this_pre_length != other_pre_length) return false;
+	  for (int i=0; i<this_pre_length; i++) {
 	    if (!this.pre[i].structuralEquals(other.pre[i])) return false;
 	  }
 	  return true;

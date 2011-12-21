@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="hub.top.GRETA.feature"
+      id="hub.top.greta"
       label="Greta"
-      version="1.1.4.qualifier"
+      version="1.2.0.qualifier"
       provider-name="service-technology.org">
 
    <description url="http://www.service-technology.org/">
@@ -100,12 +100,20 @@ version of this file under the terms of any one of the EPL or the AGPL.
       <import plugin="org.eclipse.gmf.runtime.draw2d.ui"/>
       <import plugin="org.eclipse.draw2d"/>
       <import plugin="org.eclipse.gef"/>
+      <import plugin="org.eclipse.gmf.runtime.diagram.ui.printing"/>
+      <import plugin="org.eclipse.gmf.runtime.diagram.ui.printing.render"/>
       <import plugin="org.eclipse.emf.edit"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.gmf.runtime.notation" version="1.1.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.edit" version="2.4.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.4.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.gmf.runtime.diagram.ui" version="1.1.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="hub.top.uma" version="1.2.0" match="greaterOrEqual"/>
+      <import plugin="hub.top.GRETA.diagram" version="1.1.4" match="greaterOrEqual"/>
+      <import plugin="hub.top.editor.resource" version="1.0.6" match="greaterOrEqual"/>
+      <import plugin="hub.top.editor.ptnetLoLA" version="1.0.5" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -138,13 +146,6 @@ version of this file under the terms of any one of the EPL or the AGPL.
 
    <plugin
          id="hub.top.GRETA.run"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="hub.top.GRETA.diagram.process"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -120,4 +120,27 @@ public class DNodeTransitive extends DNode {
 
     return true;
   }
+  
+  @Override
+  public boolean structuralEquals(DNode other) {
+    if (!super.structuralEquals(other)) return false;
+    
+    int this_preTrans_length = (this.preTrans == null) ? 0 : this.preTrans.length;
+    int other_preTrans_length = (!(other instanceof DNodeTransitive)|| ((DNodeTransitive)other).preTrans == null) ? 0 : ((DNodeTransitive)other).preTrans.length;
+    
+    if (this_preTrans_length != other_preTrans_length) return false;
+
+    // if this_preTrans_length > 0, then (by this_preTrans_length == other_preTrans_length
+    // holds other instanceof DNodeTransitive
+    for (int i=0; i<this_preTrans_length; i++) {
+      if (!this.preTrans[i].structuralEquals( ((DNodeTransitive)other).preTrans[i])) return false;
+    }
+    return true;
+  }
+  
+  @Override
+  public String toString() {
+    // TODO Auto-generated method stub
+    return "'"+nameTranslationTable[this.id]+"' ("+this.id+")["+this.globalId+"]" + (isAnti ? "-" : "")+" vis: "+visibleEvent; 
+  }
 }

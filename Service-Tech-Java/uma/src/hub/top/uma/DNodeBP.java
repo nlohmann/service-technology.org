@@ -20,21 +20,16 @@ package hub.top.uma;
 
 import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.DNodeSys.EventPreSet;
-import hub.top.uma.synthesis.EquivalenceRefineSuccessor;
-import hub.top.uma.synthesis.IEquivalentNodesRefine;
-import hub.top.uma.synthesis.EquivalenceRefineLabel;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import com.google.gwt.dev.util.collect.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
+
+import com.google.gwt.dev.util.collect.HashSet;
 
 /**
  * Algorithm for computing McMillan unfoldings of Petri nets ({@link PtNet})
@@ -411,9 +406,14 @@ public class DNodeBP {
 	@SuppressWarnings("unchecked")
   public LinkedList<DNode[]> findEnablingCuts(EventPreSet preConditions, Map<DNode, Set<DNode>> coRelation, DNodeSetElement conditionsToSearch, boolean synchronizes)
 	{
+    
+    //System.out.println(DNode.toString(preConditions.conds));
+
+    
     // check if cuts for the current pre-conditions have already been found
     // in the curren step
     if (cachedCuts.containsKey(preConditions)) {
+      //System.out.println("returning "+cachedCuts.get(preConditions));
       // yes, so return the previously found cuts
       return cachedCuts.get(preConditions);
     }
@@ -459,6 +459,8 @@ public class DNodeBP {
 		if (conditionsToSearch == null)
 		  conditionsToSearch = bp.getAllConditions();
 		
+    //System.out.println(conditionsToSearch);
+		
 		for (DNode cond : conditionsToSearch) {
 
 		  // no event is enabled at an anti-condition
@@ -478,8 +480,10 @@ public class DNodeBP {
 
       // check whether the branching process condition 'cond' ends with the
       // corresponding condition of 'preConditions' (based on the ID of 'cond')
-      if (!preConditions.conds[putIndex].suffixOf(cond))
+      if (!preConditions.conds[putIndex].suffixOf(cond)) {
+        //System.out.println(preConditions.conds[putIndex]+" is not suffix of "+cond);
         continue;   //no: skip
+      }
       
       // optimization: check whether 'cond' could in principle participate in a
       // cut that ends with 'preConditions', this holds true only if 'cond' for each
@@ -508,7 +512,10 @@ public class DNodeBP {
 		// with 'preConditions'. To do this, we compute all combinations of all
 		// 'possibleMatches' index-wise. 
 		
-		//System.out.println("possible matches: "+possibleMatches);
+		//for (int i=0; i<possibleMatches.length;i++) {
+	  //  System.out.println("possible matches "+i+": "+possibleMatches[i]);		  
+		//}
+
 		
     // ==========================================================================
 		// SECOND STEP: to reduce the computational effort, we remove from
@@ -884,15 +891,15 @@ public class DNodeBP {
 		for (DNode e : fireableEvents)
 		{
 		
-			//System.out.println("ENABLED "+e+" "+DNode.toString(e.pre)+":");
+			System.out.println("ENABLED "+e+" "+DNode.toString(e.pre)+":");
 			LinkedList<DNode[]> cuts = findEnablingCuts(dNodeAS.eventPreSetAbstraction.get(e), co, null, e.isAnti);
-			//System.out.println("checking enabling locations...");
+			System.out.println("checking enabling locations...");
 			
 			//Iterable<DNode> cutNodes = bp.maxNodes;
 			
 		  for (DNode[] cutNodes : cuts) {
 		    
-        //System.out.println("  @ "+DNode.toString(cutNodes) +" ???");
+        System.out.println("  @ "+DNode.toString(cutNodes) +" ???");
   
   			// see if this event is already present at the given cut
   
@@ -963,7 +970,7 @@ public class DNodeBP {
   					}
   				}
   				if (loc[i] == null)	{ // no match, cancel
-  				  //System.out.println("no match for "+ e.pre[i]);
+  				  System.out.println("no match for "+ e.pre[i]);
   					break;
   				}
   			} // finish searching for matching preconditions in max BP
@@ -971,7 +978,7 @@ public class DNodeBP {
   			if ( i == e.pre.length ) {
   				// all precondition of event i have been found in max BP
   			  
-  			  //System.out.println(e+" is enabled at "+DNode.toString(cutNodes));
+  			  System.out.println(e+" is enabled at "+DNode.toString(cutNodes));
   	      //_debug_log.append(e+" is enabled at "+DNode.toString(cutNodes)+"\n");
   				
   				assert loc[e.pre.length-1] != null : "Error, adding invalid enabling location";
@@ -981,7 +988,7 @@ public class DNodeBP {
 				  info.putEnabledEvent(e, loc);
 
   			} else {
-  			  //System.out.println("  incomplete match");
+  			  System.out.println("  incomplete match");
   			}
 		  } // for all cuts
 		}

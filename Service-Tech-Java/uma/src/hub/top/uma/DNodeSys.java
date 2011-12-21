@@ -23,6 +23,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.gwt.dev.util.collect.HashSet;
+
 /**
  * Abstract representation of a system for which a branching process shall be
  * constructed using {@link DNodeBP}. The representation encodes system dynamics
@@ -249,10 +251,12 @@ public abstract class DNodeSys {
 			  for (EventPreSet existing : eventPreSetIDs) {
 			    if (existing.equals(e_preSetIDs)) {
 			      e_preSetIDs = existing;
+			      System.out.println(e+" gets existing pre-set abstraction "+existing);
 			      break;
 			    }
 			  }
 			}
+      System.out.println(e+" gets pre-set abstraction "+e_preSetIDs);
 			eventPreSetAbstraction.put(e, e_preSetIDs);
 		}
 
@@ -318,5 +322,62 @@ public abstract class DNodeSys {
 	
 	public String getInfo () {
 	  return "";
+	}
+	
+	public String toDot() {
+	  StringBuilder b = new StringBuilder();
+	  
+    b.append("digraph BP {\n");
+    
+    // standard style for nodes and edges
+    b.append("graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" fontsize=10];\n");
+    b.append("node [fontname=\"Helvetica\" fontsize=8 fixedsize width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white];\n");
+    b.append("edge [fontname=\"Helvetica\" fontsize=8 color=white arrowhead=none weight=\"20.0\"];\n\n");
+    
+    for (DNode e : fireableEvents) {
+      
+      LinkedList<DNode> queue = new LinkedList<DNode>();
+      HashSet<DNode> visited = new HashSet<DNode>();
+      queue.add(e);
+      while (!queue.isEmpty()) {
+        DNode f = queue.removeFirst();
+        
+        String shape;
+        if (f.isEvent) shape="shape=box ";
+        else shape="shape=circle ";
+        
+        String nodeID = "n"+e.globalId+"_"+f.globalId;
+        String antiLabel = f.isAnti ? "--" : "";
+        String nodeLabel = "'"+properNames[f.id]+"'"+antiLabel+" ("+f.id+")["+f.globalId+"]";
+        
+        b.append("  "+nodeID+" ["+shape+"]\n");
+        b.append("  "+nodeID+"_l [shape=none];\n");
+        b.append("  "+nodeID+"_l -> "+nodeID+" [headlabel=\""+nodeLabel+"\"]\n");
+        
+        if (f.pre != null)
+          for (DNode g : f.pre) {
+            if (!visited.contains(g)) {
+              visited.add(g);
+              queue.addLast(g);
+            }
+            String nodeID_g = "n"+e.globalId+"_"+g.globalId;
+            b.append("  "+nodeID_g+" -> "+nodeID+" [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black];\n");
+          }
+        if (f instanceof DNodeTransitive) {
+          if (((DNodeTransitive)f).preTrans != null) 
+            for (DNode g : ((DNodeTransitive)f).preTrans) {
+              if (!visited.contains(g)) {
+                visited.add(g);
+                queue.addLast(g);
+              }
+              String nodeID_g = "n"+e.globalId+"_"+g.globalId;
+              b.append("  "+nodeID_g+" -> "+nodeID+" [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=grey style=dashed];\n");              
+            }
+        }
+      }
+      b.append("\n\n");
+    }
+	  
+	  return b.toString();
 	}
 }

@@ -221,7 +221,7 @@ public class EventStructure {
   
   public void setDependency(Event e1, Event e2) {
     // see if the dependency already exists
-    for (DNode f : e1.post) if (f == e2) return;
+    if (e1.post != null) for (DNode f : e1.post) if (f == e2) return;
     
     e2.addPreNode(e1);
     e1.addPostNode(e2);

@@ -1,0 +1,13 @@
+Example: history_indirect2
+Author: dfahland
+
+Description: In this example, action y can only occur after action r 
+occurred. However, r does not have to be a direct predecessor of y. 
+Rather, there can be an arbitrary number of other events between y 
+and r. Once y occurred, another occurrence of r (and preceding x) is 
+needed to enable y again. Additionally, r cannot immediately succeed 
+x as there need to be two occurrences of condition q (i.e. s has to 
+occur). Likewise after r there need to be two occurrences of q 
+before y can occur. However the precondition q of r requires that 
+there is no event r between q and the other predecessor q. Hence 
+after r occurred, only s will be enabled.

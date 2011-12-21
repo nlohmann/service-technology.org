@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adaptiveSystem:AdaptiveSystem xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:adaptiveSystem="adaptiveSystem" xmi:id="_MAXcMSV0EeGb_fsCqRNdaA" setWellformednessToOclets="true">
+  <oclets xmi:id="_OXZlACV0EeGb_fsCqRNdaA" name="o1" wellFormed="true">
+    <preNet xmi:id="_OXZlASV0EeGb_fsCqRNdaA" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_PEoecCV0EeGb_fsCqRNdaA" name="p" temp="" postEvents="_QQyvkCV0EeGb_fsCqRNdaA" token="1" outgoing="_Sen5ECV0EeGb_fsCqRNdaA"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_Sen5ECV0EeGb_fsCqRNdaA" source="_PEoecCV0EeGb_fsCqRNdaA" destination="_QQyvkCV0EeGb_fsCqRNdaA"/>
+    </preNet>
+    <doNet xmi:id="_ObZUMCV0EeGb_fsCqRNdaA" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_QQyvkCV0EeGb_fsCqRNdaA" name="x" preConditions="_PEoecCV0EeGb_fsCqRNdaA" postConditions="_RMW_8CV0EeGb_fsCqRNdaA _DcM7USsdEeG3EYJ5QjBSYQ" enabled="true" incoming="_Sen5ECV0EeGb_fsCqRNdaA" outgoing="_SxtNICV0EeGb_fsCqRNdaA _EDGjQCsdEeG3EYJ5QjBSYQ"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_RMW_8CV0EeGb_fsCqRNdaA" name="p" preEvents="_QQyvkCV0EeGb_fsCqRNdaA" postEvents="_RuKFcCV0EeGb_fsCqRNdaA" incoming="_SxtNICV0EeGb_fsCqRNdaA" outgoing="_TFKUoCV0EeGb_fsCqRNdaA"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_RuKFcCV0EeGb_fsCqRNdaA" name="y" preConditions="_RMW_8CV0EeGb_fsCqRNdaA _GrFSICsdEeG3EYJ5QjBSYQ" postConditions="_SCnSgCV0EeGb_fsCqRNdaA" enabled="true" incoming="_TFKUoCV0EeGb_fsCqRNdaA _HkdKICsdEeG3EYJ5QjBSYQ" outgoing="_TcpnkCV0EeGb_fsCqRNdaA"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_SCnSgCV0EeGb_fsCqRNdaA" name="p" preEvents="_RuKFcCV0EeGb_fsCqRNdaA" incoming="_TcpnkCV0EeGb_fsCqRNdaA"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_DcM7USsdEeG3EYJ5QjBSYQ" name="q" preEvents="_QQyvkCV0EeGb_fsCqRNdaA" postEvents="_4D2GgCsdEeG3EYJ5QjBSYQ" incoming="_EDGjQCsdEeG3EYJ5QjBSYQ" outgoing="_5YK1ICsdEeG3EYJ5QjBSYQ"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_GrFSICsdEeG3EYJ5QjBSYQ" name="q" preEvents="_nsgEoCsdEeG3EYJ5QjBSYQ" postEvents="_RuKFcCV0EeGb_fsCqRNdaA" incoming="_pfoPICsdEeG3EYJ5QjBSYQ" outgoing="_HkdKICsdEeG3EYJ5QjBSYQ"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_nsgEoCsdEeG3EYJ5QjBSYQ" name="" abstract="true" temp="" preConditions="_siAbACsdEeG3EYJ5QjBSYQ" postConditions="_GrFSICsdEeG3EYJ5QjBSYQ" incoming="_uW6HICsdEeG3EYJ5QjBSYQ" outgoing="_pfoPICsdEeG3EYJ5QjBSYQ"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_qHSsECsdEeG3EYJ5QjBSYQ" name="q" abstract="false" preEvents="_4D2GgCsdEeG3EYJ5QjBSYQ" postEvents="_r1FqoCsdEeG3EYJ5QjBSYQ" incoming="_51m_ECsdEeG3EYJ5QjBSYQ" outgoing="_thWYICsdEeG3EYJ5QjBSYQ"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_r1FqoCsdEeG3EYJ5QjBSYQ" name="r" preConditions="_qHSsECsdEeG3EYJ5QjBSYQ" postConditions="_siAbACsdEeG3EYJ5QjBSYQ" incoming="_thWYICsdEeG3EYJ5QjBSYQ" outgoing="_t9uLECsdEeG3EYJ5QjBSYQ"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_siAbACsdEeG3EYJ5QjBSYQ" name="q" abstract="false" preEvents="_r1FqoCsdEeG3EYJ5QjBSYQ" postEvents="_nsgEoCsdEeG3EYJ5QjBSYQ" incoming="_t9uLECsdEeG3EYJ5QjBSYQ" outgoing="_uW6HICsdEeG3EYJ5QjBSYQ"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_4D2GgCsdEeG3EYJ5QjBSYQ" name="" abstract="true" temp="" preConditions="_DcM7USsdEeG3EYJ5QjBSYQ" postConditions="_qHSsECsdEeG3EYJ5QjBSYQ" incoming="_5YK1ICsdEeG3EYJ5QjBSYQ" outgoing="_51m_ECsdEeG3EYJ5QjBSYQ"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_SxtNICV0EeGb_fsCqRNdaA" source="_QQyvkCV0EeGb_fsCqRNdaA" destination="_RMW_8CV0EeGb_fsCqRNdaA"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_TFKUoCV0EeGb_fsCqRNdaA" source="_RMW_8CV0EeGb_fsCqRNdaA" destination="_RuKFcCV0EeGb_fsCqRNdaA"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_TcpnkCV0EeGb_fsCqRNdaA" source="_RuKFcCV0EeGb_fsCqRNdaA" destination="_SCnSgCV0EeGb_fsCqRNdaA"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_EDGjQCsdEeG3EYJ5QjBSYQ" source="_QQyvkCV0EeGb_fsCqRNdaA" destination="_DcM7USsdEeG3EYJ5QjBSYQ"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_HkdKICsdEeG3EYJ5QjBSYQ" source="_GrFSICsdEeG3EYJ5QjBSYQ" destination="_RuKFcCV0EeGb_fsCqRNdaA"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_pfoPICsdEeG3EYJ5QjBSYQ" source="_nsgEoCsdEeG3EYJ5QjBSYQ" destination="_GrFSICsdEeG3EYJ5QjBSYQ"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_thWYICsdEeG3EYJ5QjBSYQ" source="_qHSsECsdEeG3EYJ5QjBSYQ" destination="_r1FqoCsdEeG3EYJ5QjBSYQ"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_t9uLECsdEeG3EYJ5QjBSYQ" source="_r1FqoCsdEeG3EYJ5QjBSYQ" destination="_siAbACsdEeG3EYJ5QjBSYQ"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_uW6HICsdEeG3EYJ5QjBSYQ" source="_siAbACsdEeG3EYJ5QjBSYQ" destination="_nsgEoCsdEeG3EYJ5QjBSYQ"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_5YK1ICsdEeG3EYJ5QjBSYQ" source="_DcM7USsdEeG3EYJ5QjBSYQ" destination="_4D2GgCsdEeG3EYJ5QjBSYQ"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_51m_ECsdEeG3EYJ5QjBSYQ" source="_4D2GgCsdEeG3EYJ5QjBSYQ" destination="_qHSsECsdEeG3EYJ5QjBSYQ"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_MoXQMCveEeGLF5gFJWjhpw" name="o2" wellFormed="true">
+    <preNet xmi:id="_MoXQMSveEeGLF5gFJWjhpw" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_MoXQMiveEeGLF5gFJWjhpw" name="q" temp="" postEvents="_MoXQNSveEeGLF5gFJWjhpw" token="1" outgoing="_MoXQMyveEeGLF5gFJWjhpw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_MoXQMyveEeGLF5gFJWjhpw" source="_MoXQMiveEeGLF5gFJWjhpw" destination="_MoXQNSveEeGLF5gFJWjhpw"/>
+    </preNet>
+    <doNet xmi:id="_MoXQNCveEeGLF5gFJWjhpw" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_MoXQNSveEeGLF5gFJWjhpw" name="s" preConditions="_MoXQMiveEeGLF5gFJWjhpw" postConditions="_MoXQNiveEeGLF5gFJWjhpw" enabled="true" incoming="_MoXQMyveEeGLF5gFJWjhpw" outgoing="_MoXQNyveEeGLF5gFJWjhpw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_MoXQNiveEeGLF5gFJWjhpw" name="q" preEvents="_MoXQNSveEeGLF5gFJWjhpw" incoming="_MoXQNyveEeGLF5gFJWjhpw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_MoXQNyveEeGLF5gFJWjhpw" source="_MoXQNSveEeGLF5gFJWjhpw" destination="_MoXQNiveEeGLF5gFJWjhpw"/>
+    </doNet>
+  </oclets>
+  <adaptiveProcess xmi:id="_MqhMcCV0EeGb_fsCqRNdaA" name="ap">
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_NQDicCV0EeGb_fsCqRNdaA" name="p" token="1"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_0UaI8CWOEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_0U4qECWOEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_1BDzkCWOEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_1BQn4CWOEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_-ZN1wCWOEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_-ZW_sCWOEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_-1OcUCWOEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_-1W_MCWOEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_-1e7ACWOEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_-1pTECWOEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_D6ZmYCWPEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_D6masCWPEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_EU8NUCWPEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_EVDiECWPEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_EVaucCWPEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_EVmUoCWPEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_EuTvkCWPEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_EubrYCWPEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_EuhyACWPEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_EuqU4CWPEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_Bb2HACWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_Bb-p4CWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_B5K8MCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_B5eeMCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_B5maACWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_B5u84CWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_CpQVUCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_CplFcCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_Cp-HACWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_CqGC0CWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_DVGHoCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_DVOqgCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_DVX0cCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_DVfJMCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_qywk0CWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_qzJmYCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_rNsNUCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_rN2lYCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_rN_vUCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_rOI5QCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_1MIzcCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_1MQvQCWUEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_LO78QCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_LPFtQCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_LuPucCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_LukekCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_Lu5OsCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_LvBKgCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_emzI0CWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_enOmoCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_fSBQECWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_fSJy8CWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_fSRuwCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_fSZqkCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_2HvqoCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_2H2_YCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_2Ze64CWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_2Zp6ACWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_2Z808CWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_2aEwwCWVEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_DQfpkCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_DQmXQCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_DlVRICWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_Dlcl4CWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_Dlj6oCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_DlrPYCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_ZmSm4CWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_ZmZUkCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_Z8ti0CWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_Z82FsCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_Z9N5ICWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_Z9hbICWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVhrcCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aVpnQCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_a46FUCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_a5BaECWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_a5JV4CWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_a5RRsCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_cO0IUCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_cPIRYCWWEeGmy8InNvT90g"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_YKUJICsdEeG3EYJ5QjBSYQ"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_YKzRUCsdEeG3EYJ5QjBSYQ"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_YK8bQCsdEeG3EYJ5QjBSYQ"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_2eg1gCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_2ep_cCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_2e0XgCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_5n5oUCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_5n_H4CsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_5obz0CsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_5ok9wCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_5ouHsCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_5o2qkCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_6ylSwCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_6yqLQCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_6yzVMCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_6y7RACsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_6zFCACsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_7nI8MCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_7nSGICsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_7nvZICsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_7n_30CsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_7oSLsCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_7oaHgCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_7ojRcCsfEeGcsow2GOJ9pA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_C5B5kCvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_C5NfwCvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_C5d-cCvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_FBL44CvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_FBYGICvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_FBlhgCvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_GlzGQCvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_Gl-scCvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_GmKSoCvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_Md8lYCvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_MeKAwCvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_MeU_4CvdEeG0asgc7C3E8A"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_F7z4oCveEeGLF5gFJWjhpw"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_F8AF4CveEeGLF5gFJWjhpw"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_F8MTICveEeGLF5gFJWjhpw"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aVzQkCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aWAE4CveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_aWplICveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aW41sCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_aXIGQCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_a1hScCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_a1tfsCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_a15F4CveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_a2HvYCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_a2Vx0CveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_bScfACveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_bSm3ECveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_bSwoECveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_bS6ZECveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_bTC78CveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_b1QRICveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_b1UikCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_b1dsgCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_b15xYCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_b2C7UCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_b2NTYCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_b2YSgCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_b2iqkCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_dDdwsCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_dDp98CveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_dD2yQCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_dECYcCveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_dEmZICveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_dEu8ACveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_dE3e4CveEeGPW_zqBcipxg"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_RjzaACvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_Rj_nQCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_RkL0gCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_R73UsCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_R8CT0CvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_R8NS8CvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_R8XrACvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_R8jRMCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_SkEkMCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_SkNuICvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_SkVp8CvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_Skez4CvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_SknWwCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_TGcRcCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_TGlbYCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_TG0E4CvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_TsJmkCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_TsSwgCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_TsbTYCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_TsioICvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_Tsm5kCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_TsvccCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_VXKW4CvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_VXTg0CvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_VXyB8CvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_VX5WsCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_VYArcCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_m0o6YCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_m0voECvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_m0280CvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_nI4sECvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_nJCdECvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_nJKY4CvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_nJRtoCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_nJZCYCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_nevAQCvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_ne2VACvfEeGRfdRPYeeETA"/>
+    <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_ne9pwCvfEeGRfdRPYeeETA"/>
+  </adaptiveProcess>
+</adaptiveSystem:AdaptiveSystem>

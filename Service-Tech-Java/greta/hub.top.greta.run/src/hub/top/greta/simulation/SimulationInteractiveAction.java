@@ -73,7 +73,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
 public abstract class SimulationInteractiveAction implements IWorkbenchWindowActionDelegate {
   
-  public static boolean option_checkCapacity = true;  // enable to set capacity of places to "1"
+  public static boolean option_checkCapacity = false;  // enable to set capacity of places to "1"
   public static boolean option_matchExactPrecondition = false;
   
   protected IWorkbenchWindow workbenchWindow;

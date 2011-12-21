@@ -7,6 +7,5 @@
 	<classpathentry kind="lib" path="tests/libs-external/junit-4.8.1.jar"/>
 	<classpathentry kind="lib" path="libs-external/pnapi-java.jar"/>
 	<classpathentry kind="lib" path="libs-external/lpsolve55j.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.st.sam.mine"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

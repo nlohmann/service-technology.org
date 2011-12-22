@@ -19,7 +19,6 @@ import java.util.Iterator;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
@@ -170,11 +169,9 @@ public class ConditionImpl extends NodeImpl implements Condition {
 	 * @generated
 	 */
 	public EList<Event> getPreEvents() {
-		//if (preEvents == null) {
-		//	preEvents = new EObjectWithInverseResolvingEList.ManyInverse<Event>(Event.class, this, AdaptiveSystemPackage.CONDITION__PRE_EVENTS, AdaptiveSystemPackage.EVENT__POST_CONDITIONS);
-		//}
-    preEvents = new BasicEList<Event>();
-    for (ArcToCondition a : getIncoming()) preEvents.add(a.getSource());
+		if (preEvents == null) {
+			preEvents = new EObjectWithInverseResolvingEList.ManyInverse<Event>(Event.class, this, AdaptiveSystemPackage.CONDITION__PRE_EVENTS, AdaptiveSystemPackage.EVENT__POST_CONDITIONS);
+		}
 		return preEvents;
 	}
 
@@ -184,11 +181,9 @@ public class ConditionImpl extends NodeImpl implements Condition {
 	 * @generated
 	 */
 	public EList<Event> getPostEvents() {
-		//if (postEvents == null) {
-		//	postEvents = new EObjectWithInverseResolvingEList.ManyInverse<Event>(Event.class, this, AdaptiveSystemPackage.CONDITION__POST_EVENTS, AdaptiveSystemPackage.EVENT__PRE_CONDITIONS);
-		//}
-	  postEvents = new BasicEList<Event>();
-	  for (ArcToEvent a : getOutgoing()) postEvents.add(a.getDestination());
+		if (postEvents == null) {
+			postEvents = new EObjectWithInverseResolvingEList.ManyInverse<Event>(Event.class, this, AdaptiveSystemPackage.CONDITION__POST_EVENTS, AdaptiveSystemPackage.EVENT__PRE_CONDITIONS);
+		}
 		return postEvents;
 	}
 
@@ -343,10 +338,10 @@ public class ConditionImpl extends NodeImpl implements Condition {
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-//			case AdaptiveSystemPackage.CONDITION__PRE_EVENTS:
-//				return ((InternalEList<InternalEObject>)(InternalEList<?>)getPreEvents()).basicAdd(otherEnd, msgs);
-//			case AdaptiveSystemPackage.CONDITION__POST_EVENTS:
-//				return ((InternalEList<InternalEObject>)(InternalEList<?>)getPostEvents()).basicAdd(otherEnd, msgs);
+			case AdaptiveSystemPackage.CONDITION__PRE_EVENTS:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getPreEvents()).basicAdd(otherEnd, msgs);
+			case AdaptiveSystemPackage.CONDITION__POST_EVENTS:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getPostEvents()).basicAdd(otherEnd, msgs);
 			case AdaptiveSystemPackage.CONDITION__INCOMING:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIncoming()).basicAdd(otherEnd, msgs);
 			case AdaptiveSystemPackage.CONDITION__OUTGOING:
@@ -363,10 +358,10 @@ public class ConditionImpl extends NodeImpl implements Condition {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-//			case AdaptiveSystemPackage.CONDITION__PRE_EVENTS:
-//				return ((InternalEList<?>)getPreEvents()).basicRemove(otherEnd, msgs);
-//			case AdaptiveSystemPackage.CONDITION__POST_EVENTS:
-//				return ((InternalEList<?>)getPostEvents()).basicRemove(otherEnd, msgs);
+			case AdaptiveSystemPackage.CONDITION__PRE_EVENTS:
+				return ((InternalEList<?>)getPreEvents()).basicRemove(otherEnd, msgs);
+			case AdaptiveSystemPackage.CONDITION__POST_EVENTS:
+				return ((InternalEList<?>)getPostEvents()).basicRemove(otherEnd, msgs);
 			case AdaptiveSystemPackage.CONDITION__INCOMING:
 				return ((InternalEList<?>)getIncoming()).basicRemove(otherEnd, msgs);
 			case AdaptiveSystemPackage.CONDITION__OUTGOING:
@@ -412,14 +407,14 @@ public class ConditionImpl extends NodeImpl implements Condition {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-//			case AdaptiveSystemPackage.CONDITION__PRE_EVENTS:
-//				getPreEvents().clear();
-//				getPreEvents().addAll((Collection<? extends Event>)newValue);
-//				return;
-//			case AdaptiveSystemPackage.CONDITION__POST_EVENTS:
-//				getPostEvents().clear();
-//				getPostEvents().addAll((Collection<? extends Event>)newValue);
-//				return;
+			case AdaptiveSystemPackage.CONDITION__PRE_EVENTS:
+				getPreEvents().clear();
+				getPreEvents().addAll((Collection<? extends Event>)newValue);
+				return;
+			case AdaptiveSystemPackage.CONDITION__POST_EVENTS:
+				getPostEvents().clear();
+				getPostEvents().addAll((Collection<? extends Event>)newValue);
+				return;
 			case AdaptiveSystemPackage.CONDITION__TOKEN:
 				setToken(((Integer)newValue).intValue());
 				return;

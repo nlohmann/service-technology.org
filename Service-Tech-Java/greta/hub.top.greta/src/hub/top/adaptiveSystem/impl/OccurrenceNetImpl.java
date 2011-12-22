@@ -7,6 +7,8 @@ package hub.top.adaptiveSystem.impl;
 
 import hub.top.adaptiveSystem.AdaptiveSystemPackage;
 import hub.top.adaptiveSystem.Arc;
+import hub.top.adaptiveSystem.ArcToCondition;
+import hub.top.adaptiveSystem.ArcToEvent;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.OccurrenceNet;
 

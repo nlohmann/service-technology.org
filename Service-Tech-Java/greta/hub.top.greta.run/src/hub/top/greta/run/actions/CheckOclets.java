@@ -326,7 +326,7 @@ public class CheckOclets extends Action implements
 					MessageDialog.openInformation(
 						shell,
 						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one (forward-)conflict  in preNet.");
+						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one (forward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPostEvents()+" in the precondition.");
 					return false;
 				}
 				//6. an preNet don't have conflicts, that means a condition has maximal one event in preEvents
@@ -335,7 +335,7 @@ public class CheckOclets extends Action implements
 					MessageDialog.openInformation(
 						shell,
 						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one (backward-)conflict  in preNet.");
+						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one (backward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPostEvents()+" in the precondition.");
 					return false;
 				}
 			}
@@ -364,16 +364,19 @@ public class CheckOclets extends Action implements
 								"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one maximal event in preNet. Only conditions are allowed to be maximal.");
 							return false;
 						}
-						//9.) no two conditions in PostSet of an event are equally labeled
-						for(Condition postCondition2 : ((Event) ocletNode).getPostConditions()) {
-							if(!postCondition.equals(postCondition2) && postCondition.getName().equals(postCondition2.getName())) {
-								System.out.println("  not well formed - event " + ocletNode.getName() + " has two same labeled conditions in postSet.");
-								MessageDialog.openInformation(
-									shell,
-									"AdaptiveSystem - check wellformedness of oclets",
-									"Oclet " + ocletName + " is not wellformed. There is at least one event in preNet which has two same labeled conditions in postSet.");
-								return false;
-							}
+						if (!postCondition.isAbstract()) {
+  						//9.) no two conditions in PostSet of an event are equally labeled
+  						for(Condition postCondition2 : ((Event) ocletNode).getPostConditions()) {
+  
+  							if(!postCondition.equals(postCondition2) && postCondition.getName().equals(postCondition2.getName())) {
+  								System.out.println("  not well formed - event " + ocletNode.getName() + " has two equally labeled post-conditions.");
+  								MessageDialog.openInformation(
+  									shell,
+  									"AdaptiveSystem - check wellformedness of oclets",
+  									"Oclet " + ocletName + " is not wellformed. Event "+ocletNode.getName()+" in precondition has two equally labeled post-conditions.");
+  								return false;
+  							}
+  						}
 						}
 					}
 				}//END if maximal events in preNet (2.) and 9.) 
@@ -400,7 +403,7 @@ public class CheckOclets extends Action implements
 					MessageDialog.openInformation(
 						shell,
 						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one minimal condition in doNet.");					
+						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one minimal condition in the contribution.");					
 					return false;
 				}
 				//6. a doNet don't have conflicts, that means a condition has maximal one event in postEvents
@@ -436,16 +439,18 @@ public class CheckOclets extends Action implements
 				if(!((Event) ocletNode).getPostConditions().isEmpty()) {
 					//9.) no two conditions in PostSet of an event are equally labeled
 					for(Condition postCondition : ((Event) ocletNode).getPostConditions()) {
-						for(Condition postCondition2 : ((Event) ocletNode).getPostConditions()) {
-							if(!postCondition.equals(postCondition2) && postCondition.getName().equals(postCondition2.getName())) {
-								System.out.println("  not well formed - event " + ocletNode.getName() + " has two same labeled conditions ("+postCondition.getName()+") in postSet.");
-								MessageDialog.openInformation(
-										shell,
-										"AdaptiveSystem - check wellformedness of oclets",
-										"Oclet " + ocletName + " is not wellformed. There is at least one event in doNet which has two same labeled conditions in postSet.");
-								return false;
-							}
-						}
+					  if (!postCondition.isAbstract()) {
+  						for(Condition postCondition2 : ((Event) ocletNode).getPostConditions()) {
+  							if(!postCondition.equals(postCondition2) && postCondition.getName().equals(postCondition2.getName())) {
+  								System.out.println("  not well formed - event " + ocletNode.getName() + " has two equally labeled post-conditions ("+postCondition.getName()+").");
+  								MessageDialog.openInformation(
+  										shell,
+  										"AdaptiveSystem - check wellformedness of oclets",
+  										"Oclet " + ocletName + " is not wellformed. Event " + ocletNode.getName() + " has two equally labeled post-conditions ("+postCondition.getName()+").");
+  								return false;
+  							}
+  						}
+					  }
 					}
 				}//END if maximal events in preNet
 			}			

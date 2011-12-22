@@ -35,6 +35,12 @@
 
 package hub.top.greta.run.actions;
 
+import hub.top.adaptiveSystem.AdaptiveSystem;
+import hub.top.adaptiveSystem.ArcToCondition;
+import hub.top.adaptiveSystem.ArcToEvent;
+import hub.top.adaptiveSystem.Condition;
+import hub.top.adaptiveSystem.Event;
+import hub.top.adaptiveSystem.Oclet;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorPlugin;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorUtil;
 
@@ -159,8 +165,60 @@ public class FixDiagramFile implements IObjectActionDelegate {
 				}
 			}
 			
+			AdaptiveSystem as = (AdaptiveSystem)d.getElement();
+			
+      Resource r2 = as.eResource();
+			
+			for (Oclet o : as.getOclets()) {
+			  for (hub.top.adaptiveSystem.Node n : o.getPreNet().getNodes()) {
+			    if (n instanceof Event) {
+			      ((Event)n).getPreConditions().clear();
+			      for (ArcToEvent a : ((Event) n).getIncoming()) {
+			        ((Event)n).getPreConditions().add(a.getSource());
+			      }
+			    }
+			    if (n instanceof Condition) {
+            ((Condition)n).getPreEvents().clear();
+            for (ArcToCondition a : ((Condition) n).getIncoming()) {
+              ((Condition)n).getPreEvents().add(a.getSource());
+            }
+          }
+			  }
+			  
+			  for (hub.top.adaptiveSystem.Node n : o.getDoNet().getNodes()) {
+          if (n instanceof Event) {
+            ((Event)n).getPreConditions().clear();
+            for (ArcToEvent a : ((Event) n).getIncoming()) {
+              ((Event)n).getPreConditions().add(a.getSource());
+            }
+          }
+          if (n instanceof Condition) {
+            ((Condition)n).getPreEvents().clear();
+            for (ArcToCondition a : ((Condition) n).getIncoming()) {
+              ((Condition)n).getPreEvents().add(a.getSource());
+            }
+          }
+        }
+			}
+      
+      for (hub.top.adaptiveSystem.Node n : as.getAdaptiveProcess().getNodes()) {
+        if (n instanceof Event) {
+          ((Event)n).getPreConditions().clear();
+          for (ArcToEvent a : ((Event) n).getIncoming()) {
+            ((Event)n).getPreConditions().add(a.getSource());
+          }
+        }
+        if (n instanceof Condition) {
+          ((Condition)n).getPreEvents().clear();
+          for (ArcToCondition a : ((Condition) n).getIncoming()) {
+            ((Condition)n).getPreEvents().add(a.getSource());
+          }
+        }
+      }
+			
 			try {
 				r.save(AdaptiveSystemDiagramEditorUtil.getSaveOptions());
+				r2.save(AdaptiveSystemDiagramEditorUtil.getSaveOptions());
 			} catch (IOException e) {
 				AdaptiveSystemDiagramEditorPlugin.getInstance().logError(
 						"Unable to store diagram resource", e); //$NON-NLS-1$

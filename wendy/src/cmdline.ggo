@@ -47,6 +47,13 @@ option "tg" -
   argoptional
   optional
 
+option "format" f
+  "Defines the format of the formulas output \n(only relevant for test guidelines)."
+  values = "tgConform", "ogConform" enum
+  default="tgConform"
+  typestr="FORMAT"
+  optional
+
 option "sa" -
   "Service automaton output."
   string

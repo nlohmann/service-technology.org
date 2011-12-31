@@ -244,15 +244,15 @@ std::ostream& operator<< (std::ostream& o, const InterfaceMarking& m) {
  * MEMBER METHODS *
  ******************/
 
-/// returns the minimum of value and the the marking value for the given label
+/// returns the minimum of value and the marking value for the given label
 uint8_t InterfaceMarking::getMin(const uint8_t value, const Label_ID& label) const{
 
 	uint8_t l = get(label);
 //	std::cout << "value: " << (int)value << "   label: " << (int)l;
 	return (value <= l ? value : l);
-	//std::cout << "  min: " << (int)value;
 }
 
+/// returns true if value and the value for the given label are equal
 bool InterfaceMarking::isEqual(const uint8_t& value, const Label_ID& label) const{
 	return value == get(label);
 }
@@ -358,6 +358,18 @@ bool InterfaceMarking::unmarked() const {
         }
     }
     return true;
+}
+
+/// returns whether the interface is unmarked for all receive labels
+bool InterfaceMarking::receiveUnmarked() const {
+
+	for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l){
+		if (marked(l)){
+			return false;
+		}
+	}
+	return true;
+
 }
 
 /*

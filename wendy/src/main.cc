@@ -179,6 +179,7 @@ void evaluateParameters(int argc, char** argv) {
         abort(12, "'--sa' and '--tg' parameter are mutually exclusive");
     }
 
+
 //    if (args_info.tg_given) {
 //        args_info.ignoreUnreceivedMessages_flag = 1; //optimization is disabled
 //    }

@@ -1,0 +1,48 @@
+{ simple sequence -  no receive event}
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,		
+  p2,
+  p3;
+
+OUTPUT
+  x,
+  y,
+  z;
+
+INITIALMARKING
+  p0:	1
+ ;
+
+FINALMARKING
+  p3:	1
+ ;
+
+TRANSITION t1	 { !x }
+CONSUME
+  p0:	1;
+	 
+PRODUCE
+  p1:	1,
+  x  :  1;
+
+
+TRANSITION t2	 { !y }
+CONSUME
+  p1:	1;
+PRODUCE
+  p2 :  1,
+  y  :  1;
+
+
+TRANSITION t3	 { !z }
+CONSUME
+  p2:	1;
+PRODUCE
+  p3 :  1,
+  z  :  1;
+
+
+{ END OF FILE }

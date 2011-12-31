@@ -3,6 +3,93 @@ AT_COLOR_TESTS
 
 m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
 
+############################################################################
+AT_BANNER([Test Guidelines])
+############################################################################
+
+AT_SETUP([ICSOC 2011 (acyclic)])
+FILE="TG_ICSOC2011_acyclic"
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/$FILE.* .])
+AT_CHECK([WENDY $FILE.owfn --verbose --showWaitstates --showTransients --tg -f ogConform --dot=- | dot -Tpdf -o $FILE.tg.pdf],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 20 knowledges reachable" stderr])
+AT_CHECK([WENDY2FIONA -i $FILE.tg -o $FILE.f.tg])
+AT_CHECK([WENDY2FIONA -i $FILE.ref.tg -o $FILE.ref.f.tg])
+AT_CHECK([FIONA -tequivalence $FILE.f.tg $FILE.ref.f.tg],0,ignore,ignore)
+AT_KEYWORDS(TG)
+AT_CLEANUP
+
+AT_SETUP([coverage])
+FILE="TG_coverage"
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/$FILE.* .])
+AT_CHECK([WENDY $FILE.owfn --verbose --showWaitstates --showTransients --tg -f ogConform --dot=- | dot -Tpdf -o $FILE.tg.pdf],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 32 knowledges reachable" stderr])
+AT_CHECK([WENDY2FIONA -i $FILE.tg -o $FILE.f.tg])
+AT_CHECK([WENDY2FIONA -i $FILE.ref.tg -o $FILE.ref.f.tg])
+AT_CHECK([FIONA -tequivalence $FILE.f.tg $FILE.ref.f.tg],0,ignore,ignore)
+AT_KEYWORDS(TG)
+AT_CLEANUP
+
+AT_SETUP([simple1])
+FILE="TG_simple1"
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/$FILE.* .])
+AT_CHECK([WENDY $FILE.owfn --verbose --showWaitstates --showTransients --tg -f ogConform --dot=- | dot -Tpdf -o $FILE.tg.pdf],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 12 knowledges reachable" stderr])
+AT_CHECK([WENDY2FIONA -i $FILE.tg -o $FILE.f.tg])
+AT_CHECK([WENDY2FIONA -i $FILE.ref.tg -o $FILE.ref.f.tg])
+AT_CHECK([FIONA -tequivalence $FILE.f.tg $FILE.ref.f.tg],0,ignore,ignore)
+AT_KEYWORDS(TG)
+AT_CLEANUP
+
+AT_SETUP([simple2])
+FILE="TG_simple2"
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/$FILE.* .])
+AT_CHECK([WENDY $FILE.owfn --verbose --showWaitstates --showTransients --tg -f ogConform --dot=- | dot -Tpdf -o $FILE.tg.pdf],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 8 knowledges reachable" stderr])
+AT_CHECK([WENDY2FIONA -i $FILE.tg -o $FILE.f.tg])
+AT_CHECK([WENDY2FIONA -i $FILE.ref.tg -o $FILE.ref.f.tg])
+AT_CHECK([FIONA -tequivalence $FILE.f.tg $FILE.ref.f.tg],0,ignore,ignore)
+AT_KEYWORDS(TG)
+AT_CLEANUP
+
+AT_SETUP([simple3])
+FILE="TG_simple3"
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/$FILE.* .])
+AT_CHECK([WENDY $FILE.owfn --verbose --showWaitstates --showTransients --tg -f ogConform --dot=- | dot -Tpdf -o $FILE.tg.pdf],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 2 knowledges reachable" stderr])
+AT_CHECK([WENDY2FIONA -i $FILE.tg -o $FILE.f.tg])
+AT_CHECK([WENDY2FIONA -i $FILE.ref.tg -o $FILE.ref.f.tg])
+AT_CHECK([FIONA -tequivalence $FILE.f.tg $FILE.ref.f.tg],0,ignore,ignore)
+AT_KEYWORDS(TG)
+AT_CLEANUP
+
+AT_SETUP([simple4])
+FILE="TG_simple4"
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/$FILE.* .])
+AT_CHECK([WENDY $FILE.owfn --verbose --showWaitstates --showTransients --tg -f ogConform --dot=- | dot -Tpdf -o $FILE.tg.pdf],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 10 knowledges reachable" stderr])
+AT_CHECK([WENDY2FIONA -i $FILE.tg -o $FILE.f.tg])
+AT_CHECK([WENDY2FIONA -i $FILE.ref.tg -o $FILE.ref.f.tg])
+AT_CHECK([FIONA -tequivalence $FILE.f.tg $FILE.ref.f.tg],0,ignore,ignore)
+AT_KEYWORDS(TG)
+AT_CLEANUP
+
+AT_SETUP([simple5])
+FILE="TG_simple5"
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/$FILE.* .])
+AT_CHECK([WENDY $FILE.owfn --verbose --showWaitstates --showTransients --tg -f ogConform --dot=- | dot -Tpdf -o $FILE.tg.pdf],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: 8 knowledges reachable" stderr])
+AT_CHECK([WENDY2FIONA -i $FILE.tg -o $FILE.f.tg])
+AT_CHECK([WENDY2FIONA -i $FILE.ref.tg -o $FILE.ref.f.tg])
+AT_CHECK([FIONA -tequivalence $FILE.f.tg $FILE.ref.f.tg],0,ignore,ignore)
+AT_KEYWORDS(TG)
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Basic Options])
@@ -1317,20 +1404,7 @@ AT_CHECK([GREP -q "(w)" myCoffee.diag.dot])
 AT_KEYWORDS(diagnosis)
 AT_CLEANUP
 
-############################################################################
-AT_BANNER([Test Guidelines])
-############################################################################
 
-AT_SETUP([ICSOC 2011 (acyclic)])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/tg_ICSOC2011_acyclic.* .])
-AT_CHECK([WENDY tg_ICSOC2011_acyclic.owfn --tg --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 20 knowledges reachable" stderr])
-AT_CHECK([WENDY2FIONA -i tg_ICSOC2011_acyclic.tg -o tg_ICSOC2011_acyclic.f.tg])
-AT_CHECK([WENDY2FIONA -i tg_ICSOC2011_acyclic.ref.tg -o tg_ICSOC2011_acyclic.ref.f.tg])
-AT_CHECK([FIONA -tequivalence tg_ICSOC2011_acyclic.f.tg tg_ICSOC2011_acyclic.ref.f.tg],0,ignore,ignore)
-AT_KEYWORDS(tg)
-AT_CLEANUP
 
 
 

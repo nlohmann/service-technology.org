@@ -1,0 +1,48 @@
+{
+  generator:    Wendy 3.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy TG_simple5.owfn --verbose --showWaitstates --showTransients --tg -f ogConform --dot=-
+  events:       0 send, 3 receive, 0 synchronous
+  statistics:   8 nodes
+}
+
+INTERFACE
+  INPUT
+    y, x, z;
+
+NODES
+  154186928 : (x + y + z)
+    y -> 154195736
+    x -> 154192728
+    z -> 154192608
+  154191752 : z
+    y -> 0
+    x -> 0
+    z -> 154193064
+  154192608 : (x + y)
+    y -> 154193904
+    x -> 154195440
+    z -> 0
+  154192728 : (y + z)
+    y -> 154191752
+    x -> 0
+    z -> 154195440
+  154193064 : final
+    y -> 0
+    x -> 0
+    z -> 0
+  154193904 : x
+    y -> 0
+    x -> 154193064
+    z -> 0
+  154195440 : y
+    y -> 154193064
+    x -> 0
+    z -> 0
+  154195736 : (x + z)
+    y -> 0
+    x -> 154191752
+    z -> 154193904
+  0 : true
+    y -> 0
+    x -> 0
+    z -> 0

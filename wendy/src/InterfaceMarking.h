@@ -113,6 +113,9 @@ class InterfaceMarking {
         /// returns whether the whole interface is unmarked
         bool unmarked() const;
 
+        /// returns whether the interface is unmarked for all receive labels
+        bool receiveUnmarked() const;
+
         /// returns whether the interface is marked at the given label
         bool marked(const Label_ID&) const;
 
@@ -128,7 +131,7 @@ class InterfaceMarking {
         /// returns the minimum of value and the marking value for the given label
         uint8_t getMin(const uint8_t value, const Label_ID&) const;
 
-        /// returns true if  value and value for the given label are equal
+        /// returns true if value and the value for the given label are equal
         bool isEqual(const uint8_t& value, const Label_ID& label) const;
 
     private: /* member functions */

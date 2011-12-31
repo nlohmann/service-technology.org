@@ -1,0 +1,94 @@
+{ spec bei der die OG (der most permissive partner) alle Kanten der Spec überdeckt; aber nicht alle Pfade}
+{ Bsp. für Verknüpfung von final per Disjunktion: !c * (!c + final)} 
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,		
+  p2,
+  p3,
+  p4,
+  p5,
+  p6;
+INPUT
+  a, 
+  b,
+  c,
+  d;
+OUTPUT
+  x,
+  y;
+
+INITIALMARKING
+  p0:	1
+ ;
+
+FINALMARKING
+  p6:	1
+ ;
+
+TRANSITION t1	 { ?a }
+CONSUME
+  p0:	1,
+  a:    1;	 
+PRODUCE
+  p1:	1;
+
+TRANSITION t2	 { ?a }
+CONSUME
+  p0:   1,
+  a:    1;
+PRODUCE
+  p2:	1;
+
+TRANSITION t3	 { ?b }
+CONSUME
+  p0:	1,
+  b:    1;
+PRODUCE
+  p3:	1;
+
+TRANSITION t4	 { !x }
+CONSUME
+  p1:	1;
+PRODUCE
+  p4 :  1,
+  x  :  1;
+ 
+TRANSITION t5	 { !x }
+CONSUME
+  p2:	1;
+PRODUCE
+  x:	1,
+  p5:   1;
+
+TRANSITION t6	 { !y }
+CONSUME
+  p3:	1;
+PRODUCE
+  y:	1,
+  p5:   1;
+
+TRANSITION t7	 { ?c }
+CONSUME
+  p4:	1,
+  c:    1;
+PRODUCE
+  p6 :  1;
+
+TRANSITION t8	 { ?c }
+CONSUME
+  p5:	1,
+  c:    1;
+PRODUCE
+  p6 :  1;
+
+TRANSITION t9	 { ?d }
+CONSUME
+  p5:	1,
+  d:    1;
+PRODUCE
+  p6 :  1;
+
+
+{ END OF FILE }

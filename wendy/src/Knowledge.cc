@@ -45,6 +45,7 @@ Knowledge::Knowledge(InnerMarking_ID m)
     todo.push(m, empty);
 
     //++maxid;
+
     // check if initial marking is already bad
     if (InnerMarking::inner_markings[m]->is_bad) {
         is_sane = 0;
@@ -181,29 +182,35 @@ Knowledge::~Knowledge() {
  * MEMBER FUNCTIONS *
  ********************/
 
+/// calculates the minimal number of messages pending in the channels
 void Knowledge::setMinMessages(){
-	assert(Label::last_send - Label::first_send > 0);
-	assert(Label::last_receive - Label::first_receive > 0);
+	assert(Label::last_send - Label::first_send >= 0);
+	assert(Label::last_receive - Label::first_receive >= -1);
 	assert(minSendMessages == NULL);
 	assert(minReceiveMessages == NULL);
 
 	minSendMessages = new uint8_t[Label::last_send - Label::first_send + 1];
-	minReceiveMessages = new uint8_t[Label::last_receive - Label::first_receive + 1];
+
+	if (Label::last_receive - Label::first_receive >= 0){
+		minReceiveMessages = new uint8_t[Label::last_receive - Label::first_receive + 1];
+	}
 
 	Label_ID current_pos;
 
-	//init minReceiveMessages
-	for(Label_ID l = Label::first_receive; l < Label::last_receive + 1; ++l){
-		current_pos = l - Label::first_receive;
-		minReceiveMessages[current_pos] = args_info.messagebound_arg + 1;
-	}
+	if (minReceiveMessages != NULL){
+		//init minReceiveMessages
+		for(Label_ID l = Label::first_receive; l < Label::last_receive + 1; ++l){
+			current_pos = l - Label::first_receive;
+			minReceiveMessages[current_pos] = args_info.messagebound_arg + 1;
+		}
 
-	//calculate the minimal number for each receive message in the bubble
-	FOREACH(pos, bubble){
-		for (size_t i = 0; i < pos->second.size(); ++i) {
-			for(Label_ID l = Label::first_receive; l < Label::last_receive+1; ++l){
-				current_pos = l - Label::first_receive;
-				minReceiveMessages[current_pos] = pos->second[i]->getMin(minReceiveMessages[current_pos],l);
+		//calculate the minimal number for each receive message in the bubble
+		FOREACH(pos, bubble){
+			for (size_t i = 0; i < pos->second.size(); ++i) {
+				for(Label_ID l = Label::first_receive; l < Label::last_receive + 1; ++l){
+					current_pos = l - Label::first_receive;
+					minReceiveMessages[current_pos] = pos->second[i]->getMin(minReceiveMessages[current_pos],l);
+				}
 			}
 		}
 	}
@@ -218,11 +225,17 @@ void Knowledge::setMinMessages(){
 	//(only the markings having the minimal receive messages are considered)
 	bool consider;
 	FOREACH(pos, bubble){
+
 		for (size_t i = 0; i < pos->second.size(); ++i) {
+
 			consider = true;
+
 			//do we need consider the current interface marking?
 			for(Label_ID l = Label::first_receive; l < Label::last_receive + 1; ++l){
+
+				assert(minReceiveMessages != NULL);
 				current_pos = l - Label::first_receive;
+
 				if (not pos->second[i]->isEqual(minReceiveMessages[current_pos],l)){
 					consider = false;
 //					break;
@@ -237,6 +250,9 @@ void Knowledge::setMinMessages(){
 			}
 		}
 	}
+
+	//assert(minSendMessages != NULL or Label::last_send - Label::first_send == -1);
+	assert(minReceiveMessages != NULL or Label::last_receive - Label::first_receive == -1);
 }
 
 /*!

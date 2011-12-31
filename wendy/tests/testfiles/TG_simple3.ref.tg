@@ -1,0 +1,15 @@
+{
+  generator:    Wendy 3.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy TG_simple3.owfn --verbose --showWaitstates --showTransients --tg -f ogConform --dot=-
+  events:       1 send, 0 receive, 0 synchronous
+  statistics:   2 nodes
+}
+
+INTERFACE
+  OUTPUT
+    a;
+
+NODES
+  145803576 : a
+    a -> 145806056
+  145806056 : final

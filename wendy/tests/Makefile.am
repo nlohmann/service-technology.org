@@ -56,7 +56,14 @@ TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
             bug16258-1.owfn bug16258-2.owfn deliver_goods.owfn \
             bug17896.owfn \
             LF_trueAnnotations.owfn \
-            tg_ICSOC2011_acyclic.owfn tg_ICSOC2011_acyclic.ref.tg
+            TG_ICSOC2011_acyclic.owfn TG_ICSOC2011_acyclic.owfn.pdf TG_ICSOC2011_acyclic.ref.tg TG_ICSOC2011_acyclic.ref.tg.pdf \
+                     TG_coverage.owfn          TG_coverage.owfn.pdf          TG_coverage.ref.tg          TG_coverage.ref.tg.pdf \
+                      TG_simple1.owfn           TG_simple1.owfn.pdf           TG_simple1.ref.tg           TG_simple1.ref.tg.pdf \
+                      TG_simple2.owfn           TG_simple2.owfn.pdf           TG_simple2.ref.tg           TG_simple2.ref.tg.pdf \
+                      TG_simple3.owfn           TG_simple3.owfn.pdf           TG_simple3.ref.tg           TG_simple3.ref.tg.pdf \
+                      TG_simple4.owfn           TG_simple4.owfn.pdf           TG_simple4.ref.tg           TG_simple4.ref.tg.pdf \
+                      TG_simple5.owfn           TG_simple5.owfn.pdf           TG_simple5.ref.tg           TG_simple5.ref.tg.pdf 
+
 
 #-----------------------------------------#
 # Part 2: Exclusions for the Cover Script #

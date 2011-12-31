@@ -1,0 +1,15 @@
+{
+  generator:    Wendy 3.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy tests/testfiles/TG_simple3.owfn --tg -f tgConform --dot=-
+  events:       1 send, 0 receive, 0 synchronous
+  statistics:   2 nodes
+}
+
+INTERFACE
+  OUTPUT
+    a;
+
+NODES
+  149584696 : a
+    a -> 149589824
+  149589824 : true [FINAL]

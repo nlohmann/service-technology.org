@@ -80,7 +80,6 @@ class Knowledge {
         /// whether this knowledge is sane
         unsigned is_sane : 1;
 
-
     private: /* attributes */
         /// reduction rule: smart send events; array of sending events that are either possible or not
         char* posSendEventsDecoded;

@@ -182,13 +182,15 @@ void StoredKnowledge::processNode(Knowledge* const K, StoredKnowledge* const SK)
     SK->evaluateKnowledge();
 
     //for test guidelines: delete edges labeled with a sending message not weak receivable by the service
-    if(args_info.tg_given and SK != empty){// and SK->is_sane ){
+    if(args_info.tg_given and SK != empty and Label::last_send - Label::first_send >= 0){
     	assert(SK->s_minMessages == NULL);
 
     	K->setMinMessages();
     	SK->s_minReceiveMessages = K->minReceiveMessages;
     	SK->s_minSendMessages = K->minSendMessages;
+
     	SK->s_minMessages = new uint8_t[Label::last_send - Label::first_send + 1];
+
 
     	//init minMessages
     	Label_ID current_pos;
@@ -894,6 +896,7 @@ void StoredKnowledge::print(std::ostream& file) const {
 */
 std::string StoredKnowledge::formula(bool dot) const {
     set<string> sendDisjunction;
+    bool isFinal = false;
 
     // represents the formula (set of disjunctions which each are a set again)
     set<set<string> > conjunctionOfDisjunctions;
@@ -940,8 +943,19 @@ std::string StoredKnowledge::formula(bool dot) const {
         }
 
         // deadlock is final
-        if (interface[i]->unmarked() and InnerMarking::inner_markings[inner[i]]->is_final) {
+        if (not args_info.tg_given and interface[i]->unmarked() and InnerMarking::inner_markings[inner[i]]->is_final) {
             disjunctionSendingReceivingSynchronous.insert("final");
+        }
+
+        // final for TG
+        if (args_info.tg_given and interface[i]->receiveUnmarked() and InnerMarking::inner_markings[inner[i]]->is_final) {
+        	if (args_info.format_arg == format_arg_tgConform){
+        		isFinal = true;
+        	}
+        	else {
+        		assert(args_info.format_arg == format_arg_ogConform);
+        		disjunctionSendingReceivingSynchronous.insert("final");
+        	}
         }
 
         // add clause
@@ -983,12 +997,25 @@ std::string StoredKnowledge::formula(bool dot) const {
         }
     }
 
+
     // required for diagnose mode in which a non-final node might have no
     // successors
     if (formula.empty()) {
-        formula = "false";
+
+    	if(args_info.tg_given){
+    		//assert(false);
+    		formula = "true";
+    	}
+    	else {
+    		formula = "false";
+    	}
+
 
         ++countLiterals;
+    }
+
+    if (args_info.tg_given and args_info.format_arg == format_arg_tgConform and isFinal){
+    	formula += " [FINAL]";
     }
 
     if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
@@ -1082,7 +1109,7 @@ void StoredKnowledge::output_dot(std::ostream& file) {
                     }
                 }
 
-                if (args_info.tg_given){
+                if (args_info.tg_given and args_info.verbose_given and Label::last_send - Label::first_send >= 0){
                 	Label_ID current_pos;
                 	file << "R: [";
                 	for(Label_ID l1 = Label::first_receive; l1 < Label::last_receive + 1; ++l1){

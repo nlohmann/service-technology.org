@@ -126,7 +126,7 @@ code
 
 code:before 
 {
-  content: "$";
+  content: "$ ";
   color: #eee;
 }
 

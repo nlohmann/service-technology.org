@@ -1,9 +1,10 @@
 ﻿#universities 
 {
-  float: left;
   padding-right: 20px;
   padding-left: 20px;
-  padding-top: 10px;
+  padding-top: 50px;
+  text-align: center;
+  
 }  
 
 #universities img 
@@ -13,6 +14,7 @@
   margin-top: 0px;
   margin-right: 20px;
   opacity:0.9;
+  border: 0;
 }
 
 #universities img:hover 
@@ -38,6 +40,7 @@
 
 #mw 
 {
+  display: none;
   position: relative;
   left: 55px;
   top: 20px;
@@ -109,4 +112,55 @@
 {
   text-align: right;
 }
+
+#picture-header-wrapper {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  background: -webkit-linear-gradient(top, #fff 0%,#fcfcfc 100%, rgba(41,184,229,1) 87%,rgba(2,174,237,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -moz-linear-gradient(top, #fff 0%,#fcfcfc 100%, rgba(41,184,229,1) 87%,rgba(2,174,237,1) 100%); /* Chrome10+,Safari5.1+ */
+
+  padding: 0;
+  border-top: 1px #fafafa solid;
+  border-bottom: 1px #fafafa solid;
+   padding-top: 20px;
+  box-shadow: 0px 0px 4px #bbb; 
+ }
+
+#picture-header {
+  position: relative;
+  margin: 0px auto;
+  width: 666px;
+  height: 222px;
+}
+
+#picture-header .picture {
+  position: relative;
+  margin: 10px;
+  border: 1px #bbb solid;
+  padding: 0;
+  box-shadow: 0px 0px 2px #bbb; 
+  height: 200px;
+  display: block;
+  float: left;
+}
+
+.klebchen {
+/*  background: url(../g/klebestreifen.png) no-repeat;*/
+  background: rgba(239,227,2,0.9);
+  -webkit-transform:rotate(-2deg);
+  -moz-transform:rotate(-2deg);
+  border: 3px rgba(239,227,2,1) solid;
+  width: 80px;
+  height: 25px;
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  top: -18px;
+  left: 60px;
+  z-index: 20;
+  box-shadow: 0px 2px 4px #bbb;    
+}
+
+
 

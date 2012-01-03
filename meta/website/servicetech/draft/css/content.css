@@ -1,7 +1,6 @@
 
 #content h2
 {
-	border-bottom:1px solid #efefef;
 	color:#444;
 	font-size:29px;
 	margin-bottom:5px;
@@ -31,7 +30,7 @@
 	line-height:32px;
 	margin:2px 0 0;
 }
-
+/*
 #content div
 {
 	color:#000;
@@ -39,6 +38,7 @@
 	line-height:32px;
 	margin:2px 0 0;
 }
+*/
 
 img.portrait
 {

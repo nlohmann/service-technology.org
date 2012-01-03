@@ -9,7 +9,8 @@ html
 body
 {
 	background:#aaa9a9;
-	font-family:'Open Sans Condensed', 'helvetica neue', 'arial narrow', helvetica, arial;
+	font-family:'Open Sans', helvetica, arial;
+  font-weight: 300;
 	height:100%;
 	margin:0;
 	padding:0;
@@ -48,10 +49,12 @@ body
 #navigation
 {
 	box-shadow:0 0 2px #333;
+	font-family:'Open Sans Condensed', 'helvetica neue', 'arial narrow', helvetica, arial;
 }
 
 #header
 {
+	font-family:'Open Sans Condensed', 'helvetica neue', 'arial narrow', helvetica, arial;
 	background:#FFF;
 	height:102px;
 	padding-bottom:8px;
@@ -60,6 +63,7 @@ body
 }
 
 #bigheader {
+	font-family:'Open Sans Condensed', 'helvetica neue', 'arial narrow', helvetica, arial;
 margin: 0; 
 padding: 0; 
 position: relative; 

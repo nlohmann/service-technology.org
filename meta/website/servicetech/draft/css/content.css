@@ -5,6 +5,8 @@
 	font-size:29px;
 	margin-bottom:5px;
 	text-transform:uppercase;
+  	font-family:'Open Sans Condensed', 'helvetica neue', 'arial narrow', helvetica, arial;
+
 }
 
 #content h3
@@ -20,6 +22,7 @@
 	text-transform:uppercase;
 	webkit-break-after:avoid;
 	webkit-break-before:column;
+	font-family:'Open Sans Condensed', 'helvetica neue', 'arial narrow', helvetica, arial;
 }
 
 

@@ -1,5 +1,6 @@
 ﻿#dlbutton 
 {
+	font-family:'Open Sans Condensed', 'helvetica neue', 'arial narrow', helvetica, arial;
   background: 
     url(../osicons/sidebyside.png) no-repeat right bottom, 
     url(../icons/dl-icon.png) no-repeat center left, 
@@ -37,6 +38,7 @@
 
 #livebutton 
 {
+	font-family:'Open Sans Condensed', 'helvetica neue', 'arial narrow', helvetica, arial;
   background: 
     url(../icons/browser-side-by-side.png) no-repeat right bottom, 
     url(../icons/live-icon.png) no-repeat center left, 

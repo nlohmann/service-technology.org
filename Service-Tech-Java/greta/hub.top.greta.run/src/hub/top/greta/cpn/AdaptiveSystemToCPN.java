@@ -56,7 +56,7 @@ public class AdaptiveSystemToCPN {
 
     for (Oclet o : as.getOclets()) {
       // check oclet headers for well-formedness: NAME(v1:TYPE1,v2:TYPE2,...)
-      if (o.getName().indexOf('(') == -1) {
+      if (o.getName().indexOf('(') < 0) {
         System.err.println("No HL-oclet specification: "+o.getName()+" has invalid parameters");
         return false;
       }
@@ -66,13 +66,16 @@ public class AdaptiveSystemToCPN {
       }
       
       String varDeclaration = o.getName().substring(o.getName().indexOf('(')+1,o.getName().lastIndexOf(')'));
-      String varDeclarations[] = varDeclaration.split(",");
-      
-      for (String v : varDeclarations) {
-        String v2[] = v.split(":");
-        if (v2.length != 2) {
-          System.err.println("No HL-oclet specification: "+o.getName()+" has invalid parameter specification: "+v);
-          return false;
+      if (varDeclaration.length() > 0) {
+        // check well-formedness of non-empty variable declarations
+        String varDeclarations[] = varDeclaration.split(",");
+        
+        for (String v : varDeclarations) {
+          String v2[] = v.split(":");
+          if (v2.length != 2) {
+            System.err.println("No HL-oclet specification: "+o.getName()+" has invalid parameter specification: "+v);
+            return false;
+          }
         }
       }
       
@@ -85,18 +88,20 @@ public class AdaptiveSystemToCPN {
             getToken(c.getName());
           } catch (Exception ex) {
             System.err.println("No HL-oclet specification: "+n.getName()+" in "+o.getName()+" (precondition) has invalid format");
+            ex.printStackTrace();
             return false;
           }
         }
       }
       for (Node n : o.getDoNet().getNodes()) {
-        if (n instanceof Condition) {
+        if (n instanceof Condition && !n.isAbstract()) {
           Condition c = (Condition)n;
           try {
             getPlaceName(c.getName());
             getToken(c.getName());
           } catch (Exception ex) {
             System.err.println("No HL-oclet specification: "+n.getName()+" in "+o.getName()+" (contribution) has invalid format");
+            ex.printStackTrace();
             return false;
           }
         }
@@ -104,7 +109,7 @@ public class AdaptiveSystemToCPN {
     }
     
     for (Node n : as.getAdaptiveProcess().getNodes()) {
-      if (n instanceof Condition) {
+      if (n instanceof Condition && !n.isAbstract()) {
         Condition c = (Condition)n;
         try {
           getPlaceName(c.getName());
@@ -325,27 +330,29 @@ public class AdaptiveSystemToCPN {
     for (Oclet o : as.getOclets()) {
       
       String varDeclaration = o.getName().substring(o.getName().indexOf('(')+1,o.getName().indexOf(')'));
-      String varDeclarations[] = varDeclaration.split(",");
-      
-      for (String v : varDeclarations) {
-        String v2[] = v.split(":");
+      if (varDeclaration.length() > 0) {
+        String varDeclarations[] = varDeclaration.split(",");
         
-        boolean alreadyDeclared = false;
-        
-        for (HLDeclaration decl : net.declaration()) {
-          if (decl.getStructure() != null
-              && decl.getStructure() instanceof VariableDeclaration)
-          {
-            for (String varNames : ((VariableDeclaration)decl.getStructure()).getVariables()) {
-              if (varNames.equals(v2[0])) alreadyDeclared = true;
+        for (String v : varDeclarations) {
+          String v2[] = v.split(":");
+          
+          boolean alreadyDeclared = false;
+          
+          for (HLDeclaration decl : net.declaration()) {
+            if (decl.getStructure() != null
+                && decl.getStructure() instanceof VariableDeclaration)
+            {
+              for (String varNames : ((VariableDeclaration)decl.getStructure()).getVariables()) {
+                if (varNames.equals(v2[0])) alreadyDeclared = true;
+              }
             }
           }
+          
+          if (!alreadyDeclared) {
+            build.declareVariable(net, v2[0], v2[1]);
+          }
+  
         }
-        
-        if (!alreadyDeclared) {
-          build.declareVariable(net, v2[0], v2[1]);
-        }
-
       }
       
       for (Node n : o.getDoNet().getNodes()) {
@@ -397,6 +404,8 @@ public class AdaptiveSystemToCPN {
       
       for (Condition c : e.getPreConditions()) {
         
+        if (c.isAbstract()) continue; // do not translate abstract conditions
+        
         String type = "INT";
         String placeName = getPlaceName(c.getName());
         String arcExpression = getToken(c.getName());
@@ -413,6 +422,8 @@ public class AdaptiveSystemToCPN {
       }
       
       for (Condition c : e.getPostConditions()) {
+        
+        if (c.isAbstract()) continue; // do not translate abstract conditions
         
         String type = "INT";
         String placeName = getPlaceName(c.getName());

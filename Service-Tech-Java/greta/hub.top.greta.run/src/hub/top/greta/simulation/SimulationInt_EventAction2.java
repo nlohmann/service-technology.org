@@ -180,6 +180,16 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
         if (b.pre == null || b.pre.length == 0) continue;
         
         DNode e = b.pre[0];
+        
+        // collect all systems events that contributed to firing this event
+        Event[] e_cause = new Event[e.causedBy.length];
+        for (int i = 0; i<e.causedBy.length; i++) {
+          for (DNode e_system : bp.getSystem().fireableEvents) {
+            if (e_system.globalId == e.causedBy[i]) {
+              e_cause[i] = (Event)system.getOriginalNode(e_system);
+            }
+          }
+        }
 
         boolean isHLenabled;
         
@@ -194,7 +204,16 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
             
             Map<String, String> toConsume = rc.a2c.getSourceTokens(bind);
             
-            if (bind.getTransitionInstance().getNode().getName().getText().equals(system.properNames[e.id])) {
+            boolean is_binding_for_event = false;
+            System.out.println(rc.a2c.eventToTransition);
+            for (Event e_system : e_cause) {
+              System.out.println(rc.a2c.eventToTransition.get(e_system)+" == "+bind.getTransitionInstance().getNode());
+              if (rc.a2c.eventToTransition.get(e_system) == bind.getTransitionInstance().getNode())
+                is_binding_for_event = true;
+            }
+            
+            //if (bind.getTransitionInstance().getNode().getName().getText().equals(system.properNames[e.id])) {
+            if (is_binding_for_event) {
   
               System.out.println(bind);
               

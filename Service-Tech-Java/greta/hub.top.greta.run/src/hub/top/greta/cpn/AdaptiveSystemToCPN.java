@@ -33,11 +33,13 @@ import org.cpntools.accesscpn.model.HLDeclaration;
 import org.cpntools.accesscpn.model.declaration.VariableDeclaration;
 import org.cpntools.accesscpn.model.exporter.DOMGenerator;
 import org.cpntools.accesscpn.model.util.BuildCPNUtil;
+import org.eclipse.core.internal.localstore.IsSynchronizedVisitor;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.emf.ecore.xmi.impl.StringSegment;
 
 public class AdaptiveSystemToCPN {
   
@@ -322,10 +324,33 @@ public class AdaptiveSystemToCPN {
   }
   
   private Map<String,String> placeTypes;
+  public Map<Event, org.cpntools.accesscpn.model.Transition> eventToTransition;
+  
+  /**
+   * Check if the give variable is already declared. If yes, return the
+   * type of the declaration. If not, return {@code null}.
+   * @param varName
+   * @return type of an existing declaration or {@code null} if not declared
+   */
+  private String isVariableDeclared(String varName) {
+    for (HLDeclaration decl : net.declaration()) {
+      if (decl.getStructure() != null
+          && decl.getStructure() instanceof VariableDeclaration)
+      {
+        for (String varNames : ((VariableDeclaration)decl.getStructure()).getVariables()) {
+          if (varNames.equals(varName)) {
+            return ((VariableDeclaration)decl.getStructure()).getTypeName();
+          }
+        }
+      }
+    }
+    return null;
+  }
   
   public void convertEventsToTransitions(AdaptiveSystem as) {
     
     List<Event> events = new LinkedList<Event>();
+    eventToTransition = new HashMap<Event, org.cpntools.accesscpn.model.Transition>();
     
     for (Oclet o : as.getOclets()) {
       
@@ -336,28 +361,14 @@ public class AdaptiveSystemToCPN {
         for (String v : varDeclarations) {
           String v2[] = v.split(":");
           
-          boolean alreadyDeclared = false;
-          
-          for (HLDeclaration decl : net.declaration()) {
-            if (decl.getStructure() != null
-                && decl.getStructure() instanceof VariableDeclaration)
-            {
-              for (String varNames : ((VariableDeclaration)decl.getStructure()).getVariables()) {
-                if (varNames.equals(v2[0])) alreadyDeclared = true;
-              }
-            }
-          }
-          
-          if (!alreadyDeclared) {
+          if (isVariableDeclared(v2[0]) == null) {
             build.declareVariable(net, v2[0], v2[1]);
           }
-  
         }
       }
       
       for (Node n : o.getDoNet().getNodes()) {
-        if (n instanceof Event)
-          
+        if (n instanceof Event && !n.isAbstract())
           events.add((Event)n);
       }
     }
@@ -389,6 +400,50 @@ public class AdaptiveSystemToCPN {
     }
   }
   
+  public static boolean isConstant(String s) {
+    // check for string constants
+    if (s.indexOf(0) == '\"' && s.indexOf(s.length()-1) == '\"') return true;
+    if (s.indexOf(0) == '\'' && s.indexOf(s.length()-1) == '\'') return true;
+    // check for number constants
+    boolean allDigits = true;
+    for (int i=0;i<s.length();i++) allDigits &= Character.isDigit(s.charAt(i));
+    if (allDigits) return true;
+    
+    return false;
+  }
+  
+  public static String convertToVariableString(String s) {
+    
+    if (isConstant(s)) return s;
+    
+    s = s.replace('*', '_');
+    s = s.replace('+', '_');
+    s = s.replace('-', '_');
+    s = s.replace('/', '_');
+    //s = s.replace('(', '_');
+    //s = s.replace(')', '_');
+    s = s.replace(' ', '_');
+    
+    // strip leading underscores (CPN Tools doesn't like that)
+    while (s.charAt(0) == '_' && s.length() > 0) s = s.substring(1);
+    
+    return s;
+  }
+  
+  private static String replaceAll(String str, String pattern, String replace) {
+    int s = 0;
+    int e = 0;
+    StringBuffer result = new StringBuffer();
+
+    while ((e = str.indexOf(pattern, s)) >= 0) {
+        result.append(str.substring(s, e));
+        result.append(replace);
+        s = e+pattern.length();
+    }
+    result.append(str.substring(s));
+    return result.toString();
+  }
+  
   public void convertEventsToTransitions(Collection<Event> events) {
     
     Map<String, org.cpntools.accesscpn.model.Place> places = new HashMap<String, org.cpntools.accesscpn.model.Place>();
@@ -398,9 +453,13 @@ public class AdaptiveSystemToCPN {
       String ocletName = ((Oclet)e.eContainer().eContainer()).getName();
       ocletName = ocletName.substring(0, ocletName.indexOf('('));
       
-      String transitionName = getTransitionName(e.getName());
+      // append a number to transition names to distinguish transitions with the same label in different scenarios
+      String transitionName = getTransitionName(e.getName())+"_"+eventToTransition.size();
       String transitionGuard = getTransitionGuard(e.getName());
       org.cpntools.accesscpn.model.Transition t = build.addTransition(eventPage, transitionName, transitionGuard);
+      eventToTransition.put(e, t);
+      
+      Map<String, String> expressionVariable = new HashMap<String, String>();
       
       for (Condition c : e.getPreConditions()) {
         
@@ -412,13 +471,27 @@ public class AdaptiveSystemToCPN {
         
         if (placeTypes.containsKey(placeName)) type = placeTypes.get(placeName);
         
+        if (!isConstant(arcExpression)) {
+          // for incoming arcs, we can only take simple variables to find the binding, replace
+          // complex expressions by variable names, remember the replacement for the post-set
+          expressionVariable.put(arcExpression, convertToVariableString(arcExpression));
+          
+          // all tokens on that place have the same type: variable has this type, declare variable
+          // if this has not been done yet and check type consistency
+          if (isVariableDeclared(expressionVariable.get(arcExpression)) == null)
+              build.declareVariable(net, expressionVariable.get(arcExpression), type);
+          else if (!isVariableDeclared(expressionVariable.get(arcExpression)).equals(type)) {
+            System.err.println("Arc expression "+arcExpression+" from "+c.getName()+" to "+e.getName()+" has the wrong type ("+isVariableDeclared(expressionVariable.get(arcExpression))+"), expected: "+type);
+          }
+        }
+        
         if (!places.containsKey(placeName)) {
           String marking = getMarkingString(placeName);
           org.cpntools.accesscpn.model.Place p = build.addPlace(eventPage, placeName, type, marking);
           places.put(placeName, p);
         }
         
-        build.addArc(eventPage, places.get(placeName), t, arcExpression);
+        build.addArc(eventPage, places.get(placeName), t, expressionVariable.get(arcExpression));
       }
       
       for (Condition c : e.getPostConditions()) {
@@ -428,6 +501,13 @@ public class AdaptiveSystemToCPN {
         String type = "INT";
         String placeName = getPlaceName(c.getName());
         String arcExpression = getToken(c.getName());
+
+        // we replaced the expressions at incoming arcs by variable names, now replace
+        // at the outgoing arcs all occurrences of the incoming-arc-expressions by the
+        // corresponding variable name
+        for (String subExp : expressionVariable.keySet()) {
+          arcExpression = replaceAll(arcExpression, subExp, expressionVariable.get(subExp));
+        }
         
         if (placeTypes.containsKey(placeName)) type = placeTypes.get(placeName);
         

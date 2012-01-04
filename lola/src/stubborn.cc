@@ -34,12 +34,23 @@ void insert_global_down(formula*);
 extern unsigned int* checkstart;
 extern Transition* LastAttractor;  ///< Last transition in list of
 
-/// \todo vielleicht static zu NewStubbStamp() machen?
 unsigned int StubbStamp = 0;
 
+void NewStubbStamp() {
+    if (StubbStamp < UINT_MAX) {
+        ++StubbStamp;
+    } else {
+        for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; ++i) {
+            Globals::Transitions[i]->stamp = 0;
+        }
+        StubbStamp = 1;
+    }
+}
 
 void stubbornclosure() {
     Transition::NrStubborn = 0;
+
+    // iterate stubborn list
     for (Transition* current = Transition::StartOfStubbornList; current; current = current->NextStubborn) {
 #ifdef EXTENDEDCTL
         if (!(current->pathrestriction[TemporalIndex])) {
@@ -55,6 +66,8 @@ void stubbornclosure() {
             }
 #endif
         }
+
+        // add all mustbeincluded to StubbornList if not already included
         for (int i = 0; current->mustbeincluded[i]; i++) {
             if (not current->mustbeincluded[i]->instubborn) {
                 current->mustbeincluded[i]->instubborn = true;
@@ -102,16 +115,30 @@ void sortscapegoats() {
     }
 }
 
+/*!
+\brief adds transition to the StubbornList
+
+The StubbornList is a single linked list that is organized by the pointers
+  * Transition::StartOfStubbornList (static - pointer to the start of the list)
+  * Transition::EndOfStubbornList (static - pointer to the end of the list)
+  * Transition.NextStubborn (member - pointer to next transition)
+*/
 void stubborninsert(Transition* t) {
+    // is transition already in the list?
     if (t->instubborn) {
         return;
     }
+
+    // prepare this transition
     t->instubborn = true;
     t->NextStubborn = NULL;
+
     if (Transition::StartOfStubbornList) {
+        // add transition to end of list
         Transition::EndOfStubbornList->NextStubborn = t;
         Transition::EndOfStubbornList = t;
     } else {
+        // list is empty - the transition *is* the list
         Transition::StartOfStubbornList = Transition::EndOfStubbornList = t;
     }
 }
@@ -685,17 +712,6 @@ Transition** stubbornfirelistreach() {
     return result;
 }
 
-void NewStubbStamp() {
-    if (StubbStamp < UINT_MAX) {
-        ++StubbStamp;
-    } else {
-        for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; ++i) {
-            Globals::Transitions[i]->stamp = 0;
-        }
-        StubbStamp = 1;
-    }
-}
-
 /*!
  Computes stubborn set without goal orientation. The TSCC based optimisation
  is included.
@@ -841,7 +857,8 @@ Transition** structreachstubbornset() {
         insert_global_up(F);
         stubbornclosure();
         Transition** result = new Transition * [Transition::NrStubborn + 5];
-        for (Transition* t = Transition::StartOfStubbornList, i = 0; t; t = t->NextStubborn) {
+        i = 0;
+        for (Transition* t = Transition::StartOfStubbornList; t; t = t->NextStubborn) {
             t->instubborn = false;
             if (t->enabled) {
                 result[i++] = t;

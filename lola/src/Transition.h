@@ -49,7 +49,7 @@ class Transition: public Node {
         static Transition* EndOfStubbornList;  ///< Anchor to end of stubborn set
         static unsigned int NrStubborn; ///< Nr. of enabled (!) transitions in stubborn set
         Transition* NextStubborn;  ///< stubborn set is organized as a single linked list
-        unsigned int instubborn; ///< This transition in stubborn set?
+        bool instubborn; ///< This transition in stubborn set?
         Place* scapegoat;  ///< insufficiently marked place for disabled transition
         Transition** mustbeincluded;  ///< If this transition is in a stubborn set, these ones must be, too
         Transition** conflicting;  ///< Transitions that can disable this transition, used as mustbeincluded
@@ -217,6 +217,7 @@ inline void Transition::initialize() {
     }
     DecrPlaces[k] = UINT_MAX;
     Decr[k] = 0;
+
     // Create list of transitions where enabledness can change
     // if this transition fires. For collecting these transitions, we
     // abuse the Enabled linked list
@@ -239,6 +240,7 @@ inline void Transition::initialize() {
         ImproveEnabling[i] = StartOfEnabledList;
     }
     ImproveEnabling[i] = NULL;
+
     // Create list of transitions where enabledness can change
     // if this transition fires. For collecting these transitions, we
     // abuse the Enabled linked list
@@ -261,8 +263,9 @@ inline void Transition::initialize() {
         ImproveDisabling[i] = StartOfEnabledList;
     }
     ImproveDisabling[i] = NULL;
+
 #ifdef STUBBORN
-    // Create list of conflicting transitions. If this  transition is enabled nd member of a
+    // Create list of conflicting transitions. If this transition is enabled and member of a
     // stubborn set then these transitions must be in the stubborn set, too.
     StartOfEnabledList = NULL;
     NrEnabled = 0;
@@ -279,6 +282,8 @@ inline void Transition::initialize() {
             }
         }
     }
+
+    // create "conflicting" array, copy data from EnabledList and reset EnabledList
     conflicting = new Transition * [NrEnabled + 1];
     for (i = 0; StartOfEnabledList; StartOfEnabledList = StartOfEnabledList -> NextEnabled, i++) {
         StartOfEnabledList->enabled = false;
@@ -287,6 +292,7 @@ inline void Transition::initialize() {
     conflicting[i] = NULL;
     mustbeincluded = conflicting;
 #endif
+
     NrEnabled = 0;
     set_hashchange();
 }

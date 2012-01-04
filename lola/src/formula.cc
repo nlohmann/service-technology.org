@@ -207,57 +207,32 @@ void atomicformula::evaluateatomic(State* s) {
 #ifdef MODELCHECKING
     switch (type) {
         case eq:
-            if (Globals::CurrentMarking[p->index] == k) {
-                s->value[index] = true;
-
-            } else {
-                s->value[index] = false;
-            }
+            s->value[index] = (Globals::CurrentMarking[p->index] == k);
             s->known[index] = true;
             break;
+
         case neq:
-            if (Globals::CurrentMarking[p->index] != k) {
-                s->value[index] = true;
-
-            } else {
-                s->value[index] = false;
-            }
+            s->value[index] = (Globals::CurrentMarking[p->index] != k);
             s->known[index] = true;
             break;
+
         case leq:
-            if (Globals::CurrentMarking[p->index] <= k) {
-                s->value[index] = true;
-
-            } else {
-                s->value[index] = false;
-            }
+            s->value[index] = (Globals::CurrentMarking[p->index] <= k);
             s->known[index] = true;
             break;
+
         case geq:
-            if (Globals::CurrentMarking[p->index] >= k) {
-                s->value[index] = true;
-
-            } else {
-                s->value[index] = false;
-            }
+            s->value[index] = (Globals::CurrentMarking[p->index] >= k);
             s->known[index] = true;
             break;
+
         case lt:
-            if (Globals::CurrentMarking[p->index] < k) {
-                s->value[index] = true;
-
-            } else {
-                s->value[index] = false;
-            }
+            s->value[index] = (Globals::CurrentMarking[p->index] < k);
             s->known[index] = true;
             break;
-        case gt:
-            if (Globals::CurrentMarking[p->index] > k) {
-                s->value[index] = true;
 
-            } else {
-                s->value[index] = false;
-            }
+        case gt:
+            s->value[index] = (Globals::CurrentMarking[p->index] > k);
             s->known[index] = true;
             break;
     }
@@ -297,37 +272,24 @@ void untilformula::evaluateatomic(State* s) {
 bool atomicformula::initatomic() {
     switch (type) {
         case  eq:
-            if (Globals::CurrentMarking[p->index] == k) {
-                return(value = true);
-            }
-            return(value = false);
-        case neq:
-            if (Globals::CurrentMarking[p->index] != k) {
-                return(value = true);
-            }
-            return(value = false);
-        case leq:
-            if (Globals::CurrentMarking[p->index] <= k) {
-                return(value = true);
-            }
-            return(value = false);
-        case geq:
-            if (Globals::CurrentMarking[p->index] >= k) {
-                return(value = true);
-            }
-            return(value = false);
-        case  lt:
-            if (Globals::CurrentMarking[p->index] < k) {
-                return(value = true);
-            }
-            return(value = false);
-        case  gt:
-            if (Globals::CurrentMarking[p->index] > k) {
-                return(value = true);
-            }
-            return(value = false);
+            return (value = (Globals::CurrentMarking[p->index] == k));
 
-            // Karsten muss das checken!
+        case neq:
+            return (value = (Globals::CurrentMarking[p->index] != k));
+
+        case leq:
+            return (value = (Globals::CurrentMarking[p->index] <= k));
+
+        case geq:
+            return (value = (Globals::CurrentMarking[p->index] >= k));
+
+        case  lt:
+            return (value = (Globals::CurrentMarking[p->index] < k));
+
+        case  gt:
+            return (value = (Globals::CurrentMarking[p->index] > k));
+
+        // Karsten muss das checken!
         default: /* this should not happen */
             assert(false);
             return false;
@@ -335,27 +297,26 @@ bool atomicformula::initatomic() {
 }
 
 bool unarybooleanformula::initatomic() {
-    if (sub->initatomic()) {
-        return (value = false);
-    }
-    return(value = true);
+    return (value = sub->initatomic() ? false : true);
 }
 
 bool binarybooleanformula::initatomic() {
     value = left->initatomic();
+
     switch (type) {
         case conj:
             if (right->initatomic()) {
                 return value;
             }
             return value = false;
+
         case disj:
             if (right->initatomic()) {
                 return value = true;
             }
             return value;
 
-            // Karsten fragen
+        // Karsten fragen
         default: /* this should not happen */
             assert(false);
             return false;
@@ -364,9 +325,8 @@ bool binarybooleanformula::initatomic() {
 
 bool booleanformula::initatomic() {
     firstvalid = cardsub;
-    unsigned int m;
 
-    m = 0;
+    unsigned int m = 0;
     while (m < firstvalid) {
         if (sub[m]->initatomic()) {
             formula* tmp;
@@ -382,17 +342,12 @@ bool booleanformula::initatomic() {
     }
     switch (type) {
         case conj:
-            if (firstvalid) {
-                return value = false;
-            }
-            return value = true;
-        case disj:
-            if (firstvalid < cardsub) {
-                return value = true;
-            }
-            return value = false;
+            return (value = firstvalid ? false : true);
 
-            // Karsten fragen
+        case disj:
+            return (value = (firstvalid < cardsub));
+
+        // Karsten fragen
         default: /* this should not happen */
             assert(false);
             return false;
@@ -412,78 +367,61 @@ bool untilformula::initatomic() {
 }
 
 formula* hlatomicformula::copy() {
-    hlatomicformula* f;
-    f = new hlatomicformula(type, ps, color);
+    hlatomicformula* f = new hlatomicformula(type, ps, color);
     f->k = k;
     return f;
 }
 
 formula* transitionformula::copy() {
-    transitionformula* f;
-    if (transition) {
-        f = new transitionformula(transition);
-    } else {
-        f = new transitionformula(hltransition, firingmode);
-    }
+    transitionformula* f = transition ?
+        new transitionformula(transition) :
+        new transitionformula(hltransition, firingmode);
     f->type = type;
     return f;
 }
 
 formula* atomicformula::copy() {
-    atomicformula* f;
-    f = new atomicformula(type, p, k);
+    atomicformula* f = new atomicformula(type, p, k);
     return f;
 }
 
 formula* unarybooleanformula::copy() {
-    unarybooleanformula* f;
-    f = new unarybooleanformula(type, sub->copy());
+    unarybooleanformula* f = new unarybooleanformula(type, sub->copy());
     return f;
 }
 
 formula* binarybooleanformula::copy() {
-    binarybooleanformula* f;
-    f = new binarybooleanformula(type, left->copy(), right->copy());
+    binarybooleanformula* f = new binarybooleanformula(type, left->copy(), right->copy());
     return f;
 }
 
 formula* booleanformula::copy() {
-    unsigned int i;
-    booleanformula* f;
-    formula** newsub;
-    newsub = new formula * [cardsub];
-    for (i = 0; i < cardsub; i++) {
+    formula** newsub = new formula * [cardsub];
+    for (unsigned int i = 0; i < cardsub; i++) {
         newsub[i] = sub[i]->copy();
     }
-    f = new booleanformula();
+    booleanformula* f = new booleanformula();
     f->type = type;
     f->sub = newsub;
     return f;
 }
 
 formula* unarytemporalformula::copy() {
-    unarytemporalformula* f;
-    if (tformula) {
-        f = new unarytemporalformula(type, element->copy(), tformula->copy());
-    } else {
-        f = new unarytemporalformula(type, element->copy(), NULL);
-    }
+    unarytemporalformula* f = tformula ?
+        new unarytemporalformula(type, element->copy(), tformula->copy()) :
+        new unarytemporalformula(type, element->copy(), NULL);
     return f;
 }
 
 formula* untilformula::copy() {
-    untilformula* f;
-    if (tformula) {
-        f = new untilformula(type, hold->copy(), goal->copy(), tformula->copy());
-    } else {
-        f = new untilformula(type, hold->copy(), goal->copy(), NULL);
-    }
+    untilformula* f = tformula ?
+        new untilformula(type, hold->copy(), goal->copy(), tformula->copy()) :
+        new untilformula(type, hold->copy(), goal->copy(), NULL);
     return f;
 }
 
 formula* quantifiedformula::copy() {
-    quantifiedformula* f;
-    f = new quantifiedformula(type, var, sub->copy());
+    quantifiedformula* f = new quantifiedformula(type, var, sub->copy());
     return f;
 }
 
@@ -492,21 +430,14 @@ formula* transitionformula::replacequantifiers() {
         return this;
     }
 
-    TrSymbol* TS;
-    unsigned int i, j;
-    fmode* fm;
-    VaSymbol* v;
-    UValue* vl;
-    char** cc;
-    char** inst;
-    unsigned int len;
-    cc = new char * [hltransition->vars->card];
-    inst = new char * [hltransition->vars->card];
-    len = strlen(hltransition->name) + 4;
-    j = 0;
-    for (i = 0; i < hltransition->vars->size; i++) {
-        for (v = static_cast<VaSymbol*>(hltransition->vars->table[i]); v; v = static_cast<VaSymbol*>(v->next)) {
-            UValue* pl;
+    char** cc = new char * [hltransition->vars->card];
+    char** inst = new char * [hltransition->vars->card];
+    unsigned int len = strlen(hltransition->name) + 4;
+
+    unsigned int j = 0;
+    for (unsigned int i = 0; i < hltransition->vars->size; i++) {
+        for (VaSymbol* v = static_cast<VaSymbol*>(hltransition->vars->table[i]); v; v = static_cast<VaSymbol*>(v->next)) {
+            fmode* fm;
             for (fm = firingmode; fm; fm = fm->next) {
                 if (fm->v == v) {
                     break;
@@ -515,8 +446,8 @@ formula* transitionformula::replacequantifiers() {
             if (!fm) {
                 yyerror("firing mode incomplete");
             }
-            vl = fm->t->evaluate();
-            pl = v->var->type->make();
+            UValue* vl = fm->t->evaluate();
+            UValue* pl = v->var->type->make();
             pl->assign(vl);
             cc[j] = pl->text();
             inst[j] = new char [strlen(v->name) + strlen(cc[j]) + 2];
@@ -527,8 +458,8 @@ formula* transitionformula::replacequantifiers() {
             j++;
         }
     }
-    char* llt;
-    llt = new char[len];
+
+    char* llt = new char[len];
     strcpy(llt, hltransition->name);
     strcpy(llt + strlen(llt), ".[");
     for (j = 0; j < hltransition->vars->card; j++) {
@@ -536,7 +467,7 @@ formula* transitionformula::replacequantifiers() {
         strcpy(llt + strlen(llt), "|");
     }
     strcpy(llt + (strlen(llt) - 1), "]");
-    TS = static_cast<TrSymbol*>(TransitionTable->lookup(llt));
+    TrSymbol* TS = static_cast<TrSymbol*>(TransitionTable->lookup(llt));
     if (!TS) {
         yyerror("transition instance does not exist");
     }
@@ -565,8 +496,7 @@ formula* binarybooleanformula::replacequantifiers() {
 }
 
 formula* booleanformula::replacequantifiers() {
-    unsigned int i;
-    for (i = 0; i < cardsub; i++) {
+    for (unsigned int i = 0; i < cardsub; i++) {
         sub[i] = sub[i]->replacequantifiers();
     }
     return this;
@@ -590,26 +520,20 @@ formula* untilformula::replacequantifiers() {
 }
 
 formula* hlatomicformula::replacequantifiers() {
-    atomicformula* f;
-    int kk;
-    UValue* vl;
-    vl = k->evaluate();
+    UValue* vl = k->evaluate();
     if (k < 0) {
         yyerror("atomic formula compares with negative value");
     }
-    kk = static_cast<UNumValue*>(vl)->v;
+    int kk = static_cast<UNumValue*>(vl)->v;
     if (!color) {
         return new atomicformula(type, ps->place, kk);
     }
 
-    UValue* pv;
-    pv = ps->sort->make();
+    UValue* pv = ps->sort->make();
     vl = color->evaluate();
     pv->assign(vl);
-    char* inst;
-    inst = pv->text();
-    char* ll;
-    ll = new char [strlen(ps->name) + strlen(inst) + 2];
+    char* inst = pv->text();
+    char* ll = new char [strlen(ps->name) + strlen(inst) + 2];
     strcpy(ll, ps->name);
     strcpy(ll + strlen(ll), ".");
     strcpy(ll + strlen(ll), inst);
@@ -620,14 +544,12 @@ formula* hlatomicformula::replacequantifiers() {
     if (ps->sort) {
         yyerror("mixed up HL and LL place names");
     }
-    f = new atomicformula(type, ps->place, kk);
+    atomicformula* f = new atomicformula(type, ps->place, kk);
     return f;
 }
 
 formula* quantifiedformula::replacequantifiers() {
-    unsigned int i;
-    booleanformula* f;
-    f = new booleanformula();
+    booleanformula* f = new booleanformula();
     if (type == qa) {
         f->type = conj;
     } else {
@@ -636,6 +558,8 @@ formula* quantifiedformula::replacequantifiers() {
     f->cardsub = var->type->size;
     f->sub = new formula * [var->type->size + 1];
     f->sub[0] = sub;
+
+    unsigned int i;
     for (i = 1; i < var->type->size; i++) {
         f->sub[i] = sub->copy();
     }
@@ -695,13 +619,11 @@ formula* untilformula::merge() {
 }
 
 formula* binarybooleanformula::merge() {
-    booleanformula* f;
-    f = new booleanformula();
+    booleanformula* f = new booleanformula();
     f->type = type;
     f->cardsub = counttype(type);
     f->sub = new formula * [f->cardsub + 1];
-    unsigned int i;
-    i = left->collectsubs(type, f->sub, 0);
+    unsigned int i = left->collectsubs(type, f->sub, 0);
     i = right->collectsubs(type, f->sub, i);
     for (i = 0; i < f->cardsub; i++) {
         f->sub[i]->parent = f;
@@ -716,8 +638,7 @@ formula* binarybooleanformula::merge() {
 
 
 formula* booleanformula::merge() {
-    booleanformula* f;
-    f = new booleanformula();
+    booleanformula* f = new booleanformula();
     f->cardsub = counttype(type);
     f->type = type;
     f->sub = new formula * [f->cardsub + 1];
@@ -737,17 +658,11 @@ formula* booleanformula::merge() {
 }
 
 bool transitionformula::evaluatetransition(Transition* t) {
-    if (transition == t) {
-        return true;
-    }
-    return false;
+    return (transition == t);
 }
 
-bool unarybooleanformula::evaluatetransition(Transition*   t) {
-    if (sub->evaluatetransition(t)) {
-        return false;
-    }
-    return true;
+bool unarybooleanformula::evaluatetransition(Transition* t) {
+    return !(sub->evaluatetransition(t));
 }
 
 bool binarybooleanformula::evaluatetransition(Transition* t) {
@@ -764,17 +679,15 @@ bool binarybooleanformula::evaluatetransition(Transition* t) {
 }
 
 bool booleanformula::evaluatetransition(Transition* t) {
-    unsigned int i;
-
     if (type == conj) {
-        for (i = 0; i < cardsub; i++) {
+        for (unsigned int i = 0; i < cardsub; i++) {
             if (!(sub[i]->evaluatetransition(t))) {
                 return false;
             }
         }
         return true;
     } else {
-        for (i = 0; i < cardsub; i++) {
+        for (unsigned int i = 0; i < cardsub; i++) {
             if (sub[i]->evaluatetransition(t)) {
                 return true;
             }
@@ -794,26 +707,27 @@ void atomicformula::setstatic() {
     index = card ++;
 #if defined(STUBBORN) && (defined(STATEPREDICATE) || defined(LIVEPROP))
     // compute global down set for state predicate
-    unsigned int i;
     switch (type) {
         case lt:
         case leq:
-            for (i = 0; i < p->NrOfArriving; i++) {
+            for (unsigned int i = 0; i < p->NrOfArriving; i++) {
                 p->ArrivingArcs[i]->tr->down = true;
             }
             break;
+
         case gt:
         case geq:
-            for (i = 0; i < p->NrOfLeaving; i++) {
+            for (unsigned int i = 0; i < p->NrOfLeaving; i++) {
                 p->LeavingArcs[i]->tr->down = true;
             }
             break;
+
         case eq:
         case neq:
-            for (i = 0; i < p->NrOfArriving; i++) {
+            for (unsigned int i = 0; i < p->NrOfArriving; i++) {
                 p->ArrivingArcs[i]->tr->down = true;
             }
-            for (i = 0; i < p->NrOfLeaving; i++) {
+            for (unsigned int i = 0; i < p->NrOfLeaving; i++) {
                 p->LeavingArcs[i]->tr->down = true;
             }
             break;
@@ -835,8 +749,7 @@ void binarybooleanformula::setstatic() {
 }
 
 void booleanformula::setstatic() {
-    unsigned int i;
-    for (i = 0; i < cardsub; i++) {
+    for (unsigned int i = 0; i < cardsub; i++) {
         sub[i]->setstatic();
         sub[i]->parent = this;
         sub[i]->parentindex = i;
@@ -875,14 +788,13 @@ void unarytemporalformula::setstatic() {
     element->parent = this;
     index = card++;
     tempindex = tempcard++;
-    unsigned int i;
     if (tformula) {
-        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+        for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; i++) {
             Globals::Transitions[i]->pathrestriction[tempindex] = tformula->evaluatetransition(Globals::Transitions[i]);
         }
         DeadStatePathRestriction[tempindex] = tformula->evaluatetransition(NULL);
     } else {
-        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+        for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; i++) {
             Globals::Transitions[i]->pathrestriction[tempindex] = true;
         }
         DeadStatePathRestriction[tempindex] = true;
@@ -896,44 +808,37 @@ void unarytemporalformula::setstatic() {
 unsigned int subindex;
 
 void atomicformula::updateatomic() {
-    bool newvalue;
-    newvalue = false;
+    bool newvalue = false;
 
     switch (type) {
         case eq:
-            if (Globals::CurrentMarking[p->index] == k) {
-                newvalue = true;
-            }
+            newvalue = (Globals::CurrentMarking[p->index] == k);
             break;
+
         case neq:
-            if (Globals::CurrentMarking[p->index] != k) {
-                newvalue = true;
-            }
+            newvalue = (Globals::CurrentMarking[p->index] != k);
             break;
+
         case leq:
-            if (Globals::CurrentMarking[p->index] <= k) {
-                newvalue = true;
-            }
-            break;
+            newvalue = (Globals::CurrentMarking[p->index] <= k);
+
         case geq:
-            if (Globals::CurrentMarking[p->index] >= k) {
-                newvalue = true;
-            }
+            newvalue = (Globals::CurrentMarking[p->index] >= k);
             break;
+
         case gt:
-            if (Globals::CurrentMarking[p->index] > k) {
-                newvalue = true;
-            }
+            newvalue = (Globals::CurrentMarking[p->index] > k);
             break;
+
         case lt:
-            if (Globals::CurrentMarking[p->index] < k) {
-                newvalue = true;
-            }
+            newvalue = (Globals::CurrentMarking[p->index] < k);
             break;
 
         default:
             break;
     }
+
+    // if the value changed, tell parent
     if (newvalue != value) {
         value = newvalue;
         subindex = parentindex;
@@ -949,6 +854,7 @@ void unarybooleanformula::updateatomic() {
     } else {
         value = true;
     }
+
     if (parent) {
         subindex = parentindex;
         parent->updateatomic();
@@ -956,17 +862,16 @@ void unarybooleanformula::updateatomic() {
 }
 
 void booleanformula::updateatomic() {
-    formula* tmp;
     bool newvalue;
     if (sub[subindex]->value) {
         firstvalid--;
-        tmp = sub[firstvalid];
+        formula* tmp = sub[firstvalid];
         sub[firstvalid] = sub[subindex];
         sub[subindex] = tmp;
         sub[firstvalid]->parentindex = firstvalid;
         sub[subindex]->parentindex = subindex;
     } else {
-        tmp = sub[firstvalid];
+        formula* tmp = sub[firstvalid];
         sub[firstvalid] = sub[subindex];
         sub[subindex] = tmp;
         sub[firstvalid]->parentindex = firstvalid;
@@ -998,76 +903,41 @@ void booleanformula::updateatomic() {
 formula* atomicformula::reduce(int* res) {
     atomic = true;
     if (p->references) {
-        * res = 2;
+        *res = 2;
         return this;
     }
+
     switch (type) {
-        case eq:
-            if (Globals::CurrentMarking[p->index] == k) {
-                * res = 1;
-            } else {
-                * res = 0;
-            }
-            break;
-        case neq:
-            if (Globals::CurrentMarking[p->index] != k) {
-                * res = 1;
-            } else {
-                * res = 0;
-            }
-            break;
-        case leq:
-            if (Globals::CurrentMarking[p->index] <= k) {
-                * res = 1;
-            } else {
-                * res = 0;
-            }
-            break;
-        case geq:
-            if (Globals::CurrentMarking[p->index] >= k) {
-                * res = 1;
-            } else {
-                * res = 0;
-            }
-            break;
-        case lt:
-            if (Globals::CurrentMarking[p->index] < k) {
-                * res = 1;
-            } else {
-                * res = 0;
-            }
-            break;
-        case gt:
-            if (Globals::CurrentMarking[p->index] > k) {
-                * res = 1;
-            } else {
-                * res = 0;
-            }
-            break;
-        default:
-            break;
+        case  eq: *res = (Globals::CurrentMarking[p->index] == k) ? 1 : 0; break;
+        case neq: *res = (Globals::CurrentMarking[p->index] != k) ? 1 : 0; break;
+        case leq: *res = (Globals::CurrentMarking[p->index] <= k) ? 1 : 0; break;
+        case geq: *res = (Globals::CurrentMarking[p->index] >= k) ? 1 : 0; break;
+        case  lt: *res = (Globals::CurrentMarking[p->index]  < k) ? 1 : 0; break;
+        case  gt: *res = (Globals::CurrentMarking[p->index]  > k) ? 1 : 0; break;
+        default:                                                           break;
     }
+
     return NULL;
 }
 
 formula* unarybooleanformula::reduce(int* res) {
     int subres;
-    sub = sub->reduce(& subres);
+    sub = sub->reduce(&subres);
     if (sub) {
         atomic = sub->atomic;
     }
     switch (subres) {
         case 0:
-            * res = 1;
+            *res = 1;
             return NULL;
         case 1:
-            * res = 0;
+            *res = 0;
             return NULL;
         case 2:
-            * res = 2;
+            *res = 2;
             return this;
 
-            // Karsten fragen
+        // Karsten fragen
         default: /* this should not happen */
             assert(false);
             return false;
@@ -1076,70 +946,70 @@ formula* unarybooleanformula::reduce(int* res) {
 
 formula* binarybooleanformula::reduce(int* res) {
     int subres1, subres2;
+    left = left->reduce(&subres1);
+    right = right->reduce(&subres2);
 
-    left = left->reduce(& subres1);
-    right = right->reduce(& subres2);
     if (type == conj) {
         switch (subres1) {
             case 0:
-                * res = 0;
+                *res = 0;
                 return NULL;
+
             case 1:
-                * res = subres2;
+                *res = subres2;
                 if (right) {
                     atomic = right->atomic;
                 }
                 return right;
+
             case 2:
                 switch (subres2) {
                     case 0:
-                        * res = 0;
+                        *res = 0;
                         return NULL;
+
                     case 1:
-                        * res = 2;
+                        *res = 2;
                         if (left) {
                             atomic = left->atomic;
                         }
                         return left;
+
                     case 2:
-                        * res = 2;
-                        if (left->atomic && right->atomic) {
-                            atomic = true;
-                        } else {
-                            atomic = false;
-                        }
+                        *res = 2;
+                        atomic = (left->atomic && right->atomic);
                         return this;
                 }
         }
     } else {
         switch (subres1) {
             case 0:
-                * res = subres2;
+                *res = subres2;
                 if (right) {
                     atomic = right->atomic;
                 }
                 return right;
+
             case 1:
-                * res = 1;
+                *res = 1;
                 return NULL;
+
             case 2:
                 switch (subres2) {
                     case 0:
-                        * res = 2;
+                        *res = 2;
                         if (left) {
                             atomic = left->atomic;
                         }
                         return left;
+
                     case 1:
-                        * res = 1;
+                        *res = 1;
                         return NULL;
+
                     case 2:
-                        * res = 2;
-                        if (left->atomic && right->atomic) {
-                            atomic = true;
-                        } else {
-                            atomic = false;
-                        }
+                        *res = 2;
+                        atomic = (left->atomic && right->atomic);
                         return this;
                 }
         }
@@ -1222,20 +1092,20 @@ formula* booleanformula::reduce(int* res) {
 }
 
 formula* unarytemporalformula::reduce(int* res) {
-    int subres;
     atomic = false;
     if (type == ex || type == ax) {
         * res = 2;
         return this;
     }
-    element = element->reduce(& subres);
+    int subres;
+    element = element->reduce(&subres);
     * res = subres;
     return this;
 }
 
 formula* untilformula::reduce(int* res) {
-    int subres;
     atomic = false;
+    int subres;
     goal = goal->reduce(& subres);
     if (subres < 2) {
         * res = subres;
@@ -1282,26 +1152,13 @@ formula* atomicformula::negate() {
     p->cardprop ++;
 #endif
     switch (type) {
-        case gt:
-            type = leq;
-            break;
-        case geq:
-            type = lt;
-            break;
-        case lt:
-            type = geq;
-            break;
-        case leq:
-            type = gt;
-            break;
-        case eq:
-            type = neq;
-            break;
-        case neq:
-            type = eq;
-            break;
-        default:
-            break;
+        case gt:   type = leq;  break;
+        case geq:  type = lt;   break;
+        case lt:   type = geq;  break;
+        case leq:  type = gt;   break;
+        case eq:   type = neq;  break;
+        case neq:  type = eq;   break;
+        default:                break;
     }
     return this;
 }
@@ -1318,30 +1175,18 @@ void transitionformula::print() {
 }
 
 void atomicformula::print() {
-    cout << "[at: ";
-    cout << p->name;
+    cout << "[at: " << p->name;
+
     switch (type) {
-        case eq:
-            cout << " = ";
-            break;
-        case neq:
-            cout << " # ";
-            break;
-        case leq:
-            cout << " <= ";
-            break;
-        case geq:
-            cout << " >= ";
-            break;
-        case lt:
-            cout << " < ";
-            break;
-        case gt:
-            cout << " > ";
-            break;
-        default:
-            cout << "???";
+        case eq:  cout << " = ";  break;
+        case neq: cout << " # ";  break;
+        case leq: cout << " <= "; break;
+        case geq: cout << " >= "; break;
+        case  lt: cout << " < ";  break;
+        case  gt: cout << " > ";  break;
+        default:  cout << "???";
     }
+
     cout << k << "]";
 }
 
@@ -1350,28 +1195,17 @@ void unarytemporalformula::print() {
     if (tformula) {
         tformula->print();
     }
+
     switch (type) {
-        case ax:
-            cout << "AX ";
-            break;
-        case ex:
-            cout << "EX ";
-            break;
-        case af:
-            cout << "AF ";
-            break;
-        case ag:
-            cout << "AG ";
-            break;
-        case ef:
-            cout << "EF ";
-            break;
-        case eg:
-            cout << "EG ";
-            break;
-        default:
-            cout << "???";
+        case ax: cout << "AX "; break;
+        case ex: cout << "EX "; break;
+        case af: cout << "AF "; break;
+        case ag: cout << "AG "; break;
+        case ef: cout << "EF "; break;
+        case eg: cout << "EG "; break;
+        default: cout << "???";
     }
+
     element->print();
     cout << "]";
 }
@@ -1381,16 +1215,13 @@ void untilformula::print() {
     if (tformula) {
         tformula->print();
     }
+
     switch (type) {
-        case au:
-            cout << "AU ";
-            break;
-        case eu:
-            cout << "EU ";
-            break;
-        default:
-            cout << "???";
+        case au: cout << "AU "; break;
+        case eu: cout << "EU "; break;
+        default: cout << "???";
     }
+
     hold->print();
     cout << ",";
     goal->print();
@@ -1410,16 +1241,13 @@ void unarybooleanformula::print() {
 
 void binarybooleanformula::print() {
     cout << "[bb: ";
+
     switch (type) {
-        case conj:
-            cout << "AND ";
-            break;
-        case disj:
-            cout << "OR ";
-            break;
-        default:
-            cout << "???";
+        case conj: cout << "AND "; break;
+        case disj: cout << "OR ";  break;
+        default: cout << "???";
     }
+
     left->print();
     cout << ", ";
     right->print();
@@ -1430,14 +1258,9 @@ void binarybooleanformula::print() {
 void booleanformula::print() {
     cout << "[bo: ";
     switch (type) {
-        case conj:
-            cout << "AND ";
-            break;
-        case disj:
-            cout << "OR ";
-            break;
-        default:
-            cout << "???";
+        case conj: cout << "AND "; break;
+        case disj: cout << "OR ";  break;
+        default: cout << "???";
     }
     for (unsigned int i = 0; i < cardsub; i++) {
         sub[i]->print();
@@ -1450,14 +1273,9 @@ void booleanformula::print() {
 void quantifiedformula::print() {
     cout << "[qu: ";
     switch (type) {
-        case qe:
-            cout << "EXISTS ";
-            break;
-        case qa:
-            cout << "ALL ";
-            break;
-        default:
-            cout << "???";
+        case qe: cout << "EXISTS "; break;
+        case qa: cout << "ALL ";    break;
+        default: cout << "???";
     }
     cout << "]";
 }
@@ -1480,16 +1298,14 @@ formula* unarybooleanformula::negate() {
 }
 
 formula* booleanformula::posate() {
-    unsigned int i;
-    for (i = 0; i < cardsub; i++) {
+    for (unsigned int i = 0; i < cardsub; i++) {
         sub[i] = sub[i]->posate();
     }
     return this;
 }
 
 formula* booleanformula::negate() {
-    unsigned int i;
-    for (i = 0; i < cardsub; i++) {
+    for (unsigned int i = 0; i < cardsub; i++) {
         sub[i] = sub[i]->negate();
     }
     if (type == conj) {
@@ -1529,13 +1345,11 @@ void update_formula(Transition* t) {
 }
 
 Transition** booleanformula::spp2(State* s) {
-    unsigned int i;
-    Transition** fl;
-
     if (type == conj) {
         return sub[0]->spp2(s);
     }
-    for (i = 0; i < cardsub; i++) {
+    for (unsigned int i = 0; i < cardsub; i++) {
+        Transition** fl;
         if ((fl = sub[i]->spp2(s))) {
             return fl;
         }
@@ -1678,13 +1492,12 @@ formula* staticformula::replacequantifiers() {
 }
 
 formula* staticformula::reduce(int* res) {
-    * res = value;
+    *res = value;
     return this;
 }
 
 formula* staticformula::copy() {
-    staticformula* f;
-    f = new staticformula(exp);
+    staticformula* f = new staticformula(exp);
     f->value = value;
     f->parent = parent;
     f->atomic = true;
@@ -1728,11 +1541,11 @@ int initialize_ctl() { // return: value if formula constant
 //initialize formula
 #ifdef WITHFORMULA
     int res;
-
     F = F->reduce(&res);
     if (res < 2) {
         return res;
     }
+
     F = F->posate(); // eliminate negations
     F->tempcard = 0;
     F->setstatic();

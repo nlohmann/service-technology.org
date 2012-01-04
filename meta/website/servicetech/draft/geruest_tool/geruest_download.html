@@ -7,7 +7,7 @@
     <link href="../main.css" rel="stylesheet" type="text/css">
     <link href="geruest_style.css" rel="stylesheet" type="text/css">
     <title>
-      service-technology.org/wendy - download
+      service-technology.org/@SHORTNAME@ - download
     </title>
   </head>
   <body>
@@ -18,7 +18,7 @@
           <div id="titlenav">
             <div id="pagetitle">
               <h1>
-                <a href="../index.html">service-technology.org</a>/<a href="index.html">wendy</a>
+                <a href="../index.html">service-technology.org</a>/<a href="index.html">@SHORTNAME@</a>
               </h1>
             </div>
             <div id="nav">
@@ -66,12 +66,10 @@
         </div>
         <div id="content">
           <h2>
-            Download Wendy
+            Download @TOOLNAME@
           </h2>
-          <h3>
-            Stable versions
-          </h3>
-          <table width="60%" id="stable-versions">
+
+          <table width="90%" id="stable-versions">
             <tr>
               <th class="theader" width="*">
                 Version
@@ -86,12 +84,10 @@
                 Windows
               </th>
             </tr>
-            <tr>
-              <td colspan="4" class="immediate"><em>Stable Versions</em></td>
-            </tr>
+
             <tr>
               <td class="text">
-                Wendy 1.3
+                @TOOLNAME@ @LATESTVERSION@
               </td>
               <td>
                 <a href="test" title="Source Code">Download</a>
@@ -105,7 +101,7 @@
             </tr>
             <tr>
               <td class="text">
-                Wendy 1.2
+                Nightly Build
               </td>
               <td>
                 <a href="test" title="Source Code">Download</a>
@@ -119,24 +115,7 @@
             </tr>
             <tr>
               <td class="text">
-                Wendy 1.1
-              </td>
-              <td>
-                <a href="test" title="Source Code">Download</a>
-              </td>
-              <td>
-                <a href="test" title="MacOS X Binary">Download</a>
-              </td>
-              <td>
-                <a href="test" title="Windows Binary">Download</a>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="4" class="immediate"><em>Nightly Build</em></td>
-            </tr>
-            <tr>
-              <td class="text">
-                Wendy SVN Revision 231
+                Older versions
               </td>
               <td>
                 <a href="test" title="Source Code">Download</a>
@@ -154,32 +133,25 @@
             Version history
           </h3>
           <div id="version_history">
-            Wendy has been developed for quite some time now. Bla <a href="changelog-link">ChangeLog</a>.
+            @TOOLNAME@ has been developed for quite some time now. Bla <a href="@CHANGELOGLINK@">ChangeLog</a>.
           </div>
           <h3>
             License
           </h3>
           <p>
-            Wendy is open source software, licensed under the AGPL 3 (??).
+            @TOOLNAME@ is open source software, licensed under the AGPL 3 (??).
           </p>
           <h2>
-            Install Wendy
+            Install @TOOLNAME@
           </h2>
           <h3>
             Requirements
           </h3>
           <p>
-            Installing and running Wendy requires a bunch of other tools:
+            Installing and running @TOOLNAME@ requires a bunch of other tools:
           </p>
           <div id="required-tools">
-            <ul>
-              <li>
-                <a href="../lola/index.html">LoLA</a>
-              </li>
-              <li>
-                <a href="requirement-link">...</a>
-              </li>
-            </ul>
+          @REQUIRMENTS@
           </div>
           <h3>
             Quick install
@@ -207,20 +179,29 @@
             Maintainer
           </h2>
           <p>
-            The current maintainer of Wendy is <a href="maintainer-link">Niels Lohmann</a>.
+            The current maintainer of @TOOLNAME@ is <a href="maintainer-link">@MAINTAINER@</a>.
           </p>
           <h2>
             Authors
           </h2>
+          <div id="authors">
+          @AUTHORS@
+          </div>
           <h2>
             Contributors
           </h2>
           <p>
             Several people have committed time, code, and advice to the development of Wendy.
           </p>
+          <div id="contributors">
+          @CONTRIBUTORS@
+          </div>
           <h2>
             Acknowledgements
           </h2>
+          <div id="acknowledgements"> 
+          @ACKNOWLEDGEMENTS@
+          </div>
         </div>
       </div>
     </div>

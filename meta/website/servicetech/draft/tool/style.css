@@ -288,3 +288,67 @@ td.immediate {
   background: url(../icons/dl-icon-small.png) no-repeat center center, #02aeed;
   border-bottom: 0px;
 }
+@font-face{ 
+        font-family: "monof55";
+        src: url('http://fontsforweb.com/public/fonts/368/monof55.eot');
+        src: local("monofur"), url('http://fontsforweb.com/public/fonts/368/monof55.ttf') format("truetype");
+    }
+#fancy-wrapper {
+  position: absolute;
+  left: 0px;
+  top: 70px;
+  width: 100px;
+  height: 100px;
+  border: 7px solid white;
+  box-shadow: -4px -4px 24px #000; 
+	background: #000; /* for non-css3 browsers */
+  background: -webkit-linear-gradient(top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,1) 100%);
+  background: -moz-linear-gradient(top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,1) 100%);
+  border-radius: 3px;
+    -webkit-transform:rotate(-2deg);
+  z-index: 200;
+}
+#fancy {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  margin-top: -0.5em;
+  margin-left: -0.5em;
+  font-family: 'monof55';
+  font-size: 60px;
+  width: 1em;
+  overflow: hidden;
+  height: 1em;
+  line-height: 1em;
+  color: rgba(255,255,255,1);  
+  color: #02AEED;
+  text-transform: uppercase;
+  z-index: 200;
+
+}
+
+#bigtitle-wrapper {
+  position: relative;
+  left: 0;
+  top: 0;
+  display: inline-block;
+  margin: 0px auto;
+  height: 215px;
+}
+
+#bigtitle-inner-wrapper {
+  position: relative;
+  padding-left: 140px;
+}
+
+#bigtitle {
+  text-align: left;
+}
+
+#bigsubtitle {
+  text-align: left;
+}
+
+  #bigheader {
+  height: 215px;
+}

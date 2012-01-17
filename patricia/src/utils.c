@@ -22,7 +22,7 @@ void killProcess(void* arg) {
 
 void killThread(void* arg) {
     pthread_t* tid = (pthread_t*)arg;
-    debug_print("%s: canceling %lu\n", __func__, *tid);
+    debug_print("%s: canceling %lu\n", __func__, (unsigned long)*tid);
     pthread_cancel(*tid);
 }
 
@@ -30,7 +30,7 @@ void killThreads(void* arg) {
     pthread_t* tid;
 
     for (tid = (pthread_t*)arg; *tid != 0; tid++) {
-        debug_print("%s: canceling %lu\n", __func__, *tid);
+        debug_print("%s: canceling %lu\n", __func__, (unsigned long)*tid);
         pthread_cancel(*tid);
     }
 }

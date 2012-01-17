@@ -10,9 +10,9 @@
 #define debug_print(...) do { } while(0)
 #endif
 
-char *append(char *s1, char *s2);
-void killProcess(void *arg);
-void killThread(void *arg);
-void killThreads(void *arg);
+char* append(char* s1, char* s2);
+void killProcess(void* arg);
+void killThread(void* arg);
+void killThreads(void* arg);
 
 #endif

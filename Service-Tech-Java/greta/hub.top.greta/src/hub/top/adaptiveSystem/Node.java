@@ -5,6 +5,8 @@
  */
 package hub.top.adaptiveSystem;
 
+import java.util.Set;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
@@ -264,10 +266,17 @@ public interface Node extends EObject {
 	public EList<? extends Node> getPreSet();
 	
 	/**
-	 * @return a list of all successors of this node
+	 * @return a list of all successors of this node (NOT including the node itself)
 	 * @author Dirk Fahland
 	 * @generated NOT
 	 */	
 	public EList<? extends Node> getPostSet();
+	
+	/**
+	 * @return a list of all transitive predecessors of this node
+   * @author Dirk Fahland
+   * @generated NOT
+	 */
+	public Set<? extends Node> getAllPredecessors();
 
 } // Node

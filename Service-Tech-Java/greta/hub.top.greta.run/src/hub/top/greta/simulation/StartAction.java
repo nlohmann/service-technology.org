@@ -35,15 +35,26 @@
 
 package hub.top.greta.simulation;
 
+import java.util.HashMap;
+import java.util.List;
+
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
+import hub.top.editor.ptnetLoLA.util.PtnetLoLAValidator;
 import hub.top.greta.cpn.AdaptiveSystemToCPN;
+import hub.top.greta.cpn.AdaptiveSystemToCPN.ModelError;
 import hub.top.greta.run.Activator;
 
 import org.cpntools.accesscpn.engine.Simulator;
 import org.cpntools.accesscpn.engine.SimulatorService;
 import org.cpntools.accesscpn.engine.highlevel.HighLevelSimulator;
 import org.cpntools.accesscpn.model.util.BuildCPNUtil;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.emf.ecore.xmi.XMLResource;
+import org.eclipse.gmf.runtime.common.ui.resources.IBookmark;
+import org.eclipse.gmf.runtime.notation.Diagram;
+import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
@@ -187,6 +198,7 @@ public class StartAction implements
 		
 		if (AdaptiveSystemToCPN.isHighLevelSpecification(simView.adaptiveSystem)) {
 		  simulationConfiguration.createNewBridgeToCPN(simView.adaptiveSystem);
+		  showMarkers(simulationConfiguration.a2c.errors);
 		} else {
 		  simulationConfiguration.terminateBridgeToCPN();
 		}
@@ -195,6 +207,50 @@ public class StartAction implements
 		simView.processViewEditor.getDiagramGraphicalViewer().deselectAll();
 		simView.processViewEditor.getDiagramGraphicalViewer().select(simView.apEditPart);
 	}
+	
+	private void showMarkers(List<AdaptiveSystemToCPN.ModelError> errors) {
+	  
+	    IResource resource = (IResource)simView.processViewEditor.getEditorInput().getAdapter(IResource.class);
+
+	    try {
+	      resource.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+	      resource.deleteMarkers(IBookmark.TYPE, true, IResource.DEPTH_INFINITE);
+	      
+	      Diagram d = simView.processViewEditor.getDiagram();
+	      
+        // collected attributes for a marker, so create one
+	      HashMap<String, Object> attribMap = new HashMap<String, Object>();
+	      
+	      for (ModelError e : errors) {
+
+          String sourceID = null;
+          
+          for (Object o : d.getChildren()) {
+            View childView = (View)o;
+            if (childView.getElement() == e.modelObject) {
+              if (childView.eResource() instanceof XMLResource) {
+                sourceID = ((XMLResource)childView.eResource()).getID(childView);
+              }
+            }
+          }
+          
+          attribMap.put(IMarker.MESSAGE,  e.error);
+          attribMap.put(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+          if (sourceID != null) attribMap.put(IMarker.SOURCE_ID, sourceID);
+          attribMap.put(IMarker.LOCATION, e.location);
+          
+          if (attribMap.size() > 0) {
+            IMarker marker;
+            marker = resource.createMarker(IMarker.PROBLEM);
+            marker.setAttributes(attribMap);
+          }
+	      }
+
+	    } catch (Exception e) {
+	      Activator.getPluginHelper().logError("Error", e);
+	    }
+	  }
+
 
 	/**
 	 * Stop simulation and notify other actions about this change

@@ -5,6 +5,11 @@
  */
 package hub.top.adaptiveSystem.impl;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import hub.top.adaptiveSystem.AdaptiveProcess;
 import hub.top.adaptiveSystem.AdaptiveSystemPackage;
 import hub.top.adaptiveSystem.Condition;
@@ -448,6 +453,29 @@ public abstract class NodeImpl extends EObjectImpl implements Node {
 	 */
 	public EObject eOldContainer() {
 		return eOldContainer;
+	}
+	
+	/**
+	 * @see hub.top.adaptiveSystem.Node#getAllPredecessors()
+	 * @generated NOT
+	 */
+	@Override
+	public Set<? extends Node> getAllPredecessors() {
+	  Set<Node> seen = new HashSet<Node>();
+	  LinkedList<Node> queue = new LinkedList<Node>();
+	  queue.add(this);
+	  
+	  while (!queue.isEmpty()) {
+	    Node n = queue.removeFirst();
+	    for (Node m : n.getPreSet()) {
+	      if (!seen.contains(m)) {
+	        seen.add(m);
+	        queue.addLast(m);
+	      }
+	    }
+	  }
+	    
+	  return seen;
 	}
 	
 	/**

@@ -23,11 +23,24 @@ public:
 	/// If key is in table: return corresponding symbol
 	/// If key is not in table: return NULL
 	Symbol * lookup(string);
-/// Generate and initialize a symbol table
-SymbolTable();
+	
+	/// Initialize iteration; return NULL if table empty
+	Symbol * first();
+	/// Continue iteration; return NULL if there is none
+	Symbol * next(); 
+
+	/// Generate and initialize a symbol table
+	SymbolTable();
+
 private:
 	///The actual symbol table. It gets pointers as we use lists for collisions.
 	Symbol * table[SIZEOF_SYMBOLTABLE];
+
 	/// The hash function to be used
 	unsigned int hash(string);
+
+	/// The index of the current element in iteration
+	unsigned int currentIndex;
+	/// Points to the current element in iteration
+	Symbol * currentSymbol;
 }

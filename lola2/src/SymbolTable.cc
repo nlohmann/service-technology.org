@@ -34,7 +34,7 @@ unsigned int SymbolTable::hash(string s)
 
 Symbol * SymbolTable::lookup(string str)
 {
-	for(Symbol sym = table[hash(atr)]; sym; sym = sym -> next)
+	for(Symbol sym = table[hash(str)]; sym; sym = sym -> next)
 	{
 		if(sym -> key == str)
 		{
@@ -62,3 +62,38 @@ bool SymbolTable::insert(Symbol * sym)
 	table[index] = sym;
 	return true;
 }
+
+/// returns pointer to first element in symbol table
+Symbol * SymbolTable::first()
+{
+	for(currentIndex = 0; currentIndex < SIZEOF_SYMBOLTABLE; currentIndex++)
+	{
+		if(table[currentIndex])
+		{
+			return(currentSymbol = table[currentIndex]);
+		}
+	}
+	return NULL;
+}
+
+/// returns pointer to next element in symbol table
+Symbol * SymbolTable::next()
+{
+	if(currentSymbol -> next)
+	{
+		// there is another element in the same hash bucket
+		return(currentSymbol = currentSymbol -> next);
+	}
+	else
+	{	
+		// there is no other element in the same bucket
+		for(++currentIndex; currentIndex < SIZEOF_SYMBOLTABLE; currentIndex++)
+		{
+			if(table[currentIndex])
+			{
+				return(currentSymbol = table[CurrentIndex]);
+			}
+		}
+		return NULL;
+	}
+} 

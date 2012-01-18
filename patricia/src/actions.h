@@ -3,15 +3,25 @@
 
 #include "types.h"
 
+/*!
+ There are three types of actions:
+ - Parallel: Actions are executed in parallel until one gives a meaningful verification result;
+             namely Positive or Negative.
+ - Try: The first action is always executed, whereas the second one is utilized only when the first fails.
+ - Run: Executing a tool with or without a timeout.
+ */
 enum ActionType { Parallel, Try, Run };
 
+/*!
+ Tagged union that contains the necessary information for the different kinds of actions.
+ */
 struct action {
     enum ActionType type;
     union {
         struct {
             struct action** actions;
             int num;
-        }        parallel;
+        } parallel;
         struct {
             struct action* try;
             struct action* then;
@@ -23,6 +33,10 @@ struct action {
     } data;
 };
 
+/*!
+ Struct containing a problem, an action and an outcome variable.
+ It is used for performing actions using threads.
+ */
 struct ptask {
     struct problem* problem;
     struct action* action;

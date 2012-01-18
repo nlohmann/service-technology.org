@@ -7,6 +7,12 @@
 #include "types.h"
 #include "utils.h"
 
+/*!
+ Uses system calls to prepare the problem for sara.
+ 
+ \param problem
+ \return exit code
+ */
 int sara_prepare(struct problem *problem) {
   int code;
   char cmd[256];
@@ -20,6 +26,13 @@ int sara_prepare(struct problem *problem) {
   return code;
 }
 
+/*!
+ Reads the logfile to obtain the verification result.
+ 
+ \param exit code
+ \param logfile
+ \return verification result
+ */
 enum VerificationState sara_interpret(int code, char *logfile) {
   enum VerificationState state = Undefined;
   int length = 1024;
@@ -39,6 +52,10 @@ enum VerificationState sara_interpret(int code, char *logfile) {
   return state;
 }
 
+/*!
+ \param problem
+ \return struct representing sara
+ */
 struct tool *sara_tool(struct problem *problem) {
   struct tool *sara = malloc(sizeof(struct tool) + sizeof(char*)*4);
   sara->name = "sara";

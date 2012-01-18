@@ -9,6 +9,14 @@
 #include "types.h"
 #include "utils.h"
 
+/*!
+ Forks a process that runs the given program and returns the verification result.
+ 
+ \param program that is executed
+ \param function for interpreting the results
+ \param logfile
+ \return verification state (Undefined on error)
+ */
 enum VerificationState forknrun(char** args, interpreter interpret, char* logfile) {
     int state;
     int out = open(logfile, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
@@ -31,6 +39,13 @@ enum VerificationState forknrun(char** args, interpreter interpret, char* logfil
     return interpret(state, logfile);
 }
 
+/*!
+ Runs a tool and returns the verification result.
+ 
+ \param problem
+ \param tool to solve the problem
+ \return verification state (Undefined on error)
+ */
 enum VerificationState run(struct problem* problem, struct tool* tool) {
     char* log = append(append(append(tool->name, "."), problem->name), ".log");
 

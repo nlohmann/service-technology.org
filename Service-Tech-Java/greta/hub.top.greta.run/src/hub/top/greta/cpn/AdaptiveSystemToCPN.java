@@ -528,9 +528,11 @@ public class AdaptiveSystemToCPN {
         
         boolean turnExpressionToVariable = false;
 
+        /* DISABLED: replacing arc expressions by variables
         if (!isConstant(arcExpression) && !isVariable(arcExpression)) {
           turnExpressionToVariable = true;
         }
+        */
                 
         if (turnExpressionToVariable) {
           
@@ -664,16 +666,30 @@ public class AdaptiveSystemToCPN {
     return ids;
   }
   
-  private Object getVariableForID(String id) {
+  /**
+   * @param id
+   * @return the name of the variable defined at this id or {@code null} if this id points to something else but a variable declaration (see {@link #isVariableDeclaration(Object)} and {@link #getObjectForID(String)}
+   */
+  private String getVariableNameForID(String id) {
     
     Object obj = getObjectForID(id);
-    if (obj != null && obj instanceof HLDeclaration) {
+    if (isVariableDeclaration(obj)) {
       HLDeclaration decl = (HLDeclaration)obj;
       if (decl.getStructure() instanceof VariableDeclaration) {
         return ((VariableDeclaration)decl.getStructure()).getVariables().get(0);
       }
     }
     return null;
+  }
+  
+  /**
+   * @param obj
+   * @return {@code true} iff the object is {@link HLDeclaration} containing a {@link VariableDeclaration}
+   */
+  private boolean isVariableDeclaration(Object obj) {
+    return (obj != null
+        && obj instanceof HLDeclaration
+        && ((HLDeclaration)obj).getStructure() instanceof VariableDeclaration);
   }
   
   private Object getObjectForID(String id) {
@@ -757,6 +773,13 @@ public class AdaptiveSystemToCPN {
     return null;
   }
   
+  /**
+   * Compute all dependencies of the post-conditions and the guard-label of 
+   * event 'e' on the (transitive) pre-conditions of event 'e'.
+   * 
+   * @param e
+   * @param sim_local
+   */
   private void buildDependencies(Event e, HighLevelSimulator sim_local) {
     
     Set<String> preConditionSingleIDs = new HashSet<String>();
@@ -768,6 +791,8 @@ public class AdaptiveSystemToCPN {
     Map<String, List<Condition>> declaringConditions = new HashMap<String, List<Condition>>();
     Map<String, List<Condition>> usingConditions = new HashMap<String, List<Condition>>();
     
+    // collect everything that is available: variables (in form of variables IDs) and
+    // complete terms which can be bound to evaluated values
     for (Node n : e.getAllPredecessors()) {
       if (n instanceof Event || n.isAbstract()) continue;
       Condition c = (Condition)n;
@@ -792,6 +817,8 @@ public class AdaptiveSystemToCPN {
           provides.get(c).add(ids[0]);
         }
         
+        /* DISABLED: re-using entire arc expressions
+         
         // this expression is completely evaluated because it is in the event's precondition and
         // hence can be bound to a value in the run
         HashSet<String> idset = new HashSet<String>();
@@ -800,9 +827,11 @@ public class AdaptiveSystemToCPN {
         }
         evaluatedCompleteExpressions.put(arcExpression, idset); 
         provides.get(c).add(arcExpression);
+        */
       }
     }
     
+    // check for each post-condition on what variables and terms it depends on
     for (Condition c : e.getPostConditions()) {
       if (c.isAbstract()) continue;
       
@@ -821,6 +850,10 @@ public class AdaptiveSystemToCPN {
         
         Set<String> missingIDs = new HashSet<String>();
         for (String id : ids) {
+          
+          Object o = getObjectForID(id);
+          if (!isVariableDeclaration(o)) continue; // only variables can be missing
+          
           if (!declaredSingleIDs.contains(id)) {
             System.err.println(c.getName()+" ("+((Oclet)c.eContainer().eContainer()).getName()+") requires variable "+getObjectForID(id));
             missingIDs.add(id);
@@ -848,7 +881,7 @@ public class AdaptiveSystemToCPN {
             
           } else {
             System.err.println(id_unresolved+" CANNOT be resolved");
-            ModelError error = new ModelError(c, c.getName(), "Cannot resolve '"+getVariableForID(id_unresolved)+"' for '"+c.getName()+"'");
+            ModelError error = new ModelError(c, c.getName(), "Cannot resolve '"+getVariableNameForID(id_unresolved)+"' for '"+c.getName()+"'");
             errors.add(error);
           }
         }

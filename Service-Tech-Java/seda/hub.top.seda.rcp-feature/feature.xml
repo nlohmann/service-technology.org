@@ -2,7 +2,7 @@
 <feature
       id="hub.top.seda.rcp"
       label="Seda RCP"
-      version="1.0.5.qualifier"
+      version="1.1.0.qualifier"
       provider-name="Service-Technology.org">
 
    <description url="http://www.service-technology.org/">
@@ -69,10 +69,6 @@ of any one of the EPL, the GPL or the LGPL.
 
    <includes
          id="hub.top.seda"
-         version="0.0.0"/>
-
-   <includes
-         id="hub.top.seda.tef"
          version="0.0.0"/>
 
    <requires>

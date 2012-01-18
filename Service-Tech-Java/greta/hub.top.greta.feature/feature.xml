@@ -2,7 +2,7 @@
 <feature
       id="hub.top.greta"
       label="Greta"
-      version="1.2.0.qualifier"
+      version="1.3.0.qualifier"
       provider-name="service-technology.org">
 
    <description url="http://www.service-technology.org/">
@@ -146,6 +146,54 @@ version of this file under the terms of any one of the EPL or the AGPL.
 
    <plugin
          id="hub.top.GRETA.run"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="hub.top.pnapi"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="hub.top.uma"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.cpntools.accesscpn.engine"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.cpntools.accesscpn.engine.highlevel"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.cpntools.accesscpn.model"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.cpntools.accesscpn.model.exporter"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.cpntools.accesscpn.model.importer"
          download-size="0"
          install-size="0"
          version="0.0.0"

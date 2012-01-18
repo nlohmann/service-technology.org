@@ -2,7 +2,7 @@
 <feature
       id="hub.top.seda"
       label="Service-Technology.org Editor Application"
-      version="1.1.0.qualifier"
+      version="1.2.0.qualifier"
       provider-name="Service-Technology.org">
 
    <description url="http://www.service-technology.org/">
@@ -69,6 +69,10 @@ of any one of the EPL, the GPL or the LGPL.
       <discovery label="Graphical Modeling Framework (GMF) Updates" url="http://download.eclipse.org/modeling/gmf/updates/releases/"/>
    </url>
 
+   <includes
+         id="hub.top.seda.tef"
+         version="0.0.0"/>
+
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
@@ -76,10 +80,10 @@ of any one of the EPL, the GPL or the LGPL.
       <import plugin="org.eclipse.gmf.runtime.diagram.ui"/>
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.emf"/>
       <import plugin="org.eclipse.emf.transaction"/>
       <import plugin="org.eclipse.osgi.services"/>
       <import plugin="org.eclipse.osgi.util"/>
-      <import plugin="org.eclipse.emf"/>
       <import plugin="org.eclipse.core.expressions"/>
       <import plugin="org.eclipse.jface"/>
       <import plugin="org.eclipse.ui.views"/>
@@ -107,19 +111,10 @@ of any one of the EPL, the GPL or the LGPL.
       <import plugin="org.eclipse.gmf.runtime.diagram.ui.printing.render"/>
       <import plugin="org.eclipse.emf.edit"/>
       <import plugin="org.eclipse.emf.transaction" version="1.2.1" match="greaterOrEqual"/>
-      <import plugin="hub.top.editor.resource" version="1.0.6" match="greaterOrEqual"/>
-      <import plugin="hub.sam.tef" version="1.0.9" match="greaterOrEqual"/>
    </requires>
 
    <plugin
          id="hub.top.editor"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="hub.top.editor.lola.text"
          download-size="0"
          install-size="0"
          version="0.0.0"

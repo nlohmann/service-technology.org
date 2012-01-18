@@ -90,7 +90,7 @@ public class AdaptiveSystemToCPN {
       
       // check conditions for well-formedness
       for (Node n : o.getPreNet().getNodes()) {
-        if (n instanceof Condition) {
+        if (n instanceof Condition && !n.isAbstract()) {
           Condition c = (Condition)n;
           try {
             getPlaceName(c.getName());
@@ -971,15 +971,22 @@ public class AdaptiveSystemToCPN {
           } else {
             
             // find the transitive pre-condition this condition depends on to resolve its term inscription
+            boolean defined_by_precondition = false;
             for (Condition c_depends_on : declaringConditions.get(id)) {
               if (e.getPreConditions().contains(c_depends_on)) {
                 // a direct pre-condition features what this condition needs: done, do not add dependency
+                defined_by_precondition = true;
                 break;
               }
+            }
+            
+            if (!defined_by_precondition) {
               // not a direct precondition: establish explicit dependency
-              System.err.println(c.getName()+" ("+((Oclet)c.eContainer().eContainer()).getName()+") depends on "+c_depends_on+" to resolve "+getObjectForID(id));
-              dependsOnConditions.get(c).add(c_depends_on);
-              break;
+              for (Condition c_depends_on : declaringConditions.get(id)) {
+                System.err.println(c.getName()+" ("+((Oclet)c.eContainer().eContainer()).getName()+") depends on "+c_depends_on+" to resolve "+getObjectForID(id));
+                dependsOnConditions.get(c).add(c_depends_on);
+                break;
+              }
             }
                         
           }

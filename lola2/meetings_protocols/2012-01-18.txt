@@ -1,0 +1,52 @@
+General Procedure
+=================
+
+LoLA komplett neu, alte LoLA als Vorlage
+
+- Memory Leaks raus
+- Reset ohne Abschießen
+- Define-Konzept: Option: ganz weg?
+- Leichter neue Features, leichter neue Programmierer
+- Einheitliche Terminologie
+- ggf. Nutzung von LPSOLVE, SAT etc.
+- Testfälle
+- komprimiertes Dateiformat? Flag für garantiert korrekten Input, Preprocessing-Info in Datei
+- systematisches Reporting, Output, Externer Listener/Monitor? Konfig-INfo
+- Zeitmessung, Zeitoptimierung in Competitions, Forced Abbruch
+- Dummy-Mode / Expert Mode
+- Symmetrien von Tommi Junttila
+- Index vs Pointer, Speicherverwaltung
+
+nicht:
+======
+
+Netz mit kompilieren
+STL außer strings
+
+später:
+=======
+
+- HL-LoLA
+
+
+Komponenten:
+===========
+Src-Verzeichnis --> Niels
+Listener --> Niels
+Parser, Symboltabelle --> Karsten, mit extra Klassen PlaceSymbol TrSymbol
+Commandline-Optionen
+Netz
+Suche
+Output / Reporting
+Markings, Graph
+Findpath
+Formel / Eigenschaften
+
+Reduktionstechniken
+- Stubborn
+- Symm
+- Sweep
+- Cover
+- CTl
+- LTL
+- Invarianten, Bithashing, Cycle ...

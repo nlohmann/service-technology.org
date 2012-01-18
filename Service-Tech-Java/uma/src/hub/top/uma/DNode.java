@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.dev.util.collect.HashSet;
@@ -66,8 +67,11 @@ public class DNode {
 	 * For finding cutOff events using the signature method, we compare whether
 	 * two events in the branching process are fired by the same set of oclet
 	 * events (see {@link DNodeBP#equivalentCuts_signature}). This array stores
-	 * the globalIDs of the oclet events that were fired for creating this event.
-	 * Is only used for events. 
+	 * the globalIDs of the nodes that defines the occurrence of this node, i.e.
+	 * for an events the IDs of events that were fired for creating this event,
+	 * for conditions the IDs of places that held a token to create this condition,
+	 * For standard branching process construction, only used for events; in
+	 * simulation also used for conditions.
 	 */
 	public int causedBy[] = null;	// remember globalIDs of events that generated this event
 	
@@ -226,68 +230,91 @@ public class DNode {
     }
     return config;
   }
+  
+  /**
+   * Check whether this node's history is a suffix of the history
+   * of another node; if this is the case, then an embedding of this node
+   * (and its predecessors) in the history of the other node is computed.
+   * Does not compute an embedding, used for backwards compatiblity.
+   * 
+   * @param complete
+   * @return
+   *    <code>true</code> iff this node (and its predecessors) is a suffix
+   *    of node complete (and its predecessors)
+   */
+  public boolean suffixOf(DNode complete) {
+    return suffixOf(complete, null);
+  }
 	
 	/**
-	 * Check whether this node's history is a suffix of the history
-	 * of another node.
-	 * 
-	 * @param complete
-	 * @return
-	 * 		<code>true</code> iff this node (and its predecessors) is a suffix
-	 * 		of node complete (and its predecessors)
-	 */
-	public boolean suffixOf(DNode complete) {
-	  DNode suffix = this;
-		if (complete.id != suffix.id)
-			return false;
-		// nodes have equal id
-		
-		if (suffix.pre == null)
-			// suffix has no predecessor, this ends with other
-			return true;
-		// need to compare predecessors
-		
-		if (complete.pre == null && suffix.pre != null)
-			// suffix has predecessors, complete not
-			return false;
-		// both nodes have predecessors
-		
-		if (complete.pre.length < suffix.pre.length)
-			// complete cannot end with suffix: complete node has too few predecessors
-			return false;
-		
-		int i=0;	// index pointing at the current pre-node of complete
-		// iterate over all pre-nodes of suffix to find a corresponding
-		// matching pre-node of complete, pre-nodes are ordered by their ids
-		for (int j=0; j<suffix.pre.length && i<complete.pre.length; j++) {
-			// the IDs of the predecessors are ordered, increment i to find the
-			// predecessor 'i' of this node that has the same ID as the predecessor 'j'
-			// of the other node, move 'i' until the IDs are equal
-			// or id of 'i' is larger than id of 'j', in the latter case, complete node
-			// has no matching predecessor 'i' for the predecessor 'j' of suffix 
-			while ( i < complete.pre.length && complete.pre[i].id < suffix.pre[j].id ) i++;
-			
-			if (i == complete.pre.length)
-				// the ID of the j'th predecessor is higher than any ID of complete node's
-				// predecessors, no match
-				return false;
-			
-			// complete.pre[i].id >= suffix.pre[j].id
-			if (complete.pre[i].id == suffix.pre[j].id) {
-				
-				if (!suffix.pre[j].suffixOf(complete.pre[i]))
-					return false;	// not matching
-			} else {
-				// these nodes 'i' and 'j' have no matching IDs, as all predecessors
-				// are ordered by their IDs, there is no further predecessor 'i+k'
-				// of this node that can match 'j': complete does not end with suffix
-				return false;
-			}
-		}
-		// successfully found that for each pre-node X of suffix
-		// exists a pre-node of complete that ends with X
-		return true;
-	}
+   * Check whether this node's history is a suffix of the history
+   * of another node; if this is the case, then an embedding of this node
+   * (and its predecessors) in the history of the other node is computed.
+   * Computes an embedding of this node's history into the history of
+   * 'complete' if {@code embedding != null}
+   * 
+   * @param complete
+   * @param embedding (can be {@code null})
+   * @return
+   *    <code>true</code> iff this node (and its predecessors) is a suffix
+   *    of node complete (and its predecessors)
+   */
+  public boolean suffixOf(DNode complete, Map<DNode, DNode> embedding) {
+    DNode suffix = this;
+    if (complete.id != suffix.id)
+      return false;
+    // nodes have equal id
+    
+    if (suffix.pre == null) {
+      // suffix has no predecessor, this ends with other
+      if (embedding != null) embedding.put(suffix, complete);
+      return true;
+    }
+    // need to compare predecessors
+    
+    if (complete.pre == null && suffix.pre != null)
+      // suffix has predecessors, complete not
+      return false;
+    // both nodes have predecessors
+    
+    if (complete.pre.length < suffix.pre.length)
+      // complete cannot end with suffix: complete node has too few predecessors
+      return false;
+    
+    int i=0;  // index pointing at the current pre-node of complete
+    // iterate over all pre-nodes of suffix to find a corresponding
+    // matching pre-node of complete, pre-nodes are ordered by their ids
+    for (int j=0; j<suffix.pre.length && i<complete.pre.length; j++) {
+      // the IDs of the predecessors are ordered, increment i to find the
+      // predecessor 'i' of this node that has the same ID as the predecessor 'j'
+      // of the other node, move 'i' until the IDs are equal
+      // or id of 'i' is larger than id of 'j', in the latter case, complete node
+      // has no matching predecessor 'i' for the predecessor 'j' of suffix 
+      while ( i < complete.pre.length && complete.pre[i].id < suffix.pre[j].id ) i++;
+      
+      if (i == complete.pre.length)
+        // the ID of the j'th predecessor is higher than any ID of complete node's
+        // predecessors, no match
+        return false;
+      
+      // complete.pre[i].id >= suffix.pre[j].id
+      if (complete.pre[i].id == suffix.pre[j].id) {
+        
+        if (!suffix.pre[j].suffixOf(complete.pre[i], embedding))
+          return false; // not matching
+      } else {
+        // these nodes 'i' and 'j' have no matching IDs, as all predecessors
+        // are ordered by their IDs, there is no further predecessor 'i+k'
+        // of this node that can match 'j': complete does not end with suffix
+        return false;
+      }
+    }
+    // successfully found that for each pre-node X of suffix
+    // exists a pre-node of complete that ends with X
+    if (embedding != null) embedding.put(suffix, complete);
+    return true;
+  }
+  
 	
 	/**
 	 * Check whether the history of this node is isomorphic to the history

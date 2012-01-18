@@ -170,8 +170,8 @@ public class Options {
   public void configure_simplifyNet() {
     checkProperties = false;
     folding_extendEquivalence_forward = false;
-  } 
-  
+  }
+ 
   //// --- search strategies for finding cut-off events
   /**
    *  check for cut-off events using the lexicographic order on events:

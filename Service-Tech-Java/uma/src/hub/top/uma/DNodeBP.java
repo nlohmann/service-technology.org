@@ -96,12 +96,13 @@ public class DNodeBP {
 
 		// instantiate DNode representation of the adaptive system
 		dNodeAS = system;
-		initialize();
 		
-		if (options == null)
-		  this.options = new Options(system);
-		else 
-		  this.options = options;
+    if (options == null)
+      this.options = new Options(system);
+    else 
+      this.options = options;
+    
+		initialize();
 	}
 	
   

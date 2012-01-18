@@ -1,6 +1,7 @@
 package hub.top.uma;
 
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.dev.util.collect.HashSet;
@@ -71,17 +72,22 @@ public class DNodeTransitive extends DNode {
    * Refines {@link DNode#suffixOf(DNode)} to check whether this node is a
    * suffix of node {@code complete} and each transitive predecessor (
    * {@link #preTrans}) of this node is in the transitive preset of node
-   * 'complete'.
+   * 'complete'. Computes an embedding of this node's history into the history
+   * of 'complete' if {@code embedding != null}.
    * 
    * @param complete
+   * @param embedding (can be {@code null})
    * @return {@code true} iff this node is a suffix of node (@code complete)
    */
-  public boolean suffixOf(DNode complete) {
+  public boolean suffixOf(DNode complete, Map<DNode, DNode> embedding) {
     
     // first all direct predecessors have to be a suffix of complete
-    if (!super.suffixOf(complete)) return false;
+    if (!super.suffixOf(complete, embedding)) return false;
     // then check each transitive predecessor
-    if (preTrans == null || preTrans.length == 0) return true;
+    if (preTrans == null || preTrans.length == 0) {
+      if (embedding != null) embedding.put(this, complete);
+      return true;
+    }
 
     nextnode: for (DNode d : this.preTrans) {
       // breadth-first search
@@ -95,7 +101,7 @@ public class DNodeTransitive extends DNode {
         DNode c = queue.removeFirst();
         // 'd' is suffix of 'c' and the visible event of 'this' node
         // is not between the matching node 'c' and 'complete'
-        if (d.suffixOf(c) && !this.visibleEventBetween(c, complete)) {
+        if (d.suffixOf(c, embedding) && !this.visibleEventBetween(c, complete)) {
           // continue matching next predecessor of 'this'
           continue nextnode;
         }
@@ -117,7 +123,8 @@ public class DNodeTransitive extends DNode {
       // no match for 'd': 'this' is not a suffix of 'complete'
       return false;
     }
-
+    
+    if (embedding != null) embedding.put(this, complete);
     return true;
   }
   

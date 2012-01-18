@@ -330,6 +330,19 @@ public class AdaptiveSystemToCPN {
     return mark;
   }
   
+  public String getMarkingString(List<Condition> conditions) {
+    String mark = null;
+    for (Condition c : conditions) {
+      String value = getToken(c.getName());
+      if (mark == null) mark = "1`"+value;
+      else {
+        mark += " ++ 1`"+value;
+      }
+    }
+      
+    return mark;
+  }
+  
   private Map<String,String> placeTypes;
   public Map<Event, org.cpntools.accesscpn.model.Transition> eventToTransition;
   public Map<Condition, org.cpntools.accesscpn.model.Place> conditionToPlace;
@@ -379,6 +392,7 @@ public class AdaptiveSystemToCPN {
     List<Event> events = new LinkedList<Event>();
     eventToTransition = new HashMap<Event, org.cpntools.accesscpn.model.Transition>();
     conditionToPlace = new HashMap<Condition, org.cpntools.accesscpn.model.Place>();
+    extraPlaces = new LinkedList<AdaptiveSystemToCPN.ExtraPlace>();
     
     for (Oclet o : as.getOclets()) {
       for (Node n : o.getDoNet().getNodes()) {
@@ -405,6 +419,22 @@ public class AdaptiveSystemToCPN {
       e.printStackTrace();
     }
   }*/
+  
+  public void setMarkingOfExtraPlaces(Map<org.cpntools.accesscpn.model.Place, List<Condition>> newTokens) {
+    try {
+
+      for (Instance<org.cpntools.accesscpn.model.PlaceNode> pi : sim.getAllPlaceInstances()) {
+        if (newTokens.containsKey(pi.getNode())) {
+          sim.setMarking(pi, getMarkingString(newTokens.get(pi.getNode())));
+        }
+      }
+      
+      System.out.println(sim.getMarking().toString());
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
   
   public void execute(Binding bind) {
     try {
@@ -489,9 +519,65 @@ public class AdaptiveSystemToCPN {
     return false;
   }
   
+  public List<ExtraPlace> extraPlaces;
+  
+  public static class ExtraPlace {
+    public ExtraPlace(Event event, Condition condition, org.cpntools.accesscpn.model.Place place) {
+      this.event = event;
+      this.condition = condition;
+      this.place = place;
+    }
+    public Event event;
+    public Condition condition;
+    public org.cpntools.accesscpn.model.Place place;
+  }
+  
+  private void addExtraPlacesForDependencies(Event e, Condition c, org.cpntools.accesscpn.model.Transition t, String transitionName) {
+    if (!dependsOnConditions.containsKey(c)) return;
+    
+    for (Condition c2 : dependsOnConditions.get(c)) {
+      
+      // find a place providing the required expression
+      String type = "INT";
+      String placeName = getPlaceName(c2.getName());
+      String arcExpression = getToken(c2.getName());
+      
+      /*
+      if (placeTypes.containsKey(placeName)) type = placeTypes.get(placeName);
+      
+      Object obj = this.getObjectForID(arcExpression);
+      if (obj != null && obj instanceof HLDeclaration) {
+        HLDeclaration decl = (HLDeclaration)obj;
+        if (decl.getStructure() instanceof VariableDeclaration) {
+          arcExpression = ((VariableDeclaration)decl.getStructure()).getVariables().get(0);
+        }
+      }
+      else arcExpression = convertToVariableString(arcExpression);
+      */
+      
+      String specialPlaceName = placeName+"_"+transitionName+"_"+arcExpression;
+      if (!places.containsKey(specialPlaceName)) {
+        String marking = getMarkingString(placeName);
+        org.cpntools.accesscpn.model.Place p = build.addPlace(eventPage, specialPlaceName, type, marking);
+        places.put(specialPlaceName, p);
+        
+        extraPlaces.add(new ExtraPlace(e, c2, p));
+        
+        System.out.println("creating place "+specialPlaceName+" for '"+arcExpression+"' at "+e.getName()+" defined by "+c2);
+      }
+      
+      build.addArc(eventPage, places.get(specialPlaceName), t, arcExpression);
+    }
+  }
+  
+  /**
+   * all places of the model, indexed by their name
+   */
+  Map<String, org.cpntools.accesscpn.model.Place> places;
+  
   public void convertEventsToTransitions(Collection<Event> events) {
     
-    Map<String, org.cpntools.accesscpn.model.Place> places = new HashMap<String, org.cpntools.accesscpn.model.Place>();
+    places = new HashMap<String, org.cpntools.accesscpn.model.Place>();
     
     for (Event e : events) {
       
@@ -507,9 +593,13 @@ public class AdaptiveSystemToCPN {
       // collect everything that is required by this event
       Set<String> requiredExpressions = new HashSet<String>();
       Set<String> providedExpressions = new HashSet<String>();
+      for (Condition c : e.getPreConditions()) {
+        if (c.isAbstract()) continue;
+        if (dependsOnExpressions.containsKey(c)) requiredExpressions.addAll(dependsOnExpressions.get(c));
+      }
       for (Condition c : e.getPostConditions()) {
         if (c.isAbstract()) continue;
-        if (dependsOn.containsKey(c)) requiredExpressions.addAll(dependsOn.get(c));
+        if (dependsOnExpressions.containsKey(c)) requiredExpressions.addAll(dependsOnExpressions.get(c));
       }
       
       Map<String, String> expressionVariable = new HashMap<String, String>();
@@ -524,7 +614,7 @@ public class AdaptiveSystemToCPN {
         
         if (placeTypes.containsKey(placeName)) type = placeTypes.get(placeName);
 
-        if (provides.containsKey(c)) providedExpressions.addAll(provides.get(c));
+        if (providesExpressions.containsKey(c)) providedExpressions.addAll(providesExpressions.get(c));
         
         boolean turnExpressionToVariable = false;
 
@@ -561,8 +651,11 @@ public class AdaptiveSystemToCPN {
         } else {
           build.addArc(eventPage, places.get(placeName), t, arcExpression);
         }
+        
+        addExtraPlacesForDependencies(e, c, t, transitionName);
       }
       
+      /*
       // add extra places for all required but missing expressions 
       for (String arcExpression : requiredExpressions) {
         if (!(providedExpressions.contains(arcExpression))) {
@@ -570,11 +663,12 @@ public class AdaptiveSystemToCPN {
           // find a place providing the required expression
           String type = "INT";
           String placeName = null;
+          Condition c2 = null; // contains the condition that providesExpressions the required term
           for (Node n2 : e.getAllPredecessors()) {
             if (n2 instanceof Event || n2.isAbstract()) continue;
-            Condition c2 = (Condition)n2;
+            c2 = (Condition)n2;
             
-            if (provides.containsKey(c2) && provides.get(c2).contains(arcExpression)) {
+            if (providesExpressions.containsKey(c2) && providesExpressions.get(c2).contains(arcExpression)) {
               placeName = getPlaceName(c2.getName());
             }
           }
@@ -597,12 +691,15 @@ public class AdaptiveSystemToCPN {
             org.cpntools.accesscpn.model.Place p = build.addPlace(eventPage, specialPlaceName, type, marking);
             places.put(specialPlaceName, p);
             
-            System.out.println("creating place "+specialPlaceName+" for '"+arcExpression+"' at "+e.getName());
+            extraPlaces.add(new ExtraPlace(e, c2, p));
+            
+            System.out.println("creating place "+specialPlaceName+" for '"+arcExpression+"' at "+e.getName()+" defined by "+c2);
           }
           
           build.addArc(eventPage, places.get(specialPlaceName), t, arcExpression);
         }
       }
+      */
       
       for (Condition c : e.getPostConditions()) {
         
@@ -618,7 +715,7 @@ public class AdaptiveSystemToCPN {
         // at the outgoing arcs all occurrences of the incoming-arc-expressions by the
         // corresponding variable name
         for (String subExp : expressionVariable.keySet()) {
-          if (dependsOn.containsKey(c) && dependsOn.get(c).contains(subExp)) {
+          if (dependsOnExpressions.containsKey(c) && dependsOnExpressions.get(c).contains(subExp)) {
             // replace subexpressions by variables only if depending on it
             arcExpression = replaceAll(arcExpression, subExp, expressionVariable.get(subExp));
           }
@@ -635,8 +732,10 @@ public class AdaptiveSystemToCPN {
         
         build.addArc(eventPage, t, places.get(placeName), arcExpression);
         //System.out.println(t.getName()+" -> "+placeName+" : "+arcExpression);
+        
+        
+        addExtraPlacesForDependencies(e, c, t, transitionName);
       }
-
       
     }
   }
@@ -743,8 +842,9 @@ public class AdaptiveSystemToCPN {
     return null;
   }
   
-  private Map<Condition,Set<String>> dependsOn;
-  private Map<Condition,Set<String>> provides;
+  private Map<Condition,Set<Condition>> dependsOnConditions;
+  private Map<Condition,Set<String>> dependsOnExpressions;
+  private Map<Condition,Set<String>> providesExpressions;
   
   /**
    * Extract IDs of the variable declarations of the variables used in the expression.
@@ -773,6 +873,12 @@ public class AdaptiveSystemToCPN {
     return null;
   }
   
+  private boolean isSingleVariable(String arcExpression, String idsInArcExpression[] ) {
+    return (idsInArcExpression != null
+        && idsInArcExpression.length == 1
+        && arcExpression.equals(getVariableNameForID(idsInArcExpression[0])));
+  }
+  
   /**
    * Compute all dependencies of the post-conditions and the guard-label of 
    * event 'e' on the (transitive) pre-conditions of event 'e'.
@@ -783,7 +889,6 @@ public class AdaptiveSystemToCPN {
   private void buildDependencies(Event e, HighLevelSimulator sim_local) {
     
     Set<String> preConditionSingleIDs = new HashSet<String>();
-    Set<String> declaredSingleIDs = new HashSet<String>();
     Set<String> usedIDs = new HashSet<String>();
     
     Map<String, Set<String>> evaluatedCompleteExpressions = new HashMap<String, Set<String>>();
@@ -804,17 +909,18 @@ public class AdaptiveSystemToCPN {
       if (ids != null && ids.length > 0) {
         //System.out.print(c.getName()+" -->* "); for (String id : ids) System.out.print(id+" "); System.out.println();
 
-        if (!provides.containsKey(c)) provides.put(c, new HashSet<String>());
+        if (!providesExpressions.containsKey(c)) providesExpressions.put(c, new HashSet<String>());
         
-        if (ids.length == 1) {
-          declaredSingleIDs.add(ids[0]);
+        // this node providesExpressions exactly one variable
+        if (isSingleVariable(arcExpression, ids))
+        {
           // this id is used in a direct predecessor of e: values can be bound to it
           if (e.getPreSet().contains(c)) preConditionSingleIDs.add(ids[0]);
 
           if (!declaringConditions.containsKey(ids[0])) declaringConditions.put(ids[0], new LinkedList<Condition>());
           declaringConditions.get(ids[0]).add(c);
           
-          provides.get(c).add(ids[0]);
+          providesExpressions.get(c).add(ids[0]);
         }
         
         /* DISABLED: re-using entire arc expressions
@@ -826,25 +932,28 @@ public class AdaptiveSystemToCPN {
           idset.add(id);
         }
         evaluatedCompleteExpressions.put(arcExpression, idset); 
-        provides.get(c).add(arcExpression);
+        providesExpressions.get(c).add(arcExpression);
         */
       }
     }
     
+    List<Condition> directEnvironment = new LinkedList<Condition>();
+    directEnvironment.addAll(e.getPreConditions());
+    directEnvironment.addAll(e.getPostConditions());
+    
     // check for each post-condition on what variables and terms it depends on
-    for (Condition c : e.getPostConditions()) {
+    for (Condition c : directEnvironment) {
       if (c.isAbstract()) continue;
       
       String placeName = getPlaceName(c.getName());
       String arcExpression = getToken(c.getName());
       
-      if (!dependsOn.containsKey(c)) {
-        dependsOn.put(c, new HashSet<String>());
-      }
+      if (!dependsOnConditions.containsKey(c)) dependsOnConditions.put(c, new HashSet<Condition>());
+      if (!dependsOnExpressions.containsKey(c)) dependsOnExpressions.put(c, new HashSet<String>());
       
       String ids[] = getDeclaringIDs(arcExpression, sim_local);
       if (ids != null && ids.length > 0) {
-        //System.out.print(c.getName()+" -->* "); for (String id : ids) System.out.print(id+" "); System.out.println();
+        System.out.print(c.getName()+" -->* "); for (String id : ids) System.out.print(id+" "); System.out.println();
 
         boolean singleID = (ids.length == 1);
         
@@ -852,21 +961,40 @@ public class AdaptiveSystemToCPN {
         for (String id : ids) {
           
           Object o = getObjectForID(id);
-          if (!isVariableDeclaration(o)) continue; // only variables can be missing
+          if (!isVariableDeclaration(o)) {
+            continue; // only variables can be missing
+          }
           
-          if (!declaredSingleIDs.contains(id)) {
+          if (!declaringConditions.containsKey(id)) {
             System.err.println(c.getName()+" ("+((Oclet)c.eContainer().eContainer()).getName()+") requires variable "+getObjectForID(id));
             missingIDs.add(id);
+          } else {
+            
+            // find the transitive pre-condition this condition depends on to resolve its term inscription
+            for (Condition c_depends_on : declaringConditions.get(id)) {
+              if (e.getPreConditions().contains(c_depends_on)) {
+                // a direct pre-condition features what this condition needs: done, do not add dependency
+                break;
+              }
+              // not a direct precondition: establish explicit dependency
+              System.err.println(c.getName()+" ("+((Oclet)c.eContainer().eContainer()).getName()+") depends on "+c_depends_on+" to resolve "+getObjectForID(id));
+              dependsOnConditions.get(c).add(c_depends_on);
+              break;
+            }
+                        
           }
-          dependsOn.get(c).add(id);
+          dependsOnExpressions.get(c).add(id);
         }
         
+        /* DISABLED: re-using entire arc expressions
+
         // if there is an immediate precondition with the same expression: add it to the dependencies
         for (Condition c2 : e.getPreConditions()) {
           if (!c2.isAbstract() && getToken(c2.getName()).equals(arcExpression)) {
-            dependsOn.get(c).add(arcExpression);
+            dependsOnExpressions.get(c).add(arcExpression);
           }
         }
+        */
         
         // CPN'Dep.find_dependencies ("fun () = amount*price-actual_amount*price","fun () = actual_amount*price")
         
@@ -876,7 +1004,7 @@ public class AdaptiveSystemToCPN {
           if (id_unresolved == null) {
             System.err.println("can be resolved with "+requiredExpressions);
             for (String exp : requiredExpressions) {
-              dependsOn.get(c).add(exp);
+              dependsOnExpressions.get(c).add(exp);
             }
             
           } else {
@@ -888,10 +1016,10 @@ public class AdaptiveSystemToCPN {
       }
     }
     
-    if (!declaredSingleIDs.containsAll(usedIDs)) {
+    if (!declaringConditions.keySet().containsAll(usedIDs)) {
       System.err.println("Event "+e.getName()+" does not have all data it needs");
       System.err.println("declared: ");
-      for (String declared : declaredSingleIDs) {
+      for (String declared : declaringConditions.keySet()) {
         System.err.println("  "+getObjectForID(declared));
       }
         
@@ -949,8 +1077,9 @@ public class AdaptiveSystemToCPN {
         e.printStackTrace();
       }
   
-      dependsOn = new HashMap<Condition, Set<String>>();
-      provides = new HashMap<Condition, Set<String>>();
+      dependsOnConditions = new HashMap<Condition, Set<Condition>>();
+      dependsOnExpressions = new HashMap<Condition, Set<String>>();
+      providesExpressions = new HashMap<Condition, Set<String>>();
       
       for (Oclet o : as.getOclets()) {
         for (Node n : o.getDoNet().getNodes()) {

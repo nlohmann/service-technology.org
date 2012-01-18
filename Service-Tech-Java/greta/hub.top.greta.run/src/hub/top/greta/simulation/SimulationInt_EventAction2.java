@@ -170,17 +170,80 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     if (eventNum > 0) {
       DNodeSet bps = bp.getBranchingProcess();
       
+      
+      HashSet<DNode> newEvents = new HashSet<DNode>();
+      nextmax: for (DNode b : bps.getCurrentMaxNodes()) {
+        if (b.pre == null || b.pre.length == 0) continue;
+        
+        DNode e = b.pre[0];
+        
+        // consider only those events that were just added
+        for (DNode c : e.post) {
+          if (c.post != null && c.post.length > 0) continue nextmax;
+        }
+        
+        newEvents.add(e);
+      }
+        
+      if (rc.a2c != null) {
+        
+        Map<org.cpntools.accesscpn.model.Place, List<Condition>> extraTokens = new HashMap<org.cpntools.accesscpn.model.Place, List<Condition>>();
+        
+        for (DNode e : newEvents) {
+          System.out.println("new event "+e);
+          
+          for (int i = 0; i<e.causedBy.length; i++) {
+            for (DNode e_system : bp.getSystem().fireableEvents) {
+              if (e_system.globalId == e.causedBy[i]) {
+                
+                System.out.println("causedBy "+e_system);
+
+                Map<DNode, DNode> embedding = new HashMap<DNode, DNode>();
+                if (!e_system.suffixOf(e, embedding)) {
+                  System.err.println("ERROR. Could not embed causing event "+e_system+" at "+e);
+                }
+                
+                List<AdaptiveSystemToCPN.ExtraPlace> extraPlaces = new LinkedList<AdaptiveSystemToCPN.ExtraPlace>();
+                for (AdaptiveSystemToCPN.ExtraPlace ep : rc.a2c.extraPlaces) {
+                  if (ep.event == (Event)system.getOriginalNode(e_system)) {
+                    extraPlaces.add(ep);
+                  }
+                }
+                
+                for (AdaptiveSystemToCPN.ExtraPlace ep : extraPlaces) {
+                  System.out.println("looking for "+ep.condition+" in "+embedding);
+                  
+                  for (Map.Entry<DNode, DNode> m : embedding.entrySet()) {
+                    if (m.getKey().isEvent) continue;
+                    
+                    // system condition that defines an extra place for the CPN Tools transition
+                    if (ep.condition == (Condition)system.getOriginalNode(m.getKey())) {
+                      // get label of original condition of the run
+                      Condition runCondition = (Condition)system.getOriginalNode(m.getValue());
+                      System.out.println(runCondition.getName()+" provides an extra value for "+rc.a2c.eventToTransition.get(ep.event));
+                      
+                      if (!extraTokens.containsKey(ep.place)) extraTokens.put(ep.place, new LinkedList<Condition>());
+                      extraTokens.get(ep.place).add(runCondition);
+                    }
+                  }
+                }
+                
+              }
+            } // for all bp.getSystem().fireableEvents
+          } // for all causedBy
+        }
+        // add additional tokens to the CPN
+        rc.a2c.setMarkingOfExtraPlaces(extraTokens);
+      }
+      
       // we identify the fired events as the pre-events of the maximal conditions
       // of the current process instance as computed by Uma
       HashSet<DNode> firedEvents = new HashSet<DNode>();
       Map<DNode, Binding> bp_enablingBinding = new HashMap<DNode, Binding>();
       List<Binding> bindings = (rc.a2c != null) ? rc.a2c.enabledTransitions() : null;
       
-      for (DNode b : bps.getCurrentMaxNodes()) {
-        if (b.pre == null || b.pre.length == 0) continue;
-        
-        DNode e = b.pre[0];
-        
+      for (DNode e : newEvents) {
+
         // collect all systems events that contributed to firing this event
         Event[] e_cause = new Event[e.causedBy.length];
         for (int i = 0; i<e.causedBy.length; i++) {
@@ -190,7 +253,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
             }
           }
         }
-
+        
         boolean isHLenabled;
         
         if (rc.a2c == null) {

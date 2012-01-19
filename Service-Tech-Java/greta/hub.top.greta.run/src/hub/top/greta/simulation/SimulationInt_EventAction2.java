@@ -309,8 +309,11 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
                 String token = AdaptiveSystemToCPN.getToken(place);
                 
                 if (!token.equals(toConsume.get(placeName))) {
-                  System.out.println(token+" of "+place+" does not match "+bind);
-                  allBindingsMatch = false;
+                  // in some cases, Strings are formatted differently, ask CPN Tools for equality
+                  if (!rc.a2c.compareValues(token, toConsume.get(placeName))) {
+                    System.out.println(token+" of "+place+" does not match "+toConsume+" in "+bind);
+                    allBindingsMatch = false;
+                  }
                 }
               }
               if (allBindingsMatch) {

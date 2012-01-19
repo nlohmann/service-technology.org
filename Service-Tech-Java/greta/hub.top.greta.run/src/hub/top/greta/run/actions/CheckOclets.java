@@ -37,6 +37,9 @@
 
 package hub.top.greta.run.actions;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.AdaptiveSystemPackage;
 import hub.top.adaptiveSystem.Condition;
@@ -47,6 +50,7 @@ import hub.top.adaptiveSystem.Oclet;
 import hub.top.adaptiveSystem.PreNet;
 import hub.top.adaptiveSystem.Temp;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
+import hub.top.greta.validation.ModelError;
 
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CommandStack;
@@ -99,6 +103,8 @@ public class CheckOclets extends Action implements
 			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
 			EList<Oclet> ocletList = adaptiveSystem.getOclets();
 					
+			List<ModelError> errors = new LinkedList<ModelError>();
+	    
 			if(!adaptiveSystem.isSetWellformednessToOclets()) {
 				// create a list of commands and add commands with values of attribute wellformed to this list
 				EList<Command> cmdList = new BasicEList<Command>();
@@ -107,7 +113,7 @@ public class CheckOclets extends Action implements
 					//check only the oclets which are not wellformed
 					if(!oclet.isWellFormed()) {
 						System.out.println("Check wellformedness of oclet : " + oclet.getName());
-						if(checkWellformedness(oclet)) {
+						if(checkWellformedness(oclet, errors)) {
 							SetCommand cmd = new SetCommand(
 									adaptiveSystemDiagramEditor.getEditingDomain(), oclet, AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed(), true);
 							cmd.setLabel("set oclet attribute " + AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed().getName());
@@ -208,7 +214,7 @@ public class CheckOclets extends Action implements
 	 * @param oclet
 	 * @return
 	 */
-	private boolean checkWellformedness(Oclet oclet) {
+	private boolean checkWellformedness(Oclet oclet, List<ModelError> errors) {
 
 		Shell shell = new Shell();
 		EList<Node> minimalNodeList = new BasicEList<Node>();
@@ -226,7 +232,7 @@ public class CheckOclets extends Action implements
 		//check each preNet-Node
 		for (Node ocletNode : oclet.getPreNet().getNodes()) {
 			//check 1. - 6. in a separate method isWellformed(node)
-			if(!isWellformed(ocletNode)) return false;
+			if(!isWellformed(ocletNode, errors)) break;
 			
 			//8. fill the list of minimal nodes for check of cycles
 			if( (  ocletNode instanceof Condition
@@ -243,7 +249,7 @@ public class CheckOclets extends Action implements
 		//check each DoNet-Nodes
 		for (Node ocletNode : oclet.getDoNet().getNodes()) {
 			//check 1. - 6. in a separate method isWellformed(node)
-			if(!isWellformed(ocletNode)) return false;
+			if(!isWellformed(ocletNode, errors)) return false;
 		}
 		
 		//8. in oclet is no cycle allowed
@@ -289,174 +295,83 @@ public class CheckOclets extends Action implements
 	 * 
 	 * 
 	 * @param node
+	 * @param errors list of errors found in the oclet
 	 * @return
 	 */
-	private boolean isWellformed(Node ocletNode) {
-		Shell shell = new Shell();
+	private boolean isWellformed(Node ocletNode, List<ModelError> errors) {
+
+	  int oldErrors = errors.size();
+	  
 		String ocletName = ((Oclet) ocletNode.eContainer().eContainer()).getName();
 		
-		/*
-		//4. abstract nodes in oclet are not allowed
-		if (ocletNode.isAbstract()) {
-			System.out.println("  not well formed - first occurrence of an abstract node.");
-			MessageDialog.openInformation(
-				shell,
-				"AdaptiveSystem - check wellformedness of oclets",
-				"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one abstract node in oclet.");
-			return false;
-		}
-		*/
+    if (ocletNode instanceof Condition) {
+      
+      Condition c = (Condition)ocletNode;
+      
+      //6. a preNet don't have conflicts, that means a condition has maximal one event in postEvents
+      if(c.getPostEvents().size() > 1) {
+        String postEvents = "";
+        for (Event e : c.getPostEvents()) postEvents += "'"+e.getName()+"' ";
+        errors.add(new ModelError(ocletNode, ocletName, "Condition '" + ocletNode.getName() + "' has more than one post-event: "+postEvents));
+      }
+      //6. an preNet don't have conflicts, that means a condition has maximal one event in preEvents
+      if(c.getPreEvents().size() > 1) {
+        String preEvents = "";
+        for (Event e : c.getPreEvents()) preEvents += "'"+e.getName()+"' ";
+        errors.add(new ModelError(ocletNode, ocletName, "Condition '" + ocletNode.getName() + "' has more than one pre-event: "+preEvents));
+      }
+      
+      if(ocletNode.eContainer() instanceof PreNet) {
+        
+        //2. all maximal conditions have to be marked     
+        if(c.isMaximal() && !c.isMarked()) {
+          errors.add(new ModelError(ocletNode, ocletName, "Condition '" + ocletNode.getName() + "' is maximal but not marked"));
+        }
+      }
+      
+      if(ocletNode.eContainer() instanceof DoNet) {
+        //3. conditions in doNet are not allowed to be minimal. A minimal condition has no preEvent.
+        if(c.getPreEvents().isEmpty()) {
+          errors.add(new ModelError(ocletNode, ocletName, "Condition '" + ocletNode.getName() + "' of the contribution has no pre-event."));
+        }
+      }
+      
+    }
 		
-		if(ocletNode.eContainer() instanceof PreNet) {
-			if (ocletNode instanceof Condition) {
-				//2. all maximal conditions have to be marked			
-				if(((Condition) ocletNode).isMaximal()) {
-					if(!((Condition) ocletNode).isMarked()) {
-					System.out.println("  not well formed - condition " + ocletNode.getName() + " is maximal but not marked.");
-					MessageDialog.openInformation(
-						shell,
-						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one maximal condition without token in preNet.");
-					return false;
-					}
-				}
-				//6. a preNet don't have conflicts, that means a condition has maximal one event in postEvents
-				if(((Condition) ocletNode).getPostEvents().size() > 1) {
-					System.out.println("  not well formed - preNet has at least one (forward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPostEvents());
-					MessageDialog.openInformation(
-						shell,
-						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one (forward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPostEvents()+" in the precondition.");
-					return false;
-				}
-				//6. an preNet don't have conflicts, that means a condition has maximal one event in preEvents
-				if(((Condition) ocletNode).getPreEvents().size() > 1) {
-					System.out.println("  not well formed - preNet has at least one (backward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPreEvents());
-					MessageDialog.openInformation(
-						shell,
-						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one (backward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPostEvents()+" in the precondition.");
-					return false;
-				}
-			}
-			
-			if(ocletNode instanceof Event) {
-				/*
-				//1. an events in preNet is not allowed to be minimal (without preSet)
-				if(((Event) ocletNode).getPreConditions().isEmpty()) {
-					System.out.println("  not well formed - event " + ocletNode.getName() + " is minimal. Only conditions are allowed to be minimal.");
-					MessageDialog.openInformation(
-						shell,
-						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one minimal event in preNet. Only conditions are allowed to be minimal.");
-					return false;					
-				}
-				*/
-				
+		if(ocletNode instanceof Event) {
+		  Event e = (Event)ocletNode;
+		  
+      //2. maximal events in preNet are not allowed
+      for(Condition postCondition : e.getPostConditions()) {
+        if (postCondition.isAbstract()) continue;
+        for(Condition postCondition2 : e.getPostConditions()) {
+          if(postCondition != postCondition2 && postCondition.getName().equals(postCondition2.getName())) {
+            errors.add(new ModelError(ocletNode, ocletName, "Event '" + ocletNode.getName() + "' has two post-condition with the same label: "+postCondition.getName()));
+          }
+        }
+      }
+		  
+	    if(ocletNode.eContainer() instanceof PreNet) {
+
 				//2. maximal events in preNet are not allowed
-				if(!((Event) ocletNode).getPostConditions().isEmpty()) {
-					for(Condition postCondition : ((Event) ocletNode).getPostConditions()) {
-						if(postCondition.eContainer() instanceof DoNet) {
-							System.out.println("  not well formed - event " + ocletNode.getName() + " is maximal. Only conditions are allowed to be maximal.");
-							MessageDialog.openInformation(
-								shell,
-								"AdaptiveSystem - check wellformedness of oclets",
-								"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one maximal event in preNet. Only conditions are allowed to be maximal.");
-							return false;
-						}
-						if (!postCondition.isAbstract()) {
-  						//9.) no two conditions in PostSet of an event are equally labeled
-  						for(Condition postCondition2 : ((Event) ocletNode).getPostConditions()) {
-  
-  							if(!postCondition.equals(postCondition2) && postCondition.getName().equals(postCondition2.getName())) {
-  								System.out.println("  not well formed - event " + ocletNode.getName() + " has two equally labeled post-conditions.");
-  								MessageDialog.openInformation(
-  									shell,
-  									"AdaptiveSystem - check wellformedness of oclets",
-  									"Oclet " + ocletName + " is not wellformed. Event "+ocletNode.getName()+" in precondition has two equally labeled post-conditions.");
-  								return false;
-  							}
-  						}
-						}
+	      for(Condition postCondition : e.getPostConditions()) {
+          if (postCondition.isAbstract()) continue;
+					if(postCondition.eContainer() instanceof DoNet) {
+					  errors.add(new ModelError(ocletNode, ocletName, "Event '" + ocletNode.getName() + "' has post-condition in the contribution: "+postCondition.getName()));
 					}
 				}//END if maximal events in preNet (2.) and 9.) 
-			}//END if ocletNode is event 
-		}
-		
-		if(ocletNode.eContainer() instanceof DoNet) {
-		  /*
-			//5. passive nodes in doNet are not allowed
-			if(ocletNode.getTemp().equals(Temp.WITHOUT)) {
-				System.out.println("  not well formed - first occurrence of an passive node in doNet.");
-				MessageDialog.openInformation(
-					shell,
-					"AdaptiveSystem - check wellformedness of oclets",
-					"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is a passive node in doNet.");
-				return false;
 			}
-			*/
-			
-			if(ocletNode instanceof Condition) {
-				//3. conditions in doNet are not allowed to be minimal. A minimal condition has no preEvent.
-				if(((Condition) ocletNode).getPreEvents().isEmpty()) {
-					System.out.println("  not well formed - condition " + ocletNode.getName() + " from doNet is minimal.");
-					MessageDialog.openInformation(
-						shell,
-						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one minimal condition in the contribution.");					
-					return false;
-				}
-				//6. a doNet don't have conflicts, that means a condition has maximal one event in postEvents
-				if(((Condition) ocletNode).getPostEvents().size() > 1) {
-					System.out.println("  not well formed - preNet has at least one (forward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPostEvents());
-					MessageDialog.openInformation(
-						shell,
-						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not not used for execution of a step because it is wellformed. "+
-						ocletNode.getName()+" has a (forward-)conflict in the contribution.");
-					return false;
-				}
-				//6. a doNet don't have conflicts, that means a condition has maximal one event in postEvents
-				if(((Condition) ocletNode).getPreEvents().size() > 1) {
-					System.out.println("  not well formed - doNet has at least one (backward-)conflict on "+ocletNode+" with "+((Condition) ocletNode).getPreEvents());
-					MessageDialog.openInformation(
-						shell,
-						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + ocletName + " is not not used for execution of a step because it is wellformed. "+ocletNode.getName()+" has a (backward-)conflict in the contribution.");
-					return false;
-				}
-			}
-			if(ocletNode instanceof Event) {
-				//3. events in doNet are not allowed to be minimal. A minimal event has no preConditions.
-				if(((Event) ocletNode).getPreConditions().isEmpty()) {
-					System.out.println("  not well formed - event" + ocletNode.getName() + " from doNet is minimal.");
-					MessageDialog.openInformation(
-							shell,
-							"AdaptiveSystem - check wellformedness of oclets",
-							"Oclet " + ocletName + " is not used for execution of a step because it is not wellformed. There is at least one minimal event in doNet.");					
-					return false;
-				}
-				if(!((Event) ocletNode).getPostConditions().isEmpty()) {
-					//9.) no two conditions in PostSet of an event are equally labeled
-					for(Condition postCondition : ((Event) ocletNode).getPostConditions()) {
-					  if (!postCondition.isAbstract()) {
-  						for(Condition postCondition2 : ((Event) ocletNode).getPostConditions()) {
-  							if(!postCondition.equals(postCondition2) && postCondition.getName().equals(postCondition2.getName())) {
-  								System.out.println("  not well formed - event " + ocletNode.getName() + " has two equally labeled post-conditions ("+postCondition.getName()+").");
-  								MessageDialog.openInformation(
-  										shell,
-  										"AdaptiveSystem - check wellformedness of oclets",
-  										"Oclet " + ocletName + " is not wellformed. Event " + ocletNode.getName() + " has two equally labeled post-conditions ("+postCondition.getName()+").");
-  								return false;
-  							}
-  						}
-					  }
-					}
-				}//END if maximal events in preNet
-			}			
+	    
+	    if(ocletNode.eContainer() instanceof DoNet) {
+	      
+  			//3. events in doNet are not allowed to be minimal. A minimal event has no preConditions.
+  			if(e.getPreConditions().isEmpty()) {
+  			  errors.add(new ModelError(ocletNode, ocletName, "Event '" + ocletNode.getName() + "' has no pre-condition"));
+  			}
+	    }
 
 		}
-		return true;
+		return oldErrors == errors.size(); // no new errors
 	}
 	
 	/**

@@ -34,37 +34,19 @@
  * version of this file under the terms of any one of the EPL or the AGPL.
 \*****************************************************************************/
 
-package hub.top.greta.cpn;
+package hub.top.greta.validation;
 
-import java.util.Map;
+import org.eclipse.emf.ecore.EObject;
 
-import hub.top.uma.DNode;
-import hub.top.uma.DNodeSys_AdaptiveSystem;
-
-public class ColoredConditionVisitor {
+public class ModelError {
   
-  private DNodeSys_AdaptiveSystem system;
-  
-  public ColoredConditionVisitor(DNodeSys_AdaptiveSystem system) {
-    this.system = system;
+  public ModelError(EObject modelEObject, String location, String error) {
+    this.modelObject = modelEObject;
+    this.location = location;
+    this.error = error;
   }
   
-  public boolean satisfiesColoring(Map<DNode, DNode> embedding) {
-    
-    // TODO: build evaluation string
-    /* let
-     *   val x1 = v1;
-     *   val x2 = v2;
-     * in
-     *   constraints over x1, x2, ...
-     * end; 
-     */
-    // TODO: evaluate
-    for (Map.Entry<DNode, DNode> m : embedding.entrySet()) {
-      System.out.println(m.getKey()+" --> "+system.getOriginalNode(m.getValue()));
-    }
-    
-    return true;
-  }
-
+  public EObject modelObject;
+  public String location;
+  public String error;
 }

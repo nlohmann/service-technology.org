@@ -42,8 +42,8 @@ import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
 import hub.top.editor.ptnetLoLA.util.PtnetLoLAValidator;
 import hub.top.greta.cpn.AdaptiveSystemToCPN;
-import hub.top.greta.cpn.AdaptiveSystemToCPN.ModelError;
 import hub.top.greta.run.Activator;
+import hub.top.greta.validation.ModelError;
 
 import org.cpntools.accesscpn.engine.Simulator;
 import org.cpntools.accesscpn.engine.SimulatorService;
@@ -208,7 +208,7 @@ public class StartAction implements
 		simView.processViewEditor.getDiagramGraphicalViewer().select(simView.apEditPart);
 	}
 	
-	private void showMarkers(List<AdaptiveSystemToCPN.ModelError> errors) {
+	private void showMarkers(List<ModelError> errors) {
 	  
 	    IResource resource = (IResource)simView.processViewEditor.getEditorInput().getAdapter(IResource.class);
 

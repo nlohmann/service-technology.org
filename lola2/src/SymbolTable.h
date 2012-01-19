@@ -1,46 +1,51 @@
 /*!
- * \author Karsten
- * \file class definition for a symbol table
- *
- * The table has strings as keys. Payload  is not explicitly represented.
- * It can be attached by deriving from class symbol.
- * Collissions are handled as linked lists
- */
+\author Karsten
+\file SymbolTable.h
+\status new
+
+\brief class definition for a symbol table
+
+The table has strings as keys. Payload  is not explicitly represented.
+It can be attached by deriving from class symbol.
+Collissions are handled as linked lists.
+*/
 
 #pragma once
 
-#include<string>
-#include"Dimensions"
+#include <string>
+#include "Dimensions.h"
+
+using std::string;
 
 class Symbol;
 
 class SymbolTable
 {
-public:
-	/// If symbol with same key is in table: return false
-	/// If symbol with same key is not in table: return true and insert it
-	bool insert(Symbol *);
-	/// If key is in table: return corresponding symbol
-	/// If key is not in table: return NULL
-	Symbol * lookup(string);
-	
-	/// Initialize iteration; return NULL if table empty
-	Symbol * first();
-	/// Continue iteration; return NULL if there is none
-	Symbol * next(); 
+    public:
+        /// If symbol with same key is in table: return false
+        /// If symbol with same key is not in table: return true and insert it
+        bool insert(Symbol*);
+        /// If key is in table: return corresponding symbol
+        /// If key is not in table: return NULL
+        Symbol* lookup(string);
 
-	/// Generate and initialize a symbol table
-	SymbolTable();
+        /// Initialize iteration; return NULL if table empty
+        Symbol* first();
+        /// Continue iteration; return NULL if there is none
+        Symbol* next();
 
-private:
-	///The actual symbol table. It gets pointers as we use lists for collisions.
-	Symbol * table[SIZEOF_SYMBOLTABLE];
+        /// Generate and initialize a symbol table
+        SymbolTable();
 
-	/// The hash function to be used
-	unsigned int hash(string);
+    private:
+        ///The actual symbol table. It gets pointers as we use lists for collisions.
+        Symbol* table[SIZEOF_SYMBOLTABLE];
 
-	/// The index of the current element in iteration
-	unsigned int currentIndex;
-	/// Points to the current element in iteration
-	Symbol * currentSymbol;
-}
+        /// The hash function to be used
+        unsigned int hash(string);
+
+        /// The index of the current element in iteration
+        unsigned int currentIndex;
+        /// Points to the current element in iteration
+        Symbol* currentSymbol;
+};

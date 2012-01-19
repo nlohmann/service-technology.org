@@ -23,6 +23,22 @@ AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
 
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
+
+# Checks for header files.
+AC_CHECK_HEADERS([arpa/inet.h netinet/in.h stdlib.h string.h sys/socket.h unistd.h])
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([memset socket strerror])
+
+# Collect required libraries if libraries are not present.
+AC_CHECK_FUNC(gethostent, , AC_CHECK_LIB(nsl, gethostent))
+AC_CHECK_FUNC(setsockopt, , AC_CHECK_LIB(socket, setsockopt))
+
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_AUTOTEST

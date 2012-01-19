@@ -24,7 +24,7 @@ class Symbol
         /// Getter for key
         string getKey();
         /// Getter for next
-	Symbol * getNext();
+        Symbol* getNext();
         /// Setter for next
         void setNext(Symbol*);
 
@@ -33,7 +33,7 @@ class Symbol
 
     private:
         ///The key. Used for insertion in symbol table
-	string key;
+        string key;
         /// Symbols with same hash value are organized as lists.
         Symbol* next;
 };

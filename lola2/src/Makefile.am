@@ -4,7 +4,9 @@ bin_PROGRAMS = lola2
 # the plain sources you need to compile (no generated code)
 lola2_SOURCES = main.cc \
                 Dimensions.h \
-                Socket.cc Socket.h
+                Socket.cc Socket.h \
+                SymbolTable.cc SymbolTable.h \
+                Symbol.h
 
 AM_CFLAGS = -Wall -W -Wextra -pedantic
 AM_CXXFLAGS = -Wall -W -Wextra -pedantic

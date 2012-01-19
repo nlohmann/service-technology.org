@@ -14,10 +14,9 @@ Collissions are handled as linked lists.
 
 #include <string>
 #include "Dimensions.h"
+#include "Symbol.h"
 
 using std::string;
-
-class Symbol;
 
 class SymbolTable
 {

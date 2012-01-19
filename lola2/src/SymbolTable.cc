@@ -39,7 +39,7 @@ unsigned int SymbolTable::hash(string s)
 
 Symbol* SymbolTable::lookup(string str)
 {
-    for (Symbol sym = table[hash(str)]; sym; sym = sym -> getNext())
+    for (Symbol* sym = table[hash(str)]; sym; sym = sym -> getNext())
     {
         if (sym -> getKey() == str)
         {

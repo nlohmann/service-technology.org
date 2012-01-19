@@ -57,6 +57,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.cpntools.accesscpn.engine.highlevel.instance.Binding;
 import org.cpntools.accesscpn.engine.highlevel.instance.ValueAssignment;
@@ -190,7 +191,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
         
       if (rc.a2c != null) {
         
-        Map<org.cpntools.accesscpn.model.Place, List<Condition>> extraTokens = new HashMap<org.cpntools.accesscpn.model.Place, List<Condition>>();
+        Map<org.cpntools.accesscpn.model.Place, Set<Condition>> extraTokens = new HashMap<org.cpntools.accesscpn.model.Place, Set<Condition>>();
         
         for (DNode e : newEvents) {
           System.out.println("new event "+e);
@@ -225,13 +226,14 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
                       Condition runCondition = (Condition)system.getOriginalNode(m.getValue());
                       System.out.println(runCondition.getName()+" provides an extra value for "+rc.a2c.eventToTransition.get(ep.event));
                       
-                      if (!extraTokens.containsKey(ep.place)) extraTokens.put(ep.place, new LinkedList<Condition>());
+                      if (!extraTokens.containsKey(ep.place)) extraTokens.put(ep.place, new HashSet<Condition>());
                       extraTokens.get(ep.place).add(runCondition);
                     }
                   }
                 }
                 
-                
+                // collect the tokens of the preconditions of enabled event 'e'
+                // to update the marking in the net to the current marking of the run (wrt. 'e')
                 for (DNode b : e.pre) {
                   Condition runCondition = (Condition)system.getOriginalNode(b);
                   if (runCondition.isAbstract()) continue;
@@ -242,9 +244,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
                   }
                   org.cpntools.accesscpn.model.Place p = rc.a2c.conditionToPlace.get(system.getOriginalNode(e_system.pre[b_system]));
                   
-                  System.out.println(runCondition.getName()+" is a token on "+p);
-
-                  if (!extraTokens.containsKey(p)) extraTokens.put(p, new LinkedList<Condition>());
+                  if (!extraTokens.containsKey(p)) extraTokens.put(p, new HashSet<Condition>());
                   extraTokens.get(p).add(runCondition);
                 }
               }

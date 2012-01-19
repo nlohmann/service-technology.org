@@ -43,6 +43,7 @@ import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
 import hub.top.editor.ptnetLoLA.util.PtnetLoLAValidator;
 import hub.top.greta.cpn.AdaptiveSystemToCPN;
 import hub.top.greta.run.Activator;
+import hub.top.greta.run.actions.ActionHelper;
 import hub.top.greta.validation.ModelError;
 
 import org.cpntools.accesscpn.engine.Simulator;
@@ -209,47 +210,8 @@ public class StartAction implements
 	}
 	
 	private void showMarkers(List<ModelError> errors) {
-	  
-	    IResource resource = (IResource)simView.processViewEditor.getEditorInput().getAdapter(IResource.class);
-
-	    try {
-	      resource.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
-	      resource.deleteMarkers(IBookmark.TYPE, true, IResource.DEPTH_INFINITE);
-	      
-	      Diagram d = simView.processViewEditor.getDiagram();
-	      
-        // collected attributes for a marker, so create one
-	      HashMap<String, Object> attribMap = new HashMap<String, Object>();
-	      
-	      for (ModelError e : errors) {
-
-          String sourceID = null;
-          
-          for (Object o : d.getChildren()) {
-            View childView = (View)o;
-            if (childView.getElement() == e.modelObject) {
-              if (childView.eResource() instanceof XMLResource) {
-                sourceID = ((XMLResource)childView.eResource()).getID(childView);
-              }
-            }
-          }
-          
-          attribMap.put(IMarker.MESSAGE,  e.error);
-          attribMap.put(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-          if (sourceID != null) attribMap.put(IMarker.SOURCE_ID, sourceID);
-          attribMap.put(IMarker.LOCATION, e.location);
-          
-          if (attribMap.size() > 0) {
-            IMarker marker;
-            marker = resource.createMarker(IMarker.PROBLEM);
-            marker.setAttributes(attribMap);
-          }
-	      }
-
-	    } catch (Exception e) {
-	      Activator.getPluginHelper().logError("Error", e);
-	    }
-	  }
+	  ActionHelper.showMarkers(errors, simView.processViewEditor);
+	}
 
 
 	/**

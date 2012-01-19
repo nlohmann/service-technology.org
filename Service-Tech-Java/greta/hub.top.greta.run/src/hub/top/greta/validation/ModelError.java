@@ -40,13 +40,22 @@ import org.eclipse.emf.ecore.EObject;
 
 public class ModelError {
   
+  public static final int SEVERE = 0;
+  public static final int WARNING = 1;
+  
   public ModelError(EObject modelEObject, String location, String error) {
+    this(modelEObject, location, error, SEVERE);
+  }
+  
+  public ModelError(EObject modelEObject, String location, String error, int errorlevel) {
     this.modelObject = modelEObject;
     this.location = location;
     this.error = error;
+    this.errorlevel = errorlevel;
   }
   
   public EObject modelObject;
   public String location;
   public String error;
+  public int errorlevel;
 }

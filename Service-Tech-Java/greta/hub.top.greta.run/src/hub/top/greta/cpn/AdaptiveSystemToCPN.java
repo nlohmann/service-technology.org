@@ -70,9 +70,12 @@ import org.cpntools.accesscpn.engine.highlevel.SyntaxFatalErrorException;
 import org.cpntools.accesscpn.engine.highlevel.checker.Checker;
 import org.cpntools.accesscpn.engine.highlevel.instance.Binding;
 import org.cpntools.accesscpn.engine.highlevel.instance.Instance;
+import org.cpntools.accesscpn.engine.highlevel.instance.Marking;
+import org.cpntools.accesscpn.engine.highlevel.instance.State;
 import org.cpntools.accesscpn.engine.highlevel.instance.cpnvalues.CPNValue;
 import org.cpntools.accesscpn.model.HLDeclaration;
 import org.cpntools.accesscpn.model.Page;
+import org.cpntools.accesscpn.model.Place;
 import org.cpntools.accesscpn.model.declaration.VariableDeclaration;
 import org.cpntools.accesscpn.model.exporter.DOMGenerator;
 import org.cpntools.accesscpn.model.util.BuildCPNUtil;
@@ -85,6 +88,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.xmi.impl.StringSegment;
 
 public class AdaptiveSystemToCPN {
+  
+  private org.eclipse.emf.common.util.URI sourceURI;
   
   public AdaptiveSystemToCPN (AdaptiveSystem as) throws Exception {
     build = new BuildCPNUtil();
@@ -190,12 +195,13 @@ public class AdaptiveSystemToCPN {
   
   public void initialize(AdaptiveSystem as) throws Exception {
     
-    org.eclipse.emf.common.util.URI ml = as.eResource().getURI()
-                  .trimFileExtension().appendFileExtension("cpn");
-    IPath ws_path = new Path(ml.toPlatformString(true));
-    IFile ws_file = ResourcesPlugin.getWorkspace().getRoot().getFile(ws_path);
+    sourceURI = as.eResource().getURI();
     
-    File file = new File(ws_file.getLocationURI());//getFile("./resource/sim_hl/basic.cpn");
+    org.eclipse.emf.common.util.URI ml = sourceURI.trimFileExtension().appendFileExtension("cpn");
+    IPath ws_path = new Path(ml.toPlatformString(true));
+    IFile cpn_basefile = ResourcesPlugin.getWorkspace().getRoot().getFile(ws_path);
+    
+    File file = new File(cpn_basefile.getLocationURI());//getFile("./resource/sim_hl/basic.cpn");
     FileInputStream in = new FileInputStream(file);
     try {
       net = (org.cpntools.accesscpn.model.impl.PetriNetImpl)org.cpntools.accesscpn.model.importer.DOMParser.parse(in, "test");
@@ -366,7 +372,7 @@ public class AdaptiveSystemToCPN {
     return mark;
   }
   
-  public String getMarkingString(List<Condition> conditions) {
+  public String getMarkingString(Collection<Condition> conditions) {
     String mark = null;
     for (Condition c : conditions) {
       String value = getToken(c.getName());
@@ -456,17 +462,52 @@ public class AdaptiveSystemToCPN {
     }
   }*/
   
-  public void setMarkingOfExtraPlaces(Map<org.cpntools.accesscpn.model.Place, List<Condition>> newTokens) {
+  public void setMarkingOfExtraPlaces(Map<org.cpntools.accesscpn.model.Place, Set<Condition>> newTokens) {
     try {
-
-      for (Instance<org.cpntools.accesscpn.model.PlaceNode> pi : sim.getAllPlaceInstances()) {
-        if (newTokens.containsKey(pi.getNode())) {
-          System.out.println("setting: "+pi.getNode()+" to "+getMarkingString(newTokens.get(pi.getNode())));
-          if (sim.setMarking(pi, getMarkingString(newTokens.get(pi.getNode())))) {
-            System.out.println("  false: "+getMarkingString(newTokens.get(pi.getNode())));
+      
+      final StringBuilder sb = new StringBuilder();
+      boolean changed = false;
+      
+      for (Map.Entry<org.cpntools.accesscpn.model.Place, Set<Condition>> m : newTokens.entrySet()) {
+        
+        Instance<org.cpntools.accesscpn.model.PlaceNode> pi = null;
+        for (Instance<org.cpntools.accesscpn.model.PlaceNode> pi2 : sim.getAllPlaceInstances()) {
+          if (pi2.getNode() == m.getKey()) {
+            pi = pi2;
+            break;
           }
         }
+
+        changed = true;
+        
+        sb.append("CPN'place");
+        sb.append(pi.getNode().getId());
+        sb.append(".set ");
+        sb.append(pi.getInstanceNumber());
+        pi.getInstanceNumber();
+        sb.append(" (");
+        sb.append(getMarkingString(newTokens.get(pi.getNode())));
+        sb.append(");");
       }
+      
+      
+      if (changed) {
+        sim.lock();
+        try {
+          sb.append("CPN'Sim.reset_scheduler();");
+          sim.evaluate(sb.toString());
+        } finally {
+          sim.release();
+        }
+      }
+      
+      /*
+      for (Instance<org.cpntools.accesscpn.model.PlaceNode> pi : sim.getAllPlaceInstances()) {
+        if (newTokens.containsKey(pi.getNode())) {
+          sim.setMarking(pi, getMarkingString(newTokens.get(pi.getNode())));
+        }
+      }
+      */
       
       System.out.println("Updated marking to:\n"+sim.getMarking().toString());
     } catch (Exception e) {
@@ -782,8 +823,15 @@ public class AdaptiveSystemToCPN {
 
   public void exportNet() {
     try {
-      System.out.println("writing");
-      DOMGenerator.export(net, "D://out.cpn");
+      String cpn_model_file_name = sourceURI.trimFileExtension().lastSegment();
+      org.eclipse.emf.common.util.URI ml = sourceURI.trimFileExtension().trimSegments(1).appendSegment(cpn_model_file_name+"_run").appendFileExtension("cpn");
+      // resolve URI of the model to absoulate path to the target file
+      IPath ws_path = new Path(ml.toPlatformString(true));
+      IFile cpn_basefile = ResourcesPlugin.getWorkspace().getRoot().getFile(ws_path);
+      String out = cpn_basefile.getRawLocation().toOSString();
+      
+      System.out.println("writing to "+out);
+      DOMGenerator.export(net, out);
       System.out.println("done");
     } catch (Exception e) {
       System.err.println("could not write debug file");
@@ -919,6 +967,38 @@ public class AdaptiveSystemToCPN {
         && arcExpression.equals(getVariableNameForID(idsInArcExpression[0])));
   }
   
+  private String[] getTupleParts(String exp) {
+    if (exp.length() > 2) {
+      
+      try {
+        if (exp.charAt(0)=='(' && exp.charAt(exp.length()-1) == ')') {
+          
+          String[] arguments = exp.substring(1, exp.length()-1).split(",");
+          for (int j=0; j<arguments.length; j++) {
+            for (int i=0; i<arguments[j].length(); i++) {
+              char c = arguments[j].charAt(i);
+              if (   !Character.isJavaIdentifierPart(c)
+                  && !Character.isLetterOrDigit(c)
+                  && !Character.isWhitespace(c)) {
+                return new String[] { exp };
+              }
+            }
+            
+            // strip surrounding white-spaces
+            while (Character.isWhitespace(arguments[j].charAt(0)))
+              arguments[j] = arguments[j].substring(1);
+            while (Character.isWhitespace(arguments[j].charAt(arguments[j].length()-1)))
+              arguments[j] = arguments[j].substring(0,arguments[j].length()-1);
+          }
+          
+          return arguments;
+        }
+      } catch (Exception e) {
+      }
+    }
+    return new String[] { exp };
+  }
+  
   /**
    * Compute all dependencies of the post-conditions and the guard-label of 
    * event 'e' on the (transitive) pre-conditions of event 'e'.
@@ -944,36 +1024,39 @@ public class AdaptiveSystemToCPN {
       
       String placeName = getPlaceName(c.getName());
       String arcExpression = getToken(c.getName());
-
-      String[] ids = getDeclaringIDs(arcExpression, sim_local);
-      if (ids != null && ids.length > 0) {
-        //System.out.print(c.getName()+" -->* "); for (String id : ids) System.out.print(id+" "); System.out.println();
-
-        if (!providesExpressions.containsKey(c)) providesExpressions.put(c, new HashSet<String>());
+      
+      for (String subExpressions : getTupleParts(arcExpression)) {
         
-        // this node providesExpressions exactly one variable
-        if (isSingleVariable(arcExpression, ids))
-        {
-          // this id is used in a direct predecessor of e: values can be bound to it
-          if (e.getPreSet().contains(c)) preConditionSingleIDs.add(ids[0]);
-
-          if (!declaringConditions.containsKey(ids[0])) declaringConditions.put(ids[0], new LinkedList<Condition>());
-          declaringConditions.get(ids[0]).add(c);
+        String[] ids = getDeclaringIDs(subExpressions, sim_local);
+        if (ids != null && ids.length > 0) {
+          //System.out.print(c.getName()+" -->* "); for (String id : ids) System.out.print(id+" "); System.out.println();
+  
+          if (!providesExpressions.containsKey(c)) providesExpressions.put(c, new HashSet<String>());
           
-          providesExpressions.get(c).add(ids[0]);
+          // this node providesExpressions exactly one variable
+          if (isSingleVariable(subExpressions, ids))
+          {
+            // this id is used in a direct predecessor of e: values can be bound to it
+            if (e.getPreSet().contains(c)) preConditionSingleIDs.add(ids[0]);
+  
+            if (!declaringConditions.containsKey(ids[0])) declaringConditions.put(ids[0], new LinkedList<Condition>());
+            declaringConditions.get(ids[0]).add(c);
+            
+            providesExpressions.get(c).add(ids[0]);
+          }
+          
+          /* DISABLED: re-using entire arc expressions
+           
+          // this expression is completely evaluated because it is in the event's precondition and
+          // hence can be bound to a value in the run
+          HashSet<String> idset = new HashSet<String>();
+          for (String id : ids) {
+            idset.add(id);
+          }
+          evaluatedCompleteExpressions.put(arcExpression, idset); 
+          providesExpressions.get(c).add(arcExpression);
+          */
         }
-        
-        /* DISABLED: re-using entire arc expressions
-         
-        // this expression is completely evaluated because it is in the event's precondition and
-        // hence can be bound to a value in the run
-        HashSet<String> idset = new HashSet<String>();
-        for (String id : ids) {
-          idset.add(id);
-        }
-        evaluatedCompleteExpressions.put(arcExpression, idset); 
-        providesExpressions.get(c).add(arcExpression);
-        */
       }
     }
     
@@ -1056,7 +1139,7 @@ public class AdaptiveSystemToCPN {
             
           } else {
             System.err.println(id_unresolved+" CANNOT be resolved");
-            ModelError error = new ModelError(c, c.getName(), "Cannot resolve '"+getVariableNameForID(id_unresolved)+"' for '"+c.getName()+"'");
+            ModelError error = new ModelError(c, ((Oclet)c.eContainer().eContainer()).getName()+"/"+c.getName(), "Cannot resolve '"+getVariableNameForID(id_unresolved)+"' for '"+c.getName()+"'", ModelError.WARNING);
             errors.add(error);
           }
         }
@@ -1192,7 +1275,7 @@ public class AdaptiveSystemToCPN {
     
     try {
       
-      System.out.println("current marking: "+sim.getMarking().toString());
+      //System.out.println("current marking: "+sim.getMarking().toString());
       
       List<Instance<org.cpntools.accesscpn.model.Transition>> tis = sim.getAllTransitionInstances();
       for (Instance<org.cpntools.accesscpn.model.Transition> ti : tis) {

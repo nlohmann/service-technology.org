@@ -36,14 +36,22 @@
 package hub.top.greta.run.actions;
 
 //import hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewer;
+import java.util.HashMap;
+import java.util.List;
+
 import hub.top.adaptiveSystem.AdaptiveProcess;
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
 import hub.top.adaptiveSystem.presentation.AdaptiveSystemEditor;
 import hub.top.editor.ptnetLoLA.PtNet;
+import hub.top.greta.run.Activator;
+import org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts.DiagramDocumentEditor;
+import hub.top.greta.validation.ModelError;
 import hub.top.uma.DNodeBP;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
@@ -51,7 +59,10 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.xmi.XMLResource;
+import org.eclipse.gmf.runtime.common.ui.resources.IBookmark;
 import org.eclipse.gmf.runtime.notation.Diagram;
+import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -204,5 +215,51 @@ public class ActionHelper extends hub.top.editor.eclipse.ActionHelper {
         MessageDialog.open(kind, null, title, message, SWT.NONE);
       }
     });
+  }
+  
+  public static void showMarkers(List<ModelError> errors, DiagramDocumentEditor editor) {
+    
+    IResource resource = (IResource)editor.getEditorInput().getAdapter(IResource.class);
+
+    try {
+      resource.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+      resource.deleteMarkers(IBookmark.TYPE, true, IResource.DEPTH_INFINITE);
+      
+      Diagram d = editor.getDiagram();
+      
+      // collected attributes for a marker, so create one
+      HashMap<String, Object> attribMap = new HashMap<String, Object>();
+      
+      for (ModelError e : errors) {
+
+        String sourceID = null;
+        
+        for (Object o : d.getChildren()) {
+          View childView = (View)o;
+          if (childView.getElement() == e.modelObject) {
+            if (childView.eResource() instanceof XMLResource) {
+              sourceID = ((XMLResource)childView.eResource()).getID(childView);
+            }
+          }
+        }
+
+        String prefix = "";
+        if (e.errorlevel == ModelError.WARNING) prefix = "(warning) ";
+        
+        attribMap.put(IMarker.MESSAGE,  prefix+e.error);
+        attribMap.put(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+        if (sourceID != null) attribMap.put(IMarker.SOURCE_ID, sourceID);
+        attribMap.put(IMarker.LOCATION, e.location);
+        
+        if (attribMap.size() > 0) {
+          IMarker marker;
+          marker = resource.createMarker(IMarker.PROBLEM);
+          marker.setAttributes(attribMap);
+        }
+      }
+
+    } catch (Exception e) {
+      Activator.getPluginHelper().logError("Error", e);
+    }
   }
 }

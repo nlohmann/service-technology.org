@@ -37,9 +37,6 @@
 
 package hub.top.greta.run.actions;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.AdaptiveSystemPackage;
 import hub.top.adaptiveSystem.Condition;
@@ -48,10 +45,18 @@ import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Oclet;
 import hub.top.adaptiveSystem.PreNet;
-import hub.top.adaptiveSystem.Temp;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
+import hub.top.greta.cpn.AdaptiveSystemToCPN;
 import hub.top.greta.validation.ModelError;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CommandStack;
 import org.eclipse.emf.common.command.CompoundCommand;
@@ -105,55 +110,95 @@ public class CheckOclets extends Action implements
 					
 			List<ModelError> errors = new LinkedList<ModelError>();
 	    
-			if(!adaptiveSystem.isSetWellformednessToOclets()) {
+			//if(!adaptiveSystem.isSetWellformednessToOclets())
+			{
 				// create a list of commands and add commands with values of attribute wellformed to this list
 				EList<Command> cmdList = new BasicEList<Command>();
+				
+				boolean wellFormedSpec = true;
 				
 				for(Oclet oclet : ocletList) {
 					//check only the oclets which are not wellformed
 					if(!oclet.isWellFormed()) {
 						System.out.println("Check wellformedness of oclet : " + oclet.getName());
-						if(checkWellformedness(oclet, errors)) {
-							SetCommand cmd = new SetCommand(
-									adaptiveSystemDiagramEditor.getEditingDomain(), oclet, AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed(), true);
-							cmd.setLabel("set oclet attribute " + AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed().getName());
-							cmd.canExecute();
-							cmdList.add(cmd);
-						}
-						else {
-							SetCommand cmd = new SetCommand(
-									adaptiveSystemDiagramEditor.getEditingDomain(), oclet, AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed(), false);
-							cmd.setLabel("set oclet attribute " + AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed().getName());
-							cmd.canExecute();
-							cmdList.add(cmd);				
-						}
+						
+						boolean isWellFormed = checkWellformedness(oclet, errors);
+						SetCommand cmd = new SetCommand(
+								adaptiveSystemDiagramEditor.getEditingDomain(), oclet, AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed(), isWellFormed);
+						cmd.setLabel("set oclet attribute " + AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed().getName());
+						cmd.canExecute();
+						cmdList.add(cmd);
+						
+						wellFormedSpec &= isWellFormed;
 					}
 				}
-				//set wellformednessOfOclets to true
-				SetCommand cmd = new SetCommand(
-						adaptiveSystemDiagramEditor.getEditingDomain(), adaptiveSystem, AdaptiveSystemPackage.eINSTANCE.getAdaptiveSystem_SetWellformednessToOclets(), true);
-				cmd.setLabel("set adaptive process attribute " + AdaptiveSystemPackage.eINSTANCE.getAdaptiveSystem_SetWellformednessToOclets().getName());
-				cmd.canExecute();
-				cmdList.add(cmd);
-				// and join all wellformed commands in a compound transition fire command
-				CompoundCommand fireCmd = new CompoundCommand(cmdList);
-				fireCmd.setLabel("proof oclets and set wellformed to each oclet.");
-				fireCmd.setDescription("proof oclets and set wellformed to each oclet.");
-				// and execute it in a transactional editing domain (for undo/redo)
-				fireCmd.canExecute();
-				((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(fireCmd);
-				action.setEnabled(false);
+				
+				if (!wellFormedSpec) {
+	        ActionHelper.showMarkers(errors, adaptiveSystemDiagramEditor);
+	        
+				} else {
+				  if (AdaptiveSystemToCPN.isHighLevelSpecification(adaptiveSystem)) {
+				    
+				    final AdaptiveSystemDiagramEditor ed = adaptiveSystemDiagramEditor;
+				    
+				    Job checkJob = new Job("Checking Data in Scenarios") {
+				      @Override
+				      protected IStatus run(IProgressMonitor monitor) {
+		            AdaptiveSystemToCPN a2c = null;
+		            try {
+		              a2c = new AdaptiveSystemToCPN(adaptiveSystem);
+		              // now read from the underlying .cpn file
+		              //a2c.loadFunctionDefinitions(adaptiveSystem);
+		              a2c.loadPlaceTypes(adaptiveSystem);
+		              a2c.declareVariables(adaptiveSystem);
+		              a2c.buildDependencies(adaptiveSystem);
+		              
+		              a2c.convertInitialRunToMarking(adaptiveSystem);
+		              a2c.convertEventsToTransitions(adaptiveSystem);
+		              a2c.check();
+		              a2c.exportNet();
+		              
+                  a2c.destroy();
+		              
+		              ActionHelper.showMarkers(a2c.errors, ed);
+		              
+		            } catch (Exception e) {
+		              e.printStackTrace();
+		            }
+		            return Status.OK_STATUS;
+				      }
+				    };
+				    checkJob.setUser(true);
+				    // FIXME: lock resource of the file only
+				    checkJob.setRule(ResourcesPlugin.getWorkspace().getRoot());
+				    checkJob.schedule();
+				  }
+				}
+				
+        /*
+        //set wellformednessOfOclets to true
+        SetCommand cmd = new SetCommand(
+            adaptiveSystemDiagramEditor.getEditingDomain(), adaptiveSystem, AdaptiveSystemPackage.eINSTANCE.getAdaptiveSystem_SetWellformednessToOclets(), true);
+        cmd.setLabel("set adaptive process attribute " + AdaptiveSystemPackage.eINSTANCE.getAdaptiveSystem_SetWellformednessToOclets().getName());
+        cmd.canExecute();
+        cmdList.add(cmd);
+        */
+        // and join all wellformed commands in a compound transition fire command
+        CompoundCommand fireCmd = new CompoundCommand(cmdList);
+        fireCmd.setLabel("proof oclets and set wellformed to each oclet.");
+        fireCmd.setDescription("proof oclets and set wellformed to each oclet.");
+        // and execute it in a transactional editing domain (for undo/redo)
+        fireCmd.canExecute();
+        ((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(fireCmd);
+        
+        //action.setEnabled(false);
+
 			} 
-		} else {
-			/*
-			Shell shell = new Shell();
-			MessageDialog.openInformation(
-				shell,
-				"AdaptiveSystem - check wellformedness of oclets run()", 
-				"This button is only enabled for *.adaptiveSystem_diagram files.");
-				*/
-			action.setEnabled(false);
 		}
+		/*
+		  else {
+			action.setEnabled(false);
+		}*/
 	}
 
 	/**
@@ -165,10 +210,12 @@ public class CheckOclets extends Action implements
 		if(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor 
 				&& action.getId().equals("hub.top.GRETA.run.checkOclets")) {
 			
+		  /*
 			adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) workbenchWindow.getActivePage().getActiveEditor();
 			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
 			
-			if(adaptiveSystem.isSetWellformednessToOclets() ) {
+			if(adaptiveSystem.isSetWellformednessToOclets() )
+			{
 				//if SetWellformdnessToOclets is true and action is enabled, than was restart of editor and initial values should be set
 				//(action disabled) ==> synchronize setWellformednessToOclets with action.isEnabled()
 				if(action.isEnabled()) {
@@ -177,13 +224,17 @@ public class CheckOclets extends Action implements
 					return;
 				}
 			} //END if isSetWellformedToOClets
-			else {
+			else
+			     */ 
+			{
 				if(!action.isEnabled()) {
 					//System.out.println("ap: " + adaptiveSystem.getOclets() + "initial ap.false und action.disabled.");
 					action.setEnabled(true);
 				}
 			}
-		} else if((!(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor)
+
+		  
+		} else if ((!(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor)
 				|| !action.getId().equals("hub.top.GRETA.run.checkOclets"))
 				&& action.isEnabled()) {
 			/*
@@ -212,10 +263,13 @@ public class CheckOclets extends Action implements
 	 * 8.) in oclet is no cycle
 	 * 9.) no two conditions in PostSet of an event are same labeled
 	 * @param oclet
+	 * @param errors
 	 * @return
 	 */
 	private boolean checkWellformedness(Oclet oclet, List<ModelError> errors) {
 
+	  int oldErrors = errors.size();
+	  
 		Shell shell = new Shell();
 		EList<Node> minimalNodeList = new BasicEList<Node>();
 		
@@ -255,31 +309,18 @@ public class CheckOclets extends Action implements
 		//8. in oclet is no cycle allowed
 		for(Node node : minimalNodeList) {
 			if(findCycle(node)) {
-				System.out.println("  not well formed - there is a cycle in oclet (start: "+node.getName()+")");
-				MessageDialog.openInformation(
-						shell,
-						"AdaptiveSystem - check wellformedness of oclets",
-						"Oclet " + oclet.getName() + " is not used for execution of a step because it is not wellformed. There is at least one cycle in oclet.");
-				cycleCheckMap.clear();
-				return false;
+			  errors.add(new ModelError(oclet, oclet.getName(), "'"+oclet.getName()+"' contains a cycle"));
 			}
 		}
 		//8. in oclet is no cycle 
 		//if number of checked nodes is smaller as the number of oclet nodes 
 		//than there are not minimal nodes i can't reach from minimal nodes hence they are in a cycle.
 		if(cycleCheckMap.size() != oclet.getPreNet().getNodes().size() + oclet.getDoNet().getNodes().size()) {
-			System.out.println("  not well formed - there is a cycle in oclet (wrong number of nodes).");
-			MessageDialog.openInformation(
-					shell,
-					"AdaptiveSystem - check wellformedness of oclets",
-					"Oclet " + oclet.getName() + " is not used for execution of a step because it is not wellformed. There is at least one cycle in oclet.");
-			cycleCheckMap.clear();
-			return false;
+      errors.add(new ModelError(oclet, oclet.getName(), "'"+oclet.getName()+"' contains a cycle"));
 		}
 		cycleCheckMap.clear();
-		
-		System.out.println("oclet " + oclet.getName() + " is wellformed.");
-		return true;
+
+		return oldErrors == errors.size();
 	}
 
 	

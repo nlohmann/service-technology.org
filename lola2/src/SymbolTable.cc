@@ -39,9 +39,9 @@ unsigned int SymbolTable::hash(string s)
 
 Symbol* SymbolTable::lookup(string str)
 {
-    for (Symbol sym = table[hash(str)]; sym; sym = sym -> next)
+    for (Symbol sym = table[hash(str)]; sym; sym = sym -> getNext())
     {
-        if (sym -> key == str)
+        if (sym -> getKey() == str)
         {
             return sym;
         }
@@ -55,15 +55,15 @@ Symbol* SymbolTable::lookup(string str)
 /// This typically indicates a syntax error "used but not defined
 bool SymbolTable::insert(Symbol* sym)
 {
-    int index = hash(sym -> key);
-    for (Symbol* othersym = table[index]; othersym; othersym = othersym -> next)
+    int index = hash(sym -> getKey());
+    for (Symbol* othersym = table[index]; othersym; othersym = othersym -> getNext())
     {
-        if (othersym -> key == sym -> key)
+        if (othersym -> getKey() == sym -> getKey())
         {
             return false;
         }
     }
-    sym -> next = table[index];
+    sym -> setNext(table[index]);
     table[index] = sym;
     return true;
 }
@@ -84,10 +84,10 @@ Symbol* SymbolTable::first()
 /// returns pointer to next element in symbol table
 Symbol* SymbolTable::next()
 {
-    if (currentSymbol -> next)
+    if (currentSymbol -> getNext())
     {
         // there is another element in the same hash bucket
-        return(currentSymbol = currentSymbol -> next);
+        return(currentSymbol = currentSymbol -> getNext());
     }
     else
     {

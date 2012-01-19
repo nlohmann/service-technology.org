@@ -156,6 +156,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     
     // let Uma compute one step = fire all events that are enabled at the end
     // of the current process instance
+    for (DNode e : bp.getBranchingProcess().allEvents) e._isNew = false;
     int eventNum = bp.step();
     
 // for debugging
@@ -172,6 +173,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
       
       
       HashSet<DNode> newEvents = new HashSet<DNode>();
+      /*
       nextmax: for (DNode b : bps.getCurrentMaxNodes()) {
         if (b.pre == null || b.pre.length == 0) continue;
         
@@ -183,7 +185,8 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
         }
         
         newEvents.add(e);
-      }
+      }*/
+      for (DNode e : bps.allEvents) if (e._isNew) newEvents.add(e);
         
       if (rc.a2c != null) {
         
@@ -228,10 +231,27 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
                   }
                 }
                 
+                
+                for (DNode b : e.pre) {
+                  Condition runCondition = (Condition)system.getOriginalNode(b);
+                  if (runCondition.isAbstract()) continue;
+                  
+                  int b_system = 0;
+                  for (;b_system<e_system.pre.length;b_system++) {
+                    if (e_system.pre[b_system].id == b.id) break;
+                  }
+                  org.cpntools.accesscpn.model.Place p = rc.a2c.conditionToPlace.get(system.getOriginalNode(e_system.pre[b_system]));
+                  
+                  System.out.println(runCondition.getName()+" is a token on "+p);
+
+                  if (!extraTokens.containsKey(p)) extraTokens.put(p, new LinkedList<Condition>());
+                  extraTokens.get(p).add(runCondition);
+                }
               }
             } // for all bp.getSystem().fireableEvents
           } // for all causedBy
         }
+        
         // add additional tokens to the CPN
         rc.a2c.setMarkingOfExtraPlaces(extraTokens);
       }
@@ -263,22 +283,24 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
           // this is a high-level specification, check enabling wrt data
           isHLenabled = false;
           
+          System.out.println("find enabling binding for "+e);
+          
           for (Binding bind : bindings) {
             
             Map<String, String> toConsume = rc.a2c.getSourceTokens(bind);
             
             boolean is_binding_for_event = false;
-            System.out.println(rc.a2c.eventToTransition);
             for (Event e_system : e_cause) {
-              System.out.println(rc.a2c.eventToTransition.get(e_system)+" == "+bind.getTransitionInstance().getNode());
               if (rc.a2c.eventToTransition.get(e_system) == bind.getTransitionInstance().getNode())
                 is_binding_for_event = true;
             }
             
+
+            
             //if (bind.getTransitionInstance().getNode().getName().getText().equals(system.properNames[e.id])) {
             if (is_binding_for_event) {
-  
-              System.out.println(bind);
+
+              System.out.println(bind+" is binding for "+e);
               
               boolean allBindingsMatch = true;
               for (DNode c : e.pre) {
@@ -287,6 +309,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
                 String token = AdaptiveSystemToCPN.getToken(place);
                 
                 if (!token.equals(toConsume.get(placeName))) {
+                  System.out.println(token+" of "+place+" does not match "+bind);
                   allBindingsMatch = false;
                 }
               }
@@ -296,6 +319,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
                 for (DNode ePrime : bp_enablingBinding.keySet()) {
                   if (e.id == ePrime.id) {
                     if (bp_enablingBinding.get(ePrime) == bind) {
+                      System.out.println(" is already bound to "+ePrime);
                       alreadyBound = true;
                     }
                   }
@@ -315,7 +339,10 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
           firedEvents.add(e);
       }
       
-      System.out.println(bp_enablingBinding);
+      System.out.println("Enabling bindings are: ");
+      for (Map.Entry<DNode, Binding> bind : bp_enablingBinding.entrySet())  {
+        System.out.println(bind.getKey()+" -> "+bind.getValue());
+      }
       
       // determine for each fired event where it was fired and which
       // oclet events caused its occurrence
@@ -350,8 +377,10 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
         enablingBinding.put(event, bp_enablingBinding.get(e));
 
         Map<String, String> tokens = null;
-        if (rc.a2c != null) // HL-specification: get resulting data values
-          tokens = rc.a2c.getResultingTokens(bp_enablingBinding.get(e)); 
+        if (rc.a2c != null) {
+          // HL-specification: get resulting data values
+          tokens = rc.a2c.getResultingTokens(bp_enablingBinding.get(e));
+        }
           
         // create corresponding post-conditions and arcs in the editor
         for (DNode b : e.post) {
@@ -386,8 +415,12 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     fireEvent(e);
     removeHighlightActivatedEvents();
     
-    if (rc.a2c != null)
+    /*
+    if (rc.a2c != null) {
+      System.out.println("firing: "+enablingBinding.get(e));
       rc.a2c.execute(enablingBinding.get(e));
+    }
+    */
 
     // remove all events that had been added temporarily to the process
     // instance to show enabling information

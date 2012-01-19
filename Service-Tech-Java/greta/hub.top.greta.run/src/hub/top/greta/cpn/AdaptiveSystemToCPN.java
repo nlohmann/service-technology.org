@@ -425,11 +425,14 @@ public class AdaptiveSystemToCPN {
 
       for (Instance<org.cpntools.accesscpn.model.PlaceNode> pi : sim.getAllPlaceInstances()) {
         if (newTokens.containsKey(pi.getNode())) {
-          sim.setMarking(pi, getMarkingString(newTokens.get(pi.getNode())));
+          System.out.println("setting: "+pi.getNode()+" to "+getMarkingString(newTokens.get(pi.getNode())));
+          if (sim.setMarking(pi, getMarkingString(newTokens.get(pi.getNode())))) {
+            System.out.println("  false: "+getMarkingString(newTokens.get(pi.getNode())));
+          }
         }
       }
       
-      System.out.println(sim.getMarking().toString());
+      System.out.println("Updated marking to:\n"+sim.getMarking().toString());
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -439,6 +442,7 @@ public class AdaptiveSystemToCPN {
   public void execute(Binding bind) {
     try {
       sim.execute(bind);
+      System.out.println("Resulting marking:\n "+sim.getMarking().toString());
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -1154,7 +1158,7 @@ public class AdaptiveSystemToCPN {
     
     try {
       
-      System.out.println(sim.getMarking().toString());
+      System.out.println("current marking: "+sim.getMarking().toString());
       
       List<Instance<org.cpntools.accesscpn.model.Transition>> tis = sim.getAllTransitionInstances();
       for (Instance<org.cpntools.accesscpn.model.Transition> ti : tis) {

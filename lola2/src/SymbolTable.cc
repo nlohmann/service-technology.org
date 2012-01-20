@@ -17,6 +17,7 @@ SymbolTable::SymbolTable()
     {
         table[i] = NULL;
     }
+    card = 0;
 }
 
 /// We use sum of ASCII values as hash value
@@ -65,6 +66,7 @@ bool SymbolTable::insert(Symbol* sym)
     }
     sym -> setNext(table[index]);
     table[index] = sym;
+    ++card;
     return true;
 }
 
@@ -101,4 +103,10 @@ Symbol* SymbolTable::next()
         }
         return NULL;
     }
+}
+
+/// returns number of entries in table
+unsigned int SymbolTable::getCard()
+{
+	return card;
 }

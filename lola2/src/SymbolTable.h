@@ -36,15 +36,22 @@ class SymbolTable
         /// Generate and initialize a symbol table
         SymbolTable();
 
+	/// Get number of entries in table
+	unsigned int getCard();
+
     private:
         ///The actual symbol table. It gets pointers as we use lists for collisions.
         Symbol* table[SIZEOF_SYMBOLTABLE];
 
         /// The hash function to be used
         unsigned int hash(string);
+	/// The number of entrie in table
+
+	unsigned int card;
 
         /// The index of the current element in iteration
         unsigned int currentIndex;
         /// Points to the current element in iteration
         Symbol* currentSymbol;
+
 };

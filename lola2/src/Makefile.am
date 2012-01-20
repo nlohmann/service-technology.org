@@ -6,7 +6,7 @@ lola2_SOURCES = main.cc \
                 Dimensions.h \
                 Socket.cc Socket.h \
                 SymbolTable.cc SymbolTable.h \
-                Symbol.h
+                Symbol.cc Symbol.h
 
 AM_CFLAGS = -Wall -W -Wextra -pedantic
 AM_CXXFLAGS = -Wall -W -Wextra -pedantic

@@ -108,5 +108,5 @@ Symbol* SymbolTable::next()
 /// returns number of entries in table
 unsigned int SymbolTable::getCard()
 {
-	return card;
+    return card;
 }

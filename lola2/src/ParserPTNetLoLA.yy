@@ -64,7 +64,7 @@ extern int yycolno;
 // their values become meaningless.
 
 /// The object containing the final outcome of the parsing process
-ParserPTNet TheResult;
+ParserPTNet * TheResult;
 /// The value of the currently active capacity statement
 unsigned int TheCapacity;
 %}
@@ -103,7 +103,7 @@ placelist:
   placelist _comma_ nodeident 
 	{ 
 		PlaceSymbol * p = new PlaceSymbol($3,TheCapacity);
-	  	if(! TheResult.PlaceTable.insert(p))
+	  	if(! TheResult->PlaceTable.insert(p))
 	  	{
 			yyerrors($3, "place '%s' name used twice", _cimportant_($3));
 	  	}
@@ -111,7 +111,7 @@ placelist:
 | nodeident 
 	{ 
 		PlaceSymbol * p = new PlaceSymbol($3,TheCapacity);
-	  	if(! TheResult.PlaceTable.insert(p))
+	  	if(! TheResult->PlaceTable.insert(p))
 	  	{
 			yyerrors($1, "place '%s' name used twice", _cimportant_($1));
 	  	}
@@ -140,7 +140,7 @@ markinglist:
 marking:
   nodeident _colon_ NUMBER 
 	{ 
-		PlaceSymbol * p = (PlaceSymbol *) TheResult.PlaceTable.lookup($1);
+		PlaceSymbol * p = (PlaceSymbol *) TheResult->PlaceTable.lookup($1);
 	  	if(!p)
 	  	{
 			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
@@ -149,7 +149,7 @@ marking:
 	}
 | nodeident  /* default: 1 token */
 	{ 
-		PlaceSymbol * p = (PlaceSymbol *) TheResult.PlaceTable.lookup($1);
+		PlaceSymbol * p = (PlaceSymbol *) TheResult->PlaceTable.lookup($1);
 	  	if(!p)
 	  	{
 			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
@@ -171,7 +171,7 @@ transition:
   _PRODUCE_ arclist _semicolon_ 
 	{
 	    	TransitionSymbol * t = new TransitionSymbol($2,$3,$5,$8);
-	    	if(!TheResult.TransitionTable.insert(t))
+	    	if(!TheResult->TransitionTable.insert(t))
 	    	{
 			yyerrors($2, "transition name '%s' used twice", _cimportant_($2));
  	    	}
@@ -214,7 +214,7 @@ arclist:
 arc:
   nodeident _colon_ NUMBER 
 	{
-		PlaceSymbol * p = TheResult.PlaceTable.lookup($1);
+		PlaceSymbol * p = TheResult->PlaceTable.lookup($1);
 		if(!p)
 		{
 			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
@@ -222,7 +222,7 @@ arc:
 		$$ = new ArcList(p,atoi($3));
 	}
 | nodeident   /* default: multiplicity 1 */
-		PlaceSymbol * p = TheResult.PlaceTable.lookup($1);
+		PlaceSymbol * p = TheResult->PlaceTable.lookup($1);
 		if(!p)
 		{
 			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
@@ -232,6 +232,14 @@ arc:
 ;
 
 %%
+
+/// Wrapping the Parser
+ParsePTNet * ParserPTNetLoLA()
+{
+	TheResult = new ParserPTNet;
+	yyparse();
+	return(TheResult);
+}
 
 /// display a parser error and exit
 void yyerrors(char* token, char const* format, ...) {

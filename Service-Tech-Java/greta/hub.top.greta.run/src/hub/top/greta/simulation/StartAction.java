@@ -112,7 +112,7 @@ public class StartAction implements
 
 		} else if (isValidConfigOf(simView.adaptiveSystem)) {
 			
-			stopSimulation(/*doReset*/ true);			
+			stopSimulation(/*doReset*/ true);
 			switchToPlay(action);
 			
 		} else if (isSimuluationRunning()) {
@@ -223,6 +223,11 @@ public class StartAction implements
 			ResetAction.resetSimulation(window.getShell(), simView);
 		
 		cancelCurrentRun();
+		
+		RunConfiguration config = StartAction.getActiveRunConfiguration(simView.adaptiveSystem);
+		if (config != null) {
+      config.terminateBridgeToCPN();
+		}
 		
 		if (simView.processViewEditor == null)
 			return;

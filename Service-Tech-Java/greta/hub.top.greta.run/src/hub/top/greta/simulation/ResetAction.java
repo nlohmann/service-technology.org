@@ -104,6 +104,8 @@ public class ResetAction implements IWorkbenchWindowActionDelegate {
 		}
 	}
 	
+	
+	
 	/**
 	 * Reset the current simulation in the current view. Will display an error
 	 * message if the current view does not show the current simulation (in this
@@ -117,10 +119,7 @@ public class ResetAction implements IWorkbenchWindowActionDelegate {
 		if (config != null) {
 			config.resetToInitial(simView.processViewEditor);
 			SimulationHelper.arrangeAllAdaptiveProcess(simView.processViewEditor.getEditingDomain(), simView.apEditPart, null);
-			
-			config.terminateBridgeToCPN();
-			if (AdaptiveSystemToCPN.isHighLevelSpecification(simView.adaptiveSystem))
-			  config.createNewBridgeToCPN(simView.adaptiveSystem);
+
 		} else {
 			MessageDialog.openError(shell,
 					"Could not reset simulation.",

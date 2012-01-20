@@ -49,8 +49,10 @@ import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
 import hub.top.greta.cpn.AdaptiveSystemToCPN;
 import hub.top.greta.validation.ModelError;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -161,6 +163,30 @@ public class CheckOclets extends Action implements
                   a2c.destroy();
 		              
 		              ActionHelper.showMarkers(a2c.errors, ed);
+
+		              // finally invalidate all erroneous oclets
+		              EList<Command> cmdList = new BasicEList<Command>();
+		              
+		              Set<Oclet> errorOclets = new HashSet<Oclet>();
+		              for (ModelError e : a2c.errors) {
+		                if (e.modelObject instanceof Oclet) errorOclets.add((Oclet)e);
+		                if (e.modelObject instanceof Node) errorOclets.add((Oclet)e.modelObject.eContainer().eContainer());
+		              }
+		              
+		              for (Oclet oclet : errorOclets) {
+  		              SetCommand cmd = new SetCommand(
+  		                  adaptiveSystemDiagramEditor.getEditingDomain(), oclet, AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed(), false);
+  		              cmd.setLabel("set oclet attribute " + AdaptiveSystemPackage.eINSTANCE.getOclet_WellFormed().getName());
+  		              cmd.canExecute();
+  		              cmdList.add(cmd);
+		              }
+		              
+		              CompoundCommand fireCmd = new CompoundCommand(cmdList);
+		              fireCmd.setLabel("Checking specification.");
+		              fireCmd.setDescription("Checking specification.");
+		              // and execute it in a transactional editing domain (for undo/redo)
+		              fireCmd.canExecute();
+		              ((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(fireCmd);
 		              
 		            } catch (Exception e) {
 		              e.printStackTrace();

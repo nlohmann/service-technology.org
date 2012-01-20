@@ -59,33 +59,23 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-import org.cpntools.accesscpn.engine.Packet;
 import org.cpntools.accesscpn.engine.Simulator;
 import org.cpntools.accesscpn.engine.SimulatorService;
-import org.cpntools.accesscpn.engine.highlevel.DeclarationCheckerException;
 import org.cpntools.accesscpn.engine.highlevel.HighLevelSimulator;
-import org.cpntools.accesscpn.engine.highlevel.PacketGenerator;
 import org.cpntools.accesscpn.engine.highlevel.SyntaxCheckerException;
-import org.cpntools.accesscpn.engine.highlevel.SyntaxFatalErrorException;
 import org.cpntools.accesscpn.engine.highlevel.checker.Checker;
 import org.cpntools.accesscpn.engine.highlevel.instance.Binding;
 import org.cpntools.accesscpn.engine.highlevel.instance.Instance;
-import org.cpntools.accesscpn.engine.highlevel.instance.Marking;
-import org.cpntools.accesscpn.engine.highlevel.instance.State;
 import org.cpntools.accesscpn.engine.highlevel.instance.cpnvalues.CPNValue;
 import org.cpntools.accesscpn.model.HLDeclaration;
-import org.cpntools.accesscpn.model.Page;
-import org.cpntools.accesscpn.model.Place;
 import org.cpntools.accesscpn.model.declaration.VariableDeclaration;
 import org.cpntools.accesscpn.model.exporter.DOMGenerator;
 import org.cpntools.accesscpn.model.util.BuildCPNUtil;
-import org.eclipse.core.internal.localstore.IsSynchronizedVisitor;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.emf.ecore.xmi.impl.StringSegment;
 
 public class AdaptiveSystemToCPN {
   
@@ -557,6 +547,26 @@ public class AdaptiveSystemToCPN {
     return s;
   }
   
+  public static String convertToPlaceName(String s) {
+    
+    if (isConstant(s)) return s;
+    
+    s = s.replace("*", "_MULT_");
+    s = s.replace("+", "_PLUS_");
+    s = s.replace("-", "_MINUS_");
+    s = s.replace("/", "_SLASH_");
+    s = s.replace("(", "_LPAR_");
+    s = s.replace(")", "_RPAR_");
+    s = s.replace(" ", "_SPACE_");
+    
+    // strip leading underscores (CPN Tools doesn't like that)
+    while (s.charAt(0) == '_' && s.length() > 0) s = s.substring(1);
+    
+    s = "V_"+s+"_VV";
+    
+    return s;
+  }
+  
   
   private static int findNextOccurrenceOfIdentifier(String exp, String subExp, int start) {
     int first = exp.indexOf(subExp, start);
@@ -613,15 +623,17 @@ public class AdaptiveSystemToCPN {
     public org.cpntools.accesscpn.model.Place place;
   }
   
-  private void addExtraPlacesForDependencies(Event e, Condition c, org.cpntools.accesscpn.model.Transition t, String transitionName) {
-    if (!dependsOnConditions.containsKey(c)) return;
+  private void addExtraPlacesForDependencies(Event e, Node n, org.cpntools.accesscpn.model.Transition t, String transitionName) {
+    if (!dependsOnConditions.containsKey(n)) return;
     
-    for (Condition c2 : dependsOnConditions.get(c)) {
+    for (Condition c2 : dependsOnConditions.get(n)) {
       
       // find a place providing the required expression
       String type = "INT";
       String placeName = getPlaceName(c2.getName());
       String arcExpression = getToken(c2.getName());
+      
+      if (placeTypes.containsKey(placeName)) type = placeTypes.get(placeName);
       
       /*
       if (placeTypes.containsKey(placeName)) type = placeTypes.get(placeName);
@@ -636,7 +648,8 @@ public class AdaptiveSystemToCPN {
       else arcExpression = convertToVariableString(arcExpression);
       */
       
-      String specialPlaceName = placeName+"_"+transitionName+"_"+arcExpression;
+      String specialPlaceName = convertToPlaceName(placeName+"_"+transitionName+"_"+arcExpression);
+      
       if (!places.containsKey(specialPlaceName)) {
         String marking = getMarkingString(placeName);
         org.cpntools.accesscpn.model.Place p = build.addPlace(eventPage, specialPlaceName, type, marking);
@@ -645,9 +658,10 @@ public class AdaptiveSystemToCPN {
         extraPlaces.add(new ExtraPlace(e, c2, p));
         
         System.out.println("creating place "+specialPlaceName+" for '"+arcExpression+"' at "+e.getName()+" defined by "+c2);
+
+        build.addArc(eventPage, places.get(specialPlaceName), t, arcExpression);
       }
-      
-      build.addArc(eventPage, places.get(specialPlaceName), t, arcExpression);
+
     }
   }
   
@@ -735,6 +749,9 @@ public class AdaptiveSystemToCPN {
         
         addExtraPlacesForDependencies(e, c, t, transitionName);
       }
+      
+      // add nodes for dependencies of the guard of event 'e'
+      addExtraPlacesForDependencies(e, e, t, transitionName);
       
       /*
       // add extra places for all required but missing expressions 
@@ -930,9 +947,9 @@ public class AdaptiveSystemToCPN {
     return null;
   }
   
-  private Map<Condition,Set<Condition>> dependsOnConditions;
-  private Map<Condition,Set<String>> dependsOnExpressions;
-  private Map<Condition,Set<String>> providesExpressions;
+  private Map<Node,Set<Condition>> dependsOnConditions;
+  private Map<Node,Set<String>> dependsOnExpressions;
+  private Map<Node,Set<String>> providesExpressions;
   
   /**
    * Extract IDs of the variable declarations of the variables used in the expression.
@@ -944,6 +961,7 @@ public class AdaptiveSystemToCPN {
    */
   private String[] getDeclaringIDs(String exp, HighLevelSimulator sim) {
     try {
+      
       String _ml_def_expression = "CPN'Dep.find_use \"fun () = "+exp+"\"";
       String result = sim.evaluate(_ml_def_expression);
 
@@ -999,6 +1017,47 @@ public class AdaptiveSystemToCPN {
     return new String[] { exp };
   }
   
+  private String[] getGuardParts(String exp) {
+    if (exp.length() > 2) {
+      
+      try {
+        if (exp.charAt(0)=='[' && exp.charAt(exp.length()-1) == ']') {
+          
+          exp = exp.substring(1, exp.length()-1);
+          String[] arguments = exp.split(",");
+          for (int j=0; j<arguments.length; j++) {
+            // strip surrounding white-spaces
+            while (Character.isWhitespace(arguments[j].charAt(0)))
+              arguments[j] = arguments[j].substring(1);
+            while (Character.isWhitespace(arguments[j].charAt(arguments[j].length()-1)))
+              arguments[j] = arguments[j].substring(0,arguments[j].length()-1);
+          }
+          
+          return arguments;
+        }
+      } catch (Exception e) {
+      }
+    }
+    return new String[] { exp };
+  }
+  
+  private String[] getGuardAssignment(String exp) {
+    try {
+      String[] arguments = exp.split("=");
+      for (int j=0; j<arguments.length; j++) {
+        // strip surrounding white-spaces
+        while (Character.isWhitespace(arguments[j].charAt(0)))
+          arguments[j] = arguments[j].substring(1);
+        while (Character.isWhitespace(arguments[j].charAt(arguments[j].length()-1)))
+          arguments[j] = arguments[j].substring(0,arguments[j].length()-1);
+      }
+      
+      return arguments;
+    } catch (Exception e) {
+    }
+    return new String[] { exp };
+  }
+  
   /**
    * Compute all dependencies of the post-conditions and the guard-label of 
    * event 'e' on the (transitive) pre-conditions of event 'e'.
@@ -1013,7 +1072,7 @@ public class AdaptiveSystemToCPN {
     
     Map<String, Set<String>> evaluatedCompleteExpressions = new HashMap<String, Set<String>>();
     
-    Map<String, List<Condition>> declaringConditions = new HashMap<String, List<Condition>>();
+    Map<String, List<Node>> declaringNodes = new HashMap<String, List<Node>>();
     Map<String, List<Condition>> usingConditions = new HashMap<String, List<Condition>>();
     
     // collect everything that is available: variables (in form of variables IDs) and
@@ -1039,8 +1098,8 @@ public class AdaptiveSystemToCPN {
             // this id is used in a direct predecessor of e: values can be bound to it
             if (e.getPreSet().contains(c)) preConditionSingleIDs.add(ids[0]);
   
-            if (!declaringConditions.containsKey(ids[0])) declaringConditions.put(ids[0], new LinkedList<Condition>());
-            declaringConditions.get(ids[0]).add(c);
+            if (!declaringNodes.containsKey(ids[0])) declaringNodes.put(ids[0], new LinkedList<Node>());
+            declaringNodes.get(ids[0]).add(c);
             
             providesExpressions.get(c).add(ids[0]);
           }
@@ -1060,23 +1119,53 @@ public class AdaptiveSystemToCPN {
       }
     }
     
-    List<Condition> directEnvironment = new LinkedList<Condition>();
+    String transitionName = getTransitionName(e.getName());
+    String guardExpression = getTransitionGuard(e.getName());
+    
+    for (String exp : getGuardParts(guardExpression)) {
+      
+      if (exp.length() == 0) continue;
+      
+      String ass[] = getGuardAssignment(exp);
+      if (ass.length != 2) continue;
+      
+      System.out.println(transitionName+": checking assignment "+exp);
+      
+      String var = ass[0];
+      String definition = ass[1];
+      
+      String[] ids = getDeclaringIDs(var, sim_local);
+      if (ids != null && ids.length > 0) {
+        // this guard assignment provides exactly one variable
+        if (isSingleVariable(var, ids))
+        {
+          preConditionSingleIDs.add(ids[0]);
+          if (!declaringNodes.containsKey(ids[0])) declaringNodes.put(ids[0], new LinkedList<Node>());
+          declaringNodes.get(ids[0]).add(e);
+        }
+      }
+    }
+    
+    List<Node> directEnvironment = new LinkedList<Node>();
     directEnvironment.addAll(e.getPreConditions());
     directEnvironment.addAll(e.getPostConditions());
+    directEnvironment.add(e);
     
     // check for each post-condition on what variables and terms it depends on
-    for (Condition c : directEnvironment) {
-      if (c.isAbstract()) continue;
+    for (Node n : directEnvironment) {
+      if (n.isAbstract()) continue;
       
-      String placeName = getPlaceName(c.getName());
-      String arcExpression = getToken(c.getName());
+      String nodeName = (n instanceof Condition) ? getPlaceName(n.getName()) : getTransitionName(n.getName());
+      String expression =  (n instanceof Condition) ? getToken(n.getName()) : getTransitionGuard(n.getName());
       
-      if (!dependsOnConditions.containsKey(c)) dependsOnConditions.put(c, new HashSet<Condition>());
-      if (!dependsOnExpressions.containsKey(c)) dependsOnExpressions.put(c, new HashSet<String>());
+      if (expression == null || expression.length() == 0) continue;
       
-      String ids[] = getDeclaringIDs(arcExpression, sim_local);
+      if (!dependsOnConditions.containsKey(n)) dependsOnConditions.put(n, new HashSet<Condition>());
+      if (!dependsOnExpressions.containsKey(n)) dependsOnExpressions.put(n, new HashSet<String>());
+      
+      String ids[] = getDeclaringIDs(expression, sim_local);
       if (ids != null && ids.length > 0) {
-        System.out.print(c.getName()+" -->* "); for (String id : ids) System.out.print(id+" "); System.out.println();
+        System.out.print(n.getName()+" -->* "); for (String id : ids) System.out.print(id+" "); System.out.println();
 
         boolean singleID = (ids.length == 1);
         
@@ -1088,15 +1177,15 @@ public class AdaptiveSystemToCPN {
             continue; // only variables can be missing
           }
           
-          if (!declaringConditions.containsKey(id)) {
-            System.err.println(c.getName()+" ("+((Oclet)c.eContainer().eContainer()).getName()+") requires variable "+getObjectForID(id));
+          if (!declaringNodes.containsKey(id)) {
+            System.err.println(n.getName()+" ("+((Oclet)n.eContainer().eContainer()).getName()+") requires variable "+getObjectForID(id));
             missingIDs.add(id);
           } else {
             
             // find the transitive pre-condition this condition depends on to resolve its term inscription
             boolean defined_by_precondition = false;
-            for (Condition c_depends_on : declaringConditions.get(id)) {
-              if (e.getPreConditions().contains(c_depends_on)) {
+            for (Node c_depends_on : declaringNodes.get(id)) {
+              if (c_depends_on == e || e.getPreConditions().contains(c_depends_on)) {
                 // a direct pre-condition features what this condition needs: done, do not add dependency
                 defined_by_precondition = true;
                 break;
@@ -1105,15 +1194,16 @@ public class AdaptiveSystemToCPN {
             
             if (!defined_by_precondition) {
               // not a direct precondition: establish explicit dependency
-              for (Condition c_depends_on : declaringConditions.get(id)) {
-                System.err.println(c.getName()+" ("+((Oclet)c.eContainer().eContainer()).getName()+") depends on "+c_depends_on+" to resolve "+getObjectForID(id));
-                dependsOnConditions.get(c).add(c_depends_on);
+              for (Node c_depends_on : declaringNodes.get(id)) {
+                // c_depends_on is a Condition (as the event would have matched the first case)
+                System.err.println(n.getName()+" ("+((Oclet)n.eContainer().eContainer()).getName()+") depends on "+c_depends_on+" to resolve "+getObjectForID(id));
+                dependsOnConditions.get(n).add((Condition)c_depends_on);
                 break;
               }
             }
                         
           }
-          dependsOnExpressions.get(c).add(id);
+          dependsOnExpressions.get(n).add(id);
         }
         
         /* DISABLED: re-using entire arc expressions
@@ -1130,26 +1220,26 @@ public class AdaptiveSystemToCPN {
         
         if (missingIDs.size() > 0) {
           Set<String> requiredExpressions = new HashSet<String>();
-          String id_unresolved = findExpressionsForMissingIDs(sim_local, missingIDs, arcExpression, evaluatedCompleteExpressions, requiredExpressions);
+          String id_unresolved = findExpressionsForMissingIDs(sim_local, missingIDs, expression, evaluatedCompleteExpressions, requiredExpressions);
           if (id_unresolved == null) {
             System.err.println("can be resolved with "+requiredExpressions);
             for (String exp : requiredExpressions) {
-              dependsOnExpressions.get(c).add(exp);
+              dependsOnExpressions.get(n).add(exp);
             }
             
           } else {
             System.err.println(id_unresolved+" CANNOT be resolved");
-            ModelError error = new ModelError(c, ((Oclet)c.eContainer().eContainer()).getName()+"/"+c.getName(), "Cannot resolve '"+getVariableNameForID(id_unresolved)+"' for '"+c.getName()+"'", ModelError.WARNING);
+            ModelError error = new ModelError(n, ((Oclet)n.eContainer().eContainer()).getName()+"/"+n.getName(), "Cannot resolve '"+getVariableNameForID(id_unresolved)+"' for '"+n.getName()+"'");
             errors.add(error);
           }
         }
       }
     }
     
-    if (!declaringConditions.keySet().containsAll(usedIDs)) {
+    if (!declaringNodes.keySet().containsAll(usedIDs)) {
       System.err.println("Event "+e.getName()+" does not have all data it needs");
       System.err.println("declared: ");
-      for (String declared : declaringConditions.keySet()) {
+      for (String declared : declaringNodes.keySet()) {
         System.err.println("  "+getObjectForID(declared));
       }
         
@@ -1162,7 +1252,7 @@ public class AdaptiveSystemToCPN {
     
     for (String id : usedIDs) {
       if (!preConditionSingleIDs.contains(id)) {
-        System.err.println("event "+e.getName()+" needs arc from "+id+" "+declaringConditions.get(id));
+        System.err.println("event "+e.getName()+" needs arc from "+id+" "+declaringNodes.get(id));
       }
     }
   }
@@ -1194,9 +1284,9 @@ public class AdaptiveSystemToCPN {
         e.printStackTrace();
       }
   
-      dependsOnConditions = new HashMap<Condition, Set<Condition>>();
-      dependsOnExpressions = new HashMap<Condition, Set<String>>();
-      providesExpressions = new HashMap<Condition, Set<String>>();
+      dependsOnConditions = new HashMap<Node, Set<Condition>>();
+      dependsOnExpressions = new HashMap<Node, Set<String>>();
+      providesExpressions = new HashMap<Node, Set<String>>();
       
       for (Oclet o : as.getOclets()) {
         for (Node n : o.getDoNet().getNodes()) {

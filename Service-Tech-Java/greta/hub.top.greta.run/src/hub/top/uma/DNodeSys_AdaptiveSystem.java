@@ -294,12 +294,19 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 			//System.out.println(d+" has predecessors "+DNode.toString(pre)+" and "+DNode.toString(preTrans));
       
 			if (n instanceof Event) {
+			  
 				d.isEvent = true;
 				// remember all events of a DoNet: these will be fired if enabled
-				if (n.eContainer() instanceof DoNet)
-					fireableEvents.add(d);
-				else if (n.eContainer() instanceof PreNet)
+				if (n.eContainer() instanceof DoNet) {
+          boolean completeEvent = true;
+          for (Node m : n.getPreSet()) if (m.isAbstract()) completeEvent = false;
+          for (Node m : n.getPostSet()) if (m.isAbstract()) completeEvent = false;
+          
+          // can only fire complete events
+          if (completeEvent) fireableEvents.add(d);
+				} else if (n.eContainer() instanceof PreNet) {
 					preConEvents.add(d);
+				}
 				
 				// for each pre-condition 'b' of this event, store this event's id
 				// as the visible event that must not appear in the transitive history

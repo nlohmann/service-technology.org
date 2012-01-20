@@ -8,9 +8,11 @@ Parses a place transition net in LoLA syntax.
 */
 
 %{
-#include "Symbol.h"
+#include "PlaceSymbol.h"
+#include "TransitionSymbol.h"
 #include "SymbolTable.h"
 #include <string>
+#include "ParserPTNet.h"
 
 using std::string;
 
@@ -19,8 +21,15 @@ void yyerrors(char* token, char const* format, ...);
 %}
 
 %union {
+	string attributeString;
+	FairnessAssumption attributeFairness;
+	ArcList * attributeArcList;
 }
 
+%type <attributeString> nodeident
+%type <atttributeFairness> fairness
+%type <attributeArcList> arclist
+%type <attributeArcList> arc
 
 ///// 4 LINES ADDED BY NIELS
 %error-verbose
@@ -47,6 +56,18 @@ extern int yylineno;
 extern int yycolno;
 %}
 
+%{
+// This list contains a few global variables. Their purpose is to
+// propagate semantic values top down or left to right which is
+// impossible with the attributes of bison. Thee variables must be initialized
+// whenever this parser in invoked. After termination of the parser,
+// their values become meaningless.
+
+/// The object containing the final outcome of the parsing process
+ParserPTNet TheResult;
+/// The value of the currently active capacity statement
+unsigned int TheCapacity;
+%}
 %%
 
 net:
@@ -64,25 +85,48 @@ placelists:
 
 capacity:
   /* empty */          /* empty capacity = unlimited capacity */ 
+	{ 
+		TheCapacity = UINT_MAX;
+	}
 | _SAFE_ _colon_       /* SAFE without number = 1-SAFE */
+	{ 
+		TheCapacity = 1;
+	}
 | _SAFE_ NUMBER _colon_ /* at most k tokens expected on these places */
+	{ 
+		TheCapacity = atoi($2);
+	}
 ;
 
 
 placelist:
-  placelist _comma_ place 
-| place 
+  placelist _comma_ nodeident 
+	{ 
+		PlaceSymbol * p = new PlaceSymbol($3,TheCapacity);
+	  	if(! TheResult.PlaceTable.insert(p))
+	  	{
+			yyerrors($3, "place '%s' name used twice", _cimportant_($3));
+	  	}
+	}
+| nodeident 
+	{ 
+		PlaceSymbol * p = new PlaceSymbol($3,TheCapacity);
+	  	if(! TheResult.PlaceTable.insert(p))
+	  	{
+			yyerrors($1, "place '%s' name used twice", _cimportant_($1));
+	  	}
+	}
 ;
-
-
-place:   /* name of a place, expected not to be present yet */
-  nodeident 
-;
-
 
 nodeident:  /* for places and transitions, names may be idents or numbers */
   IDENTIFIER  
+	{
+		$$ = $1;
+	}
 | NUMBER 
+	{
+		$$ = $1; /* result is string version of number */
+	}
 ;
 
 
@@ -95,6 +139,23 @@ markinglist:
 
 marking:
   nodeident _colon_ NUMBER 
+	{ 
+		PlaceSymbol * p = (PlaceSymbol *) TheResult.PlaceTable.lookup($1);
+	  	if(!p)
+	  	{
+			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
+	  	}
+	  	p -> addInitialMarking($3);
+	}
+| nodeident  /* default: 1 token */
+	{ 
+		PlaceSymbol * p = (PlaceSymbol *) TheResult.PlaceTable.lookup($1);
+	  	if(!p)
+	  	{
+			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
+	  	}
+	  	p -> addInitialMarking(1);
+	}
 ;
 
 
@@ -105,36 +166,71 @@ transitionlist:
 
 
 transition:
-  _TRANSITION_ tname fairness
+  _TRANSITION_ nodeident fairness
   _CONSUME_ arclist _semicolon_ 
   _PRODUCE_ arclist _semicolon_ 
+	{
+	    	TransitionSymbol * t = new TransitionSymbol($2,$3,$5,$8);
+	    	if(!TheResult.TransitionTable.insert(t))
+	    	{
+			yyerrors($2, "transition name '%s' used twice", _cimportant_($2));
+ 	    	}
+	}
 ;
 
 fairness:
 	/* empty */    /* empty = may be treated unfair */
+	{ 
+		$$ = NO_FAIRNESS;
+	}
 | _WEAK_ _FAIR_ 
+	{ 
+		$$ = WEAK_FAIRNESS;
+	}
 | _STRONG_ _FAIR_ 
+	{ 
+		$$ = STRONG_FAIRNESS;
+	}
 ;
 
-
-tname:    /* name of transition, expected not tp be present yet */
-	nodeident
-;
 
 arclist:
   /* empty */       
+	{
+		$$ = NULL;
+	}
 | arc              
+	{
+		$$ = $1;
+	}
 | arc _comma_ arclist 
+	{
+		$1.setNext($3);
+		$$ = $1;
+	}
 ;
 
 
 arc:
-  placereference _colon_ NUMBER 
+  nodeident _colon_ NUMBER 
+	{
+		PlaceSymbol * p = TheResult.PlaceTable.lookup($1);
+		if(!p)
+		{
+			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
+		}
+		$$ = new ArcList(p,atoi($3));
+	}
+| nodeident   /* default: multiplicity 1 */
+		PlaceSymbol * p = TheResult.PlaceTable.lookup($1);
+		if(!p)
+		{
+			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
+		}
+		$$ = new ArcList(p,1));
+	}
 ;
 
-placereference:   /* name of a place, expected to be present */
-	nodeident
-;
 %%
 
 /// display a parser error and exit

@@ -181,6 +181,14 @@ public class CheckOclets extends Action implements
   		              cmdList.add(cmd);
 		              }
 		              
+
+		              //set wellformednessOfOclets to true
+		              SetCommand cmd = new SetCommand(
+		                  adaptiveSystemDiagramEditor.getEditingDomain(), adaptiveSystem, AdaptiveSystemPackage.eINSTANCE.getAdaptiveSystem_SetWellformednessToOclets(), true);
+		              cmd.setLabel("set adaptive process attribute " + AdaptiveSystemPackage.eINSTANCE.getAdaptiveSystem_SetWellformednessToOclets().getName());
+		              cmd.canExecute();
+		              cmdList.add(cmd);
+		              
 		              CompoundCommand fireCmd = new CompoundCommand(cmdList);
 		              fireCmd.setLabel("Checking specification.");
 		              fireCmd.setDescription("Checking specification.");
@@ -201,14 +209,14 @@ public class CheckOclets extends Action implements
 				  }
 				}
 				
-        /*
+
         //set wellformednessOfOclets to true
         SetCommand cmd = new SetCommand(
             adaptiveSystemDiagramEditor.getEditingDomain(), adaptiveSystem, AdaptiveSystemPackage.eINSTANCE.getAdaptiveSystem_SetWellformednessToOclets(), true);
         cmd.setLabel("set adaptive process attribute " + AdaptiveSystemPackage.eINSTANCE.getAdaptiveSystem_SetWellformednessToOclets().getName());
         cmd.canExecute();
         cmdList.add(cmd);
-        */
+
         // and join all wellformed commands in a compound transition fire command
         CompoundCommand fireCmd = new CompoundCommand(cmdList);
         fireCmd.setLabel("proof oclets and set wellformed to each oclet.");

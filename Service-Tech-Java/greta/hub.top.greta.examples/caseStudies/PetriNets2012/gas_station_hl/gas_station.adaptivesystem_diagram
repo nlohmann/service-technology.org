@@ -227,13 +227,6 @@
           <element xmi:type="adaptiveSystem:Condition" href="gas_station.adaptivesystem#_zzNvwEJ_EeGecIVl3CZ6hg"/>
           <layoutConstraint xmi:type="notation:Bounds" xmi:id="_zzNvw0J_EeGecIVl3CZ6hg" x="55" y="268"/>
         </children>
-        <children xmi:type="notation:Node" xmi:id="_QtBWYUKxEeGi1PBteGjbbQ" type="2008">
-          <children xmi:type="notation:Node" xmi:id="_QtLHYEKxEeGi1PBteGjbbQ" type="4014"/>
-          <children xmi:type="notation:Node" xmi:id="_QtLHYkKxEeGi1PBteGjbbQ" type="4015"/>
-          <styles xmi:type="notation:ShapeStyle" xmi:id="_QtBWYkKxEeGi1PBteGjbbQ" fontName="Segoe UI"/>
-          <element xmi:type="adaptiveSystem:Event" href="gas_station.adaptivesystem#_QtBWYEKxEeGi1PBteGjbbQ"/>
-          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_QtBWY0KxEeGi1PBteGjbbQ" x="130" y="458"/>
-        </children>
         <children xmi:type="notation:Node" xmi:id="_Up9GAEKxEeGi1PBteGjbbQ" type="2001">
           <children xmi:type="notation:Node" xmi:id="_Up9GA0KxEeGi1PBteGjbbQ" type="4001"/>
           <children xmi:type="notation:Node" xmi:id="_Up9GBUKxEeGi1PBteGjbbQ" type="4002"/>
@@ -247,7 +240,7 @@
           <children xmi:type="notation:Node" xmi:id="_CIL3JkK1EeGbaNt5D20pqA" type="4015"/>
           <styles xmi:type="notation:ShapeStyle" xmi:id="_CIL3IkK1EeGbaNt5D20pqA" fontName="Segoe UI"/>
           <element xmi:type="adaptiveSystem:Event" href="gas_station.adaptivesystem#_CIL3IEK1EeGbaNt5D20pqA"/>
-          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_CIL3I0K1EeGbaNt5D20pqA" x="55" y="393"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_CIL3I0K1EeGbaNt5D20pqA" x="50" y="433"/>
         </children>
         <children xmi:type="notation:Node" xmi:id="_DtpZEUK1EeGbaNt5D20pqA" type="2007">
           <children xmi:type="notation:Node" xmi:id="_DtpZFEK1EeGbaNt5D20pqA" type="4011"/>
@@ -256,14 +249,6 @@
           <styles xmi:type="notation:ShapeStyle" xmi:id="_DtpZEkK1EeGbaNt5D20pqA" fontName="Segoe UI"/>
           <element xmi:type="adaptiveSystem:Condition" href="gas_station.adaptivesystem#_DtpZEEK1EeGbaNt5D20pqA"/>
           <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DtpZE0K1EeGbaNt5D20pqA" x="50" y="478"/>
-        </children>
-        <children xmi:type="notation:Node" xmi:id="_jvJmsUK1EeGbaNt5D20pqA" type="2007">
-          <children xmi:type="notation:Node" xmi:id="_jvJmtEK1EeGbaNt5D20pqA" type="4011"/>
-          <children xmi:type="notation:Node" xmi:id="_jvJmtkK1EeGbaNt5D20pqA" type="4012"/>
-          <children xmi:type="notation:Node" xmi:id="_jvJmuEK1EeGbaNt5D20pqA" type="4013"/>
-          <styles xmi:type="notation:ShapeStyle" xmi:id="_jvJmskK1EeGbaNt5D20pqA" fontName="Segoe UI"/>
-          <element xmi:type="adaptiveSystem:Condition" href="gas_station.adaptivesystem#_jvJmsEK1EeGbaNt5D20pqA"/>
-          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_jvJms0K1EeGbaNt5D20pqA" x="95" y="488"/>
         </children>
         <styles xmi:type="notation:SortingStyle" xmi:id="_p4ZhcSM7EeGuuZX63OtGpQ"/>
         <styles xmi:type="notation:FilteringStyle" xmi:id="_p4ZhciM7EeGuuZX63OtGpQ"/>
@@ -1994,7 +1979,7 @@
     <element xmi:type="adaptiveSystem:ArcToCondition" href="gas_station.adaptivesystem#_WjpykEKxEeGi1PBteGjbbQ"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_WjpylEKxEeGi1PBteGjbbQ" points="[2, 10, 1, -35]$[2, 35, 1, -10]"/>
   </edges>
-  <edges xmi:type="notation:Edge" xmi:id="_Y9VmwEKxEeGi1PBteGjbbQ" type="3002" source="__z3GoSNQEeGuuZX63OtGpQ" target="_QtBWYUKxEeGi1PBteGjbbQ">
+  <edges xmi:type="notation:Edge" xmi:id="_Y9VmwEKxEeGi1PBteGjbbQ" type="3002" source="__z3GoSNQEeGuuZX63OtGpQ" target="_CIL3IUK1EeGbaNt5D20pqA">
     <children xmi:type="notation:Node" xmi:id="_Y9VmxEKxEeGi1PBteGjbbQ" type="6002">
       <layoutConstraint xmi:type="notation:Location" xmi:id="_Y9VmxUKxEeGi1PBteGjbbQ" y="6"/>
     </children>
@@ -2029,24 +2014,6 @@
     <styles xmi:type="notation:FontStyle" xmi:id="_LlZYc0K1EeGbaNt5D20pqA" fontName="Segoe UI"/>
     <element xmi:type="adaptiveSystem:ArcToEvent" href="gas_station.adaptivesystem#_LlZYcEK1EeGbaNt5D20pqA"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_LlZYdEK1EeGbaNt5D20pqA" points="[-1, 10, -2, -35]$[-9, 43, -10, -2]"/>
-  </edges>
-  <edges xmi:type="notation:Edge" xmi:id="_lq7W4UK1EeGbaNt5D20pqA" type="3001" source="_QtBWYUKxEeGi1PBteGjbbQ" target="_jvJmsUK1EeGbaNt5D20pqA">
-    <children xmi:type="notation:Node" xmi:id="_lq7W5UK1EeGbaNt5D20pqA" type="6001">
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_lq7W5kK1EeGbaNt5D20pqA" y="6"/>
-    </children>
-    <styles xmi:type="notation:RoutingStyle" xmi:id="_lq7W4kK1EeGbaNt5D20pqA"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_lq7W40K1EeGbaNt5D20pqA" fontName="Segoe UI"/>
-    <element xmi:type="adaptiveSystem:ArcToCondition" href="gas_station.adaptivesystem#_lq7W4EK1EeGbaNt5D20pqA"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_lq7W5EK1EeGbaNt5D20pqA" points="[-10, 8, 25, -22]$[-25, 20, 10, -10]"/>
-  </edges>
-  <edges xmi:type="notation:Edge" xmi:id="_mNJTIUK1EeGbaNt5D20pqA" type="3002" source="_jvJmsUK1EeGbaNt5D20pqA" target="_UScDoSNREeGuuZX63OtGpQ">
-    <children xmi:type="notation:Node" xmi:id="_mNJTJUK1EeGbaNt5D20pqA" type="6002">
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_mNJTJkK1EeGbaNt5D20pqA" y="6"/>
-    </children>
-    <styles xmi:type="notation:RoutingStyle" xmi:id="_mNJTIkK1EeGbaNt5D20pqA"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_mNJTI0K1EeGbaNt5D20pqA" fontName="Segoe UI"/>
-    <element xmi:type="adaptiveSystem:ArcToEvent" href="gas_station.adaptivesystem#_mNJTIEK1EeGbaNt5D20pqA"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_mNJTJEK1EeGbaNt5D20pqA" points="[-10, 6, 34, -29]$[-46, 25, -2, -10]"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_T_k3AULXEeG0Z_LvI7YCGA" type="3001" source="_wfX-gUHREeGy85LFkvvJmA" target="_4pvuUULWEeG0Z_LvI7YCGA">
     <children xmi:type="notation:Node" xmi:id="_T_k3BULXEeG0Z_LvI7YCGA" type="6001">

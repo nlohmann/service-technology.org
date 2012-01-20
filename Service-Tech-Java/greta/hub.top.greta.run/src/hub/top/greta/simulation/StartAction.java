@@ -142,9 +142,14 @@ public class StartAction implements
 				// but stopping is possible 
 				action.setEnabled(false);
 		} else {
-			
-			if (!action.isEnabled())
-				action.setEnabled(true);
+		  
+		  if (simView.adaptiveSystem.isSetWellformednessToOclets()) {
+	      if (!action.isEnabled())
+	        action.setEnabled(true);
+		  } else if (startSim && action.isEnabled()) {
+        // cannot start simulation on invalid model
+        action.setEnabled(false);
+		  }
 		}
 	}
 

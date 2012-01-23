@@ -1,1 +1,24 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error"
+
+section "Reporter"
+
+option "reporter" -
+  "Reporter"
+  values="stream","socket" enum
+  typestr="REPORTER"
+  default="stream"
+  optional
+
+option "port" -
+  "Port number"
+  int
+  typestr="PORT"
+  default="1234"
+  optional
+
+option "address" -
+  "Address of listener"
+  string
+  typestr="IP"
+  default="127.0.0.1"
+  optional

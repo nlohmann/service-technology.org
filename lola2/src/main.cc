@@ -10,12 +10,14 @@
 #include <config.h>
 #include <cstdlib>
 #include <libgen.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "Reporter.h"
 #include "cmdline.h"
 #include "ParserPTNet.h"
 
-extern ParserPTNet * ParserPTNetLoLA();
+extern ParserPTNet* ParserPTNetLoLA();
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -24,8 +26,7 @@ gengetopt_args_info args_info;
 extern FILE* yyin;
 
 /// the reporter
-Reporter* rep = new ReporterStream();
-//Reporter *rep = new ReporterSocket(1234, "127.0.0.1");
+Reporter* rep = NULL;
 
 // the parsers
 extern int yyparse();
@@ -43,7 +44,7 @@ void terminationHandler()
 void evaluateParameters(int argc, char** argv)
 {
     // overwrite invocation for consistent error messages
-//    argv[0] = basename(argv[0]);
+    //    argv[0] = basename(argv[0]);
 
     // initialize the parameters structure
     struct cmdline_parser_params* params = cmdline_parser_params_create();
@@ -51,8 +52,19 @@ void evaluateParameters(int argc, char** argv)
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0)
     {
-        rep->abort(1, "invalid command-line parameter(s)");
+        fprintf(stderr, "invalid command-line parameter(s)\n");
         exit(EXIT_FAILURE);
+    }
+
+    switch (args_info.reporter_arg)
+    {
+        case (reporter_arg_stream):
+            rep = new ReporterStream();
+            break;
+        case (reporter_arg_socket):
+            rep = new ReporterSocket(args_info.port_arg, args_info.address_arg);
+            rep->message("pid = %d", getpid());
+            break;
     }
 
     free(params);
@@ -68,10 +80,12 @@ int main(int argc, char** argv)
     evaluateParameters(argc, argv);
 
     // read the input file(s)
-    ParserPTNet * symbolTables = ParserPTNetLoLA();
+    ParserPTNet* symbolTables = ParserPTNetLoLA();
     fclose(yyin);
     yylex_destroy();
     delete symbolTables;
+
+    rep->status("done");
 
     return EXIT_SUCCESS;
 }

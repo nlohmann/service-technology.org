@@ -11,6 +11,7 @@
 #include <string.h>
 #include <errno.h>
 #include <cstdlib>
+#include <ctime>
 
 #include <unistd.h>
 #include <netinet/in.h>
@@ -128,7 +129,13 @@ void Socket::receive()
 
         //        printf("recsize: %d\n ", (int)recsize);
         //        printf("datagram: %.*s\n", (int)recsize, buffer);
-        printf("%.*s\n", (int)recsize, buffer);
+
+        time_t now;
+
+        time(&now);
+        struct tm* current = localtime(&now);
+
+        printf("%s: %i:%i:%i: %.*s\n", PACKAGE, current->tm_hour, current->tm_min, current->tm_sec, (int)recsize, buffer);
     }
 }
 

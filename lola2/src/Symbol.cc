@@ -42,8 +42,3 @@ Symbol::Symbol(string k)
     next(NULL)
 {
 }
-
-Symbol::~Symbol()
-{
-	key.~string();
-}

@@ -13,6 +13,9 @@
 
 #include "Reporter.h"
 #include "cmdline.h"
+#include "ParserPTNet.h"
+
+extern ParserPTNet * ParserPTNetLoLA();
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -40,7 +43,7 @@ void terminationHandler()
 void evaluateParameters(int argc, char** argv)
 {
     // overwrite invocation for consistent error messages
-    argv[0] = basename(argv[0]);
+//    argv[0] = basename(argv[0]);
 
     // initialize the parameters structure
     struct cmdline_parser_params* params = cmdline_parser_params_create();
@@ -65,9 +68,10 @@ int main(int argc, char** argv)
     evaluateParameters(argc, argv);
 
     // read the input file(s)
-    yyparse();
+    ParserPTNet * symbolTables = ParserPTNetLoLA();
     fclose(yyin);
     yylex_destroy();
+    delete symbolTables;
 
     return EXIT_SUCCESS;
 }

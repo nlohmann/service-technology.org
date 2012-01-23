@@ -105,7 +105,7 @@ capacity:
 | _SAFE_ NUMBER _colon_ /* at most k tokens expected on these places */
     { 
         TheCapacity = atoi($2);
-	delete $2;
+	free($2);
     }
 ;
 
@@ -118,6 +118,7 @@ placelist:
         {
             yyerrors($3, "place '%s' name used twice", $3);
         }
+        free($3);
     }
 | nodeident 
     { 
@@ -126,6 +127,7 @@ placelist:
         {
             yyerrors($1, "place '%s' name used twice", $1);
         }
+        free($1);
     }
 ;
 
@@ -157,7 +159,8 @@ marking:
             yyerrors($1, "place '%s' does not exist", $1);
         }
         p -> addInitialMarking(atoi($3));
-	delete $3;
+	free($3);
+	free($1);
     }
 | nodeident  /* default: 1 token */
     { 
@@ -167,6 +170,7 @@ marking:
             yyerrors($1, "place '%s' does not exist", $1);
         }
         p -> addInitialMarking(1);
+        free($1);
     }
 ;
 
@@ -187,6 +191,7 @@ transition:
             {
             yyerrors($2, "transition name '%s' used twice", $2);
             }
+            free($2);
     }
 ;
 
@@ -232,7 +237,8 @@ arc:
             yyerrors($1, "place '%s' does not exist", $1);
         }
         $$ = new ArcList(p,atoi($3));
-	delete $3;
+	free($3);
+    free($1);
     }
 | nodeident   /* default: multiplicity 1 */
     {
@@ -242,6 +248,7 @@ arc:
             yyerrors($1, "place '%s' does not exist", $1);
         }
         $$ = new ArcList(p,1);
+        free($1);
     }
 ;
 

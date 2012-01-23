@@ -125,8 +125,9 @@ UNTIL                                    { setcol(); return _UNTIL_; }
 
 /*! pass token string as attribute to bison */
 inline void setlval() {
-    yylval.attributeString = new char[strlen(yytext) + 1];
-    strcpy(yylval.attributeString, yytext);
+    yylval.attributeString = strdup(yytext);
+//    yylval.attributeString = new char[strlen(yytext) + 1];
+//    strcpy(yylval.attributeString, yytext);
 }
 
 inline void setcol() {
@@ -137,4 +138,5 @@ inline void setcol() {
 
 //// FUNCTION MOVE FROM BISON PARSER BY NIELS
 int yywrap() {
+return 1;
 }

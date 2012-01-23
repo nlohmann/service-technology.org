@@ -15,7 +15,8 @@ ReporterSocket::ReporterSocket(u_short port, const char* ip)
 
 
 
-void ReporterSocket::message(const char* format, ...) {
+void ReporterSocket::message(const char* format, ...)
+{
     char buffer[1000];
     va_list args;
     va_start(args, format);
@@ -24,7 +25,8 @@ void ReporterSocket::message(const char* format, ...) {
     va_end(args);
 }
 
-void ReporterSocket::status(const char* format, ...) {
+void ReporterSocket::status(const char* format, ...)
+{
     char buffer[1000];
     va_list args;
     va_start(args, format);
@@ -33,7 +35,8 @@ void ReporterSocket::status(const char* format, ...) {
     va_end(args);
 }
 
-__attribute__((noreturn)) void ReporterSocket::abort(unsigned short code, const char* format, ...) {
+__attribute__((noreturn)) void ReporterSocket::abort(unsigned short code, const char* format, ...)
+{
     char buffer[1000];
     va_list args;
     va_start(args, format);

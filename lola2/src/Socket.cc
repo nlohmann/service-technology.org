@@ -126,8 +126,8 @@ void Socket::receive()
             exit(EXIT_FAILURE);
         }
 
-//        printf("recsize: %d\n ", (int)recsize);
-//        printf("datagram: %.*s\n", (int)recsize, buffer);
+        //        printf("recsize: %d\n ", (int)recsize);
+        //        printf("datagram: %.*s\n", (int)recsize, buffer);
         printf("%.*s\n", (int)recsize, buffer);
     }
 }

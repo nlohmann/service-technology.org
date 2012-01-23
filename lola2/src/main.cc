@@ -21,7 +21,7 @@ gengetopt_args_info args_info;
 extern FILE* yyin;
 
 /// the reporter
-Reporter *rep = new ReporterStream();
+Reporter* rep = new ReporterStream();
 //Reporter *rep = new ReporterSocket(1234, "127.0.0.1");
 
 // the parsers

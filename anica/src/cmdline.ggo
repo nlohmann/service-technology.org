@@ -16,6 +16,11 @@ This program checks safe petri nets for non-interference properties.\n\n  Report
 section "Analysis Task"
 sectiondesc="<<-- Anica is able to find potential and active interfering places. By default, Anica will find both. -->>\n"
 
+option "controller" -
+  "Calculate controller."
+  details="Calculate controller.\n"
+  flag off
+
 option "potentialPlaces" -
   "Potential Places."
   details="Used to find specified potential places.\n"

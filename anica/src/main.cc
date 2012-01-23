@@ -315,21 +315,23 @@ int main(int argc, char** argv) {
 		fileName = std::string(args_info.inputs[0]);
 	}
 
-	bool checkPotentialCausal = (args_info.potentialPlaces_arg != potentialPlaces_arg_conflict);
-	bool checkPotentialConflict = (args_info.potentialPlaces_arg != potentialPlaces_arg_causal);
-	bool checkActiveCausal = ((args_info.activePlaces_arg == activePlaces_arg_causal) || (args_info.activePlaces_arg == activePlaces_arg_both));
-	bool checkActiveConflict = ((args_info.activePlaces_arg == activePlaces_arg_conflict) || (args_info.activePlaces_arg == activePlaces_arg_both));
+
+    bool checkPotentialCausal = (args_info.potentialPlaces_arg != potentialPlaces_arg_conflict);
+    bool checkPotentialConflict = (args_info.potentialPlaces_arg != potentialPlaces_arg_causal);
+    bool checkActiveCausal = ((args_info.activePlaces_arg == activePlaces_arg_causal) || (args_info.activePlaces_arg == activePlaces_arg_both));
+    bool checkActiveConflict = ((args_info.activePlaces_arg == activePlaces_arg_conflict) || (args_info.activePlaces_arg == activePlaces_arg_both));
 
     std::set<std::string> downgradeTransitions;
-	std::set<pnapi::Place *> potentialCausal;
-	std::set<pnapi::Place *> potentialConflict;
-	std::set<pnapi::Place *> activeCausal;
-	std::set<pnapi::Place *> activeConflict;
-	
-	std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > potentialCausalTriple;
+    std::set<pnapi::Place *> potentialCausal;
+    std::set<pnapi::Place *> potentialConflict;
+    std::set<pnapi::Place *> activeCausal;
+    std::set<pnapi::Place *> activeConflict;
+
+    std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > potentialCausalTriple;
     std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > potentialConflictTriple;
     std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > activeCausalTriple;
     std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > activeConflictTriple;
+    
 
 	/*---------------------------------.
     | 3. handle confidence			   |
@@ -345,20 +347,28 @@ int main(int argc, char** argv) {
 		if (curConfidence == 0) {
 			// unlabeled transition
 			if (args_info.unlabeledTransitions_arg == unlabeledTransitions_arg_none) {
-				abort(6, "%s has unknown confidence level", (**t).getName().c_str());
+				if (!args_info.controller_flag) {
+				    abort(6, "%s has unknown confidence level", (**t).getName().c_str());
+				}
 			}
 			else if (args_info.unlabeledTransitions_arg == unlabeledTransitions_arg_low) {
-				(**t).setConfidence(1);
-				lowTransitions++;
+				if (!args_info.controller_flag) {
+				    (**t).setConfidence(1);
+				    lowTransitions++;
+				}
 			}
 			else if (args_info.unlabeledTransitions_arg == unlabeledTransitions_arg_high) {
-				(**t).setConfidence(2);
-				highTransitions++;
+				if (!args_info.controller_flag) {
+				    (**t).setConfidence(2);
+				    highTransitions++;
+				}
 			}
 			else if (args_info.unlabeledTransitions_arg == unlabeledTransitions_arg_down) {
-				(**t).setConfidence(3);
-				downTransitions++;
-				downgradeTransitions.insert((**t).getName());
+				if (!args_info.controller_flag) {
+				    (**t).setConfidence(3);
+				    downTransitions++;
+				    downgradeTransitions.insert((**t).getName());
+				}
 			}
 		}
 		else if (curConfidence == 1) {lowTransitions++;}
@@ -370,11 +380,19 @@ int main(int argc, char** argv) {
 	}
 
 	if (lowTransitions == 0 || highTransitions == 0) {
-		status("trivial confidence level used");
-		message(_cgood_("Non-Interference: PASSED"));
-		return EXIT_SUCCESS;
+		if (!args_info.controller_flag) {
+		    status("trivial confidence level used");
+		    message(_cgood_("Non-Interference: PASSED"));
+		    return EXIT_SUCCESS;
+		}
 	}
 
+    if (args_info.controller_flag && (downTransitions > 0)) {
+        status("PBNID and controller don't fit");
+		message(_cbad_("Controller requires PBNI(+)"));
+		return EXIT_SUCCESS;
+    }
+    
 	if (args_info.dotConfidence_given) {
 	    //clearColors(net);
 		PNAPI_FOREACH(t, net.getTransitions()) {
@@ -394,501 +412,748 @@ int main(int argc, char** argv) {
 	/*---------------------------------.
     | 4. gather potential places	   |
     `---------------------------------*/
+	    
+    std::multimap<pnapi::Place *, pnapi::Transition *> highPre;
+    std::multimap<pnapi::Place *, pnapi::Transition *> lowPost;
+    std::multimap<pnapi::Place *, pnapi::Transition *> highPost;
 
-	std::multimap<pnapi::Place *, pnapi::Transition *> highPre;
-	std::multimap<pnapi::Place *, pnapi::Transition *> lowPost;
-	std::multimap<pnapi::Place *, pnapi::Transition *> highPost;
+    if (!args_info.controller_flag) {
 
-	status("check potential places");
-	PNAPI_FOREACH(p, net.getPlaces()) {
-		status("..%s", (**p).getName().c_str());
+	    status("check potential places");
+	    PNAPI_FOREACH(p, net.getPlaces()) {
+		    status("..%s", (**p).getName().c_str());
 		
-		std::set<pnapi::Transition *> lHighPre;
-		std::set<pnapi::Transition *> lHighPost;
-		std::set<pnapi::Transition *> lLowPost;
+		    std::set<pnapi::Transition *> lHighPre;
+		    std::set<pnapi::Transition *> lHighPost;
+		    std::set<pnapi::Transition *> lLowPost;
 		
-		if (checkPotentialCausal) {
-			PNAPI_FOREACH(t, (**p).getPreset()) {
-				if (((pnapi::Transition *)(*t))->getConfidence() == 2) {
-					lHighPre.insert((pnapi::Transition *)*t);
-				}
-			}
-		}
+		    if (checkPotentialCausal) {
+			    PNAPI_FOREACH(t, (**p).getPreset()) {
+				    if (((pnapi::Transition *)(*t))->getConfidence() == 2) {
+					    lHighPre.insert((pnapi::Transition *)*t);
+				    }
+			    }
+		    }
 
-		PNAPI_FOREACH(t, (**p).getPostset()) {
-			if (((pnapi::Transition *)(*t))->getConfidence() == 2) {
-				lHighPost.insert((pnapi::Transition *)*t);
-			}
-			else if (((pnapi::Transition *)(*t))->getConfidence() == 1) {
-				lLowPost.insert((pnapi::Transition *)*t);
-			}
-		}
+		    PNAPI_FOREACH(t, (**p).getPostset()) {
+			    if (((pnapi::Transition *)(*t))->getConfidence() == 2) {
+				    lHighPost.insert((pnapi::Transition *)*t);
+			    }
+			    else if (((pnapi::Transition *)(*t))->getConfidence() == 1) {
+				    lLowPost.insert((pnapi::Transition *)*t);
+			    }
+		    }
 
-		bool lowPostDone = false;
+		    bool lowPostDone = false;
 
-		if (checkPotentialCausal) {
-			if (!lHighPre.empty() && !lLowPost.empty()) {
-				status(_cwarning_("....potential causal"));
-				potentialCausal.insert(*p);
-				FOREACH(t, lHighPre) {
-					highPre.insert(std::make_pair(*p, *t));
-				}
-				FOREACH(t, lLowPost) {
-					lowPost.insert(std::make_pair(*p, *t));
-				}
-				lowPostDone = true;
-			}
-		}
+		    if (checkPotentialCausal) {
+			    if (!lHighPre.empty() && !lLowPost.empty()) {
+				    status(_cwarning_("....potential causal"));
+				    potentialCausal.insert(*p);
+				    FOREACH(t, lHighPre) {
+					    highPre.insert(std::make_pair(*p, *t));
+				    }
+				    FOREACH(t, lLowPost) {
+					    lowPost.insert(std::make_pair(*p, *t));
+				    }
+				    lowPostDone = true;
+			    }
+		    }
 
-		if (checkPotentialConflict) {
-			if (!lHighPost.empty() && !lLowPost.empty()) {
-				status(_cwarning_("....potential conflict"));
-				potentialConflict.insert(*p);
-				FOREACH(t, lHighPost) {
-					highPost.insert(std::make_pair(*p, *t));
-				}
-				if (!lowPostDone) {
-					FOREACH(t, lLowPost) {
-						lowPost.insert(std::make_pair(*p, *t));
-					}
-				}
-			}
-		}
+		    if (checkPotentialConflict) {
+			    if (!lHighPost.empty() && !lLowPost.empty()) {
+				    status(_cwarning_("....potential conflict"));
+				    potentialConflict.insert(*p);
+				    FOREACH(t, lHighPost) {
+					    highPost.insert(std::make_pair(*p, *t));
+				    }
+				    if (!lowPostDone) {
+					    FOREACH(t, lLowPost) {
+						    lowPost.insert(std::make_pair(*p, *t));
+					    }
+				    }
+			    }
+		    }
 
-	}
+	    }
 
-	if (args_info.dotPotential_given) {
-	    if (args_info.dotConfidence_given) {clearColors(net);}
-		PNAPI_FOREACH(p, net.getPlaces()) {
-			if (args_info.dotPotential_arg != dotPotential_arg_conflict) {
-				// causal interesting
-				if (potentialCausal.find(*p) != potentialCausal.end()) {
-					// causal confirmed
-					(**p).setColor("blue");
-					if (args_info.dotPotential_arg == dotPotential_arg_both) {
-						if (potentialConflict.find(*p) != potentialConflict.end()) {
-							(**p).setColor("brown");
-						}
-					}
-				}
-			}
-			else {
-				if (potentialConflict.find(*p) != potentialConflict.end()) {
-					(**p).setColor("orange");
-				}
-			}
-		}
-		createDotFile(std::string(fileName + ".potential"), net, fileName);
-	}
+	    if (args_info.dotPotential_given) {
+	        if (args_info.dotConfidence_given) {clearColors(net);}
+		    PNAPI_FOREACH(p, net.getPlaces()) {
+			    if (args_info.dotPotential_arg != dotPotential_arg_conflict) {
+				    // causal interesting
+				    if (potentialCausal.find(*p) != potentialCausal.end()) {
+					    // causal confirmed
+					    (**p).setColor("blue");
+					    if (args_info.dotPotential_arg == dotPotential_arg_both) {
+						    if (potentialConflict.find(*p) != potentialConflict.end()) {
+							    (**p).setColor("brown");
+						    }
+					    }
+				    }
+			    }
+			    else {
+				    if (potentialConflict.find(*p) != potentialConflict.end()) {
+					    (**p).setColor("orange");
+				    }
+			    }
+		    }
+		    createDotFile(std::string(fileName + ".potential"), net, fileName);
+	    }
+	    
+	} // if (!args_info.controller_flag) {
 
 	/*---------------------------------.
     | 5. check potential places		   |
     `---------------------------------*/
 
-	std::set<std::string> allNets;
+    std::set<std::string> allNets;
 
-	if ((checkActiveCausal || checkActiveConflict) && (!potentialCausal.empty() || !potentialConflict.empty())) {
+    if (!args_info.controller_flag) {
 
-		status("check active places");
+	    if ((checkActiveCausal || checkActiveConflict) && (!potentialCausal.empty() || !potentialConflict.empty())) {
 
-		std::multimap<pnapi::Place *, pnapi::Transition *>::iterator itHigh;
-	  	std::pair<std::multimap<pnapi::Place *, pnapi::Transition *>::iterator,std::multimap<pnapi::Place *, pnapi::Transition *>::iterator> retHigh;
-		std::multimap<pnapi::Place *, pnapi::Transition *>::iterator itLow;
-	  	std::pair<std::multimap<pnapi::Place *, pnapi::Transition *>::iterator,std::multimap<pnapi::Place *, pnapi::Transition *>::iterator> retLow;
+		    status("check active places");
 
-        bool isActive;
+		    std::multimap<pnapi::Place *, pnapi::Transition *>::iterator itHigh;
+	      	std::pair<std::multimap<pnapi::Place *, pnapi::Transition *>::iterator,std::multimap<pnapi::Place *, pnapi::Transition *>::iterator> retHigh;
+		    std::multimap<pnapi::Place *, pnapi::Transition *>::iterator itLow;
+	      	std::pair<std::multimap<pnapi::Place *, pnapi::Transition *>::iterator,std::multimap<pnapi::Place *, pnapi::Transition *>::iterator> retLow;
 
-		if (checkActiveCausal) {
-		status("..potential causal places");
-			FOREACH(p, potentialCausal) {
+            bool isActive;
 
-				if (args_info.oneActiveOnly_flag && (!activeCausal.empty() || !activeConflict.empty())) {break;}
-                isActive = false;
+		    if (checkActiveCausal) {
+		    status("..potential causal places");
+			    FOREACH(p, potentialCausal) {
 
-				status("....%s (%d combination(s))", (**p).getName().c_str(), highPre.count(*p) * lowPost.count(*p));
+				    if (args_info.oneActiveOnly_flag && (!activeCausal.empty() || !activeConflict.empty())) {break;}
+                    isActive = false;
 
-				retHigh = highPre.equal_range(*p);
-				for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
-                    if (args_info.oneTripleOnly_flag && isActive) {break;}
-                
-					retLow = lowPost.equal_range(*p);
-					for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
-					    if (args_info.oneTripleOnly_flag && isActive) {break;}
+				    status("....%s (%d combination(s))", (**p).getName().c_str(), highPre.count(*p) * lowPost.count(*p));
+
+				    retHigh = highPre.equal_range(*p);
+				    for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
+                        if (args_info.oneTripleOnly_flag && isActive) {break;}
+                    
+					    retLow = lowPost.equal_range(*p);
+					    for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
+					        if (args_info.oneTripleOnly_flag && isActive) {break;}
 					
-						status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
-						potentialCausalTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
+						    status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
+						    potentialCausalTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
 
-                        pnapi::PetriNet cNet(net);
-                        
-                        pnapi::Place * curPlace = cNet.findPlace((**p).getName());
-						pnapi::Transition * curHigh = cNet.findTransition((*itHigh).second->getName());
-						pnapi::Transition * curLow = cNet.findTransition((*itLow).second->getName());
+                            pnapi::PetriNet cNet(net);
+                            
+                            pnapi::Place * curPlace = cNet.findPlace((**p).getName());
+						    pnapi::Transition * curHigh = cNet.findTransition((*itHigh).second->getName());
+						    pnapi::Transition * curLow = cNet.findTransition((*itLow).second->getName());
 
-						pnapi::Transition * lowCopy = &cNet.createTransition();
-						pnapi::Transition * highCopy = &cNet.createTransition();
-						pnapi::Place * highFired = &cNet.createPlace();
-						pnapi::Place * goal = &cNet.createPlace();
+						    pnapi::Transition * lowCopy = &cNet.createTransition();
+						    pnapi::Transition * highCopy = &cNet.createTransition();
+						    pnapi::Place * highFired = &cNet.createPlace();
+						    pnapi::Place * goal = &cNet.createPlace();
 
-                        std::set< std::pair<pnapi::Node *, pnapi::Node *> > newArcs;
+                            std::set< std::pair<pnapi::Node *, pnapi::Node *> > newArcs;
 
-                        PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
-                            newArcs.insert(std::make_pair(*prePlace, highCopy));
-                        }
-                        PNAPI_FOREACH(postPlace, curHigh->getPostset()) {
-                            newArcs.insert(std::make_pair(highCopy, *postPlace));
-                        }
-                        
-                        PNAPI_FOREACH(prePlace, curLow->getPreset()) {
-                            newArcs.insert(std::make_pair(*prePlace, lowCopy));
-                        }
+                            PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
+                                newArcs.insert(std::make_pair(*prePlace, highCopy));
+                            }
+                            PNAPI_FOREACH(postPlace, curHigh->getPostset()) {
+                                newArcs.insert(std::make_pair(highCopy, *postPlace));
+                            }
+                            
+                            PNAPI_FOREACH(prePlace, curLow->getPreset()) {
+                                newArcs.insert(std::make_pair(*prePlace, lowCopy));
+                            }
 
-						PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
-						    if (((**preTransition).getName() != (*curLow).getName()) && ( (**preTransition).getName() != (*curHigh).getName() )) {
-						        pnapi::Place * cPlace = &cNet.createPlace("", 1);
-						        newArcs.insert(std::make_pair(*preTransition, cPlace));
-							    newArcs.insert(std::make_pair(cPlace, *preTransition));
-							    newArcs.insert(std::make_pair(cPlace, highCopy));
-							}
-						}
+						    PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
+						        if (((**preTransition).getName() != (*curLow).getName()) && ( (**preTransition).getName() != (*curHigh).getName() )) {
+						            pnapi::Place * cPlace = &cNet.createPlace("", 1);
+						            newArcs.insert(std::make_pair(*preTransition, cPlace));
+							        newArcs.insert(std::make_pair(cPlace, *preTransition));
+							        newArcs.insert(std::make_pair(cPlace, highCopy));
+							    }
+						    }
 
-                        //handle downgrading transitions
-                        PNAPI_FOREACH(downTransition, downgradeTransitions) {
-					        pnapi::Place * cPlace = &cNet.createPlace("", 1);
-					        pnapi::Transition * cDown = (pnapi::Transition *)cNet.findNode(*downTransition);
-					        newArcs.insert(std::make_pair(cDown, cPlace));
-						    newArcs.insert(std::make_pair(cPlace, cDown));
-						    newArcs.insert(std::make_pair(cPlace, highCopy));
-						}
+                            //handle downgrading transitions
+                            PNAPI_FOREACH(downTransition, downgradeTransitions) {
+					            pnapi::Place * cPlace = &cNet.createPlace("", 1);
+					            pnapi::Transition * cDown = (pnapi::Transition *)cNet.findNode(*downTransition);
+					            newArcs.insert(std::make_pair(cDown, cPlace));
+						        newArcs.insert(std::make_pair(cPlace, cDown));
+						        newArcs.insert(std::make_pair(cPlace, highCopy));
+						    }
 
-                        FOREACH(a, newArcs) {
-							cNet.createArc(*a->first, *a->second);
-						}
+                            FOREACH(a, newArcs) {
+							    cNet.createArc(*a->first, *a->second);
+						    }
 
-						cNet.createArc(*highCopy, *highFired);
-						cNet.createArc(*highFired, *lowCopy);
-						cNet.createArc(*lowCopy, *goal);
+						    cNet.createArc(*highCopy, *highFired);
+						    cNet.createArc(*highFired, *lowCopy);
+						    cNet.createArc(*lowCopy, *goal);
 				
-						std::string curFileName;
-						curFileName = fileName + ".causal." + (*curPlace).getName() + "." + (*curHigh).getName() + "." + (*curLow).getName() + ".lola";
+						    std::string curFileName;
+						    curFileName = fileName + ".causal." + (*curPlace).getName() + "." + (*curHigh).getName() + "." + (*curLow).getName() + ".lola";
 
-						std::ofstream o;
-						o.open(curFileName.c_str(), std::ios_base::trunc);
-						o << pnapi::io::lola << cNet;
-						o << "\n\nFORMULA (" << goal->getName() << " = 1 )\n";
-						o.close();
+						    std::ofstream o;
+						    o.open(curFileName.c_str(), std::ios_base::trunc);
+						    o << pnapi::io::lola << cNet;
+						    o << "\n\nFORMULA (" << goal->getName() << " = 1 )\n";
+						    o.close();
 						
-                        status("........%s created", _cfilename_(curFileName));
+                            status("........%s created", _cfilename_(curFileName));
 
-						allNets.insert(curFileName);
+						    allNets.insert(curFileName);
 
-						if (args_info.modus_arg == modus_arg_lola) {
-							// call LoLA
-							if (callLoLA(curFileName)) {
-								status(_cbad_("........active"));
-								activeCausalTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
-								isActive = true;
-							}
-							else {
-								status(_cgood_("........not active"));
-							}
-						}
+						    if (args_info.modus_arg == modus_arg_lola) {
+							    // call LoLA
+							    if (callLoLA(curFileName)) {
+								    status(_cbad_("........active"));
+								    activeCausalTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
+								    isActive = true;
+							    }
+							    else {
+								    status(_cgood_("........not active"));
+							    }
+						    }
 
-					} // for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
+					    } // for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
 
-				} // for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
+				    } // for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
 				
-				if (isActive) {
-				    status(_cbad_("......active"));
-				    activeCausal.insert(*p);
-				}
-				else {
-				    status(_cgood_("......not active"));
-				}
+				    if (isActive) {
+				        status(_cbad_("......active"));
+				        activeCausal.insert(*p);
+				    }
+				    else {
+				        status(_cgood_("......not active"));
+				    }
 
-			} // FOREACH(p, potentialCausal) {
+			    } // FOREACH(p, potentialCausal) {
 
-		} // activeCausal
+		    } // activeCausal
 
-		if (checkActiveConflict) {
-			status("..potential conflict places");
-			FOREACH(p, potentialConflict) {
+		    if (checkActiveConflict) {
+			    status("..potential conflict places");
+			    FOREACH(p, potentialConflict) {
 
-				if (args_info.oneActiveOnly_flag && (!activeCausal.empty() || !activeConflict.empty())) {break;}
-				isActive = false;
+				    if (args_info.oneActiveOnly_flag && (!activeCausal.empty() || !activeConflict.empty())) {break;}
+				    isActive = false;
 
-				status("....%s (%d combination(s))", (**p).getName().c_str(), highPost.count(*p) * lowPost.count(*p));
+				    status("....%s (%d combination(s))", (**p).getName().c_str(), highPost.count(*p) * lowPost.count(*p));
 		
-				retHigh = highPost.equal_range(*p);
-				for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
-				    if (args_info.oneTripleOnly_flag && isActive) {break;}
-				    
-					retLow = lowPost.equal_range(*p);
-					for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
-					    if (args_info.oneTripleOnly_flag && isActive) {break;}
-					    
-						status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
-                        potentialConflictTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
+				    retHigh = highPost.equal_range(*p);
+				    for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
+				        if (args_info.oneTripleOnly_flag && isActive) {break;}
+				        
+					    retLow = lowPost.equal_range(*p);
+					    for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
+					        if (args_info.oneTripleOnly_flag && isActive) {break;}
+					        
+						    status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
+                            potentialConflictTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
 
-						pnapi::PetriNet cNet(net);
-                        
-                        pnapi::Place * curPlace = cNet.findPlace((**p).getName());
-						pnapi::Transition * curHigh = cNet.findTransition((*itHigh).second->getName());
-						pnapi::Transition * curLow = cNet.findTransition((*itLow).second->getName());
+						    pnapi::PetriNet cNet(net);
+                            
+                            pnapi::Place * curPlace = cNet.findPlace((**p).getName());
+						    pnapi::Transition * curHigh = cNet.findTransition((*itHigh).second->getName());
+						    pnapi::Transition * curLow = cNet.findTransition((*itLow).second->getName());
 
-						pnapi::Transition * lowCopy = &cNet.createTransition();
-						pnapi::Transition * highCopy = &cNet.createTransition();
-						pnapi::Place * highFired = &cNet.createPlace();
-						pnapi::Place * highActivated = &cNet.createPlace("", 1);
-						pnapi::Place * goal = &cNet.createPlace();
+						    pnapi::Transition * lowCopy = &cNet.createTransition();
+						    pnapi::Transition * highCopy = &cNet.createTransition();
+						    pnapi::Place * highFired = &cNet.createPlace();
+						    pnapi::Place * highActivated = &cNet.createPlace("", 1);
+						    pnapi::Place * goal = &cNet.createPlace();
 
-                        std::set< std::pair<pnapi::Node *, pnapi::Node *> > newArcs;
+                            std::set< std::pair<pnapi::Node *, pnapi::Node *> > newArcs;
 
-                        PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
-                            newArcs.insert(std::make_pair(*prePlace, highCopy));
-                            newArcs.insert(std::make_pair(highCopy, *prePlace));
-                        }
-                        
-                        PNAPI_FOREACH(prePlace, curLow->getPreset()) {
-                            newArcs.insert(std::make_pair(*prePlace, lowCopy));
-                        }
+                            PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
+                                newArcs.insert(std::make_pair(*prePlace, highCopy));
+                                newArcs.insert(std::make_pair(highCopy, *prePlace));
+                            }
+                            
+                            PNAPI_FOREACH(prePlace, curLow->getPreset()) {
+                                newArcs.insert(std::make_pair(*prePlace, lowCopy));
+                            }
 
-						PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
-						    if (((**preTransition).getName() != (*curLow).getName()) && ( (**preTransition).getName() != (*curHigh).getName() )) {
-						        pnapi::Place * cPlace = &cNet.createPlace("", 1);
-						        newArcs.insert(std::make_pair(*preTransition, cPlace));
-							    newArcs.insert(std::make_pair(cPlace, *preTransition));
-							    newArcs.insert(std::make_pair(cPlace, highCopy));
-							}
-						}
+						    PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
+						        if (((**preTransition).getName() != (*curLow).getName()) && ( (**preTransition).getName() != (*curHigh).getName() )) {
+						            pnapi::Place * cPlace = &cNet.createPlace("", 1);
+						            newArcs.insert(std::make_pair(*preTransition, cPlace));
+							        newArcs.insert(std::make_pair(cPlace, *preTransition));
+							        newArcs.insert(std::make_pair(cPlace, highCopy));
+							    }
+						    }
 
-                        //handle downgrading transitions
-                        PNAPI_FOREACH(downTransition, downgradeTransitions) {
-					        pnapi::Place * cPlace = &cNet.createPlace("", 1);
-					        pnapi::Transition * cDown = (pnapi::Transition *)cNet.findNode(*downTransition);
-					        newArcs.insert(std::make_pair(cDown, cPlace));
-						    newArcs.insert(std::make_pair(cPlace, cDown));
-						    newArcs.insert(std::make_pair(cPlace, highCopy));
-						}
+                            //handle downgrading transitions
+                            PNAPI_FOREACH(downTransition, downgradeTransitions) {
+					            pnapi::Place * cPlace = &cNet.createPlace("", 1);
+					            pnapi::Transition * cDown = (pnapi::Transition *)cNet.findNode(*downTransition);
+					            newArcs.insert(std::make_pair(cDown, cPlace));
+						        newArcs.insert(std::make_pair(cPlace, cDown));
+						        newArcs.insert(std::make_pair(cPlace, highCopy));
+						    }
 
-                        FOREACH(a, newArcs) {
-							cNet.createArc(*a->first, *a->second);
-						}
+                            FOREACH(a, newArcs) {
+							    cNet.createArc(*a->first, *a->second);
+						    }
 
-						cNet.createArc(*highCopy, *highFired);
-						cNet.createArc(*highFired, *lowCopy);
-						cNet.createArc(*lowCopy, *goal);
-						cNet.createArc(*highActivated, *curHigh);
-						cNet.createArc(*curHigh, *highActivated);
-						cNet.createArc(*highActivated, *highCopy);
+						    cNet.createArc(*highCopy, *highFired);
+						    cNet.createArc(*highFired, *lowCopy);
+						    cNet.createArc(*lowCopy, *goal);
+						    cNet.createArc(*highActivated, *curHigh);
+						    cNet.createArc(*curHigh, *highActivated);
+						    cNet.createArc(*highActivated, *highCopy);
 
-						std::string curFileName;
-						curFileName = fileName + ".conflict." + (*curPlace).getName() + "." + (*curHigh).getName() + "." + (*curLow).getName() + ".lola";
+						    std::string curFileName;
+						    curFileName = fileName + ".conflict." + (*curPlace).getName() + "." + (*curHigh).getName() + "." + (*curLow).getName() + ".lola";
 
-						std::ofstream o;
-						o.open(curFileName.c_str(), std::ios_base::trunc);
-						o << pnapi::io::lola << cNet;
-						o << "\n\nFORMULA (" << goal->getName() << " = 1 )\n";
-						o.close();
-						status("........%s created", _cfilename_(curFileName));
+						    std::ofstream o;
+						    o.open(curFileName.c_str(), std::ios_base::trunc);
+						    o << pnapi::io::lola << cNet;
+						    o << "\n\nFORMULA (" << goal->getName() << " = 1 )\n";
+						    o.close();
+						    status("........%s created", _cfilename_(curFileName));
 
-						allNets.insert(curFileName);
+						    allNets.insert(curFileName);
 
-						if (args_info.modus_arg == modus_arg_lola) {
-							// call LoLA
-							if (callLoLA(curFileName)) {
-								status(_cbad_("........active"));
-								activeConflictTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
-								isActive = true;
-							}
-							else {
-								status(_cgood_("........not active"));
-							}
-						}
+						    if (args_info.modus_arg == modus_arg_lola) {
+							    // call LoLA
+							    if (callLoLA(curFileName)) {
+								    status(_cbad_("........active"));
+								    activeConflictTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
+								    isActive = true;
+							    }
+							    else {
+								    status(_cgood_("........not active"));
+							    }
+						    }
 
-					} // for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
+					    } // for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
 
-				} // for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
+				    } // for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
 				
-				if (isActive) {
-				    status(_cbad_("......active"));
-				    activeConflict.insert(*p);
-				}
-				else {
-				    status(_cgood_("......not active"));
-				}
+				    if (isActive) {
+				        status(_cbad_("......active"));
+				        activeConflict.insert(*p);
+				    }
+				    else {
+				        status(_cgood_("......not active"));
+				    }
 
-			} // FOREACH(p, potentialConflict) {
+			    } // FOREACH(p, potentialConflict) {
 
-		} // activeCausal
+		    } // activeCausal
 
-		if (args_info.modus_arg == modus_arg_makefile) {
-			// create makefile
-			std::ofstream o;
-			o.open(std::string(fileName + ".makefile").c_str(), std::ios_base::trunc);
+		    if (args_info.modus_arg == modus_arg_makefile) {
+			    // create makefile
+			    std::ofstream o;
+			    o.open(std::string(fileName + ".makefile").c_str(), std::ios_base::trunc);
 
-			o << ".PHONY : clean veryclean\n\n";
-    		o << "SED = sed\n\n";
-    		o << "nets = ";
-    		FOREACH(f, allNets) {
-				o << basename(const_cast<char *>((*f).c_str())) << " ";
-			}
-			o << "\n\n";
+			    o << ".PHONY : clean veryclean\n\n";
+        		o << "SED = sed\n\n";
+        		o << "nets = ";
+        		FOREACH(f, allNets) {
+				    o << basename(const_cast<char *>((*f).c_str())) << " ";
+			    }
+			    o << "\n\n";
 
-			// display help
-			o << "all: activeplaces\n";
+			    // display help
+			    o << "all: activeplaces\n";
 
-			// active places using statepredicate
-			o << "\n##############################################################################\n";
-			o << "# check for active places by checking whether a marking is reachable\n";
-			o << "##############################################################################\n";
-			o << "activeplaces: $(nets:%=%.result)\n";
-			o << "%.result:\n";
-			if (args_info.witnessPath_given) {
-				o << "\t@echo \"ANALYSE NET $(@:%.result=%) -p\"\n";
-				o << "\t-@" << args_info.lola_arg << " $(@:%.result=%) -p 2> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
-			}
-			else {
-				o << "\t@echo \"ANALYSE NET $(@:%.result=%)\"\n";
-				o << "\t-@" << args_info.lola_arg << " $(@:%.result=%) 2> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
-			}
+			    // active places using statepredicate
+			    o << "\n##############################################################################\n";
+			    o << "# check for active places by checking whether a marking is reachable\n";
+			    o << "##############################################################################\n";
+			    o << "activeplaces: $(nets:%=%.result)\n";
+			    o << "%.result:\n";
+			    if (args_info.witnessPath_given) {
+				    o << "\t@echo \"ANALYSE NET $(@:%.result=%) -p\"\n";
+				    o << "\t-@" << args_info.lola_arg << " $(@:%.result=%) -p 2> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
+			    }
+			    else {
+				    o << "\t@echo \"ANALYSE NET $(@:%.result=%)\"\n";
+				    o << "\t-@" << args_info.lola_arg << " $(@:%.result=%) 2> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
+			    }
 			
-			// clean up
-			o << "\n##############################################################################\n";
-			o << "# clean up\n";
-			o << "##############################################################################\n";
-			o << "clean:\n";
-			o << "\nveryclean: clean\n";
-			//o << "\t@$(RM) $(net) $(MAKEFILE_LIST)\n";
-			//o << "\t@$(RM) $(net:.lola=).*.lola\n";
+			    // clean up
+			    o << "\n##############################################################################\n";
+			    o << "# clean up\n";
+			    o << "##############################################################################\n";
+			    o << "clean:\n";
+			    o << "\nveryclean: clean\n";
+			    //o << "\t@$(RM) $(net) $(MAKEFILE_LIST)\n";
+			    //o << "\t@$(RM) $(net:.lola=).*.lola\n";
 
-			o.close();
+			    o.close();
 
-			message("%s %s %s", _cgood_("makefile"), _cfilename_(std::string(fileName + ".makefile")), _cgood_("created"));
+			    message("%s %s %s", _cgood_("makefile"), _cfilename_(std::string(fileName + ".makefile")), _cgood_("created"));
 
-		} // (args_info.modus_arg == modus_arg_makefile) {
-		else {
-			if (args_info.dotActive_given) {
-			    if (args_info.dotConfidence_given || args_info.dotPotential_given) {clearColors(net);}
-				PNAPI_FOREACH(p, net.getPlaces()) {
-					if (args_info.dotActive_arg != dotActive_arg_conflict) {
-						// causal interesting
-						if (activeCausal.find(*p) != activeCausal.end()) {
-							// causal confirmed
-							(**p).setColor("blue");
-							if (args_info.dotActive_arg == dotActive_arg_both) {
-								if (activeConflict.find(*p) != activeConflict.end()) {
-									(**p).setColor("brown");
-								}
-							}
-						}
-					}
-					else {
-						if (activeConflict.find(*p) != activeConflict.end()) {
-							(**p).setColor("orange");
-						}
-					}
-				}
-				createDotFile(std::string(fileName + ".active"), net, fileName);
-			}
-		}
+		    } // (args_info.modus_arg == modus_arg_makefile) {
+		    else {
+			    if (args_info.dotActive_given) {
+			        if (args_info.dotConfidence_given || args_info.dotPotential_given) {clearColors(net);}
+				    PNAPI_FOREACH(p, net.getPlaces()) {
+					    if (args_info.dotActive_arg != dotActive_arg_conflict) {
+						    // causal interesting
+						    if (activeCausal.find(*p) != activeCausal.end()) {
+							    // causal confirmed
+							    (**p).setColor("blue");
+							    if (args_info.dotActive_arg == dotActive_arg_both) {
+								    if (activeConflict.find(*p) != activeConflict.end()) {
+									    (**p).setColor("brown");
+								    }
+							    }
+						    }
+					    }
+					    else {
+						    if (activeConflict.find(*p) != activeConflict.end()) {
+							    (**p).setColor("orange");
+						    }
+					    }
+				    }
+				    createDotFile(std::string(fileName + ".active"), net, fileName);
+			    }
+		    }
 
-	} // if (checkActiveCausal || checkActiveConflict) {
+	    } // if (checkActiveCausal || checkActiveConflict) {
+	    
+	} // if (!args_info.controller_flag) {
 
 	/*---------------------------------.
     | 6. finishing					   |
     `---------------------------------*/
 
-	if (args_info.modus_arg == modus_arg_lola) {
+    if (args_info.controller_flag) {
+    
+        const std::string START = "tStart";
+        const std::string MAKE_HIGH = "make_high_";
+        const std::string ACTIVATE_MAKE = "activate_make_";
+        const std::string CONFIGURE = "configure_";
+        const std::string HIGH = "_high";
+        const std::string LOW = "_low";
 
-		// clean up after active places
-		if (!args_info.noClean_flag) {
-			FOREACH(f, allNets) {
-				if (remove((*f).c_str()) != 0) {
-					abort(5, "file %s cannot be deleted", _cfilename_(*f));
-				}
-			}
+        std::set< std::pair<pnapi::Node *, pnapi::Node *> > newArcs;
+        std::set< std::string > goals;
+    
+    
+        // create new PetriNet
+        pnapi::PetriNet cNet(net);
+        // create controller structure
+	    pnapi::Transition * startTransition = &cNet.createTransition(START);
+	    pnapi::Label & label = cNet.getInterface().addSynchronousLabel("start");
+        startTransition->addLabel(label);
+	    pnapi::Place * preStart = &cNet.createPlace("", 1);
+        newArcs.insert(std::make_pair(preStart, startTransition));
+        // update initial marking
+        PNAPI_FOREACH(p, net.getPlaces()) {
+		    if ((**p).getTokenCount() > 0) {
+		        assert((**p).getTokenCount() == 1);
+		        newArcs.insert(std::make_pair(startTransition, cNet.findNode((**p).getName())));
+		        cNet.findPlace((**p).getName())->setTokenCount(0);
+		    }
 		}
+		// controller structure for all transitions
+        PNAPI_FOREACH(t, net.getTransitions()) {
+            status("handle transition %s", (**t).getName().c_str());
+            unsigned int curConfidence = (**t).getConfidence();
+		    if (curConfidence == 0) {
+			    // unlabeled transition
+			    pnapi::Place * a = &cNet.createPlace(std::string(ACTIVATE_MAKE + (**t).getName()), 1);
+			    pnapi::Place * c = &cNet.createPlace(std::string(CONFIGURE + (**t).getName()), 1);
+		        pnapi::Place * l = &cNet.createPlace(std::string((**t).getName() + LOW), 1);
+		        pnapi::Place * h = &cNet.createPlace(std::string((**t).getName() + HIGH), 0);
+		        pnapi::Transition * mt = &cNet.createTransition(std::string(MAKE_HIGH + (**t).getName()));
+		        pnapi::Label & label = cNet.getInterface().addSynchronousLabel(std::string("make_" + (**t).getName() + "_high"));
+                mt->addLabel(label);
+                newArcs.insert(std::make_pair(a, mt));
+                newArcs.insert(std::make_pair(c, mt));
+                newArcs.insert(std::make_pair(mt, c));
+                newArcs.insert(std::make_pair(c, startTransition));
+                newArcs.insert(std::make_pair(l, mt));
+                newArcs.insert(std::make_pair(mt, h));
+		    }
+		    else if (curConfidence == 1) {
+		        // low labeled
+		        cNet.createPlace(std::string((**t).getName() + HIGH), 0);
+		        cNet.createPlace(std::string((**t).getName() + LOW), 1);
+		    }
+		    else if (curConfidence == 2) {
+		        // high labeled
+		        cNet.createPlace(std::string((**t).getName() + HIGH), 1);
+		        cNet.createPlace(std::string((**t).getName() + LOW), 0);
+		    }
+        }
+        
+        // handle possible causal places
+        PNAPI_FOREACH(p, net.getPlaces()) {
+            status("handle place %s", (**p).getName().c_str());
+            PNAPI_FOREACH(tv, (**p).getPreset()) {
+                PNAPI_FOREACH(tn, (**p).getPostset()) {
+                    status("..handle causal triple (%s, %s, %s)", (**p).getName().c_str(), (**tv).getName().c_str(), (**tn).getName().c_str());
+                    // add currect causal case structure (p, tv, tn)
+			        pnapi::Place * curPlace = cNet.findPlace((**p).getName());
+				    pnapi::Transition * curHigh = cNet.findTransition((**tv).getName());
+				    pnapi::Transition * curLow = cNet.findTransition((**tn).getName());
+				    pnapi::Transition * lowCopy = &cNet.createTransition();
+				    pnapi::Transition * highCopy = &cNet.createTransition();
+				    pnapi::Place * highFired = &cNet.createPlace();
+				    pnapi::Place * goal = &cNet.createPlace();
+				    // remember goal place
+				    goals.insert(goal->getName());
+                    PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
+                        newArcs.insert(std::make_pair(*prePlace, highCopy));
+                    }
+                    PNAPI_FOREACH(postPlace, curHigh->getPostset()) {
+                        newArcs.insert(std::make_pair(highCopy, *postPlace));
+                    }
+                    PNAPI_FOREACH(prePlace, curLow->getPreset()) {
+                        newArcs.insert(std::make_pair(*prePlace, lowCopy));
+                    }
+				    PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
+				        if (((**preTransition).getName() != (*curLow).getName()) && ( (**preTransition).getName() != (*curHigh).getName() )) {
+				            pnapi::Place * cPlace = &cNet.createPlace("", 1);
+				            newArcs.insert(std::make_pair(*preTransition, cPlace));
+					        newArcs.insert(std::make_pair(cPlace, *preTransition));
+					        newArcs.insert(std::make_pair(cPlace, highCopy));
+					    }
+				    }
+				    newArcs.insert(std::make_pair(highCopy, highFired));
+				    newArcs.insert(std::make_pair(highFired, lowCopy));
+				    newArcs.insert(std::make_pair(lowCopy, goal));
+				    // add connection to controller
+				    pnapi::Place * l = cNet.findPlace(std::string(curLow->getName() + LOW));
+		            pnapi::Place * h = cNet.findPlace(std::string(curHigh->getName() + HIGH));
+		            newArcs.insert(std::make_pair(h, highCopy));
+		            newArcs.insert(std::make_pair(highCopy, h));
+		            newArcs.insert(std::make_pair(l, lowCopy));
+		            newArcs.insert(std::make_pair(lowCopy, l));
+			    }
+		    }
+        }
+        
+        // handle possible conflict places
+        std::set< std::pair<pnapi::Node *, pnapi::Node *> > done;
+        PNAPI_FOREACH(p, net.getPlaces()) {
+            status("handle place %s", (**p).getName().c_str());
+            PNAPI_FOREACH(t1, (**p).getPostset()) {
+                PNAPI_FOREACH(t2, (**p).getPostset()) {
+                    if ((t1 != t2) && (done.find(std::make_pair(*t1, *t2)) == done.end())) {
+                        done.insert(std::make_pair(*t1, *t2));
+                        status("..handle conflict triple (%s, %s, %s)", (**p).getName().c_str(), (**t1).getName().c_str(), (**t2).getName().c_str());
+                        // add currect conflict case structure (p, t1, t2)
+                        pnapi::Place * curPlace = cNet.findPlace((**p).getName());
+				        pnapi::Transition * curHigh = cNet.findTransition((**t1).getName());
+				        pnapi::Transition * curLow = cNet.findTransition((**t2).getName());
+				        pnapi::Transition * lowCopy = &cNet.createTransition();
+				        pnapi::Transition * highCopy = &cNet.createTransition();
+				        pnapi::Place * highFired = &cNet.createPlace();
+				        pnapi::Place * highActivated = &cNet.createPlace("", 1);
+				        pnapi::Place * goal = &cNet.createPlace();
+				        // remember goal place
+				        goals.insert(goal->getName());
+                        PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
+                            newArcs.insert(std::make_pair(*prePlace, highCopy));
+                            newArcs.insert(std::make_pair(highCopy, *prePlace));
+                        }
+                        PNAPI_FOREACH(prePlace, curLow->getPreset()) {
+                            newArcs.insert(std::make_pair(*prePlace, lowCopy));
+                        }
+				        PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
+				            if (((**preTransition).getName() != (*curLow).getName()) && ( (**preTransition).getName() != (*curHigh).getName() )) {
+				                pnapi::Place * cPlace = &cNet.createPlace("", 1);
+				                newArcs.insert(std::make_pair(*preTransition, cPlace));
+					            newArcs.insert(std::make_pair(cPlace, *preTransition));
+					            newArcs.insert(std::make_pair(cPlace, highCopy));
+					        }
+				        }
+				        cNet.createArc(*highCopy, *highFired);
+				        cNet.createArc(*highFired, *lowCopy);
+				        cNet.createArc(*lowCopy, *goal);
+				        cNet.createArc(*highActivated, *curHigh);
+				        cNet.createArc(*curHigh, *highActivated);
+				        cNet.createArc(*highActivated, *highCopy);
+				        // add connection to controller
+				        pnapi::Place * l = cNet.findPlace(std::string(curLow->getName() + LOW));
+		                pnapi::Place * h = cNet.findPlace(std::string(curHigh->getName() + HIGH));
+		                newArcs.insert(std::make_pair(h, highCopy));
+		                newArcs.insert(std::make_pair(highCopy, h));
+		                newArcs.insert(std::make_pair(l, lowCopy));
+		                newArcs.insert(std::make_pair(lowCopy, l));
+		                
+		                done.insert(std::make_pair(*t2, *t1));
+		                status("..handle conflict triple (%s, %s, %s)", (**p).getName().c_str(), (**t2).getName().c_str(), (**t1).getName().c_str());
+				        // add currect conflict case structure (p, t2, t1)
+                        curPlace = cNet.findPlace((**p).getName());
+				        curHigh = cNet.findTransition((**t2).getName());
+				        curLow = cNet.findTransition((**t1).getName());
+				        lowCopy = &cNet.createTransition();
+				        highCopy = &cNet.createTransition();
+				        highFired = &cNet.createPlace();
+				        highActivated = &cNet.createPlace("", 1);
+				        goal = &cNet.createPlace();
+				        // remember goal place
+				        goals.insert(goal->getName());
+                        PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
+                            newArcs.insert(std::make_pair(*prePlace, highCopy));
+                            newArcs.insert(std::make_pair(highCopy, *prePlace));
+                        }
+                        PNAPI_FOREACH(prePlace, curLow->getPreset()) {
+                            newArcs.insert(std::make_pair(*prePlace, lowCopy));
+                        }
+				        PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
+				            if (((**preTransition).getName() != (*curLow).getName()) && ( (**preTransition).getName() != (*curHigh).getName() )) {
+				                pnapi::Place * cPlace = &cNet.createPlace("", 1);
+				                newArcs.insert(std::make_pair(*preTransition, cPlace));
+					            newArcs.insert(std::make_pair(cPlace, *preTransition));
+					            newArcs.insert(std::make_pair(cPlace, highCopy));
+					        }
+				        }
+				        cNet.createArc(*highCopy, *highFired);
+				        cNet.createArc(*highFired, *lowCopy);
+				        cNet.createArc(*lowCopy, *goal);
+				        cNet.createArc(*highActivated, *curHigh);
+				        cNet.createArc(*curHigh, *highActivated);
+				        cNet.createArc(*highActivated, *highCopy);
+				        // add connection to controller
+				        l = cNet.findPlace(std::string(curLow->getName() + LOW));
+		                h = cNet.findPlace(std::string(curHigh->getName() + HIGH));
+		                newArcs.insert(std::make_pair(h, highCopy));
+		                newArcs.insert(std::make_pair(highCopy, h));
+		                newArcs.insert(std::make_pair(l, lowCopy));
+		                newArcs.insert(std::make_pair(lowCopy, l));
+		            }
+                }
+            }
+        }
+        
+        // add collected arcs
+        FOREACH(a, newArcs) {
+		    cNet.createArc(*a->first, *a->second);
+	    }
 
-		int result = 2;
-		if (checkActiveCausal || checkActiveConflict) {
-			if (!activeCausal.empty() || !activeConflict.empty()) {result = 0;}
-			else {
-				if (!checkActiveCausal && !potentialCausal.empty()) {result = 1;}
-				if (!checkActiveConflict && !potentialConflict.empty()) {result = 1;}
-			}
-		}
-		else {
-			if (!potentialCausal.empty() || !potentialConflict.empty()) {result = 1;}
-		}
-		
-		if (args_info.resultFile_given) {
-            std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> >::iterator itTriple;
-	  	    std::pair<std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> >::iterator,std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> >::iterator> retTriple;
-		    
-		    std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : fileName + ".results";
+        // build final condition
+        std::string formula = "FINALCONDITION (";
+        bool first = true;
+        FOREACH(goal, goals) {
+            if (first) {
+	            formula += *goal + " = 0 ";
+	            first = false;
+	        }
+	        else {
+	            formula += "AND " + *goal + " = 0 ";
+	        }
+	    }
+	    formula += ")\n";
+	    
+	    std::string curFileName;
+	    curFileName = fileName + ".controler" + ".owfn";
 
-		    Results results(results_filename);
+	    std::ofstream o;
+	    o.open(curFileName.c_str(), std::ios_base::trunc);
+	    o << pnapi::io::owfn << cNet;
+	    o << formula;
+	    o.close();
+	
+        status("........%s created", _cfilename_(curFileName));
+    
+    }
 
-			if (result == 0) {results.add("result.non-interference", (char*)"FAILED");}
-			if (result == 1) {results.add("result.non-interference", (char*)"POTENTIAL");}
-			if (result == 2) {results.add("result.non-interference", (char*)"PASSED");}
+    if (!args_info.controller_flag) {
 
-			results.add("places.potential_causal", (unsigned int)potentialCausal.size());
-			results.add("places.potential_conflict", (unsigned int)potentialConflict.size());
-			results.add("places.active_causal", (unsigned int)activeCausal.size());
-			results.add("places.active_conflict", (unsigned int)activeConflict.size());
+        if (args_info.modus_arg == modus_arg_lola) {
 
-			results.add("meta.package_name", (char*)PACKAGE_NAME);
-		    results.add("meta.package_version", (char*)PACKAGE_VERSION);
-		    results.add("meta.svn_version", (char*)VERSION_SVN);
-		    results.add("meta.invocation", invocation);
+            // clean up after active places
+            if (!args_info.noClean_flag) {
+	            FOREACH(f, allNets) {
+		            if (remove((*f).c_str()) != 0) {
+			            abort(5, "file %s cannot be deleted", _cfilename_(*f));
+		            }
+	            }
+            }
 
-			results.add("net.places", (unsigned int)(net.getPlaces().size()));
-			results.add("net.transitions", (unsigned int)(net.getTransitions().size()));
-			results.add("net.high", highTransitions);
-			results.add("net.down", downTransitions);
-			results.add("net.low", lowTransitions);
-			results.add("net.arcs", (unsigned int)(net.getArcs().size()));
-			
-			FOREACH(p, potentialCausal) {
-			    std::string placeName((**p).getName());
-			    results.add(std::string(placeName + ".causal_candidates").c_str(), (unsigned int)(highPre.count(*p) * lowPost.count(*p)));
-			    results.add(std::string(placeName + ".causal_isActive").c_str(), activeCausal.find(*p) != activeCausal.end());
-			    results.add(std::string(placeName + ".causal_checkedTriples").c_str(), (unsigned int)(potentialCausalTriple.count(*p)));
-			    results.add(std::string(placeName + ".causal_activeTriples").c_str(), (unsigned int)(activeCausalTriple.count(*p)));
-			    
-			    retTriple = potentialCausalTriple.equal_range(*p);
-				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
-				    results.add(std::string(placeName + ".causal_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), false);
-				}
-				retTriple = activeCausalTriple.equal_range(*p);
-				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
-				    results.add(std::string(placeName + ".causal_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), true);
-				}
-			}
-			FOREACH(p, potentialConflict) {
-			    std::string placeName((**p).getName());
-			    results.add(std::string(placeName + ".conflict_candidates").c_str(), (unsigned int)(highPost.count(*p) * lowPost.count(*p)));
-			    results.add(std::string(placeName + ".conflict_isActive").c_str(), activeConflict.find(*p) != activeConflict.end());
-			    results.add(std::string(placeName + ".conflict_checkedTriples").c_str(), (unsigned int)(potentialConflictTriple.count(*p)));
-			    results.add(std::string(placeName + ".conflict_activeTriples").c_str(), (unsigned int)(activeConflictTriple.count(*p)));
-			    
-			    retTriple = potentialConflictTriple.equal_range(*p);
-				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
-				    results.add(std::string(placeName + ".conflict_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), false);
-				}
-				retTriple = activeConflictTriple.equal_range(*p);
-				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
-				    results.add(std::string(placeName + ".conflict_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), true);
-				}
-			}
-		}
+            int result = 2;
+            if (checkActiveCausal || checkActiveConflict) {
+	            if (!activeCausal.empty() || !activeConflict.empty()) {result = 0;}
+	            else {
+		            if (!checkActiveCausal && !potentialCausal.empty()) {result = 1;}
+		            if (!checkActiveConflict && !potentialConflict.empty()) {result = 1;}
+	            }
+            }
+            else {
+	            if (!potentialCausal.empty() || !potentialConflict.empty()) {result = 1;}
+            }
 
-		if (result == 0) {message(_cbad_("Non-Interference: FAILED"));}
-		if (result == 1) {message(_cwarning_("Non-Interference: POTENTIAL"));}
-		if (result == 2) {message(_cgood_("Non-Interference: PASSED"));}
+            if (args_info.resultFile_given) {
+                std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> >::iterator itTriple;
+          	    std::pair<std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> >::iterator,std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> >::iterator> retTriple;
+                
+                std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : fileName + ".results";
 
-	}
+                Results results(results_filename);
+
+	            if (result == 0) {results.add("result.non-interference", (char*)"FAILED");}
+	            if (result == 1) {results.add("result.non-interference", (char*)"POTENTIAL");}
+	            if (result == 2) {results.add("result.non-interference", (char*)"PASSED");}
+
+	            results.add("places.potential_causal", (unsigned int)potentialCausal.size());
+	            results.add("places.potential_conflict", (unsigned int)potentialConflict.size());
+	            results.add("places.active_causal", (unsigned int)activeCausal.size());
+	            results.add("places.active_conflict", (unsigned int)activeConflict.size());
+
+	            results.add("meta.package_name", (char*)PACKAGE_NAME);
+                results.add("meta.package_version", (char*)PACKAGE_VERSION);
+                results.add("meta.svn_version", (char*)VERSION_SVN);
+                results.add("meta.invocation", invocation);
+
+	            results.add("net.places", (unsigned int)(net.getPlaces().size()));
+	            results.add("net.transitions", (unsigned int)(net.getTransitions().size()));
+	            results.add("net.high", highTransitions);
+	            results.add("net.down", downTransitions);
+	            results.add("net.low", lowTransitions);
+	            results.add("net.arcs", (unsigned int)(net.getArcs().size()));
+	
+	            FOREACH(p, potentialCausal) {
+	                std::string placeName((**p).getName());
+	                results.add(std::string(placeName + ".causal_candidates").c_str(), (unsigned int)(highPre.count(*p) * lowPost.count(*p)));
+	                results.add(std::string(placeName + ".causal_isActive").c_str(), activeCausal.find(*p) != activeCausal.end());
+	                results.add(std::string(placeName + ".causal_checkedTriples").c_str(), (unsigned int)(potentialCausalTriple.count(*p)));
+	                results.add(std::string(placeName + ".causal_activeTriples").c_str(), (unsigned int)(activeCausalTriple.count(*p)));
+	                
+	                retTriple = potentialCausalTriple.equal_range(*p);
+		            for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
+		                results.add(std::string(placeName + ".causal_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), false);
+		            }
+		            retTriple = activeCausalTriple.equal_range(*p);
+		            for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
+		                results.add(std::string(placeName + ".causal_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), true);
+		            }
+	            }
+	            FOREACH(p, potentialConflict) {
+	                std::string placeName((**p).getName());
+	                results.add(std::string(placeName + ".conflict_candidates").c_str(), (unsigned int)(highPost.count(*p) * lowPost.count(*p)));
+	                results.add(std::string(placeName + ".conflict_isActive").c_str(), activeConflict.find(*p) != activeConflict.end());
+	                results.add(std::string(placeName + ".conflict_checkedTriples").c_str(), (unsigned int)(potentialConflictTriple.count(*p)));
+	                results.add(std::string(placeName + ".conflict_activeTriples").c_str(), (unsigned int)(activeConflictTriple.count(*p)));
+	                
+	                retTriple = potentialConflictTriple.equal_range(*p);
+		            for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
+		                results.add(std::string(placeName + ".conflict_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), false);
+		            }
+		            retTriple = activeConflictTriple.equal_range(*p);
+		            for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
+		                results.add(std::string(placeName + ".conflict_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), true);
+		            }
+	            }
+            }
+
+            if (result == 0) {message(_cbad_("Non-Interference: FAILED"));}
+            if (result == 1) {message(_cwarning_("Non-Interference: POTENTIAL"));}
+            if (result == 2) {message(_cgood_("Non-Interference: PASSED"));}
+
+        }
+        
+    } // if (!args_info.controller_flag) {
 
     return EXIT_SUCCESS;
 }

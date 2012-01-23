@@ -1,3 +1,12 @@
+/*!
+\file Socket.cc
+\author Niels
+\status new
+\ingroup g_reporting
+
+\brief Socket class implementation
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>

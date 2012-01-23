@@ -9,7 +9,9 @@ Mainly copied from LoLA1
 %option yylineno
 
 %{
-#include "verbose.h"
+#include "ArcList.h"
+#include "FairnessAssumptions.h"
+#include "ParserPTNetLoLA.h"
 
 void setlval();
 void setcol();
@@ -123,8 +125,8 @@ UNTIL                                    { setcol(); return _UNTIL_; }
 
 /*! pass token string as attribute to bison */
 inline void setlval() {
-    yylval.str = new char[strlen(yytext) + 1];
-    strcpy(yylval.str, yytext);
+    yylval.attributeString = new char[strlen(yytext) + 1];
+    strcpy(yylval.attributeString, yytext);
 }
 
 inline void setcol() {

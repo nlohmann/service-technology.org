@@ -13,48 +13,51 @@ part of constructor), initial marking is specified separately (thus, setter).
 Additional information is number of pre-transitions and number of post-transitions. This information is updated while parsing transitions.
 */
 
+#include "PlaceSymbol.h"
+
 /// Constructor. Capacity available in context, the other ingredients are not
-PlaceSymbol::PlaceSymbol(string k,unsigned int cap):base(k)
+PlaceSymbol::PlaceSymbol(string k, unsigned int cap)
+    :
+    Symbol(k),
+    capacity(cap),
+    initialMarking(0),
+    cardPost(0),
+    cardPre(0)
 {
-	capacity = cap;
-	cardPre = 0;
-	cardPost = 0;
-	initialMarking = 0;
 }
 
 /// Getter for capacity
-unsigned int getCapacity()
+unsigned int PlaceSymbol::getCapacity() const
 {
-	return capacity;
+    return capacity;
 }
 
 /// Adder for initial marking
-unsigned int addInitialMarking(unsigned int newTokens)
+void PlaceSymbol::addInitialMarking(unsigned int newTokens)
 {
-	initialMarking += newTokens;
+    initialMarking += newTokens;
 }
 
-
 /// Getter for number of pre-transitions
-unsigned int getCardPre()
+unsigned int PlaceSymbol::getCardPre() const
 {
-	return cardPre;
+    return cardPre;
 }
 
 /// Getter for number of post-transitions
-unsigned int getCardPost()
+unsigned int PlaceSymbol::getCardPost() const
 {
-	return cardPost;
+    return cardPost;
 }
 
 /// Incrementor for number of post-transitions
-void notifyPost()
+void PlaceSymbol::notifyPost()
 {
-	++cardPost;
+    ++cardPost;
 }
 
 /// Incrementor for number of pre-transitions
-void notifyPre()
+void PlaceSymbol::notifyPre()
 {
-	++cardPre
+    ++cardPre;
 }

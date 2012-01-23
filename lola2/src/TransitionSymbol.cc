@@ -2,6 +2,7 @@
 \author Karsten
 \file TransitionSymbol.cc
 \status new
+\ingroup g_frontend g_symboltable
 
 \brief class implementation for a symbol with payload for transition
 
@@ -9,55 +10,56 @@ Transition symbols carry name as key, and
 - list of incoming arcs
 - list of outgoing arcs
 - a fairness assumption
-as payload. 
+as payload.
 All information is available in the context of transition definition, thus
 all information is provided in constructor
 */
 
-#pragma once
-
-#include "Symbol.h"
-#include "FairnessAssumptions.h"
-#include "ArcList.h"
+#include "TransitionSymbol.h"
 
 /// Generate and initialize a symbol
-TransitionSymbol(string k,tFairnessAssumption f,ArcList* pr, ArcList* po): base (k)
+TransitionSymbol::TransitionSymbol(string k, tFairnessAssumption f, ArcList* pr, ArcList* po)
+    :
+    Symbol(k),
+    fairness(f),
+    cardPost(0),
+    cardPre(0),
+    Post(po),
+    Pre(pr)
 {
-	fairness = f;
-	Pre = pr;
-	Post = po;
-	// count incomning arcs
-	for(ArcList * a = Pre,cardPre = 0; a -> getNext();a = a -> getNext())
-	{
-		++cardPre;
-	}
-	// count outgoing arcs
-	for(ArcList * a = Post,cardPost = 0; a -> getNext();a = a -> getNext())
-	{
-		++cardPost;
-	}
+    // count incomning arcs
+    for (ArcList* a = Pre; a -> getNext(); a = a -> getNext())
+    {
+        ++cardPre;
+    }
+
+    // count outgoing arcs
+    for (ArcList* a = Post; a -> getNext(); a = a -> getNext())
+    {
+        ++cardPost;
+    }
 }
 
 /// Getter for number of incoming arcs
-unsigned int getCardPre()
+unsigned int TransitionSymbol::getCardPre() const
 {
-	return cardPre;
+    return cardPre;
 }
 
 /// Getter for number of outgoing arcs
-unsigned int getCardPost()
+unsigned int TransitionSymbol::getCardPost() const
 {
-	return cardPost;
+    return cardPost;
 }
 
 /// Getter for incoming arcs
-unsigned int getPre()
+ArcList* TransitionSymbol::getPre() const
 {
-	return Pre;
+    return Pre;
 }
 
 /// Getter for number of post-places
-unsigned int getPost()
+ArcList* TransitionSymbol::getPost() const
 {
-	return Post;
+    return Post;
 }

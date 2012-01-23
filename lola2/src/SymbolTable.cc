@@ -2,13 +2,12 @@
 \author Karsten
 \file SymbolTable.cc
 \status new
+\ingroup g_frontend g_symboltable
 
 \brief class implementation for a symbol table
 */
 
-#include "Dimensions.h"
 #include "SymbolTable.h"
-#include <string>
 
 /// Intialization amounts to setting all entries to NULL
 SymbolTable::SymbolTable()
@@ -21,7 +20,7 @@ SymbolTable::SymbolTable()
 }
 
 /// We use sum of ASCII values as hash value
-unsigned int SymbolTable::hash(string s)
+unsigned int SymbolTable::hash(string s) const
 {
     unsigned long int result = 0;
 
@@ -38,7 +37,7 @@ unsigned int SymbolTable::hash(string s)
 /// NULL is returned if key is not present which typically
 /// indicates a syntax error "double definition"
 
-Symbol* SymbolTable::lookup(string str)
+Symbol* SymbolTable::lookup(string str) const
 {
     for (Symbol* sym = table[hash(str)]; sym; sym = sym -> getNext())
     {
@@ -106,7 +105,7 @@ Symbol* SymbolTable::next()
 }
 
 /// returns number of entries in table
-unsigned int SymbolTable::getCard()
+unsigned int SymbolTable::getCard() const
 {
     return card;
 }

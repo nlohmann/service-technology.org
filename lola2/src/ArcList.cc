@@ -2,6 +2,7 @@
 \author Karsten
 \file ArcList.cc
 \status new
+\ingroup g_frontend g_symboltable
 
 \brief class implementation for a symbol for a list of arcs
 
@@ -11,38 +12,36 @@ in the same dircetion from/to the same transtion.
 
 */
 
-#pragma once
-
-#include "PLaceSymbol.h"
+#include "ArcList.h"
 
 /// Getter for place
-PlaceSymbol *  getPlace()
+PlaceSymbol* ArcList::getPlace() const
 {
-	return place;
+    return place;
 }
 
 /// Getter for multiplicity
-unsigned int ArcList::getMultiplicity()
+unsigned int ArcList::getMultiplicity() const
 {
-	return multiplicity;
+    return multiplicity;
 }
 
 /// Getter for next
-ArcList * ArcList::getNext()
+ArcList* ArcList::getNext() const
 {
-	return next;
+    return next;
 }
 
 /// Setter for next
 void ArcList::setNext(Symbol* n)
 {
-	next = n;
+    next = (ArcList*)n;
 }
 
 /// Generate and initialize a list element
-ArcList::ArcList(PlaceSymbol* p,unsigned int m);
-
-        place = p;
-        next = NULL;
-	multiplicity = m;
+ArcList::ArcList(PlaceSymbol* p, unsigned int m) :
+    place(p),
+    next(NULL),
+    multiplicity(m)
+{
 }

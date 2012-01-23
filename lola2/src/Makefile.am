@@ -1,16 +1,25 @@
 # the main program - not bin_PROGRAMS as installation is handled manually
-bin_PROGRAMS = lola2
+bin_PROGRAMS = lola
 
 # the plain sources you need to compile (no generated code)
-lola2_SOURCES = main.cc \
+lola_SOURCES = \
+                ArcList.cc ArcList.h \
                 Dimensions.h \
+                FairnessAssumptions.h \
+                ParserPTNet.h \
+                ParserPTNetLoLA.yy Lexik.ll \
+                PlaceSymbol.cc PlaceSymbol.h \
+                Reporter.cc Reporter.h \
                 Socket.cc Socket.h \
+                Symbol.cc Symbol.h \
                 SymbolTable.cc SymbolTable.h \
-                Symbol.cc Symbol.h
+                TransitionSymbol.h TransitionSymbol.cc \
+                cmdline.c cmdline.h \
+                main.cc
 
-AM_CFLAGS = -Wall -W -Wextra -pedantic
-AM_CXXFLAGS = -Wall -W -Wextra -pedantic
-AM_LDFLAGS = -Wall -W -Wextra -pedantic
+lola_CFLAGS = -Wall -W -Wextra -pedantic
+lola_CXXFLAGS = -Wall -W -Wextra -pedantic
+lola_LDFLAGS = -Wall -W -Wextra -pedantic
 
 
 #############################################################################

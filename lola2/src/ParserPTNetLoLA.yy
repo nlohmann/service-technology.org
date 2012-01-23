@@ -8,28 +8,35 @@ Parses a place transition net in LoLA syntax.
 */
 
 %{
+#include <config.h>
 #include "PlaceSymbol.h"
 #include "TransitionSymbol.h"
 #include "SymbolTable.h"
 #include <string>
 #include "ParserPTNet.h"
+#include "FairnessAssumptions.h"
+#include "ArcList.h"
 
 using std::string;
+
+extern char* yytext;
 
 void yyerror(char const*);
 void yyerrors(char* token, char const* format, ...);
 %}
 
 %union {
-	string attributeString;
-	FairnessAssumption attributeFairness;
-	ArcList * attributeArcList;
+    char *attributeString;
+    tFairnessAssumption attributeFairness;
+    ArcList * attributeArcList;
 }
 
 %type <attributeString> nodeident
-%type <atttributeFairness> fairness
+%type <attributeFairness> fairness
 %type <attributeArcList> arclist
 %type <attributeArcList> arc
+%type <attributeString> NUMBER
+%type <attributeString> IDENTIFIER
 
 ///// 4 LINES ADDED BY NIELS
 %error-verbose
@@ -85,48 +92,48 @@ placelists:
 
 capacity:
   /* empty */          /* empty capacity = unlimited capacity */ 
-	{ 
-		TheCapacity = UINT_MAX;
-	}
+    { 
+        TheCapacity = UINT_MAX;
+    }
 | _SAFE_ _colon_       /* SAFE without number = 1-SAFE */
-	{ 
-		TheCapacity = 1;
-	}
+    { 
+        TheCapacity = 1;
+    }
 | _SAFE_ NUMBER _colon_ /* at most k tokens expected on these places */
-	{ 
-		TheCapacity = atoi($2);
-	}
+    { 
+        TheCapacity = atoi($2);
+    }
 ;
 
 
 placelist:
   placelist _comma_ nodeident 
-	{ 
-		PlaceSymbol * p = new PlaceSymbol($3,TheCapacity);
-	  	if(! TheResult->PlaceTable.insert(p))
-	  	{
-			yyerrors($3, "place '%s' name used twice", _cimportant_($3));
-	  	}
-	}
+    { 
+        PlaceSymbol * p = new PlaceSymbol($3,TheCapacity);
+        if(! TheResult->PlaceTable.insert(p))
+        {
+            yyerrors($3, "place '%s' name used twice", $3);
+        }
+    }
 | nodeident 
-	{ 
-		PlaceSymbol * p = new PlaceSymbol($3,TheCapacity);
-	  	if(! TheResult->PlaceTable.insert(p))
-	  	{
-			yyerrors($1, "place '%s' name used twice", _cimportant_($1));
-	  	}
-	}
+    { 
+        PlaceSymbol * p = new PlaceSymbol($1,TheCapacity);
+        if(! TheResult->PlaceTable.insert(p))
+        {
+            yyerrors($1, "place '%s' name used twice", $1);
+        }
+    }
 ;
 
 nodeident:  /* for places and transitions, names may be idents or numbers */
   IDENTIFIER  
-	{
-		$$ = $1;
-	}
+    {
+        $$ = $1;
+    }
 | NUMBER 
-	{
-		$$ = $1; /* result is string version of number */
-	}
+    {
+        $$ = $1; /* result is string version of number */
+    }
 ;
 
 
@@ -139,23 +146,23 @@ markinglist:
 
 marking:
   nodeident _colon_ NUMBER 
-	{ 
-		PlaceSymbol * p = (PlaceSymbol *) TheResult->PlaceTable.lookup($1);
-	  	if(!p)
-	  	{
-			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
-	  	}
-	  	p -> addInitialMarking($3);
-	}
+    { 
+        PlaceSymbol * p = (PlaceSymbol *) TheResult->PlaceTable.lookup($1);
+        if(!p)
+        {
+            yyerrors($1, "place '%s' does not exist", $1);
+        }
+        p -> addInitialMarking(atoi($3));
+    }
 | nodeident  /* default: 1 token */
-	{ 
-		PlaceSymbol * p = (PlaceSymbol *) TheResult->PlaceTable.lookup($1);
-	  	if(!p)
-	  	{
-			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
-	  	}
-	  	p -> addInitialMarking(1);
-	}
+    { 
+        PlaceSymbol * p = (PlaceSymbol *) TheResult->PlaceTable.lookup($1);
+        if(!p)
+        {
+            yyerrors($1, "place '%s' does not exist", $1);
+        }
+        p -> addInitialMarking(1);
+    }
 ;
 
 
@@ -169,82 +176,82 @@ transition:
   _TRANSITION_ nodeident fairness
   _CONSUME_ arclist _semicolon_ 
   _PRODUCE_ arclist _semicolon_ 
-	{
-	    	TransitionSymbol * t = new TransitionSymbol($2,$3,$5,$8);
-	    	if(!TheResult->TransitionTable.insert(t))
-	    	{
-			yyerrors($2, "transition name '%s' used twice", _cimportant_($2));
- 	    	}
-	}
+    {
+            TransitionSymbol * t = new TransitionSymbol($2,$3,$5,$8);
+            if(!TheResult->TransitionTable.insert(t))
+            {
+            yyerrors($2, "transition name '%s' used twice", $2);
+            }
+    }
 ;
 
 fairness:
-	/* empty */    /* empty = may be treated unfair */
-	{ 
-		$$ = NO_FAIRNESS;
-	}
+    /* empty */    /* empty = may be treated unfair */
+    { 
+        $$ = NO_FAIRNESS;
+    }
 | _WEAK_ _FAIR_ 
-	{ 
-		$$ = WEAK_FAIRNESS;
-	}
+    { 
+        $$ = WEAK_FAIRNESS;
+    }
 | _STRONG_ _FAIR_ 
-	{ 
-		$$ = STRONG_FAIRNESS;
-	}
+    { 
+        $$ = STRONG_FAIRNESS;
+    }
 ;
 
 
 arclist:
   /* empty */       
-	{
-		$$ = NULL;
-	}
+    {
+        $$ = NULL;
+    }
 | arc              
-	{
-		$$ = $1;
-	}
+    {
+        $$ = $1;
+    }
 | arc _comma_ arclist 
-	{
-		$1.setNext($3);
-		$$ = $1;
-	}
+    {
+        $1->setNext((Symbol*)$3);
+        $$ = $1;
+    }
 ;
 
 
 arc:
   nodeident _colon_ NUMBER 
-	{
-		PlaceSymbol * p = TheResult->PlaceTable.lookup($1);
-		if(!p)
-		{
-			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
-		}
-		$$ = new ArcList(p,atoi($3));
-	}
+    {
+        PlaceSymbol * p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
+        if(!p)
+        {
+            yyerrors($1, "place '%s' does not exist", $1);
+        }
+        $$ = new ArcList(p,atoi($3));
+    }
 | nodeident   /* default: multiplicity 1 */
-		PlaceSymbol * p = TheResult->PlaceTable.lookup($1);
-		if(!p)
-		{
-			yyerrors($1, "place '%s' does not exist", _cimportant_($1));
-		}
-		$$ = new ArcList(p,1));
-	}
+    {
+        PlaceSymbol * p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
+        if(!p)
+        {
+            yyerrors($1, "place '%s' does not exist", $1);
+        }
+        $$ = new ArcList(p,1);
+    }
 ;
 
 %%
 
 /// Wrapping the Parser
-ParsePTNet * ParserPTNetLoLA()
+ParserPTNet * ParserPTNetLoLA()
 {
-	TheResult = new ParserPTNet;
-	yyparse();
-	return(TheResult);
+    TheResult = new ParserPTNet;
+    yyparse();
+    return(TheResult);
 }
 
 /// display a parser error and exit
 void yyerrors(char* token, char const* format, ...) {
-    fprintf(stderr, "%s: %s:%d:%d - ", _ctool_(PACKAGE),
-    _cfilename_(basename(diagnosefilename)), yylineno, yycolno);
+    fprintf(stderr, "%s: %d:%d - ", PACKAGE, yylineno, yycolno);
 
     va_list args;
     va_start(args, format);
@@ -252,9 +259,9 @@ void yyerrors(char* token, char const* format, ...) {
     va_end(args);
 
     fprintf(stderr, "\n");
-    message("error near '%s'", token);
-    displayFileError(diagnosefilename, yylineno, token);
-    abort(3, "syntax error");
+//    message("error near '%s'", token);
+    //displayFileError(diagnosefilename, yylineno, token);
+    //abort(3, "syntax error");
 }
 
 

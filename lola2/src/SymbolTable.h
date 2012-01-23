@@ -2,6 +2,7 @@
 \author Karsten
 \file SymbolTable.h
 \status new
+\ingroup g_frontend g_symboltable
 
 \brief class definition for a symbol table
 
@@ -26,7 +27,7 @@ class SymbolTable
         bool insert(Symbol*);
         /// If key is in table: return corresponding symbol
         /// If key is not in table: return NULL
-        Symbol* lookup(string);
+        Symbol* lookup(string) const;
 
         /// Initialize iteration; return NULL if table empty
         Symbol* first();
@@ -37,14 +38,14 @@ class SymbolTable
         SymbolTable();
 
         /// Get number of entries in table
-        unsigned int getCard();
+        unsigned int getCard() const;
 
     private:
         ///The actual symbol table. It gets pointers as we use lists for collisions.
         Symbol* table[SIZEOF_SYMBOLTABLE];
 
         /// The hash function to be used
-        unsigned int hash(string);
+        unsigned int hash(string) const;
         /// The number of entrie in table
 
         unsigned int card;

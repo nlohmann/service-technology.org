@@ -1,3 +1,12 @@
+/*!
+\file Socket.h
+\author Niels
+\status new
+\ingroup g_reporting
+
+\brief Socket class definition
+*/
+
 #pragma once
 
 #include <config.h>
@@ -10,6 +19,7 @@
 
 \author Niels
 \status new
+\ingroup g_reporting
 */
 class Socket
 {

@@ -19,3 +19,12 @@
 \verbinclude @abs_top_srcdir@/COPYING
 \sa http://www.gnu.org/licenses/agpl-3.0.html
 */
+
+/*!
+\defgroup g_symboltable Symbol Table
+
+\defgroup g_frontend Front End
+
+\defgroup g_reporting Reporting
+
+*/

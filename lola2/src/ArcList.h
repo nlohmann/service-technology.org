@@ -2,6 +2,7 @@
 \author Karsten
 \file ArcList.h
 \status new
+\ingroup g_frontend g_symboltable
 
 \brief class definition for a symbol for a list of arcs
 
@@ -13,28 +14,28 @@ in the same dircetion from/to the same transtion.
 
 #pragma once
 
-#include "PLaceSymbol"
+#include "PlaceSymbol.h"
 
 class ArcList
 {
     public:
         /// Getter for place
-        PlaceSymbol *  getPlace();
+        PlaceSymbol* getPlace() const;
         /// Getter for multiplicity
-        unsigned int getMultiplicity();
+        unsigned int getMultiplicity() const;
         /// Getter for next
-        ArcList * getNext();
+        ArcList* getNext() const;
         /// Setter for next
         void setNext(Symbol*);
 
         /// Generate and initialize a list element
-        ArcList(PlaceSymbol*,unsigned int);
+        ArcList(PlaceSymbol*, unsigned int);
 
     private:
         ///The place at the other end of arc (transition implicilty given)
-        PlaceSymbol * place;
+        PlaceSymbol* place;
         /// Arcs are organized as lists.
         ArcList* next;
-	/// Multiplicity
-	unsigned int multiplicity;
+        /// Multiplicity
+        unsigned int multiplicity;
 };

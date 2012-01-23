@@ -1,0 +1,1 @@
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error"

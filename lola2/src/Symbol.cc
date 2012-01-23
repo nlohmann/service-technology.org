@@ -2,6 +2,7 @@
 \author Karsten
 \file Symbol.cc
 \status new
+\ingroup g_frontend g_symboltable
 
 \brief class implementation for a symbol
 
@@ -12,19 +13,16 @@ Payload can be added by deriving subclasses.
 
 */
 
-#include <string>
 #include "Symbol.h"
 
-using std::string;
-
 /// Getter for key
-string Symbol::getKey()
+string Symbol::getKey() const
 {
     return key;
 }
 
 /// Getter for next
-Symbol* Symbol::getNext()
+Symbol* Symbol::getNext() const
 {
     return next;
 }
@@ -39,7 +37,8 @@ void Symbol::setNext(Symbol* sym)
 /// Argument is the key.
 
 Symbol::Symbol(string k)
+    :
+    key(k),
+    next(NULL)
 {
-    key = k;
-    next = NULL;
 }

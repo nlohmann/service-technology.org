@@ -14,7 +14,7 @@ This result should be independent from the format (LoLA / PNML / ...)
 
 class ParserPTNet
 {
-public:
-	SymbolTable PlaceTable;
-	SymbolTable TransitionTable;
-}
+    public:
+        SymbolTable PlaceTable;
+        SymbolTable TransitionTable;
+};

@@ -2,6 +2,7 @@
 \author Karsten
 \file Symbol.h
 \status new
+\ingroup g_frontend g_symboltable
 
 \brief class definition for a symbol
 
@@ -22,9 +23,9 @@ class Symbol
 {
     public:
         /// Getter for key
-        string getKey();
+        string getKey() const;
         /// Getter for next
-        Symbol* getNext();
+        Symbol* getNext() const;
         /// Setter for next
         void setNext(Symbol*);
 

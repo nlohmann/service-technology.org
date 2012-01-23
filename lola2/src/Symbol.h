@@ -31,6 +31,8 @@ class Symbol
 
         /// Generate and initialize a symbol
         Symbol(string);
+	/// Delete a symbol
+	~Symbol();
 
     private:
         ///The key. Used for insertion in symbol table

@@ -105,6 +105,7 @@ capacity:
 | _SAFE_ NUMBER _colon_ /* at most k tokens expected on these places */
     { 
         TheCapacity = atoi($2);
+	delete $2;
     }
 ;
 
@@ -156,6 +157,7 @@ marking:
             yyerrors($1, "place '%s' does not exist", $1);
         }
         p -> addInitialMarking(atoi($3));
+	delete $3;
     }
 | nodeident  /* default: 1 token */
     { 
@@ -230,6 +232,7 @@ arc:
             yyerrors($1, "place '%s' does not exist", $1);
         }
         $$ = new ArcList(p,atoi($3));
+	delete $3;
     }
 | nodeident   /* default: multiplicity 1 */
     {

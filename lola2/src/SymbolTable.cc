@@ -19,6 +19,20 @@ SymbolTable::SymbolTable()
     card = 0;
 }
 
+/// Destructor calls destructors for all present symbols
+SymbolTable::~SymbolTable()
+{
+	for(int i = 0; i < SIZEOF_SYMBOLTABLE; i++)
+	{
+		while(table[i])
+		{
+			Symbol * tmp = table[i];
+			table[i] = table[i]->getNext();
+			delete tmp;
+		}
+	}
+}
+
 /// We use sum of ASCII values as hash value
 unsigned int SymbolTable::hash(string s) const
 {

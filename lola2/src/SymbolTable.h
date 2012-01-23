@@ -36,6 +36,8 @@ class SymbolTable
 
         /// Generate and initialize a symbol table
         SymbolTable();
+	/// Close SymbolTable
+	~SymbolTable();
 
         /// Get number of entries in table
         unsigned int getCard() const;

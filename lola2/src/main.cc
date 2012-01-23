@@ -21,7 +21,8 @@ gengetopt_args_info args_info;
 extern FILE* yyin;
 
 /// the reporter
-ReporterStream rep;
+Reporter *rep = new ReporterStream();
+//Reporter *rep = new ReporterSocket(1234, "127.0.0.1");
 
 // the parsers
 extern int yyparse();
@@ -47,7 +48,7 @@ void evaluateParameters(int argc, char** argv)
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0)
     {
-        rep.report("invalid command-line parameter(s)");
+        rep->abort(1, "invalid command-line parameter(s)");
         exit(EXIT_FAILURE);
     }
 
@@ -57,8 +58,6 @@ void evaluateParameters(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
-    rep.report("This is LoLA");
-    
     // set the function to call on normal termination
     atexit(terminationHandler);
 

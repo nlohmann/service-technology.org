@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <cstdlib>
 
 #include <unistd.h>
 #include <netinet/in.h>
@@ -125,8 +126,9 @@ void Socket::receive()
             exit(EXIT_FAILURE);
         }
 
-        printf("recsize: %d\n ", (int)recsize);
-        printf("datagram: %.*s\n", (int)recsize, buffer);
+//        printf("recsize: %d\n ", (int)recsize);
+//        printf("datagram: %.*s\n", (int)recsize, buffer);
+        printf("%.*s\n", (int)recsize, buffer);
     }
 }
 

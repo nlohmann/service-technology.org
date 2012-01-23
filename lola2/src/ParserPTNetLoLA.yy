@@ -9,6 +9,9 @@ Parses a place transition net in LoLA syntax.
 
 %{
 #include <config.h>
+#include <limits.h>
+#include <cstdarg>
+#include <cstdio>
 #include "PlaceSymbol.h"
 #include "TransitionSymbol.h"
 #include "SymbolTable.h"

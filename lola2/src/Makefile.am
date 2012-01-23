@@ -1,5 +1,5 @@
 # the main program - not bin_PROGRAMS as installation is handled manually
-bin_PROGRAMS = lola
+bin_PROGRAMS = lola listener
 
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
@@ -16,6 +16,10 @@ lola_SOURCES = \
                 TransitionSymbol.h TransitionSymbol.cc \
                 cmdline.c cmdline.h \
                 main.cc
+
+listener_SOURCES = Listener.cc \
+                   Reporter.cc Reporter.h \
+                   Socket.cc Socket.h
 
 lola_CFLAGS = -Wall -W -Wextra -pedantic
 lola_CXXFLAGS = -Wall -W -Wextra -pedantic

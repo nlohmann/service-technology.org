@@ -14,6 +14,10 @@ enum ActionType { Parallel, Try, Run };
 
 /*!
  Tagged union that contains the necessary information for the different kinds of actions.
+ Depending on the type the struct contains following information:
+ - Parallel: actions and the number of actions
+ - Try: two actions named "try" and "then"
+ - Run: a tool and a timeout
  */
 struct action {
     enum ActionType type;

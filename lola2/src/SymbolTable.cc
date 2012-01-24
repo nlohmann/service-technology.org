@@ -55,7 +55,7 @@ Symbol* SymbolTable::lookup(char* str) const
 {
     for (Symbol* sym = table[hash(str)]; sym; sym = sym -> getNext())
     {
-        if (sym -> getKey() == str)
+        if (!strcmp(sym -> getKey(),str))
         {
             return sym;
         }
@@ -69,10 +69,10 @@ Symbol* SymbolTable::lookup(char* str) const
 /// This typically indicates a syntax error "used but not defined
 bool SymbolTable::insert(Symbol* sym)
 {
-    int index = hash(sym -> getKey());
+    unsigned int index = hash(sym -> getKey());
     for (Symbol* othersym = table[index]; othersym; othersym = othersym -> getNext())
     {
-        if (othersym -> getKey() == sym -> getKey())
+        if (!strcmp(othersym -> getKey(), sym -> getKey()))
         {
             return false;
         }

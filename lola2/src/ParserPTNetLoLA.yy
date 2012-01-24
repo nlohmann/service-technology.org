@@ -117,8 +117,8 @@ placelist:
         if(! TheResult->PlaceTable.insert(p))
         {
             yyerrors($3, "place '%s' name used twice", $3);
+	    delete p;
         }
-        free($3);
     }
 | nodeident 
     { 
@@ -126,8 +126,8 @@ placelist:
         if(! TheResult->PlaceTable.insert(p))
         {
             yyerrors($1, "place '%s' name used twice", $1);
+	    delete p;
         }
-        free($1);
     }
 ;
 
@@ -170,7 +170,7 @@ marking:
             yyerrors($1, "place '%s' does not exist", $1);
         }
         p -> addInitialMarking(1);
-        free($1);
+	free($1);
     }
 ;
 
@@ -189,9 +189,9 @@ transition:
             TransitionSymbol * t = new TransitionSymbol($2,$3,$5,$8);
             if(!TheResult->TransitionTable.insert(t))
             {
-            yyerrors($2, "transition name '%s' used twice", $2);
+                yyerrors($2, "transition name '%s' used twice", $2);
+	        delete t;
             }
-            free($2);
     }
 ;
 
@@ -238,7 +238,7 @@ arc:
         }
         $$ = new ArcList(p,atoi($3));
 	free($3);
-    free($1);
+	free($1);
     }
 | nodeident   /* default: multiplicity 1 */
     {

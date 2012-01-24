@@ -81,11 +81,11 @@ int main(int argc, char** argv)
 
     // read the input file(s)
     ParserPTNet* symbolTables = ParserPTNetLoLA();
+    rep->status("done");
+
     fclose(yyin);
     yylex_destroy();
     delete symbolTables;
-
-    rep->status("done");
 
     return EXIT_SUCCESS;
 }

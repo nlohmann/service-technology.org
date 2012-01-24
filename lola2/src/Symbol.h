@@ -30,8 +30,8 @@ class Symbol
 
         /// Generate and initialize a symbol
         Symbol(char*);
-	/// Delete a symbol
-	virtual ~Symbol();
+        /// Delete a symbol
+        virtual ~Symbol();
 
     private:
         ///The key. Used for insertion in symbol table

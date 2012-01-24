@@ -45,5 +45,5 @@ Symbol::Symbol(char* k)
 
 Symbol::~Symbol()
 {
-	free(key);
+    free(key);
 }

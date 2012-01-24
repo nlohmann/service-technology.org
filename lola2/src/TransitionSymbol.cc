@@ -67,16 +67,16 @@ ArcList* TransitionSymbol::getPost() const
 /// Delete TransitionSymbol
 TransitionSymbol::~TransitionSymbol()
 {
-	while(Pre)
-	{
-		ArcList * tmp = Pre;
-		Pre = Pre -> getNext();
-		delete tmp;
-	}
-	while(Post)
-	{
-		ArcList * tmp = Post;
-		Post = Post -> getNext();
-		delete tmp;
-	}
+    while (Pre)
+    {
+        ArcList* tmp = Pre;
+        Pre = Pre -> getNext();
+        delete tmp;
+    }
+    while (Post)
+    {
+        ArcList* tmp = Post;
+        Post = Post -> getNext();
+        delete tmp;
+    }
 }

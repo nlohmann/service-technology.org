@@ -22,8 +22,8 @@ class PlaceSymbol: public Symbol
     public:
         /// Generate and initialize a symbol
         PlaceSymbol(char*, unsigned int);
-	/// Delete place symbol
-	virtual ~PlaceSymbol();
+        /// Delete place symbol
+        virtual ~PlaceSymbol();
 
         /// Getter for capacity
         unsigned int getCapacity() const;

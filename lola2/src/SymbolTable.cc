@@ -55,7 +55,7 @@ Symbol* SymbolTable::lookup(char* str) const
 {
     for (Symbol* sym = table[hash(str)]; sym; sym = sym -> getNext())
     {
-        if (!strcmp(sym -> getKey(),str))
+        if (!strcmp(sym -> getKey(), str))
         {
             return sym;
         }

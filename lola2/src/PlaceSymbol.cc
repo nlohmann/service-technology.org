@@ -16,7 +16,7 @@ Additional information is number of pre-transitions and number of post-transitio
 #include "PlaceSymbol.h"
 
 /// Constructor. Capacity available in context, the other ingredients are not
-PlaceSymbol::PlaceSymbol(string k, unsigned int cap)
+PlaceSymbol::PlaceSymbol(char* k, unsigned int cap)
     :
     Symbol(k),
     capacity(cap),
@@ -60,4 +60,9 @@ void PlaceSymbol::notifyPost()
 void PlaceSymbol::notifyPre()
 {
     ++cardPre;
+}
+
+/// Delete PlaceSymbol
+PlaceSymbol::~PlaceSymbol()
+{
 }

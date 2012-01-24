@@ -13,11 +13,10 @@ Collissions are handled as linked lists.
 
 #pragma once
 
-#include <string>
+#include<string>
 #include "Dimensions.h"
 #include "Symbol.h"
 
-using std::string;
 
 class SymbolTable
 {
@@ -27,7 +26,7 @@ class SymbolTable
         bool insert(Symbol*);
         /// If key is in table: return corresponding symbol
         /// If key is not in table: return NULL
-        Symbol* lookup(string) const;
+        Symbol* lookup(char*) const;
 
         /// Initialize iteration; return NULL if table empty
         Symbol* first();
@@ -47,7 +46,7 @@ class SymbolTable
         Symbol* table[SIZEOF_SYMBOLTABLE];
 
         /// The hash function to be used
-        unsigned int hash(string) const;
+        unsigned int hash(char*) const;
         /// The number of entrie in table
 
         unsigned int card;

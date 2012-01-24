@@ -45,3 +45,8 @@ ArcList::ArcList(PlaceSymbol* p, unsigned int m) :
     multiplicity(m)
 {
 }
+
+/// Delete ArcList element
+ArcList::~ArcList()
+{
+}

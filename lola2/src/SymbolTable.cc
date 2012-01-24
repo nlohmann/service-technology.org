@@ -34,11 +34,11 @@ SymbolTable::~SymbolTable()
 }
 
 /// We use sum of ASCII values as hash value
-unsigned int SymbolTable::hash(string s) const
+unsigned int SymbolTable::hash(char* s) const
 {
     unsigned long int result = 0;
 
-    for (size_t i = 0; i < s.length(); i++)
+    for (size_t i = 0; s[i]; i++)
     {
         result += s[i];
         result %= SIZEOF_SYMBOLTABLE;
@@ -51,7 +51,7 @@ unsigned int SymbolTable::hash(string s) const
 /// NULL is returned if key is not present which typically
 /// indicates a syntax error "double definition"
 
-Symbol* SymbolTable::lookup(string str) const
+Symbol* SymbolTable::lookup(char* str) const
 {
     for (Symbol* sym = table[hash(str)]; sym; sym = sym -> getNext())
     {

@@ -30,6 +30,8 @@ class ArcList
 
         /// Generate and initialize a list element
         ArcList(PlaceSymbol*, unsigned int);
+	/// Delete a list element
+	~ArcList();
 
     private:
         ///The place at the other end of arc (transition implicilty given)

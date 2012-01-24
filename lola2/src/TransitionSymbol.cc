@@ -18,7 +18,7 @@ all information is provided in constructor
 #include "TransitionSymbol.h"
 
 /// Generate and initialize a symbol
-TransitionSymbol::TransitionSymbol(string k, tFairnessAssumption f, ArcList* pr, ArcList* po)
+TransitionSymbol::TransitionSymbol(char* k, tFairnessAssumption f, ArcList* pr, ArcList* po)
     :
     Symbol(k),
     fairness(f),
@@ -62,4 +62,21 @@ ArcList* TransitionSymbol::getPre() const
 ArcList* TransitionSymbol::getPost() const
 {
     return Post;
+}
+
+/// Delete TransitionSymbol
+TransitionSymbol::~TransitionSymbol()
+{
+	while(Pre)
+	{
+		ArcList * tmp = Pre;
+		Pre = Pre -> getNext();
+		delete tmp;
+	}
+	while(Post)
+	{
+		ArcList * tmp = Post;
+		Post = Post -> getNext();
+		delete tmp;
+	}
 }

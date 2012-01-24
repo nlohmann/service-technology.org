@@ -17,24 +17,25 @@ Payload can be added by deriving subclasses.
 
 #include <string>
 
-using std::string;
 
 class Symbol
 {
     public:
         /// Getter for key
-        string getKey() const;
+        char* getKey() const;
         /// Getter for next
         Symbol* getNext() const;
         /// Setter for next
         void setNext(Symbol*);
 
         /// Generate and initialize a symbol
-        Symbol(string);
+        Symbol(char*);
+	/// Delete a symbol
+	virtual ~Symbol();
 
     private:
         ///The key. Used for insertion in symbol table
-        string key;
+        char* key;
         /// Symbols with same hash value are organized as lists.
         Symbol* next;
 };

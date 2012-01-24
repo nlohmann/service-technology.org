@@ -16,7 +16,7 @@ Payload can be added by deriving subclasses.
 #include "Symbol.h"
 
 /// Getter for key
-string Symbol::getKey() const
+char* Symbol::getKey() const
 {
     return key;
 }
@@ -36,9 +36,14 @@ void Symbol::setNext(Symbol* sym)
 /// Generate and initialize a symbol
 /// Argument is the key.
 
-Symbol::Symbol(string k)
+Symbol::Symbol(char* k)
     :
     key(k),
     next(NULL)
 {
+}
+
+Symbol::~Symbol()
+{
+	
 }

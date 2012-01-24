@@ -25,7 +25,9 @@ class TransitionSymbol: public Symbol
 {
     public:
         /// Generate and initialize a symbol
-        TransitionSymbol(string, tFairnessAssumption, ArcList*, ArcList*);
+        TransitionSymbol(char*, tFairnessAssumption, ArcList*, ArcList*);
+	/// Delete Transition symbol
+	virtual ~TransitionSymbol();
 
         /// Getter for number of incoming arcs
         unsigned int getCardPre() const;

@@ -68,17 +68,14 @@ m4_define([SED],                  [@SED@])
 #------------------------------------------#
 
 # the main executable, called through a shell script for code coverage
-m4_define([LOLA_BOUNDEDNET],      [cover.sh @abs_top_builddir@/src/lola-boundednet])
-m4_define([LOLA_BOUNDEDPLACE],    [cover.sh @abs_top_builddir@/src/lola-boundedplace])
-m4_define([LOLA_DEADLOCK],        [cover.sh @abs_top_builddir@/src/lola-deadlock])
-m4_define([LOLA_FULLLIMITED],     [cover.sh @abs_top_builddir@/src/lola-fulllimited])
-m4_define([LOLA_LIVEPROP],        [cover.sh @abs_top_builddir@/src/lola-liveprop])
-m4_define([LOLA_MODELCHECKING],   [cover.sh @abs_top_builddir@/src/lola-modelchecking])
-m4_define([LOLA_STATEPREDICATE],  [cover.sh @abs_top_builddir@/src/lola-statepredicate])
-m4_define([LOLA_STATEPREDICATE1], [cover.sh @abs_top_builddir@/src/lola-statepredicate1])
-m4_define([LOLA_STATESPACE],      [cover.sh @abs_top_builddir@/src/lola-statespace])
+m4_define([LOLA],      [cover.sh @abs_top_builddir@/src/lola])
+
+# the main executable, directly called to allow for analysis
+m4_define([LOLA_RAW],  [@abs_top_builddir@/src/lola])
 
 
 #---------------------------------------------#
 # Part 3: Optional and Mandatory Helper Tools #
 #---------------------------------------------#
+
+m4_define([VALGRIND],             [wrap.sh @VALGRIND@])

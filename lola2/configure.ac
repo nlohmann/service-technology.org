@@ -23,6 +23,9 @@ AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
 
+# search for optional tools needed by "make check"
+AC_PATH_PROG(VALGRIND,    [valgrind], not found)
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_C_INLINE

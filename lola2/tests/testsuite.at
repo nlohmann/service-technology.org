@@ -1,0 +1,62 @@
+AT_INIT
+AT_COLOR_TESTS
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([LOLA --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([LOLA --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Frontend])
+############################################################################
+
+AT_SETUP([Piping from stdin: Garavel])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([cat garavel.lola | LOLA],0,ignore,ignore)
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Piping from stdin: Kanban 5])
+AT_CHECK([cp TESTFILES/Kanban5.pnml.lola .])
+AT_CHECK([cat Kanban5.pnml.lola | LOLA],0,ignore,ignore)
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Piping from stdin: Phils 1000])
+AT_CHECK([cp TESTFILES/phils1000.lola .])
+AT_CHECK([cat phils1000.lola | LOLA],0,ignore,ignore)
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Memory Management])
+############################################################################
+
+AT_SETUP([Checking for memory leaks: Garavel])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW < garavel.lola],0,ignore,stderr)
+AT_CHECK([GREP -q "definitely lost: 0 bytes in 0 blocks" stderr])
+AT_CHECK([GREP -q "indirectly lost: 0 bytes in 0 blocks" stderr])
+AT_CHECK([GREP -q "possibly lost: 0 bytes in 0 blocks" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks: Phils 1000])
+AT_CHECK([cp TESTFILES/phils1000.lola .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW < phils1000.lola],0,ignore,stderr)
+AT_CHECK([GREP -q "definitely lost: 0 bytes in 0 blocks" stderr])
+AT_CHECK([GREP -q "indirectly lost: 0 bytes in 0 blocks" stderr])
+AT_CHECK([GREP -q "possibly lost: 0 bytes in 0 blocks" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP

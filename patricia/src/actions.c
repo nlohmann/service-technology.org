@@ -88,6 +88,7 @@ struct outcome* perform(struct problem* problem, struct action* action) {
             debug_print("%s: next action is running a tool with timeout\n", __func__);
             return performRunWithTimeout(problem, action->data.run.tool, action->data.run.timeout);
         } else {
+	    assert(action->data.run.timeout == 0);
             debug_print("%s: next action is running a tool without timeout\n", __func__);
             return performRunWithoutTimeout(problem, action->data.run.tool);
         }

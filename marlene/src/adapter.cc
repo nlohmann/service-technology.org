@@ -100,7 +100,7 @@ PetriNet_const_ptr Adapter::buildEngine() {
 	if (not args_info.diagnosis_flag) {
 		// adapter specific reduction should take place here
 		removeUnnecessaryRules();
-		findConflictFreeTransitions();
+		// findConflictFreeTransitions();
 
 		// reduce engine with standard PNAPI methods
 		_engine->reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
@@ -115,7 +115,7 @@ PetriNet_const_ptr Adapter::buildEngine() {
 	return _engine;
 }
 
-PetriNet_const_ptr Adapter::buildController() {
+PetriNet_const_ptr Adapter::composeEngine() {
 	FUNCIN
 
 	using namespace pnapi;
@@ -126,11 +126,11 @@ PetriNet_const_ptr Adapter::buildController() {
 	// we make a copy of the engine, #_engine is needed for the result
 	// #_enginecopy for the synthesis of the controller
 
-	PetriNet composed(*_engine);
+	_composition = PetriNet_ptr(new PetriNet(*_engine));
 
 	// create complementary places for the engine's internal places
 	if (_useCompPlaces) {
-		Adapter::createComplementaryPlaces(composed);
+		Adapter::createComplementaryPlaces(*_composition);
 	} else {
 		status("skipping creation of complementary places once ..");
 	}
@@ -142,10 +142,10 @@ PetriNet_const_ptr Adapter::buildController() {
 				or (args_info.useasif_arg - 1) != netindex) {
 			if (isFirstNet2BComposed == true) {
 				isFirstNet2BComposed = false;
-				composed.compose(*_nets[netindex], std::string("engine."),
+				_composition->compose(*_nets[netindex], std::string("engine."),
 						std::string("net" + toString(netindex + 1) + "."));
 			} else {
-				composed.compose(*_nets[netindex], std::string(""),
+				_composition->compose(*_nets[netindex], std::string(""),
 						std::string("net" + toString(netindex + 1) + "."));
 			}
 		} else {
@@ -155,7 +155,7 @@ PetriNet_const_ptr Adapter::buildController() {
 
 	// add complementary places for the now internal former interface places
 	if (_useCompPlaces) {
-		Condition & finalCond = composed.getFinalCondition();
+		Condition & finalCond = _composition->getFinalCondition();
 
 		for (unsigned int netindex = 0; netindex < _nets.size(); ++netindex) {
 			if (not args_info.useasif_given
@@ -174,7 +174,7 @@ PetriNet_const_ptr Adapter::buildController() {
 					std::string placeName = (*placeIter)->getName();
 					//std::string placeName2 = "net" + toString(i+1) + "." + (*placeIter)->getName();
 
-					Place * place = composed.findPlace(placeName);
+					Place * place = _composition->findPlace(placeName);
 					//if (place == NULL)
 					//{
 					//    place = composed.findPlace(placeName2);
@@ -182,7 +182,7 @@ PetriNet_const_ptr Adapter::buildController() {
 					//}
 					assert(place);
 
-					Place * compPlace = &composed.createPlace(
+					Place * compPlace = &_composition->createPlace(
 							"comp_" + placeName, _messageBound + 1,
 							_messageBound + 1);
 
@@ -194,8 +194,8 @@ PetriNet_const_ptr Adapter::buildController() {
 					std::set<Node *> postSet = place->getPostset();
 					std::set<Node *>::iterator nodeIter = postSet.begin();
 					while (nodeIter != postSet.end()) {
-						composed.createArc(*compPlace, **nodeIter);
-						composed.createArc(**nodeIter, *compPlace, 2);
+						_composition->createArc(*compPlace, **nodeIter);
+						_composition->createArc(**nodeIter, *compPlace, 2);
 						/*
 						 if ((*placeIter)->getType() == Label::INPUT)
 						 {
@@ -209,7 +209,7 @@ PetriNet_const_ptr Adapter::buildController() {
 					std::set<Node *> preSet = place->getPreset();
 					nodeIter = preSet.begin();
 					while (nodeIter != preSet.end()) {
-						composed.createArc(*compPlace, **nodeIter);
+						_composition->createArc(*compPlace, **nodeIter);
 						/*
 						 if ((*placeIter)->getType() == Label::OUTPUT)
 						 {
@@ -238,16 +238,29 @@ PetriNet_const_ptr Adapter::buildController() {
 
 	if (not args_info.diagnosis_flag) {
 		// finally reduce the strucure of the net as far as possible
-		composed.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
+		_composition->reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
 	}
 
 	if (_contType == ASYNCHRONOUS or args_info.useasif_given) {
-		composed.normalize();
+		_composition->normalize();
 	}
 	if (not args_info.diagnosis_flag) {
 		// \todo: Experiment, ob sich das hier noch lohnt.
-		composed.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // | pnapi::PetriNet::KEEP_NORMAL);
+		_composition->reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // | pnapi::PetriNet::KEEP_NORMAL);
 	}
+
+	FUNCOUT
+	return _composition;
+}
+
+PetriNet_const_ptr Adapter::buildController() {
+	FUNCIN
+
+	using namespace pnapi;
+
+	// _engine should exist here
+	assert(_engine != NULL);
+	assert(_composition != NULL);
 
 	/***********************************\
     * calculate most permissive partner *
@@ -265,7 +278,7 @@ PetriNet_const_ptr Adapter::buildController() {
 	std::string mi_filename = owfn_filename + ".mi";
 	std::string dot_filename = owfn_filename + ".dot";
 
-	owfn_temp.stream() << pnapi::io::owfn << composed << std::flush;
+	owfn_temp.stream() << pnapi::io::owfn << *_composition << std::flush;
 
 	std::string wendy_command;
 	std::string candy_command;

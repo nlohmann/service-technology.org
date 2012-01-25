@@ -69,6 +69,11 @@ option "engineonly" -
   "Only return the engine part of the adapter"
   flag off
 
+option "composedonly" -
+  "Only return the composition of engine and input services (as passed to Wendy)"
+  flag off
+  hidden
+
 option "diagnosis" -
   "Output diagnostic information in case adapter is not controllable"
   flag off

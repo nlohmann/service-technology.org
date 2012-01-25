@@ -227,6 +227,43 @@ int main(int argc, char* argv[]) {
             return 0;
         }
 
+        /*********************\
+    * Composing the engine *
+         \*********************/
+
+        time(&start_time);
+        pnapi::PetriNet composition(*adapter.composeEngine());
+        time(&end_time);
+        status("engine built [%.0f sec]", difftime(end_time, start_time));
+
+        if (args_info.composedonly_flag) {
+            std::string filename = (args_info.output_given ? std::string(
+                    args_info.output_arg) : std::string("-"));
+            Output outfile(filename, std::string("composed"));
+            outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR,
+                    PACKAGE_STRING) << meta(pnapi::io::INVOCATION,
+                    invocation) << composition;
+
+            //quit
+            {
+                time_t start_time, end_time;
+                time(&start_time);
+                cmdline_parser_free(&args_info);
+                time(&end_time);
+                status("released memory [%.0f sec]", difftime(end_time,
+                        start_time));
+            }
+
+#ifndef USE_SHARED_PTR
+            // delete(controller);
+            for (unsigned int i = 0; i < nets.size(); ++i) {
+                delete(nets[i]);
+            }
+#endif
+            nets.clear();
+            return 0;
+        }
+
         /*************************\
     * Building the controller *
          \*************************/

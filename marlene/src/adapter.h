@@ -103,9 +103,19 @@ class Adapter {
         PetriNet_const_ptr buildEngine();
 
         /*!
-         * \brief Actually builds the controller.
+         * \brief Composes the engine with the actual nets.
          *
          * \note Should only be called after Adapter::buildEngine()
+         *
+         * \return pointer to the composition of Adapter::_engine composed with
+         *         Adapter::_nets, NULL if no controller could be built
+         */
+        PetriNet_const_ptr composeEngine();
+
+        /*!
+         * \brief Actually builds the controller.
+         *
+         * \note Should only be called after Adapter::composeEngine()
          *
          * \return pointer to the controller of Adapter::_engine composed with
          *         Adapter::_nets, NULL if no controller could be built
@@ -116,6 +126,9 @@ class Adapter {
 
         //! pnapi::PetriNet containing the engine part of the adapter
         PetriNet_ptr _engine;
+
+	//! pnapi::PetriNet containing the engine composed with input nets
+	PetriNet_ptr _composition;
 
         //! pnapi::PetriNet containing the engine part of the adapter
         PetriNet_ptr _controller;

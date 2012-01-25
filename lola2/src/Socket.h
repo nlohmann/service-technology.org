@@ -24,9 +24,6 @@
 class Socket
 {
     private:
-        /// the buffer size for incoming messages
-        static size_t bufferSize;
-
         /// the length of the address struct
         static socklen_t addressLength;
 
@@ -51,7 +48,7 @@ class Socket
         ~Socket();
 
         /// receive incoming messages (does not return)
-        void receive();
+        __attribute__((noreturn)) void receive();
 
         /// send a message
         void send(const char* message) const;

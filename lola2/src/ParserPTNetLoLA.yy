@@ -5,7 +5,6 @@
 
 \todo Fehlermeldungen auch über den Reporter abhandeln.
 \todo Detaillierte Dateifehlermeldungen abschaltbar.
-\todo Herausfinden, was "%yacc" tut.
 \todo TheResult und TheCapacity in einen Namespace "parser::" packen
 
 Parses a place transition net in LoLA syntax.
@@ -31,9 +30,9 @@ void yyerrors(char* token, char const* format, ...);
 %}
 
 %union {
-    char *attributeString;
+    char* attributeString;
     tFairnessAssumption attributeFairness;
-    ArcList *attributeArcList;
+    ArcList* attributeArcList;
 }
 
 %type <attributeString> nodeident
@@ -43,10 +42,8 @@ void yyerrors(char* token, char const* format, ...);
 %type <attributeString> NUMBER
 %type <attributeString> IDENTIFIER
 
-%error-verbose
-%token_table
-%defines
-%yacc
+%error-verbose /* more verbose and specific error message string */
+/*%defines*/       /* write an output file containing macro definitions for the token types */
 
 %token _FINAL_ _AUTOMATON_ _SAFE_ _NEXT_ _ANALYSE_ _PLACE_ _MARKING_
 _TRANSITION_ _CONSUME_ _PRODUCE_ _comma_ _colon_ _semicolon_ IDENTIFIER NUMBER
@@ -62,7 +59,7 @@ _WEAK_ _FAIR_
 %{
 extern YYSTYPE yylval;
 extern int yylex();
-extern FILE *yyin;
+extern FILE* yyin;
 extern int yylineno;
 extern int yycolno;
 %}
@@ -75,7 +72,7 @@ extern int yycolno;
 // their values become meaningless.
 
 /// The object containing the final outcome of the parsing process
-ParserPTNet * TheResult;
+ParserPTNet*  TheResult;
 /// The value of the currently active capacity statement
 unsigned int TheCapacity;
 %}
@@ -90,22 +87,22 @@ net:
 
 
 placelists:
-  capacity placelist    /* several places may share unqiue capacity */ 
+  capacity placelist    /* several places may share unqiue capacity */
 | placelists _semicolon_ capacity placelist
 ;
 
 
 capacity:
-  /* empty */            /* empty capacity = unlimited capacity */ 
-    { 
+  /* empty */            /* empty capacity = unlimited capacity */
+    {
         TheCapacity = UINT_MAX;
     }
 | _SAFE_ _colon_       /* SAFE without number = 1-SAFE */
-    { 
+    {
         TheCapacity = 1;
     }
 | _SAFE_ NUMBER _colon_ /* at most k tokens expected on these places */
-    { 
+    {
         TheCapacity = atoi($2);
         free($2);
     }
@@ -113,17 +110,17 @@ capacity:
 
 
 placelist:
-  placelist _comma_ nodeident 
-    { 
-        PlaceSymbol *p = new PlaceSymbol($3, TheCapacity);
+  placelist _comma_ nodeident
+    {
+        PlaceSymbol* p = new PlaceSymbol($3, TheCapacity);
         if (! TheResult->PlaceTable.insert(p))
         {
             yyerrors($3, "place '%s' name used twice", $3);
         }
     }
-| nodeident 
-    { 
-        PlaceSymbol *p = new PlaceSymbol($1,TheCapacity);
+| nodeident
+    {
+        PlaceSymbol* p = new PlaceSymbol($1,TheCapacity);
         if (! TheResult->PlaceTable.insert(p))
         {
             yyerrors($1, "place '%s' name used twice", $1);
@@ -132,11 +129,11 @@ placelist:
 ;
 
 nodeident:  /* for places and transitions, names may be idents or numbers */
-  IDENTIFIER  
+  IDENTIFIER
     {
         $$ = $1;
     }
-| NUMBER 
+| NUMBER
     {
         $$ = $1; /* result is string version of number */
     }
@@ -153,7 +150,7 @@ markinglist:
 marking:
   nodeident _colon_ NUMBER
     {
-        PlaceSymbol *p = (PlaceSymbol *) TheResult->PlaceTable.lookup($1);
+        PlaceSymbol* p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);
@@ -163,8 +160,8 @@ marking:
         free($1);
     }
 | nodeident  /* default: 1 token */
-    { 
-        PlaceSymbol *p = (PlaceSymbol *) TheResult->PlaceTable.lookup($1);
+    {
+        PlaceSymbol* p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);
@@ -186,40 +183,40 @@ transition:
   _CONSUME_ arclist _semicolon_
   _PRODUCE_ arclist _semicolon_
     {
-            TransitionSymbol *t = new TransitionSymbol($2, $3, $5, $8);
-            if (! TheResult->TransitionTable.insert(t))
-            {
-                yyerrors($2, "transition name '%s' used twice", $2);
-            }
+        TransitionSymbol* t = new TransitionSymbol($2, $3, $5, $8);
+        if (! TheResult->TransitionTable.insert(t))
+        {
+            yyerrors($2, "transition name '%s' used twice", $2);
+        }
     }
 ;
 
 fairness:
     /* empty */    /* empty = may be treated unfair */
-    { 
+    {
         $$ = NO_FAIRNESS;
     }
-| _WEAK_ _FAIR_ 
-    { 
+| _WEAK_ _FAIR_
+    {
         $$ = WEAK_FAIRNESS;
     }
-| _STRONG_ _FAIR_ 
-    { 
+| _STRONG_ _FAIR_
+    {
         $$ = STRONG_FAIRNESS;
     }
 ;
 
 
 arclist:
-  /* empty */       
+  /* empty */
     {
         $$ = NULL;
     }
-| arc              
+| arc
     {
         $$ = $1;
     }
-| arc _comma_ arclist 
+| arc _comma_ arclist
     {
         $1->setNext((Symbol*)$3);
         $$ = $1;
@@ -228,9 +225,9 @@ arclist:
 
 
 arc:
-  nodeident _colon_ NUMBER 
+  nodeident _colon_ NUMBER
     {
-        PlaceSymbol *p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
+        PlaceSymbol* p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);
@@ -241,7 +238,7 @@ arc:
     }
 | nodeident   /* default: multiplicity 1 */
     {
-        PlaceSymbol *p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
+        PlaceSymbol* p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);
@@ -254,7 +251,7 @@ arc:
 %%
 
 /// Wrapping the Parser
-ParserPTNet *ParserPTNetLoLA()
+ParserPTNet* ParserPTNetLoLA()
 {
     TheResult = new ParserPTNet();
     yyparse();

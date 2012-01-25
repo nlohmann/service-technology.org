@@ -16,7 +16,9 @@
 /// Intialization amounts to setting all entries to NULL
 SymbolTable::SymbolTable()
     : table((Symbol**)calloc(SIZEOF_SYMBOLTABLE, sizeof(Symbol*))),
-      card(0)
+      card(0),
+      currentIndex(0),
+      currentSymbol(NULL)
 {
 }
 

@@ -12,6 +12,7 @@
 #include <string>
 
 #include "Reporter.h"
+#include "Dimensions.h"
 
 ReporterSocket::ReporterSocket(u_short port, const char* ip)
     : mySocket(Socket(port, ip))
@@ -22,7 +23,7 @@ ReporterSocket::ReporterSocket(u_short port, const char* ip)
 
 void ReporterSocket::message(const char* format, ...)
 {
-    char buffer[1000];
+    char buffer[UDP_BUFFER_SIZE];
     va_list args;
     va_start(args, format);
     vsprintf(buffer, format, args);
@@ -32,7 +33,7 @@ void ReporterSocket::message(const char* format, ...)
 
 void ReporterSocket::status(const char* format, ...)
 {
-    char buffer[1000];
+    char buffer[UDP_BUFFER_SIZE];
     va_list args;
     va_start(args, format);
     vsprintf(buffer, format, args);
@@ -42,7 +43,7 @@ void ReporterSocket::status(const char* format, ...)
 
 __attribute__((noreturn)) void ReporterSocket::abort(unsigned short code, const char* format, ...)
 {
-    char buffer[1000];
+    char buffer[UDP_BUFFER_SIZE];
     va_list args;
     va_start(args, format);
     vsprintf(buffer, format, args);
@@ -52,6 +53,10 @@ __attribute__((noreturn)) void ReporterSocket::abort(unsigned short code, const 
     exit(EXIT_FAILURE);
 }
 
+ReporterSocket::~ReporterSocket()
+{
+    status("done");
+}
 
 
 
@@ -200,4 +205,9 @@ __attribute__((noreturn)) void ReporterStream::abort(unsigned short code, const 
     }
 
     exit(EXIT_FAILURE);
+}
+
+ReporterStream::~ReporterStream()
+{
+    status("done");
 }

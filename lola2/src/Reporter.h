@@ -16,7 +16,7 @@
 class Reporter
 {
     public:
-        ~Reporter() {};
+        virtual ~Reporter() {};
 
         /// always report
         virtual void message(const char* format, ...) = 0;
@@ -35,6 +35,7 @@ class ReporterSocket : public Reporter
 
     public:
         ReporterSocket(u_short port, const char* ip);
+        ~ReporterSocket();
 
         void message(const char* format, ...);
         void status(const char* format, ...);
@@ -119,6 +120,7 @@ class ReporterStream : public Reporter
 
     public:
         ReporterStream();
+        ~ReporterStream();
         void message(const char* format, ...);
         void status(const char* format, ...);
         __attribute__((noreturn)) void abort(unsigned short code, const char* format, ...);

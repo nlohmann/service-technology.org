@@ -41,6 +41,9 @@ extern int yylex_destroy();
 void terminationHandler()
 {
     cmdline_parser_free(&args_info);
+
+    // should be the very last call
+    delete rep;
 }
 
 
@@ -66,7 +69,7 @@ void evaluateParameters(int argc, char** argv)
             rep = new ReporterStream();
             break;
         case (reporter_arg_socket):
-            rep = new ReporterSocket(args_info.port_arg, args_info.address_arg);
+            rep = new ReporterSocket((u_short)args_info.port_arg, args_info.address_arg);
             rep->message("pid = %d", getpid());
             break;
     }
@@ -85,7 +88,8 @@ int main(int argc, char** argv)
 
     // read the input file(s)
     ParserPTNet* symbolTables = ParserPTNetLoLA();
-    rep->status("done");
+
+    rep->status("finished parsing");
 
     fclose(yyin);
     yylex_destroy();

@@ -39,5 +39,5 @@ Symbol::Symbol(const char* k)
 
 Symbol::~Symbol()
 {
-    free((char*)key);
+    free(const_cast<char*>(key));
 }

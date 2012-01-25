@@ -17,12 +17,7 @@
 #include <netinet/in.h>
 
 #include "Socket.h"
-
-/*!
-\todo If we really need this variable later, we might want to move it to
-      the file Dimensions.h.
-*/
-size_t Socket::bufferSize = 1024;
+#include "Dimensions.h"
 
 socklen_t Socket::addressLength = sizeof(sockaddr_in);
 
@@ -99,23 +94,23 @@ Socket::~Socket()
 \author Niels
 \status new
 */
-void Socket::receive()
+__attribute__((noreturn)) void Socket::receive()
 {
     assert(listening);
 
     // initialize buffer
     if (!buffer)
     {
-        buffer = new char[bufferSize];
+        buffer = new char[UDP_BUFFER_SIZE];
     }
 
     ssize_t recsize;
 
     for (;;)
     {
-        // receive data from the socket sock, stores it into buffer with length bufferSize,
+        // receive data from the socket sock, stores it into buffer with length UDP_BUFFER_SIZE,
         // sets no flags, receives from address specified in sa with length fromlen
-        recsize = recvfrom(sock, (void*)buffer, bufferSize, 0, (struct sockaddr*)&address, &addressLength);
+        recsize = recvfrom(sock, (void*)buffer, UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
 
         if (recsize < 0)
         {
@@ -150,7 +145,7 @@ void Socket::receive()
 */
 void Socket::send(const char* message) const
 {
-    int bytes_sent = sendto(sock, message, strlen(message), 0, (struct sockaddr*)&address, addressLength);
+    ssize_t bytes_sent = sendto(sock, message, strlen(message), 0, (struct sockaddr*)&address, addressLength);
 
     if (bytes_sent < 0)
     {

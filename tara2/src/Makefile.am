@@ -7,9 +7,10 @@ tara_SOURCES =  main.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \
                 Output.cc Output.h \
-                DFS_graph.cc DFS_graph.h \
+                MaxCost.cc MaxCost.h \
 		lexic_graph.ll syntax_graph.yy \
-                Requirement.cc Requirement.h
+		lexic_costfunction.ll syntax_costfunction.yy \
+                iModification.cc iModification.h
                 
 # <<-- CHANGE END -->>
 

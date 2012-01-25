@@ -30,7 +30,7 @@ Wrong Input causes undefined behaviour and not necessarily an error message.
 %name-prefix="graph_"
 
 %{
-#include "DFS_graph.h"
+#include "MaxCost.h"
 #include <string>
 #include <stdio.h>
 #include <pnapi/pnapi.h>
@@ -54,7 +54,7 @@ unsigned int currentState;
 //define G_STATE_FINAL 1
 //define G_STATE_RELEVANT 2
 //define G_STATE_VISITED 4
-std::vector<short> stateInfo(5); //starting with 5
+//std::vector<short> stateInfo(5); //starting with 5
 
 std::map<const unsigned int, innerState *const> innerGraph;
 
@@ -84,25 +84,27 @@ state:
         currentState=$2;
 
         //check if we have to resize the stateInfo vector
-        if(stateInfo.capacity()<$2) {
-            stateInfo.resize(2*$2,0);
-        }
+ //rmv       if(stateInfo.capacity()<$2) {
+ //rmv           stateInfo.resize(2*$2,0);
+  //      }
 
         /* current marking is representative of an SCC */
-        if($2 == $3) {
-            stateInfo[$2] |= G_STATE_RELEVANT;
+ //rmv        if($2 == $3) {
+ //rmv           stateInfo[$2] |= G_STATE_RELEVANT;
             innerGraph.insert(std::pair<int, innerState *const>($2,new innerState));
-        }
+            innerGraph[$2]->inStack=false;
+            innerGraph[$2]->final=net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, net));
+ //       }
         /*else {
             stateInfo[$2]=0;
             stateInfo[$3]=0;
        }*/
 
        // if this state is final, then the lowlink representative is final
-       if(net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, net))) {
+  //     if() {
            //printf("FINAL: %d\n",$3);
-           stateInfo[$3] |= G_STATE_FINAL;
-       }
+  //         stateInfo[$3] |= G_STATE_FINAL;
+  //     }
        currentMarking.clear();
     }
     transitions
@@ -140,7 +142,7 @@ markingList
 ;
 
 markingList:
-  marking
+ marking
 | markingList COMMA marking
 ;
 
@@ -168,7 +170,7 @@ transition:
     if(stateInfo[currentState]>3 | stateInfo[$3]>3)
 	printf("problemo\n");
     */
-    if(stateInfo[currentState] & stateInfo[$3] & G_STATE_RELEVANT ) {
+//rmv    if(stateInfo[currentState] & stateInfo[$3] & G_STATE_RELEVANT ) {
        //printf("%s -> %d\n",$1,$3);
 
        innerTransition cur= { net->findTransition($1), $3 };
@@ -178,6 +180,6 @@ transition:
        innerGraph[currentState]->curTransition=innerGraph[currentState]->transitions.begin();
        /* iterate through all runs of target state and copy
           them to runs of current State with current transition */
-    }
+//rmv    }
   }
 ;

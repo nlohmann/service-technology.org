@@ -32,16 +32,17 @@
 #include "Output.h"
 #include "verbose.h"
 #include "syntax_graph.h"
-#include "DFS_graph.h"
+#include "MaxCost.h"
 
 // input files
 extern FILE* graph_in;
+extern FILE* costfunction_in;
 
 // the parsers
 extern int graph_parse();
 extern int graph_lex_destroy();
-extern void DFS_graph();
-
+extern int costfunction_parse();
+extern int costfunction_lex_destroy();
 
 using std::cerr;
 using std::cout;
@@ -55,18 +56,8 @@ gengetopt_args_info args_info;
 /// the invocation string
 std::string invocation;
 
-// lexer and parser
-/*
-TODO:
-extern int rg_yyparse();
-extern int rg_yylex_destroy();
-extern FILE* rg_yyin;*/
-
 /// output stream
 std::stringstream outStream;
-
-/// Reachability graph coming from LoLA
-//TODO ReachabilityGraph rg;
 
 // Name for dot output file
 std::string filename;
@@ -211,16 +202,18 @@ int main(int argc, char** argv) {
 		abort(3, "pnapi error %i", inputerror.str().c_str());
 		}
 
-    /*---------------------------------.
-    | 2. normalize the net (via PNAPI) |
-    `---------------------------------*/
+    /*----------------------------------.
+    | 2. get most permissive Partner MP |
+    `----------------------------------*/
 
-    /** uncomment next line to normalize */
-    //net->normalize();
+    // call wendy and put them together
+    // in a net n+mp
 
-    /*-------------.
-    | 3. call lola |
-    `-------------*/
+    // if uncontrollable, abort
+
+    /*------------------------.
+    | 3. call lola with n+mp  |
+    `------------------------*/
 
     std::string command="lola-statespace -m "; //TODO: as cmd-param
     std::string fileName;    
@@ -235,19 +228,19 @@ int main(int argc, char** argv) {
 
     // call lola
     message("creating a pipe to lola by calling '%s'", command.c_str());
-
     {
         // set start time
         time(&start_time);
         // create stringstream to store the open net
         std::stringstream ss;
+
+        // TODO: replace net by n+mp
         ss << pnapi::io::lola << *(net) << std::flush;
 
         // call lola and open a pipe
         FILE* fp = popen(command.c_str(), "w");
         // send the net to lola
 
-	// DEBUG:  printf("%s", ss.str().c_str());
 	fprintf(fp, "%s", ss.str().c_str());
 
         // close the pipe
@@ -274,10 +267,38 @@ int main(int argc, char** argv) {
     graph_parse();
     /* TODO destroy lexer etc */
 
-    /*-----------------------------------------------------------.
-    | 5. Do DFS on the graph while running the requirement Check | 
-    \-----------------------------------------------------------*/
-    DFS_graph();
+    /*-------------------------------------.
+    | 5. Parse Costfunction to partial map |
+    \-------------------------------------*/
+
+     status("parsing costfunction");
+       // TODO Check if file exists   
+     costfunction_in=fopen(args_info.costfunction_arg, "r");
+     costfunction_parse(); 
+ 
+    // TODO clean up: destroy lexer, file pointer etc
+
+    /*------------------------------------------.
+    | 5. Compute MaxCosts from the parsed graph | 
+    \------------------------------------------*/
+
+    // max Costs are the costs of the most expensive path through
+    // the inner state graph
+    unsigned int maxCostOfComposition=maxCost();
+
+    printf("maxCost: %d \n", maxCostOfComposition);
+
+    /*--------------------------.
+    | 6. Do The i Modification  |
+    \--------------------------*/
+
+    // TODO: implement pseudocode
+    //init modificate the net with i=maxCost
+
+    // while n controllable & i > 0
+        // iterate modification
+
+    // output yes (with partner for n_i) / no
 
     return EXIT_SUCCESS;
 }

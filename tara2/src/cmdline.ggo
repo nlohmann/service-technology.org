@@ -29,8 +29,6 @@ option "costfunction" f
   details="Use this option to provide a cost function. You can provide more than one cost function, e.g. -f foo.cf -f bar.cf .\n"
   string
   typestr="FILENAME"
-  optional
-  multiple
 
 option "pol" p
   "A policy file"

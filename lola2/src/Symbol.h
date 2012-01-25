@@ -16,6 +16,7 @@ Payload can be added by deriving subclasses.
 #pragma once
 
 #include <string>
+#include <cstdlib>
 
 
 class Symbol

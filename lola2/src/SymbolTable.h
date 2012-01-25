@@ -13,7 +13,8 @@ Collissions are handled as linked lists.
 
 #pragma once
 
-#include<string>
+#include <string>
+#include <cstring>
 #include "Dimensions.h"
 #include "Symbol.h"
 

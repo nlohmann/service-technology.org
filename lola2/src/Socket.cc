@@ -84,11 +84,7 @@ Socket::Socket(u_short port, const char* destination) :
 */
 Socket::~Socket()
 {
-    if (buffer)
-    {
-        delete[] buffer;
-    }
-
+    delete[] buffer;
     close(sock);
 }
 

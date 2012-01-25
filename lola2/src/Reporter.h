@@ -1,14 +1,30 @@
+/*!
+\file Reporter.h
+\status approved 25.01.2012
+*/
+
 #pragma once
 
 #include "Socket.h"
 
+/*!
+\todo Datei mit Fehlernummern anlegen
+\todo std::string loswerden
+\todo --verbose implementieren
+\todo Kommentieren!
+*/
 class Reporter
 {
     public:
         ~Reporter() {};
 
+        /// always report
         virtual void message(const char* format, ...) = 0;
+
+        /// only report in verbose mode
         virtual void status(const char* format, ...) = 0;
+
+        /// display error message and abort program
         __attribute__((noreturn)) virtual void abort(unsigned short code, const char* format, ...) = 0;
 };
 

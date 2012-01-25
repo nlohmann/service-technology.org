@@ -1,22 +1,23 @@
 /*!
 \author Karsten
 \file SymbolTable.cc
-\status new
+\status approved 25.01.2012
 \ingroup g_frontend g_symboltable
+\todo Mal Kollisionen zählen
 
 \brief class implementation for a symbol table
 */
 
+#include <cstring>
+#include <cstdlib>
+#include "Dimensions.h"
 #include "SymbolTable.h"
 
 /// Intialization amounts to setting all entries to NULL
 SymbolTable::SymbolTable()
+    : table((Symbol**)calloc(SIZEOF_SYMBOLTABLE, sizeof(Symbol*))),
+      card(0)
 {
-    for (int i = 0; i < SIZEOF_SYMBOLTABLE; i++)
-    {
-        table[i] = NULL;
-    }
-    card = 0;
 }
 
 /// Destructor calls destructors for all present symbols
@@ -31,27 +32,31 @@ SymbolTable::~SymbolTable()
             delete tmp;
         }
     }
+    free(table);
 }
 
 /// We use sum of ASCII values as hash value
-unsigned int SymbolTable::hash(char* s) const
+unsigned int SymbolTable::hash(const char* s) const
 {
     unsigned long int result = 0;
 
     for (size_t i = 0; s[i]; i++)
     {
         result += s[i];
-        result %= SIZEOF_SYMBOLTABLE;
     }
+    result %= SIZEOF_SYMBOLTABLE;
     return (unsigned int) result;
 }
 
-/// lookup an element from symbol table
-/// if input is correct, lookup is used for existing symbols
-/// NULL is returned if key is not present which typically
-/// indicates a syntax error "double definition"
+/*!
+\brief lookup an element from symbol table
 
-Symbol* SymbolTable::lookup(char* str) const
+if input is correct, lookup is used for existing symbols
+
+\return NULL is returned if key is not present which typically
+        indicates a syntax error "double definition"
+*/
+Symbol* SymbolTable::lookup(const char* str) const
 {
     for (Symbol* sym = table[hash(str)]; sym; sym = sym -> getNext())
     {
@@ -63,13 +68,17 @@ Symbol* SymbolTable::lookup(char* str) const
     return NULL;
 }
 
-/// insert an element into symbol table
-/// if input is correct, insert is used when key is not yet present
-/// If input is present, false is returned.
-/// This typically indicates a syntax error "used but not defined
+/*!
+\brief insert an element into symbol table
+
+if input is correct, insert is used when key is not yet present
+
+\return If input is present, false is returned.
+        This typically indicates a syntax error "used but not defined
+*/
 bool SymbolTable::insert(Symbol* sym)
 {
-    unsigned int index = hash(sym -> getKey());
+    const unsigned int index = hash(sym -> getKey());
     for (Symbol* othersym = table[index]; othersym; othersym = othersym -> getNext())
     {
         if (!strcmp(othersym -> getKey(), sym -> getKey()))
@@ -83,7 +92,7 @@ bool SymbolTable::insert(Symbol* sym)
     return true;
 }
 
-/// returns pointer to first element in symbol table
+/// \return pointer to first element in symbol table
 Symbol* SymbolTable::first()
 {
     for (currentIndex = 0; currentIndex < SIZEOF_SYMBOLTABLE; currentIndex++)
@@ -96,7 +105,7 @@ Symbol* SymbolTable::first()
     return NULL;
 }
 
-/// returns pointer to next element in symbol table
+/// \return pointer to next element in symbol table
 Symbol* SymbolTable::next()
 {
     if (currentSymbol -> getNext())

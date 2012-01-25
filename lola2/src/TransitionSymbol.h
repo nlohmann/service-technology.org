@@ -1,18 +1,10 @@
 /*!
 \author Karsten
 \file TransitionSymbol.h
-\status new
+\status approved 25.01.2012
 \ingroup g_frontend g_symboltable
 
 \brief class definition for a symbol with payload for transition
-
-Transition symbols carry name as key, and
-- list of incoming arcs
-- list of outgoing arcs
-- a fairness assumption
-as payload.
-All information is available in the context of transition definition, thus
-all information is provided in constructor
 */
 
 #pragma once
@@ -21,13 +13,24 @@ all information is provided in constructor
 #include "FairnessAssumptions.h"
 #include "ArcList.h"
 
+/*!
+Transition symbols carry name as key, and
+- list of incoming arcs
+- list of outgoing arcs
+- a fairness assumption
+as payload.
+All information is available in the context of transition definition, thus
+all information is provided in constructor
+
+\todo Doppelte Plätze behandeln.
+*/
 class TransitionSymbol: public Symbol
 {
     public:
         /// Generate and initialize a symbol
-        TransitionSymbol(char*, tFairnessAssumption, ArcList*, ArcList*);
+        TransitionSymbol(const char*, tFairnessAssumption, ArcList*, ArcList*);
         /// Delete Transition symbol
-        virtual ~TransitionSymbol();
+        ~TransitionSymbol();
 
         /// Getter for number of incoming arcs
         unsigned int getCardPre() const;
@@ -41,15 +44,19 @@ class TransitionSymbol: public Symbol
     private:
         /// The fairness assumption specified for this tarnsition
         tFairnessAssumption fairness;
+
         /// The number of transitions that consume from this place
         /// Used for creating arc data structures
         unsigned int cardPost;
+
         /// The number of transitions that produce on this place
         /// used for creating arc data structures
         unsigned int cardPre;
+
         /// The number of transitions that consume from this place
         /// Used for creating arc data structures
         ArcList* Post;
+
         /// The number of transitions that produce on this place
         /// used for creating arc data structures
         ArcList* Pre;

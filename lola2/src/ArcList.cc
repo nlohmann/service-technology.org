@@ -1,17 +1,13 @@
 /*!
 \author Karsten
 \file ArcList.cc
-\status new
+\status approved 25.01.2012
 \ingroup g_frontend g_symboltable
 
 \brief class implementation for a symbol for a list of arcs
-
-This class is used as an intermediate storage between parser and
-the actual Petri net data structures. It collects arcs connected
-in the same dircetion from/to the same transtion.
-
 */
 
+#include <cstdlib>
 #include "ArcList.h"
 
 /// Getter for place
@@ -43,10 +39,5 @@ ArcList::ArcList(PlaceSymbol* p, unsigned int m) :
     place(p),
     next(NULL),
     multiplicity(m)
-{
-}
-
-/// Delete ArcList element
-ArcList::~ArcList()
 {
 }

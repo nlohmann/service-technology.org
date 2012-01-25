@@ -1,9 +1,13 @@
 /*!
 \file Lexik.ll
 \author Karsten
+\status approved 25.01.2012
 
 Joint lexic for all inputs to LoLA
 Mainly copied from LoLA1
+
+\todo Herausfinden, ob es Probleme bei zu langen Kommentaren/Bezeichnern gibt. Idee: Maximallänge angeben.
+\todo Präfix hinzufügen?
 */
 
 %option yylineno
@@ -126,17 +130,12 @@ UNTIL                                    { setcol(); return _UNTIL_; }
 /*! pass token string as attribute to bison */
 inline void setlval() {
     yylval.attributeString = strdup(yytext);
-//    yylval.attributeString = new char[strlen(yytext) + 1];
-//    strcpy(yylval.attributeString, yytext);
 }
 
 inline void setcol() {
     yycolno += yyleng;
 }
 
-
-
-//// FUNCTION MOVE FROM BISON PARSER BY NIELS
 int yywrap() {
-return 1;
+    return 1;
 }

@@ -1,21 +1,21 @@
 /*!
 \author Karsten
 \file ArcList.h
-\status new
+\status approved 25.01.2012
 \ingroup g_frontend g_symboltable
 
 \brief class definition for a symbol for a list of arcs
-
-This class is used as an intermediate storage between parser and
-the actual Petri net data structures. It collects arcs connected
-in the same dircetion from/to the same transtion.
-
 */
 
 #pragma once
 
 #include "PlaceSymbol.h"
 
+/*!
+This class is used as an intermediate storage between parser and
+the actual Petri net data structures. It collects arcs connected
+in the same dircetion from/to the same transtion.
+*/
 class ArcList
 {
     public:
@@ -30,8 +30,6 @@ class ArcList
 
         /// Generate and initialize a list element
         ArcList(PlaceSymbol*, unsigned int);
-        /// Delete a list element
-        ~ArcList();
 
     private:
         ///The place at the other end of arc (transition implicilty given)

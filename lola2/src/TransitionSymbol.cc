@@ -1,24 +1,16 @@
 /*!
 \author Karsten
 \file TransitionSymbol.cc
-\status new
+\status approved 25.01.2012
 \ingroup g_frontend g_symboltable
 
 \brief class implementation for a symbol with payload for transition
-
-Transition symbols carry name as key, and
-- list of incoming arcs
-- list of outgoing arcs
-- a fairness assumption
-as payload.
-All information is available in the context of transition definition, thus
-all information is provided in constructor
 */
 
 #include "TransitionSymbol.h"
 
 /// Generate and initialize a symbol
-TransitionSymbol::TransitionSymbol(char* k, tFairnessAssumption f, ArcList* pr, ArcList* po)
+TransitionSymbol::TransitionSymbol(const char* k, tFairnessAssumption f, ArcList* pr, ArcList* po)
     :
     Symbol(k),
     fairness(f),

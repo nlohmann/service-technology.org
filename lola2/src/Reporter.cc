@@ -1,3 +1,8 @@
+/*!
+\file Reporter.cc
+\status approved 25.01.2012
+*/
+
 #include <config.h>
 #include <cstdio>
 #include <cstdarg>
@@ -52,7 +57,7 @@ __attribute__((noreturn)) void ReporterSocket::abort(unsigned short code, const 
 
 
 ReporterStream::ReporterStream() :
-#if !defined(__MINGW32__) && !defined(USE_SYSLOG)
+#if !defined(__MINGW32__)
     useColor(isatty(fileno(stderr)) && (
                  !strcmp(getenv("TERM"), "linux") ||
                  !strcmp(getenv("TERM"), "cygwin") ||

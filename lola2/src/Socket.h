@@ -1,7 +1,7 @@
 /*!
 \file Socket.h
 \author Niels
-\status new
+\status approved 25.01.2012
 \ingroup g_reporting
 
 \brief Socket class definition

@@ -1,22 +1,17 @@
 /*!
 \author Karsten
 \file Symbol.cc
-\status new
+\status approved 25.01.2012
 \ingroup g_frontend g_symboltable
 
 \brief class implementation for a symbol
-
-A symbol is an entry in a symbol table (class SymbolTable). It has a string
-as key. For dealing with collissions in the symbol table, symbols can be
-lnked as lists.
-Payload can be added by deriving subclasses.
-
 */
 
+#include <cstdlib>
 #include "Symbol.h"
 
 /// Getter for key
-char* Symbol::getKey() const
+const char* Symbol::getKey() const
 {
     return key;
 }
@@ -35,8 +30,7 @@ void Symbol::setNext(Symbol* sym)
 
 /// Generate and initialize a symbol
 /// Argument is the key.
-
-Symbol::Symbol(char* k)
+Symbol::Symbol(const char* k)
     :
     key(k),
     next(NULL)
@@ -45,5 +39,5 @@ Symbol::Symbol(char* k)
 
 Symbol::~Symbol()
 {
-    free(key);
+    free((char*)key);
 }

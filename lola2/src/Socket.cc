@@ -1,7 +1,7 @@
 /*!
 \file Socket.cc
 \author Niels
-\status new
+\status approved 25.01.2012
 \ingroup g_reporting
 
 \brief Socket class implementation
@@ -52,7 +52,7 @@ Socket::Socket(u_short port, const char* destination) :
 {
     if (-1 == sock)   /* if socket failed to initialize, exit */
     {
-        printf("Error Creating Socket");
+        fprintf(stderr, "Error Creating Socket");
         exit(EXIT_FAILURE);
     }
 

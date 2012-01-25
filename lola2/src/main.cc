@@ -4,7 +4,11 @@
 \brief main entry point for LoLA.
 
 \author Niels
-\status new
+\status approved 25.01.2012
+
+\todo ParserPTNetLoLA() exportieren
+\todo Parser/Lexer-Kram in h-Datei (yyin, ...)
+\todo Exit-Codes klären
 */
 
 #include <config.h>

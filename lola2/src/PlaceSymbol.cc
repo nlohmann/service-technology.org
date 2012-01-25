@@ -4,19 +4,12 @@
 \status new
 
 \brief class implementation for a symbol with payload for place
-
-Place symbols carry name as key, and
-- capacity
-- initial marking
-as payload. While capacity is in the context of place declaration (thus,
-part of constructor), initial marking is specified separately (thus, setter).
-Additional information is number of pre-transitions and number of post-transitions. This information is updated while parsing transitions.
 */
 
 #include "PlaceSymbol.h"
 
 /// Constructor. Capacity available in context, the other ingredients are not
-PlaceSymbol::PlaceSymbol(char* k, unsigned int cap)
+PlaceSymbol::PlaceSymbol(const char* k, unsigned int cap)
     :
     Symbol(k),
     capacity(cap),
@@ -60,9 +53,4 @@ void PlaceSymbol::notifyPost()
 void PlaceSymbol::notifyPre()
 {
     ++cardPre;
-}
-
-/// Delete PlaceSymbol
-PlaceSymbol::~PlaceSymbol()
-{
 }

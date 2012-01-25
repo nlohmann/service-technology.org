@@ -1,29 +1,30 @@
 /*!
 \author Karsten
 \file PlaceSymbol.h
-\status new
+\status approved 25.01.2012
 
 \brief class definition for a symbol with payload for place
-
-Place symbols carry name as key, and
-- capacity
-- initial marking
-as payload. While capacity is in the context of place declaration (thus,
-part of constructor), initial marking is specified separately (thus, setter).
-Additional information is number of pre-transitions and number of post-transitions. This information is updated while parsing transitions.
 */
 
 #pragma once
 
 #include "Symbol.h"
 
+/*!
+Place symbols carry name as key, and
+- capacity
+- initial marking
+as payload. While capacity is in the context of place declaration (thus,
+part of constructor), initial marking is specified separately (thus, setter).
+Additional information is number of pre-transitions and number of post-transitions. This information is updated while parsing transitions.
+
+\todo Dopplungen behandeln.
+*/
 class PlaceSymbol: public Symbol
 {
     public:
         /// Generate and initialize a symbol
-        PlaceSymbol(char*, unsigned int);
-        /// Delete place symbol
-        virtual ~PlaceSymbol();
+        PlaceSymbol(const char*, unsigned int);
 
         /// Getter for capacity
         unsigned int getCapacity() const;
@@ -42,7 +43,7 @@ class PlaceSymbol: public Symbol
         void notifyPre();
 
     private:
-        /// The maximum number of tokens that msut be representable for this place; UINT_MAX for absence of capacity
+        /// The maximum number of tokens that must be representable for this place; UINT_MAX for absence of capacity
         unsigned int capacity;
         /// The initial number of tokens on this place
         unsigned int initialMarking;

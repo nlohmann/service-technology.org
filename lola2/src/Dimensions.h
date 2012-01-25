@@ -1,7 +1,7 @@
 /*!
 \author Karsten
 \file Dimensions.h
-\status new
+\status approved 15.01.2012
 
 \brief collection of arbitrarily chosen but fixed constants
 */

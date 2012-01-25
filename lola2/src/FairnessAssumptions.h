@@ -1,7 +1,7 @@
 /*!
 \author Karsten
 \file FairnessAssumptions.h
-\status new
+\status approved 25.01.2012
 \ingroup g_frontend g_symboltable
 
 This is just a type definition for the possible fairness assumptions

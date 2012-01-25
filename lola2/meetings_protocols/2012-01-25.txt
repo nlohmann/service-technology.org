@@ -1,0 +1,10 @@
+Nächste Schritte:
+
+Karsten: Netz, Check_enabled, Fire
+Niels: Listener/Reporter
+Andreas: Linear unabhängige Vektoren
+Irgendwer: Analyse Hash Collissions in Symboltabelle
+
+Design-Entscheidungen:
+Netzstrukturen auf Array-Basis
+Größe der Indizes in Dimensions.h

@@ -30,9 +30,11 @@ char* append(char* s1, char* s2) {
  \param argument castable to (pid_t*)
  */
 void killProcess(void* arg) {
+    int status;
     pid_t* pid = (pid_t*)arg;
     debug_print("%s: killing %d\n", __func__, *pid);
     kill(*pid, SIGKILL);
+    waitpid(*pid, &status, WNOHANG); // avoid zombies by requesting the exit status
 }
 
 /*!

@@ -19,19 +19,25 @@
  */
 enum VerificationState forknrun(char** args, interpreter interpret, char* logfile) {
     int state;
+    int cancel;
     int out = open(logfile, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
-    pid_t pid;
-
+    pid_t pid = (pid_t)NULL;
+    
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &cancel);
+    pthread_cleanup_push(killProcess, (void*)&pid);
+    
     pid = fork();
     if (pid == 0) {
+        pthread_setcancelstate(cancel, NULL); // TODO: Is this necessary?
         debug_print("%s: running %s\n", __func__, args[0]);
         dup2(out, 1);
         dup2(out, 2);
         execvp(args[0], args);
         return Undefined; // this should never happen
     }
-
-    pthread_cleanup_push(killProcess, (void*)&pid);
+    
+    // enable cancellation
+    pthread_setcancelstate(cancel, NULL);
     debug_print("%s: waiting for pid %d\n", __func__, pid);
     waitpid(pid, &state, 0);
     debug_print("%s: pid %d returned\n", __func__, pid);

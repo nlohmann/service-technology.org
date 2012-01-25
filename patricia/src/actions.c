@@ -106,10 +106,14 @@ struct outcome* perform(struct problem* problem, struct action* action) {
 struct outcome* performParallel(struct problem* problem, struct action** actions, int num) {
     int i;
     int remaining = num;
+    int cancel;
     pthread_t threads[num + 1];
     struct ptask* ptask;
     struct outcome* outcome = malloc(sizeof(struct outcome));
-
+    
+    // disable cancellation
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &cancel);
+        
     // initialize outcome variable
     debug_print("%s: initializing\n", __func__);
     outcome->state = Undefined;
@@ -127,10 +131,12 @@ struct outcome* performParallel(struct problem* problem, struct action** actions
         ptask->outcome = outcome;
         ptask->problem = problem;
         ptask->action = actions[i];
-
+	
         pthread_create(&threads[i], NULL, threadedPerform, (void*)ptask);
-        pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     }
+
+    // allow cancelation
+    pthread_setcancelstate(cancel, NULL);
 
     // fetch the verification results from the tools
     debug_print("%s: waiting for results\n", __func__);
@@ -183,10 +189,14 @@ struct outcome* performTry(struct problem* problem, struct action* try, struct a
  \note when the timeout expires, the outcome's state is Undefined and the name is "timeout". 
  */
 struct outcome* performRunWithTimeout(struct problem* problem, struct tool* tool, unsigned int timeout) {
+    int cancel;
     struct outcome* outcome = malloc(sizeof(struct outcome));
     struct ptask* ptask = malloc(sizeof(struct ptask));
     pthread_t worker;
     pthread_t guard;
+    
+    // disable cancellation
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &cancel);
 
     // initialize variables
     debug_print("%s: initializing\n", __func__);
@@ -203,13 +213,16 @@ struct outcome* performRunWithTimeout(struct problem* problem, struct tool* tool
 
     // run worker
     debug_print("%s: creating worker thread\n", __func__);
-    pthread_create(&worker, NULL, threadedRun, (void*)ptask);
     pthread_cleanup_push(killThread, (void*)&worker);
+    pthread_create(&worker, NULL, threadedRun, (void*)ptask);
 
     // run guard
     debug_print("%s: creating guard thread\n", __func__);
-    pthread_create(&guard, NULL, threadedSleep, (void*)ptask);
     pthread_cleanup_push(killThread, (void*)&guard);
+    pthread_create(&guard, NULL, threadedSleep, (void*)ptask);
+
+    // enable cancellation
+    pthread_setcancelstate(cancel, NULL);
 
     // wait for signal
     debug_print("%s: waiting for signal\n", __func__);
@@ -246,8 +259,11 @@ struct outcome* performRunWithoutTimeout(struct problem* problem, struct tool* t
 void* threadedPerform(void* args) {
     struct ptask* ptask = (struct ptask*)args;
     struct outcome* outcome;
+    
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     outcome = perform(ptask->problem, ptask->action);
     publish(ptask->outcome, outcome->state, outcome->tool);
+    
     return NULL;
 }
 
@@ -261,8 +277,11 @@ void* threadedPerform(void* args) {
  */
 void* threadedRun(void* args) {
     struct ptask* ptask = (struct ptask*)args;
+    
     assert(ptask->action->type == Run);
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     publish(ptask->outcome, run(ptask->problem, ptask->action->data.run.tool), ptask->action->data.run.tool->name);
+    
     return NULL;
 }
 
@@ -276,8 +295,11 @@ void* threadedRun(void* args) {
  */
 void* threadedSleep(void* args) {
     struct ptask* ptask = (struct ptask*)args;
+    
     assert(ptask->action->type == Run);
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     usleep(ptask->action->data.run.timeout * 1000); // TODO: Replace this with nanosleep?
     publish(ptask->outcome, Undefined, "timeout");
+    
     return NULL;
 }

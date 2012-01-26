@@ -19,7 +19,10 @@
 # 2. Add the files you need for the test to the `testfile' directory.
 # 3. Add these files (without path) to the `TESTFILES' list.
 # 4. Add the file to the SVN repository.
-TESTFILES = 
+TESTFILES = Kanban5.pnml.lola \
+            garavel.lola \
+            phils1000.lola \
+            phils10000.lola
 
 
 #-----------------------------------------#

@@ -25,7 +25,7 @@ class Reporter
         virtual void status(const char* format, ...) = 0;
 
         /// display error message and abort program
-        __attribute__((noreturn)) virtual void abort(unsigned short code, const char* format, ...) = 0;
+        __attribute__((noreturn)) virtual void abort(uint8_t code, const char* format, ...) = 0;
 };
 
 class ReporterSocket : public Reporter
@@ -39,7 +39,7 @@ class ReporterSocket : public Reporter
 
         void message(const char* format, ...);
         void status(const char* format, ...);
-        __attribute__((noreturn)) void abort(unsigned short code, const char* format, ...);
+        __attribute__((noreturn)) void abort(uint8_t code, const char* format, ...);
 };
 
 class ReporterStream : public Reporter
@@ -123,5 +123,5 @@ class ReporterStream : public Reporter
         ~ReporterStream();
         void message(const char* format, ...);
         void status(const char* format, ...);
-        __attribute__((noreturn)) void abort(unsigned short code, const char* format, ...);
+        __attribute__((noreturn)) void abort(uint8_t code, const char* format, ...);
 };

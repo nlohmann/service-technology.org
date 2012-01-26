@@ -22,53 +22,53 @@ in its role as a node, ar contained in Node.*
 
 */
 
-class Transition
+struct Transition
 {
-public:
-	/// fairness specification
-	static  tFairnessAssumption * Fairness;
+    public:
+        /// fairness specification
+        static  tFairnessAssumption* Fairness;
 
-	/// Activation status
-	static bool * Enabled;
+        /// Activation status
+        static bool* Enabled;
 
-	/// number of enabled transitions
-	static index_type CardEnabled;
+        /// number of enabled transitions
+        static index_type CardEnabled;
 
-	/// When transition i fires from m to m', DeltaHash[i] is hash(m') - hash(m).
-	/// This value is independent of m and m'  
-	static int * DeltaHash;
+        /// When transition i fires from m to m', DeltaHash[i] is hash(m') - hash(m).
+        /// This value is independent of m and m'
+        static int* DeltaHash;
 
-	/// That many places need to be changed when transition i fires
-	/// CardDeltaT[PRE] for places that lose tokens, CardDeltaT[POST] for those that gain tokens
-	static index_type * CardDeltaT[2];
-	
-	/// These are the places that change their marking when transition i fires
-	/// DeltaT[PRE] for places that lose tokens, DeltaT[POST] for those that gain tokens
-	static index_type ** DeltaT[2];
+        /// That many places need to be changed when transition i fires
+        /// CardDeltaT[PRE] for places that lose tokens, CardDeltaT[POST] for those that gain tokens
+        static index_type* CardDeltaT[2];
 
-	/// This is the amount of change
-	static mult_type ** MultDeltaT[2];
+        /// These are the places that change their marking when transition i fires
+        /// DeltaT[PRE] for places that lose tokens, DeltaT[POST] for those that gain tokens
+        static index_type** DeltaT[2];
 
-	/// After firing transition i, that many transitions must be checked for enabledness if they
-	/// have been enabled before: card(DeltaT[PRE]\bullet)
-	static index_type * CardConflicting;
+        /// This is the amount of change
+        static mult_type** MultDeltaT[2];
 
-	/// After firing transition i, these transitions must be checked for enabledness if they
-	/// have been enabled before: (DeltaT[PRE]\bullet)
-	static index_type ** Conflicting;
+        /// After firing transition i, that many transitions must be checked for enabledness if they
+        /// have been enabled before: card(DeltaT[PRE]\bullet)
+        static index_type* CardConflicting;
 
-	/// After reverse firing transition i, that many transitions must be checked for enabledness if they
-	/// have been enabled before: card(DeltaT[POST]\bullet)
-	static index_type * CardBackConflicting;
+        /// After firing transition i, these transitions must be checked for enabledness if they
+        /// have been enabled before: (DeltaT[PRE]\bullet)
+        static index_type** Conflicting;
 
-	/// After firing transition i, these transitions must be checked for enabledness if they
-	/// have been enabled before: (DeltaT[POST]\bullet)
-	static index_type ** BackConflicting;
+        /// After reverse firing transition i, that many transitions must be checked for enabledness if they
+        /// have been enabled before: card(DeltaT[POST]\bullet)
+        static index_type* CardBackConflicting;
 
-	/// If transition i is disabled, this is its position in its scapegpat's Disabled list
-	/// Whenever t gets disabled, we sort its Pre list such that the scapegoat is the first
-	/// entry there.
-	static index_type * PositionScapegoat;
+        /// After firing transition i, these transitions must be checked for enabledness if they
+        /// have been enabled before: (DeltaT[POST]\bullet)
+        static index_type** BackConflicting;
+
+        /// If transition i is disabled, this is its position in its scapegpat's Disabled list
+        /// Whenever t gets disabled, we sort its Pre list such that the scapegoat is the first
+        /// entry there.
+        static index_type* PositionScapegoat;
 };
 
 

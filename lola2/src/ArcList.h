@@ -28,8 +28,8 @@ class ArcList
         ArcList* getNext() const;
         /// Setter for next
         void setNext(Symbol*);
-	/// Adding some tokens to multplicity
-	void addMultiplicity(mult_type);
+        /// Adding some tokens to multplicity
+        void addMultiplicity(mult_type);
 
         /// Generate and initialize a list element
         ArcList(PlaceSymbol*, unsigned int);

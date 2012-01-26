@@ -12,10 +12,10 @@
 */
 
 #include <config.h>
-#include <cstdlib>
 #include <libgen.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cstdlib>
 
 #include "Reporter.h"
 #include "cmdline.h"

@@ -41,7 +41,7 @@ void ReporterSocket::status(const char* format, ...)
     va_end(args);
 }
 
-__attribute__((noreturn)) void ReporterSocket::abort(unsigned short code, const char* format, ...)
+__attribute__((noreturn)) void ReporterSocket::abort(uint8_t code, const char* format, ...)
 {
     char buffer[UDP_BUFFER_SIZE];
     va_list args;
@@ -187,7 +187,7 @@ void ReporterStream::status(const char* format, ...)
 
  \note The codes should be documented in the manual.
 */
-__attribute__((noreturn)) void ReporterStream::abort(unsigned short code, const char* format, ...)
+__attribute__((noreturn)) void ReporterStream::abort(uint8_t code, const char* format, ...)
 {
     fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _bold_);
 

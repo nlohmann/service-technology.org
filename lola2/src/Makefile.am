@@ -4,19 +4,20 @@ bin_PROGRAMS = lola listener
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
                 ArcList.cc ArcList.h \
+                BitSetC.cc BitSetC.h \
                 Dimensions.h \
                 FairnessAssumptions.h \
-		Node.cc Node.h \
-		Place.cc Place.h \
-		Transition.cc Transition.h \
-		Marking.cc Marking.h \
+                Marking.cc Marking.h \
+                Node.cc Node.h \
                 ParserPTNet.h \
                 ParserPTNetLoLA.yy Lexik.ll \
+                Place.cc Place.h \
                 PlaceSymbol.cc PlaceSymbol.h \
                 Reporter.cc Reporter.h \
                 Socket.cc Socket.h \
                 Symbol.cc Symbol.h \
                 SymbolTable.cc SymbolTable.h \
+                Transition.cc Transition.h \
                 TransitionSymbol.h TransitionSymbol.cc \
                 cmdline.c cmdline.h \
                 main.cc
@@ -25,8 +26,8 @@ listener_SOURCES = Listener.cc \
                    Reporter.cc Reporter.h \
                    Socket.cc Socket.h
 
-lola_CFLAGS = -Waddress -Waggregate-return -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic
-lola_CXXFLAGS = -Waddress -Waggregate-return -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic
+AM_CFLAGS = -Waddress -Waggregate-return -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic
+AM_CXXFLAGS = -Waddress -Waggregate-return -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic
 
 
 #############################################################################

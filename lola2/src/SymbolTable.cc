@@ -8,6 +8,7 @@
 \brief class implementation for a symbol table
 */
 
+#include <inttypes.h>
 #include <cstring>
 #include <cstdlib>
 #include "Dimensions.h"
@@ -15,7 +16,7 @@
 
 /// Intialization amounts to setting all entries to NULL
 SymbolTable::SymbolTable()
-    : table((Symbol**)calloc(SIZEOF_SYMBOLTABLE, sizeof(Symbol*))),
+    : table(reinterpret_cast<Symbol**>(calloc(SIZEOF_SYMBOLTABLE, sizeof(Symbol*)))),
       card(0),
       currentIndex(0),
       currentSymbol(NULL)
@@ -40,11 +41,11 @@ SymbolTable::~SymbolTable()
 /// We use sum of ASCII values as hash value
 unsigned int SymbolTable::hash(const char* s) const
 {
-    unsigned long int result = 0;
+    uint64_t result = 0;
 
     for (size_t i = 0; s[i]; i++)
     {
-        result += s[i];
+        result += (uint64_t)s[i];
     }
     result %= SIZEOF_SYMBOLTABLE;
     return (unsigned int) result;

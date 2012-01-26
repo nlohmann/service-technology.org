@@ -1,33 +1,13 @@
-/*****************************************************************************\
- Cosme -- Checking Simulation, Matching, and Equivalence
-
- Copyright (c) 2010 Andreas Lehmann
-
- Cosme is free software: you can redistribute it and/or modify it under the
- terms of the GNU Affero General Public License as published by the Free
- Software Foundation, either version 3 of the License, or (at your option)
- any later version.
-
- Cosme is distributed in the hope that it will be useful, but WITHOUT ANY
- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
- more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with Cosme.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
-
-#ifndef __BITSETC_H
-#define __BITSETC_H
+#pragma once
 
 #include <config.h>
-#include <limits>
-#include <string>
-#include <sstream>
-
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
+
+#include <limits>
+#include <sstream>
+#include <string>
 
 #define bitset_base_t uint32_t
 #define BITSET_BASE_T_BITS 32
@@ -41,43 +21,52 @@
 #define BITTEST(a, b) ((a)[BITSLOT(b)] & BITMASK(b))
 #define BITNSLOTS(nb) ((nb + BITSET_BASE_T_BITS - 1) / BITSET_BASE_T_BITS)
 
-class BitSetC {
+class BitSetC
+{
     public:
 
         BitSetC(size_t bits, bool makeEmpty);
-        BitSetC(const BitSetC& other);
+        BitSetC(const BitSetC &other);
         ~BitSetC();
 
         void makeUnion(BitSetC* a);
         void makeIntersection(BitSetC* a);
         void makeDifference(BitSetC* a);
-        inline bool getBit(size_t bit) const {
+        inline bool getBit(size_t bit) const
+        {
             assert(bit < this->mBitCount);
             return BITTEST(this->mBits, bit);
         }
-        inline void setBit(size_t bit) {
+        inline void setBit(size_t bit)
+        {
             assert(bit < this->mBitCount);
             BITSET(this->mBits, bit);
         }
-        inline void clearBit(size_t bit) {
+        inline void clearBit(size_t bit)
+        {
             assert(bit < this->mBitCount);
             BITCLEAR(this->mBits, bit);
         }
         bool isIntersectionEmpty(BitSetC* a) const;
         bool isSubset(BitSetC* a) const;
-        inline bool isEmpty() const {
-            for (size_t i = 0; i < BITNSLOTS(this->mBitCount); i++) {
-                if (this->mBits[i] != 0) {
+        inline bool isEmpty() const
+        {
+            for (size_t i = 0; i < BITNSLOTS(this->mBitCount); i++)
+            {
+                if (this->mBits[i] != 0)
+                {
                     return false;
                 }
             }
             return true;
         }
         bool isEqual(BitSetC* a) const;
-        inline size_t bitCount() const {
+        inline size_t bitCount() const
+        {
             return this->mBitCount;
         }
-        inline bitset_base_t getSlot(size_t slot) const {
+        inline bitset_base_t getSlot(size_t slot) const
+        {
             assert(slot <= BITSLOT(this->mBitCount));
             return this->mBits[slot];
         }
@@ -89,5 +78,3 @@ class BitSetC {
         size_t mBitCount;
 
 };
-
-#endif //__BITSETC_H

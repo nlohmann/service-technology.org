@@ -26,7 +26,7 @@ class Symbol
         void setNext(Symbol*);
 
         /// Generate and initialize a symbol
-        Symbol(const char*);
+        explicit Symbol(const char*);
         /// Delete a symbol
         virtual ~Symbol();
 

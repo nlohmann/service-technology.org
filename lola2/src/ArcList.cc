@@ -29,7 +29,7 @@ ArcList* ArcList::getNext() const
 }
 
 /// Adder for multiplicity
-void ArcList::addMultiplicity(mult_type i) 
+void ArcList::addMultiplicity(mult_type i)
 {
     multiplicity += i;
 }
@@ -37,7 +37,7 @@ void ArcList::addMultiplicity(mult_type i)
 /// Setter for next
 void ArcList::setNext(Symbol* n)
 {
-    next = (ArcList*)n;
+    next = reinterpret_cast<ArcList*>(n);
 }
 
 /// Generate and initialize a list element

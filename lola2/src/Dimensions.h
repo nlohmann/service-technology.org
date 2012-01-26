@@ -6,6 +6,7 @@
 \brief collection of arbitrarily chosen but fixed constants
 */
 
+#pragma once
 
 /// number of entries in a symbol table
 #define SIZEOF_SYMBOLTABLE 0x10000
@@ -15,7 +16,7 @@
 
 // Some useful constants, can be used as indices in arrays
 
-/// Index for "Places" in arrays 
+/// Index for "Places" in arrays
 #define PL 0
 
 /// Index for "Transitions" in arrays

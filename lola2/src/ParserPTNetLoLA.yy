@@ -151,7 +151,7 @@ markinglist:
 marking:
   nodeident _colon_ NUMBER
     {
-        PlaceSymbol* p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
+        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable.lookup($1));
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);
@@ -162,7 +162,7 @@ marking:
     }
 | nodeident  /* default: 1 token */
     {
-        PlaceSymbol* p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
+        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable.lookup($1));
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);
@@ -219,29 +219,29 @@ arclist:
     }
 | arc _comma_ arclist
     {
-	// check for duplicate
-	ArcList * al;
-	for(al = $3; al; al = al -> getNext())
-	{
-		if(al -> getPlace() == $1 -> getPlace())
-		{
-			break;
-		}
-	}
-	if(al)
-	{	
-		//duplicate detected
-		al -> addMultiplicity($1 -> getMultiplicity());
-		delete $1;
-		$$ = $3;
-	}
-	else
-	{
-		// no duplicate detected
-		$1->setNext((Symbol*)$3);
-		$$ = $1;
-	}
-	
+    // check for duplicate
+    ArcList * al;
+    for(al = $3; al; al = al -> getNext())
+    {
+        if(al -> getPlace() == $1 -> getPlace())
+        {
+            break;
+        }
+    }
+    if(al)
+    {   
+        //duplicate detected
+        al -> addMultiplicity($1 -> getMultiplicity());
+        delete $1;
+        $$ = $3;
+    }
+    else
+    {
+        // no duplicate detected
+        $1->setNext((Symbol*)$3);
+        $$ = $1;
+    }
+    
     }
 ;
 
@@ -249,7 +249,7 @@ arclist:
 arc:
   nodeident _colon_ NUMBER
     {
-        PlaceSymbol* p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
+        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable.lookup($1));
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);
@@ -260,7 +260,7 @@ arc:
     }
 | nodeident   /* default: multiplicity 1 */
     {
-        PlaceSymbol* p = (PlaceSymbol*)TheResult->PlaceTable.lookup($1);
+        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable.lookup($1));
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);

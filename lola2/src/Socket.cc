@@ -7,14 +7,13 @@
 \brief Socket class implementation
 */
 
-#include <stdio.h>
-#include <string.h>
 #include <errno.h>
-#include <cstdlib>
-#include <ctime>
-
 #include <unistd.h>
 #include <netinet/in.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <ctime>
 
 #include "Socket.h"
 #include "Dimensions.h"
@@ -110,7 +109,7 @@ __attribute__((noreturn)) void Socket::receive()
     {
         // receive data from the socket sock, stores it into buffer with length UDP_BUFFER_SIZE,
         // sets no flags, receives from address specified in sa with length fromlen
-        recsize = recvfrom(sock, (void*)buffer, UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
+        recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
 
         if (recsize < 0)
         {
@@ -126,7 +125,8 @@ __attribute__((noreturn)) void Socket::receive()
         time(&now);
         struct tm* current = localtime(&now);
 
-        printf("%s: %i:%i:%i: %.*s\n", PACKAGE, current->tm_hour, current->tm_min, current->tm_sec, (int)recsize, buffer);
+        printf("%s: %2i:%2i:%2i: %.*s\n", PACKAGE, current->tm_hour, current->tm_min,
+               current->tm_sec, static_cast<int>(recsize), buffer);
     }
 }
 

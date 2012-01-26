@@ -23,26 +23,26 @@ or for transition only, is deffered to files Place.* and Transition.*
 
 */
 
-class Node
+struct Node
 {
-public:
-	/// number of nodes: NrOfNodes[PL] = places, NrOfNodes[TR] = transitions
-	static index_type Card[2]; 
+    public:
+        /// number of nodes: NrOfNodes[PL] = places, NrOfNodes[TR] = transitions
+        static index_type Card[2];
 
-	/// For each node, the number of nodes in pre- resp. post set.
-	/// CardArcs[PL][PRE][17] is the number of transitions that produce on place 17.
-	static index_type * CardArcs[2][2];
+        /// For each node, the number of nodes in pre- resp. post set.
+        /// CardArcs[PL][PRE][17] is the number of transitions that produce on place 17.
+        static index_type* CardArcs[2][2];
 
-	/// For each node, the indices of nodes in pre- reps. post set.
-	/// Arc[PL][POST][17][4] is the number of the 5th transition that consumes tokens from place 17.
-	static index_type ** Arc[2][2];
+        /// For each node, the indices of nodes in pre- reps. post set.
+        /// Arc[PL][POST][17][4] is the number of the 5th transition that consumes tokens from place 17.
+        static index_type** Arc[2][2];
 
-	/// for each node, the multiplicities of arcs in pre- resp. post set.
-	static mult_type ** Mult[2][2];
+        /// for each node, the multiplicities of arcs in pre- resp. post set.
+        static mult_type** Mult[2][2];
 
-	/// names of the nodes
-	/// Name[TR][15] is the name of transition 15.
-	static char ** Name[2];
+        /// names of the nodes
+        /// Name[TR][15] is the name of transition 15.
+        static char** Name[2];
 };
 
 

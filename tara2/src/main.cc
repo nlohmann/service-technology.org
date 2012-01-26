@@ -17,6 +17,11 @@
  along with Hello.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
+
+#ifndef WEXITSTATUS
+# define WEXITSTATUS(stat_val) ((unsigned int) (stat_val) >> 8)
+#endif
+
 /* <<-- CHANGE START (main program) -->> */
 // include header files
 #include <config.h>
@@ -206,25 +211,64 @@ int main(int argc, char** argv) {
     | 2. get most permissive Partner MP |
     `----------------------------------*/
 
-    // call wendy and put them together
-    // in a net n+mp
+    std::string wendyCommand("wendy --correctness=livelock ");
+    wendyCommand+=args_info.net_arg;
 
-    // if uncontrollable, abort
+    std::string tempFN;
+     // create a temporary file
+#if defined(__MINGW32__)
+        tempFN = mktemp(basename(args_info.tmpfile_arg));
+#else
+        tempFN = mktemp(args_info.tmpfile_arg);
+#endif
+
+    std::string partnerTemp=tempFN+"-mp-partner.sa";
+    wendyCommand+=" --sa="+partnerTemp;
+    message("creating a pipe to wendy by calling '%s'", wendyCommand.c_str());
+
+    int wendyExit = system(wendyCommand.c_str());
+
+    wendyExit=WEXITSTATUS(wendyExit);
+ 
+    status("Wendy done with status :%d", wendyExit); 
+ 
+    // if uncontrollable
+    // TODO add some nice error message here
+	if (wendyExit != 0 ) {
+		message("Wendy returned with status %d.", wendyExit);
+		message("Partner could not be built! No Partner was created, exiting.");
+		exit(EXIT_FAILURE);
+	}
+
+     
+    // first create automaton partner
+    pnapi::Automaton partner;
+    std::ifstream partnerStream;
+
+    //stream automaton
+    partnerStream.open(partnerTemp.c_str(), std::ifstream::in);
+    if(!partnerStream) {
+       message("Partner was not built, exiting");
+       exit(EXIT_SUCCESS);
+    }
+
+    partnerStream >> pnapi::io::sa >> partner;
+    
+    // convert to petri net
+    pnapi::PetriNet composition(partner);
+    
+    //and now we compose
+    composition.compose(*net, "mp-partner-", "");
 
     /*------------------------.
     | 3. call lola with n+mp  |
     `------------------------*/
 
     std::string command="lola-statespace -m "; //TODO: as cmd-param
-    std::string fileName;    
 
-      // create a temporary file
-#if defined(__MINGW32__)
-        fileName = mktemp(basename(args_info.tmpfile_arg));
-#else
-        fileName = mktemp(args_info.tmpfile_arg);
-#endif
-    command+=fileName;
+    // create a temporary file
+    std::string lolaFN=tempFN+ "-lola.rg";
+    command+=lolaFN;
 
     // call lola
     message("creating a pipe to lola by calling '%s'", command.c_str());
@@ -234,9 +278,9 @@ int main(int argc, char** argv) {
         // create stringstream to store the open net
         std::stringstream ss;
 
-        // TODO: replace net by n+mp
-        ss << pnapi::io::lola << *(net) << std::flush;
-
+        // ss << pnapi::io::lola << *(net) << std::flush;
+        ss << pnapi::io::lola << composition << std::flush;
+      
         // call lola and open a pipe
         FILE* fp = popen(command.c_str(), "w");
         // send the net to lola
@@ -254,7 +298,7 @@ int main(int argc, char** argv) {
 
     // DEBUG: write lola output to cout
     /*char c;
-    FILE* f=fopen(fileName.c_str(),"r");
+    FILE* f=fopen(lolaFN.c_str(),"r");
     while ((c=fgetc(f)) != EOF) {
       cout << c;
     }*/
@@ -263,7 +307,7 @@ int main(int argc, char** argv) {
     | 4. Parse the inner Graph |
     \-------------------------*/
 
-    graph_in=fopen(fileName.c_str(),"r");
+    graph_in=fopen(lolaFN.c_str(),"r");
     graph_parse();
     /* TODO destroy lexer etc */
 

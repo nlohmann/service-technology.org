@@ -30,15 +30,15 @@
 // Some type definitions for dimensioning index structures
 
 /// Type for node indices, limit the number of places/ transitions
-typedef index_type unsigned int;
+typedef unsigned int index_type;
 
 /// Type for multiplicities, limits the max. multiplicity at any arc
-typedef mult_type unsigned int;
+typedef unsigned int mult_type;
 
 /// Type for capacities, limits the max. capacity of a place (to
 /// sizeof(used type) -1, since max(type) is needed for representing
 /// unboundedness in coverability graphs
-typedef capacity_type unsigned int;
+typedef unsigned int capacity_type;
 
 
 /// size of string buffer in Socket class

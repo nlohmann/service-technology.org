@@ -6,6 +6,10 @@ lola_SOURCES = \
                 ArcList.cc ArcList.h \
                 Dimensions.h \
                 FairnessAssumptions.h \
+		Node.cc Node.h \
+		Place.cc Place.h \
+		Transition.cc Transition.h \
+		Marking.cc Marking.h \
                 ParserPTNet.h \
                 ParserPTNetLoLA.yy Lexik.ll \
                 PlaceSymbol.cc PlaceSymbol.h \

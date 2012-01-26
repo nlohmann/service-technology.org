@@ -17,7 +17,7 @@ PlaceSymbol* ArcList::getPlace() const
 }
 
 /// Getter for multiplicity
-unsigned int ArcList::getMultiplicity() const
+mult_type ArcList::getMultiplicity() const
 {
     return multiplicity;
 }
@@ -28,6 +28,12 @@ ArcList* ArcList::getNext() const
     return next;
 }
 
+/// Adder for multiplicity
+void ArcList::addMultiplicity(mult_type i) 
+{
+    multiplicity += i;
+}
+
 /// Setter for next
 void ArcList::setNext(Symbol* n)
 {
@@ -35,7 +41,7 @@ void ArcList::setNext(Symbol* n)
 }
 
 /// Generate and initialize a list element
-ArcList::ArcList(PlaceSymbol* p, unsigned int m) :
+ArcList::ArcList(PlaceSymbol* p, mult_type m) :
     place(p),
     next(NULL),
     multiplicity(m)

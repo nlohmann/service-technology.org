@@ -10,6 +10,7 @@
 #pragma once
 
 #include "PlaceSymbol.h"
+#include "Dimensions.h"
 
 /*!
 This class is used as an intermediate storage between parser and
@@ -22,11 +23,13 @@ class ArcList
         /// Getter for place
         PlaceSymbol* getPlace() const;
         /// Getter for multiplicity
-        unsigned int getMultiplicity() const;
+        mult_type getMultiplicity() const;
         /// Getter for next
         ArcList* getNext() const;
         /// Setter for next
         void setNext(Symbol*);
+	/// Adding some tokens to multplicity
+	void addMultiplicity(mult_type);
 
         /// Generate and initialize a list element
         ArcList(PlaceSymbol*, unsigned int);
@@ -37,5 +40,5 @@ class ArcList
         /// Arcs are organized as lists.
         ArcList* next;
         /// Multiplicity
-        unsigned int multiplicity;
+        mult_type multiplicity;
 };

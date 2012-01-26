@@ -21,6 +21,7 @@ Parses a place transition net in LoLA syntax.
 #include "ParserPTNet.h"
 #include "FairnessAssumptions.h"
 #include "ArcList.h"
+#include "Dimensions.h"
 
 /// the current token text from Flex
 extern char* yytext;
@@ -218,8 +219,29 @@ arclist:
     }
 | arc _comma_ arclist
     {
-        $1->setNext((Symbol*)$3);
-        $$ = $1;
+	// check for duplicate
+	ArcList * al;
+	for(al = $3; al; al = al -> getNext())
+	{
+		if(al -> getPlace() == $1 -> getPlace())
+		{
+			break;
+		}
+	}
+	if(al)
+	{	
+		//duplicate detected
+		al -> addMultiplicity($1 -> getMultiplicity());
+		delete $1;
+		$$ = $3;
+	}
+	else
+	{
+		// no duplicate detected
+		$1->setNext((Symbol*)$3);
+		$$ = $1;
+	}
+	
     }
 ;
 

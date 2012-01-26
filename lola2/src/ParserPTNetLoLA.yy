@@ -43,7 +43,7 @@ void yyerrors(char* token, char const* format, ...);
 %type <attributeString> IDENTIFIER
 
 %error-verbose /* more verbose and specific error message string */
-/*%defines*/       /* write an output file containing macro definitions for the token types */
+%defines       /* write an output file containing macro definitions for the token types */
 
 %token _FINAL_ _AUTOMATON_ _SAFE_ _NEXT_ _ANALYSE_ _PLACE_ _MARKING_
 _TRANSITION_ _CONSUME_ _PRODUCE_ _comma_ _colon_ _semicolon_ IDENTIFIER NUMBER

@@ -10,5 +10,36 @@
 /// number of entries in a symbol table
 #define SIZEOF_SYMBOLTABLE 0x10000
 
+/// number of entries in a symbol table
+#define SIZEOF_MARKINGTABLE 0x1000000
+
+// Some useful constants, can be used as indices in arrays
+
+/// Index for "Places" in arrays 
+#define PL 0
+
+/// Index for "Transitions" in arrays
+#define TR 1
+
+/// Index for "Pre Set" in arrays
+#define PRE 0
+
+/// Index for "Post Set" in arrays
+#define POST 1
+
+// Some type definitions for dimensioning index structures
+
+/// Type for node indices, limit the number of places/ transitions
+typedef index_type unsigned int;
+
+/// Type for multiplicities, limits the max. multiplicity at any arc
+typedef mult_type unsigned int;
+
+/// Type for capacities, limits the max. capacity of a place (to
+/// sizeof(used type) -1, since max(type) is needed for representing
+/// unboundedness in coverability graphs
+typedef capacity_type unsigned int;
+
+
 /// size of string buffer in Socket class
 #define UDP_BUFFER_SIZE 1024

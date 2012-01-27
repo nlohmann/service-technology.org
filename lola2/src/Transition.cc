@@ -1,15 +1,17 @@
 /*!
 \file Transition.cc
 \author Karsten
-\status new
+\status approved 27.01.2012
 \brief Useful routines for transition specific information
 
 All data that describe attributes of transitions can be found here. General
 information for a transition in its role as a node, ar contained in Node.*
+
+\todo Lohnt es sich, integers als Referenz zu übergeben?
 */
 
 #include <cstdlib>
-#include "Node.h"
+#include "Net.h"
 #include "Place.h"
 #include "Transition.h"
 #include "Marking.h"
@@ -19,28 +21,28 @@ information for a transition in its role as a node, ar contained in Node.*
 
 tFairnessAssumption* Transition::Fairness = NULL;
 bool* Transition::Enabled = NULL;
-index_type Transition::CardEnabled = 0;
-int* Transition::DeltaHash = NULL;
-index_type* Transition::CardDeltaT[2] = {NULL};
-index_type** Transition::DeltaT[2] = {NULL};
-mult_type** Transition::MultDeltaT[2] = {NULL};
-index_type* Transition::CardConflicting = NULL;
-index_type** Transition::Conflicting = NULL;
-index_type* Transition::CardBackConflicting = NULL;
-index_type** Transition::BackConflicting = NULL;
-index_type* Transition::PositionScapegoat = NULL;
+index_t Transition::CardEnabled = 0;
+hash_t* Transition::DeltaHash = NULL;
+index_t* Transition::CardDeltaT[2] = {NULL};
+index_t** Transition::DeltaT[2] = {NULL};
+mult_t** Transition::MultDeltaT[2] = {NULL};
+index_t* Transition::CardConflicting = NULL;
+index_t** Transition::Conflicting = NULL;
+index_t* Transition::CardBackConflicting = NULL;
+index_t** Transition::BackConflicting = NULL;
+index_t* Transition::PositionScapegoat = NULL;
 
 /*!
 \brief clean up transitions for valgrind
 */
-void deleteTransitions()
+void Transition::deleteTransitions()
 {
     free(Transition::Fairness);
     free(Transition::Enabled);
     free(Transition::DeltaHash);
     for (int direction = PRE; direction <= POST; direction++)
     {
-        for (index_type i = 0; i < Node::Card[TR]; i++)
+        for (index_t i = 0; i < Net::Card[TR]; i++)
         {
             free(Transition::MultDeltaT[direction][i]);
             free(Transition::DeltaT[direction][i]);
@@ -51,7 +53,7 @@ void deleteTransitions()
     }
     free(Transition::CardConflicting);
     free(Transition::CardBackConflicting);
-    for (index_type i = 0; i < Node::Card[TR]; i++)
+    for (index_t i = 0; i < Net::Card[TR]; i++)
     {
         free(Transition::Conflicting[i]);
         free(Transition::BackConflicting[i]);
@@ -67,15 +69,17 @@ void deleteTransitions()
 /// 2. if enabled ->disabled, insert in Disabled list of scapegoat
 /// 3. if disabled->enabled, Remove from Disabled list of scapegoat
 /// 4. if disabled->disabled, perhaps move to other scapegoat
-void checkEnabled(index_type t)
+/// \todo swap of values to be done with XOR (<-- Andreas!)
+void Transition::checkEnabled(index_t t)
 {
     // scan through all pre-places
-    for (index_type i = 0; i < Node::CardArcs[TR][PRE][t]; i++)
+    for (index_t i = 0; i < Net::CardArcs[TR][PRE][t]; ++i)
     {
-        if (Marking::Current[Node::Arc[TR][PRE][t][i]] < Node::Mult[TR][PRE][t][i])
+        if (Marking::Current[Net::Arc[TR][PRE][t][i]] < Net::Mult[TR][PRE][t][i])
         {
-            // transition is disabled, Node::Arc[TR][PRE][t][i] is new scapegpat
-            index_type scapegoat = Node::Arc[TR][PRE][t][i];
+            // transition is disabled, Net::Arc[TR][PRE][t][i] is the
+            // first place that is not sufficiently marked -> it is the new scapegpat
+            const index_t scapegoat = Net::Arc[TR][PRE][t][i];
             if (Transition::Enabled[t])
             {
                 // enabled --> disabled: insert to scapegoat's disabled list
@@ -86,11 +90,11 @@ void checkEnabled(index_type t)
                 // swap scapegoat to front of transition's PRE list
                 if (i > 0)
                 {
-                    mult_type tmp = Node::Mult[TR][PRE][t][i];
-                    Node::Arc[TR][PRE][t][i] = Node::Arc[TR][PRE][t][0];
-                    Node::Mult[TR][PRE][t][i] = Node::Mult[TR][PRE][t][0];
-                    Node::Arc[TR][PRE][t][0] = scapegoat;
-                    Node::Mult[TR][PRE][t][0] = tmp;
+                    mult_t tmp = Net::Mult[TR][PRE][t][i];
+                    Net::Arc[TR][PRE][t][i] = Net::Arc[TR][PRE][t][0];
+                    Net::Mult[TR][PRE][t][i] = Net::Mult[TR][PRE][t][0];
+                    Net::Arc[TR][PRE][t][0] = scapegoat;
+                    Net::Mult[TR][PRE][t][0] = tmp;
                 }
             }
             else
@@ -100,11 +104,11 @@ void checkEnabled(index_type t)
                 {
                     // indeed, scapegoat has changed.
                     // remove from old scapegoat's Disabled list
-                    index_type old_scapegoat = Node::Arc[TR][PRE][t][0];
+                    const index_t old_scapegoat = Net::Arc[TR][PRE][t][0];
                     if (Transition::PositionScapegoat[t] != --Place::CardDisabled[old_scapegoat])
                     {
-                        // transition not last in scapegoat's disabed list--> swap with last
-                        index_type other_t = Place::Disabled[old_scapegoat][Place::CardDisabled[old_scapegoat]];
+                        // transition not last in scapegoat's disabled list--> swap with last
+                        const index_t other_t = Place::Disabled[old_scapegoat][Place::CardDisabled[old_scapegoat]];
                         Transition::PositionScapegoat[other_t] = Transition::PositionScapegoat[t];
                         Place::Disabled[old_scapegoat][Transition::PositionScapegoat[t]] = other_t;
                     }
@@ -113,29 +117,30 @@ void checkEnabled(index_type t)
                     // swap scapegoat to front of transition's PRE list
                     if (i > 0)
                     {
-                        mult_type tmp = Node::Mult[TR][PRE][t][i];
-                        Node::Arc[TR][PRE][t][i] = Node::Arc[TR][PRE][t][0];
-                        Node::Mult[TR][PRE][t][i] = Node::Mult[TR][PRE][t][0];
-                        Node::Arc[TR][PRE][t][0] = scapegoat;
-                        Node::Mult[TR][PRE][t][0] = tmp;
+                        const mult_t tmp = Net::Mult[TR][PRE][t][i];
+                        Net::Arc[TR][PRE][t][i] = Net::Arc[TR][PRE][t][0];
+                        Net::Mult[TR][PRE][t][i] = Net::Mult[TR][PRE][t][0];
+                        Net::Arc[TR][PRE][t][0] = scapegoat;
+                        Net::Mult[TR][PRE][t][0] = tmp;
                     }
-
                 }
-
             }
+            // case of deactivated transition is complete
+            return;
         }
     }
-    // transition enabled
+    // for loop completed: we did not find an insufficiently marked place
+    // => transition enabled
     if (!Transition::Enabled[t])
     {
         // disabled-->enabled: remove from scapegoat's disabled list
         Transition::Enabled[t] = true;
         ++Transition::CardEnabled;
-        index_type old_scapegoat = Node::Arc[TR][PRE][t][0];
+        const index_t old_scapegoat = Net::Arc[TR][PRE][t][0];
         if (Transition::PositionScapegoat[t] != --Place::CardDisabled[old_scapegoat])
         {
             // transition not last in scapegoat's disabed list--> swap with last
-            index_type other_t = Place::Disabled[old_scapegoat][Place::CardDisabled[old_scapegoat]];
+            const index_t other_t = Place::Disabled[old_scapegoat][Place::CardDisabled[old_scapegoat]];
             Transition::PositionScapegoat[other_t] = Transition::PositionScapegoat[t];
             Place::Disabled[old_scapegoat][Transition::PositionScapegoat[t]] = other_t;
         }
@@ -144,37 +149,41 @@ void checkEnabled(index_type t)
 
 
 /// fire a transition and update enabledness of all transitions
-void fire(index_type t)
+void Transition::fire(index_t t)
 {
     // 1. Update current marking
-    for (index_type i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
+    for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {
-        Marking::Current[Transition::DeltaT[PRE][t][i]] -=  Transition::MultDeltaT[PRE][t][i];
-    }
-    for (index_type i = 0; i < Transition::CardDeltaT[POST][t]; i++)
-    {
-        Marking::Current[Transition::DeltaT[POST][t][i]] +=  Transition::MultDeltaT[POST][t][i];
-    }
-    // 2. check conflicting enabled transitions for enabledness
+        // there should be enough tokens to fire this transition
+        assert(Marking::Current[Transition::DeltaT[PRE][t][i]] >= Transition::MultDeltaT[PRE][t][i]);
 
-    for (index_type i = 0; i < Transition::CardConflicting[t]; i++)
+        Marking::Current[Transition::DeltaT[PRE][t][i]] -= Transition::MultDeltaT[PRE][t][i];
+    }
+    for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
     {
-        index_type tt;
-        if (Transition::Enabled[tt = Transition::Conflicting[t][i]])
+        Marking::Current[Transition::DeltaT[POST][t][i]] += Transition::MultDeltaT[POST][t][i];
+    }
+
+    // 2. check conflicting enabled transitions (tt) for enabledness
+    for (index_t i = 0; i < Transition::CardConflicting[t]; i++)
+    {
+        const index_t tt = Transition::Conflicting[t][i];
+        if (Transition::Enabled[tt])
         {
             checkEnabled(tt);
         }
     }
+
     // 3. check those transitions where the scapegoat received additional tokens
-    for (index_type i = 0; i < Transition::CardDeltaT[POST][t]; i++)
+    for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
     {
-        for (index_type j = 0; j < Place::CardDisabled[Transition::DeltaT[POST][t][i]]; /* tricky increment handling */)
+        for (index_t j = 0; j < Place::CardDisabled[Transition::DeltaT[POST][t][i]]; /* tricky increment handling */)
         {
-            index_type tt;
-            checkEnabled(Place::Disabled[tt = Transition::DeltaT[POST][t][i]][j]);
+            const index_t tt = Transition::DeltaT[POST][t][i];
+            checkEnabled(Place::Disabled[tt][j]);
             if (!Transition::Enabled[tt])
             {
-                j++;
+                j++; /* tricky increment handling */
             }
             else
             {
@@ -183,43 +192,48 @@ void fire(index_type t)
             }
         }
     }
+
     // 4. update hash value
-    Marking::HashCurrent += (unsigned int)Transition::DeltaHash[t];
+    Marking::HashCurrent += Transition::DeltaHash[t];
     Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
 }
 
 /// fire a transition in reverse direction (for backtracking) and update enabledness of all transitions
-void backfire(index_type t)
+void Transition::backfire(index_t t)
 {
     // 1. Update current marking
-    for (index_type i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
+    for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {
-        Marking::Current[Transition::DeltaT[PRE][t][i]] +=  Transition::MultDeltaT[PRE][t][i];
+        Marking::Current[Transition::DeltaT[PRE][t][i]] += Transition::MultDeltaT[PRE][t][i];
     }
-    for (index_type i = 0; i < Transition::CardDeltaT[POST][t]; i++)
+    for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
     {
-        Marking::Current[Transition::DeltaT[POST][t][i]] -=  Transition::MultDeltaT[POST][t][i];
-    }
-    // 2. check backward conflicting enabled transitions for enabledness
+        // there should be enough tokens to fire this transition
+        assert(Transition::DeltaT[POST][t][i] >= Transition::MultDeltaT[POST][t][i]);
 
-    for (index_type i = 0; i < Transition::CardBackConflicting[t]; i++)
+        Marking::Current[Transition::DeltaT[POST][t][i]] -= Transition::MultDeltaT[POST][t][i];
+    }
+
+    // 2. check backward conflicting enabled transitions for enabledness
+    for (index_t i = 0; i < Transition::CardBackConflicting[t]; i++)
     {
-        index_type tt;
-        if (Transition::Enabled[tt = Transition::BackConflicting[t][i]])
+        const index_t tt = Transition::BackConflicting[t][i];
+        if (Transition::Enabled[tt])
         {
             checkEnabled(tt);
         }
     }
+
     // 3. check those transitions where the scapegoat received additional tokens
-    for (index_type i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
+    for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {
-        for (index_type j = 0; j < Place::CardDisabled[Transition::DeltaT[PRE][t][i]]; /* tricky increment handling */)
+        for (index_t j = 0; j < Place::CardDisabled[Transition::DeltaT[PRE][t][i]]; /* tricky increment handling */)
         {
-            index_type tt;
-            checkEnabled(Place::Disabled[tt = Transition::DeltaT[PRE][t][i]][j]);
+            const index_t tt = Transition::DeltaT[PRE][t][i];
+            checkEnabled(Place::Disabled[tt][j]);
             if (!Transition::Enabled[tt])
             {
-                j++;
+                j++; /* tricky increment handling */
             }
             else
             {
@@ -228,7 +242,8 @@ void backfire(index_type t)
             }
         }
     }
+
     // 4. update hash value
-    Marking::HashCurrent -= (unsigned int)Transition::DeltaHash[t];
+    Marking::HashCurrent -= Transition::DeltaHash[t];
     Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
 }

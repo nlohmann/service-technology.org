@@ -1,7 +1,7 @@
 /*!
 \author Karsten
 \file PlaceSymbol.cc
-\status new
+\status approved 25.01.2012
 
 \brief class implementation for a symbol with payload for place
 */
@@ -26,7 +26,7 @@ unsigned int PlaceSymbol::getCapacity() const
 }
 
 /// Getter for initial marking
-capacity_type PlaceSymbol::getInitialMarking() const
+capacity_t PlaceSymbol::getInitialMarking() const
 {
     return initialMarking;
 }

@@ -31,11 +31,11 @@ class Symbol
         /// Delete a symbol
         virtual ~Symbol();
 
-	/// get index of symbol in net data structures
-	const index_type getIndex() const;
+        /// get index of symbol in net data structures
+        const index_t getIndex() const;
 
-	/// set index of symbol in net date structures
-	void setIndex(index_type);
+        /// set index of symbol in net date structures
+        void setIndex(index_t);
 
     private:
         ///The key. Used for insertion in symbol table
@@ -43,6 +43,6 @@ class Symbol
         /// Symbols with same hash value are organized as lists.
         Symbol* next;
 
-	/// Index in net data structure. Set during transformation symbols --> net
-	index_type index;
+        /// Index in net data structure. Set during transformation symbols --> net
+        index_t index;
 };

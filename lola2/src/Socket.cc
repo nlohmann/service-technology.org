@@ -40,7 +40,7 @@ socklen_t Socket::addressLength = sizeof(sockaddr_in);
 \status new
 */
 Socket::Socket(u_short port, const char* destination)
-:
+    :
     sock(socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)),
     listening((destination == NULL)),
     buffer(NULL)

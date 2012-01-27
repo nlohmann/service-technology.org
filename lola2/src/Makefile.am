@@ -8,7 +8,7 @@ lola_SOURCES = \
                 Dimensions.h \
                 FairnessAssumptions.h \
                 Marking.cc Marking.h \
-                Node.cc Node.h \
+                Net.cc Net.h \
                 ParserPTNet.h \
                 ParserPTNetLoLA.yy Lexik.ll \
                 Place.cc Place.h \
@@ -17,7 +17,6 @@ lola_SOURCES = \
                 Socket.cc Socket.h \
                 Symbol.cc Symbol.h \
                 SymbolTable.cc SymbolTable.h \
-                SymbolTable2Net.cc SymbolTable2Net.h \
                 Transition.cc Transition.h \
                 TransitionSymbol.h TransitionSymbol.cc \
                 cmdline.c cmdline.h \

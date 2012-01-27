@@ -8,7 +8,8 @@
 #include "Socket.h"
 
 /// error codes for the abort() function
-typedef enum {
+typedef enum
+{
     ERROR_SYNTAX,
     ERROR_COMMANDLINE
 } error_code;

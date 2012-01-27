@@ -1,7 +1,7 @@
 /*!
 \file Marking.h
 \author Karsten
-\status new
+\status approved 27.01.2012
 \brief Global data for marking specific information
 
 All data that describe attributes of markings can be found here.
@@ -18,23 +18,23 @@ struct Marking
 {
     public:
         /// initial marking
-        static capacity_type* Initial;
+        static capacity_t* Initial;
 
         /// hash value of initial marking
-        static unsigned int HashInitial;
+        static hash_t HashInitial;
 
         /// current  marking
-        static capacity_type* Current;
+        static capacity_t* Current;
 
         /// hash value of initial marking
-        static unsigned int HashCurrent;
+        static hash_t HashCurrent;
 
         /// target marking
-        static capacity_type* Target;
+        static capacity_t* Target;
 
         /// hash value of target marking
-        static unsigned int HashTarget;
-};
+        static hash_t HashTarget;
 
-/// Aufräumen der Knoten - Service für valgrind
-extern void deleteMarkings();
+        /// Aufräumen der Knoten - Service für valgrind
+        static void deleteMarkings();
+};

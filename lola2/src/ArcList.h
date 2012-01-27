@@ -23,16 +23,16 @@ class ArcList
         /// Getter for place
         PlaceSymbol* getPlace() const;
         /// Getter for multiplicity
-        mult_type getMultiplicity() const;
+        mult_t getMultiplicity() const;
         /// Getter for next
         ArcList* getNext() const;
         /// Setter for next
         void setNext(Symbol*);
         /// Adding some tokens to multplicity
-        void addMultiplicity(mult_type);
+        void addMultiplicity(mult_t);
 
         /// Generate and initialize a list element
-        ArcList(PlaceSymbol*, unsigned int);
+        ArcList(PlaceSymbol*, mult_t);
 
     private:
         ///The place at the other end of arc (transition implicilty given)
@@ -40,5 +40,5 @@ class ArcList
         /// Arcs are organized as lists.
         ArcList* next;
         /// Multiplicity
-        mult_type multiplicity;
+        mult_t multiplicity;
 };

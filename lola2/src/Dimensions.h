@@ -1,12 +1,19 @@
 /*!
 \author Karsten
 \file Dimensions.h
-\status approved 15.01.2012
+\status approved 27.01.2012
 
 \brief collection of arbitrarily chosen but fixed constants
+\todo Herausfinden, ob TR/PL in eine enum kann und man trotzdem eine for-Schleife bauen kann
+\todo Herausfinden, ob PRE/POST in eine enum kann und man trotzdem eine for-Schleife bauen kann
 */
 
 #pragma once
+
+#include <config.h>
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 
 /// number of entries in a symbol table
 #define SIZEOF_SYMBOLTABLE 0x10000
@@ -31,16 +38,21 @@
 // Some type definitions for dimensioning index structures
 
 /// Type for node indices, limit the number of places/ transitions
-typedef unsigned int index_type;
+typedef uint32_t index_t;
 
 /// Type for multiplicities, limits the max. multiplicity at any arc
-typedef unsigned int mult_type;
+typedef uint16_t mult_t;
 
 /// Type for capacities, limits the max. capacity of a place (to
 /// sizeof(used type) -1, since max(type) is needed for representing
 /// unboundedness in coverability graphs
-typedef unsigned int capacity_type;
+typedef uint32_t capacity_t;
 
+/// Type for hash values (32 bit plus enough space to calculate)
+typedef int64_t hash_t;
+
+/// Type for the number of bits required to store a place's marking
+typedef uint8_t cardbit_t;
 
 /// size of string buffer in Socket class
 #define UDP_BUFFER_SIZE 1024

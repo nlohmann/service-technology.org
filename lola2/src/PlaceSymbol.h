@@ -30,7 +30,7 @@ class PlaceSymbol: public Symbol
         /// Getter for capacity
         unsigned int getCapacity() const;
         /// Getter for initial marking
-        capacity_type getInitialMarking() const;
+        capacity_t getInitialMarking() const;
         /// Getter for number of pre-transitions
         unsigned int getCardPre() const;
         /// Getter for number of post-transitions

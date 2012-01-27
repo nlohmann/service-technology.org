@@ -4,6 +4,7 @@
 */
 
 #include <config.h>
+#include <unistd.h>
 #include <cstdio>
 #include <cstdarg>
 #include <cstdlib>
@@ -14,6 +15,15 @@
 #include "Reporter.h"
 #include "Dimensions.h"
 
+const char* Reporter::error_messages[] =
+{
+    "syntax error",
+    "command line error"
+};
+
+
+
+
 ReporterSocket::ReporterSocket(u_short port, const char* ip)
     : mySocket(Socket(port, ip))
 {
@@ -21,7 +31,7 @@ ReporterSocket::ReporterSocket(u_short port, const char* ip)
 
 
 
-void ReporterSocket::message(const char* format, ...)
+void ReporterSocket::message(const char* format, ...) const
 {
     char buffer[UDP_BUFFER_SIZE];
     va_list args;
@@ -31,7 +41,7 @@ void ReporterSocket::message(const char* format, ...)
     va_end(args);
 }
 
-void ReporterSocket::status(const char* format, ...)
+void ReporterSocket::status(const char* format, ...) const
 {
     char buffer[UDP_BUFFER_SIZE];
     va_list args;
@@ -41,7 +51,7 @@ void ReporterSocket::status(const char* format, ...)
     va_end(args);
 }
 
-__attribute__((noreturn)) void ReporterSocket::abort(uint8_t code, const char* format, ...)
+__attribute__((noreturn)) void ReporterSocket::abort(error_code code, const char* format, ...) const
 {
     char buffer[UDP_BUFFER_SIZE];
     va_list args;
@@ -100,48 +110,48 @@ ReporterStream::ReporterStream() :
 }
 
 
-const char* ReporterStream::_ctool_(const char* s)
+const char* ReporterStream::_ctool_(const char* s) const
 {
     return (std::string(_cm_) + s + _c_).c_str();
 }
 
-const char* ReporterStream::_cfilename_(const char* s)
+const char* ReporterStream::_cfilename_(const char* s) const
 {
     return (std::string(_cb__) + s + _c_).c_str();
 }
 
 
-const char* ReporterStream::_coutput_(const char* s)
+const char* ReporterStream::_coutput_(const char* s) const
 {
     return (std::string(_cB_) + s + _c_).c_str();
 }
 
 
-const char* ReporterStream::_cgood_(const char* s)
+const char* ReporterStream::_cgood_(const char* s) const
 {
     return (std::string(_cG_) + s + _c_).c_str();
 }
 
 
-const char* ReporterStream::_cbad_(const char* s)
+const char* ReporterStream::_cbad_(const char* s) const
 {
     return (std::string(_cR_) + s + _c_).c_str();
 }
 
 
-const char* ReporterStream::_cwarning_(const char* s)
+const char* ReporterStream::_cwarning_(const char* s) const
 {
     return (std::string(_cY_) + s + _c_).c_str();
 }
 
 
-const char* ReporterStream::_cimportant_(const char* s)
+const char* ReporterStream::_cimportant_(const char* s) const
 {
     return (std::string(_bold_) + s + _c_).c_str();
 }
 
 
-const char* ReporterStream::_cparameter_(const char* s)
+const char* ReporterStream::_cparameter_(const char* s) const
 {
     return (std::string(_cC_) + s + _c_).c_str();
 }
@@ -153,7 +163,7 @@ const char* ReporterStream::_cparameter_(const char* s)
 /*!
  \param format  the status message formatted as printf string
 */
-void ReporterStream::message(const char* format, ...)
+void ReporterStream::message(const char* format, ...) const
 {
     fprintf(stderr, "%s: ", _ctool_(PACKAGE));
 
@@ -168,7 +178,7 @@ void ReporterStream::message(const char* format, ...)
 /*!
  \param format  the status message formatted as printf string
 */
-void ReporterStream::status(const char* format, ...)
+void ReporterStream::status(const char* format, ...) const
 {
     fprintf(stderr, "%s: ", _ctool_(PACKAGE));
 
@@ -187,7 +197,7 @@ void ReporterStream::status(const char* format, ...)
 
  \note The codes should be documented in the manual.
 */
-__attribute__((noreturn)) void ReporterStream::abort(uint8_t code, const char* format, ...)
+__attribute__((noreturn)) void ReporterStream::abort(error_code code, const char* format, ...) const
 {
     fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _bold_);
 

@@ -2,6 +2,11 @@ args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error"
 
 section "Reporter"
 
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+
 option "reporter" -
   "Reporter"
   values="stream","socket" enum

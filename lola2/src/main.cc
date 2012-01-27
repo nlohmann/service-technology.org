@@ -65,10 +65,10 @@ void evaluateParameters(int argc, char** argv)
 
     switch (args_info.reporter_arg)
     {
-        case (reporter_arg_stream):
+        case reporter_arg_stream:
             rep = new ReporterStream();
             break;
-        case (reporter_arg_socket):
+        case reporter_arg_socket:
             rep = new ReporterSocket((u_short)args_info.port_arg, args_info.address_arg);
             rep->message("pid = %d", getpid());
             break;

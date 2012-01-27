@@ -19,8 +19,8 @@ Transition symbols carry name as key, and
 - list of outgoing arcs
 - a fairness assumption
 as payload.
-All information is available in the context of transition definition, thus
-all information is provided in constructor
+All information is available in the context of transition definition, thus all
+information is provided in constructor
 
 \todo Doppelte Plätze behandeln.
 */

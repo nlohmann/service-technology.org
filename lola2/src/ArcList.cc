@@ -41,7 +41,8 @@ void ArcList::setNext(Symbol* n)
 }
 
 /// Generate and initialize a list element
-ArcList::ArcList(PlaceSymbol* p, mult_type m) :
+ArcList::ArcList(PlaceSymbol* p, mult_type m)
+:
     place(p),
     next(NULL),
     multiplicity(m)

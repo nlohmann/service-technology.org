@@ -39,7 +39,8 @@ socklen_t Socket::addressLength = sizeof(sockaddr_in);
 \author Niels
 \status new
 */
-Socket::Socket(u_short port, const char* destination) :
+Socket::Socket(u_short port, const char* destination)
+:
     sock(socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)),
     listening((destination == NULL)),
     buffer(NULL)
@@ -145,7 +146,7 @@ __attribute__((noreturn)) void Socket::receive()
 */
 void Socket::send(const char* message) const
 {
-    ssize_t bytes_sent = sendto(sock, message, strlen(message), 0, (struct sockaddr*)&address, addressLength);
+    ssize_t bytes_sent = sendto(sock, message, strlen(message), 0, (const struct sockaddr*)&address, addressLength);
 
     if (bytes_sent < 0)
     {

@@ -1,16 +1,12 @@
 /*!
-
 \file Place.cc
 \author Karsten
 \status new
 \brief Useful rooutines for place specific information
 
-All data that describe attributes of places can be found here. General information for a place
-in its role as a node, ar contained in Node.*
+All data that describe attributes of places can be found here. General
+information for a place in its role as a node, ar contained in Node.*
 */
-
-
-// Dimensions.h has a type index_type that has at least max(nr of places,nr of transitions) elements
 
 #include <cstdlib>
 #include "Dimensions.h"
@@ -18,10 +14,15 @@ in its role as a node, ar contained in Node.*
 #include "Node.h"
 
 /*!
-
 \brief collection of information related to places
-
 */
+
+index_type Place::CardSignificant = 0;
+unsigned int* Place::Hash = NULL;
+capacity_type* Place::Capacity = NULL;
+uint8_t* Place::CardBits = NULL;
+index_type* Place::CardDisabled = NULL;
+index_type** Place::Disabled = NULL;
 
 /// aufräumen für valgrind
 void deletePlaces()
@@ -48,11 +49,3 @@ uint8_t Capacity2Bits(capacity_type cap)
     }
     return k;
 }
-
-
-index_type Place::CardSignificant = 0;
-unsigned int* Place::Hash = NULL;
-capacity_type* Place::Capacity = NULL;
-uint8_t*   Place::CardBits = NULL;
-index_type* Place::CardDisabled = NULL;
-index_type** Place::Disabled = NULL;

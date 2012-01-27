@@ -22,6 +22,9 @@ Parses a place transition net in LoLA syntax.
 #include "FairnessAssumptions.h"
 #include "ArcList.h"
 #include "Dimensions.h"
+#include "Reporter.h"
+
+extern Reporter *rep;
 
 /// the current token text from Flex
 extern char* yytext;
@@ -282,17 +285,17 @@ ParserPTNet* ParserPTNetLoLA()
 
 /// display a parser error and exit
 void yyerrors(char* token, char const* format, ...) {
-    fprintf(stderr, "%s: %d:%d - ", PACKAGE, yylineno, yycolno);
+    rep->message("%d:%d", yylineno, yycolno);
 
     va_list args;
     va_start(args, format);
-    vfprintf(stderr, format, args);
+    rep->message(format, args);
     va_end(args);
 
-    fprintf(stderr, "\n");
-//    message("error near '%s'", token);
+//    fprintf(stderr, "\n");
+    rep->message("error near '%s'", token);
     //displayFileError(diagnosefilename, yylineno, token);
-    //abort(3, "syntax error");
+    rep->abort(ERROR_SYNTAX, "syntax error");
 }
 
 

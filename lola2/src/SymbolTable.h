@@ -16,9 +16,9 @@
 /*!
 \brief Symbol table
 
-The table has strings as keys. Payload  is not explicitly represented.
-It can be attached by deriving from class symbol.
-Collissions are handled as linked lists.
+The table has strings as keys. Payload is not explicitly represented. It can
+be attached by deriving from class symbol. Collissions are handled as linked
+lists.
 */
 class SymbolTable
 {
@@ -45,7 +45,7 @@ class SymbolTable
         unsigned int getCard() const;
 
     private:
-        ///The actual symbol table. It gets pointers as we use lists for collisions.
+        /// The actual symbol table. It gets pointers as we use lists for collisions.
         Symbol** table;
 
         /// The hash function to be used

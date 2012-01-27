@@ -10,10 +10,9 @@
 #pragma once
 
 /*!
-A symbol is an entry in a symbol table (class SymbolTable). It has a string
-as key. For dealing with collissions in the symbol table, symbols can be
-lnked as lists.
-Payload can be added by deriving subclasses.
+A symbol is an entry in a symbol table (class SymbolTable). It has a string as
+key. For dealing with collissions in the symbol table, symbols can be lnked as
+lists. Payload can be added by deriving subclasses.
 */
 class Symbol
 {

@@ -36,7 +36,6 @@ void BitSetC::makeIntersection(BitSetC* a)
     {
         this->mBits[i] &= a->getSlot(i);
     }
-
 }
 
 void BitSetC::makeUnion(BitSetC* a)

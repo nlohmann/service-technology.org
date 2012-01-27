@@ -7,6 +7,13 @@
 
 #include "Socket.h"
 
+/// error codes for the abort() function
+typedef enum {
+    ERROR_SYNTAX,
+    ERROR_COMMANDLINE
+} error_code;
+
+
 /*!
 \todo Datei mit Fehlernummern anlegen
 \todo std::string loswerden
@@ -15,17 +22,21 @@
 */
 class Reporter
 {
+    private:
+        /// error messages
+        static const char* error_messages[];
+
     public:
-        virtual ~Reporter() {};
+        virtual ~Reporter() {}
 
         /// always report
-        virtual void message(const char* format, ...) = 0;
+        virtual void message(const char*, ...) const = 0;
 
         /// only report in verbose mode
-        virtual void status(const char* format, ...) = 0;
+        virtual void status(const char*, ...) const = 0;
 
         /// display error message and abort program
-        __attribute__((noreturn)) virtual void abort(uint8_t code, const char* format, ...) = 0;
+        __attribute__((noreturn)) virtual void abort(error_code, const char*, ...) const = 0;
 };
 
 class ReporterSocket : public Reporter
@@ -37,9 +48,9 @@ class ReporterSocket : public Reporter
         ReporterSocket(u_short port, const char* ip);
         ~ReporterSocket();
 
-        void message(const char* format, ...);
-        void status(const char* format, ...);
-        __attribute__((noreturn)) void abort(uint8_t code, const char* format, ...);
+        void message(const char*, ...) const;
+        void status(const char*, ...) const;
+        __attribute__((noreturn)) void abort(error_code, const char*, ...) const;
 };
 
 class ReporterStream : public Reporter
@@ -102,26 +113,26 @@ class ReporterStream : public Reporter
         const char* _underline_;
 
         /// color the name of a tool
-        const char* _ctool_(const char* s);
+        const char* _ctool_(const char* s) const;
         /// color the name of a file
-        const char* _cfilename_(const char* s);
+        const char* _cfilename_(const char* s) const;
         /// color the type of a file
-        const char* _coutput_(const char* s);
+        const char* _coutput_(const char* s) const;
         /// color some good output
-        const char* _cgood_(const char* s);
+        const char* _cgood_(const char* s) const;
         /// color some bad output
-        const char* _cbad_(const char* s);
+        const char* _cbad_(const char* s) const;
         /// color a warning
-        const char* _cwarning_(const char* s);
+        const char* _cwarning_(const char* s) const;
         /// color an important message
-        const char* _cimportant_(const char* s);
+        const char* _cimportant_(const char* s) const;
         /// color a command-line parameter
-        const char* _cparameter_(const char* s);
+        const char* _cparameter_(const char* s) const;
 
     public:
         ReporterStream();
         ~ReporterStream();
-        void message(const char* format, ...);
-        void status(const char* format, ...);
-        __attribute__((noreturn)) void abort(uint8_t code, const char* format, ...);
+        void message(const char*, ...) const;
+        void status(const char*, ...) const;
+        __attribute__((noreturn)) void abort(error_code, const char*, ...) const;
 };

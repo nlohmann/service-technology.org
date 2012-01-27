@@ -24,7 +24,6 @@
 class BitSetC
 {
     public:
-
         BitSetC(size_t bits, bool makeEmpty);
         BitSetC(const BitSetC &other);
         ~BitSetC();
@@ -73,8 +72,6 @@ class BitSetC
         std::string toString() const;
 
     private:
-
         bitset_base_t* mBits;
         size_t mBitCount;
-
 };

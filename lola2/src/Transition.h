@@ -1,17 +1,15 @@
 /*!
-
 \file Transition.h
 \author Karsten
 \status new
 \brief Global data for transition specific information
 
-All data that describe attributes of transitions can be found here. General information for a transition
-in its role as a node, ar contained in Node.*
+All data that describe attributes of transitions can be found here. General
+information for a transition in its role as a node, ar contained in Node.*
 */
 
 #pragma once
 
-// Dimensions.h has a type index_type that has at least max(nr of places,nr of transitions) elements
 #include "Dimensions.h"
 #include "FairnessAssumptions.h"
 #include "BitSetC.h"
@@ -70,7 +68,6 @@ struct Transition
         /// entry there.
         static index_type* PositionScapegoat;
 };
-
 
 /// Aufräumen der Knoten - Service für valgrind
 extern void deleteTransitions();

@@ -13,9 +13,9 @@
 #include "Dimensions.h"
 
 /*!
-This class is used as an intermediate storage between parser and
-the actual Petri net data structures. It collects arcs connected
-in the same dircetion from/to the same transtion.
+This class is used as an intermediate storage between parser and the actual
+Petri net data structures. It collects arcs connected in the same dircetion
+from/to the same transtion.
 */
 class ArcList
 {

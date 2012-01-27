@@ -14,9 +14,10 @@
 Place symbols carry name as key, and
 - capacity
 - initial marking
-as payload. While capacity is in the context of place declaration (thus,
-part of constructor), initial marking is specified separately (thus, setter).
-Additional information is number of pre-transitions and number of post-transitions. This information is updated while parsing transitions.
+as payload. While capacity is in the context of place declaration (thus, part
+of constructor), initial marking is specified separately (thus, setter).
+Additional information is number of pre-transitions and number of
+post-transitions. This information is updated while parsing transitions.
 
 \todo Dopplungen behandeln.
 */

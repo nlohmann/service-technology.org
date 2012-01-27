@@ -1,12 +1,11 @@
 /*!
-
 \file Transition.cc
 \author Karsten
 \status new
 \brief Useful routines for transition specific information
 
-All data that describe attributes of transitions can be found here. General information for a transition
-in its role as a node, ar contained in Node.*
+All data that describe attributes of transitions can be found here. General
+information for a transition in its role as a node, ar contained in Node.*
 */
 
 #include <cstdlib>
@@ -14,18 +13,26 @@ in its role as a node, ar contained in Node.*
 #include "Place.h"
 #include "Transition.h"
 #include "Marking.h"
-
-// Dimensions.h has a type index_type that has at least max(nr of places,nr of transitions) elements
 #include "Dimensions.h"
 #include "FairnessAssumptions.h"
 #include "BitSetC.h"
 
+tFairnessAssumption* Transition::Fairness = NULL;
+bool* Transition::Enabled = NULL;
+index_type Transition::CardEnabled = 0;
+int* Transition::DeltaHash = NULL;
+index_type* Transition::CardDeltaT[2] = {NULL};
+index_type** Transition::DeltaT[2] = {NULL};
+mult_type** Transition::MultDeltaT[2] = {NULL};
+index_type* Transition::CardConflicting = NULL;
+index_type** Transition::Conflicting = NULL;
+index_type* Transition::CardBackConflicting = NULL;
+index_type** Transition::BackConflicting = NULL;
+index_type* Transition::PositionScapegoat = NULL;
+
 /*!
-
 \brief clean up transitions for valgrind
-
 */
-
 void deleteTransitions()
 {
     free(Transition::Fairness);
@@ -88,11 +95,11 @@ void checkEnabled(index_type t)
             }
             else
             {
-                //disabled --> disabled: perhaps scapegoat has changed
+                // disabled --> disabled: perhaps scapegoat has changed
                 if (i > 0)
                 {
-                    //indeed, scapegoat has changed.
-                    //remove from old scapegoat's Disabled list
+                    // indeed, scapegoat has changed.
+                    // remove from old scapegoat's Disabled list
                     index_type old_scapegoat = Node::Arc[TR][PRE][t][0];
                     if (Transition::PositionScapegoat[t] != --Place::CardDisabled[old_scapegoat])
                     {
@@ -118,7 +125,7 @@ void checkEnabled(index_type t)
             }
         }
     }
-    //transition enabled
+    // transition enabled
     if (!Transition::Enabled[t])
     {
         // disabled-->enabled: remove from scapegoat's disabled list
@@ -225,17 +232,3 @@ void backfire(index_type t)
     Marking::HashCurrent -= (unsigned int)Transition::DeltaHash[t];
     Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
 }
-
-
-tFairnessAssumption* Transition::Fairness = NULL;
-bool* Transition::Enabled = NULL;
-index_type Transition::CardEnabled = 0;
-int* Transition::DeltaHash = NULL;
-index_type* Transition::CardDeltaT[2] = {NULL};
-index_type** Transition::DeltaT[2] = {NULL};
-mult_type** Transition::MultDeltaT[2] = {NULL};
-index_type* Transition::CardConflicting = NULL;
-index_type** Transition::Conflicting = NULL;
-index_type* Transition::CardBackConflicting = NULL;
-index_type** Transition::BackConflicting = NULL;
-index_type* Transition::PositionScapegoat = NULL;

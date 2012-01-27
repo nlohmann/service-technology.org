@@ -1,26 +1,21 @@
 /*!
-
 \file Place.h
 \author Karsten
 \status new
 \brief Global data for place specific information
 
-All data that describe attributes of places can be found here. General information for a place
-in its role as a node, ar contained in Node.*
+All data that describe attributes of places can be found here. General
+information for a place in its role as a node, ar contained in Node.*
 */
 
 #pragma once
 
 #include <stdint.h>
-// Dimensions.h has a type index_type that has at least max(nr of places,nr of transitions) elements
 #include "Dimensions.h"
 
 /*!
-
 \brief collection of information related to places
-
 */
-
 struct Place
 {
     public:
@@ -50,7 +45,6 @@ struct Place
         /// which is card(p\bullet)
         static index_type** Disabled;
 };
-
 
 /// Aufräumen der Knoten - Service für valgrind
 extern void deletePlaces();

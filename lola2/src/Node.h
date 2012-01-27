@@ -1,28 +1,25 @@
 /*!
-
 \file Node.h
 \author Karsten
 \status new
 \brief Global data for net structure
 
-All data that describe the net structure can be found here. Additional information for places only,
-or for transition only, is deffered to files Place.* and Transition.*
+All data that describe the net structure can be found here. Additional
+information for places only, or for transition only, is deffered to files
+Place.* and Transition.*
 */
 
 #pragma once
 
-// Dimensions.h has a type index_type that has at least max(nr of places,nr of transitions) elements
 #include "Dimensions.h"
 
 /*!
-
-
 \brief collection of information related to nodes
-All data that describe the net structure can be found here. Additional information for places only,
-or for transition only, is deffered to files Place.* and Transition.*
 
+All data that describe the net structure can be found here. Additional
+information for places only, or for transition only, is deffered to files
+Place.* and Transition.*
 */
-
 struct Node
 {
     public:
@@ -44,7 +41,6 @@ struct Node
         /// Name[TR][15] is the name of transition 15.
         static char** Name[2];
 };
-
 
 /// Aufräumen der Knoten - Service für valgrind
 extern void deleteNodes();

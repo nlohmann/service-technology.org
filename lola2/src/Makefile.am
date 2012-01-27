@@ -17,7 +17,11 @@ lola_SOURCES = \
                 Socket.cc Socket.h \
                 Symbol.cc Symbol.h \
                 SymbolTable.cc SymbolTable.h \
+<<<<<<< .mine
+                SymbolTable2Net.cc SymbolTable2Net.h \
+=======
                 Transition.cc Transition.h \
+>>>>>>> .r7084
                 TransitionSymbol.h TransitionSymbol.cc \
                 cmdline.c cmdline.h \
                 main.cc

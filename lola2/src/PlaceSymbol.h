@@ -25,12 +25,12 @@ class PlaceSymbol: public Symbol
 {
     public:
         /// Generate and initialize a symbol
-        PlaceSymbol(const char*, unsigned int);
+        PlaceSymbol(char*, unsigned int);
 
         /// Getter for capacity
         unsigned int getCapacity() const;
         /// Getter for initial marking
-        unsigned int getInitialMarking();
+        capacity_type getInitialMarking() const;
         /// Getter for number of pre-transitions
         unsigned int getCardPre() const;
         /// Getter for number of post-transitions

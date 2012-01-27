@@ -8,9 +8,11 @@
 */
 
 #include "TransitionSymbol.h"
+#include "PlaceSymbol.h"
+#include "FairnessAssumptions.h"
 
 /// Generate and initialize a symbol
-TransitionSymbol::TransitionSymbol(const char* k, tFairnessAssumption f, ArcList* pr, ArcList* po)
+TransitionSymbol::TransitionSymbol(char* k, tFairnessAssumption f, ArcList* pr, ArcList* po)
     :
     Symbol(k),
     fairness(f),
@@ -19,16 +21,18 @@ TransitionSymbol::TransitionSymbol(const char* k, tFairnessAssumption f, ArcList
     Post(po),
     Pre(pr)
 {
-    // count incomning arcs
+    // count incomning arcs at transition and at places
     for (ArcList* a = Pre; a -> getNext(); a = a -> getNext())
     {
         ++cardPre;
+	a -> getPlace() -> notifyPost();
     }
 
     // count outgoing arcs
     for (ArcList* a = Post; a -> getNext(); a = a -> getNext())
     {
         ++cardPost;
+	a -> getPlace() -> notifyPre();
     }
 }
 
@@ -54,6 +58,12 @@ ArcList* TransitionSymbol::getPre() const
 ArcList* TransitionSymbol::getPost() const
 {
     return Post;
+}
+
+/// Getter for fairness assumption
+tFairnessAssumption TransitionSymbol::getFairness() const
+{
+    return fairness;
 }
 
 /// Delete TransitionSymbol

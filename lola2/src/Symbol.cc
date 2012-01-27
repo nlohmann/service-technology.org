@@ -10,8 +10,14 @@
 #include <cstdlib>
 #include "Symbol.h"
 
+/// Getter for index
+const index_type Symbol::getIndex() const
+{
+    return index;
+}
+
 /// Getter for key
-const char* Symbol::getKey() const
+char* Symbol::getKey() const
 {
     return key;
 }
@@ -28,9 +34,15 @@ void Symbol::setNext(Symbol* sym)
     next = sym;
 }
 
+/// Setter for index
+void Symbol::setIndex(index_type i)
+{
+   index = i;
+}
+
 /// Generate and initialize a symbol
 /// Argument is the key.
-Symbol::Symbol(const char* k)
+Symbol::Symbol(char* k)
     :
     key(k),
     next(NULL)

@@ -22,9 +22,8 @@ Place.* and Transition.*
 */
 struct Node
 {
-    public:
-        /// number of nodes: NrOfNodes[PL] = places, NrOfNodes[TR] = transitions
-        static index_type Card[2];
+	/// number of nodes: Card[PL] = places, Card[TR] = transitions
+	static index_type Card[2]; 
 
         /// For each node, the number of nodes in pre- resp. post set.
         /// CardArcs[PL][PRE][17] is the number of transitions that produce on place 17.

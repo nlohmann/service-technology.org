@@ -30,10 +30,10 @@ struct Place
         /// sum_{p in P} m(p)*hash(p)
         static unsigned int* Hash;
 
-        /// The maximum number of tokens that, according to input specification, can ever
-        /// be prsent on this place. This is only used for calculating a dense representation of a
-        /// marking, not as a blocker for transition activation.
-        static capacity_type* Capacity;
+	/// The maximum number of tokens that, according to input specification, can ever 
+	/// be present on this place. This is only used for calculating a dense representation of a
+ 	/// marking, not as a blocker for transition activation.
+	static capacity_type * Capacity;
 
         /// The number of bits needed for representing the numbers 0 .. Capacity[i]
         /// Used for handling dense representations of markings
@@ -51,3 +51,6 @@ struct Place
 
 /// Aufräumen der Knoten - Service für valgrind
 extern void deletePlaces();
+
+/// Compute required nr of bits from max. nr of tokens
+extern unsigned short int Capacity2Bits(capacity_type);

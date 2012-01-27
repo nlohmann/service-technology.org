@@ -9,7 +9,7 @@
 #include "PlaceSymbol.h"
 
 /// Constructor. Capacity available in context, the other ingredients are not
-PlaceSymbol::PlaceSymbol(const char* k, unsigned int cap)
+PlaceSymbol::PlaceSymbol(char* k, unsigned int cap)
     :
     Symbol(k),
     capacity(cap),
@@ -23,6 +23,12 @@ PlaceSymbol::PlaceSymbol(const char* k, unsigned int cap)
 unsigned int PlaceSymbol::getCapacity() const
 {
     return capacity;
+}
+
+/// Getter for initial marking
+capacity_type PlaceSymbol::getInitialMarking() const
+{
+    return initialMarking;
 }
 
 /// Adder for initial marking

@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "Dimensions.h"
+
 /*!
 A symbol is an entry in a symbol table (class SymbolTable). It has a string as
 key. For dealing with collissions in the symbol table, symbols can be lnked as
@@ -18,7 +20,7 @@ class Symbol
 {
     public:
         /// Getter for key
-        const char* getKey() const;
+        char* getKey() const;
         /// Getter for next
         Symbol* getNext() const;
         /// Setter for next
@@ -29,9 +31,18 @@ class Symbol
         /// Delete a symbol
         virtual ~Symbol();
 
+	/// get index of symbol in net data structures
+	const index_type getIndex() const;
+
+	/// set index of symbol in net date structures
+	void setIndex(index_type);
+
     private:
         ///The key. Used for insertion in symbol table
-        const char* key;
+        char* key;
         /// Symbols with same hash value are organized as lists.
         Symbol* next;
+
+	/// Index in net data structure. Set during transformation symbols --> net
+	index_type index;
 };

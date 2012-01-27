@@ -28,7 +28,7 @@ class TransitionSymbol: public Symbol
 {
     public:
         /// Generate and initialize a symbol
-        TransitionSymbol(const char*, tFairnessAssumption, ArcList*, ArcList*);
+        TransitionSymbol(char*, tFairnessAssumption, ArcList*, ArcList*);
         /// Delete Transition symbol
         ~TransitionSymbol();
 
@@ -40,6 +40,8 @@ class TransitionSymbol: public Symbol
         ArcList* getPre() const;
         /// Getter for number of post-places
         ArcList* getPost() const;
+        /// Getter for fairness assumption
+        tFairnessAssumption getFairness() const;
 
     private:
         /// The fairness assumption specified for this tarnsition

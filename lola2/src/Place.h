@@ -53,4 +53,4 @@ struct Place
 extern void deletePlaces();
 
 /// Compute required nr of bits from max. nr of tokens
-extern unsigned short int Capacity2Bits(capacity_type);
+extern uint8_t Capacity2Bits(capacity_type);

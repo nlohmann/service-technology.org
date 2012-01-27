@@ -36,9 +36,4 @@ void deleteNodes()
     }
 }
 
-index_type Node::Card[2] = {0}; 
-index_type * Node::CardArcs[2][2] = {{NULL,NULL},{NULL,NULL}};
-index_type ** Node::Arc[2][2] = {{NULL,NULL},{NULL,NULL}};
-mult_type ** Node::Mult[2][2] = {{NULL,NULL},{NULL,NULL}};
-char ** Node::Name[2] = {NULL};
 

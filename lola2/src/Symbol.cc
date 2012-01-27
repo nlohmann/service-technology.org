@@ -42,14 +42,15 @@ void Symbol::setIndex(index_type i)
 
 /// Generate and initialize a symbol
 /// Argument is the key.
-Symbol::Symbol(char* k)
+Symbol::Symbol(const char* k)
     :
-    key(k),
+    key((char *) k),
     next(NULL)
 {
 }
 
 Symbol::~Symbol()
 {
-    free(const_cast<char*>(key));
+    // do not free key here, as it is passed to Node::Name
+    // free(const_cast<char*>(key));
 }

@@ -10,6 +10,7 @@ information for a place in its role as a node, ar contained in Node.*
 
 #pragma once
 
+#include <config.h>
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif

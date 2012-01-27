@@ -31,7 +31,7 @@ $(TESTSUITE): $(srcdir)/testsuite.at package.m4
 # compile the code for code coverage
 cover-prepare:
 	$(LCOV) -v >/dev/null
-	$(MAKE) --directory=$(top_srcdir)/src clean check-local \
+	$(MAKE) --directory=$(top_srcdir) clean all \
 	  CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
 	  CFLAGS+="-fprofile-arcs -ftest-coverage" \
 	  LDFLAGS+="-lgcov"
@@ -64,7 +64,7 @@ cover-html: descriptions
 	$(LCOV_GENHTML) cover/*.info.filtered \
 	   --output-directory cover-html --title "$(PACKAGE_STRING)" \
 	   --show-details --legend --description-file descriptions --sort \
-	   --prefix $(abs_top_builddir)
+	   --demangle-cpp --prefix $(abs_top_builddir)
 	@echo see `pwd`/cover-html/index.html for a coverage report
 
 cover: cover-check cover-html

@@ -21,7 +21,7 @@
 # 4. Add the file to the SVN repository.
 
 # <<-- CHANGE START (testfiles) -->>
-TESTFILES = marvin2.lola phcontrol10.unf.owfn phcontrol7.unf.owfn marvin2.owfn phcontrol3.unf.owfn phcontrol8.unf.owfn marvin3.cf phcontrol4.unf.owfn  phcontrol9.unf.owfn marvin3.owfn phcontrol5.unf.owfn  uncontrollable.owfn marvin.lola phcontrol6.unf.owfn unnormal.owfn marvin.owfn phcontrol6.unf.owfn.graph myCoffee.owfn phcontrol6.unf.owfn.lola
+TESTFILES = marvin2.lola marvin2.owfn marvin3.cf marvin3.owfn marvin.lola marvin.owfn myCoffeeCyclic_alt.owfn myCoffeeCyclic.owfn myCoffee.owfn phcontrol10.unf.owfn phcontrol3.unf.owfn phcontrol4.unf.owfn phcontrol5.unf.owfn phcontrol6.unf.owfn phcontrol6.unf.owfn.graph phcontrol6.unf.owfn.lola phcontrol7.unf.owfn phcontrol8.unf.owfn
 # <<-- CHANGE END -->>
 
 

@@ -10,7 +10,9 @@ information for a place in its role as a node, ar contained in Node.*
 
 #pragma once
 
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
 #include "Dimensions.h"
 
 /*!

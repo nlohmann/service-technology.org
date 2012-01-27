@@ -38,6 +38,8 @@
 #include "verbose.h"
 #include "syntax_graph.h"
 #include "MaxCost.h"
+#include "ServiceTools.h"
+#include "iModification.h"
 
 // input files
 extern FILE* graph_in;
@@ -264,44 +266,11 @@ int main(int argc, char** argv) {
     | 3. call lola with n+mp  |
     `------------------------*/
 
-    std::string command="lola-statespace -m "; //TODO: as cmd-param
-
     // create a temporary file
     std::string lolaFN=tempFN+ "-lola.rg";
-    command+=lolaFN;
 
-    // call lola
-    message("creating a pipe to lola by calling '%s'", command.c_str());
-    {
-        // set start time
-        time(&start_time);
-        // create stringstream to store the open net
-        std::stringstream ss;
-
-        // ss << pnapi::io::lola << *(net) << std::flush;
-        ss << pnapi::io::lola << composition << std::flush;
-      
-        // call lola and open a pipe
-        FILE* fp = popen(command.c_str(), "w");
-        // send the net to lola
-
-	fprintf(fp, "%s", ss.str().c_str());
-
-        // close the pipe
-        pclose(fp);
-        // set end time
-        time(&end_time);
-    }
-
-    // status message
-    status("lola is done [%.0f sec]", difftime(end_time, start_time)); 
-
-    // DEBUG: write lola output to cout
-    /*char c;
-    FILE* f=fopen(lolaFN.c_str(),"r");
-    while ((c=fgetc(f)) != EOF) {
-      cout << c;
-    }*/
+    // run lola-statespace from the service tools
+    getLolaStatespace(composition,lolaFN);
 
     /*-------------------------.
     | 4. Parse the inner Graph |
@@ -330,7 +299,12 @@ int main(int argc, char** argv) {
     // the inner state graph
     unsigned int maxCostOfComposition=maxCost();
 
-    printf("maxCost: %d \n", maxCostOfComposition);
+    // if this Costs are zero, every partner has cost zero.
+    if(maxCostOfComposition==0) {
+        message("Cost are 0 for every partner.");
+        return EXIT_SUCCESS;
+    }
+     
 
     /*--------------------------.
     | 6. Do The i Modification  |
@@ -338,11 +312,48 @@ int main(int argc, char** argv) {
 
     // TODO: implement pseudocode
     //init modificate the net with i=maxCost
+    iModification iMod(net, maxCostOfComposition);
+    
+    std::stringstream ssi;
+        ssi << maxCostOfComposition;
+    
+    std::string minCostPartner=tempFN+"-min-partner-";  
+    std::string curMinCostPartner=minCostPartner+ssi.str()+".sa";
+ 
+    // decrease while controlable
+    while(isControlable(*net, curMinCostPartner) && iMod.getI()>0) {
 
-    // while n controllable & i > 0
-        // iterate modification
+            // next iteration -> i decreases
+	    iMod.iterate();
+            
+            // stupid int to string conversion
+	    ssi.str("");
+	    ssi << iMod.getI();
+       
+            // update min cost file
+            curMinCostPartner=minCostPartner+ssi.str()+".sa";
+    }
 
-    // output yes (with partner for n_i) / no
+    // output file of the min cost partner
+    std::ifstream minCostPartnerStream;
+
+    // if the first iteration has failed
+    // then the costs are unbounded
+    if(iMod.getI()==maxCostOfComposition) {
+	    message("Costs are unbounded");
+            minCostPartnerStream.open(partnerTemp.c_str());
+	    cout << minCostPartnerStream.rdbuf();
+            return EXIT_SUCCESS;
+    }
+
+    // else lookup laste file and put it to std out
+    ssi.str("");
+    ssi << iMod.getI()+1;
+    curMinCostPartner=minCostPartner+ssi.str()+".sa";
+    minCostPartnerStream.open(curMinCostPartner.c_str());
+    
+    message("Cost minimal partner with costs: %d", iMod.getI()+1);
+    cout << minCostPartnerStream.rdbuf();
 
     return EXIT_SUCCESS;
 }

@@ -37,6 +37,7 @@ std::deque<int> nodeStack;
 unsigned int maxCost() {
 
    // assuming innerGraph[0] is start state
+   innerGraph[0]->curCost=0;
    nodeStack.push_back(0);
  
    unsigned int maxCost=0;
@@ -48,7 +49,18 @@ unsigned int maxCost() {
        // if accepting state, update MaxCost
        if(innerGraph[tos]->final) {
            maxCost=maxCost>curCost ? maxCost:curCost;
+/*
+DEBUG: output all expensive paths
+
+       if(curCost>maxCost) {
+          maxCost=curCost;
+          for(std::deque<int>::iterator it=nodeStack.begin();it!=nodeStack.end();it++) {
+             printf(" %d ", innerGraph[*it]->curCost);
+          }
+          printf("\n");
        }
+*/
+}
 
        /* if all childs are visited, remove from stack and reset properties */
        if(innerGraph[tos]->transitions.empty() ||

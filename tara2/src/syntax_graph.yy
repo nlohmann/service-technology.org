@@ -50,12 +50,7 @@ std::map<const pnapi::Place*, unsigned int> currentMarking;
 ///currentState during parsing
 unsigned int currentState;
 
-/// StateInfo (3=relevant AND final, 1=relevant, 0=irrelevant, 2=irrelevant & final)
-//define G_STATE_FINAL 1
-//define G_STATE_RELEVANT 2
-//define G_STATE_VISITED 4
-//std::vector<short> stateInfo(5); //starting with 5
-
+// the inner Graph that gets constructed
 std::map<const unsigned int, innerState *const> innerGraph;
 
 %}
@@ -80,40 +75,15 @@ states:
 state:
   KW_STATE NUMBER lowlink scc markings
     {
-	//printf("current state: %d\n",$2);
         currentState=$2;
+        innerGraph.insert(std::pair<int, innerState *const>($2,new innerState));
+        innerGraph[$2]->inStack=false;
+        innerGraph[$2]->final=net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, net));
 
-        //check if we have to resize the stateInfo vector
- //rmv       if(stateInfo.capacity()<$2) {
- //rmv           stateInfo.resize(2*$2,0);
-  //      }
-
-        /* current marking is representative of an SCC */
- //rmv        if($2 == $3) {
- //rmv           stateInfo[$2] |= G_STATE_RELEVANT;
-            innerGraph.insert(std::pair<int, innerState *const>($2,new innerState));
-            innerGraph[$2]->inStack=false;
-            innerGraph[$2]->final=net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, net));
- //       }
-        /*else {
-            stateInfo[$2]=0;
-            stateInfo[$3]=0;
-       }*/
-
-       // if this state is final, then the lowlink representative is final
-  //     if() {
-           //printf("FINAL: %d\n",$3);
-  //         stateInfo[$3] |= G_STATE_FINAL;
-  //     }
-       currentMarking.clear();
+        currentMarking.clear();
     }
     transitions
-   {
-      //DEBUG: ausgangsgrad
-/*      if(stateInfo[currentState] & G_STATE_RELEVANT)
-	      printf("Ausgangsgrad von %d: %d\n", currentState, innerGraph[currentState]->transitions.size());
-*/
-   }
+    { /* do nothing */  }
 ;
 
 scc:
@@ -165,21 +135,10 @@ transitionList:
 transition:
   NAME ARROW NUMBER 
   {
-    /* look if have an interesting transition */
-    /*DEBUG:
-    if(stateInfo[currentState]>3 | stateInfo[$3]>3)
-	printf("problemo\n");
-    */
-//rmv    if(stateInfo[currentState] & stateInfo[$3] & G_STATE_RELEVANT ) {
-       //printf("%s -> %d\n",$1,$3);
-
        innerTransition cur= { net->findTransition($1), $3 };
        free($1); //get rid of those strings
 
        innerGraph[currentState]->transitions.push_back(cur);
        innerGraph[currentState]->curTransition=innerGraph[currentState]->transitions.begin();
-       /* iterate through all runs of target state and copy
-          them to runs of current State with current transition */
-//rmv    }
   }
 ;

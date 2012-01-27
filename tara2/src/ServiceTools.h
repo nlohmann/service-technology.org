@@ -17,35 +17,13 @@
  along with Hello.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef I_MODIFICATION_H
-#define I_MODIFICATION_H
+#ifndef SERVICE_TOOLS_H
+#define SERVICE_TOOLS_H
 
-#include <list>
 #include <pnapi/pnapi.h>
+#include <string>
 
-
-// do the i-Modification with the a given petri net and an integer
-// inital modification starts by creating an object
-// iterative modification can be achieved by calling iterare
-// changes cannot be undone
-class iModification {
-
-   public:
-      iModification(pnapi::PetriNet* , unsigned int);
-      void iterate();
-      unsigned int getI();
-  
-   private:
-
-      pnapi::PetriNet* net;
-      unsigned int i;
-      unsigned int maxTransCost;
-
-      pnapi::Place* availableCost;
-      pnapi::Arc* outOfCreditArc;
-
-      void init();
-};
-
+bool isControlable(pnapi::PetriNet &net, std::string &tempFile, bool useWendyOptimization=false);
+void getLolaStatespace(pnapi::PetriNet &net, std::string &tempFile);
 
 #endif

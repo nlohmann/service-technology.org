@@ -25,33 +25,39 @@
 extern unsigned int cost(pnapi::Transition* t);
 
 // arguments are the net and the inter i
-iModificator::iModificator(pnapi::PetriNet* netToModify, unsigned int startI)
+iModification::iModification(pnapi::PetriNet* netToModify, unsigned int startI)
    : net(netToModify), i(startI), maxTransCost(0)
 {
    // do the init modification
    this->init();
 } 
 
-void iModificator::iterate() {
+void iModification::iterate() {
    
    if(this->i ==0)
       printf("error, cannot iterate under zero");
    // TODO: insert some nice error exit here...
 
-   this->i=i-1; // optimize ??
+   this->i--; // optimize ??
+
+   // add arc from expensed costs to  out of credit place
+   this->outOfCreditArc->setWeight(this->i+1);
+
+   // finally set the availble costs
+   this->availableCost->setTokenCount(this->maxTransCost+this->i);
 
    /// update available costs
-   unsigned int newAvailable=this->availableCost->getTokenCount()+1;
-   this->availableCost->setTokenCount(newAvailable);
+   //unsigned int newAvailable=this->availableCost->getTokenCount()+1;
+  // this->availableCost->setTokenCount(newAvailable);
 
    // update out of Credit Arc
-   unsigned int newOutOfCredit=this->outOfCreditArc->getWeight()+1;
-   this->outOfCreditArc->setWeight(newOutOfCredit);   
+  // unsigned int newOutOfCredit=this->outOfCreditArc->getWeight()+1;
+  // this->outOfCreditArc->setWeight(newOutOfCredit);   
 }
   
-unsigned int iModificator::getI() { return this->i; }
+unsigned int iModification::getI() { return this->i; }
 
-void iModificator::init() {
+void iModification::init() {
 
    //create the place for the availble costs
    // tokens will be set later
@@ -83,6 +89,8 @@ void iModificator::init() {
    // add out of credit place
    // C-Blitz, game over
    pnapi::Place* outOfCreditPlace = & net->createPlace();
+
+   net->getFinalCondition() = (net->getFinalCondition().getFormula() && ( *outOfCreditPlace == 0));
   
    // add out of credit transition
    pnapi::Transition* outOfCreditTransition = &net->createTransition();

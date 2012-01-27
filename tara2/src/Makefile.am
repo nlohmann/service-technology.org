@@ -10,7 +10,8 @@ tara_SOURCES =  main.cc \
                 MaxCost.cc MaxCost.h \
 		lexic_graph.ll syntax_graph.yy \
 		lexic_costfunction.ll syntax_costfunction.yy \
-                iModification.cc iModification.h
+                iModification.cc iModification.h \
+		ServiceTools.cc ServiceTools.h
                 
 # <<-- CHANGE END -->>
 

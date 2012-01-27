@@ -10,7 +10,7 @@ lola_SOURCES = \
                 Marking.cc Marking.h \
                 Net.cc Net.h \
                 ParserPTNet.h \
-                ParserPTNetLoLA.yy Lexik.ll \
+                ParserPTNetLoLA.yy Lexic.ll \
                 Place.cc Place.h \
                 PlaceSymbol.cc PlaceSymbol.h \
                 Reporter.cc Reporter.h \

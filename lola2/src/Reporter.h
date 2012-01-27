@@ -12,7 +12,7 @@ typedef enum
 {
     ERROR_SYNTAX,
     ERROR_COMMANDLINE
-} error_code;
+} errorcode_t;
 
 
 /*!
@@ -37,7 +37,7 @@ class Reporter
         virtual void status(const char*, ...) const = 0;
 
         /// display error message and abort program
-        __attribute__((noreturn)) virtual void abort(error_code, const char*, ...) const = 0;
+        __attribute__((noreturn)) virtual void abort(errorcode_t, const char*, ...) const = 0;
 };
 
 class ReporterSocket : public Reporter
@@ -51,7 +51,7 @@ class ReporterSocket : public Reporter
 
         void message(const char*, ...) const;
         void status(const char*, ...) const;
-        __attribute__((noreturn)) void abort(error_code, const char*, ...) const;
+        __attribute__((noreturn)) void abort(errorcode_t, const char*, ...) const;
 };
 
 class ReporterStream : public Reporter
@@ -135,5 +135,5 @@ class ReporterStream : public Reporter
         ~ReporterStream();
         void message(const char*, ...) const;
         void status(const char*, ...) const;
-        __attribute__((noreturn)) void abort(error_code, const char*, ...) const;
+        __attribute__((noreturn)) void abort(errorcode_t, const char*, ...) const;
 };

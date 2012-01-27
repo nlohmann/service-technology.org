@@ -21,7 +21,7 @@
 # 4. Add the file to the SVN repository.
 
 # <<-- CHANGE START (testfiles) -->>
-TESTFILES = 
+TESTFILES = marvin2.lola phcontrol10.unf.owfn phcontrol7.unf.owfn marvin2.owfn phcontrol3.unf.owfn phcontrol8.unf.owfn marvin3.cf phcontrol4.unf.owfn  phcontrol9.unf.owfn marvin3.owfn phcontrol5.unf.owfn  uncontrollable.owfn marvin.lola phcontrol6.unf.owfn unnormal.owfn marvin.owfn phcontrol6.unf.owfn.graph myCoffee.owfn phcontrol6.unf.owfn.lola
 # <<-- CHANGE END -->>
 
 

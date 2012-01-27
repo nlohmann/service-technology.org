@@ -33,11 +33,9 @@ public class RunExperimentEffect extends RunExperimentCompare {
   }
 
   
-  public List<short[]> getCanonicalEffects(String logFile) throws IOException {
+  public List<short[]> getCanonicalEffects(XLog xlog) {
     List<short[]> triggers = new LinkedList<short[]>();
     
-    XESImport xin = new XESImport();
-    XLog xlog = xin.readLog(logFile);
     SLog log = new SLog(xlog);
     SLogTree tree = new SLogTree(log, true);
     
@@ -52,8 +50,9 @@ public class RunExperimentEffect extends RunExperimentCompare {
   }
   
   @Override
-  public void runMiners(String logFile, int minSupportThreshold, double confidence) throws IOException {
-    List<short[]> effects = getCanonicalEffects(logFile);
+  public void runMiners(String logFile, XLog xlog, int minSupportThreshold, double confidence) throws IOException {
+    
+    List<short[]> effects = getCanonicalEffects(xlog);
     
     Configuration c_br = Configuration.mineBranching();
     c_br.effects = effects;
@@ -84,10 +83,10 @@ public class RunExperimentEffect extends RunExperimentCompare {
   }
   
   @Override
-  public String getResultsDirName(String dir, String logFileName, int minSupportThreshold, double confidence) {
+  public String getResultsDirName(String dir, String logFileName, final int traceNum, int minSupportThreshold, double confidence) {
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-    return dir+SLASH+"results_"+logFileName+"_EFF_"+minSupportThreshold+"_"+confidence+"_"+dateFormat.format(now);
+    return dir+SLASH+"results_"+logFileName+"_"+traceNum+"_EFF_"+minSupportThreshold+"_"+confidence+"_"+dateFormat.format(now);
   
   }
   

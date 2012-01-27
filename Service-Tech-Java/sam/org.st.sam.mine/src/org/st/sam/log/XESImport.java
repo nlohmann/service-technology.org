@@ -112,6 +112,7 @@ public class XESImport {
   public static String getLogFileExtension(String fileName) {
     if (fileName.endsWith(".xes.gz")) return ".xes.gz";
     if (fileName.endsWith(".xes")) return ".xes";
+    if (fileName.endsWith(".xml.zip")) return ".xml.zip";
     return fileName.substring(fileName.lastIndexOf("."));
   }
   
@@ -119,4 +120,10 @@ public class XESImport {
     String ext = getLogFileExtension(fileName);
     return fileName.substring(0, fileName.lastIndexOf(ext));
   }
+  
+  public static XLog readXLog(String logFile) throws IOException {
+    XESImport read = new XESImport();
+    return read.readLog(logFile);
+  }
+  
 }

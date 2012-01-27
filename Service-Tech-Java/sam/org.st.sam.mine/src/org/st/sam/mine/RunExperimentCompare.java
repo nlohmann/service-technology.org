@@ -2,41 +2,46 @@ package org.st.sam.mine;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import com.google.gwt.dev.util.collect.HashMap;
-import com.google.gwt.dev.util.collect.HashSet;
-
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import lscminer.datastructure.LSC;
 import lscminer.datastructure.LSCEvent;
-import lscminer.miner.LSCMiner;
 
+import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
 import org.st.sam.log.SLogTree.TreeStatistics;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
+import org.st.sam.log.XESImport;
 import org.st.sam.util.SAMOutput;
+
+import com.google.gwt.dev.util.collect.HashMap;
+import com.google.gwt.dev.util.collect.HashSet;
 
 public class RunExperimentCompare {
 
   private static String SLASH = System.getProperty("file.separator");
+  private boolean allowed_to_renderTrees = true;
   
   private Properties props;
 
@@ -119,8 +124,6 @@ public class RunExperimentCompare {
     return true;
   }
   
-  private List<Thread> runningThreads = new LinkedList<Thread>();
-  
   public Comparator< LSCEvent[] > pre_chart_comp = new Comparator<LSCEvent[]>() {
 
     @Override
@@ -135,15 +138,37 @@ public class RunExperimentCompare {
     }
   };
   
+  protected XLog readLog(final String logFile, final double traceFraction) throws IOException {
+    XLog xlog = XESImport.readXLog(logFile);
+    
+    // filter traces to create a smaller log with less branching
+    Random r = new Random();
+    List<XTrace> toRemove = new LinkedList<XTrace>();
+    for (XTrace t : xlog) {
+      if (r.nextDouble() > traceFraction) {
+        toRemove.add(t);
+      }
+    }
+    for (XTrace t : toRemove) xlog.remove(t);
+    return xlog;
+  }
+  
+
+  
   protected MineLSC minerBranch = null;
   protected MineLSC minerLinear = null;
   protected Map<LSC, SScenario> originalScenarios;
   
-  public void runMiners(final String logFile, final int minSupportThreshold, final double confidence) throws IOException {
+  private long runTime_minerBranch;
+  
+  public void runMiners(final String logFile, final XLog xlog, final int minSupportThreshold, final double confidence) throws IOException {
+
+    runTime_minerBranch = System.currentTimeMillis();
     minerBranch = new MineBranchingLSC();
     minerBranch.OPTIONS_WEIGHTED_OCCURRENCE = true;
     System.out.println("mining branching lscs from "+logFile);
-    minerBranch.mineLSCs(logFile, minSupportThreshold, confidence);
+    minerBranch.mineLSCs(xlog, minSupportThreshold, confidence, logFile);
+    runTime_minerBranch = System.currentTimeMillis()-runTime_minerBranch;
     
     minerLinear = new MineLinearLSC(minerBranch.getSupportedWords());
     minerLinear.OPTIONS_WEIGHTED_OCCURRENCE = true;
@@ -153,7 +178,7 @@ public class RunExperimentCompare {
     //  return;
     //LSCMiner minerLinear = new LSCMiner();
     //minerLinear.mineLSCs(dataSet, support, confidence, density);
-    minerLinear.mineLSCs(logFile, minSupportThreshold, confidence);
+    minerLinear.mineLSCs(xlog, minSupportThreshold, confidence, logFile);
     
     originalScenarios = new HashMap<LSC, SScenario>();
     for (LSC l : minerBranch.getScenarios().keySet()) {
@@ -180,7 +205,6 @@ public class RunExperimentCompare {
       for (LSC l : linear_lscs) {
         if (lsc_equals(l, b)) {
           is_linear = true;
-          System.out.println("comparing confidence l:"+l.getConfidence()+" b:"+b.getConfidence());
           break;
         }
       }
@@ -204,17 +228,22 @@ public class RunExperimentCompare {
   protected Date now;
   private String resultsDir;
   
-  public String getResultsDirName(String dir, String logFileName, final int minSupportThreshold, final double confidence) {
-    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-    return dir+SLASH+"results_"+logFileName+"_BL_"+minSupportThreshold+"_"+confidence+"_"+dateFormat.format(now);
+  public void setResultsDirNameGroupInfix(String dir, String logFileName) {
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm");
+    outputGroupDir = logFileName+"_"+dateFormat.format(new Date())+SLASH;
   }
   
-  public boolean createOutputDirectory(final String dir, final String inputFile, final int minSupportThreshold, final double confidence) {
+  public String getResultsDirName(String dir, String logFileName, final int traceNum, final int minSupportThreshold, final double confidence) {
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+    return dir+SLASH+outputGroupDir+"results_"+logFileName+"_"+traceNum+"_BL_"+minSupportThreshold+"_"+confidence+"_"+dateFormat.format(now);
+  }
+  
+  public boolean createOutputDirectory(final String dir, final String inputFile, final int traceNum, final int minSupportThreshold, final double confidence) {
     
     now = new Date();
     
     String logFileName = inputFile.substring(inputFile.lastIndexOf('/')+1, inputFile.indexOf('.',inputFile.lastIndexOf('/')));
-    resultsDir = getResultsDirName(dir, logFileName, minSupportThreshold, confidence);
+    resultsDir = getResultsDirName(dir, logFileName, traceNum, minSupportThreshold, confidence);
     
     File f = new File(resultsDir);
     
@@ -228,12 +257,86 @@ public class RunExperimentCompare {
     
   }
   
-  public void experiment(final String dir, final String inputFile, final int minSupportThreshold, final double confidence) throws IOException {
+  public static class ScenarioStatistics {
+    public double preChartLength;
+    public double mainChartLength;
+    public double components;
+  }
+  
+  public ScenarioStatistics[] getStatistics(Collection<LSC> scenarios) {
+    
+    if (scenarios.size() == 0) {
+      ScenarioStatistics null_stat = new ScenarioStatistics() {{
+        preChartLength=0;
+        mainChartLength=0;
+        components=0;
+      }};
+      ScenarioStatistics[] result = new ScenarioStatistics[3];
+
+      result[0] = null_stat;
+      result[1] = null_stat;
+      result[2] = null_stat;
+      
+      return result;
+ 
+    }
+    
+    ScenarioStatistics min = new ScenarioStatistics() {{
+      preChartLength=Double.MAX_VALUE;
+      mainChartLength=Double.MAX_VALUE;
+      components=Double.MAX_VALUE;
+    }};
+    ScenarioStatistics avg = new ScenarioStatistics() {{
+      preChartLength=0;
+      mainChartLength=0;
+      components=0;
+    }};
+    ScenarioStatistics max = new ScenarioStatistics() {{
+      preChartLength=Double.MIN_VALUE;
+      mainChartLength=Double.MIN_VALUE;
+      components=Double.MIN_VALUE;
+    }};
+    
+    for (LSC l : scenarios) {
+      min.preChartLength = (min.preChartLength > l.getPrechartEventNo()) ? l.getPrechartEventNo() : min.preChartLength;
+      min.mainChartLength = (min.mainChartLength > l.getMainchartEventNo()) ? l.getMainchartEventNo() : min.mainChartLength;
+      min.components = (min.components > l.getDistinctObjectNo()) ? l.getDistinctObjectNo() : min.components;
+      
+      avg.preChartLength += l.getPrechartEventNo();
+      avg.mainChartLength += l.getMainchartEventNo();
+      avg.components += l.getDistinctObjectNo();
+      
+      max.preChartLength = (max.preChartLength < l.getPrechartEventNo()) ? l.getPrechartEventNo() : max.preChartLength;
+      max.mainChartLength = (max.mainChartLength < l.getMainchartEventNo()) ? l.getMainchartEventNo() : max.mainChartLength;
+      max.components = (max.components < l.getDistinctObjectNo()) ? l.getDistinctObjectNo() : max.components;
+
+    }
+    
+    avg.preChartLength /= scenarios.size();
+    avg.mainChartLength /= scenarios.size();
+    avg.components /= scenarios.size();
+    
+    ScenarioStatistics[] result = new ScenarioStatistics[3];
+    result[0] = min;
+    result[1] = avg;
+    result[2] = max;
+    
+    return result;
+  }
+  
+  public String experiment(final String dir, final String inputFile, final XLog xlog, final int minSupportThreshold, final double confidence) throws IOException {
+    
+    System.out.println("---[ LSC Miner ] ------------------------------------------------------------");
+    System.out.println("   "+inputFile);
+    System.out.println("   size: "+xlog.size());
+    System.out.println("   support: "+minSupportThreshold);
+    System.out.println("   confidence: "+confidence);
+    System.out.println("-----------------------------------------------------------------------------");
     
     String logFile = dir+"/"+inputFile;
-    runMiners(logFile, minSupportThreshold, confidence);
+    runMiners(logFile, xlog, minSupportThreshold, confidence);
     
-    boolean render_trees = true;
+    boolean render_trees = allowed_to_renderTrees;
     if (minerBranch.getTree().nodes.size() > 3000) {
       render_trees = false;
     }
@@ -257,7 +360,7 @@ public class RunExperimentCompare {
     MineLSC.sortLSCs(onlyBranching);
     MineLSC.sortLSCs(onlyLinear);
 
-    if (!createOutputDirectory(dir, inputFile, minSupportThreshold, confidence)) return;
+    if (!createOutputDirectory(dir, inputFile, xlog.size(), minSupportThreshold, confidence)) return "could not write results";
 
     // resulting html
     StringBuilder r = new StringBuilder();
@@ -277,6 +380,21 @@ public class RunExperimentCompare {
     r.append("input file: "+dir+"/"+inputFile+"<br/>\n");
     r.append("min. support threshold: "+minSupportThreshold+"<br/>\n");
     r.append("confidence: "+confidence+"<br/>\n");
+
+
+    r.append("<h2>Input</h2>\n");
+    
+    TreeStatistics stat = minerBranch.getTree().getStatistics();
+    r.append("number of events: "+stat.alphabetSize+"<br/>\n");
+    r.append("avg. out degree: "+stat.averageOutDegree+"<br/>\n");
+    r.append("max. out degree: "+stat.maxOutDegree+"<br/>\n");
+    r.append("depth: "+stat.depth+"<br/>\n");
+    r.append("width: "+stat.width+"<br/>\n");
+    
+    int treeFigHeight = stat.depth*5;
+    if (treeFigHeight > 600) treeFigHeight = 600;
+    
+    r.append("<h2>Discovered Scenarios (general statistics)</h2>\n");
     
     minerBranch.getCoverageTreeGlobal();
     minerLinear.getCoverageTreeGlobal();
@@ -299,27 +417,35 @@ public class RunExperimentCompare {
     double coveredAlphabet_linear = (double)coveredEvents_linear.size()/minerLinear.getSLog().originalNames.length;
     r.append("alphabet coverage (branch): "+coveredAlphabet_branch+"<br/>\n");
     r.append("alphabet coverage (linear): "+coveredAlphabet_linear+"<br/>\n");
+    
+    ScenarioStatistics[] stat_branch_only = getStatistics(onlyBranching);
+    ScenarioStatistics[] stat_both = getStatistics(minerLinear.getLSCs());
+    
+    r.append("<br/>\n");
+    r.append("<b>strictly branching scenarios</b><br/>\n");
+    r.append("found "+onlyBranching.size()+" strictly branching scenarios<br/>\n");
+    r.append("length pre-chart (min/avg/max): "+stat_branch_only[0].preChartLength+"/"+stat_branch_only[1].preChartLength+"/"+stat_branch_only[2].preChartLength+"<br/>\n");
+    r.append("length main-chart (min/avg/max): "+stat_branch_only[0].mainChartLength+"/"+stat_branch_only[1].mainChartLength+"/"+stat_branch_only[2].mainChartLength+"<br/>\n");
+    r.append("#components (min/avg/max): "+stat_branch_only[0].components+"/"+stat_branch_only[1].components+"/"+stat_branch_only[2].components+"<br/>\n");
 
-    r.append("<h2>Input</h2>\n");
+    r.append("<br/>\n");
+    r.append("<b>linear and branching scenarios</b><br/>\n");
+    r.append("found "+both.size()+" linear and branching scenarios<br/>\n");
+    r.append("length pre-chart (min/avg/max): "+stat_both[0].preChartLength+"/"+stat_both[1].preChartLength+"/"+stat_both[2].preChartLength+"<br/>\n");
+    r.append("length main-chart (min/avg/max): "+stat_both[0].mainChartLength+"/"+stat_both[1].mainChartLength+"/"+stat_both[2].mainChartLength+"<br/>\n");
+    r.append("#components (min/avg/max): "+stat_both[0].components+"/"+stat_both[1].components+"/"+stat_both[2].components+"<br/>\n");
+    r.append("<br/>\n");
     
-    TreeStatistics stat = minerBranch.getTree().getStatistics();
-    r.append("number of events: "+stat.alphabetSize+"<br/>\n");
-    r.append("avg. out degree: "+stat.averageOutDegree+"<br/>\n");
-    r.append("max. out degree: "+stat.maxOutDegree+"<br/>\n");
-    r.append("depth: "+stat.depth+"<br/>\n");
-    r.append("width: "+stat.width+"<br/>\n");
-    
-    int treeFigHeight = stat.depth*5;
-    if (treeFigHeight > 600) treeFigHeight = 600;
-    
-    if (render_trees) {
+
+    if (/*render_trees*/true) {
       String input_tree_dot = inputFile+".dot";
       String input_tree_svg = inputFile+".svg";
       String input_tree_png = inputFile+".png";
       
       minerBranch.getTree().clearCoverageMarking();
       minerBranch.getCoverageTreeGlobal();
-      SAMOutput.writeToFile(minerBranch.getTree().toDot_ScenarioCoverage(minerBranch.getShortenedNames()), resultsDir+SLASH+input_tree_dot);
+      //SAMOutput.writeToFile(minerBranch.getTree().toDot_ScenarioCoverage(minerBranch.getShortenedNames()), resultsDir+SLASH+input_tree_dot);
+      SAMOutput.writeToFile(minerBranch.getTree().toDot(minerBranch.getShortenedNames()), resultsDir+SLASH+input_tree_dot);
       systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+input_tree_dot+" -o"+resultsDir+SLASH+input_tree_svg);
       //systemCall(dotRenderer+" -Tpng -Gsize=30 "+resultsDir+SLASH+input_tree_dot+" -o"+resultsDir+SLASH+input_tree_png);
       
@@ -338,19 +464,41 @@ public class RunExperimentCompare {
     SAMOutput.writeToFile(minerLinear.getLSCs().toString(), resultsDir+"/lscs_linear.txt");
     SAMOutput.writeToFile(minerBranch.getLSCs().toString(), resultsDir+"/lscs_branching.txt");
     
-    System.out.println("waiting for diagram renderers to complete: "+runningThreads.size());
-    for (Thread t : runningThreads) {
-      try {
-        t.join();
-      } catch (InterruptedException e) {
-        System.out.println(e);
-        e.printStackTrace();
-      }
-      System.out.print(".");
-    }
-    System.out.println(".");
-    
     System.out.println("finished.");
+    
+    minerBranch.getTree().clearCoverageMarking();
+    minerBranch.getCoverageTreeGlobal();
+    minerLinear.getTree().clearCoverageMarking();
+    minerLinear.getCoverageTreeGlobal();
+    
+    String stat_summary = inputFile+";"+xlog.size()+";"+minSupportThreshold+";"+confidence+";"
+        +stat.alphabetSize+";"+stat.averageOutDegree+";"+stat.maxOutDegree+";"+stat.depth+";"+stat.width+";"
+        +minerBranch.getTree().getCoverage()+";"+minerLinear.getTree().getCoverage()+";"+coveredAlphabet_branch+";"+coveredAlphabet_linear+";"
+        +onlyBranching.size()+";"+both.size()+";"
+        +stat_branch_only[0].preChartLength+";"+stat_branch_only[1].preChartLength+";"+stat_branch_only[2].preChartLength+";"
+        +stat_branch_only[0].mainChartLength+";"+stat_branch_only[1].mainChartLength+";"+stat_branch_only[2].mainChartLength+";"
+        +stat_branch_only[0].components+";"+stat_branch_only[1].components+";"+stat_branch_only[2].components+";"
+        +stat_both[0].preChartLength+";"+stat_both[1].preChartLength+";"+stat_both[2].preChartLength+";"
+        +stat_both[0].mainChartLength+";"+stat_both[1].mainChartLength+";"+stat_both[2].mainChartLength+";"
+        +stat_both[0].components+";"+stat_both[1].components+";"+stat_both[2].components+";"
+        +runTime_minerBranch;
+
+    return stat_summary;
+  }
+  
+  private String getCSVheader() {
+    String stat_header = "inputFile;traceFraction;support;confidence;"
+        +"alphabetSize;avg degree;max degree;depth;width;"
+        +"coverage (B);coverage (L);alphabet coverage(B);alphabet coverage(L);"
+        +"#scen (B);#scen (B+L);"
+        +"pre (min)(B);pre (avg)(B);pre (max)(B);"
+        +"main (min)(B);main (avg)(B);main (max)(B);"
+        +"#comp (min)(B);#comp (avg)(B);#comp (max)(B);"
+        +"pre (min)(L);pre (avg)(L);pre (max)(L);"
+        +"main (min)(L);main (avg)(L);main (max)(L);"
+        +"#comp (min)(L);#comp (avg)(L);#comp (max)(L);"
+        +"time";
+    return stat_header;
   }
   
   private void writeResults_allCharts(StringBuilder r, String resultsDir, int treeFigHeight, boolean render_trees) throws IOException {
@@ -391,7 +539,7 @@ public class RunExperimentCompare {
     
     for (LSC l : both) {
       if (pre_chart_comp.compare(l.getPreChart(), preChart) == 0
-          /*&& !isSubsumed(l, minerBranch, originalScenarios)*/)
+          && !isSubsumed(l, minerBranch, originalScenarios))
       {
         both_match.add(l);
         System.out.println(originalScenarios.get(l));
@@ -399,7 +547,7 @@ public class RunExperimentCompare {
     }
     for (LSC l : onlyLinear) {
       if (pre_chart_comp.compare(l.getPreChart(), preChart) == 0
-          /*&& !isSubsumed(l, minerBranch, originalScenarios)*/)
+          && !isSubsumed(l, minerBranch, originalScenarios))
       {
         //linear_match.add(l);
         // strictly linear scenarios (not discovered by branching miner)
@@ -410,7 +558,7 @@ public class RunExperimentCompare {
     }
     for (LSC l : onlyBranching) {
       if (pre_chart_comp.compare(l.getPreChart(), preChart) == 0
-          /*&& !isSubsumed(l, minerBranch, originalScenarios)*/)
+          && !isSubsumed(l, minerBranch, originalScenarios))
       {
         branching_match.add(l);
       }
@@ -420,7 +568,7 @@ public class RunExperimentCompare {
     
     r.append("<h2>"+title+"</h2>\n");
     if (branching_match.size() > 0) {
-      r.append("<b>"+branching_match.size()+" strict branching LSC</b></br>");
+      r.append("<b>"+branching_match.size()+" strictly branching LSC</b></br>");
       appendResults(r, branching_match, resultsDir, treeFigHeight, render_trees,
           "strictly branching LSC",
           "lsc_branch");
@@ -454,14 +602,22 @@ public class RunExperimentCompare {
     minerBranch.getTree().clearCoverageMarking();
     minerLinear.getTree().clearCoverageMarking();
     
+    ArrayList<LSC> nonSubsumed = new ArrayList<LSC>();
     for (LSC l : lscs) {
+      if (!isSubsumed(l, minerBranch, originalScenarios)) {
+        nonSubsumed.add(l);
+      }
+    }
+    if (nonSubsumed.isEmpty()) return;
+    
+    for (LSC l : nonSubsumed) {
       totalWidth += SAMOutput.getMSCWitdth(SAMOutput.getComponents(l))+10;
     }
 
     r.append("<table style='width:"+totalWidth+"px'>\n");
     r.append("<tr>\n");
     
-    for (LSC l : lscs) {
+    for (LSC l : nonSubsumed) {
       
       lsc_num++;
 
@@ -496,10 +652,10 @@ public class RunExperimentCompare {
           r.append("<object style='width:"+width+"px' data='"+lsc_renderfile+"' type='image/svg+xml'></object><br/>\n");
         //r.append("</div>\n");
 
-          if (isSubsumed(l, minerBranch, originalScenarios)) {
-            r.append("<i>subsumed</i><br/>\n");
-            //continue;
-          }
+        //  if (isSubsumed(l, minerBranch, originalScenarios)) {
+        //    r.append("<i>subsumed</i><br/>\n");
+        //    //continue;
+        //  }
 
           r.append("<b>scenario #"+originalScenarios.get(l).id+"</b><br/>\n");
           r.append("confidence: "+l.getConfidence()+"<br/>\n");
@@ -664,12 +820,14 @@ public class RunExperimentCompare {
       r.append("<hr/>\n");
     }    
   }
-  
+
   private String experimentFileRoot;
+  private String outputGroupDir = "";
   private String inputFile;
   private int support;
   private double confidence;
   private double density;
+  private double fraction = 1.0;
   
   private void printHelp() {
     System.out.println("Sam/Mine version "+props.getProperty("sam.version"));
@@ -707,15 +865,102 @@ public class RunExperimentCompare {
     return true;
   }
   
-  public void experiment() throws IOException {
-    experiment(experimentFileRoot, inputFile, support, confidence);
+  public void setParameters(String experimentFileRoot, String inputFile, double fraction, int support, double confidence) {
+    this.experimentFileRoot = experimentFileRoot;
+    this.inputFile = inputFile;
+    this.fraction = fraction;
+    this.support = support;
+    this.confidence = confidence;
   }
   
+  public void experiment() throws IOException {
+    XLog xlog = readLog(experimentFileRoot+SLASH+inputFile, fraction);
+    experiment(experimentFileRoot, inputFile, xlog, support, confidence);
+  }
+  
+  public synchronized static void log_new(String logfile, String line) throws IOException {
+    writeFile(logfile, line, false);
+  }
+  
+  public synchronized static void log(String logfile, String line) throws IOException {
+    writeFile(logfile, line, true);
+  }
+
+  /**
+   * Helper function to write a string to a file.
+   * 
+   * @param fileName
+   * @param contents
+   * @throws IOException
+   */
+  protected static void writeFile(String fileName, String contents, boolean append) throws IOException {
+    FileWriter fstream = new FileWriter(fileName, append);
+    BufferedWriter out = new BufferedWriter(fstream);
+    out.write(contents);
+    out.close();
+  }
+  
+  public void experimentMulti() throws IOException {
+    int steps=4;
+    
+    this.allowed_to_renderTrees = false;
+
+    this.setResultsDirNameGroupInfix(experimentFileRoot, inputFile);
+    String logfileDir = experimentFileRoot+SLASH+outputGroupDir+SLASH;
+        
+    File f = new File(logfileDir);
+    if (!f.exists()) {
+      if (!f.mkdir()) {
+        System.err.println("Couldn't create results directory: "+logfileDir);
+      }
+    }
+    String logfile = logfileDir+inputFile+"_stat.csv";
+    
+    log_new(logfile, getCSVheader()+"\n");
+    
+    for (int step_fract=steps; step_fract>0; step_fract--) {
+      double trace_fract = (fraction)*((double)step_fract/steps);
+      
+      XLog xlog = readLog(experimentFileRoot+SLASH+inputFile, trace_fract);
+      
+      for (int step_support=steps; step_support>0; step_support--) {
+        int support_fract = (int)(support*((double)step_support/steps));
+        
+        for (int step_confidence=steps; step_confidence>0; step_confidence--) {
+          double confidence_fract = (double)(confidence*((double)step_confidence/steps));
+          
+          String stat = experiment(experimentFileRoot, inputFile, xlog, support_fract, confidence_fract);
+          log(logfile, stat+"\n");
+        }
+
+      }
+
+    }
+
+  }
+
   public static void main(String[] args) throws IOException {
     
     RunExperimentCompare exp = new RunExperimentCompare();
-    if (!exp.readCommandLine(args)) return;
+    // if (!exp.readCommandLine(args)) return;
+    
+    //exp.experimentFileRoot = "./experiments/columba_ext/";
+    //exp.inputFile = "columba_ext_resampled2_filtered.xes.gz";
+    //exp.fraction = 1.0;
+    //exp.confidence = 1.0;
+    //exp.support = 5;
+    
+//    exp.experimentFileRoot = "./experiments/columba_ext/";
+//    exp.inputFile = "columba_ext_resampled2_agg.xes.gz";
+//    exp.fraction = 1.0;
+//    exp.confidence = 1.0;
+//    exp.support = 4;
+    
+    //exp.setParameters("./experiments/p_Afschriften/", "Afschriften_agg.xes.gz", 1.0 /*fract*/, 1 /*supp*/, 1.0 /* conf */);
+    exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
+
     exp.experiment();
+
   }
 
 }

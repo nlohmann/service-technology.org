@@ -102,6 +102,45 @@ public class LSC {
 
     return objects.size();
   }
+  
+  /**
+   * a LSC is valid only when its LSCEvents are connected.
+   *
+   * @return true if all events are connected; false otherwise
+   */
+  public Set<Integer> getUnConnectedEvents() {
+    LSCEvent[] lsc = new LSCEvent[preChart.length + mainChart.length];
+    System.arraycopy(preChart, 0, lsc, 0, preChart.length);
+    System.arraycopy(mainChart, 0, lsc, preChart.length, mainChart.length);
+    Set<Integer> unConnectedEvents = new HashSet<Integer>();
+    Set<String> metObjects = new HashSet<String>();
+
+    /* lsc[0] is the first connected events */
+    for (int inx = 1; inx < lsc.length; inx++) unConnectedEvents.add(inx);
+    metObjects.add(lsc[0].caller);
+    metObjects.add(lsc[0].callee);
+
+    /* add those events that are connected with lsc[0] deductively */
+    while (true) {
+      int metObjectNoBefore = metObjects.size();
+      for (int inx = 1; inx < lsc.length; inx++) {
+        if (unConnectedEvents.contains(inx)) {
+          String caller = lsc[inx].getCaller();
+          String callee = lsc[inx].getCallee();
+          if (metObjects.contains(caller) || metObjects.contains(callee)) {
+            unConnectedEvents.remove(inx);
+            metObjects.add(caller);
+            metObjects.add(callee);
+          }
+        }
+      }
+      int metObjectNoAfter = metObjects.size();
+      
+      if (metObjectNoAfter == metObjectNoBefore)
+        break;
+    }
+    return unConnectedEvents;
+  }
 
   /**
    * a LSC is valid only when its LSCEvents are connected.
@@ -109,42 +148,8 @@ public class LSC {
    * @return true if all events are connected; false otherwise
    */
   public boolean isConnected(){
-    LSCEvent[] lsc = new LSCEvent[preChart.length + mainChart.length];
-    System.arraycopy(preChart, 0, lsc, 0, preChart.length);
-    System.arraycopy(mainChart, 0, lsc, preChart.length, mainChart.length);
-    HashMap<LSCEvent, Boolean> connectedEvents = new HashMap<LSCEvent, Boolean>();
-    HashMap<String, Boolean> metObjects = new HashMap<String, Boolean>();
-
-    /* lsc[0] is the first connected events */
-    connectedEvents.put(lsc[0], Boolean.TRUE);
-    metObjects.put(lsc[0].caller, Boolean.TRUE);
-    metObjects.put(lsc[0].callee, Boolean.TRUE);
-
-    /* add those events that are connected with lsc[0] deductively */
-    while (true) {
-      int metObjectNoBefore = metObjects.size();
-      for (int inx = 1; inx < lsc.length; inx++) {
-        LSCEvent event = lsc[inx];
-        if (!connectedEvents.containsKey(event)) {
-          String caller = event.getCaller();
-          String callee = event.getCallee();
-          if (metObjects.containsKey(caller) || metObjects.containsKey(callee)) {
-            connectedEvents.put(event, Boolean.TRUE);
-            metObjects.put(caller, Boolean.TRUE);
-            metObjects.put(callee, Boolean.TRUE);
-          }
-        }
-      }
-      int metObjectNoAfter = metObjects.size();
-      
-      if (metObjectNoAfter == metObjectNoBefore) {
-        if (connectedEvents.size() == lsc.length) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }
+    Set<Integer> unConnectedEvents = getUnConnectedEvents();
+    return unConnectedEvents.size() == 0;
   }
 
   @Override

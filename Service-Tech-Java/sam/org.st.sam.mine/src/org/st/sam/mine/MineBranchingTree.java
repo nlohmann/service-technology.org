@@ -298,7 +298,6 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     return occurrences;
   }
 
-  /*
   @Override
   public String toDot(Map<Short, String> names) {
     StringBuilder sb = new StringBuilder();
@@ -345,8 +344,8 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     
     return sb.toString();
   }
-  */
   
+  /*
   public String toDot(Map<Short, String> names) {
     StringBuilder sb = new StringBuilder();
     
@@ -358,6 +357,8 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
       if (!names.containsKey(n.id)) names.put(n.id, Short.toString(n.id));
       
       String fillColor = null;
+      
+      String nodeLabel = " ["+n.id+"]";
       
       if (!preChartCoverage.containsKey(n)) {
         if (mainChartCoverage.containsKey(n))
@@ -378,7 +379,7 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
       String fillString = "";
       if (fillColor != null) fillString += "fillcolor="+fillColor+" style=filled";
       
-      sb.append(n.globalID + " [ "+fillString+" ];\n");
+      sb.append(n.globalID + " [ label=\""+nodeLabel+"\" "+fillString+" ];\n");
       for (SLogTreeNode n2 : n.post) {
         sb.append(n.globalID + " -> "+n2.globalID+";\n");
       }
@@ -386,7 +387,8 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     sb.append("}\n");
     
     return sb.toString();
-  }
+  }*/
+  
   
   public String toDot_ScenarioCoverage(Map<Short, String> names) {
     StringBuilder sb = new StringBuilder();

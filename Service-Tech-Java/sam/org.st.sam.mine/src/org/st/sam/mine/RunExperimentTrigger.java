@@ -30,11 +30,9 @@ public class RunExperimentTrigger extends RunExperimentCompare {
     super(dotBinary, mscGenBinary);
   }
 
-  public List<short[]> getCanonicalTriggers(String logFile) throws IOException {
+  public List<short[]> getCanonicalTriggers(XLog xlog) {
     List<short[]> triggers = new LinkedList<short[]>();
     
-    XESImport xin = new XESImport();
-    XLog xlog = xin.readLog(logFile);
     SLog log = new SLog(xlog);
     SLogTree tree = new SLogTree(log, true);
     
@@ -53,12 +51,16 @@ public class RunExperimentTrigger extends RunExperimentCompare {
     return triggers;
   }
   
+  private List<short[]> triggers = null;
+  
   @Override
-  public void runMiners(String logFile, int minSupportThreshold, double confidence) throws IOException {
-    List<short[]> triggers = getCanonicalTriggers(logFile);
+  public void runMiners(String logFile, XLog xlog, int minSupportThreshold, double confidence) throws IOException {
+    
+    if (triggers == null) triggers = getCanonicalTriggers(xlog);
     
     Configuration c_br = Configuration.mineBranching();
     c_br.triggers = triggers;
+    c_br.optimizedSearch = true;
     minerBranch = new MineLSC(c_br);
     minerBranch.OPTIONS_WEIGHTED_OCCURRENCE = true;
     System.out.println("mining branching lscs from "+logFile);
@@ -66,6 +68,7 @@ public class RunExperimentTrigger extends RunExperimentCompare {
     
     Configuration c_lin = Configuration.mineLinear();
     c_lin.triggers = triggers;
+    c_lin.optimizedSearch = true;
     minerLinear = new MineLSC(c_lin, minerBranch.getSupportedWords());
     minerLinear.OPTIONS_WEIGHTED_OCCURRENCE = true;
     System.out.println("mining linear lscs from "+logFile);
@@ -86,15 +89,18 @@ public class RunExperimentTrigger extends RunExperimentCompare {
   }
   
   @Override
-  public String getResultsDirName(String dir, String logFileName, int minSupportThreshold, double confidence) {
+  public String getResultsDirName(String dir, String logFileName, int traceNum, int minSupportThreshold, double confidence) {
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-    return dir+SLASH+"results_"+logFileName+"_TR_"+minSupportThreshold+"_"+confidence+"_"+dateFormat.format(now);
+    return dir+SLASH+"results_"+logFileName+"_"+traceNum+"_TR_"+minSupportThreshold+"_"+confidence+"_"+dateFormat.format(now);
   }
   
   public static void main(String[] args) throws IOException {
     
     RunExperimentTrigger exp = new RunExperimentTrigger();
-    if (!exp.readCommandLine(args)) return;
+    //if (!exp.readCommandLine(args)) return;
+    exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 22 /*supp*/, 1.0 /* conf */);
+    //exp.triggers = new LinkedList<short[]>();
+    //exp.triggers.add(new short[] { 35 });
     exp.experiment();
   }
 

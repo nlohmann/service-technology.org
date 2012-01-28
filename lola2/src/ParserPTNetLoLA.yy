@@ -99,7 +99,7 @@ placelists:
 capacity:
   /* empty */            /* empty capacity = unlimited capacity */
     {
-        TheCapacity = MAX_CAPACITY;
+        TheCapacity = (capacity_t)MAX_CAPACITY;
     }
 | _SAFE_ _colon_       /* SAFE without number = 1-SAFE */
     {
@@ -107,7 +107,7 @@ capacity:
     }
 | _SAFE_ NUMBER _colon_ /* at most k tokens expected on these places */
     {
-        TheCapacity = atoi($2);
+        TheCapacity = (capacity_t)atoi($2);
         free($2);
     }
 ;
@@ -159,7 +159,7 @@ marking:
         {
             yyerrors($1, "place '%s' does not exist", $1);
         }
-        p -> addInitialMarking(atoi($3));
+        p -> addInitialMarking((capacity_t)atoi($3));
         free($3);
         free($1);
     }
@@ -257,7 +257,7 @@ arc:
         {
             yyerrors($1, "place '%s' does not exist", $1);
         }
-        $$ = new ArcList(p, atoi($3));
+        $$ = new ArcList(p, (mult_t)atoi($3));
         free($3);
         free($1);
     }

@@ -11,7 +11,7 @@
 #include "Symbol.h"
 
 /// Getter for index
-const index_t Symbol::getIndex() const
+index_t Symbol::getIndex() const
 {
     return index;
 }

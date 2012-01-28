@@ -32,7 +32,7 @@ class Symbol
         virtual ~Symbol();
 
         /// get index of symbol in net data structures
-        const index_t getIndex() const;
+        index_t getIndex() const;
 
         /// set index of symbol in net date structures
         void setIndex(index_t);

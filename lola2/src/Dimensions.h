@@ -4,13 +4,16 @@
 \status approved 27.01.2012
 
 \brief collection of arbitrarily chosen but fixed constants
-\todo Herausfinden, ob TR/PL in eine enum kann und man trotzdem eine for-Schleife bauen kann
-\todo Herausfinden, ob PRE/POST in eine enum kann und man trotzdem eine for-Schleife bauen kann
 */
 
 #pragma once
 
+// the macro _CONFIGURING is set while executing the configure script to avoid
+// inclusion of config.h before creating it
+#ifndef _CONFIGURING
 #include <config.h>
+#endif
+
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -23,17 +26,17 @@
 
 // Some useful constants, can be used as indices in arrays
 
-/// Index for "Places" in arrays
-#define PL 0
+typedef enum
+{
+    PL = 0, ///< Index for "Places" in arrays
+    TR = 1  ///< Index for "Transitions" in arrays
+} node_t;
 
-/// Index for "Transitions" in arrays
-#define TR 1
-
-/// Index for "Pre Set" in arrays
-#define PRE 0
-
-/// Index for "Post Set" in arrays
-#define POST 1
+typedef enum
+{
+    PRE = 0, ///< Index for "Pre Set" in arrays
+    POST = 1 ///< Index for "Post Set" in arrays
+} direction_t;
 
 // Some type definitions for dimensioning index structures
 

@@ -40,6 +40,23 @@ AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 
+AC_CHECK_SIZEOF(void*)
+
+AC_LANG_PUSH(C++)
+AC_CHECK_SIZEOF(index_t,, [#define _CONFIGURING
+#include "src/Dimensions.h"])
+AC_CHECK_SIZEOF(mult_t,, [#define _CONFIGURING
+#include "src/Dimensions.h"])
+AC_CHECK_SIZEOF(capacity_t,, [#define _CONFIGURING
+#include "src/Dimensions.h"])
+AC_CHECK_SIZEOF(cardbit_t,, [#define _CONFIGURING
+#include "src/Dimensions.h"])
+AC_CHECK_SIZEOF(hash_t,, [#define _CONFIGURING
+#include "src/Dimensions.h"])
+
+AC_CHECK_SIZEOF(bool)
+AC_LANG_POP(C++)
+
 # Checks for header files.
 AC_FUNC_ALLOCA
 AC_CHECK_HEADERS([arpa/inet.h inttypes.h libintl.h malloc.h netinet/in.h stddef.h stdlib.h string.h sys/socket.h unistd.h limits.h])

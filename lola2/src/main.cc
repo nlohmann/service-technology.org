@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 
     rep->status("finished parsing");
 
-    
+
     fclose(yyin);
     yylex_destroy();
 
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
     symboltable2net(symbolTables);
 
     delete symbolTables;
-	
+
 
     Net::deleteNodes();
     Place::deletePlaces();

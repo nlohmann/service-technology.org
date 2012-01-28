@@ -67,10 +67,10 @@ void symboltable2net(ParserPTNet* parser)
     Net::Card[PL] = parser->PlaceTable->getCard();
     Net::Card[TR] = parser->TransitionTable->getCard();
     Place::CardSignificant = Net::Card[PL]; // this is the best choice until we know better
-    for (node_t type = PL; type <= TR; type ++)
+    for (int type = PL; type <= TR; type ++)
     {
         Net::Name[type] = (char**) malloc(Net::Card[type] * SIZEOF_VOIDP);
-        for (direction_t direction = PRE; direction <= POST; direction ++)
+        for (int direction = PRE; direction <= POST; direction ++)
         {
             Net::CardArcs[type][direction] = (index_t*) malloc(Net::Card[type] * SIZEOF_INDEX_T);
             Net::Arc[type][direction] = (index_t**) malloc(Net::Card[type] * SIZEOF_VOIDP);
@@ -124,7 +124,7 @@ void symboltable2net(ParserPTNet* parser)
     Transition::BackConflicting = (index_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
     Transition::CardEnabled = Net::Card[TR]; // start with assumption that all transitions are enabled
     Transition::PositionScapegoat = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    for (direction_t direction = PRE; direction <= POST; direction++)
+    for (int direction = PRE; direction <= POST; direction++)
     {
         Transition::CardDeltaT[direction] = (index_t*) calloc(Net::Card[TR], SIZEOF_INDEX_T);
         Transition::DeltaT[direction] = (index_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);

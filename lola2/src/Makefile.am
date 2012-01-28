@@ -27,8 +27,8 @@ listener_SOURCES = Listener.cc \
                    Reporter.cc Reporter.h \
                    Socket.cc Socket.h
 
-AM_CFLAGS = -Waddress -Waggregate-return -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic
-AM_CXXFLAGS = -Waddress -Waggregate-return -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic
+AM_CFLAGS = -Waddress -Waggregate-return -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic  -Wno-format
+AM_CXXFLAGS = -Waddress -Waggregate-return -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic  -Wno-format
 
 
 #############################################################################

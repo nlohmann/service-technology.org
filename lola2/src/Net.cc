@@ -22,9 +22,9 @@ char** Net::Name[2] = {NULL, NULL};
 /// Aufräumen der Netzstruktur -- service für valgrind
 void Net::deleteNodes()
 {
-    for (node_t type = PL; type <= TR; ++type)
+    for (int type = PL; type <= TR; ++type)
     {
-        for (direction_t direction = PRE; direction <= POST; ++direction)
+        for (int direction = PRE; direction <= POST; ++direction)
         {
             for (index_t i = 0; i < Net::Card[type]; i++)
             {

@@ -7,6 +7,7 @@
 
 
 #include <config.h>
+#include <cstdlib>
 #include "SymbolTable2Net.h"
 #include "Net.h"
 #include "Place.h"
@@ -194,15 +195,13 @@ void symboltable2net(ParserPTNet* parser)
                 {
                     //positive impact --> goes to delta post
                     delta_post[card_delta_post] = Net::Arc[TR][POST][t][j];
-                    mult_post[card_delta_post++] = Net::Mult[TR][POST][t][j]
-                                                   - Net::Mult[TR][PRE][t][i];
+                    mult_post[card_delta_post++] = (mult_t)(Net::Mult[TR][POST][t][j] - Net::Mult[TR][PRE][t][i]);
                 }
                 else
                 {
                     // negative impact --> goes to delta pre
                     delta_pre[card_delta_pre] = Net::Arc[TR][PRE][t][i];
-                    mult_pre[card_delta_pre++] = Net::Mult[TR][PRE][t][i]
-                                                 - Net::Mult[TR][POST][t][j];
+                    mult_pre[card_delta_pre++] = (mult_t)(Net::Mult[TR][PRE][t][i] - Net::Mult[TR][POST][t][j]);
                 }
                 ++i;
                 ++j;

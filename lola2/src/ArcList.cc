@@ -31,7 +31,7 @@ ArcList* ArcList::getNext() const
 /// Adder for multiplicity
 void ArcList::addMultiplicity(mult_t i)
 {
-    multiplicity += i;
+    multiplicity += (mult_t)i;
 }
 
 /// Setter for next

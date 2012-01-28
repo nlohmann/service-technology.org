@@ -44,7 +44,7 @@ void Symbol::setIndex(index_t i)
 /// Argument is the key.
 Symbol::Symbol(const char* k)
     :
-    key((char*) k),
+    key(const_cast<char*>(k)),
     next(NULL)
 {
 }

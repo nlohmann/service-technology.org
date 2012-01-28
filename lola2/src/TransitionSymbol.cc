@@ -21,15 +21,15 @@ TransitionSymbol::TransitionSymbol(char* k, tFairnessAssumption f, ArcList* pr, 
     Post(po),
     Pre(pr)
 {
-    // count incomning arcs at transition and at places
-    for (ArcList* a = Pre; a -> getNext(); a = a -> getNext())
+    // count incoming arcs at transition and at places
+    for (ArcList* a = Pre; a; a = a -> getNext())
     {
         ++cardPre;
         a -> getPlace() -> notifyPost();
     }
 
     // count outgoing arcs
-    for (ArcList* a = Post; a -> getNext(); a = a -> getNext())
+    for (ArcList* a = Post; a; a = a -> getNext())
     {
         ++cardPost;
         a -> getPlace() -> notifyPre();

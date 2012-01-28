@@ -47,9 +47,11 @@ typedef uint16_t mult_t;
 /// sizeof(used type) -1, since max(type) is needed for representing
 /// unboundedness in coverability graphs
 typedef uint32_t capacity_t;
+#define MAX_CAPACITY (((1 << 31)-1) + (1 << 31))
 
 /// Type for hash values (32 bit plus enough space to calculate)
 typedef int64_t hash_t;
+#define MAX_HASH (1 << 31)
 
 /// Type for the number of bits required to store a place's marking
 typedef uint8_t cardbit_t;

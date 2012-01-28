@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Symbol.h"
+#include "Dimensions.h"
 
 /*!
 Place symbols carry name as key, and
@@ -28,16 +29,16 @@ class PlaceSymbol: public Symbol
         PlaceSymbol(char*, unsigned int);
 
         /// Getter for capacity
-        unsigned int getCapacity() const;
+        capacity_t getCapacity() const;
         /// Getter for initial marking
         capacity_t getInitialMarking() const;
         /// Getter for number of pre-transitions
-        unsigned int getCardPre() const;
+        index_t getCardPre() const;
         /// Getter for number of post-transitions
-        unsigned int getCardPost() const;
+        index_t getCardPost() const;
         /// Adder for initial marking. If several marking specifications
         /// mention this place, tokens are added.
-        void addInitialMarking(unsigned int);
+        void addInitialMarking(capacity_t);
         /// Incrementor for number of post-transitions
         void notifyPost();
         /// Incrementor for number of pre-transitions
@@ -45,13 +46,13 @@ class PlaceSymbol: public Symbol
 
     private:
         /// The maximum number of tokens that must be representable for this place; UINT_MAX for absence of capacity
-        unsigned int capacity;
+        capacity_t capacity;
         /// The initial number of tokens on this place
-        unsigned int initialMarking;
+        capacity_t initialMarking;
         /// The number of transitions that consume from this place
         /// Used for creating arc data structures
-        unsigned int cardPost;
+        index_t cardPost;
         /// The number of transitions that produce on this place
         /// used for creating arc data structures
-        unsigned int cardPre;
+        index_t cardPre;
 };

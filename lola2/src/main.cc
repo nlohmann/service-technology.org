@@ -21,6 +21,12 @@
 #include "cmdline.h"
 #include "ParserPTNet.h"
 
+#include "Net.h"
+#include "Place.h"
+#include "Marking.h"
+#include "Transition.h"
+#include "SymbolTable2Net.h"
+
 extern ParserPTNet* ParserPTNetLoLA();
 
 /// the command line parameters
@@ -91,9 +97,20 @@ int main(int argc, char** argv)
 
     rep->status("finished parsing");
 
+    
     fclose(yyin);
     yylex_destroy();
+
+    // translate into general net structures
+    symboltable2net(symbolTables);
+
     delete symbolTables;
+	
+
+    Net::deleteNodes();
+    Place::deletePlaces();
+    Transition::deleteTransitions();
+    Marking::deleteMarkings();
 
     return EXIT_SUCCESS;
 }

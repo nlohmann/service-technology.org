@@ -78,7 +78,7 @@ extern int yycolno;
 /// The object containing the final outcome of the parsing process
 ParserPTNet*  TheResult;
 /// The value of the currently active capacity statement
-unsigned int TheCapacity;
+capacity_t TheCapacity;
 %}
 
 %%
@@ -99,7 +99,7 @@ placelists:
 capacity:
   /* empty */            /* empty capacity = unlimited capacity */
     {
-        TheCapacity = UINT_MAX;
+        TheCapacity = MAX_CAPACITY;
     }
 | _SAFE_ _colon_       /* SAFE without number = 1-SAFE */
     {
@@ -117,7 +117,7 @@ placelist:
   placelist _comma_ nodeident
     {
         PlaceSymbol* p = new PlaceSymbol($3, TheCapacity);
-        if (! TheResult->PlaceTable.insert(p))
+        if (! TheResult->PlaceTable->insert(p))
         {
             yyerrors($3, "place '%s' name used twice", $3);
         }
@@ -125,7 +125,7 @@ placelist:
 | nodeident
     {
         PlaceSymbol* p = new PlaceSymbol($1,TheCapacity);
-        if (! TheResult->PlaceTable.insert(p))
+        if (! TheResult->PlaceTable->insert(p))
         {
             yyerrors($1, "place '%s' name used twice", $1);
         }
@@ -154,7 +154,7 @@ markinglist:
 marking:
   nodeident _colon_ NUMBER
     {
-        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable.lookup($1));
+        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable->lookup($1));
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);
@@ -165,7 +165,7 @@ marking:
     }
 | nodeident  /* default: 1 token */
     {
-        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable.lookup($1));
+        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable->lookup($1));
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);
@@ -188,7 +188,7 @@ transition:
   _PRODUCE_ arclist _semicolon_
     {
         TransitionSymbol* t = new TransitionSymbol($2, $3, $5, $8);
-        if (! TheResult->TransitionTable.insert(t))
+        if (! TheResult->TransitionTable->insert(t))
         {
             yyerrors($2, "transition name '%s' used twice", $2);
         }
@@ -252,7 +252,7 @@ arclist:
 arc:
   nodeident _colon_ NUMBER
     {
-        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable.lookup($1));
+        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable->lookup($1));
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);
@@ -263,7 +263,7 @@ arc:
     }
 | nodeident   /* default: multiplicity 1 */
     {
-        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable.lookup($1));
+        PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable->lookup($1));
         if (!p)
         {
             yyerrors($1, "place '%s' does not exist", $1);

@@ -9,13 +9,14 @@ lola_SOURCES = \
                 FairnessAssumptions.h \
                 Marking.cc Marking.h \
                 Net.cc Net.h \
-                ParserPTNet.h \
+                ParserPTNet.h ParserPTNet.cc \
                 ParserPTNetLoLA.yy Lexic.ll \
                 Place.cc Place.h \
                 PlaceSymbol.cc PlaceSymbol.h \
                 Reporter.cc Reporter.h \
                 Socket.cc Socket.h \
                 Symbol.cc Symbol.h \
+                SymbolTable2Net.cc SymbolTable2Net.h \
                 SymbolTable.cc SymbolTable.h \
                 Transition.cc Transition.h \
                 TransitionSymbol.h TransitionSymbol.cc \

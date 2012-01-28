@@ -14,6 +14,8 @@ should be independent from the format (LoLA / PNML / ...)
 class ParserPTNet
 {
     public:
-        SymbolTable PlaceTable;
-        SymbolTable TransitionTable;
+        SymbolTable * PlaceTable;
+        SymbolTable * TransitionTable;
+	ParserPTNet();
+	~ParserPTNet();
 };

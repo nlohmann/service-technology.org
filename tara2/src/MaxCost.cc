@@ -54,7 +54,7 @@ DEBUG: output all expensive paths
 
        if(curCost>maxCost) {
           maxCost=curCost;
-          for(std::deque<int>::iterator it=nodeStack.begin();it!=nodeStack.end();it++) {
+          for(std::deque<int>::iterator it=nodeStack.begin();it!=nodeStack.end();++it) {
              printf(" %d ", innerGraph[*it]->curCost);
           }
           printf("\n");
@@ -74,7 +74,7 @@ DEBUG: output all expensive paths
 
        //check if next node is on Stack, as we dont want to count cycles
        if(innerGraph[innerGraph[tos]->curTransition->successor]->inStack) {
-           innerGraph[tos]->curTransition++;
+           ++(innerGraph[tos]->curTransition);
            continue;
        }
       
@@ -94,7 +94,7 @@ DEBUG: output all expensive paths
        }
  
        //for current tos goto next transition
-       innerGraph[tos]->curTransition++;
+       ++(innerGraph[tos]->curTransition);
    }
    return maxCost;
    //printf("\n maxCost: %d \n\n", maxCost);

@@ -17,8 +17,8 @@
  along with Hello.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef DFS_GRAPH_H
-#define DFS_GRAPH_H
+#ifndef MAX_COST_H
+#define MAX_COST_H
 
 #include <list>
 #include <pnapi/pnapi.h>

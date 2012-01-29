@@ -21,6 +21,7 @@ lola_SOURCES = \
                 Transition.cc Transition.h \
                 TransitionSymbol.h TransitionSymbol.cc \
                 cmdline.c cmdline.h \
+		RandomWalk.cc RandomWalk.h \
                 main.cc
 
 listener_SOURCES = Listener.cc \

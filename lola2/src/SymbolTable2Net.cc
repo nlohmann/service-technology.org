@@ -5,8 +5,11 @@
 \brief Translation of the symbol tables (from parsers) into main net structures Node, Place, Transition, and Marking
 */
 
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
 
-#include <config.h>
+#include "config.h"
 #include <cstdlib>
 #include "SymbolTable2Net.h"
 #include "Net.h"

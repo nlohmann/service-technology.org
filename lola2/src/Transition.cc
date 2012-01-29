@@ -105,24 +105,28 @@ void Transition::checkEnabled(index_t t)
                     // indeed, scapegoat has changed.
                     // remove from old scapegoat's Disabled list
                     const index_t old_scapegoat = Net::Arc[TR][PRE][t][0];
-                    if (Transition::PositionScapegoat[t] != --Place::CardDisabled[old_scapegoat])
+			index_t c = --Place::CardDisabled[old_scapegoat];
+                    if (Transition::PositionScapegoat[t] != c)
                     {
                         // transition not last in scapegoat's disabled list--> swap with last
-                        const index_t other_t = Place::Disabled[old_scapegoat][Place::CardDisabled[old_scapegoat]];
+                        const index_t other_t = Place::Disabled[old_scapegoat][c];
                         Transition::PositionScapegoat[other_t] = Transition::PositionScapegoat[t];
                         Place::Disabled[old_scapegoat][Transition::PositionScapegoat[t]] = other_t;
                     }
+		    else
+		    {
+			// transition last in old scapgoat's list --> decrement of CardDisabled in 
+			// if condition was all we needed to do
+		    }
+
                     // insert to new scapegoat's disabled list
                     Place::Disabled[scapegoat][Transition::PositionScapegoat[t] = Place::CardDisabled[scapegoat]++] = t;
-                    // swap scapegoat to front of transition's PRE list
-                    if (i > 0)
-                    {
-                        const mult_t tmp = Net::Mult[TR][PRE][t][i];
-                        Net::Arc[TR][PRE][t][i] = Net::Arc[TR][PRE][t][0];
-                        Net::Mult[TR][PRE][t][i] = Net::Mult[TR][PRE][t][0];
-                        Net::Arc[TR][PRE][t][0] = scapegoat;
-                        Net::Mult[TR][PRE][t][0] = tmp;
-                    }
+		    // swap new scapegoat to front of transition's PRE list
+			const mult_t tmp = Net::Mult[TR][PRE][t][i];
+			Net::Arc[TR][PRE][t][i] = Net::Arc[TR][PRE][t][0];
+			Net::Mult[TR][PRE][t][i] = Net::Mult[TR][PRE][t][0];
+			Net::Arc[TR][PRE][t][0] = scapegoat;
+			Net::Mult[TR][PRE][t][0] = tmp;
                 }
             }
             // case of deactivated transition is complete
@@ -137,10 +141,11 @@ void Transition::checkEnabled(index_t t)
         Transition::Enabled[t] = true;
         ++Transition::CardEnabled;
         const index_t old_scapegoat = Net::Arc[TR][PRE][t][0];
-        if (Transition::PositionScapegoat[t] != --Place::CardDisabled[old_scapegoat])
+        const index_t c = --Place::CardDisabled[old_scapegoat];
+        if (Transition::PositionScapegoat[t] != c)
         {
             // transition not last in scapegoat's disabed list--> swap with last
-            const index_t other_t = Place::Disabled[old_scapegoat][Place::CardDisabled[old_scapegoat]];
+            const index_t other_t = Place::Disabled[old_scapegoat][c];
             Transition::PositionScapegoat[other_t] = Transition::PositionScapegoat[t];
             Place::Disabled[old_scapegoat][Transition::PositionScapegoat[t]] = other_t;
         }
@@ -150,7 +155,10 @@ void Transition::checkEnabled(index_t t)
 
 /// fire a transition and update enabledness of all transitions
 void Transition::fire(index_t t)
+
 {
+	//  Don't even think about firing a disabled transition!
+	assert(Transition::Enabled[t]);
     // 1. Update current marking
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {
@@ -173,22 +181,20 @@ void Transition::fire(index_t t)
             checkEnabled(tt);
         }
     }
+     // 2a. Don't forget to check t itself! It is not member of the conflicting list!
+     checkEnabled(t);
 
     // 3. check those transitions where the scapegoat received additional tokens
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
     {
-        for (index_t j = 0; j < Place::CardDisabled[Transition::DeltaT[POST][t][i]]; /* tricky increment handling */)
+	const index_t p = Transition::DeltaT[POST][t][i]; // one place that got new tokens
+        for (index_t j = 0; j < Place::CardDisabled[p]; /* tricky increment handling */)
         {
-            const index_t tt = Transition::DeltaT[POST][t][i];
-            checkEnabled(Place::Disabled[tt][j]);
-            if (!Transition::Enabled[tt])
+            const index_t tt = Place::Disabled[p][j];
+            checkEnabled(tt);
+            if (Place::Disabled[p][j] == tt)
             {
                 j++; /* tricky increment handling */
-            }
-            else
-            {
-                // in this case, checkEnabled decremente CardDisabled and swaps
-                // another transition to position j
             }
         }
     }

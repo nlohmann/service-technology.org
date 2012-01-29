@@ -21,6 +21,7 @@
 #include "cmdline.h"
 #include "ParserPTNet.h"
 
+#include "RandomWalk.h"
 #include "Net.h"
 #include "Place.h"
 #include "Marking.h"
@@ -106,6 +107,7 @@ int main(int argc, char** argv)
 
     delete symbolTables;
 
+ randomWalk();
 
     Net::deleteNodes();
     Place::deletePlaces();

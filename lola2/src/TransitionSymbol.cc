@@ -12,7 +12,7 @@
 #include "FairnessAssumptions.h"
 
 /// Generate and initialize a symbol
-TransitionSymbol::TransitionSymbol(char* k, tFairnessAssumption f, ArcList* pr, ArcList* po)
+TransitionSymbol::TransitionSymbol(char* k, fairnessAssumption_t f, ArcList* pr, ArcList* po)
     :
     Symbol(k),
     fairness(f),
@@ -61,7 +61,7 @@ ArcList* TransitionSymbol::getPost() const
 }
 
 /// Getter for fairness assumption
-tFairnessAssumption TransitionSymbol::getFairness() const
+fairnessAssumption_t TransitionSymbol::getFairness() const
 {
     return fairness;
 }

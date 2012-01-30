@@ -35,7 +35,7 @@ void yyerrors(char* token, char const* format, ...);
 
 %union {
     char* attributeString;
-    tFairnessAssumption attributeFairness;
+    fairnessAssumption_t attributeFairness;
     ArcList* attributeArcList;
 }
 

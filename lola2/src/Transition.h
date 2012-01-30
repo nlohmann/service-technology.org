@@ -24,7 +24,7 @@ struct Transition
 {
     public:
         /// fairness specification
-        static tFairnessAssumption* Fairness;
+        static fairnessAssumption_t* Fairness;
 
         /// Activation status
         static bool* Enabled;

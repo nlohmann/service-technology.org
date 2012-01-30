@@ -28,7 +28,7 @@ class TransitionSymbol: public Symbol
 {
     public:
         /// Generate and initialize a symbol
-        TransitionSymbol(char*, tFairnessAssumption, ArcList*, ArcList*);
+        TransitionSymbol(char*, fairnessAssumption_t, ArcList*, ArcList*);
         /// Delete Transition symbol
         ~TransitionSymbol();
 
@@ -41,11 +41,11 @@ class TransitionSymbol: public Symbol
         /// Getter for number of post-places
         ArcList* getPost() const;
         /// Getter for fairness assumption
-        tFairnessAssumption getFairness() const;
+        fairnessAssumption_t getFairness() const;
 
     private:
         /// The fairness assumption specified for this tarnsition
-        tFairnessAssumption fairness;
+        fairnessAssumption_t fairness;
 
         /// The number of transitions that consume from this place
         /// Used for creating arc data structures

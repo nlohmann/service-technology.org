@@ -7,7 +7,7 @@
 All data that describe attributes of transitions can be found here. General
 information for a transition in its role as a node, ar contained in Node.*
 
-\todo Lohnt es sich, integers als Referenz zu übergeben?
+\todo Lohnt es sich, Integers als Referenz zu übergeben? -> Nein (Andreas)
 */
 
 #include <cstdlib>
@@ -19,7 +19,7 @@ information for a transition in its role as a node, ar contained in Node.*
 #include "FairnessAssumptions.h"
 #include "BitSetC.h"
 
-tFairnessAssumption* Transition::Fairness = NULL;
+fairnessAssumption_t* Transition::Fairness = NULL;
 bool* Transition::Enabled = NULL;
 index_t Transition::CardEnabled = 0;
 hash_t* Transition::DeltaHash = NULL;

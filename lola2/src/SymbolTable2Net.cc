@@ -119,7 +119,7 @@ void symboltable2net(ParserPTNet* parser)
     // current_arc is used for filling in arcs and multiplicities of places
     index_t* current_arc_post = (index_t*) calloc(Net::Card[PL], SIZEOF_INDEX_T);
     index_t* current_arc_pre = (index_t*) calloc(Net::Card[PL], SIZEOF_INDEX_T);
-    Transition::Fairness = (fairnessAssumption_t*) malloc(Net::Card[TR] * sizeof(fairnessAssumption_t));
+    Transition::Fairness = (fairnessAssumption_t*) malloc(Net::Card[TR] * SIZEOF_FAIRNESSASSUMPTION_T);
     Transition::Enabled = (bool*) malloc(Net::Card[TR] * SIZEOF_BOOL);
     Transition::DeltaHash = (hash_t*) calloc(Net::Card[TR] , SIZEOF_HASH_T);
     Transition::CardConflicting = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);

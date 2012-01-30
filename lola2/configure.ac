@@ -53,6 +53,8 @@ AC_CHECK_SIZEOF(cardbit_t,, [#define _CONFIGURING
 #include "src/Dimensions.h"])
 AC_CHECK_SIZEOF(hash_t,, [#define _CONFIGURING
 #include "src/Dimensions.h"])
+AC_CHECK_SIZEOF(fairnessAssumption_t,, [#define _CONFIGURING
+#include "src/FairnessAssumptions.h"])
 
 AC_CHECK_SIZEOF(bool)
 AC_LANG_POP(C++)

@@ -8,6 +8,7 @@
 \brief class implementation for a symbol table
 */
 
+#include <config.h>
 #include <inttypes.h>
 #include <cstring>
 #include <cstdlib>
@@ -16,7 +17,7 @@
 
 /// Intialization amounts to setting all entries to NULL
 SymbolTable::SymbolTable()
-    : table(reinterpret_cast<Symbol**>(calloc(SIZEOF_SYMBOLTABLE, sizeof(Symbol*)))),
+    : table(reinterpret_cast<Symbol**>(calloc(SIZEOF_SYMBOLTABLE, SIZEOF_VOIDP))),
       card(0),
       currentIndex(0),
       currentSymbol(NULL)

@@ -54,6 +54,51 @@ void iModification::iterate() {
   // unsigned int newOutOfCredit=this->outOfCreditArc->getWeight()+1;
   // this->outOfCreditArc->setWeight(newOutOfCredit);   
 }
+
+void iModification::update() {
+    
+   // update the arc weight
+   outOfCreditArc->setWeight(i+1);
+
+   // update the available costs
+   availableCost->setTokenCount(maxTransCost+i);
+        
+
+}
+
+
+void iModification::setToValue(unsigned int newI) {
+    
+    i = newI;
+    update();
+        
+
+}
+
+unsigned int iModification::decrease() {
+   
+   if(i ==0)
+      printf("error, cannot iterate under zero");
+   // TODO: insert some nice error exit here...
+
+   --i; // optimize ??
+    
+   update();
+   
+   return i;
+}
+
+unsigned int iModification::increase() {
+   
+   ++i; // optimize ??
+
+   update();
+   
+   return i;
+}
+
+
+
   
 unsigned int iModification::getI() { return this->i; }
 

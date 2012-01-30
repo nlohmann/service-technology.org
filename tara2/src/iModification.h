@@ -34,9 +34,14 @@ class iModification {
       iModification(pnapi::PetriNet* , unsigned int);
       void iterate();
       unsigned int getI();
+      unsigned int decrease();
+      unsigned int increase();
+      void setToValue(unsigned int);
   
    private:
 
+      void update();        
+    
       pnapi::PetriNet* net;
       unsigned int i;
       unsigned int maxTransCost;

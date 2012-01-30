@@ -23,7 +23,7 @@
 #include <pnapi/pnapi.h>
 #include <string>
 
-bool isControlable(pnapi::PetriNet &net, std::string &tempFile, bool useWendyOptimization=false);
+bool isControllable(pnapi::PetriNet &net, std::string &tempFile, bool useWendyOptimization=false);
 void getLolaStatespace(pnapi::PetriNet &net, std::string &tempFile);
 
 #endif

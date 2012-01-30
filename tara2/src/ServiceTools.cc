@@ -39,9 +39,12 @@ inline bool fileExists(const std::string& filename) {
 }
 
 
-bool isControlable(pnapi::PetriNet &net, std::string &outputFile, bool useWendyOptimization) {
+bool isControllable(pnapi::PetriNet &net, std::string &outputFile, bool useWendyOptimization) {
     
     std::string wendyCommand("wendy --correctness=livelock ");
+    if (useWendyOptimization) {
+        wendyCommand+= " --waitstatesOnly --receivingBeforeSending --seqReceivingEvents   --succeedingSendingEvent  --quitAsSoonAsPossible ";
+    }
     wendyCommand+=" --sa="+outputFile;
     
 //    message("creating a pipe to wendy by calling '%s'", wendyCommand.c_str());

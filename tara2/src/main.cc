@@ -299,61 +299,70 @@ int main(int argc, char** argv) {
     // the inner state graph
     unsigned int maxCostOfComposition=maxCost();
 
-    // if this Costs are zero, every partner has cost zero.
-    if(maxCostOfComposition==0) {
-        message("Cost are 0 for every partner.");
-        return EXIT_SUCCESS;
-    }
-     
 
-    /*--------------------------.
-    | 6. Do The i Modification  |
-    \--------------------------*/
+    /*------------------------------------------.
+    | 6. Find a corresponding partner           | 
+    \------------------------------------------*/
 
-    // TODO: implement pseudocode
-    //init modificate the net with i=maxCost
+    // Build the modified net for maxCostOfComposition
     iModification iMod(net, maxCostOfComposition);
-    
+
+    // Check whether N is controllable under budget maxCostOfComposition. If not, return the most permissive partner.
     std::stringstream ssi;
-        ssi << maxCostOfComposition;
-    
+    ssi << maxCostOfComposition;
     std::string minCostPartner=tempFN+"-min-partner-";  
     std::string curMinCostPartner=minCostPartner+ssi.str()+".sa";
- 
-    // decrease while controlable
-    while(isControlable(*net, curMinCostPartner) && iMod.getI()>0) {
-
-            // next iteration -> i decreases
-	    iMod.iterate();
-            
-            // stupid int to string conversion
-	    ssi.str("");
-	    ssi << iMod.getI();
-       
-            // update min cost file
-            curMinCostPartner=minCostPartner+ssi.str()+".sa";
-    }
+	bool bounded = isControllable(*net, curMinCostPartner, true); 
 
     // output file of the min cost partner
     std::ifstream minCostPartnerStream;
 
-    // if the first iteration has failed
-    // then the costs are unbounded
-    if(iMod.getI()==maxCostOfComposition) {
-	    message("Costs are unbounded");
-            minCostPartnerStream.open(partnerTemp.c_str());
-	    cout << minCostPartnerStream.rdbuf();
-            return EXIT_SUCCESS;
-    }
-
-    // else lookup laste file and put it to std out
-    ssi.str("");
-    ssi << iMod.getI()+1;
-    curMinCostPartner=minCostPartner+ssi.str()+".sa";
-    minCostPartnerStream.open(curMinCostPartner.c_str());
     
-    message("Cost minimal partner with costs: %d", iMod.getI()+1);
-    cout << minCostPartnerStream.rdbuf();
+
+    // If N is not controllable under budget maxCostofComposition, return the mpp. 
+    
+    if (!bounded) {
+        // Every partner is trivially cost-minimal. Thus, return the mpp
+        // TODO
+        message("Any partner is cost-minimal, returning the most-permissive partner.");
+        minCostPartnerStream.open(partnerTemp.c_str());
+	    cout << minCostPartnerStream.rdbuf();
+    } else { // start the binary search. 
+    
+        unsigned int bsUpper = maxCostOfComposition-1; // for maxCostofComposition, it is controllable anyway. 
+        unsigned int bsLower = 0;
+        unsigned int minBudget = maxCostOfComposition; 
+        
+        while (bsLower <= bsUpper) {
+            iMod.setToValue((bsLower + bsUpper) / 2);
+
+        	ssi.str("");
+	        ssi << iMod.getI();
+            curMinCostPartner=minCostPartner+ssi.str()+".sa";
+            message("Checking: %d (%d, %d)", iMod.getI(), bsLower, bsUpper);             
+            bool bsControllable = isControllable(*net, curMinCostPartner, true);
+            if (bsControllable) {
+                minBudget = iMod.getI();        
+                bsUpper = iMod.getI()-1;
+            } else {
+                bsLower = iMod.getI()+1;
+            }
+        }
+        
+        // Binary search done. The minimal budget is found. Return the partner for the minimal budget.    
+        
+        ssi.str("");
+        ssi << minBudget;
+        curMinCostPartner=minCostPartner+ssi.str()+".sa";
+        minCostPartnerStream.open(curMinCostPartner.c_str());
+        message("Cost minimal partner with costs: %d", minBudget);
+        cout << minCostPartnerStream.rdbuf();
+
+    } 
+
+    // A partner was written to standard out. Let's do the clean up and exit with success.    
+    
+    // TODO: CLEANUP
 
     return EXIT_SUCCESS;
 }

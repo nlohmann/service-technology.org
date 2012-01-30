@@ -317,8 +317,6 @@ int main(int argc, char** argv) {
     // output file of the min cost partner
     std::ifstream minCostPartnerStream;
 
-    
-
     // If N is not controllable under budget maxCostofComposition, return the mpp. 
     
     if (!bounded) {
@@ -331,6 +329,8 @@ int main(int argc, char** argv) {
         unsigned int minBudget = maxCostOfComposition; // Initially set the minimal budget to the maxCostOfComposition
         
         if (maxCostOfComposition > 0) { // Binary search is only necessary if the upper bound is greater than 0.
+            
+            status("Finding the minimal budget with a binary search");
 
             unsigned int bsUpper = maxCostOfComposition-1; // for maxCostofComposition, it is controllable anyway. 
             unsigned int bsLower = 0;
@@ -363,7 +363,7 @@ int main(int argc, char** argv) {
         ssi << minBudget;
         curMinCostPartner=minCostPartner+ssi.str()+".sa";
         minCostPartnerStream.open(curMinCostPartner.c_str());
-        message("Cost minimal partner with costs: %d", minBudget);
+        message("Found a cost minimal partner with costs: %d", minBudget);
         cout << minCostPartnerStream.rdbuf();
 
     } 

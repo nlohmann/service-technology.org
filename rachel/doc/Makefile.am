@@ -2,8 +2,6 @@ info_TEXINFOS = rachel.texi
 
 rachel_TEXINFOS = fdl.texi cmdline.out ChangeLog.texi
 
-TEXINFO_TEX = texinfo.tex
-
 EXTRA_DIST = gendocs.sh gendocs_template background.pdf cmdline.out 
 
 MAINTAINERCLEANFILES = cmdline.out

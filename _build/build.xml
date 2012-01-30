@@ -176,6 +176,10 @@
         </exec>
         <record name="artifacts/cover.log" action="stop"/>
 
+        <exec executable="sh" failonerror="false">
+            <arg value="-c" />
+            <arg value="grep 'lines......' artifacts/cover.log | sed 's/[()]//g' | awk '{ print &quot;<measurement><name>covered lines</name><value>$4</value></measurement>&quot; }'" />
+        </exec>
         <exec executable="sh" failonerror="false" output="plot_coveredlines">
             <arg value="-c" />
             <arg value="grep 'lines......' artifacts/cover.log | sed 's/[()]//g' | awk '{ print &quot;YVALUE=&quot; $4 }'" />

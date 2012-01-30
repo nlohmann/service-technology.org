@@ -69,7 +69,7 @@ void Transition::deleteTransitions()
 /// 2. if enabled ->disabled, insert in Disabled list of scapegoat
 /// 3. if disabled->enabled, Remove from Disabled list of scapegoat
 /// 4. if disabled->disabled, perhaps move to other scapegoat
-/// \todo swap of values to be done with XOR (<-- Andreas!)
+/// \todo swap of values to be done with XOR (ineffektiv(er) bei heutigen Compilern! Außerdem haben wir zwei Swaps verschränkt...)
 void Transition::checkEnabled(index_t t)
 {
     // scan through all pre-places

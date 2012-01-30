@@ -1,8 +1,0 @@
-@c <<-- CHANGE START (version information) -->>
-@heading Version 0.1-unreleased
-@itemize
-@item some first functionality
-@end itemize
-
-@heading Version 0.0
-@c <<-- CHANGE END -->>

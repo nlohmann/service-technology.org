@@ -58,8 +58,6 @@ bpel2owfn_TEXINFOS = fdl.texi ChangeLog.texi \
 		     images/rb2.png \
 		     images/diagram.png
 
-TEXINFO_TEX = texinfo.tex
-
 EXTRA_DIST = gendocs.sh gendocs_template semantics.pdf epsf.tex
 
 

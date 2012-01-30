@@ -42,7 +42,7 @@
     <target name="cppcheck" depends="prepare">
         <touch file="src/tmpfile.c" />
         <exec executable="cppcheck" failonerror="false" error="cppcheck-result.xml">
-            <arg line="src/* --enable=style,information,unusedFunction --force --verbose --report-progress --xml -j2" />
+            <arg line="src/* --enable=style,information,unusedFunction --force --verbose --report-progress --xml" />
         </exec>
         <delete file="src/tmpfile.c" />
     </target>

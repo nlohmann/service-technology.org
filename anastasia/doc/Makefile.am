@@ -18,7 +18,6 @@ HELPOPTION = --detailed-help
 #--------------------------------------#
 # GENERIC: add FDL and helper TeX file #
 #--------------------------------------#
-TEXINFO_TEX = texinfo.tex
 anastasia_TEXINFOS = fdl.texi
 
 #-----------------------------------------------------------#

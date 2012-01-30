@@ -18,7 +18,6 @@ HELPOPTION = --detailed-help
 #--------------------------------------#
 # GENERIC: add FDL and helper TeX file #
 #--------------------------------------#
-TEXINFO_TEX = texinfo.tex
 candy_TEXINFOS = fdl.texi
 
 #-----------------------------------------------------------#

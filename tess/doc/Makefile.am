@@ -2,8 +2,6 @@ info_TEXINFOS = tess.texi
 
 tess_TEXINFOS = fdl.texi cmdline.out ChangeLog.texi
 
-TEXINFO_TEX = texinfo.tex
-
 EXTRA_DIST = cmdline.out
 
 MAINTAINERCLEANFILES = cmdline.out

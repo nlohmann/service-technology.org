@@ -18,7 +18,6 @@ HELPOPTION = --full-help
 #--------------------------------------#
 # GENERIC: add FDL and helper TeX file #
 #--------------------------------------#
-TEXINFO_TEX = texinfo.tex
 mia_TEXINFOS = fdl.texi
 
 #-----------------------------------------------------------#

@@ -19,9 +19,7 @@ BANNERHEIGHT = 10
 # the help option that should be used in the manual
 HELPOPTION = --detailed-help
 
-sayo_TEXINFOS = fdl.texi cmdline.out ChangeLog.texi
-
-TEXINFO_TEX = texinfo.tex \
+sayo_TEXINFOS = fdl.texi cmdline.out ChangeLog.texi \
               examples/bits.og \
               examples/bits.interface \
               examples/bits.nodes \
@@ -39,7 +37,6 @@ TEXINFO_TEX = texinfo.tex \
 #--------------------------------------#
 # GENERIC: add FDL and helper TeX file #
 #--------------------------------------#
-# TEXINFO_TEX = texinfo.tex
 wendy_TEXINFOS = fdl.texi
 
 #-----------------------------------------------------------#

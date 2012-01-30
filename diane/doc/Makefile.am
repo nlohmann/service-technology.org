@@ -18,7 +18,6 @@ HELPOPTION = --help
 #--------------------------------------#
 # GENERIC: add FDL and helper TeX file #
 #--------------------------------------#
-TEXINFO_TEX = texinfo.tex
 diane_TEXINFOS = fdl.texi
 
 #-----------------------------------------------------------#

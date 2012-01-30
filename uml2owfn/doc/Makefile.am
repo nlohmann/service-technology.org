@@ -2,8 +2,6 @@ info_TEXINFOS = uml2owfn.texi
 
 uml2owfn_TEXINFOS = uml2owfn.texi fdl.texi cmdline.out ChangeLog.texi
 
-TEXINFO_TEX = texinfo.tex
-
 EXTRA_DIST = gendocs.sh gendocs_template
 
 MAINTAINERCLEANFILES = cmdline.out

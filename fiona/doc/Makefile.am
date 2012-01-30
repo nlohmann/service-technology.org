@@ -5,8 +5,6 @@ fiona_TEXINFOS = fdl.texi ChangeLog.texi \
 	figs/online_shop.owfn.pdf figs/online_shop.owfn.og.eps \
 	figs/online_shop.owfn.og.gif figs/online_shop.owfn.og.pdf
 
-TEXINFO_TEX = texinfo.tex
-
 EXTRA_DIST = gendocs.sh gendocs_template\
 	docShop.owfn docShop.owfn.og fionaDocumentation.pdf epsf.tex
 

@@ -2,8 +2,6 @@ info_TEXINFOS = lola.texi
 
 lola_TEXINFOS = ChangeLog.texi graph2dot.out figs fdl.texi
 
-TEXINFO_TEX = texinfo.tex
-
 EXTRA_DIST = gendocs.sh gendocs_template
 
 MAINTAINERCLEANFILES = graph2dot.out

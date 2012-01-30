@@ -21,7 +21,6 @@ HELPOPTION = --full-help
 #--------------------------------------#
 # GENERIC: add FDL and helper TeX file #
 #--------------------------------------#
-TEXINFO_TEX = texinfo.tex
 pnapi_TEXINFOS = fdl.texi
 
 #-----------------------------------------------------------#

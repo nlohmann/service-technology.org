@@ -42,7 +42,7 @@
     <target name="cppcheck" depends="prepare">
         <touch file="src/tmpfile.c" />
         <exec executable="cppcheck" failonerror="false" error="cppcheck-result.xml">
-            <arg line="src/* --enable=style,information,unusedFunction --force --verbose --report-progress --xml" />
+            <arg line="src/* --enable=all --force --verbose --report-progress --xml" />
         </exec>
         <delete file="src/tmpfile.c" />
     </target>
@@ -175,11 +175,6 @@
             <arg value="cover" />
         </exec>
         <record name="artifacts/cover.log" action="stop"/>
-
-        <exec executable="sh" failonerror="false" output="cover.xml" append="true">
-            <arg value="-c" />
-            <arg value="grep 'lines......' artifacts/cover.log | sed 's/[()]//g' | awk '{ print &quot;&lt;measurement&gt;&lt;name&gt;covered lines&lt;/name&gt;&lt;value&gt;&quot;$4&quot;&lt;/value&gt;&lt;/measurement&gt;&quot; }'" />
-        </exec>
 
         <exec executable="sh" failonerror="false" output="plot_coveredlines">
             <arg value="-c" />

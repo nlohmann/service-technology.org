@@ -323,31 +323,39 @@ int main(int argc, char** argv) {
     
     if (!bounded) {
         // Every partner is trivially cost-minimal. Thus, return the mpp
-        // TODO
         message("Any partner is cost-minimal, returning the most-permissive partner.");
         minCostPartnerStream.open(partnerTemp.c_str());
 	    cout << minCostPartnerStream.rdbuf();
-    } else { // start the binary search. 
-    
-        unsigned int bsUpper = maxCostOfComposition-1; // for maxCostofComposition, it is controllable anyway. 
-        unsigned int bsLower = 0;
-        unsigned int minBudget = maxCostOfComposition; 
+    } else { // there exists a partner with a bounded budget 
         
-        while (bsLower <= bsUpper) {
-            iMod.setToValue((bsLower + bsUpper) / 2);
+        unsigned int minBudget = maxCostOfComposition; // Initially set the minimal budget to the maxCostOfComposition
+        
+        if (maxCostOfComposition > 0) { // Binary search is only necessary if the upper bound is greater than 0.
 
-        	ssi.str("");
-	        ssi << iMod.getI();
-            curMinCostPartner=minCostPartner+ssi.str()+".sa";
-            message("Checking: %d (%d, %d)", iMod.getI(), bsLower, bsUpper);             
-            bool bsControllable = isControllable(*net, curMinCostPartner, true);
-            if (bsControllable) {
-                minBudget = iMod.getI();        
-                bsUpper = iMod.getI()-1;
-            } else {
-                bsLower = iMod.getI()+1;
+            unsigned int bsUpper = maxCostOfComposition-1; // for maxCostofComposition, it is controllable anyway. 
+            unsigned int bsLower = 0;
+            
+            while (bsLower <= bsUpper) {
+               
+                // Set the new budget to the middle of the interval
+                iMod.setToValue((bsLower + bsUpper) / 2);
+                
+                // Prepare the Wendy Call
+            	ssi.str("");
+	            ssi << iMod.getI();
+                curMinCostPartner=minCostPartner+ssi.str()+".sa";
+
+                status("Checking budget %d (lower bound: %d, upper bound: %d)", iMod.getI(), bsLower, bsUpper);             
+                bool bsControllable = isControllable(*net, curMinCostPartner, true);
+                if (bsControllable) {
+                    minBudget = iMod.getI();        
+                    bsUpper = iMod.getI()-1;
+                } else {
+                    bsLower = iMod.getI()+1;
+                }
             }
-        }
+        
+        } 
         
         // Binary search done. The minimal budget is found. Return the partner for the minimal budget.    
         

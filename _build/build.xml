@@ -3,7 +3,7 @@
     <basename property="package" file="."/>
     <property name="dir" location="."/>
 
-    <target name="all" depends="prepare, cppcheck, statsvn, autogen, configure, make_all, make_check, make_distcheck, documentation, coverage" />
+    <target name="all" depends="prepare, statsvn, autogen, configure, make_all, make_check, make_distcheck, cppcheck, documentation, coverage" />
     <target name="all_win" depends="prepare, autogen, configure_win, make_all_win" />
 
     <target name="prepare">

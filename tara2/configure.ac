@@ -1,4 +1,4 @@
-AC_INIT([Tara], 0.1-unreleased, tara@service-technology.org, tara, http://service-technology.org/tara)
+AC_INIT([Tara], 0.1, tara@service-technology.org, tara, http://service-technology.org/tara)
 
 AC_MSG_NOTICE([                    _____               ])
 AC_MSG_NOTICE([                   |_   _|_ _ _ __ __ _ ])

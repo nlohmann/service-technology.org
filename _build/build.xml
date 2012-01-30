@@ -178,7 +178,7 @@
 
         <exec executable="sh" failonerror="false">
             <arg value="-c" />
-            <arg value="grep 'lines......' artifacts/cover.log | sed 's/[()]//g' | awk '{ print &quot;&lt;measurement&gt;&lt;name&gt;covered lines&lt;/name&gt;&lt;value&gt;$4&lt;/value&gt;&lt;/measurement&gt;&quot; }'" />
+            <arg value="grep 'lines......' artifacts/cover.log | sed 's/[()]//g' | awk '{ print &quot;&lt;measurement&gt;&lt;name&gt;covered lines&lt;/name&gt;&lt;value&gt;&quot;$4&quot;&lt;/value&gt;&lt;/measurement&gt;&quot; }'" />
         </exec>
         <exec executable="sh" failonerror="false" output="plot_coveredlines">
             <arg value="-c" />

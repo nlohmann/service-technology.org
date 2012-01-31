@@ -27,3 +27,9 @@ option "address" -
   typestr="IP"
   default="127.0.0.1"
   optional
+
+section "Debugging"
+
+option "randomWalk" -
+  "Random firing of transitions"
+  flag off

@@ -107,7 +107,9 @@ int main(int argc, char** argv)
 
     delete symbolTables;
 
-    randomWalk();
+    if (args_info.randomWalk_given) {
+        randomWalk();
+    }
 
     Net::deleteNodes();
     Place::deletePlaces();

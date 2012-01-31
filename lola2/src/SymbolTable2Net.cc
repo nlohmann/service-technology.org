@@ -95,6 +95,19 @@ void symboltable2net(ParserPTNet* parser)
     index_t i;
     for ((ps = (PlaceSymbol*) parser->PlaceTable->first()), (i = 0); ps; ps = (PlaceSymbol*) parser->PlaceTable->next(), i++)
     {
+        /*!
+        \bug with make distcheck we obtain a segfault
+             Program received signal SIGSEGV, Segmentation fault.
+             Symbol::getKey (this=0x44380727) at ../../src/Symbol.cc:21
+             21	{
+             (gdb) bt
+             #0  Symbol::getKey (this=0x44380727) at ../../src/Symbol.cc:21
+             #1  0x0000000000408544 in symboltable2net (parser=0x613010)
+                 at ../../src/SymbolTable2Net.cc:101 <-- Net::Name[PL][i] = ps -> getKey();
+             #2  0x000000000040c184 in main (argc=<value optimized out>, 
+                 argv=0x7fffffffe2e8) at ../../src/main.cc:106
+             
+        */
         Net::Name[PL][i] = ps -> getKey();
         Net::CardArcs[PL][PRE][i] = ps -> getCardPre();
         Net::CardArcs[PL][POST][i] = ps -> getCardPost();

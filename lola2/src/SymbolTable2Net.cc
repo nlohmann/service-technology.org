@@ -257,7 +257,9 @@ void symboltable2net(ParserPTNet* parser)
     }
     // initialize Conflicting arrays
     // free or rename temporary data structures
-    index_t* conflicting = delta_pre;
+    //index_t* conflicting = delta_pre;
+    index_t* conflicting = (index_t*) calloc(Net::Card[TR], SIZEOF_INDEX_T);
+    free(delta_pre);
     free(delta_post);
     free(mult_pre);
     free(mult_post);
@@ -341,7 +343,7 @@ void symboltable2net(ParserPTNet* parser)
             Transition::BackConflicting[t][k] = conflicting[k];
         }
     }
-    //free(conflicting);
+    free(conflicting);
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
         Transition::checkEnabled(t);

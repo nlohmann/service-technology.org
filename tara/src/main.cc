@@ -272,16 +272,8 @@ int main(int argc, char** argv) {
     // run lola-statespace from the service tools
     getLolaStatespace(composition,lolaFN);
 
-    /*-------------------------.
-    | 4. Parse the inner Graph |
-    \-------------------------*/
-
-    graph_in=fopen(lolaFN.c_str(),"r");
-    graph_parse();
-    /* TODO destroy lexer etc */
-
     /*-------------------------------------.
-    | 5. Parse Costfunction to partial map |
+    | 4. Parse Costfunction to partial map |
     \-------------------------------------*/
 
      status("parsing costfunction");
@@ -291,13 +283,24 @@ int main(int argc, char** argv) {
  
     // TODO clean up: destroy lexer, file pointer etc
 
+
+    /*-------------------------.
+    | 5. Parse the inner Graph |
+    \-------------------------*/
+
+    graph_in=fopen(lolaFN.c_str(),"r");
+    graph_parse();
+    /* TODO destroy lexer etc */
+
+
     /*------------------------------------------.
     | 5. Compute MaxCosts from the parsed graph | 
     \------------------------------------------*/
 
     // max Costs are the costs of the most expensive path through
     // the inner state graph
-    unsigned int maxCostOfComposition=maxCost(args_info.opt_arg, args_info.opt_given, net);
+    
+    unsigned int maxCostOfComposition=maxCost(net);
 
 
     /*------------------------------------------.

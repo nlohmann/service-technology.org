@@ -58,12 +58,11 @@ option "og" -
 section "Optimization" 
 sectiondesc="There are some optimization techniques availabe to (hopefully) speed up Tara. \n"
 
-option "opt" -
-  "Uses the optimization technique 'TECH'. You may specify multiple such techniques." 
-  string
-  typestr="TECH"
+option "heuristics" h
+  "Uses the heuristics 'HEUR'." 
+  values="simple","maxout" enum  
+  typestr="HEUR"
   optional
-  multiple
 
 
 section "Configuration"

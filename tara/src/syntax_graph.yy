@@ -41,8 +41,10 @@ Wrong Input causes undefined behaviour and not necessarily an error message.
 
 extern int graph_lex();
 extern int graph_error(const char *);
-
+extern unsigned int cost(pnapi::Transition*);
 extern pnapi::PetriNet* net;
+
+unsigned int sumOfLocalMaxCosts = 0;
 
 /// current marking of the PN API net; for finding final states
 std::map<const pnapi::Place*, unsigned int> currentMarking;
@@ -71,6 +73,7 @@ unsigned int getTaraState (unsigned int lolaState) {
     // Otherwise: Create a new state, store the value, return it.
     unsigned int taraState = innerGraph.size();
     innerGraph.push_back(new innerState);
+    innerGraph.back()->maxCosts = 0;
     lolaToTara[lolaState] = taraState;
     return taraState;
 }
@@ -157,11 +160,19 @@ transitionList:
 transition:
   NAME ARROW NUMBER 
   {
-        
-       innerTransition cur= { net->findTransition($1), getTaraState($3) };
+       if (currentState != $3) { // We do not need self loops
+           unsigned int targetTaraState = getTaraState($3);
+           pnapi::Transition *const transition = net->findTransition($1);
+           unsigned int trCosts = cost(transition);           
+            innerTransition cur= { transition, targetTaraState, trCosts };
+           innerGraph[currentTaraState]->transitions.push_back(cur);
+           innerGraph[currentTaraState]->curTransition=innerGraph[currentTaraState]->transitions.begin();
+           if (trCosts > innerGraph[currentTaraState]->maxCosts) { 
+                sumOfLocalMaxCosts += trCosts - innerGraph[currentTaraState]->maxCosts; 
+                innerGraph[currentTaraState]->maxCosts = trCosts; 
+           }
+       }
        free($1); //get rid of those strings
 
-       innerGraph[currentTaraState]->transitions.push_back(cur);
-       innerGraph[currentTaraState]->curTransition=innerGraph[currentTaraState]->transitions.begin();
   }
 ;

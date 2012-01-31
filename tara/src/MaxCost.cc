@@ -25,32 +25,29 @@
 #include "syntax_graph.h"
 #include "syntax_costfunction.h"
 #include "verbose.h"
+#include "cmdline.h"
 
 std::deque<innerState *> innerGraph;
 
+extern unsigned int sumOfLocalMaxCosts;
 extern unsigned int cost(pnapi::Transition*);
 extern unsigned int getTaraState (unsigned int);
+extern gengetopt_args_info args_info;
+
 
 /* this is the Stack of the nodes in the graph of lola output */
 /* this stack is used for DFS */
 std::deque<int> nodeStack;
 
-unsigned int maxCost(char ** optimization, unsigned int optLen, pnapi::PetriNet* net) {
+unsigned int maxCost(pnapi::PetriNet* net) {
     status("LoLA returned %d states.", innerGraph.size());
     
-    bool USE_SIMPLE = false;
-    
-        for (int i = 0; i < optLen; ++i) {
-            std::string sOpt = optimization[i];
-            if (sOpt.compare("simple") == 0) {
-                USE_SIMPLE = true;
-		status("Optimization enabled: '%s'.", optimization[i]);
-            }        
-        }    
-
+    bool USE_SIMPLE = args_info.heuristics_given && args_info.heuristics_arg == heuristics_arg_simple;
+    bool USE_MAXOUT = args_info.heuristics_given && args_info.heuristics_arg == heuristics_arg_maxout;
 
     if (USE_SIMPLE) {
-    
+    	status("Optimization enabled: simple.");
+
         int maxTransCost = 0;
 
         //iterate over all transitions of the net
@@ -63,12 +60,19 @@ unsigned int maxCost(char ** optimization, unsigned int optLen, pnapi::PetriNet*
            maxTransCost=maxTransCost>curCost? maxTransCost: curCost;
          }
         
-        int val = innerGraph.size() * maxTransCost;
+        unsigned int val = innerGraph.size() * maxTransCost;
         
         status("Using simple upper bound: %d", val);        
         
         return val;
     }
+	
+    if (USE_MAXOUT) {
+    	status("Optimization enabled: maxout.");
+        status("Using maxout upper bound: %d", sumOfLocalMaxCosts);        
+        return sumOfLocalMaxCosts;
+    }
+
 
    // assuming innerGraph[0] is start state
 
@@ -123,7 +127,7 @@ DEBUG: output all expensive paths
           innerGraph[next]->inStack=true;
           
           // get costs for that transition (using the  pointer to the net transition)
-          int transitionCost=cost(innerGraph[tos]->curTransition->transition);
+          unsigned int transitionCost= innerGraph[tos]->curTransition->costs;
 
           // save the cost to that state
           // if this state is removed from stack, the cost will be subtracted

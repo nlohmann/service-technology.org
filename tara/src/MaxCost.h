@@ -24,13 +24,14 @@
 #include <pnapi/pnapi.h>
 
 // compute the maxCost of the inner Graph
-unsigned int maxCost(char ** optimization, unsigned int optLen, pnapi::PetriNet* net);
+unsigned int maxCost(pnapi::PetriNet* net);
 
 void printCurrentRun();
 
 typedef struct {
     pnapi::Transition *const transition;
     const unsigned int successor;
+    unsigned int costs;
 } innerTransition;
 
 typedef struct {
@@ -39,6 +40,7 @@ typedef struct {
    bool inStack;
    bool final;
    int curCost;
+   unsigned int maxCosts;
 } innerState;
 
 #endif

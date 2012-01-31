@@ -70,6 +70,30 @@ bool isControllable(pnapi::PetriNet &net, std::string &outputFile, bool useWendy
     return true;
 }
 
+
+void computeOG(pnapi::PetriNet &net, std::string outputFile) {
+    
+    std::string wendyCommand("wendy --correctness=livelock ");
+    wendyCommand+=" --og="+outputFile;
+    
+    // create stringstream to store the open net
+    std::stringstream ss;
+
+    // ss << pnapi::io::lola << *(net) << std::flush;
+    ss << pnapi::io::owfn << net << std::flush;
+      
+    // call wendy and open a pipe
+    FILE* fp = popen(wendyCommand.c_str(), "w");
+
+    // send the net to wendy
+    fprintf(fp, "%s", ss.str().c_str());
+
+    // close the pipe
+    pclose(fp);
+
+}
+
+
 /**
 This function calls lola-statespace with the given net and returns a file pointer to the state automaton
 of the inner graph.

@@ -334,8 +334,14 @@ int main(int argc, char** argv) {
             }
     	}
         if (args_info.og_given) {
-		    message("Any partner is cost-minimal, returning the operating guidelines.");
-            // TODO
+            std::string s = "writing operating guidelines to ";
+            if (std::string(args_info.og_arg).compare("-") == 0) {
+                s += "standard out";             
+            } else {
+                s += "file '" + std::string(args_info.og_arg) + "'";
+            }
+		    message("Any partner is cost-minimal, %s.", s.c_str());
+            computeOG(*net, args_info.og_arg);
         }
 
     } else { // there exists a partner with a bounded budget 
@@ -395,8 +401,15 @@ int main(int argc, char** argv) {
             }
     	}
         if (args_info.og_given) {
-		    message("Writing representation of all cost-minimal partners to file '%s'.", args_info.og_arg);
-            // TODO
+            std::string s = "writing operating guidelines to ";
+            if (std::string(args_info.og_arg).compare("-") == 0) {
+                s += "standard out";             
+            } else {
+                s += "file '" + std::string(args_info.og_arg) + "'";
+            }
+		    message("Computing representation of all cost-minimal partners, %s.", s.c_str());
+            iMod.setToValue(minBudget);
+            computeOG(*net, args_info.og_arg);
         }
 
     } 

@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Standard continuos integration job for Fiona</description>
+  <description>&lt;em&gt;Standard continuos integration job for Fiona&lt;/em&gt;</description>
+  <displayName>Fiona</displayName>
   <logRotator>
     <daysToKeep>-1</daysToKeep>
     <numToKeep>10</numToKeep>
@@ -27,8 +28,7 @@
     <excludedCommitMessages></excludedCommitMessages>
     <workspaceUpdater class="hudson.scm.subversion.UpdateWithCleanUpdater"/>
   </scm>
-  <assignedNode>Builder</assignedNode>
-  <canRoam>false</canRoam>
+  <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
@@ -40,7 +40,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>wget http://svn.gna.org/svn/service-tech/trunk/_build/build.xml</command>
+      <command>wget http://svn.gna.org/viewcvs/*checkout*/service-tech/trunk/_build/build.xml -O build.xml</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Ant>
       <targets></targets>
@@ -62,31 +62,17 @@
         <unstableTotalHigh></unstableTotalHigh>
         <unstableTotalNormal></unstableTotalNormal>
         <unstableTotalLow></unstableTotalLow>
-        <unstableNewAll></unstableNewAll>
-        <unstableNewHigh></unstableNewHigh>
-        <unstableNewNormal></unstableNewNormal>
-        <unstableNewLow></unstableNewLow>
         <failedTotalAll></failedTotalAll>
         <failedTotalHigh></failedTotalHigh>
         <failedTotalNormal></failedTotalNormal>
         <failedTotalLow></failedTotalLow>
-        <failedNewAll></failedNewAll>
-        <failedNewHigh></failedNewHigh>
-        <failedNewNormal></failedNewNormal>
-        <failedNewLow></failedNewLow>
       </thresholds>
       <shouldDetectModules>false</shouldDetectModules>
-      <parserConfigurations>
-        <hudson.plugins.warnings.ParserConfiguration>
-          <pattern>artifacts/make.log</pattern>
-          <parserName>GNU compiler 4 (ld)</parserName>
-        </hudson.plugins.warnings.ParserConfiguration>
-        <hudson.plugins.warnings.ParserConfiguration>
-          <pattern>artifacts/make.log</pattern>
-          <parserName>GNU compiler 4 (gcc)</parserName>
-        </hudson.plugins.warnings.ParserConfiguration>
-      </parserConfigurations>
-      <consoleLogParsers/>
+      <dontComputeNew>true</dontComputeNew>
+      <parserConfigurations/>
+      <consoleLogParsers>
+        <string>GNU compiler 4 (gcc)</string>
+      </consoleLogParsers>
     </hudson.plugins.warnings.WarningsPublisher>
     <hudson.tasks.ArtifactArchiver>
       <artifacts>artifacts/**</artifacts>
@@ -94,50 +80,6 @@
     </hudson.tasks.ArtifactArchiver>
     <hudson.plugins.plot.PlotPublisher>
       <plots>
-        <hudson.plugins.plot.Plot>
-          <title>Line Coverage</title>
-          <yaxis>lines</yaxis>
-          <series>
-            <hudson.plugins.plot.PropertiesSeries>
-              <file>plot_coveredlines</file>
-              <label>covered lines</label>
-              <fileType>properties</fileType>
-            </hudson.plugins.plot.PropertiesSeries>
-            <hudson.plugins.plot.PropertiesSeries>
-              <file>plot_totallines</file>
-              <label>total lines</label>
-              <fileType>properties</fileType>
-            </hudson.plugins.plot.PropertiesSeries>
-          </series>
-          <group>Code Coverage</group>
-          <numBuilds></numBuilds>
-          <csvFileName>1179540877.csv</csvFileName>
-          <csvLastModification>0</csvLastModification>
-          <style>line</style>
-          <useDescr>false</useDescr>
-        </hudson.plugins.plot.Plot>
-        <hudson.plugins.plot.Plot>
-          <title>Function Coverage</title>
-          <yaxis>functions</yaxis>
-          <series>
-            <hudson.plugins.plot.PropertiesSeries>
-              <file>plot_coveredfunctions</file>
-              <label>covered functions</label>
-              <fileType>properties</fileType>
-            </hudson.plugins.plot.PropertiesSeries>
-            <hudson.plugins.plot.PropertiesSeries>
-              <file>plot_totalfunctions</file>
-              <label>total functions</label>
-              <fileType>properties</fileType>
-            </hudson.plugins.plot.PropertiesSeries>
-          </series>
-          <group>Code Coverage</group>
-          <numBuilds></numBuilds>
-          <csvFileName>635865542.csv</csvFileName>
-          <csvLastModification>0</csvLastModification>
-          <style>line</style>
-          <useDescr>false</useDescr>
-        </hudson.plugins.plot.Plot>
         <hudson.plugins.plot.Plot>
           <title>Branch Coverage</title>
           <yaxis>branches</yaxis>
@@ -155,7 +97,51 @@
           </series>
           <group>Code Coverage</group>
           <numBuilds></numBuilds>
-          <csvFileName>1893049061.csv</csvFileName>
+          <csvFileName>406131750.csv</csvFileName>
+          <csvLastModification>0</csvLastModification>
+          <style>line</style>
+          <useDescr>false</useDescr>
+        </hudson.plugins.plot.Plot>
+        <hudson.plugins.plot.Plot>
+          <title>Line Coverage</title>
+          <yaxis>lines</yaxis>
+          <series>
+            <hudson.plugins.plot.PropertiesSeries>
+              <file>plot_totallines</file>
+              <label>total lines</label>
+              <fileType>properties</fileType>
+            </hudson.plugins.plot.PropertiesSeries>
+            <hudson.plugins.plot.PropertiesSeries>
+              <file>plot_coveredlines</file>
+              <label>covered lines</label>
+              <fileType>properties</fileType>
+            </hudson.plugins.plot.PropertiesSeries>
+          </series>
+          <group>Code Coverage</group>
+          <numBuilds></numBuilds>
+          <csvFileName>307685798.csv</csvFileName>
+          <csvLastModification>0</csvLastModification>
+          <style>line</style>
+          <useDescr>false</useDescr>
+        </hudson.plugins.plot.Plot>
+        <hudson.plugins.plot.Plot>
+          <title>Function Coverage</title>
+          <yaxis>functions</yaxis>
+          <series>
+            <hudson.plugins.plot.PropertiesSeries>
+              <file>plot_totalfunctions</file>
+              <label>total functions</label>
+              <fileType>properties</fileType>
+            </hudson.plugins.plot.PropertiesSeries>
+            <hudson.plugins.plot.PropertiesSeries>
+              <file>plot_coveredfunctions</file>
+              <label>covered functions</label>
+              <fileType>properties</fileType>
+            </hudson.plugins.plot.PropertiesSeries>
+          </series>
+          <group>Code Coverage</group>
+          <numBuilds></numBuilds>
+          <csvFileName>1867150305.csv</csvFileName>
           <csvLastModification>0</csvLastModification>
           <style>line</style>
           <useDescr>false</useDescr>
@@ -165,33 +151,29 @@
     <hudson.plugins.doclinks.DocLinksPublisher>
       <documents>
         <hudson.plugins.doclinks.Document>
-          <title>Doxygen</title>
-          <directory>doc/doxygen</directory>
+          <title>Code Coverage</title>
+          <directory>tests/cover-html</directory>
           <recursive>true</recursive>
-          <file>index.html</file>
           <id>1</id>
         </hudson.plugins.doclinks.Document>
         <hudson.plugins.doclinks.Document>
-          <title>SVN Statistiscs</title>
-          <directory>statsvn</directory>
+          <title>Doxygen</title>
+          <directory>doc/doxygen</directory>
           <recursive>true</recursive>
-          <file>index.html</file>
           <id>2</id>
         </hudson.plugins.doclinks.Document>
         <hudson.plugins.doclinks.Document>
-          <title>Code Coverage</title>
-          <directory>tests/cover-html</directory>
+          <title>StatSVN</title>
+          <directory>statsvn</directory>
           <recursive>true</recursive>
           <id>3</id>
         </hudson.plugins.doclinks.Document>
       </documents>
     </hudson.plugins.doclinks.DocLinksPublisher>
-    <hudson.plugins.cigame.GamePublisher/>
     <org.jenkinsci.plugins.cppcheck.CppcheckPublisher>
       <cppcheckConfig>
         <pattern></pattern>
-        <useWorkspaceAsRootPath>false</useWorkspaceAsRootPath>
-        <ignoreBlankFiles>false</ignoreBlankFiles>
+        <ignoreBlankFiles>true</ignoreBlankFiles>
         <configSeverityEvaluation>
           <threshold></threshold>
           <newThreshold></newThreshold>
@@ -209,65 +191,14 @@
           <xSize>500</xSize>
           <ySize>200</ySize>
           <displayAllErrors>true</displayAllErrors>
-          <displayErrorSeverity>true</displayErrorSeverity>
-          <displayWarningSeverity>true</displayWarningSeverity>
-          <displayStyleSeverity>true</displayStyleSeverity>
-          <displayPerformanceSeverity>true</displayPerformanceSeverity>
-          <displayInformationSeverity>true</displayInformationSeverity>
+          <displayErrorSeverity>false</displayErrorSeverity>
+          <displayWarningSeverity>false</displayWarningSeverity>
+          <displayStyleSeverity>false</displayStyleSeverity>
+          <displayPerformanceSeverity>false</displayPerformanceSeverity>
+          <displayInformationSeverity>false</displayInformationSeverity>
         </configGraph>
       </cppcheckConfig>
     </org.jenkinsci.plugins.cppcheck.CppcheckPublisher>
-    <hudson.plugins.emailext.ExtendedEmailPublisher>
-      <recipientList>$DEFAULT_RECIPIENTS</recipientList>
-      <configuredTriggers>
-        <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
-          <email>
-            <recipientList>$PROJECT_DEFAULT_RECIPIENTS</recipientList>
-            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
-            <body>$PROJECT_DEFAULT_CONTENT</body>
-            <sendToDevelopers>true</sendToDevelopers>
-            <sendToRequester>true</sendToRequester>
-            <includeCulprits>true</includeCulprits>
-            <sendToRecipientList>true</sendToRecipientList>
-          </email>
-        </hudson.plugins.emailext.plugins.trigger.FailureTrigger>
-        <hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
-          <email>
-            <recipientList>$PROJECT_DEFAULT_RECIPIENTS</recipientList>
-            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
-            <body>$PROJECT_DEFAULT_CONTENT</body>
-            <sendToDevelopers>true</sendToDevelopers>
-            <sendToRequester>true</sendToRequester>
-            <includeCulprits>true</includeCulprits>
-            <sendToRecipientList>true</sendToRecipientList>
-          </email>
-        </hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
-        <hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
-          <email>
-            <recipientList>$PROJECT_DEFAULT_RECIPIENTS</recipientList>
-            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
-            <body>$PROJECT_DEFAULT_CONTENT</body>
-            <sendToDevelopers>true</sendToDevelopers>
-            <sendToRequester>true</sendToRequester>
-            <includeCulprits>false</includeCulprits>
-            <sendToRecipientList>true</sendToRecipientList>
-          </email>
-        </hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
-      </configuredTriggers>
-      <contentType>default</contentType>
-      <defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
-      <defaultContent>$DEFAULT_CONTENT</defaultContent>
-      <attachmentsPattern></attachmentsPattern>
-    </hudson.plugins.emailext.ExtendedEmailPublisher>
-    <hudson.plugins.twitter.TwitterPublisher/>
-    <hudson.tasks.BuildTrigger>
-      <childProjects>Fiona-win</childProjects>
-      <threshold>
-        <name>SUCCESS</name>
-        <ordinal>0</ordinal>
-        <color>BLUE</color>
-      </threshold>
-    </hudson.tasks.BuildTrigger>
   </publishers>
   <buildWrappers/>
 </project>

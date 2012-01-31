@@ -37,7 +37,7 @@ index_t* Transition::PositionScapegoat = NULL;
 */
 void Transition::deleteTransitions()
 {
-    free(Transition::Fairness);
+    //free(Transition::Fairness);
     free(Transition::Enabled);
     free(Transition::DeltaHash);
     for (int direction = PRE; direction <= POST; direction++)

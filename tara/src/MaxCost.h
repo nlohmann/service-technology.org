@@ -24,7 +24,7 @@
 #include <pnapi/pnapi.h>
 
 // compute the maxCost of the inner Graph
-unsigned int maxCost();
+unsigned int maxCost(char ** optimization, unsigned int optLen, pnapi::PetriNet* net);
 
 void printCurrentRun();
 

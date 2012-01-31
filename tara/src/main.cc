@@ -297,7 +297,7 @@ int main(int argc, char** argv) {
 
     // max Costs are the costs of the most expensive path through
     // the inner state graph
-    unsigned int maxCostOfComposition=maxCost();
+    unsigned int maxCostOfComposition=maxCost(args_info.opt_arg, args_info.opt_given, net);
 
 
     /*------------------------------------------.
@@ -312,6 +312,8 @@ int main(int argc, char** argv) {
     ssi << maxCostOfComposition;
     std::string minCostPartner=tempFN+"-min-partner-";  
     std::string curMinCostPartner=minCostPartner+ssi.str()+".sa";
+    std::cout << pnapi::io::owfn << *net << std::endl;
+    return 0;
     bool bounded = isControllable(*net, curMinCostPartner, true); 
 
     // output file of the min cost partner
@@ -352,8 +354,8 @@ int main(int argc, char** argv) {
             
             status("Finding the minimal budget with a binary search");
 
-            unsigned int bsUpper = maxCostOfComposition-1; // for maxCostofComposition, it is controllable anyway. 
-            unsigned int bsLower = 0;
+            int bsUpper = maxCostOfComposition-1; // for maxCostofComposition, it is controllable anyway. 
+            int bsLower = 0;
             
             while (bsLower <= bsUpper) {
                

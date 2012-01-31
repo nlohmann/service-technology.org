@@ -41,7 +41,7 @@ inline bool fileExists(const std::string& filename) {
 
 bool isControllable(pnapi::PetriNet &net, std::string &outputFile, bool useWendyOptimization) {
     
-    std::string wendyCommand("wendy --correctness=livelock ");
+    std::string wendyCommand("wendy -v --correctness=livelock ");
     if (useWendyOptimization) {
         wendyCommand+= " --waitstatesOnly --receivingBeforeSending --seqReceivingEvents   --succeedingSendingEvent  --quitAsSoonAsPossible ";
     }

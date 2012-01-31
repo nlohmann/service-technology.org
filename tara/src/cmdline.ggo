@@ -55,6 +55,16 @@ option "og" -
   typestr="FILENAME"
   optional
 
+section "Optimization" 
+sectiondesc="There are some optimization techniques availabe to (hopefully) speed up Tara. \n"
+
+option "opt" -
+  "Uses the optimization technique 'TECH'. You may specify multiple such techniques." 
+  string
+  typestr="TECH"
+  optional
+  multiple
+
 
 section "Configuration"
 sectiondesc="Configuration files are used to control some options of Tara. Don't worry, a default configuration file is created and - if nothing else is specified - used. \n"

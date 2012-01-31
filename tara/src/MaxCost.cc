@@ -25,6 +25,7 @@
 #include <list>
 #include <stdio.h>
 #include <pnapi/pnapi.h>
+#include "verbose.h"
 
 extern std::map<const int, innerState *const> innerGraph;
 
@@ -34,7 +35,40 @@ extern unsigned int cost(pnapi::Transition*);
 /* this stack is used for DFS */
 std::deque<int> nodeStack;
 
-unsigned int maxCost() {
+unsigned int maxCost(char ** optimization, unsigned int optLen, pnapi::PetriNet* net) {
+    status("LoLA returned %d states.", innerGraph.size());
+    
+    bool USE_SIMPLE = false;
+    
+        for (int i = 0; i < optLen; ++i) {
+            status("Optimization enabled: '%s'.", optimization[i]);
+            std::string sOpt = optimization[i];
+            if (sOpt.compare("simple")) {
+                USE_SIMPLE = true;            
+            }        
+        }    
+
+
+    if (USE_SIMPLE) {
+    
+        int maxTransCost = 0;
+
+        //iterate over all transitions of the net
+        std::set<pnapi::Transition*> allTransitions=net->getTransitions();
+        for(std::set<pnapi::Transition*>::iterator it=allTransitions.begin();it!=allTransitions.end();it++) {
+          // the cost of that transition
+          int curCost=cost(*it);
+
+           // remember the most expensive transition
+           maxTransCost=maxTransCost>curCost? maxTransCost: curCost;
+         }
+        
+        int val = innerGraph.size() * maxTransCost;
+        
+        status("Using simple upper bound: %d", val);        
+        
+        return val;
+    }
 
    // assuming innerGraph[0] is start state
    innerGraph[0]->curCost=0;
@@ -43,12 +77,15 @@ unsigned int maxCost() {
    unsigned int maxCost=0;
    unsigned int curCost=0;
 
+   int test = 0;
+
    while(!nodeStack.empty()) {
        int tos(nodeStack.back()); /* tos = Top Of Stack */
      
        // if accepting state, update MaxCost
        if(innerGraph[tos]->final) {
            maxCost=maxCost>curCost ? maxCost:curCost;
+        //   std::cout << test++ << std::endl;
 /*
 DEBUG: output all expensive paths
 

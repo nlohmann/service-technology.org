@@ -312,7 +312,7 @@ int main(int argc, char** argv) {
     ssi << maxCostOfComposition;
     std::string minCostPartner=tempFN+"-min-partner-";  
     std::string curMinCostPartner=minCostPartner+ssi.str()+".sa";
-	bool bounded = isControllable(*net, curMinCostPartner, true); 
+    bool bounded = isControllable(*net, curMinCostPartner, true); 
 
     // output file of the min cost partner
     std::ifstream minCostPartnerStream;
@@ -321,9 +321,23 @@ int main(int argc, char** argv) {
     
     if (!bounded) {
         // Every partner is trivially cost-minimal. Thus, return the mpp
-        message("Any partner is cost-minimal, returning the most-permissive partner.");
-        minCostPartnerStream.open(partnerTemp.c_str());
-	    cout << minCostPartnerStream.rdbuf();
+        if (args_info.sa_given) {
+		    message("Any partner is cost-minimal, returning the most-permissive partner.");
+		    minCostPartnerStream.open(partnerTemp.c_str());
+            if (std::string(args_info.sa_arg).compare("-") != 0) {
+                std::ofstream outputFile;
+                outputFile.open(args_info.sa_arg);
+                outputFile << minCostPartnerStream.rdbuf();
+                outputFile.close();
+            } else {
+    		    cout << minCostPartnerStream.rdbuf();
+            }
+    	}
+        if (args_info.og_given) {
+		    message("Any partner is cost-minimal, returning the operating guidelines.");
+            // TODO
+        }
+
     } else { // there exists a partner with a bounded budget 
         
         unsigned int minBudget = maxCostOfComposition; // Initially set the minimal budget to the maxCostOfComposition
@@ -359,12 +373,31 @@ int main(int argc, char** argv) {
         
         // Binary search done. The minimal budget is found. Return the partner for the minimal budget.    
         
-        ssi.str("");
-        ssi << minBudget;
-        curMinCostPartner=minCostPartner+ssi.str()+".sa";
-        minCostPartnerStream.open(curMinCostPartner.c_str());
-        message("Found a cost minimal partner with costs: %d", minBudget);
-        cout << minCostPartnerStream.rdbuf();
+        message("Minimal budget found: %d", minBudget);
+
+
+        if (args_info.sa_given) {
+		    message("Synthesized a cost-minimal partner. (Costs = %d)", minBudget);
+            ssi.str("");
+            ssi << minBudget;
+            curMinCostPartner=minCostPartner+ssi.str()+".sa";
+            minCostPartnerStream.open(curMinCostPartner.c_str());
+            if (std::string(args_info.sa_arg).compare("-") != 0) {
+    		    message("Writing partner to file '%s'.",args_info.sa_arg);
+                std::ofstream outputFile;
+                outputFile.open(args_info.sa_arg);
+                outputFile << minCostPartnerStream.rdbuf();
+                outputFile.close();
+            } else {
+    		    message("Writing partner to standard out.");
+                std::ofstream outputFile;
+    		    cout << minCostPartnerStream.rdbuf();
+            }
+    	}
+        if (args_info.og_given) {
+		    message("Writing representation of all cost-minimal partners to file '%s'.", args_info.og_arg);
+            // TODO
+        }
 
     } 
 

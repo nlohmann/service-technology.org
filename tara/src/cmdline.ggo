@@ -43,6 +43,18 @@ option "net" n
   string
   typestr="FILENAME"
 
+option "sa" -
+  "Synthesizes a cost-minimal partner (service automaton) and saves it in FILENAME. If FILENAME equals a dash, the partner is written to standard out."
+  string
+  typestr="FILENAME"
+  optional
+
+option "og" -
+  "Computes the representation of all cost-minimal partners (operating guidelines) and saves it in FILENAME. If FILENAME equals a dash, the operating guideline is written to standard out."
+  string
+  typestr="FILENAME"
+  optional
+
 
 section "Configuration"
 sectiondesc="Configuration files are used to control some options of Tara. Don't worry, a default configuration file is created and - if nothing else is specified - used. \n"

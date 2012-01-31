@@ -46,13 +46,13 @@ AT_BANNER([Memory Management])
 AT_SETUP([Checking for memory leaks: Garavel])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW < garavel.lola],0,ignore,stderr)
-AT_CHECK([GREP -q -e "[[definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible]]" stderr])
+AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
 
 AT_SETUP([Checking for memory leaks: Phils 1000])
 AT_CHECK([cp TESTFILES/phils1000.lola .])
 AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW < phils1000.lola],0,ignore,stderr)
-AT_CHECK([GREP -q -e "[[definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible]]" stderr])
+AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP

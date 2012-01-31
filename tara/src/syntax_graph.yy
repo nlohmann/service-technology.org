@@ -49,9 +49,31 @@ std::map<const pnapi::Place*, unsigned int> currentMarking;
 
 ///currentState during parsing
 unsigned int currentState;
+unsigned int currentTaraState;
 
-// the inner Graph that gets constructed
-std::map<const unsigned int, innerState *const> innerGraph;
+// A mapping from the lola state numbers to the actual state numbers
+std::map<const unsigned int, unsigned int> lolaToTara;
+
+// The actual inner graph, realized by a deque (quick insertion, quick access)
+extern std::deque<innerState *> innerGraph;
+
+unsigned int getTaraState (unsigned int lolaState) {
+    // First check whether the lola state has been seen yet
+    
+    std::map<const unsigned int, unsigned int>::iterator it =  lolaToTara.find(lolaState);
+    bool seen = (it != lolaToTara.end());
+    
+    // If the state has been seen, return the value
+    if (seen) {
+        return it->second;
+    } 
+    
+    // Otherwise: Create a new state, store the value, return it.
+    unsigned int taraState = innerGraph.size();
+    innerGraph.push_back(new innerState);
+    lolaToTara[lolaState] = taraState;
+    return taraState;
+}
 
 %}
 
@@ -75,12 +97,12 @@ states:
 state:
   KW_STATE NUMBER lowlink scc markings
     {
-        currentState=$2;
-        innerGraph.insert(std::pair<int, innerState *const>($2,new innerState));
-        innerGraph[$2]->inStack=false;
-        innerGraph[$2]->final=net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, net));
-
+    currentState=$2;
+	currentTaraState = getTaraState(currentState);
+	innerGraph[currentTaraState]->inStack = false;
+	innerGraph[currentTaraState]->final = net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, net));	
         currentMarking.clear();
+	
     }
     transitions
     { /* do nothing */  }
@@ -135,10 +157,11 @@ transitionList:
 transition:
   NAME ARROW NUMBER 
   {
-       innerTransition cur= { net->findTransition($1), $3 };
+        
+       innerTransition cur= { net->findTransition($1), getTaraState($3) };
        free($1); //get rid of those strings
 
-       innerGraph[currentState]->transitions.push_back(cur);
-       innerGraph[currentState]->curTransition=innerGraph[currentState]->transitions.begin();
+       innerGraph[currentTaraState]->transitions.push_back(cur);
+       innerGraph[currentTaraState]->curTransition=innerGraph[currentTaraState]->transitions.begin();
   }
 ;

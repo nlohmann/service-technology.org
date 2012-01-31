@@ -16,20 +16,20 @@
  You should have received a copy of the GNU Affero General Public License
  along with Hello.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
+#include <stack>
+#include <map>
+#include <stdio.h>
+#include <pnapi/pnapi.h>
 
 #include "MaxCost.h"
 #include "syntax_graph.h"
 #include "syntax_costfunction.h"
-#include <stack>
-#include <map>
-#include <list>
-#include <stdio.h>
-#include <pnapi/pnapi.h>
 #include "verbose.h"
 
-extern std::map<const int, innerState *const> innerGraph;
+std::deque<innerState *> innerGraph;
 
 extern unsigned int cost(pnapi::Transition*);
+extern unsigned int getTaraState (unsigned int);
 
 /* this is the Stack of the nodes in the graph of lola output */
 /* this stack is used for DFS */
@@ -41,10 +41,10 @@ unsigned int maxCost(char ** optimization, unsigned int optLen, pnapi::PetriNet*
     bool USE_SIMPLE = false;
     
         for (int i = 0; i < optLen; ++i) {
-            status("Optimization enabled: '%s'.", optimization[i]);
             std::string sOpt = optimization[i];
-            if (sOpt.compare("simple")) {
-                USE_SIMPLE = true;            
+            if (sOpt.compare("simple") == 0) {
+                USE_SIMPLE = true;
+		status("Optimization enabled: '%s'.", optimization[i]);
             }        
         }    
 
@@ -71,13 +71,14 @@ unsigned int maxCost(char ** optimization, unsigned int optLen, pnapi::PetriNet*
     }
 
    // assuming innerGraph[0] is start state
-   innerGraph[0]->curCost=0;
-   nodeStack.push_back(0);
+
+   unsigned int initialState = getTaraState(0);
+
+   innerGraph[initialState]->curCost=0;
+   nodeStack.push_back(initialState);
  
    unsigned int maxCost=0;
    unsigned int curCost=0;
-
-   int test = 0;
 
    while(!nodeStack.empty()) {
        int tos(nodeStack.back()); /* tos = Top Of Stack */
@@ -133,6 +134,7 @@ DEBUG: output all expensive paths
        //for current tos goto next transition
        ++(innerGraph[tos]->curTransition);
    }
-   return maxCost;
+ 	status("Using upper bound: %d", maxCost);        
+  	return maxCost;
    //printf("\n maxCost: %d \n\n", maxCost);
 }

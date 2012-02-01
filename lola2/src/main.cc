@@ -107,7 +107,8 @@ int main(int argc, char** argv)
 
     delete symbolTables;
 
-    if (args_info.randomWalk_given) {
+    if (args_info.randomWalk_given)
+    {
         randomWalk();
     }
 

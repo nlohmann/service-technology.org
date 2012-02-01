@@ -89,6 +89,7 @@ unsigned int maxCost(pnapi::PetriNet* net) {
    while(!nodeStack.empty()) {
        int tos(nodeStack.back()); /* tos = Top Of Stack */
      
+       if (maxCost == sumOfLocalMaxCosts) { status("Found a path which is equal to maxout upper bound."); return maxCost; }
        // if accepting state, update MaxCost
        if(innerGraph[tos]->final) {
            maxCost=maxCost>curCost ? maxCost:curCost;

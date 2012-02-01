@@ -101,7 +101,7 @@ The second argument  is used as temporary filename.
  */
 void getLolaStatespace(pnapi::PetriNet &net, std::string &tempFileName) {
 
-    std::string command="lola-statespace -m "; //TODO: as cmd-param
+    std::string command="lola-statespace -m"; //TODO: as cmd-param
 
     command+=tempFileName;
 

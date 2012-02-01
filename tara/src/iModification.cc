@@ -21,12 +21,13 @@
 #include <list>
 #include <pnapi/pnapi.h>
 #include <stdio.h>
+#include "verbose.h"
 
 extern unsigned int cost(pnapi::Transition* t);
-
+extern int hiCosts;
 // arguments are the net and the inter i
 iModification::iModification(pnapi::PetriNet* netToModify, unsigned int startI)
-   : net(netToModify), i(startI), maxTransCost(0)
+   : net(netToModify), i(startI)
 {
    // do the init modification
    this->init();
@@ -34,18 +35,7 @@ iModification::iModification(pnapi::PetriNet* netToModify, unsigned int startI)
 
 void iModification::iterate() {
    
-   if(this->i ==0)
-      printf("error, cannot iterate under zero");
-   // TODO: insert some nice error exit here...
-
-   this->i--; // optimize ??
-
-   // add arc from expensed costs to  out of credit place
-   this->outOfCreditArc->setWeight(this->i+1);
-
-   // finally set the availble costs
-   this->availableCost->setTokenCount(this->maxTransCost+this->i);
-
+   decrease();
    /// update available costs
    //unsigned int newAvailable=this->availableCost->getTokenCount()+1;
   // this->availableCost->setTokenCount(newAvailable);
@@ -57,11 +47,8 @@ void iModification::iterate() {
 
 void iModification::update() {
     
-   // update the arc weight
-   outOfCreditArc->setWeight(i+1);
-
    // update the available costs
-   availableCost->setTokenCount(maxTransCost+i);
+   availableCost->setTokenCount(hiCosts+i);
         
 
 }
@@ -104,13 +91,13 @@ unsigned int iModification::getI() { return this->i; }
 
 void iModification::init() {
 
+   status("Initializing modification. Highest transition costs are: %d", hiCosts);
+
    //create the place for the availble costs
    // tokens will be set later
    this->availableCost= &net->createPlace();
 
-   // place for the expensed costs,
-   // we may forget that one after init
-   pnapi::Place* expensedCosts = &net->createPlace();
+
   
    //iterate over all transitions of the net
    std::set<pnapi::Transition*> allTransitions=net->getTransitions();
@@ -119,33 +106,28 @@ void iModification::init() {
       // the cost of that transition
       int curCost=cost(*it);
 
-      //if the transition is free, do nothing
-      if(curCost == 0) continue;
+      unsigned int in = 0;
+      unsigned int out = 0;
+		
+      //if the transition is free, add the self loop to the budget place and continue
+      if(curCost == 0) {
+	
+	in = hiCosts;
+	out = hiCosts;
+      } else {
+	in = hiCosts + curCost - 1 ;
+	if (hiCosts > 1) out = hiCosts - 1;
+      }
 
-      // remember the most expensive transition
-      maxTransCost=maxTransCost>curCost? maxTransCost: curCost;
-     
-      //add arc from availableCost to that transition
-      net->createArc(*availableCost,**it, curCost);
+	//add arc from availableCost to that transition
+	if (in > 0) net->createArc(*availableCost,**it, in);
+	
+	//add arc from transition to availableCost
+	if (out > 0) net->createArc(**it, *availableCost, out);
 
-      //arc from that transition to expensedCosts
-      net->createArc( **it, *expensedCosts,curCost);
- }
-   // add out of credit place
-   // C-Blitz, game over
-   pnapi::Place* outOfCreditPlace = & net->createPlace();
-
-   net->getFinalCondition() = (net->getFinalCondition().getFormula() && ( *outOfCreditPlace == 0));
-  
-   // add out of credit transition
-   pnapi::Transition* outOfCreditTransition = &net->createTransition();
-  
-   // an arc from the transition to the place
-   net->createArc( *outOfCreditTransition, *outOfCreditPlace);
-  
-    // add arc from expensed costs to  out of credit place
-    this->outOfCreditArc = & net->createArc( *expensedCosts, *outOfCreditTransition, this->i+1);
-
+   }
+   
+   net->getFinalCondition() = (net->getFinalCondition().getFormula() && ( *availableCost >= hiCosts ));
    // finally set the availble costs
-   this->availableCost->setTokenCount(maxTransCost+i);
+   this->availableCost->setTokenCount(hiCosts+i);
 }

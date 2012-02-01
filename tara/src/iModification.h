@@ -44,7 +44,7 @@ class iModification {
     
       pnapi::PetriNet* net;
       unsigned int i;
-      unsigned int maxTransCost;
+
 
       pnapi::Place* availableCost;
       pnapi::Arc* outOfCreditArc;

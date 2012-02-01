@@ -44,14 +44,14 @@ CONSUME
 PRODUCE
   p3:	1;
 
-TRANSITION t4	 { !b1 }
+TRANSITION t4	 { !b1 (t2)}
 CONSUME
   p2:	1;
 PRODUCE
   b:	1,
   p4 : 1;
  
-TRANSITION t5	 { !b2 }
+TRANSITION t5	 { !b2 (t3)}
 CONSUME
   p3:	1;
 PRODUCE

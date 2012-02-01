@@ -315,8 +315,8 @@ int main(int argc, char** argv) {
     ssi << maxCostOfComposition;
     std::string minCostPartner=tempFN+"-min-partner-";  
     std::string curMinCostPartner=minCostPartner+ssi.str()+".sa";
- /*   std::cout << pnapi::io::owfn << *net << std::endl;
-    return 0;*/
+   //std::cout << pnapi::io::owfn << *net << std::endl;
+   //return 0;
     bool bounded = isControllable(*net, curMinCostPartner, true); 
 
     // output file of the min cost partner

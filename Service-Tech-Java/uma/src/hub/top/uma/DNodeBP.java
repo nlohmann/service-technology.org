@@ -953,6 +953,7 @@ public class DNodeBP {
   
   			DNode[] loc = new DNode[e.pre.length];
   			  
+  			DNodeEmbeddingVisitor embedding = dNodeAS.getEmbeddingVisitor();
   			// see if each precondition of event e is
   			// in max BP (current maximal conditions of the current BP)
   			int i=0;
@@ -963,7 +964,7 @@ public class DNodeBP {
   				for (DNode b : cutNodes)
   				{
   					if (b.id == e.pre[i].id) {
-  						if (e.pre[i].suffixOf(b)) {
+  						if (e.pre[i].suffixOf(b, embedding)) {
   							// same ID and "endsWith"
   							loc[i] = b;	// found
   							break;

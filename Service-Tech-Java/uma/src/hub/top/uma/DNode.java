@@ -259,15 +259,19 @@ public class DNode {
    *    <code>true</code> iff this node (and its predecessors) is a suffix
    *    of node complete (and its predecessors)
    */
-  public boolean suffixOf(DNode complete, Map<DNode, DNode> embedding) {
+  public boolean suffixOf(DNode complete, DNodeEmbeddingVisitor embedding) {
     DNode suffix = this;
     if (complete.id != suffix.id)
       return false;
     // nodes have equal id
     
+    if (embedding != null) {
+        if (!embedding.canBeExtended(suffix, complete)) return false;
+    }
+    
     if (suffix.pre == null) {
       // suffix has no predecessor, this ends with other
-      if (embedding != null) embedding.put(suffix, complete);
+      if (embedding != null) embedding.extend(suffix, complete);
       return true;
     }
     // need to compare predecessors
@@ -311,7 +315,7 @@ public class DNode {
     }
     // successfully found that for each pre-node X of suffix
     // exists a pre-node of complete that ends with X
-    if (embedding != null) embedding.put(suffix, complete);
+    if (embedding != null) embedding.extend(suffix, complete);
     return true;
   }
   

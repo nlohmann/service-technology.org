@@ -294,7 +294,7 @@ public abstract class DNodeSys {
       fireableEventIndex.put(e.id, currentIndex++);
     }
   }
-	
+  
 	/**
 	 * @param d
 	 * @return
@@ -318,6 +318,10 @@ public abstract class DNodeSys {
 	    if (d.globalId == globalId) return d;
 	  }
 	  return null;
+	}
+	
+	public DNodeEmbeddingVisitor getEmbeddingVisitor() {
+	  return new DNodeEmbeddingVisitor();
 	}
 	
 	public String getInfo () {

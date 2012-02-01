@@ -79,13 +79,16 @@ public class DNodeTransitive extends DNode {
    * @param embedding (can be {@code null})
    * @return {@code true} iff this node is a suffix of node (@code complete)
    */
-  public boolean suffixOf(DNode complete, Map<DNode, DNode> embedding) {
+  @Override
+  public boolean suffixOf(DNode complete, DNodeEmbeddingVisitor embedding) {
     
     // first all direct predecessors have to be a suffix of complete
     if (!super.suffixOf(complete, embedding)) return false;
     // then check each transitive predecessor
     if (preTrans == null || preTrans.length == 0) {
-      if (embedding != null) embedding.put(this, complete);
+      // super.suffixOf guarantees returns true only if
+      // embedding.canBeExtended == true
+      if (embedding != null) embedding.extend(this, complete);
       return true;
     }
 
@@ -124,7 +127,7 @@ public class DNodeTransitive extends DNode {
       return false;
     }
     
-    if (embedding != null) embedding.put(this, complete);
+    if (embedding != null) embedding.extend(this, complete);
     return true;
   }
   

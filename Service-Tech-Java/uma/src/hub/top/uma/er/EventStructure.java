@@ -9,9 +9,11 @@ import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
+import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.synthesis.TransitiveDependencies;
 import hub.top.uma.view.ViewGeneration2;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +68,98 @@ public class EventStructure {
     allEvents.add(newNode);
   }
   
+  /**
+   * Remove the 'nodes' from the node set.
+   * @param nodes
+   */
+  public void removeAll(Collection<Event> nodes) {
+    HashSet<DNode> touched = new HashSet<DNode>();
+    
+    HashSet<DNode> toRemove = new HashSet<DNode>(nodes);
+    
+    for (DNode n : toRemove) {
+      if (n.pre != null) {
+        for (DNode pre : n.pre) {
+          if (pre == null) continue;
+          if (toRemove.contains(pre)) continue;
+          
+          for (int i=0; i<pre.post.length; i++) {
+            if (pre.post[i] == n) {
+              pre.post[i] = null;
+              break;
+            }
+          }
+          touched.add(pre);
+        }
+      }
+      
+      if (n.post != null) {
+        for (DNode post : n.post) {
+          if (post == null) continue;
+          if (toRemove.contains(post)) continue;
+          
+          for (int i=0; i<post.pre.length; i++) {
+            if (post.pre[i] == n) {
+              post.pre[i] = null;
+              break;
+            }
+          }
+          
+          touched.add(post);
+        }
+      }
+    }
+    
+    for (DNode e : toRemove) {
+      removeFromConflicts((Event)e);
+    }
+    
+    EventCollection newEvents = new EventCollection();
+    for (Event e : allEvents) {
+      if (!toRemove.contains(e)) newEvents.add(e);
+    }
+    allEvents = newEvents;
+    
+    for (DNode n : touched) {
+      
+      if (n.pre != null) {
+        int preCount = 0;
+        for (DNode pre : n.pre) {
+          if (pre != null) preCount++;
+        }
+        
+        DNode newPre[] = new DNode[preCount];
+        int newPrePos = 0;
+        for (DNode pre : n.pre) {
+          if (pre != null) {
+            newPre[newPrePos] = pre;
+            newPrePos++;
+          }
+        }
+        
+        n.pre = newPre;
+      }
+      
+      if (n.post != null) {
+        int postCount = 0;
+        for (DNode post : n.post) {
+          if (post != null) postCount++;
+        }
+        
+        DNode newPost[] = new DNode[postCount];
+        int newPostPos = 0;
+        for (DNode post : n.post) {
+          if (post != null) {
+            newPost[newPostPos] = post;
+            newPostPos++;
+          }
+        }
+        
+        n.post = newPost;
+      }
+    }
+  }
+  
   private void _setDirectConflict(Event e1, Event e2) {
     if (e1 == e2)  System.err.println("setting self-conflict on: "+e1);
     if (!directConflict.containsKey(e1)) directConflict.put(e1, new HashSet<Event>());
@@ -75,6 +169,20 @@ public class EventStructure {
   public void setDirectConflict(Event e1, Event e2) {
     _setDirectConflict(e1, e2);
     _setDirectConflict(e2, e1);
+  }
+  
+  public void removeFromConflicts(Event n) {
+    if (directConflict.containsKey(n)) {
+      for (DNode n2 : directConflict.get(n)) {
+        if (n2 != n) {
+          if (directConflict.containsKey(n2)) {
+            directConflict.get(n2).remove(n);
+            if (directConflict.get(n2).isEmpty()) directConflict.remove(n2);
+          }
+        }
+      }
+      directConflict.remove(n);
+    }
   }
   
   public boolean alreadyInConflict(Event e, Event f) {
@@ -203,7 +311,16 @@ public class EventStructure {
     return false;
   }
   
-  public void removeDependency(Event e1, Event e2) {
+  public boolean removeDependency(Event e1, Event e2) {
+    // see if the dependency exists
+    if (e1.post != null) {
+      boolean exists = false;
+      for (DNode f : e1.post) if (f == e2) { exists = true; break; }
+      if (!exists) return false;
+    } else {
+      return false;
+    }
+    
     DNode newPre[] = new DNode[e2.pre.length-1];
     int prePos = 0;
     for (DNode f : e2.pre) {
@@ -217,6 +334,7 @@ public class EventStructure {
       if (f != e2) newPost[postPos++] = f;
     }
     e1.post = newPost;
+    return true;
   }
   
   public void setDependency(Event e1, Event e2) {

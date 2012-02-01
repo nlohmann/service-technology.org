@@ -143,7 +143,6 @@ public class DNodeSet {
 	 * @param newNode
 	 */
 	public void add(DNode newNode) {
-//System.out.println("adding "+newNode+" "+DNode.toString(newNode.pre)+" to "+this);
 		assert newNode != null : "Error! Trying to insert null node into DNodeSet";
 		
 		// the predecessors of newNode are no longer maxNodes in this set
@@ -588,6 +587,8 @@ public class DNodeSet {
 	 */
 	public DNode[] fire(DNode ocletEvent, DNode[] fireLocation, boolean safe) {
 	  
+	  
+	  
 	  // FIXME: DNodeBP causes multiple occurrences of the same event
 	  if (!safe && eventExistsAtLocation(ocletEvent.id, fireLocation)) {
       System.err.println("trying to fire existing event "+ocletEvent+" at "+DNode.toString(fireLocation));
@@ -602,6 +603,8 @@ public class DNodeSet {
 		// cutOff events
 		newEvent.causedBy = new int[1];
 		newEvent.causedBy[0] = ocletEvent.globalId;
+		
+		System.out.println("fired "+newEvent+" cause: "+newEvent.causedBy);
 		
 		// set post-node of conditions
 		for (DNode preNode : fireLocation) {
@@ -687,6 +690,8 @@ public class DNodeSet {
       }
     }
     // now convert the boolean array to a short array of IDs 
+		
+		System.out.println("fired* "+newEvent+" cause: "+newEvent.causedBy);
 		
 		// instantiate the remaining post-conditions of the new oclet event
 		DNode postConditions[] = new DNode[postCount];

@@ -79,8 +79,10 @@ unsigned int maxCost(pnapi::PetriNet* net) {
    unsigned int initialState = getTaraState(0);
 
    innerGraph[initialState]->curCost=0;
+   innerGraph[initialState]->inStack=true;
+   innerGraph[initialState]->curTransition = innerGraph[initialState]->transitions.begin();
    nodeStack.push_back(initialState);
- 
+    
    unsigned int maxCost=0;
    unsigned int curCost=0;
 
@@ -90,23 +92,10 @@ unsigned int maxCost(pnapi::PetriNet* net) {
        // if accepting state, update MaxCost
        if(innerGraph[tos]->final) {
            maxCost=maxCost>curCost ? maxCost:curCost;
-        //   std::cout << test++ << std::endl;
-/*
-DEBUG: output all expensive paths
-
-       if(curCost>maxCost) {
-          maxCost=curCost;
-          for(std::deque<int>::iterator it=nodeStack.begin();it!=nodeStack.end();++it) {
-             printf(" %d ", innerGraph[*it]->curCost);
-          }
-          printf("\n");
-       }
-*/
-}
-
+        }
+    
        /* if all childs are visited, remove from stack and reset properties */
-       if(innerGraph[tos]->transitions.empty() ||
-              (innerGraph[tos]->curTransition == innerGraph[tos]->transitions.end())) {
+       if(innerGraph[tos]->curTransition == innerGraph[tos]->transitions.end()) {
               curCost=curCost-innerGraph[tos]->curCost;
               innerGraph[tos]->inStack=false;
               nodeStack.pop_back();
@@ -125,8 +114,9 @@ DEBUG: output all expensive paths
           int next=innerGraph[tos]->curTransition->successor;
           nodeStack.push_back(next);
           innerGraph[next]->inStack=true;
+          innerGraph[next]->curTransition = innerGraph[next]->transitions.begin();
           
-          // get costs for that transition (using the  pointer to the net transition)
+          // get costs for that transition
           unsigned int transitionCost= innerGraph[tos]->curTransition->costs;
 
           // save the cost to that state

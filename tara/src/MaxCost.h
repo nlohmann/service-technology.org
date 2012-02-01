@@ -35,8 +35,8 @@ typedef struct {
 } innerTransition;
 
 typedef struct {
-   std::list<innerTransition> transitions;
-   std::list<innerTransition>::iterator curTransition;
+   std::deque<innerTransition> transitions;
+   std::deque<innerTransition>::iterator curTransition;
    bool inStack;
    bool final;
    int curCost;

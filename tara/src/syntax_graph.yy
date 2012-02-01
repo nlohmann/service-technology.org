@@ -166,7 +166,6 @@ transition:
            unsigned int trCosts = cost(transition);           
             innerTransition cur= { transition, targetTaraState, trCosts };
            innerGraph[currentTaraState]->transitions.push_back(cur);
-           innerGraph[currentTaraState]->curTransition=innerGraph[currentTaraState]->transitions.begin();
            if (trCosts > innerGraph[currentTaraState]->maxCosts) { 
                 sumOfLocalMaxCosts += trCosts - innerGraph[currentTaraState]->maxCosts; 
                 innerGraph[currentTaraState]->maxCosts = trCosts; 

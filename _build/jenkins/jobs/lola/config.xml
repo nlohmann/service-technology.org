@@ -85,13 +85,13 @@
           <yaxis>branches</yaxis>
           <series>
             <hudson.plugins.plot.PropertiesSeries>
-              <file>plot_coveredbranches</file>
-              <label>covered branches</label>
+              <file>plot_totalbranches</file>
+              <label>total branches</label>
               <fileType>properties</fileType>
             </hudson.plugins.plot.PropertiesSeries>
             <hudson.plugins.plot.PropertiesSeries>
-              <file>plot_totalbranches</file>
-              <label>total branches</label>
+              <file>plot_coveredbranches</file>
+              <label>covered branches</label>
               <fileType>properties</fileType>
             </hudson.plugins.plot.PropertiesSeries>
           </series>

@@ -8,6 +8,7 @@ import hub.top.petrinet.Transition;
 import hub.top.scenario.OcletIO;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeSys;
+import hub.top.uma.Uma;
 import hub.top.uma.er.EventStructure.EventCollection;
 import hub.top.uma.er.SynthesisFromES;
 import hub.top.uma.view.ViewGeneration2;
@@ -75,7 +76,7 @@ public class EventStructureReplay {
   
   public void extendByTrace(String trace[]) {
     
-    System.out.println(ViewGeneration2.toString(trace));
+    //System.out.println(ViewGeneration2.toString(trace));
     
     traceCount++;
     
@@ -886,9 +887,13 @@ public class EventStructureReplay {
     //String fileName_system_sysPath = "./examples/model_correction/a12f0n00_alpha.lola";
     //String fileName_trace  = "./examples/model_correction/a12f0n05_aligned_to_00.log.txt";
     
-    String fileName_system_sysPath = "./examples/model_correction/a12f0n05_alpha.lola";
-    String fileName_trace  = "./examples/model_correction/a12f0n05_aligned.log_4.txt";
+    //String fileName_system_sysPath = "./examples/model_correction/a12f0n05_alpha.lola";
     //String fileName_trace  = "./examples/model_correction/a12f0n05_aligned.log.txt";
+    //String fileName_trace  = "./examples/model_correction/a12f0n05_aligned.log.txt";
+    
+    String fileName_system_sysPath = "./examples/model_correction/a22f0n00.lola";
+    String fileName_trace  = "./examples/model_correction/a22f0n05.log_50.txt";
+
     
     PetriNet sysModel = PetriNetIO.readNetFromFile(fileName_system_sysPath);
     List<String[]> allTraces = ViewGeneration2.readTraces(fileName_trace);
@@ -897,66 +902,55 @@ public class EventStructureReplay {
     sysModel.turnIntoLabeledNet();
     
     EventStructureReplay replay = new EventStructureReplay(sysModel);
-    
+
+    Uma.out.println("build up event structure");
     for (String[] trace : allTraces) {
       replay.extendByTrace(trace);
     }
+    Uma.out.println(replay.es.allEvents.size()+" events");
+
+    Uma.out.println("remove transitive dependencies");
     replay.es.removeTransitiveDependencies();
     OcletIO.writeFile(replay.es.toDot(replay.properNames), fileName_system_sysPath+"_es.dot");
     
-    for (Event e : replay.es.allEvents) {
-      Set<DNode> ev = e.getAllPredecessors();
-      for (DNode e2 : ev) {
-        if (replay.es.inConflict(e, (Event)e2)) {
-          System.err.println("Error1: "+e+" # "+e2);
-        }
-      }
-    }
-    
+    Uma.out.println("refining conflicts");
     replay.refineConflicts();
+    Uma.out.println("reduce transitive conflicts");
     replay.es.reduceTransitiveConflicts();
     OcletIO.writeFile(replay.es.toDot(replay.properNames), fileName_system_sysPath+"_es2.dot");
-    
-    for (Event e : replay.es.allEvents) {
-      Set<DNode> ev = e.getAllPredecessors();
-      for (DNode e2 : ev) {
-        if (replay.es.inConflict(e, (Event)e2)) {
-          System.err.println("Error2: "+e+" # "+e2);
-        }
-      }
-    }
-    
+
+    Uma.out.println("set single events");
     replay.setSingleEvents();
+    Uma.out.println("identify ordering relations");
     replay.getConcurrentEvents();
+    Uma.out.println("maximizing concurrency");
     replay.extendConcurrency();
     
-    
-    //replay.coarsenCausality();
+
+    Uma.out.println("refining conflicts");
     replay.refineConflicts();
+    Uma.out.println("reducing transitive conflicts");
     replay.es.reduceTransitiveConflicts();
+    Uma.out.println("reducing transitive dependencies");
     replay.es.removeTransitiveDependencies();
+    Uma.out.println("removing tau events");
     replay.removeSuperFluousTauEvents();
+    Uma.out.println("refining conflicts");
     replay.refineConflicts();
+    Uma.out.println("reducing transitive conflicts");
     replay.es.reduceTransitiveConflicts();
+    Uma.out.println("reducing transitive dependencies");
     replay.es.removeTransitiveDependencies();
     
     OcletIO.writeFile(replay.es.toDot(replay.properNames), fileName_system_sysPath+"_es3.dot");
     
-    for (Event e : replay.es.allEvents) {
-      Set<DNode> ev = e.getAllPredecessors();
-      for (DNode e2 : ev) {
-        if (replay.es.inConflict(e, (Event)e2)) {
-          System.err.println("Error3: "+e+" # "+e2);
-        }
-      }
-    }
-    
-    
-
+    Uma.out.println("folding forward");
     replay.foldForward();
     //replay.removeSuperFluousTauEvents();
     //replay.refineConflicts();
+    Uma.out.println("reducing transitive conflicts");
     replay.es.reduceTransitiveConflicts();
+    Uma.out.println("reducing transitive dependencies");
     replay.es.removeTransitiveDependencies();
     
     OcletIO.writeFile(replay.es.toDot(replay.properNames), fileName_system_sysPath+"_es4.dot");
@@ -974,6 +968,7 @@ public class EventStructureReplay {
       }
     }
     
+    Uma.out.println("synthesizing Petri net from "+replay.es.allEvents.size()+" events");
     SynthesisFromES synth = new SynthesisFromES(replay.properNames, fileName_system_sysPath);
     PetriNet net = synth.synthesize(replay.es);
     

@@ -443,7 +443,7 @@ public class SynthesisFromES {
       hub.top.uma.synthesis.EquivalenceRefineSuccessor splitter = new hub.top.uma.synthesis.EquivalenceRefineSuccessor(build); 
 
       Uma.out.println("relax..");
-      //build.relaxFoldingEquivalence(splitter);
+      build.relaxFutureEquivalence(splitter);
       Uma.out.println("determinize..");
       //while (build.extendFoldingEquivalence_deterministic()) {
       //  Uma.out.println("determinize..");

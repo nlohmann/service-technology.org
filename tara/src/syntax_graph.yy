@@ -38,15 +38,12 @@ Wrong Input causes undefined behaviour and not necessarily an error message.
 #include <list>
 #include <algorithm>
 #include <utility>
+#include "Tara.h"
 #include "MaxCost.h"
 #include "verbose.h"
 
 extern int graph_lex();
 extern int graph_error(const char *);
-extern unsigned int cost(pnapi::Transition*);
-extern pnapi::PetriNet* net;
-
-unsigned int sumOfLocalMaxCosts = 0;
 
 /// current marking of the PN API net; for finding final states
 std::map<const pnapi::Place*, unsigned int> currentMarking;
@@ -57,9 +54,6 @@ unsigned int currentTaraState;
 
 // A mapping from the lola state numbers to the actual state numbers
 std::map<const unsigned int, unsigned int> lolaToTara;
-
-// The actual inner graph, realized by a deque (quick insertion, quick access)
-extern std::deque<innerState *> innerGraph;
 
 unsigned int getTaraState (unsigned int lolaState) {
     // First check whether the lola state has been seen yet
@@ -73,9 +67,9 @@ unsigned int getTaraState (unsigned int lolaState) {
     } 
     
     // Otherwise: Create a new state, store the value, return it.
-    unsigned int taraState = innerGraph.size();
-    innerGraph.push_back(new innerState);
-    innerGraph.back()->maxCosts = 0;
+    unsigned int taraState = Tara::graph.size();
+    Tara::graph.push_back(new innerState);
+    Tara::graph.back()->maxCosts = 0;
     lolaToTara[lolaState] = taraState;
     return taraState;
 }
@@ -104,8 +98,9 @@ state:
     {
     currentState=$2;
 	currentTaraState = getTaraState(currentState);
-	innerGraph[currentTaraState]->inStack = false;
-	innerGraph[currentTaraState]->final = net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, net));	
+	if (currentState == 0) Tara::initialState = currentTaraState;
+	Tara::graph[currentTaraState]->inStack = false;
+	Tara::graph[currentTaraState]->final = Tara::net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, Tara::net));	
         currentMarking.clear();
 	
     }
@@ -145,7 +140,7 @@ markingList:
 
 marking:
   NAME COLON NUMBER
-  { currentMarking[net->findPlace($1)] = $3; free($1); }
+  { currentMarking[Tara::net->findPlace($1)] = $3; free($1); }
   /* calculate current marking to find final states*/
 ;
 
@@ -166,29 +161,29 @@ transition:
            
 	       unsigned int targetTaraState = getTaraState($3);
            
-           unsigned int oldTransition = innerGraph[currentTaraState]->transitions.size();
+           unsigned int oldTransition = Tara::graph[currentTaraState]->transitions.size();
            
-           for (int i = 0; i < innerGraph[currentTaraState]->transitions.size(); ++i) {
-                if (innerGraph[currentTaraState]->transitions[i].successor == targetTaraState) {
+           for (int i = 0; i < Tara::graph[currentTaraState]->transitions.size(); ++i) {
+                if (Tara::graph[currentTaraState]->transitions[i].successor == targetTaraState) {
                     oldTransition = i;
 
                 }
             }
              
-        	   pnapi::Transition *const transition = net->findTransition($1);
-           unsigned int trCosts = cost(transition);           
+        	   pnapi::Transition *const transition = Tara::net->findTransition($1);
+           unsigned int trCosts = Tara::cost(transition);           
                                    
-           if (oldTransition != innerGraph[currentTaraState]->transitions.size() && innerGraph[currentTaraState]->transitions[oldTransition].costs < trCosts) {
-                innerGraph[currentTaraState]->transitions[oldTransition].costs = trCosts;
+           if (oldTransition != Tara::graph[currentTaraState]->transitions.size() && Tara::graph[currentTaraState]->transitions[oldTransition].costs < trCosts) {
+                Tara::graph[currentTaraState]->transitions[oldTransition].costs = trCosts;
 
            } else {
                innerTransition cur= { transition, targetTaraState, trCosts };
-               innerGraph[currentTaraState]->transitions.push_back(cur);
+               Tara::graph[currentTaraState]->transitions.push_back(cur);
            }        
 	           
-           if (trCosts > innerGraph[currentTaraState]->maxCosts) { 
-                sumOfLocalMaxCosts += trCosts - innerGraph[currentTaraState]->maxCosts; 
-                innerGraph[currentTaraState]->maxCosts = trCosts; 
+           if (trCosts > Tara::graph[currentTaraState]->maxCosts) { 
+                Tara::sumOfLocalMaxCosts += trCosts - Tara::graph[currentTaraState]->maxCosts; 
+                Tara::graph[currentTaraState]->maxCosts = trCosts; 
            }
        }
        free($1); //get rid of those strings

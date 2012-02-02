@@ -36,10 +36,12 @@
 #include "cmdline.h"
 #include "Output.h"
 #include "verbose.h"
+#include "Tara.h"
 #include "syntax_graph.h"
 #include "MaxCost.h"
 #include "ServiceTools.h"
 #include "iModification.h"
+
 
 // input files
 extern FILE* graph_in;
@@ -63,17 +65,8 @@ gengetopt_args_info args_info;
 /// the invocation string
 std::string invocation;
 
-/// output stream
-std::stringstream outStream;
-
-// Name for dot output file
-std::string filename;
-
 /// a variable holding the time of the call
 clock_t start_clock = clock();
-
-///the input net
-pnapi::PetriNet* net;
 
 /// check if a file exists and can be opened for reading
 inline bool fileExists(const std::string& filename) {
@@ -182,12 +175,12 @@ int main(int argc, char** argv) {
     Output::setKeepTempfiles(args_info.noClean_flag);
 
     /*----------------------.
-    | 1. parse the open net |
+    | 1. parse the open Tara::net |
     `----------------------*/
 
-    // Parsing the open net, using the PNAPI
+    // Parsing the open Tara::net, using the PNAPI
 	status("Processing %s", args_info.net_arg);
-	net = new pnapi::PetriNet;
+	Tara::net = new pnapi::PetriNet;
 
 	try {
 
@@ -195,14 +188,14 @@ int main(int argc, char** argv) {
 	
 		std::ifstream inputStream;
 		inputStream.open(args_info.net_arg);
-		inputStream >> pnapi::io::owfn >> *(net);
+		inputStream >> pnapi::io::owfn >> *(Tara::net);
 		inputStream.close();
 
 		/*maybe only with verbose-flag?*/
 		std::stringstream pnstats;
-		pnstats << pnapi::io::stat << *(net);
+		pnstats << pnapi::io::stat << *(Tara::net);
 
-		status("read net %s", pnstats.str().c_str());
+		status("read Tara::net %s", pnstats.str().c_str());
 	} catch (pnapi::exception::InputError error) {
 		std::stringstream inputerror;
 		inputerror << error;
@@ -250,17 +243,17 @@ int main(int argc, char** argv) {
     //stream automaton
     partnerStream.open(partnerTemp.c_str(), std::ifstream::in);
     if(!partnerStream) {
-	message("Net is not controllable. Exit.");
+	message("Tara::net is not controllable. Exit.");
 	exit(EXIT_FAILURE);
     }
 
     partnerStream >> pnapi::io::sa >> partner;
     
-    // convert to petri net
+    // convert to petri Tara::net
     pnapi::PetriNet composition(partner);
     
     //and now we compose
-    composition.compose(*net, "mp-partner-", "");
+    composition.compose(*Tara::net, "mp-partner-", "");
 
     /*------------------------.
     | 3. call lola with n+mp  |
@@ -299,29 +292,29 @@ int main(int argc, char** argv) {
     /*------------------------------------------.
     | 5. Compute MaxCosts from the parsed graph | 
     \------------------------------------------*/
-    message("Step 4: Find an upper bound for the minimal budget w.r.t. net '%s' and cost function '%s'", args_info.net_arg, args_info.costfunction_arg);    
+    message("Step 4: Find an upper bound for the minimal budget w.r.t. Tara::net '%s' and cost function '%s'", args_info.net_arg, args_info.costfunction_arg);    
 
     // max Costs are the costs of the most expensive path through
     // the inner state graph
     
-    unsigned int maxCostOfComposition=maxCost(net);
+    unsigned int maxCostOfComposition=maxCost(Tara::net);
 
 
     /*------------------------------------------.
     | 6. Find a corresponding partner           | 
     \------------------------------------------*/
 
-    // Build the modified net for maxCostOfComposition
-    iModification iMod(net, maxCostOfComposition);
+    // Build the modified Tara::net for maxCostOfComposition
+    iModification iMod(Tara::net, maxCostOfComposition);
 
     // Check whether N is controllable under budget maxCostOfComposition. If not, return the most permissive partner.
     std::stringstream ssi;
     ssi << maxCostOfComposition;
     std::string minCostPartner=tempFN+"-min-partner-";  
     std::string curMinCostPartner=minCostPartner+ssi.str()+".sa";
-   //std::cout << pnapi::io::owfn << *net << std::endl;
+   //std::cout << pnapi::io::owfn << *Tara::net << std::endl;
    //return 0;
-    bool bounded = isControllable(*net, curMinCostPartner, true); 
+    bool bounded = isControllable(*Tara::net, curMinCostPartner, true); 
 
     // output file of the min cost partner
     std::ifstream minCostPartnerStream;
@@ -350,7 +343,7 @@ int main(int argc, char** argv) {
                 s += "file '" + std::string(args_info.og_arg) + "'";
             }
 		    message("Any partner is cost-minimal, %s.", s.c_str());
-            computeOG(*net, args_info.og_arg);
+            computeOG(*Tara::net, args_info.og_arg);
         }
 
     } else { // there exists a partner with a bounded budget 
@@ -375,7 +368,7 @@ int main(int argc, char** argv) {
                 curMinCostPartner=minCostPartner+ssi.str()+".sa";
 
                 status("Checking budget %d (lower bound: %d, upper bound: %d)", iMod.getI(), bsLower, bsUpper);             
-                bool bsControllable = isControllable(*net, curMinCostPartner, true);
+                bool bsControllable = isControllable(*Tara::net, curMinCostPartner, true);
                 if (bsControllable) {
                     minBudget = iMod.getI();        
                     bsUpper = iMod.getI()-1;
@@ -418,7 +411,7 @@ int main(int argc, char** argv) {
             }
 		    message("Computing representation of all cost-minimal partners, %s.", s.c_str());
             iMod.setToValue(minBudget);
-            computeOG(*net, args_info.og_arg);
+            computeOG(*Tara::net, args_info.og_arg);
         }
 
     } 

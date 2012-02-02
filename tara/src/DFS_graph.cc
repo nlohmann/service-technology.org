@@ -25,8 +25,8 @@
 #include <list>
 #include <stdio.h>
 #include <pnapi/pnapi.h>
+#include "Tara.h"
 
-extern std::map<const int, innerState *const> innerGraph;
 
 /// StateInfo (3=relevant AND final, 1=relevant, 0=irrelevant, 2=irrelevant & final)
 //define G_STATE_FINAL 1
@@ -48,7 +48,7 @@ void DFS_graph() {
 
    /* printf("starting DFS on inner Graph\n"); */
 
-   // assuming innerGraph[0] is start state
+   // assuming Tara::graph[0] is start state
    nodeStack.push_back(0);
 
    int runs=0; /* for counting the accepted runs */
@@ -72,26 +72,26 @@ void DFS_graph() {
               printf("nicht OK\n");
        }
        /* check the iterator for the node, if there are any unvisited transitions */
-       if(!innerGraph[tos]->transitions.empty() &&
-              (innerGraph[tos]->curTransition != innerGraph[tos]->transitions.end())) {
+       if(!Tara::graph[tos]->transitions.empty() &&
+              (Tara::graph[tos]->curTransition != Tara::graph[tos]->transitions.end())) {
 
            // update the requirement checker
            // if advancing is not possible, continue...
-           if(!rc.advance(innerGraph[tos]->curTransition->transition)) {
-               innerGraph[tos]->curTransition++;
+           if(!rc.advance(Tara::graph[tos]->curTransition->transition)) {
+               Tara::graph[tos]->curTransition++;
                continue;
            } /* if requirement check is okay, we get forward in DFS */
 
-           nodeStack.push_back(innerGraph[tos]->curTransition->successor);
+           nodeStack.push_back(Tara::graph[tos]->curTransition->successor);
 
            //add the transition to the transition stack
-           transitionStack.push_back(innerGraph[tos]->curTransition->transition);
+           transitionStack.push_back(Tara::graph[tos]->curTransition->transition);
 
            //reset the iterator of the successor (if we visit a state more than one time)
-           innerGraph[innerGraph[tos]->curTransition->successor]->curTransition=innerGraph[innerGraph[tos]->curTransition->successor]->transitions.begin();
+           Tara::graph[Tara::graph[tos]->curTransition->successor]->curTransition=Tara::graph[Tara::graph[tos]->curTransition->successor]->transitions.begin();
 
            //for current tos goto next transition
-           innerGraph[tos]->curTransition++;
+           Tara::graph[tos]->curTransition++;
        }
        else { /* node finished */
           rc.abate(); /* abate the requirement checker */

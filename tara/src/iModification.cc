@@ -22,9 +22,8 @@
 #include <pnapi/pnapi.h>
 #include <stdio.h>
 #include "verbose.h"
+#include "Tara.h"
 
-extern unsigned int cost(pnapi::Transition* t);
-extern int hiCosts;
 // arguments are the net and the inter i
 iModification::iModification(pnapi::PetriNet* netToModify, unsigned int startI)
    : net(netToModify), i(startI)
@@ -48,7 +47,7 @@ void iModification::iterate() {
 void iModification::update() {
     
    // update the available costs
-   availableCost->setTokenCount(hiCosts+i);
+   availableCost->setTokenCount(Tara::highestTransitionCosts+i);
         
 
 }
@@ -91,7 +90,7 @@ unsigned int iModification::getI() { return this->i; }
 
 void iModification::init() {
 
-   status("Initializing modification. Highest transition costs are: %d", hiCosts);
+   status("Initializing modification. Highest transition costs are: %d", Tara::highestTransitionCosts);
 
    //create the place for the availble costs
    // tokens will be set later
@@ -104,7 +103,7 @@ void iModification::init() {
    for(std::set<pnapi::Transition*>::iterator it=allTransitions.begin();it!=allTransitions.end();it++) {
 
       // the cost of that transition
-      int curCost=cost(*it);
+      int curCost=Tara::cost(*it);
 
       unsigned int in = 0;
       unsigned int out = 0;
@@ -112,11 +111,11 @@ void iModification::init() {
       //if the transition is free, add the self loop to the budget place and continue
       if(curCost == 0) {
 	
-	in = hiCosts;
-	out = hiCosts;
+	in = Tara::highestTransitionCosts;
+	out = Tara::highestTransitionCosts;
       } else {
-	in = hiCosts + curCost - 1 ;
-	if (hiCosts > 1) out = hiCosts - 1;
+	in = Tara::highestTransitionCosts + curCost - 1 ;
+	if (Tara::highestTransitionCosts > 1) out = Tara::highestTransitionCosts - 1;
       }
 
 	//add arc from availableCost to that transition
@@ -127,7 +126,7 @@ void iModification::init() {
 
    }
    
-   net->getFinalCondition() = (net->getFinalCondition().getFormula() && ( *availableCost >= hiCosts ));
+   net->getFinalCondition() = (net->getFinalCondition().getFormula() && ( *availableCost >= Tara::highestTransitionCosts ));
    // finally set the availble costs
-   this->availableCost->setTokenCount(hiCosts+i);
+   this->availableCost->setTokenCount(Tara::highestTransitionCosts+i);
 }

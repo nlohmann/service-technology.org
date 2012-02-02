@@ -11,7 +11,8 @@ tara_SOURCES =  main.cc \
 		lexic_graph.ll syntax_graph.yy \
 		lexic_costfunction.ll syntax_costfunction.yy \
                 iModification.cc iModification.h \
-		ServiceTools.cc ServiceTools.h
+		ServiceTools.cc ServiceTools.h \
+		Tara.cc Tara.h
                 
 # <<-- CHANGE END -->>
 

@@ -22,16 +22,12 @@
 #include <pnapi/pnapi.h>
 
 #include "MaxCost.h"
+#include "Tara.h"
 #include "syntax_graph.h"
 #include "syntax_costfunction.h"
 #include "verbose.h"
 #include "cmdline.h"
 
-std::deque<innerState *> innerGraph;
-
-extern unsigned int sumOfLocalMaxCosts;
-extern unsigned int cost(pnapi::Transition*);
-extern unsigned int getTaraState (unsigned int);
 extern gengetopt_args_info args_info;
 
 
@@ -40,7 +36,7 @@ extern gengetopt_args_info args_info;
 std::deque<int> nodeStack;
 
 unsigned int maxCost(pnapi::PetriNet* net) {
-    status("LoLA returned %d states.", innerGraph.size());
+    status("LoLA returned %d states.", Tara::graph.size());
     
     bool USE_SIMPLE = args_info.heuristics_given && args_info.heuristics_arg == heuristics_arg_simple;
     bool USE_MAXOUT = args_info.heuristics_given && args_info.heuristics_arg == heuristics_arg_maxout;
@@ -54,13 +50,13 @@ unsigned int maxCost(pnapi::PetriNet* net) {
         std::set<pnapi::Transition*> allTransitions=net->getTransitions();
         for(std::set<pnapi::Transition*>::iterator it=allTransitions.begin();it!=allTransitions.end();it++) {
           // the cost of that transition
-          int curCost=cost(*it);
+          int curCost=Tara::cost(*it);
 
            // remember the most expensive transition
            maxTransCost=maxTransCost>curCost? maxTransCost: curCost;
          }
         
-        unsigned int val = innerGraph.size() * maxTransCost;
+        unsigned int val = Tara::graph.size() * maxTransCost;
         
         status("Using simple upper bound: %d", val);        
         
@@ -69,19 +65,17 @@ unsigned int maxCost(pnapi::PetriNet* net) {
 	
     if (USE_MAXOUT) {
     	status("Optimization enabled: maxout.");
-        status("Using maxout upper bound: %d", sumOfLocalMaxCosts);        
-        return sumOfLocalMaxCosts;
+        status("Using maxout upper bound: %d", Tara::sumOfLocalMaxCosts);        
+        return Tara::sumOfLocalMaxCosts;
     }
 
 
-   // assuming innerGraph[0] is start state
+   // assuming Tara::graph[0] is start state
 
-   unsigned int initialState = getTaraState(0);
-
-   innerGraph[initialState]->curCost=0;
-   innerGraph[initialState]->inStack=true;
-   innerGraph[initialState]->curTransition = innerGraph[initialState]->transitions.begin();
-   nodeStack.push_back(initialState);
+   Tara::graph[Tara::initialState]->curCost=0;
+   Tara::graph[Tara::initialState]->inStack=true;
+   Tara::graph[Tara::initialState]->curTransition = Tara::graph[Tara::initialState]->transitions.begin();
+   nodeStack.push_back(Tara::initialState);
     
    unsigned int maxCost=0;
    unsigned int curCost=0;
@@ -90,49 +84,49 @@ unsigned int maxCost(pnapi::PetriNet* net) {
    while(!nodeStack.empty()) {
        int tos(nodeStack.back()); /* tos = Top Of Stack */
      
-       if (maxCost == sumOfLocalMaxCosts) { status("Found a path which is equal to maxout upper bound."); return maxCost; }
+       if (maxCost == Tara::sumOfLocalMaxCosts) { status("Found a path which is equal to maxout upper bound."); return maxCost; }
        // if accepting state, update MaxCost
-       if(innerGraph[tos]->final) {
+       if(Tara::graph[tos]->final) {
            maxCost=maxCost>curCost ? maxCost:curCost;
 	//   status("Final state found. Current max: %d", maxCost);
         }
     
        /* if all childs are visited, remove from stack and reset properties */
-       if(innerGraph[tos]->curTransition == innerGraph[tos]->transitions.end()) {
+       if(Tara::graph[tos]->curTransition == Tara::graph[tos]->transitions.end()) {
     //          status("Found a path of length %d with costs %d", curLen, curCost);
 	      --curLen;
-              curCost=curCost-innerGraph[tos]->curCost;
-              innerGraph[tos]->inStack=false;
-              innerGraph[tos]->curTransition = innerGraph[tos]->transitions.begin();
+              curCost=curCost-Tara::graph[tos]->curCost;
+              Tara::graph[tos]->inStack=false;
+              Tara::graph[tos]->curTransition = Tara::graph[tos]->transitions.begin();
 	      nodeStack.pop_back();
 	      continue;
        }
 
        //check if next node is on Stack, as we dont want to count cycles
-       if(innerGraph[innerGraph[tos]->curTransition->successor]->inStack) {
-           ++(innerGraph[tos]->curTransition);
-	//   status("Saw an old node: %d", innerGraph[tos]->curTransition->successor);
+       if(Tara::graph[Tara::graph[tos]->curTransition->successor]->inStack) {
+           ++(Tara::graph[tos]->curTransition);
+	//   status("Saw an old node: %d", Tara::graph[tos]->curTransition->successor);
            continue;
        }
       
        { 
           //push child
-          int next=innerGraph[tos]->curTransition->successor;
+          int next=Tara::graph[tos]->curTransition->successor;
           nodeStack.push_back(next);
-          innerGraph[next]->inStack=true;
-          innerGraph[next]->curTransition = innerGraph[next]->transitions.begin();
+          Tara::graph[next]->inStack=true;
+          Tara::graph[next]->curTransition = Tara::graph[next]->transitions.begin();
           ++curLen;
           // get costs for that transition
-          unsigned int transitionCost= innerGraph[tos]->curTransition->costs;
+          unsigned int transitionCost= Tara::graph[tos]->curTransition->costs;
 
           // save the cost to that state
           // if this state is removed from stack, the cost will be subtracted
-          innerGraph[next]->curCost=transitionCost;
+          Tara::graph[next]->curCost=transitionCost;
           curCost+=transitionCost;
        }
  
        //for current tos goto next transition
-       ++(innerGraph[tos]->curTransition);
+       ++(Tara::graph[tos]->curTransition);
    }
  	status("Using upper bound: %d", maxCost);        
   	return maxCost;

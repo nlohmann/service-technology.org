@@ -34,25 +34,12 @@ Wrong Input causes undefined behaviour and not necessarily an error message.
 #include <string>
 #include <stdio.h>
 #include <pnapi/pnapi.h>
+#include "Tara.h"
 
-//the partial CostFunction maps some transition to a natural number
-//this function can be completed by returning zero as default
-std::map<pnapi::Transition* ,unsigned int> partialCostFunction;
 
 extern int costfunction_lex();
 extern int costfunction_error(const char *);
 
-extern pnapi::PetriNet* net;
-
-unsigned int hiCosts = 0;
-
-unsigned int cost(pnapi::Transition* t) {
-   std::map<pnapi::Transition*,unsigned int>::iterator cost = partialCostFunction.find(t);
-   if(cost==partialCostFunction.end()) 
-      return 0;
-
-   return cost->second;
-}
 
 %}
 
@@ -75,10 +62,10 @@ costs:
 
 cost:
    CF_NAME CF_COLON CF_NUMBER {
-       pnapi::Transition* t=net->findTransition($1);
+       pnapi::Transition* t=Tara::net->findTransition($1);
        if(t!=NULL) {
-           partialCostFunction[t]=$3;
-	   if (hiCosts < $3) hiCosts = $3;
+           Tara::partialCostFunction[t]=$3;
+	   if (Tara::highestTransitionCosts < $3) Tara::highestTransitionCosts = $3;
 	}
        free($1); //free string
    }

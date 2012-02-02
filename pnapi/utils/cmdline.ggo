@@ -35,6 +35,10 @@ option "removePorts" -
   "Removes ports in output files."
   flag off
 
+option "strictOutputSyntax" s
+  "Enforces strict output syntax, i.e. only elements defined in the appropriate standard will be used."
+  flag off
+
 option "guessFormula" -
   "Derive the final condition from the structure (i.e., the sink place) of the net."
   flag off

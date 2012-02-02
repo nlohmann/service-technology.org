@@ -165,6 +165,8 @@ std::ostream & formula(std::ostream &);
 std::ostream & noRoles(std::ostream &);
 /// remove all ports
 std::ostream & removePorts(std::ostream &);
+/// only use syntax defined by the formt's standard
+std::ostream & strictSyntax(std::ostream &);
 
 /// meta information manipulator
 util::Manipulator<std::pair<MetaInformation, std::string> >
@@ -576,6 +578,16 @@ struct PortRemoval
 };
 
 /*!
+ * \brief strict output syntax
+ * \note initially used to print standard compliant PNML
+ */
+struct StrictSyntax
+{
+  bool isSet;
+  StrictSyntax() : isSet(false) {}
+};
+
+/*!
  * \brief node name type
  * 
  * Mapping from node names to dot IDs.
@@ -642,6 +654,7 @@ typedef StreamMetaData<Delim> DelimData;
 typedef StreamMetaData<Formula> FormulaData;
 typedef StreamMetaData<Role> RoleData;
 typedef StreamMetaData<PortRemoval> PortData;
+typedef StreamMetaData<StrictSyntax> StrictSyntaxData;
 typedef StreamMetaData<DotNodeName> DotNameData;
 typedef StreamMetaData<PntNodeData> PntData;
 typedef StreamMetaData<std::map<pnapi::io::MetaInformation, std::string> > MetaData;

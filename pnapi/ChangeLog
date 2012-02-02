@@ -40,6 +40,8 @@ Version 4.03-unreleased
 
 * unfolder will now use temporary files instead of /tmp/input
 
+* added switch for standard compliant PNML
+
 Version 4.02 (2010-07-28)
 =========================
 

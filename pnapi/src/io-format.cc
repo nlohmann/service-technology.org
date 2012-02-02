@@ -53,6 +53,14 @@ std::ostream & stat(std::ostream & ios)
   return ios;
 }
 
+/*!
+ * \brief only use syntax defined by the formt's standard
+ */
+std::ostream & strictSyntax(std::ostream & ios)
+{
+  util::StrictSyntaxData::data(ios).isSet = true;
+  return ios;
+}
 
 namespace __stat
 {
@@ -1055,18 +1063,28 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"
   << "<!--\n"
   << "  generator:   " << net.getMetaInformation(os, CREATOR, PACKAGE_STRING) << endl
-  << "  input file:  " << net.getMetaInformation(os, INPUTFILE) << endl
-  << "  invocation:  " << net.getMetaInformation(os, INVOCATION) << endl
-  << "  net size:    " << stat << net << pnml  
-  << "\n-->\n\n"
+  << "  input file:  " << net.getMetaInformation(os, INPUTFILE) << endl;
 
-  << "<pnml>\n"
-  
-  << "  <module>\n"
+  // invocation strings most likely contains "--foo" but -- is forbidden in PNML comments
+  if(!util::StrictSyntaxData::data(os).isSet)
+  {
+    os << "  invocation:  " << net.getMetaInformation(os, INVOCATION) << endl;
+  }
 
-  << net.interface_
+  os << "  net size:    " << stat << net << pnml << "\n-->\n\n";
 
-  << "\n    <net id=\"n1\" type=\"PTNet\">\n";
+  if(util::StrictSyntaxData::data(os).isSet)
+  {
+    os << "<pnml xmlns=\"http://www.pnml.org/version-2009/grammar/pnml\">\n"
+       << "\n    <net id=\"n1\" type=\"http://www.pnml.org/version-2009/grammar/ptnet\">\n";
+  }
+  else
+  {
+    os << "<pnml>\n"
+       << "  <module>\n"
+       << net.interface_
+       << "\n    <net id=\"n1\" type=\"PTNet\">\n";
+  }
 
   if (!net.getMetaInformation(os, INPUTFILE).empty())
   {
@@ -1075,23 +1093,36 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
        << "    </name>\n";
   }
 
+  if(util::StrictSyntaxData::data(os).isSet)
+  {
+    os << "    <page id=\"page\">\n";
+  }
+
   os << net.places_
 
   << net.transitions_
 
-  << net.arcs_
+  << net.arcs_;
 
-  << "    </net>\n"
+  if(util::StrictSyntaxData::data(os).isSet)
+  {
+    os << "    </page>\n";
+  }
 
-  << "    <finalmarkings>\n"
-  << "      <marking>\n"
-  << net.finalCondition_
-  << "      </marking>\n"  
-  << "    </finalmarkings>\n"
+  os << "    </net>\n";
 
-  << "  </module>\n"
+  if(!util::StrictSyntaxData::data(os).isSet)
+  {
+    os << "    <finalmarkings>\n"
+       << "      <marking>\n"
+       << net.finalCondition_
+       << "      </marking>\n"
+       << "    </finalmarkings>\n"
+
+       << "  </module>\n";
+  }
   
-  << "</pnml>\n";
+  os << "</pnml>\n";
 
   return os << endl;
 }

@@ -618,6 +618,10 @@ int main(int argc, char** argv) {
                         outfile.stream() << io::removePorts;
                     }
 
+                    if (args_info.strictOutputSyntax_flag) {
+                        outfile.stream() << io::strictSyntax;
+                    }
+
                     switch (args_info.output_arg[j]) {
 
                             // create oWFN output

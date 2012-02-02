@@ -370,7 +370,7 @@ std::ostream & output(std::ostream & os, const Interface & interface)
   
   map<string, Port *> ports = interface.getPorts();
   
-  if(util::PortData::data(os).remove)
+  if(util::PortData::data(os).isSet)
   {
     os << "/// input\n node [shape=circle fillcolor=orange]\n"<< interface.getInputLabels()
        << "\n/// output\n node [shape=circle fillcolor=yellow]\n" << interface.getOutputLabels()
@@ -645,7 +645,7 @@ std::ios_base & lola(std::ios_base & ios)
  */
 std::ostream & formula(std::ostream & os)
 {
-  util::FormulaData::data(os).formula = true;
+  util::FormulaData::data(os).isSet = true;
   return os;
 }
 
@@ -677,7 +677,7 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << delim("\n") << net.transitions_ << endl
   << endl;
 
-  if (util::FormulaData::data(os).formula)
+  if (util::FormulaData::data(os).isSet)
   {
     os << "FORMULA\n  "
        << net.finalCondition_ << endl
@@ -874,7 +874,7 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << delim("\n") << net.transitions_ << endl
   << endl;
 
-  if (util::FormulaData::data(os).formula)
+  if (util::FormulaData::data(os).isSet)
   {
     os << "FORMULA\n  "
        << net.finalCondition_ << endl
@@ -1385,7 +1385,7 @@ std::ios_base & owfn(std::ios_base & ios)
  */
 std::ostream & noRoles(std::ostream & os)
 {
-  util::RoleData::data(os).role = true;
+  util::RoleData::data(os).isSet = true;
   return os;
 }
 
@@ -1394,7 +1394,7 @@ std::ostream & noRoles(std::ostream & os)
  */
 std::ostream & removePorts(std::ostream & os)
 {
-  util::PortData::data(os).remove = true;
+  util::PortData::data(os).isSet = true;
   return os;
 }
 
@@ -1426,7 +1426,7 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << io::util::groupPlacesByCapacity(net.places_)
   << ";\n\n" << delim(", ");
   
-  if(!net.roles_.empty() && !(util::RoleData::data(os).role))
+  if(!net.roles_.empty() && !(util::RoleData::data(os).isSet))
   {
     os << "ROLES\n  " << net.roles_ << ";\n\n";  
   }
@@ -1494,7 +1494,7 @@ std::ostream & output(std::ostream & os, const Transition & t)
   if(t.getCost() != 0)
     os << "  COST " << t.getCost() << ";\n";
 
-  if(!t.getRoles().empty() && !(util::RoleData::data(os).role))
+  if(!t.getRoles().empty() && !(util::RoleData::data(os).isSet))
   {
     os << "  ROLES\n    " << t.getRoles() << ";\n";
   }
@@ -1570,7 +1570,7 @@ std::ostream & output(std::ostream & os, const Interface & interface)
 {
   os << "INTERFACE\n" << delim(", ");
   
-  if(util::PortData::data(os).remove)
+  if(util::PortData::data(os).isSet)
   {
     if(!interface.getInputLabels().empty())
     {

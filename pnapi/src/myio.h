@@ -556,35 +556,29 @@ struct Delim
   std::string delim;
 };
 
-/// formula type
-struct Formula
+/// boolean stream data names
+enum BooleanStreamDataNames
 {
-  bool formula;
-  Formula() : formula(false) {}
+  BSDN_FORMULA, // whether adding final condition fomula in lola output
+  BSDN_ROLE, // whether remove role information when writing
+  BSDN_PORT, // whether to remove interface
+  BSDN_STRICT // whether to print standard compliant output
 };
-
-/// role type
-struct Role
-{
-  bool role;
-  Role() : role(false) {}
-};
-
-/// port removal type
-struct PortRemoval
-{
-  bool remove;
-  PortRemoval() : remove(false) {}
-};
+/*!
+ * \todo Maybe this can be generalized even more so adding a new boolean manipulator
+ *       can be reduced to a single line of code.
+ */
 
 /*!
- * \brief strict output syntax
- * \note initially used to print standard compliant PNML
+ * \brief generic boolean meta data struct
+ * \param v stream data name
+ * \param d default value (false by default)
  */
-struct StrictSyntax
-{
-  bool isSet;
-  StrictSyntax() : isSet(false) {}
+template<BooleanStreamDataNames v, bool d = false>
+struct BooleanStreamData {
+    enum { value = v };
+    bool isSet;
+    BooleanStreamData() : isSet(d) {};
 };
 
 /*!
@@ -651,10 +645,10 @@ template <typename T> int StreamMetaData<T>::index;
 typedef StreamMetaData<io::util::Format> FormatData;
 typedef StreamMetaData<io::util::Mode> ModeData;
 typedef StreamMetaData<Delim> DelimData;
-typedef StreamMetaData<Formula> FormulaData;
-typedef StreamMetaData<Role> RoleData;
-typedef StreamMetaData<PortRemoval> PortData;
-typedef StreamMetaData<StrictSyntax> StrictSyntaxData;
+typedef StreamMetaData<BooleanStreamData<BSDN_FORMULA> > FormulaData;
+typedef StreamMetaData<BooleanStreamData<BSDN_ROLE> > RoleData;
+typedef StreamMetaData<BooleanStreamData<BSDN_PORT> > PortData;
+typedef StreamMetaData<BooleanStreamData<BSDN_STRICT> > StrictSyntaxData;
 typedef StreamMetaData<DotNodeName> DotNameData;
 typedef StreamMetaData<PntNodeData> PntData;
 typedef StreamMetaData<std::map<pnapi::io::MetaInformation, std::string> > MetaData;

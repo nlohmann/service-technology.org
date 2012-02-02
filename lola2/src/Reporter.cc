@@ -136,14 +136,18 @@ ReporterStream::ReporterStream() :
 Reporter::String ReporterStream::_ctool_(const char* s) const
 {
     char* res = NULL;
-    asprintf(&res, "%s%s%s", _cm_, s, _c_);
+    int bytes = asprintf(&res, "%s%s%s", _cm_, s, _c_);
+    assert(bytes != -1);
+    assert(res);
     return String(res);
 }
 
 Reporter::String ReporterStream::_cfilename_(const char* s) const
 {
     char* res = NULL;
-    asprintf(&res, "%s%s%s", _cb__, s, _c_);
+    int bytes = asprintf(&res, "%s%s%s", _cb__, s, _c_);
+    assert(bytes != -1);
+    assert(res);
     return String(res);
 }
 
@@ -151,7 +155,9 @@ Reporter::String ReporterStream::_cfilename_(const char* s) const
 Reporter::String ReporterStream::_coutput_(const char* s) const
 {
     char* res = NULL;
-    asprintf(&res, "%s%s%s", _cB_, s, _c_);
+    int bytes = asprintf(&res, "%s%s%s", _cB_, s, _c_);
+    assert(bytes != -1);
+    assert(res);
     return String(res);
 }
 
@@ -159,7 +165,9 @@ Reporter::String ReporterStream::_coutput_(const char* s) const
 Reporter::String ReporterStream::_cgood_(const char* s) const
 {
     char* res = NULL;
-    asprintf(&res, "%s%s%s", _cG_, s, _c_);
+    int bytes = asprintf(&res, "%s%s%s", _cG_, s, _c_);
+    assert(bytes != -1);
+    assert(res);
     return String(res);
 }
 
@@ -167,7 +175,9 @@ Reporter::String ReporterStream::_cgood_(const char* s) const
 Reporter::String ReporterStream::_cbad_(const char* s) const
 {
     char* res = NULL;
-    asprintf(&res, "%s%s%s", _cR_, s, _c_);
+    int bytes = asprintf(&res, "%s%s%s", _cR_, s, _c_);
+    assert(bytes != -1);
+    assert(res);
     return String(res);
 }
 
@@ -175,7 +185,9 @@ Reporter::String ReporterStream::_cbad_(const char* s) const
 Reporter::String ReporterStream::_cwarning_(const char* s) const
 {
     char* res = NULL;
-    asprintf(&res, "%s%s%s", _cY_, s, _c_);
+    int bytes = asprintf(&res, "%s%s%s", _cY_, s, _c_);
+    assert(bytes != -1);
+    assert(res);
     return String(res);
 }
 
@@ -183,7 +195,9 @@ Reporter::String ReporterStream::_cwarning_(const char* s) const
 Reporter::String ReporterStream::_cimportant_(const char* s) const
 {
     char* res = NULL;
-    asprintf(&res, "%s%s%s", _bold_, s, _c_);
+    int bytes = asprintf(&res, "%s%s%s", _bold_, s, _c_);
+    assert(bytes != -1);
+    assert(res);
     return String(res);
 }
 
@@ -191,7 +205,9 @@ Reporter::String ReporterStream::_cimportant_(const char* s) const
 Reporter::String ReporterStream::_cparameter_(const char* s) const
 {
     char* res = NULL;
-    asprintf(&res, "%s%s%s", _cC_, s, _c_);
+    int bytes = asprintf(&res, "%s%s%s", _cC_, s, _c_);
+    assert(bytes != -1);
+    assert(res);
     return String(res);
 }
 

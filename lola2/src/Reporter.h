@@ -38,7 +38,7 @@ class Reporter
                 ~String();
 
                 /// operator for implicit cast to char*
-                operator char* () const;
+                char* str() const;
         };
 
     private:
@@ -132,21 +132,21 @@ class ReporterStream : public Reporter
         const char* _underline_;
 
         /// color the name of a tool
-        const char* _ctool_(const char* s) const;
+        Reporter::String _ctool_(const char* s) const;
         /// color the name of a file
-        const char* _cfilename_(const char* s) const;
+        Reporter::String _cfilename_(const char* s) const;
         /// color the type of a file
-        const char* _coutput_(const char* s) const;
+        Reporter::String _coutput_(const char* s) const;
         /// color some good output
-        const char* _cgood_(const char* s) const;
+        Reporter::String _cgood_(const char* s) const;
         /// color some bad output
-        const char* _cbad_(const char* s) const;
+        Reporter::String _cbad_(const char* s) const;
         /// color a warning
-        const char* _cwarning_(const char* s) const;
+        Reporter::String _cwarning_(const char* s) const;
         /// color an important message
-        const char* _cimportant_(const char* s) const;
+        Reporter::String _cimportant_(const char* s) const;
         /// color a command-line parameter
-        const char* _cparameter_(const char* s) const;
+        Reporter::String _cparameter_(const char* s) const;
 
     public:
         ReporterStream();

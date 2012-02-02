@@ -37,7 +37,7 @@ Reporter::String::~String()
     free(s);
 }
 
-Reporter::String::operator char* () const
+char* Reporter::String::str() const
 {
     return s;
 }
@@ -133,14 +133,14 @@ ReporterStream::ReporterStream() :
 }
 
 
-const char* ReporterStream::_ctool_(const char* s) const
+Reporter::String ReporterStream::_ctool_(const char* s) const
 {
     char* res = NULL;
     asprintf(&res, "%s%s%s", _cm_, s, _c_);
     return String(res);
 }
 
-const char* ReporterStream::_cfilename_(const char* s) const
+Reporter::String ReporterStream::_cfilename_(const char* s) const
 {
     char* res = NULL;
     asprintf(&res, "%s%s%s", _cb__, s, _c_);
@@ -148,7 +148,7 @@ const char* ReporterStream::_cfilename_(const char* s) const
 }
 
 
-const char* ReporterStream::_coutput_(const char* s) const
+Reporter::String ReporterStream::_coutput_(const char* s) const
 {
     char* res = NULL;
     asprintf(&res, "%s%s%s", _cB_, s, _c_);
@@ -156,7 +156,7 @@ const char* ReporterStream::_coutput_(const char* s) const
 }
 
 
-const char* ReporterStream::_cgood_(const char* s) const
+Reporter::String ReporterStream::_cgood_(const char* s) const
 {
     char* res = NULL;
     asprintf(&res, "%s%s%s", _cG_, s, _c_);
@@ -164,7 +164,7 @@ const char* ReporterStream::_cgood_(const char* s) const
 }
 
 
-const char* ReporterStream::_cbad_(const char* s) const
+Reporter::String ReporterStream::_cbad_(const char* s) const
 {
     char* res = NULL;
     asprintf(&res, "%s%s%s", _cR_, s, _c_);
@@ -172,7 +172,7 @@ const char* ReporterStream::_cbad_(const char* s) const
 }
 
 
-const char* ReporterStream::_cwarning_(const char* s) const
+Reporter::String ReporterStream::_cwarning_(const char* s) const
 {
     char* res = NULL;
     asprintf(&res, "%s%s%s", _cY_, s, _c_);
@@ -180,7 +180,7 @@ const char* ReporterStream::_cwarning_(const char* s) const
 }
 
 
-const char* ReporterStream::_cimportant_(const char* s) const
+Reporter::String ReporterStream::_cimportant_(const char* s) const
 {
     char* res = NULL;
     asprintf(&res, "%s%s%s", _bold_, s, _c_);
@@ -188,7 +188,7 @@ const char* ReporterStream::_cimportant_(const char* s) const
 }
 
 
-const char* ReporterStream::_cparameter_(const char* s) const
+Reporter::String ReporterStream::_cparameter_(const char* s) const
 {
     char* res = NULL;
     asprintf(&res, "%s%s%s", _cC_, s, _c_);
@@ -204,7 +204,7 @@ const char* ReporterStream::_cparameter_(const char* s) const
 */
 void ReporterStream::message(const char* format, ...) const
 {
-    fprintf(stderr, "%s: ", _ctool_(PACKAGE));
+    fprintf(stderr, "%s: ", _ctool_(PACKAGE).str());
 
     va_list args;
     va_start(args, format);
@@ -219,7 +219,7 @@ void ReporterStream::message(const char* format, ...) const
 */
 void ReporterStream::status(const char* format, ...) const
 {
-    fprintf(stderr, "%s: ", _ctool_(PACKAGE));
+    fprintf(stderr, "%s: ", _ctool_(PACKAGE).str());
 
     va_list args;
     va_start(args, format);
@@ -238,7 +238,7 @@ void ReporterStream::status(const char* format, ...) const
 */
 __attribute__((noreturn)) void ReporterStream::abort(errorcode_t code, const char* format, ...) const
 {
-    fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _bold_);
+    fprintf(stderr, "%s: %s", _ctool_(PACKAGE).str(), _bold_);
 
     va_list args;
     va_start(args, format);

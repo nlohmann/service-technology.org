@@ -66,8 +66,10 @@ unsigned int cost(pnapi::Transition* t) {
 
 %%
 
-costs:
-    cost
+empty: costs | ;
+
+costs: 
+     cost
    | cost costs
 ;
 

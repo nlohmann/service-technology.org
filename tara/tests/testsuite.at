@@ -19,4 +19,53 @@ AT_CHECK([TARA --version],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
+AT_SETUP([Not controllable input net])
+AT_CHECK([cp TESTFILES/notControllable.owfn .])
+AT_CHECK([cp TESTFILES/null.cf .])
+AT_CHECK([TARA --net=notControllable.owfn --costfunction=null.cf],1,ignore,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Minimal budget 0])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cp TESTFILES/null.cf .])
+AT_CHECK([TARA --net=myCoffee.owfn --costfunction=null.cf],0,ignore,stderr)
+AT_CHECK([GREP -q "Minimal budget found: 0" stderr])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Minimal budget != 0])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cp TESTFILES/marvin3.cf .])
+AT_CHECK([TARA --net=myCoffee.owfn --costfunction=marvin3.cf],0,ignore,stderr)
+AT_CHECK([GREP -q "Minimal budget found: 7" stderr])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Minimal budget != 0, cyclic])
+AT_CHECK([cp TESTFILES/myCoffeeCyclic.owfn .])
+AT_CHECK([cp TESTFILES/marvin3.cf .])
+AT_CHECK([TARA --net=myCoffeeCyclic.owfn --costfunction=marvin3.cf],0,ignore,stderr)
+AT_CHECK([GREP -q "Minimal budget found: 7" stderr])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Minimal budget != 0, cyclic, heuristic simple])
+AT_CHECK([cp TESTFILES/myCoffeeCyclic.owfn .])
+AT_CHECK([cp TESTFILES/marvin3.cf .])
+AT_CHECK([TARA --net=myCoffeeCyclic.owfn --costfunction=marvin3.cf --heuristics=simple],0,ignore,stderr)
+AT_CHECK([GREP -q "Minimal budget found: 7" stderr])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Minimal budget != 0, cyclic, heuristic maxout])
+AT_CHECK([cp TESTFILES/myCoffeeCyclic.owfn .])
+AT_CHECK([cp TESTFILES/marvin3.cf .])
+AT_CHECK([TARA --net=myCoffeeCyclic.owfn --costfunction=marvin3.cf --heuristics=maxout],0,ignore,stderr)
+AT_CHECK([GREP -q "Minimal budget found: 7" stderr])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+
 # <<-- CHANGE END -->>

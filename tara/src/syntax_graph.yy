@@ -30,14 +30,16 @@ Wrong Input causes undefined behaviour and not necessarily an error message.
 %name-prefix="graph_"
 
 %{
-#include "MaxCost.h"
 #include <string>
 #include <stdio.h>
 #include <pnapi/pnapi.h>
 #include <map>
 #include <set>
 #include <list>
+#include <algorithm>
 #include <utility>
+#include "MaxCost.h"
+#include "verbose.h"
 
 extern int graph_lex();
 extern int graph_error(const char *);
@@ -161,11 +163,29 @@ transition:
   NAME ARROW NUMBER 
   {
        if (currentState != $3) { // We do not need self loops
-           unsigned int targetTaraState = getTaraState($3);
-           pnapi::Transition *const transition = net->findTransition($1);
+           
+	       unsigned int targetTaraState = getTaraState($3);
+           
+           unsigned int oldTransition = innerGraph[currentTaraState]->transitions.size();
+           
+           for (int i = 0; i < innerGraph[currentTaraState]->transitions.size(); ++i) {
+                if (innerGraph[currentTaraState]->transitions[i].successor == targetTaraState) {
+                    oldTransition = i;
+
+                }
+            }
+             
+        	   pnapi::Transition *const transition = net->findTransition($1);
            unsigned int trCosts = cost(transition);           
-            innerTransition cur= { transition, targetTaraState, trCosts };
-           innerGraph[currentTaraState]->transitions.push_back(cur);
+                                   
+           if (oldTransition != innerGraph[currentTaraState]->transitions.size() && innerGraph[currentTaraState]->transitions[oldTransition].costs < trCosts) {
+                innerGraph[currentTaraState]->transitions[oldTransition].costs = trCosts;
+
+           } else {
+               innerTransition cur= { transition, targetTaraState, trCosts };
+               innerGraph[currentTaraState]->transitions.push_back(cur);
+           }        
+	           
            if (trCosts > innerGraph[currentTaraState]->maxCosts) { 
                 sumOfLocalMaxCosts += trCosts - innerGraph[currentTaraState]->maxCosts; 
                 innerGraph[currentTaraState]->maxCosts = trCosts; 

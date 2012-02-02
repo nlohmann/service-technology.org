@@ -109,7 +109,7 @@ void getLolaStatespace(pnapi::PetriNet &net, std::string &tempFileName) {
     time_t end_time;
 
     // call lola
-    message("creating a pipe to lola by calling '%s'", command.c_str());
+    status("creating a pipe to lola by calling '%s'", command.c_str());
     {
         // set start time
         time(&start_time);

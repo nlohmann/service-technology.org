@@ -85,6 +85,7 @@ unsigned int maxCost(pnapi::PetriNet* net) {
     
    unsigned int maxCost=0;
    unsigned int curCost=0;
+   unsigned int curLen=0;
 
    while(!nodeStack.empty()) {
        int tos(nodeStack.back()); /* tos = Top Of Stack */
@@ -93,20 +94,24 @@ unsigned int maxCost(pnapi::PetriNet* net) {
        // if accepting state, update MaxCost
        if(innerGraph[tos]->final) {
            maxCost=maxCost>curCost ? maxCost:curCost;
+	//   status("Final state found. Current max: %d", maxCost);
         }
     
        /* if all childs are visited, remove from stack and reset properties */
        if(innerGraph[tos]->curTransition == innerGraph[tos]->transitions.end()) {
+    //          status("Found a path of length %d with costs %d", curLen, curCost);
+	      --curLen;
               curCost=curCost-innerGraph[tos]->curCost;
               innerGraph[tos]->inStack=false;
-              nodeStack.pop_back();
               innerGraph[tos]->curTransition = innerGraph[tos]->transitions.begin();
-              continue;
+	      nodeStack.pop_back();
+	      continue;
        }
 
        //check if next node is on Stack, as we dont want to count cycles
        if(innerGraph[innerGraph[tos]->curTransition->successor]->inStack) {
            ++(innerGraph[tos]->curTransition);
+	//   status("Saw an old node: %d", innerGraph[tos]->curTransition->successor);
            continue;
        }
       
@@ -116,7 +121,7 @@ unsigned int maxCost(pnapi::PetriNet* net) {
           nodeStack.push_back(next);
           innerGraph[next]->inStack=true;
           innerGraph[next]->curTransition = innerGraph[next]->transitions.begin();
-          
+          ++curLen;
           // get costs for that transition
           unsigned int transitionCost= innerGraph[tos]->curTransition->costs;
 

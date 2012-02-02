@@ -202,7 +202,7 @@ int main(int argc, char** argv) {
 		std::stringstream pnstats;
 		pnstats << pnapi::io::stat << *(net);
 
-		message("read net %s", pnstats.str().c_str());
+		status("read net %s", pnstats.str().c_str());
 	} catch (pnapi::exception::InputError error) {
 		std::stringstream inputerror;
 		inputerror << error;
@@ -226,19 +226,19 @@ int main(int argc, char** argv) {
 
     std::string partnerTemp=tempFN+"-mp-partner.sa";
     wendyCommand+=" --sa="+partnerTemp;
-    message("creating a pipe to wendy by calling '%s'", wendyCommand.c_str());
+    message("Step 1: Synthesize the most-permissive partner of '%s'", args_info.net_arg);    
+    status("creating a pipe to wendy by calling '%s'", wendyCommand.c_str());
 
     int wendyExit = system(wendyCommand.c_str());
 
     wendyExit=WEXITSTATUS(wendyExit);
  
-    status("Wendy done with status :%d", wendyExit); 
+    status("Wendy done with status: %d", wendyExit); 
  
-    // if uncontrollable
+    // if wendy exits with status != 0
     // TODO add some nice error message here
 	if (wendyExit != 0 ) {
-		message("Wendy returned with status %d.", wendyExit);
-		message("Partner could not be built! No Partner was created, exiting.");
+		message("Wendy returned an error. Exit.");
 		exit(EXIT_FAILURE);
 	}
 
@@ -250,8 +250,8 @@ int main(int argc, char** argv) {
     //stream automaton
     partnerStream.open(partnerTemp.c_str(), std::ifstream::in);
     if(!partnerStream) {
-       message("Partner was not built, exiting");
-       exit(EXIT_SUCCESS);
+	message("Net is not controllable. Exit.");
+	exit(EXIT_FAILURE);
     }
 
     partnerStream >> pnapi::io::sa >> partner;
@@ -266,6 +266,8 @@ int main(int argc, char** argv) {
     | 3. call lola with n+mp  |
     `------------------------*/
 
+    message("Step 2: Build the state space of '%s' and its most-permissive partner", args_info.net_arg);    
+
     // create a temporary file
     std::string lolaFN=tempFN+ "-lola.rg";
 
@@ -275,6 +277,7 @@ int main(int argc, char** argv) {
     /*-------------------------------------.
     | 4. Parse Costfunction to partial map |
     \-------------------------------------*/
+    message("Step 3: Parse the cost function from '%s' and apply it to the built statespace", args_info.costfunction_arg);    
 
      status("parsing costfunction");
        // TODO Check if file exists   
@@ -296,6 +299,7 @@ int main(int argc, char** argv) {
     /*------------------------------------------.
     | 5. Compute MaxCosts from the parsed graph | 
     \------------------------------------------*/
+    message("Step 4: Find an upper bound for the minimal budget w.r.t. net '%s' and cost function '%s'", args_info.net_arg, args_info.costfunction_arg);    
 
     // max Costs are the costs of the most expensive path through
     // the inner state graph
@@ -355,7 +359,7 @@ int main(int argc, char** argv) {
         
         if (maxCostOfComposition > 0) { // Binary search is only necessary if the upper bound is greater than 0.
             
-            status("Finding the minimal budget with a binary search");
+            status("Step 5: Find the minimal budget with a binary search");
 
             int bsUpper = maxCostOfComposition-1; // for maxCostofComposition, it is controllable anyway. 
             int bsLower = 0;

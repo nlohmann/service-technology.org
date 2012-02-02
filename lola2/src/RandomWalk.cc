@@ -14,7 +14,7 @@ repeatedly fir random transitions
 #include "Place.h"
 #include "Marking.h"
 
-void randomWalk()
+__attribute__((noreturn)) void randomWalk()
 {
     // repeat forever
     while (true)

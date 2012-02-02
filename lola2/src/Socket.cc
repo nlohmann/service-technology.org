@@ -45,7 +45,7 @@ Socket::Socket(u_short port, const char* destination)
     listening((destination == NULL)),
     buffer(NULL)
 {
-    if (-1 == sock)   /* if socket failed to initialize, exit */
+    if UNLIKELY(-1 == sock)    /* if socket failed to initialize, exit */
     {
         fprintf(stderr, "Error Creating Socket");
         exit(EXIT_FAILURE);
@@ -61,7 +61,7 @@ Socket::Socket(u_short port, const char* destination)
     if (listening)
     {
         // bind the socket sock to the address specified in address
-        if (-1 == bind(sock, (struct sockaddr*)&address, addressLength))
+        if UNLIKELY(-1 == bind(sock, (struct sockaddr*)&address, addressLength))
         {
             perror("error bind failed");
             close(sock);
@@ -112,7 +112,7 @@ __attribute__((noreturn)) void Socket::receive()
         // sets no flags, receives from address specified in sa with length fromlen
         recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
 
-        if (recsize < 0)
+        if UNLIKELY(recsize < 0)
         {
             fprintf(stderr, "%s\n", strerror(errno));
             exit(EXIT_FAILURE);
@@ -148,7 +148,7 @@ void Socket::send(const char* message) const
 {
     ssize_t bytes_sent = sendto(sock, message, strlen(message), 0, (const struct sockaddr*)&address, addressLength);
 
-    if (bytes_sent < 0)
+    if UNLIKELY(bytes_sent < 0)
     {
         printf("Error sending packet: %s\n", strerror(errno));
         exit(EXIT_FAILURE);

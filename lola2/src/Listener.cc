@@ -3,6 +3,7 @@
 \todo comment me
 */
 
+#include <config.h>
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
@@ -14,13 +15,13 @@ Reporter* rep = new ReporterStream();
 
 int main(int argc, char** argv)
 {
-    if (argc == 2 and !strcmp(argv[1], "--help"))
+    if UNLIKELY (argc == 2 and !strcmp(argv[1], "--help"))
     {
         printf("No help\n");
         return EXIT_SUCCESS;
     }
 
-    if (argc == 2 and !strcmp(argv[1], "--version"))
+    if UNLIKELY (argc == 2 and !strcmp(argv[1], "--version"))
     {
         printf("No version\n");
         return EXIT_SUCCESS;

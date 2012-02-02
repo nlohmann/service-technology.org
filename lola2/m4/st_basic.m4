@@ -37,13 +37,13 @@ AH_BOTTOM([/*!
 \brief tell compiler that condition is very likely true
 \ref http://stackoverflow.com/questions/109710/likely-unlikely-macros-in-the-linux-kernel
 */
-#define LIKELY(x)       __builtin_expect((x),1)
+#define LIKELY(x)       (__builtin_expect((x),1))
 
 /*!
 \brief tell compliler that condition is very likely false
 \ref http://stackoverflow.com/questions/109710/likely-unlikely-macros-in-the-linux-kernel
 */
-#define UNLIKELY(x)     __builtin_expect((x),0)
+#define UNLIKELY(x)     (__builtin_expect((x),0))
 ])
 
 #

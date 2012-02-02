@@ -64,7 +64,7 @@ void evaluateParameters(int argc, char** argv)
     struct cmdline_parser_params* params = cmdline_parser_params_create();
 
     // call the cmdline parser
-    if (UNLIKELY(cmdline_parser(argc, argv, &args_info) != 0))
+    if UNLIKELY(cmdline_parser(argc, argv, &args_info) != 0)
     {
         fprintf(stderr, "invalid command-line parameter(s)\n");
         exit(EXIT_FAILURE);

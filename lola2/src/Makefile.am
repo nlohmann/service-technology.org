@@ -13,6 +13,7 @@ lola_SOURCES = \
                 ParserPTNetLoLA.yy Lexic.ll \
                 Place.cc Place.h \
                 PlaceSymbol.cc PlaceSymbol.h \
+                RandomWalk.cc RandomWalk.h \
                 Reporter.cc Reporter.h \
                 Socket.cc Socket.h \
                 Symbol.cc Symbol.h \
@@ -21,7 +22,6 @@ lola_SOURCES = \
                 Transition.cc Transition.h \
                 TransitionSymbol.h TransitionSymbol.cc \
                 cmdline.c cmdline.h \
-		RandomWalk.cc RandomWalk.h \
                 main.cc
 
 listener_SOURCES = Listener.cc \

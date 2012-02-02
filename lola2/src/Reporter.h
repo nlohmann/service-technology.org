@@ -17,12 +17,30 @@ typedef enum
 
 /*!
 \todo Datei mit Fehlernummern anlegen
-\todo std::string loswerden
 \todo --verbose implementieren
 \todo Kommentieren!
 */
 class Reporter
 {
+    protected:
+        /// string class to avoid STL's std::string
+        class String
+        {
+            private:
+                /// payload - is freed in destructor
+                char* s;
+
+            public:
+                /// constructor (does only copy pointer, not content)
+                String(char* s);
+
+                /// destructor - frees payload
+                ~String();
+
+                /// operator for implicit cast to char*
+                operator char* () const;
+        };
+
     private:
         /// error messages
         static const char* error_messages[];

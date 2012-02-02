@@ -10,7 +10,6 @@
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
-#include <string>
 
 #include "Reporter.h"
 #include "Dimensions.h"
@@ -20,6 +19,30 @@ const char* Reporter::error_messages[] =
     "syntax error",
     "command line error"
 };
+
+
+
+
+/*!
+\note The given string is NOT copied! Only the pointer is stored and it will be
+      freed by the constructor. DO NOT use this constructor with const char*,
+      string literals, or anything that should live longer than this object
+*/
+Reporter::String::String(char* s) : s(s)
+{
+}
+
+Reporter::String::~String()
+{
+    free(s);
+}
+
+Reporter::String::operator char* () const
+{
+    return s;
+}
+
+
 
 
 
@@ -112,48 +135,64 @@ ReporterStream::ReporterStream() :
 
 const char* ReporterStream::_ctool_(const char* s) const
 {
-    return (std::string(_cm_) + s + _c_).c_str();
+    char* res = NULL;
+    asprintf(&res, "%s%s%s", _cm_, s, _c_);
+    return String(res);
 }
 
 const char* ReporterStream::_cfilename_(const char* s) const
 {
-    return (std::string(_cb__) + s + _c_).c_str();
+    char* res = NULL;
+    asprintf(&res, "%s%s%s", _cb__, s, _c_);
+    return String(res);
 }
 
 
 const char* ReporterStream::_coutput_(const char* s) const
 {
-    return (std::string(_cB_) + s + _c_).c_str();
+    char* res = NULL;
+    asprintf(&res, "%s%s%s", _cB_, s, _c_);
+    return String(res);
 }
 
 
 const char* ReporterStream::_cgood_(const char* s) const
 {
-    return (std::string(_cG_) + s + _c_).c_str();
+    char* res = NULL;
+    asprintf(&res, "%s%s%s", _cG_, s, _c_);
+    return String(res);
 }
 
 
 const char* ReporterStream::_cbad_(const char* s) const
 {
-    return (std::string(_cR_) + s + _c_).c_str();
+    char* res = NULL;
+    asprintf(&res, "%s%s%s", _cR_, s, _c_);
+    return String(res);
 }
 
 
 const char* ReporterStream::_cwarning_(const char* s) const
 {
-    return (std::string(_cY_) + s + _c_).c_str();
+    char* res = NULL;
+    asprintf(&res, "%s%s%s", _cY_, s, _c_);
+    return String(res);
 }
 
 
 const char* ReporterStream::_cimportant_(const char* s) const
 {
-    return (std::string(_bold_) + s + _c_).c_str();
+    char* res = NULL;
+    asprintf(&res, "%s%s%s", _bold_, s, _c_);
+    return String(res);
 }
 
 
 const char* ReporterStream::_cparameter_(const char* s) const
 {
-    return (std::string(_cC_) + s + _c_).c_str();
+    char* res = NULL;
+    asprintf(&res, "%s%s%s", _cC_, s, _c_);
+    return String(res);
 }
 
 

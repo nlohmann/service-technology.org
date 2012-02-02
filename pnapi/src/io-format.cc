@@ -1155,7 +1155,7 @@ std::ostream & output(std::ostream & os, const Transition & t)
 {
   os << "      <transition id=\"" << t.getName();
   
-  if(t.getLabels().empty())
+  if(util::StrictSyntaxData::data(os).isSet || t.getLabels().empty())
   {
     return (os << "\" />\n");
   }

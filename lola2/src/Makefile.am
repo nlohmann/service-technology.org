@@ -4,7 +4,6 @@ bin_PROGRAMS = lola listener
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
                 ArcList.cc ArcList.h \
-                BitSetC.cc BitSetC.h \
                 Dimensions.h \
                 FairnessAssumptions.h \
                 Marking.cc Marking.h \

@@ -20,9 +20,23 @@ information for a place in its role as a node, ar contained in Node.*
 
 index_t Place::CardSignificant = 0;
 hash_t* Place::Hash = NULL;
+
+/*!
+This is only used for calculating a dense representation of a marking, not as
+a blocker for transition activation.
+*/
 capacity_t* Place::Capacity = NULL;
+
+/*!
+Used for handling dense representations of markings
+*/
 cardbit_t* Place::CardBits = NULL;
 index_t* Place::CardDisabled = NULL;
+
+/*!
+The arrays Disabled[i] are allocated for the maximum number of such
+transitions which is \f$card(p^\bullet)\f$
+*/
 index_t** Place::Disabled = NULL;
 
 /// aufräumen für valgrind

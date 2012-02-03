@@ -17,7 +17,6 @@ information for a transition in its role as a node, ar contained in Node.*
 #include "Marking.h"
 #include "Dimensions.h"
 #include "FairnessAssumptions.h"
-#include "BitSetC.h"
 
 fairnessAssumption_t* Transition::Fairness = NULL;
 bool* Transition::Enabled = NULL;
@@ -30,6 +29,11 @@ index_t* Transition::CardConflicting = NULL;
 index_t** Transition::Conflicting = NULL;
 index_t* Transition::CardBackConflicting = NULL;
 index_t** Transition::BackConflicting = NULL;
+
+/*!
+Whenever t gets disabled, we sort its Pre list such that the scapegoat is the
+first entry there.
+*/
 index_t* Transition::PositionScapegoat = NULL;
 
 /*!

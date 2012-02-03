@@ -21,7 +21,7 @@ const char* Reporter::error_messages[] =
 };
 
 
-
+/*---------------------------------------------------------------------------*/
 
 /*!
 \note The given string is NOT copied! Only the pointer is stored and it will be
@@ -30,8 +30,13 @@ const char* Reporter::error_messages[] =
 */
 Reporter::String::String(char* s) : s(s)
 {
+    assert(s);
 }
 
+/*!
+\pre memory for s was allocated outside this object using malloc
+\post memory for s is released
+*/
 Reporter::String::~String()
 {
     free(s);
@@ -42,17 +47,12 @@ char* Reporter::String::str() const
     return s;
 }
 
-
-
-
-
+/*---------------------------------------------------------------------------*/
 
 ReporterSocket::ReporterSocket(u_short port, const char* ip)
     : mySocket(Socket(port, ip))
 {
 }
-
-
 
 void ReporterSocket::message(const char* format, ...) const
 {
@@ -77,11 +77,18 @@ void ReporterSocket::status(const char* format, ...) const
 __attribute__((noreturn)) void ReporterSocket::abort(errorcode_t code, const char* format, ...) const
 {
     char buffer[UDP_BUFFER_SIZE];
+    
+    sprintf(buffer, "%s: ", PACKAGE);
+    mySocket.send(buffer);
+
     va_list args;
     va_start(args, format);
     vsprintf(buffer, format, args);
     mySocket.send(buffer);
     va_end(args);
+
+    sprintf(buffer, " -- aborting [#%02d]", code);
+    mySocket.send(buffer);
 
     exit(EXIT_FAILURE);
 }
@@ -91,8 +98,7 @@ ReporterSocket::~ReporterSocket()
     status("done");
 }
 
-
-
+/*---------------------------------------------------------------------------*/
 
 ReporterStream::ReporterStream() :
 #if !defined(__MINGW32__)
@@ -132,7 +138,6 @@ ReporterStream::ReporterStream() :
 {
 }
 
-
 Reporter::String ReporterStream::_ctool_(const char* s) const
 {
     char* res = NULL;
@@ -151,7 +156,6 @@ Reporter::String ReporterStream::_cfilename_(const char* s) const
     return String(res);
 }
 
-
 Reporter::String ReporterStream::_coutput_(const char* s) const
 {
     char* res = NULL;
@@ -160,7 +164,6 @@ Reporter::String ReporterStream::_coutput_(const char* s) const
     assert(res);
     return String(res);
 }
-
 
 Reporter::String ReporterStream::_cgood_(const char* s) const
 {
@@ -171,7 +174,6 @@ Reporter::String ReporterStream::_cgood_(const char* s) const
     return String(res);
 }
 
-
 Reporter::String ReporterStream::_cbad_(const char* s) const
 {
     char* res = NULL;
@@ -180,7 +182,6 @@ Reporter::String ReporterStream::_cbad_(const char* s) const
     assert(res);
     return String(res);
 }
-
 
 Reporter::String ReporterStream::_cwarning_(const char* s) const
 {
@@ -191,7 +192,6 @@ Reporter::String ReporterStream::_cwarning_(const char* s) const
     return String(res);
 }
 
-
 Reporter::String ReporterStream::_cimportant_(const char* s) const
 {
     char* res = NULL;
@@ -201,7 +201,6 @@ Reporter::String ReporterStream::_cimportant_(const char* s) const
     return String(res);
 }
 
-
 Reporter::String ReporterStream::_cparameter_(const char* s) const
 {
     char* res = NULL;
@@ -210,9 +209,6 @@ Reporter::String ReporterStream::_cparameter_(const char* s) const
     assert(res);
     return String(res);
 }
-
-
-
 
 
 /*!
@@ -229,6 +225,7 @@ void ReporterStream::message(const char* format, ...) const
 
     fprintf(stderr, "\n");
 }
+
 
 /*!
  \param format  the status message formatted as printf string

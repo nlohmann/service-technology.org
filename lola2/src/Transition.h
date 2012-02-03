@@ -12,7 +12,6 @@ information for a transition in its role as a node, ar contained in Node.*
 
 #include "Dimensions.h"
 #include "FairnessAssumptions.h"
-#include "BitSetC.h"
 
 /*!
 
@@ -32,40 +31,31 @@ struct Transition
         /// number of enabled transitions
         static index_t CardEnabled;
 
-        /// When transition i fires from m to m', DeltaHash[i] is hash(m') - hash(m).
-        /// This value is independent of m and m'
+        /// When transition i fires from m to m', DeltaHash[i] is hash(m') - hash(m). This value is independent of m and m'
         static hash_t* DeltaHash;
 
-        /// That many places need to be changed when transition i fires
-        /// CardDeltaT[PRE] for places that lose tokens, CardDeltaT[POST] for those that gain tokens
+        /// That many places need to be changed when transition i fires CardDeltaT[PRE] for places that lose tokens, CardDeltaT[POST] for those that gain tokens
         static index_t* CardDeltaT[2];
 
-        /// These are the places that change their marking when transition i fires
-        /// DeltaT[PRE] for places that lose tokens, DeltaT[POST] for those that gain tokens
+        /// These are the places that change their marking when transition i fires DeltaT[PRE] for places that lose tokens, DeltaT[POST] for those that gain tokens
         static index_t** DeltaT[2];
 
         /// This is the amount of change
         static mult_t** MultDeltaT[2];
 
-        /// After firing transition i, that many transitions must be checked for enabledness if they
-        /// have been enabled before: card(DeltaT[PRE]\bullet)
+        /// After firing transition i, that many transitions must be checked for enabledness if they have been enabled before: \f$card(DeltaT[PRE]^\bullet)\f$
         static index_t* CardConflicting;
 
-        /// After firing transition i, these transitions must be checked for enabledness if they
-        /// have been enabled before: (DeltaT[PRE]\bullet)
+        /// After firing transition i, these transitions must be checked for enabledness if they have been enabled before: \f$(DeltaT[PRE]^\bullet)\f$
         static index_t** Conflicting;
 
-        /// After reverse firing transition i, that many transitions must be checked for enabledness if they
-        /// have been enabled before: card(DeltaT[POST]\bullet)
+        /// After reverse firing transition i, that many transitions must be checked for enabledness if they have been enabled before: \f$card(DeltaT[POST]^\bullet)\f$
         static index_t* CardBackConflicting;
 
-        /// After firing transition i, these transitions must be checked for enabledness if they
-        /// have been enabled before: (DeltaT[POST]\bullet)
+        /// After firing transition i, these transitions must be checked for enabledness if they have been enabled before: \f$(DeltaT[POST]^\bullet)\f$
         static index_t** BackConflicting;
 
         /// If transition i is disabled, this is its position in its scapegpat's Disabled list
-        /// Whenever t gets disabled, we sort its Pre list such that the scapegoat is the first
-        /// entry there.
         static index_t* PositionScapegoat;
 
         /// Check transition for activation

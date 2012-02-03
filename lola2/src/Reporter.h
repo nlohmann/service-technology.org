@@ -37,7 +37,7 @@ class Reporter
                 /// destructor - frees payload
                 ~String();
 
-                /// operator for implicit cast to char*
+                /// getter for s
                 char* str() const;
         };
 

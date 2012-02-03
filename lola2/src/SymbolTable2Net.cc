@@ -93,7 +93,7 @@ void symboltable2net(ParserPTNet* parser)
     // fill all information that is locally available in symbols, allocate node specific arrays
     PlaceSymbol* ps;
     index_t i;
-    for ((ps = (PlaceSymbol*) parser->PlaceTable->first()), (i = 0); ps; ps = reinterpret_cast<PlaceSymbol*>(parser->PlaceTable->next()), i++)
+    for ((ps = reinterpret_cast<PlaceSymbol*>(parser->PlaceTable->first())), (i = 0); ps; ps = reinterpret_cast<PlaceSymbol*>(parser->PlaceTable->next()), i++)
     {
         Net::Name[PL][i] = ps -> getKey();
         Net::CardArcs[PL][PRE][i] = ps -> getCardPre();
@@ -134,7 +134,7 @@ void symboltable2net(ParserPTNet* parser)
         Transition::MultDeltaT[direction] = (mult_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
     }
     TransitionSymbol* ts;
-    for (ts = (TransitionSymbol*) parser->TransitionTable->first(), i = 0; ts; ts = reinterpret_cast<TransitionSymbol*>(parser->TransitionTable->next()), i++)
+    for (ts = reinterpret_cast<TransitionSymbol*>(parser->TransitionTable->first()), i = 0; ts; ts = reinterpret_cast<TransitionSymbol*>(parser->TransitionTable->next()), i++)
     {
         Net::Name[TR][i] = ts -> getKey();
         Net::CardArcs[TR][PRE][i] = ts -> getCardPre();

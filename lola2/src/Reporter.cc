@@ -77,7 +77,7 @@ void ReporterSocket::status(const char* format, ...) const
 __attribute__((noreturn)) void ReporterSocket::abort(errorcode_t code, const char* format, ...) const
 {
     char buffer[UDP_BUFFER_SIZE];
-    
+
     sprintf(buffer, "%s: ", PACKAGE);
     mySocket.send(buffer);
 

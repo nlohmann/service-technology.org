@@ -13,6 +13,7 @@
 #include "config.h"
 #include "config-log.h"
 #include "Output.h"
+#include "Parser.h"
 
 class Tara {
 public:
@@ -47,6 +48,9 @@ public:
 
     /// evaluate the command line parameters
     static void evaluateParameters(int argc, char** argv);
+
+    static Parser costfunctionParser;
+    static Parser lolaParser;
 
 };
 

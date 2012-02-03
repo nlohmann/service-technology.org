@@ -13,6 +13,16 @@ gengetopt_args_info Tara::args_info;
 
 std::deque<innerState *> Tara::graph;
 
+extern int graph_parse();
+extern int graph_lex_destroy();
+extern FILE* graph_in;
+Parser Tara::lolaParser=Parser(graph_parse,&graph_in,graph_lex_destroy);
+
+extern int costfunction_parse();
+extern int costfunction_lex_destroy();
+extern FILE* costfunction_in;
+Parser Tara::costfunctionParser=Parser(costfunction_parse,&costfunction_in,costfunction_lex_destroy);
+
 unsigned int Tara::cost(pnapi::Transition* t) {
    std::map<pnapi::Transition*,unsigned int>::iterator cost = Tara::partialCostFunction.find(t);
    if(cost==partialCostFunction.end()) 

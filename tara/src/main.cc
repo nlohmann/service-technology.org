@@ -38,25 +38,11 @@
 #include "ServiceTools.h"
 #include "iModification.h"
 
-
-// input files
-extern FILE* graph_in;
-extern FILE* costfunction_in;
-
-// the parsers
-extern int graph_parse();
-extern int graph_lex_destroy();
-extern int costfunction_parse();
-extern int costfunction_lex_destroy();
-
 using std::cerr;
 using std::cout;
 using std::endl;
 using std::map;
 using std::ofstream;
-
-/// the invocation string
-std::string invocation;
 
 /// a variable holding the time of the call
 clock_t start_clock = clock();
@@ -83,6 +69,8 @@ int main(int argc, char** argv) {
     | 0. parse the command line parameters  |
     `--------------------------------------*/
     Tara::evaluateParameters(argc, argv);
+
+    //TODO: reorganize temp file stuff
     Output::setTempfileTemplate(Tara::args_info.tmpfile_arg);
     Output::setKeepTempfiles(Tara::args_info.noClean_flag);
 
@@ -144,8 +132,8 @@ int main(int argc, char** argv) {
     //stream automaton
     partnerStream.open(partnerTemp.c_str(), std::ifstream::in);
     if(!partnerStream) { //TODO: is this check necessary ?
-	message("Tara::net is not controllable. Exit.");
-	exit(EXIT_FAILURE);
+        message("Tara::net is not controllable. Exit.");
+        exit(EXIT_FAILURE);
     }
 
     partnerStream >> pnapi::io::sa >> partner;
@@ -168,29 +156,19 @@ int main(int argc, char** argv) {
     // run lola-statespace from the service tools
     getLolaStatespace(composition,lolaFN);
 
-
-    //TODO: maybe wrap parsers in classes?
     /*-------------------------------------.
     | 4. Parse Costfunction to partial map |
     \-------------------------------------*/
     message("Step 3: Parse the cost function from '%s' and apply it to the built statespace", Tara::args_info.costfunction_arg);    
 
-     status("parsing costfunction");
-       // TODO Check if file exists   
-     costfunction_in=fopen(Tara::args_info.costfunction_arg, "r");
-     costfunction_parse(); 
- 
-    // TODO clean up: destroy lexer, file pointer etc
-
+    status("parsing costfunction");
+    Tara::costfunctionParser.parse(Tara::args_info.costfunction_arg);
 
     /*-------------------------.
     | 5. Parse the inner Graph |
     \-------------------------*/
 
-    graph_in=fopen(lolaFN.c_str(),"r");
-    graph_parse();
-    /* TODO destroy lexer etc */
-
+    Tara::lolaParser.parse(lolaFN.c_str()); 
 
     /*------------------------------------------.
     | 5. Compute MaxCosts from the parsed graph | 

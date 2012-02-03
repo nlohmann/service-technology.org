@@ -62,8 +62,19 @@ bool isControllable(pnapi::PetriNet &net, std::string &outputFile, bool useWendy
     fprintf(fp, "%s", ss.str().c_str());
 
     // close the pipe
-    pclose(fp);
+    // TODO: is this really the exit status of wendy?
+    // TODO: How we may get the exit code here?
+    int wendyExit=pclose(fp);
+    status("Wendy done with status: %d", wendyExit);
 
+    //if wendy exits with status != 0
+    //TODO add some nice error message here
+    if (wendyExit != 0 ) {
+        message("Wendy returned an error. Exit.");
+	exit(EXIT_FAILURE);
+    }
+
+    // Check if output file exists
     if(!fileExists(outputFile)) {
         return false;
     }

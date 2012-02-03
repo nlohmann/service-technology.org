@@ -206,9 +206,7 @@ int main(int argc, char** argv) {
     | 2. get most permissive Partner MP |
     `----------------------------------*/
 
-    std::string wendyCommand("wendy --correctness=livelock ");
-    wendyCommand+=args_info.net_arg;
-
+// TODO: renice this temp file stuff, maybe use Output class in an appropiate way?
     std::string tempFN;
      // create a temporary file
 #if defined(__MINGW32__)
@@ -217,24 +215,13 @@ int main(int argc, char** argv) {
         tempFN = mktemp(args_info.tmpfile_arg);
 #endif
 
+
     std::string partnerTemp=tempFN+"-mp-partner.sa";
-    wendyCommand+=" --sa="+partnerTemp;
-    message("Step 1: Synthesize the most-permissive partner of '%s'", args_info.net_arg);    
-    status("creating a pipe to wendy by calling '%s'", wendyCommand.c_str());
 
-    int wendyExit = system(wendyCommand.c_str());
-
-    wendyExit=WEXITSTATUS(wendyExit);
- 
-    status("Wendy done with status: %d", wendyExit); 
- 
-    // if wendy exits with status != 0
-    // TODO add some nice error message here
-	if (wendyExit != 0 ) {
-		message("Wendy returned an error. Exit.");
-		exit(EXIT_FAILURE);
-	}
-
+    if(!isControllable((*Tara::net), partnerTemp, false) ) {
+	    message("Tara::net is not controllable. Exit.");
+	    exit(EXIT_FAILURE); // TODO maybe change return status, is this a failure ??
+    }
      
     // first create automaton partner
     pnapi::Automaton partner;
@@ -242,7 +229,7 @@ int main(int argc, char** argv) {
 
     //stream automaton
     partnerStream.open(partnerTemp.c_str(), std::ifstream::in);
-    if(!partnerStream) {
+    if(!partnerStream) { //TODO: is this check necessary ?
 	message("Tara::net is not controllable. Exit.");
 	exit(EXIT_FAILURE);
     }
@@ -267,6 +254,8 @@ int main(int argc, char** argv) {
     // run lola-statespace from the service tools
     getLolaStatespace(composition,lolaFN);
 
+
+    //TODO: maybe wrap parsers in classes?
     /*-------------------------------------.
     | 4. Parse Costfunction to partial map |
     \-------------------------------------*/

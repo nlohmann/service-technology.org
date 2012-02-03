@@ -26,8 +26,7 @@
 #include <fstream>
 #include "cmdline.h"
 #include "verbose.h"
-
-extern gengetopt_args_info args_info;
+#include "Tara.h"
 
 
 /***************************************************************************\
@@ -86,7 +85,7 @@ void message(const char* format, ...) {
  \param format  the status message formatted as printf string
 */
 void status(const char* format, ...) {
-    if (not args_info.verbose_flag) {
+    if (not Tara::args_info.verbose_flag) {
         return;
     }
 

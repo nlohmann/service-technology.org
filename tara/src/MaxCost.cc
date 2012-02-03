@@ -28,8 +28,6 @@
 #include "verbose.h"
 #include "cmdline.h"
 
-extern gengetopt_args_info args_info;
-
 
 /* this is the Stack of the nodes in the graph of lola output */
 /* this stack is used for DFS */
@@ -38,8 +36,8 @@ std::deque<int> nodeStack;
 unsigned int maxCost(pnapi::PetriNet* net) {
     status("LoLA returned %d states.", Tara::graph.size());
     
-    bool USE_SIMPLE = args_info.heuristics_given && args_info.heuristics_arg == heuristics_arg_simple;
-    bool USE_MAXOUT = args_info.heuristics_given && args_info.heuristics_arg == heuristics_arg_maxout;
+    bool USE_SIMPLE = Tara::args_info.heuristics_given && Tara::args_info.heuristics_arg == heuristics_arg_simple;
+    bool USE_MAXOUT = Tara::args_info.heuristics_given && Tara::args_info.heuristics_arg == heuristics_arg_maxout;
 
     if (USE_SIMPLE) {
     	status("Optimization enabled: simple.");

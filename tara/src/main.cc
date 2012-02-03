@@ -18,10 +18,6 @@
 \*****************************************************************************/
 
 
-#ifndef WEXITSTATUS
-# define WEXITSTATUS(stat_val) ((unsigned int) (stat_val) >> 8)
-#endif
-
 /* <<-- CHANGE START (main program) -->> */
 // include header files
 #include <config.h>
@@ -59,99 +55,18 @@ using std::endl;
 using std::map;
 using std::ofstream;
 
-/// the command line parameters
-gengetopt_args_info args_info;
-
 /// the invocation string
 std::string invocation;
 
 /// a variable holding the time of the call
 clock_t start_clock = clock();
 
-/// check if a file exists and can be opened for reading
-inline bool fileExists(const std::string& filename) {
-    std::ifstream tmp(filename.c_str(), std::ios_base::in);
-    return tmp.good();
-}
-
-
-/// evaluate the command line parameters
-void evaluateParameters(int argc, char** argv) {
-    // overwrite invocation for consistent error messages
-    argv[0] = basename(argv[0]);
-
-    // store invocation in a std::string for meta information in file output
-    for (int i = 0; i < argc; ++i) {
-        invocation += std::string(argv[i]) + " ";
-    }
-
-    // initialize the parameters structure
-    struct cmdline_parser_params* params = cmdline_parser_params_create();
-
-    // call the cmdline parser
-    if (cmdline_parser(argc, argv, &args_info) != 0) {
-        abort(7, "invalid command-line parameter(s)");
-    }
-
-    // debug option
-    if (args_info.bug_flag) {
-        {
-            Output debug_output("bug.log", "configuration information");
-            debug_output.stream() << CONFIG_LOG << std::flush;
-        }
-        message("please send file 'bug.log' to %s!", PACKAGE_BUGREPORT);
-        exit(EXIT_SUCCESS);
-    }
-
-    // read a configuration file if necessary
-    if (args_info.config_given) {
-        // initialize the config file parser
-        params->initialize = 0;
-        params->override = 0;
-
-        // call the config file parser
-        if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
-            abort(14, "error reading configuration file '%s'", args_info.config_arg);
-        } else {
-            status("using configuration file '%s'", args_info.config_arg);
-        }
-    } else {
-        // check for configuration files
-        std::string conf_generic_filename = std::string(PACKAGE) + ".conf";
-        std::string conf_filename = fileExists(conf_generic_filename) ? conf_generic_filename :
-                                    (fileExists(std::string(SYSCONFDIR) + "/" + conf_generic_filename) ?
-                                     (std::string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
-
-        if (conf_filename != "") {
-            // initialize the config file parser
-            params->initialize = 0;
-            params->override = 0;
-            if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
-                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
-            } else {
-                status("using configuration file '%s'", conf_filename.c_str());
-            }
-        } else {
-            status("not using a configuration file");
-        }
-    }
-
-
-    // check whether at most one file is given
-    if (args_info.inputs_num > 1) {
-        abort(4, "at most one reachability graph must be given");
-    }
-
-    free(params);
-}
-
-
 /// a function collecting calls to organize termination (close files, ...)
 void terminationHandler() {
     /* [USER] Add code here */
 
     // print statistics
-    if (args_info.stats_flag) {
+    if(Tara::args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
         int i = system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
@@ -164,22 +79,21 @@ int main(int argc, char** argv) {
     
     time_t start_time, end_time;
 
-    // set the function to call on normal termination
-    atexit(terminationHandler);
-
     /*--------------------------------------.
     | 0. parse the command line parameters  |
     `--------------------------------------*/
-    evaluateParameters(argc, argv);
-    Output::setTempfileTemplate(args_info.tmpfile_arg);
-    Output::setKeepTempfiles(args_info.noClean_flag);
+    Tara::evaluateParameters(argc, argv);
+    Output::setTempfileTemplate(Tara::args_info.tmpfile_arg);
+    Output::setKeepTempfiles(Tara::args_info.noClean_flag);
 
+    // set the function to call on normal termination
+    atexit(terminationHandler);
     /*----------------------.
     | 1. parse the open Tara::net |
     `----------------------*/
 
     // Parsing the open Tara::net, using the PNAPI
-	status("Processing %s", args_info.net_arg);
+	status("Processing %s", Tara::args_info.net_arg);
 	Tara::net = new pnapi::PetriNet;
 
 	try {
@@ -187,7 +101,7 @@ int main(int argc, char** argv) {
 		// parse either from standard input or from a given file
 	
 		std::ifstream inputStream;
-		inputStream.open(args_info.net_arg);
+		inputStream.open(Tara::args_info.net_arg);
 		inputStream >> pnapi::io::owfn >> *(Tara::net);
 		inputStream.close();
 
@@ -210,9 +124,9 @@ int main(int argc, char** argv) {
     std::string tempFN;
      // create a temporary file
 #if defined(__MINGW32__)
-        tempFN = mktemp(basename(args_info.tmpfile_arg));
+        tempFN = mktemp(basename(Tara::args_info.tmpfile_arg));
 #else
-        tempFN = mktemp(args_info.tmpfile_arg);
+        tempFN = mktemp(Tara::args_info.tmpfile_arg);
 #endif
 
 
@@ -246,7 +160,7 @@ int main(int argc, char** argv) {
     | 3. call lola with n+mp  |
     `------------------------*/
 
-    message("Step 2: Build the state space of '%s' and its most-permissive partner", args_info.net_arg);    
+    message("Step 2: Build the state space of '%s' and its most-permissive partner", Tara::args_info.net_arg);    
 
     // create a temporary file
     std::string lolaFN=tempFN+ "-lola.rg";
@@ -259,11 +173,11 @@ int main(int argc, char** argv) {
     /*-------------------------------------.
     | 4. Parse Costfunction to partial map |
     \-------------------------------------*/
-    message("Step 3: Parse the cost function from '%s' and apply it to the built statespace", args_info.costfunction_arg);    
+    message("Step 3: Parse the cost function from '%s' and apply it to the built statespace", Tara::args_info.costfunction_arg);    
 
      status("parsing costfunction");
        // TODO Check if file exists   
-     costfunction_in=fopen(args_info.costfunction_arg, "r");
+     costfunction_in=fopen(Tara::args_info.costfunction_arg, "r");
      costfunction_parse(); 
  
     // TODO clean up: destroy lexer, file pointer etc
@@ -281,7 +195,7 @@ int main(int argc, char** argv) {
     /*------------------------------------------.
     | 5. Compute MaxCosts from the parsed graph | 
     \------------------------------------------*/
-    message("Step 4: Find an upper bound for the minimal budget w.r.t. Tara::net '%s' and cost function '%s'", args_info.net_arg, args_info.costfunction_arg);    
+    message("Step 4: Find an upper bound for the minimal budget w.r.t. Tara::net '%s' and cost function '%s'", Tara::args_info.net_arg, Tara::args_info.costfunction_arg);    
 
     // max Costs are the costs of the most expensive path through
     // the inner state graph
@@ -312,27 +226,27 @@ int main(int argc, char** argv) {
     
     if (!bounded) {
         // Every partner is trivially cost-minimal. Thus, return the mpp
-        if (args_info.sa_given) {
+        if (Tara::args_info.sa_given) {
 		    message("Any partner is cost-minimal, returning the most-permissive partner.");
 		    minCostPartnerStream.open(partnerTemp.c_str());
-            if (std::string(args_info.sa_arg).compare("-") != 0) {
+            if (std::string(Tara::args_info.sa_arg).compare("-") != 0) {
                 std::ofstream outputFile;
-                outputFile.open(args_info.sa_arg);
+                outputFile.open(Tara::args_info.sa_arg);
                 outputFile << minCostPartnerStream.rdbuf();
                 outputFile.close();
             } else {
     		    cout << minCostPartnerStream.rdbuf();
             }
     	}
-        if (args_info.og_given) {
+        if (Tara::args_info.og_given) {
             std::string s = "writing operating guidelines to ";
-            if (std::string(args_info.og_arg).compare("-") == 0) {
+            if (std::string(Tara::args_info.og_arg).compare("-") == 0) {
                 s += "standard out";             
             } else {
-                s += "file '" + std::string(args_info.og_arg) + "'";
+                s += "file '" + std::string(Tara::args_info.og_arg) + "'";
             }
 		    message("Any partner is cost-minimal, %s.", s.c_str());
-            computeOG(*Tara::net, args_info.og_arg);
+            computeOG(*Tara::net, Tara::args_info.og_arg);
         }
 
     } else { // there exists a partner with a bounded budget 
@@ -373,16 +287,16 @@ int main(int argc, char** argv) {
         message("Minimal budget found: %d", minBudget);
 
 
-        if (args_info.sa_given) {
+        if (Tara::args_info.sa_given) {
 		    message("Synthesized a cost-minimal partner. (Costs = %d)", minBudget);
             ssi.str("");
             ssi << minBudget;
             curMinCostPartner=minCostPartner+ssi.str()+".sa";
             minCostPartnerStream.open(curMinCostPartner.c_str());
-            if (std::string(args_info.sa_arg).compare("-") != 0) {
-    		    message("Writing partner to file '%s'.",args_info.sa_arg);
+            if (std::string(Tara::args_info.sa_arg).compare("-") != 0) {
+    		    message("Writing partner to file '%s'.",Tara::args_info.sa_arg);
                 std::ofstream outputFile;
-                outputFile.open(args_info.sa_arg);
+                outputFile.open(Tara::args_info.sa_arg);
                 outputFile << minCostPartnerStream.rdbuf();
                 outputFile.close();
             } else {
@@ -391,16 +305,16 @@ int main(int argc, char** argv) {
     		    cout << minCostPartnerStream.rdbuf();
             }
     	}
-        if (args_info.og_given) {
+        if (Tara::args_info.og_given) {
             std::string s = "writing operating guidelines to ";
-            if (std::string(args_info.og_arg).compare("-") == 0) {
+            if (std::string(Tara::args_info.og_arg).compare("-") == 0) {
                 s += "standard out";             
             } else {
-                s += "file '" + std::string(args_info.og_arg) + "'";
+                s += "file '" + std::string(Tara::args_info.og_arg) + "'";
             }
 		    message("Computing representation of all cost-minimal partners, %s.", s.c_str());
             iMod.setToValue(minBudget);
-            computeOG(*Tara::net, args_info.og_arg);
+            computeOG(*Tara::net, Tara::args_info.og_arg);
         }
 
     } 

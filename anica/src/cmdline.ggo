@@ -11,42 +11,41 @@ args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --co
 
 description "About Anica:"
 purpose "Automated Non-Interference Check Assistent.\n
-This program checks safe petri nets for non-interference properties.\n\n  Report bugs to anica@service-technology.org.\n  Visit Anica's home page at http://service-technology.org/anica"
+This program reasons about non-interference properties in safe Petri nets.\n\n  Report bugs to anica@service-technology.org.\n  Visit Anica's home page at http://service-technology.org/anica"
 
 section "Analysis Task"
-sectiondesc="<<-- Anica is able to find potential and active interfering places. By default, Anica will find both. -->>\n"
+sectiondesc="<<-- Anica is able to handle different tasks for different properties. It can perform verification, controllability and characterization for different properties.  -->>\n"
 
-option "controller" -
-  "Calculate controller."
-  details="Calculate controller.\n"
-  flag off
-
-option "potentialPlaces" -
-  "Potential Places."
-  details="Used to find specified potential places.\n"
-  values="causal","conflict","both" enum
-  default="both"
+option "task" t
+  "Task to perform." 
+  details="Verification checks the choosen property against the given net. Controllability creates one controllability problem for Wendy. Characterization calculates all possible annotations fullfilling the choosen property.\n" 
+  values="verfification","controllability", "characterization" enum 
+  typestr="TASK" 
+  default="verfification" 
   optional
 
-option "activePlaces" -
-  "Active Places."
-  details="Used to find specified active places.\n"
-  values="causal","conflict","both","none" enum
-  default="both"
+option "property" p
+  "Property to consider." 
+  details="Positive Place Based Non-Interference (PBNI+) and Place Based Non-Interferece with Downgrading (PBNID) are supported.\n" 
+  values="PBNI+","PBNID" enum 
+  typestr="PROPERTY" 
+  default="PBNI+" 
   optional
-
-option "oneActiveOnly" -
-  "Only one active place."
-  details="After the first active place the check will be finished.\n"
-  flag off
-
-option "oneTripleOnly" -
-  "Only one active triple (one high and low combination per place)."
-  details="After the first active triple the check (for this place) will be finished.\n"
-  flag on
 
 section "Input/Output"
 sectiondesc="<<-- When called without an input file, Anica reads from the standard input stream. -->>\n"
+
+option "unlabeledTransitions" -
+  "How to handle unlabeled transitions."
+  details="By default unlabeled transitions are not allowed for some tasks and properties, but to be more flexible you can choose a standard value for unlabeled transitions.\n"
+  values="high","low","down","none" enum
+  default="none"
+  optional
+
+option "useReprensativeNames" -
+  "Name new nodes in a reprensative way."
+  details="By default new nodes get random names.\n"
+  flag off
 
 option "resultFile" r
   "Results output."
@@ -83,6 +82,33 @@ option "dotActive" -
   default="both"
   optional
 
+section "Reductions" 
+sectiondesc="These options control the reductions Anica uses while performing the task.\n"
+
+option "potentialPlaces" -
+  "Potential Places."
+  details="Used to find specified potential places.\n"
+  values="causal","conflict","both" enum
+  default="both"
+  optional
+
+option "activePlaces" -
+  "Active Places."
+  details="Used to find specified active places.\n"
+  values="causal","conflict","both","none" enum
+  default="both"
+  optional
+
+option "oneActiveOnly" -
+  "Only one active place."
+  details="After the first active place the check will be finished.\n"
+  flag off
+
+option "oneTripleOnly" -
+  "Only one active triple (one high and low combination per place)."
+  details="After the first active triple the check (for this place) will be finished.\n"
+  flag on
+
 section "Configuration"
 sectiondesc="<<-- Anica relies on several other tools. These options configure Anica to find these tools. -->>\n"
 
@@ -101,19 +127,30 @@ option "lola" -
   default="lola-statepredicate1"
   optional
   hidden
-
-option "unlabeledTransitions" -
-  "How to handle unlabeled transitions."
-  details="By default unlabeled transitions are not allowed. To be more flexible you can choose a standard value for unlabeled transitions.\n"
-  values="high","low","down","none" enum
-  default="none"
+  
+option "lolaWendy" -
+  "Set the path and binary of LoLA used by Wendy."
+  details="The Lola binary (lola-statespace1). Lola can be downloaded from http://service-technology.org/lola and compiled using `make lola-statespace1'.\n"
+  string
+  typestr="FILENAME"
+  default="lola-statespace1"
   optional
+  hidden
+
+option "wendy" -
+  "Set the path and binary of Wendy."
+  details="The Wendy binary. Wendy can be downloaded from http://service-technology.org/wendy and compiled using `make'.\n"
+  string
+  typestr="FILENAME"
+  default="wendy"
+  optional
+  hidden
 
 option "modus" -
-  "Determines wether LoLA is called directly or a makefile is created."
-  details="Calling LoLA directly may cause long terms of unobservable actions but provide informations automatically.\n"
-  values="lola","makefile" enum
-  default="lola"
+  "Determines whether the tool is called directly, a makefile is created or just some statistic is performed."
+  details="Calling a tool directly may cause long terms of unobservable actions but provide informations automatically.\n"
+  values="call","makefile","statistic" enum
+  default="call"
   optional
 
 option "tmpfile" -
@@ -129,7 +166,6 @@ option "noClean" -
   "Do not delete temporary files."
   details="Any temporary files created will be kept after Anica terminates.\n"
   flag off
-
 
 section "Debugging"
 sectiondesc="<<-- These options control how much debug output Anica creates. -->>\n"

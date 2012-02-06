@@ -30,7 +30,7 @@ extern Reporter *rep;
 extern char* yytext;
 
 void yyerror(char const*);
-void yyerrors(char* token, char const* format, ...);
+void yyerrors(char* token, const char* format, ...);
 %}
 
 %union {
@@ -124,7 +124,8 @@ placelist:
     }
 | nodeident
     {
-        PlaceSymbol* p = new PlaceSymbol($1,TheCapacity);
+        PlaceSymbol* p = new PlaceSymbol($1, TheCapacity);
+        // this action is only triggered for the first place - there can be no duplicates here!
         if (UNLIKELY (! TheResult->PlaceTable->insert(p)))
         {
             yyerrors($1, "place '%s' name used twice", $1);
@@ -284,10 +285,13 @@ ParserPTNet* ParserPTNetLoLA()
 }
 
 /// display a parser error and exit
-void yyerrors(char* token, char const* format, ...) {
+void yyerrors(char* token, const char* format, ...) {
     va_list args;
     va_start(args, format);
-    rep->status(format, args);
+    char* errormessage = NULL;
+    vasprintf(&errormessage, format, args);
+    rep->status(errormessage);
+    free(errormessage);
     va_end(args);
 
     rep->status("%d:%d - error near '%s'", yylineno, yycolno, token);

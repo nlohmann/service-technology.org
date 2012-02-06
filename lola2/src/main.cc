@@ -66,8 +66,8 @@ void evaluateParameters(int argc, char** argv)
     // call the cmdline parser
     if (UNLIKELY(cmdline_parser(argc, argv, &args_info) != 0))
     {
-        fprintf(stderr, "invalid command-line parameter(s)\n");
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "%s: invalid command-line parameter(s)\n", PACKAGE);
+        exit(EXIT_ERROR);
     }
 
     switch (args_info.reporter_arg)

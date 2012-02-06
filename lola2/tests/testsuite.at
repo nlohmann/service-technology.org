@@ -2,17 +2,25 @@ AT_INIT
 AT_COLOR_TESTS
 
 ############################################################################
-AT_BANNER([Basic Options])
+AT_BANNER([Command-line parameters])
 ############################################################################
 
 AT_SETUP([Help output])
 AT_CHECK([LOLA --help],0,ignore)
-AT_KEYWORDS(basic)
+AT_CHECK([LISTENER --help],0,ignore)
+AT_KEYWORDS(commandline)
 AT_CLEANUP
 
 AT_SETUP([Version output])
 AT_CHECK([LOLA --version],0,ignore)
-AT_KEYWORDS(basic)
+AT_CHECK([LISTENER --version],0,ignore)
+AT_KEYWORDS(commandline)
+AT_CLEANUP
+
+AT_SETUP([Wrong parameter])
+AT_CHECK([LOLA --unknownparameter],2,ignore,stderr)
+AT_CHECK([GREP -q "lola: invalid command-line parameter(s)" stderr])
+AT_KEYWORDS(commandline)
 AT_CLEANUP
 
 
@@ -35,6 +43,74 @@ AT_CLEANUP
 AT_SETUP([Piping from stdin: Phils 1000])
 AT_CHECK([cp TESTFILES/phils1000.lola .])
 AT_CHECK([cat phils1000.lola | LOLA],0,ignore,ignore)
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Frontend errors])
+############################################################################
+
+AT_SETUP([Duplicate place])
+AT_DATA(netfile,[PLACE p1, p1;
+])
+AT_CHECK([cat netfile | LOLA -v],2,ignore,stderr)
+AT_CHECK([GREP -q "lola: place 'p1' name used twice" stderr])
+AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Mark nonexisting place])
+AT_DATA(netfile,[PLACE p1;
+MARKING p2: 1;
+])
+AT_CHECK([cat netfile | LOLA -v],2,ignore,stderr)
+AT_CHECK([GREP -q "lola: place 'p2' does not exist" stderr])
+AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
+AT_DATA(netfile,[PLACE p1;
+MARKING p2;
+])
+AT_CHECK([cat netfile | LOLA -v],2,ignore,stderr)
+AT_CHECK([GREP -q "lola: place 'p2' does not exist" stderr])
+AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Reference nonexisting place])
+AT_DATA(netfile,[PLACE p1;
+MARKING p1: 1;
+TRANSITION t1
+CONSUME p2: 1;
+PRODUCE p1;
+])
+AT_CHECK([cat netfile | LOLA -v],2,ignore,stderr)
+AT_CHECK([GREP -q "lola: place 'p2' does not exist" stderr])
+AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
+AT_DATA(netfile,[PLACE p1;
+MARKING p1: 1;
+TRANSITION t1
+CONSUME p2;
+PRODUCE p1;
+])
+AT_CHECK([cat netfile | LOLA -v],2,ignore,stderr)
+AT_CHECK([GREP -q "lola: place 'p2' does not exist" stderr])
+AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Duplicate transition])
+AT_DATA(netfile,[PLACE p1;
+MARKING p1;
+TRANSITION t1
+CONSUME p1;
+PRODUCE p1;
+TRANSITION t1
+CONSUME p1;
+PRODUCE p1;
+])
+AT_CHECK([cat netfile | LOLA -v],2,ignore,stderr)
+AT_CHECK([GREP -q "lola: transition name 't1' used twice" stderr])
+AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 

@@ -16,8 +16,6 @@ typedef enum
 
 
 /*!
-\todo Datei mit Fehlernummern anlegen
-\todo --verbose implementieren
 \todo Kommentieren!
 */
 class Reporter
@@ -41,7 +39,6 @@ class Reporter
                 char* str() const;
         };
 
-    private:
         /// error messages
         static const char* error_messages[];
 
@@ -55,26 +52,32 @@ class Reporter
         virtual void status(const char*, ...) const = 0;
 
         /// display error message and abort program
-        __attribute__((noreturn)) virtual void abort(errorcode_t, const char*, ...) const = 0;
+        __attribute__((noreturn)) virtual void abort(errorcode_t) const = 0;
 };
 
 class ReporterSocket : public Reporter
 {
     private:
+        /// whether verbose reports are desired
+        bool verbose;
+
         Socket mySocket;
 
     public:
-        ReporterSocket(u_short port, const char* ip);
+        ReporterSocket(u_short port, const char* ip, bool verbose=true);
         ~ReporterSocket();
 
         void message(const char*, ...) const;
         void status(const char*, ...) const;
-        __attribute__((noreturn)) void abort(errorcode_t, const char*, ...) const;
+        __attribute__((noreturn)) void abort(errorcode_t) const;
 };
 
 class ReporterStream : public Reporter
 {
     private:
+        /// whether verbose reports are desired
+        bool verbose;
+
         /// whether to use colored output
         const bool useColor;
 
@@ -149,9 +152,9 @@ class ReporterStream : public Reporter
         Reporter::String _cparameter_(const char* s) const;
 
     public:
-        ReporterStream();
+        ReporterStream(bool verbose = true);
         ~ReporterStream();
         void message(const char*, ...) const;
         void status(const char*, ...) const;
-        __attribute__((noreturn)) void abort(errorcode_t, const char*, ...) const;
+        __attribute__((noreturn)) void abort(errorcode_t) const;
 };

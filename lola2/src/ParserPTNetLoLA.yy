@@ -285,17 +285,14 @@ ParserPTNet* ParserPTNetLoLA()
 
 /// display a parser error and exit
 void yyerrors(char* token, char const* format, ...) {
-    rep->message("%d:%d", yylineno, yycolno);
-
     va_list args;
     va_start(args, format);
-    rep->message(format, args);
+    rep->status(format, args);
     va_end(args);
 
-//    fprintf(stderr, "\n");
-    rep->message("error near '%s'", token);
-    //displayFileError(diagnosefilename, yylineno, token);
-    rep->abort(ERROR_SYNTAX, "syntax error");
+    rep->status("%d:%d - error near '%s'", yylineno, yycolno, token);
+
+    rep->abort(ERROR_SYNTAX);
 }
 
 

@@ -61,3 +61,20 @@ typedef uint8_t cardbit_t;
 
 /// size of string buffer in Socket class
 #define UDP_BUFFER_SIZE 1024
+
+/*!
+The exit codes of LoLA: 
+0   specified state or deadlock found/net or place unbounded/home marking
+    exists/net is reversible/predicate is live/CTL formula true/transition
+    not dead/liveness property does not hold;
+1   the opposite verification result as a thumb rule, if the outcome of a
+    verification result can be supported by a counterexample or witness
+    path, that case corresponds to return value 0; 
+2   any kind of error (syntax error, wrong command line, ...) occurred
+*/
+typedef enum
+{
+    EXIT_EARLY = 0, ///< counterexample found
+    EXIT_FULL  = 1, ///< no counterexample found
+    EXIT_ERROR = 2  ///< error
+} exit_t;

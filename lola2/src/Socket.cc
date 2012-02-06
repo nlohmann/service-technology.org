@@ -34,7 +34,6 @@ socklen_t Socket::addressLength = sizeof(sockaddr_in);
       also bound.
 
 \todo We might think of a default port (e.g., 5555) for LoLA.
-\todo We might not want to call perror and exit in case an error occurs.
 
 \author Niels
 \status new
@@ -47,8 +46,12 @@ Socket::Socket(u_short port, const char* destination)
 {
     if (UNLIKELY(-1 == sock))    /* if socket failed to initialize, exit */
     {
-        fprintf(stderr, "Error Creating Socket");
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "%s: error creating socket\n", PACKAGE);
+        if (errno != 0)
+        {
+            fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
+        }
+        exit(EXIT_ERROR);
     }
 
     // specify the address
@@ -63,9 +66,14 @@ Socket::Socket(u_short port, const char* destination)
         // bind the socket sock to the address specified in address
         if (UNLIKELY(-1 == bind(sock, (struct sockaddr*)&address, addressLength)))
         {
-            perror("error bind failed");
             close(sock);
-            exit(EXIT_FAILURE);
+
+            fprintf(stderr, "%s: bind failed\n", PACKAGE);
+            if (errno != 0)
+            {
+                fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
+            }
+            exit(EXIT_ERROR);
         }
     }
 }
@@ -89,10 +97,6 @@ Socket::~Socket()
 
 \todo We might want a function that receives a single message instead and care
       about the infinite loop somewhere else.
-\todo We might not want to call perror and exit in case an error occurs.
-
-\author Niels
-\status new
 */
 __attribute__((noreturn)) void Socket::receive()
 {
@@ -114,8 +118,12 @@ __attribute__((noreturn)) void Socket::receive()
 
         if (UNLIKELY(recsize < 0))
         {
-            fprintf(stderr, "%s\n", strerror(errno));
-            exit(EXIT_FAILURE);
+            fprintf(stderr, "%s: receive failed\n", PACKAGE);
+            if (errno != 0)
+            {
+                fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
+            }
+            exit(EXIT_ERROR);
         }
 
         //        printf("recsize: %d\n ", (int)recsize);
@@ -126,7 +134,7 @@ __attribute__((noreturn)) void Socket::receive()
         time(&now);
         struct tm* current = localtime(&now);
 
-        printf("%s: %2i:%2i:%2i: %.*s\n", PACKAGE, current->tm_hour, current->tm_min,
+        printf("%s: %02i:%02i:%02i: %.*s\n", PACKAGE, current->tm_hour, current->tm_min,
                current->tm_sec, static_cast<int>(recsize), buffer);
     }
 }
@@ -138,11 +146,6 @@ __attribute__((noreturn)) void Socket::receive()
 
 \post The given message is sent to the socket #sock. As we are using UDP
       datagrams it is not guaranteed whether the message is actually received.
-
-\todo We might not want to call perror and exit in case an error occurs.
-
-\author Niels
-\status new
 */
 void Socket::send(const char* message) const
 {
@@ -150,7 +153,11 @@ void Socket::send(const char* message) const
 
     if (UNLIKELY(bytes_sent < 0))
     {
-        printf("Error sending packet: %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "%s: error sending packet: %s\n", PACKAGE, strerror(errno));
+        if (errno != 0)
+        {
+            fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
+        }
+        exit(EXIT_ERROR);
     }
 }

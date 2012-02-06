@@ -49,8 +49,8 @@ char* Reporter::String::str() const
 
 /*---------------------------------------------------------------------------*/
 
-ReporterSocket::ReporterSocket(u_short port, const char* ip)
-    : mySocket(Socket(port, ip))
+ReporterSocket::ReporterSocket(u_short port, const char* ip, bool verbose)
+    : verbose(verbose), mySocket(Socket(port, ip))
 {
 }
 
@@ -66,6 +66,11 @@ void ReporterSocket::message(const char* format, ...) const
 
 void ReporterSocket::status(const char* format, ...) const
 {
+    if (not verbose)
+    {
+        return;
+    }
+
     char buffer[UDP_BUFFER_SIZE];
     va_list args;
     va_start(args, format);
@@ -74,23 +79,21 @@ void ReporterSocket::status(const char* format, ...) const
     va_end(args);
 }
 
-__attribute__((noreturn)) void ReporterSocket::abort(errorcode_t code, const char* format, ...) const
+__attribute__((noreturn)) void ReporterSocket::abort(errorcode_t code) const
 {
     char buffer[UDP_BUFFER_SIZE];
 
-    sprintf(buffer, "%s: ", PACKAGE);
+    sprintf(buffer, "%s: %s -- aborting [#%02d]", PACKAGE, error_messages[code], code);
     mySocket.send(buffer);
 
-    va_list args;
-    va_start(args, format);
-    vsprintf(buffer, format, args);
-    mySocket.send(buffer);
-    va_end(args);
+    status("see manual for a documentation of this error");
 
-    sprintf(buffer, " -- aborting [#%02d]", code);
-    mySocket.send(buffer);
+    if (errno != 0)
+    {
+        status("last error message: %s", strerror(errno));
+    }
 
-    exit(EXIT_FAILURE);
+    exit(EXIT_ERROR);
 }
 
 ReporterSocket::~ReporterSocket()
@@ -100,7 +103,8 @@ ReporterSocket::~ReporterSocket()
 
 /*---------------------------------------------------------------------------*/
 
-ReporterStream::ReporterStream() :
+ReporterStream::ReporterStream(bool verbose) :
+    verbose(verbose),
 #if !defined(__MINGW32__)
     useColor(isatty(fileno(stderr)) && (
                  !strcmp(getenv("TERM"), "linux") ||
@@ -141,7 +145,7 @@ ReporterStream::ReporterStream() :
 Reporter::String ReporterStream::_ctool_(const char* s) const
 {
     char* res = NULL;
-    int bytes = asprintf(&res, "%s%s%s", _cm_, s, _c_);
+    const int bytes = asprintf(&res, "%s%s%s", _cm_, s, _c_);
     assert(bytes != -1);
     assert(res);
     return String(res);
@@ -150,7 +154,7 @@ Reporter::String ReporterStream::_ctool_(const char* s) const
 Reporter::String ReporterStream::_cfilename_(const char* s) const
 {
     char* res = NULL;
-    int bytes = asprintf(&res, "%s%s%s", _cb__, s, _c_);
+    const int bytes = asprintf(&res, "%s%s%s", _cb__, s, _c_);
     assert(bytes != -1);
     assert(res);
     return String(res);
@@ -159,7 +163,7 @@ Reporter::String ReporterStream::_cfilename_(const char* s) const
 Reporter::String ReporterStream::_coutput_(const char* s) const
 {
     char* res = NULL;
-    int bytes = asprintf(&res, "%s%s%s", _cB_, s, _c_);
+    const int bytes = asprintf(&res, "%s%s%s", _cB_, s, _c_);
     assert(bytes != -1);
     assert(res);
     return String(res);
@@ -168,7 +172,7 @@ Reporter::String ReporterStream::_coutput_(const char* s) const
 Reporter::String ReporterStream::_cgood_(const char* s) const
 {
     char* res = NULL;
-    int bytes = asprintf(&res, "%s%s%s", _cG_, s, _c_);
+    const int bytes = asprintf(&res, "%s%s%s", _cG_, s, _c_);
     assert(bytes != -1);
     assert(res);
     return String(res);
@@ -177,7 +181,7 @@ Reporter::String ReporterStream::_cgood_(const char* s) const
 Reporter::String ReporterStream::_cbad_(const char* s) const
 {
     char* res = NULL;
-    int bytes = asprintf(&res, "%s%s%s", _cR_, s, _c_);
+    const int bytes = asprintf(&res, "%s%s%s", _cR_, s, _c_);
     assert(bytes != -1);
     assert(res);
     return String(res);
@@ -186,7 +190,7 @@ Reporter::String ReporterStream::_cbad_(const char* s) const
 Reporter::String ReporterStream::_cwarning_(const char* s) const
 {
     char* res = NULL;
-    int bytes = asprintf(&res, "%s%s%s", _cY_, s, _c_);
+    const int bytes = asprintf(&res, "%s%s%s", _cY_, s, _c_);
     assert(bytes != -1);
     assert(res);
     return String(res);
@@ -195,7 +199,7 @@ Reporter::String ReporterStream::_cwarning_(const char* s) const
 Reporter::String ReporterStream::_cimportant_(const char* s) const
 {
     char* res = NULL;
-    int bytes = asprintf(&res, "%s%s%s", _bold_, s, _c_);
+    const int bytes = asprintf(&res, "%s%s%s", _bold_, s, _c_);
     assert(bytes != -1);
     assert(res);
     return String(res);
@@ -204,7 +208,7 @@ Reporter::String ReporterStream::_cimportant_(const char* s) const
 Reporter::String ReporterStream::_cparameter_(const char* s) const
 {
     char* res = NULL;
-    int bytes = asprintf(&res, "%s%s%s", _cC_, s, _c_);
+    const int bytes = asprintf(&res, "%s%s%s", _cC_, s, _c_);
     assert(bytes != -1);
     assert(res);
     return String(res);
@@ -232,6 +236,11 @@ void ReporterStream::message(const char* format, ...) const
 */
 void ReporterStream::status(const char* format, ...) const
 {
+    if (not verbose)
+    {
+        return;
+    }
+
     fprintf(stderr, "%s: ", _ctool_(PACKAGE).str());
 
     va_list args;
@@ -246,27 +255,21 @@ void ReporterStream::status(const char* format, ...) const
 /*!
  \param code    the error code
  \param format  the error message formatted as printf string
-
- \note The codes should be documented in the manual.
 */
-__attribute__((noreturn)) void ReporterStream::abort(errorcode_t code, const char* format, ...) const
+__attribute__((noreturn))
+void ReporterStream::abort(errorcode_t code) const
 {
-    fprintf(stderr, "%s: %s", _ctool_(PACKAGE).str(), _bold_);
-
-    va_list args;
-    va_start(args, format);
-    vfprintf(stderr, format, args);
-    va_end(args);
-
-    fprintf(stderr, "%s -- %saborting [#%02d]%s\n", _c_, _cR_, code, _c_);
+    fprintf(stderr, "%s: %s%s%s%s -- aborting [#%02d]%s\n",
+            _ctool_(PACKAGE).str(), _cR_, error_messages[code], _c_, _bold_, code, _c_);
 
     status("see manual for a documentation of this error");
+
     if (errno != 0)
     {
         status("last error message: %s", strerror(errno));
     }
 
-    exit(EXIT_FAILURE);
+    exit(EXIT_ERROR);
 }
 
 ReporterStream::~ReporterStream()

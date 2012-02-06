@@ -69,7 +69,7 @@ AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([LISTENER > listener.log &],0)
 AT_CHECK([cat garavel.lola | LOLA --reporter=socket --verbose],0,ignore,ignore)
 AT_CHECK([killall listener],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: caught signal: 'Terminated: 15'" stderr])
+AT_CHECK([GREP -q "lola: caught signal" stderr])
 AT_CHECK([GREP -q "finished parsing" listener.log])
 AT_KEYWORDS(reporter)
 AT_CLEANUP

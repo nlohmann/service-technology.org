@@ -48,9 +48,3 @@ Symbol::Symbol(const char* k)
     next(NULL)
 {
 }
-
-Symbol::~Symbol()
-{
-    // do not free key here, as it is passed to Node::Name
-    // free(const_cast<char*>(key));
-}

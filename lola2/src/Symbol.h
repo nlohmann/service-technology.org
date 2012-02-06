@@ -29,7 +29,7 @@ class Symbol
         /// Generate and initialize a symbol
         explicit Symbol(const char*);
         /// Delete a symbol
-        virtual ~Symbol();
+        virtual ~Symbol() {};
 
         /// get index of symbol in net data structures
         index_t getIndex() const;

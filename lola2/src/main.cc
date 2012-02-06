@@ -113,6 +113,12 @@ int main(int argc, char** argv)
         randomWalk();
     }
 
+    if (args_info.printNet_given)
+    {
+        rep->status("print net");
+        print_net();
+    }
+
     Net::deleteNodes();
     Place::deletePlaces();
     Transition::deleteTransitions();

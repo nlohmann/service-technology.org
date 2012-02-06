@@ -51,6 +51,15 @@ AT_CLEANUP
 AT_BANNER([Frontend errors])
 ############################################################################
 
+AT_SETUP([Syntax error])
+AT_DATA(netfile,[foobar;
+])
+AT_CHECK([cat netfile | LOLA -v],2,ignore,stderr)
+AT_CHECK([GREP -q "lola: syntax error, unexpected" stderr])
+AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
 AT_SETUP([Duplicate place])
 AT_DATA(netfile,[PLACE p1, p1;
 ])
@@ -60,13 +69,17 @@ AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
-AT_SETUP([Mark nonexisting place])
+AT_SETUP([Mark nonexisting place (1/2)])
 AT_DATA(netfile,[PLACE p1;
 MARKING p2: 1;
 ])
 AT_CHECK([cat netfile | LOLA -v],2,ignore,stderr)
 AT_CHECK([GREP -q "lola: place 'p2' does not exist" stderr])
 AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Mark nonexisting place (2/2)])
 AT_DATA(netfile,[PLACE p1;
 MARKING p2;
 ])
@@ -76,7 +89,7 @@ AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
-AT_SETUP([Reference nonexisting place])
+AT_SETUP([Reference nonexisting place (1/2)])
 AT_DATA(netfile,[PLACE p1;
 MARKING p1: 1;
 TRANSITION t1
@@ -86,6 +99,10 @@ PRODUCE p1;
 AT_CHECK([cat netfile | LOLA -v],2,ignore,stderr)
 AT_CHECK([GREP -q "lola: place 'p2' does not exist" stderr])
 AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Reference nonexisting place (2/2)])
 AT_DATA(netfile,[PLACE p1;
 MARKING p1: 1;
 TRANSITION t1
@@ -112,6 +129,19 @@ AT_CHECK([cat netfile | LOLA -v],2,ignore,stderr)
 AT_CHECK([GREP -q "lola: transition name 't1' used twice" stderr])
 AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
 AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Debugging])
+############################################################################
+
+AT_SETUP([Print net])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([cat garavel.lola | LOLA --printNet],0,stdout)
+AT_CHECK([GREP -q "485 places" stdout])
+AT_CHECK([GREP -q "776  transitions" stdout])
+AT_KEYWORDS(reporter)
 AT_CLEANUP
 
 

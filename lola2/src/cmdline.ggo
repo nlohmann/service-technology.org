@@ -33,3 +33,7 @@ section "Debugging"
 option "randomWalk" -
   "Random firing of transitions"
   flag off
+
+option "printNet" -
+  "Print the net"
+  flag off

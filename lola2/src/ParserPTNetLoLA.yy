@@ -3,7 +3,6 @@
 \file ParserPTNetLoLA.yy
 \status approved 25.01.2012
 
-\todo Fehlermeldungen auch über den Reporter abhandeln.
 \todo Detaillierte Dateifehlermeldungen abschaltbar.
 \todo TheResult und TheCapacity in einen Namespace "parser::" packen
 
@@ -160,7 +159,7 @@ marking:
         {
             yyerrors($1, "place '%s' does not exist", $1);
         }
-        p -> addInitialMarking((capacity_t)atoi($3));
+        p->addInitialMarking((capacity_t)atoi($3));
         free($3);
         free($1);
     }
@@ -171,7 +170,7 @@ marking:
         {
             yyerrors($1, "place '%s' does not exist", $1);
         }
-        p -> addInitialMarking(1);
+        p->addInitialMarking(1);
         free($1);
     }
 ;
@@ -223,29 +222,28 @@ arclist:
     }
 | arc _comma_ arclist
     {
-    // check for duplicate
-    ArcList * al;
-    for(al = $3; al; al = al -> getNext())
-    {
-        if(al -> getPlace() == $1 -> getPlace())
+        // check for duplicate
+        ArcList * al;
+        for (al = $3; al; al = al->getNext())
         {
-            break;
+            if (al->getPlace() == $1->getPlace())
+            {
+                break;
+            }
         }
-    }
-    if(al)
-    {   
-        //duplicate detected
-        al -> addMultiplicity($1 -> getMultiplicity());
-        delete $1;
-        $$ = $3;
-    }
-    else
-    {
-        // no duplicate detected
-        $1->setNext((Symbol*)$3);
-        $$ = $1;
-    }
-    
+        if (al)
+        {   
+            //duplicate detected
+            al->addMultiplicity($1->getMultiplicity());
+            delete $1;
+            $$ = $3;
+        }
+        else
+        {
+            // no duplicate detected
+            $1->setNext((Symbol*)$3);
+            $$ = $1;
+        }    
     }
 ;
 

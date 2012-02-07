@@ -11,8 +11,17 @@
 
 #include <config.h>
 #include <sys/types.h>
-#include <sys/socket.h>
+
+#ifdef WIN32
+#include <winsock.h>
+#include <windows.h>
+#include <stdint.h>
+typedef uint32_t socklen_t;
+#else
 #include <arpa/inet.h>
+#include <sys/socket.h>
+#endif
+
 
 /*!
 \brief class encapsulating Berkely Sockets (using UDP datagrams)

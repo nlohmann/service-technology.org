@@ -17,7 +17,8 @@
 const char* Reporter::error_messages[] =
 {
     "syntax error",
-    "command line error"
+    "command line error",
+    "file input/output error"
 };
 
 
@@ -101,6 +102,16 @@ ReporterSocket::~ReporterSocket()
     status("done");
 }
 
+Reporter::String ReporterSocket::markup(markup_t, const char* format, ...) const
+{
+    va_list args;
+    va_start(args, format);
+    char* message = NULL;
+    vasprintf(&message, format, args);
+    va_end(args);
+    return Reporter::String(message);
+}
+
 /*---------------------------------------------------------------------------*/
 
 ReporterStream::ReporterStream(bool verbose) :
@@ -142,85 +153,13 @@ ReporterStream::ReporterStream(bool verbose) :
 {
 }
 
-Reporter::String ReporterStream::_ctool_(const char* s) const
-{
-    char* res = NULL;
-    const int bytes = asprintf(&res, "%s%s%s", _cm_, s, _c_);
-    assert(bytes != -1);
-    assert(res);
-    return String(res);
-}
-
-Reporter::String ReporterStream::_cfilename_(const char* s) const
-{
-    char* res = NULL;
-    const int bytes = asprintf(&res, "%s%s%s", _cb__, s, _c_);
-    assert(bytes != -1);
-    assert(res);
-    return String(res);
-}
-
-Reporter::String ReporterStream::_coutput_(const char* s) const
-{
-    char* res = NULL;
-    const int bytes = asprintf(&res, "%s%s%s", _cB_, s, _c_);
-    assert(bytes != -1);
-    assert(res);
-    return String(res);
-}
-
-Reporter::String ReporterStream::_cgood_(const char* s) const
-{
-    char* res = NULL;
-    const int bytes = asprintf(&res, "%s%s%s", _cG_, s, _c_);
-    assert(bytes != -1);
-    assert(res);
-    return String(res);
-}
-
-Reporter::String ReporterStream::_cbad_(const char* s) const
-{
-    char* res = NULL;
-    const int bytes = asprintf(&res, "%s%s%s", _cR_, s, _c_);
-    assert(bytes != -1);
-    assert(res);
-    return String(res);
-}
-
-Reporter::String ReporterStream::_cwarning_(const char* s) const
-{
-    char* res = NULL;
-    const int bytes = asprintf(&res, "%s%s%s", _cY_, s, _c_);
-    assert(bytes != -1);
-    assert(res);
-    return String(res);
-}
-
-Reporter::String ReporterStream::_cimportant_(const char* s) const
-{
-    char* res = NULL;
-    const int bytes = asprintf(&res, "%s%s%s", _bold_, s, _c_);
-    assert(bytes != -1);
-    assert(res);
-    return String(res);
-}
-
-Reporter::String ReporterStream::_cparameter_(const char* s) const
-{
-    char* res = NULL;
-    const int bytes = asprintf(&res, "%s%s%s", _cC_, s, _c_);
-    assert(bytes != -1);
-    assert(res);
-    return String(res);
-}
-
 
 /*!
  \param format  the status message formatted as printf string
 */
 void ReporterStream::message(const char* format, ...) const
 {
-    fprintf(stderr, "%s: ", _ctool_(PACKAGE).str());
+    fprintf(stderr, "%s: ", markup(MARKUP_TOOL, PACKAGE).str());
 
     va_list args;
     va_start(args, format);
@@ -241,7 +180,7 @@ void ReporterStream::status(const char* format, ...) const
         return;
     }
 
-    fprintf(stderr, "%s: ", _ctool_(PACKAGE).str());
+    fprintf(stderr, "%s: ", markup(MARKUP_TOOL, PACKAGE).str());
 
     va_list args;
     va_start(args, format);
@@ -260,19 +199,65 @@ __attribute__((noreturn))
 void ReporterStream::abort(errorcode_t code) const
 {
     fprintf(stderr, "%s: %s%s%s%s -- aborting [#%02d]%s\n",
-            _ctool_(PACKAGE).str(), _cR_, error_messages[code], _c_, _bold_, code, _c_);
+            markup(MARKUP_TOOL, PACKAGE).str(), _cR_, error_messages[code], _c_, _bold_, code, _c_);
 
     status("see manual for a documentation of this error");
 
     if (errno != 0)
     {
-        status("last error message: %s", strerror(errno));
+        status("last error message: %s", markup(MARKUP_IMPORTANT, strerror(errno)).str());
     }
 
     exit(EXIT_ERROR);
 }
 
-ReporterStream::~ReporterStream()
+Reporter::String ReporterStream::markup(markup_t markup, const char* format, ...) const
 {
-    status("done");
+    va_list args;
+    va_start(args, format);
+    char* message = NULL;
+    vasprintf(&message, format, args);
+    va_end(args);
+
+    char* res = NULL;
+
+    switch (markup)
+    {
+        case (MARKUP_TOOL):
+            asprintf(&res, "%s%s%s", _cm_, message, _c_);
+            break;
+
+        case (MARKUP_FILE):
+            asprintf(&res, "%s%s%s", _cb__, message, _c_);
+            break;
+
+        case (MARKUP_OUTPUT):
+            asprintf(&res, "%s%s%s", _cB_, message, _c_);
+            break;
+
+        case (MARKUP_GOOD):
+            asprintf(&res, "%s%s%s", _cG_, message, _c_);
+            break;
+
+        case (MARKUP_BAD):
+            asprintf(&res, "%s%s%s", _cR_, message, _c_);
+            break;
+
+        case (MARKUP_WARNING):
+            asprintf(&res, "%s%s%s", _cY_, message, _c_);
+            break;
+
+        case (MARKUP_IMPORTANT):
+            asprintf(&res, "%s%s%s", _bold_, message, _c_);
+            break;
+
+        case (MARKUP_PARAMETER):
+            asprintf(&res, "%s%s%s", _cC_, message, _c_);
+            break;
+    }
+
+    assert(res);
+    free(message);
+
+    return Reporter::String(res);
 }

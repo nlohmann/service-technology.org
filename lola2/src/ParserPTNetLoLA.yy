@@ -12,8 +12,10 @@ Parses a place transition net in LoLA syntax.
 %{
 #include <config.h>
 #include <limits.h>
+#include <libgen.h>
 #include <cstdarg>
 #include <cstdio>
+#include "cmdline.h"
 #include "PlaceSymbol.h"
 #include "TransitionSymbol.h"
 #include "SymbolTable.h"
@@ -23,7 +25,9 @@ Parses a place transition net in LoLA syntax.
 #include "Dimensions.h"
 #include "Reporter.h"
 
-extern Reporter *rep;
+extern int currentFile;
+extern gengetopt_args_info args_info;
+extern Reporter* rep;
 
 /// the current token text from Flex
 extern char* yytext;
@@ -115,7 +119,7 @@ capacity:
 placelist:
   placelist _comma_ nodeident
     {
-        PlaceSymbol* p = new PlaceSymbol($3, TheCapacity);
+        PlaceSymbol *p = new PlaceSymbol($3, TheCapacity);
         if (UNLIKELY (! TheResult->PlaceTable->insert(p)))
         {
             yyerrors($3, "place '%s' name used twice", $3);
@@ -123,12 +127,8 @@ placelist:
     }
 | nodeident
     {
-        PlaceSymbol* p = new PlaceSymbol($1, TheCapacity);
         // this action is only triggered for the first place - there can be no duplicates here!
-        if (UNLIKELY (! TheResult->PlaceTable->insert(p)))
-        {
-            yyerrors($1, "place '%s' name used twice", $1);
-        }
+        TheResult->PlaceTable->insert(new PlaceSymbol($1, TheCapacity));
     }
 ;
 
@@ -292,11 +292,11 @@ void yyerrors(char* token, const char* format, ...) {
     free(errormessage);
     va_end(args);
 
-    rep->status("%d:%d - error near '%s'", yylineno, yycolno, token);
+    rep->status("%s:%d:%d - error near '%s'", (currentFile == -1) ? rep->markup(MARKUP_FILE, "stdin").str() : rep->markup(MARKUP_FILE, basename(args_info.inputs[currentFile])).str(),
+        yylineno, yycolno, token);
 
     rep->abort(ERROR_SYNTAX);
 }
-
 
 /// display a parser error and exit
 void yyerror(char const* mess) {

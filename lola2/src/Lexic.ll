@@ -13,9 +13,15 @@ Mainly copied from LoLA1
 %option yylineno
 
 %{
+#include "cmdline.h"
 #include "ArcList.h"
 #include "FairnessAssumptions.h"
 #include "ParserPTNetLoLA.h"
+#include "Reporter.h"
+
+extern int currentFile;
+extern gengetopt_args_info args_info;
+extern Reporter* rep;
 
 void setlval();
 void setcol();
@@ -137,5 +143,23 @@ inline void setcol() {
 }
 
 int yywrap() {
-    return 1;
+    if (currentFile == -1 or currentFile == args_info.inputs_num-1)
+    {
+        // done parsing
+        return 1;
+    }
+    else
+    {
+        currentFile++;
+        yyin = fopen(args_info.inputs[currentFile], "r");
+        if (!yyin)
+        {
+            rep->status("could not open file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
+            rep->abort(ERROR_FILE);
+        }
+        rep->status("reading from file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
+        yycolno = 1;
+        yylineno = 1;
+        return 0;
+    }
 }

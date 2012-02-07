@@ -67,7 +67,7 @@ AC_CHECK_HEADERS([arpa/inet.h inttypes.h libintl.h malloc.h netinet/in.h stddef.
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS([asprintf atexit memset socket strchr strerror strdup strtol])
+AC_CHECK_FUNCS([asprintf vasprintf snprintf vsnprintf atexit memset socket strchr strerror strdup strtol strsignal signal])
 
 # Collect required libraries if libraries are not present.
 AC_CHECK_FUNC(gethostent, , AC_CHECK_LIB(nsl, gethostent))

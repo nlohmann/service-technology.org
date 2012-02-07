@@ -7,16 +7,30 @@
 
 #include "Socket.h"
 
-/// error codes for the abort() function
+/// error codes for the Reporter::abort() function
 typedef enum
 {
-    ERROR_SYNTAX,
-    ERROR_COMMANDLINE
+    ERROR_SYNTAX,       ///< syntax error
+    ERROR_COMMANDLINE,  ///< wrong commandline parameter
+    ERROR_FILE          ///< file input/output error
 } errorcode_t;
+
+/// markup types for Reporter::markup() function
+typedef enum
+{
+    MARKUP_TOOL,      ///< markup the name of a tool
+    MARKUP_FILE,      ///< markup the name of a file
+    MARKUP_OUTPUT,    ///< markup the type of a file
+    MARKUP_GOOD,      ///< markup some good output
+    MARKUP_BAD,       ///< markup some bad output
+    MARKUP_WARNING,   ///< markup a warning
+    MARKUP_IMPORTANT, ///< markup an important message
+    MARKUP_PARAMETER  ///< markup a command-line parameter
+} markup_t;
 
 
 /*!
-\todo Kommentieren!
+\brief Class to implement reporting functionality
 */
 class Reporter
 {
@@ -45,6 +59,9 @@ class Reporter
     public:
         virtual ~Reporter() {}
 
+        /// markup a string
+        virtual Reporter::String markup(markup_t, const char*, ...) const = 0;
+
         /// always report
         virtual void message(const char*, ...) const = 0;
 
@@ -61,15 +78,17 @@ class ReporterSocket : public Reporter
         /// whether verbose reports are desired
         bool verbose;
 
+        /// socket for this reporter
         Socket mySocket;
 
     public:
-        ReporterSocket(u_short port, const char* ip, bool verbose=true);
+        ReporterSocket(u_short port, const char* ip, bool = true);
         ~ReporterSocket();
 
         void message(const char*, ...) const;
         void status(const char*, ...) const;
         __attribute__((noreturn)) void abort(errorcode_t) const;
+        Reporter::String markup(markup_t, const char*, ...) const;
 };
 
 class ReporterStream : public Reporter
@@ -81,7 +100,6 @@ class ReporterStream : public Reporter
         /// whether to use colored output
         const bool useColor;
 
-    public:
         /// set foreground color to red
         const char* _cr_;
         /// set foreground color to green
@@ -134,27 +152,11 @@ class ReporterStream : public Reporter
         /// unterline text
         const char* _underline_;
 
-        /// color the name of a tool
-        Reporter::String _ctool_(const char* s) const;
-        /// color the name of a file
-        Reporter::String _cfilename_(const char* s) const;
-        /// color the type of a file
-        Reporter::String _coutput_(const char* s) const;
-        /// color some good output
-        Reporter::String _cgood_(const char* s) const;
-        /// color some bad output
-        Reporter::String _cbad_(const char* s) const;
-        /// color a warning
-        Reporter::String _cwarning_(const char* s) const;
-        /// color an important message
-        Reporter::String _cimportant_(const char* s) const;
-        /// color a command-line parameter
-        Reporter::String _cparameter_(const char* s) const;
-
     public:
-        ReporterStream(bool verbose = true);
-        ~ReporterStream();
+        ReporterStream(bool = true);
+
         void message(const char*, ...) const;
         void status(const char*, ...) const;
         __attribute__((noreturn)) void abort(errorcode_t) const;
+        Reporter::String markup(markup_t, const char*, ...) const;
 };

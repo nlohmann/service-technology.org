@@ -9,7 +9,9 @@
 
 #include <errno.h>
 #include <unistd.h>
+#ifndef WIN32
 #include <netinet/in.h>
+#endif
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>

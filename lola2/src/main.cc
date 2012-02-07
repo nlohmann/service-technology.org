@@ -8,7 +8,6 @@
 
 \todo ParserPTNetLoLA() exportieren
 \todo Parser/Lexer-Kram in h-Datei (yyin, ...)
-\todo Exit-Codes klären
 */
 
 #include <config.h>
@@ -39,6 +38,15 @@ extern FILE* yyin;
 /// the reporter
 Reporter* rep = NULL;
 
+/*!
+\brief variable to manage multiple files
+\todo This should not be global.
+
+-1: stdin
+otherwise: index in args_info.inputs
+*/
+int currentFile = -1;
+
 // the parsers
 extern int yyparse();
 extern int yylex_destroy();
@@ -57,9 +65,6 @@ void terminationHandler()
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv)
 {
-    // overwrite invocation for consistent error messages
-    //    argv[0] = basename(argv[0]);
-
     // initialize the parameters structure
     struct cmdline_parser_params* params = cmdline_parser_params_create();
 
@@ -92,6 +97,24 @@ int main(int argc, char** argv)
 
     // parse the command line parameters
     evaluateParameters(argc, argv);
+
+
+    if (args_info.inputs_num == 0)
+    {
+        rep->status("reading from %s", rep->markup(MARKUP_FILE, "stdin").str());
+        /* nothing to do - yyin is pointing to stdin */
+    }
+    else
+    {
+        currentFile = 0;
+        yyin = fopen(args_info.inputs[currentFile], "r");
+        if (!yyin)
+        {
+            rep->status("could not open file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
+            rep->abort(ERROR_FILE);
+        }
+        rep->status("reading from file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
+    }
 
     // read the input file(s)
     ParserPTNet* symbolTables = ParserPTNetLoLA();

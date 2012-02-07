@@ -34,11 +34,6 @@ socklen_t Socket::addressLength = sizeof(sockaddr_in);
       (client) or receiving messages (server).
 \post The socket #sock is created. If we are receiving (server), the it is
       also bound.
-
-\todo We might think of a default port (e.g., 5555) for LoLA.
-
-\author Niels
-\status new
 */
 Socket::Socket(u_short port, const char* destination)
     :
@@ -83,9 +78,6 @@ Socket::Socket(u_short port, const char* destination)
 /*!
 \post The socket #sock is closed.
 \post Memory allocated for the #buffer is released.
-
-\author Niels
-\status new
 */
 Socket::~Socket()
 {
@@ -105,10 +97,7 @@ __attribute__((noreturn)) void Socket::receive()
     assert(listening);
 
     // initialize buffer
-    if (!buffer)
-    {
-        buffer = new char[UDP_BUFFER_SIZE];
-    }
+    buffer = new char[UDP_BUFFER_SIZE];
 
     ssize_t recsize;
 
@@ -128,11 +117,7 @@ __attribute__((noreturn)) void Socket::receive()
             exit(EXIT_ERROR);
         }
 
-        //        printf("recsize: %d\n ", (int)recsize);
-        //        printf("datagram: %.*s\n", (int)recsize, buffer);
-
         time_t now;
-
         time(&now);
         struct tm* current = localtime(&now);
 

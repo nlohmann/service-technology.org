@@ -80,6 +80,7 @@ void evaluateParameters(int argc, char** argv)
         case reporter_arg_stream:
             rep = new ReporterStream(args_info.verbose_given);
             break;
+
         case reporter_arg_socket:
             rep = new ReporterSocket((u_short)args_info.port_arg, args_info.address_arg, args_info.verbose_given);
             rep->message("pid = %d", getpid());

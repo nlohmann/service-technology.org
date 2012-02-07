@@ -110,7 +110,7 @@ int main(int argc, char** argv)
     if (args_info.randomWalk_given)
     {
         rep->status("random walk");
-        randomWalk();
+        randomWalk(args_info.randomWalk_arg);
     }
 
     if (args_info.printNet_given)

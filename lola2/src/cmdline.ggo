@@ -32,7 +32,10 @@ section "Debugging"
 
 option "randomWalk" -
   "Random firing of transitions"
-  flag off
+  int
+  default="0"
+  optional
+  argoptional
 
 option "printNet" -
   "Print the net"

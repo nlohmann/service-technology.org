@@ -12,4 +12,4 @@ They can later on be used as a starting point for the "findpath" feature
 */
 
 
-__attribute__((noreturn)) void randomWalk();
+void randomWalk(int = 0);

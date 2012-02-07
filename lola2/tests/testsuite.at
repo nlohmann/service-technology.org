@@ -164,10 +164,8 @@ AT_CLEANUP
 
 AT_SETUP([Random walk])
 AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([cat garavel.lola | LOLA --randomWalk > randomwalk.log &],0,stdout)
-AT_CHECK([sleep 1])
-AT_CHECK([killall lola],0,ignore,ignore)
-AT_CHECK([GREP -q "firing t49" randomwalk.log])
+AT_CHECK([cat garavel.lola | LOLA --randomWalk=10000],0,stdout)
+AT_CHECK([GREP -q "firing t49" stdout])
 AT_KEYWORDS(reporter)
 AT_CLEANUP
 

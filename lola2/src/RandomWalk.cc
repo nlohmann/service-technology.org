@@ -14,8 +14,10 @@ repeatedly fir random transitions
 #include "Place.h"
 #include "Marking.h"
 
-__attribute__((noreturn)) void randomWalk()
+void randomWalk(int transitions)
 {
+    int firedTransitions = 0;
+
     // repeat forever
     while (true)
     {
@@ -50,8 +52,14 @@ __attribute__((noreturn)) void randomWalk()
             }
             assert(t < Net::Card[TR]);
             assert(Transition::Enabled[t]);
-            printf("\n firing %s", Net::Name[TR][t]);
+            printf(" firing %s\n", Net::Name[TR][t]);
             Transition::fire(t);
+
+            // early abortion
+            if (transitions != 0 and (++firedTransitions >= transitions))
+            {
+                return;
+            }
         }
         printf("\n*************\n*************\n");
         // reset initial marking

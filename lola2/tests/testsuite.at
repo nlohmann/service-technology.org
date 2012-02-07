@@ -46,6 +46,44 @@ AT_CHECK([LOLA garavel.lola],0,ignore,ignore)
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
+AT_SETUP([Reading from two files])
+AT_DATA(netfile1,[PLACE p1;
+MARKING p1;
+])
+AT_DATA(netfile2,[TRANSITION t1
+CONSUME p1;
+PRODUCE p1;
+])
+AT_CHECK([LOLA netfile1 netfile2 -v],0,ignore,stderr)
+AT_CHECK([GREP -q "lola: finished parsing" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Reading from two files (error)])
+AT_DATA(netfile1,[PLACE p1;
+MARKING p1;
+])
+AT_CHECK([LOLA netfile1 netfile2 -v],2,ignore,stderr)
+AT_CHECK([GREP -q "lola: could not open file netfile2" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Reading from nonexisting file])
+AT_CHECK([LOLA garavel.lola -v],2,ignore,stderr)
+AT_CHECK([GREP -q "lola: could not open file garavel.lola" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Reading from nonreadable file])
+AT_DATA(netfile,[
+])
+AT_CHECK([chmod a-r netfile])
+AT_CHECK([LOLA netfile -v],2,ignore,stderr)
+AT_CHECK([GREP -q "lola: could not open file netfile" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+
 
 ############################################################################
 AT_BANNER([Syntax])
@@ -189,9 +227,14 @@ AT_CHECK([GREP -q "reading from file garavel.lola" output])
 AT_KEYWORDS(reporter)
 AT_CLEANUP
 
-AT_SETUP([ReporterSocket: sending only])
+AT_SETUP([ReporterSocket: sending only (1/2)])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([LOLA garavel.lola --reporter=socket],0,ignore,ignore)
+AT_KEYWORDS(reporter)
+AT_CLEANUP
+
+AT_SETUP([ReporterSocket: sending only (2/2)])
+AT_CHECK([LOLA garavel.lola --reporter=socket],2,ignore,ignore)
 AT_KEYWORDS(reporter)
 AT_CLEANUP
 

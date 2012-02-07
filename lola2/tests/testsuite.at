@@ -48,10 +48,28 @@ AT_CLEANUP
 
 
 ############################################################################
-AT_BANNER([Frontend errors])
+AT_BANNER([Syntax])
 ############################################################################
 
-AT_SETUP([Syntax error])
+AT_SETUP([Minimal syntactic correct net])
+AT_CHECK([cp TESTFILES/syntax_min.lola .])
+AT_CHECK([cat syntax_min.lola | LOLA],0,ignore,ignore)
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([All syntactic features])
+AT_CHECK([cp TESTFILES/syntax_full.lola .])
+AT_CHECK([cat syntax_full.lola | LOLA],0,ignore,ignore)
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([UTF8 input])
+AT_CHECK([cp TESTFILES/syntax_utf8.lola .])
+AT_CHECK([cat syntax_utf8.lola | LOLA],0,ignore,ignore)
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Generic syntax error])
 AT_DATA(netfile,[foobar;
 ])
 AT_CHECK([cat netfile | LOLA -v],2,ignore,stderr)

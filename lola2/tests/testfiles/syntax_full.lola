@@ -1,0 +1,33 @@
+/* This is a
+multi-line comment */
+
+{ This is a single-line comment }
+
+/* { Single-line comments are allowed to be in here } */
+
+PLACE
+ p1;
+ SAFE: p2, 3, p5;  /* SAFE keyword to safe memory */
+ SAFE 9: 4, p3;    /* Yes, numbers can be place names */
+
+MARKING
+ p1: 1,
+ p3,       /* syntactic sugar: you can skip ": 1" */
+ p1,       /* syntactic sugar: you can list a place several times */
+ p3: 2;
+
+TRANSITION t1
+CONSUME p1: 1;
+PRODUCE p3;      /* syntactic sugar: you can skip ": 1" */
+
+TRANSITION p1  /* Yes, you can use the same name for places and transitions */
+CONSUME 4;
+PRODUCE p1;
+
+TRANSITION ^^ WEAK FAIR     /* weak fair transition */
+CONSUME ;   /* may be empty */
+PRODUCE ;   /* may be empty */
+
+TRANSITION */* STRONG FAIR    /* strong fair transition */
+CONSUME ;
+PRODUCE ;

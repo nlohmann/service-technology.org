@@ -42,7 +42,7 @@ option "unlabeledTransitions" -
   default="none"
   optional
 
-option "useReprensativeNames" -
+option "useRepresantiveNames" -
   "Name new nodes in a reprensative way."
   details="By default new nodes get random names.\n"
   flag off

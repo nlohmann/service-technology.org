@@ -1,8 +1,3 @@
-/*!
-\status approved 25.01.2012
-\todo comment me
-*/
-
 #include <config.h>
 #include <cstring>
 #include <cstdio>
@@ -13,12 +8,6 @@
 
 /// the reporter
 Reporter* rep = new ReporterStream();
-
-void signal_callback_handler(int signum)
-{
-    rep->message("caught signal: '%s'\n", strsignal(signum));
-    exit(EXIT_SUCCESS);
-}
 
 int main(int argc, char** argv)
 {
@@ -34,11 +23,9 @@ int main(int argc, char** argv)
         return EXIT_SUCCESS;
     }
 
-    signal(SIGTERM, signal_callback_handler);
-
-    rep->message("listening on port 5555");
-    Socket s(5555);
-    s.receive();
+    rep->message("sending KILL packet to port 5556");
+    Socket s(5556, "127.0.0.1");
+    s.send("foo");
 
     return EXIT_SUCCESS;
 }

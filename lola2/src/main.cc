@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstdlib>
+#include <pthread.h>
 
 #include "Reporter.h"
 #include "cmdline.h"
@@ -38,6 +39,9 @@ extern FILE* yyin;
 /// the reporter
 Reporter* rep = NULL;
 
+/// the thread that listens for stop messages
+pthread_t listener_thread;
+
 /*!
 \brief variable to manage multiple files
 \todo This should not be global.
@@ -57,8 +61,29 @@ void terminationHandler()
 {
     cmdline_parser_free(&args_info);
 
+    // shut down killer thread
+    if (args_info.killerThread_given)
+    {
+        const int ret = pthread_cancel(listener_thread);
+        if (ret == 0)
+        {
+            rep->status("killed listener thread");
+        }
+    }
+
     // should be the very last call
     delete rep;
+}
+
+
+/// helper function to terminate LoLA via sockets
+__attribute__((noreturn)) void* start_listener_helper(void* ptr)
+{
+    Socket listener_socket(args_info.killerThread_arg);
+    listener_socket.waitFor("foo");
+    rep->message("received %s packet - shutting down",
+        rep->markup(MARKUP_BAD, "KILL").str());
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -99,7 +124,17 @@ int main(int argc, char** argv)
     // parse the command line parameters
     evaluateParameters(argc, argv);
 
+    // start up listener thread
+    if (args_info.killerThread_given)
+    {
+        rep->status("setting up listener socket at port %s",
+            rep->markup(MARKUP_FILE, "%d", args_info.killerThread_arg).str());
 
+        // start the listening thread
+        int ret = pthread_create(&listener_thread, NULL, start_listener_helper, NULL);
+    }
+
+    // handle input
     if (args_info.inputs_num == 0)
     {
         rep->status("reading from %s", rep->markup(MARKUP_FILE, "stdin").str());

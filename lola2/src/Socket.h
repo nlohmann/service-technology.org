@@ -59,6 +59,9 @@ class Socket
         /// receive incoming messages (does not return)
         __attribute__((noreturn)) void receive();
 
+        /// wait for a specific message
+        bool waitFor(const char* message);
+
         /// send a message
         void send(const char* message) const;
 };

@@ -23,6 +23,12 @@ AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
 
+# check for POSIX threads
+AX_PTHREAD()
+LIBS="$PTHREAD_LIBS $LIBS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+CC="$PTHREAD_CC"
+
 # search for optional tools needed by "make check"
 AC_PATH_PROG(VALGRIND,    [valgrind], not found)
 
@@ -65,8 +71,6 @@ AC_FUNC_ALLOCA
 AC_CHECK_HEADERS([arpa/inet.h inttypes.h libintl.h malloc.h netinet/in.h stddef.h stdlib.h string.h sys/socket.h unistd.h limits.h])
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
 AC_CHECK_FUNCS([asprintf vasprintf snprintf vsnprintf atexit memset socket strchr strerror strdup strtol strsignal signal])
 
 # Collect required libraries if libraries are not present.

@@ -1,5 +1,5 @@
-# the main program - not bin_PROGRAMS as installation is handled manually
-bin_PROGRAMS = lola listener
+# the main program
+bin_PROGRAMS = lola listener killer
 
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
@@ -26,6 +26,10 @@ lola_SOURCES = \
 listener_SOURCES = Listener.cc \
                    Reporter.cc Reporter.h \
                    Socket.cc Socket.h
+
+killer_SOURCES = Killer.cc \
+                 Reporter.cc Reporter.h \
+                 Socket.cc Socket.h
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

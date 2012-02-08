@@ -15,10 +15,10 @@ option "reporter" -
   optional
 
 option "port" -
-  "Port number"
+  "Port number for outgoing messages"
   int
   typestr="PORT"
-  default="1234"
+  default="5555"
   optional
 
 option "address" -
@@ -27,6 +27,14 @@ option "address" -
   typestr="IP"
   default="127.0.0.1"
   optional
+
+option "killerThread" -
+  "Whether to start a killer thread to remotely terminate LoLA"
+   int
+   typestr="PORT"
+   optional
+   default="5556"
+   argoptional
 
 section "Debugging"
 

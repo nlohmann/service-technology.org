@@ -16,6 +16,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <ctime>
+#include <pthread.h>
 
 #include "Socket.h"
 #include "Dimensions.h"
@@ -97,7 +98,10 @@ __attribute__((noreturn)) void Socket::receive()
     assert(listening);
 
     // initialize buffer
-    buffer = new char[UDP_BUFFER_SIZE];
+    if (buffer == NULL)
+    {
+        buffer = new char[UDP_BUFFER_SIZE];
+    }
 
     ssize_t recsize;
 
@@ -110,7 +114,7 @@ __attribute__((noreturn)) void Socket::receive()
         if (UNLIKELY(recsize < 0))
         {
             fprintf(stderr, "%s: receive failed\n", PACKAGE);
-            if (errno != 0)
+            if (errno == 0)
             {
                 fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
             }
@@ -146,5 +150,45 @@ void Socket::send(const char* message) const
             fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
         }
         exit(EXIT_ERROR);
+    }
+}
+
+bool Socket::waitFor(const char* message)
+{
+    assert(listening);
+
+    for (;;)
+    {
+        // initialize buffer
+        if (buffer == NULL)
+        {
+            buffer = new char[UDP_BUFFER_SIZE];
+        }
+
+        ssize_t recsize;
+
+        // receive data from the socket sock, stores it into buffer with length UDP_BUFFER_SIZE,
+        // sets no flags, receives from address specified in sa with length fromlen
+        recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
+
+        if (UNLIKELY(recsize < 0))
+        {
+            fprintf(stderr, "%s: receive failed\n", PACKAGE);
+            if (errno != 0)
+            {
+                fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
+            }
+            exit(EXIT_ERROR);
+        }
+
+        char* received = NULL;
+        asprintf(&received, "%.*s", static_cast<int>(recsize), buffer);
+
+        assert(received);
+
+        if (!strcmp(received, message))
+        {
+            return true;
+        }
     }
 }

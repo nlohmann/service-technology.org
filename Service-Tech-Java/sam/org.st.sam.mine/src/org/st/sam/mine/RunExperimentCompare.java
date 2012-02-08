@@ -33,6 +33,7 @@ import org.st.sam.log.SLogTree.TreeStatistics;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.log.XESImport;
+import org.st.sam.mine.MineLSC.Configuration;
 import org.st.sam.util.SAMOutput;
 
 import com.google.gwt.dev.util.collect.HashMap;
@@ -43,7 +44,7 @@ public class RunExperimentCompare {
   private static String SLASH = System.getProperty("file.separator");
   private boolean allowed_to_renderTrees = true;
   
-  private Properties props;
+  protected Properties props;
 
   public RunExperimentCompare() throws IOException {
     props = new Properties();
@@ -164,13 +165,18 @@ public class RunExperimentCompare {
   public void runMiners(final String logFile, final XLog xlog, final int minSupportThreshold, final double confidence) throws IOException {
 
     runTime_minerBranch = System.currentTimeMillis();
-    minerBranch = new MineBranchingLSC();
+    
+    Configuration config_branch = Configuration.mineBranching();
+    config_branch.allowEventRepetitions = false;
+    minerBranch = new MineLSC(config_branch);
     minerBranch.OPTIONS_WEIGHTED_OCCURRENCE = true;
     System.out.println("mining branching lscs from "+logFile);
     minerBranch.mineLSCs(xlog, minSupportThreshold, confidence, logFile);
     runTime_minerBranch = System.currentTimeMillis()-runTime_minerBranch;
     
-    minerLinear = new MineLinearLSC(minerBranch.getSupportedWords());
+    Configuration config_linear = Configuration.mineLinear();
+    config_linear.allowEventRepetitions = false;
+    minerLinear = new MineLSC(config_linear, minerBranch.getSupportedWords());
     minerLinear.OPTIONS_WEIGHTED_OCCURRENCE = true;
     System.out.println("mining linear lscs from "+logFile);
     //LSCEvent[][] dataSet = MineLinearLSC.readInput(experimentFileRoot+"/"+inputFile);
@@ -181,6 +187,7 @@ public class RunExperimentCompare {
     minerLinear.mineLSCs(xlog, minSupportThreshold, confidence, logFile);
     
     originalScenarios = new HashMap<LSC, SScenario>();
+    // comment out the following loop to consider only linear mining results
     for (LSC l : minerBranch.getScenarios().keySet()) {
       originalScenarios.put(l, minerBranch.getScenarios().get(l));
     }
@@ -223,6 +230,12 @@ public class RunExperimentCompare {
       }
       if (!is_branching) onlyLinear.add(l);
     }
+    
+    /* uncomment this to get linear-only results
+    both = linear_lscs;
+    onlyBranching.clear();
+    onlyLinear.clear();
+    */
   }
   
   protected Date now;
@@ -829,7 +842,7 @@ public class RunExperimentCompare {
   private double density;
   private double fraction = 1.0;
   
-  private void printHelp() {
+  protected void printHelp() {
     System.out.println("Sam/Mine version "+props.getProperty("sam.version"));
     System.out.println("usage:  sam_mine <inputfile.xes.gz> <support> <confidence>");
     System.out.println("  <inputfile>     path to log file");
@@ -851,6 +864,7 @@ public class RunExperimentCompare {
       support = Integer.parseInt(args[1]);
       confidence = Double.parseDouble(args[2]);
       density = 1.0;
+      fraction = 1.0;
       
       if (support < 1) throw new NumberFormatException("support must be larger than 0");
       if (confidence < 0.0 || confidence > 1.0) throw new NumberFormatException("confidence must be between 0.0 and 1.0");
@@ -942,7 +956,7 @@ public class RunExperimentCompare {
   public static void main(String[] args) throws IOException {
     
     RunExperimentCompare exp = new RunExperimentCompare();
-    // if (!exp.readCommandLine(args)) return;
+    if (!exp.readCommandLine(args)) return;
     
     //exp.experimentFileRoot = "./experiments/columba_ext/";
     //exp.inputFile = "columba_ext_resampled2_filtered.xes.gz";
@@ -957,7 +971,7 @@ public class RunExperimentCompare {
 //    exp.support = 4;
     
     //exp.setParameters("./experiments/p_Afschriften/", "Afschriften_agg.xes.gz", 1.0 /*fract*/, 1 /*supp*/, 1.0 /* conf */);
-    exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
+    //exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 20 /*supp*/, 1.0 /* conf */);
 
     exp.experiment();
 

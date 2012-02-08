@@ -67,7 +67,7 @@ public class BranchingMinerTest extends TestSuite {
 		MineLSC miner = new MineBranchingLSC();
 		miner.mineLSCs_writeResults(sourceFile, 40, 1.0);
 		
-		checkOutputGeneral(sourceFile, 23);
+		checkOutputGeneral(sourceFile, 1);
 	}
 	
 	@Test
@@ -79,7 +79,7 @@ public class BranchingMinerTest extends TestSuite {
     MineLSC miner = new MineBranchingLSC();
     miner.mineLSCs_writeResults(sourceFile, 80, 1.0);
     
-    checkOutputGeneral(sourceFile, 56);
+    checkOutputGeneral(sourceFile, 115);
   }
 	
 	@Test
@@ -106,6 +106,6 @@ public class BranchingMinerTest extends TestSuite {
     MineLSC miner = new MineBranchingLSC();
     miner.mineLSCs_writeResults(sourceFile, 10, 1.0);
     
-    checkOutputGeneral(sourceFile, 86);
+    checkOutputGeneral(sourceFile, 91);
   }
 }

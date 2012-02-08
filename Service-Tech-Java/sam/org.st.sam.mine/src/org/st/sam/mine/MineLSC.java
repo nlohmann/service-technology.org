@@ -37,6 +37,7 @@ public class MineLSC {
     public int mode = MODE_BRANCHING;
     public boolean optimizedSearch = true;
     public boolean skipEvents_invisible = true;
+    public boolean allowEventRepetitions = false;
     public List<short[]> triggers = null;
     public List<short[]> effects = null;
     
@@ -574,7 +575,8 @@ public class MineLSC {
       // it does: skip this successor (each event occurs only once)
       if (count > 0) {
         //mineSupportedWords_subwords(tree, minSupThreshold, word, ev, words, e);
-        continue;
+        if (!config.allowEventRepetitions || count > 2) continue;
+        if (e == word[0]) continue; // never repeat first pre-chart event
       }
       
       short[] nextWord = Arrays.copyOf(word, word.length+1);
@@ -594,7 +596,8 @@ public class MineLSC {
       if (total_occurrences >= minSupThreshold) {
       
         List<Short> ev_avail = new LinkedList<Short>(ev);
-        ev_avail.remove((Short)e); // event id 'e' no longer available for continuation
+        if (!config.allowEventRepetitions)
+          ev_avail.remove((Short)e); // event id 'e' no longer available for continuation
         
         //List<Short> preferedSuccNext = ev;
         Set<Short> violatingSuccessors = new TreeSet<Short>(short_comp);

@@ -153,6 +153,16 @@ public class RunExperimentEffect extends RunExperimentCompare {
     r.append("<hr/>\n");
   }
   
+  
+  @Override
+  protected void printHelp() {
+    System.out.println("Sam/Mine for Effects, version "+props.getProperty("sam.version"));
+    System.out.println("usage:  sam_mine_effect <inputfile.xes.gz> <support> <confidence>");
+    System.out.println("  <inputfile>     path to log file");
+    System.out.println("  <support>       minimum support threshold (integers > 0)");
+    System.out.println("  <confidence>    minimum confidence (between 0.0 and 1.0)");
+  }
+  
   public static void main(String[] args) throws IOException {
     
     RunExperimentEffect exp = new RunExperimentEffect();

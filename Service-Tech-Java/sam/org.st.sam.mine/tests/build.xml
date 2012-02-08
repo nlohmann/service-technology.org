@@ -96,8 +96,10 @@
 	      <classpath refid="classpath.test"/>
 
 		  <!-- JUnit: set output format -->
+		  <formatter type="plain" usefile="false" />
 	      <formatter type="xml" />
     	  <formatter type="plain" />
+
 	    	
 	      <!-- JUnit: test cases to run -->
 	      <sysproperty key="test.testFileRoot" path="${dir.testfiles.minetest}"/>

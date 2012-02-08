@@ -94,6 +94,15 @@ public class RunExperimentTrigger extends RunExperimentCompare {
     return dir+SLASH+"results_"+logFileName+"_"+traceNum+"_TR_"+minSupportThreshold+"_"+confidence+"_"+dateFormat.format(now);
   }
   
+  @Override
+  protected void printHelp() {
+    System.out.println("Sam/Mine for Triggers, version "+props.getProperty("sam.version"));
+    System.out.println("usage:  sam_mine_trigger <inputfile.xes.gz> <support> <confidence>");
+    System.out.println("  <inputfile>     path to log file");
+    System.out.println("  <support>       minimum support threshold (integers > 0)");
+    System.out.println("  <confidence>    minimum confidence (between 0.0 and 1.0)");
+  }
+  
   public static void main(String[] args) throws IOException {
     
     RunExperimentTrigger exp = new RunExperimentTrigger();

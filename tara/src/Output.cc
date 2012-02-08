@@ -43,7 +43,6 @@ std::string Output::tempfileTemplate = "/tmp/temp-XXXXXX";
 #endif
 bool Output::keepTempfiles = true;
 
-std::deque<Output*> Output::listOfTempFiles(0);
 
 /***************
  * CONSTRUCTOR *
@@ -52,11 +51,10 @@ std::deque<Output*> Output::listOfTempFiles(0);
 /*!
  This constructor creates a temporary file using createTmp() as helper.
 */
-Output::Output( const std::string& postfix) :
-    os(*(new std::ofstream(createTmp(postfix), std::ofstream::out | std::ofstream::trunc))),
+Output::Output() :
+    os(*(new std::ofstream(createTmp(), std::ofstream::out | std::ofstream::trunc))),
     filename(temp), kind("") {
     status("writing to temporary file '%s'", _cfilename_(filename));
-    listOfTempFiles.push_back(this);
 }
 
 /*!
@@ -106,8 +104,6 @@ Output::~Output() {
                     // files in mode 0600.
                     status("closed, but could not delete temporary file '%s'", _cfilename_(filename));
                 }
-		// remove from the list
-		listOfTempFiles.erase(std::find(listOfTempFiles.begin(), listOfTempFiles.end(), this));
             }
             free(temp);
         }
@@ -150,17 +146,14 @@ std::ostream& Output::stream() const {
  \note mkstemp already opens the temp file, so there is no need to check
        whether the creation of the std::ofstream succeeded.
 */
-char* Output::createTmp(const std::string& postfix) {
-
-    std::string tempName=tempfileTemplate+postfix;
-
+char* Output::createTmp() {
 #ifdef __MINGW32__
-    temp = basename(const_cast<char*>(tempName.c_str()));
+    temp = basename(const_cast<char*>(tempfileTemplate.c_str()));
     if (mktemp(temp) == NULL) {
         abort(13, "could not create temporary file '%s'", _cfilename_(basename(const_cast<char*>(tempfileTemplate.c_str()))));
     };
 #else
-    temp = strdup(tempName.c_str());
+    temp = strdup(tempfileTemplate.c_str());
     if (mkstemp(temp) == -1) {
         abort(13, "could not create temporary file '%s'", _cfilename_(temp));
     };

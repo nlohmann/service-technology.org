@@ -8,7 +8,7 @@
 /*!
  \param  exit code
  \return Positive on 0, Negative on 1, otherwise Undefined
- 
+
  \note only use this function with exit codes (e.g. by wait)
  */
 enum VerificationState code2state(int code) {
@@ -40,7 +40,7 @@ int state2code(enum VerificationState state) {
 
 /*!
  This function extracts the problem information from the arguments passed to the program.
- 
+
  \param number of arguments
  \param vector of arguments
  \return problem struct containing the extracted information
@@ -63,7 +63,7 @@ struct problem* mkProblem(int argc, char* argv[]) {
  Writes verification state and the tool's name to the outcome variable.
  That is, a mutex is acquired, the information written and the mutex released.
  Additionally, it notifies waiting threads using the condition variable.
- 
+
  \param mutex protected variable the information is written to
  \param verification state the tool yielded
  \param name of the tool that generated the verification state

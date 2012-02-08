@@ -25,7 +25,7 @@ int state2code(enum VerificationState state);
 
 /*!
  A problem consists of a formula and a net on which the formula is verified.
- Additionally, a problem has a name, which is used for 
+ Additionally, a problem has a name, which is used for
  */
 struct problem {
     char* name;

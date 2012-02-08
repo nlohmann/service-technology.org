@@ -12,7 +12,7 @@
  \param first string
  \param second string
  \return newly created string consisting of the first and second argument
- 
+
  \note the combined length of the strings passed must not exceed 255.
  \note the created string is not longer than 255 chars.
  */
@@ -26,7 +26,7 @@ char* append(char* s1, char* s2) {
 
 /*!
  Kills the process with the given pid.
- 
+
  \param argument castable to (pid_t*)
  */
 void killProcess(void* arg) {
@@ -39,7 +39,7 @@ void killProcess(void* arg) {
 
 /*!
  Kills a thread with the given thread id.
- 
+
  \param argument castable to (pthread_t*).
  */
 void killThread(void* arg) {
@@ -51,9 +51,9 @@ void killThread(void* arg) {
 /*!
  Kills threads with the given thread ids.
  Pointer arithmetic is used to obtain the thread ids.
- 
+
  \param argument castable to (pthread_t*).
- 
+
  \note the behaviour is unspecified when the array of thread ids is not zero-terminated.
  */
 void killThreads(void* arg) {

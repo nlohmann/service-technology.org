@@ -11,7 +11,7 @@
 
 /*!
  Forks a process that runs the given program and returns the verification result.
- 
+
  \param program that is executed
  \param function for interpreting the results
  \param logfile
@@ -22,10 +22,10 @@ enum VerificationState forknrun(char** args, interpreter interpret, char* logfil
     int cancel;
     int out = open(logfile, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
     pid_t pid = (pid_t)NULL;
-    
+
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &cancel);
     pthread_cleanup_push(killProcess, (void*)&pid);
-    
+
     pid = fork();
     if (pid == 0) {
         pthread_setcancelstate(cancel, NULL); // TODO: Is this necessary?
@@ -35,7 +35,7 @@ enum VerificationState forknrun(char** args, interpreter interpret, char* logfil
         execvp(args[0], args);
         return Undefined; // this should never happen
     }
-    
+
     // enable cancellation
     pthread_setcancelstate(cancel, NULL);
     debug_print("%s: waiting for pid %d\n", __func__, pid);
@@ -47,7 +47,7 @@ enum VerificationState forknrun(char** args, interpreter interpret, char* logfil
 
 /*!
  Runs a tool and returns the verification result.
- 
+
  \param problem
  \param tool to solve the problem
  \return verification state (Undefined on error)

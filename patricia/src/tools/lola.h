@@ -3,9 +3,9 @@
 
 #include "types.h"
 
-int lola_prepare(struct problem *problem);
-enum VerificationState lola_interpret(int code, char *logfile);
-struct tool *findpath_tool(struct problem *problem);
-struct tool *statepredicate_tool(struct problem *problem);
+int lola_prepare(struct problem* problem);
+enum VerificationState lola_interpret(int code, char* logfile);
+struct tool* findpath_tool(struct problem* problem);
+struct tool* statepredicate_tool(struct problem* problem);
 
 #endif

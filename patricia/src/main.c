@@ -11,11 +11,11 @@
 
 /*!
  This function returns an action that solves the given problem.
- 
+
  \param problem
  \return action solving the problem
- 
- \note this function should be rewritten when 
+
+ \note this function should be rewritten when
  */
 struct action* plan(struct problem* problem) {
     struct action* findpath = tool2action(findpath_tool(problem), 200);
@@ -30,7 +30,7 @@ struct action* plan(struct problem* problem) {
  - "Verified (%s)" (%s is replaced by the tool's name)
  - "Refuted (%s)" (%s is replaced by the tool's name)
  - "Could neither verify nor refute"
- 
+
  \param number of arguments
  \param arguments vector
  \return exit code (1 on invalid arguments passed)

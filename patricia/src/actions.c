@@ -69,7 +69,7 @@ struct action* tool2action(struct tool* tool, int timeout) {
  - performTry (Try)
  - performRunWithTimeout (Run, timeout strictly greater than zero)
  - performRunWithoutTimeout (Run, timeout equals zero)
- 
+
  \param problem
  \param action tree that is executed
  \return outcome
@@ -88,7 +88,7 @@ struct outcome* perform(struct problem* problem, struct action* action) {
             debug_print("%s: next action is running a tool with timeout\n", __func__);
             return performRunWithTimeout(problem, action->data.run.tool, action->data.run.timeout);
         } else {
-	    assert(action->data.run.timeout == 0);
+            assert(action->data.run.timeout == 0);
             debug_print("%s: next action is running a tool without timeout\n", __func__);
             return performRunWithoutTimeout(problem, action->data.run.tool);
         }
@@ -110,10 +110,10 @@ struct outcome* performParallel(struct problem* problem, struct action** actions
     pthread_t threads[num + 1];
     struct ptask* ptask;
     struct outcome* outcome = malloc(sizeof(struct outcome));
-    
+
     // disable cancellation
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &cancel);
-        
+
     // initialize outcome variable
     debug_print("%s: initializing\n", __func__);
     outcome->state = Undefined;
@@ -131,7 +131,7 @@ struct outcome* performParallel(struct problem* problem, struct action** actions
         ptask->outcome = outcome;
         ptask->problem = problem;
         ptask->action = actions[i];
-	
+
         pthread_create(&threads[i], NULL, threadedPerform, (void*)ptask);
     }
 
@@ -185,8 +185,8 @@ struct outcome* performTry(struct problem* problem, struct action* try, struct a
  \param tool solving the problem
  \param timeout in milliseconds
  \return outcome
- 
- \note when the timeout expires, the outcome's state is Undefined and the name is "timeout". 
+
+ \note when the timeout expires, the outcome's state is Undefined and the name is "timeout".
  */
 struct outcome* performRunWithTimeout(struct problem* problem, struct tool* tool, unsigned int timeout) {
     int cancel;
@@ -194,7 +194,7 @@ struct outcome* performRunWithTimeout(struct problem* problem, struct tool* tool
     struct ptask* ptask = malloc(sizeof(struct ptask));
     pthread_t worker;
     pthread_t guard;
-    
+
     // disable cancellation
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &cancel);
 
@@ -253,53 +253,53 @@ struct outcome* performRunWithoutTimeout(struct problem* problem, struct tool* t
 /*!
  Performs the given action and publishes the outcome.
  This function is used for calling perform in a new thread.
- 
+
  \param arguments castable to (struct ptask*)
  */
 void* threadedPerform(void* args) {
     struct ptask* ptask = (struct ptask*)args;
     struct outcome* outcome;
-    
+
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     outcome = perform(ptask->problem, ptask->action);
     publish(ptask->outcome, outcome->state, outcome->tool);
-    
+
     return NULL;
 }
 
 /*!
  Runs a tool and publishes the outcome.
  This function is used for running a tool in a new thread.
- 
+
  \param arguments castable to (struct ptask*)
- 
+
  \note the action of the ptask variable has type of Run
  */
 void* threadedRun(void* args) {
     struct ptask* ptask = (struct ptask*)args;
-    
+
     assert(ptask->action->type == Run);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     publish(ptask->outcome, run(ptask->problem, ptask->action->data.run.tool), ptask->action->data.run.tool->name);
-    
+
     return NULL;
 }
 
 /*!
  Sleeps and then publishes Undefined under the name "timeout".
  This function is used for implementing timeouts.
- 
+
  \param arguments castable to (struct ptask*)
- 
+
  \note the action of the ptask variable has type of Run
  */
 void* threadedSleep(void* args) {
     struct ptask* ptask = (struct ptask*)args;
-    
+
     assert(ptask->action->type == Run);
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     usleep(ptask->action->data.run.timeout * 1000); // TODO: Replace this with nanosleep?
     publish(ptask->outcome, Undefined, "timeout");
-    
+
     return NULL;
 }

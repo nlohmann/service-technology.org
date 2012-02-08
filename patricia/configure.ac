@@ -26,10 +26,16 @@ LIBS="$PTHREAD_LIBS $LIBS"
 CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 CC="$PTHREAD_CC"
 
+# check for verification tools
+AC_PATH_PROG(LOLA_STATEPREDICATE, [lola-statepredicate], [])
+AC_PATH_PROG(LOLA_FINDPATH, [lola-findpath], [])
+AC_PATH_PROG(SARA, [sara], [])
+
 # check for required functions and die if they are not found
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_ERROR([cannot use required functions]))
 
 # write files
 AC_CONFIG_FILES([
-	Makefile src/Makefile doc/Doxyfile doc/Doxydetails])
+	Makefile src/Makefile doc/Doxyfile doc/Doxydetails tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

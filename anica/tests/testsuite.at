@@ -389,7 +389,7 @@ AT_BANNER([Valgrind])
 AT_SETUP([Checking for memory leaks (PBNI)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/both.ifn .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes ANICA_RAW both.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --resultFile],0,ignore,stderr)
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes ANICA_RAW both.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --resultFile --finalize],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
@@ -397,7 +397,7 @@ AT_CLEANUP
 AT_SETUP([Checking for memory leaks (PBNID)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/activeCausalDowngrade.ifn .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes ANICA_RAW activeCausalDowngrade.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --resultFile],0,ignore,stderr)
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes ANICA_RAW activeCausalDowngrade.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --resultFile --finalize],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP

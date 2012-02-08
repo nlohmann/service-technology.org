@@ -175,6 +175,12 @@ option "verbose" v
   details="Show verbose information reporting intermediate steps.\n"
   flag off
 
+option "finalize" - 
+  "Release all allocated memory." 
+  details="This option calls the destructors of all objects that have been created by Anica. This is usually not necessary, because the operating system cleans up once Anica terminates. However, this option can be used to detect memory leaks.\n" 
+  flag off 
+  hidden
+
 option "bug" -
   "Write configuration information into a file `bug.log'."
   details="This output file gives information on the machine Anica was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"

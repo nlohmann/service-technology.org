@@ -38,7 +38,7 @@ typedef struct {
   pnapi::Place * goal;
   pnapi::Transition * hC;
   pnapi::Transition * lC;
-} extented_result_t;
+} extended_result_t;
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -182,7 +182,7 @@ void evaluateParameters(int argc, char** argv) {
 		status(_cwarning_("activePlaces requieres modus=call: no dot-file will be created."));
 	}
 
-    free(params);
+    if (args_info.finalize_flag) {free(params);}
 }
 
 void clearColors(pnapi::PetriNet & Petrinet) {
@@ -237,16 +237,14 @@ bool callLoLA(const pnapi::PetriNet& net, const pnapi::Place * goal) {
     time(&end_time);
     status("........%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
 
-	if (ret == 0) {
-		return true;
+	switch (ret)  {
+	    case 0:
+		    return true;
+	    case 1:
+		    return false;
+	    default:
+		    abort(9, "LoLA parse error");
 	}
-	else if (ret == 1) {
-		return false;
-	}
-	else {
-		abort(9, "LoLA parse error");
-	}
-	return true;
 }
 
 bool callWendy(const pnapi::PetriNet& net) {
@@ -275,20 +273,19 @@ bool callWendy(const pnapi::PetriNet& net) {
     time(&end_time);
     status("........%s is done [%.0f sec]", _ctool_("Wendy"), difftime(end_time, start_time));
 
-	if (ret == 0) {
-		return true;
+	switch (ret)  {
+	    case 0:
+		    return true;
+	    case 1:
+		    return false;
+	    default:
+		    abort(9, "Wendy parse error");
 	}
-	else if (ret == 1) {
-		return false;
-	}
-	else {
-		abort(9, "Wendy parse error");
-	}
-	return true;
 }
 
-extented_result_t addCausalPattern(pnapi::PetriNet& extendedNet, const pnapi::Place& s, const pnapi::Transition& h, const pnapi::Transition& l, const std::set<std::string>& downgradeTransitions, std::set< std::pair<pnapi::Node*, pnapi::Node*> >& newArcs, const bool insertArcs) {
-    extented_result_t ret;
+// ToDo: gemeinsame Elemente zusammenfassen?!
+extended_result_t addCausalPattern(pnapi::PetriNet& extendedNet, const pnapi::Place& s, const pnapi::Transition& h, const pnapi::Transition& l, const std::set<std::string>& downgradeTransitions, std::set< std::pair<pnapi::Node*, pnapi::Node*> >& newArcs, const bool insertArcs) {
+    extended_result_t ret;
     
     // sprechende Namen eruieren
     pnapi::Transition* lC = &extendedNet.createTransition();
@@ -344,23 +341,22 @@ extented_result_t addCausalPattern(pnapi::PetriNet& extendedNet, const pnapi::Pl
         newArcs.insert(std::make_pair(a, hC));
     }
 
+    newArcs.insert(std::make_pair(hC, fired));
+    newArcs.insert(std::make_pair(fired, lC));
+    newArcs.insert(std::make_pair(lC, goal));
+
     if (insertArcs) {
         FOREACH(a, newArcs) {
             extendedNet.createArc(*a->first, *a->second);
         }
-
-        extendedNet.createArc(*hC, *fired);
-        extendedNet.createArc(*fired, *lC);
-        extendedNet.createArc(*lC, *goal);
-        
         newArcs.clear();
     }
 
     return ret;
 }
 
-extented_result_t addConflictPattern(pnapi::PetriNet& extendedNet, const pnapi::Place& s, pnapi::Transition& h, const pnapi::Transition& l, const std::set<std::string>& downgradeTransitions, std::set< std::pair<pnapi::Node*, pnapi::Node*> >& newArcs, const bool insertArcs) {
-    extented_result_t ret;
+extended_result_t addConflictPattern(pnapi::PetriNet& extendedNet, const pnapi::Place& s, pnapi::Transition& h, const pnapi::Transition& l, const std::set<std::string>& downgradeTransitions, std::set< std::pair<pnapi::Node*, pnapi::Node*> >& newArcs, const bool insertArcs) {
+    extended_result_t ret;
     
     pnapi::Transition* lC = &extendedNet.createTransition();
     pnapi::Transition* hC = &extendedNet.createTransition();
@@ -414,30 +410,28 @@ extented_result_t addConflictPattern(pnapi::PetriNet& extendedNet, const pnapi::
         newArcs.insert(std::make_pair(a, d));
         newArcs.insert(std::make_pair(a, hC));
     }
-
+       
+    newArcs.insert(std::make_pair(hC, fired));
+    newArcs.insert(std::make_pair(fired, lC));
+    newArcs.insert(std::make_pair(lC, goal)); 
+    newArcs.insert(std::make_pair(enabled, &h));
+    newArcs.insert(std::make_pair(&h, enabled));
+    newArcs.insert(std::make_pair(enabled, hC));
+    
     if (insertArcs) {
         FOREACH(a, newArcs) {
             extendedNet.createArc(*a->first, *a->second);
         }
-
-        extendedNet.createArc(*hC, *fired);
-        extendedNet.createArc(*fired, *lC);
-        extendedNet.createArc(*lC, *goal);
-        extendedNet.createArc(*enabled, h);
-        extendedNet.createArc(h, *enabled);
-        extendedNet.createArc(*enabled, *hC);
-        
         newArcs.clear();
     }
     
     return ret;
 }
 
-void createLolaTask(const pnapi::PetriNet& extendedNet, const pnapi::Place& goal, const std::string& name, std::set<std::string>& allNets) {
+void createLolaTask(const pnapi::PetriNet& extendedNet, const std::string& name, std::set<std::string>& allNets) {
     std::ofstream o;
     o.open(name.c_str(), std::ios_base::trunc);
     o << pnapi::io::lola << extendedNet;
-    o << "\n\nFORMULA (" << goal.getName() << " = 1 )\n";
     o.close();
     //status("........%s created", _cfilename_(curFileName));
     allNets.insert(name);
@@ -462,7 +456,7 @@ void terminationHandler() {
 		int ret = system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
     }
 
-	cmdline_parser_free(&args_info);
+	if (args_info.finalize_flag) {cmdline_parser_free(&args_info);}
 }
 
 /// main-function
@@ -727,15 +721,12 @@ int main(int argc, char** argv) {
     | 5. check potential places		   |
     `---------------------------------*/
 
-    //?
     const bool checkActiveCausal = (args_info.task_arg != task_arg_verfification) ? true : ((args_info.activePlaces_arg == activePlaces_arg_causal) || (args_info.activePlaces_arg == activePlaces_arg_both));
     const bool checkActiveConflict = (args_info.task_arg != task_arg_verfification) ? true : ((args_info.activePlaces_arg == activePlaces_arg_conflict) || (args_info.activePlaces_arg == activePlaces_arg_both));
     
     std::set<pnapi::Place *> activeCausal;
     std::set<pnapi::Place *> activeConflict;
 
-
-    
     std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > potentialCausalTriple;
     std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > potentialConflictTriple;
     std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > activeCausalTriple;
@@ -743,74 +734,72 @@ int main(int argc, char** argv) {
 
     std::set<std::string> allNets;
 
-
     if ((checkActiveCausal || checkActiveConflict) && (!potentialCausal.empty() || !potentialConflict.empty())) {
+        // check active places
 
 	    status("check active places");
 	    
-	    std::set< std::pair<pnapi::Node*, pnapi::Node*> > newArcs;
-	    
-	    // gern conditional
-	    pnapi::PetriNet controllerNet(net);
-	    // ToDo: aufräumen?!
-	    const std::string PRESTART = "preStart";
-        const std::string START = "tStart";
-        const std::string MAKE_HIGH = "make_high_";
-        const std::string ACTIVATE_MAKE = "activate_make_";
-        const std::string CONFIGURE = "configure_";
         const std::string HIGH = "_high";
         const std::string LOW = "_low";
-        const std::string GOAL = "goal_";
 	    
+	    pnapi::PetriNet* extendedNet;
+	    pnapi::Place* s;
+		pnapi::Transition* h;
+		pnapi::Transition* l;
+		extended_result_t extResult;
+	    
+	    std::set< std::pair<pnapi::Node*, pnapi::Node*> > newArcs;
+	    
+	    // initial stuff before considering the specific net
 	    switch (args_info.task_arg) {
 	        case task_arg_verfification:
 	            break;
 	        case task_arg_characterization:
 	            break;
 	        case task_arg_controllability:
-	            pnapi::Transition * startTransition = &controllerNet.createTransition(START);
-                pnapi::Label & label = controllerNet.getInterface().addSynchronousLabel("start");
-                startTransition->addLabel(label);
-                pnapi::Place * preStart = &controllerNet.createPlace(PRESTART, 1);
-                controllerNet.getFinalCondition().addProposition(*preStart == 0, true);
+	            extendedNet = new pnapi::PetriNet(net);
+	            pnapi::Transition* startTransition = &extendedNet->createTransition("tStart");
+                startTransition->addLabel(extendedNet->getInterface().addSynchronousLabel("start"));
+                pnapi::Place * preStart = &extendedNet->createPlace("preStart", 1);
+                extendedNet->getFinalCondition().addProposition(*preStart == 0, true);
                 newArcs.insert(std::make_pair(preStart, startTransition));
                 // update initial marking
                 PNAPI_FOREACH(p, net.getPlaces()) {
                     if ((**p).getTokenCount() > 0) {
                         assert((**p).getTokenCount() == 1);
-                        newArcs.insert(std::make_pair(startTransition, controllerNet.findNode((**p).getName())));
-                        controllerNet.findPlace((**p).getName())->setTokenCount(0);
+                        newArcs.insert(std::make_pair(startTransition, extendedNet->findNode((**p).getName())));
+                        extendedNet->findPlace((**p).getName())->setTokenCount(0);
                     }
                 }
                 // controller structure for all transitions
                 PNAPI_FOREACH(t, net.getTransitions()) {
                     status("handle transition %s", (**t).getName().c_str());
-                    unsigned int curConfidence = (**t).getConfidence();
-                    if (curConfidence == 0) {
-	                    // unlabeled transition
-	                    pnapi::Place * a = &controllerNet.createPlace(std::string(ACTIVATE_MAKE + (**t).getName()), 1);
-	                    pnapi::Place * c = &controllerNet.createPlace(std::string(CONFIGURE + (**t).getName()), 1);
-                        pnapi::Place * l = &controllerNet.createPlace(std::string((**t).getName() + LOW), 1);
-                        pnapi::Place * h = &controllerNet.createPlace(std::string((**t).getName() + HIGH), 0);
-                        pnapi::Transition * mt = &controllerNet.createTransition(std::string(MAKE_HIGH + (**t).getName()));
-                        pnapi::Label & label = controllerNet.getInterface().addSynchronousLabel(std::string("make_" + (**t).getName() + "_high"));
-                        mt->addLabel(label);
-                        newArcs.insert(std::make_pair(a, mt));
-                        newArcs.insert(std::make_pair(c, mt));
-                        newArcs.insert(std::make_pair(mt, c));
-                        newArcs.insert(std::make_pair(c, startTransition));
-                        newArcs.insert(std::make_pair(l, mt));
-                        newArcs.insert(std::make_pair(mt, h));
-                    }
-                    else if (curConfidence == 1) {
+                    switch ((**t).getConfidence()) {
+                    case CONFIDENCE_LOW:
                         // low labeled
-                        controllerNet.createPlace(std::string((**t).getName() + HIGH), 0);
-                        controllerNet.createPlace(std::string((**t).getName() + LOW), 1);
-                    }
-                    else if (curConfidence == 2) {
+                        extendedNet->createPlace(std::string((**t).getName() + HIGH), 0);
+                        extendedNet->createPlace(std::string((**t).getName() + LOW), 1);
+                        break;
+                    case CONFIDENCE_HIGH:
                         // high labeled
-                        controllerNet.createPlace(std::string((**t).getName() + HIGH), 1);
-                        controllerNet.createPlace(std::string((**t).getName() + LOW), 0);
+                        extendedNet->createPlace(std::string((**t).getName() + HIGH), 1);
+                        extendedNet->createPlace(std::string((**t).getName() + LOW), 0);
+                        break;
+                    case CONFIDENCE_NONE:
+                        // unlabeled transition
+                        pnapi::Place * controllerActivate = &extendedNet->createPlace(std::string("activate_make_" + (**t).getName()), 1);
+                        pnapi::Place * controllerConfigure = &extendedNet->createPlace(std::string("configure_" + (**t).getName()), 1);
+                        pnapi::Place * controllerLow = &extendedNet->createPlace(std::string((**t).getName() + LOW), 1);
+                        pnapi::Place * controllerHigh = &extendedNet->createPlace(std::string((**t).getName() + HIGH), 0);
+                        pnapi::Transition * controllerMakeHigh = &extendedNet->createTransition(std::string("make_high_" + (**t).getName()));
+                        controllerMakeHigh->addLabel(extendedNet->getInterface().addSynchronousLabel(std::string("make_" + (**t).getName() + "_high")));
+                        newArcs.insert(std::make_pair(controllerActivate, controllerMakeHigh));
+                        newArcs.insert(std::make_pair(controllerConfigure, controllerMakeHigh));
+                        newArcs.insert(std::make_pair(controllerMakeHigh, controllerConfigure));
+                        newArcs.insert(std::make_pair(controllerConfigure, startTransition));
+                        newArcs.insert(std::make_pair(controllerLow, controllerMakeHigh));
+                        newArcs.insert(std::make_pair(controllerMakeHigh, controllerHigh));
+                        break;
                     }
                 }
 	            break;
@@ -827,6 +816,7 @@ int main(int argc, char** argv) {
 	    status("..potential causal places");
 		    FOREACH(p, potentialCausal) {
 
+                // we have a potential causal place
 			    if (args_info.oneActiveOnly_flag && (!activeCausal.empty() || !activeConflict.empty())) {break;}
                 isActive = false;
 
@@ -839,29 +829,27 @@ int main(int argc, char** argv) {
 				    retLow = lowPost.equal_range(*p);
 				    for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
 				        if (isActive && args_info.oneTripleOnly_flag) {break;}
-				
+				        
+				        // we have a potential causal triple
 					    status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
 					    potentialCausalTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
-
-                        pnapi::PetriNet extentedNet(net);
-                        
-                        const pnapi::Place* s = extentedNet.findPlace((**p).getName());
-					    const pnapi::Transition* h = extentedNet.findTransition((*itHigh).second->getName());
-					    const pnapi::Transition* l = extentedNet.findTransition((*itLow).second->getName());
-					    
-					    extented_result_t extResult;
 					    
 					    switch (args_info.task_arg) {
 					        case task_arg_verfification:
-					            extResult = addCausalPattern(extentedNet, *s, *h, *l, downgradeTransitions, newArcs, true);
+					            extendedNet = new pnapi::PetriNet(net);
+					            s = extendedNet->findPlace((**p).getName());
+					            h = extendedNet->findTransition((*itHigh).second->getName());
+					            l = extendedNet->findTransition((*itLow).second->getName());
+					            extResult = addCausalPattern(*extendedNet, *s, *h, *l, downgradeTransitions, newArcs, true);
+					            extendedNet->getFinalCondition().addProposition(*extResult.goal == 0, true);
 					            switch (args_info.modus_arg) {
 			                        case modus_arg_makefile:
-			                            createLolaTask(extentedNet, *extResult.goal, fileName + ".causal." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
+			                            createLolaTask(*extendedNet, fileName + ".causal." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
 					                    break;
 
 					                case modus_arg_call:
 						                // call LoLA
-						                if (callLoLA(extentedNet, extResult.goal)) {
+						                if (callLoLA(*extendedNet, extResult.goal)) {
 							                status(_cbad_("........active"));
 							                activeCausalTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
 							                isActive = true;
@@ -870,22 +858,25 @@ int main(int argc, char** argv) {
 							                status(_cgood_("........not active"));
 						                }
 						                break;
-						            case modus_arg_statistic:
-						                // ist hier was zu tun?    
-						                break;
 					            }
+					            if (args_info.finalize_flag) {delete extendedNet;}
 					            break;
 					            
 					        case task_arg_characterization: // ToDo: mit task_arg_verfification zusammenfassen...
-					            extResult = addCausalPattern(extentedNet, *s, *h, *l, downgradeTransitions, newArcs, true);
+					            extendedNet = new pnapi::PetriNet(net);
+					            s = extendedNet->findPlace((**p).getName());
+					            h = extendedNet->findTransition((*itHigh).second->getName());
+					            l = extendedNet->findTransition((*itLow).second->getName());
+					            extResult = addCausalPattern(*extendedNet, *s, *h, *l, downgradeTransitions, newArcs, true);
+					            extendedNet->getFinalCondition().addProposition(*extResult.goal == 0, true);
 					            switch (args_info.modus_arg) {
 			                        case modus_arg_makefile:
-			                            createLolaTask(extentedNet, *extResult.goal, fileName + ".causal." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
+			                            createLolaTask(*extendedNet, fileName + ".causal." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
 					                    break;
 
 					                case modus_arg_call:
 						                // call LoLA
-						                if (callLoLA(extentedNet, extResult.goal)) {
+						                if (callLoLA(*extendedNet, extResult.goal)) {
 							                status(_cbad_("........active"));
 							                activeCausalTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
 							                isActive = true;
@@ -894,18 +885,19 @@ int main(int argc, char** argv) {
 							                status(_cgood_("........not active"));
 						                }
 						                break;
-						            case modus_arg_statistic:
-						                // ist hier was zu tun?    
-						                break;
 					            }
+					            if (args_info.finalize_flag) {delete extendedNet;}
 					            break;
 					            
 					        case task_arg_controllability:
-					            extResult = addCausalPattern(controllerNet, *s, *h, *l, downgradeTransitions, newArcs, false);
-					            controllerNet.getFinalCondition().addProposition(*extResult.goal == 0, true);
+				                s = extendedNet->findPlace((**p).getName());
+				                h = extendedNet->findTransition((*itHigh).second->getName());
+				                l = extendedNet->findTransition((*itLow).second->getName());
+					            extResult = addCausalPattern(*extendedNet, *s, *h, *l, downgradeTransitions, newArcs, false);
+					            extendedNet->getFinalCondition().addProposition(*extResult.goal == 0, true);
 					            // ToDo: mit oben abgleichen
-                                pnapi::Place * lController = controllerNet.findPlace(std::string(l->getName() + LOW));
-                                pnapi::Place * hController = controllerNet.findPlace(std::string(h->getName() + HIGH));
+                                pnapi::Place * lController = extendedNet->findPlace(std::string(l->getName() + LOW));
+                                pnapi::Place * hController = extendedNet->findPlace(std::string(h->getName() + HIGH));
                                 newArcs.insert(std::make_pair(hController, extResult.hC));
                                 newArcs.insert(std::make_pair(extResult.hC, hController));
                                 newArcs.insert(std::make_pair(lController, extResult.lC));
@@ -918,12 +910,28 @@ int main(int argc, char** argv) {
 
 			    } // h's
 			
-			    if (isActive) {
-			        status(_cbad_("......active"));
-			        activeCausal.insert(*p);
-			    }
-			    else {
-			        status(_cgood_("......not active"));
+			    // activation of place is now decided
+			    switch (args_info.task_arg) {
+			        case task_arg_verfification:
+			            if (isActive) {
+			                status(_cbad_("......active"));
+			                activeCausal.insert(*p);
+			            }
+			            else {
+			                status(_cgood_("......not active"));
+			            }
+			            break;
+			        case task_arg_characterization:
+			            if (isActive) {
+			                status(_cbad_("......active"));
+			                activeCausal.insert(*p);
+			            }
+			            else {
+			                status(_cgood_("......not active"));
+			            }
+			            break;
+			        case task_arg_controllability:
+			            break;
 			    }
 
 		    } // s's
@@ -934,6 +942,7 @@ int main(int argc, char** argv) {
 		    status("..potential conflict places");
 		    FOREACH(p, potentialConflict) {
 
+                // we have a potential conflict place
 			    if (args_info.oneActiveOnly_flag && (!activeCausal.empty() || !activeConflict.empty())) {break;}
 			    isActive = false;
 
@@ -948,28 +957,26 @@ int main(int argc, char** argv) {
 				        if ((*itHigh).second == (*itLow).second) {continue;}
 				        if (args_info.oneTripleOnly_flag && isActive) {break;}
 				        
+				        // we have a potential conflict triple
 					    status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
                         potentialConflictTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
 
-                        pnapi::PetriNet extentedNet(net);
-                       
-                        const pnapi::Place* s = extentedNet.findPlace((**p).getName());
-                        pnapi::Transition* h = extentedNet.findTransition((*itHigh).second->getName());
-                        const pnapi::Transition* l = extentedNet.findTransition((*itLow).second->getName());
-
-                        extented_result_t extResult;
-
                         switch (args_info.task_arg) {
 					        case task_arg_verfification:
-					            extResult = addConflictPattern(extentedNet, *s, *h, *l, downgradeTransitions, newArcs, true);
+					            extendedNet = new pnapi::PetriNet(net);
+					            s = extendedNet->findPlace((**p).getName());
+					            h = extendedNet->findTransition((*itHigh).second->getName());
+					            l = extendedNet->findTransition((*itLow).second->getName());
+					            extResult = addConflictPattern(*extendedNet, *s, *h, *l, downgradeTransitions, newArcs, true);
+					            extendedNet->getFinalCondition().addProposition(*extResult.goal == 0, true);
 					            switch (args_info.modus_arg) {
 			                        case modus_arg_makefile:
-			                            createLolaTask(extentedNet, *extResult.goal, fileName + ".conflict." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
+			                            createLolaTask(*extendedNet, fileName + ".conflict." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
 					                    break;
 
 					                case modus_arg_call:
 						                // call LoLA
-						                if (callLoLA(extentedNet, extResult.goal)) {
+						                if (callLoLA(*extendedNet, extResult.goal)) {
 							                status(_cbad_("........active"));
 							                activeConflictTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
 							                isActive = true;
@@ -978,22 +985,25 @@ int main(int argc, char** argv) {
 							                status(_cgood_("........not active"));
 						                }
 						                break;
-						            case modus_arg_statistic:
-						                break;
-						                
 					            }
+					            if (args_info.finalize_flag) {delete extendedNet;}
 					            break;
 					            
 					        case task_arg_characterization: // ToDo: mit task_arg_verfification zusammenfassen...
-					            extResult = addConflictPattern(extentedNet, *s, *h, *l, downgradeTransitions, newArcs, true);
+					            extendedNet = new pnapi::PetriNet(net);
+					            s = extendedNet->findPlace((**p).getName());
+					            h = extendedNet->findTransition((*itHigh).second->getName());
+					            l = extendedNet->findTransition((*itLow).second->getName());
+					            extResult = addConflictPattern(*extendedNet, *s, *h, *l, downgradeTransitions, newArcs, true);
+					            extendedNet->getFinalCondition().addProposition(*extResult.goal == 0, true);
 					            switch (args_info.modus_arg) {
 			                        case modus_arg_makefile:
-			                            createLolaTask(extentedNet, *extResult.goal, fileName + ".conflict." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
+			                            createLolaTask(*extendedNet, fileName + ".conflict." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
 					                    break;
 
 					                case modus_arg_call:
 						                // call LoLA
-						                if (callLoLA(extentedNet, extResult.goal)) {
+						                if (callLoLA(*extendedNet, extResult.goal)) {
 							                status(_cbad_("........active"));
 							                activeConflictTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
 							                isActive = true;
@@ -1002,18 +1012,19 @@ int main(int argc, char** argv) {
 							                status(_cgood_("........not active"));
 						                }
 						                break;
-						            case modus_arg_statistic:
-						                // ist hier was zu tun?    
-						                break;
 					            }
+					            if (args_info.finalize_flag) {delete extendedNet;}
 					            break;
 					            
 					        case task_arg_controllability:
-					            extResult = addConflictPattern(extentedNet, *s, *h, *l, downgradeTransitions, newArcs, false);
-					            controllerNet.getFinalCondition().addProposition(*extResult.goal == 0, true);
+					            s = extendedNet->findPlace((**p).getName());
+					            h = extendedNet->findTransition((*itHigh).second->getName());
+					            l = extendedNet->findTransition((*itLow).second->getName());
+					            extResult = addConflictPattern(*extendedNet, *s, *h, *l, downgradeTransitions, newArcs, false);
+					            extendedNet->getFinalCondition().addProposition(*extResult.goal == 0, true);
 					            // ToDo: mit oben abgleichen
-                                pnapi::Place * lController = controllerNet.findPlace(std::string(l->getName() + LOW));
-                                pnapi::Place * hController = controllerNet.findPlace(std::string(h->getName() + HIGH));
+                                pnapi::Place * lController = extendedNet->findPlace(std::string(l->getName() + LOW));
+                                pnapi::Place * hController = extendedNet->findPlace(std::string(h->getName() + HIGH));
                                 newArcs.insert(std::make_pair(hController, extResult.hC));
                                 newArcs.insert(std::make_pair(extResult.hC, hController));
                                 newArcs.insert(std::make_pair(lController, extResult.lC));
@@ -1026,12 +1037,28 @@ int main(int argc, char** argv) {
 
 			    } // h's
 			
-			    if (isActive) {
-			        status(_cbad_("......active"));
-			        activeConflict.insert(*p);
-			    }
-			    else {
-			        status(_cgood_("......not active"));
+			    // activation of place is now decided
+			    switch (args_info.task_arg) {
+			        case task_arg_verfification:
+			            if (isActive) {
+			                status(_cbad_("......active"));
+			                activeConflict.insert(*p);
+			            }
+			            else {
+			                status(_cgood_("......not active"));
+			            }
+			            break;
+			        case task_arg_characterization:
+			            if (isActive) {
+			                status(_cbad_("......active"));
+			                activeCausal.insert(*p);
+			            }
+			            else {
+			                status(_cgood_("......not active"));
+			            }
+			            break;
+			        case task_arg_controllability:
+			            break;
 			    }
 
 		    } // s's
@@ -1046,28 +1073,25 @@ int main(int argc, char** argv) {
 	        case task_arg_controllability:
 	            // add collected arcs
                 FOREACH(a, newArcs) {
-		            controllerNet.createArc(*a->first, *a->second);
+		            extendedNet->createArc(*a->first, *a->second);
 	            }
 	            switch (args_info.modus_arg) {
                     case modus_arg_makefile:
-                        createWendyTask(controllerNet, fileName + ".controler" + ".owfn", allNets);
+                        createWendyTask(*extendedNet, fileName + ".controler" + ".owfn", allNets);
                         // ToDo: create makefile
 	                    break;
 
 	                case modus_arg_call:
 		                // call Wendy
-		                // ToDo: Punkte zählen...;-)
-                        if (callWendy(controllerNet)) {
-	                        status(_cgood_("........controllable"));
+                        if (callWendy(*extendedNet)) {
+	                        status(_cgood_("Controllable"));
                         }
                         else {
-	                        status(_cbad_("........uncontrollable"));
+	                        status(_cbad_("Uncontrollable"));
                         }
-		                break;
-		            case modus_arg_statistic:
-		                // ist hier was zu tun?    
-		                break;
+                        break;
 	            }
+	            if (args_info.finalize_flag) {delete extendedNet;}
 	            break;
 	    }
 

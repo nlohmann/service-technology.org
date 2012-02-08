@@ -23,6 +23,8 @@
 
 #include <iostream>
 #include <string>
+#include <deque>
+#include <algorithm>
 
 
 /*!
@@ -49,6 +51,9 @@ class Output {
 
         /// whether tempfiles should be deleted upon termination
         static bool keepTempfiles;
+  
+        /// list of all temp files, for cleanup
+        static std::deque<Output*> listOfTempFiles;
 
     public: /* static functions */
         /// set the tempfile template
@@ -57,13 +62,17 @@ class Output {
         /// set the whether tempfiles should be deleted upon termination
         static void setKeepTempfiles(bool);
 
+        //TODO
+        /// deletes & closes all temp files
+        //static void cleanup();
+
     private: /* member functions */
         /// helper function to create temp files
-        char* createTmp();
+        char* createTmp(const std::string& postfix="");
 
     public: /* member functions */
         /// constructor (creates temp file)
-        Output();
+        Output(const std::string& postfix="");
 
         /// constructor (opens named stream or directs to std::cout)
         Output(const std::string&, const std::string&);

@@ -15,6 +15,12 @@ class Parser {
             : yy_parse(_yy_parse), file(_file) { };
 
        int parse(const char* filename);
+
+       /// Parser object for Lola output
+       static Parser lola;
+
+       /// Parser object for costfunction
+       static Parser costfunction;
     private:
        /// The file pointer from yacc/bison file
        FILE** file;

@@ -76,9 +76,9 @@ int main(int argc, char** argv) {
 
     // set the function to call on normal termination
     atexit(terminationHandler);
-    /*----------------------.
+    /*----------------------------.
     | 1. parse the open Tara::net |
-    `----------------------*/
+    `----------------------------*/
 
     // Parsing the open Tara::net, using the PNAPI
 	status("Processing %s", Tara::args_info.net_arg);
@@ -162,13 +162,13 @@ int main(int argc, char** argv) {
     message("Step 3: Parse the cost function from '%s' and apply it to the built statespace", Tara::args_info.costfunction_arg);    
 
     status("parsing costfunction");
-    Tara::costfunctionParser.parse(Tara::args_info.costfunction_arg);
+    Parser::costfunction.parse(Tara::args_info.costfunction_arg);
 
     /*-------------------------.
     | 5. Parse the inner Graph |
     \-------------------------*/
-
-    Tara::lolaParser.parse(lolaFN.c_str()); 
+    status("parsing inner graph");
+    Parser::lola.parse(lolaFN.c_str()); 
 
     /*------------------------------------------.
     | 5. Compute MaxCosts from the parsed graph | 

@@ -49,9 +49,6 @@ public:
     /// evaluate the command line parameters
     static void evaluateParameters(int argc, char** argv);
 
-    static Parser costfunctionParser;
-    static Parser lolaParser;
-
 };
 
 #endif

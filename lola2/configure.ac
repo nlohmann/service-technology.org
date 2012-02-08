@@ -27,7 +27,8 @@ AC_PROG_YACC
 AX_PTHREAD()
 LIBS="$PTHREAD_LIBS $LIBS"
 CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
-CC="$PTHREAD_CC"
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+# CC="$PTHREAD_CC"
 
 # search for optional tools needed by "make check"
 AC_PATH_PROG(VALGRIND,    [valgrind], not found)

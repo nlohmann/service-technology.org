@@ -11,6 +11,7 @@
 
 #include <config.h>
 #include <sys/types.h>
+#include "Dimensions.h"
 
 #ifdef WIN32
 #include <winsock.h>
@@ -25,29 +26,19 @@ typedef uint32_t socklen_t;
 
 /*!
 \brief class encapsulating Berkely Sockets (using UDP datagrams)
-
-\author Niels
-\status new
 \ingroup g_reporting
 */
 class Socket
 {
     private:
-        /// the length of the address struct
-        static socklen_t addressLength;
-
-    private:
         /// the socket
-        int sock;
+        const int sock;
 
         /// the address
         sockaddr_in address;
 
         /// whether we are listening (server) or sending (client)
-        bool listening;
-
-        /// a buffer for incoming messages
-        char* buffer;
+        const unsigned listening : 1;
 
     public:
         /// create a socket - port is mandatory, destination address optional
@@ -57,10 +48,10 @@ class Socket
         ~Socket();
 
         /// receive incoming messages (does not return)
-        __attribute__((noreturn)) void receive();
+        __attribute__((noreturn)) void receive() const;
 
         /// wait for a specific message
-        bool waitFor(const char* message);
+        char* waitFor(const char* message) const;
 
         /// send a message
         void send(const char* message) const;

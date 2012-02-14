@@ -23,9 +23,12 @@ int main(int argc, char** argv)
         return EXIT_SUCCESS;
     }
 
-    rep->message("sending KILL packet to port 5556");
-    Socket s(5556, "127.0.0.1");
-    s.send("foo");
+    const int port = 5556;
+    const char* hostname = "localhost";
+    const char* secret = "goodbye";
+    rep->message("sending %s packet (%s) to %s", rep->markup(MARKUP_BAD, "KILL").str(), rep->markup(MARKUP_IMPORTANT, secret).str(), rep->markup(MARKUP_FILE, "%s:%d", hostname, port).str());
+    Socket s(port, hostname);
+    s.send(secret);
 
     return EXIT_SUCCESS;
 }

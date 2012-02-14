@@ -71,10 +71,12 @@ The exit codes of LoLA:
     verification result can be supported by a counterexample or witness
     path, that case corresponds to return value 0;
 2   any kind of error (syntax error, wrong command line, ...) occurred
+3   premature termination (ctrl+C, kill, remote termination, ...)
 */
 typedef enum
 {
-    EXIT_EARLY = 0, ///< counterexample found
-    EXIT_FULL  = 1, ///< no counterexample found
-    EXIT_ERROR = 2  ///< error
+    EXIT_EARLY       = 0, ///< counterexample found
+    EXIT_FULL        = 1, ///< no counterexample found
+    EXIT_ERROR       = 2, ///< error
+    EXIT_TERMINATION = 3  ///< premature termination
 } exit_t;

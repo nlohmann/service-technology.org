@@ -63,16 +63,26 @@ AC_CHECK_SIZEOF(hash_t,, [#define _CONFIGURING
 #include "$srcdir/src/Dimensions.h"])
 AC_CHECK_SIZEOF(fairnessAssumption_t,, [#define _CONFIGURING
 #include "$srcdir/src/FairnessAssumptions.h"])
+AC_CHECK_SIZEOF(sockaddr_in,, [#include <sys/types.h>
+#ifdef WIN32
+#include <winsock.h>
+#include <windows.h>
+#include <stdint.h>
+typedef uint32_t socklen_t;
+#else
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#endif])
 
 AC_CHECK_SIZEOF(bool)
 AC_LANG_POP(C++)
 
 # Checks for header files.
 AC_FUNC_ALLOCA
-AC_CHECK_HEADERS([arpa/inet.h inttypes.h libintl.h malloc.h netinet/in.h stddef.h stdlib.h string.h sys/socket.h unistd.h limits.h])
+AC_CHECK_HEADERS([arpa/inet.h inttypes.h libintl.h malloc.h netinet/in.h stddef.h stdlib.h string.h sys/socket.h unistd.h limits.h netdb.h])
 
 # Checks for library functions.
-AC_CHECK_FUNCS([asprintf vasprintf snprintf vsnprintf atexit memset socket strchr strerror strdup strtol strsignal signal])
+AC_CHECK_FUNCS([asprintf vasprintf snprintf vsnprintf atexit memset socket strchr strerror strdup strtol strsignal signal gethostbyname inet_ntoa kill])
 
 # Collect required libraries if libraries are not present.
 AC_CHECK_FUNC(gethostent, , AC_CHECK_LIB(nsl, gethostent))

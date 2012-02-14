@@ -6,6 +6,7 @@ lola_SOURCES = \
                 ArcList.cc ArcList.h \
                 Dimensions.h \
                 FairnessAssumptions.h \
+                Handlers.cc Handlers.h \
                 Marking.cc Marking.h \
                 Net.cc Net.h \
                 ParserPTNet.h ParserPTNet.cc \

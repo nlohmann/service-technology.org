@@ -12,20 +12,23 @@ typedef enum
 {
     ERROR_SYNTAX,       ///< syntax error
     ERROR_COMMANDLINE,  ///< wrong commandline parameter
-    ERROR_FILE          ///< file input/output error
+    ERROR_FILE,         ///< file input/output error
+    ERROR_NETWORK,      ///< network error
+    ERROR_THREADING     ///< thread-related error
 } errorcode_t;
 
 /// markup types for Reporter::markup() function
 typedef enum
 {
-    MARKUP_TOOL,      ///< markup the name of a tool
-    MARKUP_FILE,      ///< markup the name of a file
-    MARKUP_OUTPUT,    ///< markup the type of a file
-    MARKUP_GOOD,      ///< markup some good output
-    MARKUP_BAD,       ///< markup some bad output
-    MARKUP_WARNING,   ///< markup a warning
-    MARKUP_IMPORTANT, ///< markup an important message
-    MARKUP_PARAMETER  ///< markup a command-line parameter
+    MARKUP_TOOL,        ///< markup the name of a tool
+    MARKUP_FILE,        ///< markup the name of a file
+    MARKUP_OUTPUT,      ///< markup the type of a file
+    MARKUP_GOOD,        ///< markup some good output
+    MARKUP_BAD,         ///< markup some bad output
+    MARKUP_WARNING,     ///< markup a warning
+    MARKUP_IMPORTANT,   ///< markup an important message
+    MARKUP_PARAMETER,   ///< markup a command-line parameter
+    MARKUP_UNIMPORTANT  ///< markup an unimportant message
 } markup_t;
 
 
@@ -72,33 +75,46 @@ class Reporter
         __attribute__((noreturn)) virtual void abort(errorcode_t) const = 0;
 };
 
+/*!
+\brief Realization of Reporter class to write to Berkeley sockets
+*/
 class ReporterSocket : public Reporter
 {
     private:
         /// whether verbose reports are desired
-        bool verbose;
+        const unsigned verbose : 1;
 
         /// socket for this reporter
         Socket mySocket;
 
     public:
-        ReporterSocket(u_short port, const char* ip, bool = true);
+        ReporterSocket(u_short port, const char*, bool = true);
         ~ReporterSocket();
 
+        /// always report
         void message(const char*, ...) const;
+
+        /// only report in verbose mode
         void status(const char*, ...) const;
+
+        /// display error message and abort program
         __attribute__((noreturn)) void abort(errorcode_t) const;
+
+        /// markup a string
         Reporter::String markup(markup_t, const char*, ...) const;
 };
 
+/*!
+\brief Realization of Reporter class to write to standard error
+*/
 class ReporterStream : public Reporter
 {
     private:
         /// whether verbose reports are desired
-        bool verbose;
+        const unsigned verbose : 1;
 
         /// whether to use colored output
-        const bool useColor;
+        const unsigned useColor : 1;
 
         /// set foreground color to red
         const char* _cr_;
@@ -155,8 +171,15 @@ class ReporterStream : public Reporter
     public:
         ReporterStream(bool = true);
 
+        /// always report
         void message(const char*, ...) const;
+
+        /// only report in verbose mode
         void status(const char*, ...) const;
+
+        /// display error message and abort program
         __attribute__((noreturn)) void abort(errorcode_t) const;
+
+        /// markup a string
         Reporter::String markup(markup_t, const char*, ...) const;
 };

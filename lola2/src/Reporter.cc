@@ -18,7 +18,9 @@ const char* Reporter::error_messages[] =
 {
     "syntax error",
     "command line error",
-    "file input/output error"
+    "file input/output error",
+    "network error",
+    "thread error"
 };
 
 
@@ -35,8 +37,8 @@ Reporter::String::String(char* s) : s(s)
 }
 
 /*!
-\pre memory for s was allocated outside this object using malloc
-\post memory for s is released
+\pre memory for member s was allocated outside this object using malloc
+\post memory for member s is released
 */
 Reporter::String::~String()
 {
@@ -50,11 +52,19 @@ char* Reporter::String::str() const
 
 /*---------------------------------------------------------------------------*/
 
+/*!
+\param port     the port to use
+\param[in] ip   the target IP address
+\param verbose  whether to display verbose messages
+*/
 ReporterSocket::ReporterSocket(u_short port, const char* ip, bool verbose)
     : verbose(verbose), mySocket(Socket(port, ip))
 {
 }
 
+/*!
+\param[in] format  the status message formatted as printf string
+*/
 void ReporterSocket::message(const char* format, ...) const
 {
     char buffer[UDP_BUFFER_SIZE];
@@ -65,6 +75,10 @@ void ReporterSocket::message(const char* format, ...) const
     va_end(args);
 }
 
+/*!
+\param[in] format  the status message formatted as printf string
+\post The message is not printed unless the #verbose member is true.
+*/
 void ReporterSocket::status(const char* format, ...) const
 {
     if (not verbose)
@@ -80,10 +94,14 @@ void ReporterSocket::status(const char* format, ...) const
     va_end(args);
 }
 
+/*!
+\param code    the error code
+\param format  the error message formatted as printf string
+\todo Handle premature termination with signals.
+*/
 __attribute__((noreturn)) void ReporterSocket::abort(errorcode_t code) const
 {
     char buffer[UDP_BUFFER_SIZE];
-
     sprintf(buffer, "%s: %s -- aborting [#%02d]", PACKAGE, error_messages[code], code);
     mySocket.send(buffer);
 
@@ -102,18 +120,29 @@ ReporterSocket::~ReporterSocket()
     status("done");
 }
 
+/*!
+\param markup  how to markup the string (ignored here)
+\param[in] format  the string to format
+\post Passed string format is formatted according to markup.
+\note Memory for res is released by Reporter::~String().
+*/
 Reporter::String ReporterSocket::markup(markup_t, const char* format, ...) const
 {
     va_list args;
     va_start(args, format);
-    char* message = NULL;
-    vasprintf(&message, format, args);
+    char* res = NULL;
+    vasprintf(&res, format, args);
     va_end(args);
-    return Reporter::String(message);
+    return Reporter::String(res);
 }
 
 /*---------------------------------------------------------------------------*/
 
+/*!
+\param verbose  whether to display verbose messages
+\post All member variables for colors are initialited according to the value
+      of #useColor.
+*/
 ReporterStream::ReporterStream(bool verbose) :
     verbose(verbose),
 #if !defined(__MINGW32__)
@@ -155,7 +184,7 @@ ReporterStream::ReporterStream(bool verbose) :
 
 
 /*!
- \param format  the status message formatted as printf string
+\param[in] format  the status message formatted as printf string
 */
 void ReporterStream::message(const char* format, ...) const
 {
@@ -171,7 +200,8 @@ void ReporterStream::message(const char* format, ...) const
 
 
 /*!
- \param format  the status message formatted as printf string
+\param[in] format  the status message formatted as printf string
+\post The message is not printed unless the #verbose member is true.
 */
 void ReporterStream::status(const char* format, ...) const
 {
@@ -192,11 +222,10 @@ void ReporterStream::status(const char* format, ...) const
 
 
 /*!
- \param code    the error code
- \param format  the error message formatted as printf string
+\param code    the error code
+\todo Handle premature termination with signals.
 */
-__attribute__((noreturn))
-void ReporterStream::abort(errorcode_t code) const
+__attribute__((noreturn)) void ReporterStream::abort(errorcode_t code) const
 {
     fprintf(stderr, "%s: %s%s%s%s -- aborting [#%02d]%s\n",
             markup(MARKUP_TOOL, PACKAGE).str(), _cR_, error_messages[code], _c_, _bold_, code, _c_);
@@ -211,6 +240,12 @@ void ReporterStream::abort(errorcode_t code) const
     exit(EXIT_ERROR);
 }
 
+/*!
+\param markup  how to markup the string
+\param[in] format  the string to format
+\post Passed string format is formatted according to markup.
+\note Memory for res is released by ~Reporter::String().
+*/
 Reporter::String ReporterStream::markup(markup_t markup, const char* format, ...) const
 {
     va_list args;
@@ -220,42 +255,48 @@ Reporter::String ReporterStream::markup(markup_t markup, const char* format, ...
     va_end(args);
 
     char* res = NULL;
+    int bytes = -1;
 
     switch (markup)
     {
         case (MARKUP_TOOL):
-            asprintf(&res, "%s%s%s", _cm_, message, _c_);
+            bytes = asprintf(&res, "%s%s%s", _cm_, message, _c_);
             break;
 
         case (MARKUP_FILE):
-            asprintf(&res, "%s%s%s", _cb__, message, _c_);
+            bytes = asprintf(&res, "%s%s%s", _cb__, message, _c_);
             break;
 
         case (MARKUP_OUTPUT):
-            asprintf(&res, "%s%s%s", _cB_, message, _c_);
+            bytes = asprintf(&res, "%s%s%s", _cB_, message, _c_);
             break;
 
         case (MARKUP_GOOD):
-            asprintf(&res, "%s%s%s", _cG_, message, _c_);
+            bytes = asprintf(&res, "%s%s%s", _cG_, message, _c_);
             break;
 
         case (MARKUP_BAD):
-            asprintf(&res, "%s%s%s", _cR_, message, _c_);
+            bytes = asprintf(&res, "%s%s%s", _cR_, message, _c_);
             break;
 
         case (MARKUP_WARNING):
-            asprintf(&res, "%s%s%s", _cY_, message, _c_);
+            bytes = asprintf(&res, "%s%s%s", _cY_, message, _c_);
             break;
 
         case (MARKUP_IMPORTANT):
-            asprintf(&res, "%s%s%s", _bold_, message, _c_);
+            bytes = asprintf(&res, "%s%s%s", _bold_, message, _c_);
             break;
 
         case (MARKUP_PARAMETER):
-            asprintf(&res, "%s%s%s", _cC_, message, _c_);
+            bytes = asprintf(&res, "%s%s%s", _cC_, message, _c_);
+            break;
+
+        case (MARKUP_UNIMPORTANT):
+            bytes = asprintf(&res, "%s%s%s", _cl_, message, _c_);
             break;
     }
 
+    assert(bytes != -1);
     assert(res);
     free(message);
 

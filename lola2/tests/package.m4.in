@@ -70,7 +70,7 @@ m4_define([SED],                  [@SED@])
 # the main executable, called through a shell script for code coverage
 m4_define([LOLA],       [cover.sh @abs_top_builddir@/src/lola])
 m4_define([LISTENER],   [cover.sh @abs_top_builddir@/src/listener])
-m4_define([TERMINATOR], [cover.sh @abs_top_builddir@/src/killer])
+m4_define([KILLER],     [cover.sh @abs_top_builddir@/src/killer])
 
 # the main executable, directly called to allow for analysis
 m4_define([LOLA_RAW],  [@abs_top_builddir@/src/lola])

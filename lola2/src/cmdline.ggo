@@ -9,31 +9,43 @@ option "verbose" v
 
 option "reporter" -
   "Reporter"
+  details="Chooses a reporter to send reports to.\n"
   values="stream","socket" enum
   typestr="REPORTER"
   default="stream"
   optional
 
-option "port" -
-  "Port number for outgoing messages"
+option "outputport" -
+  "Output port number"
+  details="This option specifies a port number for outgoing messages. This port is used to communicate with a listener process which displays LoLA's reports.\n"
   int
   typestr="PORT"
   default="5555"
   optional
 
-option "address" -
-  "Address of listener"
-  string
-  typestr="IP"
-  default="127.0.0.1"
+option "inputport" -
+  "Input port number"
+  details="This option specifies a port number for incoming messages. This port is used to remotely terminate LoLA in case the option --remoteTermination is used.\n"
+  int
+  typestr="PORT"
+  default="5556"
   optional
 
-option "killerThread" -
-  "Whether to start a killer thread to remotely terminate LoLA"
-   int
-   typestr="PORT"
+option "address" -
+  "Hostname or IP for reports"
+  details="The hostname or IP address of a listener process to which LoLA will send reports to.\n"
+  string
+  typestr="HOSTNAME"
+  default="localhost"
+  optional
+
+option "remoteTermination" -
+  "Allow remote termination"
+  details="This option installs a termination handler that allows to remotely terminate LoLA by sending a specified SECRET to the input port.\n"
+   string
+   typestr="SECRET"
    optional
-   default="5556"
+   default="goodbye"
    argoptional
 
 section "Debugging"

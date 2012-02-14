@@ -34,10 +34,11 @@ int main(int argc, char** argv)
         return EXIT_SUCCESS;
     }
 
+    const int port = 5555;
     signal(SIGTERM, signal_callback_handler);
 
-    rep->message("listening on port 5555");
-    Socket s(5555);
+    Socket s(port);
+    rep->message("listening on port %s", rep->markup(MARKUP_FILE, "%d", port).str());
     s.receive();
 
     return EXIT_SUCCESS;

@@ -10,7 +10,10 @@ Mainly copied from LoLA1
 \todo Präfix hinzufügen?
 */
 
-%option yylineno
+/* we want line numbering */
+%option yylineno  
+/* we don't neet yyunput() */
+%option nounput
 
 %{
 #include "cmdline.h"
@@ -143,7 +146,7 @@ inline void setcol() {
 }
 
 int yywrap() {
-    if (currentFile == -1 or currentFile == args_info.inputs_num-1)
+    if (currentFile == -1 or currentFile == (int)args_info.inputs_num-1)
     {
         // done parsing
         return 1;
@@ -152,7 +155,7 @@ int yywrap() {
     {
         currentFile++;
         yyin = fopen(args_info.inputs[currentFile], "r");
-        if (!yyin)
+        if (UNLIKELY(!yyin))
         {
             rep->status("could not open file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
             rep->abort(ERROR_FILE);

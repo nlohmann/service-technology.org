@@ -7,11 +7,18 @@
 \brief Socket class implementation
 */
 
-#include <errno.h>
+#include <config.h>
 #include <unistd.h>
-#ifndef WIN32
+
+#ifdef WIN32
+#include <winsock.h>
+#include <windows.h>
+#else
 #include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 #endif
+
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -19,114 +26,115 @@
 #include <pthread.h>
 
 #include "Socket.h"
-#include "Dimensions.h"
-
-socklen_t Socket::addressLength = sizeof(sockaddr_in);
+#include "Reporter.h"
 
 
 /*!
 \param[in] port  The port to be used. Note that port numbers <1000 need root
            access.
 \param[in] destination  If the socket should be used to send messages (client)
-           then this parameter should hold an IPv4 address in the standard
-           format "xxx.xxx.xxx.xxx". It defaults to NULL (server).
+           then this parameter should hold an a hostname or an IPv4 address in
+           the standard format "xxx.xxx.xxx.xxx". It defaults to NULL (server).
 
 \post The member #listening is set according to whether we are sending
       (client) or receiving messages (server).
 \post The socket #sock is created. If we are receiving (server), the it is
       also bound.
 */
-Socket::Socket(u_short port, const char* destination)
-    :
+Socket::Socket(u_short port, const char* hostname) :
     sock(socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)),
-    listening((destination == NULL)),
-    buffer(NULL)
+    listening((hostname == NULL))
 {
-    if (UNLIKELY(-1 == sock))    /* if socket failed to initialize, exit */
+    if (UNLIKELY(sock == -1))
     {
-        fprintf(stderr, "%s: error creating socket\n", PACKAGE);
-        if (errno != 0)
-        {
-            fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
-        }
-        exit(EXIT_ERROR);
+        ReporterStream rep(true);
+        rep.message("could not initialize socket at port %s", rep.markup(MARKUP_FILE, "%d", port).str());
+        rep.abort(ERROR_NETWORK);
     }
 
     // specify the address
-    addressLength = sizeof(address);
-    memset(&address, 0, addressLength);
+    memset(&address, 0, SIZEOF_SOCKADDR_IN);
     address.sin_family = AF_INET;
     address.sin_port = htons(port);
-    address.sin_addr.s_addr = listening ? INADDR_ANY : inet_addr(destination);
 
     if (listening)
     {
+        address.sin_addr.s_addr = INADDR_ANY;
+
         // bind the socket sock to the address specified in address
-        if (UNLIKELY(-1 == bind(sock, (struct sockaddr*)&address, addressLength)))
+        if (UNLIKELY(bind(sock, (struct sockaddr*)&address, SIZEOF_SOCKADDR_IN) == -1))
         {
             close(sock);
-
-            fprintf(stderr, "%s: bind failed\n", PACKAGE);
-            if (errno != 0)
-            {
-                fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
-            }
-            exit(EXIT_ERROR);
+            ReporterStream rep(true);
+            rep.message("could not bind socket at port %s", rep.markup(MARKUP_FILE, "%d", port).str());
+            rep.abort(ERROR_NETWORK);
         }
+    }
+    else
+    {
+        // resolve the hostname
+        const hostent* record = gethostbyname(hostname);
+        if (UNLIKELY(record == NULL))
+        {
+            ReporterStream rep(true);
+            rep.message("host %s is not available", rep.markup(MARKUP_FILE, "%s", hostname).str());
+            rep.abort(ERROR_NETWORK);
+        }
+
+        const in_addr* resolved_address = (in_addr*)record->h_addr;
+        address.sin_addr.s_addr = inet_addr(inet_ntoa(* resolved_address));
     }
 }
 
 /*!
 \post The socket #sock is closed.
-\post Memory allocated for the #buffer is released.
 */
 Socket::~Socket()
 {
-    delete[] buffer;
     close(sock);
 }
 
 
 /*!
 \post No postcondition: this function never terminates.
-
-\todo We might want a function that receives a single message instead and care
-      about the infinite loop somewhere else.
+\todo The reporter could be a parameter.
 */
-__attribute__((noreturn)) void Socket::receive()
+__attribute__((noreturn)) void Socket::receive() const
 {
     assert(listening);
 
-    // initialize buffer
-    if (buffer == NULL)
-    {
-        buffer = new char[UDP_BUFFER_SIZE];
-    }
+    // the length of the address struct
+    static socklen_t addressLength = SIZEOF_SOCKADDR_IN;
 
-    ssize_t recsize;
+    /// a reporter for the received message
+    ReporterStream rep(true);
 
-    for (;;)
+    // a buffer for incoming messages
+    char buffer[UDP_BUFFER_SIZE];
+
+    while (true)
     {
-        // receive data from the socket sock, stores it into buffer with length UDP_BUFFER_SIZE,
-        // sets no flags, receives from address specified in sa with length fromlen
-        recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
+        // receive data from the socket sock, stores it into buffer with
+        // length UDP_BUFFER_SIZE, sets no flags, receives from address
+        // specified in sa with length fromlen
+        const ssize_t recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
 
         if (UNLIKELY(recsize < 0))
         {
-            fprintf(stderr, "%s: receive failed\n", PACKAGE);
-            if (errno == 0)
-            {
-                fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
-            }
-            exit(EXIT_ERROR);
+            rep.message("could not receive message");
+            rep.abort(ERROR_NETWORK);
         }
 
+        // get sender IP
+        char display[INET_ADDRSTRLEN] = {0};
+        inet_ntop(AF_INET, &address.sin_addr.s_addr, display, INET_ADDRSTRLEN);
+
+        // get time
         time_t now;
         time(&now);
         struct tm* current = localtime(&now);
 
-        printf("%s: %02i:%02i:%02i: %.*s\n", PACKAGE, current->tm_hour, current->tm_min,
-               current->tm_sec, static_cast<int>(recsize), buffer);
+        rep.message("%s: %.*s", rep.markup(MARKUP_UNIMPORTANT, "%s @ %02i:%02i:%02i", display, current->tm_hour, current->tm_min, current->tm_sec).str(), static_cast<int>(recsize), buffer);
     }
 }
 
@@ -140,55 +148,59 @@ __attribute__((noreturn)) void Socket::receive()
 */
 void Socket::send(const char* message) const
 {
-    ssize_t bytes_sent = sendto(sock, message, strlen(message), 0, (const struct sockaddr*)&address, addressLength);
+    const ssize_t bytes_sent = sendto(sock, message, strlen(message), 0, (const struct sockaddr*)&address, SIZEOF_SOCKADDR_IN);
 
     if (UNLIKELY(bytes_sent < 0))
     {
-        fprintf(stderr, "%s: error sending packet: %s\n", PACKAGE, strerror(errno));
-        if (errno != 0)
-        {
-            fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
-        }
-        exit(EXIT_ERROR);
+        ReporterStream rep(true);
+        rep.message("could not send message '%s'", message);
+        rep.abort(ERROR_NETWORK);
     }
 }
 
-bool Socket::waitFor(const char* message)
+/*!
+\note This function is best called inside a thread.
+\param[in] message  the target message to wait for
+\return return the sender IP if a message is received that matches the target
+        #message
+\post Memory for return value needs to be freed by caller.
+*/
+char* Socket::waitFor(const char* message) const
 {
     assert(listening);
 
-    for (;;)
+    // the length of the address struct
+    static socklen_t addressLength = SIZEOF_SOCKADDR_IN;
+
+    // a buffer for incoming messages
+    char buffer[UDP_BUFFER_SIZE];
+
+    while (true)
     {
-        // initialize buffer
-        if (buffer == NULL)
-        {
-            buffer = new char[UDP_BUFFER_SIZE];
-        }
-
-        ssize_t recsize;
-
-        // receive data from the socket sock, stores it into buffer with length UDP_BUFFER_SIZE,
-        // sets no flags, receives from address specified in sa with length fromlen
-        recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
+        // receive data from the socket sock, stores it into buffer with
+        // length UDP_BUFFER_SIZE, sets no flags, receives from address
+        // specified in sa with length fromlen
+        const ssize_t recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
 
         if (UNLIKELY(recsize < 0))
         {
-            fprintf(stderr, "%s: receive failed\n", PACKAGE);
-            if (errno != 0)
-            {
-                fprintf(stderr, "%s: last error message: %s\n", PACKAGE, strerror(errno));
-            }
-            exit(EXIT_ERROR);
+            ReporterStream rep(true);
+            rep.message("could not receive message");
+            rep.abort(ERROR_NETWORK);
         }
 
         char* received = NULL;
-        asprintf(&received, "%.*s", static_cast<int>(recsize), buffer);
-
+        const int bytes = asprintf(&received, "%.*s", static_cast<int>(recsize), buffer);
+        assert(bytes != -1);
         assert(received);
 
+        // the received message matches the target message
         if (!strcmp(received, message))
         {
-            return true;
+            // get sender IP
+            char* senderaddress = (char*)malloc(INET_ADDRSTRLEN * SIZEOF_CHAR);
+            inet_ntop(AF_INET, &address.sin_addr.s_addr, senderaddress, INET_ADDRSTRLEN);
+            return senderaddress;
         }
     }
 }

@@ -15,12 +15,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstdlib>
-#include <pthread.h>
 
 #include "Reporter.h"
 #include "cmdline.h"
 #include "ParserPTNet.h"
 
+#include "Handlers.h"
 #include "RandomWalk.h"
 #include "Net.h"
 #include "Place.h"
@@ -39,8 +39,6 @@ extern FILE* yyin;
 /// the reporter
 Reporter* rep = NULL;
 
-/// the thread that listens for stop messages
-pthread_t listener_thread;
 
 /*!
 \brief variable to manage multiple files
@@ -56,37 +54,6 @@ extern int yyparse();
 extern int yylex_destroy();
 
 
-/// a function collecting calls to organize termination (close files, ...)
-void terminationHandler()
-{
-    cmdline_parser_free(&args_info);
-
-    // shut down killer thread
-    if (args_info.killerThread_given)
-    {
-        const int ret = pthread_cancel(listener_thread);
-        if (ret == 0)
-        {
-            rep->status("killed listener thread");
-        }
-    }
-
-    // should be the very last call
-    delete rep;
-}
-
-
-/// helper function to terminate LoLA via sockets
-__attribute__((noreturn)) void* start_listener_helper(void* ptr)
-{
-    Socket listener_socket(args_info.killerThread_arg);
-    listener_socket.waitFor("foo");
-    rep->message("received %s packet - shutting down",
-        rep->markup(MARKUP_BAD, "KILL").str());
-    exit(EXIT_SUCCESS);
-}
-
-
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv)
 {
@@ -96,8 +63,9 @@ void evaluateParameters(int argc, char** argv)
     // call the cmdline parser
     if (UNLIKELY(cmdline_parser(argc, argv, &args_info) != 0))
     {
-        fprintf(stderr, "%s: invalid command-line parameter(s)\n", PACKAGE);
-        exit(EXIT_ERROR);
+        ReporterStream rep(true);
+        rep.message("invalid command-line parameter(s)");
+        rep.abort(ERROR_COMMANDLINE);
     }
 
     switch (args_info.reporter_arg)
@@ -107,7 +75,7 @@ void evaluateParameters(int argc, char** argv)
             break;
 
         case reporter_arg_socket:
-            rep = new ReporterSocket((u_short)args_info.port_arg, args_info.address_arg, args_info.verbose_given);
+            rep = new ReporterSocket((u_short)args_info.outputport_arg, args_info.address_arg, args_info.verbose_given);
             rep->message("pid = %d", getpid());
             break;
     }
@@ -118,21 +86,14 @@ void evaluateParameters(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
-    // set the function to call on normal termination
-    atexit(terminationHandler);
+    // install exit handler for ordered exit()
+    Handlers::installExitHandler();
 
     // parse the command line parameters
     evaluateParameters(argc, argv);
 
-    // start up listener thread
-    if (args_info.killerThread_given)
-    {
-        rep->status("setting up listener socket at port %s",
-            rep->markup(MARKUP_FILE, "%d", args_info.killerThread_arg).str());
-
-        // start the listening thread
-        int ret = pthread_create(&listener_thread, NULL, start_listener_helper, NULL);
-    }
+    // install termination handler for ordered premature termination
+    Handlers::installTerminationHandlers();
 
     // handle input
     if (args_info.inputs_num == 0)
@@ -144,7 +105,7 @@ int main(int argc, char** argv)
     {
         currentFile = 0;
         yyin = fopen(args_info.inputs[currentFile], "r");
-        if (!yyin)
+        if (UNLIKELY(!yyin))
         {
             rep->status("could not open file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
             rep->abort(ERROR_FILE);

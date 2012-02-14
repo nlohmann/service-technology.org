@@ -8,12 +8,14 @@ AT_BANNER([Command-line parameters])
 AT_SETUP([Help output])
 AT_CHECK([LOLA --help],0,ignore)
 AT_CHECK([LISTENER --help],0,ignore)
+AT_CHECK([KILLER --help],0,ignore)
 AT_KEYWORDS(commandline)
 AT_CLEANUP
 
 AT_SETUP([Version output])
 AT_CHECK([LOLA --version],0,ignore)
 AT_CHECK([LISTENER --version],0,ignore)
+AT_CHECK([KILLER --version],0,ignore)
 AT_KEYWORDS(commandline)
 AT_CLEANUP
 
@@ -241,10 +243,10 @@ AT_CLEANUP
 
 AT_SETUP([ReporterSocket: sending/receiving])
 AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([LISTENER > listener.log &],0)
+AT_CHECK([LISTENER 2> listener.log &],0)
 AT_CHECK([LOLA garavel.lola --reporter=socket --verbose],0,ignore,ignore)
 AT_CHECK([killall listener],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: caught signal" stderr])
+AT_CHECK([GREP -q "lola: caught signal" listener.log])
 AT_CHECK([GREP -q "finished parsing" listener.log])
 AT_KEYWORDS(reporter)
 AT_CLEANUP

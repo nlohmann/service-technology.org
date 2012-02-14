@@ -32,10 +32,10 @@ $(TESTSUITE): $(srcdir)/testsuite.at package.m4
 cover-prepare:
 	$(LCOV) -v >/dev/null
 	$(MAKE) --directory=$(top_srcdir) clean all \
-	  CPPFLAGS+="-DNDEBUG" \
-	  CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
-	  CFLAGS+="-fprofile-arcs -ftest-coverage" \
-	  LDFLAGS+="-lgcov"
+	  AM_CPPFLAGS+="-DNDEBUG" \
+	  AM_CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
+	  AM_CFLAGS+="-fprofile-arcs -ftest-coverage" \
+	  AM_LDFLAGS+="-lgcov"
 
 # get descriptions from the testsuite
 descriptions: $(TESTSUITE)

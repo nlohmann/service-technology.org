@@ -8,7 +8,7 @@ anica_SOURCES = main.cc \
                 cmdline.c cmdline.h \
                 Output.cc Output.h \
 				Results.cc Results.h \
-				util.h
+				anica-util.h
 # <<-- CHANGE END -->>
 
 # the configuration files
@@ -16,13 +16,23 @@ sysconf_DATA = anica.conf
 
 # pass the sysconfdir to Anica (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 anica_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
+anica_LDADD = 
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
 anica_CPPFLAGS += -I$(top_srcdir)/libs
-anica_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
+anica_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
+anica_LDADD += $(builddir)/../libs/cudd/libobj.a \
+	$(builddir)/../libs/cudd/libdddmp.a \
+	$(builddir)/../libs/cudd/libcudd.a \
+	$(builddir)/../libs/cudd/libmtr.a \
+	$(builddir)/../libs/cudd/libst.a \
+	$(builddir)/../libs/cudd/libutil.a \
+	$(builddir)/../libs/cudd/libepd.a
+
+anica_CPPFLAGS += -I$(top_srcdir)/libs/cudd/include
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

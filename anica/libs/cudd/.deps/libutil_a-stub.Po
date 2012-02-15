@@ -1,0 +1,1 @@
+libutil_a-stub.o: util/stub.c

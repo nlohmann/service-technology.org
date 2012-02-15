@@ -1,7 +1,7 @@
 #include "config.h"
 #include "Results.h"
 #include "verbose.h"
-#include "util.h"
+#include "anica-util.h"
 
 Results::Results(std::string name) : filename(name), output(NULL), values() {}
 

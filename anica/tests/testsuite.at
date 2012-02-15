@@ -397,7 +397,7 @@ AT_CLEANUP
 AT_SETUP([Checking for memory leaks (PBNID)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/activeCausalDowngrade.ifn .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes ANICA_RAW activeCausalDowngrade.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --resultFile --finalize],0,ignore,stderr)
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes ANICA_RAW activeCausalDowngrade.ifn -v --stats --property=PBNID --dotConfidence=all --dotPotential=both --dotActive=both --resultFile --finalize],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
@@ -436,7 +436,7 @@ AT_CLEANUP
 AT_SETUP([Active causal downgrade (Lola)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/activeCausalDowngrade.ifn .])
-AT_CHECK([ANICA activeCausalDowngrade.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
+AT_CHECK([ANICA activeCausalDowngrade.ifn -v --stats --property=PBNID --dotConfidence=all --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
 AT_CHECK([test -f activeCausalDowngrade.ifn.makefile])
 AT_KEYWORDS(makefile)
 AT_CLEANUP
@@ -521,7 +521,7 @@ AT_CLEANUP
 AT_SETUP([Mutual downgrade (Lola)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/mutual-downgrade.ifn .])
-AT_CHECK([ANICA mutual-downgrade.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=call --resultFile],0,ignore,stderr)
+AT_CHECK([ANICA mutual-downgrade.ifn -v --stats --property=PBNID --dotConfidence=all --dotPotential=both --dotActive=both --modus=call --resultFile],0,ignore,stderr)
 AT_CHECK([GREP -q "potential_causal = 0;" mutual-downgrade.ifn.results])
 AT_CHECK([GREP -q "potential_conflict = 0;" mutual-downgrade.ifn.results])
 AT_CHECK([GREP -q "Non-Interference: PASSED" stderr])
@@ -531,7 +531,7 @@ AT_CLEANUP
 AT_SETUP([Active causal downgrade (Lola)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/activeCausalDowngrade.ifn .])
-AT_CHECK([ANICA activeCausalDowngrade.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=call --resultFile],0,ignore,stderr)
+AT_CHECK([ANICA activeCausalDowngrade.ifn -v --stats --property=PBNID --dotConfidence=all --dotPotential=both --dotActive=both --modus=call --resultFile],0,ignore,stderr)
 AT_CHECK([GREP -q "causal_triple(s, h, l) = false;" activeCausalDowngrade.ifn.results])
 AT_CHECK([GREP -q "Non-Interference: PASSED" stderr])
 AT_KEYWORDS(tests)

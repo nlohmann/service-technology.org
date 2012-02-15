@@ -14,6 +14,11 @@ AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 
+AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_RANLIB
+AM_PROG_CC_C_O
+
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_LOLA([1.16])
@@ -42,10 +47,18 @@ AC_PATH_PROG(VALGRIND,    [valgrind], not found)
 # AC_TYPE_SIZE_T
 # AC_CHECK_SIZEOF([void*])
 
+# Checks for libraries.
+# FIXME: Replace `main' with a function in `-lm':
+AC_CHECK_LIB([m], [main])
+
+# needed to compile CUDD on x86_64 machines
+AC_CHECK_SIZEOF([void*])
+CUDD_XFLAGS="-DSIZEOF_VOID_P=$ac_cv_sizeof_voidp"
+AC_SUBST(CUDD_XFLAGS)
 
 # write files
 AC_CONFIG_FILES([
-	Makefile libs/pnapi/Makefile src/Makefile src/anica.conf doc/Makefile
+	Makefile libs/cudd/Makefile libs/pnapi/Makefile src/Makefile src/anica.conf doc/Makefile
 	doc/Doxyfile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

@@ -60,7 +60,7 @@ sectiondesc="There are some optimization techniques availabe to (hopefully) spee
 
 option "heuristics" h
   "Uses the heuristics 'HEUR'." 
-  values="simple","maxout" enum  
+  values="simple","maxout","lp" enum  
   typestr="HEUR"
   optional
 

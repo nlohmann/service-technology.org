@@ -44,6 +44,10 @@ AC_PATH_PROG(WENDY,         [wendy], not found)
 # AC_TYPE_SIZE_T
 # AC_CHECK_SIZEOF([void*])
 
+# check if we can handle dynamic libs
+AC_DISABLE_SHARED
+AC_PROG_LIBTOOL
+
 
 # check for libconfig
 AC_LANG([C++])
@@ -51,7 +55,7 @@ AC_CHECK_LIB(config++, config_init)
 
 # write files
 AC_CONFIG_FILES([
-	Makefile libs/pnapi/Makefile src/Makefile src/tara.conf doc/Makefile
+	Makefile libs/pnapi/Makefile libs/lp_solve/Makefile src/Makefile src/tara.conf doc/Makefile
 	doc/Doxyfile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

@@ -100,7 +100,10 @@ state:
 	currentTaraState = getTaraState(currentState);
 	if (currentState == 0) Tara::initialState = currentTaraState;
 	Tara::graph[currentTaraState]->inStack = false;
-	Tara::graph[currentTaraState]->final = Tara::net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, Tara::net));	
+	Tara::graph[currentTaraState]->final = Tara::net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, Tara::net));
+    if (Tara::graph[currentTaraState]-> final) {
+        ++Tara::nrOfFinals;
+    }	
         currentMarking.clear();
 	
     }
@@ -179,6 +182,7 @@ transition:
            } else {
                innerTransition cur= { transition, targetTaraState, trCosts };
                Tara::graph[currentTaraState]->transitions.push_back(cur);
+               ++Tara::nrOfEdges;
            }        
 	           
            if (trCosts > Tara::graph[currentTaraState]->maxCosts) { 

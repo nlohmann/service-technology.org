@@ -2,10 +2,12 @@
 #define TARA_H
 
 #include <deque>
-#include <pnapi/pnapi.h>
 #include <string>
 #include <iostream>
 #include <fstream>
+
+#include <pnapi/pnapi.h>
+#include <lp_solve/lp_lib.h>
 
 #include "MaxCost.h"
 #include "cmdline.h"
@@ -48,6 +50,27 @@ public:
 
     /// evaluate the command line parameters
     static void evaluateParameters(int argc, char** argv);
+
+    /// The system used if the lp-heuristic is used
+    static lprec* lp; 
+
+    /// The number of final states in the inner graph
+    static int nrOfEdges;
+
+    /// The number of edges in the inner graph
+    static int nrOfFinals;
+    
+    /// Constructs the linear program from the parsed graph
+    static void constructLP();
+
+    /// Solves the linear program
+    static int solveLP();
+
+    /// Delete the linear program
+    static void deleteLP();
+
+    /// Print the linear program
+    static void printLP();
 
 };
 

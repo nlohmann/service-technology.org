@@ -38,6 +38,7 @@ unsigned int maxCost(pnapi::PetriNet* net) {
     
     bool USE_SIMPLE = Tara::args_info.heuristics_given && Tara::args_info.heuristics_arg == heuristics_arg_simple;
     bool USE_MAXOUT = Tara::args_info.heuristics_given && Tara::args_info.heuristics_arg == heuristics_arg_maxout;
+    bool USE_LP = Tara::args_info.heuristics_given && Tara::args_info.heuristics_arg == heuristics_arg_lp;
 
     if (USE_SIMPLE) {
     	status("Optimization enabled: simple.");
@@ -67,8 +68,15 @@ unsigned int maxCost(pnapi::PetriNet* net) {
         return Tara::sumOfLocalMaxCosts;
     }
 
+    if (USE_LP) {
+    	status("Optimization enabled: LP.");
+        Tara::constructLP();
+        int val = Tara::solveLP();        
+        status("Using LP upper bound: %d", val);
+//        Tara::deleteLP();        
+        return val;
+    }
 
-   // assuming Tara::graph[0] is start state
 
    Tara::graph[Tara::initialState]->curCost=0;
    Tara::graph[Tara::initialState]->inStack=true;

@@ -4,7 +4,9 @@
 unsigned int Tara::highestTransitionCosts = 0;
 unsigned int Tara::sumOfLocalMaxCosts = 0;
 unsigned int Tara::initialState = 0;
-
+lprec* Tara::lp = 0; 
+int Tara::nrOfEdges = 0;
+int Tara::nrOfFinals = 0;
 std::map<pnapi::Transition* ,unsigned int> Tara::partialCostFunction;
 
 pnapi::PetriNet* Tara::net = 0; 
@@ -99,4 +101,86 @@ void Tara::evaluateParameters(int argc, char** argv) {
     }
 
     free(params);
+}
+
+void Tara::constructLP() {
+
+    // Number of rows: For each vertex, we include a row -- includes the virtual final vertex
+    int NUMBER_OF_ROWS = graph.size() + 1;
+
+    // Number of columns: For each edge, we include a column -- includes the virtual edges to the virtual final vertex
+    int NUMBER_OF_COLUMNS = nrOfEdges + nrOfFinals; 
+
+    lp = make_lp(NUMBER_OF_ROWS, NUMBER_OF_COLUMNS);
+    
+    set_verbose(lp, 3);    
+
+    int currentEdge = 1;
+
+    for (int vertexCounter = 0; vertexCounter < graph.size(); ++vertexCounter) {
+    
+        innerState* currentVertex = graph[vertexCounter];        
+
+        for (int edgeCounter = 0; edgeCounter < currentVertex->transitions.size(); ++edgeCounter) {
+            REAL sparsecolumn[3]; /* one element per non-zero value -- always exactly three: objective function, source vertex and target vertex. self loops are eliminated while parsing */
+            int rowno[3];
+
+            int targetVertex = (int) currentVertex->transitions[edgeCounter].successor + 1;
+
+            rowno[0] = 0; // objective function
+            rowno[1] = vertexCounter + 1; // source vertex
+            rowno[2] = targetVertex; // the target vertex row
+            
+            sparsecolumn[0] = (REAL) currentVertex->transitions[edgeCounter].costs; // the costs for visiting the edge
+            sparsecolumn[1] = -1.0; // a token is taken from the source vertex                
+            sparsecolumn[2] = 1.0; // a token is put to the target vertex 
+
+            set_binary(lp, currentEdge, TRUE); /* sets variable to binary */
+            unsigned char res = set_columnex(lp, currentEdge, 3, sparsecolumn, rowno); /* changes the values of existing column 2 */
+            if (res != TRUE) abort(7,"Could not set the values in the LP."); 
+            ++currentEdge;
+        }
+
+
+        if (currentVertex->final) {
+            REAL sparsecolumn[1]; /* one element per non-zero value -- always exactly two: current vertex and final vertex. */
+            int rowno[1];
+            rowno[0] = vertexCounter + 1;
+            sparsecolumn[0] = -1.0;
+            rowno[1] = NUMBER_OF_ROWS; // virtual final vertex
+            sparsecolumn[1] = +1.0;
+            set_binary(lp, currentEdge, TRUE); /* sets variable to binary */
+            unsigned char res = set_columnex(lp, currentEdge, 2, sparsecolumn, rowno); /* changes the values of existing column 2 */ 
+            if (res != TRUE) abort(7, "Could not set the values in the LP."); 
+            ++currentEdge;
+        }               
+
+        set_constr_type(lp, vertexCounter+1, EQ);
+        set_rh(lp, vertexCounter+1, 0);
+
+    }
+    set_rh(lp, initialState+1, -1);
+    set_rh(lp, NUMBER_OF_ROWS, +1);
+    set_constr_type(lp, NUMBER_OF_ROWS, EQ);
+    
+    set_maxim(lp);    
+    
+}
+
+int Tara::solveLP() {
+
+    solve(lp);
+
+    return get_objective(lp);
+
+}
+
+void Tara::deleteLP() {
+    delete_lp(lp);
+    lp = 0;
+}
+
+void Tara::printLP() {
+    print_lp(lp);
+
 }

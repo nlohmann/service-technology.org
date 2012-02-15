@@ -25,11 +25,12 @@ sysconf_DATA = tara.conf
 # pass the sysconfdir to Hello (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 tara_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 tara_CXXFLAGS = -lpthread
+tara_LDADD = -lpthread
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
 tara_CPPFLAGS += -I$(top_srcdir)/libs
-tara_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
+tara_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
 

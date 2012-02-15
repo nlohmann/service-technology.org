@@ -9,6 +9,8 @@
 #include <stdint.h>
 #endif
 
+#include <string.h>
+
 #include "config.h"
 #include <cstdlib>
 #include "SymbolTable2Net.h"
@@ -24,7 +26,7 @@
 /// in the range of from to to (not including to)
 void sort_arcs(index_t* arcs, mult_t* mults, index_t from, index_t to)
 {
-    if (to - from < 2)
+    if ((to - from) < 2)
     {
         return;    // less than 2 elements are always sorted
     }
@@ -258,13 +260,17 @@ void symboltable2net(ParserPTNet* parser)
             mult_post[card_delta_post++] = Net::Mult[TR][POST][t][j];
         }
 
-        ///\todo use memcopy?
         Transition::CardDeltaT[PRE][t] = card_delta_pre;
         Transition::CardDeltaT[POST][t] = card_delta_post;
         Transition::DeltaT[PRE][t] = (index_t*) malloc(card_delta_pre * SIZEOF_INDEX_T);
         Transition::DeltaT[POST][t] = (index_t*) malloc(card_delta_post * SIZEOF_INDEX_T);
         Transition::MultDeltaT[PRE][t] = (mult_t*) malloc(card_delta_pre * SIZEOF_MULT_T);
         Transition::MultDeltaT[POST][t] = (mult_t*) malloc(card_delta_post * SIZEOF_MULT_T);
+        memcpy(Transition::DeltaT[PRE][t], delta_pre, card_delta_pre * SIZEOF_INDEX_T);
+        memcpy(Transition::MultDeltaT[PRE][t], mult_pre, card_delta_pre * SIZEOF_MULT_T);
+        memcpy(Transition::DeltaT[POST][t], delta_post, card_delta_post * SIZEOF_INDEX_T);
+        memcpy(Transition::MultDeltaT[POST][t], mult_post, card_delta_post * SIZEOF_MULT_T);
+        /*
         for (i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
         {
             Transition::DeltaT[PRE][t][i] = delta_pre[i];
@@ -275,10 +281,9 @@ void symboltable2net(ParserPTNet* parser)
             Transition::DeltaT[POST][t][j] = delta_post[j];
             Transition::MultDeltaT[POST][t][j] = mult_post[j];
         }
+        */
     }
     // initialize Conflicting arrays
-    // free or rename temporary data structures
-    //index_t* conflicting = delta_pre;
     index_t* conflicting = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
     free(delta_pre);
     free(delta_post);
@@ -319,13 +324,15 @@ void symboltable2net(ParserPTNet* parser)
             }
         }
         
-        ///\todo memcopy?
         Transition::CardConflicting[t] = card_conflicting;
         Transition::Conflicting[t] = (index_t*) malloc(card_conflicting * SIZEOF_INDEX_T);
+        memcpy(Transition::Conflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
+        /*
         for (index_t k = 0; k < card_conflicting; k++)
         {
             Transition::Conflicting[t][k] = conflicting[k];
         }
+        */
 
         card_conflicting = 0;
 
@@ -360,13 +367,15 @@ void symboltable2net(ParserPTNet* parser)
             }
         }
         
-        ///\todo memcopy?
         Transition::CardBackConflicting[t] = card_conflicting;
         Transition::BackConflicting[t] = (index_t*) malloc(card_conflicting * SIZEOF_INDEX_T);
+        memcpy(Transition::BackConflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
+        /*
         for (index_t k = 0; k < card_conflicting; k++)
         {
             Transition::BackConflicting[t][k] = conflicting[k];
         }
+        */
     }
     free(conflicting);
 

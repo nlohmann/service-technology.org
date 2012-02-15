@@ -37,6 +37,7 @@
 #include "MaxCost.h"
 #include "ServiceTools.h"
 #include "iModification.h"
+#include "CCSearch.h"
 
 using std::cerr;
 using std::cout;
@@ -233,28 +234,40 @@ int main(int argc, char** argv) {
         
         if (maxCostOfComposition > 0) { // Binary search is only necessary if the upper bound is greater than 0.
             
-            status("Step 5: Find the minimal budget with a binary search");
 
-            int bsUpper = maxCostOfComposition-1; // for maxCostofComposition, it is controllable anyway. 
-            int bsLower = 0;
+            bool USE_CONCURRENCY = Tara::args_info.concurrency_given;
+
+            if(USE_CONCURRENCY) {
+                status("Step 5: Find minimal budget with concurrent search");
+                // run the experimental conccurrent search for comparison with correct result
+                CCSearch::setBounds(0,maxCostOfComposition);
+                minBudget=CCSearch::search();
+            }
+            else {
+
+                status("Step 5: Find the minimal budget with a binary search");
+
+                int bsUpper = maxCostOfComposition-1; // for maxCostofComposition, it is controllable anyway. 
+                int bsLower = 0;
             
-            while (bsLower <= bsUpper) {
-               
-                // Set the new budget to the middle of the interval
-                iMod.setToValue((bsLower + bsUpper) / 2);
-                
-                // Prepare the Wendy Call
-            	ssi.str("");
-	            ssi << iMod.getI();
-                curMinCostPartner=minCostPartner+ssi.str()+".sa";
+                while (bsLower <= bsUpper) {
+                   
+                    // Set the new budget to the middle of the interval
+                    iMod.setToValue((bsLower + bsUpper) / 2);
+                        
+                    // Prepare the Wendy Call
+                    ssi.str("");
+                    ssi << iMod.getI();
+                    curMinCostPartner=minCostPartner+ssi.str()+".sa";
 
-                status("Checking budget %d (lower bound: %d, upper bound: %d)", iMod.getI(), bsLower, bsUpper);             
-                bool bsControllable = isControllable(*Tara::net, curMinCostPartner, true);
-                if (bsControllable) {
-                    minBudget = iMod.getI();        
-                    bsUpper = iMod.getI()-1;
-                } else {
-                    bsLower = iMod.getI()+1;
+                    status("Checking budget %d (lower bound: %d, upper bound: %d)", iMod.getI(), bsLower, bsUpper);             
+                    bool bsControllable = isControllable(*Tara::net, curMinCostPartner, true);
+                    if (bsControllable) {
+                        minBudget = iMod.getI();        
+                        bsUpper = iMod.getI()-1;
+                    } else {
+                        bsLower = iMod.getI()+1;
+                    }
                 }
             }
         

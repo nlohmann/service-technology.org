@@ -64,6 +64,11 @@ option "heuristics" h
   typestr="HEUR"
   optional
 
+option "concurrency" m
+  "Use concurrency"
+  int
+  optional
+
 
 section "Configuration"
 sectiondesc="Configuration files are used to control some options of Tara. Don't worry, a default configuration file is created and - if nothing else is specified - used. \n"

@@ -4,15 +4,17 @@ bin_PROGRAMS = tara
 # the plain sources you need to compile (no generated code)
 # <<-- CHANGE START (the program's sources) -->>
 tara_SOURCES =  main.cc \
-                verbose.cc verbose.h \
-                cmdline.c cmdline.h \
-                Output.cc Output.h \
-                MaxCost.cc MaxCost.h \
-		lexic_graph.ll syntax_graph.yy \
-		lexic_costfunction.ll syntax_costfunction.yy \
-                iModification.cc iModification.h \
-		ServiceTools.cc ServiceTools.h \
+        verbose.cc verbose.h \
+        cmdline.c cmdline.h \
+        Output.cc Output.h \
+        MaxCost.cc MaxCost.h \
+        lexic_graph.ll syntax_graph.yy \
+        lexic_costfunction.ll syntax_costfunction.yy \
+        iModification.cc iModification.h \
+        ServiceTools.cc ServiceTools.h \
 		Tara.cc Tara.h \
+        CCSearch.h CCSearch.cc \
+        tinythread.h tinythread.cpp \
         Parser.cc Parser.h
                 
 # <<-- CHANGE END -->>
@@ -22,6 +24,7 @@ sysconf_DATA = tara.conf
 
 # pass the sysconfdir to Hello (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 tara_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
+tara_CXXFLAGS = -lpthread
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI

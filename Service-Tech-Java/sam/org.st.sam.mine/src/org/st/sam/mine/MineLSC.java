@@ -71,6 +71,14 @@ public class MineLSC {
   
   private Configuration config;
   
+  public  long time_start_candiate_words;
+  public  long time_end_candiate_words;
+  
+  public  long time_start_scenario_discovery;
+  public  long time_end_scenario_discovery;
+  
+  public  long number_of_candidate_words;
+  
   public MineLSC(Configuration config) {
     this(config, null);
   }
@@ -129,6 +137,8 @@ public class MineLSC {
     
     boolean mergeTraces = (config.mode == Configuration.MODE_BRANCHING) ? true : false;
     
+    time_start_candiate_words = System.currentTimeMillis();
+    
     tree = new MineBranchingTree(getSLog(), mergeTraces);
     
     String stat = tree.getStatistics().toString();
@@ -136,7 +146,9 @@ public class MineLSC {
     
     List<short[]> supportedWords = getSupportedWords(tree, minSupportThreshold);
     System.out.println("found "+supportedWords.size()+" supported words");
+    number_of_candidate_words = supportedWords.size();
     
+    time_end_candiate_words = System.currentTimeMillis();
     /*
     for (short[] w : supportedWords) {
       for (Short e : w) {
@@ -146,7 +158,8 @@ public class MineLSC {
     }
     */
     
-
+    time_start_scenario_discovery = System.currentTimeMillis();
+    
     int total = 0;
     Map<Integer, LinkedList<short[]>> supportedWordsClasses = new HashMap<Integer, LinkedList<short[]>>();
     int largestWordSize = 0;
@@ -328,6 +341,8 @@ public class MineLSC {
         //supportedWordsClasses.get(size).removeAll(mined);
       }
     //}
+      
+    time_end_scenario_discovery = System.currentTimeMillis();
       
     for (SScenario s : scenarios) {
       System.out.println(s);

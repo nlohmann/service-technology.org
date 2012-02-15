@@ -1,4 +1,14 @@
-This release provides automated experiment execution functionality.
+This release of Sam/Mine provides automated experiment execution functionality.
+
+Contents
+--------
+
+  1. Running Experiments
+  2. System Requirements and Parameters
+  
+  
+1. RUNNING EXPERIMENTS
+----------------------
 
 To run an experiment, call:
 
@@ -31,15 +41,53 @@ There are some "Experiment Suites" available.
 
   * To run a standard experiment with relatively high support and
     confidence values, execute 'run_all_simple.bat'.
-  * For an experiment with varying support and confidence settings
-    on the same data set, execute 'run_crossftp_succinct_mult.bat'.
     
-REQUIREMENTS:
-  1. The tool needs 'mscgen' (which is packed with this tool in
-     './resources/mscgen') to render the discovered LSCs.
-  2. The tool needs GraphViz Dot to render the trees.
+    The entire suite takes around 230 seconds to discover scenarios
+    (between 1 second and 160 seconds per individual experiment)
+    + additional time needed to render graphics of the result files which can 
+    take several seconds to a few minutes per graph depending on size and
+    complexity. (Time taken on an Intel CORE i5 with 2.4 GHz).
+    
+  * For an experiment with varying support and confidence settings
+    on the same data set, execute <TODO: add>
+
+    
+2. REQUIREMENTS AND PARAMETERS
+------------------------------
+
+The tool is ready to run on Windows and Linux 32bit or 64bit that have at
+least 2GB of free memory available. For more details and other operating
+systems see below.
+
+The tool is written in Standard Java and runs on all Java Virtual Machines
+provided by Sun/Oracle that support Java 1.6 Update 22 or higher. 
+
+To render graphics of the results, the tool calls two additional tools:
+
+  1. The tool needs 'mscgen' to render the discovered LSCs. A Windows binary
+     and a statically-linked Linux binary are provided in this release in
+     directory ./resources/mscgen. Other versions of Mscgen and the source
+     code are available from http://www.mcternan.me.uk/mscgen/
+     
+  2. The tool needs GraphViz Dot to render the trees. The tools requires
+     GraphViz Dot to be installed on the system. GraphViz Dot is available
+     from http://www.graphviz.org/
   
 The path to the binaries of these tools are stored in './sam_mine.properties'
 The default settings assume 'mscgen' to be stored in  ./resources/mscgen' and
 GraphViz Dot to be available on the path (i.e. can be called from anywhere).
 Adjust the settings in './sam_mine.properties' to your system to run the tool.
+
+The default memory allocation for the tool is 2.0GB. You may want to adjust
+the default memory allocation if your machine has less memory available to
+allocate, or if you pick a low 'support' parameter value which will increase
+memory consumption. To adjust the memory allocated to the JVM,
+
+  1. Edit sam_mine.bat/sam_mine.sh, and
+  2. Change the parameter -Xmx2G to an appropriate value, e.g.
+       -Xmx1G or -Xmx4G
+     Note that allocating more than 2GB of memory requires a 64bit JVM.
+     
+The batch experiments can all be run with 1GB of memory. Note that execution
+time increases drastically when too little memory is allocated to the JVM
+causing frequent sweeps of the Garbage Collector in the available memory.

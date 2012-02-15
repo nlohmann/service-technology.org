@@ -435,12 +435,18 @@ public class RunExperimentCompare {
     ScenarioStatistics[] stat_both = getStatistics(minerLinear.getLSCs());
     
     r.append("<br/>\n");
+    r.append("supported words: "+minerBranch.number_of_candidate_words+"<br/>\n");
+    r.append("time to find supported words: "+(minerBranch.time_end_candiate_words-minerBranch.time_start_candiate_words)+"ms</br>");
+    r.append("time to find branching scenarios: "+(minerBranch.time_end_scenario_discovery-minerBranch.time_start_scenario_discovery)+"ms<br/>");
+    r.append("time to find linear scenarios   : "+(minerLinear.time_end_scenario_discovery-minerLinear.time_start_scenario_discovery)+"ms<br/>");
+    
+    r.append("<br/>\n");
     r.append("<b>strictly branching scenarios</b><br/>\n");
     r.append("found "+onlyBranching.size()+" strictly branching scenarios<br/>\n");
     r.append("length pre-chart (min/avg/max): "+stat_branch_only[0].preChartLength+"/"+stat_branch_only[1].preChartLength+"/"+stat_branch_only[2].preChartLength+"<br/>\n");
     r.append("length main-chart (min/avg/max): "+stat_branch_only[0].mainChartLength+"/"+stat_branch_only[1].mainChartLength+"/"+stat_branch_only[2].mainChartLength+"<br/>\n");
     r.append("#components (min/avg/max): "+stat_branch_only[0].components+"/"+stat_branch_only[1].components+"/"+stat_branch_only[2].components+"<br/>\n");
-
+   
     r.append("<br/>\n");
     r.append("<b>linear and branching scenarios</b><br/>\n");
     r.append("found "+both.size()+" linear and branching scenarios<br/>\n");
@@ -478,6 +484,10 @@ public class RunExperimentCompare {
     SAMOutput.writeToFile(minerBranch.getLSCs().toString(), resultsDir+"/lscs_branching.txt");
     
     System.out.println("finished.");
+    System.out.println("discovering candidate words    : "+(minerBranch.time_end_candiate_words-minerBranch.time_start_candiate_words)+"ms");
+    System.out.println("discovering branching scenarios: "+(minerBranch.time_end_scenario_discovery-minerBranch.time_start_scenario_discovery)+"ms");
+    System.out.println("discovering linear scenarios   : "+(minerLinear.time_end_scenario_discovery-minerLinear.time_start_scenario_discovery)+"ms");
+
     
     minerBranch.getTree().clearCoverageMarking();
     minerBranch.getCoverageTreeGlobal();
@@ -495,6 +505,8 @@ public class RunExperimentCompare {
         +stat_both[0].mainChartLength+";"+stat_both[1].mainChartLength+";"+stat_both[2].mainChartLength+";"
         +stat_both[0].components+";"+stat_both[1].components+";"+stat_both[2].components+";"
         +runTime_minerBranch;
+    
+    
 
     return stat_summary;
   }

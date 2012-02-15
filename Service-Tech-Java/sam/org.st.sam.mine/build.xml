@@ -192,6 +192,7 @@
 			<fileset dir="${home}/resources/">
 				<include name="mscgen/bgd.dll" />
 				<include name="mscgen/mscgen.exe" />
+				<include name="mscgen/mscgen" />
 			</fileset>
 		</copy>
 		
@@ -200,6 +201,7 @@
 				<include name="sam_mine*.bat" />
 				<include name="sam_mine*.sh" />
 				<include name="run_*.bat" />
+				<include name="run_*.sh" />
 				<include name="manual.txt" />
 			</fileset>
 		</copy>

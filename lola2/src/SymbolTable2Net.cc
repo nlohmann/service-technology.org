@@ -24,23 +24,25 @@
 
 /// sorts array of arc (= node id) plus corresponding array of multiplicities
 /// in the range of from to to (not including to)
-void sort_arcs(index_t* arcs, mult_t* mults, index_t from, index_t to)
+void sort_arcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to)
 {
     if ((to - from) < 2)
     {
         return;    // less than 2 elements are always sorted
     }
+
     index_t blue = from; // points to first index where element is not known < pivot
     index_t white = from + 1; // points to first index where element is not know <= pivot
     index_t red = to; // points to last index (+1) where element is not know to be  pivot
-    index_t pivot = arcs[from];
+    const index_t pivot = arcs[from];
 
     assert(from < to);
+
     while (red > white)
     {
         if (arcs[white] < pivot)
         {
-            // swap white <-> blue
+            // swap white <->blue
             const index_t tmp_index = arcs[blue];
             const mult_t tmp_mult = mults[blue];
             arcs[blue] = arcs[white];
@@ -52,7 +54,8 @@ void sort_arcs(index_t* arcs, mult_t* mults, index_t from, index_t to)
         {
             // there are no duplicates in arc list
             assert(arcs[white] > pivot);
-            // swap white <-> red
+
+            // swap white <->red
             const index_t tmp_index = arcs[--red];
             const mult_t tmp_mult = mults[red];
             arcs[red] = arcs[white];
@@ -60,9 +63,10 @@ void sort_arcs(index_t* arcs, mult_t* mults, index_t from, index_t to)
             arcs[white] = tmp_index;
             mults[white] = tmp_mult;
         }
-
     }
+
     assert(blue + 1 == red);
+
     sort_arcs(arcs, mults, from, blue);
     sort_arcs(arcs, mults, red, to);
 }
@@ -73,13 +77,18 @@ void sort_arcs(index_t* arcs, mult_t* mults, index_t from, index_t to)
 */
 void symboltable2net(ParserPTNet* parser)
 {
+    /*********************************************
+    * 1. Allocate memory for basic net structure *
+    *********************************************/
+
+    // 1.1 set cardinalities
     const index_t cardPL = parser->PlaceTable->getCard();
     const index_t cardTR = parser->TransitionTable->getCard();
-
-    // Allocate arrays for places and transitions
     Net::Card[PL] = cardPL;
     Net::Card[TR] = cardTR;
     Place::CardSignificant = cardPL; // this is the best choice until we know better
+
+    // 1.2 allocate arrays for node (places and transitions) names, arcs, and multiplicities
     for (int type = PL; type <= TR; type ++)
     {
         Net::Name[type] = (char**) malloc(Net::Card[type] * SIZEOF_VOIDP);
@@ -90,109 +99,152 @@ void symboltable2net(ParserPTNet* parser)
             Net::Mult[type][direction] = (mult_t**) malloc(Net::Card[type] * SIZEOF_VOIDP);
         }
     }
+
+
+    /********************************
+    * 2. Allocate memory for places *
+    *********************************/
+
     Place::Hash = (hash_t*) malloc(cardPL * SIZEOF_HASH_T);
     Place::Capacity = (capacity_t*) malloc(cardPL * SIZEOF_CAPACITY_T);
     Place::CardBits = (cardbit_t*) malloc(cardPL * SIZEOF_CARDBIT_T);
-    // use calloc: initial assumption: no transition is disabled
-    Place::CardDisabled = (index_t*) calloc(cardPL , SIZEOF_INDEX_T);
+    Place::CardDisabled = (index_t*) calloc(cardPL , SIZEOF_INDEX_T); // use calloc: initial assumption: no transition is disabled
     Place::Disabled = (index_t**) malloc(cardPL * SIZEOF_VOIDP);
+
+
+    /**********************************
+    * 3. Allocate memory for markings *
+    ***********************************/
+
     Marking::Initial = (capacity_t*) malloc(cardPL * SIZEOF_CAPACITY_T);
     Marking::Current = (capacity_t*) malloc(cardPL * SIZEOF_CAPACITY_T);
     Marking::HashInitial = 0;
+
+
+    /***********************************************
+    * 4. Copy data from the symbol table to places *
+    ************************************************/
+
     // fill all information that is locally available in symbols, allocate node specific arrays
     PlaceSymbol* ps;
     index_t i;
     for ((ps = reinterpret_cast<PlaceSymbol*>(parser->PlaceTable->first())), (i = 0); ps; ps = reinterpret_cast<PlaceSymbol*>(parser->PlaceTable->next()), i++)
     {
-        const index_t tempCardPre = ps -> getCardPre();
-        const index_t tempCardPost = ps -> getCardPost();
+        const index_t tempCardPre = ps->getCardPre();
+        const index_t tempCardPost = ps->getCardPost();
 
-        Net::Name[PL][i] = ps -> getKey();
+        Net::Name[PL][i] = ps->getKey();
         Net::CardArcs[PL][PRE][i] = tempCardPre;
         Net::CardArcs[PL][POST][i] = tempCardPost;
-        ps -> setIndex(i);
+        ps->setIndex(i);
+
+        // allocate memory for place's arcs (is copied later with transitions)
         Net::Arc[PL][PRE][i] = (index_t*) malloc(tempCardPre * SIZEOF_INDEX_T);
         Net::Arc[PL][POST][i] = (index_t*) malloc(tempCardPost * SIZEOF_INDEX_T);
         Net::Mult[PL][PRE][i] = (mult_t*) malloc(tempCardPre * SIZEOF_MULT_T);
         Net::Mult[PL][POST][i] = (mult_t*) malloc(tempCardPost * SIZEOF_MULT_T);
 
+        // hash and capacity
         Place::Hash[i] = rand() % MAX_HASH;
-        Place::Capacity[i] = ps -> getCapacity();
+        Place::Capacity[i] = ps->getCapacity();
         Place::CardBits[i] = Place::Capacity2Bits(Place::Capacity[i]);
+
         // initially: no disabled transistions (through CardDisabled = 0)
         // correct values will be achieved by initial checkEnabled...
         Place::Disabled[i] = (index_t*) malloc(tempCardPost * SIZEOF_INDEX_T);
 
-        Marking::Initial[i] = Marking::Current[i] = ps -> getInitialMarking();
+        // set initial marking and calculate hash
+        Marking::Initial[i] = Marking::Current[i] = ps->getInitialMarking();
         Marking::HashInitial = (Marking::HashInitial + Place::Hash[i] * Marking::Initial[i]) % SIZEOF_MARKINGTABLE;
     }
+
+    // set hash value for initial marking
     Marking::HashCurrent = Marking::HashInitial;
-    // current_arc is used for filling in arcs and multiplicities of places
-    // calloc: no arcs there yet
-    index_t* current_arc_post = (index_t*) calloc(cardPL, SIZEOF_INDEX_T);
-    index_t* current_arc_pre = (index_t*) calloc(cardPL, SIZEOF_INDEX_T);
+
+
+    /*************************************
+    * 5. Allocate memory for transitions *
+    **************************************/
+
+    // allocate memory for static data
     Transition::Fairness = (fairnessAssumption_t*) malloc(cardTR * SIZEOF_FAIRNESSASSUMPTION_T);
     Transition::Enabled = (bool*) malloc(cardTR * SIZEOF_BOOL);
-    // calloc: delta hash must be initially 0
-    Transition::DeltaHash = (hash_t*) calloc(cardTR , SIZEOF_HASH_T);
+    Transition::DeltaHash = (hash_t*) calloc(cardTR , SIZEOF_HASH_T); // calloc: delta hash must be initially 0
     Transition::CardConflicting = (index_t*) malloc(cardTR * SIZEOF_INDEX_T);
     Transition::Conflicting = (index_t**) malloc(cardTR * SIZEOF_VOIDP);
     Transition::CardBackConflicting = (index_t*) malloc(cardTR * SIZEOF_INDEX_T);
     Transition::BackConflicting = (index_t**) malloc(cardTR * SIZEOF_VOIDP);
     Transition::CardEnabled = cardTR; // start with assumption that all transitions are enabled
     Transition::PositionScapegoat = (index_t*) malloc(cardTR * SIZEOF_INDEX_T);
+
+    // allocate memory for deltas
     for (int direction = PRE; direction <= POST; direction++)
     {
-        // calloc: no arcs there yet
-        Transition::CardDeltaT[direction] = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
+        Transition::CardDeltaT[direction] = (index_t*) calloc(cardTR, SIZEOF_INDEX_T); // calloc: no arcs there yet
         Transition::DeltaT[direction] = (index_t**) malloc(cardTR * SIZEOF_VOIDP);
         Transition::MultDeltaT[direction] = (mult_t**) malloc(cardTR * SIZEOF_VOIDP);
     }
+
+
+    /****************************************************
+    * 6. Copy data from the symbol table to transitions *
+    *****************************************************/
+
+    // current_arc is used for filling in arcs and multiplicities of places
+    index_t* current_arc_post = (index_t*) calloc(cardPL, SIZEOF_INDEX_T); // calloc: no arcs there yet
+    index_t* current_arc_pre = (index_t*) calloc(cardPL, SIZEOF_INDEX_T); // calloc: no arcs there yet
+
     TransitionSymbol* ts;
     for (ts = reinterpret_cast<TransitionSymbol*>(parser->TransitionTable->first()), i = 0; ts; ts = reinterpret_cast<TransitionSymbol*>(parser->TransitionTable->next()), i++)
     {
-        const index_t tempCardPre = ts -> getCardPre();
-        const index_t tempCardPost = ts -> getCardPost();
-        
-        Net::Name[TR][i] = ts -> getKey();
+        const index_t tempCardPre = ts->getCardPre();
+        const index_t tempCardPost = ts->getCardPost();
+
+        Net::Name[TR][i] = ts->getKey();
         Net::CardArcs[TR][PRE][i] = tempCardPre;
         Net::CardArcs[TR][POST][i] = tempCardPost;
-        ts -> setIndex(i);
+        ts->setIndex(i);
+
+        // allocate memory for transition's arcs
         Net::Arc[TR][PRE][i] = (index_t*) malloc(tempCardPre * SIZEOF_INDEX_T);
         Net::Arc[TR][POST][i] = (index_t*) malloc(tempCardPost * SIZEOF_INDEX_T);
         Net::Mult[TR][PRE][i] = (mult_t*) malloc(tempCardPre * SIZEOF_MULT_T);
         Net::Mult[TR][POST][i] = (mult_t*) malloc(tempCardPost * SIZEOF_MULT_T);
+
         Transition::Enabled[i] = true;
-        Transition::Fairness[i] = ts -> getFairness();
+        Transition::Fairness[i] = ts->getFairness();
+
+        // copy arcs (for transitions AND places)
         ArcList* al;
         index_t j;
-        for (al = ts ->getPre(), j = 0; al; al = al -> getNext(), j++)
+        for (al = ts->getPre(), j = 0; al; al = al->getNext(), j++)
         {
-            const index_t k = al -> getPlace() -> getIndex();
+            const index_t k = al->getPlace()->getIndex();
             Net::Arc[TR][PRE][i][j] = k;
             Net::Arc[PL][POST][k][current_arc_post[k]] = i;
-            Net::Mult[PL][POST][k][(current_arc_post[k])++] =
-                Net::Mult[TR][PRE][i][j] = al -> getMultiplicity();
+            Net::Mult[PL][POST][k][(current_arc_post[k])++] = Net::Mult[TR][PRE][i][j] = al->getMultiplicity();
         }
-        for (al = ts ->getPost(), j = 0; al; al = al -> getNext(), j++)
+        for (al = ts->getPost(), j = 0; al; al = al->getNext(), j++)
         {
-            const index_t k = al -> getPlace() -> getIndex();
+            const index_t k = al->getPlace()->getIndex();
             Net::Arc[TR][POST][i][j] = k;
             Net::Arc[PL][PRE][k][current_arc_pre[k]] = i;
-            Net::Mult[PL][PRE][k][(current_arc_pre[k])++] =
-                Net::Mult[TR][POST][i][j] = al -> getMultiplicity();
+            Net::Mult[PL][PRE][k][(current_arc_pre[k])++] = Net::Mult[TR][POST][i][j] = al->getMultiplicity();
         }
     }
-    // logically, current_arc_* can be freed here, physically, we just rename them to
-    // their new purpose
-    //free(current_arc_pre);
-    //free(current_arc_post);
-    index_t* delta_pre = current_arc_pre;   // temporarily collect places where a transition
-    // has negative token balance
-    index_t* delta_post = current_arc_post; // temporarily collect places where a transition
-    // has positive token balance.
+
+
+    /*********************
+    * 7. Organize Deltas *
+    **********************/
+
+    // logically, current_arc_* can be freed here, physically, we just rename them to their new purpose (reuse)
+    index_t* delta_pre = current_arc_pre;   // temporarily collect places where a transition has negative token balance
+    index_t* delta_post = current_arc_post; // temporarily collect places where a transition has positive token balance.
+
     mult_t* mult_pre = (mult_t*) malloc(cardPL * SIZEOF_MULT_T);   // same for multiplicities
     mult_t* mult_post = (mult_t*) malloc(cardPL * SIZEOF_MULT_T);   // same for multiplicities
+
     for (index_t t = 0; t < cardTR; t++)
     {
         // initialize DeltaT structures
@@ -200,6 +252,7 @@ void symboltable2net(ParserPTNet* parser)
         index_t card_delta_post = 0;
         sort_arcs(Net::Arc[TR][PRE][t], Net::Mult[TR][PRE][t], 0, Net::CardArcs[TR][PRE][t]);
         sort_arcs(Net::Arc[TR][POST][t], Net::Mult[TR][POST][t], 0, Net::CardArcs[TR][POST][t]);
+
         index_t i; // parallel iteration through sorted pre and post arc sets
         index_t j;
         for (i = 0, j = 0; (i < Net::CardArcs[TR][PRE][t]) && (j < Net::CardArcs[TR][POST][t]); /* tricky increment */)
@@ -215,13 +268,13 @@ void symboltable2net(ParserPTNet* parser)
                 {
                     if (Net::Mult[TR][PRE][t][i] < Net::Mult[TR][POST][t][j])
                     {
-                        //positive impact --> goes to delta post
+                        // positive impact -->goes to delta post
                         delta_post[card_delta_post] = Net::Arc[TR][POST][t][j];
                         mult_post[card_delta_post++] = (mult_t)(Net::Mult[TR][POST][t][j] - Net::Mult[TR][PRE][t][i]);
                     }
                     else
                     {
-                        // negative impact --> goes to delta pre
+                        // negative impact -->goes to delta pre
                         delta_pre[card_delta_pre] = Net::Arc[TR][PRE][t][i];
                         mult_pre[card_delta_pre++] = (mult_t)(Net::Mult[TR][PRE][t][i] - Net::Mult[TR][POST][t][j]);
                     }
@@ -260,37 +313,43 @@ void symboltable2net(ParserPTNet* parser)
             mult_post[card_delta_post++] = Net::Mult[TR][POST][t][j];
         }
 
+
+        /*********************
+        * 7a. Copy Deltas *
+        **********************/
+
+        // allocate memory for deltas
         Transition::CardDeltaT[PRE][t] = card_delta_pre;
         Transition::CardDeltaT[POST][t] = card_delta_post;
         Transition::DeltaT[PRE][t] = (index_t*) malloc(card_delta_pre * SIZEOF_INDEX_T);
         Transition::DeltaT[POST][t] = (index_t*) malloc(card_delta_post * SIZEOF_INDEX_T);
         Transition::MultDeltaT[PRE][t] = (mult_t*) malloc(card_delta_pre * SIZEOF_MULT_T);
         Transition::MultDeltaT[POST][t] = (mult_t*) malloc(card_delta_post * SIZEOF_MULT_T);
+
+        // copy information on deltas
         memcpy(Transition::DeltaT[PRE][t], delta_pre, card_delta_pre * SIZEOF_INDEX_T);
         memcpy(Transition::MultDeltaT[PRE][t], mult_pre, card_delta_pre * SIZEOF_MULT_T);
         memcpy(Transition::DeltaT[POST][t], delta_post, card_delta_post * SIZEOF_INDEX_T);
         memcpy(Transition::MultDeltaT[POST][t], mult_post, card_delta_post * SIZEOF_MULT_T);
-        /*
-        for (i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
-        {
-            Transition::DeltaT[PRE][t][i] = delta_pre[i];
-            Transition::MultDeltaT[PRE][t][i] = mult_pre[i];
-        }
-        for (j = 0; j < Transition::CardDeltaT[POST][t]; j++)
-        {
-            Transition::DeltaT[POST][t][j] = delta_post[j];
-            Transition::MultDeltaT[POST][t][j] = mult_post[j];
-        }
-        */
     }
-    // initialize Conflicting arrays
-    index_t* conflicting = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
+
     free(delta_pre);
     free(delta_post);
     free(mult_pre);
     free(mult_post);
+
+
+    /**************************************
+    * 8. Organize conflicting transitions *
+    ***************************************/
+
+    // initialize Conflicting arrays
+    index_t* conflicting = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
+
+    ///\todo make search for conflicting transitions a function to avoid code duplication
     for (index_t t = 0; t < cardTR; t++)
     {
+        // 8.1 conflicting transitions
         index_t card_conflicting = 0;
 
         /// 1. collect all conflicting transitions \f$(\null^\bullet t)^\bullet\f$
@@ -323,17 +382,13 @@ void symboltable2net(ParserPTNet* parser)
 
             }
         }
-        
+
         Transition::CardConflicting[t] = card_conflicting;
         Transition::Conflicting[t] = (index_t*) malloc(card_conflicting * SIZEOF_INDEX_T);
         memcpy(Transition::Conflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
-        /*
-        for (index_t k = 0; k < card_conflicting; k++)
-        {
-            Transition::Conflicting[t][k] = conflicting[k];
-        }
-        */
 
+
+        // 8.2 backward conflicting transitions
         card_conflicting = 0;
 
         /// 1. collect all backward conflicting transitions \f$(t^\bullet)^\bullet\f$
@@ -366,18 +421,18 @@ void symboltable2net(ParserPTNet* parser)
 
             }
         }
-        
+
         Transition::CardBackConflicting[t] = card_conflicting;
         Transition::BackConflicting[t] = (index_t*) malloc(card_conflicting * SIZEOF_INDEX_T);
         memcpy(Transition::BackConflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
-        /*
-        for (index_t k = 0; k < card_conflicting; k++)
-        {
-            Transition::BackConflicting[t][k] = conflicting[k];
-        }
-        */
     }
+
     free(conflicting);
+
+
+    /*******************************
+    * 9. Initial enabledness check *
+    ********************************/
 
     for (index_t t = 0; t < cardTR; t++)
     {

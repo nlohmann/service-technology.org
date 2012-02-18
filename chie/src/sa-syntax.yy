@@ -1,7 +1,8 @@
 %{
 #include <map>
 #include <string>
-#include "automata.h"
+#include <vector>
+#include "serviceAutomaton.h"
 
 // generic bison/flex stuff
 extern char * sa_yytext;
@@ -23,6 +24,13 @@ unsigned int currentNode;
 
 // last read ident
 std::string sa_lastIdent;
+
+// vector of receive events
+std::vector<std::string> sa_receiving;
+
+// vector of sending events
+std::vector<std::string> sa_sending;
+
 %}
 
 %name-prefix="sa_yy"
@@ -45,7 +53,17 @@ std::string sa_lastIdent;
 
 
 sa:
-  INTERFACE input output synchronous NODES nodes
+  INTERFACE
+  {
+    // clear vectors
+    sa_receiving.clear();
+    sa_sending.clear();
+  }
+  input output synchronous NODES
+  {
+    sa_result = new ServiceAutomaton(sa_sending, sa_receiving, !sa_specification);
+  }
+  nodes
 ;
 
 
@@ -77,24 +95,25 @@ identlist:
   /* empty */
 | IDENT
   {
-    if (sa_specification && // pointer not NULL, i.e. we are parsing a test case
-        (sa_specification->isSendingEvent.count(sa_lastIdent) > 0) && // current ident is a communication event of the specification
-        (sa_specification->isSendingEvent[sa_lastIdent] != inputEvents)) // current ident is an event of the same type as the event of the specification
+    if (inputEvents)
     {
-      // both service automata are sending or both are receiving this event
-      sa_yyerror("channel type mismatch");
+      sa_receiving.push_back(sa_lastIdent);
     }
-    sa_result->isSendingEvent[sa_lastIdent] = !inputEvents;
+    else
+    {
+      sa_sending.push_back(sa_lastIdent);
+    }
   }
 | identlist COMMA IDENT
   {
-    if (sa_specification && // see above
-        (sa_specification->isSendingEvent.count(sa_lastIdent) > 0) &&
-        (sa_specification->isSendingEvent[sa_lastIdent] != inputEvents))
+    if (inputEvents)
     {
-      sa_yyerror("channel type mismatch");
+      sa_receiving.push_back(sa_lastIdent);
     }
-    sa_result->isSendingEvent[sa_lastIdent] = !inputEvents;
+    else
+    {
+      sa_sending.push_back(sa_lastIdent);
+    }
   }
 ;
 
@@ -115,7 +134,7 @@ node:
   {
     if(!hasSuccessors)
     {
-      sa_result->noSuccessorStates.insert($1);
+      sa_result->setNoSuccessorState($1);
     }
   }
 ;
@@ -124,11 +143,14 @@ node:
 annotation:
   /* empty */
 | COLON INITIAL_
-  { sa_result->initialState = currentNode; }
+  { sa_result->setInitialState(currentNode); }
 | COLON FINAL
-  { sa_result->finalStates.insert(currentNode); }
+  { sa_result->setFinalState(currentNode); }
 | COLON INITIAL_ COMMA FINAL
-  { sa_result->finalStates.insert(sa_result->initialState = currentNode); }
+  {
+    sa_result->setFinalState(currentNode);
+    sa_result->setInitialState(currentNode);
+  }
 ;
 
 
@@ -136,7 +158,7 @@ successors:
   /* empty */
 | successors IDENT ARROW NUMBER
   {
-    sa_result->stateSpace[currentNode][sa_lastIdent].insert($4);
+    sa_result->addSuccessor(currentNode, sa_lastIdent, $4);
     hasSuccessors = true;
   }
 ;

@@ -3,13 +3,13 @@ bin_PROGRAMS = chie
 
 # the plain sources you need to compile (no generated code)
 chie_SOURCES = sa-syntax.yy sa-lexic.ll \
+	        cmdline.c cmdline.h \
+		knowledge.h knowledge.cc \
+		Output.h Output.cc \
+		productAutomaton.h productAutomaton.cc \
+		serviceAutomaton.h serviceAutomaton.cc \
+		verbose.h verbose.cc \
 		main.cc \
-		automata.cc automata.h \
-		conformanceCheck.cc conformanceCheck.h \
-                verbose.cc verbose.h \
-                cmdline.c cmdline.h \
-                Output.cc Output.h \
-		dot.h dot.cc \
 		util.h
 
 # the configuration files

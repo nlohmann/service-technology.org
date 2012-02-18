@@ -19,17 +19,14 @@
 
 // include header files
 #include <config.h>
-#include <ctime>
-#include <libgen.h>
-#include <fstream>
-#include <map>
-#include <sstream>
-#include <string>
-
 #include "config-log.h"
+
+//#include <ctime>
+#include <fstream>
+//#include <libgen.h>
+
 #include "cmdline.h"
-#include "automata.h"
-#include "conformanceCheck.h"
+#include "knowledge.h"
 #include "Output.h"
 #include "verbose.h"
 
@@ -58,10 +55,6 @@ extern FILE* sa_yyin;
 // whether parsing the second automaton
 ServiceAutomaton * sa_specification = NULL;
 ServiceAutomaton * sa_result = NULL;
-
-// global variable for verbose output
-std::string globalErrorMessage;
-
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
@@ -179,9 +172,6 @@ int main(int argc, char** argv) {
     | 1. parse service automaton |
     `---------------------------*/
 
-    // allocate resulting automaton
-    ServiceAutomaton specification;
-
     // open service automaton
     if(args_info.specification_given) // if service is specified by --service=foo.sa
     {
@@ -199,9 +189,6 @@ int main(int argc, char** argv) {
         abort(0, "failed to open '%s'", args_info.inputs[0]);
       }
     }
-
-    // set result pointer
-    sa_result = &specification;
 
     // actual parsing
     sa_yyparse();
@@ -229,10 +216,6 @@ int main(int argc, char** argv) {
           abort(0, "failed to open '%s'", (args_info.inputs_num == 0) ? "standard input stream" : args_info.inputs[i]);
       }
 
-      // set result pointer
-      ServiceAutomaton testCase;
-      sa_result = &testCase;
-
       // parse test case
       sa_yyparse();
 
@@ -255,12 +238,28 @@ int main(int argc, char** argv) {
       }
 
       // do the test
-      bool result = isConformancePartner(specification, testCase, dotFileName);
+      ProductAutomaton composition(*sa_specification, *sa_result);
+      Knowledge * knowledge = NULL;
+      bool result = composition.checkStrongReceivability() && (knowledge = new Knowledge(composition))->checkWeakReceivability();
+
+      if(knowledge) // if weak receivability checked
+      {
+        Knowledge::deleteAll(); // free memory
+        // Note: this also deletes "knowledge" (!)
+      }
       message("%s: %s", ((args_info.inputs_num == 0) ? "stdin" : args_info.inputs[i]), (result ? "YES" : "NO"));
       if(!result)
       {
-        status(globalErrorMessage.c_str()); // give more information when --verbose is given
+        status(composition.errorMessage.c_str()); // give more information when --verbose is given
       }
+
+      if(args_info.dot_given && ((!result) || args_info.printAll_given))
+      {
+        composition.writeToDotFile(dotFileName, !result);
+      }
+
+      // free memory
+      delete sa_result;
     } while (++i < args_info.inputs_num);
 
     return EXIT_SUCCESS;

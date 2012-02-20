@@ -14,7 +14,7 @@
 /// the reporter
 Reporter* rep = new ReporterStream();
 
-void signal_callback_handler(int signum)
+__attribute__((noreturn)) void signal_callback_handler(int signum)
 {
     rep->message("caught signal: '%s'\n", strsignal(signum));
     exit(EXIT_SUCCESS);

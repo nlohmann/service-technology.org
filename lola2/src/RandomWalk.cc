@@ -77,6 +77,5 @@ void randomWalk(int transitions)
         {
             Transition::checkEnabled(i);
         }
-
     }
 }

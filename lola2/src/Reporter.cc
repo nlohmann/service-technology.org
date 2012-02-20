@@ -131,7 +131,8 @@ Reporter::String ReporterSocket::markup(markup_t, const char* format, ...) const
     va_list args;
     va_start(args, format);
     char* res = NULL;
-    vasprintf(&res, format, args);
+    const int r = vasprintf(&res, format, args);
+    assert(r != -1);
     va_end(args);
     return Reporter::String(res);
 }
@@ -251,7 +252,8 @@ Reporter::String ReporterStream::markup(markup_t markup, const char* format, ...
     va_list args;
     va_start(args, format);
     char* message = NULL;
-    vasprintf(&message, format, args);
+    const int r = vasprintf(&message, format, args);
+    assert(r != -1);
     va_end(args);
 
     char* res = NULL;

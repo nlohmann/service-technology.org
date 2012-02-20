@@ -287,7 +287,7 @@ __attribute__((noreturn)) void yyerrors(char* token, const char* format, ...) {
     va_list args;
     va_start(args, format);
     char* errormessage = NULL;
-    int res = vasprintf(&errormessage, format, args);
+    const int res = vasprintf(&errormessage, format, args);
     assert(res != -1);
     rep->status(errormessage);
     free(errormessage);

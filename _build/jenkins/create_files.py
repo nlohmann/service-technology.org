@@ -2,6 +2,7 @@
 import re
 import os
 import shutil
+import sys
 
 from xml2dict import XML2Dict
 
@@ -27,6 +28,7 @@ for t in data.tools.tool:
     o.write(r)
     o.close()
 
+sys.exit()
 
 # Windows jobs
 templatedata = open('config-win.xml-template').read()

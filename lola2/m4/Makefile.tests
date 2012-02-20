@@ -30,7 +30,7 @@ $(TESTSUITE): $(srcdir)/testsuite.at package.m4
 
 cover-covertura: cover-prepare $(TESTSUITE)
 	-$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)
-	cd $(top_srcdir) ; gcovr src -b -x > covertura.xml
+	cd $(top_srcdir) ; gcovr -r src -b -x > covertura.xml
 
 # compile the code for code coverage
 cover-prepare:

@@ -62,9 +62,9 @@ if input is correct, lookup is used for existing symbols
 */
 Symbol* SymbolTable::lookup(const char* str) const
 {
-    for (Symbol* sym = table[hash(str)]; sym; sym = sym -> getNext())
+    for (Symbol* sym = table[hash(str)]; sym; sym = sym->getNext())
     {
-        if (!strcmp(sym -> getKey(), str))
+        if (!strcmp(sym->getKey(), str))
         {
             return sym;
         }
@@ -82,15 +82,15 @@ if input is correct, insert is used when key is not yet present
 */
 bool SymbolTable::insert(Symbol* sym)
 {
-    const unsigned int index = hash(sym -> getKey());
-    for (Symbol* othersym = table[index]; othersym; othersym = othersym -> getNext())
+    const unsigned int index = hash(sym->getKey());
+    for (Symbol* othersym = table[index]; othersym; othersym = othersym->getNext())
     {
-        if (!strcmp(othersym -> getKey(), sym -> getKey()))
+        if (!strcmp(othersym->getKey(), sym->getKey()))
         {
             return false;
         }
     }
-    sym -> setNext(table[index]);
+    sym->setNext(table[index]);
     table[index] = sym;
     ++card;
     return true;
@@ -112,10 +112,10 @@ Symbol* SymbolTable::first()
 /// \return pointer to next element in symbol table
 Symbol* SymbolTable::next()
 {
-    if (currentSymbol -> getNext())
+    if (currentSymbol->getNext())
     {
         // there is another element in the same hash bucket
-        return(currentSymbol = currentSymbol -> getNext());
+        return(currentSymbol = currentSymbol->getNext());
     }
     else
     {

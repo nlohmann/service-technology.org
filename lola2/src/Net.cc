@@ -43,7 +43,7 @@ void Net::deleteNodes()
     }
 }
 
-void print_net()
+void Net::print()
 {
     printf("Net\n===\n\n");
 

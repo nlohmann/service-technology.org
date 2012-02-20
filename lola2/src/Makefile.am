@@ -17,7 +17,6 @@ lola_SOURCES = \
                 Reporter.cc Reporter.h \
                 Socket.cc Socket.h \
                 Symbol.cc Symbol.h \
-                SymbolTable2Net.cc SymbolTable2Net.h \
                 SymbolTable.cc SymbolTable.h \
                 Transition.cc Transition.h \
                 TransitionSymbol.h TransitionSymbol.cc \

@@ -26,7 +26,6 @@
 #include "Place.h"
 #include "Marking.h"
 #include "Transition.h"
-#include "SymbolTable2Net.h"
 
 extern ParserPTNet* ParserPTNetLoLA();
 
@@ -123,7 +122,7 @@ int main(int argc, char** argv)
     yylex_destroy();
 
     // translate into general net structures
-    symboltable2net(symbolTables);
+    symbolTables->symboltable2net();
 
     delete symbolTables;
 
@@ -137,7 +136,7 @@ int main(int argc, char** argv)
     if (args_info.printNet_given)
     {
         rep->status("print net");
-        print_net();
+        Net::print();
     }
 
     Net::deleteNodes();

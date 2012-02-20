@@ -1,10 +1,9 @@
 /*!
-
 \file RandomWalk.cc
 \author Karsten
 \status new
 
-repeatedly fir random transitions
+repeatedly fire random transitions
 */
 
 #include <cstdio>

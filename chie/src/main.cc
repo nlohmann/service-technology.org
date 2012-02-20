@@ -53,8 +53,8 @@ extern FILE* sa_yyin;
 
 /// additional parser data
 // whether parsing the second automaton
-ServiceAutomaton * sa_specification = NULL;
-ServiceAutomaton * sa_result = NULL;
+ServiceAutomaton* sa_specification = NULL;
+ServiceAutomaton* sa_result = NULL;
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
@@ -120,14 +120,15 @@ void evaluateParameters(int argc, char** argv) {
 
     // check input
     if (!args_info.specification_given) {
-      // count input files
-      switch(args_info.inputs_num) {
-      case 0:
-        abort(0, "no specification given");
-      case 1:
-        abort(0, "no test chase given");
-      default: /* all is fine */ ;
-      }
+        // count input files
+        switch (args_info.inputs_num) {
+            case 0:
+                abort(0, "no specification given");
+            case 1:
+                abort(0, "no test chase given");
+            default: /* all is fine */
+                ;
+        }
     }
 
     free(params);
@@ -173,21 +174,18 @@ int main(int argc, char** argv) {
     `---------------------------*/
 
     // open service automaton
-    if(args_info.specification_given) // if service is specified by --service=foo.sa
-    {
-      // open given automaton
-      sa_yyin = fopen(args_info.specification_arg, "r");
-      if(!sa_yyin) {
-        abort(0, "failed to open '%s'", args_info.specification_arg);
-      }
-    }
-    else
-    {
-      // otherwise assume first file given as the service' automaton
-      sa_yyin = fopen(args_info.inputs[0], "r");
-      if(!sa_yyin) {
-        abort(0, "failed to open '%s'", args_info.inputs[0]);
-      }
+    if (args_info.specification_given) { // if service is specified by --service=foo.sa
+        // open given automaton
+        sa_yyin = fopen(args_info.specification_arg, "r");
+        if (!sa_yyin) {
+            abort(0, "failed to open '%s'", args_info.specification_arg);
+        }
+    } else {
+        // otherwise assume first file given as the service' automaton
+        sa_yyin = fopen(args_info.inputs[0], "r");
+        if (!sa_yyin) {
+            abort(0, "failed to open '%s'", args_info.inputs[0]);
+        }
     }
 
     // actual parsing
@@ -208,58 +206,50 @@ int main(int argc, char** argv) {
 
     // if --specification is given, the first file given is a test case
     int i = (args_info.specification_given ? 0 : 1);
-    do
-    {
-      // set input
-      sa_yyin = (args_info.inputs_num == 0) ? stdin : fopen(args_info.inputs[i], "r");
-      if (!sa_yyin) {
-          abort(0, "failed to open '%s'", (args_info.inputs_num == 0) ? "standard input stream" : args_info.inputs[i]);
-      }
-
-      // parse test case
-      sa_yyparse();
-
-      // close input
-      fclose(sa_yyin);
-
-
-      // generate filename for dot output
-      if(args_info.dot_given)
-      {
-        if(args_info.inputs_num == 0)
-        {
-          dotFileName = "stdin.dot";
+    do {
+        // set input
+        sa_yyin = (args_info.inputs_num == 0) ? stdin : fopen(args_info.inputs[i], "r");
+        if (!sa_yyin) {
+            abort(0, "failed to open '%s'", (args_info.inputs_num == 0) ? "standard input stream" : args_info.inputs[i]);
         }
-        else
-        {
-          dotFileName = args_info.inputs[i];
-          dotFileName += ".dot";
+
+        // parse test case
+        sa_yyparse();
+
+        // close input
+        fclose(sa_yyin);
+
+
+        // generate filename for dot output
+        if (args_info.dot_given) {
+            if (args_info.inputs_num == 0) {
+                dotFileName = "stdin.dot";
+            } else {
+                dotFileName = args_info.inputs[i];
+                dotFileName += ".dot";
+            }
         }
-      }
 
-      // do the test
-      ProductAutomaton composition(*sa_specification, *sa_result);
-      Knowledge * knowledge = NULL;
-      bool result = composition.checkStrongReceivability() && (knowledge = new Knowledge(composition))->checkWeakReceivability();
+        // do the test
+        ProductAutomaton composition(*sa_specification, *sa_result);
+        Knowledge* knowledge = NULL;
+        bool result = composition.checkStrongReceivability() && (knowledge = new Knowledge(composition))->checkWeakReceivability();
 
-      if(knowledge) // if weak receivability checked
-      {
-        Knowledge::deleteAll(); // free memory
-        // Note: this also deletes "knowledge" (!)
-      }
-      message("%s: %s", ((args_info.inputs_num == 0) ? "stdin" : args_info.inputs[i]), (result ? "YES" : "NO"));
-      if(!result)
-      {
-        status(composition.errorMessage.c_str()); // give more information when --verbose is given
-      }
+        if (knowledge) { // if weak receivability checked
+            Knowledge::deleteAll(); // free memory
+            // Note: this also deletes "knowledge" (!)
+        }
+        message("%s: %s", ((args_info.inputs_num == 0) ? "stdin" : args_info.inputs[i]), (result ? "YES" : "NO"));
+        if (!result) {
+            status(composition.errorMessage.c_str()); // give more information when --verbose is given
+        }
 
-      if(args_info.dot_given && ((!result) || args_info.printAll_given))
-      {
-        composition.writeToDotFile(dotFileName, !result);
-      }
+        if (args_info.dot_given && ((!result) || args_info.printAll_given)) {
+            composition.writeToDotFile(dotFileName, !result);
+        }
 
-      // free memory
-      delete sa_result;
+        // free memory
+        delete sa_result;
     } while (++i < args_info.inputs_num);
 
     return EXIT_SUCCESS;

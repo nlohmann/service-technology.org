@@ -163,6 +163,7 @@ void Transition::fire(index_t t)
 {
     //  Don't even think about firing a disabled transition!
     assert(Transition::Enabled[t]);
+
     // 1. Update current marking
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {

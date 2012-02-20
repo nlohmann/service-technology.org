@@ -32,7 +32,7 @@
 /*!
 \param[in] port  The port to be used. Note that port numbers <1000 need root
            access.
-\param[in] destination  If the socket should be used to send messages (client)
+\param[in] hostname  If the socket should be used to send messages (client)
            then this parameter should hold an a hostname or an IPv4 address in
            the standard format "xxx.xxx.xxx.xxx". It defaults to NULL (server).
 
@@ -162,7 +162,7 @@ void Socket::send(const char* message) const
 \note This function is best called inside a thread.
 \param[in] message  the target message to wait for
 \return return the sender IP if a message is received that matches the target
-        #message
+        message
 \post Memory for return value needs to be freed by caller.
 */
 char* Socket::waitFor(const char* message) const

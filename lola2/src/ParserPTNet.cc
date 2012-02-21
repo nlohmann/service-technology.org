@@ -1,11 +1,12 @@
-
 /*!
 \author Karsten
 \file ParserPTNet.h
-\status new
+\status approved 21.02.2012
 
 Class definition for the result of the parsing of a low level net. This result
 should be independent from the format (LoLA / PNML / ...)
+
+\todo Mal den new-Operator in Bezug auf Exceptions ansehen.
 */
 
 #include <config.h>
@@ -152,6 +153,7 @@ void ParserPTNet::symboltable2net()
         const index_t tempCardPre = ps->getCardPre();
         const index_t tempCardPost = ps->getCardPost();
 
+        // we take care of the place name (not destructed by SymbolTable)
         Net::Name[PL][i] = ps->getKey();
         Net::CardArcs[PL][PRE][i] = tempCardPre;
         Net::CardArcs[PL][POST][i] = tempCardPost;
@@ -219,6 +221,7 @@ void ParserPTNet::symboltable2net()
         const index_t tempCardPre = ts->getCardPre();
         const index_t tempCardPost = ts->getCardPost();
 
+        // we need to take care of the name (not destructed by SymbolTable)
         Net::Name[TR][i] = ts->getKey();
         Net::CardArcs[TR][PRE][i] = tempCardPre;
         Net::CardArcs[TR][POST][i] = tempCardPost;
@@ -398,7 +401,6 @@ void ParserPTNet::symboltable2net()
                 {
                     conflicting[card_conflicting++] = tt;
                 }
-
             }
         }
 
@@ -437,7 +439,6 @@ void ParserPTNet::symboltable2net()
                 {
                     conflicting[card_conflicting++] = tt;
                 }
-
             }
         }
 

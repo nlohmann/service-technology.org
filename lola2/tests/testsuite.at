@@ -103,6 +103,23 @@ AT_CHECK([cat syntax_full.lola | LOLA],0,ignore,ignore)
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
+AT_SETUP([Double arc])
+AT_DATA(netfile,[PLACE p1, p2, p3;
+MARKING p1;
+TRANSITION t1
+CONSUME p1:1;
+PRODUCE p1:1;
+TRANSITION t2
+CONSUME p2:2;
+PRODUCE p2:1;
+TRANSITION t3
+CONSUME p3:1;
+PRODUCE p3:2;
+])
+AT_CHECK([cat netfile | LOLA -v],0,ignore,stderr)
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
 AT_SETUP([UTF8 input])
 AT_CHECK([cp TESTFILES/syntax_utf8.lola .])
 AT_CHECK([cat syntax_utf8.lola | LOLA],0,ignore,ignore)

@@ -13,8 +13,8 @@ as the absence of fairness.
 
 typedef enum
 {
-    NO_FAIRNESS,
-    WEAK_FAIRNESS,
-    STRONG_FAIRNESS
+    NO_FAIRNESS     = 0,
+    WEAK_FAIRNESS   = 1,
+    STRONG_FAIRNESS = 2
 }
 fairnessAssumption_t;

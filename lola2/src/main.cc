@@ -96,37 +96,40 @@ int main(int argc, char** argv)
     // install termination handler for ordered premature termination
     Handlers::installTerminationHandlers();
 
-    // handle input
-    if (args_info.inputs_num == 0)
+    /* this can be replaced by binary read */
     {
-        rep->status("reading from %s", rep->markup(MARKUP_FILE, "stdin").str());
-        /* nothing to do - yyin is pointing to stdin */
-    }
-    else
-    {
-        currentFile = 0;
-        yyin = fopen(args_info.inputs[currentFile], "r");
-        if (UNLIKELY(!yyin))
+        // handle input
+        if (args_info.inputs_num == 0)
         {
-            rep->status("could not open file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
-            rep->abort(ERROR_FILE);
+            rep->status("reading from %s", rep->markup(MARKUP_FILE, "stdin").str());
+            /* nothing to do - yyin is pointing to stdin */
         }
-        rep->status("reading from file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
+        else
+        {
+            currentFile = 0;
+            yyin = fopen(args_info.inputs[currentFile], "r");
+            if (UNLIKELY(!yyin))
+            {
+                rep->status("could not open file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
+                rep->abort(ERROR_FILE);
+            }
+            rep->status("reading from file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
+        }
+
+
+        // read the input file(s)
+        ParserPTNet* symbolTables = ParserPTNetLoLA();
+
+        rep->status("finished parsing");
+
+        fclose(yyin);
+        yylex_destroy();
+
+        // translate into general net structures
+        symbolTables->symboltable2net();
+
+        delete symbolTables;
     }
-
-
-    // read the input file(s)
-    ParserPTNet* symbolTables = ParserPTNetLoLA();
-
-    rep->status("finished parsing");
-
-    fclose(yyin);
-    yylex_destroy();
-
-    // translate into general net structures
-    symbolTables->symboltable2net();
-
-    delete symbolTables;
 
 
     if (args_info.randomWalk_given)

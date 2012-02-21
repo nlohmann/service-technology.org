@@ -251,13 +251,14 @@ AT_CHECK([GREP -q "finished parsing" listener.log])
 AT_KEYWORDS(reporter)
 AT_CLEANUP
 
-#AT_SETUP([ReporterSocket: killer])
-#AT_CHECK([cp TESTFILES/garavel.lola .])
-#AT_CHECK([LOLA garavel.lola --randomWalk --killerThread 2> lola.log &],0,ignore,ignore)
-#AT_CHECK([TERMINATOR],0,ignore,ignore)
-#AT_CHECK([GREP -q "lola: received KILL packet - shutting down" lola.log])
-#AT_KEYWORDS(reporter)
-#AT_CLEANUP
+AT_SETUP([ReporterSocket: killer thread])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([LOLA garavel.lola --randomWalk --remoteTermination & 2> /dev/null],0,ignore,ignore)
+AT_CHECK([KILLER],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: sending KILL packet (goodbye)" stderr])
+AT_CHECK([GREP -q "lola: received KILL packet (goodbye)" stderr])
+AT_KEYWORDS(reporter)
+AT_CLEANUP
 
 
 ############################################################################

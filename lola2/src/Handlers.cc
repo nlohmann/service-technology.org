@@ -10,6 +10,7 @@
 #include <csignal>
 #include <cstdlib>
 #include <cstring>
+#include <unistd.h>
 
 #include "Handlers.h"
 #include "Socket.h"
@@ -50,7 +51,7 @@ void* Handlers::remoteTerminationHandler(void*)
     free(sender);
 
     // abort LoLA by sending SIGUSR1 signal
-    kill(0, SIGUSR1);
+    kill(getpid(), SIGUSR1);
     return NULL;
 }
 

@@ -148,7 +148,6 @@ void WriteNetFile(FILE * f)
 #include <stdint.h>
 #endif
 
-#include "SymbolTable2Net.h"
 
 void ReadNetFile(FILE * f)
 {

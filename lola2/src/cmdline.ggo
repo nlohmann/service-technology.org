@@ -1,4 +1,19 @@
-args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error"
+args "--include-getopt --show-required --unamed-opts=FILES --no-handle-error"
+
+section "Input/Output"
+
+option "compressed" -
+  "Read a compressed file"
+  flag off
+
+option "writeCompressed" -
+  "Write a compressed file"
+  string
+  typestr="PREFIX"
+  optional
+  default="compressedOutput"
+  argoptional
+
 
 section "Reporter"
 

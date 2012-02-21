@@ -20,12 +20,9 @@
 #include "cmdline.h"
 #include "ParserPTNet.h"
 
+#include "Net.h"
 #include "Handlers.h"
 #include "RandomWalk.h"
-#include "Net.h"
-#include "Place.h"
-#include "Marking.h"
-#include "Transition.h"
 #include "CompressedIO.h"
 #include <cstdio>
 
@@ -96,7 +93,32 @@ int main(int argc, char** argv)
     // install termination handler for ordered premature termination
     Handlers::installTerminationHandlers();
 
-    /* this can be replaced by binary read */
+
+    // file input
+    if (args_info.compressed_given)
+    {
+        // read from stdin
+        if (args_info.inputs_num == 0)
+        {
+            ReadNetFile(stdin);
+        }
+        if (args_info.inputs_num == 1)
+        {
+            FILE *in = fopen(args_info.inputs[0], "r");
+            ReadNetFile(in);
+            fclose(in);
+        }
+        if (args_info.inputs_num == 2)
+        {
+            FILE *in = fopen(args_info.inputs[0], "r");
+            ReadNetFile(in);
+            fclose(in);
+            FILE *names = fopen(args_info.inputs[1], "r");
+            ReadNameFile(names);
+            fclose(names);
+        }
+    }
+    else
     {
         // handle input
         if (args_info.inputs_num == 0)
@@ -144,10 +166,16 @@ int main(int argc, char** argv)
         Net::print();
     }
 
-    Net::deleteNodes();
-    Place::deletePlaces();
-    Transition::deleteTransitions();
-    Marking::deleteMarkings();
+    /// \todo add suffix
+    /// \todo write name file
+    /// \todo encapsulate file handling
+    if (args_info.writeCompressed_given)
+    {
+        rep->status("print compressed net");
+        FILE *out = fopen(args_info.writeCompressed_arg, "w");
+        WriteNetFile(out);
+        fclose(out);
+    }
 
     return EXIT_SUCCESS;
 }

@@ -12,6 +12,10 @@
 #include <cstring>
 #include <unistd.h>
 
+#include "Net.h"
+#include "Place.h"
+#include "Marking.h"
+#include "Transition.h"
 #include "Handlers.h"
 #include "Socket.h"
 #include "Reporter.h"
@@ -74,6 +78,12 @@ void Handlers::exitHandler()
             rep->status("killed listener thread");
         }
     }
+
+    // tidy up
+    Net::deleteNodes();
+    Place::deletePlaces();
+    Transition::deleteTransitions();
+    Marking::deleteMarkings();
 
     // should be the very last call
     delete rep;

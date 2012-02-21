@@ -1,17 +1,16 @@
 /*!
-
 \file CompressedIO.cc
 \author Karsten
 \status new
 
-Input and outout from/to a file in compressed format. We generate two separate files that
-can be read in arbitrary order. In this version, we use an ASCII file where data are separated
-by spaces and newlines
-
+Input and outout from/to a file in compressed format. We generate two separate
+files that can be read in arbitrary order. In this version, we use an ASCII
+file where data are separated by spaces and newlines
 */
 
 #include <cstdio>
 #include <cstring>
+#include <cstdlib>
 #include "CompressedIO.h"
 #include "Net.h"
 #include "Marking.h"
@@ -19,127 +18,134 @@ by spaces and newlines
 #include "Place.h"
 #include "Transition.h"
 
-void WriteNameFile(FILE * f)
+void WriteNameFile(FILE* f)
 {
-	// 1. Number of places
-	fprintf(f,"%u\n", Net::Card[PL]);
+    // 1. Number of places
+    fprintf(f, "%u\n", Net::Card[PL]);
 
-	// 2. Places with one name per line, oin order of indices
-	for(index_t p = 0; p < Net::Card[PL]; p++)
-	{
-		fprintf(f,"%s\n", Net::Name[PL][p]);
-	}
+    // 2. Places with one name per line, oin order of indices
+    for (index_t p = 0; p < Net::Card[PL]; p++)
+    {
+        fprintf(f, "%s\n", Net::Name[PL][p]);
+    }
 
-	// 3. Number of transition
-	fprintf(f,"%u\n", Net::Card[TR]);
-	
-	// 4. Transitions with one name per line, in order of indices
-	for(index_t t = 0; t < Net::Card[TR]; t++)
-	{
-		fprintf(f,"%s\n", Net::Name[TR][t]);
-	}
+    // 3. Number of transition
+    fprintf(f, "%u\n", Net::Card[TR]);
+
+    // 4. Transitions with one name per line, in order of indices
+    for (index_t t = 0; t < Net::Card[TR]; t++)
+    {
+        fprintf(f, "%s\n", Net::Name[TR][t]);
+    }
 }
 
-void ReadNameFile(FILE * f)
+void ReadNameFile(FILE* f)
 {
-	char buffer[10000];
-	unsigned int tmp1, tmp2;
+    char buffer[10000];
+    unsigned int tmp1;
 
-	// 1. Number of places
-	fscanf(f,"%u",&tmp1);
-	Net::Card[PL] = (index_t) tmp1;
+    // 1. Number of places
+    fscanf(f, "%u", &tmp1);
+    Net::Card[PL] = (index_t) tmp1;
 
-	// 2. Places with one index, one name per line
-	for(index_t p = 0; p < Net::Card[PL]; p++)
-	{
-		fscanf(f,"%s",buffer);
-		Net::Name[PL][p] = (char *) malloc((strlen(buffer)+1) * sizeof(char)) ;
-		strcpy(Net::Name[PL][p],buffer);
-	}
-	
+    // 2. Places with one index, one name per line
+    for (index_t p = 0; p < Net::Card[PL]; p++)
+    {
+        fscanf(f, "%s", buffer);
+        Net::Name[PL][p] = (char*) malloc((strlen(buffer) + 1) * sizeof(char)) ;
+        strcpy(Net::Name[PL][p], buffer);
+    }
 
-	// 3. Number of transition
-	fscanf(f,"%u",&tmp1);
-	Net::Card[TR] = (index_t) tmp1;
-	
-	// 4. Transitions with one index, one name per line
-	for(index_t t = 0; t < Net::Card[TR]; t++)
-	{
-		fscanf(f,"%s",buffer);
-		Net::Name[TR][t] = (char *) malloc((strlen(buffer)+1) * sizeof(char)) ;
-		strcpy(Net::Name[TR][t],buffer);
-	}
+
+    // 3. Number of transition
+    fscanf(f, "%u", &tmp1);
+    Net::Card[TR] = (index_t) tmp1;
+
+    // 4. Transitions with one index, one name per line
+    for (index_t t = 0; t < Net::Card[TR]; t++)
+    {
+        fscanf(f, "%s", buffer);
+        Net::Name[TR][t] = (char*) malloc((strlen(buffer) + 1) * sizeof(char)) ;
+        strcpy(Net::Name[TR][t], buffer);
+    }
 }
 
-void WriteNetFile(FILE * f)
+void WriteNetFile(FILE* f)
 {
-	// 1. Number of places and significant places
-	fprintf(f,"%u %u", Net::Card[PL],Place::CardSignificant);
+    // 1. Number of places and significant places
+    fprintf(f, "%u %u", Net::Card[PL], Place::CardSignificant);
 
-	// 2. For each place...
-	for(index_t p = 0; p < Net::Card[PL]; p++)
-	{	
-		fprintf(f,"\n");
-		// 2.a initial marking
-		fprintf(f,"%u ", Marking::Initial[p]);
+    // 2. For each place...
+    for (index_t p = 0; p < Net::Card[PL]; p++)
+    {
+        fprintf(f, "\n");
+        // 2.a initial marking
+        fprintf(f, "%u ", Marking::Initial[p]);
 
-		// 2.b capacity
-		fprintf(f,"%u ", Place::Capacity[p]);
-		
-		// 2.c nr of incoming arcs
-		fprintf(f,"%u ", Net::CardArcs[PL][PRE][p]);
+        // 2.b capacity
+        fprintf(f, "%u ", Place::Capacity[p]);
 
-		for(index_t i = 0; i < Net::CardArcs[PL][PRE][p]; i++)
-		{
-			// 2.d incoming arcs and multiplicities
-			fprintf(f,"%u %u ",Net::Arc[PL][PRE][p][i],Net::Mult[PL][PRE][p][i]);
-		}
+        // 2.c nr of incoming arcs
+        fprintf(f, "%u ", Net::CardArcs[PL][PRE][p]);
 
-		// 2.e nr of outgoing arcs
-		fprintf(f,"%u ", Net::CardArcs[PL][POST][p]);
+        for (index_t i = 0; i < Net::CardArcs[PL][PRE][p]; i++)
+        {
+            // 2.d incoming arcs and multiplicities
+            fprintf(f, "%u %u ", Net::Arc[PL][PRE][p][i], Net::Mult[PL][PRE][p][i]);
+        }
 
-		for(index_t i = 0; i < Net::CardArcs[PL][POST][p]; i++)
-		{
-			// 2.f outgoing arcs and multiplicities
-			fprintf(f,"%u %u ",Net::Arc[PL][POST][p][i],Net::Mult[PL][POST][p][i]);
-		}
-	}
-	// 3. Number of transitions
-	fprintf(f,"\n%u", Net::Card[TR]);
+        // 2.e nr of outgoing arcs
+        fprintf(f, "%u ", Net::CardArcs[PL][POST][p]);
 
-	// 2. For each transition...
-	for(index_t t = 0; t < Net::Card[TR]; t++)
-	{	
-		fprintf(f,"\n");
-		// 2.a fairness
-		int fair;
-		switch(Transition::Fairness[t])
-		{
-		case NO_FAIRNESS: fair = 0; break;
-		case WEAK_FAIRNESS: fair = 1; break;
-		case STRONG_FAIRNESS: fair = 2; break;
-		default: fair = 4;
-		}
-		fprintf(f,"%u ", fair);
+        for (index_t i = 0; i < Net::CardArcs[PL][POST][p]; i++)
+        {
+            // 2.f outgoing arcs and multiplicities
+            fprintf(f, "%u %u ", Net::Arc[PL][POST][p][i], Net::Mult[PL][POST][p][i]);
+        }
+    }
+    // 3. Number of transitions
+    fprintf(f, "\n%u", Net::Card[TR]);
 
-		// 2.b nr of incoming arcs
-		fprintf(f,"%u ", Net::CardArcs[TR][PRE][t]);
+    // 2. For each transition...
+    for (index_t t = 0; t < Net::Card[TR]; t++)
+    {
+        fprintf(f, "\n");
+        // 2.a fairness
+        int fair;
+        switch (Transition::Fairness[t])
+        {
+            case NO_FAIRNESS:
+                fair = 0;
+                break;
+            case WEAK_FAIRNESS:
+                fair = 1;
+                break;
+            case STRONG_FAIRNESS:
+                fair = 2;
+                break;
+            default:
+                fair = 4;
+        }
+        fprintf(f, "%u ", fair);
 
-		for(index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
-		{
-			// 2.d incoming arcs and multiplicities
-			fprintf(f,"%u %u ",Net::Arc[TR][PRE][t][i],Net::Mult[TR][PRE][t][i]);
-		}
+        // 2.b nr of incoming arcs
+        fprintf(f, "%u ", Net::CardArcs[TR][PRE][t]);
 
-		// 2.e nr of outgoing arcs
-		fprintf(f,"%u ", Net::CardArcs[TR][POST][t]);
+        for (index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
+        {
+            // 2.d incoming arcs and multiplicities
+            fprintf(f, "%u %u ", Net::Arc[TR][PRE][t][i], Net::Mult[TR][PRE][t][i]);
+        }
 
-		for(index_t i = 0; i < Net::CardArcs[TR][POST][t]; i++)
-		{
-			// 2.f outgoing arcs and multiplicities
-			fprintf(f,"%u %u ",Net::Arc[TR][POST][t][i],Net::Mult[TR][POST][t][i]);
-		}
-	}
+        // 2.e nr of outgoing arcs
+        fprintf(f, "%u ", Net::CardArcs[TR][POST][t]);
+
+        for (index_t i = 0; i < Net::CardArcs[TR][POST][t]; i++)
+        {
+            // 2.f outgoing arcs and multiplicities
+            fprintf(f, "%u %u ", Net::Arc[TR][POST][t][i], Net::Mult[TR][POST][t][i]);
+        }
+    }
 
 }
 
@@ -149,22 +155,22 @@ void WriteNetFile(FILE * f)
 #endif
 
 
-void ReadNetFile(FILE * f)
+void ReadNetFile(FILE* f)
 {
     // read number of places
     unsigned int tmp1, tmp2;
-    fscanf(f,"%u %u",&tmp1,&tmp2);
-     Net::Card[PL] = (index_t) tmp1;
-     Place::CardSignificant = (index_t) tmp2;
+    fscanf(f, "%u %u", &tmp1, &tmp2);
+    Net::Card[PL] = (index_t) tmp1;
+    Place::CardSignificant = (index_t) tmp2;
     // allocate place arrays
-        Net::Name[PL] = (char**) calloc(Net::Card[PL] , SIZEOF_VOIDP);
-        for (int direction = PRE; direction <= POST; direction ++)
-        {
-            Net::CardArcs[PL][direction] = (index_t*) malloc(Net::Card[PL] * SIZEOF_INDEX_T);
-            Net::Arc[PL][direction] = (index_t**) malloc(Net::Card[PL] * SIZEOF_VOIDP);
-            Net::Mult[PL][direction] = (mult_t**) malloc(Net::Card[PL] * SIZEOF_VOIDP);
+    Net::Name[PL] = (char**) calloc(Net::Card[PL] , SIZEOF_VOIDP);
+    for (int direction = PRE; direction <= POST; direction ++)
+    {
+        Net::CardArcs[PL][direction] = (index_t*) malloc(Net::Card[PL] * SIZEOF_INDEX_T);
+        Net::Arc[PL][direction] = (index_t**) malloc(Net::Card[PL] * SIZEOF_VOIDP);
+        Net::Mult[PL][direction] = (mult_t**) malloc(Net::Card[PL] * SIZEOF_VOIDP);
 
-        }
+    }
     Place::Hash = (hash_t*) malloc(Net::Card[PL] * SIZEOF_HASH_T);
     Place::Capacity = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
     Place::CardBits = (cardbit_t*) malloc(Net::Card[PL] * SIZEOF_CARDBIT_T);
@@ -177,34 +183,34 @@ void ReadNetFile(FILE * f)
     for (index_t p = 0; p < Net::Card[PL]; p++)
     {
         Place::Hash[p] = rand() % MAX_HASH;
-	fscanf(f,"%u",&tmp1);
-	Marking::Initial[p] = (capacity_t) tmp1;
-	Marking::Current[p] = Marking::Initial[p];
+        fscanf(f, "%u", &tmp1);
+        Marking::Initial[p] = (capacity_t) tmp1;
+        Marking::Current[p] = Marking::Initial[p];
         Marking::HashInitial += Place::Hash[p] * Marking::Initial[p];
         Marking::HashInitial %= SIZEOF_MARKINGTABLE;
-	fscanf(f,"%u",&tmp1);
-	Place::Capacity[p] = (capacity_t) tmp1;
+        fscanf(f, "%u", &tmp1);
+        Place::Capacity[p] = (capacity_t) tmp1;
         Place::CardBits[p] = Place::Capacity2Bits(Place::Capacity[p]);
-        fscanf(f,"%u",&tmp1);
-	Net::CardArcs[PL][PRE][p] = (index_t) tmp1;
+        fscanf(f, "%u", &tmp1);
+        Net::CardArcs[PL][PRE][p] = (index_t) tmp1;
         Net::Arc[PL][PRE][p] = (index_t*) malloc(Net::CardArcs[PL][PRE][p] * SIZEOF_INDEX_T);
         Net::Mult[PL][PRE][p] = (mult_t*) malloc(Net::CardArcs[PL][PRE][p] * SIZEOF_MULT_T);
-	for(index_t i = 0; i < Net::CardArcs[PL][PRE][p];i++)
-	{
-		fscanf(f,"%u %u", &tmp1,&tmp2);
-		Net::Arc[PL][PRE][p][i] = (index_t) tmp1;
-		Net::Mult[PL][PRE][p][i] = (mult_t) tmp2;
-	}
-        fscanf(f,"%u",&tmp1);
-	Net::CardArcs[PL][POST][p] = (index_t) tmp1;
+        for (index_t i = 0; i < Net::CardArcs[PL][PRE][p]; i++)
+        {
+            fscanf(f, "%u %u", &tmp1, &tmp2);
+            Net::Arc[PL][PRE][p][i] = (index_t) tmp1;
+            Net::Mult[PL][PRE][p][i] = (mult_t) tmp2;
+        }
+        fscanf(f, "%u", &tmp1);
+        Net::CardArcs[PL][POST][p] = (index_t) tmp1;
         Net::Arc[PL][POST][p] = (index_t*) malloc(Net::CardArcs[PL][POST][p] * SIZEOF_INDEX_T);
         Net::Mult[PL][POST][p] = (mult_t*) malloc(Net::CardArcs[PL][POST][p] * SIZEOF_MULT_T);
-	for(index_t i = 0; i < Net::CardArcs[PL][POST][p];i++)
-	{
-		fscanf(f,"%u %u", &tmp1,&tmp2);
-		Net::Arc[PL][POST][p][i] = (index_t) tmp1;
-		Net::Mult[PL][POST][p][i] = (mult_t) tmp2;
-	}
+        for (index_t i = 0; i < Net::CardArcs[PL][POST][p]; i++)
+        {
+            fscanf(f, "%u %u", &tmp1, &tmp2);
+            Net::Arc[PL][POST][p][i] = (index_t) tmp1;
+            Net::Mult[PL][POST][p][i] = (mult_t) tmp2;
+        }
         // initially: no disabled transistions (through CardDisabled = 0)
         // correct values will be achieved by initial checkEnabled...
         Place::Disabled[p] = (index_t*) malloc(Net::CardArcs[PL][POST][p] * SIZEOF_INDEX_T);
@@ -213,17 +219,17 @@ void ReadNetFile(FILE * f)
     Marking::HashCurrent = Marking::HashInitial;
     // Allocate arrays for places and transitions
 
-    fscanf(f,"%u",&tmp1);
+    fscanf(f, "%u", &tmp1);
     Net::Card[TR] = (index_t) tmp1;
 
-        Net::Name[TR] = (char**) calloc(Net::Card[TR] , SIZEOF_VOIDP);
-        for (int direction = PRE; direction <= POST; direction ++)
-        {
-            Net::CardArcs[TR][direction] = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-            Net::Arc[TR][direction] = (index_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
-            Net::Mult[TR][direction] = (mult_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
+    Net::Name[TR] = (char**) calloc(Net::Card[TR] , SIZEOF_VOIDP);
+    for (int direction = PRE; direction <= POST; direction ++)
+    {
+        Net::CardArcs[TR][direction] = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+        Net::Arc[TR][direction] = (index_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
+        Net::Mult[TR][direction] = (mult_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
 
-        }
+    }
 
     index_t* current_arc_post = (index_t*) calloc(Net::Card[PL], SIZEOF_INDEX_T);
     index_t* current_arc_pre = (index_t*) calloc(Net::Card[PL], SIZEOF_INDEX_T);
@@ -244,36 +250,43 @@ void ReadNetFile(FILE * f)
     }
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
-	unsigned int fair;
-	fscanf(f,"%u",&fair);
-	switch(fair)
-	{
-	case 0: Transition::Fairness[t] = NO_FAIRNESS; break;
-	case 1: Transition::Fairness[t] = WEAK_FAIRNESS; break;
-	case 2: Transition::Fairness[t] = STRONG_FAIRNESS; break;
-	default: Transition::Fairness[t] = NO_FAIRNESS;
-	}
-        fscanf(f,"%u",&tmp1); 
-	Net::CardArcs[TR][PRE][t] = (index_t) tmp1;
+        unsigned int fair;
+        fscanf(f, "%u", &fair);
+        switch (fair)
+        {
+            case 0:
+                Transition::Fairness[t] = NO_FAIRNESS;
+                break;
+            case 1:
+                Transition::Fairness[t] = WEAK_FAIRNESS;
+                break;
+            case 2:
+                Transition::Fairness[t] = STRONG_FAIRNESS;
+                break;
+            default:
+                Transition::Fairness[t] = NO_FAIRNESS;
+        }
+        fscanf(f, "%u", &tmp1);
+        Net::CardArcs[TR][PRE][t] = (index_t) tmp1;
         Net::Arc[TR][PRE][t] = (index_t*) malloc(Net::CardArcs[TR][PRE][t] * SIZEOF_INDEX_T);
         Net::Mult[TR][PRE][t] = (mult_t*) malloc(Net::CardArcs[TR][PRE][t] * SIZEOF_MULT_T);
         Transition::Enabled[t] = true;
-	for(index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
-	{
-		fscanf(f,"%u %u",&tmp1,&tmp2);
-		Net::Arc[TR][PRE][t][i] = (index_t) tmp1;
-		Net::Mult[TR][PRE][t][i] = (mult_t) tmp2;
-	}
-        fscanf(f,"%u",&tmp1); 
-	Net::CardArcs[TR][POST][t] = (index_t) tmp1;
+        for (index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
+        {
+            fscanf(f, "%u %u", &tmp1, &tmp2);
+            Net::Arc[TR][PRE][t][i] = (index_t) tmp1;
+            Net::Mult[TR][PRE][t][i] = (mult_t) tmp2;
+        }
+        fscanf(f, "%u", &tmp1);
+        Net::CardArcs[TR][POST][t] = (index_t) tmp1;
         Net::Arc[TR][POST][t] = (index_t*) malloc(Net::CardArcs[TR][POST][t] * SIZEOF_INDEX_T);
         Net::Mult[TR][POST][t] = (mult_t*) malloc(Net::CardArcs[TR][POST][t] * SIZEOF_MULT_T);
-	for(index_t i = 0; i < Net::CardArcs[TR][POST][t]; i++)
-	{
-		fscanf(f,"%u %u",&tmp1,&tmp2);
-		Net::Arc[TR][POST][t][i] = (index_t) tmp1;
-		Net::Mult[TR][POST][t][i] = (mult_t) tmp2;
-	}
+        for (index_t i = 0; i < Net::CardArcs[TR][POST][t]; i++)
+        {
+            fscanf(f, "%u %u", &tmp1, &tmp2);
+            Net::Arc[TR][POST][t][i] = (index_t) tmp1;
+            Net::Mult[TR][POST][t][i] = (mult_t) tmp2;
+        }
     }
     // logically, current_arc_* can be freed here, physically, we just rename them to
     // their new purpose

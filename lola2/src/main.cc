@@ -26,6 +26,8 @@
 #include "Place.h"
 #include "Marking.h"
 #include "Transition.h"
+#include "CompressedIO.h"
+#include <cstdio>
 
 extern ParserPTNet* ParserPTNetLoLA();
 

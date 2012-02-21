@@ -12,6 +12,7 @@ lola_SOURCES = \
                 ParserPTNet.h ParserPTNet.cc \
                 ParserPTNetLoLA.yy Lexic.ll \
                 Place.cc Place.h \
+		CompressedIO.cc CompressedIO.h \
                 PlaceSymbol.cc PlaceSymbol.h \
                 RandomWalk.cc RandomWalk.h \
                 Reporter.cc Reporter.h \

@@ -14,9 +14,9 @@ should be independent from the format (LoLA / PNML / ...)
 class ParserPTNet
 {
     private:
-        static void sort_arcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to);
 
     public:
+        static void sort_arcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to);
         SymbolTable* PlaceTable;
         SymbolTable* TransitionTable;
 

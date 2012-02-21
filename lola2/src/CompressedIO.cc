@@ -13,9 +13,9 @@ by spaces and newlines
 #include <cstdio>
 #include <cstring>
 #include "CompressedIO.h"
-#include "SymbolTable2Net.h"
 #include "Net.h"
 #include "Marking.h"
+#include "ParserPTNet.h"
 #include "Place.h"
 #include "Transition.h"
 
@@ -291,8 +291,8 @@ void ReadNetFile(FILE * f)
         // initialize DeltaT structures
         index_t card_delta_pre = 0;
         index_t card_delta_post = 0;
-        sort_arcs(Net::Arc[TR][PRE][t], Net::Mult[TR][PRE][t], 0, Net::CardArcs[TR][PRE][t]);
-        sort_arcs(Net::Arc[TR][POST][t], Net::Mult[TR][POST][t], 0, Net::CardArcs[TR][POST][t]);
+        ParserPTNet::sort_arcs(Net::Arc[TR][PRE][t], Net::Mult[TR][PRE][t], 0, Net::CardArcs[TR][PRE][t]);
+        ParserPTNet::sort_arcs(Net::Arc[TR][POST][t], Net::Mult[TR][POST][t], 0, Net::CardArcs[TR][POST][t]);
         index_t i; // parallel iteration through sorted pre and post arc sets
         index_t j;
         for (i = 0, j = 0; (i < Net::CardArcs[TR][PRE][t]) && (j < Net::CardArcs[TR][POST][t]); /* tricky increment */)

@@ -4,6 +4,7 @@ bin_PROGRAMS = lola listener killer
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
                 ArcList.cc ArcList.h \
+                CompressedIO.cc CompressedIO.h \
                 Dimensions.h \
                 FairnessAssumptions.h \
                 Handlers.cc Handlers.h \
@@ -12,11 +13,11 @@ lola_SOURCES = \
                 ParserPTNet.h ParserPTNet.cc \
                 ParserPTNetLoLA.yy Lexic.ll \
                 Place.cc Place.h \
-		CompressedIO.cc CompressedIO.h \
                 PlaceSymbol.cc PlaceSymbol.h \
                 RandomWalk.cc RandomWalk.h \
                 Reporter.cc Reporter.h \
                 Socket.cc Socket.h \
+                Store.h \
                 Symbol.cc Symbol.h \
                 SymbolTable.cc SymbolTable.h \
                 Transition.cc Transition.h \

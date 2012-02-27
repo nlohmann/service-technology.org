@@ -8,6 +8,7 @@ lola_SOURCES = \
                 Dimensions.h \
                 FairnessAssumptions.h \
                 Handlers.cc Handlers.h \
+                InputOutput.cc InputOutput.h \
                 Marking.cc Marking.h \
                 Net.cc Net.h \
                 ParserPTNet.h ParserPTNet.cc \
@@ -17,6 +18,7 @@ lola_SOURCES = \
                 RandomWalk.cc RandomWalk.h \
                 Reporter.cc Reporter.h \
                 Socket.cc Socket.h \
+                SimpleString.cc SimpleString.h \
                 Store.h \
                 Symbol.cc Symbol.h \
                 SymbolTable.cc SymbolTable.h \
@@ -27,10 +29,12 @@ lola_SOURCES = \
 
 listener_SOURCES = Listener.cc \
                    Reporter.cc Reporter.h \
+                   SimpleString.cc SimpleString.h \
                    Socket.cc Socket.h
 
 killer_SOURCES = Killer.cc \
                  Reporter.cc Reporter.h \
+                 SimpleString.cc SimpleString.h \
                  Socket.cc Socket.h
 
 #############################################################################

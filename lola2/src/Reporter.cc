@@ -27,32 +27,6 @@ const char* Reporter::error_messages[] =
 /*---------------------------------------------------------------------------*/
 
 /*!
-\note The given string is NOT copied! Only the pointer is stored and it will be
-      freed by the constructor. DO NOT use this constructor with const char*,
-      string literals, or anything that should live longer than this object
-*/
-Reporter::String::String(char* s) : s(s)
-{
-    assert(s);
-}
-
-/*!
-\pre memory for member s was allocated outside this object using malloc
-\post memory for member s is released
-*/
-Reporter::String::~String()
-{
-    free(s);
-}
-
-char* Reporter::String::str() const
-{
-    return s;
-}
-
-/*---------------------------------------------------------------------------*/
-
-/*!
 \param port     the port to use
 \param[in] ip   the target IP address
 \param verbose  whether to display verbose messages
@@ -126,7 +100,7 @@ ReporterSocket::~ReporterSocket()
 \post Passed string format is formatted according to markup.
 \note Memory for res is released by Reporter::~String().
 */
-Reporter::String ReporterSocket::markup(markup_t, const char* format, ...) const
+String ReporterSocket::markup(markup_t, const char* format, ...) const
 {
     va_list args;
     va_start(args, format);
@@ -134,7 +108,7 @@ Reporter::String ReporterSocket::markup(markup_t, const char* format, ...) const
     const int r = vasprintf(&res, format, args);
     assert(r != -1);
     va_end(args);
-    return Reporter::String(res);
+    return String(res);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -247,7 +221,7 @@ __attribute__((noreturn)) void ReporterStream::abort(errorcode_t code) const
 \post Passed string format is formatted according to markup.
 \note Memory for res is released by ~Reporter::String().
 */
-Reporter::String ReporterStream::markup(markup_t markup, const char* format, ...) const
+String ReporterStream::markup(markup_t markup, const char* format, ...) const
 {
     va_list args;
     va_start(args, format);
@@ -302,5 +276,5 @@ Reporter::String ReporterStream::markup(markup_t markup, const char* format, ...
     assert(res);
     free(message);
 
-    return Reporter::String(res);
+    return String(res);
 }

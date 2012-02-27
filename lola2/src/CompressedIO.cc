@@ -8,9 +8,10 @@ files that can be read in arbitrary order. In this version, we use an ASCII
 file where data are separated by spaces and newlines
 */
 
+#include <config.h>
 #include <cstdio>
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>

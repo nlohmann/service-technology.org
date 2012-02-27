@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <csignal>
+#include "SimpleString.h"
 #include "Socket.h"
 #include "Reporter.h"
 

@@ -21,6 +21,7 @@
 #include "Reporter.h"
 #include "Dimensions.h"
 #include "cmdline.h"
+#include "String.h"
 
 extern Reporter* rep;
 extern gengetopt_args_info args_info;

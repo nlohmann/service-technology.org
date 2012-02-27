@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "SimpleString.h"
 #include "Socket.h"
 
 /// error codes for the Reporter::abort() function
@@ -38,24 +39,6 @@ typedef enum
 class Reporter
 {
     protected:
-        /// string class to avoid STL's std::string
-        class String
-        {
-            private:
-                /// payload - is freed in destructor
-                char* s;
-
-            public:
-                /// constructor (does only copy pointer, not content)
-                String(char* s);
-
-                /// destructor - frees payload
-                ~String();
-
-                /// getter for s
-                char* str() const;
-        };
-
         /// error messages
         static const char* error_messages[];
 
@@ -63,7 +46,7 @@ class Reporter
         virtual ~Reporter() {}
 
         /// markup a string
-        virtual Reporter::String markup(markup_t, const char*, ...) const = 0;
+        virtual String markup(markup_t, const char*, ...) const = 0;
 
         /// always report
         virtual void message(const char*, ...) const = 0;
@@ -101,7 +84,7 @@ class ReporterSocket : public Reporter
         __attribute__((noreturn)) void abort(errorcode_t) const;
 
         /// markup a string
-        Reporter::String markup(markup_t, const char*, ...) const;
+        String markup(markup_t, const char*, ...) const;
 };
 
 /*!
@@ -181,5 +164,5 @@ class ReporterStream : public Reporter
         __attribute__((noreturn)) void abort(errorcode_t) const;
 
         /// markup a string
-        Reporter::String markup(markup_t, const char*, ...) const;
+        String markup(markup_t, const char*, ...) const;
 };

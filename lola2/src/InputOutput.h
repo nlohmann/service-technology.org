@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdio.h>
-#include "String.h"
+#include "SimpleString.h"
 
 class IO
 {

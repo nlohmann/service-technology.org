@@ -281,6 +281,11 @@ AT_CHECK([KILLER],0,stdout,stderr)
 AT_CHECK([KILLER],0,stdout,stderr)
 AT_CHECK([KILLER],0,stdout,stderr)
 AT_CHECK([KILLER],0,stdout,stderr)
+AT_CHECK([KILLER],0,stdout,stderr)
+AT_CHECK([KILLER],0,stdout,stderr)
+AT_CHECK([KILLER],0,stdout,stderr)
+AT_CHECK([KILLER],0,stdout,stderr)
+AT_CHECK([KILLER],0,stdout,stderr)
 AT_KEYWORDS(reporter)
 AT_CLEANUP
 

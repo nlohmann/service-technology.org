@@ -27,7 +27,7 @@
 #include "CompressedIO.h"
 
 #include "Store.h"
-#include "BddStore.h"
+#include "BDDStore.h"
 
 extern ParserPTNet* ParserPTNetLoLA();
 

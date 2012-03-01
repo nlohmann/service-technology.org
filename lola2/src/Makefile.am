@@ -28,6 +28,16 @@ lola_SOURCES = \
                 cmdline.c cmdline.h \
                 main.cc
 
+lola_LDADD = $(builddir)/../libs/cudd/libobj.a \
+	$(builddir)/../libs/cudd/libdddmp.a \
+	$(builddir)/../libs/cudd/libcudd.a \
+	$(builddir)/../libs/cudd/libmtr.a \
+	$(builddir)/../libs/cudd/libst.a \
+	$(builddir)/../libs/cudd/libutil.a \
+	$(builddir)/../libs/cudd/libepd.a
+
+lola_CPPFLAGS = -I$(top_srcdir)/libs/cudd/include
+
 listener_SOURCES = Listener.cc \
                    Reporter.cc Reporter.h \
                    SimpleString.cc SimpleString.h \

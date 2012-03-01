@@ -22,6 +22,13 @@ AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
+AC_PROG_RANLIB
+
+# use the service-technology.org macros
+AC_ST_BASIC
+AC_ST_AUTOTEST
+AC_ST_VERBOSE
+
 
 # check for POSIX threads
 AX_PTHREAD()
@@ -88,14 +95,22 @@ AC_CHECK_FUNCS([asprintf vasprintf snprintf vsnprintf atexit memset socket strch
 AC_CHECK_FUNC(gethostent, , AC_CHECK_LIB(nsl, gethostent))
 AC_CHECK_FUNC(setsockopt, , AC_CHECK_LIB(socket, setsockopt))
 
-# use the service-technology.org macros
-AC_ST_BASIC
-AC_ST_AUTOTEST
-AC_ST_VERBOSE
+
+####################################################################
+# Checks for libraries.
+# FIXME: Replace `main' with a function in `-lm':
+AC_CHECK_LIB([m], [main])
+
+# needed to compile CUDD on x86_64 machines
+AC_CHECK_SIZEOF([void*])
+CUDD_XFLAGS="-DSIZEOF_VOID_P=$ac_cv_sizeof_voidp"
+AC_SUBST(CUDD_XFLAGS)
+####################################################################
+
 
 # write files
 AC_CONFIG_FILES([
 	Makefile src/Makefile doc/Doxyfile doc/Doxydetails
-	tests/Makefile tests/package.m4])
+	tests/Makefile tests/package.m4 libs/cudd/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

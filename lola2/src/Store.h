@@ -1,5 +1,10 @@
 #pragma once
 
+#include <config.h>
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
+
 class State;
 
 /*!
@@ -27,7 +32,7 @@ class Store
 
         Store() : markings(0), calls(0) {}
 
-        virtual ~Store() = 0;
+        virtual ~Store() {};
 
         /// check whether current marking is stored
         virtual bool searchAndInsert() = 0;

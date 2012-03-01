@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstdlib>
+#include <cstdio>
 
 #include "Reporter.h"
 #include "cmdline.h"
@@ -24,7 +25,9 @@
 #include "Handlers.h"
 #include "RandomWalk.h"
 #include "CompressedIO.h"
-#include <cstdio>
+
+#include "Store.h"
+#include "BddStore.h"
 
 extern ParserPTNet* ParserPTNetLoLA();
 
@@ -176,6 +179,11 @@ int main(int argc, char** argv)
         WriteNetFile(out);
         fclose(out);
     }
+
+/*
+    Store *s = new BDDStore();
+    s->searchAndInsert();
+*/
 
     return EXIT_SUCCESS;
 }

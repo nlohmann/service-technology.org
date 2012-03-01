@@ -17,6 +17,7 @@ lola_SOURCES = \
                 PlaceSymbol.cc PlaceSymbol.h \
                 RandomWalk.cc RandomWalk.h \
                 Reporter.cc Reporter.h \
+                LinearAlgebra.cc LinearAlgebra.h \
                 Socket.cc Socket.h \
                 SimpleString.cc SimpleString.h \
                 Store.h \

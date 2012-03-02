@@ -33,7 +33,8 @@ TESTFILES = activeCausal.ifn \
 			mutual.ifn \
 			mutual-downgrade.ifn \
 			wrong-format.ifn \
-			causal-illegal-sequence.ifn
+			causal-illegal-sequence.ifn \
+			zeus.ifn
 # <<-- CHANGE END -->>
 
 

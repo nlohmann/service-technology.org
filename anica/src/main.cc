@@ -151,7 +151,7 @@ void evaluateParameters(int argc, char** argv) {
     }
 
 	// check dependencies
-    if ((args_info.task_arg != task_arg_verfification) && (args_info.property_arg != property_arg_PBNIPLUS_)) {
+    if ((args_info.task_arg != task_arg_verification) && (args_info.property_arg != property_arg_PBNIPLUS_)) {
 		abort(7, "task and property combination is not supported");
 	}
 
@@ -170,17 +170,17 @@ void evaluateParameters(int argc, char** argv) {
 	//if ((args_info.task_arg == task_arg_characterization) && (args_info.modus_arg == mdous_arg_call)) {
 	//	status(_cwarning_("modus=call makes no sense with task characterization: BUT will be performed."));
 	//}
-	if ((args_info.task_arg != task_arg_verfification) && (args_info.unlabeledTransitions_arg != unlabeledTransitions_arg_none)) {
+	if ((args_info.task_arg != task_arg_verification) && (args_info.unlabeledTransitions_arg != unlabeledTransitions_arg_none)) {
 		status(_cwarning_("unlabeledTransitions makes no sense with current task: BUT will be performed."));
 	}
-	if ((args_info.task_arg != task_arg_verfification) && (checkActiveCausal || checkActiveConflict)) {
+	if ((args_info.task_arg != task_arg_verification) && (checkActiveCausal || checkActiveConflict)) {
 		status(_cwarning_("activePlaces have no influence on this task: parameter will be ignored."));
 	}
-	if ((args_info.task_arg != task_arg_verfification) && args_info.oneActiveOnly_flag) {
+	if ((args_info.task_arg != task_arg_verification) && args_info.oneActiveOnly_flag) {
 		status(_cwarning_("oneActiveOnly has no influence on this task: parameter will be ignored."));
 		args_info.oneActiveOnly_flag = false;
 	}
-	if ((args_info.task_arg != task_arg_verfification) && args_info.oneTripleOnly_flag) {
+	if ((args_info.task_arg != task_arg_verification) && args_info.oneTripleOnly_flag) {
 		status(_cwarning_("oneTripleOnly has no influence on this task: parameter will be ignored."));
 		args_info.oneTripleOnly_flag = false;
 	}
@@ -545,10 +545,9 @@ int main(int argc, char** argv) {
 	FOREACH(t, net.getTransitions()) {
 		switch ((**t).getConfidence()) {
 		    case CONFIDENCE_NONE:
-			    // unlabeled transition
 			    switch (args_info.unlabeledTransitions_arg) {
 			        case unlabeledTransitions_arg_none:
-				        if (args_info.task_arg == task_arg_verfification) {
+				        if (args_info.task_arg == task_arg_verification) {
 				            abort(6, "%s has unknown confidence level", (**t).getName().c_str());
 				        }
 				        break;
@@ -582,7 +581,7 @@ int main(int argc, char** argv) {
 		}
 	}
 
-    if (args_info.task_arg == task_arg_verfification) {
+    if (args_info.task_arg == task_arg_verification) {
 	    if (lowTransitions == 0 || highTransitions == 0) {
 	        status("trivial confidence level used");
 	        message(_cgood_("Non-Interference: PASSED"));
@@ -591,7 +590,7 @@ int main(int argc, char** argv) {
 	    }
 	}
 
-    if ((args_info.task_arg != task_arg_verfification) && (downTransitions > 0)) {
+    if ((args_info.task_arg != task_arg_verification) && (downTransitions > 0)) {
 		abort(800, "PBNID is not supported for your task");
     }
     
@@ -622,8 +621,8 @@ int main(int argc, char** argv) {
     | 4. gather potential places	   |
     `---------------------------------*/
 	 
-	const bool checkPotentialCausal = (args_info.task_arg != task_arg_verfification) ? true : (args_info.potentialPlaces_arg != potentialPlaces_arg_conflict);
-    const bool checkPotentialConflict = (args_info.task_arg != task_arg_verfification) ? true : (args_info.potentialPlaces_arg != potentialPlaces_arg_causal);
+	const bool checkPotentialCausal = (args_info.task_arg != task_arg_verification) ? true : (args_info.potentialPlaces_arg != potentialPlaces_arg_conflict);
+    const bool checkPotentialConflict = (args_info.task_arg != task_arg_verification) ? true : (args_info.potentialPlaces_arg != potentialPlaces_arg_causal);
     
     set<Place *> potentialCausal;
     set<Place *> potentialConflict;
@@ -639,19 +638,9 @@ int main(int argc, char** argv) {
 	    set<Transition *> lHighPre;
 	    set<Transition *> lHighPost;
 	    set<Transition *> lLowPost;
-	
-	    if (checkPotentialCausal) {
-		    FOREACH(t, (**p).getPreset()) {
-		        const unsigned int confidence = ((Transition *)(*t))->getConfidence();
-			    if (confidence == CONFIDENCE_HIGH) {
-				    lHighPre.insert((Transition *)*t);
-			    }
-			    if ((args_info.task_arg != task_arg_verfification) && (confidence == CONFIDENCE_NONE)) {
-			        lHighPre.insert((Transition *)*t);
-			    }
-		    }
-	    }
-
+		
+		bool doubleTransition = false;
+		
 	    FOREACH(t, (**p).getPostset()) {
 	        switch (((Transition *)(*t))->getConfidence()) {
 		        case CONFIDENCE_HIGH:
@@ -661,18 +650,34 @@ int main(int argc, char** argv) {
 			        lLowPost.insert((Transition *)*t);
 			        break;
 		        case CONFIDENCE_NONE:
-		            if (args_info.task_arg != task_arg_verfification) {
-		                // handle (later!) the case of same transition
-		                lHighPost.insert((Transition *)*t);
-		                lLowPost.insert((Transition *)*t);
+		            if (args_info.task_arg != task_arg_verification) {
+	                    // handle (later!) the case of same transition
+	                    lHighPost.insert((Transition *)*t);
+	                    lLowPost.insert((Transition *)*t);
+	                    doubleTransition = true;
 		            }
 		            break;
 		    }
 	    }
-        
+	
+	    if (doubleTransition && (lHighPost.size() == 1) && (lLowPost.size() == 1)) {
+	        // only one and the same transition is element of the both sets
+	        // lHighPost is therefore uninteresting
+	        lHighPost.clear();
+	    }
+	
 	    bool lowPostDone = false;
-
-	    if (checkPotentialCausal) {
+	
+	    if (checkPotentialCausal && (lLowPost.size() > 0)) {
+		    FOREACH(t, (**p).getPreset()) {
+		        const unsigned int confidence = ((Transition *)(*t))->getConfidence();
+			    if (confidence == CONFIDENCE_HIGH) {
+				    lHighPre.insert((Transition *)*t);
+			    }
+			    if ((args_info.task_arg != task_arg_verification) && (confidence == CONFIDENCE_NONE)) {
+			        lHighPre.insert((Transition *)*t);
+			    }
+		    }
 		    if (!lHighPre.empty() && !lLowPost.empty()) {
 			    status(_cwarning_("....potential causal"));
 			    potentialCausal.insert(*p);
@@ -731,8 +736,8 @@ int main(int argc, char** argv) {
     | 5. check potential places		   |
     `---------------------------------*/
 
-    const bool checkActiveCausal = (args_info.task_arg != task_arg_verfification) ? true : ((args_info.activePlaces_arg == activePlaces_arg_causal) || (args_info.activePlaces_arg == activePlaces_arg_both));
-    const bool checkActiveConflict = (args_info.task_arg != task_arg_verfification) ? true : ((args_info.activePlaces_arg == activePlaces_arg_conflict) || (args_info.activePlaces_arg == activePlaces_arg_both));
+    const bool checkActiveCausal = (args_info.task_arg != task_arg_verification) ? true : ((args_info.activePlaces_arg == activePlaces_arg_causal) || (args_info.activePlaces_arg == activePlaces_arg_both));
+    const bool checkActiveConflict = (args_info.task_arg != task_arg_verification) ? true : ((args_info.activePlaces_arg == activePlaces_arg_conflict) || (args_info.activePlaces_arg == activePlaces_arg_both));
     
     set<Place *> activeCausal;
     set<Place *> activeConflict;
@@ -766,9 +771,9 @@ int main(int argc, char** argv) {
 	    
 	    unsigned int i;
 	    
-	    // initial stuff before considering the specific net
+	    // initial stuff before considering the triples
 	    switch (args_info.task_arg) {
-	        case task_arg_verfification:
+	        case task_arg_verification:
 	            break;
 	        case task_arg_characterization:
 	            cuddManager = new Cudd();
@@ -812,20 +817,6 @@ int main(int argc, char** argv) {
                             break;
                         case CONFIDENCE_NONE:
                             // unlabeled transition
-                            /*
-                            Place* controllerActivate = &extendedNet->createPlace(string("activate_make_" + (**t).getName()), 1);
-                            Place* controllerConfigure = &extendedNet->createPlace(string("configure_" + (**t).getName()), 1);
-                            Place* controllerLow = &extendedNet->createPlace(string((**t).getName() + LOW), 1);
-                            Place* controllerHigh = &extendedNet->createPlace(string((**t).getName() + HIGH), 0);
-                            Transition* controllerMakeHigh = &extendedNet->createTransition(string("make_high_" + (**t).getName()));
-                            controllerMakeHigh->addLabel(extendedNet->getInterface().addSynchronousLabel(string("make_" + (**t).getName() + "_high")));
-                            newArcs.insert(make_pair(controllerActivate, controllerMakeHigh));
-                            newArcs.insert(make_pair(controllerConfigure, controllerMakeHigh));
-                            newArcs.insert(make_pair(controllerMakeHigh, controllerConfigure));
-                            newArcs.insert(make_pair(controllerConfigure, startTransition));
-                            newArcs.insert(make_pair(controllerLow, controllerMakeHigh));
-                            newArcs.insert(make_pair(controllerMakeHigh, controllerHigh));
-                            */
                             Place* controllerConfigure = &extendedNet->createPlace(string("configure_" + (**t).getName()), 1);
                             Transition* controllerMakeHigh = &extendedNet->createTransition(string("make_high_" + (**t).getName()));
                             controllerMakeHigh->addLabel(extendedNet->getInterface().addSynchronousLabel(string("make_" + (**t).getName() + "_high")));
@@ -870,7 +861,7 @@ int main(int argc, char** argv) {
 					    status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
 					    potentialCausalTriple.insert(make_pair(*p, make_pair((*itHigh).second, (*itLow).second)));
 					    
-					    if (args_info.task_arg == task_arg_verfification || args_info.task_arg == task_arg_characterization) {
+					    if (args_info.task_arg == task_arg_verification || args_info.task_arg == task_arg_characterization) {
 					        extendedNet = new PetriNet(net);
 					    }
 					    s = extendedNet->findPlace((**p).getName());
@@ -881,7 +872,7 @@ int main(int argc, char** argv) {
 			            extendedNet->getFinalCondition().addProposition(*extResult.goal == 0, true);
 					    
 					    switch (args_info.task_arg) {
-					        case task_arg_verfification:
+					        case task_arg_verification:
 					            switch (args_info.modus_arg) {
 			                        case modus_arg_makefile:
 			                            createLolaTask(*extendedNet, fileName + ".causal." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
@@ -902,7 +893,7 @@ int main(int argc, char** argv) {
 					            if (args_info.finalize_flag) {delete extendedNet;}
 					            break;
 					            
-					        case task_arg_characterization: // ToDo: mit task_arg_verfification zusammenfassen...
+					        case task_arg_characterization: // ToDo: mit task_arg_verification zusammenfassen...
 					            switch (args_info.modus_arg) {
 			                        case modus_arg_makefile:
 			                            createLolaTask(*extendedNet, fileName + ".causal." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
@@ -926,12 +917,12 @@ int main(int argc, char** argv) {
 					            
 					        case task_arg_controllability:
 					            // ToDo: mit oben abgleichen
-                                Place * lController = extendedNet->findPlace(string(l->getName() + LOW));
-                                Place * hController = extendedNet->findPlace(string(h->getName() + HIGH));
-                                newArcs.insert(make_pair(hController, extResult.hC));
-                                newArcs.insert(make_pair(extResult.hC, hController));
-                                newArcs.insert(make_pair(lController, extResult.lC));
-                                newArcs.insert(make_pair(extResult.lC, lController));
+                                Place * controllerLow = extendedNet->findPlace(string(l->getName() + LOW));
+                                Place * controllerHigh = extendedNet->findPlace(string(h->getName() + HIGH));
+                                newArcs.insert(make_pair(controllerHigh, extResult.hC));
+                                newArcs.insert(make_pair(extResult.hC, controllerHigh));
+                                newArcs.insert(make_pair(controllerLow, extResult.lC));
+                                newArcs.insert(make_pair(extResult.lC, controllerLow));
 					            break;
 					            
 					    }
@@ -942,7 +933,7 @@ int main(int argc, char** argv) {
 			
 			    // activation of place is now decided
 			    switch (args_info.task_arg) {
-			        case task_arg_verfification:
+			        case task_arg_verification:
 			            if (isActive) {
 			                status(_cbad_("......active"));
 			                activeCausal.insert(*p);
@@ -976,7 +967,7 @@ int main(int argc, char** argv) {
 			    if (args_info.oneActiveOnly_flag && (!activeCausal.empty() || !activeConflict.empty())) {break;}
 			    isActive = false;
 
-			    status("....%s (%d combination(s))", (**p).getName().c_str(), highPost.count(*p) * lowPost.count(*p));
+			    status("....%s (<=%d combination(s))", (**p).getName().c_str(), highPost.count(*p) * lowPost.count(*p));
 	
 			    retHigh = highPost.equal_range(*p);
 			    for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
@@ -991,7 +982,7 @@ int main(int argc, char** argv) {
 					    status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
                         potentialConflictTriple.insert(make_pair(*p, make_pair((*itHigh).second, (*itLow).second)));
 
-                        if (args_info.task_arg == task_arg_verfification || args_info.task_arg == task_arg_characterization) {
+                        if (args_info.task_arg == task_arg_verification || args_info.task_arg == task_arg_characterization) {
 					        extendedNet = new PetriNet(net);
 					    }
 					    s = extendedNet->findPlace((**p).getName());
@@ -1002,7 +993,7 @@ int main(int argc, char** argv) {
 					    extendedNet->getFinalCondition().addProposition(*extResult.goal == 0, true);
 
                         switch (args_info.task_arg) {
-					        case task_arg_verfification:
+					        case task_arg_verification:
 					            switch (args_info.modus_arg) {
 			                        case modus_arg_makefile:
 			                            createLolaTask(*extendedNet, fileName + ".conflict." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
@@ -1023,7 +1014,7 @@ int main(int argc, char** argv) {
 					            if (args_info.finalize_flag) {delete extendedNet;}
 					            break;
 					            
-					        case task_arg_characterization: // ToDo: mit task_arg_verfification zusammenfassen...
+					        case task_arg_characterization: // ToDo: mit task_arg_verification zusammenfassen...
 					            switch (args_info.modus_arg) {
 			                        case modus_arg_makefile:
 			                            createLolaTask(*extendedNet, fileName + ".conflict." + (*s).getName() + "." + (*h).getName() + "." + (*l).getName() + ".lola", allNets);
@@ -1047,12 +1038,12 @@ int main(int argc, char** argv) {
 					            
 					        case task_arg_controllability:
 					            // ToDo: mit oben abgleichen
-                                Place * lController = extendedNet->findPlace(string(l->getName() + LOW));
-                                Place * hController = extendedNet->findPlace(string(h->getName() + HIGH));
-                                newArcs.insert(make_pair(hController, extResult.hC));
-                                newArcs.insert(make_pair(extResult.hC, hController));
-                                newArcs.insert(make_pair(lController, extResult.lC));
-                                newArcs.insert(make_pair(extResult.lC, lController));
+                                Place * controllerLow = extendedNet->findPlace(string(l->getName() + LOW));
+                                Place * controllerHigh = extendedNet->findPlace(string(h->getName() + HIGH));
+                                newArcs.insert(make_pair(controllerHigh, extResult.hC));
+                                newArcs.insert(make_pair(extResult.hC, controllerHigh));
+                                newArcs.insert(make_pair(controllerLow, extResult.lC));
+                                newArcs.insert(make_pair(extResult.lC, controllerLow));
 					            break;
 					            
 					    }
@@ -1063,7 +1054,7 @@ int main(int argc, char** argv) {
 			
 			    // activation of place is now decided
 			    switch (args_info.task_arg) {
-			        case task_arg_verfification:
+			        case task_arg_verification:
 			            if (isActive) {
 			                status(_cbad_("......active"));
 			                activeConflict.insert(*p);
@@ -1088,20 +1079,21 @@ int main(int argc, char** argv) {
 		    } // s's
 
 	    } // activeConflict
+	    
 	    switch (args_info.task_arg) {
-	        case task_arg_verfification:
+	        case task_arg_verification:
 	            break;
 	        case task_arg_characterization:
 	            //ToDo: Ausgabe in DOT-File pipen
-	            cuddManager->DumpDot(vector<BDD>(1, cuddOutput), cuddVariableNames);
-	            //message("nodeCount: %d", cuddManager->nodeCount(outputs));
+	            //cuddManager->DumpDot(vector<BDD>(1, cuddOutput), cuddVariableNames);
+	            message("nodeCount: %d", cuddManager->nodeCount(vector<BDD>(1, cuddOutput)));
 	            if (args_info.finalize_flag) {
+	                delete cuddManager;
 	                for (unsigned int i = 0; i < net.getTransitions().size(); i++) {
 	                    free(cuddVariableNames[i]);
 	                }
 	                delete[] cuddVariableNames;
 	            }
-	            
 	            break;
 	        case task_arg_controllability:
 	            // add collected arcs
@@ -1134,7 +1126,7 @@ int main(int argc, char** argv) {
         ofstream o;
         
         switch (args_info.task_arg) {
-            case task_arg_verfification:
+            case task_arg_verification:
                 // create makefile for verification
                 o.open(string(fileName + ".makefile").c_str(), ios_base::trunc);
 
@@ -1218,7 +1210,7 @@ int main(int argc, char** argv) {
     | 6. finishing					   |
     `---------------------------------*/
     
-    if (args_info.task_arg == task_arg_verfification) {
+    if (args_info.task_arg == task_arg_verification) {
         if (args_info.modus_arg == modus_arg_call) {
 
             // clean up after active places

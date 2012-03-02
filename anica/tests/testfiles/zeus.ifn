@@ -1,0 +1,28 @@
+{ Petri net created by Petri Net API 4.03-unreleased Frontend (x86_64-unknown-linux-gnu) reading ../C_003_009_0013.lola }
+
+PLACE
+  void, submitted, collected, finished;
+
+MARKING
+  void:1;
+
+
+
+TRANSITION submit
+  CONSUME void:1;
+  PRODUCE submitted:1;
+
+TRANSITION collect
+  CONSUME submitted:1;
+  PRODUCE collected:1;
+
+TRANSITION initiate
+  CONSUME collected:1;
+  PRODUCE finished:1;
+
+TRANSITION prepare
+  CONSUME collected:1;
+  PRODUCE finished:1;
+
+
+{ END OF FILE }

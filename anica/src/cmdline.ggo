@@ -19,9 +19,9 @@ sectiondesc="<<-- Anica is able to handle different tasks for different properti
 option "task" t
   "Task to perform." 
   details="Verification checks the choosen property against the given net. Controllability creates one controllability problem for Wendy. Characterization calculates all possible annotations fullfilling the choosen property.\n" 
-  values="verfification","controllability", "characterization" enum 
+  values="verification","controllability", "characterization" enum 
   typestr="TASK" 
-  default="verfification" 
+  default="verification" 
   optional
 
 option "property" p

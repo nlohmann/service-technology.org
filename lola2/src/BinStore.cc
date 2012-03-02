@@ -74,22 +74,22 @@ bool BinStore::searchAndInsert()
 	unsigned char ** newvector; 
 
 	/// the place we are currently ealing with
-	index_t place_index;
+	index_t place_index = 0;
 
 	/// the bit of the place's marking we are currently dealing with
-	bitindex_t placebit_index;
+	bitindex_t placebit_index = 0;
 	
 	/// the byte in the vector we are currently dealing with
-	bitindex_t vector_byte;
+	bitindex_t vector_byte = 0;
 
 	/// the bit within current byte of vector we are currently dealing with
-	unsigned short int vector_bit;
+	unsigned short int vector_bit = 0;
 
 	///  the current bit if bits are counted through all places
-	bitindex_t position; 
+	bitindex_t position = 0; 
 
 	/// the part of the marking that is not yet transformed to bits
-	capacity_t remainder;
+	capacity_t remainder = 0;
 
 	// Is hash bucket empty?
 	if(!(firstvector[Marking::HashCurrent]))
@@ -203,6 +203,7 @@ bool BinStore::searchAndInsert()
 			if(vector_bit == 0) *newvector[vector_byte] = 0;
 			if(remainder / (1 << placebit_index))
 			{
+			    //\todo conversion to ‘unsigned char’ from ‘int’ may alter its value
 				*newvector[vector_byte] |= 1 << vector_bit++;
 				remainder -= 1 << placebit_index;
 				if(vector_bit >= 8)

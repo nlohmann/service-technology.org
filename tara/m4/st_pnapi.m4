@@ -9,9 +9,11 @@ ST_PNAPI_OLDLIBS=${LIBS}
 
 # only use installed Petri Net API if this was configured with --with-pnapi
   AC_ARG_WITH(pnapi,
-  AS_HELP_STRING([--without-pnapi],[The configure script will try to link against a preinstalled version of the Petri Net API (libpnapi). If this fails, a shipped version (see 'libs/pnapi') will be used instead. This parameter overrides this check and always uses the shipped version.]),
-  [], [with_pnapi=yes]
+  AS_HELP_STRING([--with-pnapi],[The configure script will not try to link against a preinstalled version of the Petri Net API (libpnapi). This parameter overrides this uses the shipped version, if checks if a preinstalled version exists.]),
+
+  [], [with_pnapi=no]
 )
+#feb 2012 update: always compile pnapi by default
 
 # check whether PNAPI is present and we can link against it
 AC_LANG([C++])
@@ -21,7 +23,7 @@ AC_CHECK_LIB(pnapi, libpnapi_is_present)
 AC_MSG_CHECKING([whether to use installed Petri Net API])
 if test "x$with_pnapi" = xno; then
   # NO: user gave '--without-pnapi' parameter
-  AC_MSG_RESULT([no (--without-pnapi)])
+  AC_MSG_RESULT([no])
   AM_CONDITIONAL(COMPILE_PNAPI, [true])
   LIBS=${ST_PNAPI_OLDLIBS}
 else

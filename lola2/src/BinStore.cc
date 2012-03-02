@@ -5,7 +5,7 @@
 \brief implement Store as a decision tree with bitvectors..
 */
 
-#include "Binstore.h"
+#include "BinStore.h"
 #include "Marking.h"
 #include "Net.h"
 #include "Place.h"

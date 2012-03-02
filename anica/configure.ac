@@ -56,6 +56,33 @@ AC_CHECK_SIZEOF([void*])
 CUDD_XFLAGS="-DSIZEOF_VOID_P=$ac_cv_sizeof_voidp"
 AC_SUBST(CUDD_XFLAGS)
 
+
+# Checks for header files.
+AC_FUNC_ALLOCA
+AC_CHECK_HEADERS([arpa/inet.h i netinet/in.h sys/socket.h netdb.h])
+
+# Checks for library functions.
+AC_CHECK_FUNCS([socket gethostbyname inet_ntoa])
+
+# Collect required libraries if libraries are not present.
+AC_CHECK_FUNC(gethostent, , AC_CHECK_LIB(nsl, gethostent))
+AC_CHECK_FUNC(setsockopt, , AC_CHECK_LIB(socket, setsockopt))
+
+
+AC_CHECK_SIZEOF(char)
+AC_CHECK_SIZEOF(sockaddr_in,, [#include <sys/types.h>
+#ifdef WIN32
+#include <winsock.h>
+#include <windows.h>
+#include <stdint.h>
+typedef uint32_t socklen_t;
+#else
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#endif])
+
+
+
 # write files
 AC_CONFIG_FILES([
 	Makefile libs/cudd/Makefile libs/pnapi/Makefile src/Makefile src/anica.conf doc/Makefile

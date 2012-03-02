@@ -40,4 +40,29 @@ AH_BOTTOM([#ifdef __cplusplus
 #include <assert.h>
 #endif])
 
+# functions to influence branch prediction
+AC_HEADER_ASSERT
+AH_BOTTOM([/*!
+\brief tell compiler that condition is very likely true
+\sa http://stackoverflow.com/questions/109710/likely-unlikely-macros-in-the-linux-kernel
+*/
+#define LIKELY(x)       (__builtin_expect((x),1))
+
+/*!
+\brief tell compliler that condition is very likely false
+\sa http://stackoverflow.com/questions/109710/likely-unlikely-macros-in-the-linux-kernel
+*/
+#define UNLIKELY(x)     (__builtin_expect((x),0))
+])
+
+#
+# add a Doxygen comment
+AH_TOP([/*!
+\file config.h
+\brief preprocessor directives set by the configure script
+*/
+])
+
+])
+
 ])

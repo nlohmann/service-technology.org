@@ -1,5 +1,5 @@
 # the main program
-bin_PROGRAMS = anica
+bin_PROGRAMS = anica reasoner
 
 # the plain sources you need to compile (no generated code)
 # <<-- CHANGE START (the program's sources) -->>
@@ -9,6 +9,9 @@ anica_SOURCES = main.cc \
                 Output.cc Output.h \
 				Results.cc Results.h \
 				anica-util.h
+
+reasoner_SOURCES = reasoner.cc Socket.cc Socket.h Reporter.cc Reporter.h SimpleString.h SimpleString.cc
+
 # <<-- CHANGE END -->>
 
 # the configuration files
@@ -17,6 +20,9 @@ sysconf_DATA = anica.conf
 # pass the sysconfdir to Anica (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 anica_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 anica_LDADD = 
+
+reasoner_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
+reasoner_LDADD = 
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
@@ -33,6 +39,16 @@ anica_LDADD += $(builddir)/../libs/cudd/libobj.a \
 	$(builddir)/../libs/cudd/libepd.a
 
 anica_CPPFLAGS += -I$(top_srcdir)/libs/cudd/include
+
+reasoner_LDADD += $(builddir)/../libs/cudd/libobj.a \
+	$(builddir)/../libs/cudd/libdddmp.a \
+	$(builddir)/../libs/cudd/libcudd.a \
+	$(builddir)/../libs/cudd/libmtr.a \
+	$(builddir)/../libs/cudd/libst.a \
+	$(builddir)/../libs/cudd/libutil.a \
+	$(builddir)/../libs/cudd/libepd.a
+
+reasoner_CPPFLAGS += -I$(top_srcdir)/libs/cudd/include
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

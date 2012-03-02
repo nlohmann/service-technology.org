@@ -28,6 +28,8 @@ should be independent from the format (LoLA / PNML / ...)
 #include "TransitionSymbol.h"
 #include "Symbol.h"
 
+#include "StructuralReduction.h"
+
 ParserPTNet::ParserPTNet()
 {
     PlaceTable = new SymbolTable();
@@ -450,10 +452,14 @@ void ParserPTNet::symboltable2net()
 
     free(conflicting);
 
+    /****************************
+    * 9. Set significant places *
+    ****************************/
+    setSignificantPlaces();
 
-    /*******************************
-    * 9. Initial enabledness check *
-    ********************************/
+    /********************************
+    * 10. Initial enabledness check *
+    *********************************/
 
     for (index_t t = 0; t < cardTR; t++)
     {

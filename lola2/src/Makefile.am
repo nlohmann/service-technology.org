@@ -20,6 +20,7 @@ lola_SOURCES = \
                 RandomWalk.cc RandomWalk.h \
                 Reporter.cc Reporter.h \
                 LinearAlgebra.cc LinearAlgebra.h \
+                StructuralReduction.cc StructuralReduction.h \
                 Socket.cc Socket.h \
                 SimpleString.cc SimpleString.h \
                 Store.h \

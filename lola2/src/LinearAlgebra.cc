@@ -20,7 +20,7 @@ using std::endl;
 #include "Net.h"
 
 /// computes the ggt of two unsigned integers
-inline uint64_t ggt(uint64_t a, uint64_t b)
+inline int64_t ggt(int64_t a, int64_t b)
 {
     while (true) {
         a %= b;
@@ -35,12 +35,14 @@ inline uint64_t ggt(uint64_t a, uint64_t b)
 }
 
 /// multiplies two unsigned intergers with respect to overflows
-inline uint64_t safeMult(uint64_t a, uint64_t b)
+inline int64_t safeMult(int64_t a, int64_t b)
 {
-    // overflow handling
-    if (b > 0 && a > 18446744073709551615 / b) {
+    //overflow handling
+    ///\todo overflow handling
+    if (b > 0 && a > 9223372036854775807 / b) {
         assert(false);
     }
+    
     return (a * b);
 }
 
@@ -49,8 +51,16 @@ void Matrix::Row::printRow() const
 {
     for (index_t i = 0; i < varCount; ++i) {
        cout << coefficients[i] << "*" << variables[i] << " ";
+       //cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
     }
     cout << endl;
+    /*
+    for (index_t i = 0; i < varCount; ++i) {
+       //cout << coefficients[i] << "*" << variables[i] << " ";
+       cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
+    }
+    cout << endl;
+    */
 }
 
 /// frees memory of current row
@@ -60,40 +70,20 @@ Matrix::Row::~Row()
     free(coefficients);
 }
 
-/// creates a new row based on Net.h types
-Matrix::Row::Row(index_t length, const index_t* var, const mult_t* coef)
-{
-    varCount = length;
-    next = NULL;
-    
-    // request memory for new row
-    variables = (index_t*) malloc(length * SIZEOF_INDEX_T);
-    // coefficients are stored as uint64_t
-    coefficients = (uint64_t*) malloc(length * sizeof(uint64_t));
-    
-    // copy the given variables into new (own) memory
-    memcpy(variables, var, length * SIZEOF_INDEX_T);
-    // copy the given coefficients into new (own) memory
-    // memcpy is no option because the data types are different
-    for (index_t i = 0; i < length; ++i) {
-        coefficients[i] = coef[i];
-    }
-}
-
 /// creates a new row based on LinearAlgebra.h types
-Matrix::Row::Row(index_t length, const index_t* var, const uint64_t* coef)
+Matrix::Row::Row(index_t length, const index_t* var, const int64_t* coef)
 {
     varCount = length;
     next = NULL;
     
     // request memory for new row
     variables = (index_t*) malloc(length * SIZEOF_INDEX_T);
-    // coefficients are stored as uint64_t
-    coefficients = (uint64_t*) malloc(length * sizeof(uint64_t));
+    // coefficients are stored as int64_t
+    coefficients = (int64_t*) malloc(length * sizeof(int64_t));
     
     // memcpy is used because given and new memory has the same types
     memcpy(variables, var, length * SIZEOF_INDEX_T);
-    memcpy(coefficients, coef, length * sizeof(uint64_t));
+    memcpy(coefficients, coef, length * sizeof(int64_t));
 }
 
 /// eleminates the first variable on the second row of the first variable
@@ -104,15 +94,15 @@ void Matrix::Row::apply(Matrix& matrix)
     assert(this != next);
     
     // calculate correctur factors
-    uint64_t ggtFactor = ggt(coefficients[0], next->coefficients[0]);
-    const uint64_t firstRowFactor = next->coefficients[0] / ggtFactor;
-    const uint64_t secondRowFactor = coefficients[0] / ggtFactor;
+    int64_t ggtFactor = ggt(coefficients[0], next->coefficients[0]);
+    const int64_t firstRowFactor = next->coefficients[0] / ggtFactor;
+    const int64_t secondRowFactor = coefficients[0] / ggtFactor;
     
     // get some space for the new row (secondRow - firstRow)
     // at most |firstRow| + |secondRow| elements are neccessary
     // one less is also suitable
     index_t* newVar = (index_t*) calloc((varCount + next->varCount), SIZEOF_INDEX_T);
-    uint64_t* newCoef = (uint64_t*) calloc((varCount + next->varCount), sizeof(uint64_t));
+    int64_t* newCoef = (int64_t*) calloc((varCount + next->varCount), sizeof(int64_t));
     index_t newSize = 0;
     
     // start with the second element, because the first one is to be ruled out
@@ -127,12 +117,16 @@ void Matrix::Row::apply(Matrix& matrix)
             newVar[newSize] = variables[firstRow];
             // new coefficient is (-1) * rowOne * factorOne  
             newCoef[newSize] = safeMult(-firstRowFactor, coefficients[firstRow]);
+            // goto next element
+            firstRow++;
         }
         else if (variables[firstRow] > next->variables[secondRow]) {
             // the one in the second row has the smaller index
             newVar[newSize] = next->variables[secondRow];
             // new coefficient is rowTwo * FactorTwo
             newCoef[newSize] = safeMult(secondRowFactor, next->coefficients[secondRow]);
+            // goto next element
+            secondRow++;
         }
         else {
             // it's the same index, so calculate new coefficient
@@ -147,12 +141,13 @@ void Matrix::Row::apply(Matrix& matrix)
                 // assumption: decreasing 0 will lead to maxInt but
                 //              upcoming increase will result in 0 again            
             }
+            // goto next elements
+            firstRow++;
+            secondRow++;
         }
         
-        // goto next elements
+        // increase newSize
         newSize++;
-        firstRow++;
-        secondRow++;
     }
     // all "common" elements are processed 
    
@@ -178,18 +173,6 @@ void Matrix::Row::apply(Matrix& matrix)
         secondRow++;
     }
     
-    // maybe the new row is empty
-    if (newSize == 0) {
-        // new row is empty
-        // process with next row (of current first variable)
-        next = next->next;
-        // free memory of the new (empty) row
-        free(newVar);
-        free(newCoef);
-        // exit method
-        return;
-    }
-    
     // new row has been calculated
     // decrease coefficients
     // calculate ggt of new row
@@ -202,23 +185,16 @@ void Matrix::Row::apply(Matrix& matrix)
        newCoef[i] /= ggtFactor;
     }
     
+    // delete second row
+    matrix.deleteRow(this);
+    
     // create new row based on new arrays
-    Row* newRow = new Row(newSize, newVar, newCoef);
+    if (newSize != 0) {
+        matrix.addRow(newSize, newVar, newCoef);
+    }
     // free memory of the new row (data is already processed)
     free(newVar);
     free(newCoef);
-    
-    // delete second row and add new row
-    // process with next row (of current first variable)
-    Row* tmp = next;
-    next = next->next;
-    // delete current second row
-    delete tmp;
-    // decrease rowCounter
-    --matrix.rowCount;
-    // insert new row at its right position
-    newRow->next = matrix.matrix[newRow->variables[0]];
-    matrix.matrix[newRow->variables[0]] = newRow;
 }
 
 /// frees memory of current matrix
@@ -226,14 +202,16 @@ Matrix::~Matrix()
 {
     for (index_t c = 0; c < colCount; ++c) {
         Row* curRow = matrix[c];
-        while (curRow) {
+        while (curRow != NULL) {
             // save current row
             Row* toDelete = curRow;
             // set next row (successor of current row)
             curRow = curRow->next;
             // delete current row
             delete toDelete;
+            --rowCount;
         }
+        matrix[c] = NULL;
     }
     // delete array for variables (and their rows)
     delete[] matrix;
@@ -243,15 +221,16 @@ Matrix::~Matrix()
 void Matrix::printMatrix() const
 {
     for (index_t c = 0; c < colCount; ++c) {
+    cout << "place " << c << endl;
         Row* curRow = matrix[c];
-        while (curRow) {
+        while (curRow != NULL) {
             curRow->printRow();
             curRow = curRow->next; 
         }
     }
 }
 
-/// creats a new matrix
+/// creates a new matrix
 /// size depicts the number of variables (=columns)
 Matrix::Matrix(index_t size)
 {
@@ -264,22 +243,41 @@ Matrix::Matrix(index_t size)
     }
 }
 
-/// adds a row to the current matrix with Net.h types
-void Matrix::addRow(index_t length, const index_t* var, const mult_t* coef)
+/// adds a row to the current matrix
+void Matrix::addRow(index_t length, const index_t* var, const int64_t* coef)
 {
     // if new row contains no variables, do nothing
     if (length == 0) return;
     
     // create new row based on given data
     Row* row = new Row(length, var, coef);
-
+    
     // insert new row at right position
     row->next = matrix[row->variables[0]];
     matrix[row->variables[0]] = row;
-    
+  
     // increase rowCount
     ++rowCount;
 }
+
+/// deletes the successor ot the given row in the current matrix
+void Matrix::deleteRow(Row* row)
+{
+    // if row or its successor is NULL, do nothing
+    if (row == NULL) return;
+    if (row->next == NULL) return;
+    
+    // set successor to successors sucessor
+    Row* tmp = row->next;
+    row->next = row->next->next;
+
+    // delete successor
+    delete tmp;
+    
+    // decrease rowCount
+    --rowCount;
+}
+
 
 /// reduces the current matrix to triangular form
 void Matrix::reduce()
@@ -292,9 +290,16 @@ void Matrix::reduce()
     // for each variable i (=column)
     for (index_t i = 0; i < colCount; ++i) {
         // if there at least two rows with variable i as first variable 
-        while (matrix[i] && matrix[i]->next) {
+        while ((matrix[i] != NULL) && (matrix[i]->next != NULL)) {
             // get rid of the second row
             matrix[i]->apply(*this);
         }
     }
+}
+
+/// Returns true iff place with given index is significant
+bool Matrix::isSignificant(index_t place) const
+{
+    assert(place < colCount);
+    return (matrix[place] != NULL);
 }

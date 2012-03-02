@@ -16,21 +16,6 @@ Using places (transitions) as variables and their effect to the net as rows, the
 */
 class Matrix
 {
-    public: 
-        /// Generate and initialize a matrix
-        explicit Matrix(index_t);
-        /// Delete a matrix
-        ~Matrix();
-
-        /// Add a new row to the matrix
-        void addRow(index_t, const index_t*, const mult_t*);
-        
-        /// Generate the triangular form of the matrix (original one gets lost)
-        void reduce();
-
-        /// Write matrix to cout (for debug purposes)
-        void printMatrix() const;
-
     private:
         /*!
         A row is used to store a row.
@@ -39,9 +24,7 @@ class Matrix
         {
             public:
                 /// Generate and initialize a row based on Net.h types
-                Row(index_t, const index_t*, const mult_t*);
-                /// Generate and initialize a row based on LinearAlgebra.h types
-                Row(index_t, const index_t*, const uint64_t*);
+                Row(index_t, const index_t*, const int64_t*);
                 /// Delete a row
                 ~Row();
                 
@@ -56,7 +39,7 @@ class Matrix
                 /// Array of variable indizes in current row with non zero coefficients
                 index_t* variables;
                 /// Array of non zero coefficients in current row (same order as variables)
-                uint64_t* coefficients;
+                int64_t* coefficients;
                 
                 /// Pointer to successor row with same first variable (NULL if none present)
                 Row* next;
@@ -68,4 +51,25 @@ class Matrix
         index_t rowCount;
         /// Number of stored columns in current matrix
         index_t colCount;
+    
+    public: 
+        /// Generate and initialize a matrix
+        explicit Matrix(index_t);
+        /// Delete a matrix
+        ~Matrix();
+
+        /// Add a new row to the matrix
+        void addRow(index_t, const index_t*, const int64_t*);
+        
+        /// Delete the successor of a row in the matrix
+        void deleteRow(Row*);
+        
+        /// Generate the triangular form of the matrix (original one gets lost)
+        void reduce();
+
+        /// Write matrix to cout (for debug purposes)
+        void printMatrix() const;
+        
+        /// Returns true iff place with given index is significant
+        bool isSignificant(index_t) const;
 };

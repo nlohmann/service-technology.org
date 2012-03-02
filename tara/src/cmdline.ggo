@@ -25,8 +25,8 @@ option "dfa" d
   multiple
 
 option "costfunction" f
-  "A cost function file"
-  details="Use this option to provide a cost function. You can provide more than one cost function, e.g. -f foo.cf -f bar.cf .\n"
+  "A cost function file, -r for random costs"
+  details="Use this option to provide a cost function. Write -r to generate random cost function.\n"
   string
   typestr="FILENAME"
 
@@ -69,6 +69,15 @@ option "concurrency" m
   int
   optional
 
+option "maxrandomcost" r
+   "maximal costs, if random"
+   int
+   optional
+
+option "minrandomcost" t
+   "minimal costs, if random cost function"
+   int
+   optional
 
 section "Configuration"
 sectiondesc="Configuration files are used to control some options of Tara. Don't worry, a default configuration file is created and - if nothing else is specified - used. \n"

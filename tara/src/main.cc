@@ -163,7 +163,26 @@ int main(int argc, char** argv) {
     message("Step 3: Parse the cost function from '%s' and apply it to the built statespace", Tara::args_info.costfunction_arg);    
 
     status("parsing costfunction");
-    Parser::costfunction.parse(Tara::args_info.costfunction_arg);
+    if(strcmp(Tara::args_info.costfunction_arg,"-r")!=0)
+	Parser::costfunction.parse(Tara::args_info.costfunction_arg);
+    else {  // if costfunction should be random
+       status("generating random costfunction");
+       const std::set<pnapi::Transition*> transitions=Tara::net->getTransitions();
+       for(std::set<pnapi::Transition*>::iterator it=transitions.begin();it!=transitions.end();++it) {
+
+            //get argument
+            unsigned int min=(Tara::args_info.minrandomcost_given)?Tara::args_info.minrandomcost_arg:0;
+            unsigned int mod=(Tara::args_info.maxrandomcost_given)?Tara::args_info.maxrandomcost_arg-min+1:101-min;
+            unsigned int cur;
+
+            // seed random by time and last random
+            srand(time(NULL)+cur+1);
+ 
+            //get next rand and pass it to partial cost function
+            cur=min+(rand() % mod);
+            Tara::partialCostFunction[*it]= cur; 
+       }
+    }
 
     /*-------------------------.
     | 5. Parse the inner Graph |

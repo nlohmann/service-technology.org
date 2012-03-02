@@ -21,7 +21,7 @@
 /// number of entries in a symbol table
 #define SIZEOF_SYMBOLTABLE 0x10000
 
-/// number of entries in a symbol table
+/// number of entries in a hash table for markings
 #define SIZEOF_MARKINGTABLE 0x1000000
 
 // Some useful constants, can be used as indices in arrays
@@ -42,6 +42,10 @@ typedef enum
 
 /// Type for node indices, limit the number of places/ transitions
 typedef uint32_t index_t;
+
+/// Type for bitvector indices, should be large enough for card(places) * log maxcapacity
+
+typedef uint32_t bitindex_t;
 
 /// Type for multiplicities, limits the max. multiplicity at any arc
 typedef uint16_t mult_t;

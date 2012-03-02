@@ -31,6 +31,7 @@ capacity_t* Place::Capacity = NULL;
 Used for handling dense representations of markings
 */
 cardbit_t* Place::CardBits = NULL;
+index_t Place::SizeOfBitVector = 0;
 index_t* Place::CardDisabled = NULL;
 
 /*!

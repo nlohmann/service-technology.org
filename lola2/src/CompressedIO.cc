@@ -191,7 +191,8 @@ void ReadNetFile(FILE* f)
         // read capacity
         fscanf(f, "%u", &tmp1);
         Place::Capacity[p] = (capacity_t)(tmp1 == 0 ? MAX_CAPACITY : tmp1);
-        Place::CardBits[p] = Place::Capacity2Bits(Place::Capacity[p]);
+	Place::SizeOfBitVector +=
+        (Place::CardBits[p] = Place::Capacity2Bits(Place::Capacity[p]));
 
         // read number of prearcs
         fscanf(f, "%u", &tmp1);

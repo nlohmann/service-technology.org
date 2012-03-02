@@ -30,6 +30,9 @@ struct Place
         /// The number of bits needed for representing the numbers 0 .. Capacity[i]
         static cardbit_t* CardBits;
 
+	/// The sum of the CardBits of all places
+	static index_t SizeOfBitVector;
+
         /// Number of transitions for which this place is the distinguished insufficiently marked Pre-place (scapegoat)
         static index_t* CardDisabled;
 

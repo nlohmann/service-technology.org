@@ -4,6 +4,7 @@ bin_PROGRAMS = lola listener killer
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
                 ArcList.cc ArcList.h \
+		BinStore.h BinStore.cc \
                 BDDStore.cc BDDStore.h \
                 CompressedIO.cc CompressedIO.h \
                 Dimensions.h \

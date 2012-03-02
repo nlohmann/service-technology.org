@@ -74,12 +74,12 @@ AT_CHECK([MARLENE ca1_sync.owfn td.owfn --rulefile=td_sync2.ar --asyncif --verbo
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
-AT_SETUP([Small test (asynchronous 3)])
-AT_CHECK_WENDY
-AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td_cyclic.owfn TESTFILES/td_sync2.ar TESTFILES/async3_exp.owfn .])
-AT_CHECK([MARLENE ca1_sync.owfn td_cyclic.owfn --rulefile=td_sync2.ar --asyncif --verbose DEFAULTPARAMETERS],0,stdout,ignore)
-AT_KEYWORDS(sample)
-AT_CLEANUP
+#AT_SETUP([Small test (asynchronous 3)])
+#AT_CHECK_WENDY
+#AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td_cyclic.owfn TESTFILES/td_sync2.ar TESTFILES/async3_exp.owfn .])
+#AT_CHECK([MARLENE ca1_sync.owfn td_cyclic.owfn --rulefile=td_sync2.ar --asyncif --verbose DEFAULTPARAMETERS],0,stdout,ignore)
+#AT_KEYWORDS(sample)
+#AT_CLEANUP
 
 AT_SETUP([Small test (weak termination)])
 AT_CHECK_WENDY

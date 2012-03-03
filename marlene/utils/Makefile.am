@@ -1,6 +1,7 @@
 bin_PROGRAMS = pruner
 
 pruner_SOURCES = pruner.cc \
+                 pruner-statespace.h pruner-statespace.cc \
 		 Output.h Output.cc \
 		 pruner_lexer_graph.ll pruner_parser_graph.yy \
 		 pruner_lexer_communication.ll pruner_parser_communication.yy \

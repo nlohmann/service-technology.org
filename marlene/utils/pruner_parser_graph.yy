@@ -29,41 +29,21 @@
 #include <vector>
 #include <string>
 #include <map>
-//#include "InnerMarking.h"
-//#include "Label.h"
-#include "Output.h"
-//#include "Cover.h"
+//#include "Output.h"
 #include "pruner-cmdline.h"
-//#include "types.h"
 #include "pruner-verbose.h"
-//#include "util.h"
-
-/// the vector of the successor state numbers of the current marking
-//std::vector<InnerMarking_ID> currentSuccessors;
-
-/// the labels of the outgoing edges of the current marking
-//std::vector<Label_ID> currentLabels;
-
-/// names of transitions, that are enabled under the current marking (needed for cover)
-//std::set<std::string> currentTransitions;
-
-/// the Tarjan lowlink value of the current marking
-//InnerMarking_ID currentLowlink;
-
-/// a marking of the PN API net
-//std::map<const pnapi::Place*, unsigned int> marking;
-
-/// storage for current (terminal) strongly connected component
-// std::set<InnerMarking_ID> currentSCC;
-
-/// a file to store a mapping from marking ids to actual Petri net markings
-//extern Output *markingoutput;
-
-/// the command line parameters
-//extern gengetopt_args_info args_info;
+#include "pruner-helper.h"
+#include "pruner-statespace.h"
 
 extern int graph_yylex();
 extern int graph_yyerror(const char *);
+
+using std::tr1::shared_ptr;
+
+ListOfPairs::List_ptr currentMarking;
+ListOfPairs::List_ptr currentTransitions;
+unsigned int lowlink;
+List<unsigned int>::List_ptr sccmember;
 %}
 
 %union {
@@ -73,6 +53,7 @@ extern int graph_yyerror(const char *);
 
 %type <val> NUMBER
 %type <str> NAME
+%type <val> scc_member
 
 %%
 
@@ -83,70 +64,12 @@ states:
 
 state:
   KW_STATE NUMBER lowlink scc markings_or_transitions
-    {
-    	/*
-        InnerMarking::markingMap[$2] = new InnerMarking($2, currentLabels, currentSuccessors,
-                                           InnerMarking::net->getFinalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
-
-        if (markingoutput) {
-            markingoutput->stream() << $2 << ": ";
-            FOREACH(p, marking) {
-                if (p != marking.begin()) {
-                    markingoutput->stream() << ", ";
-                }
-                markingoutput->stream() << p->first->getName() << ":" << p->second;
-            }
-            markingoutput->stream() << "\n";
-        }
-        */
-		/*
-        if (args_info.cover_given) {
-            Cover::checkInnerMarking($2, marking, currentTransitions);
-            currentTransitions.clear();
-        }
-        */
-
-        /* ================================================================================= */
-        /* calculate strongly connected components and do some evaluation on its members     */
-        /* ================================================================================= */
-
-        /* current marking is representative of an SCC and either reduction by smart sending events or correctness criteria livelock freedom is turned on */
-        /*
-        if ((currentLowlink == $2 and not args_info.ignoreUnreceivedMessages_flag)
-            or args_info.correctness_arg == correctness_arg_livelock) {
-
-            // insert representative into current SCC of inner markings
-            currentSCC.insert($2);
-            
-            // we have found a non-trivial SCC within the inner markings, so the reachability graph
-            // contains a cycle
-            if (currentSCC.size() > 1) {
-                InnerMarking::is_acyclic = false;
-            }
-
-            // reduction by smart sending events is turned on
-            if (not args_info.ignoreUnreceivedMessages_flag) {
-                // it is a trivial SCC
-                if (currentSCC.size() == 1) {
-                    // analyze only representative with respect to possible sending events
-                    InnerMarking::markingMap[$2]->calcReachableSendingEvents();
-                } else {
-                    // analyze all members of current SCC with respect to possible sending events and final markings reachable
-                    InnerMarking::analyzeSCCOfInnerMarkings(currentSCC);
-                }
-            } else if (args_info.ignoreUnreceivedMessages_flag and args_info.correctness_arg == correctness_arg_livelock) {
-                // no smart sending event reduction but livelock freedom is turned on
-                InnerMarking::finalMarkingReachableSCC(currentSCC);
-            }
-        } // end if, livelock freedom
-		*/
-		/*
-        currentLabels.clear();
-        currentSuccessors.clear();
-        marking.clear();
-        // currentSCC.clear();
-        */
-   }
+  {
+    State::stateSpace[$2] = shared_ptr<State>(new State($2, currentMarking, currentTransitions, lowlink, sccmember));
+    currentMarking = ListOfPairs::List_ptr();
+    currentTransitions = ListOfPairs::List_ptr();
+    sccmember = List<unsigned int>::List_ptr();
+  }
 ;
 
 
@@ -157,21 +80,39 @@ scc:
 
 scc_members:
   scc_member
+  {
+    if(sccmember.get() == 0) {
+      sccmember = List<unsigned int>::List_ptr(new List<unsigned int>($1));
+    }
+    else {
+      sccmember->push_back($1);
+    }
+  }
 | scc_members scc_member
+  {
+    if(sccmember.get() == 0) {
+      sccmember = List<unsigned int>::List_ptr(new List<unsigned int>($2));
+    }
+    else {
+      sccmember->push_back($2);
+    }
+  }
 ;
 
 scc_member:
   NUMBER
-    { 
-    	//currentSCC.insert($1); 
-    }
+  {
+    $$ = $1;
+  }
 ;
 
 /* do something with Tarjan's lowlink value (needed for generating
    livelock free partners or reduction rule smart sending event) */
 lowlink:
   KW_LOWLINK NUMBER
-    { /*currentLowlink = $2;*/ }
+  {
+    lowlink = $2;
+  }
 ;
 
 markings_or_transitions:
@@ -188,8 +129,17 @@ markings:
 
 marking:
   NAME COLON NUMBER
-    { /*marking[InnerMarking::net->findPlace($1)] = $3;*/ 
-      free($1); }
+    { 
+      shared_ptr< Pair< std::string, unsigned int > > p(new Pair<std::string, unsigned int>(std::string($1), $3));
+      if (currentMarking.get() == 0) {
+        currentMarking = ListOfPairs::List_ptr(new ListOfPairs(p));
+      } else {
+        currentMarking->push_back(p);
+      }
+      
+      free($1); 
+      // status("Pair was %s, %d", p->getFirst().c_str(), p->getSecond());  
+    }
 ;
 
 transitions:
@@ -200,22 +150,14 @@ transitions:
 transition:
   NAME ARROW NUMBER
     {
-      /*
-      // a workaround for bug #14719
-      if (Label::sync_events > 0) {
-          for (size_t i = 0; i < currentLabels.size(); ++i) {
-              if (SYNC(Label::name2id[$1]) and currentLabels[i] == Label::name2id[$1]) {
-                  abort(17, "synchronous label '%s' of transition '%s' already used in this marking", Label::id2name[Label::name2id[$1]].c_str(), $1);
-              }
-          }
+      shared_ptr< Pair< std::string, unsigned int > > p(new Pair<std::string, unsigned int>(std::string($1), $3));
+      if (currentTransitions.get() == 0) {
+        currentTransitions = ListOfPairs::List_ptr(new ListOfPairs(p));
+      } else {
+        currentTransitions->push_back(p);
       }
-
-      currentLabels.push_back(Label::name2id[$1]);
-      if(args_info. cover_given) {
-          currentTransitions.insert($1);
-      }
-      currentSuccessors.push_back($3);
-      */
-      free($1);
+      
+      free($1); 
+      // status("Transition was %s -> %d", p->getFirst().c_str(), p->getSecond());  
     }
 ;

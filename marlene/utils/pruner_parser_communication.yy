@@ -18,7 +18,10 @@
 \*****************************************************************************/
 
 
-%token KW_STATE KW_LOWLINK KW_SCC COLON COMMA ARROW NUMBER NAME
+%token KW_ABSTRACT_HEADING KW_REMAINING_HEADING
+%token KW_IN KW_OUT KW_SYNC
+%token EQUALS COMMA
+%token NUMBER NAME
 
 %expect 0
 %defines
@@ -47,146 +50,19 @@ extern int communication_yyerror(const char *);
 
 %%
 
-states:
-  state
-| states state
+interfaceinformation:
+    abstract_information remaining_information
 ;
 
-state:
-  KW_STATE NUMBER lowlink scc markings_or_transitions
-    {
-    	/*
-        InnerMarking::markingMap[$2] = new InnerMarking($2, currentLabels, currentSuccessors,
-                                           InnerMarking::net->getFinalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
-
-        if (markingoutput) {
-            markingoutput->stream() << $2 << ": ";
-            FOREACH(p, marking) {
-                if (p != marking.begin()) {
-                    markingoutput->stream() << ", ";
-                }
-                markingoutput->stream() << p->first->getName() << ":" << p->second;
-            }
-            markingoutput->stream() << "\n";
-        }
-        */
-		/*
-        if (args_info.cover_given) {
-            Cover::checkInnerMarking($2, marking, currentTransitions);
-            currentTransitions.clear();
-        }
-        */
-
-        /* ================================================================================= */
-        /* calculate strongly connected components and do some evaluation on its members     */
-        /* ================================================================================= */
-
-        /* current marking is representative of an SCC and either reduction by smart sending events or correctness criteria livelock freedom is turned on */
-        /*
-        if ((currentLowlink == $2 and not args_info.ignoreUnreceivedMessages_flag)
-            or args_info.correctness_arg == correctness_arg_livelock) {
-
-            // insert representative into current SCC of inner markings
-            currentSCC.insert($2);
-            
-            // we have found a non-trivial SCC within the inner markings, so the reachability graph
-            // contains a cycle
-            if (currentSCC.size() > 1) {
-                InnerMarking::is_acyclic = false;
-            }
-
-            // reduction by smart sending events is turned on
-            if (not args_info.ignoreUnreceivedMessages_flag) {
-                // it is a trivial SCC
-                if (currentSCC.size() == 1) {
-                    // analyze only representative with respect to possible sending events
-                    InnerMarking::markingMap[$2]->calcReachableSendingEvents();
-                } else {
-                    // analyze all members of current SCC with respect to possible sending events and final markings reachable
-                    InnerMarking::analyzeSCCOfInnerMarkings(currentSCC);
-                }
-            } else if (args_info.ignoreUnreceivedMessages_flag and args_info.correctness_arg == correctness_arg_livelock) {
-                // no smart sending event reduction but livelock freedom is turned on
-                InnerMarking::finalMarkingReachableSCC(currentSCC);
-            }
-        } // end if, livelock freedom
-		*/
-		/*
-        currentLabels.clear();
-        currentSuccessors.clear();
-        marking.clear();
-        // currentSCC.clear();
-        */
-   }
+abstract_information:
+    /* empty */
+    |
+    KW_ABSTRACT_HEADING
 ;
 
-
-scc:
-  /* empty */
-| KW_SCC scc_members
+remaining_information:
+    /* empty */
+    |
+    KW_REMAINING_HEADING
 ;
 
-scc_members:
-  scc_member
-| scc_members scc_member
-;
-
-scc_member:
-  NUMBER
-    { 
-    	//currentSCC.insert($1); 
-    }
-;
-
-/* do something with Tarjan's lowlink value (needed for generating
-   livelock free partners or reduction rule smart sending event) */
-lowlink:
-  KW_LOWLINK NUMBER
-    { /*currentLowlink = $2;*/ }
-;
-
-markings_or_transitions:
-  /* empty */
-| markings
-| transitions
-| markings transitions
-;
-
-markings:
-  marking
-| markings COMMA marking
-;
-
-marking:
-  NAME COLON NUMBER
-    { /*marking[InnerMarking::net->findPlace($1)] = $3;*/ 
-      free($1); }
-;
-
-transitions:
-  transition
-| transitions transition
-;
-
-transition:
-  NAME ARROW NUMBER
-    {
-      /*
-      // a workaround for bug #14719
-      if (Label::sync_events > 0) {
-          for (size_t i = 0; i < currentLabels.size(); ++i) {
-              if (SYNC(Label::name2id[$1]) and currentLabels[i] == Label::name2id[$1]) {
-                  abort(17, "synchronous label '%s' of transition '%s' already used in this marking", Label::id2name[Label::name2id[$1]].c_str(), $1);
-              }
-          }
-      }
-
-      currentLabels.push_back(Label::name2id[$1]);
-      if(args_info. cover_given) {
-          currentTransitions.insert($1);
-      }
-      currentSuccessors.push_back($3);
-      */
-      free($1);
-    }
-;

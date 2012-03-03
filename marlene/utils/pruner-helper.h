@@ -21,8 +21,11 @@
 
 #include <iostream>
 #include <string>
+#include "config.h"
 #include "pruner-cmdline.h"
 #include "pruner-verbose.h"
+
+using std::tr1::shared_ptr;
 
 // some initial values, which are the default values
 
@@ -33,3 +36,96 @@ extern bool fileExists(std::string filename);
 
 extern std::string toString(int i);
 
+template<typename Keytype>
+class List {
+
+public:
+  typedef shared_ptr< List<Keytype> > List_ptr;
+
+  List(Keytype value);
+  ~List();
+
+  void push_back(Keytype value);
+  Keytype getValue();
+  List_ptr getNext();
+
+  unsigned int length();
+
+private:
+  Keytype value;
+  List_ptr next;
+};
+
+template<typename type1, typename type2>
+class Pair {
+
+public:
+
+  Pair(type1 first, type2 second);
+
+  type1 getFirst();
+  type2 getSecond();
+
+private:
+  type1 first;
+  type2 second;
+
+};
+
+/* Template code */
+
+
+template <typename Keytype>
+List<Keytype>::List(Keytype value) {
+  this->value = value;
+}
+
+template <typename Keytype>
+List<Keytype>::~List() {
+  next = shared_ptr< List >();
+}
+
+template <typename Keytype>
+void List<Keytype>::push_back(Keytype value) {
+
+  if ( next.get() == 0) {
+    next = List_ptr(new List(value));
+  }
+  else {
+    next->push_back(value);
+  }
+}
+
+template <typename Keytype>
+Keytype List<Keytype>::getValue() {
+  return value;
+}
+
+template <typename Keytype>
+typename List<Keytype>::List_ptr List<Keytype>::getNext() {
+  return next;
+}
+
+template <typename Keytype>
+unsigned int List<Keytype>::length() {
+  if (next.get() == 0)
+    return 1;
+  else return 1 + next->length();
+}
+
+
+template <typename type1, typename type2>
+Pair<type1, type2>::Pair(type1 first, type2 second) {
+  this->first = first;
+  this->second = second;
+}
+
+template <typename type1, typename type2>
+type1 Pair<type1, type2>::getFirst() {
+  return first;
+}
+
+template <typename type1, typename type2>
+type2 Pair<type1, type2>::getSecond() {
+  return second;
+}

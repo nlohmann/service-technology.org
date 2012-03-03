@@ -37,14 +37,13 @@ number    [0-9][0-9]*
 
 %%
 
-"Formula with\n"{number}" subformula(s)." { /* skip */ }
-
-"STATE"      { return KW_STATE; }
-"Lowlink:"   { return KW_LOWLINK; }
-"SCC:"       { return KW_SCC; }
-":"          { return COLON; }
-","          { return COMMA; }
-"->"         { return ARROW; }
+"INTERFACE TO BE ABSTRACTED"	{ return KW_ABSTRACT_HEADING; }
+"REMAINING INTERFACE"   		{ return KW_REMAINING_HEADING; }
+"IN"                            { return KW_IN; }
+"OUT"                           { return KW_OUT; }
+"SYNC"                          { return KW_SYNC; }
+"="                             { return EQUALS; }
+","                             { return COMMA; }
 
 {number}     { communication_yylval.val = atoi(communication_yytext); return NUMBER; }
 {name}       { communication_yylval.str = strdup(communication_yytext); return NAME; }

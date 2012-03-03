@@ -41,95 +41,95 @@ gengetopt_args_info args_info;
 void print_version (void)
 {
 #if defined(VERSION_SVN)
-    printf ("%s %s (rev. %s)\n", PACKAGE, VERSION, VERSION_SVN);
+  printf ("%s %s (rev. %s)\n", PACKAGE, VERSION, VERSION_SVN);
 #else
-    printf ("%s %s\n", PACKAGE, VERSION);
+  printf ("%s %s\n", PACKAGE, VERSION);
 #endif
 }
 
 void evaluate_command_line(int argc, char* argv[])
 {
-    // overwrite invokation for consistent error messages
-    // argv[0] = PACKAGE;
+  // overwrite invokation for consistent error messages
+  // argv[0] = PACKAGE;
 
-    // set default values
-    //cmdline_parser_init(&args_info);
+  // set default values
+  //cmdline_parser_init(&args_info);
 
-    // initialize the parameters structure
-    struct cmdline_parser_params *params = cmdline_parser_params_create();
+  // initialize the parameters structure
+  struct cmdline_parser_params *params = cmdline_parser_params_create();
 
-    // call the cmdline parser
-    if (cmdline_parser(argc, argv, &args_info) != 0)
+  // call the cmdline parser
+  if (cmdline_parser(argc, argv, &args_info) != 0)
+  {
+    abort(7, "invalid command-line parameter(s)");
+  }
+
+  // read a configuration file if necessary
+  if (args_info.config_given)
+  {
+    // initialize the config file parser
+    params->initialize = 0;
+    params->override = 0;
+
+    // call the config file parser
+    if (cmdline_parser_config_file (args_info.config_arg, &args_info, params) != 0)
     {
-        abort(7, "invalid command-line parameter(s)");
-    }
-
-    // read a configuration file if necessary
-    if (args_info.config_given)
-    {
-        // initialize the config file parser
-        params->initialize = 0;
-        params->override = 0;
-
-        // call the config file parser
-        if (cmdline_parser_config_file (args_info.config_arg, &args_info, params) != 0)
-        {
-            abort(14, "error reading configuration file '%s'", args_info.config_arg);
-        }
-        else
-        {
-            status("using configuration file '%s'", args_info.config_arg);
-        }
+      abort(14, "error reading configuration file '%s'", args_info.config_arg);
     }
     else
     {
-        // check for configuration files
-        std::string conf_filename = fileExists("pruner.conf") ? "pruner.conf" :
-                                    (fileExists(std::string(SYSCONFDIR) + "/pruner.conf") ?
-                                     (std::string(SYSCONFDIR) + "/pruner.conf") : "");
-
-        if (conf_filename != "")
-        {
-            // initialize the config file parser
-            params->initialize = 0;
-            params->override = 0;
-            if (cmdline_parser_config_file ((char*)conf_filename.c_str(), &args_info, params) != 0)
-            {
-                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
-            }
-            else
-            {
-                status("using configuration file '%s'", conf_filename.c_str());
-            }
-        }
-        else
-        {
-            status("not using a configuration file");
-        }
+      status("using configuration file '%s'", args_info.config_arg);
     }
+  }
+  else
+  {
+    // check for configuration files
+    std::string conf_filename = fileExists("pruner.conf") ? "pruner.conf" :
+                                (fileExists(std::string(SYSCONFDIR) + "/pruner.conf") ?
+                                 (std::string(SYSCONFDIR) + "/pruner.conf") : "");
 
-    if (args_info.version_given)
+    if (conf_filename != "")
     {
-        print_version();
-        exit(EXIT_SUCCESS);
+      // initialize the config file parser
+      params->initialize = 0;
+      params->override = 0;
+      if (cmdline_parser_config_file ((char*)conf_filename.c_str(), &args_info, params) != 0)
+      {
+        abort(14, "error reading configuration file '%s'", conf_filename.c_str());
+      }
+      else
+      {
+        status("using configuration file '%s'", conf_filename.c_str());
+      }
     }
+    else
+    {
+      status("not using a configuration file");
+    }
+  }
 
-    free(params);
+  if (args_info.version_given)
+  {
+    print_version();
+    exit(EXIT_SUCCESS);
+  }
+
+  free(params);
 
 }
 
 bool fileExists(std::string filename)
 {
-    FILE *tmp = fopen(filename.c_str(), "r");
-    if (tmp)
-    {
-        fclose(tmp);
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+  FILE *tmp = fopen(filename.c_str(), "r");
+  if (tmp)
+  {
+    fclose(tmp);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 
@@ -142,10 +142,10 @@ bool fileExists(std::string filename)
  */
 std::string toString(int i)
 {
-    std::ostringstream buffer;
+  std::ostringstream buffer;
 
-    buffer << i;
+  buffer << i;
 
-    return buffer.str();
+  return buffer.str();
 }
 

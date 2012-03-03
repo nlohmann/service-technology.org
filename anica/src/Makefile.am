@@ -1,5 +1,5 @@
 # the main program
-bin_PROGRAMS = anica reasoner
+bin_PROGRAMS = anica reasoner GUI GUIsendfile
 
 # the plain sources you need to compile (no generated code)
 # <<-- CHANGE START (the program's sources) -->>
@@ -11,6 +11,16 @@ anica_SOURCES = main.cc \
 				anica-util.h
 
 reasoner_SOURCES = reasoner.cc Socket.cc Socket.h Reporter.cc Reporter.h SimpleString.h SimpleString.cc
+
+GUI_SOURCES = GUI.cc \
+                 Reporter.cc Reporter.h \
+                 SimpleString.cc SimpleString.h \
+                 Socket.cc Socket.h
+
+GUIsendfile_SOURCES = GUIsendfile.cc \
+              Reporter.cc Reporter.h \
+              SimpleString.cc SimpleString.h \
+              Socket.cc Socket.h
 
 # <<-- CHANGE END -->>
 

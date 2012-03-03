@@ -204,3 +204,33 @@ char* Socket::waitFor(const char* message) const
         }
     }
 }
+
+char* Socket::receiveMessage() const
+{
+    assert(listening);
+
+    // the length of the address struct
+    static socklen_t addressLength = SIZEOF_SOCKADDR_IN;
+
+    // a buffer for incoming messages
+    char buffer[UDP_BUFFER_SIZE];
+
+    // receive data from the socket sock, stores it into buffer with
+    // length UDP_BUFFER_SIZE, sets no flags, receives from address
+    // specified in sa with length fromlen
+    const ssize_t recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
+
+    if (UNLIKELY(recsize < 0))
+    {
+        ReporterStream rep(true);
+        rep.message("could not receive message");
+        rep.abort(ERROR_NETWORK);
+    }
+
+    char* received = NULL;
+    const int bytes = asprintf(&received, "%.*s", static_cast<int>(recsize), buffer);
+    assert(bytes != -1);
+    assert(received);
+
+    return received;
+}

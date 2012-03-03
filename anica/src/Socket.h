@@ -22,7 +22,7 @@ typedef uint32_t socklen_t;
 #include <sys/socket.h>
 #endif
 
-#define UDP_BUFFER_SIZE 1024
+#define UDP_BUFFER_SIZE 1024*1024
 
 /*!
 \brief class encapsulating Berkely Sockets (using UDP datagrams)
@@ -52,6 +52,9 @@ class Socket
 
         /// wait for a specific message
         char* waitFor(const char* message) const;
+
+        /// receive a line
+        char* receiveMessage() const;
 
         /// send a message
         void send(const char* message) const;

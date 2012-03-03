@@ -14,32 +14,32 @@ class State;
 class BinStore : public Store
 {
     public:
-	BinStore();
+        BinStore();
         ~BinStore();
 
         /// check whether current marking is stored
         virtual bool searchAndInsert();
 
         /// check whether current marking is sted and return state
-        virtual bool searchAndInsert(State **s);
+        virtual bool searchAndInsert(State** s);
     private:
-	/// a binary decision node
-	class Decision
-	{
-		public:
-			Decision(bitindex_t);
-			bitindex_t bit;
-			unsigned char * vector;
-			Decision * nextold;
-			Decision * nextnew;
-			State * state;
-			~Decision();
-		
-	};
-	// first branch in decision tree; NULL as long as less than two elements in bucket
-	Decision * branch[SIZEOF_MARKINGTABLE]; 
+        /// a binary decision node
+        class Decision
+        {
+            public:
+                Decision(bitindex_t);
+                bitindex_t bit;
+                unsigned char* vector;
+                Decision* nextold;
+                Decision* nextnew;
+                State* state;
+                ~Decision();
 
-	// first vector in bucket; null as long as bucket empty
-	unsigned char * firstvector[SIZEOF_MARKINGTABLE];
+        };
+        // first branch in decision tree; NULL as long as less than two elements in bucket
+        Decision* branch[SIZEOF_MARKINGTABLE];
+
+        // first vector in bucket; null as long as bucket empty
+        unsigned char* firstvector[SIZEOF_MARKINGTABLE];
 };
 

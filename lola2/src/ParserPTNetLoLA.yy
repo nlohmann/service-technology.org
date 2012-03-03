@@ -15,7 +15,6 @@ Parses a place transition net in LoLA syntax.
 #include <libgen.h>
 #include <cstdarg>
 #include <cstdio>
-#include "cmdline.h"
 #include "PlaceSymbol.h"
 #include "TransitionSymbol.h"
 #include "SymbolTable.h"
@@ -24,10 +23,11 @@ Parses a place transition net in LoLA syntax.
 #include "ArcList.h"
 #include "Dimensions.h"
 #include "Reporter.h"
+#include "InputOutput.h"
 
 extern int currentFile;
-extern gengetopt_args_info args_info;
 extern Reporter* rep;
+extern Input* netFile;
 
 /// the current token text from Flex
 extern char* yytext;
@@ -293,8 +293,7 @@ __attribute__((noreturn)) void yyerrors(char* token, const char* format, ...) {
     free(errormessage);
     va_end(args);
 
-    rep->status("%s:%d:%d - error near '%s'", (currentFile == -1) ? rep->markup(MARKUP_FILE, "stdin").str() : rep->markup(MARKUP_FILE, basename(args_info.inputs[currentFile])).str(),
-        yylineno, yycolno, token);
+    rep->status("%s:%d:%d - error near '%s'", rep->markup(MARKUP_FILE, basename((char*)netFile->getFilename())).str(), yylineno, yycolno, token);
 
     rep->abort(ERROR_SYNTAX);
 }

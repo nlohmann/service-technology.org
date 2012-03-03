@@ -21,10 +21,12 @@ Mainly copied from LoLA1
 #include "FairnessAssumptions.h"
 #include "ParserPTNetLoLA.h"
 #include "Reporter.h"
+#include "InputOutput.h"
 
 extern int currentFile;
 extern gengetopt_args_info args_info;
 extern Reporter* rep;
+extern Input *netFile;
 
 void setlval();
 void setcol();
@@ -137,30 +139,29 @@ UNTIL                                    { setcol(); return _UNTIL_; }
 %%
 
 /*! pass token string as attribute to bison */
-inline void setlval() {
+inline void setlval()
+{
     yylval.attributeString = strdup(yytext);
 }
 
-inline void setcol() {
+inline void setcol()
+{
     yycolno += yyleng;
 }
 
-int yywrap() {
-    if (currentFile == -1 or currentFile == (int)args_info.inputs_num-1)
+int yywrap()
+{
+    if (currentFile == (int)args_info.inputs_num-1 or currentFile == -1)
     {
-        // done parsing
+        // last or only file parsed - done parsing
         return 1;
     }
     else
     {
-        currentFile++;
-        yyin = fopen(args_info.inputs[currentFile], "r");
-        if (UNLIKELY(!yyin))
-        {
-            rep->status("could not open file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
-            rep->abort(ERROR_FILE);
-        }
-        rep->status("reading from file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
+        // open next file
+        delete netFile;
+        netFile = new Input("net", args_info.inputs[++currentFile]);
+
         yycolno = 1;
         yylineno = 1;
         return 0;

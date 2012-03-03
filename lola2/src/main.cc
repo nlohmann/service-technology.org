@@ -26,6 +26,8 @@
 #include "RandomWalk.h"
 #include "CompressedIO.h"
 
+#include "InputOutput.h"
+
 #include "Store.h"
 #include "BDDStore.h"
 
@@ -49,6 +51,8 @@ Reporter* rep = NULL;
 otherwise: index in args_info.inputs
 */
 int currentFile = -1;
+Input* netFile;
+
 
 // the parsers
 extern int yyparse();
@@ -81,6 +85,8 @@ void evaluateParameters(int argc, char** argv)
             break;
     }
 
+    IO::setReporter(rep);
+
     free(params);
 }
 
@@ -103,22 +109,20 @@ int main(int argc, char** argv)
         // read from stdin
         if (args_info.inputs_num == 0)
         {
-            ReadNetFile(stdin);
+            Input in("compressed net");
+            ReadNetFile(in);
         }
         if (args_info.inputs_num == 1)
         {
-            FILE *in = fopen(args_info.inputs[0], "r");
+            Input in("compressed net", args_info.inputs[0]);
             ReadNetFile(in);
-            fclose(in);
         }
         if (args_info.inputs_num == 2)
         {
-            FILE *in = fopen(args_info.inputs[0], "r");
-            ReadNetFile(in);
-            fclose(in);
-            FILE *names = fopen(args_info.inputs[1], "r");
-            ReadNameFile(names);
-            fclose(names);
+            Input netfile("compressed net", args_info.inputs[0]);
+            ReadNetFile(netfile);
+            Input namefile("compress net", args_info.inputs[1]);
+            ReadNameFile(namefile);
         }
     }
     else
@@ -126,28 +130,26 @@ int main(int argc, char** argv)
         // handle input
         if (args_info.inputs_num == 0)
         {
-            rep->status("reading from %s", rep->markup(MARKUP_FILE, "stdin").str());
-            /* nothing to do - yyin is pointing to stdin */
+            // read from stdin
+            netFile = new Input("net");
         }
         else
         {
             currentFile = 0;
-            yyin = fopen(args_info.inputs[currentFile], "r");
-            if (UNLIKELY(!yyin))
-            {
-                rep->status("could not open file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
-                rep->abort(ERROR_FILE);
-            }
-            rep->status("reading from file %s", rep->markup(MARKUP_FILE, args_info.inputs[currentFile]).str());
+            netFile = new Input("net", args_info.inputs[currentFile]);
         }
 
+        // pass the opened file pointer to flex via FILE *yyin
+        yyin = *netFile;
 
         // read the input file(s)
         ParserPTNet* symbolTables = ParserPTNetLoLA();
 
         rep->status("finished parsing");
 
-        fclose(yyin);
+        // close net file
+        delete netFile;
+
         yylex_destroy();
 
         // translate into general net structures
@@ -169,21 +171,21 @@ int main(int argc, char** argv)
         Net::print();
     }
 
-    /// \todo add suffix
-    /// \todo write name file
-    /// \todo encapsulate file handling
     if (args_info.writeCompressed_given)
     {
         rep->status("print compressed net");
-        FILE *out = fopen(args_info.writeCompressed_arg, "w");
-        WriteNetFile(out);
-        fclose(out);
+
+        Output netfile("compressed net", std::string(args_info.writeCompressed_arg) + ".net");
+        WriteNetFile(netfile);
+
+        Output namefile("compressed net", std::string(args_info.writeCompressed_arg) + ".names");
+        WriteNameFile(namefile);
     }
 
-/*
-    Store *s = new BDDStore();
-    s->searchAndInsert();
-*/
+    /*
+        Store *s = new BDDStore();
+        s->searchAndInsert();
+    */
 
     return EXIT_SUCCESS;
 }

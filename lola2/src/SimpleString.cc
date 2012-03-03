@@ -1,7 +1,19 @@
 #include <config.h>
 #include <cstdlib>
 #include <cstring>
+#include <cstdio>
 #include "SimpleString.h"
+
+
+String::String() : s(strdup(""))
+{
+    assert(s);
+}
+
+String::String(const String &other) : s(strdup(other.s))
+{
+    assert(s);
+}
 
 /*!
 \note The given string is NOT copied! Only the pointer is stored and it will be

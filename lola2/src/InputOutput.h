@@ -1,48 +1,56 @@
 #pragma once
 
-#include <stdio.h>
-#include "SimpleString.h"
+#include <string>
+#include <cstdio>
+#include "Reporter.h"
 
 class IO
 {
     protected:
+        /// a reporter for status messages
+        static Reporter* r;
+
+        /// the filename (or empty in case of stdin/stdout)
+        std::string filename;
+
+        /// the kind of the file
+        std::string kind;
+
         /// the filepointer
-        FILE *fp;
+        FILE* fp;
 
     public:
+        static void setReporter(Reporter*);
+
+        /// implicit cast to FILE* (return fp)
         operator FILE* ();
 
-        IO(FILE*);
+        /// return filename
+        const char* getFilename();
+
+        /// default constructor
+        IO(FILE*, std::string, std::string);
 
         /// destructor
         ~IO();
 };
 
-/*
 class Output : public IO
 {
-    private:
-        /// it's a temp file if its not NULL
-        char *temp;
-
     public:
         /// output to stdout (given kind)
-        Output(String);
+        Output(std::string);
 
         /// output to file (given kind and filename)
-        Output(String, String);
+        Output(std::string, std::string);
 };
 
 class Input : public IO
 {
     public:
         /// input from stdin (given kind)
-        Input(String);
+        Input(std::string);
 
-        /// input from file (given kind and filename)
-        Input(String, String);
-
-        /// input from open file (given filepointer, kind, and filename)
-        Input(FILE*, String, String);
+        /// input from file (given filename)
+        Input(std::string, std::string);
 };
-*/

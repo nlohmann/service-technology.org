@@ -8,8 +8,14 @@ class String
         char* s;
 
     public:
+        /// constructor for empty string
+        String();
+
+        /// copy constructor
+        String(const String &);
+
         /// constructor (does only copy pointer, not content)
-        String(char* s);
+        explicit String(char* s);
 
         /// constructor (actually copying content)
         String(char* s, bool);

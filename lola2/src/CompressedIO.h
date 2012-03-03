@@ -14,7 +14,7 @@ file where data are separated by spaces and newlines.
 
 #include <cstdio>
 
-void WriteNameFile(FILE *);
-void WriteNetFile(FILE *);
-void ReadNameFile(FILE *);
-void ReadNetFile(FILE *);
+void WriteNameFile(FILE*);
+void WriteNetFile(FILE*);
+void ReadNameFile(FILE*);
+void ReadNetFile(FILE*);

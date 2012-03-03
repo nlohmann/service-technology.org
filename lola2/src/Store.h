@@ -38,7 +38,7 @@ class Store
         virtual bool searchAndInsert() = 0;
 
         /// check whether current marking is stored and return state
-        virtual bool searchAndInsert(State **s) = 0;
+        virtual bool searchAndInsert(State** s) = 0;
 };
 
 // class BinStore : public Store;

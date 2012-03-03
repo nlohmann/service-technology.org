@@ -170,8 +170,8 @@ void ParserPTNet::symboltable2net()
         // hash and capacity
         Place::Hash[i] = rand() % MAX_HASH;
         Place::Capacity[i] = ps->getCapacity();
-	Place::SizeOfBitVector += 
-        	(Place::CardBits[i] = Place::Capacity2Bits(Place::Capacity[i]));
+        Place::SizeOfBitVector +=
+            (Place::CardBits[i] = Place::Capacity2Bits(Place::Capacity[i]));
 
         // initially: no disabled transistions (through CardDisabled = 0)
         // correct values will be achieved by initial checkEnabled...

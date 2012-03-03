@@ -8,6 +8,7 @@ anica_SOURCES = main.cc \
                 cmdline.c cmdline.h \
                 Output.cc Output.h \
 				Results.cc Results.h \
+                AnicaLib.cc AnicaLib.h \
 				anica-util.h
 
 reasoner_SOURCES = reasoner.cc Socket.cc Socket.h Reporter.cc Reporter.h SimpleString.h SimpleString.cc

@@ -1,4 +1,7 @@
 #include <string>
+#include <sstream>
+#include <cstdio>
+#include <fstream>
 
 #include <pnapi/pnapi.h>
 #include <cuddObj.hh>
@@ -103,14 +106,39 @@ void evaluateReassignment() {
 }
 
 
+const char *getNet(json_value *root) {
+    assert(root->type == JSON_OBJECT);
+
+    for (json_value *it = root->first_child; it; it = it->next_sibling) {
+        if (it->name && !strcmp(it->name, "net")) {
+            return it->string_value;
+        }
+    }
+    
+    rep->status("no net found");
+    rep->abort(ERROR_SYNTAX);
+    return "";
+}
+
+const char* getCommand(json_value *root) {
+    assert(root->type == JSON_OBJECT);
+
+    for (json_value *it = root->first_child; it; it = it->next_sibling) {
+        if (it->name && !strcmp(it->name, "command")) {
+            return it->string_value;
+        }
+    }
+
+    
+    rep->status("no command found");
+    rep->abort(ERROR_SYNTAX);
+    return "";
+}
+
+
 int main() {
     int inputPort = 5556;
     int outputPort = 5555;
-
-
-//    base64::encoder E;
-//    E.encode(std::cin, std::cout);
-
 
     // initialize ports
     rep->status("listening to socket %d", inputPort);
@@ -124,7 +152,48 @@ int main() {
 
         json_value* json = receiveJson();
         assert(json);
-        print_json(json);
+
+        rep->status("command: %s", getCommand(json));
+
+        const char* net = getNet(json);
+        char* out = (char*)malloc(BUFFERSIZE);
+
+        base64::decoder D;
+        D.decode(net, strlen(net), out);
+
+/*
+        FILE* tmp = fopen("tmp", "w");
+        fprintf(tmp, "%s", out);
+        fclose(tmp);
+        free(out);
+
+        pnapi::PetriNet n;
+        try {
+            
+        std::ifstream inputStream("tmp");
+        inputStream >> meta(pnapi::io::INPUTFILE, "tmp") >> pnapi::io::lola >> n;
+    } catch (const pnapi::exception::InputError& error) {
+        std::cerr << error;
+    }
+*/
+
+
+/*
+        pnapi::PetriNet n;
+        std::stringstream ss;
+        ss << std::string(out);
+
+//        printf("\n\n\n%s\n\n\n", ss.str().c_str());
+
+        try {
+            ss >> pnapi::io::lola >> n;
+            std::cout << n;
+        } catch (const pnapi::exception::InputError& error) {
+            std::cerr << error;
+        }
+
+*/
+//        print_json(json);
     }
 
     rep->status("done");

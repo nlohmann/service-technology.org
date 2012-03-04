@@ -4,4 +4,4 @@ libbase64_a_SOURCES = cdecode.c cencode.c
 
 libbase64_a_CPPFLAGS = -I include
 
-EXTRA_DIST = b64
+EXTRA_DIST = include

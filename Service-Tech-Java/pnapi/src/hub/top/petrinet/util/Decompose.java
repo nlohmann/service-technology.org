@@ -19,6 +19,7 @@ package hub.top.petrinet.util;
 
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 
@@ -468,7 +469,7 @@ public class Decompose {
       net.setRoles_unassigned();
       PetriNet scenarioNet = decomposeToScenarios_split(net);
       scenarioNet.anonymizeNet();
-      PetriNetIO.writeToFile(scenarioNet, fileName+"_scenario", PetriNetIO.FORMAT_DOT, PetriNetIO.PARAM_SWIMLANE);
+      PetriNetIO_Out.writeToFile(scenarioNet, fileName+"_scenario", PetriNetIO_Out.FORMAT_DOT, PetriNetIO_Out.PARAM_SWIMLANE);
       
       /*
       LinkedList<PetriNet> scenarios = toScenarios(net);

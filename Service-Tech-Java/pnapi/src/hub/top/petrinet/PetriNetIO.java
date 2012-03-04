@@ -17,17 +17,8 @@
 
 package hub.top.petrinet;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
-
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.EarlyExitException;
-import org.antlr.runtime.MismatchedTokenException;
-import org.antlr.runtime.RecognitionException;
 
 /**
  * 
@@ -47,12 +38,12 @@ public class PetriNetIO {
   public static PetriNet readNetFromFile(String fileName) throws IOException {
     
     String ext = fileName.substring(fileName.lastIndexOf('.')+1);
-    int format = getFormatForFileExtension(ext);
+    int format = PetriNetIO_Out.getFormatForFileExtension(ext);
     
-    if (format == FORMAT_LOLA) {
+    if (format == PetriNetIO_Out.FORMAT_LOLA) {
     
-      LoLALexer lex = new LoLALexer(new ANTLRFileStream(fileName));
-      CommonTokenStream tokens = new CommonTokenStream(lex);
+      LoLALexer lex = new LoLALexer(new org.antlr.runtime.ANTLRFileStream(fileName));
+      org.antlr.runtime.CommonTokenStream tokens = new org.antlr.runtime.CommonTokenStream(lex);
   
       LoLAParser parser = new LoLAParser(tokens);
   
@@ -60,15 +51,15 @@ public class PetriNetIO {
         PetriNet result = parser.net();
         return result;
           
-      } catch (RecognitionException e)  {
+      } catch (org.antlr.runtime.RecognitionException e)  {
         handleParsingException(e, fileName);
       }
 
       
-    } else if (format == FORMAT_OWFN) {
+    } else if (format == PetriNetIO_Out.FORMAT_OWFN) {
     	
-      OWFNLexer lex = new OWFNLexer(new ANTLRFileStream(fileName));
-      CommonTokenStream tokens = new CommonTokenStream(lex);
+      OWFNLexer lex = new OWFNLexer(new org.antlr.runtime.ANTLRFileStream(fileName));
+      org.antlr.runtime.CommonTokenStream tokens = new org.antlr.runtime.CommonTokenStream(lex);
   
       OWFNParser parser = new OWFNParser(tokens);
   
@@ -76,15 +67,15 @@ public class PetriNetIO {
         PetriNet result = parser.net();
         return result;
           
-      } catch (RecognitionException e)  {
+      } catch (org.antlr.runtime.RecognitionException e)  {
         handleParsingException(e, fileName);
       }
 
       
-    } else if (format == FORMAT_WOFLAN) {
+    } else if (format == PetriNetIO_Out.FORMAT_WOFLAN) {
 
-      TPNLexer lex = new TPNLexer(new ANTLRFileStream(fileName));
-      CommonTokenStream tokens = new CommonTokenStream(lex);
+      TPNLexer lex = new TPNLexer(new org.antlr.runtime.ANTLRFileStream(fileName));
+      org.antlr.runtime.CommonTokenStream tokens = new org.antlr.runtime.CommonTokenStream(lex);
   
       TPNParser parser = new TPNParser(tokens);
   
@@ -92,7 +83,7 @@ public class PetriNetIO {
         PetriNet result = parser.net();
         return result;
           
-      } catch (RecognitionException e)  {
+      } catch (org.antlr.runtime.RecognitionException e)  {
         handleParsingException(e, fileName);
       }
     }
@@ -107,301 +98,20 @@ public class PetriNetIO {
    * @param e
    * @param fileName
    */
-  private static void handleParsingException(RecognitionException e, String fileName) {
-    if (e instanceof EarlyExitException) {
-      EarlyExitException e2 = (EarlyExitException)e;
+  private static void handleParsingException(org.antlr.runtime.RecognitionException e, String fileName) {
+    if (e instanceof org.antlr.runtime.EarlyExitException) {
+      org.antlr.runtime.EarlyExitException e2 = (org.antlr.runtime.EarlyExitException)e;
       System.err.println("failed parsing "+fileName);
       System.err.println("found unexpected '"+e2.token.getText()+"' in "
           +"line "+e2.line+ " at column "+(e2.charPositionInLine+1));
-    } else if (e instanceof MismatchedTokenException) {
-      MismatchedTokenException e2 = (MismatchedTokenException)e;
+    } else if (e instanceof org.antlr.runtime.MismatchedTokenException) {
+      org.antlr.runtime.MismatchedTokenException e2 = (org.antlr.runtime.MismatchedTokenException)e;
       System.err.println("failed parsing "+fileName);
       System.err.println("line "+e2.line+":"+(e2.charPositionInLine+1)+" found unexpected "+e2.token.getText());
     } else {
       System.err.println("Error parsing file "+fileName);
       e.printStackTrace();
     }
-  }
-  
-  public static final int FORMAT_DOT = 1;
-  public static final int FORMAT_LOLA = 2;
-  public static final int FORMAT_OWFN = 3;
-  public static final int FORMAT_WOFLAN = 4;
-  
-  public static String toLoLA(String ident) {
-    String result = ident.replace(' ', '_');
-    result = result.replace('(', '_');
-    result = result.replace(')', '_');
-    result = result.replace('[', '_');
-    result = result.replace(']', '_');
-    result = result.replace('=', '_');
-    result = result.replace(':', '_');
-    result = result.replace('{', '_');
-    result = result.replace('}', '_');
-    result = result.replace(',', '_');
-    result = result.replace(';', '_');
-
-    return result;
-  }
-  
-  public static String toLoLA(PetriNet net) {
-    StringBuilder b = new StringBuilder();
-    
-    boolean labeled_net = !net.isUnlabeled();
-    
-    b.append("{\n");
-    b.append("  input file:\n");
-    b.append("  invocation:\n");
-    b.append("  net size:     "+net.getInfo(false)+"\n");
-    b.append("}\n\n");
-    
-    // ---------------------- places ------------------------
-    b.append("PLACE");
-      b.append("    ");
-      Iterator<Place> place = net.getPlaces().iterator();
-      while (place.hasNext()) {
-        Place p = place.next();
-        String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
-        b.append(" "+toLoLA(placeName));
-        if (place.hasNext()) b.append(",");
-      }
-      b.append(";\n");
-    b.append("\n");
-    
-    // ---------------------- markings ------------------------
-    b.append("MARKING\n");
-    b.append("  ");
-    boolean firstPlace = true;
-    for (Place p : net.getPlaces()) {
-      if (p.getTokens() > 0) {
-        if (!firstPlace) b.append(",");
-        String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
-        b.append(" "+toLoLA(placeName)+":"+p.getTokens());
-        firstPlace = false;
-      }
-    }
-    b.append(";\n\n");
-    
-    // ---------------------- transitions ------------------------
-    for (Transition t : net.getTransitions()) {
-      String transitionName = (labeled_net ? t.getUniqueIdentifier() : t.getName());
-      b.append("TRANSITION "+toLoLA(transitionName)+"\n");
-        // pre-places of the transition
-        b.append("  CONSUME");
-        place = t.getPreSet().iterator();
-        while (place.hasNext()) {
-          Place p = place.next();
-          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
-          b.append(" "+toLoLA(placeName)+":1");
-          if (place.hasNext()) b.append(",");
-        }
-        b.append(";\n");
-        // post-places of the transition
-        b.append("  PRODUCE");
-        place = t.getPostSet().iterator();
-        while (place.hasNext()) {
-          Place p = place.next();
-          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
-          b.append(" "+toLoLA(placeName)+":1");
-          if (place.hasNext()) b.append(",");
-        }
-        b.append(";\n");
-      b.append("\n");
-    }
-    return b.toString();
-  }
-  
-  public static String toOWFN(PetriNet net) {
-    StringBuilder b = new StringBuilder();
-    
-    boolean labeled_net = !net.isUnlabeled();
-    
-    b.append("{\n");
-    b.append("  input file:\n");
-    b.append("  invocation:\n");
-    b.append("  net size:     "+net.getInfo(false)+"\n");
-    b.append("}\n\n");
-    
-    // ---------------------- places ------------------------
-    b.append("PLACE");
-      // print roles
-      if (net.getRoles().size() > 0) {
-        b.append("  ROLES");
-        Iterator<String> role = net.getRoles().iterator();
-        while (role.hasNext()) {
-          b.append(" "+toLoLA(role.next()));
-          if (role.hasNext()) b.append(",");
-        }
-        b.append(";\n");
-      }
-      // print internal places
-      b.append("  INTERNAL\n");
-        b.append("    ");
-        Iterator<Place> place = net.getPlaces().iterator();
-        while (place.hasNext()) {
-          Place p = place.next();
-          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
-          b.append(" "+toLoLA(placeName));
-          if (place.hasNext()) b.append(",");
-        }
-        b.append(";\n");
-
-      // print input places
-      b.append("  INPUT\n");
-        b.append("    "); /*
-        place = net.getPlaces().iterator();
-        while (place.hasNext()) {
-          Place p = place.next();
-          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
-          b.append(" "+toLoLA(placeName));
-          if (place.hasNext()) b.append(",");
-        } */
-        b.append(";\n");
-
-      // print input places
-      b.append("  OUTPUT\n");
-        b.append("    "); /*
-        place = net.getPlaces().iterator();
-        while (place.hasNext()) {
-          Place p = place.next();
-          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
-          b.append(" "+toLoLA(placeName));
-          if (place.hasNext()) b.append(",");
-        } */
-        b.append(";\n");
-    b.append("\n");
-    
-    // ---------------------- markings ------------------------
-    b.append("INITIALMARKING\n");
-    b.append("  ");
-    boolean firstPlace = true;
-    for (Place p : net.getPlaces()) {
-      if (p.getTokens() > 0) {
-        if (!firstPlace) b.append(",");
-        String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
-        b.append(" "+toLoLA(placeName)+":"+p.getTokens());
-        firstPlace = false;
-      }
-    }
-    b.append(";\n\n");
-    
-    b.append("FINALCONDITION\n");
-    b.append("  TRUE;\n");
-    b.append("\n");
-    
-    // ---------------------- transitions ------------------------
-    for (Transition t : net.getTransitions()) {
-      String transitionName = (labeled_net ? t.getUniqueIdentifier() : t.getName());
-      b.append("TRANSITION "+toLoLA(transitionName)+"\n");
-        // print roles of the transition
-        if (t.getRoles().size() > 0) {
-          b.append("  ROLES");
-          Iterator<String> role = t.getRoles().iterator();
-          while (role.hasNext()) {
-            b.append(" "+toLoLA(role.next()));
-            if (role.hasNext()) b.append(",");
-          }
-          b.append(";\n");
-        }
-        // pre-places of the transition
-        b.append("  CONSUME");
-        place = t.getPreSet().iterator();
-        while (place.hasNext()) {
-          Place p = place.next();
-          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
-          b.append(" "+toLoLA(placeName)+":1");
-          if (place.hasNext()) b.append(",");
-        }
-        b.append(";\n");
-        // post-places of the transition
-        b.append("  PRODUCE");
-        place = t.getPostSet().iterator();
-        while (place.hasNext()) {
-          Place p = place.next();
-          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
-          b.append(" "+toLoLA(placeName)+":1");
-          if (place.hasNext()) b.append(",");
-        }
-        b.append(";\n");
-      b.append("\n");
-    }
-    
-    return b.toString();
-  }
-  
-  /**
-   * @param format
-   * @return standard file extension for given file format
-   */
-  public static String getFileExtension(int format) {
-    switch(format) {
-    case FORMAT_DOT: return "dot";
-    case FORMAT_LOLA: return "lola";
-    case FORMAT_OWFN: return "owfn";
-    case FORMAT_WOFLAN: return "tpn";
-    }
-    return "unknown";
-  }
-  
-  /**
-   * @param format
-   * @return standard file extension for given file format
-   */
-  public static int getFormatForFileExtension(String ext) {
-    if ("dot".equals(ext)) return FORMAT_DOT;
-    else if ("lola".equals(ext)) return FORMAT_LOLA;
-    else if ("owfn".equals(ext)) return FORMAT_OWFN;
-    else if ("tpn".equals(ext)) return FORMAT_WOFLAN;
-    else return 0;
-  }
-  
-  /**
-   * @param fileName
-   * @return <code>true</code> iff we have a parser that can read the
-   * file contents (decision is based on the file extension)
-   */
-  public static boolean isParseableFileType(String fileName) {
-    String ext = fileName.substring(fileName.lastIndexOf('.')+1);
-    int type = getFormatForFileExtension(ext);
-    if (type == FORMAT_LOLA || type == FORMAT_OWFN || type == FORMAT_WOFLAN)
-      return true;
-    else
-      return false;
-  }
-  
-  public static final int PARAM_SWIMLANE = 1;
-  
-  public static void writeToFile(PetriNet net, String fileName, int format, int parameter) throws IOException {
-
-    String extendedFileName;
-    int extIndex = fileName.lastIndexOf('.');
-    if (extIndex >= 0) {
-      String ext = fileName.substring(extIndex+1);
-      if (!ext.equals(getFileExtension(format)))
-        extendedFileName = fileName+"."+getFileExtension(format);
-      else
-        extendedFileName = fileName;
-    } else {
-      extendedFileName = fileName+"."+getFileExtension(format);
-    }
-    
-    // Create file 
-    FileWriter fstream = new FileWriter(extendedFileName);
-    BufferedWriter out = new BufferedWriter(fstream);
-    
-    if (format == FORMAT_DOT) {
-      if ((parameter & PARAM_SWIMLANE) == 1)
-        out.write(net.toDot_swimlanes());
-      else
-        out.write(net.toDot());
-    } else if (format == FORMAT_LOLA) {
-      out.write(PetriNetIO.toLoLA(net));
-    } else if (format == FORMAT_OWFN) {
-      out.write(PetriNetIO.toOWFN(net));
-    }
-
-    //Close the output stream
-    out.close();
   }
   
   private String options_inFile = null;
@@ -431,11 +141,11 @@ public class PetriNetIO {
       if ("-f".equals(args[i])) {
         ++i;
         if ("dot".equals(args[i]))
-          options_outputFormat = FORMAT_DOT;
+          options_outputFormat = PetriNetIO_Out.FORMAT_DOT;
         else if ("lola".equals(args[i]))
-          options_outputFormat = FORMAT_LOLA;
+          options_outputFormat = PetriNetIO_Out.FORMAT_LOLA;
         else if ("owfn".equals(args[i]))
-          options_outputFormat = FORMAT_OWFN;
+          options_outputFormat = PetriNetIO_Out.FORMAT_OWFN;
       }
     }
   }
@@ -453,7 +163,21 @@ public class PetriNetIO {
     if (net == null) return;
 
     //net.anonymizeNet();
-    writeToFile(net, fileName, options_outputFormat, 0);
+    PetriNetIO_Out.writeToFile(net, fileName, options_outputFormat, 0);
+  }
+  
+  /**
+   * @param fileName
+   * @return <code>true</code> iff we have a parser that can read the
+   * file contents (decision is based on the file extension)
+   */
+  public static boolean isParseableFileType(String fileName) {
+    String ext = fileName.substring(fileName.lastIndexOf('.')+1);
+    int type = PetriNetIO_Out.getFormatForFileExtension(ext);
+    if (type == PetriNetIO_Out.FORMAT_LOLA || type == PetriNetIO_Out.FORMAT_OWFN || type == PetriNetIO_Out.FORMAT_WOFLAN)
+      return true;
+    else
+      return false;
   }
   
   /**
@@ -513,7 +237,7 @@ public class PetriNetIO {
     pn_process.parseCommandLine(args);
     
     if (pn_process.options_outputFormat == 0)
-      pn_process.options_outputFormat = FORMAT_DOT;
+      pn_process.options_outputFormat = PetriNetIO_Out.FORMAT_DOT;
 
     pn_process.run();
   }

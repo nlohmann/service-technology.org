@@ -22,6 +22,7 @@ import java.util.HashSet;
 
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 
@@ -341,6 +342,6 @@ public class StructuralReduction {
       
     }
     
-    PetriNetIO.writeToFile(net, fileName, PetriNetIO.FORMAT_DOT, 0);
+    PetriNetIO_Out.writeToFile(net, fileName, PetriNetIO_Out.FORMAT_DOT, 0);
   }
 }

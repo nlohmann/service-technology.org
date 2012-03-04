@@ -2,6 +2,7 @@
 
 #include <pnapi/pnapi.h>
 #include <cuddObj.hh>
+#include <json.h>
 
 #include "Socket.h"
 #include "Reporter.h"

@@ -57,9 +57,10 @@ reasoner_LDADD += $(builddir)/../libs/cudd/libobj.a \
 	$(builddir)/../libs/cudd/libmtr.a \
 	$(builddir)/../libs/cudd/libst.a \
 	$(builddir)/../libs/cudd/libutil.a \
-	$(builddir)/../libs/cudd/libepd.a
+	$(builddir)/../libs/cudd/libepd.a \
+	$(builddir)/../libs/vjson/libvjson.a
 
-reasoner_CPPFLAGS += -I$(top_srcdir)/libs/cudd/include
+reasoner_CPPFLAGS += -I$(top_srcdir)/libs/cudd/include -I$(top_srcdir)/libs/vjson
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

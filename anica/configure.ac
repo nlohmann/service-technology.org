@@ -85,7 +85,7 @@ typedef uint32_t socklen_t;
 
 # write files
 AC_CONFIG_FILES([
-	Makefile libs/cudd/Makefile libs/pnapi/Makefile src/Makefile src/anica.conf doc/Makefile
+	Makefile libs/cudd/Makefile libs/pnapi/Makefile libs/vjson/Makefile src/Makefile src/anica.conf doc/Makefile
 	doc/Doxyfile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

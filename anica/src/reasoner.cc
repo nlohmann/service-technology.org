@@ -3,15 +3,52 @@
 #include <pnapi/pnapi.h>
 #include <cuddObj.hh>
 #include <json.h>
+#include <b64/encode.h>
+#include <b64/decode.h>
 
 #include "Socket.h"
 #include "Reporter.h"
 
-pnapi::PetriNet *net = NULL;
-Socket *inputSocket = NULL;
-Socket *outputSocket = NULL;
-Reporter *rep = new ReporterStream();
+pnapi::PetriNet* net = NULL;
+Socket* inputSocket = NULL;
+Socket* outputSocket = NULL;
+Reporter* rep = new ReporterStream();
 
+
+#define IDENT(n) for (int i = 0; i < n; ++i) printf("    ")
+
+void print_json(json_value* value, int ident = 0) {
+    IDENT(ident);
+    if (value->name) {
+        printf("\"%s\" = ", value->name);
+    }
+    switch (value->type) {
+        case JSON_NULL:
+            printf("null\n");
+            break;
+        case JSON_OBJECT:
+        case JSON_ARRAY:
+            printf(value->type == JSON_OBJECT ? "{\n" : "[\n");
+            for (json_value* it = value->first_child; it; it = it->next_sibling) {
+                print_json(it, ident + 1);
+            }
+            IDENT(ident);
+            printf(value->type == JSON_OBJECT ? "}\n" : "]\n");
+            break;
+        case JSON_STRING:
+            printf("\"%s\"\n", value->string_value);
+            break;
+        case JSON_INT:
+            printf("%d\n", value->int_value);
+            break;
+        case JSON_FLOAT:
+            printf("%f\n", value->float_value);
+            break;
+        case JSON_BOOL:
+            printf(value->int_value ? "true\n" : "false\n");
+            break;
+    }
+}
 
 void sendError() {
     /* create an error message for the GUI */
@@ -25,14 +62,27 @@ void sendInformation() {
 }
 
 
+json_value* receiveJson() {
+    char* msg = inputSocket->receiveMessage();
+
+    rep->status("received %d bytes", strlen(msg));
+
+    char* errorPos = 0;
+    char* errorDesc = 0;
+    int errorLine = 0;
+    block_allocator allocator(1 << 10); // 1 KB per block
+
+    json_value* root = json_parse(msg, &errorPos, &errorDesc, &errorLine, &allocator);    
+
+    if (root == NULL) {
+        rep->status("error at line %d - %s", errorLine, errorDesc);
+        rep->abort(ERROR_SYNTAX);
+    }
+
+    return root;
+}
+
 void receiveNet() {
-    char *msg = inputSocket->receiveMessage();
-    std::string netString(msg);
-    free(msg);
-
-    rep->status("received %d bytes", netString.length());
-
-    /* create net from string netString */
 }
 
 
@@ -43,7 +93,7 @@ void receiveReassignment() {
 
 void calculateCharacterization() {
     /* calculate BDD */
-    
+
     /* in case of error, call sendError() */
 }
 
@@ -52,20 +102,15 @@ void evaluateReassignment() {
     /* do stuff with the BDD */
 }
 
-std::string receiveCommand() {
-    char *msg = inputSocket->receiveMessage();
-    std::string result(msg);
-    free(msg);
-
-    rep->status("received command '%s'", result.c_str());
-
-    return result;
-}
-
 
 int main() {
     int inputPort = 5556;
     int outputPort = 5555;
+
+
+//    base64::encoder E;
+//    E.encode(std::cin, std::cout);
+
 
     // initialize ports
     rep->status("listening to socket %d", inputPort);
@@ -75,27 +120,11 @@ int main() {
 
     // state machine
     while (true) {
-        rep->status("waiting for command");
-        std::string command = receiveCommand();
+        rep->status("waiting for messages");
 
-        if (command == "TERMINATE") {
-            break;
-        }
-
-        if (command == "NET") {
-            receiveNet();
-            calculateCharacterization();
-            continue;
-        }
-
-        if (command == "REASSIGNMENT") {
-            receiveReassignment();
-            evaluateReassignment();
-            continue;
-        }
-
-        rep->status("wrong command '%s'", command.c_str());
-        rep->abort(ERROR_SYNTAX);
+        json_value* json = receiveJson();
+        assert(json);
+        print_json(json);
     }
 
     rep->status("done");

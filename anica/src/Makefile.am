@@ -58,9 +58,10 @@ reasoner_LDADD += $(builddir)/../libs/cudd/libobj.a \
 	$(builddir)/../libs/cudd/libst.a \
 	$(builddir)/../libs/cudd/libutil.a \
 	$(builddir)/../libs/cudd/libepd.a \
-	$(builddir)/../libs/vjson/libvjson.a
+	$(builddir)/../libs/vjson/libvjson.a \
+	$(builddir)/../libs/base64/libbase64.a
 
-reasoner_CPPFLAGS += -I$(top_srcdir)/libs/cudd/include -I$(top_srcdir)/libs/vjson
+reasoner_CPPFLAGS += -I$(top_srcdir)/libs/cudd/include -I$(top_srcdir)/libs/vjson -I$(top_srcdir)/libs/base64/include -DBUFFERSIZE=16777216
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

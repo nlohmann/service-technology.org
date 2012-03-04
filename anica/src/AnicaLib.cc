@@ -243,12 +243,19 @@ bool anica::AnicaLib::isActiveCausalPlace(const std::string& p) {
     TriplePointer* resultTriple;
     
     PNAPI_FOREACH(h, place->getPreset()) {
-        if (((pnapi::Transition*)(*h))->getConfidence() == anica::CONFIDENCE_HIGH) {
+        const int presetConfidence = ((pnapi::Transition*)(*h))->getConfidence();
+        assert(presetConfidence != anica::CONFIDENCE_NONE); 
+        if (presetConfidence == anica::CONFIDENCE_HIGH) {
             PNAPI_FOREACH(l, place->getPostset()) {
-                if (((pnapi::Transition*)(*l))->getConfidence() == anica::CONFIDENCE_LOW) {
-                    if (isActiveCausalTriple(place, (pnapi::Transition*)*h, (pnapi::Transition*)*l)) {
+                const int postsetConfidence = ((pnapi::Transition*)(*l))->getConfidence();
+                assert(postsetConfidence != anica::CONFIDENCE_NONE); 
+                if (postsetConfidence == anica::CONFIDENCE_LOW) {
+                    TriplePointer* tripel = new TriplePointer(place, (pnapi::Transition*)*h, (pnapi::Transition*)*l); 
+                    if (isActiveCausalTriple(tripel)) {
+                        delete tripel;
                         return true;
                     }
+                    delete tripel;
                 }
             }
         }
@@ -268,13 +275,18 @@ bool anica::AnicaLib::isActiveConflictPlace(const std::string& p) {
     TriplePointer* resultTriple;
     
     PNAPI_FOREACH(h, place->getPostset()) {
-        if (((pnapi::Transition*)(*h))->getConfidence() == anica::CONFIDENCE_HIGH) {
+        const int postsetConfidence = ((pnapi::Transition*)(*h))->getConfidence();
+        assert(postsetConfidence != anica::CONFIDENCE_NONE); 
+        if (postsetConfidence == anica::CONFIDENCE_HIGH) {
             // todo: smarter implementieren...;-)
             PNAPI_FOREACH(l, place->getPostset()) {
                 if (((pnapi::Transition*)(*l))->getConfidence() == anica::CONFIDENCE_LOW) {
-                    if (isActiveConflictTriple(place, (pnapi::Transition*)*h, (pnapi::Transition*)*l)) {
+                    TriplePointer* tripel = new TriplePointer(place, (pnapi::Transition*)*h, (pnapi::Transition*)*l); 
+                    if (isActiveConflictTriple(tripel)) {
+                        delete tripel;
                         return true;
                     }
+                    delete tripel;
                 }
             }
         }
@@ -283,18 +295,20 @@ bool anica::AnicaLib::isActiveConflictPlace(const std::string& p) {
     return false;
 }
 
-bool anica::AnicaLib::isActiveCausalTriple(const pnapi::Place* s, const pnapi::Transition* h, const pnapi::Transition* l)
+bool anica::AnicaLib::isActiveCausalTriple(const anica::TriplePointer* tripel)
 {
-    assert(s != NULL);
-    assert(h != NULL);
-    assert(l != NULL);
+    assert(tripel->place != NULL);
+    assert(tripel->high != NULL);
+    assert(tripel->low != NULL);
     
     pnapi::PetriNet* taskNet = new pnapi::PetriNet(*initialNet);
     newArcs.clear();
-    TriplePointer* resultTriple = addCausalPattern(*taskNet, taskNet->findPlace(s->getName()), taskNet->findTransition(h->getName()), taskNet->findTransition(l->getName()), true);
+    TriplePointer* taskTriple = new TriplePointer(taskNet->findPlace(tripel->place->getName()), taskNet->findTransition(tripel->high->getName()), taskNet->findTransition(tripel->low->getName()));
+    TriplePointer* resultTriple = addCausalPattern(*taskNet, taskTriple, true);
     
     const int ret = callLoLA(*taskNet, resultTriple->place);
     
+    delete taskTriple;
     delete taskNet;
     delete resultTriple;
 
@@ -308,18 +322,20 @@ bool anica::AnicaLib::isActiveCausalTriple(const pnapi::Place* s, const pnapi::T
     }
 }
 
-bool anica::AnicaLib::isActiveConflictTriple(const pnapi::Place* s, const pnapi::Transition* h, const pnapi::Transition* l)
+bool anica::AnicaLib::isActiveConflictTriple(const anica::TriplePointer* tripel)
 {
-    assert(s != NULL);
-    assert(h != NULL);
-    assert(l != NULL);
+    assert(tripel->place != NULL);
+    assert(tripel->high != NULL);
+    assert(tripel->low != NULL);
     
     pnapi::PetriNet* taskNet = new pnapi::PetriNet(*initialNet);
     newArcs.clear();
-    TriplePointer* resultTriple = addConflictPattern(*taskNet, taskNet->findPlace(s->getName()), taskNet->findTransition(h->getName()), taskNet->findTransition(l->getName()), true);
+    TriplePointer* taskTriple = new TriplePointer(taskNet->findPlace(tripel->place->getName()), taskNet->findTransition(tripel->high->getName()), taskNet->findTransition(tripel->low->getName()));
+    TriplePointer* resultTriple = addConflictPattern(*taskNet, taskTriple, true);
     
     const int ret = callLoLA(*taskNet, resultTriple->place);
     
+    delete taskTriple;
     delete taskNet;
     delete resultTriple;
 
@@ -399,40 +415,40 @@ int anica::AnicaLib::callLoLA(const pnapi::PetriNet& net, const pnapi::Place* go
 	return (pclose(fp) / 256);
 }
 
-anica::TriplePointer* anica::AnicaLib::addCausalPattern(pnapi::PetriNet& extendedNet, pnapi::Place* s, pnapi::Transition* h, pnapi::Transition* l, bool insertArcs)
+anica::TriplePointer* anica::AnicaLib::addCausalPattern(pnapi::PetriNet& extendedNet, const anica::TriplePointer* tripel, bool insertArcs)
 {   
     pnapi::Transition* lC = &extendedNet.createTransition();
     pnapi::Transition* hC = &extendedNet.createTransition();
     pnapi::Place* fired = &extendedNet.createPlace();
     pnapi::Place* goal = &extendedNet.createPlace();
 
-    const std::string triple = "(" + s->getName() + ", " + h->getName() + ", " + l->getName() + ")";
+    const std::string tripleName = "(" + tripel->place->getName() + ", " + tripel->high->getName() + ", " + tripel->low->getName() + ")";
 
     if (represantiveNames) {
-        lC->setName("lC_" + triple);
-        hC->setName("hC_" + triple);
-        fired->setName("fired_" + triple);
-        goal->setName("goal_" + triple);
+        lC->setName("lC_" + tripleName);
+        hC->setName("hC_" + tripleName);
+        fired->setName("fired_" + tripleName);
+        goal->setName("goal_" + tripleName);
     }
 
     TriplePointer* ret = new TriplePointer(goal, hC, lC);
 
-    PNAPI_FOREACH(prePlace, h->getPreset()) {
+    PNAPI_FOREACH(prePlace, tripel->high->getPreset()) {
         newArcs.insert(std::make_pair(*prePlace, hC));
     }
-    PNAPI_FOREACH(postPlace, h->getPostset()) {
+    PNAPI_FOREACH(postPlace, tripel->high->getPostset()) {
         newArcs.insert(std::make_pair(hC, *postPlace));
     }
 
-    PNAPI_FOREACH(prePlace, l->getPreset()) {
+    PNAPI_FOREACH(prePlace, tripel->low->getPreset()) {
         newArcs.insert(std::make_pair(*prePlace, lC));
     }
 
-    PNAPI_FOREACH(preTransition, s->getPreset()) {
-        if (((**preTransition).getName() != l->getName()) && ( (**preTransition).getName() != h->getName() )) {
+    PNAPI_FOREACH(preTransition, tripel->place->getPreset()) {
+        if (((**preTransition).getName() != tripel->low->getName()) && ( (**preTransition).getName() != tripel->high->getName() )) {
             pnapi::Place* a = &extendedNet.createPlace("", 1);
             if (represantiveNames) {
-                a->setName("p_" + (**preTransition).getName() + "_" + triple);
+                a->setName("p_" + (**preTransition).getName() + "_" + tripleName);
             }
             newArcs.insert(std::make_pair(*preTransition, a));
             newArcs.insert(std::make_pair(a, *preTransition));
@@ -446,7 +462,7 @@ anica::TriplePointer* anica::AnicaLib::addCausalPattern(pnapi::PetriNet& extende
             pnapi::Place* a = &extendedNet.createPlace("", 1);
             pnapi::Transition* d = (pnapi::Transition*)extendedNet.findTransition((**downTransition).getName());
             if (represantiveNames) {
-                a->setName("d_" + d->getName() + "_" + triple);
+                a->setName("d_" + d->getName() + "_" + tripleName);
             }
             newArcs.insert(std::make_pair(d, a));
             newArcs.insert(std::make_pair(a, d));
@@ -468,7 +484,7 @@ anica::TriplePointer* anica::AnicaLib::addCausalPattern(pnapi::PetriNet& extende
     return ret;
 }
 
-anica::TriplePointer* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& extendedNet, pnapi::Place* s, pnapi::Transition* h, pnapi::Transition* l, bool insertArcs)
+anica::TriplePointer* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& extendedNet, const anica::TriplePointer* tripel, bool insertArcs)
 {   
     pnapi::Transition* lC = &extendedNet.createTransition();
     pnapi::Transition* hC = &extendedNet.createTransition();
@@ -476,32 +492,32 @@ anica::TriplePointer* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& exten
     pnapi::Place* enabled = &extendedNet.createPlace("", 1);
     pnapi::Place* goal = &extendedNet.createPlace();
 
-    const std::string triple = "(" + s->getName() + ", " + h->getName() + ", " + l->getName() + ")";
+    const std::string tripleName = "(" + tripel->place->getName() + ", " + tripel->high->getName() + ", " + tripel->low->getName() + ")";
 
     if (represantiveNames) {
-        lC->setName("lC_" + triple);
-        hC->setName("hC_" + triple);
-        fired->setName("fired_" + triple);
-        enabled->setName("enabled_" +triple);
-        goal->setName("goal_" + triple);
+        lC->setName("lC_" + tripleName);
+        hC->setName("hC_" + tripleName);
+        fired->setName("fired_" + tripleName);
+        enabled->setName("enabled_" +tripleName);
+        goal->setName("goal_" + tripleName);
     }
 
     TriplePointer* ret = new TriplePointer(goal, hC, lC);
 
-    PNAPI_FOREACH(prePlace, h->getPreset()) {
+    PNAPI_FOREACH(prePlace, tripel->high->getPreset()) {
         newArcs.insert(std::make_pair(*prePlace, hC));
         newArcs.insert(std::make_pair(hC, *prePlace));
     }
 
-    PNAPI_FOREACH(prePlace, l->getPreset()) {
+    PNAPI_FOREACH(prePlace, tripel->low->getPreset()) {
         newArcs.insert(std::make_pair(*prePlace, lC));
     }
 
-    PNAPI_FOREACH(preTransition, s->getPreset()) {
-        if (((**preTransition).getName() != l->getName()) && ( (**preTransition).getName() != h->getName() )) {
+    PNAPI_FOREACH(preTransition, tripel->place->getPreset()) {
+        if (((**preTransition).getName() != tripel->low->getName()) && ( (**preTransition).getName() != tripel->high->getName() )) {
             pnapi::Place* a = &extendedNet.createPlace("", 1);
             if (represantiveNames) {
-                a->setName("p_" + (**preTransition).getName() + "_" + triple);
+                a->setName("p_" + (**preTransition).getName() + "_" + tripleName);
             }
             newArcs.insert(std::make_pair(*preTransition, a));
             newArcs.insert(std::make_pair(a, *preTransition));
@@ -515,7 +531,7 @@ anica::TriplePointer* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& exten
             pnapi::Place* a = &extendedNet.createPlace("", 1);
             pnapi::Transition* d = (pnapi::Transition*)extendedNet.findTransition((**downTransition).getName());
             if (represantiveNames) {
-                a->setName("d_" + d->getName() + "_" + triple);
+                a->setName("d_" + d->getName() + "_" + tripleName);
             }
             newArcs.insert(std::make_pair(d, a));
             newArcs.insert(std::make_pair(a, d));
@@ -526,8 +542,8 @@ anica::TriplePointer* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& exten
     newArcs.insert(std::make_pair(hC, fired));
     newArcs.insert(std::make_pair(fired, lC));
     newArcs.insert(std::make_pair(lC, goal)); 
-    newArcs.insert(std::make_pair(enabled, h));
-    newArcs.insert(std::make_pair(h, enabled));
+    newArcs.insert(std::make_pair(enabled, const_cast<pnapi::Transition*>(tripel->high)));
+    newArcs.insert(std::make_pair(const_cast<pnapi::Transition*>(tripel->high), enabled));
     newArcs.insert(std::make_pair(enabled, hC));
 
     if (insertArcs) {
@@ -538,4 +554,101 @@ anica::TriplePointer* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& exten
     }
 
     return ret;
+}
+
+bool anica::AnicaLib::isSecure()
+{
+    assert(initialNet != NULL);
+    assert(lolaPath != "");
+    
+    assert(unassignedTransitionsCount != 0);
+    
+    const size_t transitionsCount = initialNet->getTransitions().size();
+    if (highLabeledTransitionsCount == transitionsCount) {
+        return true;
+    }
+    if (lowLabeledTransitionsCount == transitionsCount) {
+        return true;
+    }
+       
+    PNAPI_FOREACH(p, initialNet->getPlaces()) {
+        const std::string placeName = (**p).getName();
+        if (isActiveCausalPlace(placeName)) {
+            return false;
+        }
+        if (isActiveConflictPlace(placeName)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool anica::AnicaLib::isActiveCausalTriple(const anica::Triple* triple)
+{
+    assert(triple != NULL);
+    assert(initialNet != NULL);
+    assert(triple->place != "");
+    assert(triple->high != "");
+    assert(triple->low != "");
+    
+    const anica::TriplePointer* taskTriple = new anica::TriplePointer(initialNet->findPlace(triple->place), initialNet->findTransition(triple->high), initialNet->findTransition(triple->low));
+ 
+    const bool ret = isActiveCausalTriple(taskTriple);   
+    delete taskTriple;
+    
+    return ret;
+}
+
+bool anica::AnicaLib::isActiveConflictTriple(const anica::Triple* triple)
+{
+    assert(triple != NULL);
+    assert(initialNet != NULL);
+    assert(triple->place != "");
+    assert(triple->high != "");
+    assert(triple->low != "");
+    
+    const anica::TriplePointer* taskTriple = new anica::TriplePointer(initialNet->findPlace(triple->place), initialNet->findTransition(triple->high), initialNet->findTransition(triple->low));
+ 
+    const bool ret = isActiveConflictTriple(taskTriple);   
+    delete taskTriple;
+    
+    return ret;
+}
+
+const anica::Triple* anica::AnicaLib::addCausalPattern(pnapi::PetriNet& net, const Triple* triple)
+{
+    assert(initialNet != NULL);
+    assert(triple != NULL);
+    assert(triple->place != "");
+    assert(triple->high != "");
+    assert(triple->low != "");
+    
+    newArcs.clear();
+    const anica::TriplePointer* taskTriple = new anica::TriplePointer(net.findPlace(triple->place), net.findTransition(triple->high), net.findTransition(triple->low));
+    const anica::TriplePointer* resultTriple = addCausalPattern(net, taskTriple, true);
+    
+    delete taskTriple;
+    const anica::Triple* returnTriple = new anica::Triple(resultTriple->place->getName(), resultTriple->high->getName(), resultTriple->low->getName());
+    delete resultTriple;
+    
+    return returnTriple;
+}
+
+const anica::Triple* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& net, const Triple* triple)
+{
+    assert(initialNet != NULL);
+    assert(triple != NULL);
+    assert(triple->place != "");
+    assert(triple->high != "");
+    assert(triple->low != "");
+    
+    newArcs.clear();
+    const anica::TriplePointer* taskTriple = new anica::TriplePointer(net.findPlace(triple->place), net.findTransition(triple->high), net.findTransition(triple->low));
+    const anica::TriplePointer* resultTriple = addConflictPattern(net, taskTriple, true);
+    
+    delete taskTriple;
+    const anica::Triple* returnTriple = new anica::Triple(resultTriple->place->getName(), resultTriple->high->getName(), resultTriple->low->getName());
+    delete resultTriple;
+    
+    return returnTriple;
 }

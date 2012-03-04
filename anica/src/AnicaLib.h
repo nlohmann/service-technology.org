@@ -67,6 +67,13 @@ class AnicaLib
         bool isPotentialConflictPlace(const std::string&) const;
         bool isActiveCausalPlace(const std::string&);
         bool isActiveConflictPlace(const std::string&);
+        bool isActiveCausalTriple(const Triple*);
+        bool isActiveConflictTriple(const Triple*);
+        
+        bool isSecure();
+        
+        const Triple* addCausalPattern(pnapi::PetriNet&, const Triple*);
+        const Triple* addConflictPattern(pnapi::PetriNet&, const Triple*);
         
         void setProperty(property_e);
         const int getProperty() const;
@@ -88,11 +95,11 @@ class AnicaLib
     
         void setTransitionAssignment(const pnapi::Transition*, confidence_e);
     
-        TriplePointer* addCausalPattern(pnapi::PetriNet&, pnapi::Place*, pnapi::Transition*, pnapi::Transition*, bool);
-        TriplePointer* addConflictPattern(pnapi::PetriNet&, pnapi::Place*, pnapi::Transition*, pnapi::Transition*, bool);
+        TriplePointer* addCausalPattern(pnapi::PetriNet&, const TriplePointer*, bool);
+        TriplePointer* addConflictPattern(pnapi::PetriNet&, const TriplePointer*, bool);
     
-        bool isActiveCausalTriple(const pnapi::Place*, const pnapi::Transition*, const pnapi::Transition*);
-        bool isActiveConflictTriple(const pnapi::Place*, const pnapi::Transition*, const pnapi::Transition*);
+        bool isActiveCausalTriple(const TriplePointer*);
+        bool isActiveConflictTriple(const TriplePointer*);
         
         pnapi::PetriNet* initialNet;
  

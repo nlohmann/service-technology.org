@@ -37,6 +37,8 @@
 #include "anica-util.h"
 #include "Results.h"
 
+#include "AnicaLib.h"
+
 using namespace pnapi;
 using namespace std;
 
@@ -535,6 +537,23 @@ int main(int argc, char** argv) {
     | 3. handle confidence			   |
     `---------------------------------*/
 
+    /*
+    // LIBTEST
+    anica::AnicaLib alib(net);
+    
+    alib.setLolaPath(string(args_info.lola_arg));
+    
+    if (alib.isSecure()) {
+        message("secure");
+    }
+    else {
+        message("INSECURE");
+    }
+    
+    return 0;
+    // LIBTEST END!
+    */
+    
     unsigned int downTransitions = 0;
 	unsigned int highTransitions = 0;
 	unsigned int lowTransitions = 0;

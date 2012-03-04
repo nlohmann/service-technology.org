@@ -71,6 +71,8 @@ class AnicaLib
         bool isActiveConflictTriple(const Triple*);
         
         bool isSecure();
+    
+        Cudd* getCharacterization(char**, BDD*);
         
         const Triple* addCausalPattern(pnapi::PetriNet&, const Triple*);
         const Triple* addConflictPattern(pnapi::PetriNet&, const Triple*);
@@ -119,6 +121,7 @@ class AnicaLib
         size_t unassignedTransitionsCount;
         size_t highLabeledTransitionsCount;
         size_t lowLabeledTransitionsCount;
+        // kann entfernt werden (da == downgradeTransitions.size())
         size_t downLabeledTransitionsCount;
         size_t potentialCausalPlacesCount;
         size_t potentialConflictPlacesCount;

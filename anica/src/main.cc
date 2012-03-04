@@ -543,13 +543,25 @@ int main(int argc, char** argv) {
     
     alib.setLolaPath(string(args_info.lola_arg));
     
+    /*
     if (alib.isSecure()) {
         message("secure");
     }
     else {
         message("INSECURE");
     }
+    */
     
+    /*
+    char** cuddVariableNames;
+    cuddVariableNames = new char*[net.getTransitions().size()];
+    BDD* cuddOutput = new BDD();
+    Cudd* myBDD = alib.getCharacterization(cuddVariableNames, cuddOutput);
+    
+    myBDD->DumpDot(vector<BDD>(1, *cuddOutput), cuddVariableNames);
+    */
+    
+    /*
     return 0;
     // LIBTEST END!
     */
@@ -1104,7 +1116,7 @@ int main(int argc, char** argv) {
 	            break;
 	        case task_arg_characterization:
 	            //ToDo: Ausgabe in DOT-File pipen
-	            //cuddManager->DumpDot(vector<BDD>(1, cuddOutput), cuddVariableNames);
+	            cuddManager->DumpDot(vector<BDD>(1, cuddOutput), cuddVariableNames);
 	            message("nodeCount: %d", cuddManager->nodeCount(vector<BDD>(1, cuddOutput)));
 	            if (args_info.finalize_flag) {
 	                delete cuddManager;

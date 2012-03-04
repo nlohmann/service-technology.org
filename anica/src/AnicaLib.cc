@@ -362,6 +362,10 @@ void anica::AnicaLib::initialize()
     newArcs.clear();
     downgradeTransitions.clear();
     unassignedTransitions.clear();
+    downLabeledTransitionsCount = 0;
+    unassignedTransitionsCount = 0;
+    lowLabeledTransitionsCount = 0;
+    highLabeledTransitionsCount = 0;
     potentialCausalPlacesCount = 0;
     potentialConflictPlacesCount = 0;
     activeCausalPlacesCount = 0;
@@ -651,4 +655,66 @@ const anica::Triple* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& net, c
     delete resultTriple;
     
     return returnTriple;
+}
+
+Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOutput)
+{
+    assert(initialNet != NULL);
+    assert(downLabeledTransitionsCount == 0);
+    
+    Cudd* cuddManager = new Cudd();
+    std::map<std::string, BDD> cuddVariables;
+	
+    cuddManager->AutodynEnable(CUDD_REORDER_GROUP_SIFT_CONV);
+    *cuddOutput = cuddManager->bddOne();
+    size_t i = 0;
+    PNAPI_FOREACH(t, initialNet->getTransitions()) {
+        cuddVariables[(**t).getName()] = cuddManager->bddVar();
+        cuddVariableNames[i++] = strdup((**t).getName().c_str());
+    }
+    
+    PNAPI_FOREACH(p, initialNet->getPlaces()) {
+        // check potential causal triples
+        PNAPI_FOREACH(highTransition, (*p)->getPreset()) {
+            const int highConfidence = ((pnapi::Transition*)(*highTransition))->getConfidence();
+            assert(highConfidence != anica::CONFIDENCE_DOWN);
+            if (highConfidence == anica::CONFIDENCE_HIGH || highConfidence == anica::CONFIDENCE_NONE) {
+                // current preTransition may be part of a causal triple
+                PNAPI_FOREACH(lowTransition, (*p)->getPostset()) {
+                    const int lowConfidence = ((pnapi::Transition*)(*lowTransition))->getConfidence();
+                    assert(lowConfidence != anica::CONFIDENCE_DOWN);
+                    if (lowConfidence == anica::CONFIDENCE_LOW || lowConfidence == anica::CONFIDENCE_NONE) {
+                        // potential causal triple
+                        const anica::TriplePointer* taskTriple = new anica::TriplePointer((pnapi::Place*)*p, (pnapi::Transition*)*highTransition, (pnapi::Transition*)*lowTransition);
+                        if (isActiveCausalTriple(taskTriple)) {
+                            *cuddOutput *= !(cuddVariables[(**highTransition).getName()] * !cuddVariables[(**lowTransition).getName()]);  
+                        }
+                        delete taskTriple;
+                    }
+                }
+            }
+        } 
+        // check potential conflict triples
+        PNAPI_FOREACH(highTransition, (*p)->getPostset()) {
+            const int highConfidence = ((pnapi::Transition*)(*highTransition))->getConfidence();
+            assert(highConfidence != anica::CONFIDENCE_DOWN);
+            if (highConfidence == anica::CONFIDENCE_HIGH || highConfidence == anica::CONFIDENCE_NONE) {
+                // current highTransition may be part of a causal triple
+                PNAPI_FOREACH(lowTransition, (*p)->getPostset()) {
+                    if (lowTransition != highTransition) {
+                        // low and high transition must be different ones
+                        const int lowConfidence = ((pnapi::Transition*)(*lowTransition))->getConfidence();
+                        // potential conflict triple
+                        const anica::TriplePointer* taskTriple = new anica::TriplePointer((pnapi::Place*)*p, (pnapi::Transition*)*highTransition, (pnapi::Transition*)*lowTransition);
+                        if (isActiveConflictTriple(taskTriple)) {
+                            *cuddOutput *= !(cuddVariables[(**highTransition).getName()] * !cuddVariables[(**lowTransition).getName()]);  
+                        }
+                        delete taskTriple;
+                    }
+                }
+            }
+        }
+    }   
+    
+    return cuddManager;   	   
 }

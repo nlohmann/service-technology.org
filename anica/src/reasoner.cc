@@ -14,12 +14,16 @@
 
 pnapi::PetriNet net;
 Reporter* rep = new ReporterStream();
+Socket* inputSocket;
+Socket* outputSocket;
 
 typedef enum {
-    CONFIDENCE_NONE,
-    CONFIDENCE_HIGH,
-    CONFIDENCE_LOW
+    CONFIDENCE_NONE = 0,
+    CONFIDENCE_HIGH = 1,
+    CONFIDENCE_LOW  = 2
 } confidence_levels;
+
+const char* levels[] = {"", "HIGH", "LOW"};
 
 /// the current assignment
 std::map<std::string, confidence_levels> assignment;
@@ -63,9 +67,39 @@ void print_json(json_value* value, int ident = 0) {
 
 /////////////////////////////////////////////////////////////////////////////
 
+void sendAssignment() {
+    std::string assignment_string = "{\n  \"assignment\": {";
+
+    for (std::map<std::string, confidence_levels>::iterator it = assignment.begin(); it != assignment.end(); ++it) {
+        if (it != assignment.begin()) {
+            assignment_string += ",";
+        }
+        assignment_string += "\n    \"" + it->first + "\": \"" + levels[it->second] + "\"";
+    }
+
+    assignment_string += "\n  }\n}\n";
+
+    outputSocket->send(assignment_string.c_str());
+    rep->status("sent %d bytes", assignment_string.length());
+}
+
+void sendError(char* message) {
+    // create message
+    char* msg;
+    asprintf(&msg, "{\n  \"error\": \"%s\"\n}", message);
+    assert(msg);
+
+    // send message
+    outputSocket->send(msg);
+    rep->status("sent %d bytes", strlen(msg));
+
+    // tidy up
+    free(msg);
+}
+
 // receive a JSON object from the given input socket
-json_value* receiveJson(Socket& inputSocket) {
-    char* msg = inputSocket.receiveMessage();
+json_value* receiveJson() {
+    char* msg = inputSocket->receiveMessage();
 
     rep->status("received %d bytes", strlen(msg));
 
@@ -191,15 +225,15 @@ int main() {
 
     // initialize ports
     rep->status("listening to socket %d", inputPort);
-    Socket inputSocket(inputPort);
-//    rep->status("talking to socket %d", outputPort);
-//    Socket outputSocket(outputPort, "localhost");
+    inputSocket = new Socket(inputPort);
+    rep->status("talking to socket %d", outputPort);
+    outputSocket = new Socket(outputPort, "localhost");
 
     // state machine
     while (true) {
         rep->status("waiting for messages");
 
-        json_value* json = receiveJson(inputSocket);
+        json_value* json = receiveJson();
         const char* command = getCommand(json);
 
         if (!strcmp(command, "net")) {

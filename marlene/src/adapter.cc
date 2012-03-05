@@ -267,8 +267,6 @@ PetriNet_const_ptr Adapter::buildController() {
 	 \***********************************/
 // create a unique temporary file name
 	Output owfn_temp;
-//        Output sa_temp;
-//       Output og_temp;
 
 	std::string owfn_filename(owfn_temp.name());
 	std::string sa_filename = owfn_filename + ".sa";
@@ -284,11 +282,11 @@ PetriNet_const_ptr Adapter::buildController() {
 	std::string candy_command;
 
 	std::string path2wendy = std::string(args_info.wendy_arg);
-// wendy is really essential
+	// wendy is really essential
 	assert(path2wendy != "");
 	std::string path2candy = std::string(args_info.candy_arg);
 
-// should we diagnose?
+	// should we diagnose?
 	if (args_info.diagnosis_flag) {
 		std::string property = "deadlock";
 		if (args_info.property_arg == property_arg_livelock) {
@@ -304,7 +302,7 @@ PetriNet_const_ptr Adapter::buildController() {
 			Output cf_file(cost_filename, "cost file");
 			cf_file.stream() << cost_file_content;
 
-// optimization
+			// optimization
 			wendy_command = path2wendy + " " + owfn_filename + " --og=-";
 			candy_command = " | " + path2candy + " --automata --output="
 					+ sa_filename + " --costfile=" + cost_filename;
@@ -685,19 +683,19 @@ void Adapter::createRuleTransitions() {
 		std::list<unsigned int> messageList = rule.getRule().first;
 		std::list<unsigned int>::iterator messageIter = messageList.begin();
 		while (messageIter != messageList.end()) {
-// create places for precondition
+			// create places for precondition
 			std::string placeName = _rs.getMessageForId(*messageIter) + "_int";
 
-// let's look, if the place already exists
+			// let's look, if the place already exists
 			Place * place = _engine->findPlace(placeName);
 
-// nope, create it
+			// nope, create it
 			if (place == NULL) {
 				place = &_engine->createPlace(placeName, 0, _messageBound);
 			}
 
-// create arc between this place and rule transition
-// \TODO: Arc multiplicities
+			// create arc between this place and rule transition
+			// \TODO: Arc multiplicities
 			_engine->createArc(*place, *trans);
 
 			++messageIter;
@@ -706,18 +704,18 @@ void Adapter::createRuleTransitions() {
 		messageList = rule.getRule().second;
 		messageIter = messageList.begin();
 		while (messageIter != messageList.end()) {
-// create places for postcondition
+			// create places for postcondition
 			std::string placeName = _rs.getMessageForId(*messageIter) + "_int";
 
-// let's look, if the place already exists
+			// let's look, if the place already exists
 			Place * place = _engine->findPlace(placeName);
 
-// nope, create it
+			// nope, create it
 			if (place == NULL) {
 				place = &_engine->createPlace(placeName, 0, _messageBound);
 			}
 
-// create arc between this place and rule transition
+			// create arc between this place and rule transition
 			_engine->createArc(*trans, *place);
 
 			++messageIter;
@@ -728,7 +726,7 @@ void Adapter::createRuleTransitions() {
 		messageList = rule.getSyncList();
 		messageIter = messageList.begin();
 		while (messageIter != messageList.end()) {
-// get label name and insert it into label list for transition
+			// get label name and insert it into label list for transition
 			std::string labelName = _rs.getMessageForId(*messageIter);
 			pnapi::Label * syncLabel = _engine->getInterface().findLabel(
 					labelName);
@@ -889,7 +887,7 @@ void Adapter::removeUnnecessaryRules() {
 
 		while (place2Delete != placeDeletionList.end()) {
 			Place * p = *place2Delete;
-//status("Deleting post set of place %s.", p->getName().c_str());
+			//status("Deleting post set of place %s.", p->getName().c_str());
 
 			std::set<Node *> postset = p->getPostset();
 
@@ -927,7 +925,7 @@ void Adapter::findConflictFreeTransitions() {
 		Transition * trans = _engine->findTransition(transname);
 		// does it still exist
 		if (trans != NULL) {
-// check every pre place, if it is conflict free
+			// check every pre place, if it is conflict free
 			std::set<Node *> preset = trans->getPreset();
 			std::set<Node *>::iterator placeIter = preset.begin();
 
@@ -941,7 +939,7 @@ void Adapter::findConflictFreeTransitions() {
 				}
 			}
 
-// check every post place, if it is conflict free
+			// check every post place, if it is conflict free
 			std::set<Node *> postset = trans->getPostset();
 			placeIter = postset.begin();
 
@@ -974,12 +972,11 @@ void Adapter::findConflictFreeTransitions() {
 
 //! returns the name for the rule with index i
 inline std::string Adapter::getRuleName(unsigned int i) {
-	FUNCIN
+
 	return "rule_" + toString(i);
-	FUNCOUT
 }
 
-inline std::string Adapter::computeMPP(std::string filename) {
+std::string Adapter::computeMPP(const std::string & filename) {
 
 	std::string results_filename = filename + ".results";
 	std::string sa_filename = filename + ".sa";
@@ -990,35 +987,49 @@ inline std::string Adapter::computeMPP(std::string filename) {
 
 	time_t start_time, end_time;
 
+	// try to open results file (should work, if pre-computed, it should exist
 	std::ifstream rfile(results_filename.c_str());
+	// if file does not exist, create it
 	if (!rfile) {
 
-		std::ifstream owfnFile(filename.c_str());
-		Output normNet;
+		// this is the name of the owfn input file
+		std::string owfnFileName(filename);
+		// this is the owfn input file
+		std::ifstream owfnFile(owfnFileName.c_str());
 
+		// read owfn file into Petr net and close file
 		PetriNet_ptr net(new pnapi::PetriNet);
 		owfnFile >> pnapi::io::owfn >> *net;
 		owfnFile.close();
 
+		// this is the output for the normalized net
+		// define here, cause it should only be delelted at the end of the method
+		Output normNet;
+
+
+		// if net is not normal, normalize it, and take normalized net as input
 		if (not net->isNormal()) {
 			net->normalize();
+
 			normNet.stream() << pnapi::io::owfn << *net << std::flush;
-			filename = normNet.name();
-// normNet.stream().flush();
+			owfnFileName = normNet.name();
 		}
 
 		std::string mpp_command = path2wendy + " --sa=" + sa_filename
-				+ " --result=" + results_filename + " " + filename;
+				+ " --result=" + results_filename + " " + owfnFileName;
 		status("Generating most-permissive partner for `%s' by executing",
-				filename.c_str());
-
+				owfnFileName.c_str());
 		status("%s", mpp_command.c_str());
+
 		time(&start_time);
 		int result = system(mpp_command.c_str());
 		result = WEXITSTATUS(result);
 		time(&end_time);
+
 		status("Wendy done [%.0f sec]", difftime(end_time, start_time));
+
 		rfile.open(results_filename.c_str());
+
 #ifndef USE_SHARED_PTR
 		delete (net);
 #endif
@@ -1048,9 +1059,7 @@ void RuleSet::addRules(FILE_ptr inputStream) {
 	extern int adapt_rules_yyparse();
 	extern RuleSet * workingSet;
 	extern int adapt_rules_yylineno;
-// #ifdef YY_FLEX_HAS_YYLEX_DESTROY
 	extern int adapt_rules_yylex_destroy();
-// #endif
 
 // \TODO: Parser
 	/*
@@ -1071,9 +1080,7 @@ void RuleSet::addRules(FILE_ptr inputStream) {
 	adapt_rules_yylineno = 1;
 
 	adapt_rules_yyparse();
-// #ifdef YY_FLEX_HAS_YYLEX_DESTROY
 	adapt_rules_yylex_destroy();
-// #endif
 
 	FUNCOUT
 }

@@ -189,7 +189,7 @@ class Adapter {
          */
         static inline std::string getRuleName(unsigned int i);
 
-        static inline std::string computeMPP(std::string);
+        static std::string computeMPP(const std::string &);
 
         std::string cost_file_content;
 

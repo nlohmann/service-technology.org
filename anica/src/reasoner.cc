@@ -1,22 +1,30 @@
-#include <string>
+#include <cstring>
 #include <sstream>
 #include <cstdio>
-#include <fstream>
+#include <map>
+#include <string>
 
 #include <pnapi/pnapi.h>
 #include <cuddObj.hh>
 #include <json.h>
-#include <b64/encode.h>
 #include <b64/decode.h>
 
 #include "Socket.h"
 #include "Reporter.h"
 
-pnapi::PetriNet* net = NULL;
-Socket* inputSocket = NULL;
-Socket* outputSocket = NULL;
+pnapi::PetriNet net;
 Reporter* rep = new ReporterStream();
 
+typedef enum {
+    CONFIDENCE_NONE,
+    CONFIDENCE_HIGH,
+    CONFIDENCE_LOW
+} confidence_levels;
+
+/// the current assignment
+std::map<std::string, confidence_levels> assignment;
+
+/////////////////////////////////////////////////////////////////////////////
 
 #define IDENT(n) for (int i = 0; i < n; ++i) printf("    ")
 
@@ -53,20 +61,11 @@ void print_json(json_value* value, int ident = 0) {
     }
 }
 
-void sendError() {
-    /* create an error message for the GUI */
-    outputSocket->send("your net has a problem");
-}
+/////////////////////////////////////////////////////////////////////////////
 
-
-void sendInformation() {
-    /* send further information to the GUI */
-    outputSocket->send("here is more information for you");
-}
-
-
-json_value* receiveJson() {
-    char* msg = inputSocket->receiveMessage();
+// receive a JSON object from the given input socket
+json_value* receiveJson(Socket& inputSocket) {
+    char* msg = inputSocket.receiveMessage();
 
     rep->status("received %d bytes", strlen(msg));
 
@@ -75,7 +74,7 @@ json_value* receiveJson() {
     int errorLine = 0;
     block_allocator allocator(1 << 10); // 1 KB per block
 
-    json_value* root = json_parse(msg, &errorPos, &errorDesc, &errorLine, &allocator);    
+    json_value* root = json_parse(msg, &errorPos, &errorDesc, &errorLine, &allocator);
 
     if (root == NULL) {
         rep->status("error at line %d - %s", errorLine, errorDesc);
@@ -85,54 +84,104 @@ json_value* receiveJson() {
     return root;
 }
 
-void receiveNet() {
-}
 
+/// get the command from JSON object
+const char* getCommand(json_value* json) {
+    assert(json->type == JSON_OBJECT);
 
-void receiveReassignment() {
-    /* update local assignment */
-}
-
-
-void calculateCharacterization() {
-    /* calculate BDD */
-
-    /* in case of error, call sendError() */
-}
-
-
-void evaluateReassignment() {
-    /* do stuff with the BDD */
-}
-
-
-const char *getNet(json_value *root) {
-    assert(root->type == JSON_OBJECT);
-
-    for (json_value *it = root->first_child; it; it = it->next_sibling) {
-        if (it->name && !strcmp(it->name, "net")) {
-            return it->string_value;
-        }
-    }
-    
-    rep->status("no net found");
-    rep->abort(ERROR_SYNTAX);
-    return "";
-}
-
-const char* getCommand(json_value *root) {
-    assert(root->type == JSON_OBJECT);
-
-    for (json_value *it = root->first_child; it; it = it->next_sibling) {
+    for (json_value* it = json->first_child; it; it = it->next_sibling) {
         if (it->name && !strcmp(it->name, "command")) {
+            rep->status("command: %s", it->string_value);
             return it->string_value;
         }
     }
 
-    
     rep->status("no command found");
     rep->abort(ERROR_SYNTAX);
     return "";
+}
+
+
+/// update net from JSON object
+void updateNet(json_value* json) {
+    // 1. strip net string from JSON
+    char* netstring = NULL;
+
+    assert(json->type == JSON_OBJECT);
+    for (json_value* it = json->first_child; it; it = it->next_sibling) {
+        if (it->name && !strcmp(it->name, "net")) {
+            netstring = it->string_value;
+        }
+    }
+
+    if (netstring == NULL) {
+        rep->status("no net found");
+        rep->abort(ERROR_SYNTAX);
+    }
+
+
+    // 2. decode net string from Base64
+    std::stringstream n1;
+    std::stringstream n2;
+    base64::decoder D;
+    n1 << netstring;
+    D.decode(n1, n2);
+
+
+    // 3. parse the net
+    try {
+        n2 >> pnapi::io::lola >> net;
+    } catch (const pnapi::exception::InputError& error) {
+        std::stringstream ss;
+        ss << error;
+        rep->status("parse error: %s", ss.str().c_str());
+        rep->abort(ERROR_SYNTAX);
+    }
+
+    std::stringstream ss;
+    ss << pnapi::io::stat << net;
+    rep->status("received net: %s", ss.str().c_str());
+}
+
+
+/// update assignment from JSON object
+void updateAssignment(json_value* json) {
+    // 1. get assignment
+    assert(json->type == JSON_OBJECT);
+
+    json_value* ass = NULL;
+    for (json_value* it = json->first_child; it; it = it->next_sibling) {
+        if (it->name && !strcmp(it->name, "assignment")) {
+            ass = it;
+        }
+    }
+
+    if (ass == NULL) {
+        rep->status("no assignment found");
+        rep->abort(ERROR_SYNTAX);
+    }
+
+    // 2. update assignment
+    for (json_value* it = ass->first_child; it; it = it->next_sibling) {
+        assert(it->name);
+        assert(it->string_value);
+        if (!strcmp(it->string_value, "HIGH")) {
+            assignment[it->name] = CONFIDENCE_HIGH;
+        } else {
+            if (!strcmp(it->string_value, "LOW")) {
+                assignment[it->name] = CONFIDENCE_LOW;
+            } else {
+                if (!strcmp(it->string_value, "")) {
+                    assignment[it->name] = CONFIDENCE_NONE;
+                } else {
+                    rep->status("wrong confidence level %s", it->string_value);
+                    rep->abort(ERROR_SYNTAX);
+                }
+            }
+        }
+    }
+
+    rep->status("updated assignment");
 }
 
 
@@ -142,65 +191,30 @@ int main() {
 
     // initialize ports
     rep->status("listening to socket %d", inputPort);
-    inputSocket = new Socket(inputPort);
-    rep->status("talking to socket %d", outputPort);
-    outputSocket = new Socket(outputPort, "localhost");
+    Socket inputSocket(inputPort);
+//    rep->status("talking to socket %d", outputPort);
+//    Socket outputSocket(outputPort, "localhost");
 
     // state machine
     while (true) {
         rep->status("waiting for messages");
 
-        json_value* json = receiveJson();
-        assert(json);
+        json_value* json = receiveJson(inputSocket);
+        const char* command = getCommand(json);
 
-        rep->status("command: %s", getCommand(json));
-
-        const char* net = getNet(json);
-        char* out = (char*)malloc(BUFFERSIZE);
-
-        base64::decoder D;
-        D.decode(net, strlen(net), out);
-
-/*
-        FILE* tmp = fopen("tmp", "w");
-        fprintf(tmp, "%s", out);
-        fclose(tmp);
-        free(out);
-
-        pnapi::PetriNet n;
-        try {
-            
-        std::ifstream inputStream("tmp");
-        inputStream >> meta(pnapi::io::INPUTFILE, "tmp") >> pnapi::io::lola >> n;
-    } catch (const pnapi::exception::InputError& error) {
-        std::cerr << error;
-    }
-*/
-
-
-/*
-        pnapi::PetriNet n;
-        std::stringstream ss;
-        ss << std::string(out);
-
-//        printf("\n\n\n%s\n\n\n", ss.str().c_str());
-
-        try {
-            ss >> pnapi::io::lola >> n;
-            std::cout << n;
-        } catch (const pnapi::exception::InputError& error) {
-            std::cerr << error;
+        if (!strcmp(command, "net")) {
+            updateNet(json);
+            continue;
         }
 
-*/
-//        print_json(json);
+        if (!strcmp(command, "assignment")) {
+            updateAssignment(json);
+            continue;
+        }
+
+        if (!strcmp(command, "terminate")) {
+            rep->status("done");
+            return EXIT_SUCCESS;
+        }
     }
-
-    rep->status("done");
-
-    // tidy up
-    delete inputSocket;
-    delete outputSocket;
-    delete rep;
-    return 0;
 }

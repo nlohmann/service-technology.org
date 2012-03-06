@@ -71,6 +71,7 @@ void print_json(json_value* value, int ident = 0) {
 
 /////////////////////////////////////////////////////////////////////////////
 
+/// send an assignment as JSON to the output socket
 void sendAssignment() {
     assert(assignment.size() == net.getTransitions().size());
 
@@ -89,7 +90,9 @@ void sendAssignment() {
     rep->status("sent %d bytes", assignment_string.length());
 }
 
-void sendError(char* message) {
+
+/// send an error message as JSON to the output socket
+void sendError(const char* message) {
     // create message
     char* msg;
     asprintf(&msg, "{\n  \"error\": \"%s\"\n}", message);
@@ -103,7 +106,8 @@ void sendError(char* message) {
     free(msg);
 }
 
-// receive a JSON object from the given input socket
+
+/// receive a JSON object from the given input socket
 json_value* receiveJson() {
     char* msg = inputSocket->receiveMessage();
 
@@ -233,6 +237,8 @@ void updateAssignment(json_value* json) {
     rep->status("updated assignment");
 }
 
+
+/// collect more information on the assignment
 void updateNonInterference() {
     assert(alib != NULL);
     
@@ -249,6 +255,7 @@ void updateNonInterference() {
             rep->status("assignment is secure");
         }
         else {
+            sendError("assignment is not secure");
             rep->status("assignment is NOT secure");
         }
     }
@@ -293,6 +300,7 @@ void updateNonInterference() {
         }
     }
 }
+
 
 int main(int argc, char** argv) {
     if (UNLIKELY(argc == 2 and !strcmp(argv[1], "--help")))

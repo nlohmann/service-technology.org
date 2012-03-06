@@ -40,6 +40,7 @@ if COMPILE_PNAPI
 anica_CPPFLAGS += -I$(top_srcdir)/libs
 reasoner_CPPFLAGS += -I$(top_srcdir)/libs
 anica_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
+reasoner_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
 anica_LDADD += $(builddir)/../libs/cudd/libobj.a \

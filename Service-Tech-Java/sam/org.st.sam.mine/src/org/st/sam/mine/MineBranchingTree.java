@@ -17,12 +17,12 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     super(log, mergeTraces);
   }
   
-  public void continuesWith(SLogTreeNode n, short word[], boolean[] visible, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, Set<Short> violators, Set<Short> stuck_at) {
+  public void continuesWith(SLogTreeNode n, short word[], boolean[] visible, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, boolean[] violators, Set<Short> stuck_at) {
     SLogTreeNode[] occurrence = new SLogTreeNode[word.length]; 
     continuesWith(n, word, 0, visible, occurrence, occurrences, partialOccurrences, violators, stuck_at);
   }
   
-  public void continuesWith(SLogTreeNode n, short word[], int pos, boolean[] visible, SLogTreeNode[] occurrence, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, Set<Short> violators, Set<Short> stuck_at) {
+  public void continuesWith(SLogTreeNode n, short word[], int pos, boolean[] visible, SLogTreeNode[] occurrence, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, boolean[] violators, Set<Short> stuck_at) {
     // no more letters to check: word found
     if (n.id == word[pos] && pos == word.length-1) {
       occurrence[pos] = n;
@@ -62,12 +62,12 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     }
   }
   
-  private void registerViolators(short[] word, SLogTreeNode endNode, Set<Short> violators) {
+  private void registerViolators(short[] word, SLogTreeNode endNode, boolean[] violators) {
     for (SLogTreeNode v : endNode.post) {
       // remember all successor ids that occur in the word, i.e. prevented an occurrence 
       for (short w : word) {
         if (w == v.id) {
-          violators.add(v.id);
+          violators[v.id] = true;
           break;
         }
       }
@@ -283,14 +283,14 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     return new double[] { (double)coveredNodes_all/totalNodes, (double)coveredNodes_main/totalNodes };
   }
   
-  public SimpleArrayList<SLogTreeNode[]> countOccurrences(short word[], Set<Short> violators, Set<Short> stuck_at) {
+  public SimpleArrayList<SLogTreeNode[]> countOccurrences(short word[], boolean[] violators, Set<Short> stuck_at) {
     boolean[] visible = new boolean[slog.originalNames.length];
     for (int i=0; i<word.length; i++) visible[word[i]] = true;
     
     return countOccurrences(word, visible, violators, stuck_at);
   }
   
-  public SimpleArrayList<SLogTreeNode[]> countOccurrences(short word[], boolean[] visible, Set<Short> violators, Set<Short> stuck_at) {
+  public SimpleArrayList<SLogTreeNode[]> countOccurrences(short word[], boolean[] visible, boolean[] violators, Set<Short> stuck_at) {
     SimpleArrayList<SLogTreeNode[]> occurrences = new SimpleArrayList<SLogTreeNode[]>();
     
     for (SLogTreeNode n : nodes) {

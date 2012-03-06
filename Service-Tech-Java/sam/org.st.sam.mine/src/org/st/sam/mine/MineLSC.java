@@ -601,7 +601,7 @@ public class MineLSC {
     if (dot_count % 100 == 0) System.out.print(".");
     if (dot_count > 8000) { System.out.println(". "+words.nodes.size()+" "+toString(largestWord_checked)); dot_count = 0; }
     
-    Set<Short> violators = new HashSet<Short>();
+    boolean[] violators = new boolean[slog.originalNames.length];
     Set<Short> stuck_at = null;
     
     if (showDebug(word, preferedSucc)) {
@@ -731,8 +731,14 @@ public class MineLSC {
     } // for all successor events
         
         if (word.length > 1) {
-          if (stuck_at != null) violators.addAll(stuck_at);
-          for (Short ignore : violators) {
+          if (stuck_at != null) {
+            // violators.addAll(stuck_at);
+            for (Short e : stuck_at) violators[e.shortValue()] = true;
+          }
+          for (short ignore=0; ignore<violators.length; ignore++) {
+            // only consider the events that are violating some occurrence
+            if (!violators[ignore]) continue;
+            
             
             int v_count = 0;
             for (Short v : word) {
@@ -751,7 +757,7 @@ public class MineLSC {
               j++;
             }
             
-            short[] ev_red = removeFrom(ev, ignore.shortValue());
+            short[] ev_red = removeFrom(ev, ignore);
 
             if (lessThan(newWord, largestWord_checked))
             {

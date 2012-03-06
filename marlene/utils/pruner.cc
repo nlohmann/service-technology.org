@@ -38,7 +38,11 @@
 #include "pruner-statespace.h"
 
 // include PN API headers
-// #include "pnapi/pnapi.h"
+#include "pnapi/pnapi.h"
+
+typedef std::tr1::shared_ptr<pnapi::PetriNet> PetriNet_ptr;
+
+PetriNet_ptr net(new pnapi::PetriNet());
 
 /// a variable holding the time of the call
 clock_t start_clock = clock();
@@ -100,17 +104,10 @@ int main(int argc, char* argv[]) {
 
     communication_yylineno = 1;
 
-#ifdef USE_SHARED_PTR
     std::tr1::shared_ptr<FILE> interfacefile(fopen(
           args_info.interface_arg, "r"), fclose);
     if (interfacefile.get() != NULL) {
       communication_yyin = interfacefile.get();
-#else
-    FILE * interfacefile = fopen(args_info.interface_arg, "r");
-    if (interfacefile != NULL) {
-      communication_yyin = interfacefile;
-
-#endif
       communication_yyparse();
     } else {
       abort(2, "Interface file %s could not be opened for reading",
@@ -119,30 +116,80 @@ int main(int argc, char* argv[]) {
     time(&end_time);
     status("reading interface file done [%.0f sec]", difftime(
              end_time, start_time));
-#ifndef USE_SHARED_PTR
-    fclose(interfacefile);
-#endif
-
     communication_yylex_destroy();
   }
   //	graph_yyin = inputStream;
 
+  //reading open net file
   {
-    // extern FILE * graph_yyin;
+    if (args_info.net_given) {
+
+            std::string filename(args_info.net_arg);
+            status("reading open net from file \"%s\"",
+                    filename.c_str());
+            try {
+                std::ifstream inputfile(filename.c_str(),
+                        std::ios_base::in);
+                if (inputfile.good()) {
+                    inputfile >> meta(pnapi::io::INPUTFILE, filename)
+                            >> meta(pnapi::io::CREATOR, PACKAGE_STRING)
+                            >> meta(pnapi::io::INVOCATION, invocation)
+                            >> pnapi::io::owfn >> *net;
+
+                    //std::cerr << pnapi::io::owfn << *net;
+
+                } else {
+                    abort(
+                            2,
+                            "Open net file %s could not be opened for reading",
+                            filename.c_str());
+                }
+            } catch (const pnapi::exception::InputError& error) {
+                std::cerr << PACKAGE << ":" << error << std::endl;
+                displayFileError(error.filename.c_str(), error.line,
+                        error.token.c_str());
+                abort(2, " ");
+            }
+
+    }
+  }
+
+  {
+    time(&start_time);
+    extern FILE * graph_yyin;
     extern int graph_yyparse();
     extern int graph_yylineno;
     extern int graph_yylex_destroy();
 
     graph_yylineno = 1;
 
+    // opening stream to lola-statespace
+#warning "Lola is hard-coded for now"
+    std::string lola_command = "lola-statespace -M ";
+    if (args_info.inputs_num > 0) {
+      lola_command += args_info.inputs[0];
+    }
+    status("running lola: \"%s\"", lola_command.c_str());
+	  std::tr1::shared_ptr<FILE> lolafile(popen(
+	                      lola_command.c_str(), "r"), pclose);
+
+	  graph_yyin = lolafile.get();
+
     graph_yyparse();
     graph_yylex_destroy();
 
+    time(&end_time);
+    status("running lola done[%.0f sec]", difftime(end_time, start_time));
   }
 
   /* do the pruning here and now */
+  State::checkFinalReachable();
 
+  // now: tau abstraction
+  // now: actual pruning
+  State::prune();
 
+  State::calculateSCC();
   State::output();
 
   // cmdline_parser_free(&args_info);

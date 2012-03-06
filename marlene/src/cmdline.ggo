@@ -1,4 +1,4 @@
-args "--long-help --include-getopt --show-required --unamed-opts=FILE --no-handle-version --conf-parser"
+args "--long-help --include-getopt --show-required --unamed-opts=FILE --conf-parser"
 
 purpose "Synthesizing behavioral adapters."
 description "About Marlene:"
@@ -159,6 +159,14 @@ option "petrify" -
   string
   typestr="FILE"
   default="petrify"
+  optional
+  hidden
+
+option "pruner" -
+  "Set the name of the pruner binary needed for deciding adaptability."
+  string
+  typestr="FILE"
+  default="pruner"
   optional
   hidden
 

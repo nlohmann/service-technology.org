@@ -17,10 +17,9 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
 %token KW_ABSTRACT_HEADING KW_REMAINING_HEADING
 %token KW_IN KW_OUT KW_SYNC
-%token EQUALS COMMA
+%token EQUALS COMMA SEMICOLON
 %token NUMBER NAME
 
 %expect 0
@@ -28,16 +27,23 @@
 %name-prefix="communication_yy"
 
 %{
+// options for Bison
+#define YYDEBUG 1
+#define YYERROR_VERBOSE 0  // for verbose error messages
+
 #include <fstream>
 #include <vector>
 #include <string>
 #include <map>
 #include "Output.h"
 #include "pruner-cmdline.h"
+#include "pruner-statespace.h"
 #include "pruner-verbose.h"
 
 extern int communication_yylex();
 extern int communication_yyerror(const char *);
+
+std::map< std::string, std::string > transitionMapping;
 %}
 
 %union {
@@ -58,11 +64,83 @@ abstract_information:
     /* empty */
     |
     KW_ABSTRACT_HEADING
+    {
+        transitionMapping.clear();
+    }
+    input
+    {
+        State::abstractedIn = transitionMapping;
+        transitionMapping.clear();
+    }
+    output
+    {
+        State::abstractedOut = transitionMapping;
+        transitionMapping.clear();
+    }
+    sync
+    {
+        State::abstractedSync = transitionMapping;
+        transitionMapping.clear();
+    }
 ;
 
 remaining_information:
     /* empty */
     |
     KW_REMAINING_HEADING
+    {
+        transitionMapping.clear();
+    }
+    input
+    {
+        State::remainingIn = transitionMapping;
+        transitionMapping.clear();
+    }
+    output
+    {
+        State::remainingSync = transitionMapping;
+        transitionMapping.clear();
+    }
+    sync
+    {
+        State::remainingSync = transitionMapping;
+        transitionMapping.clear();
+    }
+;
+
+input:
+    /* empty */
+    | 
+    KW_IN
+    transitions SEMICOLON
+;
+
+output:
+    /* empty */
+    | 
+    KW_OUT
+    transitions SEMICOLON
+;
+
+sync:
+    /* empty */
+    | 
+    KW_SYNC
+    transitions SEMICOLON
+;
+
+transitions:
+    transition
+    |
+    transitions COMMA transition
+;
+
+transition:
+    NAME EQUALS NAME
+    {
+        transitionMapping[$1] = $3;
+        free($1);
+        free($3);
+    }
 ;
 

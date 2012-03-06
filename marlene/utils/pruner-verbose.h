@@ -7,6 +7,8 @@
 #include <string>
 #include <unistd.h>
 
+#undef PACKAGE
+#define PACKAGE "pruner"
 
 /// unconditionally print a message
 void message(const char* format, ...);

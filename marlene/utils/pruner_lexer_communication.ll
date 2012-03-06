@@ -32,18 +32,19 @@
 void communication_yyerror(const char*);
 %}
 
-name      [^,;:()\t \n\{\}][^,;:()\t \n\{\}]*
+name      [^,;:()\t \n\{\}=][^,;:()\t \n\{\}=]*
 number    [0-9][0-9]*
 
 %%
 
-"INTERFACE TO BE ABSTRACTED"	{ return KW_ABSTRACT_HEADING; }
-"REMAINING INTERFACE"   		{ return KW_REMAINING_HEADING; }
+"INTERFACE TO BE ABSTRACTED"    { return KW_ABSTRACT_HEADING; }
+"REMAINING INTERFACE"           { return KW_REMAINING_HEADING; }
 "IN"                            { return KW_IN; }
 "OUT"                           { return KW_OUT; }
 "SYNC"                          { return KW_SYNC; }
 "="                             { return EQUALS; }
 ","                             { return COMMA; }
+";"                             { return SEMICOLON; }
 
 {number}     { communication_yylval.val = atoi(communication_yytext); return NUMBER; }
 {name}       { communication_yylval.str = strdup(communication_yytext); return NAME; }
@@ -52,7 +53,9 @@ number    [0-9][0-9]*
 
 %%
 
-__attribute__((noreturn)) void communication_yyerror(const char* msg) {
-  status("error near '%s': %s", communication_yytext, msg);
-  abort(6, "error while parsing the reachability graph");
+__attribute__((noreturn)) void communication_yyerror(const char* msg)
+{
+  message("error while reading adapter rules\n%s\nerror in line %d, token last read '%s'", msg, communication_yylineno, communication_yytext);
+  exit(EXIT_FAILURE);
 }
+

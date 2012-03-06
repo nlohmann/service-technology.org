@@ -50,6 +50,7 @@ public:
   List_ptr getNext();
 
   unsigned int length();
+  static bool contains(List_ptr list, Keytype value);
 
 private:
   Keytype value;
@@ -113,6 +114,20 @@ unsigned int List<Keytype>::length() {
   else return 1 + next->length();
 }
 
+template <typename Keytype>
+bool List<Keytype>::contains(List_ptr list, Keytype value) {
+  if (list.get() == 0) {
+      return false;
+  }
+  List_ptr next = list;
+  do {
+      if (next->getValue == value) {
+          return true;
+      }
+      list = list->getNext();
+  } while (list.get() != 0);
+  return false;
+}
 
 template <typename type1, typename type2>
 Pair<type1, type2>::Pair(type1 first, type2 second) {

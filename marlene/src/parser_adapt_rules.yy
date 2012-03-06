@@ -51,7 +51,7 @@ typedef std::list< unsigned int > * uilist_ptr;
 RuleSet::RuleSet_ptr workingSet;
 RuleSet::AdapterRule::cfMode cfmodus = RuleSet::AdapterRule::AR_NORMAL;
 
-int adapt_rules_yyerror(const char* msg)
+__attribute__((noreturn)) int adapt_rules_yyerror(const char* msg)
 {
   message("error while reading adapter rules\n%s\nerror in line %d, token last read '%s'", msg, adapt_rules_yylineno, adapt_rules_yytext);
   exit(EXIT_FAILURE);

@@ -11,6 +11,12 @@ option "interface" i
   typestr="FILE"
   optional
 
+option "net" n
+  "Providing the net for checking final states"
+  string
+  typestr="FILE"
+  optional
+
 section "Additional information for configuration"
 
 option "config" -
@@ -34,6 +40,12 @@ option "noClean" -
   details="Any temporary files created by Petri is kept after Petri terminates.\n"
   flag off
 
+section "LoLA compatibility"
+
+option "Marking" M
+  "Outputs stategraph on stdout."
+  flag off
+  hidden
 
 section "Debugging"
 

@@ -31,9 +31,16 @@
 #include <map>
 //#include "Output.h"
 #include "pruner-cmdline.h"
-#include "pruner-verbose.h"
-#include "pruner-helper.h"
 #include "pruner-statespace.h"
+#include "pruner-helper.h"
+#include "pruner-verbose.h"
+
+// include PN API headers
+#include "pnapi/pnapi.h"
+typedef std::tr1::shared_ptr<pnapi::PetriNet> PetriNet_ptr;
+
+extern PetriNet_ptr net;
+
 
 extern int graph_yylex();
 extern int graph_yyerror(const char *);
@@ -44,6 +51,8 @@ ListOfPairs::List_ptr currentMarking;
 ListOfPairs::List_ptr currentTransitions;
 unsigned int lowlink;
 List<unsigned int>::List_ptr sccmember;
+
+shared_ptr< pnapi::Marking > pnMarking (new pnapi::Marking(*net));
 %}
 
 %union {
@@ -65,10 +74,13 @@ states:
 state:
   KW_STATE NUMBER lowlink scc markings_or_transitions
   {
-    State::stateSpace[$2] = shared_ptr<State>(new State($2, currentMarking, currentTransitions, lowlink, sccmember));
+    bool isFinal = net->getFinalCondition().isSatisfied(*pnMarking);
+    State::stateSpace[$2] = shared_ptr<State>(new State($2, currentMarking, currentTransitions, isFinal, lowlink, sccmember));
     currentMarking = ListOfPairs::List_ptr();
     currentTransitions = ListOfPairs::List_ptr();
     sccmember = List<unsigned int>::List_ptr();
+    pnMarking = shared_ptr<pnapi::Marking>(new pnapi::Marking(*net));
+    pnMarking->clear();
   }
 ;
 
@@ -136,6 +148,8 @@ marking:
       } else {
         currentMarking->push_back(p);
       }
+      //status("Result of findPlace %s: %d", $1, net->findPlace($1));
+      (*pnMarking)[*(net->findPlace($1))] = $3;
       
       free($1); 
       // status("Pair was %s, %d", p->getFirst().c_str(), p->getSecond());  

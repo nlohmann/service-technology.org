@@ -66,1091 +66,1233 @@
 
 /* For documentation of the following functions, please see header file. */
 
-Adapter::Adapter(std::vector<PetriNet_ptr> & nets, RuleSet & rs,
-		ControllerType contType, unsigned int messageBound, bool useCompPlaces) :
-		_engine(new pnapi::PetriNet), _controller(), _nets(nets), _rs(rs), _contType(
-				contType), _messageBound(messageBound), _useCompPlaces(
-				useCompPlaces) {
-	FUNCIN
-	/* empty */
-	FUNCOUT
+Adapter::Adapter( std::vector< PetriNet_ptr > & nets, RuleSet & rs,
+        ControllerType contType, unsigned int messageBound, bool useCompPlaces ) :
+        _engine( new pnapi::PetriNet ), _controller(), _nets( nets ), _rs( rs ), _contType(
+                contType ), _messageBound( messageBound ), _useCompPlaces(
+                useCompPlaces ) {
+    FUNCIN
+    /* empty */
+    FUNCOUT
 }
 
 Adapter::~Adapter() {
-	FUNCIN
+    FUNCIN
 #ifndef USE_SHARED_PTR
-	// deleting the engine if it exists
-	delete (_engine);
-	_engine = NULL;
-	delete (_controller);
-	_controller = NULL;
+    // deleting the engine if it exists
+    delete (_engine);
+    _engine = NULL;
+    delete (_controller);
+    _controller = NULL;
 #endif
-	FUNCOUT
+    FUNCOUT
 }
 
-PetriNet_const_ptr Adapter::buildEngine() {
-	FUNCIN
+PetriNet_const_ptr
+Adapter::buildEngine() {
+    FUNCIN
 
-	// create port to the controller
-	_engine->createPort("controller");
-	// create engine and transitions for the transformation rules
-	createEngineInterface();
-	createRuleTransitions();
+    // create port to the controller
+    if(not args_info.useasif_given) {
+    _engine->createPort( "controller" );
+    }
+    // create engine and transitions for the transformation rules
+    createEngineInterface();
+    createRuleTransitions();
 
-	if (not args_info.diagnosis_flag) {
-		// adapter specific reduction should take place here
-		removeUnnecessaryRules();
-		// findConflictFreeTransitions();
+    if ( not args_info.diagnosis_flag ) {
+        // adapter specific reduction should take place here
+        removeUnnecessaryRules();
+        // findConflictFreeTransitions();
 
-		// reduce engine with standard PNAPI methods
-		_engine->reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
-	}
+        // reduce engine with standard PNAPI methods
+        if (not args_info.useasif_given) {
+        _engine->reduce(
+                pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT ); // due to bug https://gna.org/bugs/?15820, normally 4
+        }
+    }
 
-	// set final condition
-	pnapi::Condition & finalCond = _engine->getFinalCondition();
-	pnapi::Marking finalMarking(*_engine);
-	finalCond.addMarking(finalMarking);
+    // set final condition
+    pnapi::Condition & finalCond = _engine->getFinalCondition();
+    pnapi::Marking finalMarking( *_engine );
+    finalCond.addMarking( finalMarking );
 
-	FUNCOUT
-	return _engine;
+    FUNCOUT
+    return _engine;
 }
 
-PetriNet_const_ptr Adapter::composeEngine() {
-	FUNCIN
+PetriNet_const_ptr
+Adapter::composeEngine() {
+    FUNCIN
 
-	using namespace pnapi;
+    using namespace pnapi;
 
-	// _engine should exist here
-	assert(_engine != NULL);
+    // _engine should exist here
+    assert( _engine != NULL );
 
-	// we make a copy of the engine, #_engine is needed for the result
-	// #_enginecopy for the synthesis of the controller
+    // we make a copy of the engine, #_engine is needed for the result
+    // #_enginecopy for the synthesis of the controller
 
-	_composition = PetriNet_ptr(new PetriNet(*_engine));
+    _composition = PetriNet_ptr( new PetriNet( *_engine ) );
 
-	// create complementary places for the engine's internal places
-	if (_useCompPlaces) {
-		Adapter::createComplementaryPlaces(*_composition);
-	} else {
-		status("skipping creation of complementary places once ..");
-	}
+    // create complementary places for the engine's internal places
+    if ( _useCompPlaces ) {
+        Adapter::createComplementaryPlaces( *_composition );
+    } else {
+        status( "skipping creation of complementary places once .." );
+    }
 
-	// compose engine with nets
-	bool isFirstNet2BComposed = true;
-	for (unsigned int netindex = 0; netindex < _nets.size(); ++netindex) {
-		if (not args_info.useasif_given
-				or (args_info.useasif_arg - 1) != netindex) {
-			if (isFirstNet2BComposed == true) {
-				isFirstNet2BComposed = false;
-				_composition->compose(*_nets[netindex], std::string("engine."),
-						std::string("net" + toString(netindex + 1) + "."));
-			} else {
-				_composition->compose(*_nets[netindex], std::string(""),
-						std::string("net" + toString(netindex + 1) + "."));
-			}
-		} else {
-			status("ignoring net with index %d", netindex + 1);
-		}
-	}
+    // compose engine with nets
+    bool isFirstNet2BComposed = true;
+    for ( unsigned int netindex = 0; netindex < _nets.size(); ++netindex ) {
+        if ( not args_info.useasif_given
+                or ( args_info.useasif_arg - 1 ) != netindex ) {
+            if ( isFirstNet2BComposed == true ) {
+                isFirstNet2BComposed = false;
+                _composition->compose( *_nets[netindex],
+                        std::string( "engine." ),
+                        std::string( "net" + toString( netindex + 1 ) + "." ) );
+            } else {
+                _composition->compose( *_nets[netindex], std::string( "" ),
+                        std::string( "net" + toString( netindex + 1 ) + "." ) );
+            }
+        } else {
+            status( "ignoring net with index %d", netindex + 1 );
+        }
+    }
 
-	// add complementary places for the now internal former interface places
-	if (_useCompPlaces) {
-		Condition & finalCond = _composition->getFinalCondition();
+    // add complementary places for the now internal former interface places
+    if ( _useCompPlaces ) {
+        Condition & finalCond = _composition->getFinalCondition();
 
-		for (unsigned int netindex = 0; netindex < _nets.size(); ++netindex) {
-			if (not args_info.useasif_given
-					or (args_info.useasif_arg - 1) != netindex) {
-				const std::set<Label *> & ifPlaces =
-						_nets[netindex]->getInterface().getAsynchronousLabels();
-				std::set<Label *>::const_iterator placeIter = ifPlaces.begin();
+        for ( unsigned int netindex = 0; netindex < _nets.size(); ++netindex ) {
+            if ( not args_info.useasif_given
+                    or ( args_info.useasif_arg - 1 ) != netindex ) {
+                const std::set< Label * > & ifPlaces =
+                        _nets[netindex]->getInterface().getAsynchronousLabels();
+                std::set< Label * >::const_iterator placeIter =
+                        ifPlaces.begin();
 
-				/*
-				 Place * dictatorPlace = composed.findPlace("engine.comp_thegreatdictator");
-				 assert(dictatorPlace);
-				 */
+                /*
+                 Place * dictatorPlace = composed.findPlace("engine.comp_thegreatdictator");
+                 assert(dictatorPlace);
+                 */
 
-				while (placeIter != ifPlaces.end()) {
-					// \todo: warum werden beide Platznamen gebraucht? wo geht hier beim Komponieren was schief?
-					std::string placeName = (*placeIter)->getName();
-					//std::string placeName2 = "net" + toString(i+1) + "." + (*placeIter)->getName();
+                while ( placeIter != ifPlaces.end() ) {
+                    // \todo: warum werden beide Platznamen gebraucht? wo geht hier beim Komponieren was schief?
+                    std::string placeName = ( *placeIter )->getName();
+                    //std::string placeName2 = "net" + toString(i+1) + "." + (*placeIter)->getName();
 
-					Place * place = _composition->findPlace(placeName);
-					//if (place == NULL)
-					//{
-					//    place = composed.findPlace(placeName2);
-					//    placeName = placeName2;
-					//}
-					assert(place);
+                    Place * place = _composition->findPlace( placeName );
+                    //if (place == NULL)
+                    //{
+                    //    place = composed.findPlace(placeName2);
+                    //    placeName = placeName2;
+                    //}
+                    assert( place );
 
-					Place * compPlace = &_composition->createPlace(
-							"comp_" + placeName, _messageBound + 1,
-							_messageBound + 1);
+                    Place * compPlace = &_composition->createPlace(
+                            "comp_" + placeName, _messageBound + 1,
+                            _messageBound + 1 );
 
-					formula::FormulaEqual prop(
-							formula::FormulaEqual(*compPlace,
-									_messageBound + 1));
-					finalCond.addProposition(prop);
+                    formula::FormulaEqual prop(
+                            formula::FormulaEqual( *compPlace,
+                                    _messageBound + 1 ) );
+                    finalCond.addProposition( prop );
 
-					std::set<Node *> postSet = place->getPostset();
-					std::set<Node *>::iterator nodeIter = postSet.begin();
-					while (nodeIter != postSet.end()) {
-						_composition->createArc(*compPlace, **nodeIter);
-						_composition->createArc(**nodeIter, *compPlace, 2);
-						/*
-						 if ((*placeIter)->getType() == Label::INPUT)
-						 {
-						 composed.createArc(**nodeIter, *dictatorPlace);
-						 composed.createArc(*dictatorPlace, **nodeIter);
-						 }
-						 */
-						++nodeIter;
-					}
+                    std::set< Node * > postSet = place->getPostset();
+                    std::set< Node * >::iterator nodeIter = postSet.begin();
+                    while ( nodeIter != postSet.end() ) {
+                        _composition->createArc( *compPlace, * *nodeIter );
+                        _composition->createArc( * *nodeIter, *compPlace, 2 );
+                        /*
+                         if ((*placeIter)->getType() == Label::INPUT)
+                         {
+                         composed.createArc(**nodeIter, *dictatorPlace);
+                         composed.createArc(*dictatorPlace, **nodeIter);
+                         }
+                         */
+                        ++nodeIter;
+                    }
 
-					std::set<Node *> preSet = place->getPreset();
-					nodeIter = preSet.begin();
-					while (nodeIter != preSet.end()) {
-						_composition->createArc(*compPlace, **nodeIter);
-						/*
-						 if ((*placeIter)->getType() == Label::OUTPUT)
-						 {
-						 composed.createArc(**nodeIter, *dictatorPlace);
-						 composed.createArc(*dictatorPlace, **nodeIter);
-						 }
-						 */
-						++nodeIter;
-					}
+                    std::set< Node * > preSet = place->getPreset();
+                    nodeIter = preSet.begin();
+                    while ( nodeIter != preSet.end() ) {
+                        _composition->createArc( *compPlace, * *nodeIter );
+                        /*
+                         if ((*placeIter)->getType() == Label::OUTPUT)
+                         {
+                         composed.createArc(**nodeIter, *dictatorPlace);
+                         composed.createArc(*dictatorPlace, **nodeIter);
+                         }
+                         */
+                        ++nodeIter;
+                    }
 
-					/*
-					 // deadlock transition for message bound violation of former interface
-					 Transition * dlTrans = &composed.createTransition("dl_"
-					 + placeName);
-					 composed.createArc(*place, *dlTrans, _messageBound + 1);
-					 composed.createArc(*dictatorPlace, *dlTrans);
-					 */
+                    /*
+                     // deadlock transition for message bound violation of former interface
+                     Transition * dlTrans = &composed.createTransition("dl_"
+                     + placeName);
+                     composed.createArc(*place, *dlTrans, _messageBound + 1);
+                     composed.createArc(*dictatorPlace, *dlTrans);
+                     */
 
-					++placeIter;
-				}
-			}
-		}
-	} else {
-		status("skipping creation of complementary places twice ..");
-	}
+                    ++placeIter;
+                }
+            }
+        }
+    } else {
+        status( "skipping creation of complementary places twice .." );
+    }
 
-	if (not args_info.diagnosis_flag) {
-		// finally reduce the strucure of the net as far as possible
-		_composition->reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
-	}
+    if ( not args_info.diagnosis_flag && not args_info.useasif_given) {
+        // finally reduce the strucure of the net as far as possible
+        _composition->reduce(
+                pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT ); // due to bug https://gna.org/bugs/?15820, normally 4
+    }
 
-	if (_contType == ASYNCHRONOUS or args_info.useasif_given) {
-		_composition->normalize();
-	}
-	if (not args_info.diagnosis_flag) {
-		// \todo: Experiment, ob sich das hier noch lohnt.
-		_composition->reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // | pnapi::PetriNet::KEEP_NORMAL);
-	}
+    if ( _contType == ASYNCHRONOUS or args_info.useasif_given ) {
+        _composition->normalize();
+    }
+    if ( not args_info.diagnosis_flag && not args_info.useasif_given ) {
+        // \todo: Experiment, ob sich das hier noch lohnt.
+        _composition->reduce(
+                pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT ); // | pnapi::PetriNet::KEEP_NORMAL);
+    }
 
-	FUNCOUT
-	return _composition;
+    FUNCOUT
+    return _composition;
 }
 
-PetriNet_const_ptr Adapter::buildController() {
-	FUNCIN
+PetriNet_const_ptr
+Adapter::buildController() {
+    FUNCIN
 
-	using namespace pnapi;
+    using namespace pnapi;
 
-	// _engine should exist here
-	assert(_engine != NULL);
-	assert(_composition != NULL);
+    // _engine should exist here
+    assert( _engine != NULL );
+    assert( _composition != NULL );
 
-	/***********************************\
+    /***********************************\
     * calculate most permissive partner *
-	 \***********************************/
+     \***********************************/
 // create a unique temporary file name
-	Output owfn_temp;
+    Output owfn_temp;
 
-	std::string owfn_filename(owfn_temp.name());
-	std::string sa_filename = owfn_filename + ".sa";
-	std::string og_filename = owfn_filename + ".og";
-	std::string cost_filename = owfn_filename + ".cf";
-	std::string diag_filename = owfn_filename + ".diag";
-	std::string mi_filename = owfn_filename + ".mi";
-	std::string dot_filename = owfn_filename + ".dot";
+    Output pruner_temp;
 
-	owfn_temp.stream() << pnapi::io::owfn << *_composition << std::flush;
+    std::string owfn_filename( owfn_temp.name() );
+    std::string sa_filename = owfn_filename + ".sa";
+    std::string og_filename = owfn_filename + ".og";
+    std::string cost_filename = owfn_filename + ".cf";
+    std::string diag_filename = owfn_filename + ".diag";
+    std::string mi_filename = owfn_filename + ".mi";
+    std::string dot_filename = owfn_filename + ".dot";
+    std::string pruner_filename( pruner_temp.name() );
 
-	std::string wendy_command;
-	std::string candy_command;
+    owfn_temp.stream() << pnapi::io::owfn << *_composition << std::flush;
 
-	std::string path2wendy = std::string(args_info.wendy_arg);
-	// wendy is really essential
-	assert(path2wendy != "");
-	std::string path2candy = std::string(args_info.candy_arg);
+    if ( args_info.useasif_given ) {
+        // writing prunter information
+        pruner_temp.stream() << "INTERFACE TO BE ABSTRACTED" << std::endl;
+        if ( not controllerInterfaceSync.empty() ) {
+            pruner_temp.stream() << "SYNC" << std::endl;
+            bool first = true;
+            for ( std::map< std::string, std::string >::const_iterator mapping =
+                    controllerInterfaceSync.begin();
+                    mapping != controllerInterfaceSync.end(); ++mapping, first =
+                            false ) {
+                if ( not first ) {
+                    pruner_temp.stream() << ", ";
+                }
+                pruner_temp.stream() << "engine." << mapping->first << "="
+                        << mapping->second;
+            }
+            pruner_temp.stream() << ";" << std::endl << std::endl;
+        }
+        pruner_temp.stream() << "REMAINING INTERFACE" << std::endl;
+        if ( not netInterfaceIn.empty() ) {
+            pruner_temp.stream() << "IN" << std::endl;
+            bool first = true;
+            for ( std::map< std::string, std::string >::const_iterator mapping =
+                    netInterfaceIn.begin(); mapping != netInterfaceIn.end();
+                    ++mapping, first = false ) {
+                if ( not first ) {
+                    pruner_temp.stream() << ", ";
+                }
+                pruner_temp.stream() << "engine." << mapping->first << "="
+                        << mapping->second;
+            }
+            pruner_temp.stream() << ";" << std::endl << std::endl;
+        }
+        if ( not netInterfaceOut.empty() ) {
+            pruner_temp.stream() << "OUT" << std::endl;
+            bool first = true;
+            for ( std::map< std::string, std::string >::const_iterator mapping =
+                    netInterfaceOut.begin(); mapping != netInterfaceOut.end();
+                    ++mapping, first = false ) {
+                if ( not first ) {
+                    pruner_temp.stream() << ", ";
+                }
+                pruner_temp.stream() << "engine." << mapping->first << "="
+                        << mapping->second;
+            }
+            pruner_temp.stream() << ";" << std::endl << std::endl;
+        }
+        /*
+        pruner_temp.stream() << "FINALCONDITION" << std::endl;
 
-	// should we diagnose?
-	if (args_info.diagnosis_flag) {
-		std::string property = "deadlock";
-		if (args_info.property_arg == property_arg_livelock) {
-			property = "livelock";
-		}
-		wendy_command = path2wendy + " " + owfn_filename + " --diagnose" // --noDeadlockDetection"
-		+ " --correctness=" + property + " --sa=" + sa_filename + " --mi="
-				+ mi_filename + " --dot=" + dot_filename + " --resultFile="
-				+ diag_filename;
-	} else {
-		if (args_info.costoptimized_flag) {
-			assert(path2candy != "");
-			Output cf_file(cost_filename, "cost file");
-			cf_file.stream() << cost_file_content;
+        try {
+            using pnapi::io::util::operator<<;
 
-			// optimization
-			wendy_command = path2wendy + " " + owfn_filename + " --og=-";
-			candy_command = " | " + path2candy + " --automata --output="
-					+ sa_filename + " --costfile=" + cost_filename;
-		} else {
-			std::string property = "deadlock";
-			if (args_info.property_arg == property_arg_livelock) {
-				property = "livelock";
-			}
+            pruner_temp.stream() << pnapi::io::owfn << _composition->getFinalCondition().getFormula() << std::endl;
+        }catch (pnapi::exception::AssertionFailedError ex) {
+            std::cerr << ex << std::endl;
+        }
+        */
+
+        pruner_temp.stream() << std::flush;
+    } // end output to pruner information
+
+    std::string wendy_command;
+    std::string candy_command;
+
+    std::string path2wendy = std::string( args_info.wendy_arg );
+    // wendy is really essential
+    assert( path2wendy != "" );
+    std::string path2candy = std::string( args_info.candy_arg );
+
+    // should we diagnose?
+    if ( args_info.diagnosis_flag ) {
+        std::string property = "deadlock";
+        if ( args_info.property_arg == property_arg_livelock ) {
+            property = "livelock";
+        }
+        wendy_command = path2wendy + " " + owfn_filename + " --diagnose" // --noDeadlockDetection"
+        + " --correctness=" + property + " --sa=" + sa_filename + " --mi="
+                + mi_filename + " --dot=" + dot_filename + " --resultFile="
+                + diag_filename;
+    } else {
+        if ( args_info.costoptimized_flag ) {
+            assert( path2candy != "" );
+            Output cf_file( cost_filename, "cost file" );
+            cf_file.stream() << cost_file_content;
+
+            // optimization
+            wendy_command = path2wendy + " " + owfn_filename + " --og=-";
+            candy_command = " | " + path2candy + " --automata --output="
+                    + sa_filename + " --costfile=" + cost_filename;
+        } else {
+            std::string property = "deadlock";
+            if ( args_info.property_arg == property_arg_livelock ) {
+                property = "livelock";
+            }
 // default behavior
 #warning EXPERIMENTAL CODE for adaptable service characterization
-			if (args_info.useasif_given == true)
-			{
-				wendy_command = path2wendy + " " + "--correctness=" + property + " "
-						+ owfn_filename // + " --sa=" + sa_filename;
-						+ " --dot=" + dot_filename + " --og=" + og_filename;
+            if ( args_info.useasif_given == true ) {
+                wendy_command = path2wendy + " " + "--correctness=" + property
+                        + " " + owfn_filename // + " --sa=" + sa_filename;
+                + " --dot=" + dot_filename + " --og=" + og_filename
+                        + " --lola=\"" + args_info.pruner_arg + " -v -i"
+                        + pruner_filename + " -n" + owfn_filename + "\""
+                        + " --noClean";
 
-			} else {
-			wendy_command = path2wendy + " " + "--correctness=" + property + " "
-					+ owfn_filename + " --sa=" + sa_filename;
-			}
-		}
-	}
-	wendy_command += " -m" + toString(_messageBound);
-	if ((args_info.type_arg == type_arg_arbitrary)
-			and not (args_info.costoptimized_flag)) {
-		wendy_command +=
-				" --waitstatesOnly --receivingBeforeSending --seqReceivingEvents --succeedingSendingEvent --quitAsSoonAsPossible";
-	}
+            } else {
+                wendy_command = path2wendy + " " + "--correctness=" + property
+                        + " " + owfn_filename + " --sa=" + sa_filename;
+            }
+        }
+    }
+    wendy_command += " -m" + toString( _messageBound );
+    if ( ( args_info.type_arg == type_arg_arbitrary )
+            and not ( args_info.costoptimized_flag ) ) {
+        wendy_command +=
+                " --waitstatesOnly --receivingBeforeSending --seqReceivingEvents --succeedingSendingEvent --quitAsSoonAsPossible";
+    }
 
-	if (args_info.chatty_flag) {
-		wendy_command += " --succeedingSendingEvent";
-	} else if (args_info.arrogant_flag) {
-		wendy_command += " --receivingBeforeSending";
-	}
+    if ( args_info.chatty_flag ) {
+        wendy_command += " --succeedingSendingEvent";
+    } else if ( args_info.arrogant_flag ) {
+        wendy_command += " --receivingBeforeSending";
+    }
 
-	time_t start_time, end_time;
+    time_t start_time, end_time;
 
 #ifdef __MINGW32__
-	wendy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> NUL");
-	candy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> NUL");
+    wendy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> NUL");
+    candy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> NUL");
 #else
-	wendy_command += (
-			(args_info.verbose_flag) ? " --verbose" : " 2> /dev/null");
-	candy_command += (
-			(args_info.verbose_flag) ?
-					" --verbose 1>&2" : " 1>&2 2> /dev/null");
+    wendy_command += (
+            ( args_info.verbose_flag ) ? " --verbose" : " 2> /dev/null" );
+    candy_command += (
+            ( args_info.verbose_flag ) ?
+                    " --verbose 1>&2" : " 1>&2 2> /dev/null" );
 #endif
 
-	if (args_info.costoptimized_flag) {
-		wendy_command += candy_command;
-	}
-	time(&start_time);
-	status("executing '%s'", wendy_command.c_str());
-	int result = system(wendy_command.c_str());
-	result = WEXITSTATUS(result);
-	time(&end_time);
-	status("Wendy done [%.0f sec]", difftime(end_time, start_time));
+    if ( args_info.costoptimized_flag ) {
+        wendy_command += candy_command;
+    }
+    time( &start_time );
+    status( "executing '%s'", wendy_command.c_str() );
+    int result = system( wendy_command.c_str() );
+    result = WEXITSTATUS(result);
+    time( &end_time );
+    status( "Wendy done [%.0f sec]", difftime( end_time, start_time ) );
 
-	if (result != 0 and not args_info.diagnosis_flag) {
-		message("Wendy returned with status %d.", result);
-		message("Controller could not be built! No adapter was created, exiting.");
-		exit(EXIT_FAILURE);
-	}
+    if ( result != 0 and not args_info.diagnosis_flag ) {
+        message( "Wendy returned with status %d.", result );
+        message(
+                "Controller could not be built! No adapter was created, exiting." );
+        exit( EXIT_FAILURE );
+    }
 
-	if (args_info.useasif_given == true) {
+    if ( args_info.useasif_given == true ) {
 #warning EXPERIMENTAL CODE: always copies the resulting OG & dot into cwd as controller.og/.dot
-	message("EXPERIMENTAL: copying \"%s\" and \"%s\" to \"controller.og\" and \"controller.dot\" (resp.) in cwd.", og_filename.c_str(), dot_filename.c_str());
-	{
-		std::ifstream ifs(og_filename.c_str(), std::ios::binary);
-		std::ofstream ofs("controller.og", std::ios::binary);
-		ofs << ifs.rdbuf();
-	}
-	{
-		std::ifstream ifs(dot_filename.c_str(), std::ios::binary);
-		std::ofstream ofs("controller.dot", std::ios::binary);
-		ofs << ifs.rdbuf() << std::flush;
-	}
-	system("dot -Tpng -ocontroller.png controller.dot");
+        message(
+                "EXPERIMENTAL: copying \"%s\" and \"%s\" to \"controller.og\" and \"controller.dot\" (resp.) in cwd.",
+                og_filename.c_str(), dot_filename.c_str() );
+        {
+            std::ifstream ifs( og_filename.c_str(), std::ios::binary );
+            std::ofstream ofs( "controller.og", std::ios::binary );
+            ofs << ifs.rdbuf();
+        }
+        {
+            std::ifstream ifs( dot_filename.c_str(), std::ios::binary );
+            std::ofstream ofs( "controller.dot", std::ios::binary );
+            ofs << ifs.rdbuf() << std::flush;
+        }
+        system( "dot -Tpng -ocontroller.png controller.dot" );
 //################################################################################################
-	}
+    }
 
-	// bool diagnosis_superfluous = false;
-	if (args_info.diagnosis_flag) {
-		/********* *\
+    // bool diagnosis_superfluous = false;
+    if ( args_info.diagnosis_flag ) {
+        /********* *\
         * diagnosis *
-		 \***********/
-		status("Going into diagnosis mode ...");
+         \***********/
+        status( "Going into diagnosis mode ..." );
 
-		// TODO: debug
-		//std::string png_command = "dot -Tpng -odiag.png < " + diag_filename
-		//        + ".dot";
-		//status("Executing png command: %s", png_command.c_str());
-		//system(png_command.c_str());
+        // TODO: debug
+        //std::string png_command = "dot -Tpng -odiag.png < " + diag_filename
+        //        + ".dot";
+        //status("Executing png command: %s", png_command.c_str());
+        //system(png_command.c_str());
 
 #if defined(HAVE_LIBCONFIG__) and HAVE_LIBCONFIG__ == 1
 
-		// open MPPs for each net or create them if necessary
-		std::vector<std::string> mpp_files;
-		for (unsigned i = 0; i < args_info.inputs_num; ++i) {
-			std::string filename = std::string(args_info.inputs[i]);
+        // open MPPs for each net or create them if necessary
+        std::vector< std::string > mpp_files;
+        for ( unsigned i = 0; i < args_info.inputs_num; ++i ) {
+            std::string filename = std::string( args_info.inputs[i] );
 
-			mpp_files.push_back(Adapter::computeMPP(filename));
-		}
+            mpp_files.push_back( Adapter::computeMPP( filename ) );
+        }
 
-		MarkingInformation mi(mi_filename);
-		Diagnosis diag(diag_filename, mi);
-		if (not diag.superfluous) {
-			diag.readMPPs(mpp_files);
-			diag.evaluateDeadlocks(_nets, *_engine);
-			if (args_info.property_arg == property_arg_livelock) {
-				diag.evaluateLivelocks(_nets, *_engine);
-			}
-			diag.evaluateAlternatives(_nets, *_engine);
+        MarkingInformation mi( mi_filename );
+        Diagnosis diag( diag_filename, mi );
+        if ( not diag.superfluous ) {
+            diag.readMPPs( mpp_files );
+            diag.evaluateDeadlocks( _nets, *_engine );
+            if ( args_info.property_arg == property_arg_livelock ) {
+                diag.evaluateLivelocks( _nets, *_engine );
+            }
+            diag.evaluateAlternatives( _nets, *_engine );
 
-			diag.outputLive();
-		}
-		// diagnosis_superfluous = diag.superfluous;
-		if (diag.superfluous) {
+            diag.outputLive();
+        }
+        // diagnosis_superfluous = diag.superfluous;
+        if ( diag.superfluous ) {
 // args_info.diagnosis_flag = 0;
-		}
+        }
 #endif
 
-	}
-	if (not args_info.diagnosis_flag) {
-		/*******************************\
+    }
+    if ( not args_info.diagnosis_flag ) {
+        /*******************************\
         * parse most-permissive partner *
-		 \*******************************/
-		std::ifstream sa_file(sa_filename.c_str(), std::ios_base::in);
-		if (!sa_file) {
-			message(
-					"Controller was not built! No adapter was created, exiting.");
-			exit(EXIT_FAILURE);
-		}
-		Automaton_ptr mpp_sa(new pnapi::Automaton());
-		sa_file >> pnapi::io::sa >> *mpp_sa;
-		sa_file.close();
+         \*******************************/
+        std::ifstream sa_file( sa_filename.c_str(), std::ios_base::in );
+        if ( !sa_file ) {
+            message(
+                    "Controller was not built! No adapter was created, exiting." );
+            exit( EXIT_FAILURE );
+        }
+        Automaton_ptr mpp_sa( new pnapi::Automaton() );
+        sa_file >> pnapi::io::sa >> *mpp_sa;
+        sa_file.close();
 
-		/***********************************************\
+        /***********************************************\
             * transform most-permissive partner to open net *
-		 \***********************************************/
-		time(&start_time);
+         \***********************************************/
+        time( &start_time );
 
-		std::string path2genet = std::string(args_info.genet_arg);
-		std::string path2petrify = std::string(args_info.petrify_arg);
+        std::string path2genet = std::string( args_info.genet_arg );
+        std::string path2petrify = std::string( args_info.petrify_arg );
 
-		if (args_info.sa2on_arg == sa2on_arg_genet and (path2genet != ""))
+        if ( args_info.sa2on_arg == sa2on_arg_genet and ( path2genet != "" ) )
 
-		{
-			status("Using Genet for conversion from SA to open net.");
-			pnapi::PetriNet::setGenet(path2genet);
-			_controller = PetriNet_ptr(
-					new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::GENET,
-							args_info.messagebound_arg + 1));
-		} else if (args_info.sa2on_arg == sa2on_arg_petrify
-				and path2petrify != "") {
-			status("Using Petrify for conversion from SA to open net.");
-			pnapi::PetriNet::setPetrify(path2petrify);
-			_controller = PetriNet_ptr(
-					new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::PETRIFY));
-		} else {
-			status("Using a state machine for conversion from SA to open net.");
-			_controller = PetriNet_ptr(
-					new pnapi::PetriNet(*mpp_sa,
-							pnapi::PetriNet::STATEMACHINE));
-		}
+        {
+            status( "Using Genet for conversion from SA to open net." );
+            pnapi::PetriNet::setGenet( path2genet );
+            _controller = PetriNet_ptr(
+                    new pnapi::PetriNet( *mpp_sa, pnapi::PetriNet::GENET,
+                            args_info.messagebound_arg + 1 ) );
+        } else if ( args_info.sa2on_arg == sa2on_arg_petrify
+                and path2petrify != "" ) {
+            status( "Using Petrify for conversion from SA to open net." );
+            pnapi::PetriNet::setPetrify( path2petrify );
+            _controller = PetriNet_ptr(
+                    new pnapi::PetriNet( *mpp_sa, pnapi::PetriNet::PETRIFY ) );
+        } else {
+            status(
+                    "Using a state machine for conversion from SA to open net." );
+            _controller = PetriNet_ptr(
+                    new pnapi::PetriNet( *mpp_sa,
+                            pnapi::PetriNet::STATEMACHINE ) );
+        }
 #ifndef USE_SHARED_PTR
-		delete mpp_sa;
+        delete mpp_sa;
 #endif
-	}
+    }
 
-	//cleaning up files
-	if (not args_info.noClean_flag) {
-		status("cleaning up temporary files.");
-		status(" ... deleting %s.", sa_filename.c_str());
-		remove(sa_filename.c_str());
-		if (args_info.costoptimized_flag) {
-			status(" ... deleting %s.", og_filename.c_str());
-			remove(og_filename.c_str());
-			status(" ... deleting %s.", cost_filename.c_str());
-			remove(cost_filename.c_str());
-		} else if (args_info.diagnosis_flag) {
-			status(" ... deleting %s.", diag_filename.c_str());
-			remove(diag_filename.c_str());
-			status(" ... deleting %s.", mi_filename.c_str());
-			remove(mi_filename.c_str());
-			status(" ... deleting %s.", dot_filename.c_str());
-			remove(dot_filename.c_str());
-		}
-	}
+    //cleaning up files
+    if ( not args_info.noClean_flag ) {
+        status( "cleaning up temporary files." );
+        status( " ... deleting %s.", sa_filename.c_str() );
+        remove( sa_filename.c_str() );
+        if ( args_info.costoptimized_flag ) {
+            status( " ... deleting %s.", og_filename.c_str() );
+            remove( og_filename.c_str() );
+            status( " ... deleting %s.", cost_filename.c_str() );
+            remove( cost_filename.c_str() );
+        } else if ( args_info.diagnosis_flag ) {
+            status( " ... deleting %s.", diag_filename.c_str() );
+            remove( diag_filename.c_str() );
+            status( " ... deleting %s.", mi_filename.c_str() );
+            remove( mi_filename.c_str() );
+            status( " ... deleting %s.", dot_filename.c_str() );
+            remove( dot_filename.c_str() );
+        }
+    }
 
-	if (not args_info.diagnosis_flag) {
-		// CG workaround
+    if ( not args_info.diagnosis_flag ) {
+        // CG workaround
 
-		status("Port work-around: adding all labels to port `controller'.");
+        status( "Port work-around: adding all labels to port `controller'." );
 
-		_controller->createPort("controller");
-		// CG Workaround
-		while (_controller->getInterface().getPorts().size() > 1) {
-			std::map<std::string, Port *>::const_iterator p =
-					_controller->getInterface().getPorts().begin();
-			pnapi::Port * port1 = p->second;
-			++p;
-			pnapi::Port * port2 = p->second;
+        _controller->createPort( "controller" );
+        // CG Workaround
+        while ( _controller->getInterface().getPorts().size() > 1 ) {
+            std::map< std::string, Port * >::const_iterator p =
+                    _controller->getInterface().getPorts().begin();
+            pnapi::Port * port1 = p->second;
+            ++p;
+            pnapi::Port * port2 = p->second;
 
-			_controller->getInterface().mergePorts(*port1, *port2,
-					"controller");
-		}
+            _controller->getInterface().mergePorts( *port1, *port2,
+                    "controller" );
+        }
 
-	}
+    }
 
-	time(&end_time);
+    time( &end_time );
 
-	if (args_info.verbose_flag and not args_info.diagnosis_flag) {
-		std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat
-				<< *_controller << std::endl;
-		status("converting most-permissive partner done [%.0f sec]",
-				difftime(end_time, start_time));
-	}
+    if ( args_info.verbose_flag and not args_info.diagnosis_flag ) {
+        std::cerr << PACKAGE << ": most-permissive partner: " << pnapi::io::stat
+                << *_controller << std::endl;
+        status( "converting most-permissive partner done [%.0f sec]",
+                difftime( end_time, start_time ) );
+    }
 
-	FUNCOUT
-	return _controller;
+    FUNCOUT
+    return _controller;
 }
 
 /**
  * \brief   creates the interface towards the involved services
  */
-void Adapter::createEngineInterface() {
-	FUNCIN
+void
+Adapter::createEngineInterface() {
+    FUNCIN
 
-	assert(_engine != NULL);
+    assert( _engine != NULL );
 
-	pnapi::Port & contport = *(_engine->getInterface().getPort("controller"));
+    pnapi::Port & contport =
+            *( _engine->getInterface().getPort( "controller" ) );
 
-	for (unsigned int netindex = 0; netindex < _nets.size(); ++netindex) {
-		using namespace pnapi;
-		// renaming the net is done when merging the nets
+    // iterate over nets for creating interace of engine
+    for ( unsigned int netindex = 0; netindex < _nets.size(); ++netindex ) {
+        using namespace pnapi;
+        // renaming the net is done when merging the nets
 
-		std::string portname = "net" + toString(netindex);
+        // port name toward net with current index
+        std::string portname = "net" + toString( netindex );
 
-		pnapi::Port & netport = _engine->createPort(portname);
+        pnapi::Port & netport = _engine->createPort( portname );
 
-		// CG Workaround
-		_nets[netindex]->createPort(portname);
-		while (_nets[netindex]->getInterface().getPorts().size() > 1) {
-			std::map<std::string, Port *>::const_iterator p =
-					_nets[netindex]->getInterface().getPorts().begin();
-			pnapi::Port * port1 = p->second;
-			++p;
-			pnapi::Port * port2 = p->second;
+        // CG Workaround: merging ports of net into one port
+        _nets[netindex]->createPort( portname );
+        while ( _nets[netindex]->getInterface().getPorts().size() > 1 ) {
+            std::map< std::string, Port * >::const_iterator p =
+                    _nets[netindex]->getInterface().getPorts().begin();
+            pnapi::Port * port1 = p->second;
+            ++p;
+            pnapi::Port * port2 = p->second;
 
-			_nets[netindex]->getInterface().mergePorts(*port1, *port2,
-					portname);
-		}
+            _nets[netindex]->getInterface().mergePorts( *port1, *port2,
+                    portname );
+        }
 
-		const std::set<Label *> netIf =
-				_nets[netindex]->getInterface().getAsynchronousLabels();
-		for (std::set<Label *>::const_iterator place = netIf.begin();
-				place != netIf.end(); ++place) {
-			pnapi::Label::Type labeltype = (*place)->getType();
-			const std::string labelname((*place)->getName());
+        // iterating over interface
+        const std::set< Label * > netIf =
+                _nets[netindex]->getInterface().getAsynchronousLabels();
+        for ( std::set< Label * >::const_iterator place = netIf.begin();
+                place != netIf.end(); ++place ) {
+            pnapi::Label::Type labeltype = ( *place )->getType();
+            const std::string labelname( ( *place )->getName() );
 
 // get interface name
 //const std::string & ifname = (*place)->getName();
 // internal name
-			std::string internalname;
-			if (args_info.withprefix_flag) {
-				internalname = (labelname.substr(
-						labelname.find_first_of(".") + 1) + "_int");
-			} else {
-				internalname = (labelname + "_int");
-			}
+            std::string internalname;
+            if ( args_info.withprefix_flag ) {
+                internalname = ( labelname.substr(
+                        labelname.find_first_of( "." ) + 1 ) + "_int" );
+            } else {
+                internalname = ( labelname + "_int" );
+            }
 
-			Label * iflabel = NULL;
-			if (labeltype == Label::INPUT) {
-				iflabel = &netport.addOutputLabel(labelname);
-			} else {
-				iflabel = &netport.addInputLabel(labelname);
-			}
+            Label * iflabel = NULL;
+            if ( labeltype == Label::INPUT ) {
+                iflabel = &netport.addOutputLabel( labelname );
+            } else {
+                iflabel = &netport.addInputLabel( labelname );
+            }
 
-			Place * intplace = _engine->findPlace(internalname);
-			if (intplace == NULL) {
-				//! the internal place which is a copy of the interface place
-				intplace = &_engine->createPlace(internalname, 0,
-						_messageBound);
+            Place * intplace = _engine->findPlace( internalname );
+            if ( intplace == NULL ) {
+                //! the internal place which is a copy of the interface place
+                intplace = &_engine->createPlace( internalname, 0,
+                        _messageBound );
 
-			}
+            }
 //! name of sending/receiving transition
-			std::string inttransname(((labeltype == Label::INPUT) ? "t_send_"
-			: "t_receive_")+ labelname);
+            std::string inttransname(
+                    ( ( labeltype == Label::INPUT ) ? "t_send_" : "t_receive_" )
+                            + labelname );
 
-//! transition which moves the token between the interface place and its copy
-			Transition & inttrans = _engine->createTransition(inttransname);
+            if ( labeltype == Label::INPUT ) {
+                netInterfaceIn[inttransname] = labelname;
+            } else {
+                netInterfaceOut[inttransname] = labelname;
+            }
+
+            //! transition which moves the token between the interface place and its copy
+            Transition & inttrans = _engine->createTransition( inttransname );
 
 // create arcs between the internal place, the transition
 // and the interface place
-			if (labeltype == Label::INPUT) {
-				_engine->createArc(*intplace, inttrans);
-				// _engine->createArc(inttrans, ifplace);
-			} else {
-				// _engine->createArc(ifplace, inttrans);
-				_engine->createArc(inttrans, *intplace);
-			}
-			inttrans.addLabel(*iflabel);
+            if ( labeltype == Label::INPUT ) {
+                _engine->createArc( *intplace, inttrans );
+                // _engine->createArc(inttrans, ifplace);
+            } else {
+                // _engine->createArc(ifplace, inttrans);
+                _engine->createArc( inttrans, *intplace );
+            }
+            inttrans.addLabel( *iflabel );
 
 // if we have a synchronous interface, create label for transition
-			if (_contType == SYNCHRONOUS) {
-				Label & contLabel = contport.addSynchronousLabel(
-						"sync_" + inttransname);
-				inttrans.addLabel(contLabel);
+          if (not args_info.useasif_given)
+            {
 
-				cost_file_content += "sync_" + inttransname + " 0;\n";
+              if (_contType == SYNCHRONOUS)
+                {
+                  Label & contLabel = contport.addSynchronousLabel(
+                      "sync_" + inttransname);
+                  inttrans.addLabel(contLabel);
 
-			}
-// else create interface place to the controller
-			else {
-				if (labeltype == Label::INPUT) {
-					Label & inputLabel = contport.addInputLabel(
-							"send_" + labelname);
-					inttrans.addLabel(inputLabel);
-				} else {
-					Label & outputLabel = contport.addOutputLabel(
-							"receive_" + labelname);
-					inttrans.addLabel(outputLabel);
-				}
-			}
-		}
-		std::set<Label *> ifLabels(
-				_nets[netindex]->getInterface().getSynchronousLabels());
-		for (std::set<Label *>::const_iterator iter = ifLabels.begin();
-				iter != ifLabels.end(); ++iter) {
-			const std::string labelname((*iter)->getName());
-			netport.addSynchronousLabel(labelname);
-		}
+                  cost_file_content += "sync_" + inttransname + " 0;\n";
 
-	}
-	FUNCOUT
+                }
+              // else create interface place to the controller
+              else
+                {
+                  if (labeltype == Label::INPUT)
+                    {
+                      Label & inputLabel = contport.addInputLabel(
+                          "send_" + labelname);
+                      inttrans.addLabel(inputLabel);
+                    }
+                  else
+                    {
+                      Label & outputLabel = contport.addOutputLabel(
+                          "receive_" + labelname);
+                      inttrans.addLabel(outputLabel);
+                    }
+                }
+            }
+          else
+            {
+              /* \TODO: add information about controller interface to pruner input */
+#warning        "To be implemented as a list of pairs"
+              controllerInterfaceSync[inttrans.getName()] = "sync_"
+                  + inttransname;
+            }
+
+        }
+        std::set< Label * > ifLabels(
+                _nets[netindex]->getInterface().getSynchronousLabels() );
+        for ( std::set< Label * >::const_iterator iter = ifLabels.begin();
+                iter != ifLabels.end(); ++iter ) {
+            const std::string labelname( ( *iter )->getName() );
+            netport.addSynchronousLabel( labelname );
+        }
+
+    }
+    FUNCOUT
 }
 
-void Adapter::createRuleTransitions() {
-	FUNCIN
-	using namespace pnapi;
+void
+Adapter::createRuleTransitions() {
+    FUNCIN
+    using namespace pnapi;
 
-	// we need the port to the controller for adding control labels
-	pnapi::Port & contport = *(_engine->getInterface().getPort("controller"));
+    // we need the port to the controller for adding control labels
+    pnapi::Port & contport =
+            *( _engine->getInterface().getPort( "controller" ) );
 
-	// transitions are numbered
-	unsigned int transNumber = 1;
+    // transitions are numbered
+    unsigned int transNumber = 1;
 
-	// get given rules
-	std::list<RuleSet::AdapterRule::AdapterRule_ptr> rules = _rs.getRules();
-	// iterate them
-	std::list<RuleSet::AdapterRule::AdapterRule_ptr>::iterator ruleIter =
-			rules.begin();
-	while (ruleIter != rules.end()) {
-		const RuleSet::AdapterRule & rule = **ruleIter;
+    // get given rules
+    std::list< RuleSet::AdapterRule::AdapterRule_ptr > rules = _rs.getRules();
+    // iterate them
+    std::list< RuleSet::AdapterRule::AdapterRule_ptr >::iterator ruleIter =
+            rules.begin();
+    while ( ruleIter != rules.end() ) {
+        const RuleSet::AdapterRule & rule = * *ruleIter;
 
-		std::string transName(Adapter::getRuleName(transNumber));
+        std::string transName( Adapter::getRuleName( transNumber ) );
 
-		// create rule transition
+        // create rule transition
 
-		// maybe transition alread exists (but why!)
-		Transition * trans = _engine->findTransition(transName);
-		// so let's have an assertion here
-		assert(trans == NULL);
+        // maybe transition alread exists (but why!)
+        Transition * trans = _engine->findTransition( transName );
+        // so let's have an assertion here
+        assert( trans == NULL );
 
-		if (trans == NULL) {
-			trans = &_engine->createTransition(transName);
-		}
+        if ( trans == NULL ) {
+            trans = &_engine->createTransition( transName );
+        }
 
-		// add costs to the transition
-		trans->setCost(rule.getCosts());
-		// status("setting costs %d for %s", rule.getCosts(), transName.c_str());
+        // add costs to the transition
+        trans->setCost( rule.getCosts() );
+        // status("setting costs %d for %s", rule.getCosts(), transName.c_str());
 
-		cost_file_content += "sync_" + transName + " "
-				+ toString(rule.getCosts()) + ";\n";
+        cost_file_content += "sync_" + transName + " "
+                + toString( rule.getCosts() ) + ";\n";
 
-		// now for the places, iterate and connect them to the transition
-		std::list<unsigned int> messageList = rule.getRule().first;
-		std::list<unsigned int>::iterator messageIter = messageList.begin();
-		while (messageIter != messageList.end()) {
-			// create places for precondition
-			std::string placeName = _rs.getMessageForId(*messageIter) + "_int";
+        // now for the places, iterate and connect them to the transition
+        std::list< unsigned int > messageList = rule.getRule().first;
+        std::list< unsigned int >::iterator messageIter = messageList.begin();
+        while ( messageIter != messageList.end() ) {
+            // create places for precondition
+            std::string placeName = _rs.getMessageForId( *messageIter )
+                    + "_int";
 
-			// let's look, if the place already exists
-			Place * place = _engine->findPlace(placeName);
+            // let's look, if the place already exists
+            Place * place = _engine->findPlace( placeName );
 
-			// nope, create it
-			if (place == NULL) {
-				place = &_engine->createPlace(placeName, 0, _messageBound);
-			}
+            // nope, create it
+            if ( place == NULL ) {
+                place = &_engine->createPlace( placeName, 0, _messageBound );
+            }
 
-			// create arc between this place and rule transition
-			// \TODO: Arc multiplicities
-			_engine->createArc(*place, *trans);
+            // create arc between this place and rule transition
+            // \TODO: Arc multiplicities
+            _engine->createArc( *place, *trans );
 
-			++messageIter;
-		}
+            ++messageIter;
+        }
 
-		messageList = rule.getRule().second;
-		messageIter = messageList.begin();
-		while (messageIter != messageList.end()) {
-			// create places for postcondition
-			std::string placeName = _rs.getMessageForId(*messageIter) + "_int";
+        messageList = rule.getRule().second;
+        messageIter = messageList.begin();
+        while ( messageIter != messageList.end() ) {
+            // create places for postcondition
+            std::string placeName = _rs.getMessageForId( *messageIter )
+                    + "_int";
 
-			// let's look, if the place already exists
-			Place * place = _engine->findPlace(placeName);
+            // let's look, if the place already exists
+            Place * place = _engine->findPlace( placeName );
 
-			// nope, create it
-			if (place == NULL) {
-				place = &_engine->createPlace(placeName, 0, _messageBound);
-			}
+            // nope, create it
+            if ( place == NULL ) {
+                place = &_engine->createPlace( placeName, 0, _messageBound );
+            }
 
-			// create arc between this place and rule transition
-			_engine->createArc(*trans, *place);
+            // create arc between this place and rule transition
+            _engine->createArc( *trans, *place );
 
-			++messageIter;
-		}
+            ++messageIter;
+        }
 
-		// get synchronouns labels for this rule.
-		std::set<std::string> syncLabel;
-		messageList = rule.getSyncList();
-		messageIter = messageList.begin();
-		while (messageIter != messageList.end()) {
-			// get label name and insert it into label list for transition
-			std::string labelName = _rs.getMessageForId(*messageIter);
-			pnapi::Label * syncLabel = _engine->getInterface().findLabel(
-					labelName);
-			if (syncLabel != NULL) {
-				trans->addLabel(*syncLabel);
-			} else // This transition will never fire, so a dead place is added!
-			{
-				Place * deadplace = _engine->findPlace(labelName);
-				if (deadplace == NULL) {
-					deadplace = &_engine->createPlace(labelName);
-				}
-				_engine->createArc(*deadplace, *trans);
-			}
+        // get synchronouns labels for this rule.
+#warning "Needs to be added to remaining interface for adaptability"
+        std::set< std::string > syncLabel;
+        messageList = rule.getSyncList();
+        messageIter = messageList.begin();
+        while ( messageIter != messageList.end() ) {
+            // get label name and insert it into label list for transition
+            std::string labelName = _rs.getMessageForId( *messageIter );
+            pnapi::Label * syncLabel = _engine->getInterface().findLabel(
+                    labelName );
+            if ( syncLabel != NULL ) {
+                trans->addLabel( *syncLabel );
+            } else // This transition will never fire, so a dead place is added!
+            {
+                Place * deadplace = _engine->findPlace( labelName );
+                if ( deadplace == NULL ) {
+                    deadplace = &_engine->createPlace( labelName );
+                }
+                _engine->createArc( *deadplace, *trans );
+            }
 
-			++messageIter;
-		}
+            ++messageIter;
+        }
 
-		// if we have a synchronous interface, create label for transition
-		if (_contType == SYNCHRONOUS) {
-			Label & synclabel = contport.addSynchronousLabel(
-					"sync_" + transName);
-			trans->addLabel(synclabel);
-		}
-		// else create interface place to the controller
-		else {
-			if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL
-					|| rule.getMode() == RuleSet::AdapterRule::AR_CONTROLLABLE) {
-				Label & inputlabel = contport.addInputLabel(
-						"control_" + transName);
-				trans->addLabel(inputlabel);
-			}
+        if ( not args_info.useasif_given ) {
+            // if we have a synchronous interface, create label for transition
+            if ( _contType == SYNCHRONOUS ) {
+                Label & synclabel = contport.addSynchronousLabel(
+                        "sync_" + transName );
+                trans->addLabel( synclabel );
+            }
+            // else create interface place to the controller
+            else {
+                if ( rule.getMode() == RuleSet::AdapterRule::AR_NORMAL
+                        || rule.getMode()
+                                == RuleSet::AdapterRule::AR_CONTROLLABLE ) {
+                    Label & inputlabel = contport.addInputLabel(
+                            "control_" + transName );
+                    trans->addLabel( inputlabel );
+                }
 
-			if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL
-					|| rule.getMode() == RuleSet::AdapterRule::AR_OBSERVABLE) {
-				Label & outputlabel = contport.addOutputLabel(
-						"observe_" + transName);
-				trans->addLabel(outputlabel);
-			}
+                if ( rule.getMode() == RuleSet::AdapterRule::AR_NORMAL
+                        || rule.getMode() == RuleSet::AdapterRule::AR_OBSERVABLE ) {
+                    Label & outputlabel = contport.addOutputLabel(
+                            "observe_" + transName );
+                    trans->addLabel( outputlabel );
+                }
 
-		}
-		// next Tansition
-		++transNumber;
-		++ruleIter;
-	}
-	FUNCOUT
+            }
+        } else {
+            /* \TODO: add information about controller interface to pruner input */
+#warning	"To be implemented as a list of pairs"
+            controllerInterfaceSync[trans->getName()] = "sync_" + transName;
+//      status( "adding transition to controller interface: %s = %s",
+//          trans->getName().c_str(),
+//          controllerInterfaceSync[trans->getName()].c_str() );
+        }
+        // next Tansition
+        ++transNumber;
+        ++ruleIter;
+    }
+    FUNCOUT
 }
 
 /// \todo: was ist mit Pl�tzen, die Selfloop haben?
-void Adapter::createComplementaryPlaces(pnapi::PetriNet & net) {
-	FUNCIN
+void
+Adapter::createComplementaryPlaces( pnapi::PetriNet & net ) {
+    FUNCIN
 
-	using namespace pnapi;
+    using namespace pnapi;
 
-	std::set<Place *> intPlaces = net.getPlaces();
-	std::set<Place *>::iterator placeIter = intPlaces.begin();
+    std::set< Place * > intPlaces = net.getPlaces();
+    std::set< Place * >::iterator placeIter = intPlaces.begin();
 
-	/*
-	 Place & dictatorPlace = net.createPlace("comp_thegreatdictator", 1, 1);
+    /*
+     Place & dictatorPlace = net.createPlace("comp_thegreatdictator", 1, 1);
 
-	 {
-	 // update final condition
-	 Condition & finalCond = net.getFinalCondition();
+     {
+     // update final condition
+     Condition & finalCond = net.getFinalCondition();
 
-	 formula::FormulaEqual prop (formula::FormulaEqual(dictatorPlace, 1));
-	 finalCond.addProposition(prop);
+     formula::FormulaEqual prop (formula::FormulaEqual(dictatorPlace, 1));
+     finalCond.addProposition(prop);
 
-	 //connect every transition to the dictator place via read arc
-	 std::set< Transition * > transes = net.getTransitions();
-	 for ( std::set< Transition * >::iterator trans = transes.begin(); trans != transes.end(); ++trans)
-	 {
-	 net.createArc(**trans, dictatorPlace);
-	 net.createArc(dictatorPlace, **trans);
-	 }
-	 }
-	 */
+     //connect every transition to the dictator place via read arc
+     std::set< Transition * > transes = net.getTransitions();
+     for ( std::set< Transition * >::iterator trans = transes.begin(); trans != transes.end(); ++trans)
+     {
+     net.createArc(**trans, dictatorPlace);
+     net.createArc(dictatorPlace, **trans);
+     }
+     }
+     */
 
-	while (placeIter != intPlaces.end()) {
-		Place & place = **placeIter;
-		Place & compPlace = net.createPlace("comp_" + place.getName(),
-				place.getCapacity() + 1, place.getCapacity() + 1);
+    while ( placeIter != intPlaces.end() ) {
+        Place & place = * *placeIter;
+        Place & compPlace = net.createPlace( "comp_" + place.getName(),
+                place.getCapacity() + 1, place.getCapacity() + 1 );
 
-		// update final condition
-		Condition & finalCond = net.getFinalCondition();
+        // update final condition
+        Condition & finalCond = net.getFinalCondition();
 
-		formula::FormulaEqual prop(
-				formula::FormulaEqual(compPlace, place.getCapacity() + 1));
-		finalCond.addProposition(prop);
+        formula::FormulaEqual prop(
+                formula::FormulaEqual( compPlace, place.getCapacity() + 1 ) );
+        finalCond.addProposition( prop );
 
-		std::set<Node *> preSet = place.getPreset();
-		std::set<Node *>::iterator nodeIter = preSet.begin();
-		while (nodeIter != preSet.end()) {
-			Arc * a = net.findArc(**nodeIter, place);
-			int x = (a != NULL) ? a->getWeight() : 0;
-			Arc * b = net.findArc(place, **nodeIter);
-			int y = (b != NULL) ? b->getWeight() : 0;
-			unsigned int weight = std::max(x - y, 0);
-			if (weight > 0) {
-				net.createArc(compPlace, **nodeIter, weight);
-			}
-			++nodeIter;
-		}
+        std::set< Node * > preSet = place.getPreset();
+        std::set< Node * >::iterator nodeIter = preSet.begin();
+        while ( nodeIter != preSet.end() ) {
+            Arc * a = net.findArc( * *nodeIter, place );
+            int x = ( a != NULL ) ? a->getWeight() : 0;
+            Arc * b = net.findArc( place, * *nodeIter );
+            int y = ( b != NULL ) ? b->getWeight() : 0;
+            unsigned int weight = std::max( x - y, 0 );
+            if ( weight > 0 ) {
+                net.createArc( compPlace, * *nodeIter, weight );
+            }
+            ++nodeIter;
+        }
 
-		std::set<Node *> postSet = place.getPostset();
-		nodeIter = postSet.begin();
-		while (nodeIter != postSet.end()) {
-			Arc * a = net.findArc(**nodeIter, place);
-			int x = (a != NULL) ? a->getWeight() : 0;
-			Arc * b = net.findArc(place, **nodeIter);
-			int y = (b != NULL) ? b->getWeight() : 0;
-			unsigned int weight = std::max(y - x, 0);
-			if (weight > 0) {
-				net.createArc(**nodeIter, compPlace, weight + 1);
-				net.createArc(compPlace, **nodeIter, 1);
-			}
-			++nodeIter;
-		}
+        std::set< Node * > postSet = place.getPostset();
+        nodeIter = postSet.begin();
+        while ( nodeIter != postSet.end() ) {
+            Arc * a = net.findArc( * *nodeIter, place );
+            int x = ( a != NULL ) ? a->getWeight() : 0;
+            Arc * b = net.findArc( place, * *nodeIter );
+            int y = ( b != NULL ) ? b->getWeight() : 0;
+            unsigned int weight = std::max( y - x, 0 );
+            if ( weight > 0 ) {
+                net.createArc( * *nodeIter, compPlace, weight + 1 );
+                net.createArc( compPlace, * *nodeIter, 1 );
+            }
+            ++nodeIter;
+        }
 
-		/*
-		 // deadlock transition
-		 Transition & trans = net.createTransition("dl_" + place.getName());
+        /*
+         // deadlock transition
+         Transition & trans = net.createTransition("dl_" + place.getName());
 
-		 net.createArc(place, trans, place.getCapacity() + 1);
-		 net.createArc(dictatorPlace, trans);
-		 */
+         net.createArc(place, trans, place.getCapacity() + 1);
+         net.createArc(dictatorPlace, trans);
+         */
 
-		++placeIter;
-	}
+        ++placeIter;
+    }
 
-	FUNCOUT
+    FUNCOUT
 }
 
 /// \todo: kann doch die API!?
-void Adapter::removeUnnecessaryRules() {
-	FUNCIN
+void
+Adapter::removeUnnecessaryRules() {
+    FUNCIN
 
-	using namespace pnapi;
+    using namespace pnapi;
 
-	std::set<Place *> possibleDeadPlaces = _engine->getPlaces();
+    std::set< Place * > possibleDeadPlaces = _engine->getPlaces();
 
-	while (!possibleDeadPlaces.empty()) {
-		// find all place with an empty preset (so places are structually dead)
+    while ( !possibleDeadPlaces.empty() ) {
+        // find all place with an empty preset (so places are structually dead)
 
-		std::set<Place *>::iterator placeIter = possibleDeadPlaces.begin();
+        std::set< Place * >::iterator placeIter = possibleDeadPlaces.begin();
 
-		std::list<Place *> placeDeletionList;
+        std::list< Place * > placeDeletionList;
 
-		while (placeIter != possibleDeadPlaces.end()) {
-			if ((*placeIter)->getPreset().empty()) {
-				placeDeletionList.push_back(*placeIter);
-			}
-			++placeIter;
-		}
+        while ( placeIter != possibleDeadPlaces.end() ) {
+            if ( ( *placeIter )->getPreset().empty() ) {
+                placeDeletionList.push_back( *placeIter );
+            }
+            ++placeIter;
+        }
 
-		possibleDeadPlaces.clear();
+        possibleDeadPlaces.clear();
 
-		// delete dead places and all depending nodes
-		std::list<Place *>::iterator place2Delete = placeDeletionList.begin();
+        // delete dead places and all depending nodes
+        std::list< Place * >::iterator place2Delete = placeDeletionList.begin();
 
-		while (place2Delete != placeDeletionList.end()) {
-			Place * p = *place2Delete;
-			//status("Deleting post set of place %s.", p->getName().c_str());
+        while ( place2Delete != placeDeletionList.end() ) {
+            Place * p = *place2Delete;
+            //status("Deleting post set of place %s.", p->getName().c_str());
 
-			std::set<Node *> postset = p->getPostset();
+            std::set< Node * > postset = p->getPostset();
 
-			std::set<Node *>::iterator nodeIter = postset.begin();
+            std::set< Node * >::iterator nodeIter = postset.begin();
 
-			while (nodeIter != postset.end()) {
-				std::set<Node *> deadCandidates = (*nodeIter)->getPostset();
-				std::set<Node *>::const_iterator cand = deadCandidates.begin();
+            while ( nodeIter != postset.end() ) {
+                std::set< Node * > deadCandidates = ( *nodeIter )->getPostset();
+                std::set< Node * >::const_iterator cand =
+                        deadCandidates.begin();
 
-				while (cand != deadCandidates.end()) {
-					possibleDeadPlaces.insert(dynamic_cast<Place*>(*cand));
-					++cand;
-				}
+                while ( cand != deadCandidates.end() ) {
+                    possibleDeadPlaces.insert(
+                            dynamic_cast< Place* >( *cand ) );
+                    ++cand;
+                }
 
-				_engine->deleteTransition(
-						*(dynamic_cast<Transition*>(*nodeIter)));
-				++nodeIter;
-			}
+                _engine->deleteTransition(
+                        *( dynamic_cast< Transition* >( *nodeIter ) ) );
+                ++nodeIter;
+            }
 
-			_engine->deletePlace(*p);
-			++place2Delete;
-		}
-	}
-	FUNCOUT
+            _engine->deletePlace( *p );
+            ++place2Delete;
+        }
+    }
+    FUNCOUT
 }
 
-void Adapter::findConflictFreeTransitions() {
-	FUNCIN
-	using namespace pnapi;
+void
+Adapter::findConflictFreeTransitions() {
+    FUNCIN
+    using namespace pnapi;
 
-	for (unsigned int i = 1; i <= _rs.getRules().size(); ++i) {
-		// get the name of the transition
-		std::string transname(Adapter::getRuleName(i));
+    for ( unsigned int i = 1; i <= _rs.getRules().size(); ++i ) {
+        // get the name of the transition
+        std::string transname( Adapter::getRuleName( i ) );
 
-		Transition * trans = _engine->findTransition(transname);
-		// does it still exist
-		if (trans != NULL) {
-			// check every pre place, if it is conflict free
-			std::set<Node *> preset = trans->getPreset();
-			std::set<Node *>::iterator placeIter = preset.begin();
+        Transition * trans = _engine->findTransition( transname );
+        // does it still exist
+        if ( trans != NULL ) {
+            // check every pre place, if it is conflict free
+            std::set< Node * > preset = trans->getPreset();
+            std::set< Node * >::iterator placeIter = preset.begin();
 
-			bool no_enact = not preset.empty();
-			while (no_enact and placeIter != preset.end()) {
-				if ((*placeIter)->getPostset().size() > 1) {
-					no_enact = false;
-					// placeIter = preset.end();
-				} else {
-					++placeIter;
-				}
-			}
+            bool no_enact = not preset.empty();
+            while ( no_enact and placeIter != preset.end() ) {
+                if ( ( *placeIter )->getPostset().size() > 1 ) {
+                    no_enact = false;
+                    // placeIter = preset.end();
+                } else {
+                    ++placeIter;
+                }
+            }
 
-			// check every post place, if it is conflict free
-			std::set<Node *> postset = trans->getPostset();
-			placeIter = postset.begin();
+            // check every post place, if it is conflict free
+            std::set< Node * > postset = trans->getPostset();
+            placeIter = postset.begin();
 
-			bool no_notify = not postset.empty();
-			while (no_notify and placeIter != postset.end()) {
-				if ((*placeIter)->getPreset().size() > 1) {
-					no_notify = false;
-					// placeIter = postset.end();
-				} else {
-					++placeIter;
-				}
-			}
+            bool no_notify = not postset.empty();
+            while ( no_notify and placeIter != postset.end() ) {
+                if ( ( *placeIter )->getPreset().size() > 1 ) {
+                    no_notify = false;
+                    // placeIter = postset.end();
+                } else {
+                    ++placeIter;
+                }
+            }
 
-			if (no_enact or no_notify) {
-				const std::map<pnapi::Label *, unsigned int> labels =
-						trans->getLabels();
-				for (std::map<pnapi::Label *, unsigned int>::const_iterator label =
-						labels.begin(); label != labels.end(); ++label) {
-					if ((label->first->getType() == pnapi::Label::INPUT
-							and no_enact)
-							or (label->first->getType() == pnapi::Label::OUTPUT
-									and no_notify) or (no_enact and no_notify))
-						trans->removeLabel(*(label->first));
-				}
-			}
-		}
-	}
-	FUNCOUT
+            if ( no_enact or no_notify ) {
+                const std::map< pnapi::Label *, unsigned int > labels =
+                        trans->getLabels();
+                for ( std::map< pnapi::Label *, unsigned int >::const_iterator label =
+                        labels.begin(); label != labels.end(); ++label ) {
+                    if ( ( label->first->getType() == pnapi::Label::INPUT
+                            and no_enact )
+                            or ( label->first->getType() == pnapi::Label::OUTPUT
+                                    and no_notify )
+                            or ( no_enact and no_notify ) )
+                        trans->removeLabel( *( label->first ) );
+                }
+            }
+        }
+    }
+    FUNCOUT
 }
 
 //! returns the name for the rule with index i
-inline std::string Adapter::getRuleName(unsigned int i) {
-
-	return "rule_" + toString(i);
+inline std::string
+Adapter::getRuleName( unsigned int i ) {
+    FUNCIN
+    FUNCOUT
+    return "rule_" + toString( i );
 }
 
-std::string Adapter::computeMPP(const std::string & filename) {
+std::string
+Adapter::computeMPP( const std::string & filename ) {
 
-	std::string results_filename = filename + ".results";
-	std::string sa_filename = filename + ".sa";
+    std::string results_filename = filename + ".results";
+    std::string sa_filename = filename + ".sa";
 
-	std::string path2wendy = std::string(args_info.wendy_arg);
-	// wendy is really essential
-	assert(path2wendy != "");
+    std::string path2wendy = std::string( args_info.wendy_arg );
+    // wendy is really essential
+    assert( path2wendy != "" );
 
-	time_t start_time, end_time;
+    time_t start_time, end_time;
 
-	// try to open results file (should work, if pre-computed, it should exist
-	std::ifstream rfile(results_filename.c_str());
-	// if file does not exist, create it
-	if (!rfile) {
+    // try to open results file (should work, if pre-computed, it should exist
+    std::ifstream rfile( results_filename.c_str() );
+    // if file does not exist, create it
+    if ( !rfile ) {
+        // this is the name of the owfn input file
+        std::string owfnFileName( filename );
+        // this is the owfn input file
+        std::ifstream owfnFile( owfnFileName.c_str() );
+        // read owfn file into Petr net and close file
+        PetriNet_ptr net( new pnapi::PetriNet );
+        owfnFile >> pnapi::io::owfn >> *net;
+        owfnFile.close();
+        // this is the output for the normalized net
+        // define here, cause it should only be delelted at the end of the method
+        Output normNet;
 
-		// this is the name of the owfn input file
-		std::string owfnFileName(filename);
-		// this is the owfn input file
-		std::ifstream owfnFile(owfnFileName.c_str());
+        // if net is not normal, normalize it, and take normalized net as input
+        if ( not net->isNormal() ) {
+            net->normalize();
 
-		// read owfn file into Petr net and close file
-		PetriNet_ptr net(new pnapi::PetriNet);
-		owfnFile >> pnapi::io::owfn >> *net;
-		owfnFile.close();
+            normNet.stream() << pnapi::io::owfn << *net << std::flush;
+            owfnFileName = normNet.name();
+        }
 
-		// this is the output for the normalized net
-		// define here, cause it should only be delelted at the end of the method
-		Output normNet;
+        std::string mpp_command = path2wendy + " --sa=" + sa_filename
+                + " --result=" + results_filename + " " + owfnFileName;
+        status( "Generating most-permissive partner for `%s' by executing",
+                owfnFileName.c_str() );
+        status( "%s", mpp_command.c_str() );
 
+        time( &start_time );
+        int result = system( mpp_command.c_str() );
+        result = WEXITSTATUS(result);
+        time( &end_time );
 
-		// if net is not normal, normalize it, and take normalized net as input
-		if (not net->isNormal()) {
-			net->normalize();
+        status( "Wendy done [%.0f sec]", difftime( end_time, start_time ) );
 
-			normNet.stream() << pnapi::io::owfn << *net << std::flush;
-			owfnFileName = normNet.name();
-		}
-
-		std::string mpp_command = path2wendy + " --sa=" + sa_filename
-				+ " --result=" + results_filename + " " + owfnFileName;
-		status("Generating most-permissive partner for `%s' by executing",
-				owfnFileName.c_str());
-		status("%s", mpp_command.c_str());
-
-		time(&start_time);
-		int result = system(mpp_command.c_str());
-		result = WEXITSTATUS(result);
-		time(&end_time);
-
-		status("Wendy done [%.0f sec]", difftime(end_time, start_time));
-
-		rfile.open(results_filename.c_str());
+        rfile.open( results_filename.c_str() );
 
 #ifndef USE_SHARED_PTR
-		delete (net);
+        delete (net);
 #endif
-	}
-	rfile.close();
+    }
+    rfile.close();
 
-	return results_filename;
+    return results_filename;
 
 }
 
 RuleSet::RuleSet() :
-		_maxId(0) {
-	FUNCIN
-	/* empty */
-	FUNCOUT
+        _maxId( 0 ) {
+    FUNCIN
+    /* empty */
+    FUNCOUT
 }
 
 RuleSet::~RuleSet() {
-	FUNCIN
-	_adapterRules.clear();
-	FUNCOUT
+    FUNCIN
+    _adapterRules.clear();
+    FUNCOUT
 }
 
-void RuleSet::addRules(FILE_ptr inputStream) {
-	FUNCIN
-	extern FILE * adapt_rules_yyin;
-	extern int adapt_rules_yyparse();
-	extern RuleSet * workingSet;
-	extern int adapt_rules_yylineno;
-	extern int adapt_rules_yylex_destroy();
+void
+RuleSet::addRules( FILE_ptr inputStream ) {
+    FUNCIN
+    extern FILE * adapt_rules_yyin;
+    extern int
+    adapt_rules_yyparse();
+    extern RuleSet * workingSet;
+    extern int adapt_rules_yylineno;
+    extern int
+    adapt_rules_yylex_destroy();
 
 // \TODO: Parser
-	/*
-	 extern int adapt_rules_yydebug;
-	 extern int adapt_rules_yy_flex_debug;
-	 extern FILE* adapt_rules_yyin;
-	 extern int adapt_rules_yyerror();
-	 extern int adapt_rules_yyparse();
+    /*
+     extern int adapt_rules_yydebug;
+     extern int adapt_rules_yy_flex_debug;
+     extern FILE* adapt_rules_yyin;
+     extern int adapt_rules_yyerror();
+     extern int adapt_rules_yyparse();
 
-	 */
+     */
 
-	workingSet = this;
+    workingSet = this;
 #ifdef USE_SHARED_PTR
-	adapt_rules_yyin = inputStream.get();
+    adapt_rules_yyin = inputStream.get();
 #else
-	adapt_rules_yyin = inputStream;
+    adapt_rules_yyin = inputStream;
 #endif
-	adapt_rules_yylineno = 1;
+    adapt_rules_yylineno = 1;
 
-	adapt_rules_yyparse();
-	adapt_rules_yylex_destroy();
+    adapt_rules_yyparse();
+    adapt_rules_yylex_destroy();
 
-	FUNCOUT
+    FUNCOUT
 }
 
-inline const std::list<RuleSet::AdapterRule::AdapterRule_ptr> RuleSet::getRules() const {
-	FUNCIN
-	FUNCOUT
-	return _adapterRules;
+inline const std::list< RuleSet::AdapterRule::AdapterRule_ptr >
+RuleSet::getRules() const {
+    FUNCIN
+    FUNCOUT
+    return _adapterRules;
 }
 
-inline const std::string RuleSet::getMessageForId(const unsigned int id) const {
-	FUNCIN
-	std::map<unsigned int, std::string>::const_iterator iter =
-			_messageIndex.find(id);
-	assert( iter != _messageIndex.end());
+inline const std::string
+RuleSet::getMessageForId( const unsigned int id ) const {
+    FUNCIN
+    std::map< unsigned int, std::string >::const_iterator iter =
+            _messageIndex.find( id );
+    assert( iter != _messageIndex.end() );
 
-	FUNCOUT
-	return iter->second;
+    FUNCOUT
+    return iter->second;
 }
 
-unsigned int RuleSet::getIdForMessage(std::string message) {
-	FUNCIN
-	// getting the id once is enough
-	unsigned int id = _messageId[message];
-	if (id == 0) {
-		++_maxId;
-		_messageIndex[_maxId] = message;
-		FUNCOUT
-		return (_messageId[message] = _maxId);
-	} else {
-		FUNCOUT
-		return id;
-	}
+unsigned int
+RuleSet::getIdForMessage( std::string message ) {
+    FUNCIN
+    // getting the id once is enough
+    unsigned int id = _messageId[message];
+    if ( id == 0 ) {
+        ++_maxId;
+        _messageIndex[_maxId] = message;
+        FUNCOUT
+        return ( _messageId[message] = _maxId );
+    } else {
+        FUNCOUT
+        return id;
+    }
 }
 
-RuleSet::AdapterRule::AdapterRule(rulepair & rule, syncList & slist,
-		cfMode modus, int costs) :
-		_rule(rule), _syncList(slist), _modus(modus), _costs(costs) {
-	FUNCIN
-	/* empty */
-	FUNCOUT
+RuleSet::AdapterRule::AdapterRule( rulepair & rule, syncList & slist,
+        cfMode modus, int costs ) :
+        _rule( rule ), _syncList( slist ), _modus( modus ), _costs( costs ) {
+    FUNCIN
+    /* empty */
+    FUNCOUT
 }
 
 RuleSet::AdapterRule::~AdapterRule() {
-	FUNCIN
-	/* empty */
-	FUNCOUT
+    FUNCIN
+    /* empty */
+    FUNCOUT
 }
 
-inline const RuleSet::AdapterRule::rulepair & RuleSet::AdapterRule::getRule() const {
-	FUNCIN
-	FUNCOUT
-	return _rule;
+inline const RuleSet::AdapterRule::rulepair &
+RuleSet::AdapterRule::getRule() const {
+    FUNCIN
+    FUNCOUT
+    return _rule;
 }
 
-inline const RuleSet::AdapterRule::syncList & RuleSet::AdapterRule::getSyncList() const {
-	FUNCIN
-	FUNCOUT
-	return _syncList;
+inline const RuleSet::AdapterRule::syncList &
+RuleSet::AdapterRule::getSyncList() const {
+    FUNCIN
+    FUNCOUT
+    return _syncList;
 }
 
-inline const RuleSet::AdapterRule::cfMode & RuleSet::AdapterRule::getMode() const {
-	FUNCIN
-	FUNCOUT
-	return _modus;
+inline const RuleSet::AdapterRule::cfMode &
+RuleSet::AdapterRule::getMode() const {
+    FUNCIN
+    FUNCOUT
+    return _modus;
 }
 
-inline const int & RuleSet::AdapterRule::getCosts() const {
-	FUNCIN
-	FUNCOUT
-	return _costs;
+inline const int &
+RuleSet::AdapterRule::getCosts() const {
+    FUNCIN
+    FUNCOUT
+    return _costs;
 }
 

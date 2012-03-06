@@ -1,3 +1,5 @@
+#include <config.h>
+
 #include <cstring>
 #include <sstream>
 #include <cstdio>
@@ -327,7 +329,7 @@ int main(int argc, char** argv) {
             cuddVariableNames = new char*[net.getTransitions().size()];
             
             alib = new anica::AnicaLib(net);
-            alib->setLolaPath("lola-statespace1");
+            alib->setLolaPath(LOLA_STATEPREDICATE1);
             
             updateNonInterference();
             

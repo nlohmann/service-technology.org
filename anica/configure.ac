@@ -26,6 +26,8 @@ AC_ST_AUTOTEST
 AC_ST_PNAPI([4.03])
 AC_ST_VERBOSE
 
+AC_DEFINE_UNQUOTED([LOLA_STATEPREDICATE1], ["${LOLA}"], [The LoLA binary.])
+
 # search for optional tools needed by "make check"
 # AC_PATH_PROG(FIONA,       [fiona], not found)
 # AC_PATH_PROG(MARLENE,     [marlene], not found)

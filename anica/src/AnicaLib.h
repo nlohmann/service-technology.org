@@ -72,7 +72,11 @@ class AnicaLib
         
         bool isSecure();
     
-        Cudd* getCharacterization(char**, BDD*, std::map<std::string, BDD>&);
+        Cudd* getCharacterization(char**, BDD*, std::map<std::string, BDD*>&);
+        pnapi::PetriNet* getControllerProblem();
+        
+        pnapi::PetriNet* getCurrentNet() const;
+        
         
         const Triple* addCausalPattern(pnapi::PetriNet&, const Triple&);
         const Triple* addConflictPattern(pnapi::PetriNet&, const Triple&);

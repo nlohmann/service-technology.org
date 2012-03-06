@@ -25,7 +25,7 @@ anica::AnicaLib* alib;
 char** cuddVariableNames;
 BDD* cuddOutput;
 Cudd* myBDD;
-std::map<std::string, BDD> cuddVariables;
+std::map<std::string, BDD*> cuddVariables;
 
 const char* levels[] = {"", "LOW", "HIGH"};
 
@@ -242,12 +242,6 @@ void updateAssignment(json_value* json) {
 void updateNonInterference() {
     assert(alib != NULL);
     
-    // delete current BDD structures
-    delete cuddOutput;
-    cuddOutput = NULL;
-    delete myBDD;
-    myBDD = NULL;
-    
     // evaluate non-interference
     if (alib->getHighLabeledTransitionsCount() + alib->getLowLabeledTransitionsCount() == net.getTransitions().size()) {
         // net has only high and low labeled transitions
@@ -272,7 +266,7 @@ void updateNonInterference() {
                     const std::string transitionName = (**t).getName();
                     rep->status("..checking: %s", transitionName.c_str());
                     
-                    BDD curTransitionHigh = cuddVariables[transitionName];
+                    BDD curTransitionHigh = *cuddVariables[transitionName];
                     BDD curResultHigh = !*cuddOutput + curTransitionHigh;    
                     // is high implied?
                     if (curResultHigh == myBDD->bddOne()) {
@@ -283,7 +277,7 @@ void updateNonInterference() {
                     else {
                         // no
                         // is low implied?
-                        BDD curTransitionLow = !cuddVariables[transitionName];
+                        BDD curTransitionLow = !*cuddVariables[transitionName];
                         BDD curResultLow = !*cuddOutput + curTransitionLow;
                         if (curResultLow == myBDD->bddOne()) {
                             rep->status("....LOW");
@@ -292,6 +286,14 @@ void updateNonInterference() {
                     }
                 }
             }
+            
+            // delete current BDD structures
+            delete cuddOutput;
+            cuddOutput = NULL;
+            delete myBDD;
+            myBDD = NULL;
+            cuddVariables.clear();
+            
             // send back all implications (-> new assignment)
             sendAssignment();
         }

@@ -682,7 +682,73 @@ const anica::Triple* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& net, c
     return returnTriple;
 }
 
-Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOutput, std::map<std::string, BDD>& cuddVariables)
+pnapi::PetriNet* anica::AnicaLib::getCurrentNet() const {
+    if (initialNet == NULL) {
+        return NULL;
+    }
+    return new pnapi::PetriNet(*initialNet);
+}
+
+pnapi::PetriNet* anica::AnicaLib::getControllerProblem() {
+    if (initialNet == NULL) {
+        return NULL;
+    }
+    
+    assert(downgradeTransitions.size() == 0);
+    
+    const std::string HIGH = "_high";
+    const std::string LOW = "_low";
+    
+    pnapi::PetriNet* resultNet = new pnapi::PetriNet(*initialNet);
+    
+    newArcs.clear();
+    setRepresantiveNames(true);
+    
+    pnapi::Transition* startTransition = &resultNet->createTransition("tStart");
+    startTransition->addLabel(resultNet->getInterface().addSynchronousLabel("start"));
+    pnapi::Place* preStart = &resultNet->createPlace("preStart", 1);
+    resultNet->getFinalCondition().addProposition(*preStart == 0, true);
+    newArcs.insert(std::make_pair(preStart, startTransition));
+    // update initial marking
+    PNAPI_FOREACH(p, initialNet->getPlaces()) {
+        if ((**p).getTokenCount() > 0) {
+            assert((**p).getTokenCount() == 1);
+            newArcs.insert(std::make_pair(startTransition, resultNet->findNode((**p).getName())));
+            resultNet->findPlace((**p).getName())->setTokenCount(0);
+        }
+    }
+    // controller structure for all transitions
+    PNAPI_FOREACH(t, initialNet->getTransitions()) {
+        switch ((**t).getConfidence()) {
+            case anica::CONFIDENCE_LOW:
+                // low labeled
+                resultNet->createPlace(std::string((**t).getName() + HIGH), 0);
+                resultNet->createPlace(std::string((**t).getName() + LOW), 1);
+                break;
+            case anica::CONFIDENCE_HIGH:
+                // high labeled
+                resultNet->createPlace(std::string((**t).getName() + HIGH), 1);
+                resultNet->createPlace(std::string((**t).getName() + LOW), 0);
+                break;
+            case anica::CONFIDENCE_NONE:
+                // unlabeled transition
+                pnapi::Place* controllerConfigure = &resultNet->createPlace(std::string("configure_" + (**t).getName()), 1);
+                pnapi::Transition* controllerMakeHigh = &resultNet->createTransition(std::string("make_high_" + (**t).getName()));
+                controllerMakeHigh->addLabel(resultNet->getInterface().addSynchronousLabel(std::string("make_" + (**t).getName() + "_high")));
+                newArcs.insert(std::make_pair(&resultNet->createPlace(std::string("activate_make_" + (**t).getName()), 1), controllerMakeHigh));
+                newArcs.insert(std::make_pair(controllerConfigure, controllerMakeHigh));
+                newArcs.insert(std::make_pair(controllerMakeHigh, controllerConfigure));
+                newArcs.insert(std::make_pair(controllerConfigure, startTransition));
+                newArcs.insert(std::make_pair(&resultNet->createPlace(std::string((**t).getName() + LOW), 1), controllerMakeHigh));
+                newArcs.insert(std::make_pair(controllerMakeHigh, &resultNet->createPlace(std::string((**t).getName() + HIGH), 0)));
+                break;
+        }
+    }
+    
+    return resultNet;
+}
+
+Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOutput, std::map<std::string, BDD*>& cuddVariables)
 {
     assert(initialNet != NULL);
     assert(downgradeTransitions.size() == 0);
@@ -695,15 +761,15 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
     *cuddOutput = cuddManager->bddOne();
     size_t i = 0;
     PNAPI_FOREACH(t, initialNet->getTransitions()) {
-        cuddVariables[(**t).getName()] = cuddManager->bddVar();
+        cuddVariables[(**t).getName()] = &cuddManager->bddVar();
         cuddVariableNames[i++] = strdup((**t).getName().c_str());
         // encode given assignments
         switch ((**t).getConfidence()) {
             case anica::CONFIDENCE_HIGH:
-                *cuddOutput *= cuddVariables[(**t).getName()];
+                *cuddOutput *= *cuddVariables[(**t).getName()];
                 break;
             case anica::CONFIDENCE_LOW:
-                *cuddOutput *= !cuddVariables[(**t).getName()];
+                *cuddOutput *= !*cuddVariables[(**t).getName()];
                 break;
             case anica::CONFIDENCE_NONE:
                 break;
@@ -727,7 +793,10 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
                         // potential causal triple
                         const anica::TriplePointer* taskTriple = new anica::TriplePointer((pnapi::Place*)*p, (pnapi::Transition*)*highTransition, (pnapi::Transition*)*lowTransition);
                         if (isActiveCausalTriple(taskTriple)) {
-                            *cuddOutput *= !(cuddVariables[(**highTransition).getName()] * !cuddVariables[(**lowTransition).getName()]);  
+                            //BDD* highBDD = cuddVariables[(**highTransition).getName()];
+                            //BDD* lowBDD = cuddVariables[(**lowTransition).getName()];
+                            //*cuddOutput *= !(*highBDD * !*lowBDD);  
+                            *cuddOutput *= !(*cuddVariables[(**highTransition).getName()] * !*cuddVariables[(**lowTransition).getName()]);
                         }
                         delete taskTriple;
                     }
@@ -747,7 +816,11 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
                         // potential conflict triple
                         const anica::TriplePointer* taskTriple = new anica::TriplePointer((pnapi::Place*)*p, (pnapi::Transition*)*highTransition, (pnapi::Transition*)*lowTransition);
                         if (isActiveConflictTriple(taskTriple)) {
-                            *cuddOutput *= !(cuddVariables[(**highTransition).getName()] * !cuddVariables[(**lowTransition).getName()]);  
+                            //BDD* highBDD = cuddVariables[(**highTransition).getName()];
+                            //BDD* lowBDD = cuddVariables[(**lowTransition).getName()];
+                            //*cuddOutput *= !(*highBDD * !*lowBDD);  
+                            //*cuddOutput *= !(*highBDD * !*lowBDD);
+                            *cuddOutput *= !(*cuddVariables[(**highTransition).getName()] * !*cuddVariables[(**lowTransition).getName()]);  
                         }
                         delete taskTriple;
                     }

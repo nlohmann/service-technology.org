@@ -27,14 +27,6 @@ BDD* cuddOutput;
 Cudd* myBDD;
 std::map<std::string, BDD> cuddVariables;
 
-/*
-typedef enum {
-    CONFIDENCE_NONE = 0,
-    CONFIDENCE_HIGH = 1,
-    CONFIDENCE_LOW  = 2
-} confidence_levels;
-*/
-
 const char* levels[] = {"", "LOW", "HIGH"};
 
 /// the current assignment
@@ -80,6 +72,8 @@ void print_json(json_value* value, int ident = 0) {
 /////////////////////////////////////////////////////////////////////////////
 
 void sendAssignment() {
+    assert(assignment.size() == net.getTransitions().size());
+
     std::string assignment_string = "{\n  \"assignment\": {";
 
     for (std::map<std::string, anica::confidence_e>::iterator it = assignment.begin(); it != assignment.end(); ++it) {
@@ -187,6 +181,12 @@ void updateNet(json_value* json) {
     std::stringstream ss;
     ss << pnapi::io::stat << net;
     rep->status("received net: %s", ss.str().c_str());
+
+
+    // 4. set assignment
+    PNAPI_FOREACH(t, net.getTransitions()) {
+        assignment[(*t)->getName()] = static_cast<anica::confidence_e>((*t)->getConfidence());
+    }
 }
 
 
@@ -227,6 +227,8 @@ void updateAssignment(json_value* json) {
             }
         }
     }
+
+    assert(assignment.size() == net.getTransitions().size());
 
     rep->status("updated assignment");
 }

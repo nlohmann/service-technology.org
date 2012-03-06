@@ -13,6 +13,12 @@ pruner_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\" -I$(top_srcdir)/src
 
 AM_CPPFLAGS = -I$(top_srcdir)/src
 
+# only add the local Petri net API if necessary
+if COMPILE_PNAPI
+pruner_CPPFLAGS += -I$(top_srcdir)/libs
+pruner_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
+endif
+
 GGOFILES = pruner-cmdline.ggo
 BUILT_SOURCES = $(GGOFILES:.ggo=.c)
 EXTRA_DIST = $(GGOFILES)

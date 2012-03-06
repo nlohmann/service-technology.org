@@ -1,8 +1,6 @@
 package org.st.sam.mine;
 
 import java.util.Arrays;
-import com.google.gwt.dev.util.collect.HashMap;
-import com.google.gwt.dev.util.collect.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,18 +9,21 @@ import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.mine.collect.SimpleArrayList;
 
+import com.google.gwt.dev.util.collect.HashMap;
+import com.google.gwt.dev.util.collect.HashSet;
+
 public class MineBranchingTree extends org.st.sam.log.SLogTree {
 
   public MineBranchingTree(SLog log, boolean mergeTraces) {
     super(log, mergeTraces);
   }
   
-  public void continuesWith(SLogTreeNode n, short word[], boolean[] visible, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, boolean[] violators, Set<Short> stuck_at) {
+  public void continuesWith(SLogTreeNode n, short word[], boolean[] visible, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, boolean[] violators, boolean[] stuck_at) {
     SLogTreeNode[] occurrence = new SLogTreeNode[word.length]; 
     continuesWith(n, word, 0, visible, occurrence, occurrences, partialOccurrences, violators, stuck_at);
   }
   
-  public void continuesWith(SLogTreeNode n, short word[], int pos, boolean[] visible, SLogTreeNode[] occurrence, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, boolean[] violators, Set<Short> stuck_at) {
+  public void continuesWith(SLogTreeNode n, short word[], int pos, boolean[] visible, SLogTreeNode[] occurrence, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, boolean[] violators, boolean[] stuck_at) {
     // no more letters to check: word found
     if (n.id == word[pos] && pos == word.length-1) {
       occurrence[pos] = n;
@@ -50,7 +51,7 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
       }
       
       if (stuck_at != null) {
-        stuck_at.add(word[pos]);
+        stuck_at[word[pos]] = true;
       }
       
       return;
@@ -283,14 +284,14 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     return new double[] { (double)coveredNodes_all/totalNodes, (double)coveredNodes_main/totalNodes };
   }
   
-  public SimpleArrayList<SLogTreeNode[]> countOccurrences(short word[], boolean[] violators, Set<Short> stuck_at) {
+  public SimpleArrayList<SLogTreeNode[]> countOccurrences(short word[], boolean[] violators, boolean[] stuck_at) {
     boolean[] visible = new boolean[slog.originalNames.length];
     for (int i=0; i<word.length; i++) visible[word[i]] = true;
     
     return countOccurrences(word, visible, violators, stuck_at);
   }
   
-  public SimpleArrayList<SLogTreeNode[]> countOccurrences(short word[], boolean[] visible, boolean[] violators, Set<Short> stuck_at) {
+  public SimpleArrayList<SLogTreeNode[]> countOccurrences(short word[], boolean[] visible, boolean[] violators, boolean[] stuck_at) {
     SimpleArrayList<SLogTreeNode[]> occurrences = new SimpleArrayList<SLogTreeNode[]>();
     
     for (SLogTreeNode n : nodes) {

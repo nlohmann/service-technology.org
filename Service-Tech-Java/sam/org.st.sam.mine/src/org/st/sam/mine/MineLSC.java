@@ -602,7 +602,7 @@ public class MineLSC {
     if (dot_count > 8000) { System.out.println(". "+words.nodes.size()+" "+toString(largestWord_checked)); dot_count = 0; }
     
     boolean[] violators = new boolean[slog.originalNames.length];
-    Set<Short> stuck_at = null;
+    boolean[] stuck_at = null;
     
     if (showDebug(word, preferedSucc)) {
       log(log_msw, "--- extending "+toString(word)+" with "+newPreferedSucc+"\n");
@@ -631,10 +631,16 @@ public class MineLSC {
         log(log_msw, "next word: "+toString(nextWord));
       }
       
-      Set<Short> stuck_here = new HashSet<Short>();
+      boolean[] stuck_here = new boolean[slog.originalNames.length];
       SimpleArrayList<SLogTreeNode[]> occ = tree.countOccurrences(nextWord, violators, stuck_here);
-      if (stuck_at == null) stuck_at = stuck_here;
-      else stuck_at.retainAll(stuck_here);
+      if (stuck_at == null) {
+        stuck_at = stuck_here;
+      } else {
+        //stuck_at.retainAll(stuck_here);
+        for (int i=0; i<stuck_at.length;i++) {
+          stuck_at[i] = stuck_at[i] && stuck_here[i];
+        }
+      }
       
       int total_occurrences = getTotalOccurrences(occ);
       
@@ -733,7 +739,9 @@ public class MineLSC {
         if (word.length > 1) {
           if (stuck_at != null) {
             // violators.addAll(stuck_at);
-            for (Short e : stuck_at) violators[e.shortValue()] = true;
+            for (int i=0;i<stuck_at.length;i++) {
+              if (stuck_at[i]) violators[i] = true;
+            }
           }
           for (short ignore=0; ignore<violators.length; ignore++) {
             // only consider the events that are violating some occurrence
@@ -741,7 +749,7 @@ public class MineLSC {
             
             
             int v_count = 0;
-            for (Short v : word) {
+            for (short v : word) {
               if (v == ignore) v_count++;
             }
             if (v_count == 0) continue;

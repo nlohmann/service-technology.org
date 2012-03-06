@@ -785,7 +785,13 @@ public class MineLSC {
     if (dot_count > 8000) { System.out.println(". "+words.nodes.size()+" "+toString(largestWord_checked)); dot_count = 0; }
     
     
-    Set<Short> visibleEvents = (config.skipEvents_invisible == false) ? new HashSet<Short>(ev) : null;
+    boolean visibleEvents[];
+    if (config.skipEvents_invisible == false) {
+      visibleEvents = new boolean[slog.originalNames.length];
+      for (int e=0; e<word.length;e++) visibleEvents[word[e]] = true;
+    } else {
+      visibleEvents = null;
+    }
     
     for (Short e : ev) {
       

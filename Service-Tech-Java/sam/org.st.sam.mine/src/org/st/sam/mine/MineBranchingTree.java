@@ -17,12 +17,12 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     super(log, mergeTraces);
   }
   
-  public void continuesWith(SLogTreeNode n, short word[], Set<Short> visible, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, Set<Short> violators, Set<Short> stuck_at) {
+  public void continuesWith(SLogTreeNode n, short word[], boolean[] visible, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, Set<Short> violators, Set<Short> stuck_at) {
     SLogTreeNode[] occurrence = new SLogTreeNode[word.length]; 
     continuesWith(n, word, 0, visible, occurrence, occurrences, partialOccurrences, violators, stuck_at);
   }
   
-  public void continuesWith(SLogTreeNode n, short word[], int pos, Set<Short> visible, SLogTreeNode[] occurrence, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, Set<Short> violators, Set<Short> stuck_at) {
+  public void continuesWith(SLogTreeNode n, short word[], int pos, boolean[] visible, SLogTreeNode[] occurrence, SimpleArrayList<SLogTreeNode[]> occurrences, SimpleArrayList<SLogTreeNode[]> partialOccurrences, Set<Short> violators, Set<Short> stuck_at) {
     // no more letters to check: word found
     if (n.id == word[pos] && pos == word.length-1) {
       occurrence[pos] = n;
@@ -31,7 +31,7 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     }
 
     // this node is labeled with the current letter or with an invisible letter
-    if (n.id == word[pos] || !visible.contains(n.id)) {
+    if (n.id == word[pos] || !visible[n.id]) {
       // find the successors that continues the word
       for (SLogTreeNode n2 : n.post) {
         // if the current node is labeled with the current event, move to the next event
@@ -40,7 +40,7 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
         if (n.id == word[pos]) occurrence[pos] = n;
         continuesWith(n2, word, pos+nextLetter, visible, occurrence, occurrences, partialOccurrences, violators, stuck_at);
       }
-    } else if (visible.contains(n.id)) {
+    } else if (visible[n.id]) {
       // a visible letter, occurring in wrong order -> no continuation
       if (violators != null) {
         if (pos > 0)
@@ -74,7 +74,7 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     }
   }
         
-  public boolean endsWith(SLogTreeNode n, short word[], int pos, Set<Short> visible, SLogTreeNode[] occurrence) {
+  public boolean endsWith(SLogTreeNode n, short word[], int pos, boolean[] visible, SLogTreeNode[] occurrence) {
     // no more letters to check: word found
     if (n.id == word[pos] && pos == 0) {
       occurrence[pos] = n;
@@ -82,7 +82,7 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     }
 
     // this node is labeled with the current letter or with an invisible letter
-    if (n.id == word[pos] || !visible.contains(n.id)) {
+    if (n.id == word[pos] || !visible[n.id]) {
       // find the predecessors that continues the word
       SLogTreeNode n2 = n.pre;
       if (n2 == null) {
@@ -134,9 +134,9 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     int mainMatch_neg = 0;
     int mainMatch_weak_neg = 0;
     
-    Set<Short> visible = new HashSet<Short>();
-    for (short e : s.pre) visible.add(e);
-    for (short e : s.main) visible.add(e);
+    boolean visible[] = new boolean[slog.originalNames.length];
+    for (int e=0; e<s.pre.length;e++) visible[s.pre[e]] = true;
+    for (int e=0; e<s.main.length;e++) visible[s.main[e]] = true;
     
     for (SLogTreeNode n : nodes) {
       if (n.id == s.pre[s.pre.length-1]) {
@@ -284,12 +284,13 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
   }
   
   public SimpleArrayList<SLogTreeNode[]> countOccurrences(short word[], Set<Short> violators, Set<Short> stuck_at) {
-    Set<Short> visible = new HashSet<Short>();
-    for (short e : word) visible.add(e);
+    boolean[] visible = new boolean[slog.originalNames.length];
+    for (int i=0; i<word.length; i++) visible[word[i]] = true;
+    
     return countOccurrences(word, visible, violators, stuck_at);
   }
   
-  public SimpleArrayList<SLogTreeNode[]> countOccurrences(short word[], Set<Short> visible, Set<Short> violators, Set<Short> stuck_at) {
+  public SimpleArrayList<SLogTreeNode[]> countOccurrences(short word[], boolean[] visible, Set<Short> violators, Set<Short> stuck_at) {
     SimpleArrayList<SLogTreeNode[]> occurrences = new SimpleArrayList<SLogTreeNode[]>();
     
     for (SLogTreeNode n : nodes) {

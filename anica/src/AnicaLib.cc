@@ -34,10 +34,8 @@ anica::AnicaLib::AnicaLib()
     lolaWitnessPath(false),
     lolaVerbose(false),
     propertyToCheck(anica::PROPERTY_PBNIPLUS),
-    unassignedTransitionsCount(0),
     highLabeledTransitionsCount(0),
     lowLabeledTransitionsCount(0),
-    downLabeledTransitionsCount(0),
     potentialCausalPlacesCount(0),
     potentialConflictPlacesCount(0),
     activeCausalPlacesCount(0),
@@ -75,7 +73,7 @@ anica::AnicaLib::~AnicaLib()
 const size_t anica::AnicaLib::getUnassignedTransitionsCount() const {
     assert(initialNet != NULL);
     
-    return unassignedTransitionsCount;
+    return unassignedTransitions.size();
 }
 
 const size_t anica::AnicaLib::getHighLabeledTransitionsCount() const {
@@ -93,7 +91,7 @@ const size_t anica::AnicaLib::getLowLabeledTransitionsCount() const {
 const size_t anica::AnicaLib::getDownLabeledTransitionsCount() const {
     assert(initialNet != NULL);
     
-    return downLabeledTransitionsCount;
+    return downgradeTransitions.size();
 }
 
 void anica::AnicaLib::setProperty(property_e property)
@@ -158,7 +156,6 @@ void anica::AnicaLib::setTransitionAssignment(pnapi::Transition* t, confidence_e
     
     switch (t->getConfidence()) {
         case anica::CONFIDENCE_NONE:
-            unassignedTransitionsCount--;
             unassignedTransitions.erase(const_cast<pnapi::Transition*>(t));
 	        break;
 	    case anica::CONFIDENCE_LOW:
@@ -168,7 +165,6 @@ void anica::AnicaLib::setTransitionAssignment(pnapi::Transition* t, confidence_e
 	        highLabeledTransitionsCount--;
 	        break;
 	    case anica::CONFIDENCE_DOWN:
-	        downLabeledTransitionsCount--;
 	        downgradeTransitions.erase(const_cast<pnapi::Transition*>(t));
 	        break;
 	    default:
@@ -179,7 +175,6 @@ void anica::AnicaLib::setTransitionAssignment(pnapi::Transition* t, confidence_e
 	t->setConfidence(c);
 	switch (c) {
         case anica::CONFIDENCE_NONE:
-            unassignedTransitionsCount++;
             unassignedTransitions.insert(const_cast<pnapi::Transition*>(t));
 	        break;
 	    case anica::CONFIDENCE_LOW:
@@ -189,7 +184,6 @@ void anica::AnicaLib::setTransitionAssignment(pnapi::Transition* t, confidence_e
 	        highLabeledTransitionsCount++;
 	        break;
 	    case anica::CONFIDENCE_DOWN:
-	        downLabeledTransitionsCount++;
 	        downgradeTransitions.insert(const_cast<pnapi::Transition*>(t));
 	}
 }
@@ -397,8 +391,6 @@ void anica::AnicaLib::initialize()
     newArcs.clear();
     downgradeTransitions.clear();
     unassignedTransitions.clear();
-    downLabeledTransitionsCount = 0;
-    unassignedTransitionsCount = 0;
     lowLabeledTransitionsCount = 0;
     highLabeledTransitionsCount = 0;
     potentialCausalPlacesCount = 0;
@@ -409,7 +401,6 @@ void anica::AnicaLib::initialize()
     PNAPI_FOREACH(t, initialNet->getTransitions()) {
         switch ((**t).getConfidence()) {
 		    case anica::CONFIDENCE_NONE:
-                unassignedTransitionsCount++;
                 unassignedTransitions.insert(*t);
 		        break;
 		    case anica::CONFIDENCE_LOW:
@@ -419,7 +410,6 @@ void anica::AnicaLib::initialize()
 		        highLabeledTransitionsCount++;
 		        break;
 		    case anica::CONFIDENCE_DOWN:
-		        downLabeledTransitionsCount++;
 		        downgradeTransitions.insert(*t);
 		        break;
 		    default:
@@ -600,7 +590,7 @@ bool anica::AnicaLib::isSecure()
     assert(initialNet != NULL);
     assert(lolaPath != "");
     
-    assert(unassignedTransitionsCount == 0);
+    assert(unassignedTransitions.size() == 0);
     
     const size_t transitionsCount = initialNet->getTransitions().size();
     if (highLabeledTransitionsCount == transitionsCount) {
@@ -622,15 +612,14 @@ bool anica::AnicaLib::isSecure()
     return true;
 }
 
-bool anica::AnicaLib::isActiveCausalTriple(const anica::Triple* triple)
+bool anica::AnicaLib::isActiveCausalTriple(const anica::Triple& triple)
 {
-    assert(triple != NULL);
     assert(initialNet != NULL);
-    assert(triple->place != "");
-    assert(triple->high != "");
-    assert(triple->low != "");
+    assert(triple.place != "");
+    assert(triple.high != "");
+    assert(triple.low != "");
     
-    const anica::TriplePointer* taskTriple = new anica::TriplePointer(initialNet->findPlace(triple->place), initialNet->findTransition(triple->high), initialNet->findTransition(triple->low));
+    const anica::TriplePointer* taskTriple = new anica::TriplePointer(initialNet->findPlace(triple.place), initialNet->findTransition(triple.high), initialNet->findTransition(triple.low));
  
     const bool ret = isActiveCausalTriple(taskTriple);   
     delete taskTriple;
@@ -638,15 +627,14 @@ bool anica::AnicaLib::isActiveCausalTriple(const anica::Triple* triple)
     return ret;
 }
 
-bool anica::AnicaLib::isActiveConflictTriple(const anica::Triple* triple)
+bool anica::AnicaLib::isActiveConflictTriple(const anica::Triple& triple)
 {
-    assert(triple != NULL);
     assert(initialNet != NULL);
-    assert(triple->place != "");
-    assert(triple->high != "");
-    assert(triple->low != "");
+    assert(triple.place != "");
+    assert(triple.high != "");
+    assert(triple.low != "");
     
-    const anica::TriplePointer* taskTriple = new anica::TriplePointer(initialNet->findPlace(triple->place), initialNet->findTransition(triple->high), initialNet->findTransition(triple->low));
+    const anica::TriplePointer* taskTriple = new anica::TriplePointer(initialNet->findPlace(triple.place), initialNet->findTransition(triple.high), initialNet->findTransition(triple.low));
  
     const bool ret = isActiveConflictTriple(taskTriple);   
     delete taskTriple;
@@ -654,16 +642,15 @@ bool anica::AnicaLib::isActiveConflictTriple(const anica::Triple* triple)
     return ret;
 }
 
-const anica::Triple* anica::AnicaLib::addCausalPattern(pnapi::PetriNet& net, const Triple* triple)
+const anica::Triple* anica::AnicaLib::addCausalPattern(pnapi::PetriNet& net, const Triple& triple)
 {
     assert(initialNet != NULL);
-    assert(triple != NULL);
-    assert(triple->place != "");
-    assert(triple->high != "");
-    assert(triple->low != "");
+    assert(triple.place != "");
+    assert(triple.high != "");
+    assert(triple.low != "");
     
     newArcs.clear();
-    const anica::TriplePointer* taskTriple = new anica::TriplePointer(net.findPlace(triple->place), net.findTransition(triple->high), net.findTransition(triple->low));
+    const anica::TriplePointer* taskTriple = new anica::TriplePointer(net.findPlace(triple.place), net.findTransition(triple.high), net.findTransition(triple.low));
     const anica::TriplePointer* resultTriple = addCausalPattern(net, taskTriple, true);
     
     delete taskTriple;
@@ -673,16 +660,15 @@ const anica::Triple* anica::AnicaLib::addCausalPattern(pnapi::PetriNet& net, con
     return returnTriple;
 }
 
-const anica::Triple* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& net, const Triple* triple)
+const anica::Triple* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& net, const Triple& triple)
 {
     assert(initialNet != NULL);
-    assert(triple != NULL);
-    assert(triple->place != "");
-    assert(triple->high != "");
-    assert(triple->low != "");
+    assert(triple.place != "");
+    assert(triple.high != "");
+    assert(triple.low != "");
     
     newArcs.clear();
-    const anica::TriplePointer* taskTriple = new anica::TriplePointer(net.findPlace(triple->place), net.findTransition(triple->high), net.findTransition(triple->low));
+    const anica::TriplePointer* taskTriple = new anica::TriplePointer(net.findPlace(triple.place), net.findTransition(triple.high), net.findTransition(triple.low));
     const anica::TriplePointer* resultTriple = addConflictPattern(net, taskTriple, true);
     
     delete taskTriple;
@@ -695,7 +681,7 @@ const anica::Triple* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& net, c
 Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOutput, std::map<std::string, BDD>& cuddVariables)
 {
     assert(initialNet != NULL);
-    assert(downLabeledTransitionsCount == 0);
+    assert(downgradeTransitions.size() == 0);
     
     Cudd* cuddManager = new Cudd();
     //std::map<std::string, BDD> cuddVariables;
@@ -707,6 +693,7 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
     PNAPI_FOREACH(t, initialNet->getTransitions()) {
         cuddVariables[(**t).getName()] = cuddManager->bddVar();
         cuddVariableNames[i++] = strdup((**t).getName().c_str());
+        // encode given assignments
         switch ((**t).getConfidence()) {
             case anica::CONFIDENCE_HIGH:
                 *cuddOutput *= cuddVariables[(**t).getName()];

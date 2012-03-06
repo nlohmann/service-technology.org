@@ -67,15 +67,15 @@ class AnicaLib
         bool isPotentialConflictPlace(const std::string&) const;
         bool isActiveCausalPlace(const std::string&);
         bool isActiveConflictPlace(const std::string&);
-        bool isActiveCausalTriple(const Triple*);
-        bool isActiveConflictTriple(const Triple*);
+        bool isActiveCausalTriple(const Triple&);
+        bool isActiveConflictTriple(const Triple&);
         
         bool isSecure();
     
         Cudd* getCharacterization(char**, BDD*, std::map<std::string, BDD>&);
         
-        const Triple* addCausalPattern(pnapi::PetriNet&, const Triple*);
-        const Triple* addConflictPattern(pnapi::PetriNet&, const Triple*);
+        const Triple* addCausalPattern(pnapi::PetriNet&, const Triple&);
+        const Triple* addConflictPattern(pnapi::PetriNet&, const Triple&);
         
         void setProperty(property_e);
         const int getProperty() const;
@@ -123,11 +123,8 @@ class AnicaLib
         std::set<pnapi::Transition*> downgradeTransitions;
         std::set<pnapi::Transition*> unassignedTransitions;
         
-        size_t unassignedTransitionsCount;
         size_t highLabeledTransitionsCount;
         size_t lowLabeledTransitionsCount;
-        // kann entfernt werden (da == downgradeTransitions.size())
-        size_t downLabeledTransitionsCount;
         size_t potentialCausalPlacesCount;
         size_t potentialConflictPlacesCount;
         size_t activeCausalPlacesCount;

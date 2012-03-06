@@ -79,13 +79,14 @@ public class RunExperimentTrigger extends RunExperimentCompare {
     //minerLinear.mineLSCs(dataSet, support, confidence, density);
     minerLinear.mineLSCs(logFile, minSupportThreshold, confidence);
     
-    originalScenarios = new HashMap<LSC, SScenario>();
+    originalScenarios_branch = new HashMap<LSC, SScenario>();
+    originalScenarios_linear = new HashMap<LSC, SScenario>();
     for (LSC l : minerBranch.getScenarios().keySet()) {
-      originalScenarios.put(l, minerBranch.getScenarios().get(l));
+      originalScenarios_branch.put(l, minerBranch.getScenarios().get(l));
     }
     for (LSC l : minerLinear.getScenarios().keySet()) {
-      originalScenarios.put(l, minerLinear.getScenarios().get(l));
-    }  
+      originalScenarios_linear.put(l, minerLinear.getScenarios().get(l));
+    }
   }
   
   @Override
@@ -107,7 +108,8 @@ public class RunExperimentTrigger extends RunExperimentCompare {
     
     RunExperimentTrigger exp = new RunExperimentTrigger();
     //if (!exp.readCommandLine(args)) return;
-    exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 22 /*supp*/, 1.0 /* conf */);
+    //exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 22 /*supp*/, 1.0 /* conf */);
+    exp.setParameters("./experiments/columba_v3/", "columba_v3_resampled_agg_filtered3c.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
     //exp.triggers = new LinkedList<short[]>();
     //exp.triggers.add(new short[] { 35 });
     exp.experiment();

@@ -134,16 +134,18 @@ public class SScenario {
   
   
   public boolean implies(SScenario other) {
-    short[] w1 = this.getWord();
-    short[] w2 = other.getWord();
+    short[] this_word = this.getWord();
+    short[] other_word = other.getWord();
     
-    if (!isSubSequence(other.pre, this.pre) && isSubSequence(w2, w1)) {
+    if (   isSubSequence(this.pre, other.pre) && isSubSequence(other_word, this_word)
+        || isSubSequence(other_word, this.main) && !isSubSequence(other.pre, this.pre) 
+           /* no match on pre-chart but completely contained in main */) {
       return true;
     } else {
       return false;
     }
   }
-
+    
   public static boolean isSubSequence(short[] thisChart, short[] otherChart) {
     
     int o = 0;

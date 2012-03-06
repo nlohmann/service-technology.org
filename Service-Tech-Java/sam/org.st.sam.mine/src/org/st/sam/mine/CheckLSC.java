@@ -168,7 +168,8 @@ public class CheckLSC {
   public static void main(String args[]) throws Exception {
     if (args.length != 2) {
       System.out.println("error, wrong number of arguments");
-      System.out.println("usage: java "+MineLSC.class.getCanonicalName()+" <logfile.xes>");
+      System.out.println("usage: java "+MineLSC.class.getCanonicalName()+" <logfile.xes> <chart>");
+      System.out.println("    <chart>  1,2,3---4,5,6,7");
       return;
     }
     

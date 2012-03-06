@@ -86,6 +86,10 @@ public class ResampleLog {
     return s.toString();
   }
   
+  /**
+   * resample the log to start a new trace on the given event
+   * @return
+   */
   public XLog resample() {
     
     XLog newLog = xlogFactory.createLog();

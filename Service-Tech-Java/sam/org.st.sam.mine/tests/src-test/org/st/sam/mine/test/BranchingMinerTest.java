@@ -89,7 +89,7 @@ public class BranchingMinerTest extends TestSuite {
 	  short[] main1 = new short[] { 16, 17, 18, 19, 20, 30, 31, 32, 35, 36, 42, 43, 44, 57, 58, 59, 60, 61, 62, 13, 14 };
 	  
 	  short[] pre2 = new short[] { 19 };
-    short[] main2 = new short[] { 20, 30, 31, 32, 35, 36, 42, 43, 44, 57, 58, 59, 60, 61, 62, 13, 14 };
+    short[] main2 = new short[] {                 20, 30, 31, 32, 35, 36, 42, 43, 44, 57, 58, 59, 60, 61, 62, 13, 14 };
     
     SScenario s1 = new SScenario(pre1, main1);
     SScenario s2 = new SScenario(pre2, main2);

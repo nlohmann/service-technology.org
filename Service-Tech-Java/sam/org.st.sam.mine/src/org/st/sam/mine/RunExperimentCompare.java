@@ -49,9 +49,12 @@ public class RunExperimentCompare {
   public RunExperimentCompare() throws IOException {
     props = new Properties();
     props.load(new FileInputStream("sam_mine.properties"));
+    
+    String os = System.getProperty("os.name");
+    String bin_ext = (os.startsWith("Windows")) ? ".exe" : "";
 
-    dotRenderer = props.getProperty("sam.dot");
-    mscRenderer = props.getProperty("sam.mscgen");
+    dotRenderer = props.getProperty("sam.dot") + bin_ext;
+    mscRenderer = props.getProperty("sam.mscgen") + bin_ext;
   }
   
   public RunExperimentCompare(String dotBinary, String mscGenBinary) throws IOException {
@@ -158,7 +161,8 @@ public class RunExperimentCompare {
   
   protected MineLSC minerBranch = null;
   protected MineLSC minerLinear = null;
-  protected Map<LSC, SScenario> originalScenarios;
+  protected Map<LSC, SScenario> originalScenarios_linear;
+  protected Map<LSC, SScenario> originalScenarios_branch;
   
   private long runTime_minerBranch;
   
@@ -186,13 +190,14 @@ public class RunExperimentCompare {
     //minerLinear.mineLSCs(dataSet, support, confidence, density);
     minerLinear.mineLSCs(xlog, minSupportThreshold, confidence, logFile);
     
-    originalScenarios = new HashMap<LSC, SScenario>();
+    originalScenarios_branch = new HashMap<LSC, SScenario>();
+    originalScenarios_linear = new HashMap<LSC, SScenario>();
     // comment out the following loop to consider only linear mining results
     for (LSC l : minerBranch.getScenarios().keySet()) {
-      originalScenarios.put(l, minerBranch.getScenarios().get(l));
+      originalScenarios_branch.put(l, minerBranch.getScenarios().get(l));
     }
     for (LSC l : minerLinear.getScenarios().keySet()) {
-      originalScenarios.put(l, minerLinear.getScenarios().get(l));
+      originalScenarios_linear.put(l, minerLinear.getScenarios().get(l));
     }
   }
 
@@ -216,7 +221,11 @@ public class RunExperimentCompare {
         }
       }
       if (!is_linear) onlyBranching.add(b);
-      else both.add(b);
+      else {
+        both.add(b);
+        originalScenarios_branch.put(b, minerBranch.getScenarios().get(b));
+        originalScenarios_linear.put(b, minerBranch.getScenarios().get(b));
+      }
     }
     
     onlyLinear = new ArrayList<LSC>(); 
@@ -412,8 +421,10 @@ public class RunExperimentCompare {
     minerBranch.getCoverageTreeGlobal();
     minerLinear.getCoverageTreeGlobal();
     
-    r.append("tree coverage (branch): "+minerBranch.getTree().getCoverage()+"<br/>\n");
-    r.append("tree coverage (linear): "+minerLinear.getTree().getCoverage()+"<br/>\n");
+    double[] coverage_branch = minerBranch.getTree().getCoverage();
+    double[] coverage_linear = minerLinear.getTree().getCoverage();
+    r.append("tree coverage (branch), main chart events/all chart events: "+coverage_branch[1]+"/"+coverage_branch[0]+"<br/>\n");
+    r.append("tree coverage (linear), main chart events/all chart events: "+coverage_linear[1]+"/"+coverage_linear[0]+"<br/>\n");
     
     Set<Short> coveredEvents_branch = new HashSet<Short>();
     for (SScenario s : minerBranch.getScenarios().values()) {
@@ -436,9 +447,9 @@ public class RunExperimentCompare {
     
     r.append("<br/>\n");
     r.append("supported words: "+minerBranch.number_of_candidate_words+"<br/>\n");
-    r.append("time to find supported words: "+(minerBranch.time_end_candiate_words-minerBranch.time_start_candiate_words)+"ms</br>");
-    r.append("time to find branching scenarios: "+(minerBranch.time_end_scenario_discovery-minerBranch.time_start_scenario_discovery)+"ms<br/>");
-    r.append("time to find linear scenarios   : "+(minerLinear.time_end_scenario_discovery-minerLinear.time_start_scenario_discovery)+"ms<br/>");
+    r.append("time to find supported words: "+(minerBranch.time_candiate_words)+"ms</br>");
+    r.append("time to find branching scenarios: "+(minerBranch.time_scenario_discovery)+"ms<br/>");
+    r.append("time to find linear scenarios   : "+(minerLinear.time_scenario_discovery)+"ms<br/>");
     
     r.append("<br/>\n");
     r.append("<b>strictly branching scenarios</b><br/>\n");
@@ -449,7 +460,7 @@ public class RunExperimentCompare {
    
     r.append("<br/>\n");
     r.append("<b>linear and branching scenarios</b><br/>\n");
-    r.append("found "+both.size()+" linear and branching scenarios<br/>\n");
+    r.append("found "+(both.size()+onlyLinear.size())+" linear and branching scenarios<br/>\n");
     r.append("length pre-chart (min/avg/max): "+stat_both[0].preChartLength+"/"+stat_both[1].preChartLength+"/"+stat_both[2].preChartLength+"<br/>\n");
     r.append("length main-chart (min/avg/max): "+stat_both[0].mainChartLength+"/"+stat_both[1].mainChartLength+"/"+stat_both[2].mainChartLength+"<br/>\n");
     r.append("#components (min/avg/max): "+stat_both[0].components+"/"+stat_both[1].components+"/"+stat_both[2].components+"<br/>\n");
@@ -484,9 +495,9 @@ public class RunExperimentCompare {
     SAMOutput.writeToFile(minerBranch.getLSCs().toString(), resultsDir+"/lscs_branching.txt");
     
     System.out.println("finished.");
-    System.out.println("discovering candidate words    : "+(minerBranch.time_end_candiate_words-minerBranch.time_start_candiate_words)+"ms");
-    System.out.println("discovering branching scenarios: "+(minerBranch.time_end_scenario_discovery-minerBranch.time_start_scenario_discovery)+"ms");
-    System.out.println("discovering linear scenarios   : "+(minerLinear.time_end_scenario_discovery-minerLinear.time_start_scenario_discovery)+"ms");
+    System.out.println("discovering candidate words    : "+(minerBranch.time_candiate_words)+"ms");
+    System.out.println("discovering branching scenarios: "+(minerBranch.time_scenario_discovery)+"ms");
+    System.out.println("discovering linear scenarios   : "+(minerLinear.time_scenario_discovery)+"ms");
 
     
     minerBranch.getTree().clearCoverageMarking();
@@ -497,7 +508,7 @@ public class RunExperimentCompare {
     String stat_summary = inputFile+";"+xlog.size()+";"+minSupportThreshold+";"+confidence+";"
         +stat.alphabetSize+";"+stat.averageOutDegree+";"+stat.maxOutDegree+";"+stat.depth+";"+stat.width+";"
         +minerBranch.getTree().getCoverage()+";"+minerLinear.getTree().getCoverage()+";"+coveredAlphabet_branch+";"+coveredAlphabet_linear+";"
-        +onlyBranching.size()+";"+both.size()+";"
+        +onlyBranching.size()+";"+(both.size()+onlyLinear.size())+";"
         +stat_branch_only[0].preChartLength+";"+stat_branch_only[1].preChartLength+";"+stat_branch_only[2].preChartLength+";"
         +stat_branch_only[0].mainChartLength+";"+stat_branch_only[1].mainChartLength+";"+stat_branch_only[2].mainChartLength+";"
         +stat_branch_only[0].components+";"+stat_branch_only[1].components+";"+stat_branch_only[2].components+";"
@@ -564,15 +575,15 @@ public class RunExperimentCompare {
     
     for (LSC l : both) {
       if (pre_chart_comp.compare(l.getPreChart(), preChart) == 0
-          && !isSubsumed(l, minerBranch, originalScenarios))
+          && !isSubsumed(originalScenarios_branch.get(l), minerLinear, originalScenarios_linear))
       {
         both_match.add(l);
-        System.out.println(originalScenarios.get(l));
+        System.out.println(originalScenarios_branch.get(l));
       }
     }
     for (LSC l : onlyLinear) {
       if (pre_chart_comp.compare(l.getPreChart(), preChart) == 0
-          && !isSubsumed(l, minerBranch, originalScenarios))
+          && !isSubsumed(originalScenarios_linear.get(l),  minerLinear, originalScenarios_linear))
       {
         //linear_match.add(l);
         // strictly linear scenarios (not discovered by branching miner)
@@ -583,7 +594,7 @@ public class RunExperimentCompare {
     }
     for (LSC l : onlyBranching) {
       if (pre_chart_comp.compare(l.getPreChart(), preChart) == 0
-          && !isSubsumed(l, minerBranch, originalScenarios))
+          && !isSubsumed(originalScenarios_branch.get(l), minerBranch, originalScenarios_branch))
       {
         branching_match.add(l);
       }
@@ -594,13 +605,13 @@ public class RunExperimentCompare {
     r.append("<h2>"+title+"</h2>\n");
     if (branching_match.size() > 0) {
       r.append("<b>"+branching_match.size()+" strictly branching LSC</b></br>");
-      appendResults(r, branching_match, resultsDir, treeFigHeight, render_trees,
+      appendResults(r, branching_match, minerBranch, originalScenarios_branch, resultsDir, treeFigHeight, render_trees,
           "strictly branching LSC",
           "lsc_branch");
     }
     if (both_match.size() > 0) {
       r.append("<b>"+both_match.size()+" linear and branching LSC</b></br>");
-      appendResults(r, both_match, resultsDir, treeFigHeight, render_trees,
+      appendResults(r, both_match, minerLinear, originalScenarios_linear,resultsDir, treeFigHeight, render_trees,
           "linear and branching LSC",
           "lsc_both");
     }
@@ -614,6 +625,8 @@ public class RunExperimentCompare {
   protected void appendResults(
       StringBuilder r,
       ArrayList<LSC> lscs,
+      MineLSC miner_for_subsumption,
+      Map<LSC, SScenario> originalScenarios,
       final String resultsDir,
       int treeFigHeight,
        boolean render_trees,
@@ -629,7 +642,7 @@ public class RunExperimentCompare {
     
     ArrayList<LSC> nonSubsumed = new ArrayList<LSC>();
     for (LSC l : lscs) {
-      if (!isSubsumed(l, minerBranch, originalScenarios)) {
+      if (!isSubsumed(originalScenarios.get(l), miner_for_subsumption, originalScenarios)) {
         nonSubsumed.add(l);
       }
     }
@@ -687,6 +700,9 @@ public class RunExperimentCompare {
           r.append("support: "+l.getSupport()+"<br/>\n");
           r.append("scenario: "+originalScenarios.get(l).toString().replace('>', '-')+"<br/>\n");
           
+          if (isSubsumed(originalScenarios.get(l), minerBranch, originalScenarios_branch))
+            r.append("subsumed by branching scenario<br/>\n");
+          
           List<SLogTreeNode[]> occ = minerBranch.getTree().countOccurrences(originalScenarios.get(l).getWord(), null, null);
           int total_occurrences = minerBranch.getTotalOccurrences(occ);
           //r.append("support (re-compute) "+total_occurrences+"/"+occ.size()+"<br/>\n");
@@ -729,121 +745,22 @@ public class RunExperimentCompare {
 
   }
   
-  private boolean isSubsumed(LSC l, MineLSC minerBranch, Map<LSC, SScenario> originalScenarios) {
+  private boolean isSubsumed(SScenario s2, MineLSC minerBranch, Map<LSC, SScenario> originalScenarios) {
     boolean subsumed = false;
     for (SScenario s : originalScenarios.values()) {
-      if (originalScenarios.get(l) == s) continue;
-      if (originalScenarios.get(l).weakerThan(s) && !s.weakerThan(originalScenarios.get(l))) {
-        //r.append("<b>scenario "+originalScenarios.get(l).toString().replace('>', '-')+" is subsumed by "+s.toString().replace('>', '-')+"</b><br/>\n");
+      if (s2 == s) continue;
+      if (s2.weakerThan(s) && !s.weakerThan(s2)) {
+        System.out.println("<b>scenario "+s2.toString().replace('>', '-')+" is subsumed by "+s.toString().replace('>', '-')+"</b><br/>\n");
         subsumed = true;
         continue;
       }
-      if (minerBranch.implies(s, originalScenarios.get(l)) && !minerBranch.implies(originalScenarios.get(l), s)) {
-        //r.append("<b>scenario "+originalScenarios.get(l).toString().replace('>', '-')+" is implied by "+s.toString().replace('>', '-')+"</b><br/>\n");
+      if (minerBranch.implies(s, s2) && !minerBranch.implies(s2, s)) {
+        System.out.println("<b>scenario "+s2.toString().replace('>', '-')+" is implied by "+s.toString().replace('>', '-')+"</b><br/>\n");
         subsumed = true;
         continue;
       }
     }
     return subsumed;
-  }
-
-  private void writeResultsSection(StringBuilder r, ArrayList<LSC> lscs, final String resultsDir, int treeFigHeight,
-                                   MineLSC minerBranch, Map<LSC, SScenario> originalScenarios, boolean render_trees,
-                                   String title, String ref_prefix) throws IOException {
-    
-    if (minerBranch == null) render_trees = false;
-    
-    r.append("<h2>"+title+"</h2>\n");
-    
-    r.append("found "+lscs.size()+" LSCs<br/>\n");
-    for (int i=0; i<lscs.size(); i++) {
-      r.append("<a href='#"+ref_prefix+"_"+(i+1)+"'>["+(i+1)+"]</a> ");
-      if (((i+1) % 20) == 0) r.append("<br/>\n");
-    }
-    r.append("<br/>\n");
-    
-    String output_tree_dot = inputFile+"_cov.dot";
-    String output_tree_svg = inputFile+"_cov.svg";
-    String output_tree_png = inputFile+"_cov.png";
-    
-    SAMOutput.writeToFile(minerBranch.getCoverageTreeGlobal(), resultsDir+SLASH+output_tree_dot);
-    systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+output_tree_dot+" -o"+resultsDir+SLASH+output_tree_svg);
-    systemCall(dotRenderer+" -Tpng -Gsize=30 "+resultsDir+SLASH+output_tree_dot+" -o"+resultsDir+SLASH+output_tree_png);
-    
-    //r.append("<object style='height: 300px' data='"+output_tree_svg+"' type='image/svg+xml'></object><br/>\n");
-    r.append("<a href='"+output_tree_svg+"'><img style='height: "+treeFigHeight+"px' src='"+output_tree_png+"'/></a><br/>\n");
-    r.append("<hr />");
-
-    
-    StringBuilder found_lscs = new StringBuilder();
-    
-    for (int i=0; i<lscs.size(); i++) {
-      
-      LSC l = lscs.get(i);
-      
-      found_lscs.append(l.toString());
-      found_lscs.append("\n");
-
-      String lsc_string = SAMOutput.toMSCRenderer("LSC "+(i+1)+" conf="+l.getConfidence()+" supp="+l.getSupport(), l);
-      final String lsc_resultfile = "lsc_"+(i+1)+"_"+ref_prefix+".lsc.txt";
-      final String lsc_renderfile = "lsc_"+(i+1)+"_"+ref_prefix+".lsc.svg";
-      SAMOutput.writeToFile(lsc_string, resultsDir+SLASH+lsc_resultfile);
-      
-      //Thread t = new Thread() {
-      //  public void run() {
-          systemCall(mscRenderer+" -Tsvg -i"+resultsDir+SLASH+lsc_resultfile+" -o "+resultsDir+SLASH+lsc_renderfile);
-      //  };
-      //};
-      //t.start();
-      //runningThreads.add(t);
-
-      r.append("<a name='"+ref_prefix+"_"+(i+1)+"'/>\n");
-      r.append("<h2>LSC "+(i+1)+"</h2>\n");
-      r.append("confidence: "+l.getConfidence()+"<br/>\n");
-      r.append("support: "+l.getSupport()+"<br/>\n");
-      r.append("scenario: "+originalScenarios.get(l).toString().replace('>', '-')+"<br/>\n");
-      
-      List<SLogTreeNode[]> occ = minerBranch.getTree().countOccurrences(originalScenarios.get(l).getWord(), null, null);
-      int total_occurrences = minerBranch.getTotalOccurrences(occ);
-      r.append("support (re-compute) "+total_occurrences+"/"+occ.size()+"<br/>\n");
-      r.append("confidence (re-compute) "+minerBranch.getTree().confidence(originalScenarios.get(l), false)+"<br/>\n");
-      
-      if (isSubsumed(l, minerBranch, originalScenarios)) {
-        r.append("<i>subsumed</i><br/>\n");
-        continue;
-      }
-      
-      r.append("<object data='"+lsc_renderfile+"' type='image/svg+xml'></object><br/>\n");
-      
-      if (render_trees) {
-        if (originalScenarios.containsKey(l)) {
-          String ct_string = minerBranch.getCoverageTreeFor(originalScenarios.get(l));
-          final String ct_dotfile = "tree_cov_"+ref_prefix+"_"+(i+1)+".dot";
-          final String ct_svgfile = "tree_cov_"+ref_prefix+"_"+(i+1)+".svg";
-          final String ct_pngfile = "tree_cov_"+ref_prefix+"_"+(i+1)+".png";
-          SAMOutput.writeToFile(ct_string, resultsDir+SLASH+ct_dotfile);
-          
-          //Thread t2 = new Thread() {
-          //  public void run() {
-              systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+ct_dotfile+" -o"+resultsDir+SLASH+ct_svgfile);
-              systemCall(dotRenderer+" -Tpng -Gsize=30 "+resultsDir+SLASH+ct_dotfile+" -o"+resultsDir+SLASH+ct_pngfile);
-          //  };
-          //};
-          //t2.start();
-          //runningThreads.add(t2);
-          
-          //r.append("<object style='height: 300px' data='"+ct_svgfile+"' type='image/svg+xml'></object><br/>\n");
-          r.append("<a href='"+ct_svgfile+"'><img style='height: "+treeFigHeight+"px' src='"+ct_pngfile+"'/></a><br/>\n");
-        } else {
-          r.append("<i>coverage tree could not be rendered</i><br/>\n");
-        }
-      } else {
-        r.append("<i>scenario coverage tree not shown due to size</i><br/>\n");
-      }
-      
-      r.append("<a href='#general'>top</a><br/>\n");
-      r.append("<hr/>\n");
-    }    
   }
 
   private String experimentFileRoot;
@@ -968,7 +885,7 @@ public class RunExperimentCompare {
   public static void main(String[] args) throws IOException {
     
     RunExperimentCompare exp = new RunExperimentCompare();
-    if (!exp.readCommandLine(args)) return;
+    //if (!exp.readCommandLine(args)) return;
     
     //exp.experimentFileRoot = "./experiments/columba_ext/";
     //exp.inputFile = "columba_ext_resampled2_filtered.xes.gz";
@@ -983,7 +900,10 @@ public class RunExperimentCompare {
 //    exp.support = 4;
     
     //exp.setParameters("./experiments/p_Afschriften/", "Afschriften_agg.xes.gz", 1.0 /*fract*/, 1 /*supp*/, 1.0 /* conf */);
-    //exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 20 /*supp*/, 1.0 /* conf */);
+    //exp.setParameters("./experiments/columba_v3/", "columba_v3_resampled_agg.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
+    //exp.setParameters("./experiments/columba_v3/", "columba_v3_resampled_agg_filtered3c.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
+    exp.setParameters("./experiments/crossftp_succinct/", "crossftp_succinct_traceset.xes.gz", 1.0 /*fract*/, 12 /*supp*/, 1.0 /* conf */);
+    //exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 5 /*supp*/, 1.0 /* conf */);
 
     exp.experiment();
 

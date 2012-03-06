@@ -260,21 +260,28 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
   private Map<SLogTreeNode, Integer> preChartCoverage_fail = new HashMap<SLogTreeNode, Integer>();
   private Map<SLogTreeNode, Integer> mainChartCoverage_partial = new HashMap<SLogTreeNode, Integer>();
   
-  public double getCoverage() {
+  /**
+   * @return array of two elements [cov_all,cov_main] describing the coverage
+   *         nodes in the tree by all chart events and the coverage in the tree
+   *         only by main chart events
+   */
+  public double[] getCoverage() {
 
-    int coveredNodes = 0;
+    int coveredNodes_all = 0;
+    int coveredNodes_main = 0;
     int totalNodes = 0;
     
     for (SLogTreeNode n : this.nodes) {
-      if (   preChartCoverage.containsKey(n) && preChartCoverage.get(n) > 0
-          || mainChartCoverage.containsKey(n) && mainChartCoverage.get(n) > 0)
-      {
-        coveredNodes += nodeCount.get(n);
-      }
+      if (mainChartCoverage.containsKey(n) && mainChartCoverage.get(n) > 0) {
+        coveredNodes_all += nodeCount.get(n);
+        coveredNodes_main += nodeCount.get(n);
+      } else if (preChartCoverage.containsKey(n) && preChartCoverage.get(n) > 0) {
+        coveredNodes_all += nodeCount.get(n);
+      } 
       totalNodes += nodeCount.get(n);
     }
     
-    return (double)coveredNodes/totalNodes;
+    return new double[] { (double)coveredNodes_all/totalNodes, (double)coveredNodes_main/totalNodes };
   }
   
   public LinkedList<SLogTreeNode[]> countOccurrences(short word[], Set<Short> violators, Set<Short> stuck_at) {

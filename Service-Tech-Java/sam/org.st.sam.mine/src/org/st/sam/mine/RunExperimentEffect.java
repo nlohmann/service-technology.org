@@ -73,12 +73,13 @@ public class RunExperimentEffect extends RunExperimentCompare {
     //minerLinear.mineLSCs(dataSet, support, confidence, density);
     minerLinear.mineLSCs(logFile, minSupportThreshold, confidence);
     
-    originalScenarios = new HashMap<LSC, SScenario>();
+    originalScenarios_branch = new HashMap<LSC, SScenario>();
+    originalScenarios_linear = new HashMap<LSC, SScenario>();
     for (LSC l : minerBranch.getScenarios().keySet()) {
-      originalScenarios.put(l, minerBranch.getScenarios().get(l));
+      originalScenarios_branch.put(l, minerBranch.getScenarios().get(l));
     }
     for (LSC l : minerLinear.getScenarios().keySet()) {
-      originalScenarios.put(l, minerLinear.getScenarios().get(l));
+      originalScenarios_linear.put(l, minerLinear.getScenarios().get(l));
     }  
   }
   
@@ -111,7 +112,7 @@ public class RunExperimentEffect extends RunExperimentCompare {
           /*&& !isSubsumed(l, minerBranch, originalScenarios)*/)
       {
         both_match.add(l);
-        System.out.println(originalScenarios.get(l));
+        System.out.println(originalScenarios_linear.get(l));
       }
     }
     for (LSC l : onlyLinear) {
@@ -138,13 +139,13 @@ public class RunExperimentEffect extends RunExperimentCompare {
     r.append("<h2>"+title+"</h2>\n");
     if (branching_match.size() > 0) {
       r.append("<b>"+branching_match.size()+" strict branching LSC</b></br>");
-      appendResults(r, branching_match, resultsDir, treeFigHeight, render_trees,
+      appendResults(r, branching_match, minerBranch, originalScenarios_branch, resultsDir, treeFigHeight, render_trees,
           "strictly branching LSC",
           "lsc_branch");
     }
     if (both_match.size() > 0) {
       r.append("<b>"+both_match.size()+" linear and branching LSC</b></br>");
-      appendResults(r, both_match, resultsDir, treeFigHeight, render_trees,
+      appendResults(r, both_match, minerLinear, originalScenarios_linear, resultsDir, treeFigHeight, render_trees,
           "linear and branching LSC",
           "lsc_both");
     }
@@ -166,7 +167,9 @@ public class RunExperimentEffect extends RunExperimentCompare {
   public static void main(String[] args) throws IOException {
     
     RunExperimentEffect exp = new RunExperimentEffect();
-    if (!exp.readCommandLine(args)) return;
+    //if (!exp.readCommandLine(args)) return;
+    exp.setParameters("./experiments/columba_v3/", "columba_v3_resampled_agg_filtered3c.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
+
     exp.experiment();
   }
 

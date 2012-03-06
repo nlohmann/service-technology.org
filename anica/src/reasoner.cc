@@ -234,7 +234,9 @@ void updateNonInterference() {
     
     // delete current BDD structures
     delete cuddOutput;
+    cuddOutput = NULL;
     delete myBDD;
+    myBDD = NULL;
     
     // evaluate non-interference
     if (alib->getHighLabeledTransitionsCount() + alib->getLowLabeledTransitionsCount() == net.getTransitions().size()) {

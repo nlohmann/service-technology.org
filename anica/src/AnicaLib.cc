@@ -303,12 +303,13 @@ bool anica::AnicaLib::isActiveConflictPlace(const std::string& p) {
     pnapi::PetriNet* taskNet;
     TriplePointer* resultTriple;
     
-    PNAPI_FOREACH(h, place->getPostset()) {
+    const std::set<pnapi::Node*> postset = place->getPostset();
+    
+    PNAPI_FOREACH(h, postset) {
         const int postsetConfidence = ((pnapi::Transition*)(*h))->getConfidence();
         assert(postsetConfidence != anica::CONFIDENCE_NONE); 
         if (postsetConfidence == anica::CONFIDENCE_HIGH) {
-            // todo: smarter implementieren...;-)
-            PNAPI_FOREACH(l, place->getPostset()) {
+            PNAPI_FOREACH(l, postset) {
                 if (((pnapi::Transition*)(*l))->getConfidence() == anica::CONFIDENCE_LOW) {
                     TriplePointer* tripel = new TriplePointer(place, (pnapi::Transition*)*h, (pnapi::Transition*)*l); 
                     if (isActiveConflictTriple(tripel)) {
@@ -591,6 +592,9 @@ bool anica::AnicaLib::isSecure()
     assert(lolaPath != "");
     
     assert(unassignedTransitions.size() == 0);
+    if (propertyToCheck != anica::PROPERTY_PBNID && downgradeTransitions.size() > 0) {
+        assert(false);
+    }
     
     const size_t transitionsCount = initialNet->getTransitions().size();
     if (highLabeledTransitionsCount == transitionsCount) {
@@ -709,13 +713,14 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
     }
     
     PNAPI_FOREACH(p, initialNet->getPlaces()) {
+        const std::set<pnapi::Node*> postset = (*p)->getPostset();
         // check potential causal triples
         PNAPI_FOREACH(highTransition, (*p)->getPreset()) {
             const int highConfidence = ((pnapi::Transition*)(*highTransition))->getConfidence();
             assert(highConfidence != anica::CONFIDENCE_DOWN);
             if (highConfidence == anica::CONFIDENCE_HIGH || highConfidence == anica::CONFIDENCE_NONE) {
                 // current preTransition may be part of a causal triple
-                PNAPI_FOREACH(lowTransition, (*p)->getPostset()) {
+                PNAPI_FOREACH(lowTransition, postset) {
                     const int lowConfidence = ((pnapi::Transition*)(*lowTransition))->getConfidence();
                     assert(lowConfidence != anica::CONFIDENCE_DOWN);
                     if (lowConfidence == anica::CONFIDENCE_LOW || lowConfidence == anica::CONFIDENCE_NONE) {
@@ -730,12 +735,12 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
             }
         } 
         // check potential conflict triples
-        PNAPI_FOREACH(highTransition, (*p)->getPostset()) {
+        PNAPI_FOREACH(highTransition, postset) {
             const int highConfidence = ((pnapi::Transition*)(*highTransition))->getConfidence();
             assert(highConfidence != anica::CONFIDENCE_DOWN);
             if (highConfidence == anica::CONFIDENCE_HIGH || highConfidence == anica::CONFIDENCE_NONE) {
                 // current highTransition may be part of a causal triple
-                PNAPI_FOREACH(lowTransition, (*p)->getPostset()) {
+                PNAPI_FOREACH(lowTransition, postset) {
                     if (lowTransition != highTransition) {
                         // low and high transition must be different ones
                         const int lowConfidence = ((pnapi::Transition*)(*lowTransition))->getConfidence();

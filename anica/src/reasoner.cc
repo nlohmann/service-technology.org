@@ -289,6 +289,18 @@ void updateNonInterference() {
 }
 
 int main() {
+    if (UNLIKELY(argc == 2 and !strcmp(argv[1], "--help")))
+    {
+        printf("No help\n");
+        return EXIT_SUCCESS;
+    }
+
+    if (UNLIKELY(argc == 2 and !strcmp(argv[1], "--version")))
+    {
+        printf("No version\n");
+        return EXIT_SUCCESS;
+    }
+
     int inputPort = 5556;
     int outputPort = 5555;
 

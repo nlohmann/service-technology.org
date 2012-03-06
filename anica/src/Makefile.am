@@ -11,7 +11,7 @@ anica_SOURCES = main.cc \
                 AnicaLib.cc AnicaLib.h \
 				anica-util.h
 
-reasoner_SOURCES = reasoner.cc Socket.cc Socket.h Reporter.cc Reporter.h SimpleString.h SimpleString.cc
+reasoner_SOURCES = reasoner.cc Socket.cc Socket.h Reporter.cc Reporter.h AnicaLib.cc AnicaLib.h SimpleString.h SimpleString.cc
 
 GUI_SOURCES = GUI.cc \
                  Reporter.cc Reporter.h \

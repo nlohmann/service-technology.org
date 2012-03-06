@@ -56,10 +56,44 @@ anica::AnicaLib::AnicaLib(const pnapi::PetriNet& net)
     initialize();
 }
 
+anica::AnicaLib::AnicaLib(const pnapi::PetriNet& net, confidence_e c)
+{
+    AnicaLib();
+    
+    initialNet = new pnapi::PetriNet(net);
+    initialize();
+    
+    assignUnassignedTransitions(c);
+}
+
 anica::AnicaLib::~AnicaLib()
 {
     delete initialNet;
     initialNet = NULL;
+}
+
+const size_t anica::AnicaLib::getUnassignedTransitionsCount() const {
+    assert(initialNet != NULL);
+    
+    return unassignedTransitionsCount;
+}
+
+const size_t anica::AnicaLib::getHighLabeledTransitionsCount() const {
+    assert(initialNet != NULL);
+    
+    return highLabeledTransitionsCount;
+}
+
+const size_t anica::AnicaLib::getLowLabeledTransitionsCount() const {
+    assert(initialNet != NULL);
+    
+    return lowLabeledTransitionsCount;
+}
+
+const size_t anica::AnicaLib::getDownLabeledTransitionsCount() const {
+    assert(initialNet != NULL);
+    
+    return downLabeledTransitionsCount;
 }
 
 void anica::AnicaLib::setProperty(property_e property)
@@ -112,7 +146,7 @@ const bool anica::AnicaLib::getLolaVerbose() const
     return lolaVerbose;
 }
 
-void anica::AnicaLib::setTransitionAssignment(const pnapi::Transition* t, confidence_e c)
+void anica::AnicaLib::setTransitionAssignment(pnapi::Transition* t, confidence_e c)
 {
     assert(initialNet != NULL);
     // todo: exception
@@ -142,6 +176,7 @@ void anica::AnicaLib::setTransitionAssignment(const pnapi::Transition* t, confid
 	        assert(false);
 	}
 	
+	t->setConfidence(c);
 	switch (c) {
         case anica::CONFIDENCE_NONE:
             unassignedTransitionsCount++;
@@ -162,7 +197,7 @@ void anica::AnicaLib::setTransitionAssignment(const pnapi::Transition* t, confid
 void anica::AnicaLib::assignTransition(const std::string& t, confidence_e c) {
     assert(initialNet != NULL);
     
-    const pnapi::Transition* transition = initialNet->findTransition(t);
+    pnapi::Transition* transition = initialNet->findTransition(t);
     // todo: exception
     assert(transition != NULL);
     
@@ -565,7 +600,7 @@ bool anica::AnicaLib::isSecure()
     assert(initialNet != NULL);
     assert(lolaPath != "");
     
-    assert(unassignedTransitionsCount != 0);
+    assert(unassignedTransitionsCount == 0);
     
     const size_t transitionsCount = initialNet->getTransitions().size();
     if (highLabeledTransitionsCount == transitionsCount) {
@@ -657,13 +692,14 @@ const anica::Triple* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& net, c
     return returnTriple;
 }
 
-Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOutput)
+Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOutput, std::map<std::string, BDD>& cuddVariables)
 {
     assert(initialNet != NULL);
     assert(downLabeledTransitionsCount == 0);
     
     Cudd* cuddManager = new Cudd();
-    std::map<std::string, BDD> cuddVariables;
+    //std::map<std::string, BDD> cuddVariables;
+	cuddVariables.clear();
 	
     cuddManager->AutodynEnable(CUDD_REORDER_GROUP_SIFT_CONV);
     *cuddOutput = cuddManager->bddOne();
@@ -671,6 +707,18 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
     PNAPI_FOREACH(t, initialNet->getTransitions()) {
         cuddVariables[(**t).getName()] = cuddManager->bddVar();
         cuddVariableNames[i++] = strdup((**t).getName().c_str());
+        switch ((**t).getConfidence()) {
+            case anica::CONFIDENCE_HIGH:
+                *cuddOutput *= cuddVariables[(**t).getName()];
+                break;
+            case anica::CONFIDENCE_LOW:
+                *cuddOutput *= !cuddVariables[(**t).getName()];
+                break;
+            case anica::CONFIDENCE_NONE:
+                break;
+            default:
+                assert(false);
+        }
     }
     
     PNAPI_FOREACH(p, initialNet->getPlaces()) {

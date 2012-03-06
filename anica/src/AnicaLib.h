@@ -72,7 +72,7 @@ class AnicaLib
         
         bool isSecure();
     
-        Cudd* getCharacterization(char**, BDD*);
+        Cudd* getCharacterization(char**, BDD*, std::map<std::string, BDD>&);
         
         const Triple* addCausalPattern(pnapi::PetriNet&, const Triple*);
         const Triple* addConflictPattern(pnapi::PetriNet&, const Triple*);
@@ -82,6 +82,11 @@ class AnicaLib
         
         void setRepresantiveNames(bool);
         const bool getRepresantiveNames() const;
+        
+        const size_t getUnassignedTransitionsCount() const;
+        const size_t getHighLabeledTransitionsCount() const;
+        const size_t getLowLabeledTransitionsCount() const;
+        const size_t getDownLabeledTransitionsCount() const;
         
         void setLolaPath(const std::string&);
         const std::string& getLolaPath() const;
@@ -95,7 +100,7 @@ class AnicaLib
         
         void initialize();
     
-        void setTransitionAssignment(const pnapi::Transition*, confidence_e);
+        void setTransitionAssignment(pnapi::Transition*, confidence_e);
     
         TriplePointer* addCausalPattern(pnapi::PetriNet&, const TriplePointer*, bool);
         TriplePointer* addConflictPattern(pnapi::PetriNet&, const TriplePointer*, bool);

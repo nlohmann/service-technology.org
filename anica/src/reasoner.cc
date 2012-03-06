@@ -12,21 +12,31 @@
 #include "Socket.h"
 #include "Reporter.h"
 
+#include "AnicaLib.h"
+
 pnapi::PetriNet net;
 Reporter* rep = new ReporterStream();
 Socket* inputSocket;
 Socket* outputSocket;
 
+anica::AnicaLib* alib;
+char** cuddVariableNames;
+BDD* cuddOutput;
+Cudd* myBDD;
+std::map<std::string, BDD> cuddVariables;
+
+/*
 typedef enum {
     CONFIDENCE_NONE = 0,
     CONFIDENCE_HIGH = 1,
     CONFIDENCE_LOW  = 2
 } confidence_levels;
+*/
 
-const char* levels[] = {"", "HIGH", "LOW"};
+const char* levels[] = {"", "LOW", "HIGH"};
 
 /// the current assignment
-std::map<std::string, confidence_levels> assignment;
+std::map<std::string, anica::confidence_e> assignment;
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -70,7 +80,7 @@ void print_json(json_value* value, int ident = 0) {
 void sendAssignment() {
     std::string assignment_string = "{\n  \"assignment\": {";
 
-    for (std::map<std::string, confidence_levels>::iterator it = assignment.begin(); it != assignment.end(); ++it) {
+    for (std::map<std::string, anica::confidence_e>::iterator it = assignment.begin(); it != assignment.end(); ++it) {
         if (it != assignment.begin()) {
             assignment_string += ",";
         }
@@ -196,17 +206,18 @@ void updateAssignment(json_value* json) {
     }
 
     // 2. update assignment
+    assignment.clear();
     for (json_value* it = ass->first_child; it; it = it->next_sibling) {
         assert(it->name);
         assert(it->string_value);
         if (!strcmp(it->string_value, "HIGH")) {
-            assignment[it->name] = CONFIDENCE_HIGH;
+            assignment[it->name] = anica::CONFIDENCE_HIGH;
         } else {
             if (!strcmp(it->string_value, "LOW")) {
-                assignment[it->name] = CONFIDENCE_LOW;
+                assignment[it->name] = anica::CONFIDENCE_LOW;
             } else {
                 if (!strcmp(it->string_value, "")) {
-                    assignment[it->name] = CONFIDENCE_NONE;
+                    assignment[it->name] = anica::CONFIDENCE_NONE;
                 } else {
                     rep->status("wrong confidence level %s", it->string_value);
                     rep->abort(ERROR_SYNTAX);
@@ -218,6 +229,64 @@ void updateAssignment(json_value* json) {
     rep->status("updated assignment");
 }
 
+void updateNonInterference() {
+    assert(alib != NULL);
+    
+    // delete current BDD structures
+    delete cuddOutput;
+    delete myBDD;
+    
+    // evaluate non-interference
+    if (alib->getHighLabeledTransitionsCount() + alib->getLowLabeledTransitionsCount() == net.getTransitions().size()) {
+        // net has only high and low labeled transitions
+        if (alib->isSecure()) {
+            rep->status("assignment is secure");
+        }
+        else {
+            rep->status("assignment is NOT secure");
+        }
+    }
+    else {
+        if (alib->getDownLabeledTransitionsCount() == 0) {
+            cuddOutput = new BDD();
+            myBDD = alib->getCharacterization(cuddVariableNames, cuddOutput, cuddVariables);
+            
+            rep->status("characterization calculated");
+            
+            // check implications for all unassigned transitions
+            PNAPI_FOREACH(t, net.getTransitions()) {
+                if ((**t).getConfidence() == anica::CONFIDENCE_NONE) {
+                    const std::string transitionName = (**t).getName();
+                    rep->status("..checking: %s", transitionName.c_str());
+                    
+                    BDD curTransitionHigh = cuddVariables[transitionName];
+                    BDD curResultHigh = !*cuddOutput + curTransitionHigh;    
+                    // is high implied?
+                    if (curResultHigh == myBDD->bddOne()) {
+                        // yes
+                        rep->status("....HIGH");
+                        assignment[transitionName] = anica::CONFIDENCE_HIGH;
+                    }
+                    else {
+                        // no
+                        // is low implied?
+                        BDD curTransitionLow = !cuddVariables[transitionName];
+                        BDD curResultLow = !*cuddOutput + curTransitionLow;
+                        if (curResultLow == myBDD->bddOne()) {
+                            rep->status("....LOW");
+                            assignment[transitionName] = anica::CONFIDENCE_LOW;
+                        }
+                    }
+                }
+            }
+            // send back all implications (-> new assignment)
+            sendAssignment();
+        }
+        else {
+            rep->status("ERROR: assignment contains DOWNGRADES");
+        }
+    }
+}
 
 int main() {
     int inputPort = 5556;
@@ -238,11 +307,33 @@ int main() {
 
         if (!strcmp(command, "net")) {
             updateNet(json);
+            
+            delete alib;
+            delete[] cuddVariableNames;
+            cuddVariableNames = new char*[net.getTransitions().size()];
+            
+            alib = new anica::AnicaLib(net);
+            alib->setLolaPath("lola-statespace1");
+            
+            updateNonInterference();
+            
             continue;
         }
 
         if (!strcmp(command, "assignment")) {
             updateAssignment(json);
+            
+            // if a net is present
+            if (alib != NULL) {
+                // update all transitions with new confidence
+                PNAPI_FOREACH(t, net.getTransitions()) {
+                    const std::string transitionName = (**t).getName();
+                    assert(assignment.find(transitionName) != assignment.end());
+                    alib->assignTransition(transitionName, assignment[transitionName]);       
+                }
+                updateNonInterference();
+            }
+            
             continue;
         }
 

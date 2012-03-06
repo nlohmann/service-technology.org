@@ -14,6 +14,18 @@ Reporter* rep = new ReporterStream();
 
 int main(int argc, char** argv)
 {
+    if (UNLIKELY(argc == 2 and !strcmp(argv[1], "--help")))
+    {
+        printf("No help\n");
+        return EXIT_SUCCESS;
+    }
+
+    if (UNLIKELY(argc == 2 and !strcmp(argv[1], "--version")))
+    {
+        printf("No version\n");
+        return EXIT_SUCCESS;
+    }
+
     const int port = 5556;
     const char* hostname = "localhost";
     Socket s(port, hostname);

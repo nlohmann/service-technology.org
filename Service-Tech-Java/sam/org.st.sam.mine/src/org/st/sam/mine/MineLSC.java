@@ -9,13 +9,14 @@ import java.util.Arrays;
 import com.google.gwt.dev.util.collect.HashMap;
 import com.google.gwt.dev.util.collect.HashSet;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+//import java.util.TreeSet;
 
 import lscminer.datastructure.LSC;
 import lscminer.datastructure.LSCEvent;
@@ -26,6 +27,7 @@ import org.st.sam.log.SLogTree;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.log.XESImport;
+import org.st.sam.mine.collect.SimpleArrayList;
 import org.st.sam.util.SAMOutput;
 
 public class MineLSC {
@@ -133,8 +135,6 @@ public class MineLSC {
   public void mineLSCs(final XLog xlog, int minSupportThreshold, double confidence, String targetFilePrefix) throws IOException {
     System.out.println("log contains "+xlog.size()+" traces");
     setSLog(new SLog(xlog));
-    
-    boolean doWordDiscovery = this.supportedWords == null;
     
     boolean mergeTraces = (config.mode == Configuration.MODE_BRANCHING) ? true : false;
     
@@ -297,7 +297,7 @@ public class MineLSC {
                   System.out.println(s+" satisfies confidence");
                 }
                 
-                List<SLogTreeNode[]> occ = tree.countOccurrences(cand, null, null);
+                SimpleArrayList<SLogTreeNode[]> occ = tree.countOccurrences(cand, null, null);
                 int total_occurrences = getTotalOccurrences(occ);
                 
                 LSC l = slog.toLSC(s, total_occurrences, c);
@@ -387,7 +387,7 @@ public class MineLSC {
       return false;
   }
   
-  public int getTotalOccurrences(List<SLogTreeNode[]> occ) {
+  public int getTotalOccurrences(SimpleArrayList<SLogTreeNode[]> occ) {
     
     if (OPTIONS_WEIGHTED_OCCURRENCE) {
       int total_occurrences = 0;
@@ -512,7 +512,7 @@ public class MineLSC {
       
       //if (e < 11 || (e >= 16 && e <=26)) continue; 
       
-      List<SLogTreeNode[]> occ = tree.countOccurrences(new short[] { (short)e }, null, null);
+      SimpleArrayList<SLogTreeNode[]> occ = tree.countOccurrences(new short[] { (short)e }, null, null);
 
       int total_occurrences = getTotalOccurrences(occ);
 
@@ -521,6 +521,9 @@ public class MineLSC {
         singleEvents.add((short)e);
       }
     }
+    
+    // copy all events to an array
+    short[] allEvents = toArray(singleEvents);
 
     for (short e : singleEvents) {
       
@@ -534,8 +537,8 @@ public class MineLSC {
       }
       
       System.out.println("mining for "+e);
-      List<Short> remainingEvents = new LinkedList<Short>(singleEvents);
-      remainingEvents.remove((Short)e);
+      short remainingEvents[] = removeFrom(allEvents, e);
+      
       if (config.optimizedSearch)
         mineSupportedWords_optimized(tree, minSupThreshold, new short[] { e }, remainingEvents, remainingEvents, supportedWords, false);
       else
@@ -545,50 +548,6 @@ public class MineLSC {
 
   }
   
-  private void mineSupportedWords_again(List<short[]> usedWords, int minSupThreshold) {
-    
-    List<Short> singleEvents = new LinkedList<Short>();
-    
-    supportedWords = new SLogTree();
-    int maxEventId = getSLog().originalNames.length;
-    for (int e=0; e<maxEventId; e++) {
-      
-      //if (e < 11 || (e >= 16 && e <=26)) continue; 
-      
-      List<SLogTreeNode[]> occ = tree.countOccurrences(new short[] { (short)e }, null, null);
-
-      int total_occurrences = getTotalOccurrences(occ);
-
-      if (total_occurrences >= minSupThreshold) {
-        singleEvents.add((short)e);
-      }
-    }
-    
-    if (config.optimizedSearch) {
-
-      System.out.println("searching on prefixes...");
-      for (short[] w : usedWords) {
-        for (int l = w.length-1; l>1; l--) {
-          short prefix[] = Arrays.copyOf(w, l);
-          
-          if (config.triggers != null) {
-            boolean isTriggerEvent = false;
-            for (short[] trig : config.triggers) {
-              if (trig[0] == prefix[0]) isTriggerEvent = true;
-            }
-            // when mining triggers, skip words that do not start like a trigger
-            if (!isTriggerEvent) continue;
-          }
-          
-          List<Short> remainingEvents = new LinkedList<Short>(singleEvents);
-          for (short e : prefix) remainingEvents.remove((Short)e);
-          mineSupportedWords_optimized(tree, minSupThreshold, prefix, remainingEvents, remainingEvents, supportedWords, false);  
-        }
-      }
-    }
-  }
-  
- 
   public static Comparator< Short > short_comp = new Comparator<Short>() {
 
     @Override
@@ -604,18 +563,18 @@ public class MineLSC {
   private short[] largestWord_checked = null;
   
   private HashMap<SLogTreeNode, Set<Short>> checkSuccessors = new HashMap<SLogTreeNode, Set<Short>>();
-  private HashMap<Short,TreeSet<Short>> retryMap = new HashMap<Short, TreeSet<Short>>(); 
+  private HashMap<Short,HashSet<Short>> retryMap = new HashMap<Short, HashSet<Short>>(); 
   
-  private void mineSupportedWords_optimized(MineBranchingTree tree, int minSupThreshold, final short word[], List<Short> ev, List<Short> preferedSucc, SLogTree words, boolean check) {
+  private void mineSupportedWords_optimized(MineBranchingTree tree, int minSupThreshold, final short word[], final short[] ev, final short[] preferedSucc, SLogTree words, boolean check) {
 
-    List<Short> newPreferedSucc = new LinkedList<Short>(preferedSucc);
+    short[] newPreferedSucc = preferedSucc;
     SLogTreeNode leaf = words.contains(word);
     if (leaf != null && checkSuccessors.containsKey(leaf)) {
       Set<Short> checkedSuccessors = checkSuccessors.get(leaf);
       // remove all successors to explore that have already been explored
-      newPreferedSucc.removeAll(checkedSuccessors);
+      newPreferedSucc = removeFrom(newPreferedSucc, checkedSuccessors);
       // if there is none left, we are done
-      if (newPreferedSucc.isEmpty()) {
+      if (newPreferedSucc.length == 0) {
         if (showDebug(word, preferedSucc)) {
           log(log_msw, "already seen "+toString(word)+" "+checkSuccessors.get(leaf)+"\n");
         }
@@ -627,8 +586,9 @@ public class MineLSC {
     else if (lessThan(largestWord_checked, word)) largestWord_checked = word;
     
     SLogTreeNode n = words.addTrace(word);
-    if (!checkSuccessors.containsKey(n)) checkSuccessors.put(n, new TreeSet<Short>(short_comp));
-    checkSuccessors.get(n).addAll(newPreferedSucc);
+    if (!checkSuccessors.containsKey(n)) checkSuccessors.put(n, new HashSet<Short>());
+    for (int i=0; i<newPreferedSucc.length; i++)
+      checkSuccessors.get(n).add(newPreferedSucc[i]);
     //System.out.println(toString(word));
     if (showDebug(word, preferedSucc)) {
       log(log_msw, "adding "+toString(word)+" "+checkSuccessors.get(n)+"\n");
@@ -641,7 +601,7 @@ public class MineLSC {
     if (dot_count % 100 == 0) System.out.print(".");
     if (dot_count > 8000) { System.out.println(". "+words.nodes.size()+" "+toString(largestWord_checked)); dot_count = 0; }
     
-    Set<Short> violators = new TreeSet<Short>(short_comp);
+    Set<Short> violators = new HashSet<Short>();
     Set<Short> stuck_at = null;
     
     if (showDebug(word, preferedSucc)) {
@@ -671,8 +631,8 @@ public class MineLSC {
         log(log_msw, "next word: "+toString(nextWord));
       }
       
-      Set<Short> stuck_here = new TreeSet<Short>(short_comp);
-      List<SLogTreeNode[]> occ = tree.countOccurrences(nextWord, violators, stuck_here);
+      Set<Short> stuck_here = new HashSet<Short>();
+      SimpleArrayList<SLogTreeNode[]> occ = tree.countOccurrences(nextWord, violators, stuck_here);
       if (stuck_at == null) stuck_at = stuck_here;
       else stuck_at.retainAll(stuck_here);
       
@@ -680,13 +640,20 @@ public class MineLSC {
       
       if (total_occurrences >= minSupThreshold) {
       
-        List<Short> ev_avail = new LinkedList<Short>(ev);
-        if (!config.allowEventRepetitions)
-          ev_avail.remove((Short)e); // event id 'e' no longer available for continuation
+        // compute list of available events for continuation in the recursion
+        short ev_avail[];
+        if (config.allowEventRepetitions) {
+          // re-use list of available events
+          ev_avail = ev;
+        } else {
+          // event id 'e' no longer available for continuation,
+          // copy list and remove 'e' from list
+          ev_avail = removeFrom(ev, e);
+        }
         
         //List<Short> preferedSuccNext = ev;
-        Set<Short> violatingSuccessors = new TreeSet<Short>(short_comp);
-        List<Short> preferedSuccNext = getPreferredSuccessors(ev_avail, occ, violatingSuccessors);
+        Set<Short> violatingSuccessors = new HashSet<Short>();
+        final short[] preferedSuccNext = getPreferredSuccessors(ev_avail, occ, violatingSuccessors);
 
         if (showDebug(nextWord, preferedSucc)) {
           log(log_msw, " IS IN "+total_occurrences+" prefered succ: "+preferedSuccNext+" violating succ: "+violatingSuccessors+"\n");
@@ -721,11 +688,14 @@ public class MineLSC {
               mineSupportedWords_optimized(tree, minSupThreshold, newWord, ev_avail, preferedSuccNext, words, true);
             } else {
               
-              if (!retryMap.containsKey(ignore)) retryMap.put(ignore, new TreeSet<Short>(short_comp));
-              if (ignoreSuccessor != -1)
+              if (!retryMap.containsKey(ignore)) retryMap.put(ignore, new HashSet<Short>());
+              if (ignoreSuccessor != -1) {
                 retryMap.get(ignore).add(ignoreSuccessor); // possible successor
-              else
-                retryMap.get(ignore).addAll(ev_avail);     // worst case: we don't know anything: try all
+              } else {
+                // worst case: we don't know anything: try all
+                for (short _event_avail : ev_avail)
+                  retryMap.get(ignore).add(_event_avail);  
+              }
             }
           }
         }
@@ -733,8 +703,10 @@ public class MineLSC {
         // but we already collected all letters that could come after the current letter
         // extend 'word' with these new successors (skipping over the current letter)
         if (retryMap.containsKey(e)) {
-          List<Short> preferedSuccNext_skip_over_e = new LinkedList<Short>(retryMap.get(e));
+          short[] preferedSuccNext_skip_over_e = toArray(retryMap.get(e));
           retryMap.remove(e); // we have handled these successors, remove from the map
+          
+          Arrays.sort(preferedSuccNext_skip_over_e);
           
           if (showDebug(word, preferedSuccNext_skip_over_e)) {
             log(log_msw, "RETRY 1b "+toString(word) +" WITH "+preferedSuccNext_skip_over_e+"\n");
@@ -779,8 +751,7 @@ public class MineLSC {
               j++;
             }
             
-            LinkedList<Short> ev_red = new LinkedList<Short>(ev);
-            ev_red.remove((Short)ignore);
+            short[] ev_red = removeFrom(ev, ignore.shortValue());
 
             if (lessThan(newWord, largestWord_checked))
             {
@@ -834,7 +805,7 @@ public class MineLSC {
       short[] nextWord = Arrays.copyOf(word, word.length+1);
       nextWord[word.length] = e;
       
-      List<SLogTreeNode[]> occ = (config.skipEvents_invisible)
+      SimpleArrayList<SLogTreeNode[]> occ = (config.skipEvents_invisible)
           ? tree.countOccurrences(nextWord, null, null) 
           : tree.countOccurrences(nextWord, visibleEvents, null, null);
       
@@ -849,6 +820,64 @@ public class MineLSC {
         
   }
 
+  /**
+   * Convert collection of Short objects to an array of shorts.
+   * @param c
+   * @return
+   */
+  private short[] toArray(Collection<Short> c) {
+    short a[] = new short[c.size()];
+    int i=0;
+    for (Short s : c) a[i++] = s;
+    return a;
+  }
+  
+  /**
+   * Remove all occurrences of element from the list.
+   * 
+   * @param list
+   * @param element
+   * @return a new array containing all elements except the given element
+   * 
+   */
+  private short[] removeFrom(short[] list, short element) {
+    int new_length = 0;
+    for (int i=0; i<list.length; i++) {
+      if (element != list[i]) new_length++;
+    }
+    
+    short[] reduced_list = new short[new_length];
+    int i_new = 0;
+    for (int i_old=0; i_old<list.length; i_old++) {
+      if (element != list[i_old]) reduced_list[i_new++] = list[i_old];
+    }
+    
+    return reduced_list;
+  }
+  
+  /**
+   * Remove element from the list.
+   * 
+   * @param list
+   * @param element
+   * @return a new array containing all elements except the given element
+   * 
+   */
+  private short[] removeFrom(short[] list, Set<Short> elements) {
+    
+    int new_length = 0;
+    for (int i=0; i<list.length; i++) {
+      if (!elements.contains(list[i])) new_length++;
+    }
+    
+    short[] reduced_list = new short[new_length];
+    int i_new = 0;
+    for (int i_old=0; i_old<list.length; i_old++) {
+      if (!elements.contains(list[i_old])) reduced_list[i_new++] = list[i_old];
+    }
+    
+    return reduced_list;
+  }
   
   private static boolean lessThan(short[] word1, short[] word2) {
     int i=0;
@@ -861,7 +890,7 @@ public class MineLSC {
     return (word1.length < word2.length);
   }
 
-  private static boolean showDebug(short[] word, List<Short> preferedSucc) {
+  private static boolean showDebug(short[] word, short[] preferedSucc) {
 
     return false;
     /*
@@ -879,9 +908,16 @@ public class MineLSC {
     //return (word[0] == 85);
   }
   
-  private void getVisibleSuccessors(List<Short> visibleEvents, SLogTreeNode n, Set<Short> visibleSuccessors, Set<Short> violatingSuccessors) {
+  private boolean contains(short[] list, short element) {
+    for (int i=0; i<list.length; i++) {
+      if (list[i] == element) return true;
+    }
+    return false;
+  }
+  
+  private void getVisibleSuccessors(short[] visibleEvents, SLogTreeNode n, Set<Short> visibleSuccessors, Set<Short> violatingSuccessors) {
     for (SLogTreeNode succ : n.post) {
-      if (visibleEvents.contains(succ.id))
+      if (contains(visibleEvents, succ.id))
         visibleSuccessors.add(succ.id);
       else {
         violatingSuccessors.add(succ.id);
@@ -890,9 +926,10 @@ public class MineLSC {
     }
   }
   
-  private List<Short> getPreferredSuccessors(List<Short> allowedEvents, List<SLogTreeNode[]> occ, Set<Short> violatingSuccessors) {
+  private short[] getPreferredSuccessors(short[] allowedEvents, SimpleArrayList<SLogTreeNode[]> occ, Set<Short> violatingSuccessors) {
     HashSet<Short> allSuccessors = new HashSet<Short>();
-    HashSet<Short> jointSuccessors = new HashSet<Short>(allowedEvents);
+    HashSet<Short> jointSuccessors = new HashSet<Short>();
+    for (int i=0; i<allowedEvents.length; i++) jointSuccessors.add(allowedEvents[i]);
     
     for (SLogTreeNode[] occurrence : occ) {
       
@@ -912,8 +949,14 @@ public class MineLSC {
     // only if the successors of all occurrences are identical and
     // allowed to build a word, use them as successors 
     if (allSuccessors.equals(jointSuccessors) && jointSuccessors.size() == 1) {
-      // remove all letters that cannot be used for further extensions 
-      return new LinkedList<Short>(jointSuccessors);
+      // remove all letters that cannot be used for further extensions
+      short[] result = new short[jointSuccessors.size()];
+      int i=0;
+      for (Short s : jointSuccessors) {
+        result[i++] = s;
+      }
+      Arrays.sort(result);
+      return result;
     } else {
       // otherwise the word may continue with any event
       return allowedEvents;

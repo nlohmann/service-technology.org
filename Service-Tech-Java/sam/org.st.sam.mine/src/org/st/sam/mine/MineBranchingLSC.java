@@ -13,6 +13,8 @@ public class MineBranchingLSC extends MineLSC {
   }
 
   public static void main(String args[]) throws Exception {
+    
+    /*
     if (args.length != 3) {
       System.out.println("error, wrong number of arguments");
       System.out.println("usage: java "+MineLSC.class.getCanonicalName()+" <logfile.xes>");
@@ -22,6 +24,11 @@ public class MineBranchingLSC extends MineLSC {
     String srcFile = args[0];
     int support = Integer.parseInt(args[1]);
     double confidence = Double.parseDouble(args[2]);
+
+    */
+    String srcFile = "./experiments/crossftp_succinct/crossftp_succinct_traceset.xes.gz";
+    int support = 12;
+    double confidence = 1.0;
     MineLSC miner = new MineBranchingLSC();
     miner.mineLSCs_writeResults(srcFile, support, confidence);
   }

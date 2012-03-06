@@ -1,10 +1,12 @@
 package lscminer.datastructure;
 
-import java.util.*;
+import java.util.Set;
+
+import com.google.gwt.dev.util.collect.HashSet;
 
 /**
  *
- * @author Anh Cuong Nguyen
+ * @author Anh Cuong Nguyen, dfahland
  */
 public class LSC {
   LSCEvent[] preChart;
@@ -65,21 +67,7 @@ public class LSC {
 
       return maxLength;
   }
-
-  public int getObjectsNo(){
-    HashMap<String, Boolean> objects = new HashMap<String, Boolean>();
-    for (LSCEvent event: preChart){
-      objects.put(event.caller, Boolean.TRUE);
-      objects.put(event.callee, Boolean.TRUE);
-    }
-    for (LSCEvent event: mainChart){
-      objects.put(event.caller, Boolean.TRUE);
-      objects.put(event.callee, Boolean.TRUE);
-    }
-
-    return objects.size();
-  }
-
+  
   public int getPrechartEventNo(){
     return preChart.length;
   }
@@ -88,19 +76,25 @@ public class LSC {
     return mainChart.length;
   }
 
-  public int getDistinctObjectNo(){
-    HashMap<String, Boolean> objects = new HashMap<String, Boolean>();
 
-    for (LSCEvent event: preChart){
-      objects.put(event.callee, Boolean.TRUE);
-      objects.put(event.caller, Boolean.TRUE);
+  private int objectsNumber = -1;
+  
+  public int getDistinctObjectNo() {
+    if (objectsNumber != -1) return objectsNumber;
+    
+    Set<String> objects = new HashSet<String>();
+    for (LSCEvent event : preChart) {
+      objects.add(event.caller);
+      objects.add(event.callee);
     }
-    for (LSCEvent event: mainChart){
-      objects.put(event.callee, Boolean.TRUE);
-      objects.put(event.caller, Boolean.TRUE);
+    for (LSCEvent event : mainChart) {
+      objects.add(event.caller);
+      objects.add(event.callee);
     }
-
-    return objects.size();
+    
+    objectsNumber = objects.size();
+    
+    return objectsNumber;
   }
   
   /**

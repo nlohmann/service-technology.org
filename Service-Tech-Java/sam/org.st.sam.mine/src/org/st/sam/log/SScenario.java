@@ -17,27 +17,41 @@ public class SScenario {
     this.main = main;
   }
   
+  private short[] word = null;
+  
   public short[] getWord() {
-    short[] word = new short[pre.length+main.length];
-    for (int e=0; e<pre.length; e++) {
-      word[e] = pre[e];
+    
+    if (word == null) {
+      word = new short[pre.length+main.length];
+      for (int e=0; e<pre.length; e++) {
+        word[e] = pre[e];
+      }
+      for (int e=0; e<main.length; e++) {
+        word[e+pre.length] = main[e];
+      }
     }
-    for (int e=0; e<main.length; e++) {
-      word[e+pre.length] = main[e];
-    }
+    
     return word;
   }
   
+  private String toString = null;
+  
   public String toString() {
-    String ret = "";
-    for (short e : pre) {
-      ret += e+" ";
+    if (toString == null) {
+      StringBuilder sb = new StringBuilder();
+      
+      for (short e : pre) {
+        sb.append(e);
+        sb.append(' ');
+      }
+      sb.append(" --> ");
+      for (short e : main) {
+        sb.append(e);
+        sb.append(' ');
+      }
+      toString = sb.toString();
     }
-    ret += " --> ";
-    for (short e : main) {
-      ret += e+" ";
-    }
-    return ret;
+    return toString;
   }
   
   public static boolean isSubWordOf(short[] word, short[] other, HashSet<Short> visible) {

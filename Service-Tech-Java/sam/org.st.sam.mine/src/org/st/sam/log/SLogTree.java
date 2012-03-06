@@ -17,12 +17,15 @@ public class SLogTree {
   
   private Set<SLogTreeNode> leafs = new HashSet<SLogTreeNode>();
   
+  protected SLog slog;
+  
   public SLogTree() {
     this.mergeTraces = true;
   }
   
   public SLogTree(SLog log, boolean mergeTraces) {
     this.mergeTraces = mergeTraces;
+    this.slog = log;
     buildTree(log);
   }
   

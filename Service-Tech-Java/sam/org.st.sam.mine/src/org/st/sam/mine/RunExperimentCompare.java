@@ -34,6 +34,7 @@ import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.log.XESImport;
 import org.st.sam.mine.MineLSC.Configuration;
+import org.st.sam.mine.collect.SimpleArrayList;
 import org.st.sam.util.SAMOutput;
 
 import com.google.gwt.dev.util.collect.HashMap;
@@ -703,7 +704,7 @@ public class RunExperimentCompare {
           if (isSubsumed(originalScenarios.get(l), minerBranch, originalScenarios_branch))
             r.append("subsumed by branching scenario<br/>\n");
           
-          List<SLogTreeNode[]> occ = minerBranch.getTree().countOccurrences(originalScenarios.get(l).getWord(), null, null);
+          SimpleArrayList<SLogTreeNode[]> occ = minerBranch.getTree().countOccurrences(originalScenarios.get(l).getWord(), null, null);
           int total_occurrences = minerBranch.getTotalOccurrences(occ);
           //r.append("support (re-compute) "+total_occurrences+"/"+occ.size()+"<br/>\n");
           r.append("confidence (branch) "+minerBranch.getTree().confidence(originalScenarios.get(l), true)+"<br/>\n");

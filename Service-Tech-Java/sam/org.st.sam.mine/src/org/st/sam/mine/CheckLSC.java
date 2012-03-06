@@ -12,6 +12,7 @@ import org.st.sam.log.SLog;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.log.XESImport;
+import org.st.sam.mine.collect.SimpleArrayList;
 import org.st.sam.util.SAMOutput;
 
 public class CheckLSC {
@@ -119,7 +120,7 @@ public class CheckLSC {
       word[e+s.pre.length] = s.main[e];
     }
     
-    LinkedList<SLogTreeNode[]> occ = tree.countOccurrences(word, null, null);
+    SimpleArrayList<SLogTreeNode[]> occ = tree.countOccurrences(word, null, null);
     double conf = tree.confidence(s, true);
     int total_occurrences = getTotalOccurrences(occ);
 
@@ -129,7 +130,7 @@ public class CheckLSC {
 
   }
   
-  public int getTotalOccurrences(LinkedList<SLogTreeNode[]> occ) {
+  public int getTotalOccurrences(SimpleArrayList<SLogTreeNode[]> occ) {
     int total_occurrences = 0;
     for (SLogTreeNode[] o : occ) {
       // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word

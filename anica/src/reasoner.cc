@@ -288,7 +288,7 @@ void updateNonInterference() {
     }
 }
 
-int main() {
+int main(int argc, char** argv) {
     if (UNLIKELY(argc == 2 and !strcmp(argv[1], "--help")))
     {
         printf("No help\n");

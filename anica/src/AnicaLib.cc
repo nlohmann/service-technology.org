@@ -452,7 +452,7 @@ anica::TriplePointer* anica::AnicaLib::addCausalPattern(pnapi::PetriNet& extende
     pnapi::Place* fired = &extendedNet.createPlace();
     pnapi::Place* goal = &extendedNet.createPlace();
 
-    const std::string tripleName = "(" + tripel->place->getName() + ", " + tripel->high->getName() + ", " + tripel->low->getName() + ")";
+    const std::string tripleName = "<" + tripel->place->getName() + "_" + tripel->high->getName() + "_" + tripel->low->getName() + ">";
 
     if (represantiveNames) {
         lC->setName("lC_" + tripleName);
@@ -522,7 +522,7 @@ anica::TriplePointer* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& exten
     pnapi::Place* enabled = &extendedNet.createPlace("", 1);
     pnapi::Place* goal = &extendedNet.createPlace();
 
-    const std::string tripleName = "(" + tripel->place->getName() + ", " + tripel->high->getName() + ", " + tripel->low->getName() + ")";
+    const std::string tripleName = "<" + tripel->place->getName() + "_" + tripel->high->getName() + "_" + tripel->low->getName() + ">";
 
     if (represantiveNames) {
         lC->setName("lC_" + tripleName);
@@ -745,6 +745,79 @@ pnapi::PetriNet* anica::AnicaLib::getControllerProblem() {
         }
     }
     
+    PNAPI_FOREACH(p, initialNet->getPlaces()) {
+        const std::set<pnapi::Node*> postset = (*p)->getPostset();
+        // check potential causal triples
+        PNAPI_FOREACH(highTransition, (*p)->getPreset()) {
+            const int highConfidence = ((pnapi::Transition*)(*highTransition))->getConfidence();
+            const std::string highName = ((pnapi::Transition*)(*highTransition))->getName();
+            assert(highConfidence != anica::CONFIDENCE_DOWN);
+            if (highConfidence == anica::CONFIDENCE_HIGH || highConfidence == anica::CONFIDENCE_NONE) {
+                // current preTransition may be part of a causal triple
+                PNAPI_FOREACH(lowTransition, postset) {
+                    const int lowConfidence = ((pnapi::Transition*)(*lowTransition))->getConfidence();
+                    const std::string lowName = ((pnapi::Transition*)(*lowTransition))->getName();
+                    assert(lowConfidence != anica::CONFIDENCE_DOWN);
+                    if (lowConfidence == anica::CONFIDENCE_LOW || lowConfidence == anica::CONFIDENCE_NONE) {
+                        // potential causal triple
+                        
+                        anica::TriplePointer* inputTripel = new anica::TriplePointer(resultNet->findPlace((*p)->getName()), resultNet->findTransition(highName), resultNet->findTransition(lowName));
+                        anica::TriplePointer* resultTripel = addCausalPattern(*resultNet, inputTripel, false);
+                        
+                        pnapi::Transition* newHigh = const_cast<pnapi::Transition*>(resultTripel->high);
+                        pnapi::Transition* newLow = const_cast<pnapi::Transition*>(resultTripel->low);
+                        
+                        pnapi::Place * controllerLow = resultNet->findPlace(std::string(lowName + LOW));
+                        pnapi::Place * controllerHigh = resultNet->findPlace(std::string(highName + HIGH));
+                        newArcs.insert(std::make_pair(controllerHigh, newHigh));
+                        newArcs.insert(std::make_pair(newHigh, controllerHigh));
+                        newArcs.insert(std::make_pair(controllerLow, newLow));
+                        newArcs.insert(std::make_pair(newLow, controllerLow));
+                        
+                        delete inputTripel;
+                    }
+                }
+            }
+        } 
+        // check potential conflict triples
+        PNAPI_FOREACH(highTransition, postset) {
+            const int highConfidence = ((pnapi::Transition*)(*highTransition))->getConfidence();
+            const std::string highName = ((pnapi::Transition*)(*highTransition))->getName();
+            assert(highConfidence != anica::CONFIDENCE_DOWN);
+            if (highConfidence == anica::CONFIDENCE_HIGH || highConfidence == anica::CONFIDENCE_NONE) {
+                // current highTransition may be part of a causal triple
+                PNAPI_FOREACH(lowTransition, postset) {
+                    if (lowTransition != highTransition) {
+                        // low and high transition must be different ones
+                        const int lowConfidence = ((pnapi::Transition*)(*lowTransition))->getConfidence();
+                        const std::string lowName = ((pnapi::Transition*)(*lowTransition))->getName();
+                        // potential conflict triple
+                        
+                        anica::TriplePointer* inputTripel = new anica::TriplePointer(resultNet->findPlace((*p)->getName()), resultNet->findTransition(highName), resultNet->findTransition(lowName));
+                        anica::TriplePointer* resultTripel = addConflictPattern(*resultNet, inputTripel, false);
+                        
+                        pnapi::Transition* newHigh = const_cast<pnapi::Transition*>(resultTripel->high);
+                        pnapi::Transition* newLow = const_cast<pnapi::Transition*>(resultTripel->low);
+                        
+                        pnapi::Place * controllerLow = resultNet->findPlace(std::string(lowName + LOW));
+                        pnapi::Place * controllerHigh = resultNet->findPlace(std::string(highName + HIGH));
+                        newArcs.insert(std::make_pair(controllerHigh, newHigh));
+                        newArcs.insert(std::make_pair(newHigh, controllerHigh));
+                        newArcs.insert(std::make_pair(controllerLow, newLow));
+                        newArcs.insert(std::make_pair(newLow, controllerLow));
+                        
+                        delete inputTripel;
+                    }
+                }
+            }
+        }
+    }
+    
+    // add collected arcs
+    PNAPI_FOREACH(a, newArcs) {
+        resultNet->createArc(*a->first, *a->second);
+    } 
+    
     return resultNet;
 }
 
@@ -794,9 +867,6 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
                         // potential causal triple
                         const anica::TriplePointer* taskTriple = new anica::TriplePointer((pnapi::Place*)*p, (pnapi::Transition*)*highTransition, (pnapi::Transition*)*lowTransition);
                         if (isActiveCausalTriple(taskTriple)) {
-                            //BDD* highBDD = cuddVariables[(**highTransition).getName()];
-                            //BDD* lowBDD = cuddVariables[(**lowTransition).getName()];
-                            //*cuddOutput *= !(*highBDD * !*lowBDD);  
                             *cuddOutput *= !(cuddManager->bddVar(cuddVariables[(**highTransition).getName()]) * !cuddManager->bddVar(cuddVariables[(**lowTransition).getName()]));
                         }
                         delete taskTriple;
@@ -817,10 +887,6 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
                         // potential conflict triple
                         const anica::TriplePointer* taskTriple = new anica::TriplePointer((pnapi::Place*)*p, (pnapi::Transition*)*highTransition, (pnapi::Transition*)*lowTransition);
                         if (isActiveConflictTriple(taskTriple)) {
-                            //BDD* highBDD = cuddVariables[(**highTransition).getName()];
-                            //BDD* lowBDD = cuddVariables[(**lowTransition).getName()];
-                            //*cuddOutput *= !(*highBDD * !*lowBDD);  
-                            //*cuddOutput *= !(*highBDD * !*lowBDD);
                             *cuddOutput *= !(cuddManager->bddVar(cuddVariables[(**highTransition).getName()]) * !cuddManager->bddVar(cuddVariables[(**lowTransition).getName()]));  
                         }
                         delete taskTriple;

@@ -537,7 +537,7 @@ int main(int argc, char** argv) {
     | 3. handle confidence			   |
     `---------------------------------*/
 
-    /*
+    
     // LIBTEST
     anica::AnicaLib alib(net);
     
@@ -562,9 +562,22 @@ int main(int argc, char** argv) {
     */
     
     /*
+    PetriNet* controllerNet = alib.getControllerProblem();
+    
+    ofstream o;
+    o.open("Anica-controller.owfn", ios_base::trunc);
+    o << io::owfn << *controllerNet;
+    o.close();
+    //status("........%s created", _cfilename_(curFileName));
+    
+    callWendy(*controllerNet);
+    */
+    
+    /*
     return 0;
     // LIBTEST END!
     */
+    
     
     unsigned int downTransitions = 0;
 	unsigned int highTransitions = 0;

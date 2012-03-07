@@ -85,20 +85,6 @@ option "dotActive" -
 section "Reductions" 
 sectiondesc="These options control the reductions Anica uses while performing the task.\n"
 
-option "potentialPlaces" -
-  "Potential Places."
-  details="Used to find specified potential places.\n"
-  values="causal","conflict","both" enum
-  default="both"
-  optional
-
-option "activePlaces" -
-  "Active Places."
-  details="Used to find specified active places.\n"
-  values="causal","conflict","both","none" enum
-  default="both"
-  optional
-
 option "oneActiveOnly" -
   "Only one active place."
   details="After the first active place the check will be finished.\n"
@@ -146,12 +132,10 @@ option "wendy" -
   optional
   hidden
 
-option "modus" -
-  "Determines whether the tool is called directly, a makefile is created or just some statistic is performed."
-  details="Calling a tool directly may cause long terms of unobservable actions but provide informations automatically.\n"
-  values="call","makefile","statistic" enum
-  default="call"
-  optional
+option "wendyCall" -
+  "Determines whether Wendy is called directly or a file is created."
+  details="Calling Wendy directly may cause long terms of unobservable actions but provide informations automatically.\n"
+  flag off
 
 option "tmpfile" -
   "Set the path and name of temporary files."

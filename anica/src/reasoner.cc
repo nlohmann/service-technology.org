@@ -338,10 +338,14 @@ int main(int argc, char** argv) {
         const char* command = getCommand(json);
 
         if (!strcmp(command, "net")) {
+            delete alib;
+            for (size_t i = 0; i < net.getTransitions().size(); ++i) {
+                free(cuddVariableNames[i]);
+            }
+            delete[] cuddVariableNames;
+            
             updateNet(json);
             
-            delete alib;
-            delete[] cuddVariableNames;
             cuddVariableNames = new char*[net.getTransitions().size()];
             
             alib = new anica::AnicaLib(net);

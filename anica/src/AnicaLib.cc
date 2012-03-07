@@ -35,6 +35,7 @@ anica::AnicaLib::AnicaLib()
     lolaVerbose(false),
     oneTripleOnly(true),
     oneActiveOnly(true),
+    keepTempFiles(false),
     propertyToCheck(anica::PROPERTY_PBNIPLUS),
     highLabeledTransitionsCount(0),
     lowLabeledTransitionsCount(0),
@@ -164,6 +165,16 @@ void anica::AnicaLib::setLolaVerbose(bool v)
 const bool anica::AnicaLib::getLolaVerbose() const
 {
     return lolaVerbose;
+}
+
+void anica::AnicaLib::setKeepTempFiles(bool v)
+{
+    keepTempFiles = v;
+}
+
+const bool anica::AnicaLib::getKeepTempFiles() const
+{
+    return keepTempFiles;
 }
 
 void anica::AnicaLib::setTransitionAssignment(pnapi::Transition* t, confidence_e c)
@@ -868,6 +879,7 @@ pnapi::PetriNet* anica::AnicaLib::getControllerProblem() {
                         newArcs.insert(std::make_pair(newLow, controllerLow));
                         
                         delete inputTripel;
+                        delete resultTripel;
                     }
                 }
             }
@@ -900,6 +912,7 @@ pnapi::PetriNet* anica::AnicaLib::getControllerProblem() {
                         newArcs.insert(std::make_pair(newLow, controllerLow));
                         
                         delete inputTripel;
+                        delete resultTripel;
                     }
                 }
             }
@@ -990,6 +1003,30 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
     }   
     
     return cuddManager;   	   
+}
+
+void anica::AnicaLib::clearColors() {
+    assert(initialNet != NULL);
+    
+    clearColors(*initialNet);
+}
+
+void anica::AnicaLib::colorPotentialPlaces(anica::colorPlaceTask_e task) {
+    assert(initialNet != NULL);
+    
+    colorPotentialPlaces(*initialNet, task);
+}
+
+void anica::AnicaLib::colorActivePlaces(anica::colorPlaceTask_e task) {
+    assert(initialNet != NULL);
+    
+    colorActivePlaces(*initialNet, task);
+}
+
+void anica::AnicaLib::colorConfidence(anica::colorConfidenceTask_e task) {
+    assert(initialNet != NULL);
+    
+    colorConfidence(*initialNet, task);
 }
 
 void anica::AnicaLib::clearColors(pnapi::PetriNet& net) {
@@ -1084,7 +1121,7 @@ void anica::AnicaLib::colorActivePlaces(pnapi::PetriNet& net, anica::colorPlaceT
     }
 }
 
-void anica::AnicaLib::colorConfidentiality(pnapi::PetriNet& net, anica::colorConfidenceTask_e task) {
+void anica::AnicaLib::colorConfidence(pnapi::PetriNet& net, anica::colorConfidenceTask_e task) {
     clearColors(net);
     
     PNAPI_FOREACH(t, net.getTransitions()) {

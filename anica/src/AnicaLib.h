@@ -93,10 +93,10 @@ class AnicaLib
         
         pnapi::PetriNet* getCurrentNet() const;
         
-        void colorPotentialPlaces(pnapi::PetriNet&, colorPlaceTask_e);
-        void colorActivePlaces(pnapi::PetriNet&, colorPlaceTask_e);
-        void colorConfidentiality(pnapi::PetriNet&, colorConfidenceTask_e);
-        void clearColors(pnapi::PetriNet&);
+        void colorPotentialPlaces(colorPlaceTask_e);
+        void colorActivePlaces(colorPlaceTask_e);
+        void colorConfidence(colorConfidenceTask_e);
+        void clearColors();
         
         const Triple* addCausalPattern(pnapi::PetriNet&, const Triple&);
         const Triple* addConflictPattern(pnapi::PetriNet&, const Triple&);
@@ -123,6 +123,9 @@ class AnicaLib
         void setLolaVerbose(bool);
         const bool getLolaVerbose() const;
         
+        void setKeepTempFiles(bool);
+        const bool getKeepTempFiles() const;
+        
     private:
         int callLoLA(const pnapi::PetriNet&, const pnapi::Place*) const;
         
@@ -141,6 +144,11 @@ class AnicaLib
         bool isActiveCausalTriple(pnapi::PetriNet&, const TriplePointer*);
         bool isActiveConflictTriple(pnapi::PetriNet&, const TriplePointer*);
         
+        void colorPotentialPlaces(pnapi::PetriNet&, colorPlaceTask_e);
+        void colorActivePlaces(pnapi::PetriNet&, colorPlaceTask_e);
+        void colorConfidence(pnapi::PetriNet&, colorConfidenceTask_e);
+        void clearColors(pnapi::PetriNet&);
+        
         pnapi::PetriNet* initialNet;
  
         property_e propertyToCheck;
@@ -152,6 +160,8 @@ class AnicaLib
         std::string lolaPath;
         bool lolaWitnessPath;
         bool lolaVerbose;
+ 
+        bool keepTempFiles;
  
         std::set< std::pair<pnapi::Node*, pnapi::Node*> > newArcs;
  

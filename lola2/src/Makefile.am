@@ -24,6 +24,7 @@ lola_SOURCES = \
                 Socket.cc Socket.h \
                 SimpleString.cc SimpleString.h \
                 Store.h \
+		swap.h swap.cc \
                 Symbol.cc Symbol.h \
                 SymbolTable.cc SymbolTable.h \
                 Transition.cc Transition.h \

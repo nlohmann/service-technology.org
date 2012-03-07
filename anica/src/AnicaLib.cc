@@ -748,34 +748,35 @@ pnapi::PetriNet* anica::AnicaLib::getControllerProblem() {
     return resultNet;
 }
 
-Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOutput, std::map<std::string, BDD*>& cuddVariables)
+Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOutput, std::map<std::string, int>& cuddVariables)
 {
     assert(initialNet != NULL);
     assert(downgradeTransitions.size() == 0);
     
     Cudd* cuddManager = new Cudd();
-    //std::map<std::string, BDD> cuddVariables;
 	cuddVariables.clear();
 	
     cuddManager->AutodynEnable(CUDD_REORDER_GROUP_SIFT_CONV);
     *cuddOutput = cuddManager->bddOne();
     size_t i = 0;
     PNAPI_FOREACH(t, initialNet->getTransitions()) {
-        cuddVariables[(**t).getName()] = &cuddManager->bddVar();
-        cuddVariableNames[i++] = strdup((**t).getName().c_str());
+        cuddVariables[(**t).getName()] = i;
+        cuddManager->bddVar(i);
+        cuddVariableNames[i] = strdup((**t).getName().c_str());
         // encode given assignments
         switch ((**t).getConfidence()) {
             case anica::CONFIDENCE_HIGH:
-                *cuddOutput *= *cuddVariables[(**t).getName()];
+                *cuddOutput *= cuddManager->bddVar(i);
                 break;
             case anica::CONFIDENCE_LOW:
-                *cuddOutput *= !*cuddVariables[(**t).getName()];
+                *cuddOutput *= !cuddManager->bddVar(i);
                 break;
             case anica::CONFIDENCE_NONE:
                 break;
             default:
                 assert(false);
         }
+        i++;
     }
     
     PNAPI_FOREACH(p, initialNet->getPlaces()) {
@@ -796,7 +797,7 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
                             //BDD* highBDD = cuddVariables[(**highTransition).getName()];
                             //BDD* lowBDD = cuddVariables[(**lowTransition).getName()];
                             //*cuddOutput *= !(*highBDD * !*lowBDD);  
-                            *cuddOutput *= !(*cuddVariables[(**highTransition).getName()] * !*cuddVariables[(**lowTransition).getName()]);
+                            *cuddOutput *= !(cuddManager->bddVar(cuddVariables[(**highTransition).getName()]) * !cuddManager->bddVar(cuddVariables[(**lowTransition).getName()]));
                         }
                         delete taskTriple;
                     }
@@ -820,7 +821,7 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
                             //BDD* lowBDD = cuddVariables[(**lowTransition).getName()];
                             //*cuddOutput *= !(*highBDD * !*lowBDD);  
                             //*cuddOutput *= !(*highBDD * !*lowBDD);
-                            *cuddOutput *= !(*cuddVariables[(**highTransition).getName()] * !*cuddVariables[(**lowTransition).getName()]);  
+                            *cuddOutput *= !(cuddManager->bddVar(cuddVariables[(**highTransition).getName()]) * !cuddManager->bddVar(cuddVariables[(**lowTransition).getName()]));  
                         }
                         delete taskTriple;
                     }

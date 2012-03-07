@@ -25,7 +25,7 @@ anica::AnicaLib* alib;
 char** cuddVariableNames;
 BDD* cuddOutput;
 Cudd* myBDD;
-std::map<std::string, BDD*> cuddVariables;
+std::map<std::string, int> cuddVariables;
 
 const char* levels[] = {"", "LOW", "HIGH"};
 
@@ -188,6 +188,7 @@ void updateNet(json_value* json) {
 
 
     // 4. set assignment
+    assignment.clear();
     PNAPI_FOREACH(t, net.getTransitions()) {
         assignment[(*t)->getName()] = static_cast<anica::confidence_e>((*t)->getConfidence());
     }
@@ -264,12 +265,11 @@ void updateNonInterference() {
             PNAPI_FOREACH(t, net.getTransitions()) {
                 if ((**t).getConfidence() == anica::CONFIDENCE_NONE) {
                     const std::string transitionName = (**t).getName();
+                    const int bddIndex = cuddVariables[transitionName];
                     rep->status("..checking: %s", transitionName.c_str());
-                    
-                    BDD curTransitionHigh = *cuddVariables[transitionName];
-                    BDD curResultHigh = !*cuddOutput + curTransitionHigh;    
+                      
                     // is high implied?
-                    if (curResultHigh == myBDD->bddOne()) {
+                    if ((!*cuddOutput + myBDD->bddVar(bddIndex)) == myBDD->bddOne()) {
                         // yes
                         rep->status("....HIGH");
                         assignment[transitionName] = anica::CONFIDENCE_HIGH;
@@ -277,9 +277,7 @@ void updateNonInterference() {
                     else {
                         // no
                         // is low implied?
-                        BDD curTransitionLow = !*cuddVariables[transitionName];
-                        BDD curResultLow = !*cuddOutput + curTransitionLow;
-                        if (curResultLow == myBDD->bddOne()) {
+                        if ((!*cuddOutput + !myBDD->bddVar(bddIndex)) == myBDD->bddOne()) {
                             rep->status("....LOW");
                             assignment[transitionName] = anica::CONFIDENCE_LOW;
                         }

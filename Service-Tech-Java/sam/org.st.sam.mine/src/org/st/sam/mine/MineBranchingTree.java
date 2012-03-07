@@ -111,20 +111,44 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     scenarioCoverage.clear();
   }
   
-  public int support(short[] word) {
-    SimpleArrayList<SLogTreeNode[]> occ = countOccurrences(word, null, null);
-    return occ.size();
+  public int getTotalOccurrences(SimpleArrayList<SLogTreeNode[]> occ, boolean OPTIONS_WEIGHTED_OCCURRENCE) {
+    
+    if (OPTIONS_WEIGHTED_OCCURRENCE) {
+      int total_occurrences = 0;
+      for (SLogTreeNode[] o : occ) {
+        // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word
+        total_occurrences += nodeCount.get(o[o.length-1]);
+      }
+      return total_occurrences;
+    } else {
+      return occ.size();
+    }
   }
   
-  public int support(SScenario s) {
-    short[] word = new short[s.pre.length+s.main.length];
-    for (int e=0; e<s.pre.length; e++) {
-      word[e] = s.pre[e];
+  public int support(short[] word, boolean OPTIONS_WEIGHTED_OCCURRENCE) {
+    
+    SimpleArrayList<SLogTreeNode[]> occ = countOccurrences(word, null, null);
+    int total_occurrences = getTotalOccurrences(occ, OPTIONS_WEIGHTED_OCCURRENCE);
+    
+    return total_occurrences;
+  }
+  
+  public int support(SScenario s, boolean OPTIONS_WEIGHTED_OCCURRENCE) {
+    
+    if (s.support == -1) {
+    
+      short[] word = new short[s.pre.length+s.main.length];
+      for (int e=0; e<s.pre.length; e++) {
+        word[e] = s.pre[e];
+      }
+      for (int e=0; e<s.main.length; e++) {
+        word[e+s.pre.length] = s.main[e];
+      }
+      s.support = support(word, OPTIONS_WEIGHTED_OCCURRENCE);
+      
     }
-    for (int e=0; e<s.main.length; e++) {
-      word[e+s.pre.length] = s.main[e];
-    }
-    return support(word);
+    
+    return s.support;
   }
   
   private Map<SScenario, SimpleArrayList<SLogTreeNode[]> > scenarioCoverage = new HashMap<SScenario, SimpleArrayList<SLogTreeNode[]>>();
@@ -138,6 +162,12 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     boolean visible[] = new boolean[slog.originalNames.length];
     for (int e=0; e<s.pre.length;e++) visible[s.pre[e]] = true;
     for (int e=0; e<s.main.length;e++) visible[s.main[e]] = true;
+    
+    // to store complete occurrences of the main-chart
+    SimpleArrayList<SLogTreeNode[]> occurrences = new SimpleArrayList<SLogTreeNode[]>();
+    // to store partial occurrences of the main-chart that could be completed
+    // (when a trace was extended at a leaf)
+    SimpleArrayList<SLogTreeNode[]> partialOccurrences = new SimpleArrayList<SLogTreeNode[]>();
     
     for (SLogTreeNode n : nodes) {
       if (n.id == s.pre[s.pre.length-1]) {
@@ -163,11 +193,9 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
           for (SLogTreeNode n2 : n.post) {
             SLogTreeNode occurrence[] = new SLogTreeNode[s.main.length];
             
-            // to store complete occurrences of the main-chart
-            SimpleArrayList<SLogTreeNode[]> occurrences = new SimpleArrayList<SLogTreeNode[]>();
-            // to store partial occurrences of the main-chart that could be completed
-            // (when a trace was extended at a leaf)
-            SimpleArrayList<SLogTreeNode[]> partialOccurrences = new SimpleArrayList<SLogTreeNode[]>();
+            // clear storages from last iteration
+            occurrences.quickClear();
+            partialOccurrences.quickClear();
             
             // get continuations with main-chart
             continuesWith(n2, s.main, 0, visible, occurrence, occurrences, partialOccurrences, null, null);

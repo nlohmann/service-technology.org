@@ -298,14 +298,16 @@ public class MineLSC {
                 }
                 
                 SimpleArrayList<SLogTreeNode[]> occ = tree.countOccurrences(cand, null, null);
-                int total_occurrences = getTotalOccurrences(occ);
+                int total_occurrences = tree.getTotalOccurrences(occ, OPTIONS_WEIGHTED_OCCURRENCE);
                 
                 LSC l = slog.toLSC(s, total_occurrences, c);
+                s.support = total_occurrences;
                 
                 if (l.isConnected()) {
                   if (showDebug(cand, null)) {
                     System.out.println("  is connected");
                   }
+                  
                   boolean s_weaker = false;
                   List<SScenario> toRemove = new LinkedList<SScenario>();
                   for (SScenario s2 : scenarios) {
@@ -347,8 +349,7 @@ public class MineLSC {
                     
                     //mined.add(cand);
                     //total -= (size-splitPos);
-                  } else {
-                    
+                  } else { // s is weaker
                   }
                   break;  
                   // we found a scenario for this candidate word. any other scenario
@@ -381,25 +382,14 @@ public class MineLSC {
   }
   
   public boolean implies(SScenario s1, SScenario s2) {
-    if (s1.implies(s2) && tree.support(s1) >= tree.support(s2))
+    //if (s1.implies(s2) && s2l.get(s1).getSupport() >= s2l.get(s2).getSupport())
+    if (s1.implies(s2) && tree.support(s1, OPTIONS_WEIGHTED_OCCURRENCE) >= tree.support(s2, OPTIONS_WEIGHTED_OCCURRENCE))
       return true;
     else
       return false;
   }
   
-  public int getTotalOccurrences(SimpleArrayList<SLogTreeNode[]> occ) {
-    
-    if (OPTIONS_WEIGHTED_OCCURRENCE) {
-      int total_occurrences = 0;
-      for (SLogTreeNode[] o : occ) {
-        // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word
-        total_occurrences += tree.nodeCount.get(o[o.length-1]);
-      }
-      return total_occurrences;
-    } else {
-      return occ.size();
-    }
-  }
+
   
   public Map<Short, String> getShortenedNames() {
     
@@ -514,7 +504,7 @@ public class MineLSC {
       
       SimpleArrayList<SLogTreeNode[]> occ = tree.countOccurrences(new short[] { (short)e }, null, null);
 
-      int total_occurrences = getTotalOccurrences(occ);
+      int total_occurrences = tree.getTotalOccurrences(occ, OPTIONS_WEIGHTED_OCCURRENCE);
 
       System.out.println("found "+e+" "+occ.size()+" times amounting to "+total_occurrences+" occurrences in the log // "+getSLog().originalNames[e]);
       if (total_occurrences >= minSupThreshold) {
@@ -648,7 +638,7 @@ public class MineLSC {
         }
       }
       
-      int total_occurrences = getTotalOccurrences(occ);
+      int total_occurrences = tree.getTotalOccurrences(occ, OPTIONS_WEIGHTED_OCCURRENCE);
       
       if (total_occurrences >= minSupThreshold) {
       
@@ -742,7 +732,7 @@ public class MineLSC {
           log(log_msw, " IS OUT "+total_occurrences+" violators: "+violators+" stuck: "+stuck_at+"\n");
         }
         
-        if (newPreferedSucc != ev) {
+        if (!Arrays.equals(newPreferedSucc,ev)) {
           if (showDebug(nextWord, preferedSucc)) {
             log(log_msw, "RETRY 2 "+toString(word) +" WITH ALL SUCCESSORS\n");
           }
@@ -826,7 +816,7 @@ public class MineLSC {
           ? tree.countOccurrences(nextWord, null, null) 
           : tree.countOccurrences(nextWord, visibleEvents, null, null);
       
-      int total_occurrences = getTotalOccurrences(occ);
+      int total_occurrences = tree.getTotalOccurrences(occ, OPTIONS_WEIGHTED_OCCURRENCE);
       
       if (total_occurrences >= minSupThreshold) {
       
@@ -867,30 +857,6 @@ public class MineLSC {
     int i_new = 0;
     for (int i_old=0; i_old<list.length; i_old++) {
       if (element != list[i_old]) reduced_list[i_new++] = list[i_old];
-    }
-    
-    return reduced_list;
-  }
-  
-  /**
-   * Remove element from the list.
-   * 
-   * @param list
-   * @param element
-   * @return a new array containing all elements except the given element
-   * 
-   */
-  private short[] removeFrom(short[] list, Set<Short> elements) {
-    
-    int new_length = 0;
-    for (int i=0; i<list.length; i++) {
-      if (!elements.contains(list[i])) new_length++;
-    }
-    
-    short[] reduced_list = new short[new_length];
-    int i_new = 0;
-    for (int i_old=0; i_old<list.length; i_old++) {
-      if (!elements.contains(list[i_old])) reduced_list[i_new++] = list[i_old];
     }
     
     return reduced_list;

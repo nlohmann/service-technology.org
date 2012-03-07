@@ -75,6 +75,8 @@ public class SLog {
       traceNum++;
     }
     originalNames = allNamesOrdered.toArray(new String[allNamesOrdered.size()]);
+    
+    computeLSCEventNames();
   }
 
   public String toString_native() {
@@ -88,15 +90,33 @@ public class SLog {
     }
     return sb.toString();
   }
+  
+  private final static int LSC_CALLER = 0;
+  private final static int LSC_CALLEE = 1;
+  private final static int LSC_METHOD = 2;
+  private String[][] event_id_to_lsc_events;
+  
+  public void computeLSCEventNames() {
+    
+    event_id_to_lsc_events = new String[originalNames.length][3];
+    
+    for (short event=0; event<originalNames.length;event++) {
+      int i1 = originalNames[event].indexOf('|');
+      int i2 = originalNames[event].indexOf('|', i1+1);
+      
+      event_id_to_lsc_events[event][LSC_CALLER] = originalNames[event].substring(0, i1);
+      event_id_to_lsc_events[event][LSC_CALLEE] = originalNames[event].substring(i1+1, i2);
+      event_id_to_lsc_events[event][LSC_METHOD] = originalNames[event].substring(i2+1);
+    }
+  }
+
 
   public LSCEvent toLSCEvent(short event) {
-    int i1 = originalNames[event].indexOf('|');
-    int i2 = originalNames[event].indexOf('|', i1+1);
-    String caller = originalNames[event].substring(0, i1);
-    String callee = originalNames[event].substring(i1+1, i2);
-    String method = originalNames[event].substring(i2+1);
-    
-    return new LSCEvent(caller, callee, method);
+
+    return new LSCEvent(
+        event_id_to_lsc_events[event][LSC_CALLER],
+        event_id_to_lsc_events[event][LSC_CALLEE],
+        event_id_to_lsc_events[event][LSC_METHOD]);
   }
   
   public LSC toLSC(SScenario s, int support, double confidence) {
@@ -130,6 +150,6 @@ public class SLog {
   public SScenario toSScenario(LSC l) throws Exception {
     short pre[] = toSScenario_chart(l.getPreChart());
     short main[] = toSScenario_chart(l.getMainChart());
-    return new SScenario(pre, main);
+    return new SScenario(pre, main, l.getSupport());
   }
 }

@@ -705,7 +705,7 @@ public class RunExperimentCompare {
             r.append("subsumed by branching scenario<br/>\n");
           
           SimpleArrayList<SLogTreeNode[]> occ = minerBranch.getTree().countOccurrences(originalScenarios.get(l).getWord(), null, null);
-          int total_occurrences = minerBranch.getTotalOccurrences(occ);
+          int total_occurrences = minerBranch.getTree().getTotalOccurrences(occ,minerBranch.OPTIONS_WEIGHTED_OCCURRENCE);
           //r.append("support (re-compute) "+total_occurrences+"/"+occ.size()+"<br/>\n");
           r.append("confidence (branch) "+minerBranch.getTree().confidence(originalScenarios.get(l), true)+"<br/>\n");
           r.append("confidence (linear) "+minerLinear.getTree().confidence(originalScenarios.get(l), true)+"<br/>\n");
@@ -905,6 +905,8 @@ public class RunExperimentCompare {
     //exp.setParameters("./experiments/columba_v3/", "columba_v3_resampled_agg_filtered3c.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
     exp.setParameters("./experiments/crossftp_succinct/", "crossftp_succinct_traceset.xes.gz", 1.0 /*fract*/, 12 /*supp*/, 1.0 /* conf */);
     //exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 5 /*supp*/, 1.0 /* conf */);
+    
+    //exp.setParameters("./experiments/jeti_invariants/", "jeti_invariants.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
 
     exp.experiment();
 

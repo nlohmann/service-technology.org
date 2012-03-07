@@ -12,9 +12,16 @@ public class SScenario {
   
   public int id = _scenarioCounter++;
   
+  public int support = -1;
+  
   public SScenario(short pre[], short main[]) {
+    this(pre, main, -1);
+  }
+  
+  public SScenario(short pre[], short main[], int support) {
     this.pre = pre;
     this.main = main;
+    this.support = support;
   }
   
   private short[] word = null;

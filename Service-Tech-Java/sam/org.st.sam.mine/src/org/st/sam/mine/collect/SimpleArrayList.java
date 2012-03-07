@@ -46,6 +46,12 @@ private static final int INIT_SIZE = 8;
     contents = new Object[INIT_SIZE];
     size = 0;
   }
+  
+  public void quickClear(){
+    
+    for (int i=0; i<contents.length; i++) contents[i] = null;
+    size = 0;
+  }
 
   @Override
   public Iterator<T> iterator() {

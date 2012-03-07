@@ -19,13 +19,6 @@ HOT:
 	 nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.ui.HistoryPanel|nu.fw.jeti.plugins.drawing.ui.HistoryPanel.addAction(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
 	 nu.fw.jeti.plugins.drawing.ui.HistoryPanel|nu.fw.jeti.plugins.drawing.shapes.actions.Action|nu.fw.jeti.plugins.drawing.shapes.actions.Action.happenedBefore(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
 
-(11 ,1.0)
-COLD: 
-	 nu.fw.jeti.plugins.drawing.shapes.PictureChat$1|nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.shapes.PictureHistory.addIncomingMessage(nu.fw.jeti.plugins.drawing.elements.PictureMessage, java.util.List)
-HOT: 
-	 nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.ui.HistoryPanel|nu.fw.jeti.plugins.drawing.ui.HistoryPanel.addAction(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
-	 nu.fw.jeti.plugins.drawing.shapes.PictureChat$1|nu.fw.jeti.plugins.drawing.shapes.PictureChat|nu.fw.jeti.plugins.drawing.shapes.PictureChat.showWindow()
-
 (147 ,1.0)
 COLD: 
 	 nu.fw.jeti.backend.Jabber|nu.fw.jeti.ui.ChatWindows|nu.fw.jeti.ui.ChatWindows.requestComposing(nu.fw.jeti.jabber.JID, java.lang.String, java.lang.String)
@@ -424,13 +417,6 @@ HOT:
 	 nu.fw.jeti.plugins.drawing.shapes.actions.Display|nu.fw.jeti.plugins.drawing.shapes.PictureChat|nu.fw.jeti.plugins.drawing.shapes.PictureChat.showWindow()
 	 nu.fw.jeti.plugins.drawing.shapes.actions.Display|nu.fw.jeti.plugins.drawing.shapes.PictureChat|nu.fw.jeti.plugins.drawing.shapes.PictureChat.getMyJID()
 	 nu.fw.jeti.plugins.drawing.shapes.PictureChat$1|nu.fw.jeti.plugins.drawing.shapes.PictureChat|nu.fw.jeti.plugins.drawing.shapes.PictureChat.showWindow()
-
-(24 ,1.0)
-COLD: 
-	 nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.shapes.actions.Action|nu.fw.jeti.plugins.drawing.shapes.actions.Action.happenedBefore(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
-HOT: 
-	 nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.ui.HistoryPanel|nu.fw.jeti.plugins.drawing.ui.HistoryPanel.addAction(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
-	 nu.fw.jeti.plugins.drawing.ui.HistoryPanel|nu.fw.jeti.plugins.drawing.shapes.actions.Action|nu.fw.jeti.plugins.drawing.shapes.actions.Action.happenedBefore(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
 
 (24 ,1.0)
 COLD: 
@@ -929,11 +915,25 @@ COLD:
 HOT: 
 	 nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.shapes.actions.Action|nu.fw.jeti.plugins.drawing.shapes.actions.Action.happenedBefore(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
 
+(31 ,1.0)
+COLD: 
+	 nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.shapes.actions.Action|nu.fw.jeti.plugins.drawing.shapes.actions.Action.happenedBefore(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
+HOT: 
+	 nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.ui.HistoryPanel|nu.fw.jeti.plugins.drawing.ui.HistoryPanel.addAction(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
+	 nu.fw.jeti.plugins.drawing.ui.HistoryPanel|nu.fw.jeti.plugins.drawing.shapes.actions.Action|nu.fw.jeti.plugins.drawing.shapes.actions.Action.happenedBefore(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
+
 (32 ,1.0)
 COLD: 
 	 nu.fw.jeti.backend.Jabber|nu.fw.jeti.plugins.drawing.shapes.PictureChat|nu.fw.jeti.plugins.drawing.shapes.PictureChat.newMessage(nu.fw.jeti.plugins.drawing.elements.PictureMessage)
 HOT: 
 	 nu.fw.jeti.plugins.drawing.shapes.PictureChat$1|nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.shapes.PictureHistory.addIncomingMessage(nu.fw.jeti.plugins.drawing.elements.PictureMessage, java.util.List)
+	 nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.ui.HistoryPanel|nu.fw.jeti.plugins.drawing.ui.HistoryPanel.addAction(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
+	 nu.fw.jeti.plugins.drawing.shapes.PictureChat$1|nu.fw.jeti.plugins.drawing.shapes.PictureChat|nu.fw.jeti.plugins.drawing.shapes.PictureChat.showWindow()
+
+(50 ,1.0)
+COLD: 
+	 nu.fw.jeti.plugins.drawing.shapes.PictureChat$1|nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.shapes.PictureHistory.addIncomingMessage(nu.fw.jeti.plugins.drawing.elements.PictureMessage, java.util.List)
+HOT: 
 	 nu.fw.jeti.plugins.drawing.shapes.PictureHistory|nu.fw.jeti.plugins.drawing.ui.HistoryPanel|nu.fw.jeti.plugins.drawing.ui.HistoryPanel.addAction(nu.fw.jeti.plugins.drawing.shapes.actions.Action)
 	 nu.fw.jeti.plugins.drawing.shapes.PictureChat$1|nu.fw.jeti.plugins.drawing.shapes.PictureChat|nu.fw.jeti.plugins.drawing.shapes.PictureChat.showWindow()
 

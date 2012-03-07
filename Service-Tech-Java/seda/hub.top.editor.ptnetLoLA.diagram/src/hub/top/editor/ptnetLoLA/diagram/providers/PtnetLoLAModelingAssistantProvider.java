@@ -25,146 +25,187 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
  * @generated
  */
 public class PtnetLoLAModelingAssistantProvider extends
-		ModelingAssistantProvider {
+    ModelingAssistantProvider {
 
-	/**
-	 * @generated
-	 */
-	public List getTypesForPopupBar(IAdaptable host) {
-		IGraphicalEditPart editPart = (IGraphicalEditPart) host
-				.getAdapter(IGraphicalEditPart.class);
-		if (editPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart) {
-			List types = new ArrayList();
-			types
-					.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
-			types
-					.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
-			return types;
-		}
-		return Collections.EMPTY_LIST;
-	}
+  /**
+   * @generated
+   */
+  public List getTypesForPopupBar(IAdaptable host) {
+    IGraphicalEditPart editPart = (IGraphicalEditPart) host
+        .getAdapter(IGraphicalEditPart.class);
+    if (editPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart) {
+      ArrayList<IElementType> types = new ArrayList<IElementType>(2);
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
+      return types;
+    }
+    return Collections.EMPTY_LIST;
+  }
 
-	/**
-	 * @generated
-	 */
-	public List getRelTypesOnSource(IAdaptable source) {
-		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
-				.getAdapter(IGraphicalEditPart.class);
-		return Collections.EMPTY_LIST;
-	}
+  /**
+   * @generated
+   */
+  public List getRelTypesOnSource(IAdaptable source) {
+    IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
+        .getAdapter(IGraphicalEditPart.class);
+    if (sourceEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) {
+      return ((hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) sourceEditPart)
+          .getMARelTypesOnSource();
+    }
+    if (sourceEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) {
+      return ((hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) sourceEditPart)
+          .getMARelTypesOnSource();
+    }
+    return Collections.EMPTY_LIST;
+  }
 
-	/**
-	 * @generated
-	 */
-	public List getRelTypesOnTarget(IAdaptable target) {
-		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
-				.getAdapter(IGraphicalEditPart.class);
-		return Collections.EMPTY_LIST;
-	}
+  /**
+   * @generated
+   */
+  public List getRelTypesOnTarget(IAdaptable target) {
+    IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
+        .getAdapter(IGraphicalEditPart.class);
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) {
+      return ((hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) targetEditPart)
+          .getMARelTypesOnTarget();
+    }
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) {
+      return ((hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) targetEditPart)
+          .getMARelTypesOnTarget();
+    }
+    return Collections.EMPTY_LIST;
+  }
 
-	/**
-	 * @generated
-	 */
-	public List getRelTypesOnSourceAndTarget(IAdaptable source, IAdaptable target) {
-		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
-				.getAdapter(IGraphicalEditPart.class);
-		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
-				.getAdapter(IGraphicalEditPart.class);
-		return Collections.EMPTY_LIST;
-	}
+  /**
+   * @generated
+   */
+  public List getRelTypesOnSourceAndTarget(IAdaptable source, IAdaptable target) {
+    IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
+        .getAdapter(IGraphicalEditPart.class);
+    IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
+        .getAdapter(IGraphicalEditPart.class);
+    if (sourceEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) {
+      return ((hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) sourceEditPart)
+          .getMARelTypesOnSourceAndTarget(targetEditPart);
+    }
+    if (sourceEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) {
+      return ((hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) sourceEditPart)
+          .getMARelTypesOnSourceAndTarget(targetEditPart);
+    }
+    return Collections.EMPTY_LIST;
+  }
 
-	/**
-	 * @generated
-	 */
-	public List getTypesForSource(IAdaptable target, IElementType relationshipType) {
-		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
-				.getAdapter(IGraphicalEditPart.class);
-		return Collections.EMPTY_LIST;
-	}
+  /**
+   * @generated
+   */
+  public List getTypesForSource(IAdaptable target, IElementType relationshipType) {
+    IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
+        .getAdapter(IGraphicalEditPart.class);
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) {
+      return ((hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) targetEditPart)
+          .getMATypesForSource(relationshipType);
+    }
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) {
+      return ((hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) targetEditPart)
+          .getMATypesForSource(relationshipType);
+    }
+    return Collections.EMPTY_LIST;
+  }
 
-	/**
-	 * @generated
-	 */
-	public List getTypesForTarget(IAdaptable source, IElementType relationshipType) {
-		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
-				.getAdapter(IGraphicalEditPart.class);
-		return Collections.EMPTY_LIST;
-	}
+  /**
+   * @generated
+   */
+  public List getTypesForTarget(IAdaptable source, IElementType relationshipType) {
+    IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
+        .getAdapter(IGraphicalEditPart.class);
+    if (sourceEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) {
+      return ((hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) sourceEditPart)
+          .getMATypesForTarget(relationshipType);
+    }
+    if (sourceEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) {
+      return ((hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) sourceEditPart)
+          .getMATypesForTarget(relationshipType);
+    }
+    return Collections.EMPTY_LIST;
+  }
 
-	/**
-	 * @generated
-	 */
-	public EObject selectExistingElementForSource(IAdaptable target,
-			IElementType relationshipType) {
-		return selectExistingElement(target, getTypesForSource(target,
-				relationshipType));
-	}
+  /**
+   * @generated
+   */
+  public EObject selectExistingElementForSource(IAdaptable target,
+      IElementType relationshipType) {
+    return selectExistingElement(target,
+        getTypesForSource(target, relationshipType));
+  }
 
-	/**
-	 * @generated
-	 */
-	public EObject selectExistingElementForTarget(IAdaptable source,
-			IElementType relationshipType) {
-		return selectExistingElement(source, getTypesForTarget(source,
-				relationshipType));
-	}
+  /**
+   * @generated
+   */
+  public EObject selectExistingElementForTarget(IAdaptable source,
+      IElementType relationshipType) {
+    return selectExistingElement(source,
+        getTypesForTarget(source, relationshipType));
+  }
 
-	/**
-	 * @generated
-	 */
-	protected EObject selectExistingElement(IAdaptable host, Collection types) {
-		if (types.isEmpty()) {
-			return null;
-		}
-		IGraphicalEditPart editPart = (IGraphicalEditPart) host
-				.getAdapter(IGraphicalEditPart.class);
-		if (editPart == null) {
-			return null;
-		}
-		Diagram diagram = (Diagram) editPart.getRoot().getContents().getModel();
-		Collection elements = new HashSet();
-		for (Iterator it = diagram.getElement().eAllContents(); it.hasNext();) {
-			EObject element = (EObject) it.next();
-			if (isApplicableElement(element, types)) {
-				elements.add(element);
-			}
-		}
-		if (elements.isEmpty()) {
-			return null;
-		}
-		return selectElement((EObject[]) elements.toArray(new EObject[elements
-				.size()]));
-	}
+  /**
+   * @generated
+   */
+  protected EObject selectExistingElement(IAdaptable host, Collection types) {
+    if (types.isEmpty()) {
+      return null;
+    }
+    IGraphicalEditPart editPart = (IGraphicalEditPart) host
+        .getAdapter(IGraphicalEditPart.class);
+    if (editPart == null) {
+      return null;
+    }
+    Diagram diagram = (Diagram) editPart.getRoot().getContents().getModel();
+    HashSet<EObject> elements = new HashSet<EObject>();
+    for (Iterator<EObject> it = diagram.getElement().eAllContents(); it
+        .hasNext();) {
+      EObject element = it.next();
+      if (isApplicableElement(element, types)) {
+        elements.add(element);
+      }
+    }
+    if (elements.isEmpty()) {
+      return null;
+    }
+    return selectElement((EObject[]) elements.toArray(new EObject[elements
+        .size()]));
+  }
 
-	/**
-	 * @generated
-	 */
-	protected boolean isApplicableElement(EObject element, Collection types) {
-		IElementType type = ElementTypeRegistry.getInstance().getElementType(
-				element);
-		return types.contains(type);
-	}
+  /**
+   * @generated
+   */
+  protected boolean isApplicableElement(EObject element, Collection types) {
+    IElementType type = ElementTypeRegistry.getInstance().getElementType(
+        element);
+    return types.contains(type);
+  }
 
-	/**
-	 * @generated
-	 */
-	protected EObject selectElement(EObject[] elements) {
-		Shell shell = Display.getCurrent().getActiveShell();
-		ILabelProvider labelProvider = new AdapterFactoryLabelProvider(
-				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-						.getInstance().getItemProvidersAdapterFactory());
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(shell,
-				labelProvider);
-		dialog
-				.setMessage(hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLAModelingAssistantProviderMessage);
-		dialog
-				.setTitle(hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLAModelingAssistantProviderTitle);
-		dialog.setMultipleSelection(false);
-		dialog.setElements(elements);
-		EObject selected = null;
-		if (dialog.open() == Window.OK) {
-			selected = (EObject) dialog.getFirstResult();
-		}
-		return selected;
-	}
+  /**
+   * @generated
+   */
+  protected EObject selectElement(EObject[] elements) {
+    Shell shell = Display.getCurrent().getActiveShell();
+    ILabelProvider labelProvider = new AdapterFactoryLabelProvider(
+        hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
+            .getInstance().getItemProvidersAdapterFactory());
+    ElementListSelectionDialog dialog = new ElementListSelectionDialog(shell,
+        labelProvider);
+    dialog
+        .setMessage(hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLAModelingAssistantProviderMessage);
+    dialog
+        .setTitle(hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLAModelingAssistantProviderTitle);
+    dialog.setMultipleSelection(false);
+    dialog.setElements(elements);
+    EObject selected = null;
+    if (dialog.open() == Window.OK) {
+      selected = (EObject) dialog.getFirstResult();
+    }
+    return selected;
+  }
 }

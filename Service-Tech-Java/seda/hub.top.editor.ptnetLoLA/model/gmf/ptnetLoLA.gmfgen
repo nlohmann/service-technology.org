@@ -2,18 +2,16 @@
 <gmfgen:GenEditorGenerator xmi:version="2.0"
     xmlns:xmi="http://www.omg.org/XMI"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:gmfgen="http://www.eclipse.org/gmf/2008/GenModel" diagramFileExtension="ptnet_diagram"
+    xmlns:gmfgen="http://www.eclipse.org/gmf/2009/GenModel" diagramFileExtension="ptnet_diagram"
     domainFileExtension="ptnet"
     copyrightText=" Copyright (c) 2008 Dirk Fahland. All rights reserved. EPL1.0/GPL3.0/LGPL3.0&#xD;&#xA; &#xD;&#xA; ServiceTechnolog.org - PetriNet Editor Framework&#xD;&#xA; &#xD;&#xA; This program and the accompanying materials are made available under&#xD;&#xA; the terms of the Eclipse Public License v1.0, which accompanies this&#xD;&#xA; distribution, and is available at http://www.eclipse.org/legal/epl-v10.html&#xD;&#xA; &#xD;&#xA; Software distributed under the License is distributed on an &quot;AS IS&quot; basis,&#xD;&#xA; WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License&#xD;&#xA; for the specific language governing rights and limitations under the&#xD;&#xA; License.&#xD;&#xA;&#xD;&#xA; The Original Code is this file as it was released on July 30, 2008.&#xD;&#xA; The Initial Developer of the Original Code is&#xD;&#xA; &#x9;&#x9;Dirk Fahland&#xD;&#xA; &#xD;&#xA; Portions created by the Initial Developer are Copyright (c) 2008&#xD;&#xA; the Initial Developer. All Rights Reserved.&#xD;&#xA;&#xD;&#xA; Contributor(s):&#xD;&#xA;&#xD;&#xA; Alternatively, the contents of this file may be used under the terms of&#xD;&#xA; either the GNU General Public License Version 3 or later (the &quot;GPL&quot;), or&#xD;&#xA; the GNU Lesser General Public License Version 3 or later (the &quot;LGPL&quot;),&#xD;&#xA; in which case the provisions of the GPL or the LGPL are applicable instead&#xD;&#xA; of those above. If you wish to allow use of your version of this file only&#xD;&#xA; under the terms of either the GPL or the LGPL, and not to allow others to&#xD;&#xA; use your version of this file under the terms of the EPL, indicate your&#xD;&#xA; decision by deleting the provisions above and replace them with the notice&#xD;&#xA; and other provisions required by the GPL or the LGPL. If you do not delete&#xD;&#xA; the provisions above, a recipient may use your version of this file under&#xD;&#xA; the terms of any one of the EPL, the GPL or the LGPL.">
   <diagram
       visualID="1000"
       editPartClassName="PtNetEditPart"
       itemSemanticEditPolicyClassName="PtNetItemSemanticEditPolicy"
-      notationViewFactoryClassName="PtNetViewFactory"
       canonicalEditPolicyClassName="PtNetCanonicalEditPolicy"
       iconProviderPriority="Low"
-      creationWizardIconPath="icons/document.net.bw_2.16.png"
-      validationProviderPriority="Low">
+      creationWizardIconPath="icons/document.net.bw_2.16.png">
     <diagramRunTimeClass
         href="../../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Diagram"/>
     <elementType
@@ -28,7 +26,6 @@
         visualID="2001"
         editPartClassName="TransitionEditPart"
         itemSemanticEditPolicyClassName="TransitionItemSemanticEditPolicy"
-        notationViewFactoryClassName="TransitionViewFactory"
         canonicalEditPolicyClassName="TransitionCanonicalEditPolicy"
         graphicalNodeEditPolicyClassName="TransitionGraphicalNodeEditPolicy"
         createCommandClassName="TransitionCreateCommand">
@@ -63,8 +60,7 @@
           xsi:type="gmfgen:GenExternalNodeLabel"
           visualID="5001"
           editPartClassName="TransitionNameEditPart"
-          itemSemanticEditPolicyClassName="TransitionNameItemSemanticEditPolicy"
-          notationViewFactoryClassName="TransitionNameViewFactory">
+          itemSemanticEditPolicyClassName="TransitionNameItemSemanticEditPolicy">
         <diagramRunTimeClass
             href="../../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
         <viewmap
@@ -73,7 +69,8 @@
           <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
         </viewmap>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet">
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0">
           <metaFeatures
               href="../ptnetLoLA.genmodel#//ptnetLoLA/Node/name"/>
         </modelFacet>
@@ -83,7 +80,6 @@
         visualID="2002"
         editPartClassName="PlaceEditPart"
         itemSemanticEditPolicyClassName="PlaceItemSemanticEditPolicy"
-        notationViewFactoryClassName="PlaceViewFactory"
         canonicalEditPolicyClassName="PlaceCanonicalEditPolicy"
         graphicalNodeEditPolicyClassName="PlaceGraphicalNodeEditPolicy"
         createCommandClassName="PlaceCreateCommand">
@@ -118,8 +114,7 @@
           xsi:type="gmfgen:GenExternalNodeLabel"
           visualID="5002"
           editPartClassName="PlaceNameEditPart"
-          itemSemanticEditPolicyClassName="PlaceNameItemSemanticEditPolicy"
-          notationViewFactoryClassName="PlaceNameViewFactory">
+          itemSemanticEditPolicyClassName="PlaceNameItemSemanticEditPolicy">
         <diagramRunTimeClass
             href="../../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
         <viewmap
@@ -129,6 +124,7 @@
         </viewmap>
         <modelFacet
             xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0"
             viewPattern=""
             editorPattern=""
             editPattern="">
@@ -139,8 +135,7 @@
       <labels
           visualID="5003"
           editPartClassName="PlaceTokenEditPart"
-          itemSemanticEditPolicyClassName="PlaceTokenItemSemanticEditPolicy"
-          notationViewFactoryClassName="PlaceTokenViewFactory">
+          itemSemanticEditPolicyClassName="PlaceTokenItemSemanticEditPolicy">
         <diagramRunTimeClass
             href="../../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
         <viewmap
@@ -153,6 +148,7 @@
         </viewmap>
         <modelFacet
             xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0"
             viewPattern=""
             editorPattern=""
             editPattern="">
@@ -165,7 +161,6 @@
         visualID="4001"
         editPartClassName="ArcToPlaceEditPart"
         itemSemanticEditPolicyClassName="ArcToPlaceItemSemanticEditPolicy"
-        notationViewFactoryClassName="ArcToPlaceViewFactory"
         createCommandClassName="ArcToPlaceCreateCommand"
         reorientCommandClassName="ArcToPlaceReorientCommand">
       <diagramRunTimeClass
@@ -199,7 +194,6 @@
           visualID="6001"
           editPartClassName="ArcToPlaceWeightEditPart"
           itemSemanticEditPolicyClassName="ArcToPlaceWeightItemSemanticEditPolicy"
-          notationViewFactoryClassName="ArcToPlaceWeightViewFactory"
           readOnly="true">
         <diagramRunTimeClass
             href="../../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
@@ -213,7 +207,8 @@
               y="5"/>
         </viewmap>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet">
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0">
           <metaFeatures
               href="../ptnetLoLA.genmodel#//ptnetLoLA/Arc/weight"/>
         </modelFacet>
@@ -226,7 +221,6 @@
         visualID="4002"
         editPartClassName="ArcToTransitionEditPart"
         itemSemanticEditPolicyClassName="ArcToTransitionItemSemanticEditPolicy"
-        notationViewFactoryClassName="ArcToTransitionViewFactory"
         createCommandClassName="ArcToTransitionCreateCommand"
         reorientCommandClassName="ArcToTransitionReorientCommand">
       <diagramRunTimeClass
@@ -260,7 +254,6 @@
           visualID="6002"
           editPartClassName="ArcToTransitionWeightEditPart"
           itemSemanticEditPolicyClassName="ArcToTransitionWeightItemSemanticEditPolicy"
-          notationViewFactoryClassName="ArcToTransitionWeightViewFactory"
           readOnly="true">
         <diagramRunTimeClass
             href="../../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
@@ -274,7 +267,8 @@
               y="5"/>
         </viewmap>
         <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet">
+            xsi:type="gmfgen:FeatureLabelModelFacet"
+            parser="//@labelParsers/@implementations.0">
           <metaFeatures
               href="../ptnetLoLA.genmodel#//ptnetLoLA/Arc/weight"/>
         </modelFacet>
@@ -505,4 +499,15 @@
           body="self.oclIsKindOf(Transition)"/>
     </providers>
   </expressionProviders>
+  <labelParsers
+      extensibleViaService="true">
+    <implementations
+        xsi:type="gmfgen:PredefinedParser"
+        uses="//@diagram/@topLevelNodes.0/@labels.0/@modelFacet //@diagram/@topLevelNodes.1/@labels.0/@modelFacet //@diagram/@topLevelNodes.1/@labels.1/@modelFacet //@diagram/@links.0/@labels.0/@modelFacet //@diagram/@links.1/@labels.0/@modelFacet"/>
+  </labelParsers>
+  <contextMenus
+      context="//@diagram">
+    <items
+        xsi:type="gmfgen:LoadResourceAction"/>
+  </contextMenus>
 </gmfgen:GenEditorGenerator>

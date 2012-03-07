@@ -40,118 +40,118 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class MarkingImpl extends EObjectImpl implements Marking {
 	/**
-	 * The cached value of the '{@link #getPlaces() <em>Places</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #getPlaces() <em>Places</em>}' containment reference list.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getPlaces()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getPlaces()
+   * @generated
+   * @ordered
+   */
 	protected EList<RefMarkedPlace> places;
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected MarkingImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@Override
 	protected EClass eStaticClass() {
-		return PtnetLoLAPackage.Literals.MARKING;
-	}
+    return PtnetLoLAPackage.Literals.MARKING;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public EList<RefMarkedPlace> getPlaces() {
-		if (places == null) {
-			places = new EObjectContainmentEList<RefMarkedPlace>(RefMarkedPlace.class, this, PtnetLoLAPackage.MARKING__PLACES);
-		}
-		return places;
-	}
+    if (places == null) {
+      places = new EObjectContainmentEList<RefMarkedPlace>(RefMarkedPlace.class, this, PtnetLoLAPackage.MARKING__PLACES);
+    }
+    return places;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case PtnetLoLAPackage.MARKING__PLACES:
-				return ((InternalEList<?>)getPlaces()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
+    switch (featureID) {
+      case PtnetLoLAPackage.MARKING__PLACES:
+        return ((InternalEList<?>)getPlaces()).basicRemove(otherEnd, msgs);
+    }
+    return super.eInverseRemove(otherEnd, featureID, msgs);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case PtnetLoLAPackage.MARKING__PLACES:
-				return getPlaces();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
+    switch (featureID) {
+      case PtnetLoLAPackage.MARKING__PLACES:
+        return getPlaces();
+    }
+    return super.eGet(featureID, resolve, coreType);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case PtnetLoLAPackage.MARKING__PLACES:
-				getPlaces().clear();
-				getPlaces().addAll((Collection<? extends RefMarkedPlace>)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
+    switch (featureID) {
+      case PtnetLoLAPackage.MARKING__PLACES:
+        getPlaces().clear();
+        getPlaces().addAll((Collection<? extends RefMarkedPlace>)newValue);
+        return;
+    }
+    super.eSet(featureID, newValue);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@Override
 	public void eUnset(int featureID) {
-		switch (featureID) {
-			case PtnetLoLAPackage.MARKING__PLACES:
-				getPlaces().clear();
-				return;
-		}
-		super.eUnset(featureID);
-	}
+    switch (featureID) {
+      case PtnetLoLAPackage.MARKING__PLACES:
+        getPlaces().clear();
+        return;
+    }
+    super.eUnset(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@Override
 	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case PtnetLoLAPackage.MARKING__PLACES:
-				return places != null && !places.isEmpty();
-		}
-		return super.eIsSet(featureID);
-	}
+    switch (featureID) {
+      case PtnetLoLAPackage.MARKING__PLACES:
+        return places != null && !places.isEmpty();
+    }
+    return super.eIsSet(featureID);
+  }
 
 } //MarkingImpl

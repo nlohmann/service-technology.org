@@ -34,129 +34,129 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  */
 public class PlaceReferenceImpl extends EObjectImpl implements PlaceReference {
 	/**
-	 * The cached value of the '{@link #getPlace() <em>Place</em>}' reference.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #getPlace() <em>Place</em>}' reference.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getPlace()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getPlace()
+   * @generated
+   * @ordered
+   */
 	protected Place place;
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected PlaceReferenceImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@Override
 	protected EClass eStaticClass() {
-		return PtnetLoLAPackage.Literals.PLACE_REFERENCE;
-	}
+    return PtnetLoLAPackage.Literals.PLACE_REFERENCE;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Place getPlace() {
-		if (place != null && place.eIsProxy()) {
-			InternalEObject oldPlace = (InternalEObject)place;
-			place = (Place)eResolveProxy(oldPlace);
-			if (place != oldPlace) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, PtnetLoLAPackage.PLACE_REFERENCE__PLACE, oldPlace, place));
-			}
-		}
-		return place;
-	}
+    if (place != null && place.eIsProxy()) {
+      InternalEObject oldPlace = (InternalEObject)place;
+      place = (Place)eResolveProxy(oldPlace);
+      if (place != oldPlace) {
+        if (eNotificationRequired())
+          eNotify(new ENotificationImpl(this, Notification.RESOLVE, PtnetLoLAPackage.PLACE_REFERENCE__PLACE, oldPlace, place));
+      }
+    }
+    return place;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Place basicGetPlace() {
-		return place;
-	}
+    return place;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void setPlace(Place newPlace) {
-		Place oldPlace = place;
-		place = newPlace;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, PtnetLoLAPackage.PLACE_REFERENCE__PLACE, oldPlace, place));
-	}
+    Place oldPlace = place;
+    place = newPlace;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, PtnetLoLAPackage.PLACE_REFERENCE__PLACE, oldPlace, place));
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case PtnetLoLAPackage.PLACE_REFERENCE__PLACE:
-				if (resolve) return getPlace();
-				return basicGetPlace();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
+    switch (featureID) {
+      case PtnetLoLAPackage.PLACE_REFERENCE__PLACE:
+        if (resolve) return getPlace();
+        return basicGetPlace();
+    }
+    return super.eGet(featureID, resolve, coreType);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@Override
 	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case PtnetLoLAPackage.PLACE_REFERENCE__PLACE:
-				setPlace((Place)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
+    switch (featureID) {
+      case PtnetLoLAPackage.PLACE_REFERENCE__PLACE:
+        setPlace((Place)newValue);
+        return;
+    }
+    super.eSet(featureID, newValue);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@Override
 	public void eUnset(int featureID) {
-		switch (featureID) {
-			case PtnetLoLAPackage.PLACE_REFERENCE__PLACE:
-				setPlace((Place)null);
-				return;
-		}
-		super.eUnset(featureID);
-	}
+    switch (featureID) {
+      case PtnetLoLAPackage.PLACE_REFERENCE__PLACE:
+        setPlace((Place)null);
+        return;
+    }
+    super.eUnset(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@Override
 	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case PtnetLoLAPackage.PLACE_REFERENCE__PLACE:
-				return place != null;
-		}
-		return super.eIsSet(featureID);
-	}
+    switch (featureID) {
+      case PtnetLoLAPackage.PLACE_REFERENCE__PLACE:
+        return place != null;
+    }
+    return super.eIsSet(featureID);
+  }
 
 } //PlaceReferenceImpl

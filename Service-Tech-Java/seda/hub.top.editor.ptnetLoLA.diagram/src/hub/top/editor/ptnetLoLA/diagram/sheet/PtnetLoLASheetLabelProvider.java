@@ -3,78 +3,83 @@ package hub.top.editor.ptnetLoLA.diagram.sheet;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.gef.EditPart;
+import org.eclipse.gmf.runtime.emf.type.core.IElementType;
 import org.eclipse.gmf.runtime.notation.View;
+import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.graphics.Image;
 
 /**
  * @generated
  */
-public class PtnetLoLASheetLabelProvider extends DecoratingLabelProvider {
+public class PtnetLoLASheetLabelProvider extends BaseLabelProvider implements
+    ILabelProvider {
 
-	/**
-	 * @generated
-	 */
-	public PtnetLoLASheetLabelProvider() {
-		super(new AdapterFactoryLabelProvider(
-				hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-						.getInstance().getItemProvidersAdapterFactory()), null);
-	}
+  /**
+   * @generated
+   */
+  public String getText(Object element) {
+    element = unwrap(element);
+    if (element instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup) {
+      return ((hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup) element)
+          .getGroupName();
+    }
+    IElementType etype = getElementType(getView(element));
+    return etype == null ? "" : etype.getDisplayName();
+  }
 
-	/**
-	 * @generated
-	 */
-	public String getText(Object element) {
-		Object selected = unwrap(element);
-		if (selected instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup) {
-			return ((hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup) selected)
-					.getGroupName();
-		}
-		return super.getText(selected);
-	}
+  /**
+   * @generated
+   */
+  public Image getImage(Object element) {
+    IElementType etype = getElementType(getView(unwrap(element)));
+    return etype == null ? null
+        : hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes
+            .getImage(etype);
+  }
 
-	/**
-	 * @generated
-	 */
-	public Image getImage(Object element) {
-		return super.getImage(unwrap(element));
-	}
+  /**
+   * @generated
+   */
+  private Object unwrap(Object element) {
+    if (element instanceof IStructuredSelection) {
+      return ((IStructuredSelection) element).getFirstElement();
+    }
+    return element;
+  }
 
-	/**
-	 * @generated
-	 */
-	private Object unwrap(Object element) {
-		if (element instanceof IStructuredSelection) {
-			return unwrap(((IStructuredSelection) element).getFirstElement());
-		}
-		if (element instanceof EditPart) {
-			return unwrapEditPart((EditPart) element);
-		}
-		if (element instanceof IAdaptable) {
-			View view = (View) ((IAdaptable) element).getAdapter(View.class);
-			if (view != null) {
-				return unwrapView(view);
-			}
-		}
-		return element;
-	}
+  /**
+   * @generated
+   */
+  private View getView(Object element) {
+    if (element instanceof View) {
+      return (View) element;
+    }
+    if (element instanceof IAdaptable) {
+      return (View) ((IAdaptable) element).getAdapter(View.class);
+    }
+    return null;
+  }
 
-	/**
-	 * @generated
-	 */
-	private Object unwrapEditPart(EditPart p) {
-		if (p.getModel() instanceof View) {
-			return unwrapView((View) p.getModel());
-		}
-		return p.getModel();
-	}
-
-	/**
-	 * @generated
-	 */
-	private Object unwrapView(View view) {
-		return view.getElement() == null ? view : view.getElement();
-	}
+  /**
+   * @generated
+   */
+  private IElementType getElementType(View view) {
+    // For intermediate views climb up the containment hierarchy to find the one associated with an element type.
+    while (view != null) {
+      int vid = hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
+          .getVisualID(view);
+      IElementType etype = hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes
+          .getElementType(vid);
+      if (etype != null) {
+        return etype;
+      }
+      view = view.eContainer() instanceof View ? (View) view.eContainer()
+          : null;
+    }
+    return null;
+  }
 
 }

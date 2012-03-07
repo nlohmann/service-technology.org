@@ -40,8 +40,10 @@ import hub.top.editor.petrinets.diagram.graphics.LineBorderNet;
 import hub.top.editor.ptnetLoLA.NodeType;
 import hub.top.editor.ptnetLoLA.Place;
 
+import java.util.Collections;
 import java.util.Iterator;
 
+import java.util.List;
 import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LayeredPane;
@@ -51,10 +53,15 @@ import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
+import org.eclipse.gef.Request;
+import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editparts.LayerManager;
+import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
+import org.eclipse.gef.handles.MoveHandle;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.GraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
+import org.eclipse.gmf.runtime.diagram.ui.editpolicies.NonResizableLabelEditPolicy;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
 import org.eclipse.gmf.runtime.notation.Node;
@@ -66,247 +73,295 @@ import org.eclipse.swt.graphics.Color;
  */
 public class PtNetEditPart extends DiagramEditPart {
 
-	/**
-	 * @generated
-	 */
-	public final static String MODEL_ID = "PtnetLoLA"; //$NON-NLS-1$
+  /**
+   * @generated
+   */
+  public final static String MODEL_ID = "PtnetLoLA"; //$NON-NLS-1$
 
-	/**
-	 * @generated
-	 */
-	public static final int VISUAL_ID = 1000;
+  /**
+   * @generated
+   */
+  public static final int VISUAL_ID = 1000;
 
-	/**
-	 * @generated
-	 */
-	public PtNetEditPart(View view) {
-		super(view);
-	}
-	
-	/**
-	 * @generated
-	 */
-	protected void createDefaultEditPolicies() {
-		super.createDefaultEditPolicies();
-		//installEditPolicy(EditPolicyRoles.CREATION_ROLE,
-		//		new hub.top.editor.ptnetLoLA.diagram.edit.policies.PtNetCreationEditPolicy());
-		installEditPolicy(
-				EditPolicyRoles.SEMANTIC_ROLE,
-				new hub.top.editor.ptnetLoLA.diagram.edit.policies.PtNetItemSemanticEditPolicy());
-		installEditPolicy(
-				EditPolicyRoles.CANONICAL_ROLE,
-				new hub.top.editor.ptnetLoLA.diagram.edit.policies.PtNetCanonicalEditPolicy());
-		// removeEditPolicy(org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles.POPUPBAR_ROLE);
-	}
+  /**
+   * @generated
+   */
+  public PtNetEditPart(View view) {
+    super(view);
+  }
 
-	public static final String BACKGROUND_LAYERS = "hub.top.editor.petrinets.layers.background";
-	
-	@Override
-	public void activate() {
+  /**
+   * @generated
+   */
+  protected void createDefaultEditPolicies() {
+    super.createDefaultEditPolicies();
+    installEditPolicy(
+        EditPolicyRoles.SEMANTIC_ROLE,
+        new hub.top.editor.ptnetLoLA.diagram.edit.policies.PtNetItemSemanticEditPolicy());
+    installEditPolicy(
+        EditPolicyRoles.CANONICAL_ROLE,
+        new hub.top.editor.ptnetLoLA.diagram.edit.policies.PtNetCanonicalEditPolicy());
+    // removeEditPolicy(org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles.POPUPBAR_ROLE);
+  }
 
-		// create a new background layer for this diagram
-		LayerManager man = (LayerManager)getRoot();
-		LayeredPane printable = (LayeredPane)man.getLayer(PRINTABLE_LAYERS);
-		FreeformLayer backgroundLayer = new FreeformLayer();
-		// push background to the back of all printable layers
-		printable.add(backgroundLayer,BACKGROUND_LAYERS, 0);
-		
-		NodeFigure borderFig = createBorderFigure();
+  /**
+   * @generated
+   */
+  /*package-local*/static class NodeLabelDragPolicy extends
+      NonResizableEditPolicy {
 
-		// add figure to the this diagram, and draw it
-		getFigure().add(borderFig, 0);	
-		borderFig.setParent(getFigure());
-		borderFig.repaint();
-		// add figure to the background layer, must be executed last for
-		// proper positioning
-		backgroundLayer.add(borderFig);		
-		
-		// add a layout-listener that is called whenever a node is
-		// repositioned in this diagram, the layout-listener calculates
-		// the outermost nodes of the diagram and repositions the
-		// bordering rectangle around it
-		getFigure().addLayoutListener(new LayoutListener.Stub() {
+    /**
+     * @generated
+     */
+    @SuppressWarnings("rawtypes")
+    protected List createSelectionHandles() {
+      MoveHandle h = new MoveHandle(
+          (org.eclipse.gef.GraphicalEditPart) getHost());
+      h.setBorder(null);
+      return Collections.singletonList(h);
+    }
+
+    /**
+     * @generated
+     */
+    public Command getCommand(Request request) {
+      return null;
+    }
+
+    /**
+     * @generated
+     */
+    public boolean understandsRequest(Request request) {
+      return false;
+    }
+  }
+
+  /**
+   * @generated
+   */
+  /*package-local*/static class LinkLabelDragPolicy extends
+      NonResizableLabelEditPolicy {
+
+    /**
+     * @generated
+     */
+    @SuppressWarnings("rawtypes")
+    protected List createSelectionHandles() {
+      MoveHandle mh = new MoveHandle(
+          (org.eclipse.gef.GraphicalEditPart) getHost());
+      mh.setBorder(null);
+      return Collections.singletonList(mh);
+    }
+  }
+
+  public static final String BACKGROUND_LAYERS = "hub.top.editor.petrinets.layers.background";
+
+  @Override
+  public void activate() {
+
+    // create a new background layer for this diagram
+    LayerManager man = (LayerManager) getRoot();
+    LayeredPane printable = (LayeredPane) man.getLayer(PRINTABLE_LAYERS);
+    FreeformLayer backgroundLayer = new FreeformLayer();
+    // push background to the back of all printable layers
+    printable.add(backgroundLayer, BACKGROUND_LAYERS, 0);
+
+    NodeFigure borderFig = createBorderFigure();
+
+    // add figure to the this diagram, and draw it
+    getFigure().add(borderFig, 0);
+    borderFig.setParent(getFigure());
+    borderFig.repaint();
+    // add figure to the background layer, must be executed last for
+    // proper positioning
+    backgroundLayer.add(borderFig);
+
+    // add a layout-listener that is called whenever a node is
+    // repositioned in this diagram, the layout-listener calculates
+    // the outermost nodes of the diagram and repositions the
+    // bordering rectangle around it
+    getFigure().addLayoutListener(new LayoutListener.Stub() {
       @Override
       public void postLayout(IFigure hostFigure) {
-      	PtNetEditPart net = PtNetEditPart.this;
-      	Iterator it = net.getChildren().iterator();
-      	
-      	boolean needsBorder = false;
-      	
-      	// determine outermost bounds of the net by iterating over all
-      	// child edit parts of this net
-      	Rectangle netBounds = null;
-      	while (it.hasNext()) {
-      		EditPart part = (EditPart)it.next();
-      		if (part instanceof PlaceEditPart || part instanceof TransitionEditPart) {
-      			// consider edit parts of places and transitions only
-      			
-      			boolean center = false;
-      			if (part instanceof PlaceEditPart) {
-      				Place p = (Place)((Node)part.getModel()).getElement();
-      				if (   p.getType() == NodeType.INPUT
-      						|| p.getType() == NodeType.OUTPUT
-      						|| p.getType() == NodeType.INOUT )
-      				{
-      					// in case the place is an interface place, find the
-      					// center of the shape of the node (interface nodes are
-      					// positioned directly on the border)
-      					center = true;
-      					// we only need a border if there is an interface node
-      					needsBorder = true;
-      				}
-      			}
-      			
-      			// retrieve geometry of the nodes edit part
-      			GraphicalEditPart gep = (GraphicalEditPart)part;
-      			Rectangle nodeBounds = new Rectangle(gep.getFigure().getBounds());
-      			
-      			// calculate its contribution to the bounds of the net
-      			if (center)
-      				nodeBounds = new Rectangle(nodeBounds.getCenter(), new Dimension(0,0));
-      			else {
-      				nodeBounds.expand(20, 20);
-      			}
-      			
-      			// and extend the existing bounds accordingly
-      			if (netBounds == null)
-      				netBounds = nodeBounds;
-      			else
-      				netBounds = netBounds.union(nodeBounds);
-      		}
-      	}
+        PtNetEditPart net = PtNetEditPart.this;
+        Iterator it = net.getChildren().iterator();
 
-      	// check whether to hide or to show the border 
-      	if (needsBorder && netBounds != null) {
-      		// draw the border rectangle
-      		
-        	if (netBounds.equals(PtNetEditPart.this.getBorderFigure().getBounds())) {
-        		// do not redraw if nothing has changed
-        		return;
-        	}
+        boolean needsBorder = false;
 
-      		getBorderPrimaryShape().repositionAndShow(netBounds);
-      	} else {
-      		// hide the border rectangle
-      		getBorderPrimaryShape().hide();
-      	}
+        // determine outermost bounds of the net by iterating over all
+        // child edit parts of this net
+        Rectangle netBounds = null;
+        while (it.hasNext()) {
+          EditPart part = (EditPart) it.next();
+          if (part instanceof PlaceEditPart
+              || part instanceof TransitionEditPart) {
+            // consider edit parts of places and transitions only
+
+            boolean center = false;
+            if (part instanceof PlaceEditPart) {
+              Place p = (Place) ((Node) part.getModel()).getElement();
+              if (p.getType() == NodeType.INPUT
+                  || p.getType() == NodeType.OUTPUT
+                  || p.getType() == NodeType.INOUT) {
+                // in case the place is an interface place, find the
+                // center of the shape of the node (interface nodes are
+                // positioned directly on the border)
+                center = true;
+                // we only need a border if there is an interface node
+                needsBorder = true;
+              }
+            }
+
+            // retrieve geometry of the nodes edit part
+            GraphicalEditPart gep = (GraphicalEditPart) part;
+            Rectangle nodeBounds = new Rectangle(gep.getFigure().getBounds());
+
+            // calculate its contribution to the bounds of the net
+            if (center)
+              nodeBounds = new Rectangle(nodeBounds.getCenter(), new Dimension(
+                  0, 0));
+            else {
+              nodeBounds.expand(20, 20);
+            }
+
+            // and extend the existing bounds accordingly
+            if (netBounds == null)
+              netBounds = nodeBounds;
+            else
+              netBounds = netBounds.union(nodeBounds);
+          }
+        }
+
+        // check whether to hide or to show the border 
+        if (needsBorder && netBounds != null) {
+          // draw the border rectangle
+
+          if (netBounds
+              .equals(PtNetEditPart.this.getBorderFigure().getBounds())) {
+            // do not redraw if nothing has changed
+            return;
+          }
+
+          getBorderPrimaryShape().repositionAndShow(netBounds);
+        } else {
+          // hide the border rectangle
+          getBorderPrimaryShape().hide();
+        }
       }
-});
-		
-		super.activate();
-	}
-	
-	
-	protected NodeFigure borderFigure;
-	
-	/**
-	 * @return newly created figure of the border around an open net
-	 */
-	protected NodeFigure createBorderFigure() {
-		DefaultSizeNodeFigure figure = new DefaultSizeNodeFigure(getMapMode()
-				.DPtoLP(0), getMapMode().DPtoLP(0));
-		
-		figure.setBounds(new Rectangle(0,0,0,0));
-		figure.setOpaque(false);
-		figure.setFocusTraversable(true);
-		figure.setLayoutManager(new StackLayout());
-		figure.setVisible(true);
-		figure.setValid(true);
+    });
 
-		createBorderPrimaryShape(figure);
+    super.activate();
+  }
 
-		return borderFigure = figure;
-	}
-	
-	/**
-	 * @return current figure of the border around an open net
-	 */
-	protected NodeFigure getBorderFigure () {
-		return borderFigure;
-	}
+  protected NodeFigure borderFigure;
 
-	/**
-	 * primary shape of the border figure, accessible for manipulation
-	 * of the node graphics
-	 */
-	protected IFigure borderPrimaryShape;
-	
-	/**
-	 * create a new primary shape of the border figure, can be accessed
-	 * at any time via <code>{@link PtNetEditPart#getBorderPrimaryShape()}</code>
-	 * 
-	 * @param host Figure that will contain this shape
-	 * @return the newly created shape
-	 */
-	protected IFigure createBorderPrimaryShape(NodeFigure host) {
-		NetBorderFigure figure = new NetBorderFigure(host);
-		host.add(figure);
-		return borderPrimaryShape = figure;
-	}
+  /**
+   * @return newly created figure of the border around an open net
+   */
+  protected NodeFigure createBorderFigure() {
+    DefaultSizeNodeFigure figure = new DefaultSizeNodeFigure(getMapMode()
+        .DPtoLP(0), getMapMode().DPtoLP(0));
 
-	/**
-	 * @return shape of the border figure
-	 */
-	public NetBorderFigure getBorderPrimaryShape() {
-		return (NetBorderFigure) borderPrimaryShape;
-	}
-	
-	/**
-	 * dashed rectangle to be repositioned according to the contents of
-	 * this diagram
-	 * 
-	 * @author Dirk Fahland
-	 */
-	public class NetBorderFigure extends RectangleFigure {
-		
-		private final NodeFigure fHostFigure;
+    figure.setBounds(new Rectangle(0, 0, 0, 0));
+    figure.setOpaque(false);
+    figure.setFocusTraversable(true);
+    figure.setLayoutManager(new StackLayout());
+    figure.setVisible(true);
+    figure.setValid(true);
 
-		public NetBorderFigure(NodeFigure host) {
-			super();
-			
-			this.setFill(false);
-			this.setPreferredSize(new Dimension(getMapMode().DPtoLP(25), getMapMode()
-					.DPtoLP(25)));
-			this.setFocusTraversable(true);
-			this.setOpaque(false);
-			
-			
-			this.setBorder(new LineBorderNet());
-			
-			fHostFigure = host;
-		}
+    createBorderPrimaryShape(figure);
 
-		private boolean myUseLocalCoordinates = false;
+    return borderFigure = figure;
+  }
 
-		protected boolean useLocalCoordinates() {
-			return myUseLocalCoordinates;
-		}
+  /**
+   * @return current figure of the border around an open net
+   */
+  protected NodeFigure getBorderFigure() {
+    return borderFigure;
+  }
 
-		protected void setUseLocalCoordinates(boolean useLocalCoordinates) {
-			myUseLocalCoordinates = useLocalCoordinates;
-		}
-		
-		public void repositionAndShow (Rectangle r) {
-	  		setOutline(true);
-	  		//setVisibility(true);
-	  		//setVisible(true);
-	  		fHostFigure.setBounds(r);
-	  		fHostFigure.repaint(r.x-1, r.y-1, r.width+1, r.height+1);
-		}
-		
-		public void hide () {
-	  		Rectangle oldR = fHostFigure.getBounds();
-	  		
-	  		setOutline(false);
-	  		//setVisibility(false);
-	  		//setVisible(false);
-	  		setSize(getMapMode().DPtoLP(0), getMapMode().DPtoLP(0));
-	  		fHostFigure.setBounds(new Rectangle(0,0,0,0));
-	  		fHostFigure.repaint(oldR.x-1, oldR.y-1, oldR.width+1, oldR.height+1);
-		}
-	}
-	
+  /**
+   * primary shape of the border figure, accessible for manipulation
+   * of the node graphics
+   */
+  protected IFigure borderPrimaryShape;
 
-	static final Color THIS_FORE = new Color(null, 0, 0, 0);
+  /**
+   * create a new primary shape of the border figure, can be accessed
+   * at any time via <code>{@link PtNetEditPart#getBorderPrimaryShape()}</code>
+   * 
+   * @param host Figure that will contain this shape
+   * @return the newly created shape
+   */
+  protected IFigure createBorderPrimaryShape(NodeFigure host) {
+    NetBorderFigure figure = new NetBorderFigure(host);
+    host.add(figure);
+    return borderPrimaryShape = figure;
+  }
+
+  /**
+   * @return shape of the border figure
+   */
+  public NetBorderFigure getBorderPrimaryShape() {
+    return (NetBorderFigure) borderPrimaryShape;
+  }
+
+  /**
+   * dashed rectangle to be repositioned according to the contents of
+   * this diagram
+   * 
+   * @author Dirk Fahland
+   */
+  public class NetBorderFigure extends RectangleFigure {
+
+    private final NodeFigure fHostFigure;
+
+    public NetBorderFigure(NodeFigure host) {
+      super();
+
+      this.setFill(false);
+      this.setPreferredSize(new Dimension(getMapMode().DPtoLP(25), getMapMode()
+          .DPtoLP(25)));
+      this.setFocusTraversable(true);
+      this.setOpaque(false);
+
+      this.setBorder(new LineBorderNet());
+
+      fHostFigure = host;
+    }
+
+    private boolean myUseLocalCoordinates = false;
+
+    protected boolean useLocalCoordinates() {
+      return myUseLocalCoordinates;
+    }
+
+    protected void setUseLocalCoordinates(boolean useLocalCoordinates) {
+      myUseLocalCoordinates = useLocalCoordinates;
+    }
+
+    public void repositionAndShow(Rectangle r) {
+      setOutline(true);
+      //setVisibility(true);
+      //setVisible(true);
+      fHostFigure.setBounds(r);
+      fHostFigure.repaint(r.x - 1, r.y - 1, r.width + 1, r.height + 1);
+    }
+
+    public void hide() {
+      Rectangle oldR = fHostFigure.getBounds();
+
+      setOutline(false);
+      //setVisibility(false);
+      //setVisible(false);
+      setSize(getMapMode().DPtoLP(0), getMapMode().DPtoLP(0));
+      fHostFigure.setBounds(new Rectangle(0, 0, 0, 0));
+      fHostFigure.repaint(oldR.x - 1, oldR.y - 1, oldR.width + 1,
+          oldR.height + 1);
+    }
+  }
+
+  static final Color THIS_FORE = new Color(null, 0, 0, 0);
 
 }

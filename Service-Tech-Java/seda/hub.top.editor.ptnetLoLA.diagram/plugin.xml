@@ -2,15 +2,12 @@
 <?eclipse version="3.0"?>
 <plugin>
 
-   <extension point="org.eclipse.team.core.fileTypes">
+   <extension point="org.eclipse.team.core.fileTypes" id="repo-ftype">
       <?gmfgen generated="true"?>
-      <fileTypes
-         type="text"
-         extension="ptnet_diagram">
-      </fileTypes>
+      <fileTypes type="text" extension="ptnet_diagram"/>
    </extension>
 
-   <extension point="org.eclipse.emf.ecore.extension_parser">
+   <extension point="org.eclipse.emf.ecore.extension_parser" id="resource-factory">
       <?gmfgen generated="true"?>
       <parser
          type="ptnet_diagram"
@@ -18,7 +15,7 @@
       </parser>
    </extension>
 
-   <extension point="org.eclipse.ui.editors">
+   <extension point="org.eclipse.ui.editors" id="gmf-editor">
       <?gmfgen generated="true"?>
       <editor
          id="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorID"
@@ -30,21 +27,9 @@
          matchingStrategy="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAMatchingStrategy"
          contributorClass="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramActionBarContributor">
       </editor>
-
-      <!-- for backwards compatibility -->
-      <editor
-         id="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorID"
-         name="%editorName"
-         icon="icons/document.net.bw_2.16.png"
-         extensions="ptnetlola_diagram"
-         default="true"
-         class="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditor"
-         matchingStrategy="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAMatchingStrategy"
-         contributorClass="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramActionBarContributor">
-      </editor>
    </extension>
    
-   <extension point="org.eclipse.ui.contexts">
+   <extension point="org.eclipse.ui.contexts" id="ui-context">
       <?gmfgen generated="true"?>
       <context
          description="%context.description"
@@ -54,35 +39,19 @@
       </context>
    </extension>
 
-   <extension point="org.eclipse.ui.newWizards">
+   <extension point="org.eclipse.ui.newWizards" id="creation-wizard">
       <?gmfgen generated="true"?>
   	  <wizard
   	     name="%newWizardName"
   	     icon="icons/document.net.bw_2.16.png"
-  	     category="hub.top.editor.newWizards.category"
+  	     category="org.eclipse.ui.Examples"
   	     class="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLACreationWizard"
   	     id="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLACreationWizardID">
   	  	 <description>%newWizardDesc</description>  
       </wizard>
    </extension>
 
-   <extension point="org.eclipse.ui.popupMenus">
-      <?gmfgen generated="true"?>
-      <objectContribution
-            adaptable="false"
-            id="hub.top.editor.ptnetLoLA.diagram.LoadResource"
-            objectClass="hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart">
-         <action
-               class="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLALoadResourceAction"
-               enablesFor="1"
-               id="hub.top.editor.ptnetLoLA.diagram.LoadResourceAction"
-               label="%loadResourceActionLabel"
-               menubarPath="additions">
-         </action>
-      </objectContribution>           
-   </extension>
-
-   <extension point="org.eclipse.ui.popupMenus">
+   <extension point="org.eclipse.ui.popupMenus" id="init-diagram-action">
       <?gmfgen generated="true"?>
       <objectContribution
             id="hub.top.editor.ptnetLoLA.diagram.InitDiagram"
@@ -96,24 +65,11 @@
                id="hub.top.editor.ptnetLoLA.diagram.InitDiagramAction">
          </action>
       </objectContribution>
-   
-   	  <!-- for backwards compatibility -->
-      <objectContribution
-            id="hub.top.editor.ptnetLoLA.diagram.PtNetLoLARename"
-            nameFilter="*.ptnetlola"
-            objectClass="org.eclipse.core.resources.IFile">
-         <action
-               class="hub.top.editor.ui.actions.PtNetLoLARename"
-               enablesFor="1"
-               icon="icons/document.net.bw_2.convert.16.png"
-               id="hub.top.editor.ptnetLoLA.diagram.PtNetLoLARename"
-               label="Rename to .ptnet"
-               menubarPath="additions">
-         </action>
-      </objectContribution>
-   </extension>   
+   </extension>
+
+      
 	
-   <extension point="org.eclipse.gmf.runtime.common.ui.services.action.globalActionHandlerProviders">
+   <extension point="org.eclipse.gmf.runtime.common.ui.services.action.globalActionHandlerProviders" id="global-actions">
       <?gmfgen generated="true"?>
       <GlobalActionHandlerProvider
          class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramGlobalActionHandlerProvider"
@@ -126,6 +82,10 @@
             <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart">
                <GlobalActionId actionId="save"/>
             </ElementType>
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart">
+               <GlobalActionId actionId="save">
+               </GlobalActionId>
+            </ElementType>        
          </ViewId>
       </GlobalActionHandlerProvider>
       <GlobalActionHandlerProvider
@@ -164,51 +124,51 @@
 
    
 
-   <extension point="org.eclipse.core.runtime.preferences">
+   <extension point="org.eclipse.core.runtime.preferences" id="prefs">
       <?gmfgen generated="true"?>
       <initializer class="hub.top.editor.ptnetLoLA.diagram.preferences.DiagramPreferenceInitializer"/>
    </extension>
 
-   <extension point="org.eclipse.ui.preferencePages">
+   <extension point="org.eclipse.ui.preferencePages" id="prefpages">
       <?gmfgen generated="true"?>
       <page
             id="hub.top.editor.ptnetLoLA.diagram.general"
-            name="%preference.page.title.hub.top.editor.ptnetLoLA.diagram.general"
+            name="%prefpage.hub.top.editor.ptnetLoLA.diagram.general"
             class="hub.top.editor.ptnetLoLA.diagram.preferences.DiagramGeneralPreferencePage">
       </page>
       <page
             id="hub.top.editor.ptnetLoLA.diagram.appearance"
-            name="%preference.page.title.hub.top.editor.ptnetLoLA.diagram.appearance"
+            name="%prefpage.hub.top.editor.ptnetLoLA.diagram.appearance"
             category="hub.top.editor.ptnetLoLA.diagram.general"
             class="hub.top.editor.ptnetLoLA.diagram.preferences.DiagramAppearancePreferencePage">
       </page>
       <page
             id="hub.top.editor.ptnetLoLA.diagram.connections"
-            name="%preference.page.title.hub.top.editor.ptnetLoLA.diagram.connections"
+            name="%prefpage.hub.top.editor.ptnetLoLA.diagram.connections"
             category="hub.top.editor.ptnetLoLA.diagram.general"
             class="hub.top.editor.ptnetLoLA.diagram.preferences.DiagramConnectionsPreferencePage">
       </page>
       <page
             id="hub.top.editor.ptnetLoLA.diagram.printing"
-            name="%preference.page.title.hub.top.editor.ptnetLoLA.diagram.printing"
+            name="%prefpage.hub.top.editor.ptnetLoLA.diagram.printing"
             category="hub.top.editor.ptnetLoLA.diagram.general"
             class="hub.top.editor.ptnetLoLA.diagram.preferences.DiagramPrintingPreferencePage">
       </page>
       <page
             id="hub.top.editor.ptnetLoLA.diagram.rulersAndGrid"
-            name="%preference.page.title.hub.top.editor.ptnetLoLA.diagram.rulersAndGrid"
+            name="%prefpage.hub.top.editor.ptnetLoLA.diagram.rulersAndGrid"
             category="hub.top.editor.ptnetLoLA.diagram.general"
             class="hub.top.editor.ptnetLoLA.diagram.preferences.DiagramRulersAndGridPreferencePage">
       </page>
       <page
             id="hub.top.editor.ptnetLoLA.diagram.pathmaps"
-            name="%preference.page.title.hub.top.editor.ptnetLoLA.diagram.pathmaps"
+            name="%prefpage.hub.top.editor.ptnetLoLA.diagram.pathmaps"
             category="hub.top.editor.ptnetLoLA.diagram.general"
             class="org.eclipse.gmf.runtime.emf.ui.preferences.PathmapsPreferencePage">
       </page>
    </extension>
 
-   <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor" id="prop-contrib">
       <?gmfgen generated="true"?>
       <propertyContributor
             contributorId="hub.top.editor.ptnetLoLA.diagram"
@@ -219,7 +179,7 @@
       </propertyContributor>
    </extension>
 
-   <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs" id="proptabs">
       <?gmfgen generated="true"?>   
       <propertyTabs contributorId="hub.top.editor.ptnetLoLA.diagram">
          <propertyTab
@@ -237,7 +197,7 @@
       </propertyTabs>
    </extension>
 
-   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections" id="propsections">
       <?gmfgen generated="true"?>   
       <propertySections contributorId="hub.top.editor.ptnetLoLA.diagram">
          <propertySection id="property.section.ConnectorAppearancePropertySection" 
@@ -271,45 +231,65 @@
       </propertySections>
    </extension>
 
-   <extension point="org.eclipse.gmf.runtime.diagram.core.viewProviders">
+   <extension point="org.eclipse.gmf.runtime.diagram.core.viewProviders" id="view-provider">
       <?gmfgen generated="true"?>
       <viewProvider class="hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAViewProvider">
          <Priority name="Lowest"/>
          <context viewClass="org.eclipse.gmf.runtime.notation.Diagram" semanticHints="PtnetLoLA"/>
-         <context viewClass="org.eclipse.gmf.runtime.notation.Node" semanticHints=""/>
-         <context viewClass="org.eclipse.gmf.runtime.notation.Edge" semanticHints=""/>
+         <context viewClass="org.eclipse.gmf.runtime.notation.Node" semanticHints="2001,2002"/>
+         <context viewClass="org.eclipse.gmf.runtime.notation.Edge" semanticHints="4001,4002"/>
       </viewProvider>
    </extension>
 
-   <extension point="org.eclipse.gmf.runtime.diagram.ui.editpartProviders">
+   <extension point="org.eclipse.gmf.runtime.diagram.ui.editpartProviders" id="ep-provider">
       <?gmfgen generated="true"?>
       <editpartProvider class="hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAEditPartProvider">
          <Priority name="Lowest"/>
+         <object class="org.eclipse.gmf.runtime.notation.Diagram" id="generated-diagram">
+            <method name="getType()" value="PtnetLoLA"/>
+         </object>
+         <object class="org.eclipse.gmf.runtime.notation.Node" id="generated-nodes">
+            <method name="getType()" value="2001,2002"/>
+         </object>
+         <object class="org.eclipse.gmf.runtime.notation.Edge" id="generated-links">
+            <method name="getType()" value="4001,4002"/>
+         </object>
+         <object class="org.eclipse.gmf.runtime.notation.Node" id="generated-labels">
+            <method name="getType()" value="5001,5002,5003"/>
+         </object>
+         <object class="org.eclipse.gmf.runtime.notation.Node" id="generated-compartments">
+            <method name="getType()" value=""/>
+         </object>
+         <context views="generated-diagram,generated-nodes,generated-links,generated-labels,generated-compartments"/>
       </editpartProvider>
    </extension>
 
-   <extension point="org.eclipse.gmf.runtime.emf.ui.modelingAssistantProviders">
+   <extension point="org.eclipse.gmf.runtime.emf.ui.modelingAssistantProviders" id="modelassist-provider">
       <?gmfgen generated="true"?>
       <modelingAssistantProvider class="hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAModelingAssistantProvider">
          <Priority name="Lowest"/>
+         <object class="hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart" id="PtNet_1000"/>
+         <object class="hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart" id="Transition_2001"/>
+         <object class="hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart" id="Place_2002"/>
+         <context elements="PtNet_1000,Transition_2001,Place_2002"/>
       </modelingAssistantProvider>
    </extension>
 
-   <extension point="org.eclipse.gmf.runtime.common.ui.services.iconProviders">
+   <extension point="org.eclipse.gmf.runtime.common.ui.services.iconProviders" id="icon-provider">
       <?gmfgen generated="true"?>
       <IconProvider class="hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAIconProvider">
          <Priority name="Low"/>
       </IconProvider>
    </extension>
 
-   <extension point="org.eclipse.gmf.runtime.common.ui.services.parserProviders">
+   <extension point="org.eclipse.gmf.runtime.common.ui.services.parserProviders" id="parser-provider">
       <?gmfgen generated="true"?>
       <ParserProvider class="hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAParserProvider">
          <Priority name="Lowest"/>
       </ParserProvider>
    </extension>
 
-   <extension point="org.eclipse.gmf.runtime.emf.type.core.elementTypes">
+   <extension point="org.eclipse.gmf.runtime.emf.type.core.elementTypes" id="element-types">
       <?gmfgen generated="true"?>
       <metamodel nsURI="http://www.informatik.hu-berlin.de/top/tools/editors/petrinets">
          <metamodelType
@@ -363,13 +343,13 @@
       </metamodel>
    </extension>
 
-   <extension point="org.eclipse.gmf.runtime.emf.type.core.elementTypeBindings">
+   <extension point="org.eclipse.gmf.runtime.emf.type.core.elementTypeBindings" id="element-types-bindings">
       <?gmfgen generated="true"?>
       <clientContext id="hub.top.editor.ptnetLoLA.diagram.TypeContext">
          <enablement>
             <test
                property="org.eclipse.gmf.runtime.emf.core.editingDomain"
-               value="hub.top.editor.ptnetLoLA.editingDomain"/>
+               value="hub.top.editor.ptnetLoLA.diagram.EditingDomain"/>
          </enablement>
       </clientContext> 
       <binding context="hub.top.editor.ptnetLoLA.diagram.TypeContext">
@@ -381,7 +361,7 @@
          <advice ref="org.eclipse.gmf.runtime.diagram.core.advice.notationDepdendents"/>
       </binding>
    </extension>
-	   <extension point="org.eclipse.core.expressions.propertyTesters">
+	   <extension point="org.eclipse.core.expressions.propertyTesters" id="navigator-proptest.isURIEditorInput">
       <?gmfgen generated="true"?>
        <propertyTester
            id="hub.top.editor.ptnetLoLA.diagram.URIEditorInputPropertyTester"
@@ -392,18 +372,8 @@
        </propertyTester>
    </extension>
 
-	   <extension point="org.eclipse.core.expressions.propertyTesters">
-      <?gmfgen generated="true"?>
-       <propertyTester
-           id="hub.top.editor.ptnetLoLA.diagram.DomainModelElementPropertyTester"
-           type="org.eclipse.emf.ecore.EObject"
-           namespace="hub.top.editor.ptnetLoLA.diagram"
-           properties="isDomainModelElement"
-           class="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADomainModelElementTester">
-       </propertyTester>
-   </extension>
-
-	   <extension point="org.eclipse.ui.navigator.viewer">
+	   
+	   <extension point="org.eclipse.ui.navigator.viewer" id="navigator-viewbinding">
       <?gmfgen generated="true"?>
       <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
          <includes>
@@ -419,7 +389,7 @@
       </viewerActionBinding>
    </extension>
 
-   <extension point="org.eclipse.ui.navigator.navigatorContent">
+   <extension point="org.eclipse.ui.navigator.navigatorContent" id="navigator-content">
       <?gmfgen generated="true"?>
       <navigatorContent
             id="hub.top.editor.ptnetLoLA.diagram.resourceContent" 
@@ -471,17 +441,11 @@
     	          <instanceof value="org.eclipse.core.resources.IFile"/>
         	      <test property="org.eclipse.core.resources.extension" value="ptnet"/>
                </and>
-               <and>
-                  <instanceof value="org.eclipse.emf.ecore.EObject"/>
-                  <test property="hub.top.editor.ptnetLoLA.diagram.isDomainModelElement"/>
-               </and>
+               <instanceof value="hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLADomainNavigatorItem"/>
             </or>
          </triggerPoints>
          <possibleChildren>
-            <and>
-       	       <instanceof value="org.eclipse.emf.ecore.EObject"/>
-       	       <test property="hub.top.editor.ptnetLoLA.diagram.isDomainModelElement"/>
-       	    </and>
+            <instanceof value="hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLADomainNavigatorItem"/>
          </possibleChildren>
       </navigatorContent>
       <actionProvider
@@ -495,7 +459,7 @@
       </actionProvider>
    </extension>
    
-	   <extension point="org.eclipse.ui.navigator.linkHelper">
+	   <extension point="org.eclipse.ui.navigator.linkHelper" id="navigator-linkhelper">
       <?gmfgen generated="true"?>
       <linkHelper
             id="hub.top.editor.ptnetLoLA.diagram.navigatorLinkHelper"
@@ -511,7 +475,7 @@
          </selectionEnablement>
       </linkHelper>
    </extension>
-   <extension point="org.eclipse.ui.commands">
+   <extension point="org.eclipse.ui.commands" id="update-cmd">
       <?gmfgen generated="true"?>
       <command
          categoryId="org.eclipse.ui.category.edit"
@@ -521,7 +485,7 @@
          name="%update.diagram.name"/>
    </extension>
    
-   <extension point="org.eclipse.ui.bindings">
+   <extension point="org.eclipse.ui.bindings" id="update-cmd-binding">
       <?gmfgen generated="true"?>
       <key 
          commandId="hub.top.editor.ptnetLoLA.diagram.updateDiagram"
@@ -586,16 +550,7 @@
             </command>
          </toolbar>
       </menuContribution>
-   </extension><extension point="org.eclipse.gmf.runtime.common.ui.services.action.contributionItemProviders">
-      <?gmfgen generated="true"?>
-      <contributionItemProvider class="hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAContributionItemProvider">
-         <Priority name="Low"/>
-         <partContribution id="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorID">
-            <partAction menubarPath="/file/print" id="printPreviewAction"/>
-         </partContribution>
-      </contributionItemProvider>
-   </extension>
-   
+   </extension>   
    <extension
          id="hub.top.editor.ptnetLoLA.diagrams.tool.NodeDecoratorProvider"
          name="NodeDecoratorProvider"
@@ -614,4 +569,37 @@
          </context>
       </decoratorProvider>
    </extension>
+<extension point="org.eclipse.ui.menus" id="context-menus">
+      <?gmfgen generated="true"?>
+      <!-- menuContribution locationURI="menu:org.eclipse.ui.main.menu?after=">
+      </menuContribution>
+      <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=">
+      </menuContribution -->
+      <menuContribution locationURI="popup:org.eclipse.gmf.runtime.diagram.ui.DiagramEditorContextMenu">
+         <command commandId="hub.top.editor.ptnetLoLA.diagram.LoadResourceAction">
+            <visibleWhen>
+               <and>
+                  <with variable="activePartId"><equals value="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorID"/></with>
+                  <with variable="selection"><iterate ifEmpty="false"> 
+                     <instanceof value="hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart"/>
+                  </iterate></with>
+               </and>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+
+<extension point="org.eclipse.ui.commands" id="menu-commands">
+      <?gmfgen generated="true"?>
+      <category id="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorID" name="%cmdcategory.name" description="%cmdcategory.desc"/>
+      <command id="hub.top.editor.ptnetLoLA.diagram.LoadResourceAction"
+         name="Load Resource"
+         categoryId="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorID"
+         defaultHandler="hub.top.editor.ptnetLoLA.diagram.part.LoadResourceAction"/>
+   </extension>
+
+<extension point="org.eclipse.ui.handlers" id="menu-handlers">
+      <?gmfgen generated="true"?>
+   </extension>
+
 </plugin>

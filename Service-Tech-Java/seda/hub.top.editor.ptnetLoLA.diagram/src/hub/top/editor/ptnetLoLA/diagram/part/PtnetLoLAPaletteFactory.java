@@ -40,6 +40,7 @@ import hub.top.editor.petrinets.diagram.tool.FireTool;
 import hub.top.editor.ptnetLoLA.provider.PtnetLoLAEditPlugin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.eclipse.gef.Tool;
 import org.eclipse.gef.palette.PaletteContainer;
@@ -48,6 +49,7 @@ import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.palette.ToolEntry;
 import org.eclipse.gmf.runtime.diagram.ui.tools.UnspecifiedTypeConnectionTool;
 import org.eclipse.gmf.runtime.diagram.ui.tools.UnspecifiedTypeCreationTool;
+import org.eclipse.gmf.runtime.emf.type.core.IElementType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -57,163 +59,166 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  */
 public class PtnetLoLAPaletteFactory {
 
-	/**
-	 * @generated
-	 */
-	public void fillPalette(PaletteRoot paletteRoot) {
-		paletteRoot.add(createPtnetLoLA1Group());
-		paletteRoot.add(createSimulationControl2Group());
-	}
+  /**
+   * @generated
+   */
+  public void fillPalette(PaletteRoot paletteRoot) {
+    paletteRoot.add(createPtnetLoLA1Group());
+    paletteRoot.add(createSimulationControl2Group());
+  }
 
-	/**
-	 * Creates "ptnetLoLA" palette tool group
-	 * @generated
-	 */
-	private PaletteContainer createPtnetLoLA1Group() {
-		PaletteGroup paletteContainer = new PaletteGroup(
-				hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLA1Group_title);
-		paletteContainer.add(createPlace1CreationTool());
-		paletteContainer.add(createTransition2CreationTool());
-		paletteContainer.add(createArc3CreationTool());
-		return paletteContainer;
-	}
+  /**
+   * Creates "ptnetLoLA" palette tool group
+   * @generated
+   */
+  private PaletteContainer createPtnetLoLA1Group() {
+    PaletteGroup paletteContainer = new PaletteGroup(
+        hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLA1Group_title);
+    paletteContainer.setId("createPtnetLoLA1Group"); //$NON-NLS-1$
+    paletteContainer.add(createPlace1CreationTool());
+    paletteContainer.add(createTransition2CreationTool());
+    paletteContainer.add(createArc3CreationTool());
+    return paletteContainer;
+  }
 
-	/**
-	 * Creates "Simulation Control" palette tool group
-	 * @generated
-	 */
-	private PaletteContainer createSimulationControl2Group() {
-		PaletteGroup paletteContainer = new PaletteGroup(
-				hub.top.editor.ptnetLoLA.diagram.part.Messages.SimulationControl2Group_title);
-		paletteContainer
-				.setDescription(hub.top.editor.ptnetLoLA.diagram.part.Messages.SimulationControl2Group_desc);
-		paletteContainer.add(createFireTransitionTool1CreationTool());
-		return paletteContainer;
-	}
+  /**
+   * Creates "Simulation Control" palette tool group
+   * @generated
+   */
+  private PaletteContainer createSimulationControl2Group() {
+    PaletteGroup paletteContainer = new PaletteGroup(
+        hub.top.editor.ptnetLoLA.diagram.part.Messages.SimulationControl2Group_title);
+    paletteContainer.setId("createSimulationControl2Group"); //$NON-NLS-1$
+    paletteContainer
+        .setDescription(hub.top.editor.ptnetLoLA.diagram.part.Messages.SimulationControl2Group_desc);
+    paletteContainer.add(createFireTransitionTool1CreationTool());
+    return paletteContainer;
+  }
 
-	/**
-	 * @generated
-	 */
-	private ToolEntry createPlace1CreationTool() {
-		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
-		types
-				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
-		NodeToolEntry entry = new NodeToolEntry(
-				hub.top.editor.ptnetLoLA.diagram.part.Messages.Place1CreationTool_title,
-				hub.top.editor.ptnetLoLA.diagram.part.Messages.Place1CreationTool_desc,
-				types);
-		entry
-				.setSmallIcon(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes
-						.getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002));
-		entry.setLargeIcon(entry.getSmallIcon());
-		return entry;
-	}
+  /**
+   * @generated
+   */
+  private ToolEntry createPlace1CreationTool() {
+    NodeToolEntry entry = new NodeToolEntry(
+        hub.top.editor.ptnetLoLA.diagram.part.Messages.Place1CreationTool_title,
+        hub.top.editor.ptnetLoLA.diagram.part.Messages.Place1CreationTool_desc,
+        Collections
+            .singletonList(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002));
+    entry.setId("createPlace1CreationTool"); //$NON-NLS-1$
+    entry
+        .setSmallIcon(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes
+            .getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002));
+    entry.setLargeIcon(entry.getSmallIcon());
+    return entry;
+  }
 
-	/**
-	 * @generated
-	 */
-	private ToolEntry createTransition2CreationTool() {
-		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
-		types
-				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
-		NodeToolEntry entry = new NodeToolEntry(
-				hub.top.editor.ptnetLoLA.diagram.part.Messages.Transition2CreationTool_title,
-				hub.top.editor.ptnetLoLA.diagram.part.Messages.Transition2CreationTool_desc,
-				types);
-		entry
-				.setSmallIcon(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes
-						.getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001));
-		entry.setLargeIcon(entry.getSmallIcon());
-		return entry;
-	}
+  /**
+   * @generated
+   */
+  private ToolEntry createTransition2CreationTool() {
+    NodeToolEntry entry = new NodeToolEntry(
+        hub.top.editor.ptnetLoLA.diagram.part.Messages.Transition2CreationTool_title,
+        hub.top.editor.ptnetLoLA.diagram.part.Messages.Transition2CreationTool_desc,
+        Collections
+            .singletonList(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001));
+    entry.setId("createTransition2CreationTool"); //$NON-NLS-1$
+    entry
+        .setSmallIcon(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes
+            .getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001));
+    entry.setLargeIcon(entry.getSmallIcon());
+    return entry;
+  }
 
-	/**
-	 * @generated
-	 */
-	private ToolEntry createArc3CreationTool() {
-		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(2);
-		types
-				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001);
-		types
-				.add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002);
-		LinkToolEntry entry = new LinkToolEntry(
-				hub.top.editor.ptnetLoLA.diagram.part.Messages.Arc3CreationTool_title,
-				hub.top.editor.ptnetLoLA.diagram.part.Messages.Arc3CreationTool_desc,
-				types);
-		entry
-				.setSmallIcon(AbstractUIPlugin.imageDescriptorFromPlugin(PtnetLoLAEditPlugin.ID, "icons/full/obj16/Arc.gif"));
-		
-		entry.setLargeIcon(entry.getSmallIcon());
-		return entry;
-	}
+  /**
+   * @generated
+   */
+  private ToolEntry createArc3CreationTool() {
+    ArrayList<IElementType> types = new ArrayList<IElementType>(2);
+    types
+        .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001);
+    types
+        .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002);
+    LinkToolEntry entry = new LinkToolEntry(
+        hub.top.editor.ptnetLoLA.diagram.part.Messages.Arc3CreationTool_title,
+        hub.top.editor.ptnetLoLA.diagram.part.Messages.Arc3CreationTool_desc,
+        types);
+    entry.setId("createArc3CreationTool"); //$NON-NLS-1$
+    entry
+        .setSmallIcon(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes
+            .getImageDescriptor(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001));
+    entry.setLargeIcon(entry.getSmallIcon());
+    return entry;
+  }
 
-	/**
-	 * @generated
-	 */
-	private ToolEntry createFireTransitionTool1CreationTool() {
-		ToolEntry entry = new ToolEntry(
-				hub.top.editor.ptnetLoLA.diagram.part.Messages.FireTransitionTool1CreationTool_title,
-				hub.top.editor.ptnetLoLA.diagram.part.Messages.FireTransitionTool1CreationTool_desc,
-				null, null) {
-		};
-		entry.setToolClass(FireTool.class);
-		return entry;
-	}
+  /**
+   * @generated
+   */
+  private ToolEntry createFireTransitionTool1CreationTool() {
+    ToolEntry entry = new ToolEntry(
+        hub.top.editor.ptnetLoLA.diagram.part.Messages.FireTransitionTool1CreationTool_title,
+        hub.top.editor.ptnetLoLA.diagram.part.Messages.FireTransitionTool1CreationTool_desc,
+        null, null) {
+    };
+    entry.setId("createFireTransitionTool1CreationTool"); //$NON-NLS-1$
+    entry.setToolClass(FireTool.class);
+    return entry;
+  }
 
-	/**
-	 * @generated
-	 */
-	private static class NodeToolEntry extends ToolEntry {
+  /**
+   * @generated
+   */
+  private static class NodeToolEntry extends ToolEntry {
 
-		/**
-		 * @generated
-		 */
-		private final List elementTypes;
+    /**
+     * @generated
+     */
+    private final List<IElementType> elementTypes;
 
-		/**
-		 * @generated
-		 */
-		private NodeToolEntry(String title, String description, List elementTypes) {
-			super(title, description, null, null);
-			this.elementTypes = elementTypes;
-		}
+    /**
+     * @generated
+     */
+    private NodeToolEntry(String title, String description,
+        List<IElementType> elementTypes) {
+      super(title, description, null, null);
+      this.elementTypes = elementTypes;
+    }
 
-		/**
-		 * @generated
-		 */
-		public Tool createTool() {
-			Tool tool = new UnspecifiedTypeCreationTool(elementTypes);
-			tool.setProperties(getToolProperties());
-			return tool;
-		}
-	}
+    /**
+     * @generated
+     */
+    public Tool createTool() {
+      Tool tool = new UnspecifiedTypeCreationTool(elementTypes);
+      tool.setProperties(getToolProperties());
+      return tool;
+    }
+  }
 
-	/**
-	 * @generated
-	 */
-	private static class LinkToolEntry extends ToolEntry {
+  /**
+   * @generated
+   */
+  private static class LinkToolEntry extends ToolEntry {
 
-		/**
-		 * @generated
-		 */
-		private final List relationshipTypes;
+    /**
+     * @generated
+     */
+    private final List<IElementType> relationshipTypes;
 
-		/**
-		 * @generated
-		 */
-		private LinkToolEntry(String title, String description,
-				List relationshipTypes) {
-			super(title, description, null, null);
-			this.relationshipTypes = relationshipTypes;
-		}
+    /**
+     * @generated
+     */
+    private LinkToolEntry(String title, String description,
+        List<IElementType> relationshipTypes) {
+      super(title, description, null, null);
+      this.relationshipTypes = relationshipTypes;
+    }
 
-		/**
-		 * @generated
-		 */
-		public Tool createTool() {
-			Tool tool = new UnspecifiedTypeConnectionTool(relationshipTypes);
-			tool.setProperties(getToolProperties());
-			return tool;
-		}
-	}
+    /**
+     * @generated
+     */
+    public Tool createTool() {
+      Tool tool = new UnspecifiedTypeConnectionTool(relationshipTypes);
+      tool.setProperties(getToolProperties());
+      return tool;
+    }
+  }
 }

@@ -10,51 +10,51 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributo
  */
 public abstract class PtnetLoLAAbstractNavigatorItem extends PlatformObject {
 
-	/**
-	 * @generated
-	 */
-	static {
-		final Class[] supportedTypes = new Class[] { ITabbedPropertySheetPageContributor.class };
-		final ITabbedPropertySheetPageContributor propertySheetPageContributor = new ITabbedPropertySheetPageContributor() {
-			public String getContributorId() {
-				return "hub.top.editor.ptnetLoLA.diagram"; //$NON-NLS-1$
-			}
-		};
-		Platform.getAdapterManager().registerAdapters(
-				new IAdapterFactory() {
+  /**
+   * @generated
+   */
+  static {
+    final Class[] supportedTypes = new Class[] { ITabbedPropertySheetPageContributor.class };
+    final ITabbedPropertySheetPageContributor propertySheetPageContributor = new ITabbedPropertySheetPageContributor() {
+      public String getContributorId() {
+        return "hub.top.editor.ptnetLoLA.diagram"; //$NON-NLS-1$
+      }
+    };
+    Platform.getAdapterManager().registerAdapters(
+        new IAdapterFactory() {
 
-					public Object getAdapter(Object adaptableObject, Class adapterType) {
-						if (adaptableObject instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem
-								&& adapterType == ITabbedPropertySheetPageContributor.class) {
-							return propertySheetPageContributor;
-						}
-						return null;
-					}
+          public Object getAdapter(Object adaptableObject, Class adapterType) {
+            if (adaptableObject instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem
+                && adapterType == ITabbedPropertySheetPageContributor.class) {
+              return propertySheetPageContributor;
+            }
+            return null;
+          }
 
-					public Class[] getAdapterList() {
-						return supportedTypes;
-					}
-				},
-				hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem.class);
-	}
+          public Class[] getAdapterList() {
+            return supportedTypes;
+          }
+        },
+        hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem.class);
+  }
 
-	/**
-	 * @generated
-	 */
-	private Object myParent;
+  /**
+   * @generated
+   */
+  private Object myParent;
 
-	/**
-	 * @generated
-	 */
-	protected PtnetLoLAAbstractNavigatorItem(Object parent) {
-		myParent = parent;
-	}
+  /**
+   * @generated
+   */
+  protected PtnetLoLAAbstractNavigatorItem(Object parent) {
+    myParent = parent;
+  }
 
-	/**
-	 * @generated
-	 */
-	public Object getParent() {
-		return myParent;
-	}
+  /**
+   * @generated
+   */
+  public Object getParent() {
+    return myParent;
+  }
 
 }

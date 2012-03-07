@@ -1,4 +1,4 @@
-/**
+/*
  *  Copyright (c) 2008 Dirk Fahland. All rights reserved. EPL1.0/GPL3.0/LGPL3.0
  *  
  *  ServiceTechnolog.org - PetriNet Editor Framework
@@ -32,54 +32,12 @@
  *  and other provisions required by the GPL or the LGPL. If you do not delete
  *  the provisions above, a recipient may use your version of this file under
  *  the terms of any one of the EPL, the GPL or the LGPL.
- *
- * $Id$
  */
-package hub.top.editor.ptnetLoLA;
-
+package hub.top.editor.ptnetLoLA.diagram.edit.helpers;
 
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Arc To Place Ext</b></em>'.
- * <!-- end-user-doc -->
- *
- * <p>
- * The following features are supported:
- * <ul>
- *   <li>{@link hub.top.editor.ptnetLoLA.ArcToPlaceExt#getProbability <em>Probability</em>}</li>
- * </ul>
- * </p>
- *
- * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getArcToPlaceExt()
- * @model
  * @generated
  */
-public interface ArcToPlaceExt extends ArcToPlace {
-  /**
-   * Returns the value of the '<em><b>Probability</b></em>' attribute.
-   * The default value is <code>"1.0"</code>.
-   * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Probability</em>' attribute isn't clear,
-   * there really should be more of a description here...
-   * </p>
-   * <!-- end-user-doc -->
-   * @return the value of the '<em>Probability</em>' attribute.
-   * @see #setProbability(double)
-   * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getArcToPlaceExt_Probability()
-   * @model default="1.0"
-   * @generated
-   */
-  double getProbability();
-
-  /**
-   * Sets the value of the '{@link hub.top.editor.ptnetLoLA.ArcToPlaceExt#getProbability <em>Probability</em>}' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Probability</em>' attribute.
-   * @see #getProbability()
-   * @generated
-   */
-  void setProbability(double value);
-
-} // ArcToPlaceExt
+public class TransitionExtEditHelper extends
+    hub.top.editor.ptnetLoLA.diagram.edit.helpers.PtnetLoLABaseEditHelper {
+}

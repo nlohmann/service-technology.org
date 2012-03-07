@@ -11,60 +11,58 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.DuplicateElementsRequest;
  * @generated
  */
 public class PtNetItemSemanticEditPolicy
-		extends
-		hub.top.editor.ptnetLoLA.diagram.edit.policies.PtnetLoLABaseItemSemanticEditPolicy {
+    extends
+    hub.top.editor.ptnetLoLA.diagram.edit.policies.PtnetLoLABaseItemSemanticEditPolicy {
 
-	/**
-	 * @generated
-	 */
-	protected Command getCreateCommand(CreateElementRequest req) {
-		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001 == req
-				.getElementType()) {
-			if (req.getContainmentFeature() == null) {
-				req
-						.setContainmentFeature(hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-								.getPtNet_Transitions());
-			}
-			return getGEFWrapper(new hub.top.editor.ptnetLoLA.diagram.edit.commands.TransitionCreateCommand(
-					req));
-		}
-		if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002 == req
-				.getElementType()) {
-			if (req.getContainmentFeature() == null) {
-				req
-						.setContainmentFeature(hub.top.editor.ptnetLoLA.PtnetLoLAPackage.eINSTANCE
-								.getPtNet_Places());
-			}
-			return getGEFWrapper(new hub.top.editor.ptnetLoLA.diagram.edit.commands.PlaceCreateCommand(
-					req));
-		}
-		return super.getCreateCommand(req);
-	}
+  /**
+   * @generated
+   */
+  public PtNetItemSemanticEditPolicy() {
+    super(
+        hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.PtNet_1000);
+  }
 
-	/**
-	 * @generated
-	 */
-	protected Command getDuplicateCommand(DuplicateElementsRequest req) {
-		TransactionalEditingDomain editingDomain = ((IGraphicalEditPart) getHost())
-				.getEditingDomain();
-		return getGEFWrapper(new DuplicateAnythingCommand(editingDomain, req));
-	}
+  /**
+   * @generated
+   */
+  protected Command getCreateCommand(CreateElementRequest req) {
+    if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001 == req
+        .getElementType()) {
+      return getGEFWrapper(new hub.top.editor.ptnetLoLA.diagram.edit.commands.TransitionCreateCommand(
+          req));
+    }
+    if (hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002 == req
+        .getElementType()) {
+      return getGEFWrapper(new hub.top.editor.ptnetLoLA.diagram.edit.commands.PlaceCreateCommand(
+          req));
+    }
+    return super.getCreateCommand(req);
+  }
 
-	/**
-	 * @generated
-	 */
-	private static class DuplicateAnythingCommand extends
-			DuplicateEObjectsCommand {
+  /**
+   * @generated
+   */
+  protected Command getDuplicateCommand(DuplicateElementsRequest req) {
+    TransactionalEditingDomain editingDomain = ((IGraphicalEditPart) getHost())
+        .getEditingDomain();
+    return getGEFWrapper(new DuplicateAnythingCommand(editingDomain, req));
+  }
 
-		/**
-		 * @generated
-		 */
-		public DuplicateAnythingCommand(TransactionalEditingDomain editingDomain,
-				DuplicateElementsRequest req) {
-			super(editingDomain, req.getLabel(), req.getElementsToBeDuplicated(), req
-					.getAllDuplicatedElementsMap());
-		}
+  /**
+   * @generated
+   */
+  private static class DuplicateAnythingCommand extends
+      DuplicateEObjectsCommand {
 
-	}
+    /**
+     * @generated
+     */
+    public DuplicateAnythingCommand(TransactionalEditingDomain editingDomain,
+        DuplicateElementsRequest req) {
+      super(editingDomain, req.getLabel(), req.getElementsToBeDuplicated(), req
+          .getAllDuplicatedElementsMap());
+    }
+
+  }
 
 }

@@ -28,23 +28,23 @@ import org.eclipse.emf.ecore.EClass;
  */
 public class TransitionImpl extends NodeImpl implements Transition {
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected TransitionImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	@Override
 	protected EClass eStaticClass() {
-		return PtnetLoLAPackage.Literals.TRANSITION;
-	}
+    return PtnetLoLAPackage.Literals.TRANSITION;
+  }
 	
 	 /**
    * @return the list of pre-transitions of this place

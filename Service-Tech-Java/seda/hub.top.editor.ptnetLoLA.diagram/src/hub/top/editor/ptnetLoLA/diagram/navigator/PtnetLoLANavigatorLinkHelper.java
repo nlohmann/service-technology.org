@@ -29,98 +29,100 @@ import org.eclipse.ui.part.FileEditorInput;
  */
 public class PtnetLoLANavigatorLinkHelper implements ILinkHelper {
 
-	/**
-	 * @generated
-	 */
-	private static IEditorInput getEditorInput(Diagram diagram) {
-		Resource diagramResource = diagram.eResource();
-		for (Iterator it = diagramResource.getContents().iterator(); it.hasNext();) {
-			EObject nextEObject = (EObject) it.next();
-			if (nextEObject == diagram) {
-				return new FileEditorInput(WorkspaceSynchronizer
-						.getFile(diagramResource));
-			}
-			if (nextEObject instanceof Diagram) {
-				break;
-			}
-		}
-		URI uri = EcoreUtil.getURI(diagram);
-		String editorName = uri.lastSegment()
-				+ "#" + diagram.eResource().getContents().indexOf(diagram); //$NON-NLS-1$
-		IEditorInput editorInput = new URIEditorInput(uri, editorName);
-		return editorInput;
-	}
+  /**
+   * @generated
+   */
+  private static IEditorInput getEditorInput(Diagram diagram) {
+    Resource diagramResource = diagram.eResource();
+    for (EObject nextEObject : diagramResource.getContents()) {
+      if (nextEObject == diagram) {
+        return new FileEditorInput(
+            WorkspaceSynchronizer.getFile(diagramResource));
+      }
+      if (nextEObject instanceof Diagram) {
+        break;
+      }
+    }
+    URI uri = EcoreUtil.getURI(diagram);
+    String editorName = uri.lastSegment() + '#'
+        + diagram.eResource().getContents().indexOf(diagram);
+    IEditorInput editorInput = new URIEditorInput(uri, editorName);
+    return editorInput;
+  }
 
-	/**
-	 * @generated
-	 */
-	public IStructuredSelection findSelection(IEditorInput anInput) {
-		IDiagramDocument document = hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-				.getInstance().getDocumentProvider().getDiagramDocument(anInput);
-		if (document == null) {
-			return StructuredSelection.EMPTY;
-		}
-		Diagram diagram = document.getDiagram();
-		IFile file = WorkspaceSynchronizer.getFile(diagram.eResource());
-		if (file != null) {
-			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem item = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem(
-					diagram, file, false);
-			return new StructuredSelection(item);
-		}
-		return StructuredSelection.EMPTY;
-	}
+  /**
+   * @generated
+   */
+  public IStructuredSelection findSelection(IEditorInput anInput) {
+    IDiagramDocument document = hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
+        .getInstance().getDocumentProvider().getDiagramDocument(anInput);
+    if (document == null) {
+      return StructuredSelection.EMPTY;
+    }
+    Diagram diagram = document.getDiagram();
+    if (diagram == null || diagram.eResource() == null) {
+      return StructuredSelection.EMPTY;
+    }
+    IFile file = WorkspaceSynchronizer.getFile(diagram.eResource());
+    if (file != null) {
+      hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem item = new hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem(
+          diagram, file, false);
+      return new StructuredSelection(item);
+    }
+    return StructuredSelection.EMPTY;
+  }
 
-	/**
-	 * @generated
-	 */
-	public void activateEditor(IWorkbenchPage aPage,
-			IStructuredSelection aSelection) {
-		if (aSelection == null || aSelection.isEmpty()) {
-			return;
-		}
-		if (false == aSelection.getFirstElement() instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem) {
-			return;
-		}
+  /**
+   * @generated
+   */
+  public void activateEditor(IWorkbenchPage aPage,
+      IStructuredSelection aSelection) {
+    if (aSelection == null || aSelection.isEmpty()) {
+      return;
+    }
+    if (false == aSelection.getFirstElement() instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem) {
+      return;
+    }
 
-		hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem abstractNavigatorItem = (hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem) aSelection
-				.getFirstElement();
-		View navigatorView = null;
-		if (abstractNavigatorItem instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem) {
-			navigatorView = ((hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem) abstractNavigatorItem)
-					.getView();
-		} else if (abstractNavigatorItem instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup) {
-			hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup navigatorGroup = (hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup) abstractNavigatorItem;
-			if (navigatorGroup.getParent() instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem) {
-				navigatorView = ((hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem) navigatorGroup
-						.getParent()).getView();
-			}
-		}
-		if (navigatorView == null) {
-			return;
-		}
-		IEditorInput editorInput = getEditorInput(navigatorView.getDiagram());
-		IEditorPart editor = aPage.findEditor(editorInput);
-		if (editor == null) {
-			return;
-		}
-		aPage.bringToTop(editor);
-		if (editor instanceof DiagramEditor) {
-			DiagramEditor diagramEditor = (DiagramEditor) editor;
-			ResourceSet diagramEditorResourceSet = diagramEditor.getEditingDomain()
-					.getResourceSet();
-			EObject selectedView = diagramEditorResourceSet.getEObject(EcoreUtil
-					.getURI(navigatorView), true);
-			if (selectedView == null) {
-				return;
-			}
-			GraphicalViewer graphicalViewer = (GraphicalViewer) diagramEditor
-					.getAdapter(GraphicalViewer.class);
-			EditPart selectedEditPart = (EditPart) graphicalViewer
-					.getEditPartRegistry().get(selectedView);
-			if (selectedEditPart != null) {
-				graphicalViewer.select(selectedEditPart);
-			}
-		}
-	}
+    hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem abstractNavigatorItem = (hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLAAbstractNavigatorItem) aSelection
+        .getFirstElement();
+    View navigatorView = null;
+    if (abstractNavigatorItem instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem) {
+      navigatorView = ((hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem) abstractNavigatorItem)
+          .getView();
+    } else if (abstractNavigatorItem instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup) {
+      hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup navigatorGroup = (hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorGroup) abstractNavigatorItem;
+      if (navigatorGroup.getParent() instanceof hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem) {
+        navigatorView = ((hub.top.editor.ptnetLoLA.diagram.navigator.PtnetLoLANavigatorItem) navigatorGroup
+            .getParent()).getView();
+      }
+    }
+    if (navigatorView == null) {
+      return;
+    }
+    IEditorInput editorInput = getEditorInput(navigatorView.getDiagram());
+    IEditorPart editor = aPage.findEditor(editorInput);
+    if (editor == null) {
+      return;
+    }
+    aPage.bringToTop(editor);
+    if (editor instanceof DiagramEditor) {
+      DiagramEditor diagramEditor = (DiagramEditor) editor;
+      ResourceSet diagramEditorResourceSet = diagramEditor.getEditingDomain()
+          .getResourceSet();
+      EObject selectedView = diagramEditorResourceSet.getEObject(
+          EcoreUtil.getURI(navigatorView), true);
+      if (selectedView == null) {
+        return;
+      }
+      GraphicalViewer graphicalViewer = (GraphicalViewer) diagramEditor
+          .getAdapter(GraphicalViewer.class);
+      EditPart selectedEditPart = (EditPart) graphicalViewer
+          .getEditPartRegistry().get(selectedView);
+      if (selectedEditPart != null) {
+        graphicalViewer.select(selectedEditPart);
+      }
+    }
+  }
 
 }

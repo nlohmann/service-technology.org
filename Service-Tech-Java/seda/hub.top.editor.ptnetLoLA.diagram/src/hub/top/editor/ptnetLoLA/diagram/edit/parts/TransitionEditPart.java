@@ -42,9 +42,14 @@ import hub.top.editor.ptnetLoLA.Place;
 import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.Transition;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RectangleFigure;
+import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.emf.common.util.BasicEList;
@@ -54,17 +59,21 @@ import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
+import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
+import org.eclipse.gef.handles.MoveHandle;
 import org.eclipse.gef.requests.CreateRequest;
 import org.eclipse.gef.requests.SelectionRequest;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.AbstractBorderedShapeEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IBorderItemEditPart;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.BorderItemSelectionEditPolicy;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
 import org.eclipse.gmf.runtime.diagram.ui.figures.BorderItemLocator;
+import org.eclipse.gmf.runtime.emf.type.core.IElementType;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
 import org.eclipse.gmf.runtime.notation.View;
@@ -75,286 +84,417 @@ import org.eclipse.swt.graphics.Color;
  */
 public class TransitionEditPart extends AbstractBorderedShapeEditPart {
 
-	/**
-	 * @generated
-	 */
-	public static final int VISUAL_ID = 2001;
+  /**
+   * @generated
+   */
+  public static final int VISUAL_ID = 2001;
 
-	/**
-	 * @generated
-	 */
-	protected IFigure contentPane;
+  /**
+   * @generated
+   */
+  protected IFigure contentPane;
 
-	/**
-	 * @generated
-	 */
-	protected IFigure primaryShape;
+  /**
+   * @generated
+   */
+  protected IFigure primaryShape;
 
-	/**
-	 * @generated
-	 */
-	public TransitionEditPart(View view) {
-		super(view);
-	}
+  /**
+   * @generated
+   */
+  public TransitionEditPart(View view) {
+    super(view);
+  }
 
-	/**
-	 * @generated
-	 */
-	protected void createDefaultEditPolicies() {
-		super.createDefaultEditPolicies();
-		installEditPolicy(
-				EditPolicyRoles.SEMANTIC_ROLE,
-				new hub.top.editor.ptnetLoLA.diagram.edit.policies.TransitionItemSemanticEditPolicy());
-		installEditPolicy(EditPolicy.LAYOUT_ROLE, createLayoutEditPolicy());
-		// XXX need an SCR to runtime to have another abstract superclass that would let children add reasonable editpolicies
-		// removeEditPolicy(org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles.CONNECTION_HANDLES_ROLE);
-	}
+  /**
+   * @generated
+   */
+  protected void createDefaultEditPolicies() {
+    super.createDefaultEditPolicies();
+    installEditPolicy(
+        EditPolicyRoles.SEMANTIC_ROLE,
+        new hub.top.editor.ptnetLoLA.diagram.edit.policies.TransitionItemSemanticEditPolicy());
+    installEditPolicy(EditPolicy.LAYOUT_ROLE, createLayoutEditPolicy());
+    // XXX need an SCR to runtime to have another abstract superclass that would let children add reasonable editpolicies
+    // removeEditPolicy(org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles.CONNECTION_HANDLES_ROLE);
+  }
 
-	/**
-	 * @generated
-	 */
-	protected LayoutEditPolicy createLayoutEditPolicy() {
-		LayoutEditPolicy lep = new LayoutEditPolicy() {
+  /**
+   * @generated
+   */
+  protected LayoutEditPolicy createLayoutEditPolicy() {
+    org.eclipse.gmf.runtime.diagram.ui.editpolicies.LayoutEditPolicy lep = new org.eclipse.gmf.runtime.diagram.ui.editpolicies.LayoutEditPolicy() {
 
-			protected EditPolicy createChildEditPolicy(EditPart child) {
-				if (child instanceof IBorderItemEditPart) {
-					return new BorderItemSelectionEditPolicy();
-				}
-				EditPolicy result = child.getEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE);
-				if (result == null) {
-					result = new NonResizableEditPolicy();
-				}
-				return result;
-			}
+      protected EditPolicy createChildEditPolicy(EditPart child) {
+        View childView = (View) child.getModel();
+        switch (hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
+            .getVisualID(childView)) {
+        case hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionNameEditPart.VISUAL_ID:
+          return new BorderItemSelectionEditPolicy() {
 
-			protected Command getMoveChildrenCommand(Request request) {
-				return null;
-			}
+            protected List createSelectionHandles() {
+              MoveHandle mh = new MoveHandle((GraphicalEditPart) getHost());
+              mh.setBorder(null);
+              return Collections.singletonList(mh);
+            }
+          };
+        }
+        EditPolicy result = child.getEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE);
+        if (result == null) {
+          result = new NonResizableEditPolicy();
+        }
+        return result;
+      }
 
-			protected Command getCreateCommand(CreateRequest request) {
-				return null;
-			}
-		};
-		return lep;
-	}
+      protected Command getMoveChildrenCommand(Request request) {
+        return null;
+      }
 
-	/**
-	 * @generated
-	 */
-	protected IFigure createNodeShape() {
-		TransitionFigure figure = new TransitionFigure();
-		return primaryShape = figure;
-	}
+      protected Command getCreateCommand(CreateRequest request) {
+        return null;
+      }
+    };
+    return lep;
+  }
 
-	/**
-	 * @generated
-	 */
-	public TransitionFigure getPrimaryShape() {
-		return (TransitionFigure) primaryShape;
-	}
+  /**
+   * @generated
+   */
+  protected IFigure createNodeShape() {
+    return primaryShape = new TransitionFigure();
+  }
 
-	/**
-	 * @generated not
-	 */
-	protected void addBorderItem(IFigure borderItemContainer,
-			IBorderItemEditPart borderItemEditPart) {
-		if (borderItemEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionNameEditPart) {
-			BorderItemLocator locator = new BorderItemLocator(getMainFigure(),
-					PositionConstants.SOUTH);
-			locator.setBorderItemOffset(new Dimension(-5, -5));
-			borderItemContainer.add(borderItemEditPart.getFigure(), locator);
-		} else {
-			super.addBorderItem(borderItemContainer, borderItemEditPart);
-		}
-	}
+  /**
+   * @generated
+   */
+  public TransitionFigure getPrimaryShape() {
+    return (TransitionFigure) primaryShape;
+  }
 
-	/**
-	 * @generated
-	 */
-	protected NodeFigure createNodePlate() {
-		DefaultSizeNodeFigure result = new DefaultSizeNodeFigure(getMapMode()
-				.DPtoLP(25), getMapMode().DPtoLP(25));
-		return result;
-	}
+  /**
+   * @generated not
+   */
+  protected void addBorderItem(IFigure borderItemContainer,
+      IBorderItemEditPart borderItemEditPart) {
+    if (borderItemEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionNameEditPart) {
+      BorderItemLocator locator = new BorderItemLocator(getMainFigure(),
+          PositionConstants.SOUTH);
+      locator.setBorderItemOffset(new Dimension(-5, -5));
+      borderItemContainer.add(borderItemEditPart.getFigure(), locator);
+    } else {
+      super.addBorderItem(borderItemContainer, borderItemEditPart);
+    }
+  }
 
-	/**
-	 * Creates figure for this edit part.
-	 * 
-	 * Body of this method does not depend on settings in generation model
-	 * so you may safely remove <i>generated</i> tag and modify it.
-	 * 
-	 * @generated
-	 */
-	protected NodeFigure createMainFigure() {
-		NodeFigure figure = createNodePlate();
-		figure.setLayoutManager(new StackLayout());
-		IFigure shape = createNodeShape();
-		figure.add(shape);
-		contentPane = setupContentPane(shape);
-		return figure;
-	}
+  /**
+   * @generated
+   */
+  protected NodeFigure createNodePlate() {
+    DefaultSizeNodeFigure result = new DefaultSizeNodeFigure(25, 25);
+    return result;
+  }
 
-	/**
-	 * Default implementation treats passed figure as content pane.
-	 * Respects layout one may have set for generated figure.
-	 * @param nodeShape instance of generated figure class
-	 * @generated
-	 */
-	protected IFigure setupContentPane(IFigure nodeShape) {
-		return nodeShape; // use nodeShape itself as contentPane
-	}
+  /**
+   * Creates figure for this edit part.
+   * 
+   * Body of this method does not depend on settings in generation model
+   * so you may safely remove <i>generated</i> tag and modify it.
+   * 
+   * @generated
+   */
+  protected NodeFigure createMainFigure() {
+    NodeFigure figure = createNodePlate();
+    figure.setLayoutManager(new StackLayout());
+    IFigure shape = createNodeShape();
+    figure.add(shape);
+    contentPane = setupContentPane(shape);
+    return figure;
+  }
 
-	/**
-	 * @generated
-	 */
-	public IFigure getContentPane() {
-		if (contentPane != null) {
-			return contentPane;
-		}
-		return super.getContentPane();
-	}
+  /**
+   * Default implementation treats passed figure as content pane.
+   * Respects layout one may have set for generated figure.
+   * @param nodeShape instance of generated figure class
+   * @generated
+   */
+  protected IFigure setupContentPane(IFigure nodeShape) {
+    return nodeShape; // use nodeShape itself as contentPane
+  }
 
-	/**
-	 * @generated
-	 */
-	public EditPart getPrimaryChildEditPart() {
-		return getChildBySemanticHint(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
-				.getType(hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionNameEditPart.VISUAL_ID));
-	}
+  /**
+   * @generated
+   */
+  public IFigure getContentPane() {
+    if (contentPane != null) {
+      return contentPane;
+    }
+    return super.getContentPane();
+  }
 
-	/**
-	 * @generated
-	 */
-	public class TransitionFigure extends RectangleFigure {
+  /**
+   * @generated
+   */
+  protected void setForegroundColor(Color color) {
+    if (primaryShape != null) {
+      primaryShape.setForegroundColor(color);
+    }
+  }
 
-		/**
-		 * @generated
-		 */
-		public TransitionFigure() {
-			this.setLineWidth(2);
-			this.setForegroundColor(THIS_FORE);
-			this.setBackgroundColor(THIS_BACK);
-			this.setPreferredSize(new Dimension(getMapMode().DPtoLP(25), getMapMode()
-					.DPtoLP(25)));
-		}
+  /**
+   * @generated
+   */
+  protected void setBackgroundColor(Color color) {
+    if (primaryShape != null) {
+      primaryShape.setBackgroundColor(color);
+    }
+  }
 
-		/**
-		 * @generated
-		 */
-		private boolean myUseLocalCoordinates = false;
+  /**
+   * @generated
+   */
+  protected void setLineWidth(int width) {
+    if (primaryShape instanceof Shape) {
+      ((Shape) primaryShape).setLineWidth(width);
+    }
+  }
 
-		/**
-		 * @generated
-		 */
-		protected boolean useLocalCoordinates() {
-			return myUseLocalCoordinates;
-		}
+  /**
+   * @generated
+   */
+  protected void setLineType(int style) {
+    if (primaryShape instanceof Shape) {
+      ((Shape) primaryShape).setLineStyle(style);
+    }
+  }
 
-		/**
-		 * @generated
-		 */
-		protected void setUseLocalCoordinates(boolean useLocalCoordinates) {
-			myUseLocalCoordinates = useLocalCoordinates;
-		}
+  /**
+   * @generated
+   */
+  public EditPart getPrimaryChildEditPart() {
+    return getChildBySemanticHint(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
+        .getType(hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionNameEditPart.VISUAL_ID));
+  }
 
-	}
+  /**
+   * @generated
+   */
+  public List<IElementType> getMARelTypesOnSource() {
+    ArrayList<IElementType> types = new ArrayList<IElementType>(2);
+    types
+        .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001);
+    types
+        .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002);
+    return types;
+  }
 
-	/**
-	 * @generated
-	 */
-	static final Color THIS_FORE = new Color(null, 0, 0, 0);
+  /**
+   * @generated
+   */
+  public List<IElementType> getMARelTypesOnSourceAndTarget(
+      IGraphicalEditPart targetEditPart) {
+    LinkedList<IElementType> types = new LinkedList<IElementType>();
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001);
+    }
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001);
+    }
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002);
+    }
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002);
+    }
+    return types;
+  }
 
-	/**
-	 * @generated
-	 */
-	static final Color THIS_BACK = new Color(null, 255, 255, 255);
+  /**
+   * @generated
+   */
+  public List<IElementType> getMATypesForTarget(IElementType relationshipType) {
+    LinkedList<IElementType> types = new LinkedList<IElementType>();
+    if (relationshipType == hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
+    } else if (relationshipType == hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
+    }
+    return types;
+  }
 
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#getTargetEditPart(org.eclipse.gef.Request)
-	 * 
-	 * @generated NOT
-	 */
-	@Override
-	public EditPart getTargetEditPart(Request request) {
-		// check whether request comes from a standard tool
-		EditPart editPart = super.getTargetEditPart(request);
-		// if none is found, do extended checking
-		if (editPart == null) {
-			// a transition can be fired
-			if (request.getType() == FireTool.REQ_FIRE_NET_ELEMENT) {
-				return this;
-			}
-		}
-		return editPart;
-	}
+  /**
+   * @generated
+   */
+  public List<IElementType> getMARelTypesOnTarget() {
+    ArrayList<IElementType> types = new ArrayList<IElementType>(2);
+    types
+        .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001);
+    types
+        .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002);
+    return types;
+  }
 
-	/**
-	 * @see org.eclipse.gmf.runtime.diagram.ui.editparts.GraphicalEditPart#performRequest(org.eclipse.gef.Request)
-	 * 
-	 * @generated NOT
-	 */
-	@Override
-	public void performRequest(Request request) {
+  /**
+   * @generated
+   */
+  public List<IElementType> getMATypesForSource(IElementType relationshipType) {
+    LinkedList<IElementType> types = new LinkedList<IElementType>();
+    if (relationshipType == hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
+    } else if (relationshipType == hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
+    }
+    return types;
+  }
 
-		// this request is a transition fire-request
-		if (request instanceof SelectionRequest
-				&& request.getType() == FireTool.REQ_FIRE_NET_ELEMENT) {
-			// get the model element of this controller: a transition
-			View view = (View) this.getModel();
-			Transition t = (Transition) view.getElement();
+  /**
+   * @generated
+   */
+  public class TransitionFigure extends RectangleFigure {
 
-			// get the structural feature we want to manipulate:
-			// the number of tokens on a place
-			EStructuralFeature featToken = PtnetLoLAPackage.eINSTANCE
-					.getPlace_Token();
-			// create a list of commands and add token consume/produce commands to this list
-			EList<org.eclipse.emf.common.command.Command> cmdList = new BasicEList<org.eclipse.emf.common.command.Command>();
-			boolean enabled = true;
-			// the preset of the transition
-			for (Arc arc : t.getIncoming()) {
-				Place p = (Place) arc.getSource();
-				// this places has not enough tokens, t is not enabled
-				if (p.getToken() < arc.getWeight()) {
-					enabled = false;
-					break;
-				}
-			}
+    /**
+     * @generated
+     */
+    public TransitionFigure() {
+      this.setLineWidth(2);
+      this.setForegroundColor(THIS_FORE);
+      this.setBackgroundColor(THIS_BACK);
+      this.setPreferredSize(new Dimension(getMapMode().DPtoLP(25), getMapMode()
+          .DPtoLP(25)));
+    }
 
-			if (enabled) // if t is enabled
-			{
-				EMap<Place, Integer> tokenMap = new BasicEMap<Place, Integer>();
-				// tokens to be consumed
-				for (Arc arc : t.getIncoming()) {
-					Place p = (Place) arc.getSource();
-					tokenMap.put(p, new Integer(p.getToken() - arc.getWeight()));
-				}
-				// tokens to be produced
-				for (Arc arc : t.getOutgoing()) {
-					Place p = (Place) arc.getTarget();
-					Integer pRemoved = tokenMap.get(p);
-					if (pRemoved == null)
-						tokenMap.put(p, new Integer(p.getToken() + arc.getWeight()));
-					else
-						tokenMap.put(p, pRemoved + arc.getWeight());
-				}
+    /**
+     * @generated
+     */
+    private boolean myUseLocalCoordinates = false;
 
-				// create the marking update commands
-				for (java.util.Map.Entry<Place, Integer> e : tokenMap) {
+    /**
+     * @generated
+     */
+    protected boolean useLocalCoordinates() {
+      return myUseLocalCoordinates;
+    }
 
-					org.eclipse.emf.edit.command.SetCommand cmd = new org.eclipse.emf.edit.command.SetCommand(
-							this.getEditingDomain(), e.getKey(), featToken, e.getValue());
-					cmd.setLabel("set token on " + e.getKey().getName());
-					cmdList.add(cmd);
-				}
-				// and join all token commands in a compound transition fire command
-				org.eclipse.emf.common.command.CompoundCommand fireCmd = new org.eclipse.emf.common.command.CompoundCommand(
-						cmdList);
-				fireCmd.setLabel("fire " + t.getName());
-				fireCmd.setDescription("fire " + t.getName());
-				// and execute it in a transactional editing domain (for undo/redo)
-				this.getEditingDomain().getCommandStack().execute(fireCmd);
-			}
-		} else
-			super.performRequest(request);
-	}
+    /**
+     * @generated
+     */
+    protected void setUseLocalCoordinates(boolean useLocalCoordinates) {
+      myUseLocalCoordinates = useLocalCoordinates;
+    }
+
+  }
+
+  /**
+   * @generated
+   */
+  static final Color THIS_FORE = new Color(null, 0, 0, 0);
+
+  /**
+   * @generated
+   */
+  static final Color THIS_BACK = new Color(null, 255, 255, 255);
+
+  /**
+   * @see org.eclipse.gef.editparts.AbstractEditPart#getTargetEditPart(org.eclipse.gef.Request)
+   * 
+   * @generated NOT
+   */
+  @Override
+  public EditPart getTargetEditPart(Request request) {
+    // check whether request comes from a standard tool
+    EditPart editPart = super.getTargetEditPart(request);
+    // if none is found, do extended checking
+    if (editPart == null) {
+      // a transition can be fired
+      if (request.getType() == FireTool.REQ_FIRE_NET_ELEMENT) {
+        return this;
+      }
+    }
+    return editPart;
+  }
+
+  /**
+   * @see org.eclipse.gmf.runtime.diagram.ui.editparts.GraphicalEditPart#performRequest(org.eclipse.gef.Request)
+   * 
+   * @generated NOT
+   */
+  @Override
+  public void performRequest(Request request) {
+
+    // this request is a transition fire-request
+    if (request instanceof SelectionRequest
+        && request.getType() == FireTool.REQ_FIRE_NET_ELEMENT) {
+      // get the model element of this controller: a transition
+      View view = (View) this.getModel();
+      Transition t = (Transition) view.getElement();
+
+      // get the structural feature we want to manipulate:
+      // the number of tokens on a place
+      EStructuralFeature featToken = PtnetLoLAPackage.eINSTANCE
+          .getPlace_Token();
+      // create a list of commands and add token consume/produce commands to this list
+      EList<org.eclipse.emf.common.command.Command> cmdList = new BasicEList<org.eclipse.emf.common.command.Command>();
+      boolean enabled = true;
+      // the preset of the transition
+      for (Arc arc : t.getIncoming()) {
+        Place p = (Place) arc.getSource();
+        // this places has not enough tokens, t is not enabled
+        if (p.getToken() < arc.getWeight()) {
+          enabled = false;
+          break;
+        }
+      }
+
+      if (enabled) // if t is enabled
+      {
+        EMap<Place, Integer> tokenMap = new BasicEMap<Place, Integer>();
+        // tokens to be consumed
+        for (Arc arc : t.getIncoming()) {
+          Place p = (Place) arc.getSource();
+          tokenMap.put(p, new Integer(p.getToken() - arc.getWeight()));
+        }
+        // tokens to be produced
+        for (Arc arc : t.getOutgoing()) {
+          Place p = (Place) arc.getTarget();
+          Integer pRemoved = tokenMap.get(p);
+          if (pRemoved == null)
+            tokenMap.put(p, new Integer(p.getToken() + arc.getWeight()));
+          else
+            tokenMap.put(p, pRemoved + arc.getWeight());
+        }
+
+        // create the marking update commands
+        for (java.util.Map.Entry<Place, Integer> e : tokenMap) {
+
+          org.eclipse.emf.edit.command.SetCommand cmd = new org.eclipse.emf.edit.command.SetCommand(
+              this.getEditingDomain(), e.getKey(), featToken, e.getValue());
+          cmd.setLabel("set token on " + e.getKey().getName());
+          cmdList.add(cmd);
+        }
+        // and join all token commands in a compound transition fire command
+        org.eclipse.emf.common.command.CompoundCommand fireCmd = new org.eclipse.emf.common.command.CompoundCommand(
+            cmdList);
+        fireCmd.setLabel("fire " + t.getName());
+        fireCmd.setDescription("fire " + t.getName());
+        // and execute it in a transactional editing domain (for undo/redo)
+        this.getEditingDomain().getCommandStack().execute(fireCmd);
+      }
+    } else
+      super.performRequest(request);
+  }
 }

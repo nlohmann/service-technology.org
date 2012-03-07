@@ -7,11 +7,11 @@ import org.eclipse.gmf.runtime.diagram.ui.preferences.RulerGridPreferencePage;
  */
 public class DiagramRulersAndGridPreferencePage extends RulerGridPreferencePage {
 
-	/**
-	 * @generated
-	 */
-	public DiagramRulersAndGridPreferencePage() {
-		setPreferenceStore(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-				.getInstance().getPreferenceStore());
-	}
+  /**
+   * @generated
+   */
+  public DiagramRulersAndGridPreferencePage() {
+    setPreferenceStore(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
+        .getInstance().getPreferenceStore());
+  }
 }

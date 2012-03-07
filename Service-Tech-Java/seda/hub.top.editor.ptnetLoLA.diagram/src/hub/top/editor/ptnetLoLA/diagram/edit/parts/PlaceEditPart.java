@@ -40,20 +40,27 @@ import hub.top.editor.ptnetLoLA.NodeType;
 import hub.top.editor.ptnetLoLA.Place;
 import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.Ellipse;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.PositionConstants;
+import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
+import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
+import org.eclipse.gef.handles.MoveHandle;
 import org.eclipse.gef.requests.CreateRequest;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.AbstractBorderedShapeEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IBorderItemEditPart;
@@ -64,6 +71,7 @@ import org.eclipse.gmf.runtime.diagram.ui.figures.BorderItemLocator;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.ConstrainedToolbarLayout;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
+import org.eclipse.gmf.runtime.emf.type.core.IElementType;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.internal.figures.CircleFigure;
@@ -78,342 +86,474 @@ import org.eclipse.swt.widgets.Display;
  */
 public class PlaceEditPart extends AbstractBorderedShapeEditPart {
 
-	/**
-	 * @generated
-	 */
-	public static final int VISUAL_ID = 2002;
+  /**
+   * @generated
+   */
+  public static final int VISUAL_ID = 2002;
 
-	/**
-	 * @generated
-	 */
-	protected IFigure contentPane;
+  /**
+   * @generated
+   */
+  protected IFigure contentPane;
 
-	/**
-	 * @generated
-	 */
-	protected IFigure primaryShape;
+  /**
+   * @generated
+   */
+  protected IFigure primaryShape;
 
-	/**
-	 * @generated
-	 */
-	public PlaceEditPart(View view) {
-		super(view);
-	}
+  /**
+   * @generated
+   */
+  public PlaceEditPart(View view) {
+    super(view);
+  }
 
-	/**
-	 * @generated
-	 */
-	protected void createDefaultEditPolicies() {
-		super.createDefaultEditPolicies();
-		installEditPolicy(
-				EditPolicyRoles.SEMANTIC_ROLE,
-				new hub.top.editor.ptnetLoLA.diagram.edit.policies.PlaceItemSemanticEditPolicy());
-		installEditPolicy(EditPolicy.LAYOUT_ROLE, createLayoutEditPolicy());
-		// XXX need an SCR to runtime to have another abstract superclass that would let children add reasonable editpolicies
-		// removeEditPolicy(org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles.CONNECTION_HANDLES_ROLE);
-	}
+  /**
+   * @generated
+   */
+  protected void createDefaultEditPolicies() {
+    super.createDefaultEditPolicies();
+    installEditPolicy(
+        EditPolicyRoles.SEMANTIC_ROLE,
+        new hub.top.editor.ptnetLoLA.diagram.edit.policies.PlaceItemSemanticEditPolicy());
+    installEditPolicy(EditPolicy.LAYOUT_ROLE, createLayoutEditPolicy());
+    // XXX need an SCR to runtime to have another abstract superclass that would let children add reasonable editpolicies
+    // removeEditPolicy(org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles.CONNECTION_HANDLES_ROLE);
+  }
 
-	/**
-	 * @generated
-	 */
-	protected LayoutEditPolicy createLayoutEditPolicy() {
-		LayoutEditPolicy lep = new LayoutEditPolicy() {
+  /**
+   * @generated
+   */
+  protected LayoutEditPolicy createLayoutEditPolicy() {
+    org.eclipse.gmf.runtime.diagram.ui.editpolicies.LayoutEditPolicy lep = new org.eclipse.gmf.runtime.diagram.ui.editpolicies.LayoutEditPolicy() {
 
-			protected EditPolicy createChildEditPolicy(EditPart child) {
-				if (child instanceof IBorderItemEditPart) {
-					return new BorderItemSelectionEditPolicy();
-				}
-				EditPolicy result = child.getEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE);
-				if (result == null) {
-					result = new NonResizableEditPolicy();
-				}
-				return result;
-			}
+      protected EditPolicy createChildEditPolicy(EditPart child) {
+        View childView = (View) child.getModel();
+        switch (hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
+            .getVisualID(childView)) {
+        case hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceNameEditPart.VISUAL_ID:
+          return new BorderItemSelectionEditPolicy() {
 
-			protected Command getMoveChildrenCommand(Request request) {
-				return null;
-			}
+            protected List createSelectionHandles() {
+              MoveHandle mh = new MoveHandle((GraphicalEditPart) getHost());
+              mh.setBorder(null);
+              return Collections.singletonList(mh);
+            }
+          };
+        }
+        EditPolicy result = child.getEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE);
+        if (result == null) {
+          result = new NonResizableEditPolicy();
+        }
+        return result;
+      }
 
-			protected Command getCreateCommand(CreateRequest request) {
-				return null;
-			}
-		};
-		return lep;
-	}
+      protected Command getMoveChildrenCommand(Request request) {
+        return null;
+      }
 
-	/**
-	 * @generated
-	 */
-	protected IFigure createNodeShape() {
-		PlaceFigure figure = new PlaceFigure();
-		return primaryShape = figure;
-	}
+      protected Command getCreateCommand(CreateRequest request) {
+        return null;
+      }
+    };
+    return lep;
+  }
 
-	/**
-	 * @generated
-	 */
-	public PlaceFigure getPrimaryShape() {
-		return (PlaceFigure) primaryShape;
-	}
+  /**
+   * @generated
+   */
+  protected IFigure createNodeShape() {
+    return primaryShape = new PlaceFigure();
+  }
 
-	/**
-	 * @generated
-	 */
-	protected boolean addFixedChild(EditPart childEditPart) {
-		if (childEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceTokenEditPart) {
-			((hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceTokenEditPart) childEditPart)
-					.setLabel(getPrimaryShape().getFigurePlaceTokenLabel());
-			return true;
-		}
-		return false;
-	}
+  /**
+   * @generated
+   */
+  public PlaceFigure getPrimaryShape() {
+    return (PlaceFigure) primaryShape;
+  }
 
-	/**
-	 * @generated
-	 */
-	protected boolean removeFixedChild(EditPart childEditPart) {
+  /**
+   * @generated
+   */
+  protected boolean addFixedChild(EditPart childEditPart) {
+    if (childEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceTokenEditPart) {
+      ((hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceTokenEditPart) childEditPart)
+          .setLabel(getPrimaryShape().getFigurePlaceTokenLabel());
+      return true;
+    }
+    return false;
+  }
 
-		return false;
-	}
+  /**
+   * @generated
+   */
+  protected boolean removeFixedChild(EditPart childEditPart) {
+    if (childEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceTokenEditPart) {
+      return true;
+    }
+    return false;
+  }
 
-	/**
-	 * @generated
-	 */
-	protected void addChildVisual(EditPart childEditPart, int index) {
-		if (addFixedChild(childEditPart)) {
-			return;
-		}
-		super.addChildVisual(childEditPart, -1);
-	}
+  /**
+   * @generated
+   */
+  protected void addChildVisual(EditPart childEditPart, int index) {
+    if (addFixedChild(childEditPart)) {
+      return;
+    }
+    super.addChildVisual(childEditPart, -1);
+  }
 
-	/**
-	 * @generated
-	 */
-	protected void removeChildVisual(EditPart childEditPart) {
-		if (removeFixedChild(childEditPart)) {
-			return;
-		}
-		super.removeChildVisual(childEditPart);
-	}
+  /**
+   * @generated
+   */
+  protected void removeChildVisual(EditPart childEditPart) {
+    if (removeFixedChild(childEditPart)) {
+      return;
+    }
+    super.removeChildVisual(childEditPart);
+  }
 
-	/**
-	 * @generated
-	 */
-	protected IFigure getContentPaneFor(IGraphicalEditPart editPart) {
+  /**
+   * @generated
+   */
+  protected IFigure getContentPaneFor(IGraphicalEditPart editPart) {
+    if (editPart instanceof IBorderItemEditPart) {
+      return getBorderedFigure().getBorderItemContainer();
+    }
+    return getContentPane();
+  }
 
-		return super.getContentPaneFor(editPart);
-	}
+  /**
+   * @generated not
+   */
+  protected void addBorderItem(IFigure borderItemContainer,
+      IBorderItemEditPart borderItemEditPart) {
+    if (borderItemEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceNameEditPart) {
+      BorderItemLocator locator = new BorderItemLocator(getMainFigure(),
+          PositionConstants.SOUTH);
+      locator.setBorderItemOffset(new Dimension(-5, -5));
+      borderItemContainer.add(borderItemEditPart.getFigure(), locator);
+    } else {
+      super.addBorderItem(borderItemContainer, borderItemEditPart);
+    }
+  }
 
-	/**
-	 * @generated not
-	 */
-	protected void addBorderItem(IFigure borderItemContainer,
-			IBorderItemEditPart borderItemEditPart) {
-		if (borderItemEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceNameEditPart) {
-			BorderItemLocator locator = new BorderItemLocator(getMainFigure(),
-					PositionConstants.SOUTH);
-			locator.setBorderItemOffset(new Dimension(-5, -5));
-			borderItemContainer.add(borderItemEditPart.getFigure(), locator);
-		} else {
-			super.addBorderItem(borderItemContainer, borderItemEditPart);
-		}
-	}
+  /**
+   * @generated
+   */
+  protected NodeFigure createNodePlate() {
+    DefaultSizeNodeFigure result = new DefaultSizeNodeFigure(25, 25);
+    return result;
+  }
 
-	/**
-	 * @generated
-	 */
-	protected NodeFigure createNodePlate() {
-		DefaultSizeNodeFigure result = /*new DefaultSizeNodeFigure(getMapMode()
-				.DPtoLP(25), getMapMode().DPtoLP(25));*/
-		new CircleFigure(getMapMode().DPtoLP(25), getMapMode().DPtoLP(25));
+  /**
+   * Creates figure for this edit part.
+   * 
+   * Body of this method does not depend on settings in generation model
+   * so you may safely remove <i>generated</i> tag and modify it.
+   * 
+   * @generated
+   */
+  protected NodeFigure createMainFigure() {
+    NodeFigure figure = createNodePlate();
+    figure.setLayoutManager(new StackLayout());
+    IFigure shape = createNodeShape();
+    figure.add(shape);
+    contentPane = setupContentPane(shape);
+    return figure;
+  }
 
-		return result;
-	}
+  /**
+   * Default implementation treats passed figure as content pane.
+   * Respects layout one may have set for generated figure.
+   * @param nodeShape instance of generated figure class
+   * @generated
+   */
+  protected IFigure setupContentPane(IFigure nodeShape) {
+    if (nodeShape.getLayoutManager() == null) {
+      ConstrainedToolbarLayout layout = new ConstrainedToolbarLayout();
+      layout.setSpacing(5);
+      nodeShape.setLayoutManager(layout);
+    }
+    return nodeShape; // use nodeShape itself as contentPane
+  }
 
-	/**
-	 * Creates figure for this edit part.
-	 * 
-	 * Body of this method does not depend on settings in generation model
-	 * so you may safely remove <i>generated</i> tag and modify it.
-	 * 
-	 * @generated
-	 */
-	protected NodeFigure createMainFigure() {
-		NodeFigure figure = createNodePlate();
-		figure.setLayoutManager(new StackLayout());
-		IFigure shape = createNodeShape();
-		figure.add(shape);
-		contentPane = setupContentPane(shape);
-		return figure;
-	}
+  /**
+   * @generated
+   */
+  public IFigure getContentPane() {
+    if (contentPane != null) {
+      return contentPane;
+    }
+    return super.getContentPane();
+  }
 
-	/**
-	 * Default implementation treats passed figure as content pane.
-	 * Respects layout one may have set for generated figure.
-	 * @param nodeShape instance of generated figure class
-	 * @generated
-	 */
-	protected IFigure setupContentPane(IFigure nodeShape) {
-		if (nodeShape.getLayoutManager() == null) {
-			ConstrainedToolbarLayout layout = new ConstrainedToolbarLayout();
-			layout.setSpacing(getMapMode().DPtoLP(5));
-			nodeShape.setLayoutManager(layout);
-		}
-		return nodeShape; // use nodeShape itself as contentPane
-	}
+  /**
+   * @generated
+   */
+  protected void setForegroundColor(Color color) {
+    if (primaryShape != null) {
+      primaryShape.setForegroundColor(color);
+    }
+  }
 
-	/**
-	 * @generated
-	 */
-	public IFigure getContentPane() {
-		if (contentPane != null) {
-			return contentPane;
-		}
-		return super.getContentPane();
-	}
+  /**
+   * @generated
+   */
+  protected void setBackgroundColor(Color color) {
+    if (primaryShape != null) {
+      primaryShape.setBackgroundColor(color);
+    }
+  }
 
-	/**
-	 * @generated
-	 */
-	public EditPart getPrimaryChildEditPart() {
-		return getChildBySemanticHint(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
-				.getType(hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceNameEditPart.VISUAL_ID));
-	}
+  /**
+   * @generated
+   */
+  protected void setLineWidth(int width) {
+    if (primaryShape instanceof Shape) {
+      ((Shape) primaryShape).setLineWidth(width);
+    }
+  }
 
-	/**
-	 * @generated not
-	 */
-	@Override
-	protected void handleNotificationEvent(Notification notification) {
-		Object feature = notification.getFeature();
-		//do something after changing model 
-		if (notification.getNotifier() instanceof Place) {
-			//System.out.println("feature " + feature);
-			if (feature instanceof EAttribute) {
-				EAttribute attribute = (EAttribute) feature;
-				//System.out.println("is EAttribute, " + attribute.getName()
-				//		+ " ?= "
-				//		+ PtnetLoLAPackage.eINSTANCE.getNode_Type().getName());
-				if (attribute.getName().equals(
-						PtnetLoLAPackage.eINSTANCE.getNode_Type().getName())) {
-					this.getPrimaryShape().recolorFigure();
-				}
-			}
-		}
-		super.handleNotificationEvent(notification);
-	}
+  /**
+   * @generated
+   */
+  protected void setLineType(int style) {
+    if (primaryShape instanceof Shape) {
+      ((Shape) primaryShape).setLineStyle(style);
+    }
+  }
 
-	/**
-	 * @generated
-	 */
-	public class PlaceFigure extends Ellipse {
+  /**
+   * @generated
+   */
+  public EditPart getPrimaryChildEditPart() {
+    return getChildBySemanticHint(hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLAVisualIDRegistry
+        .getType(hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceNameEditPart.VISUAL_ID));
+  }
 
-		/**
-		 * @generated
-		 */
-		private WrappingLabel fFigurePlaceTokenLabel;
+  /**
+   * @generated
+   */
+  public List<IElementType> getMARelTypesOnSource() {
+    ArrayList<IElementType> types = new ArrayList<IElementType>(2);
+    types
+        .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001);
+    types
+        .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002);
+    return types;
+  }
 
-		/**
-		 * @generated not
-		 */
-		public PlaceFigure() {
+  /**
+   * @generated
+   */
+  public List<IElementType> getMARelTypesOnSourceAndTarget(
+      IGraphicalEditPart targetEditPart) {
+    LinkedList<IElementType> types = new LinkedList<IElementType>();
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001);
+    }
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001);
+    }
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.TransitionEditPart) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002);
+    }
+    if (targetEditPart instanceof hub.top.editor.ptnetLoLA.diagram.edit.parts.PlaceEditPart) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002);
+    }
+    return types;
+  }
 
-			BorderLayout layoutThis = new BorderLayout();
-			this.setLayoutManager(layoutThis);
+  /**
+   * @generated
+   */
+  public List<IElementType> getMATypesForTarget(IElementType relationshipType) {
+    LinkedList<IElementType> types = new LinkedList<IElementType>();
+    if (relationshipType == hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
+    } else if (relationshipType == hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
+    }
+    return types;
+  }
 
-			this.setLineWidth(2);
-			this.setForegroundColor(THIS_FORE);
-			this.setBackgroundColor(THIS_BACK);
-			this.setPreferredSize(new Dimension(getMapMode().DPtoLP(25), getMapMode()
-					.DPtoLP(25)));
-			createContents();
-			recolorFigure();
-		}
+  /**
+   * @generated
+   */
+  public List<IElementType> getMARelTypesOnTarget() {
+    ArrayList<IElementType> types = new ArrayList<IElementType>(2);
+    types
+        .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001);
+    types
+        .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002);
+    return types;
+  }
 
-		/**
-		 * @generated
-		 */
-		private void createContents() {
+  /**
+   * @generated
+   */
+  public List<IElementType> getMATypesForSource(IElementType relationshipType) {
+    LinkedList<IElementType> types = new LinkedList<IElementType>();
+    if (relationshipType == hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToPlace_4001) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
+    } else if (relationshipType == hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.ArcToTransition_4002) {
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Transition_2001);
+      types
+          .add(hub.top.editor.ptnetLoLA.diagram.providers.PtnetLoLAElementTypes.Place_2002);
+    }
+    return types;
+  }
 
-			fFigurePlaceTokenLabel = new WrappingLabel();
-			fFigurePlaceTokenLabel.setText("0");
+  /**
+   * @generated not
+   */
+  @Override
+  protected void handleNotificationEvent(Notification notification) {
+    Object feature = notification.getFeature();
+    //do something after changing model 
+    if (notification.getNotifier() instanceof Place) {
+      //System.out.println("feature " + feature);
+      if (feature instanceof EAttribute) {
+        EAttribute attribute = (EAttribute) feature;
+        //System.out.println("is EAttribute, " + attribute.getName()
+        //		+ " ?= "
+        //		+ PtnetLoLAPackage.eINSTANCE.getNode_Type().getName());
+        if (attribute.getName().equals(
+            PtnetLoLAPackage.eINSTANCE.getNode_Type().getName())) {
+          this.getPrimaryShape().recolorFigure();
+        }
+      }
+    }
+    super.handleNotificationEvent(notification);
+  }
 
-			fFigurePlaceTokenLabel.setFont(FFIGUREPLACETOKENLABEL_FONT);
-			fFigurePlaceTokenLabel.setAlignment(PositionConstants.CENTER);
+  /**
+   * @generated
+   */
+  public class PlaceFigure extends Ellipse {
 
-			this.add(fFigurePlaceTokenLabel, BorderLayout.CENTER);
+    /**
+     * @generated
+     */
+    private WrappingLabel fFigurePlaceTokenLabel;
 
-		}
+    /**
+     * @generated not
+     */
+    public PlaceFigure() {
 
-		/**
-		 * @generated
-		 */
-		private boolean myUseLocalCoordinates = false;
+      BorderLayout layoutThis = new BorderLayout();
+      this.setLayoutManager(layoutThis);
 
-		/**
-		 * @generated
-		 */
-		protected boolean useLocalCoordinates() {
-			return myUseLocalCoordinates;
-		}
+      this.setLineWidth(2);
+      this.setForegroundColor(THIS_FORE);
+      this.setBackgroundColor(THIS_BACK);
+      this.setPreferredSize(new Dimension(getMapMode().DPtoLP(25), getMapMode()
+          .DPtoLP(25)));
+      createContents();
+      recolorFigure();
+    }
 
-		/**
-		 * @generated
-		 */
-		protected void setUseLocalCoordinates(boolean useLocalCoordinates) {
-			myUseLocalCoordinates = useLocalCoordinates;
-		}
+    /**
+     * @generated
+     */
+    private void createContents() {
 
-		/**
-		 * @generated
-		 */
-		public WrappingLabel getFigurePlaceTokenLabel() {
-			return fFigurePlaceTokenLabel;
-		}
+      fFigurePlaceTokenLabel = new WrappingLabel();
+      fFigurePlaceTokenLabel.setText("0");
 
-		/**
-		 * must be called in the constructor of this class
-		 * @generated not
-		 */
-		protected void recolorFigure() {
-			Place p = (Place) ((org.eclipse.gmf.runtime.notation.Node) (PlaceEditPart.this)
-					.getModel()).getElement();
-			if (p.getType() == NodeType.INPUT)
-				setBackgroundColor(THIS_BACK_ORANGE);
-			else if (p.getType() == NodeType.OUTPUT)
-				setBackgroundColor(THIS_BACK_YELLOW);
-			else
-				setBackgroundColor(THIS_BACK);
-			//System.out.println(getBackgroundColor());
-		}
-	}
+      fFigurePlaceTokenLabel.setFont(FFIGUREPLACETOKENLABEL_FONT);
 
-	/**
-	 * @generated
-	 */
-	static final Color THIS_FORE = new Color(null, 0, 0, 0);
+      this.add(fFigurePlaceTokenLabel, BorderLayout.CENTER);
 
-	/**
-	 * @generated
-	 */
-	static final Color THIS_BACK = new Color(null, 255, 255, 255);
+    }
 
-	/**
-	 * @generated not
-	 */
-	static final Color THIS_BACK_ORANGE = new Color(null, 230, 145, 52);
+    /**
+     * @generated
+     */
+    private boolean myUseLocalCoordinates = false;
 
-	/**
-	 * @generated not
-	 */
-	static final Color THIS_BACK_YELLOW = new Color(null, 239, 228, 24);
+    /**
+     * @generated
+     */
+    protected boolean useLocalCoordinates() {
+      return myUseLocalCoordinates;
+    }
 
-	/**
-	 * @generated
-	 */
-	static final Font FFIGUREPLACETOKENLABEL_FONT = new Font(
-			Display.getCurrent(),
-			Display.getDefault().getSystemFont().getFontData()[0].getName(), 9,
-			SWT.BOLD);
+    /**
+     * @generated
+     */
+    protected void setUseLocalCoordinates(boolean useLocalCoordinates) {
+      myUseLocalCoordinates = useLocalCoordinates;
+    }
+
+    /**
+     * @generated
+     */
+    public WrappingLabel getFigurePlaceTokenLabel() {
+      return fFigurePlaceTokenLabel;
+    }
+
+    /**
+     * must be called in the constructor of this class
+     * @generated not
+     */
+    protected void recolorFigure() {
+      Place p = (Place) ((org.eclipse.gmf.runtime.notation.Node) (PlaceEditPart.this)
+          .getModel()).getElement();
+      if (p.getType() == NodeType.INPUT)
+        setBackgroundColor(THIS_BACK_ORANGE);
+      else if (p.getType() == NodeType.OUTPUT)
+        setBackgroundColor(THIS_BACK_YELLOW);
+      else
+        setBackgroundColor(THIS_BACK);
+      //System.out.println(getBackgroundColor());
+    }
+  }
+
+  /**
+   * @generated
+   */
+  static final Color THIS_FORE = new Color(null, 0, 0, 0);
+
+  /**
+   * @generated
+   */
+  static final Color THIS_BACK = new Color(null, 255, 255, 255);
+
+  /**
+   * @generated not
+   */
+  static final Color THIS_BACK_ORANGE = new Color(null, 230, 145, 52);
+
+  /**
+   * @generated not
+   */
+  static final Color THIS_BACK_YELLOW = new Color(null, 239, 228, 24);
+
+  /**
+   * @generated
+   */
+  static final Font FFIGUREPLACETOKENLABEL_FONT = new Font(
+      Display.getCurrent(),
+      Display.getDefault().getSystemFont().getFontData()[0].getName(), 9,
+      SWT.BOLD);
 
 }

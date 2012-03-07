@@ -8,28 +8,29 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class DiagramPreferenceInitializer extends AbstractPreferenceInitializer {
 
-	/**
-	 * @generated
-	 */
-	public void initializeDefaultPreferences() {
-		IPreferenceStore store = getPreferenceStore();
-		hub.top.editor.ptnetLoLA.diagram.preferences.DiagramPrintingPreferencePage
-				.initDefaults(store);
-		hub.top.editor.ptnetLoLA.diagram.preferences.DiagramGeneralPreferencePage
-				.initDefaults(store);
-		hub.top.editor.ptnetLoLA.diagram.preferences.DiagramAppearancePreferencePage
-				.initDefaults(store);
-		hub.top.editor.ptnetLoLA.diagram.preferences.DiagramConnectionsPreferencePage
-				.initDefaults(store);
-		hub.top.editor.ptnetLoLA.diagram.preferences.DiagramRulersAndGridPreferencePage
-				.initDefaults(store);
-	}
+  /**
+   * @generated
+   */
+  public void initializeDefaultPreferences() {
+    IPreferenceStore store = getPreferenceStore();
+    hub.top.editor.ptnetLoLA.diagram.preferences.DiagramGeneralPreferencePage
+        .initDefaults(store);
+    hub.top.editor.ptnetLoLA.diagram.preferences.DiagramAppearancePreferencePage
+        .initDefaults(store);
+    hub.top.editor.ptnetLoLA.diagram.preferences.DiagramConnectionsPreferencePage
+        .initDefaults(store);
+    hub.top.editor.ptnetLoLA.diagram.preferences.DiagramPrintingPreferencePage
+        .initDefaults(store);
+    hub.top.editor.ptnetLoLA.diagram.preferences.DiagramRulersAndGridPreferencePage
+        .initDefaults(store);
 
-	/**
-	 * @generated
-	 */
-	protected IPreferenceStore getPreferenceStore() {
-		return hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
-				.getInstance().getPreferenceStore();
-	}
+  }
+
+  /**
+   * @generated
+   */
+  protected IPreferenceStore getPreferenceStore() {
+    return hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
+        .getInstance().getPreferenceStore();
+  }
 }

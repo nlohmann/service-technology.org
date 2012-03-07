@@ -13,4 +13,22 @@ import org.eclipse.emf.ecore.EStructuralFeature;
  * @generated
  */
 public class ElementInitializers {
+
+  protected ElementInitializers() {
+    // use #getInstance to access cached instance
+  }
+
+  /**
+   * @generated
+   */
+  public static ElementInitializers getInstance() {
+    ElementInitializers cached = hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
+        .getInstance().getElementInitializers();
+    if (cached == null) {
+      hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorPlugin
+          .getInstance().setElementInitializers(
+              cached = new ElementInitializers());
+    }
+    return cached;
+  }
 }

@@ -27,6 +27,8 @@ public:
   static std::map< std::string, std::string > remainingOut;
   static std::map< std::string, std::string > remainingSync;
 
+  static unsigned int messageBound;
+
   static void
   output();
 
@@ -45,9 +47,12 @@ private:
   ListOfPairs::List_ptr transitions;
   bool isFinal;
   bool finalReachable;
+  bool finalEnforceable;
   unsigned int index;
   unsigned int lowlink;
+  unsigned int lastMessagesReset;
   List<unsigned int>::List_ptr sccmember;
+  std::map<std::string, unsigned int> messages;
 
   static bool
   checkFinalReachable(unsigned int stateNo, std::map<unsigned int, bool>& seen
@@ -62,6 +67,6 @@ private:
 
   static void
   prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
-      , unsigned int & count);
+          , std::map<unsigned int, bool>& active, unsigned int & count);
 
 };

@@ -98,7 +98,7 @@ remaining_information:
     }
     output
     {
-        State::remainingSync = transitionMapping;
+        State::remainingOut = transitionMapping;
         transitionMapping.clear();
     }
     sync

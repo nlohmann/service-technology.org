@@ -682,10 +682,14 @@ Adapter::createEngineInterface() {
                     ( ( labeltype == Label::INPUT ) ? "t_send_" : "t_receive_" )
                             + labelname );
 
-            if ( labeltype == Label::INPUT ) {
-                netInterfaceIn[inttransname] = labelname;
-            } else {
-                netInterfaceOut[inttransname] = labelname;
+            if (args_info.useasif_given) {
+                if (args_info.useasif_arg == netindex + 1) {
+                    if (labeltype == Label::INPUT) {
+                        netInterfaceOut[inttransname] = labelname;
+                    } else {
+                        netInterfaceIn[inttransname] = labelname;
+                    }
+                }
             }
 
             //! transition which moves the token between the interface place and its copy
@@ -736,7 +740,7 @@ Adapter::createEngineInterface() {
             {
               /* \TODO: add information about controller interface to pruner input */
 #warning        "To be implemented as a list of pairs"
-              controllerInterfaceSync[inttrans.getName()] = "sync_"
+              controllerInterfaceSync[inttransname] = "sync_"
                   + inttransname;
             }
 

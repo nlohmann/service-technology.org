@@ -121,8 +121,8 @@ int main(int argc, char* argv[]) {
   //	graph_yyin = inputStream;
 
   //reading open net file
-  {
     if (args_info.net_given) {
+        time(&start_time);
 
             std::string filename(args_info.net_arg);
             status("reading open net from file \"%s\"",
@@ -150,11 +150,13 @@ int main(int argc, char* argv[]) {
                         error.token.c_str());
                 abort(2, " ");
             }
+            time(&end_time);
+            status("reading interface file done [%.0f sec]", difftime(
+                     end_time, start_time));
 
     }
-  }
 
-  {
+
     time(&start_time);
     extern FILE * graph_yyin;
     extern int graph_yyparse();
@@ -170,6 +172,7 @@ int main(int argc, char* argv[]) {
       lola_command += args_info.inputs[0];
     }
     status("running lola: \"%s\"", lola_command.c_str());
+    {
 	  std::tr1::shared_ptr<FILE> lolafile(popen(
 	                      lola_command.c_str(), "r"), pclose);
 
@@ -177,19 +180,24 @@ int main(int argc, char* argv[]) {
 
     graph_yyparse();
     graph_yylex_destroy();
-
+    }
     time(&end_time);
-    status("running lola done[%.0f sec]", difftime(end_time, start_time));
-  }
+    status("running lola done [%.0f sec]", difftime(end_time, start_time));
+    status("lola found %d states.", State::stateSpace.size());
 
+
+  status("starting pruning of reachability graph");
+  time(&start_time);
   /* do the pruning here and now */
   State::checkFinalReachable();
 
   // now: tau abstraction
   // now: actual pruning
   State::prune();
+  time(&end_time);
+  status("pruning done [%.0f sec]", difftime(end_time, start_time));
 
-  State::calculateSCC();
+  //State::calculateSCC();
   State::output();
 
   // cmdline_parser_free(&args_info);

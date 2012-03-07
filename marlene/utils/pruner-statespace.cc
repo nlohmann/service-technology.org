@@ -112,10 +112,10 @@ bool State::checkFinalReachable() {
         old_count = count;
         count = 0;
         result = checkFinalReachable(0, seen, count);
-        status("There are %d state(s) for which a final state is reachable",
-                count);
         seen.clear();
     } while (count > old_count);
+    status("There are %d state(s) for which a final state is reachable.",
+            count);
     return result;
 }
 
@@ -178,7 +178,7 @@ void State::calculateSCC(unsigned int stateNo, unsigned int& index,
             state->lowlink =
                     (state->lowlink < successor->lowlink) ?
                             state->lowlink : successor->lowlink;
-        } else if (find(stack.begin(), stack.end(), successor->number)
+        } else if (find(stack.begin(), stack.end(), successor->index)
                 != stack.end()) {
             state->lowlink =
                     (state->lowlink < successor->index) ?
@@ -202,6 +202,9 @@ void State::calculateSCC(unsigned int stateNo, unsigned int& index,
         state->sccmember = newSCC;
 
     }
+    else {
+        state->sccmember = List<unsigned int>::List_ptr();
+    }
 
 }
 
@@ -209,16 +212,19 @@ void State::prune() {
 
     unsigned int count = 0;
     unsigned int old_count = 0;
+    unsigned int sum = 0;
 
     do {
         std::map<unsigned int, bool> seen;
         std::map<unsigned int, bool> active;
         old_count = count;
-        count = 0;
         prune(0, seen, active, count);
-        status("Removed %d transitions.", count);
+        status("removed %d transitions in iteration", count - old_count);
+//        sum += count;
+        calculateSCC();
         seen.clear();
     } while (count > old_count);
+    status("removed %d transitions in total", count);
 }
 
 void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen, std::map<unsigned int, bool>& active, unsigned int & count) {
@@ -228,7 +234,6 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen, std:
     ListOfPairs::List_ptr newTransitions;
     bool finalReachable = false || state->isFinal;
     bool finalEnforceable = false || state->isFinal;
-//    bool finalInAllSuccessors = true;
 
     // now we have seen this state
     seen[stateNo] = true;
@@ -254,23 +259,21 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen, std:
             if (state->finalReachable && (not successor->finalReachable)
                     && (abstractedSync[transition->getValue()->getFirst()] != "")) {
                 keepTransition = false;
-                status(
-                        "pruning from state %d to %d (cause label is %s)",
-                        stateNo,
-                        successor->number,
-                        abstractedSync[transition->getValue()->getFirst()].c_str());
+//                status(
+//                        "pruning from state %d to %d (cause label is %s)",
+//                        stateNo,
+//                        successor->number,
+//                        abstractedSync[transition->getValue()->getFirst()].c_str());
             } else { // otherwise the regular handling
-//                if (not seen[successor->number])
-//                prune(successor->number, seen, count);
 
                 // if we have no seen the successor so far, process
                 if (not seen[successor->number])
                 {
                     // first check, if we would violate mb
-                    status("Label: %s, In: %s, Out: %s, Sync: %s", transitionname.c_str(), remainingIn[transitionname].c_str(), remainingOut[transitionname].c_str(), remainingSync[transitionname].c_str());
+//                    status("Label: %s, In: %s, Out: %s, Sync: %s", transitionname.c_str(), remainingIn[transitionname].c_str(), remainingOut[transitionname].c_str(), remainingSync[transitionname].c_str());
                     // copy message count, if not receiving or sync transition
                     if (remainingIn[transitionname] == "" && remainingSync[transitionname] == "") {
-                        status("It's neither a receiving nor a sync transition for the interface");
+//                        status("It's neither a receiving nor a sync transition for the interface");
                         successor->messages = state->messages;
                         successor->lastMessagesReset = state->lastMessagesReset;
                     }
@@ -279,7 +282,7 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen, std:
                     }
                     // if sending transition, increase count
                     if (remainingOut[transitionname] != "") {
-                        status("checking for message bound of label %s: %d", remainingOut[transitionname].c_str(), successor->messages[remainingOut[transitionname]]);
+//                        status("checking for message bound of label %s: %d", remainingOut[transitionname].c_str(), successor->messages[remainingOut[transitionname]]);
                         ++(successor->messages[remainingOut[transitionname]]);
                     }
                     // check for messagebound
@@ -294,11 +297,11 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen, std:
                         // as this is an action of the engine we can decide to
                         // remove the transition :)
                         keepTransition = false;
-                        status(
-                                "pruning from state %d to %d (cause label %s causes mbv)",
-                                stateNo,
-                                successor->number,
-                                abstractedSync[transitionname].c_str());
+//                        status(
+//                                "pruning from state %d to %d (cause label %s causes mbv)",
+//                                stateNo,
+//                                successor->number,
+//                                abstractedSync[transitionname].c_str());
                     }
                 } else {
                     // check for message bound violations
@@ -308,12 +311,12 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen, std:
                             // if there is a difference, then its bad!
                             if (message->second - successor->messages[message->first] > 0) {
                                 keepTransition = false;
-                                status(
-                                        "pruning from state %d to %d (cause label %s causes mbv on circle, because message %s is created)",
-                                        stateNo,
-                                        successor->number,
-                                        abstractedSync[transition->getValue()->getFirst()].c_str(),
-                                        message->first.c_str());
+//                                status(
+//                                        "pruning from state %d to %d (cause label %s causes mbv on circle, because message %s is created)",
+//                                        stateNo,
+//                                        successor->number,
+//                                        abstractedSync[transition->getValue()->getFirst()].c_str(),
+//                                        message->first.c_str());
                             }
                         }
                     } else {

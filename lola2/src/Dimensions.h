@@ -24,6 +24,9 @@
 /// number of entries in a hash table for markings
 #define SIZEOF_MARKINGTABLE 0x1000000
 
+/// number of stack frames in one chunk of the search stack, better be power of two
+#define SIZEOF_STACKCHUNK 0x1000
+
 // Some useful constants, can be used as indices in arrays
 
 typedef enum

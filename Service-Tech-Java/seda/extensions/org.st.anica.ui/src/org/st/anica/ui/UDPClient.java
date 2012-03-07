@@ -3,14 +3,14 @@ import java.io.*;
 import java.net.*;
 
 public class UDPClient {
-    private String hostname = "localhost";
     private int port = 5556;
     private InetAddress ipaddress;
     private DatagramSocket socket;
-
-    public UDPClient() throws IOException {
-        socket = new DatagramSocket(); 
-        ipaddress = InetAddress.getByName(hostname);
+    
+    public UDPClient(String hostname, int port) throws IOException {
+      this.port = port;
+      socket = new DatagramSocket(); 
+      ipaddress = InetAddress.getByName(hostname);
     }
     
     public void send(String s) throws IOException {
@@ -24,7 +24,7 @@ public class UDPClient {
     }
     
     public static void main(String[] args) throws IOException {
-        UDPClient e = new UDPClient();
+        UDPClient e = new UDPClient("localhost", 5556);
         e.send("Hallo!");
         e.finalize();
     }

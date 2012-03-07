@@ -1,5 +1,7 @@
 package org.st.anica.ui;
 
+import hub.top.editor.eclipse.PluginHelper;
+
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -46,5 +48,12 @@ public class Activator extends AbstractUIPlugin {
 	public static Activator getDefault() {
 		return plugin;
 	}
+	
+	 /**
+   * @return standard plugin helper for this plugin
+   */
+  public static PluginHelper getPluginHelper () {
+    return new PluginHelper(getDefault(), PLUGIN_ID);
+  }
 
 }

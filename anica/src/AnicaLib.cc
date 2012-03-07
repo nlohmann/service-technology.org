@@ -33,6 +33,8 @@ anica::AnicaLib::AnicaLib()
     lolaPath(""),
     lolaWitnessPath(false),
     lolaVerbose(false),
+    oneTripleOnly(true),
+    oneActiveOnly(true),
     propertyToCheck(anica::PROPERTY_PBNIPLUS),
     highLabeledTransitionsCount(0),
     lowLabeledTransitionsCount(0),
@@ -112,6 +114,26 @@ void anica::AnicaLib::setRepresantiveNames(bool r)
 const bool anica::AnicaLib::getRepresantiveNames() const
 {
     return represantiveNames;
+}
+
+void anica::AnicaLib::setOneTripleOnly(bool r)
+{
+    oneTripleOnly = r;
+}
+
+const bool anica::AnicaLib::getOneTripleOnly() const
+{
+    return oneTripleOnly;
+}
+
+void anica::AnicaLib::setOneActiveOnly(bool r)
+{
+    oneActiveOnly = r;
+}
+
+const bool anica::AnicaLib::getOneActiveOnly() const
+{
+    return oneActiveOnly;
 }
 
 void anica::AnicaLib::setLolaPath(const std::string& path)
@@ -208,68 +230,91 @@ void anica::AnicaLib::assignUnassignedTransitions(confidence_e c) {
     }
 }
 
-bool anica::AnicaLib::isPotentialCausalPlace(const std::string& p) const {
-    assert(initialNet != NULL);
-    
-    const pnapi::Place* place = initialNet->findPlace(p);
-    // todo: exception
+size_t anica::AnicaLib::isPotentialCausalPlace(const pnapi::Place* place) const {
     assert(place != NULL);
     
     bool hasHighPredecessor = false;
+    size_t ret = 0;
     
-    PNAPI_FOREACH(t, place->getPreset()) {
-        if (((pnapi::Transition*)(*t))->getConfidence() == anica::CONFIDENCE_HIGH) {
-            hasHighPredecessor = true;
-            break;
+    if (oneTripleOnly) {
+        // fast check
+        PNAPI_FOREACH(t, place->getPreset()) {
+            if (((pnapi::Transition*)(*t))->getConfidence() == anica::CONFIDENCE_HIGH) {
+                hasHighPredecessor = true;
+                break;
+            }
         }
+        
+        if (hasHighPredecessor) {
+            PNAPI_FOREACH(t, place->getPostset()) {
+                if (((pnapi::Transition*)(*t))->getConfidence() == anica::CONFIDENCE_LOW) {
+                    ret++;
+                    break;
+                }
+            }
+        }
+        
     }
-    
-    if (hasHighPredecessor) {
-        PNAPI_FOREACH(t, place->getPostset()) {
-            if (((pnapi::Transition*)(*t))->getConfidence() == anica::CONFIDENCE_LOW) {
-                return true;
+    else {
+        // count all potential triples
+        PNAPI_FOREACH(t, place->getPreset()) {
+            if (((pnapi::Transition*)(*t))->getConfidence() == anica::CONFIDENCE_HIGH) {
+                PNAPI_FOREACH(t, place->getPostset()) {
+                    if (((pnapi::Transition*)(*t))->getConfidence() == anica::CONFIDENCE_LOW) {
+                        ret++;
+                    }
+                }
             }
         }
     }
     
-    return false;
+    return ret;
 }
 
-bool anica::AnicaLib::isPotentialConflictPlace(const std::string& p) const {
-    assert(initialNet != NULL);
-    
-    const pnapi::Place* place = initialNet->findPlace(p);
-    // todo: exception
+size_t anica::AnicaLib::isPotentialConflictPlace(const pnapi::Place* place) const {
     assert(place != NULL);
     
     bool hasHighSuccessor = false;
     bool hasLowSuccessor = false;
     
-    PNAPI_FOREACH(t, place->getPostset()) {
-        const int c = ((pnapi::Transition*)(*t))->getConfidence();
-        if (c == anica::CONFIDENCE_HIGH) {
-            hasHighSuccessor = true;
+    size_t ret = 0;
+    
+    if (oneTripleOnly) {
+        PNAPI_FOREACH(t, place->getPostset()) {
+            const int c = ((pnapi::Transition*)(*t))->getConfidence();
+            if (c == anica::CONFIDENCE_HIGH) {
+                hasHighSuccessor = true;
+            }
+            if (c == anica::CONFIDENCE_LOW) {
+                hasLowSuccessor = true;
+            }
+            if (hasHighSuccessor && hasLowSuccessor) {
+                ret++;
+                break;
+            }
         }
-        if (c == anica::CONFIDENCE_LOW) {
-            hasLowSuccessor = true;
-        }
-        if (hasHighSuccessor && hasLowSuccessor) {
-            return true;
+    }
+    else {
+        const std::set<pnapi::Node*> postset = place->getPostset();
+        PNAPI_FOREACH(h, postset) {
+            if (((pnapi::Transition*)(*h))->getConfidence() == anica::CONFIDENCE_HIGH) {
+                PNAPI_FOREACH(l, postset) {
+                    if (((pnapi::Transition*)(*l))->getConfidence() == anica::CONFIDENCE_LOW) {
+                        ret++;
+                    }
+                }
+            }
         }
     }
     
-    return false;
+    return ret;
 }
 
-bool anica::AnicaLib::isActiveCausalPlace(const std::string& p) {
-    assert(initialNet != NULL);
-    
-    const pnapi::Place* place = initialNet->findPlace(p);
-    // todo: exception
+size_t anica::AnicaLib::isActiveCausalPlace(pnapi::PetriNet& net, const pnapi::Place* place) {
     assert(place != NULL);
     
-    pnapi::PetriNet* taskNet;
     TriplePointer* resultTriple;
+    size_t ret = 0;
     
     PNAPI_FOREACH(h, place->getPreset()) {
         const int presetConfidence = ((pnapi::Transition*)(*h))->getConfidence();
@@ -280,28 +325,26 @@ bool anica::AnicaLib::isActiveCausalPlace(const std::string& p) {
                 assert(postsetConfidence != anica::CONFIDENCE_NONE); 
                 if (postsetConfidence == anica::CONFIDENCE_LOW) {
                     TriplePointer* tripel = new TriplePointer(place, (pnapi::Transition*)*h, (pnapi::Transition*)*l); 
-                    if (isActiveCausalTriple(tripel)) {
-                        delete tripel;
-                        return true;
+                    if (isActiveCausalTriple(net, tripel)) {
+                        ret++;
                     }
                     delete tripel;
+                    if ((!oneTripleOnly) && (ret > 0)) {
+                        return ret;
+                    }
                 }
             }
         }
     }
     
-    return false;
+    return ret;
 }
 
-bool anica::AnicaLib::isActiveConflictPlace(const std::string& p) {
-    assert(initialNet != NULL);
-    
-    const pnapi::Place* place = initialNet->findPlace(p);
-    // todo: exception
+size_t anica::AnicaLib::isActiveConflictPlace(pnapi::PetriNet& net, const pnapi::Place* place) {
     assert(place != NULL);
     
-    pnapi::PetriNet* taskNet;
     TriplePointer* resultTriple;
+    size_t ret = 0;
     
     const std::set<pnapi::Node*> postset = place->getPostset();
     
@@ -312,26 +355,66 @@ bool anica::AnicaLib::isActiveConflictPlace(const std::string& p) {
             PNAPI_FOREACH(l, postset) {
                 if (((pnapi::Transition*)(*l))->getConfidence() == anica::CONFIDENCE_LOW) {
                     TriplePointer* tripel = new TriplePointer(place, (pnapi::Transition*)*h, (pnapi::Transition*)*l); 
-                    if (isActiveConflictTriple(tripel)) {
-                        delete tripel;
-                        return true;
+                    if (isActiveConflictTriple(net, tripel)) {
+                        ret++;
                     }
                     delete tripel;
+                    if ((!oneTripleOnly) && (ret > 0)) {
+                        return ret;
+                    }
                 }
             }
         }
     }
     
-    return false;
+    return ret;
 }
 
-bool anica::AnicaLib::isActiveCausalTriple(const anica::TriplePointer* tripel)
+size_t anica::AnicaLib::isPotentialCausalPlace(const std::string& p) const {
+    assert(initialNet != NULL);
+    
+    const pnapi::Place* place = initialNet->findPlace(p);
+    assert(place != NULL);
+    
+    return isPotentialCausalPlace(place);
+}
+
+size_t anica::AnicaLib::isPotentialConflictPlace(const std::string& p) const {
+    assert(initialNet != NULL);
+    
+    const pnapi::Place* place = initialNet->findPlace(p);
+    assert(place != NULL);
+    
+    return isPotentialConflictPlace(place);
+}
+
+size_t anica::AnicaLib::isActiveCausalPlace(const std::string& p) {
+    assert(initialNet != NULL);
+    
+    const pnapi::Place* place = initialNet->findPlace(p);
+    // todo: exception
+    assert(place != NULL);
+    
+    return isActiveCausalPlace(*initialNet, place);
+}
+
+size_t anica::AnicaLib::isActiveConflictPlace(const std::string& p) {
+    assert(initialNet != NULL);
+    
+    const pnapi::Place* place = initialNet->findPlace(p);
+    // todo: exception
+    assert(place != NULL);
+    
+    return isActiveConflictPlace(*initialNet, place);
+}
+
+bool anica::AnicaLib::isActiveCausalTriple(pnapi::PetriNet& net, const anica::TriplePointer* tripel)
 {
     assert(tripel->place != NULL);
     assert(tripel->high != NULL);
     assert(tripel->low != NULL);
     
-    pnapi::PetriNet* taskNet = new pnapi::PetriNet(*initialNet);
+    pnapi::PetriNet* taskNet = new pnapi::PetriNet(net);
     newArcs.clear();
     TriplePointer* taskTriple = new TriplePointer(taskNet->findPlace(tripel->place->getName()), taskNet->findTransition(tripel->high->getName()), taskNet->findTransition(tripel->low->getName()));
     TriplePointer* resultTriple = addCausalPattern(*taskNet, taskTriple, true);
@@ -352,13 +435,13 @@ bool anica::AnicaLib::isActiveCausalTriple(const anica::TriplePointer* tripel)
     }
 }
 
-bool anica::AnicaLib::isActiveConflictTriple(const anica::TriplePointer* tripel)
+bool anica::AnicaLib::isActiveConflictTriple(pnapi::PetriNet& net, const anica::TriplePointer* tripel)
 {
     assert(tripel->place != NULL);
     assert(tripel->high != NULL);
     assert(tripel->low != NULL);
     
-    pnapi::PetriNet* taskNet = new pnapi::PetriNet(*initialNet);
+    pnapi::PetriNet* taskNet = new pnapi::PetriNet(net);
     newArcs.clear();
     TriplePointer* taskTriple = new TriplePointer(taskNet->findPlace(tripel->place->getName()), taskNet->findTransition(tripel->high->getName()), taskNet->findTransition(tripel->low->getName()));
     TriplePointer* resultTriple = addConflictPattern(*taskNet, taskTriple, true);
@@ -389,6 +472,8 @@ void anica::AnicaLib::initialize()
     lolaPath = "";
     lolaWitnessPath = false;
     lolaVerbose = false;
+    oneTripleOnly = true;
+    oneActiveOnly = true;
     newArcs.clear();
     downgradeTransitions.clear();
     unassignedTransitions.clear();
@@ -586,10 +671,12 @@ anica::TriplePointer* anica::AnicaLib::addConflictPattern(pnapi::PetriNet& exten
     return ret;
 }
 
-bool anica::AnicaLib::isSecure()
+size_t anica::AnicaLib::isSecure()
 {
     assert(initialNet != NULL);
     assert(lolaPath != "");
+    
+    size_t ret = 0;
     
     assert(unassignedTransitions.size() == 0);
     if (propertyToCheck != anica::PROPERTY_PBNID && downgradeTransitions.size() > 0) {
@@ -598,22 +685,28 @@ bool anica::AnicaLib::isSecure()
     
     const size_t transitionsCount = initialNet->getTransitions().size();
     if (highLabeledTransitionsCount == transitionsCount) {
-        return true;
+        return ret;
     }
     if (lowLabeledTransitionsCount == transitionsCount) {
-        return true;
+        return ret;
     }
        
     PNAPI_FOREACH(p, initialNet->getPlaces()) {
         const std::string placeName = (**p).getName();
         if (isActiveCausalPlace(placeName)) {
-            return false;
+            ret++;
+            if (oneActiveOnly) {
+                break;
+            }
         }
         if (isActiveConflictPlace(placeName)) {
-            return false;
+            ret++;
+            if (oneActiveOnly) {
+                break;
+            }
         }
     }
-    return true;
+    return ret;
 }
 
 bool anica::AnicaLib::isActiveCausalTriple(const anica::Triple& triple)
@@ -625,7 +718,7 @@ bool anica::AnicaLib::isActiveCausalTriple(const anica::Triple& triple)
     
     const anica::TriplePointer* taskTriple = new anica::TriplePointer(initialNet->findPlace(triple.place), initialNet->findTransition(triple.high), initialNet->findTransition(triple.low));
  
-    const bool ret = isActiveCausalTriple(taskTriple);   
+    const bool ret = isActiveCausalTriple(*initialNet, taskTriple);   
     delete taskTriple;
     
     return ret;
@@ -640,7 +733,7 @@ bool anica::AnicaLib::isActiveConflictTriple(const anica::Triple& triple)
     
     const anica::TriplePointer* taskTriple = new anica::TriplePointer(initialNet->findPlace(triple.place), initialNet->findTransition(triple.high), initialNet->findTransition(triple.low));
  
-    const bool ret = isActiveConflictTriple(taskTriple);   
+    const bool ret = isActiveConflictTriple(*initialNet, taskTriple);   
     delete taskTriple;
     
     return ret;
@@ -866,7 +959,7 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
                     if (lowConfidence == anica::CONFIDENCE_LOW || lowConfidence == anica::CONFIDENCE_NONE) {
                         // potential causal triple
                         const anica::TriplePointer* taskTriple = new anica::TriplePointer((pnapi::Place*)*p, (pnapi::Transition*)*highTransition, (pnapi::Transition*)*lowTransition);
-                        if (isActiveCausalTriple(taskTriple)) {
+                        if (isActiveCausalTriple(*initialNet, taskTriple)) {
                             *cuddOutput *= !(cuddManager->bddVar(cuddVariables[(**highTransition).getName()]) * !cuddManager->bddVar(cuddVariables[(**lowTransition).getName()]));
                         }
                         delete taskTriple;
@@ -886,7 +979,7 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
                         const int lowConfidence = ((pnapi::Transition*)(*lowTransition))->getConfidence();
                         // potential conflict triple
                         const anica::TriplePointer* taskTriple = new anica::TriplePointer((pnapi::Place*)*p, (pnapi::Transition*)*highTransition, (pnapi::Transition*)*lowTransition);
-                        if (isActiveConflictTriple(taskTriple)) {
+                        if (isActiveConflictTriple(*initialNet, taskTriple)) {
                             *cuddOutput *= !(cuddManager->bddVar(cuddVariables[(**highTransition).getName()]) * !cuddManager->bddVar(cuddVariables[(**lowTransition).getName()]));  
                         }
                         delete taskTriple;
@@ -897,4 +990,120 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
     }   
     
     return cuddManager;   	   
+}
+
+void anica::AnicaLib::clearColors(pnapi::PetriNet& net) {
+    PNAPI_FOREACH(node, net.getNodes()) {
+        (**node).setColor("");
+    }
+}
+
+void anica::AnicaLib::colorPotentialPlaces(pnapi::PetriNet& net, anica::colorPlaceTask_e task) {
+    clearColors(net);
+    
+    const bool checkCausal = ((task == anica::COLOR_PLACE_TASK_ALL) || (task == anica::COLOR_PLACE_TASK_CAUSAL));
+    const bool checkConflict = ((task == anica::COLOR_PLACE_TASK_ALL) || (task == anica::COLOR_PLACE_TASK_CONFLICT));
+    
+    PNAPI_FOREACH(p, net.getPlaces()) {
+        bool isCausal;
+        bool isConflict;
+        
+        if (checkCausal) {
+            isCausal = (isPotentialCausalPlace(*p) > 0); 
+        }
+        if (checkConflict) {
+            isConflict = (isPotentialConflictPlace(*p) > 0); 
+        }
+        
+        switch (task) {
+            case anica::COLOR_PLACE_TASK_ALL:
+                if (isCausal && isConflict) {
+                    (**p).setColor("brown");
+                }
+                else if (isCausal) {
+                    (**p).setColor("blue");
+                }
+                else if (isConflict) {
+                    (**p).setColor("orange");
+                }
+                break;
+            case anica::COLOR_PLACE_TASK_CAUSAL:
+                if (isCausal) {
+                    (**p).setColor("blue");
+                }
+                break;
+            case anica::COLOR_PLACE_TASK_CONFLICT:
+                if (isConflict) {
+                    (**p).setColor("orange");
+                }
+                break;
+        }
+    }
+}
+
+void anica::AnicaLib::colorActivePlaces(pnapi::PetriNet& net, anica::colorPlaceTask_e task) {
+    clearColors(net);
+    
+    const bool checkCausal = ((task == anica::COLOR_PLACE_TASK_ALL) || (task == anica::COLOR_PLACE_TASK_CAUSAL));
+    const bool checkConflict = ((task == anica::COLOR_PLACE_TASK_ALL) || (task == anica::COLOR_PLACE_TASK_CONFLICT));
+    
+    PNAPI_FOREACH(p, net.getPlaces()) {
+        bool isCausal;
+        bool isConflict;
+        
+        if (checkCausal) {
+            isCausal = (isActiveCausalPlace(net, *p) > 0); 
+        }
+        if (checkConflict) {
+            isConflict = (isActiveConflictPlace(net,*p) > 0); 
+        }
+        
+        switch (task) {
+            case anica::COLOR_PLACE_TASK_ALL:
+                if (isCausal && isConflict) {
+                    (**p).setColor("brown");
+                }
+                else if (isCausal) {
+                    (**p).setColor("blue");
+                }
+                else if (isConflict) {
+                    (**p).setColor("orange");
+                }
+                break;
+            case anica::COLOR_PLACE_TASK_CAUSAL:
+                if (isCausal) {
+                    (**p).setColor("blue");
+                }
+                break;
+            case anica::COLOR_PLACE_TASK_CONFLICT:
+                if (isConflict) {
+                    (**p).setColor("orange");
+                }
+                break;
+        }
+    }
+}
+
+void anica::AnicaLib::colorConfidentiality(pnapi::PetriNet& net, anica::colorConfidenceTask_e task) {
+    clearColors(net);
+    
+    PNAPI_FOREACH(t, net.getTransitions()) {
+	    switch ((**t).getConfidence()) {
+		    case anica::CONFIDENCE_LOW:
+		        if ((task == anica::COLOR_CONFIDENCE_TASK_LOW) || (task = anica::COLOR_CONFIDENCE_TASK_ALL)) {
+			        (**t).setColor("green");
+			    }
+			    break;
+		    case anica::CONFIDENCE_HIGH:
+		        if ((task == anica::COLOR_CONFIDENCE_TASK_HIGH) || (task = anica::COLOR_CONFIDENCE_TASK_ALL)) {
+			        (**t).setColor("red");
+			    }
+			    break;
+		    case anica::CONFIDENCE_DOWN:
+		        if ((task == anica::COLOR_CONFIDENCE_TASK_DOWN) || (task = anica::COLOR_CONFIDENCE_TASK_ALL)) {
+			        (**t).setColor("yellow");
+			    }
+			    break;
+	    }
+	}
 }

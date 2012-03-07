@@ -18,6 +18,21 @@ typedef enum
 
 typedef enum
 {
+    COLOR_CONFIDENCE_TASK_ALL = 0,
+    COLOR_CONFIDENCE_TASK_LOW = 1,
+    COLOR_CONFIDENCE_TASK_HIGH = 2,
+    COLOR_CONFIDENCE_TASK_DOWN = 3
+} colorConfidenceTask_e;
+
+typedef enum
+{
+    COLOR_PLACE_TASK_ALL = 0,
+    COLOR_PLACE_TASK_CAUSAL = 1,
+    COLOR_PLACE_TASK_CONFLICT = 2
+} colorPlaceTask_e;
+
+typedef enum
+{
     PROPERTY_PBNIPLUS = 0,
     PROPERTY_PBNID = 1
 } property_e;
@@ -63,20 +78,25 @@ class AnicaLib
         // assigns all transitions with given assignment
         void assignUnassignedTransitions(confidence_e);
 
-        bool isPotentialCausalPlace(const std::string&) const;
-        bool isPotentialConflictPlace(const std::string&) const;
-        bool isActiveCausalPlace(const std::string&);
-        bool isActiveConflictPlace(const std::string&);
+        size_t isPotentialCausalPlace(const std::string&) const;
+        size_t isPotentialConflictPlace(const std::string&) const;
+        size_t isActiveCausalPlace(const std::string&);
+        size_t isActiveConflictPlace(const std::string&);
+        
         bool isActiveCausalTriple(const Triple&);
         bool isActiveConflictTriple(const Triple&);
         
-        bool isSecure();
+        size_t isSecure();
     
         Cudd* getCharacterization(char**, BDD*, std::map<std::string, int>&);
         pnapi::PetriNet* getControllerProblem();
         
         pnapi::PetriNet* getCurrentNet() const;
         
+        void colorPotentialPlaces(pnapi::PetriNet&, colorPlaceTask_e);
+        void colorActivePlaces(pnapi::PetriNet&, colorPlaceTask_e);
+        void colorConfidentiality(pnapi::PetriNet&, colorConfidenceTask_e);
+        void clearColors(pnapi::PetriNet&);
         
         const Triple* addCausalPattern(pnapi::PetriNet&, const Triple&);
         const Triple* addConflictPattern(pnapi::PetriNet&, const Triple&);
@@ -86,6 +106,10 @@ class AnicaLib
         
         void setRepresantiveNames(bool);
         const bool getRepresantiveNames() const;
+        void setOneTripleOnly(bool);
+        const bool getOneTripleOnly() const;
+        void setOneActiveOnly(bool);
+        const bool getOneActiveOnly() const;
         
         const size_t getUnassignedTransitionsCount() const;
         const size_t getHighLabeledTransitionsCount() const;
@@ -100,7 +124,7 @@ class AnicaLib
         const bool getLolaVerbose() const;
         
     private:
-        int callLoLA(const pnapi::PetriNet& net, const pnapi::Place* goal) const;
+        int callLoLA(const pnapi::PetriNet&, const pnapi::Place*) const;
         
         void initialize();
     
@@ -109,14 +133,21 @@ class AnicaLib
         TriplePointer* addCausalPattern(pnapi::PetriNet&, const TriplePointer*, bool);
         TriplePointer* addConflictPattern(pnapi::PetriNet&, const TriplePointer*, bool);
     
-        bool isActiveCausalTriple(const TriplePointer*);
-        bool isActiveConflictTriple(const TriplePointer*);
+        size_t isPotentialCausalPlace(const pnapi::Place*) const;
+        size_t isPotentialConflictPlace(const pnapi::Place*) const;
+        size_t isActiveCausalPlace(pnapi::PetriNet&, const pnapi::Place*);
+        size_t isActiveConflictPlace(pnapi::PetriNet&, const pnapi::Place*);
+        
+        bool isActiveCausalTriple(pnapi::PetriNet&, const TriplePointer*);
+        bool isActiveConflictTriple(pnapi::PetriNet&, const TriplePointer*);
         
         pnapi::PetriNet* initialNet;
  
         property_e propertyToCheck;
  
         bool represantiveNames;
+        bool oneTripleOnly;
+        bool oneActiveOnly;
  
         std::string lolaPath;
         bool lolaWitnessPath;

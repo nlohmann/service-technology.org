@@ -246,7 +246,7 @@ void updateNonInterference() {
     // evaluate non-interference
     if (alib->getHighLabeledTransitionsCount() + alib->getLowLabeledTransitionsCount() == net.getTransitions().size()) {
         // net has only high and low labeled transitions
-        if (alib->isSecure()) {
+        if (alib->isSecure() == 0) {
             rep->status("assignment is secure");
         }
         else {
@@ -282,7 +282,7 @@ void updateNonInterference() {
                             rep->status("%s -> HIGH", transitionName.c_str());
                             break;
                         case 2:
-                            // variable is don't care
+                            // variable is "free"
                             break;
                         default:
                             // should not happen

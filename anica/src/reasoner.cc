@@ -261,26 +261,32 @@ void updateNonInterference() {
             
             rep->status("characterization calculated");
             
-            // check implications for all unassigned transitions
+            // check implications for all transitions
+            int* cube; // a pointer to an array of ints
+            CUDD_VALUE_TYPE value; // useless required variable
+            cuddOutput->FirstCube(&cube, &value); // get an assignment
+            
+            // report implied assignments
             PNAPI_FOREACH(t, net.getTransitions()) {
                 if ((**t).getConfidence() == anica::CONFIDENCE_NONE) {
                     const std::string transitionName = (**t).getName();
                     const int bddIndex = cuddVariables[transitionName];
-                    rep->status("..checking: %s", transitionName.c_str());
-                      
-                    // is high implied?
-                    if ((!*cuddOutput + myBDD->bddVar(bddIndex)) == myBDD->bddOne()) {
-                        // yes
-                        rep->status("....HIGH");
-                        assignment[transitionName] = anica::CONFIDENCE_HIGH;
-                    }
-                    else {
-                        // no
-                        // is low implied?
-                        if ((!*cuddOutput + !myBDD->bddVar(bddIndex)) == myBDD->bddOne()) {
-                            rep->status("....LOW");
-                            assignment[transitionName] = anica::CONFIDENCE_LOW;
-                        }
+                    
+                    switch (cube[bddIndex]) {
+                        case 0:
+                            // variable must be false
+                            rep->status("%s -> LOW", transitionName.c_str());
+                            break;
+                        case 1:
+                            // variable must be true
+                            rep->status("%s -> HIGH", transitionName.c_str());
+                            break;
+                        case 2:
+                            // variable is don't care
+                            break;
+                        default:
+                            // should not happen
+                            assert(false);
                     }
                 }
             }

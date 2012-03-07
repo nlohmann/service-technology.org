@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Anica UI
+Bundle-SymbolicName: org.st.anica.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.st.anica.ui.Activator
+Bundle-Vendor: service-technology.org
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ hub.top.editor.ptnetLoLA.diagram;bundle-version="1.0.4",
+ org.eclipse.gmf.runtime.notation,
+ hub.top.editor.lola.text
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

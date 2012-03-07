@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="hub.top.editor.commands.category"
+            id="hub.top.editor.commands.checkConfidence"
+            name="Check Confidence of Transitions">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.st.anica.ui.CheckConfidence"
+            commandId="hub.top.editor.commands.checkConfidence">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="hub.top.editor.menus.petrinetsMenu"
+               label="Petri Nets"
+               mnemonic="M">
+            <command
+                  commandId="hub.top.editor.commands.checkConfidence"
+                  id="hub.top.editor.menus.checkConfidence"
+                  mnemonic="C">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="hub.top.editor.toolbars.petrinetsToolbar">
+            <command
+                  commandId="hub.top.editor.commands.checkConfidence"
+                  id="hub.top.editor.toolbars.convertToDiagram"
+                  tooltip="check confidence">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>   
+</plugin>

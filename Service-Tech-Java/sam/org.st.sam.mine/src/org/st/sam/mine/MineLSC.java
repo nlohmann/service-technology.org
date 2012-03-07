@@ -261,14 +261,17 @@ public class MineLSC {
                   System.out.println("check "+toString(pre)+" "+toString(main_cand)+" is not connected");
                 }
 
-                Set<Integer> unConnected = l_test.getUnConnectedEvents();
-                if (main_cand.length > unConnected.size())
+                boolean[] unConnected = l_test.getUnConnectedEvents();
+                int numUnconnected = 0;
+                for (int i=0; i<unConnected.length; i++) if (unConnected[i]) numUnconnected++;
+                
+                if (main_cand.length > numUnconnected)
                 {
                   // skip unconnected events
-                  short[] newMain = new short[main_cand.length-unConnected.size()];
+                  short[] newMain = new short[main_cand.length-numUnconnected];
                   int i=0,j=0;
                   while (j<newMain.length) {
-                    if (!unConnected.contains(i+pre.length)) {
+                    if (!unConnected[i+pre.length]) {
                       newMain[j] = main_cand[i];
                       j++;
                     }

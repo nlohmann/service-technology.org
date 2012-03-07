@@ -102,15 +102,16 @@ public class LSC {
    *
    * @return true if all events are connected; false otherwise
    */
-  public Set<Integer> getUnConnectedEvents() {
+  public boolean[] getUnConnectedEvents() {
     LSCEvent[] lsc = new LSCEvent[preChart.length + mainChart.length];
     System.arraycopy(preChart, 0, lsc, 0, preChart.length);
     System.arraycopy(mainChart, 0, lsc, preChart.length, mainChart.length);
-    Set<Integer> unConnectedEvents = new HashSet<Integer>();
+    
+    boolean[] unConnectedEvents = new boolean[lsc.length];
     Set<String> metObjects = new HashSet<String>();
 
     /* lsc[0] is the first connected events */
-    for (int inx = 1; inx < lsc.length; inx++) unConnectedEvents.add(inx);
+    for (int inx = 1; inx < lsc.length; inx++) unConnectedEvents[inx] = true;
     metObjects.add(lsc[0].caller);
     metObjects.add(lsc[0].callee);
 
@@ -118,11 +119,11 @@ public class LSC {
     while (true) {
       int metObjectNoBefore = metObjects.size();
       for (int inx = 1; inx < lsc.length; inx++) {
-        if (unConnectedEvents.contains(inx)) {
+        if (unConnectedEvents[inx]) {
           String caller = lsc[inx].getCaller();
           String callee = lsc[inx].getCallee();
           if (metObjects.contains(caller) || metObjects.contains(callee)) {
-            unConnectedEvents.remove(inx);
+            unConnectedEvents[inx] = false;
             metObjects.add(caller);
             metObjects.add(callee);
           }
@@ -142,8 +143,9 @@ public class LSC {
    * @return true if all events are connected; false otherwise
    */
   public boolean isConnected(){
-    Set<Integer> unConnectedEvents = getUnConnectedEvents();
-    return unConnectedEvents.size() == 0;
+    boolean[] unConnectedEvents = getUnConnectedEvents();
+    for (int i=0; i<unConnectedEvents.length; i++) if (unConnectedEvents[i]) return false;
+    return true;
   }
 
   @Override

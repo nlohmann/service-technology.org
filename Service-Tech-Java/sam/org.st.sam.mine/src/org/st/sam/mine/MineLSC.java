@@ -562,17 +562,23 @@ public class MineLSC {
   
   private short[] largestWord_checked = null;
   
-  private HashMap<SLogTreeNode, Set<Short>> checkSuccessors = new HashMap<SLogTreeNode, Set<Short>>();
-  private HashMap<Short,HashSet<Short>> retryMap = new HashMap<Short, HashSet<Short>>(); 
+  private HashMap<SLogTreeNode,boolean[]> checkSuccessors = new HashMap<SLogTreeNode,boolean[]>();
+  private HashMap<Short,boolean[]> retryMap = new HashMap<Short, boolean[]>(); 
   
   private void mineSupportedWords_optimized(MineBranchingTree tree, int minSupThreshold, final short word[], final short[] ev, final short[] preferedSucc, SLogTree words, boolean check) {
 
     short[] newPreferedSucc = preferedSucc;
     SLogTreeNode leaf = words.contains(word);
     if (leaf != null && checkSuccessors.containsKey(leaf)) {
-      Set<Short> checkedSuccessors = checkSuccessors.get(leaf);
+      
+      boolean[] checkedSuccessors2 = checkSuccessors.get(leaf);
+      
+      //Set<Short> checkedSuccessors = new HashSet<Short>();
+      //for (short b=0; b<checkedSuccessors2.length; b++) if (checkedSuccessors2[b]) checkedSuccessors.add(b);
+      
       // remove all successors to explore that have already been explored
-      newPreferedSucc = removeFrom(newPreferedSucc, checkedSuccessors);
+      newPreferedSucc = removeFrom(newPreferedSucc, checkedSuccessors2);
+      
       // if there is none left, we are done
       if (newPreferedSucc.length == 0) {
         if (showDebug(word, preferedSucc)) {
@@ -586,9 +592,9 @@ public class MineLSC {
     else if (lessThan(largestWord_checked, word)) largestWord_checked = word;
     
     SLogTreeNode n = words.addTrace(word);
-    if (!checkSuccessors.containsKey(n)) checkSuccessors.put(n, new HashSet<Short>());
+    if (!checkSuccessors.containsKey(n)) checkSuccessors.put(n, new boolean[slog.originalNames.length]);
     for (int i=0; i<newPreferedSucc.length; i++)
-      checkSuccessors.get(n).add(newPreferedSucc[i]);
+      checkSuccessors.get(n)[newPreferedSucc[i]] = true;
     //System.out.println(toString(word));
     if (showDebug(word, preferedSucc)) {
       log(log_msw, "adding "+toString(word)+" "+checkSuccessors.get(n)+"\n");
@@ -694,13 +700,13 @@ public class MineLSC {
               mineSupportedWords_optimized(tree, minSupThreshold, newWord, ev_avail, preferedSuccNext, words, true);
             } else {
               
-              if (!retryMap.containsKey(ignore)) retryMap.put(ignore, new HashSet<Short>());
+              if (!retryMap.containsKey(ignore)) retryMap.put(ignore, new boolean[slog.originalNames.length]);
               if (ignoreSuccessor != -1) {
-                retryMap.get(ignore).add(ignoreSuccessor); // possible successor
+                retryMap.get(ignore)[ignoreSuccessor] = true; // possible successor
               } else {
                 // worst case: we don't know anything: try all
                 for (short _event_avail : ev_avail)
-                  retryMap.get(ignore).add(_event_avail);  
+                  retryMap.get(ignore)[_event_avail] = true;  
               }
             }
           }
@@ -709,10 +715,20 @@ public class MineLSC {
         // but we already collected all letters that could come after the current letter
         // extend 'word' with these new successors (skipping over the current letter)
         if (retryMap.containsKey(e)) {
-          short[] preferedSuccNext_skip_over_e = toArray(retryMap.get(e));
-          retryMap.remove(e); // we have handled these successors, remove from the map
           
-          Arrays.sort(preferedSuccNext_skip_over_e);
+          boolean[] retry = retryMap.get(e);
+          int size = 0;
+          for (int i=0; i<retry.length; i++) {
+            if (retry[i] && i != e) size++; // all events but e
+          }
+          
+          short[] preferedSuccNext_skip_over_e = new short[size];
+          int pos=0;
+          for (short i=0; i<retry.length; i++) {
+            if (retry[i] && i != e) preferedSuccNext_skip_over_e[pos++] = i;
+          }
+          
+          retryMap.remove(e); // we have handled these successors, remove from the map
           
           if (showDebug(word, preferedSuccNext_skip_over_e)) {
             log(log_msw, "RETRY 1b "+toString(word) +" WITH "+preferedSuccNext_skip_over_e+"\n");
@@ -739,32 +755,13 @@ public class MineLSC {
         if (word.length > 1) {
           if (stuck_at != null) {
             // violators.addAll(stuck_at);
-            for (int i=0;i<stuck_at.length;i++) {
-              if (stuck_at[i]) violators[i] = true;
-            }
+            for (int i=0;i<stuck_at.length;i++) stuck_at[i] = stuck_at[i] || violators[i];
           }
           for (short ignore=0; ignore<violators.length; ignore++) {
             // only consider the events that are violating some occurrence
             if (!violators[ignore]) continue;
             
-            
-            int v_count = 0;
-            for (short v : word) {
-              if (v == ignore) v_count++;
-            }
-            if (v_count == 0) continue;
-            
-            short[] newWord = new short[word.length-1];
-            int j=0;
-            while (word[j] != ignore) {
-              newWord[j] = word[j];
-              j++;
-            }
-            while (j<newWord.length) {
-              newWord[j] = word[j+1];
-              j++;
-            }
-            
+            short[] newWord = removeFrom(word, ignore);
             short[] ev_red = removeFrom(ev, ignore);
 
             if (lessThan(newWord, largestWord_checked))
@@ -894,6 +891,30 @@ public class MineLSC {
     int i_new = 0;
     for (int i_old=0; i_old<list.length; i_old++) {
       if (!elements.contains(list[i_old])) reduced_list[i_new++] = list[i_old];
+    }
+    
+    return reduced_list;
+  }
+  
+  /**
+   * Remove element from the list.
+   * 
+   * @param list
+   * @param element
+   * @return a new array containing all elements except the given element
+   * 
+   */
+  private short[] removeFrom(short[] list, boolean[] removeIndex) {
+    
+    int new_length = 0;
+    for (int i=0; i<list.length; i++) {
+      if (!removeIndex[list[i]]) new_length++;
+    }
+    
+    short[] reduced_list = new short[new_length];
+    int i_new = 0;
+    for (int i_old=0; i_old<list.length; i_old++) {
+      if (!removeIndex[list[i_old]]) reduced_list[i_new++] = list[i_old];
     }
     
     return reduced_list;

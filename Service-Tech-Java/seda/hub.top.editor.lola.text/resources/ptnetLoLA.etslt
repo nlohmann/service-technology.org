@@ -34,8 +34,10 @@ syntax(PtNet) "resources/ptnetLoLA.ecore" {
 
        
     TransitionList -> (Transition:composite(transitions)  { addArcsToNet($0); }  )*;
-    Transition:element(Transition) ->
-       "TRANSITION" ws(space) LOLAIDENT:composite(name) ws(statement)
+    Transition:element(TransitionExt) ->
+       "TRANSITION" ws(space) LOLAIDENT:composite(name) 
+       		(Confidence:composite(confidence) )?
+       	ws(statement)
            "CONSUME"
            ws(blockstart)
                (ArcToTransitionList)? ws(empty) ";"
@@ -45,6 +47,10 @@ syntax(PtNet) "resources/ptnetLoLA.ecore" {
                (ArcToPlaceList)? ws(empty) ";" 
            ws(blockend) ws(statement)
        ws(statement);
+       
+    Confidence:constant("HIGH":Confidence) -> ws(space) "HIGH";
+    Confidence:constant("LOW":Confidence) -> ws(space) "LOW";
+    
 
     ArcToTransitionList [0] -> ws(indent) ArcToTransition:composite(incoming)  ;
     ArcToTransitionList [1] -> ws(indent) ArcToTransition:composite(incoming) ws(empty) "," ws(statement) ArcToTransitionList ;

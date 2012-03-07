@@ -40,21 +40,21 @@ template<typename Keytype>
 class List {
 
 public:
-  typedef shared_ptr< List<Keytype> > List_ptr;
+    typedef shared_ptr< List<Keytype> > List_ptr;
 
-  List(Keytype value);
-  ~List();
+    List(Keytype value);
+    ~List();
 
-  void push_back(Keytype value);
-  Keytype getValue();
-  List_ptr getNext();
+    void push_back(Keytype value);
+    Keytype getValue();
+    List_ptr getNext();
 
-  unsigned int length();
-  static bool contains(List_ptr list, Keytype value);
+    unsigned int length();
+    static bool contains(List_ptr list, Keytype value);
 
 private:
-  Keytype value;
-  List_ptr next;
+    Keytype value;
+    List_ptr next;
 };
 
 template<typename type1, typename type2>
@@ -62,14 +62,14 @@ class Pair {
 
 public:
 
-  Pair(type1 first, type2 second);
+    Pair(type1 first, type2 second);
 
-  type1 getFirst();
-  type2 getSecond();
+    type1 getFirst();
+    type2 getSecond();
 
 private:
-  type1 first;
-  type2 second;
+    type1 first;
+    type2 second;
 
 };
 
@@ -78,69 +78,69 @@ private:
 
 template <typename Keytype>
 List<Keytype>::List(Keytype value) {
-  this->value = value;
+    this->value = value;
 }
 
 template <typename Keytype>
 List<Keytype>::~List() {
-  next = shared_ptr< List >();
+    next = shared_ptr< List >();
 }
 
 template <typename Keytype>
 void List<Keytype>::push_back(Keytype value) {
 
-  if ( next.get() == 0) {
-    next = List_ptr(new List(value));
-  }
-  else {
-    next->push_back(value);
-  }
+    if ( next.get() == 0) {
+        next = List_ptr(new List(value));
+    }
+    else {
+        next->push_back(value);
+    }
 }
 
 template <typename Keytype>
 Keytype List<Keytype>::getValue() {
-  return value;
+    return value;
 }
 
 template <typename Keytype>
 typename List<Keytype>::List_ptr List<Keytype>::getNext() {
-  return next;
+    return next;
 }
 
 template <typename Keytype>
 unsigned int List<Keytype>::length() {
-  if (next.get() == 0)
-    return 1;
-  else return 1 + next->length();
+    if (next.get() == 0)
+        return 1;
+    else return 1 + next->length();
 }
 
 template <typename Keytype>
 bool List<Keytype>::contains(List_ptr list, Keytype value) {
-  if (list.get() == 0) {
-      return false;
-  }
-  List_ptr next = list;
-  do {
-      if (next->getValue == value) {
-          return true;
-      }
-      list = list->getNext();
-  } while (list.get() != 0);
-  return false;
+    if (list.get() == 0) {
+        return false;
+    }
+    List_ptr next = list;
+    do {
+        if (next->getValue == value) {
+            return true;
+        }
+        list = list->getNext();
+    } while (list.get() != 0);
+    return false;
 }
 
 template <typename type1, typename type2>
 Pair<type1, type2>::Pair(type1 first, type2 second) {
-  this->first = first;
-  this->second = second;
+    this->first = first;
+    this->second = second;
 }
 
 template <typename type1, typename type2>
 type1 Pair<type1, type2>::getFirst() {
-  return first;
+    return first;
 }
 
 template <typename type1, typename type2>
 type2 Pair<type1, type2>::getSecond() {
-  return second;
+    return second;
 }

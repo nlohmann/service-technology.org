@@ -12,61 +12,61 @@ class State
 {
 
 public:
-  State(long number, ListOfPairs::List_ptr marking,
-      ListOfPairs::List_ptr transitions, bool isFinal, unsigned int lowlink,
-      List<unsigned int>::List_ptr sccmember);
-  ~State();
+    State(long number, ListOfPairs::List_ptr marking,
+          ListOfPairs::List_ptr transitions, bool isFinal, unsigned int lowlink,
+          List<unsigned int>::List_ptr sccmember);
+    ~State();
 
-  static std::map<unsigned int, shared_ptr<State> > stateSpace;
+    static std::map<unsigned int, shared_ptr<State> > stateSpace;
 
-  static std::map< std::string, std::string > abstractedIn;
-  static std::map< std::string, std::string > abstractedOut;
-  static std::map< std::string, std::string > abstractedSync;
+    static std::map< std::string, std::string > abstractedIn;
+    static std::map< std::string, std::string > abstractedOut;
+    static std::map< std::string, std::string > abstractedSync;
 
-  static std::map< std::string, std::string > remainingIn;
-  static std::map< std::string, std::string > remainingOut;
-  static std::map< std::string, std::string > remainingSync;
+    static std::map< std::string, std::string > remainingIn;
+    static std::map< std::string, std::string > remainingOut;
+    static std::map< std::string, std::string > remainingSync;
 
-  static unsigned int messageBound;
+    static unsigned int messageBound;
 
-  static void
-  output();
+    static void
+    output();
 
-  static bool
-  checkFinalReachable();
+    static bool
+    checkFinalReachable();
 
-  static void
-  calculateSCC();
+    static void
+    calculateSCC();
 
-  static void
-  prune();
+    static void
+    prune();
 
 private:
-  long number;
-  ListOfPairs::List_ptr marking;
-  ListOfPairs::List_ptr transitions;
-  bool isFinal;
-  bool finalReachable;
-  bool finalEnforceable;
-  unsigned int index;
-  unsigned int lowlink;
-  unsigned int lastMessagesReset;
-  List<unsigned int>::List_ptr sccmember;
-  std::map<std::string, unsigned int> messages;
+    long number;
+    ListOfPairs::List_ptr marking;
+    ListOfPairs::List_ptr transitions;
+    bool isFinal;
+    bool finalReachable;
+    bool finalEnforceable;
+    unsigned int index;
+    unsigned int lowlink;
+    unsigned int lastMessagesReset;
+    List<unsigned int>::List_ptr sccmember;
+    std::map<std::string, unsigned int> messages;
 
-  static bool
-  checkFinalReachable(unsigned int stateNo, std::map<unsigned int, bool>& seen
-      , unsigned int & count);
+    static bool
+    checkFinalReachable(unsigned int stateNo, std::map<unsigned int, bool>& seen
+                        , unsigned int & count);
 
-  static void
-  calculateSCC(unsigned int stateNo, unsigned int& index, unsigned int& lowlink,
-      std::map<unsigned int, bool>& seen, std::list<unsigned int>& stack);
+    static void
+    calculateSCC(unsigned int stateNo, unsigned int& index, unsigned int& lowlink,
+                 std::map<unsigned int, bool>& seen, std::list<unsigned int>& stack);
 
-  static void
-  output(unsigned int stateNo, std::map<unsigned int, bool>& seen);
+    static void
+    output(unsigned int stateNo, std::map<unsigned int, bool>& seen);
 
-  static void
-  prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
+    static void
+    prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
           , std::map<unsigned int, bool>& active, unsigned int & count);
 
 };

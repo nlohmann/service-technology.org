@@ -42,52 +42,52 @@
 */
 class Output {
 private: /* static members */
-  /// the template for temfiles to create
-  static std::string tempfileTemplate;
+    /// the template for temfiles to create
+    static std::string tempfileTemplate;
 
-  /// whether tempfiles should be deleted upon termination
-  static bool keepTempfiles;
+    /// whether tempfiles should be deleted upon termination
+    static bool keepTempfiles;
 
 public: /* static functions */
-  /// set the tempfile template
-  static void setTempfileTemplate(std::string);
+    /// set the tempfile template
+    static void setTempfileTemplate(std::string);
 
-  /// set the whether tempfiles should be deleted upon termination
-  static void setKeepTempfiles(bool);
+    /// set the whether tempfiles should be deleted upon termination
+    static void setKeepTempfiles(bool);
 
 private: /* member functions */
-  /// helper function to create temp files
-  char* createTmp();
+    /// helper function to create temp files
+    char* createTmp();
 
 public: /* member functions */
-  /// constructor (creates temp file)
-  Output();
+    /// constructor (creates temp file)
+    Output();
 
-  /// constructor (opens named stream or directs to std::cout)
-  Output(const std::string&, const std::string&);
+    /// constructor (opens named stream or directs to std::cout)
+    Output(const std::string&, const std::string&);
 
-  /// destructor (closes stream)
-  ~Output();
+    /// destructor (closes stream)
+    ~Output();
 
-  /// implicit conversation operator to ostream
-  operator std::ostream& () const;
+    /// implicit conversation operator to ostream
+    operator std::ostream& () const;
 
-  /// returns the filename of this object
-  std::string name() const;
+    /// returns the filename of this object
+    std::string name() const;
 
-  /// returns the stream of this object
-  std::ostream& stream() const;
+    /// returns the stream of this object
+    std::ostream& stream() const;
 
 private: /* member attributes */
-  /// the stream itself
-  std::ostream& os;
+    /// the stream itself
+    std::ostream& os;
 
-  /// filename of the output stream
-  std::string filename;
+    /// filename of the output stream
+    std::string filename;
 
-  /// its a temp file if its not NULL
-  char* temp;
+    /// its a temp file if its not NULL
+    char* temp;
 
-  /// the kind of the file
-  const std::string kind;
+    /// the kind of the file
+    const std::string kind;
 };

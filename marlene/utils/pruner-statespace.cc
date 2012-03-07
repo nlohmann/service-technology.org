@@ -16,8 +16,8 @@ std::map<std::string, std::string> State::remainingSync;
 unsigned int State::messageBound = 1;
 
 State::State(long number, ListOfPairs::List_ptr marking,
-        ListOfPairs::List_ptr transitions, bool isFinal, unsigned int lowlink,
-        List<unsigned int>::List_ptr sccmember) {
+             ListOfPairs::List_ptr transitions, bool isFinal, unsigned int lowlink,
+             List<unsigned int>::List_ptr sccmember) {
     this->number = number;
     this->marking = marking;
     this->transitions = transitions;
@@ -59,7 +59,7 @@ void State::output(unsigned int stateNo, std::map<unsigned int, bool>& seen) {
             for (ListOfPairs::List_ptr transition = state->transitions;
                     transition.get() != 0;
                     output(transition->getValue()->getSecond(), seen), transition =
-                            transition->getNext())
+                        transition->getNext())
                 ;
 
         }
@@ -69,7 +69,7 @@ void State::output(unsigned int stateNo, std::map<unsigned int, bool>& seen) {
             cout << " SCC:";
             for (List<unsigned int>::List_ptr next = state->sccmember;
                     next.get() != 0; cout << " " << next->getValue(), next =
-                            next->getNext())
+                        next->getNext())
                 ;
         }
         if (state->marking.get() != 0) {
@@ -77,9 +77,9 @@ void State::output(unsigned int stateNo, std::map<unsigned int, bool>& seen) {
             for (ListOfPairs::List_ptr marking = state->marking;
                     marking.get() != 0;
                     cout << (first ? "" : ",") << endl
-                            << marking->getValue()->getFirst() << " : "
-                            << marking->getValue()->getSecond(), marking =
-                            marking->getNext(), first = false)
+                    << marking->getValue()->getFirst() << " : "
+                    << marking->getValue()->getSecond(), marking =
+                        marking->getNext(), first = false)
                 ;
 
         }
@@ -88,11 +88,11 @@ void State::output(unsigned int stateNo, std::map<unsigned int, bool>& seen) {
             for (ListOfPairs::List_ptr transition = state->transitions;
                     transition.get() != 0;
                     cout
-                            << endl
-                            << transition->getValue()->getFirst()
-                            << " -> "
-                            << stateSpace[transition->getValue()->getSecond()]->index, transition =
-                            transition->getNext())
+                    << endl
+                    << transition->getValue()->getFirst()
+                    << " -> "
+                    << stateSpace[transition->getValue()->getSecond()]->index, transition =
+                        transition->getNext())
                 ;
 
         }
@@ -115,12 +115,12 @@ bool State::checkFinalReachable() {
         seen.clear();
     } while (count > old_count);
     status("There are %d state(s) for which a final state is reachable.",
-            count);
+           count);
     return result;
 }
 
 bool State::checkFinalReachable(unsigned int stateNo,
-        std::map<unsigned int, bool>& seen , unsigned int & count) {
+                                std::map<unsigned int, bool>& seen , unsigned int & count) {
 
     shared_ptr<State> state = stateSpace[stateNo];
 
@@ -132,12 +132,12 @@ bool State::checkFinalReachable(unsigned int stateNo,
 
             if (not seen[transition->getValue()->getSecond()]) {
                 bool resultstep = checkFinalReachable(
-                        transition->getValue()->getSecond(), seen, count);
+                                      transition->getValue()->getSecond(), seen, count);
                 result = result || resultstep;
             }
             result =
-                    result
-                            || stateSpace[transition->getValue()->getSecond()]->finalReachable;
+                result
+                || stateSpace[transition->getValue()->getSecond()]->finalReachable;
         }
         if (result) {
             ++count;
@@ -157,8 +157,8 @@ void State::calculateSCC() {
 }
 
 void State::calculateSCC(unsigned int stateNo, unsigned int& index,
-        unsigned int& lowlink, std::map<unsigned int, bool>& seen
-        , std::list<unsigned int>& stack) {
+                         unsigned int& lowlink, std::map<unsigned int, bool>& seen
+                         , std::list<unsigned int>& stack) {
     shared_ptr<State> state = stateSpace[stateNo];
 
     seen[stateNo] = true;
@@ -172,17 +172,17 @@ void State::calculateSCC(unsigned int stateNo, unsigned int& index,
     for (ListOfPairs::List_ptr transition = state->transitions;
             transition.get() != 0; transition = transition->getNext()) {
         shared_ptr<State> successor =
-                stateSpace[transition->getValue()->getSecond()];
+            stateSpace[transition->getValue()->getSecond()];
         if (not seen[successor->number]) {
             calculateSCC(successor->number, index, lowlink, seen, stack);
             state->lowlink =
-                    (state->lowlink < successor->lowlink) ?
-                            state->lowlink : successor->lowlink;
+                (state->lowlink < successor->lowlink) ?
+                state->lowlink : successor->lowlink;
         } else if (find(stack.begin(), stack.end(), successor->index)
-                != stack.end()) {
+                   != stack.end()) {
             state->lowlink =
-                    (state->lowlink < successor->index) ?
-                            state->lowlink : successor->index;
+                (state->lowlink < successor->index) ?
+                state->lowlink : successor->index;
         }
     }
 
@@ -194,15 +194,14 @@ void State::calculateSCC(unsigned int stateNo, unsigned int& index,
             stack.pop_front();
             if (newSCC.get() == 0) {
                 newSCC = List<unsigned int>::List_ptr(
-                        new List<unsigned int>(w));
+                             new List<unsigned int>(w));
             } else {
                 newSCC->push_back(w);
             }
         } while (w != state->index);
         state->sccmember = newSCC;
 
-    }
-    else {
+    } else {
         state->sccmember = List<unsigned int>::List_ptr();
     }
 
@@ -227,7 +226,8 @@ void State::prune() {
     status("removed %d transitions in total", count);
 }
 
-void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen, std::map<unsigned int, bool>& active, unsigned int & count) {
+void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
+                  , std::map<unsigned int, bool>& active, unsigned int & count) {
 
     shared_ptr<State> state = stateSpace[stateNo];
 
@@ -250,7 +250,7 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen, std:
 
             // this is the successor state
             shared_ptr<State> successor =
-                    stateSpace[transition->getValue()->getSecond()];
+                stateSpace[transition->getValue()->getSecond()];
             // and this is the firing transition
             std::string transitionname = transition->getValue()->getFirst();
 
@@ -267,17 +267,16 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen, std:
             } else { // otherwise the regular handling
 
                 // if we have no seen the successor so far, process
-                if (not seen[successor->number])
-                {
+                if (not seen[successor->number]) {
                     // first check, if we would violate mb
 //                    status("Label: %s, In: %s, Out: %s, Sync: %s", transitionname.c_str(), remainingIn[transitionname].c_str(), remainingOut[transitionname].c_str(), remainingSync[transitionname].c_str());
                     // copy message count, if not receiving or sync transition
-                    if (remainingIn[transitionname] == "" && remainingSync[transitionname] == "") {
+                    if (remainingIn[transitionname] == ""
+                            && remainingSync[transitionname] == "") {
 //                        status("It's neither a receiving nor a sync transition for the interface");
                         successor->messages = state->messages;
                         successor->lastMessagesReset = state->lastMessagesReset;
-                    }
-                    else {
+                    } else {
                         successor->lastMessagesReset = successor->number;
                     }
                     // if sending transition, increase count
@@ -306,29 +305,83 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen, std:
                 } else {
                     // check for message bound violations
                     // is it a circle?
-                    if ((successor->lastMessagesReset == state->lastMessagesReset) && active[successor->number]) {
-                        for (std::map<std::string, unsigned int>::const_iterator message = state->messages.begin(); message != state->messages.end(); ++message) {
-                            // if there is a difference, then its bad!
-                            if (message->second - successor->messages[message->first] > 0) {
-                                keepTransition = false;
+                    if (successor->lastMessagesReset
+                            == state->lastMessagesReset) {
+                        if (active[successor->number]) {
+                            for (std::map<std::string, unsigned int>::const_iterator message =
+                                        state->messages.begin();
+                                    message != state->messages.end();
+                                    ++message) {
+                                // if there is a difference, then its bad!
+                                if (message->second
+                                        - successor->messages[message->first]
+                                        > 0) {
+                                    keepTransition = false;
+                                    break;
 //                                status(
 //                                        "pruning from state %d to %d (cause label %s causes mbv on circle, because message %s is created)",
 //                                        stateNo,
 //                                        successor->number,
 //                                        abstractedSync[transition->getValue()->getFirst()].c_str(),
 //                                        message->first.c_str());
+                                }
+                            }
+                        } else {
+                            // not a circle ... non-deterministic decision?
+                            int smallerCount = 0;
+                            for (std::map<std::string, unsigned int>::const_iterator message =
+                                        state->messages.begin();
+                                    message != state->messages.end();
+                                    ++message) {
+                                // if there is a difference, then its bad!
+                                if (message->second < successor->messages[message->first] ) {
+                                    ++smallerCount;
+                                } else {
+                                    if (message->second > successor->messages[message->first] ) {
+                                        smallerCount = 0;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (smallerCount > 0) {
+                                keepTransition = false;
+                                status(
+                                    "pruning from state %d to %d (cause label %s causes mbv on internal decision)",
+                                    stateNo,
+                                    successor->number,
+                                    abstractedSync[transition->getValue()->getFirst()].c_str());
+                            }
+                            smallerCount = 0;
+                            for (std::map<std::string, unsigned int>::const_iterator message =
+                                        successor->messages.begin();
+                                    message != successor->messages.end();
+                                    ++message) {
+                                // if there is a difference, then its bad!
+                                if (message->second < state->messages[message->first] ) {
+                                    ++smallerCount;
+                                } else {
+                                    if (message->second > state->messages[message->first] ) {
+                                        smallerCount = 0;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (smallerCount > 0) {
+                                keepTransition = false;
+                                status(
+                                    "pruning from state %d to %d (cause label %s causes mbv on internal decision)",
+                                    stateNo,
+                                    successor->number,
+                                    abstractedSync[transition->getValue()->getFirst()].c_str());
                             }
                         }
-                    } else {
-
-                        // not a circle ... non-deterministic decision?
                     }
                 }
 
-
                 // if we still keep the transition, now check if violate enforceability
                 //evaluate transition
-                if (abstractedSync[transitionname] != "" && not successor->finalEnforceable) {
+                if (abstractedSync[transitionname] != ""
+                        && not successor->finalEnforceable) {
                     keepTransition = false;
                 }
 
@@ -338,16 +391,17 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen, std:
             if (keepTransition) {
                 finalReachable = finalReachable || successor->finalReachable;
                 if (state->lowlink == successor->lowlink) {
-                    finalEnforceable = finalEnforceable && successor->finalReachable;
-                } else
-                {
-                    finalEnforceable = finalEnforceable && successor->finalEnforceable;
+                    finalEnforceable = finalEnforceable
+                                       && successor->finalReachable;
+                } else {
+                    finalEnforceable = finalEnforceable
+                                       && successor->finalEnforceable;
                 }
                 // finalInAllSuccessors = finalInAllSuccessors && successor->finalReachable;
                 // add only, if successor only leads to a final state
                 if (newTransitions.get() == 0) {
                     newTransitions = ListOfPairs::List_ptr(
-                            new ListOfPairs(transition->getValue()));
+                                         new ListOfPairs(transition->getValue()));
                 } else {
                     newTransitions->push_back(transition->getValue());
                 }

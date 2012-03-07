@@ -39,11 +39,11 @@ void displayFileError(const char* filename, int lineno, const char* token);
 /// whether to use colored output
 #if !defined(__MINGW32__) && !defined(USE_SYSLOG)
 const bool _useColor = isatty(fileno(stderr)) && (
-                         !strcmp(getenv("TERM"), "linux") ||
-                         !strcmp(getenv("TERM"), "cygwin") ||
-                         !strcmp(getenv("TERM"), "xterm") ||
-                         !strcmp(getenv("TERM"), "xterm-color") ||
-                         !strcmp(getenv("TERM"), "xterm-256color"));
+                           !strcmp(getenv("TERM"), "linux") ||
+                           !strcmp(getenv("TERM"), "cygwin") ||
+                           !strcmp(getenv("TERM"), "xterm") ||
+                           !strcmp(getenv("TERM"), "xterm-color") ||
+                           !strcmp(getenv("TERM"), "xterm-256color"));
 #else
 const bool _useColor = false;
 #endif

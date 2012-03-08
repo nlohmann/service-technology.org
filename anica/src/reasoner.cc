@@ -248,6 +248,7 @@ void updateNonInterference() {
         // net has only high and low labeled transitions
         if (alib->isSecure() == 0) {
             rep->status("assignment is secure");
+            sendAssignment();
         }
         else {
             sendError("assignment is not secure");
@@ -303,6 +304,7 @@ void updateNonInterference() {
         }
         else {
             rep->status("ERROR: assignment contains DOWNGRADES");
+            rep->abort(ERROR_SYNTAX);
         }
     }
 }

@@ -14,7 +14,7 @@
 #include "Marking.h"
 #include "swap.h"
 
-void swap(index_t left,index_t right)
+void swapPlaces(index_t left,index_t right)
 {
 	// 1. Net data structures
 

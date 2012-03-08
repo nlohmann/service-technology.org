@@ -21,6 +21,7 @@ using std::endl;
 #include "Net.h"
 #include "Transition.h"
 #include "Place.h"
+#include "swap.h"
 
 void setSignificantPlaces()
 {
@@ -113,15 +114,26 @@ void setSignificantPlaces()
     m.reduce();
 
     // gather significant places
-    ///\todo reorder sigificant places
-    //Place::CardSignificant = 0;
+    Place::CardSignificant = 0;
+    index_t lastSignificant = cardPL - 1;
     for (index_t p = 0; p < cardPL; ++p)
-    {
+    { 
         if (m.isSignificant(p))
         {
-            //        cout << p << " is significant" << endl;
-            //        Place::CardSignificant++;
+            Place::CardSignificant++;
+        }
+        else {
+            // p needs to be swapped
+            // find first significant place from the right end of all places
+            while (!m.isSignificant(lastSignificant)) {
+                lastSignificant--;
+            }
+            if (lastSignificant <= p) {
+                // we are finished
+                break;
+            }
+            // swap lastSignificant with p
+            swapPlaces(p, lastSignificant);
         }
     }
-    //cout << "significant places " << Place::CardSignificant << endl;
 }

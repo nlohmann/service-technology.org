@@ -108,21 +108,14 @@ void iModification::init() {
       unsigned int in = 0;
       unsigned int out = 0;
 		
-      //if the transition is free, add the self loop to the budget place and continue
-      if(curCost == 0) {
+     in = Tara::highestTransitionCosts;
+	 out = Tara::highestTransitionCosts - curCost;
+     
+	 //add arc from availableCost to that transition
+	 if (in > 0) net->createArc(*availableCost,**it, in);
 	
-	in = Tara::highestTransitionCosts;
-	out = Tara::highestTransitionCosts;
-      } else {
-	in = Tara::highestTransitionCosts + curCost - 1 ;
-	if (Tara::highestTransitionCosts > 1) out = Tara::highestTransitionCosts - 1;
-      }
-
-	//add arc from availableCost to that transition
-	if (in > 0) net->createArc(*availableCost,**it, in);
-	
-	//add arc from transition to availableCost
-	if (out > 0) net->createArc(**it, *availableCost, out);
+	 //add arc from transition to availableCost
+	 if (out > 0) net->createArc(**it, *availableCost, out);
 
    }
    

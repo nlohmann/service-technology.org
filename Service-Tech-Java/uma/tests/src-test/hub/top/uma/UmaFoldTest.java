@@ -2,6 +2,7 @@ package hub.top.uma;
 
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.unfold.DNodeSys_OccurrenceNet;
 import hub.top.uma.DNodeSet.DNodeSetElement;
@@ -197,7 +198,7 @@ public class UmaFoldTest extends hub.top.test.TestCase {
           && net.getArcs().size() == 17);
           
       
-      PetriNetIO.writeToFile(net, testFileRoot+"/unfold_refold2_result.dot", PetriNetIO.FORMAT_DOT, 0);
+      PetriNetIO_Out.writeToFile(net, testFileRoot+"/unfold_refold2_result.dot", PetriNetIO_Out.FORMAT_DOT, 0);
 
     
     } catch (InvalidModelException e) {

@@ -1,6 +1,6 @@
 package hub.top.uma.view;
 
-import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
 
@@ -119,10 +119,10 @@ public class MineSimplifyExperiment extends MineSimplify {
       if (sim.result._nets[step] != null) {
       
         String targetPath_dot = path+"/"+system+".step"+step+".dot";
-        PetriNetIO.writeToFile(sim.result._nets[step], targetPath_dot, PetriNetIO.FORMAT_DOT, 0);
+        PetriNetIO_Out.writeToFile(sim.result._nets[step], targetPath_dot, PetriNetIO_Out.FORMAT_DOT, 0);
         
         String targetPath_lola = path+"/"+system+".step"+step+".lola";
-        PetriNetIO.writeToFile(sim.result._nets[step], targetPath_lola, PetriNetIO.FORMAT_LOLA, 0);
+        PetriNetIO_Out.writeToFile(sim.result._nets[step], targetPath_lola, PetriNetIO_Out.FORMAT_LOLA, 0);
       }
     }
     

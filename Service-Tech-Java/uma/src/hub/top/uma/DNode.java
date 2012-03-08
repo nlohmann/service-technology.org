@@ -149,6 +149,7 @@ public class DNode {
 	 * @param d
 	 */
 	public void addPostNode(DNode d) {
+	  
 		if (post == null || post.length == 0) {
 			post = new DNode[1];
 			post[0] = d;
@@ -198,6 +199,7 @@ public class DNode {
    * @param d
    */
   public void addPreNode(DNode d) {
+    
     if (pre == null) {
       pre = new DNode[1];
       pre[0] = d;
@@ -421,7 +423,7 @@ public class DNode {
     }
     return true;
   }
-	
+  
   /**
    * @param arr
    * @return a string representation of the given {@link DNode} array

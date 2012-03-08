@@ -1213,6 +1213,11 @@ public class DNodeBP {
     updateConcurrencyRelation(postConditions[0], postConditions);
 	}
 
+	public static final int REL_LEQ = 0;
+	public static final int REL_GEQ = 1;
+	public static final int REL_CO = 2;
+	public static final int REL_CONFL = 3;
+	
   /**
    * Determines whether 'd' and 'd2' are concurrent using a structural search on
    * the branching process instead of the explicit concurrency relation
@@ -1222,12 +1227,12 @@ public class DNodeBP {
    * @param d2
    * @return <code>true</code> iff the nodes 'd' and 'd2' are concurrent
    */
-	public boolean areConcurrent_struct(DNode d, DNode d2) {
+	public int areConcurrent_struct(DNode d, DNode d2) {
 	  
 	  HashSet<DNode> dPre = bp.getAllPredecessors(d);
-	  if (dPre.contains(d2)) return false;
+	  if (dPre.contains(d2)) return REL_GEQ;
 	  HashSet<DNode> dPre2 = bp.getAllPredecessors(d2);
-	  if (dPre2.contains(d)) return false;
+	  if (dPre2.contains(d)) return REL_LEQ;
 	  
 	  for (DNode b : dPre) {
       if (b.isEvent) continue;
@@ -1244,10 +1249,10 @@ public class DNodeBP {
 	      if (dPre2.contains(e) && !dPre.contains(e)) e_in_dPre2_notIn_dPre = true;
 	    }
 	    if (e_in_dPre_notIn_dPre2 && e_in_dPre2_notIn_dPre) // 'd' and 'd2' conflict on b
-	      return false;
+	      return REL_CONFL;
 	  }
 	  
-	  return true;
+	  return REL_CO;
 	}
 	
 	/**

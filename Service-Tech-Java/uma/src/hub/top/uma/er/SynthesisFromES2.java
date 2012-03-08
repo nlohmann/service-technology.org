@@ -24,26 +24,27 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.google.gwt.dev.util.collect.HashMap;
 import com.google.gwt.dev.util.collect.HashSet;
 
-public class SynthesisFromES {
+public class SynthesisFromES2 {
   
   private String properNames[];
   private String path;
   
-  public SynthesisFromES(String properNames[], String path) {
+  public SynthesisFromES2(String properNames[], String path) {
     this.properNames = properNames;
     this.path = path;
   }
   
   class Pair {
-    Event first;
+    Set<Event> first;
     Set<Event> second;
 
-    public Pair(Event f, Set<Event> s) { first = f; second = s; }
-    public Event getFirst() { return first; }
+    public Pair(Set<Event> f, Set<Event> s) { first = f; second = s; }
+    public Set<Event> getFirst() { return first; }
     public Set<Event> getSecond() { return second; }
-    public void setFirst(Event val) { first = val; }
+    public void setFirst(Set<Event> val) { first = val; }
     public void setSecond(Set<Event> val) { second = val; }
     public String toString() {
       return String.format("(%s,%s)", first, second);
@@ -64,7 +65,20 @@ public class SynthesisFromES {
   }
   
   
-  public void getConflictCluster(EventStructure es, Set<Event> current, Set<Set<Event>> cc) {
+
+  
+  private static String toString(int[] arr) {
+    if (arr == null) return "null";
+    String r = "[";
+    for (int i = 0; i<arr.length; i++) {
+      if (i > 0) r += ", ";
+      r += arr[i];
+    }
+    r += "]";
+    return r;
+  }
+  
+  private void getConflictCluster(EventStructure es, Set<Event> current, Set<Set<Event>> cc) {
     
     boolean isConflictCluster = true;
     for (Event e : current) {
@@ -103,90 +117,6 @@ public class SynthesisFromES {
     }
   }
   
-  private static String toString(int[] arr) {
-    if (arr == null) return "null";
-    String r = "[";
-    for (int i = 0; i<arr.length; i++) {
-      if (i > 0) r += ", ";
-      r += arr[i];
-    }
-    r += "]";
-    return r;
-  }
-  
-  public List<Set<Event>> getConflictClusters(EventStructure es, Set<Event> current, boolean directConflicts) {
-    Event[] c_events = current.toArray(new Event[current.size()]);
-    boolean adj_matrix[][] = new boolean [c_events.length][c_events.length];
-    
-    for (int i=0;i<c_events.length;i++) {
-      for (int j=0;j<c_events.length;j++) {
-        if (i == j) adj_matrix[i][j] = true;
-        else {
-          if (directConflicts)
-            adj_matrix[i][j] = es.directConflict.containsKey(c_events[i]) && es.directConflict.get(c_events[i]).contains(c_events[j]);
-          else
-            adj_matrix[i][j] = es.inConflict(c_events[i], c_events[j]);
-        }
-      }
-    }
-    
-    List<Set<Event>> cc = new LinkedList<Set<Event>>();
-
-    BronKerbosch bk = new BronKerbosch();
-    TreeSet<int[]> cliques = bk.findCliques(adj_matrix);
-    //System.out.println("found "+cliques.size()+" cliques");
-    for (int[] c : cliques) {
-      Set<Event> conf = new HashSet<Event>();
-      for (int i=0; i<c.length; i++) {
-        conf.add(c_events[c[i]]);
-      }
-      //System.out.println("adding "+conf);
-      cc.add(conf);
-    }
-    
-    return cc;
-  }
-  
-  public Set<Set<Event>> getConflictClusters(EventStructure es) {
-    Set<Set<Event>> cc = new HashSet<Set<Event>>();
-    
-    int count = 0;
-    for (Event e : es.getAllEvents()) {
-      count++;
-      
-      if (es.directConflict.containsKey(e)) {
-        Set<Event> current = new HashSet<Event>();
-        for (Event f : es.directConflict.get(e)) current.add(f);
-        current.add(e);
-        
-        //System.out.println(count+"/"+es.allEvents.size()+":"+current.size());
-        
-        //System.out.println("check "+current);
-        //getConflictCluster(es, current, cc);
-
-        // find conflict clusters for the current events
-        for (Set<Event> _cc : getConflictClusters(es, current, true)) {
-          cc.add(_cc);
-        }
-      }
-
-      Set<Event> self = new HashSet<Event>();
-      self.add(e);
-
-      boolean alreadyContained = false;
-      for (Set<Event> other : cc) {
-        if (other.containsAll(self)) {
-          alreadyContained = true;
-          break;
-        }
-      }
-      //if (!alreadyContained)
-      {
-        cc.add(self);
-      }
-    }
-    return cc;
-  }
   
   public Set<Event> jointPreEvents(EventStructure es, Set<Event> cc) {
     Set<Event> joint = null;
@@ -227,10 +157,29 @@ public class SynthesisFromES {
     return true;
   }
   
-  private void addPlace(PetriNet pnet, EventStructure es, Event e, Set<Event> cc, Set<Place> implicitPlaces, Set<Place> implicitPlaces_2ormore, Map<Pair, Place> B, Map<Place, Pair> B2) {
+  public boolean isImplict(EventStructure es, Set<Event> pre, Set<Event> cc) {
+    for (Event post : cc) {
+      //System.out.println(pre+" -->+ "+post+"?");
+      for (Event e : pre) {
+        if (!es.isTransitiveDependent(e, post)) {
+          //System.out.println("no");
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
+  private void addPlace(PetriNet pnet, EventStructure es, Set<Event> e, Set<Event> cc, Set<Place> implicitPlaces, Set<Place> implicitPlaces_2ormore, Map<Pair, Place> B, Map<Place, Pair> B2) {
     Pair pair = new Pair(e, cc);
-
-    String srcTransitionLabel = properNames[e.id];
+    
+    String srcTransitionLabel = "";
+    for (Event f : e) {
+      String tgtTransitionLabel = properNames[f.id];
+      srcTransitionLabel += ","+tgtTransitionLabel;
+      
+      //System.out.println(f+" maps to "+E.get(f));
+    }
 
     // translate the IDs of the defining events to the labels
     // so that conditions are consistently labeled throughout the occurrence net
@@ -263,11 +212,64 @@ public class SynthesisFromES {
     }
   }
   
+  private boolean isAValidFoldedCluster(EventStructure es, Set<Event> cc) {
+    
+    if (cc.size() == 1) return true;
+    
+    for (Event e : cc) {
+      for (Event e_equiv : es.equiv.get(e)) {
+        
+        if (!es.directConflict.containsKey(e_equiv)) {
+          return false;
+        }
+        
+        HashSet<Event> e_confl_equiv = new HashSet<Event>();
+        for (Event f : es.directConflict.get(e_equiv)) {
+          e_confl_equiv.add(es.canonical.get(f));
+        }
+        
+        for (Event e_confl : cc) {
+          if (e == e_confl) continue;
+
+          if (!e_confl_equiv.contains(e_confl)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+  
   public PetriNet synthesize(EventStructure es) {
+    
+    Map<Event, Set<Event>> equiv = es.equiv;
+    Map<Event, Event> canonical = es.canonical;
     
     PetriNet pnet = new PetriNet();
 
     System.out.println("generate events");
+    
+    // ---------------------------------------------------------
+    // 2. COMPUTE CE
+    // ---------------------------------------------------------
+    
+    System.out.println("generate conflict clusters");
+    Set<Set<Event>> CC = es.getConflictClusters();
+    
+    Set<Set<Event>> CC_equiv = new HashSet<Set<Event>>();
+    for (Set<Event> cc : CC) {
+      HashSet<Event> cc_equiv = new HashSet<Event>();
+      for (Event e : cc) {
+        cc_equiv.add(canonical.get(e));
+      }
+      CC_equiv.add(cc_equiv);
+    }
+    
+    System.out.println("---------- conflict clusters equiv ------------");
+    for (Set<Event> cc : CC_equiv) {
+      System.out.println(cc);
+    }
+    System.out.println("---------- /conflict clusters equiv ------------");
     
     // ---------------------------------------------------------
     // 1. Initialize E
@@ -275,24 +277,15 @@ public class SynthesisFromES {
     Map<Event, Transition> E = new LinkedHashMap<Event, Transition>();
     Map<Transition, Event> E2 = new LinkedHashMap<Transition, Event>();
     Map<Integer, Event> E_index = new LinkedHashMap<Integer, Event>();
-    for (Event n: es.allEvents) {
+    
+    for (Event n: equiv.keySet()) {
+      
       String transitionLabel = properNames[n.id];
       E_index.put(n.globalId, n);
       Transition t = pnet.addTransition(transitionLabel);
       E.put(n, t);
       E2.put(t, n);
     }
-
-    // ---------------------------------------------------------
-    // 2. COMPUTE CE
-    // ---------------------------------------------------------
-    
-    System.out.println("generate conflict clusters");
-    Set<Set<Event>> CC = getConflictClusters(es);
-    
-    //for (Set<Event> cc : CC) {
-    //  System.out.println(cc);
-    //}
     
     //System.out.println(reducedFlow);
     //System.out.println(implicitFlow);
@@ -307,10 +300,12 @@ public class SynthesisFromES {
     // ---------------------------------------------------------
     // 3. COMPUTE B
     // ---------------------------------------------------------
-    Map<Pair, Place> B = new LinkedHashMap<Pair, Place>();
-    Map<Place, Pair> B2 = new LinkedHashMap<Place,Pair>();
-    for (Event e : E.keySet()){
+
+    Map<Set<Event>, Set<Event>> dependencyMap = new HashMap<Set<Event>, Set<Event>>();
+    for (Event e : es.allEvents) {
       for (Set<Event> cc : CC) {
+        
+        Set<Event> jointPreEvents = jointPreEvents(es, cc);
         
         /*
         boolean isCondition = true;
@@ -333,13 +328,21 @@ public class SynthesisFromES {
         }
         */
         
-        boolean isCondition = jointPreEvents(es, cc).contains(e);
-
-        if (isCondition) {
-          addPlace(pnet, es, e, cc, implicitPlaces, implicitPlaces_2ormore, B, B2);
+        boolean isCondition = jointPreEvents.contains(e);
+        boolean isImplicit = isImplict(es, e, cc);
+        if (isCondition && !isImplicit) {
+          Set<Event> cc_equiv = new HashSet<Event>();
+          for (Event e_cc : cc) cc_equiv.add(canonical.get(e_cc));
+          
+          if (isAValidFoldedCluster(es, cc_equiv)) {
+            if (!dependencyMap.containsKey(cc_equiv)) dependencyMap.put(cc_equiv, new HashSet<Event>());
+            dependencyMap.get(cc_equiv).add(canonical.get(e));
+          }
         }
       }
+    }
       
+      /*
       if (e.post != null) {
         for (DNode ePost : e.post) {
           if (es.isTransitiveDependent(e, (Event)ePost)) {
@@ -350,7 +353,17 @@ public class SynthesisFromES {
           }
         }
       }
-    }
+      */
+      
+      Map<Pair, Place> B = new LinkedHashMap<Pair, Place>();
+      Map<Place, Pair> B2 = new LinkedHashMap<Place,Pair>();
+      
+      for (Map.Entry<Set<Event>,Set<Event>> dep : dependencyMap.entrySet()) {
+
+        addPlace(pnet, es, dep.getValue(), dep.getKey(), implicitPlaces, implicitPlaces_2ormore, B, B2);
+        
+        System.out.println(dep.getValue() +" --> "+dep.getKey());
+      }
     
     System.out.println("generate arcs");
 
@@ -359,197 +372,19 @@ public class SynthesisFromES {
     // ---------------------------------------------------------
     for (Pair pair: B.keySet()) {
       Place place = B.get(pair);
-      Event e = pair.getFirst();
+      Set<Event> pre_events = pair.getFirst();
       Set<Event> cc = pair.getSecond();
       for (Event f : cc) {
+        if (canonical.get(f) != f) continue;
+        
         Transition trans = E.get(f);
         pnet.addArc(place, trans);
       }
-      Transition trans = E.get(e);
-      pnet.addArc(trans, place);
-    }
-    
-    try {
-      EventStructureReplay_Trace.writeFile(pnet.toDot(), path+"_bp.dot");
-    } catch (IOException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
-    
-
-    Set<Place> final_implicitPlaces = new HashSet<Place>();
-    
-    System.out.println("remove subsumed conditions");
-    // ---------------------------------------------------------
-    // 5. CLEAN THE NET
-    // ---------------------------------------------------------
-    
-    // --- Remove subsumed conditions
-    Set<Place> subsumedConditions = new HashSet<Place>();
-    for (Transition src: pnet.getTransitions())
-      if (src.getPostSet().size() > 1)
-        for (Place p1: src.getPostSet()) {
-          
-          for (Place p2: src.getPostSet()) {
-            
-            if (p1 != p2 && p1.getPostSet().containsAll(p2.getPostSet())) {
-              //System.out.println(p1+" subsumes "+p2);
-              subsumedConditions.add(p2);
-            }
-            
-          }
-        }
-    
-    //System.out.println(subsumedConditions);
-    for (Place place: subsumedConditions) {
-      System.out.println("removing subsumed "+place);
-      pnet.removePlace(place);
-      //final_implicitPlaces.add(place);
-    }
-    
-    implicitPlaces_2ormore.removeAll(subsumedConditions);
-    for (Place place: implicitPlaces_2ormore) {
-      System.out.println("removing transitive conflicts 1 "+place);
-      //pnet.removePlace(place);
-      final_implicitPlaces.add(place);
-    }
-    
-    /*
-    System.out.println("implicit places: "+implicitPlaces);
-    
-    System.out.println("generating additional conflict clusters");
-    // compute conflict clusters that have to be materialized because of transitive dependencies
-    for (Transition t : pnet.getTransitions()) {
-      Set<Transition> post = new HashSet<Transition>();
-      for (hub.top.petrinet.Arc a : t.getOutgoing()) {
-        for (hub.top.petrinet.Arc a2 : a.getTarget().getOutgoing()) {
-          post.add((Transition)a2.getTarget());
-        }
+      for (Event e : pre_events) {
+        Transition trans = E.get(e);
+        pnet.addArc(trans, place);
       }
-      
-      List<Place> t_postPlaces = t.getPostSet();
-      System.out.println("check "+t+" "+t_postPlaces);
-      
-      Set<Set<Event>> CCs = new HashSet<Set<Event>>();
-      for (Transition t2 : post) {
-        
-        Place implicitPrePlace = null;
-        for (Place p : t2.getPreSet()) {
-          if (p.getIncoming().size() == 1 && p.getOutgoing().size() == 1 && t_postPlaces.contains(p)) {
-            if (implicitPlaces.contains(p)) {
-              implicitPrePlace = p;
-              break;
-            }
-          }
-        }
-        if (implicitPrePlace == null) continue;
-        
-        System.out.println("  implicit arc: "+implicitPrePlace);
-        
-        // t -> t2 is a transitive dependency, make sure that is comes with
-        // a conflict
-        
-        Set<Transition> conflicts = new HashSet<Transition>();
-        conflicts.add(t2);
-        for (Transition t3 : post) {
-          if (t2 != t3 && es.inConflict(E2.get(t2), E2.get(t3)))
-          {
-            Place connectingPlace = null;
-            for (Place p : t2.getPreSet()) {
-              if (p.getIncoming().size() == 1 && p.getOutgoing().size() == 1 && t_postPlaces.contains(p)) {
-                connectingPlace = p;
-                break;
-              }
-            }
-            if (connectingPlace == null) continue;
-            conflicts.add(t3);
-          }
-        }
-        
-        System.out.println("  conflicts: "+conflicts);
-
-        if (conflicts.size() > 1) {
-          
-          Set<Event> current = new HashSet<Event>();
-          for (Transition t3 : conflicts) current.add(E2.get(t3));
-          
-          // find all conflict clusters in this bunch of transitions
-          List<Set<Event>> current_cc = getConflictClusters(es, current, false);
-          
-          for (Set<Event> cc : current_cc) {
-            
-            System.out.println("  cc: "+cc);
-            
-            // for each conflict cluster, create a place (unless such a place already exists)
-            // see if t has a post-place that materializes the conflict between the transitions
-            boolean conflictExists = false;
-            boolean oneNonImplicit = false;
-            for (Place p : t_postPlaces) {
-              int cc_PostEvents = 0;
-              for (Transition t3 : p.getPostSet()) {
-                if (cc.contains(E2.get(t3))) {
-                  if (!implicitPlaces.contains(p)) oneNonImplicit = true;
-                  cc_PostEvents++;
-                }
-              }
-              if (cc_PostEvents == cc.size()) {
-                conflictExists = true;
-                break;
-              }
-            }
-            
-            System.out.println("exists: "+conflictExists+" non-trans: "+oneNonImplicit);
-            
-            // no: remember conflict cluster and 
-            if (oneNonImplicit && !conflictExists) {
-              CCs.add(cc);
-            }
-          }
-        }
-      }
-      
-      for (Set<Event> cc : CCs) {
-        
-        List<Place> toRemove = new LinkedList<Place>();
-        for (Place p : t.getPostSet()) {
-          if (p.getOutgoing().size() == 1 && cc.contains(E2.get(p.getPostSet().get(0))) ) {
-            toRemove.add(p);
-          }
-        }
-        
-        if (toRemove.size() != cc.size()) {
-          System.out.println(cc+" / "+toRemove);
-          continue; // does not merge the right amount of arcs
-        }
-        
-        String srcTransitionLabel = t.getName();
-
-        // translate the IDs of the defining events to the labels
-        // so that conditions are consistently labeled throughout the occurrence net
-        // then we can identify equivalent conditions based on their labels
-        String placeLabel = "("+srcTransitionLabel;
-        
-        //String placeLabel = "(";
-        for (Event f : cc) {
-          String tgtTransitionLabel = properNames[f.id];
-          placeLabel += ","+tgtTransitionLabel;
-          //System.out.println(f+" maps to "+E.get(f));
-        }
-        
-        placeLabel += ")";
-
-        System.out.println("generating additional "+placeLabel+" for "+toRemove);
-
-        Place place = pnet.addPlace(placeLabel);
-        pnet.addArc(t, place);
-        for (Event e : cc) pnet.addArc(place, E.get(e));
-        
-        for (Place p : toRemove) {
-          pnet.removePlace(p);
-          implicitPlaces.remove(p);
-        }
-      }
-    }*/
+    }
     
     
     // --- Remove transitive conflicts
@@ -588,7 +423,7 @@ public class SynthesisFromES {
           if (!is_tr_conflict) break;
         }
         
-        if (is_tr_conflict) {
+        if (is_tr_conflict && b.getPreSet().size() > 0) {
           //System.out.println("is transitive: "+b);
           
           Transition pre = b.getPreSet().get(0);
@@ -612,41 +447,15 @@ public class SynthesisFromES {
     for (Place place: transitiveConflicts) {
       System.out.println("removing transitive conflicts "+place);
       pnet.removePlace(place);
-      //final_implicitPlaces.add(place);
     }
-
-    System.out.println("searching for implicit places in "+pnet.getInfo(false));
-    // after removing subsumed conditions and transitive conflicts,
-    // some of the original implicit conditions are maybe no longer
-    // implicit. Check here.
-    for (Place p : implicitPlaces) {
-      if (!pnet.getPlaces().contains(p)) continue;
-      if (p.getPreSet().isEmpty()) continue;
-      if (p.getPostSet().isEmpty()) continue;
-      
-      //System.out.println("is "+p+" still implied?");
-      boolean isImplicit = true;
-      
-      Transition t = p.getPreSet().get(0);
-      for (Transition t2 : p.getPostSet()) {
-
-        if (!existsPathWithoutCondition(t, t2, p, pnet, new HashSet<Place>())) {
-          isImplicit = false;
-          //System.out.println("  no path "+t+" --> "+t2);
-        }
-      }
-      if (isImplicit) {
-        //System.out.println("  yes, adding");
-        final_implicitPlaces.add(p);
-      }
-    }
-  
+    
+    
     // --- Add source place
 
     Place initialPlace = pnet.addPlace("start");
     initialPlace.setTokens(1);
 
-    for (Event e : es.getAllEvents())
+    for (Event e : E.keySet())
     {
       if (e.pre == null || e.pre.length == 0) {
         Transition src = E.get(e);
@@ -660,100 +469,18 @@ public class SynthesisFromES {
       }
     }
     
-
     try {
-      //PetriNetIO.writeToFile(pnet, path+"_bp2", PetriNetIO.FORMAT_LOLA, 0);
-      //PetriNetIO.writeToFile(pnet, path+"_bp2", PetriNetIO.FORMAT_DOT, 0);
-      EventStructureReplay_Trace.writeFile(pnet.toDot(), path+"_bp2.dot");
+      EventStructureReplay_Trace.writeFile(pnet.toDot(), path+"_bp.dot");
     } catch (IOException e1) {
       // TODO Auto-generated catch block
       e1.printStackTrace();
     }
-
-    PetriNet folded = fold(pnet, final_implicitPlaces);
     
-    System.out.println("done: "+pnet.getInfo(false)+" -> "+folded.getInfo(false));
+    System.out.println("folded to "+pnet.getInfo(false));
     
-    return folded;
+    return pnet;
   }
   
-  private PetriNet fold(PetriNet occnet, Set<Place> implicitPlaces) {
-    try {
-      
-      DNodeSys_OccurrenceNet sys = new DNodeSys_OccurrenceNet(occnet, implicitPlaces);
-      
-      System.out.println("implicit places: "+implicitPlaces);
-
-      DNodeRefold build = Uma.initBuildPrefix_View(sys, 0);
-      
-      try {
-        OcletIO_Out.writeFile(build.toDot(), path+"_bp2_b.dot");
-      } catch (Exception e) {
-        System.err.println(e);
-      }
-
-      Uma.out.println("equivalence..");
-      build.futureEquivalence();
-
-      //build.debug_printFoldingEquivalence();
-
-      Uma.out.println("join maximal..");
-      build.extendFutureEquivalence_maximal();
-
-      Uma.out.println("fold backwards..");
-
-      while (build.extendFutureEquivalence_backwards()) {
-        Uma.out.println("fold backwards..");
-      }
-      
-      //while (build.refineFoldingEquivalence_removeSuperfluous()) {
-      //  Uma.out.println("remove superfluous..");
-      //}
-
-      hub.top.uma.synthesis.EquivalenceRefineSuccessorGeneralize splitter = new hub.top.uma.synthesis.EquivalenceRefineSuccessorGeneralize(build); 
-
-      Uma.out.println("relax..");
-      build.relaxFutureEquivalence(splitter);
-      Uma.out.println("determinize..");
-      //while (build.extendFoldingEquivalence_deterministic()) {
-      //  Uma.out.println("determinize..");
-      //}
-      
-      //build.futureEquivalence()._debug_printFoldingEquivalence();
-      
-      /*
-      TransitiveDependencies dep = new TransitiveDependencies(build);
-      HashSet<DNode> implicit = dep.getImpliedConditions_solutionGlobal();
-      for (DNode d : implicit) {
-        d.isImplied = true;
-      }*/
-      
-      NetSynthesis synth = new NetSynthesis(build);
-      DNodeSetElement nonImplied = new DNodeSetElement();
-      for (DNode d : build.getBranchingProcess().getAllNodes()) {
-        if (nonImplied.contains(d)) {
-          System.out.println("duplicate node "+d);
-          continue;
-        }
-        if (!d.isImplied) {
-          System.out.println("node "+d);
-          nonImplied.add(d);
-        } else {
-          System.out.println("implicit "+d);
-          //nonImplied.add(d);
-        }
-      }
-      PetriNet net = synth.foldToNet_labeled(nonImplied, false);
-      
-      return net;
-
-    } catch (InvalidModelException e) {
-      System.err.println(e);
-      e.printStackTrace();
-    }
-
-    return null;
-  }
   
   private boolean existsPathWithoutCondition(Transition t1, Transition t2, Place b, PetriNet pnet, Set<Place> toRemove) {
     if (t1.equals(t2)) return true;
@@ -923,7 +650,7 @@ public class SynthesisFromES {
     
     EventStructure es = new EventStructure(build.getBranchingProcess());
     
-    SynthesisFromES synth = new SynthesisFromES(sys.properNames, fileName_system_sysPath);
+    SynthesisFromES2 synth = new SynthesisFromES2(sys.properNames, fileName_system_sysPath);
     PetriNet net = synth.synthesize(es);
     
     //PetriNetIO.writeToFile(net, fileName_system_sysPath+"_refold", PetriNetIO.FORMAT_DOT, 0);

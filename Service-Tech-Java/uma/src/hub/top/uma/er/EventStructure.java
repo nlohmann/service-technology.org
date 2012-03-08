@@ -2,14 +2,12 @@ package hub.top.uma.er;
 
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
-import hub.top.scenario.OcletIO;
+import hub.top.scenario.OcletIO_Out;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeRefold;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys;
-import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
-import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.synthesis.TransitiveDependencies;
 import hub.top.uma.view.ViewGeneration2;
 
@@ -18,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.google.gwt.dev.util.collect.HashMap;
 import com.google.gwt.dev.util.collect.HashSet;
@@ -73,6 +72,7 @@ public class EventStructure {
    * @param nodes
    */
   public void removeAll(Collection<Event> nodes) {
+    
     HashSet<DNode> touched = new HashSet<DNode>();
     
     HashSet<DNode> toRemove = new HashSet<DNode>(nodes);
@@ -111,6 +111,7 @@ public class EventStructure {
     }
     
     for (DNode e : toRemove) {
+      //System.out.println("remove "+e);
       removeFromConflicts((Event)e);
     }
     
@@ -160,13 +161,99 @@ public class EventStructure {
     }
   }
   
+
+  /**
+   * @param current
+   * @param directConflicts consider only direct conflicts, or also transitive conflicts
+   * @return all conflict clusters in the 'current' set of events
+   */
+  public List<Set<Event>> getConflictClusters(Set<Event> current, boolean directConflicts) {
+    Event[] c_events = current.toArray(new Event[current.size()]);
+    boolean adj_matrix[][] = new boolean [c_events.length][c_events.length];
+    
+    for (int i=0;i<c_events.length;i++) {
+      for (int j=0;j<c_events.length;j++) {
+        if (i == j) adj_matrix[i][j] = true;
+        else {
+          if (directConflicts)
+            adj_matrix[i][j] = directConflict.containsKey(c_events[i]) && directConflict.get(c_events[i]).contains(c_events[j]);
+          else
+            adj_matrix[i][j] = inConflict(c_events[i], c_events[j]);
+        }
+      }
+    }
+    
+    List<Set<Event>> cc = new LinkedList<Set<Event>>();
+
+    BronKerbosch bk = new BronKerbosch();
+    TreeSet<int[]> cliques = bk.findCliques(adj_matrix);
+    //System.out.println("found "+cliques.size()+" cliques");
+    for (int[] c : cliques) {
+      Set<Event> conf = new HashSet<Event>();
+      for (int i=0; i<c.length; i++) {
+        conf.add(c_events[c[i]]);
+      }
+      //System.out.println("adding "+conf);
+      cc.add(conf);
+    }
+    
+    return cc;
+  }
+  
+  /**
+   * @return all conflict clusters of the event structure
+   */
+  public Set<Set<Event>> getConflictClusters() {
+    Set<Set<Event>> cc = new HashSet<Set<Event>>();
+    
+    int count = 0;
+    for (Event e : getAllEvents()) {
+      count++;
+      
+      if (directConflict.containsKey(e)) {
+        Set<Event> current = new HashSet<Event>();
+        for (Event f : directConflict.get(e)) current.add(f);
+        current.add(e);
+        
+        //System.out.println(count+"/"+es.allEvents.size()+":"+current.size());
+        
+        //System.out.println("check "+current);
+        //getConflictCluster(es, current, cc);
+
+        // find conflict clusters for the current events
+        for (Set<Event> _cc : getConflictClusters(current, true)) {
+          cc.add(_cc);
+        }
+      }
+
+      Set<Event> self = new HashSet<Event>();
+      self.add(e);
+
+      boolean alreadyContained = false;
+      for (Set<Event> other : cc) {
+        if (other.containsAll(self)) {
+          alreadyContained = true;
+          break;
+        }
+      }
+      //if (!alreadyContained)
+      {
+        cc.add(self);
+      }
+    }
+    return cc;
+  }
+  
   private void _setDirectConflict(Event e1, Event e2) {
-    if (e1 == e2)  System.err.println("setting self-conflict on: "+e1);
+    if (e1 == e2) {
+      System.err.println("setting self-conflict on: "+e1);
+    }
     if (!directConflict.containsKey(e1)) directConflict.put(e1, new HashSet<Event>());
     directConflict.get(e1).add(e2);
   }
 
   public void setDirectConflict(Event e1, Event e2) {
+    //System.out.println("setting "+e1+" # "+e2);
     _setDirectConflict(e1, e2);
     _setDirectConflict(e2, e1);
   }
@@ -183,16 +270,26 @@ public class EventStructure {
       }
       directConflict.remove(n);
     }
+    
+    for (Event e : directConflict.keySet()) {
+      if (directConflict.get(e).contains(n)) {
+        System.out.println(e+" still has "+n+" in conflict");
+      }
+    }
   }
   
-  public boolean alreadyInConflict(Event e, Event f) {
-    Set<Event> e_pres = getPrimeConfiguration(e, true);
-    Set<Event> f_pres = getPrimeConfiguration(f, true);
-    
-    for (Event e_pre : e_pres) {
-      for (Event f_pre : f_pres) {
+  public boolean alreadyInConflict_byOther(Event e, Event f) {
+    Set<Event> e_pred = getPrimeConfiguration(e, true);
+    Set<Event> f_pred = getPrimeConfiguration(e, true);
+    return alreadyInConflict_byOther(e_pred, e, f_pred, f);
+  }
+  
+  public boolean alreadyInConflict_byOther(Set<Event> e_pred, Event e, Set<Event> f_pred, Event f) {
+    for (Event e_pre : e_pred) {
+      for (Event f_pre : f_pred) {
         if (e_pre == e && f_pre == f) continue;
-        if (e_pres.contains(f_pre)) continue;
+        // no need to check conflict of events that are causally dependent
+        if (e_pred.contains(f_pre)) continue;
         
         if (directConflict.containsKey(e_pre) && directConflict.get(e_pre).contains(f_pre)) {
           return true;
@@ -203,19 +300,46 @@ public class EventStructure {
     return false;
   }
   
-  public void reduceTransitiveConflicts() {
-    for (Event e : getAllEvents()) {
-      for (Event f : getAllEvents()) {
-        
-        if (directConflict.containsKey(e) && directConflict.get(e).contains(f)) {
-          if (alreadyInConflict(e, f)) {
+  /**
+   * @param e
+   * @param f
+   * @return {@code true} iff events e and f are in direct conflict with the same set of events
+   */
+  public boolean conflictEquivalent(Event e, Event f) {
+    int num_e = (directConflict.containsKey(e)) ? directConflict.get(e).size() : 0;
+    int num_f = (directConflict.containsKey(f)) ? directConflict.get(f).size() : 0;
+    
+    if (num_e == 0 && num_f == 0) return true;
+    if (num_e > 0 && num_e == num_f) return directConflict.get(e).equals(directConflict.get(f));
+    return false;
+  }
+  
+  public boolean reduceTransitiveConflicts() {
+    return reduceTransitiveConflicts(getAllEvents());
+  }
+  
+  public boolean reduceTransitiveConflicts(EventCollection events) {
+    
+    boolean changed = false;
+    for (Event e : events) {
+      Set<Event> e_pred = null;
+      
+      if (directConflict.containsKey(e)) {
+        for (Event f : directConflict.get(e))
+        {
+          if (e_pred == null) e_pred = getPrimeConfiguration(e, true);
+          Set<Event> f_pred = getPrimeConfiguration(f, true);
+          
+          if (alreadyInConflict_byOther(e_pred, e, f_pred, f)) {
             directConflict.get(e).remove(f);
             directConflict.get(f).remove(e);
+            changed = true;
           }
         }
         
       }
     }
+    return changed;
   }
   
 
@@ -248,19 +372,52 @@ public class EventStructure {
     return primeConfiguration;
   }
   
+  public Set<Event> getPrimeSuffix(Event event, boolean withself) {
+
+    // the events of the prime configuration of 'event'
+    HashSet<Event> primeSuffix = new HashSet<Event>();
+
+    // find all predecessor events of 'event' and their post-conditions
+    // by backwards breadth-first search from 'event'
+    LinkedList<Event> queue = new LinkedList<Event>();
+    queue.add(event);
+    if (withself) primeSuffix.add(event);
+
+    // run breadth-first search
+    while (!queue.isEmpty()) {
+
+      Event first = queue.removeFirst();
+      if (first.post == null) continue;
+      
+      for (DNode postNode : first.post) {
+        Event postEvent = (Event) postNode;
+        if (!primeSuffix.contains(postEvent)) {
+          // only add to the queue if not queued already
+          queue.add(postEvent);
+          primeSuffix.add(postEvent);
+        } // all predecessor events of preCondition
+      }
+    }
+    return primeSuffix;
+  }
+  
   public boolean inDirectConflict(Event e1, Event e2) {
     if (directConflict.containsKey(e1) && directConflict.get(e1).contains(e2)) return true;
     return false;
   }
   
   public boolean inConflict(Event e1, Event e2) {
-    Set<Event> e1_pre = getPrimeConfiguration(e1, true);
-    Set<Event> e2_pre = getPrimeConfiguration(e2, true);
+    Set<Event> e1_pred = getPrimeConfiguration(e1, true);
+    Set<Event> e2_pred = getPrimeConfiguration(e2, true);
+    return inConflict(e1_pred, e1, e2_pred, e2);
+  }
+  
+  public boolean inConflict(Set<Event> e1_pred, Event e1, Set<Event> e2_pred, Event e2) {
     
-    for (Event f : e1_pre) {
+    for (Event f : e1_pred) {
       if (directConflict.containsKey(f)) {
         for (Event f_confl : directConflict.get(f)) {
-          if (e2_pre.contains(f_confl)) {
+          if (e2_pred.contains(f_confl)) {
             return true;
           }
         }
@@ -341,6 +498,8 @@ public class EventStructure {
     // see if the dependency already exists
     if (e1.post != null) for (DNode f : e1.post) if (f == e2) return;
     
+    //System.out.println("set "+e1+" -> "+e2);
+    
     e2.addPreNode(e1);
     e1.addPostNode(e2);
   }
@@ -356,6 +515,12 @@ public class EventStructure {
         }
       }
       
+      for (DNode f : toRemove) {
+        //System.out.println("remove "+f+" -> "+e);
+        removeDependency((Event)f, e);
+      }
+      
+      /*
       DNode newPre[] = new DNode[e.pre.length-toRemove.size()];
       int prePos = 0;
       for (DNode f : e.pre) {
@@ -369,7 +534,7 @@ public class EventStructure {
           if (g != e) newPost[postPos++] = g;
         }
         f.post = newPost;
-      }
+      }*/
     }
   }
   
@@ -486,7 +651,7 @@ public class EventStructure {
       if (directConflict.containsKey(n)) {
         for (Event confl : directConflict.get(n)) {
           if (confl.globalId < n.globalId) {
-            b.append("  e"+confl.globalId+" -> e"+n.globalId+" [weight=10000.0 arrowhead=none color=red]\n");
+            b.append("  e"+confl.globalId+" -> e"+n.globalId+" [weight=100.0 arrowhead=none color=red]\n");
           }
         }
       }
@@ -494,6 +659,245 @@ public class EventStructure {
     
     b.append("}");
     return b.toString();
+  }
+  
+  private boolean allPostEventsVisited(Event e_equiv, Map<Event, Event> canonical) {
+    if (e_equiv.post == null || e_equiv.post.length == 0) return true;
+    // see if each post-event of 'eEquiv' has been visited, if not,
+    // then we cannot fold e_equiv yet
+    for (DNode f : e_equiv.post) {
+      if (!canonical.containsKey(f)) {
+        //System.out.println("not seen "+f);
+        return false;
+      }
+    }
+    
+    return true;
+  }
+  
+  public Map<Event, Set<Event>> equiv;
+  public Map<Event, Event> canonical;
+  
+  public void foldBackwards() {
+    
+    canonical = new HashMap<Event, Event>();
+    equiv = new HashMap<Event, Set<Event>>();
+    
+    LinkedList<Event> queue = new LinkedList<Event>();
+    
+    // collect all maximal events
+    LinkedList<Event> maxEvents = new LinkedList<Event>();
+    for (Event e : allEvents) {
+      if (e.post == null || e.post.length == 0) maxEvents.add(e);
+    }
+    
+    // partition into classes of events of the same label
+    Map<Short, Set<Event>> label_equiv = new HashMap<Short, Set<Event>>();
+    for (Event e : maxEvents) {
+      if (!label_equiv.containsKey(e.id)) label_equiv.put(e.id, new HashSet<Event>());
+      label_equiv.get(e.id).add(e);
+    }
+    
+    // make each class an equivalence class with the event with the smallest global id
+    // as canonical representative, add the canonical representative to the queue
+    for (Set<Event> eq : label_equiv.values()) {
+      Event minEvent = null;
+      for (Event e : eq) {
+        if (minEvent == null) minEvent = e;
+        else if (minEvent.globalId > e.globalId) minEvent = e;
+      }
+      
+      for (Event e : eq) {
+        canonical.put(e, minEvent);
+        queue.addLast(e);
+        //System.out.println("add "+e);
+      }
+      equiv.put(minEvent, eq);
+    }
+    
+    int count = 0;
+    
+
+    while (!queue.isEmpty()) {
+      
+      Event e = queue.removeFirst();
+      
+      //System.out.println(equiv.get(canonical.get(e)));
+
+      // check that for all predecessors of 'e', each post-event has
+      // been visited (otherwise we cannot fold for these events),
+      // correspondingly for all events equivalent to 'e'
+      boolean seen_allPosts_of_allPre_of_allEquiv = true;
+      all_e_equiv: for (Event e_equiv : equiv.get(canonical.get(e))) {
+
+        if (e_equiv.pre == null || e_equiv.pre.length == 0) continue;
+        for (DNode f : e_equiv.pre) {
+          if (!allPostEventsVisited((Event)f, canonical)) {
+            seen_allPosts_of_allPre_of_allEquiv = false;
+            break all_e_equiv;
+          }
+        }
+        
+      }
+      // no, some equivalent event 'e' has some predecessor that has 
+      // not all its post-events visited. push 'e' back in the queue
+      if (!seen_allPosts_of_allPre_of_allEquiv) {
+        /*
+        queue.addLast(e);
+        System.out.println("skip "+e);
+        
+        count++;
+        if (count > 5) break;
+        
+        continue;
+        */
+        continue;
+      }
+      
+      label_equiv.clear();
+      // get all predecessors and put them into equivalence classes of the same label
+      for (Event e_equiv : equiv.get(canonical.get(e))) {
+        if (e_equiv.pre == null || e_equiv.pre.length == 0) continue;
+        for (DNode _f : e_equiv.pre) {
+          Event f = (Event)_f;
+          if (!label_equiv.containsKey(f.id)) label_equiv.put(f.id, new HashSet<Event>());
+          label_equiv.get(f.id).add(f);
+        }
+      }
+      // partition equivalence classes by equivalent successors
+      for (Set<Event> label_eq : label_equiv.values()) {
+        Map<Set<Event>,Set<Event>> succ_classes = new HashMap<Set<Event>, Set<Event>>();
+        
+
+        for (Event e_label : label_eq) {
+          Set<Event> succ = new HashSet<Event>();
+          if (e_label.post != null)
+            for (DNode _f : e_label.post) {
+              Event f = (Event)_f;
+              succ.add(canonical.get(f));
+            }
+          
+          if (!succ_classes.containsKey(succ)) succ_classes.put(succ, new HashSet<Event>());
+          succ_classes.get(succ).add(e_label);
+          
+          
+        }
+        
+        // make each class an equivalence class with the event with the smallest global id
+        // as canonical representative, add the canonical representative to the queue
+        for (Set<Event> succ_eq : succ_classes.values()) {
+          
+          /*
+          // perhaps some of the events are already in some equivalence class
+          // take the union of all events
+          Set<Event> all = new HashSet<Event>();
+          for (Event e_succ : succ_eq) {
+            all.add(e_succ);
+            if (canonical.containsKey(e_succ)) {
+              all.addAll(equiv.get(canonical.get(e_succ)));
+            }
+          }
+          */
+          
+          Event minEvent = null;
+          for (Event e_succ : succ_eq) {
+            if (minEvent == null) minEvent = e_succ;
+            else if (minEvent.globalId > e_succ.globalId) minEvent = e_succ;
+          }
+          
+          for (Event e_succ : succ_eq) {
+
+            // visit folded nodes - but only those that have not been visited yet
+            if (!canonical.containsKey(e_succ)) {
+              queue.addLast(e_succ);
+              //System.out.println("add "+e_succ);
+            }
+            
+            // clear old equivalence class
+            if (equiv.containsKey(e_succ) && e_succ != minEvent) equiv.remove(e_succ);
+            canonical.put(e_succ, minEvent);
+          }
+          
+          if (!equiv.containsKey(minEvent)) equiv.put(minEvent, new HashSet<Event>());
+          equiv.get(minEvent).addAll(succ_eq);
+        }
+      }
+    }
+    
+    for (Event e : allEvents) {
+      if (!canonical.containsKey(e)) {
+        canonical.put(e, e);
+        equiv.put(e, new HashSet<Event>());
+        equiv.get(e).add(e);
+      }
+    }
+    
+    System.out.println("-------------------> folding relation on events");
+    for (Set<Event> eq : equiv.values()) {
+      System.out.println(eq);
+    }
+  }
+  
+  public void refineFoldingByConflicts() {
+    
+    boolean changed = true;
+    while (changed) {
+      changed = false;
+
+      Map<Set<Event>,Set<Event>> conflict_sets = new HashMap<Set<Event>, Set<Event>>();
+      Event considered = null;
+      
+      for (Event e : equiv.keySet()) {
+        Set<Event> e_class = equiv.get(e);
+        
+        conflict_sets.clear();
+
+        for (Event f : e_class) {
+          Set<Event> conf_canonical = new HashSet<Event>();
+          
+          if (directConflict.containsKey(f)) {
+            for (Event f_confl : directConflict.get(f)) conf_canonical.add(canonical.get(f_confl));
+          }
+          
+          if (!conflict_sets.containsKey(conf_canonical)) conflict_sets.put(conf_canonical, new HashSet<Event>());
+          conflict_sets.get(conf_canonical).add(f); 
+        }
+        
+        if (conflict_sets.size() > 1) {
+          System.out.println(e_class+" --> "+conflict_sets.values());
+          considered = e;
+
+          break;
+        }
+      }
+      
+      if (considered != null) {
+        changed = true;
+        
+        equiv.remove(considered);
+        
+        for (Set<Event> conf_eq : conflict_sets.values()) {
+          
+          Event minEvent = null;
+          for (Event e_succ : conf_eq) {
+            if (minEvent == null) minEvent = e_succ;
+            else if (minEvent.globalId > e_succ.globalId) minEvent = e_succ;
+          }
+          
+          for (Event e_succ : conf_eq) {
+  
+            // clear old equivalence class
+            if (equiv.containsKey(e_succ) && e_succ != minEvent) equiv.remove(e_succ);
+            canonical.put(e_succ, minEvent);
+          }
+          
+          if (!equiv.containsKey(minEvent)) equiv.put(minEvent, new HashSet<Event>());
+          equiv.get(minEvent).addAll(conf_eq);
+        }
+      }
+      
+    }
+    
   }
 
   public static void main(String args[]) throws Throwable {
@@ -521,6 +925,6 @@ public class EventStructure {
     
     EventStructure es = new EventStructure(build.getBranchingProcess());
     
-    OcletIO.writeFile(es.toDot(sys.properNames), fileName_system_sysPath+"_es.dot");
+    OcletIO_Out.writeFile(es.toDot(sys.properNames), fileName_system_sysPath+"_es.dot");
   }
 }

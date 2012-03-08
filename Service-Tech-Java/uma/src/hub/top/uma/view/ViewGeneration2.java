@@ -21,6 +21,7 @@ package hub.top.uma.view;
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeBP.EnablingInfo;
@@ -902,7 +903,7 @@ public class ViewGeneration2 {
        try {
          
          PetriNet net = generateView(systemFile, 3, traceFile);
-         PetriNetIO.writeToFile(net, systemFile+".view", PetriNetIO.FORMAT_DOT, 0);
+         PetriNetIO_Out.writeToFile(net, systemFile+".view", PetriNetIO_Out.FORMAT_DOT, 0);
          
        } catch (IOException e) {
          System.err.println(e);

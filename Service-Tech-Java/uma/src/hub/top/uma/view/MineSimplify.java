@@ -22,7 +22,7 @@ import hub.top.petrinet.Arc;
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.Node;
 import hub.top.petrinet.PetriNet;
-import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 import hub.top.uma.DNode;
@@ -59,7 +59,7 @@ public class MineSimplify {
   private String fileName_trace;
   
   private ISystemModel sysModel;
-  private LinkedList<String[]> allTraces;
+  private List<String[]> allTraces;
 
   protected ViewGeneration2 viewGen;                   // the class used to construct the log-induced branching prefix
   private DNodeRefold build = null;                    // the branching process of sysModel
@@ -229,7 +229,7 @@ public class MineSimplify {
    * @param sysModel
    * @param allTraces
    */
-  public MineSimplify(ISystemModel sysModel, LinkedList<String[]> allTraces) 
+  public MineSimplify(ISystemModel sysModel, List<String[]> allTraces) 
   {
     this.sysModel = sysModel;
     this.allTraces = allTraces;
@@ -244,7 +244,7 @@ public class MineSimplify {
    * @param allTraces
    * @param config
    */
-  public MineSimplify(ISystemModel sysModel, LinkedList<String[]> allTraces, Configuration config) 
+  public MineSimplify(ISystemModel sysModel, List<String[]> allTraces, Configuration config) 
   {
     this.sysModel = sysModel;
     this.allTraces = allTraces;
@@ -354,7 +354,7 @@ public class MineSimplify {
       return;
     
     String targetPath_lola = fileName_system_sysPath+".simplified.lola";
-    PetriNetIO.writeToFile(simplifiedNet, targetPath_lola, PetriNetIO.FORMAT_LOLA, 0);
+    PetriNetIO_Out.writeToFile(simplifiedNet, targetPath_lola, PetriNetIO_Out.FORMAT_LOLA, 0);
 
     for (Transition t : simplifiedNet.getTransitions())
       t.setName("");
@@ -362,7 +362,7 @@ public class MineSimplify {
       p.setName("");
     
     String targetPath_dot = fileName_system_sysPath+".simplified.dot";
-    PetriNetIO.writeToFile(simplifiedNet, targetPath_dot, PetriNetIO.FORMAT_DOT, 0);
+    PetriNetIO_Out.writeToFile(simplifiedNet, targetPath_dot, PetriNetIO_Out.FORMAT_DOT, 0);
     
     String targetPath_result = fileName_system_sysPath+".simplified.result.txt";
     writeFile(targetPath_result, result.toString(), false);
@@ -400,7 +400,7 @@ public class MineSimplify {
    * @return the simplified Petri net
    * @throws InvalidModelException
    */
-  private PetriNet simplifyModel(ISystemModel sysModel, LinkedList<String[]> traces,
+  private PetriNet simplifyModel(ISystemModel sysModel, List<String[]> traces,
     Configuration config) throws InvalidModelException {
     
     // step 1) unfold and refold-model
@@ -466,7 +466,7 @@ public class MineSimplify {
    * @return refolded Petri net
    * @throws InvalidModelException
    */
-  private PetriNet unfoldRefold(ISystemModel sysModel, LinkedList<String[]> traces)  throws InvalidModelException {
+  private PetriNet unfoldRefold(ISystemModel sysModel, List<String[]> traces)  throws InvalidModelException {
     DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
     build = Uma.initBuildPrefix_View(sys, 0);
 
@@ -563,7 +563,7 @@ public class MineSimplify {
    * @param traces
    * @throws InvalidModelException
    */
-  private void assertBranchingProcess(PetriNet net, ISystemModel sysModel, LinkedList<String[]> traces) throws InvalidModelException {
+  private void assertBranchingProcess(PetriNet net, ISystemModel sysModel, List<String[]> traces) throws InvalidModelException {
     if (build != null) return;
 
     Uma.out.println("assert existence of branching process...");

@@ -2,10 +2,11 @@ package hub.top.uma;
 
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
-import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.petrinet.unfold.DNodeSys_PetriNet;
 import hub.top.scenario.DNodeSys_OcletSpecification;
 import hub.top.scenario.OcletIO;
+import hub.top.scenario.OcletIO_Out;
 import hub.top.scenario.OcletSpecification;
 
 import java.io.BufferedWriter;
@@ -23,7 +24,7 @@ public class Uma {
 
   private String options_inFile = null;
   private String options_inFile_Ext = null;
-  private int options_outputFormat = PetriNetIO.FORMAT_DOT;
+  private int options_outputFormat = PetriNetIO_Out.FORMAT_DOT;
   private int options_mode = MODE_COMPUTE_PREFIX;
   private int options_bound = 1;
   
@@ -73,11 +74,11 @@ public class Uma {
       if ("-f".equals(args[i])) {
         ++i;
         if ("dot".equals(args[i]))
-          options_outputFormat = PetriNetIO.FORMAT_DOT;
+          options_outputFormat = PetriNetIO_Out.FORMAT_DOT;
         else if ("lola".equals(args[i]))
-          options_outputFormat = PetriNetIO.FORMAT_LOLA;
+          options_outputFormat = PetriNetIO_Out.FORMAT_LOLA;
         else if ("owfn".equals(args[i]))
-          options_outputFormat = PetriNetIO.FORMAT_OWFN;
+          options_outputFormat = PetriNetIO_Out.FORMAT_OWFN;
         else {
           System.out.println("unknown output file format: "+args[i]);
           return false;
@@ -190,7 +191,7 @@ public class Uma {
     DNodeSys sys = getBehavioralSystemModel(sysModel);
     DNodeBP build = buildPrefix(initBuildPrefix(sys, bound));
 
-    if (options_outputFormat == PetriNetIO.FORMAT_DOT) {
+    if (options_outputFormat == PetriNetIO_Out.FORMAT_DOT) {
       System.out.println("writing to "+options_inFile+".bp.dot");
       FileWriter fstream = new FileWriter(options_inFile+".bp.dot");
       BufferedWriter out = new BufferedWriter(fstream);
@@ -212,9 +213,9 @@ public class Uma {
     
     if ("oclets".equals(ext)) {
       OcletSpecification os = new OcletSpecification(net);
-      OcletIO.writeToFile(os, fileName, outputFormat, 0);
+      OcletIO_Out.writeToFile(os, fileName, outputFormat, 0);
     } else {
-      PetriNetIO.writeToFile(net, fileName, outputFormat, 0);
+      PetriNetIO_Out.writeToFile(net, fileName, outputFormat, 0);
     }
   }
   

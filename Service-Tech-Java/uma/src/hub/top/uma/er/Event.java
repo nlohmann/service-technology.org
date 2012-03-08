@@ -17,6 +17,10 @@
 
 package hub.top.uma.er;
 
+import java.util.LinkedList;
+
+import com.google.gwt.dev.util.collect.HashSet;
+
 import hub.top.uma.DNode;
 
 /**
@@ -25,6 +29,8 @@ import hub.top.uma.DNode;
  * @author dfahland
  */
 public class Event extends DNode {
+  
+  public boolean originalModelEvent = false;
 
   public Event(short id, int preSize) {
     super(id, preSize);

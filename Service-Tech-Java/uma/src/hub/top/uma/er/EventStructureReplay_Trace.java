@@ -6,13 +6,15 @@ import hub.top.petrinet.PetriNetIO;
 import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
-import hub.top.scenario.OcletIO_Out;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.Uma;
 import hub.top.uma.er.EventStructure.EventCollection;
 import hub.top.uma.view.ViewGeneration2;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -23,15 +25,19 @@ import java.util.Set;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
-public class EventStructureReplay {
+public class EventStructureReplay_Trace {
   
   private PetriNet net;
   private EventStructure es;
   
   private Event artificialStart;
   
-  public EventStructureReplay(PetriNet net) {
+  public EventStructureReplay_Trace(PetriNet net) {
     this.net = net;
+    
+    net.makeNormalNet();
+    net.turnIntoLabeledNet();
+    
     this.es = new EventStructure();
     
     buildNameTable();
@@ -113,21 +119,33 @@ public class EventStructureReplay {
 
     
     // execute the trace
-    for (String event : trace) {
+    nextevent: for (String event : trace) {
+      
+      boolean isTauStep = false;
+      
+      String transitionName;
+      if (event.startsWith("tau_")) {
+        transitionName = event.substring(4);
+        isTauStep = true;
+      } else {
+        transitionName = event;
+      }
       
       // find the transition to fire
       Transition toFire = null;
       for (Transition t : net.getTransitions()) {
-        if (t.getName().equals(event)) {
+        if (t.getName().equals(transitionName)) {
           toFire = t;
           break;
         }
       }
       
       if (toFire == null) {
-        System.err.println("Error. Net does not contain transition with name "+event);
+        System.err.println("Error. Net does not contain transition with name "+transitionName);
         return;
       }
+      
+      int numMissingTokens = 0;
       
       // find the tokens that are consumed by 'toFire'
       List<Token> toConsume = new LinkedList<Token>();
@@ -139,16 +157,25 @@ public class EventStructureReplay {
             continue nextplace;
           }
         }
+        
+        
         // no token on p: add new token
         Token m = new Token(p,lastEvent);
         marking.add(m);
         toConsume.add(m);
+        numMissingTokens++;
       }
-
-      short toFireID = nameToID.get(toFire.getName());
+      
+      short toFireID = nameToID.get(event);
       Event newEvent = appendEvent(toFireID, toConsume, toFire.getPostSet(), marking, config, lastEvent, true);
       lastEvent = newEvent;
       
+      if (numMissingTokens == 0) {
+        newEvent.originalModelEvent = true; 
+      } else {
+        newEvent.originalModelEvent = false;
+      }
+
       // remember that the event participates in this trace
       if (!inTrace.containsKey(lastEvent)) inTrace.put(lastEvent, new HashSet<Integer>());
       inTrace.get(lastEvent).add(traceCount);
@@ -313,9 +340,12 @@ public class EventStructureReplay {
         }
       }
     }
+    /* -- do not set all conflicts, keep just the minimal ones
     if (ord == ORD_CONFLICT) {
       es.setDirectConflict(e, f);
     }
+    */
+    
     /*
     // reduce transitive conflicts
     if (es.inDirectConflict(e, f) && es.alreadyInConflict_byOther(e_pred, e, f_pred, f)) {
@@ -370,8 +400,10 @@ public class EventStructureReplay {
     
     // collect all names and assign each new name a new ID
     for (Node n : net.getTransitions()) {
-      if (nameToID.get(n.getName()) == null)
+      if (nameToID.get(n.getName()) == null) {
         nameToID.put(n.getName(), currentNameID++);
+        nameToID.put("tau_"+n.getName(), currentNameID++);
+      }
      nodeNum++;
     }
     for (Node n : net.getPlaces()) {
@@ -543,7 +575,16 @@ public class EventStructureReplay {
     cosets.put(artificialStart, new HashSet<Event>());
     cosets.get(artificialStart).add(artificialStart);
     
+    int count = 0;
+    int step = es.allEvents.size() / 100 + 1;
+    int step_60 = step * 60;
+    
     while (!queue.isEmpty()) {
+      
+      count++;
+      
+      if (count % step == 0) System.out.print(".");
+      if (count % step_60 == 0) System.out.println(count);
       
       EventCollection touched = new EventCollection();
       
@@ -620,7 +661,9 @@ public class EventStructureReplay {
             if (k != l) {
               if (depends[k][l]) {
                 es.setDependency(d_k, d_l);
-              } else {
+                
+                // do not remove dependencies between original model events  
+              } else /*if (!d_l.originalModelEvent || !d_k.originalModelEvent)*/ {
                 if (es.removeDependency(d_k, d_l)) {
                 
                   if (es.directConflict.containsKey(d_k)) {
@@ -651,8 +694,8 @@ public class EventStructureReplay {
         }
       }
       
-      refineConflicts(touched);
-      es.reduceTransitiveConflicts(touched);
+      //refineConflicts(touched);
+      //es.reduceTransitiveConflicts(touched);
       es.removeTransitiveDependencies();
     }
 
@@ -798,6 +841,7 @@ public class EventStructureReplay {
           
           if (allPredecessorsSeen) {
 
+
             // TODO: and all predecessors must be mutually equivalent
             if (!id_equivalent.containsKey(f.id)) id_equivalent.put(f.id, new HashSet<Event>());
             for (DNode f_other : id_equivalent.get(f.id)) {
@@ -844,8 +888,17 @@ public class EventStructureReplay {
       System.out.println(equiv);
     }
     
+    int count = 0;
+    int step = es.allEvents.size() / 100 + 1;
+    int step_60 = step * 60;
+    
     System.out.println("transferring conflicts to folding...");
     for (Event e : es.allEvents) {
+      
+      count++;
+      if (count % step == 0) System.out.print(".");
+      if (count % step_60 == 0) System.out.println(count);
+      
       Set<Event> e_pre = null;
       if (canonical.containsKey(e) && canonical.get(e) == e)
       {
@@ -864,12 +917,18 @@ public class EventStructureReplay {
       }
     }
     
+    count = 0;
+    
     System.out.println("clearing conflicts...");
     for (Event e : es.allEvents) {
       
+      count++;
+      if (count % step == 0) System.out.print(".");
+      if (count % step_60 == 0) System.out.println(count);
+      
       if (canonical.containsKey(e) && canonical.get(e) == e) {
         
-        System.out.println("clear "+e);
+        //System.out.println("clear "+e);
         
         // remove stale conflict relations that hold because predecessors
         // of 'e' are merged with conflicting predecessors but these
@@ -878,7 +937,7 @@ public class EventStructureReplay {
           List<Event> removeFromConflicts = new LinkedList<Event>();
           for (Event eConfl : es.directConflict.get(e)) {
             
-            System.out.println("   -- "+eConfl);
+            //System.out.println("   -- "+eConfl);
             
             // the events e and f are in conflict, look whether there are
             // equivalent events e* and f* merged into e and f that are 
@@ -1030,13 +1089,310 @@ public class EventStructureReplay {
         es.setDependency(preNew, f);
       }
       es.setDirectConflict(e, preNew);
-      
       newEvents.add(preNew);
     }
     
     for (Event preNew : newEvents)
       es.add(preNew);
     
+  }
+  
+  public void makeEventsSimilar() {
+    
+    Map<Short,Set<Short>> largestPre = new HashMap<Short, Set<Short>>();
+    
+    for (Event e : es.getAllEvents()) {
+      
+      Set<Short> pre_ids = new HashSet<Short>();
+      if (e.pre != null) for (DNode pre : e.pre) pre_ids.add(pre.id);
+      if (!largestPre.containsKey(e.id)) largestPre.put(e.id, pre_ids);
+      if (largestPre.get(e.id).size() < pre_ids.size()) largestPre.put(e.id, pre_ids);
+    }
+    
+    for (Event e : es.getAllEvents()) {
+      
+      if (e.id == nameToID.get(NAME_TAU)) continue;
+      
+      if (e.pre != null) {
+        
+        int to_add = largestPre.get(e.id).size() - e.pre.length;
+            
+        if (to_add > 0) {
+          
+          Set<Event> e_preds = es.getPrimeConfiguration(e, false);
+          
+          nextmissing: for (Short pre_missing : largestPre.get(e.id)) {
+            for (DNode having : e.pre) if (having.id == pre_missing) continue nextmissing;
+            
+            System.out.println(e+" misses "+properNames[pre_missing]);
+            
+            boolean found = false;
+            
+            
+            // look in the predecessors of 'e' for an event that has the same id as the missing one
+            for (Event e_pred : e_preds) {
+              if (e_pred.id == pre_missing) {
+                // yes, add a direct dependency
+System.out.println("add transitive "+e_pred+" --> "+e);
+                es.setDependency(e_pred, e);
+                found = true;
+                break;
+              }
+            }
+            
+            if (!found) {
+              pred_conflicts: for (Event e_pred : e_preds) {
+                if (es.directConflict.containsKey(e_pred) && !e.hasPred(e_pred))
+                {
+                  for (Event e_confl : es.directConflict.get(e_pred)) {
+                    if (e_confl.id == pre_missing) {
+
+System.out.println("add transitive "+e_pred+" --> "+e);
+                      
+                      es.setDependency(e_pred, e);
+                      found = true;
+                      break pred_conflicts;
+                    }
+                  }
+                }
+              }
+              
+            }
+            
+            if (!found) {
+              for (Event e_pred : e_preds) {
+                if (!e.hasPred(e_pred))
+                {
+System.out.println("add transitive "+e_pred+" --> "+e);
+                  es.setDependency(e_pred, e);
+                  found = true;
+                  //break;
+                }
+              }
+              
+            }
+
+            
+            if (found) {
+              to_add--;
+              
+              // we added a transitive edge to 'e', 'e' inherits all conflicts to make sure
+              // that the new transitive edges align with the transitive conflicts
+              // when translating the event structure to a branching process
+              for (Event e_pred : e_preds) {
+                if (es.directConflict.containsKey(e_pred)) {
+                  for (Event e_confl : es.directConflict.get(e_pred)) {
+                    //es.setDirectConflict(e, e_confl);
+                  }
+                }
+              }
+              
+            }
+            if (to_add == 0) break;
+          }
+        }
+        
+        if (to_add > 0) System.out.println("could not generate "+to_add+" depdencies for "+e);
+      }
+    }
+  }
+  
+  public void addAllPredecessors() {
+    
+    Map<Short,Set<Short>> largestPre = new HashMap<Short, Set<Short>>();
+    
+    for (Event e : es.getAllEvents()) {
+      
+      Set<Short> pre_ids = new HashSet<Short>();
+      if (e.pre != null) for (DNode pre : e.pre) pre_ids.add(pre.id);
+      if (!largestPre.containsKey(e.id)) largestPre.put(e.id, pre_ids);
+      if (largestPre.get(e.id).size() < pre_ids.size()) largestPre.put(e.id, pre_ids);
+    }
+    
+    for (Event e : es.getAllEvents()) {
+      
+      //if (e.id == nameToID.get(NAME_TAU)) continue;
+      
+      if (e.pre != null) {
+        
+        int to_add = largestPre.get(e.id).size() - e.pre.length;
+        
+        if (to_add > 0) {
+        
+          Set<Event> e_preds = es.getPrimeConfiguration(e, false);
+          for (Event e_pred : e_preds) {
+            if (!e.hasPred(e_pred))
+            {
+  System.out.println("add transitive "+e_pred+" --> "+e);
+              es.setDependency(e_pred, e);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  public void materializeTransitiveConflictsForTransitiveEdges() {
+    for (Event e : es.allEvents) {
+      if (e.post == null) continue;
+      for (int i=0; i<e.post.length; i++) {
+        for (int j=i+1; j<e.post.length; j++) {
+          
+          if (es.inConflict((Event)e.post[i], (Event)e.post[j])) {
+            es.setDirectConflict((Event)e.post[i], (Event)e.post[j]);
+          }
+        }
+      }
+    }
+  }
+  
+  public PetriNet replay(List<String[]> allTraces, String tempOutputFile) throws IOException {
+    
+    EventStructureReplay_Trace replay = this;
+    
+    Uma.out.println("build up event structure");
+    int tNum = 0;
+    for (String[] trace : allTraces) {
+      tNum++;
+      replay.extendByTrace(trace);
+      
+      System.out.print(".");
+      if (tNum % 60 == 0) System.out.println(tNum);
+    }
+    Uma.out.println(replay.es.allEvents.size()+" events");
+
+    Uma.out.println("remove transitive dependencies");
+    replay.es.removeTransitiveDependencies();
+    writeFile(replay.es.toDot(replay.properNames), tempOutputFile+"_es.dot");
+    
+    // -- not needed when conflicts are properly set during trace construction
+    //Uma.out.println("refining conflicts");
+    //replay.refineConflicts();
+    Uma.out.println("reduce transitive conflicts");
+    while (replay.es.reduceTransitiveConflicts()) {};
+    writeFile(replay.es.toDot(replay.properNames), tempOutputFile+"_es2.dot");
+
+    Uma.out.println("set single events");
+    replay.setSingleEvents();
+    Uma.out.println("identify ordering relations");
+    replay.getConcurrentEvents();
+    Uma.out.println("maximizing concurrency");
+    replay.extendConcurrency();
+    writeFile(replay.es.toDot(replay.properNames), tempOutputFile+"_es2b.dot");
+
+    Uma.out.println("reducing transitive conflicts");
+    replay.es.reduceTransitiveConflicts();
+    Uma.out.println("reducing transitive dependencies");
+    replay.es.removeTransitiveDependencies();
+    Uma.out.println("removing tau events");
+    replay.removeSuperFluousTauEvents();
+    //Uma.out.println("refining conflicts");
+    //replay.refineConflicts();
+    Uma.out.println("reducing transitive conflicts");
+    while (replay.es.reduceTransitiveConflicts()) {};
+    Uma.out.println("reducing transitive dependencies");
+    replay.es.removeTransitiveDependencies();
+    
+    writeFile(replay.es.toDot(replay.properNames), tempOutputFile+"_es3.dot");
+    
+    Uma.out.println("folding forward");
+    replay.foldForward();
+    //replay.removeSuperFluousTauEvents();
+    //replay.refineConflicts();
+    Uma.out.println("reducing transitive conflicts");
+    while (replay.es.reduceTransitiveConflicts()) {};
+    Uma.out.println("reducing transitive dependencies");
+    replay.es.removeTransitiveDependencies();
+    
+    writeFile(replay.es.toDot(replay.properNames), tempOutputFile+"_es4.dot");
+    
+    for (Event e : replay.es.allEvents) {
+      Set<DNode> ev = e.getAllPredecessors();
+      for (DNode e2 : ev) {
+        if (replay.es.inConflict(e, (Event)e2)) {
+          System.err.println("Error4: "+e+" #  "+e2);
+        }
+        if (replay.es.inDirectConflict(e, (Event)e2)) {
+          System.err.println("Error4: "+e+" #! "+e2);
+          
+          System.out.println("FIXING "+e+" #! "+e2);
+          replay.es.directConflict.get(e).remove((Event)e2);
+          replay.es.directConflict.get((Event)e2).remove(e);
+          
+          if (replay.es.directConflict.get(e).size() == 0) replay.es.directConflict.remove(e);
+          if (replay.es.directConflict.get(e2).size() == 0) replay.es.directConflict.remove(e2);
+        }
+        
+      }
+    }
+    
+    
+    Uma.out.println("reducing transitive conflicts");
+    while (replay.es.reduceTransitiveConflicts()) {};
+    Uma.out.println("localizing conflicts");
+    replay.makeConflictFansLocal();
+    //replay.removeSuperFluousTauEvents();
+    //replay.refineConflicts();
+    Uma.out.println("reducing transitive conflicts");
+    while (replay.es.reduceTransitiveConflicts()) {};
+    Uma.out.println("reducing transitive dependencies");
+    //replay.es.removeTransitiveDependencies();
+    
+    writeFile(replay.es.toDot(replay.properNames), tempOutputFile+"_es5.dot");
+    
+    for (Event e : replay.es.allEvents) {
+      Set<DNode> ev = e.getAllPredecessors();
+      for (DNode e2 : ev) {
+        if (replay.es.inConflict(e, (Event)e2)) {
+          System.err.println("Error5: "+e+" #  "+e2);
+        }
+        if (replay.es.inDirectConflict(e, (Event)e2)) {
+          System.err.println("Error5: "+e+" #! "+e2);
+          System.err.println(e.getAllPredecessors());
+          System.err.println(replay.es.getPrimeConfiguration(e, true));
+        }
+      }
+    }
+    
+                        ///// <<<<<<<<<<<<-----------------
+    boolean useVariant2 = true;    ///// <<<<<<<<<<<<-----------------
+                        ///// <<<<<<<<<<<<-----------------
+                        ///// <<<<<<<<<<<<-----------------
+    
+    if (useVariant2) {
+      System.out.println("find future equivalence on events");
+      replay.es.foldBackwards();
+      System.out.println("refining by conflicts");
+      replay.es.refineFoldingByConflicts();
+      
+    } else {
+    
+      Uma.out.println("making events similar");
+      //replay.makeEventsSimilar();
+      replay.addAllPredecessors();
+      Uma.out.println("materialize transitive conflicts for transitive edges");
+      //replay.materializeTransitiveConflictsForTransitiveEdges();
+    }
+    
+    writeFile(replay.es.toDot(replay.properNames), tempOutputFile+"_es6.dot");
+    
+    PetriNet net;
+    Uma.out.println("synthesizing Petri net from "+replay.es.allEvents.size()+" events");
+    if (useVariant2) {
+      SynthesisFromES2 synth = new SynthesisFromES2(replay.properNames, tempOutputFile);
+      net = synth.synthesize(replay.es);
+    } else {
+      SynthesisFromES synth = new SynthesisFromES(replay.properNames, tempOutputFile);
+      net = synth.synthesize(replay.es);
+    }
+    
+    for (Transition t : net.getTransitions()) {
+      if (t.getName().startsWith("tau_")) {
+        t.setName("tau");
+      }
+    }
+
+    return net;
   }
   
   public static void main(String args[]) throws Throwable {
@@ -1050,12 +1406,12 @@ public class EventStructureReplay {
     //String fileName_system_sysPath = "./examples/model_correction/a12f0n00_alpha.lola";
     //String fileName_trace  = "./examples/model_correction/a12f0n05_aligned_to_00.log.txt";
     
-    String fileName_system_sysPath = "./examples/model_correction/a12f0n05_alpha.lola";
-    String fileName_trace  = "./examples/model_correction/a12f0n05_aligned.log.txt";
+    //String fileName_system_sysPath = "./examples/model_correction/a12f0n05_alpha.lola";
+    //String fileName_trace  = "./examples/model_correction/a12f0n05_aligned.log_20.txt";
     //String fileName_trace  = "./examples/model_correction/a12f0n05_aligned.log.txt";
     
-    //String fileName_system_sysPath = "./examples/model_correction/a22f0n00.lola";
-    //String fileName_trace  = "./examples/model_correction/a22f0n05.log_100.txt";
+    String fileName_system_sysPath = "./examples/model_correction/a22f0n00.lola";
+    String fileName_trace  = "./examples/model_correction/a22f0n05.log_100.txt";
     //String fileName_trace  = "./examples/model_correction/a22f0n05.log.txt";
 
     
@@ -1086,111 +1442,25 @@ public class EventStructureReplay {
       sysModel = PetriNetIO.readNetFromFile(fileName_system_sysPath);
     }
     
-    sysModel.makeNormalNet();
-    sysModel.turnIntoLabeledNet();
     
-    EventStructureReplay replay = new EventStructureReplay(sysModel);
-
-    Uma.out.println("build up event structure");
-    int tNum = 0;
-    for (String[] trace : allTraces) {
-      tNum++;
-      replay.extendByTrace(trace);
-      
-      System.out.print(".");
-      if (tNum % 60 == 0) System.out.println(tNum);
-    }
-    Uma.out.println(replay.es.allEvents.size()+" events");
-
-    Uma.out.println("remove transitive dependencies");
-    replay.es.removeTransitiveDependencies();
-    OcletIO_Out.writeFile(replay.es.toDot(replay.properNames), fileName_system_sysPath+"_es.dot");
+    EventStructureReplay_Trace replay = new EventStructureReplay_Trace(sysModel);
+    PetriNet net = replay.replay(allTraces, fileName_system_sysPath);
     
-    // -- not needed when conflicts are properly set during trace construction
-    Uma.out.println("refining conflicts");
-    replay.refineConflicts();
-    Uma.out.println("reduce transitive conflicts");
-    while (replay.es.reduceTransitiveConflicts()) {};
-    OcletIO_Out.writeFile(replay.es.toDot(replay.properNames), fileName_system_sysPath+"_es2.dot");
-
-    Uma.out.println("set single events");
-    replay.setSingleEvents();
-    Uma.out.println("identify ordering relations");
-    replay.getConcurrentEvents();
-    Uma.out.println("maximizing concurrency");
-    replay.extendConcurrency();
-    OcletIO_Out.writeFile(replay.es.toDot(replay.properNames), fileName_system_sysPath+"_es2b.dot");
-
-    Uma.out.println("reducing transitive conflicts");
-    replay.es.reduceTransitiveConflicts();
-    Uma.out.println("reducing transitive dependencies");
-    replay.es.removeTransitiveDependencies();
-    Uma.out.println("removing tau events");
-    replay.removeSuperFluousTauEvents();
-    //Uma.out.println("refining conflicts");
-    //replay.refineConflicts();
-    Uma.out.println("reducing transitive conflicts");
-    while (replay.es.reduceTransitiveConflicts()) {};
-    Uma.out.println("reducing transitive dependencies");
-    replay.es.removeTransitiveDependencies();
-    
-    OcletIO_Out.writeFile(replay.es.toDot(replay.properNames), fileName_system_sysPath+"_es3.dot");
-    
-    Uma.out.println("folding forward");
-    replay.foldForward();
-    //replay.removeSuperFluousTauEvents();
-    //replay.refineConflicts();
-    Uma.out.println("reducing transitive conflicts");
-    while (replay.es.reduceTransitiveConflicts()) {};
-    Uma.out.println("reducing transitive dependencies");
-    replay.es.removeTransitiveDependencies();
-    
-    OcletIO_Out.writeFile(replay.es.toDot(replay.properNames), fileName_system_sysPath+"_es4.dot");
-    
-    for (Event e : replay.es.allEvents) {
-      Set<DNode> ev = e.getAllPredecessors();
-      for (DNode e2 : ev) {
-        if (replay.es.inConflict(e, (Event)e2)) {
-          System.err.println("Error4: "+e+" #  "+e2);
-        }
-        if (replay.es.inDirectConflict(e, (Event)e2)) {
-          System.err.println("Error4: "+e+" #! "+e2);
-        }
-
-      }
-    }
-    
-    
-    Uma.out.println("localizing conflicts");
-    replay.makeConflictFansLocal();
-    //replay.removeSuperFluousTauEvents();
-    //replay.refineConflicts();
-    Uma.out.println("reducing transitive conflicts");
-    while (replay.es.reduceTransitiveConflicts()) {};
-    Uma.out.println("reducing transitive dependencies");
-    replay.es.removeTransitiveDependencies();
-    
-    OcletIO_Out.writeFile(replay.es.toDot(replay.properNames), fileName_system_sysPath+"_es5.dot");
-    
-    for (Event e : replay.es.allEvents) {
-      Set<DNode> ev = e.getAllPredecessors();
-      for (DNode e2 : ev) {
-        if (replay.es.inConflict(e, (Event)e2)) {
-          System.err.println("Error5: "+e+" #  "+e2);
-        }
-        if (replay.es.inDirectConflict(e, (Event)e2)) {
-          System.err.println("Error5: "+e+" #! "+e2);
-        }
-
-      }
-    }
-    
-    Uma.out.println("synthesizing Petri net from "+replay.es.allEvents.size()+" events");
-    SynthesisFromES synth = new SynthesisFromES(replay.properNames, fileName_system_sysPath);
-    PetriNet net = synth.synthesize(replay.es);
+    //ImplicitPlaces.findImplicitPlaces(net);
     
     PetriNetIO_Out.writeToFile(net, fileName_system_sysPath+"_refold", PetriNetIO_Out.FORMAT_DOT, 0);
     PetriNetIO_Out.writeToFile(net, fileName_system_sysPath+"_refold", PetriNetIO_Out.FORMAT_LOLA, 0);
   }
 
+  public static void writeFile(String s, String fileName) throws IOException {
+
+    // Create file 
+    FileWriter fstream = new FileWriter(fileName);
+    BufferedWriter out = new BufferedWriter(fstream);
+    
+    out.write(s);
+
+    //Close the output stream
+    out.close();
+  }
 }

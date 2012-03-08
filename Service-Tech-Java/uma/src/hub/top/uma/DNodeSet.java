@@ -122,7 +122,10 @@ public class DNodeSet {
 	  while (!queue.isEmpty()) {
 	    DNode d = queue.removeFirst();
 	    
-	    if (d.isEvent) allEvents.add(d);
+	    if (d.isEvent) {
+	      if (allEvents.contains(d)) System.out.println(d+" already in");
+	      else allEvents.add(d);
+	    }
 	    //if (!d.isEvent && !initialConditions.contains(d)) allConditions.add(d);
 	    
 	    if (d.pre != null)
@@ -919,6 +922,8 @@ public class DNodeSet {
 				b.append("  c"+n.globalId+" ["+antiFillString+"]\n");
       else if (n.isCutOff)
         b.append("  c"+n.globalId+" ["+cutOffFillString+"]\n");
+      else if (n.isImplied)
+        b.append("  c"+n.globalId+" ["+impliedFillString+"]\n");
 			else
 				b.append("  c"+n.globalId+" []\n");
 			
@@ -977,8 +982,9 @@ public class DNodeSet {
 		// finally, print all edges
 		b.append("\n\n");
 		b.append(" edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black];\n");
-		for (DNode n : allConditions) {
+		for (DNode n : getAllNodes()) {
 			String prefix = n.isEvent ? "e" : "c";
+			
 			for (int i=0; i<n.pre.length; i++) {
 				if (n.pre[i] == null) continue;
 				if (!option_printAnti && n.isAnti) continue;
@@ -994,24 +1000,6 @@ public class DNodeSet {
 					b.append("  c"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0 "+rgbColorString+"]\n");
 			}
 		}
-    for (DNode n : allEvents) {
-      String prefix = n.isEvent ? "e" : "c";
-      for (int i=0; i<n.pre.length; i++) {
-        if (n.pre[i] == null) continue;
-        if (!option_printAnti && n.isAnti) continue;
-        
-        String rgbColorString = "";
-        if (coloring.containsKey(n)) {
-          rgbColorString = "color="+coloring.get(n);
-        }
-        
-        if (n.pre[i].isEvent)
-          b.append("  e"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0 "+rgbColorString+"]\n");
-        else
-          b.append("  c"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0 "+rgbColorString+"]\n");
-      }
-    }
-
 		
 		b.append("}");
 		return b.toString();

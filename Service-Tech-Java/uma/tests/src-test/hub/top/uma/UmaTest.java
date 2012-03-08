@@ -9,14 +9,12 @@ import hub.top.petrinet.unfold.DNodeSys_PetriNet;
 import hub.top.scenario.DNodeSys_OcletSpecification;
 import hub.top.scenario.Oclet;
 import hub.top.scenario.OcletIO;
+import hub.top.scenario.OcletIO_Out;
 import hub.top.scenario.OcletSpecification;
 import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.synthesis.NetSynthesis;
 
 import java.io.IOException;
-import java.util.Map.Entry;
-
-import com.google.gwt.dev.util.collect.HashSet;
 
 public class UmaTest extends hub.top.test.TestCase {
 	
@@ -73,7 +71,7 @@ public class UmaTest extends hub.top.test.TestCase {
       
       while (build.step() > 0);
       
-      OcletIO.writeFile(build.toDot(), testFileRoot+"/net_lexik.bp.dot");
+      OcletIO_Out.writeFile(build.toDot(), testFileRoot+"/net_lexik.bp.dot");
       
       int cutOffCount = 0;
       for (DNode e : build.getBranchingProcess().allEvents) {
@@ -507,8 +505,8 @@ public class UmaTest extends hub.top.test.TestCase {
           
           boolean co1 = build.co.get(d).contains(d2);
           boolean co2 = build.co.get(d2).contains(d);
-          boolean co3 = build.areConcurrent_struct(d, d2);
-          boolean co4 = build.areConcurrent_struct(d2, d);
+          boolean co3 = build.areConcurrent_struct(d, d2) == DNodeBP.REL_CO;
+          boolean co4 = build.areConcurrent_struct(d2, d) == DNodeBP.REL_CO;
           
           assertTrue(lastTest + " # symmetric co relation", co1 == co2);
           assertTrue(lastTest + " # symmetric co structural", co3 == co4);

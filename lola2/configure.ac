@@ -17,6 +17,9 @@ AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
+${CFLAGS="-g"}
+${CXXFLAGS="-g"}
+
 # check for standard programs needed to compile
 AC_PROG_CXX
 AM_PROG_CC_C_O

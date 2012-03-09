@@ -28,6 +28,12 @@ void setSignificantPlaces()
     // save number of places
     const index_t cardPL = Net::Card[PL];
 
+    if (cardPL < 2) {
+        // nohing to do
+        Place::CardSignificant = cardPL;
+        return;
+    }
+
     // request memory for one full row
     index_t* newVar = (index_t*) calloc(cardPL, SIZEOF_INDEX_T);
     int64_t* newCoef = (int64_t*) calloc(cardPL, sizeof(int64_t));
@@ -112,7 +118,7 @@ void setSignificantPlaces()
 
     // reduce matrix
     m.reduce();
-
+    
     // gather significant places
     Place::CardSignificant = 0;
     index_t lastSignificant = cardPL - 1;

@@ -29,6 +29,9 @@
 #include "InputOutput.h"
 
 #include "Store.h"
+#include "BinStore.h"
+#include "Firelist.h"
+#include "SimpleProperty.h"
 #include "BDDStore.h"
 #include "BinStore.h"
 
@@ -185,6 +188,13 @@ int main(int argc, char** argv)
         Output namefile("compressed net", std::string(args_info.writeCompressed_arg) + ".names");
         WriteNameFile(namefile);
     }
+
+    //BinStore bs;
+    Firelist fl;
+
+    SimpleProperty p;
+
+    //if(p.depth_first(bs,fl)) printf("\nyes\n"); else printf("\nno\n");
 
     /*
         Store *s = new BDDStore();

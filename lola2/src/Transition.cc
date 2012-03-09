@@ -89,6 +89,7 @@ void Transition::checkEnabled(index_t t)
                 // enabled --> disabled: insert to scapegoat's disabled list
                 Transition::Enabled[t] = false;
                 --Transition::CardEnabled;
+ 		assert(Place::CardDisabled[scapegoat] <= Net::CardArcs[PL][POST][scapegoat]);
                 Place::Disabled[scapegoat][Transition::PositionScapegoat[t] = Place::CardDisabled[scapegoat]++] = t;
 
                 // swap scapegoat to front of transition's PRE list

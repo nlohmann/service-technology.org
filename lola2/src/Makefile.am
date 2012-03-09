@@ -1,6 +1,9 @@
 # the main program
 bin_PROGRAMS = lola listener killer
 
+lola_CFLAGS = -g
+lola_CXXFLAGS = -g
+
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
                 ArcList.cc ArcList.h \

@@ -14,6 +14,7 @@
 #include "Marking.h"
 #include "swap.h"
 
+bool is_consistent();
 void swapPlaces(index_t left,index_t right)
 {
 	// 1. Net data structures
@@ -21,6 +22,7 @@ void swapPlaces(index_t left,index_t right)
 	char * tempname = Net::Name[PL][left];
 	Net::Name[PL][left] = Net::Name[PL][right];
 	Net::Name[PL][right] = tempname;
+	assert(is_consistent());
 
 	for(int direction = PRE; direction <= POST; ++direction )
 	{
@@ -35,20 +37,25 @@ void swapPlaces(index_t left,index_t right)
 		mult_t * tempmultpointer = Net::Mult[PL][direction][left];
 		Net::Mult[PL][direction][left] = Net::Mult[PL][direction][right];
 		Net::Mult[PL][direction][right] = tempmultpointer;
+	}
 
-		// the tricky part of 1.: references to left and right in transition arc lists
+	// the tricky part of 1.: references to left and right in transition arc lists
 
-		// It is tricky because both places may refer to the same transition, so we do not
-		// trivially known whether a change has already been done. Scanning through all transitions
-		// rather than the environments of left and right is too costly, so we chose to go
-		// through all transitions in the environment of one transition twice with setting temporary indices in the
-		// first run.
+	// It is tricky because both places may refer to the same transition, so we do not
+	// trivially known whether a change has already been done. Scanning through all transitions
+	// rather than the environments of left and right is too costly, so we chose to go
+	// through all transitions in the environment of one transition twice with setting temporary indices in the
+	// first run.
 
-		// first run left
-		for(index_t a = 0; a < Net::CardArcs[PL][direction][left]; ++a)
+	// Part of the trick is that all Net:: information for place left is already at index right
+
+	// first run left
+	for(int direction = PRE; direction <= POST ; ++direction)
+	{
+		for(index_t a = 0; a < Net::CardArcs[PL][direction][right]; ++a)
 		{
 			direction_t otherdirection = (direction ==PRE) ? POST : PRE ; 
-			const index_t t = Net::Arc[PL][direction][left][a];
+			const index_t t = Net::Arc[PL][direction][right][a];
 			for(index_t b = 0; b < Net::CardArcs[TR][otherdirection][t]; b++)
 			{
 				if(Net::Arc[TR][otherdirection][t][b] == left)
@@ -57,11 +64,14 @@ void swapPlaces(index_t left,index_t right)
 				}
 			}
 		}
-		// only run right
-		for(index_t a = 0; a < Net::CardArcs[PL][direction][right]; ++a)
+	}
+	// only run right
+	for(int direction = PRE; direction <= POST ; ++direction)
+	{
+		for(index_t a = 0; a < Net::CardArcs[PL][direction][left]; ++a)
 		{
 			direction_t otherdirection = (direction ==PRE) ? POST : PRE ; 
-			const index_t t = Net::Arc[PL][direction][right][a];
+			const index_t t = Net::Arc[PL][direction][left][a];
 			for(index_t b = 0; b < Net::CardArcs[TR][otherdirection][t]; b++)
 			{
 				if(Net::Arc[TR][otherdirection][t][b] == right)
@@ -70,11 +80,14 @@ void swapPlaces(index_t left,index_t right)
 				}
 			}
 		}
-		// second run left
-		for(index_t a = 0; a < Net::CardArcs[PL][direction][left]; ++a)
+	}
+	// second run left
+	for(int direction = PRE; direction <= POST ; ++direction)
+	{
+		for(index_t a = 0; a < Net::CardArcs[PL][direction][right]; ++a)
 		{
 			direction_t otherdirection = (direction ==PRE) ? POST : PRE ; 
-			const index_t t = Net::Arc[PL][direction][left][a];
+			const index_t t = Net::Arc[PL][direction][right][a];
 			for(index_t b = 0; b < Net::CardArcs[TR][otherdirection][t]; b++)
 			{
 				if(Net::Arc[TR][otherdirection][t][b] == Net::Card[PL])
@@ -84,6 +97,7 @@ void swapPlaces(index_t left,index_t right)
 			}
 		}
 	}
+	assert(is_consistent());
 	
 	// 2. Place data structures
 
@@ -129,15 +143,16 @@ void swapPlaces(index_t left,index_t right)
 
 	// 4. Transition data structures
 
-	for(int direction = PRE; direction <= POST; ++direction)
-	{
-		// again, the tricky way...
+	// again, the tricky way...
+	// Part of the trick is that all Net:: information for place left is already at index right
 
-		// first run left
-		for(index_t a = 0; a < Net::CardArcs[PL][direction][left]; ++a)
+	// first run left
+	for(int direction = PRE; direction <= POST ; ++direction)
+	{
+		for(index_t a = 0; a < Net::CardArcs[PL][direction][right]; ++a)
 		{
 			direction_t otherdirection = (direction ==PRE) ? POST : PRE ; 
-			const index_t t = Net::Arc[PL][direction][left][a];
+			const index_t t = Net::Arc[PL][direction][right][a];
 			for(index_t b = 0; b < Transition::CardDeltaT[otherdirection][t]; b++)
 			{
 				if(Transition::DeltaT[otherdirection][t][b] == left)
@@ -146,11 +161,14 @@ void swapPlaces(index_t left,index_t right)
 				}
 			}
 		}
-		// only run right
-		for(index_t a = 0; a < Net::CardArcs[PL][direction][right]; ++a)
+	}
+	// only run right
+	for(int direction = PRE; direction <= POST ; ++direction)
+	{
+		for(index_t a = 0; a < Net::CardArcs[PL][direction][left]; ++a)
 		{
 			direction_t otherdirection = (direction ==PRE) ? POST : PRE ; 
-			const index_t t = Net::Arc[PL][direction][right][a];
+			const index_t t = Net::Arc[PL][direction][left][a];
 			for(index_t b = 0; b < Transition::CardDeltaT[otherdirection][t]; b++)
 			{
 				if(Transition::DeltaT[otherdirection][t][b] == right)
@@ -159,11 +177,14 @@ void swapPlaces(index_t left,index_t right)
 				}
 			}
 		}
+	}
+	for(int direction = PRE; direction <= POST ; ++direction)
+	{
 		// second run left
-		for(index_t a = 0; a < Net::CardArcs[PL][direction][left]; ++a)
+		for(index_t a = 0; a < Net::CardArcs[PL][direction][right]; ++a)
 		{
 			direction_t otherdirection = (direction ==PRE) ? POST : PRE ; 
-			const index_t t = Net::Arc[PL][direction][left][a];
+			const index_t t = Net::Arc[PL][direction][right][a];
 			for(index_t b = 0; b < Transition::CardDeltaT[otherdirection][t]; b++)
 			{
 				if(Transition::DeltaT[otherdirection][t][b] == Net::Card[PL])
@@ -173,9 +194,38 @@ void swapPlaces(index_t left,index_t right)
 			}
 		}
 	}
-	
-	
-	
-	
+	assert(is_consistent());
+}
 
+bool is_consistent()
+{
+	for(int type = PL; type <= TR; ++type)
+	{
+		node_t othertype = (type == PL) ? TR : PL;
+		for(int direction = PRE; direction <= POST; direction++)
+		{
+			direction_t otherdirection = (direction == PRE)? POST : PRE;
+			for(index_t n = 0; n < Net::Card[type] ; n ++)
+			{
+				for(index_t a=0;a<Net::CardArcs[type][direction][n]; a++)
+				{
+					index_t nn = Net::Arc[type][direction][n][a];
+					index_t b;
+					for(b=0;b < Net::CardArcs[othertype][otherdirection][nn];b++)
+					{
+						if(Net::Arc[othertype][otherdirection][nn][b] == n)
+						{
+							break;
+						}
+					}
+					if(b >= Net::CardArcs[othertype][otherdirection][nn])
+					{
+						return false;
+					}
+				}
+				
+			}
+		}
+	}
+	return true;
 }

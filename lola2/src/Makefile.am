@@ -4,11 +4,12 @@ bin_PROGRAMS = lola listener killer
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
                 ArcList.cc ArcList.h \
-		BinStore.h BinStore.cc \
+                BinStore.h BinStore.cc \
                 BDDStore.cc BDDStore.h \
                 CompressedIO.cc CompressedIO.h \
                 Dimensions.h \
                 FairnessAssumptions.h \
+                Firelist.cc Firelist.h \
                 Handlers.cc Handlers.h \
                 InputOutput.cc InputOutput.h \
                 Marking.cc Marking.h \
@@ -20,11 +21,13 @@ lola_SOURCES = \
                 RandomWalk.cc RandomWalk.h \
                 Reporter.cc Reporter.h \
                 LinearAlgebra.cc LinearAlgebra.h \
+                SearchStack.cc SearchStack.h \
+                SimpleProperty.cc SimpleProperty.h \
                 StructuralReduction.cc StructuralReduction.h \
                 Socket.cc Socket.h \
                 SimpleString.cc SimpleString.h \
                 Store.h \
-		swap.h swap.cc \
+                swap.h swap.cc \
                 Symbol.cc Symbol.h \
                 SymbolTable.cc SymbolTable.h \
                 Transition.cc Transition.h \

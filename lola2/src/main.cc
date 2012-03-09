@@ -30,6 +30,10 @@
 
 #include "Store.h"
 #include "BDDStore.h"
+#include "BinStore.h"
+
+#include "Firelist.h"
+
 
 extern ParserPTNet* ParserPTNetLoLA();
 
@@ -186,6 +190,9 @@ int main(int argc, char** argv)
         Store *s = new BDDStore();
         s->searchAndInsert();
     */
+
+    Store *s = new BinStore();
+    Firelist *f = new Firelist();
 
     return EXIT_SUCCESS;
 }

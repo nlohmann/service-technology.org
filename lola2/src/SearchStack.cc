@@ -5,6 +5,8 @@
 \brief organizes the search stack for dfs or bfs
 */
 
+#include <cstdlib>
+
 #include "Dimensions.h"
 #include "SearchStack.h"
 

@@ -42,39 +42,39 @@ void State::output() {
 
     std::map<unsigned int, bool> seen;
 
-    output(0, seen);
+    stateSpace[0]->output(seen);
 }
 
-void State::output(unsigned int stateNo, std::map<unsigned int, bool>& seen) {
+void State::output(std::map<unsigned int, bool>& seen) {
 
     using namespace std;
 
-    if (not seen[stateNo]) {
-        seen[stateNo] = true;
+    if (not seen[number]) {
+        seen[number] = true;
 
-        shared_ptr<State> state(stateSpace[stateNo]);
+        //shared_ptr<State> state(stateSpace[stateNo]);
 
         // first: output all successors
-        if (state->transitions.get() != 0) {
-            for (ListOfPairs::List_ptr transition = state->transitions;
+        if (transitions.get() != 0) {
+            for (ListOfPairs::List_ptr transition = transitions;
                     transition.get() != 0;
-                    output(transition->getValue()->getSecond(), seen), transition =
+                    stateSpace[transition->getValue()->getSecond()]->output(seen), transition =
                         transition->getNext())
                 ;
 
         }
 
-        cout << "STATE " << state->index << " Lowlink: " << state->lowlink;
-        if (state->sccmember.get() != 0) {
+        cout << "STATE " << index << " Lowlink: " << lowlink;
+        if (sccmember.get() != 0) {
             cout << " SCC:";
-            for (List<unsigned int>::List_ptr next = state->sccmember;
+            for (List<unsigned int>::List_ptr next = sccmember;
                     next.get() != 0; cout << " " << next->getValue(), next =
                         next->getNext())
                 ;
         }
-        if (state->marking.get() != 0) {
+        if (marking.get() != 0) {
             bool first = true;
-            for (ListOfPairs::List_ptr marking = state->marking;
+            for (ListOfPairs::List_ptr marking = this->marking;
                     marking.get() != 0;
                     cout << (first ? "" : ",") << endl
                     << marking->getValue()->getFirst() << " : "
@@ -84,8 +84,8 @@ void State::output(unsigned int stateNo, std::map<unsigned int, bool>& seen) {
 
         }
         cout << endl;
-        if (state->transitions.get() != 0) {
-            for (ListOfPairs::List_ptr transition = state->transitions;
+        if (transitions.get() != 0) {
+            for (ListOfPairs::List_ptr transition = transitions;
                     transition.get() != 0;
                     cout
                     << endl
@@ -111,7 +111,7 @@ bool State::checkFinalReachable() {
     do {
         old_count = count;
         count = 0;
-        result = checkFinalReachable(0, seen, count);
+        result = stateSpace[0]->checkFinalReachable(seen, count);
         seen.clear();
     } while (count > old_count);
     status("There are %d state(s) for which a final state is reachable.",
@@ -119,20 +119,18 @@ bool State::checkFinalReachable() {
     return result;
 }
 
-bool State::checkFinalReachable(unsigned int stateNo,
-                                std::map<unsigned int, bool>& seen , unsigned int & count) {
+bool State::checkFinalReachable(std::map<unsigned int, bool>& seen , unsigned int & count) {
 
-    shared_ptr<State> state = stateSpace[stateNo];
+    //shared_ptr<State> state = stateSpace[stateNo];
 
-    bool result = state->isFinal || state->finalReachable;
-    seen[stateNo] = true;
-    if (state->transitions.get() != 0) {
-        for (ListOfPairs::List_ptr transition = state->transitions;
+    bool result = isFinal || finalReachable;
+    seen[number] = true;
+    if (transitions.get() != 0) {
+        for (ListOfPairs::List_ptr transition = transitions;
                 transition.get() != 0; transition = transition->getNext()) {
 
             if (not seen[transition->getValue()->getSecond()]) {
-                bool resultstep = checkFinalReachable(
-                                      transition->getValue()->getSecond(), seen, count);
+                bool resultstep = stateSpace[transition->getValue()->getSecond()]->checkFinalReachable(seen, count);
                 result = result || resultstep;
             }
             result =
@@ -143,9 +141,22 @@ bool State::checkFinalReachable(unsigned int stateNo,
             ++count;
         }
     }
-    state->finalReachable = result;
+    finalReachable = result;
     return result;
 }
+
+void State::tauFolding() {
+
+    std::map< unsigned int, bool> seen;
+    // brauchen wir das überhaupt?
+    std::map< unsigned int, bool> statesFolded;
+}
+
+ListOfPairs::List_ptr State::taufolding(std::map<unsigned int, bool>& seen, std::map<unsigned int, bool>& statesFolded) {
+
+    // hier einfach ne Schleife, die alles erkennt?
+}
+
 
 void State::calculateSCC() {
     unsigned int index = 0;
@@ -153,40 +164,40 @@ void State::calculateSCC() {
 
     std::map<unsigned int, bool> seen;
     std::list<unsigned int> stack;
-    calculateSCC(0, index, lowlink, seen, stack);
+    stateSpace[0]->calculateSCC(index, lowlink, seen, stack);
 }
 
-void State::calculateSCC(unsigned int stateNo, unsigned int& index,
+void State::calculateSCC(unsigned int& index,
                          unsigned int& lowlink, std::map<unsigned int, bool>& seen
                          , std::list<unsigned int>& stack) {
-    shared_ptr<State> state = stateSpace[stateNo];
+    // shared_ptr<State> state = stateSpace[stateNo];
 
-    seen[stateNo] = true;
+    seen[number] = true;
 
-    state->index = index;
-    state->lowlink = index;
+    this->index = index;
+    this->lowlink = index;
     ++index;
 
-    stack.push_front(state->index);
+    stack.push_front(this->index);
 
-    for (ListOfPairs::List_ptr transition = state->transitions;
+    for (ListOfPairs::List_ptr transition = transitions;
             transition.get() != 0; transition = transition->getNext()) {
         shared_ptr<State> successor =
             stateSpace[transition->getValue()->getSecond()];
         if (not seen[successor->number]) {
-            calculateSCC(successor->number, index, lowlink, seen, stack);
-            state->lowlink =
-                (state->lowlink < successor->lowlink) ?
-                state->lowlink : successor->lowlink;
+            successor->calculateSCC(index, lowlink, seen, stack);
+            this->lowlink =
+                (this->lowlink < successor->lowlink) ?
+                this->lowlink : successor->lowlink;
         } else if (find(stack.begin(), stack.end(), successor->index)
                    != stack.end()) {
-            state->lowlink =
-                (state->lowlink < successor->index) ?
-                state->lowlink : successor->index;
+            this->lowlink =
+                (this->lowlink < successor->index) ?
+                this->lowlink : successor->index;
         }
     }
 
-    if (state->lowlink == state->index) {
+    if (this->lowlink == this->index) {
         List<unsigned int>::List_ptr newSCC;
         unsigned int w = 0;
         do {
@@ -198,11 +209,11 @@ void State::calculateSCC(unsigned int stateNo, unsigned int& index,
             } else {
                 newSCC->push_back(w);
             }
-        } while (w != state->index);
-        state->sccmember = newSCC;
+        } while (w != this->index);
+        this->sccmember = newSCC;
 
     } else {
-        state->sccmember = List<unsigned int>::List_ptr();
+        this->sccmember = List<unsigned int>::List_ptr();
     }
 
 }
@@ -217,7 +228,7 @@ void State::prune() {
         std::map<unsigned int, bool> seen;
         std::map<unsigned int, bool> active;
         old_count = count;
-        prune(0, seen, active, count);
+        stateSpace[0]->prune(seen, active, count);
         status("removed %d transitions in iteration", count - old_count);
 //        sum += count;
         calculateSCC();
@@ -226,23 +237,23 @@ void State::prune() {
     status("removed %d transitions in total", count);
 }
 
-void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
+void State::prune(std::map<unsigned int, bool>& seen
                   , std::map<unsigned int, bool>& active, unsigned int & count) {
 
-    shared_ptr<State> state = stateSpace[stateNo];
+    // shared_ptr<State> state = stateSpace[stateNo];
 
     ListOfPairs::List_ptr newTransitions;
-    bool finalReachable = false || state->isFinal;
-    bool finalEnforceable = false || state->isFinal;
+    bool finalReachable = false || isFinal;
+    bool finalEnforceable = false || isFinal;
 
     // now we have seen this state
-    seen[stateNo] = true;
-    active[stateNo] = true;
+    seen[number] = true;
+    active[number] = true;
     // if it has transitions, process successors
-    if (state->transitions.get() != 0) {
+    if (transitions.get() != 0) {
         //expect to be true, may be changed by transitions
         finalEnforceable = true;
-        for (ListOfPairs::List_ptr transition = state->transitions;
+        for (ListOfPairs::List_ptr transition = transitions;
                 transition.get() != 0; transition = transition->getNext()) {
 
             // expect to keep the transition
@@ -256,7 +267,7 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
 
             // if final state is not even reachable, we do not need to follow it,
             // if under control of controller port
-            if (state->finalReachable && (not successor->finalReachable)
+            if (this->finalReachable && (not successor->finalReachable)
                     && (abstractedSync[transition->getValue()->getFirst()] != "")) {
                 keepTransition = false;
 //                status(
@@ -268,14 +279,20 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
 
                 // if we have no seen the successor so far, process
                 if (not seen[successor->number]) {
+
+
+                    //Do the same for incoming messages ... we do not need states we never wanna reach
+
+
+
                     // first check, if we would violate mb
 //                    status("Label: %s, In: %s, Out: %s, Sync: %s", transitionname.c_str(), remainingIn[transitionname].c_str(), remainingOut[transitionname].c_str(), remainingSync[transitionname].c_str());
                     // copy message count, if not receiving or sync transition
                     if (remainingIn[transitionname] == ""
                             && remainingSync[transitionname] == "") {
 //                        status("It's neither a receiving nor a sync transition for the interface");
-                        successor->messages = state->messages;
-                        successor->lastMessagesReset = state->lastMessagesReset;
+                        successor->messages = messages;
+                        successor->lastMessagesReset = lastMessagesReset;
                     } else {
                         successor->lastMessagesReset = successor->number;
                     }
@@ -288,7 +305,7 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
                     if (successor->messages[remainingOut[transitionname]]
                             <= messageBound) {
                         // messeage bound is okay, so go on
-                        prune(successor->number, seen, active, count);
+                        successor->prune(seen, active, count);
 
                     } else {
                         // message bound is violate, so from successor final state
@@ -306,11 +323,11 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
                     // check for message bound violations
                     // is it a circle?
                     if (successor->lastMessagesReset
-                            == state->lastMessagesReset) {
+                            == lastMessagesReset) {
                         if (active[successor->number]) {
                             for (std::map<std::string, unsigned int>::const_iterator message =
-                                        state->messages.begin();
-                                    message != state->messages.end();
+                                        messages.begin();
+                                    message != messages.end();
                                     ++message) {
                                 // if there is a difference, then its bad!
                                 if (message->second
@@ -330,8 +347,8 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
                             // not a circle ... non-deterministic decision?
                             int smallerCount = 0;
                             for (std::map<std::string, unsigned int>::const_iterator message =
-                                        state->messages.begin();
-                                    message != state->messages.end();
+                                        messages.begin();
+                                    message != messages.end();
                                     ++message) {
                                 // if there is a difference, then its bad!
                                 if (message->second < successor->messages[message->first] ) {
@@ -347,7 +364,7 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
                                 keepTransition = false;
                                 status(
                                     "pruning from state %d to %d (cause label %s causes mbv on internal decision)",
-                                    stateNo,
+                                    number,
                                     successor->number,
                                     abstractedSync[transition->getValue()->getFirst()].c_str());
                             }
@@ -357,10 +374,10 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
                                     message != successor->messages.end();
                                     ++message) {
                                 // if there is a difference, then its bad!
-                                if (message->second < state->messages[message->first] ) {
+                                if (message->second < messages[message->first] ) {
                                     ++smallerCount;
                                 } else {
-                                    if (message->second > state->messages[message->first] ) {
+                                    if (message->second > messages[message->first] ) {
                                         smallerCount = 0;
                                         break;
                                     }
@@ -370,7 +387,7 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
                                 keepTransition = false;
                                 status(
                                     "pruning from state %d to %d (cause label %s causes mbv on internal decision)",
-                                    stateNo,
+                                    number,
                                     successor->number,
                                     abstractedSync[transition->getValue()->getFirst()].c_str());
                             }
@@ -390,7 +407,7 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
             // we keep it
             if (keepTransition) {
                 finalReachable = finalReachable || successor->finalReachable;
-                if (state->lowlink == successor->lowlink) {
+                if (lowlink == successor->lowlink) {
                     finalEnforceable = finalEnforceable
                                        && successor->finalReachable;
                 } else {
@@ -410,9 +427,9 @@ void State::prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
             }
         }
     }
-    state->finalReachable = finalReachable || state->isFinal; // || finalEnforceable;
-    state->finalEnforceable = finalEnforceable || state->isFinal;
-    state->transitions = newTransitions;
-    active[stateNo] = false;
+    this->finalReachable = finalReachable || this->isFinal; // || finalEnforceable;
+    this->finalEnforceable = finalEnforceable || this->isFinal;
+    transitions = newTransitions;
+    active[number] = false;
 
 }

@@ -39,6 +39,9 @@ public:
     calculateSCC();
 
     static void
+    tauFolding();
+
+    static void
     prune();
 
 private:
@@ -54,19 +57,17 @@ private:
     List<unsigned int>::List_ptr sccmember;
     std::map<std::string, unsigned int> messages;
 
-    static bool
-    checkFinalReachable(unsigned int stateNo, std::map<unsigned int, bool>& seen
+    bool checkFinalReachable(std::map<unsigned int, bool>& seen
                         , unsigned int & count);
 
-    static void
-    calculateSCC(unsigned int stateNo, unsigned int& index, unsigned int& lowlink,
+    void calculateSCC(unsigned int& index, unsigned int& lowlink,
                  std::map<unsigned int, bool>& seen, std::list<unsigned int>& stack);
 
-    static void
-    output(unsigned int stateNo, std::map<unsigned int, bool>& seen);
+    void output(std::map<unsigned int, bool>& seen);
 
-    static void
-    prune(unsigned int stateNo, std::map<unsigned int, bool>& seen
+    ListOfPairs::List_ptr taufolding(std::map<unsigned int, bool>& seen, std::map<unsigned int, bool>& statesFolded);
+
+    void prune(std::map<unsigned int, bool>& seen
           , std::map<unsigned int, bool>& active, unsigned int & count);
 
 };

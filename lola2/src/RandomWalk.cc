@@ -53,6 +53,7 @@ void randomWalk(int transitions)
             assert(Transition::Enabled[t]);
             printf(" firing %s\n", Net::Name[TR][t]);
             Transition::fire(t);
+            Transition::updateEnabled(t);
 
             // early abortion
             if (transitions != 0 and (++firedTransitions >= transitions))

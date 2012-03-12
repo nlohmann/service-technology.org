@@ -22,7 +22,7 @@
 #define SIZEOF_SYMBOLTABLE 0x10000
 
 /// number of entries in a hash table for markings
-#define SIZEOF_MARKINGTABLE 2
+#define SIZEOF_MARKINGTABLE 0x100000
 
 /// number of stack frames in one chunk of the search stack, better be power of two
 #define SIZEOF_STACKCHUNK 0x1000

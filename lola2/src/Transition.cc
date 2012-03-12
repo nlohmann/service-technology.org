@@ -180,6 +180,10 @@ void Transition::fire(index_t t)
     // 2. update hash value
     Marking::HashCurrent += Transition::DeltaHash[t];
     Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
+    while( Marking::HashCurrent < 0)
+    {
+	Marking::HashCurrent += SIZEOF_MARKINGTABLE;
+    }
 }
 
 /// update enabledness information after having fired a transition
@@ -232,6 +236,10 @@ void Transition::backfire(index_t t)
     // 2. update hash value
     Marking::HashCurrent -= Transition::DeltaHash[t];
     Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
+    while( Marking::HashCurrent < 0)
+    {
+	Marking::HashCurrent += SIZEOF_MARKINGTABLE;
+    }
 
 }
 

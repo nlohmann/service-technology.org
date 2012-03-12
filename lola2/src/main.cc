@@ -189,15 +189,16 @@ int main(int argc, char** argv)
         WriteNameFile(namefile);
     }
 
-/*
     BinStore bs;
     Firelist fl;
 
     SimpleProperty p;
 
+    if (!args_info.randomWalk_given)
+    {
     if(p.depth_first(bs,fl)) printf("\nyes\n"); else printf("\nno\n");
     printf("\n%u %u\n",bs.markings,bs.calls);
-*/
+    }
 
 
     return EXIT_SUCCESS;

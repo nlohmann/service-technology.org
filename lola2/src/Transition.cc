@@ -273,3 +273,21 @@ void Transition::revertEnabled(index_t t)
     }
 
 }
+
+bool testEnabled(index_t t)
+{
+	if(Transition::Enabled[t])
+	{
+		for(index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
+		{
+			index_t p = Net::Arc[TR][PRE][t][i];
+			if(Marking::Current[p] < Net::Mult[TR][PRE][t][i]) return false;
+		}
+	}
+	else
+	{
+		index_t p = Net::Arc[TR][PRE][t][0];
+		if(Marking::Current[p] >= Net::Mult[TR][PRE][t][0]) return false;
+	}
+	return true;
+}

@@ -13,6 +13,7 @@ repeatedly fire random transitions
 #include "Place.h"
 #include "Marking.h"
 
+
 void randomWalk(int transitions)
 {
     int firedTransitions = 0;
@@ -24,7 +25,6 @@ void randomWalk(int transitions)
         while (Transition::CardEnabled > 0)
         {
             // one iteration is for firing a single transition
-
             // 1. select transition
             index_t y = 0;
             for (index_t z = 0; z < Net::Card[TR]; z++)

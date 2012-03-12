@@ -92,7 +92,7 @@ bool isControllable(pnapi::PetriNet &net, bool useWendyOptimization) {
 	if(inControllability && line.compare("  result = false;")==0)
 		return false;
     }
-    printf(" moooeep \n");
+    printf("the wendy result file could not be correct analysed.\n");
     exit(-1);
     return false;
 }

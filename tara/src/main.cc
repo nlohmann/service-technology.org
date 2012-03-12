@@ -154,10 +154,17 @@ int main(int argc, char** argv) {
        unsigned int mod=(Tara::args_info.maxrandomcost_given)?Tara::args_info.maxrandomcost_arg-min+1:101-min;
        unsigned int cur=0;
 
+       //seed rand
+       bool seedGiven=Tara::args_info.randomseed_given;
+       unsigned int seed;
+       if(seedGiven)
+	       seed=(unsigned int) Tara::args_info.randomseed_arg;
+       else
+	       seed=time(NULL);
+
+       srand(seed);
+
        for(std::set<pnapi::Transition*>::iterator it=transitions.begin();it!=transitions.end();++it) {
-            // seed random by time and last random
-            srand(time(NULL)+cur+1);
- 
             //get next rand and pass it to partial cost function
             cur=min+(rand() % mod);
             Tara::partialCostFunction[*it]= cur; 

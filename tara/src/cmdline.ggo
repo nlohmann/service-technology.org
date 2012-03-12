@@ -79,6 +79,13 @@ option "minrandomcost" t
    int
    optional
 
+option "randomseed" -
+   "set the random seed, used for automated tests"
+   int
+   default="0"
+   optional
+   hidden
+
 section "Configuration"
 sectiondesc="Configuration files are used to control some options of Tara. Don't worry, a default configuration file is created and - if nothing else is specified - used. \n"
 

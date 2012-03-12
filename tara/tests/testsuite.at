@@ -21,6 +21,15 @@ AT_CHECK([TARA --version],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
+AT_SETUP([Wrong input files])
+AT_CHECK([cp TESTFILES/marvin3.cf .])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([TARA --net=marvin3.cf -f-r],1,ignore,ignore)
+AT_CHECK([TARA --net=myCoffee.owfn -f myCoffee.owfn],1,ignore,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
 AT_SETUP([Not controllable input net])
 AT_CHECK_WENDY
 AT_CHECK([cp TESTFILES/notControllable.owfn .])
@@ -73,6 +82,44 @@ AT_CHECK([TARA --net=myCoffeeCyclic.owfn --costfunction=marvin3.cf --heuristics=
 AT_CHECK([GREP -q "Minimal budget found: 7" stderr])
 AT_KEYWORDS(basic)
 AT_CLEANUP
+
+AT_SETUP([Minimal budget != 0, cyclic, heuristic lp])
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/myCoffeeCyclic.owfn .])
+AT_CHECK([cp TESTFILES/marvin3.cf .])
+AT_CHECK([TARA --net=myCoffeeCyclic.owfn --costfunction=marvin3.cf --heuristics=lp],0,ignore,stderr)
+AT_CHECK([GREP -q "Minimal budget found: 7" stderr])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Minimal budget != 0, cyclic, heuristic lp, concurrency=2])
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/myCoffeeCyclic.owfn .])
+AT_CHECK([cp TESTFILES/marvin3.cf .])
+AT_CHECK([TARA --net=myCoffeeCyclic.owfn --costfunction=marvin3.cf --heuristics=lp --concurrency=2],0,ignore,stderr)
+AT_CHECK([GREP -q "Minimal budget found: 7" stderr])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+AT_SETUP([simple alternatives, random costs, verbose])
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/simpleAlternative.owfn .])
+AT_CHECK([TARA --net=simpleAlternative.owfn --costfunction=-r --randomseed=0 -v],0,ignore,stderr)
+AT_CHECK([GREP -q "Minimal budget found: 32" stderr])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+AT_SETUP([Minimal budget != 0, 3ph control, og output])
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/phcontrol3.unf.owfn .])
+AT_CHECK([cp TESTFILES/phCosts.cf .])
+AT_CHECK([TARA --net=phcontrol3.unf.owfn --og=- --costfunction=phCosts.cf],0,stdout,ignore)
+AT_CHECK([GREP -q "statistics:   67 nodes, 67 SCSs" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
 
 
 

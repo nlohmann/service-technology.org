@@ -6,6 +6,7 @@
 */
 
 #include <cstdlib>
+#include <cstdio>
 
 #include "BinStore.h"
 #include "Marking.h"
@@ -14,13 +15,11 @@
 
 class State;
 
+
 BinStore::BinStore()
 {
-    for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
-    {
-        branch[i] = NULL;
-        firstvector[i] = NULL;
-    }
+	branch = (Decision **) calloc(SIZEOF_VOIDP,SIZEOF_MARKINGTABLE);
+	firstvector = (unsigned char **) calloc(SIZEOF_VOIDP,SIZEOF_MARKINGTABLE);
 }
 
 BinStore::~BinStore()
@@ -33,10 +32,12 @@ BinStore::~BinStore()
         }
         if (firstvector[i])
         {
-            delete firstvector[i];
+            free(firstvector[i]);
         }
 
     }
+    free(branch);
+    free(firstvector);
 }
 
 /// create a new branch in the decision tree at depth b.
@@ -46,7 +47,7 @@ BinStore::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NUL
 
 BinStore::Decision::~Decision()
 {
-    delete [] vector;
+    free(vector);
     if (nextnew)
     {
         delete nextnew;
@@ -64,111 +65,133 @@ BinStore::Decision::~Decision()
 
 bool BinStore::searchAndInsert()
 {
+	++calls;;
+    // the general assumption is that we read marking, vectors etc. left to right, with 
+    // low indices left, high indices right, 
+    // msb left and lsb right.
+
     /// If a new decision record is inserted, * anchor must point to it
     Decision** anchor;
 
     /// the vector we are currently investigating
     unsigned char* currentvector;
 
-    /// the the place where the new vector goes to
+    /// the place where the new vector goes to
     unsigned char** newvector;
 
-    /// the place we are currently ealing with
+    /// the place we are currently dealing with
     index_t place_index = 0;
 
     /// the bit of the place's marking we are currently dealing with
-    bitindex_t placebit_index = 0;
+    bitindex_t placebit_index = Place::CardBits[0] - 1; // indicates start with msb
 
     /// the byte in the vector we are currently dealing with
     bitindex_t vector_byte = 0;
 
     /// the bit within current byte of vector we are currently dealing with
-    unsigned short int vector_bit = 0;
+    unsigned short int vector_bit = 7; // bit is the shift width, so 7 indicates start with msb
 
     ///  the current bit if bits are counted through all places
+    /// This means, position is the current global depth in the decision tree
     bitindex_t position = 0;
 
-    /// the part of the marking that is not yet transformed to bits
-    capacity_t remainder = 0;
-
-    // Is hash bucket empty?
-    if (!(firstvector[Marking::HashCurrent]))
+    // Is hash bucket empty? If so, assign to currentvector
+    if (!(currentvector = (firstvector[Marking::HashCurrent])))
     {
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
-        place_index = 0;
-        placebit_index = 0;
-        remainder = Marking::Current[0];
-        position = 0;
         newvector = firstvector + Marking::HashCurrent;
     }
     else
     {
         // Here, hash bucket is not empty.
-        currentvector = firstvector[Marking::HashCurrent];
-        place_index = 0;
-        placebit_index = Place::CardBits[0] - 1;
         anchor = branch + Marking::HashCurrent;
 
-        // dive down in currentvector to first mismatch. No mismatch = state found
 
-        do
-        {
-            if ((remainder & (1 << placebit_index)) != (currentvector[vector_byte] & (1 << vector_bit)))
-            {
-                break;
-            }
-            ++position;
-            if (++vector_bit >= 8)
-            {
-                vector_bit = 0;
-                ++vector_byte;
-            }
-            if (placebit_index-- == 0)
-            {
-                place_index++;
-                if (place_index >= Place::CardSignificant)
-                {
-                    // no mismatch --> state found
-                    return true;
-                }
-                placebit_index = Place::CardBits[place_index] - 1;
-            }
-        }
-        while (true);
-        // here, we have the first mismatch to currentvector --> evaluate the branching tree:
-        // between two branches: state not found
-        // at some branch: switch to other currentvector
-        while (*anchor)
-        {
-            if (position == (*anchor)->bit)
-            {
-                // switch to other currentvector
-                anchor = &((* anchor) -> nextnew);
-                currentvector = (* anchor) -> vector;
-                vector_byte = 0;
-                vector_bit = 0;
-                ++position;
-                if (placebit_index-- == 0)
-                {
-                    place_index++;
-                    if (place_index >= Place::CardSignificant)
-                    {
-                        // no mismatch --> state found
-                        return true;
-                    }
-                    placebit_index = Place::CardBits[place_index] - 1;
-                }
-                continue;
+	while(true) // for various currentvectors do...
+	{
+        
+		while(true) // dive down in currentvector to first mismatch. No mismatch = state found
+		{
+		     // comparison of one bit between current marking and current vector
+		    if (((Marking::Current[place_index] & (1 << placebit_index))>>placebit_index) != ((currentvector[vector_byte] & (1 << vector_bit))>>vector_bit))
+		    {
+			// This is the mismatch we were looking for
+			break;
+		    }
 
-            }
-            if (position > (*anchor)->bit)
-            {
-                anchor = &((*anchor)->nextold);
-                continue;
-            }
-            assert(position < (*anchor)->bit);
-            break;
-        }
+		    // increment global bit counter
+		    ++position;
+
+		    // increment index in currentvector
+		    if (vector_bit-- == 0)
+		    {
+			vector_bit = 7;
+			++vector_byte;
+		    }
+		     //increment index in currentmarking
+		    if (placebit_index-- == 0)
+		    {
+			place_index++;
+			if (place_index >= Place::CardSignificant)
+			{
+			    // no mismatch --> state found
+			    return true;
+			}
+			placebit_index = Place::CardBits[place_index] - 1;
+		    }
+		}
+		// Arriving here, we have the first mismatch to currentvector 
+		// --> evaluate the branching tree:
+		// Mismatch between two branches: state not found
+		// Mismatch at some branch: switch to other currentvector
+		while (true)
+		{
+		    if(!*anchor) 
+		    {
+		    	goto insert; // no further branch
+		    }
+		    // mismatch exactly at branch?
+		    if (position == (*anchor)->bit)
+		    {
+			// switch to other currentvector 
+			currentvector = (* anchor) -> vector;
+			anchor = &((* anchor) -> nextnew);
+			// Indices in new vector start at msb in byte 0
+			vector_byte = 0;
+			vector_bit = 7;
+			++position;  // the mismatching bit is not represented in new vector
+				     // as it must be the opposite of the mismatching one in old vector
+
+			// forward one bit in current marking, as mismatching one is implicitly
+			// matched by the switch to new vector
+			if (placebit_index-- == 0)
+			{
+			    place_index++;
+			    if (place_index >= Place::CardSignificant)
+			    {
+				// no mismatch --> state found
+				return true;
+			    }
+			    placebit_index = Place::CardBits[place_index] - 1;
+			}
+			break; //goto next iteration of "for various currentvectors do"
+			       // since we need a new mismatch in new vector
+
+		    }
+		    // mismatch beyond branch
+		    if (position > (*anchor)->bit)
+		    {
+			// dive down in nextold list for next branch descending from current vector
+			anchor = &((*anchor)->nextold);
+			continue; // goto comparison between current mismatch and next branch
+		    }
+		    // arriving here, the mismatch is before next branch off current vector
+		    assert(position < (*anchor)->bit);
+		    goto insert;
+		}
+
+	}
+insert:
         // state not found --> prepare for insertion
         Decision* newdecision = new Decision(position);
         newdecision -> nextold = * anchor;
@@ -182,49 +205,81 @@ bool BinStore::searchAndInsert()
             place_index++;
             if (place_index >= Place::CardSignificant)
             {
-                // no mismatch --> state found
-                return true;
+                // new vector needs only 0 bits.
+		// Handle this manually as effect of malloc(0) is implementation dependent 
+		* newvector = NULL;
+		    ++markings;
+		return false;
             }
             placebit_index = Place::CardBits[place_index] - 1;
         }
     }
 
     // compress current marking into bitvector
-    // we assume that place_index, placebit_index, and remainer have the correct
+    // we assume that place_index, placebit_index, position have the correct
     // initial values
-    *newvector = new unsigned char [((Place::SizeOfBitVector - position) + 7) / 8];
+    *newvector = (unsigned char *) calloc (((Place::SizeOfBitVector - position) + 7) / 8, sizeof(unsigned char));
     vector_byte = 0;
-    vector_bit = 0;
-    while (place_index < Net::Card[PL])
+    vector_bit = 7;
+    while (true) // loop through place_index
     {
-        placebit_index = Place::CardBits[place_index] - 1;
-        do
+        while(true) // loop through placebit_index
         {
-            if (vector_bit == 0)
-            {
-                *newvector[vector_byte] = 0;
-            }
-            if (remainder / (1 << placebit_index))
-            {
-                //\todo conversion to ‘unsigned char’ from ‘int’ may alter its value
-                *newvector[vector_byte] |= 1 << vector_bit++;
-                remainder -= 1 << placebit_index;
-                if (vector_bit >= 8)
-                {
-                    vector_bit = 0;
-                    vector_byte ++;
-                }
-            }
+		if (Marking::Current[place_index] & (1 << placebit_index))
+		{
+		    assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);
+			//\todo conversion to ‘unsigned char’ from ‘int’ may alter its value
+			(*newvector)[vector_byte] |= 1 << vector_bit;
+		}
+		if (vector_bit-- == 0)
+		{
+		    vector_bit = 7;
+		    vector_byte ++;
+		}
+		if (placebit_index-- == 0) break;
         }
-        while (placebit_index-- != 0);
         ++place_index;
-        if (place_index >= Net::Card[PL])
-        {
-            break;
-        }
-        remainder = Marking::Current[place_index];
+	if(place_index >= Place::CardSignificant) break;
+	placebit_index = Place::CardBits[place_index] - 1;
     }
+
+		    ++markings;
     return false;
 }
 
 bool BinStore::searchAndInsert(State** result) {}
+
+
+void BinStore::pbs(unsigned int b, unsigned int p, unsigned char * f, void * v)
+{
+	
+		int i;
+		Decision * d = (Decision *) v;
+		if( d )	
+		{
+			pbs(d -> bit + 1, 0, d -> vector, d -> nextnew);
+		}
+		for(i = 0; i < b; i++) printf(" ");
+		for(; i <= (d? d->bit : Place::SizeOfBitVector -1); i++)
+		{
+			if(f[(i-b + p)/8] & (1 << (7-(i-b+p)%8))) printf("1"); else printf("0");
+		}
+		printf("\n");
+		
+		if( d )
+		{
+			pbs(d->bit + 1, p + d->bit -b +1, f , d -> nextold);
+		}
+}
+void BinStore::printBinStore()
+{
+	for(unsigned int i = 0; i < Place::CardSignificant; i++) printf("%s:%d ",Net::Name[PL][i],Marking::Current[i]);
+	printf("\n\n");
+	
+	for(unsigned int i = 0; i < SIZEOF_MARKINGTABLE;i++)
+	{
+		printf("\n hash value %u\n", i);
+		if(firstvector[i]) BinStore::pbs(0,0,firstvector[i],branch[i]);
+		printf("\n");
+	}
+}

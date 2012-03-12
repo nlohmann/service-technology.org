@@ -189,20 +189,19 @@ int main(int argc, char** argv)
         WriteNameFile(namefile);
     }
 
-    //BinStore bs;
+    BinStore bs;
     Firelist fl;
 
     SimpleProperty p;
 
-    //if(p.depth_first(bs,fl)) printf("\nyes\n"); else printf("\nno\n");
+    if(p.depth_first(bs,fl)) printf("\nyes\n"); else printf("\nno\n");
+    printf("\n%u %u\n",bs.markings,bs.calls);
 
     /*
         Store *s = new BDDStore();
         s->searchAndInsert();
     */
 
-    Store *s = new BinStore();
-    Firelist *f = new Firelist();
 
     return EXIT_SUCCESS;
 }

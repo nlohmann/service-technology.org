@@ -22,6 +22,8 @@ class BinStore : public Store
 
         /// check whether current marking is sted and return state
         virtual bool searchAndInsert(State** s);
+	void pbs(unsigned int, unsigned int, unsigned char *, void *);
+	void printBinStore();
     private:
         /// a binary decision node
         class Decision
@@ -37,9 +39,9 @@ class BinStore : public Store
 
         };
         // first branch in decision tree; NULL as long as less than two elements in bucket
-        Decision* branch[SIZEOF_MARKINGTABLE];
+        Decision** branch;
 
         // first vector in bucket; null as long as bucket empty
-        unsigned char* firstvector[SIZEOF_MARKINGTABLE];
+        unsigned char** firstvector;
 };
 

@@ -158,7 +158,7 @@ void Transition::checkEnabled(index_t t)
 }
 
 
-/// fire a transition and update enabledness of all transitions
+/// fire a transition and 
 void Transition::fire(index_t t)
 
 {
@@ -177,8 +177,15 @@ void Transition::fire(index_t t)
     {
         Marking::Current[Transition::DeltaT[POST][t][i]] += Transition::MultDeltaT[POST][t][i];
     }
+    // 2. update hash value
+    Marking::HashCurrent += Transition::DeltaHash[t];
+    Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
+}
 
-    // 2. check conflicting enabled transitions (tt) for enabledness
+/// update enabledness information after having fired a transition
+void Transition::updateEnabled( index_t t)
+{
+    // 1. check conflicting enabled transitions (tt) for enabledness
     for (index_t i = 0; i < Transition::CardConflicting[t]; i++)
     {
         const index_t tt = Transition::Conflicting[t][i];
@@ -187,10 +194,10 @@ void Transition::fire(index_t t)
             checkEnabled(tt);
         }
     }
-    // 2a. Don't forget to check t itself! It is not member of the conflicting list!
+    // 1a. Don't forget to check t itself! It is not member of the conflicting list!
     checkEnabled(t);
 
-    // 3. check those transitions where the scapegoat received additional tokens
+    // 2. check those transitions where the scapegoat received additional tokens
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
     {
         const index_t p = Transition::DeltaT[POST][t][i]; // one place that got new tokens
@@ -205,9 +212,6 @@ void Transition::fire(index_t t)
         }
     }
 
-    // 4. update hash value
-    Marking::HashCurrent += Transition::DeltaHash[t];
-    Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
 }
 
 /// fire a transition in reverse direction (for backtracking) and update enabledness of all transitions
@@ -220,13 +224,21 @@ void Transition::backfire(index_t t)
     }
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
     {
-        // there should be enough tokens to fire this transition
-        assert(Transition::DeltaT[POST][t][i] >= Transition::MultDeltaT[POST][t][i]);
+        // there should be enough tokens to backfire this transition
+        assert(Marking::Current[Transition::DeltaT[POST][t][i]] >= Transition::MultDeltaT[POST][t][i]);
 
         Marking::Current[Transition::DeltaT[POST][t][i]] -= Transition::MultDeltaT[POST][t][i];
     }
+    // 2. update hash value
+    Marking::HashCurrent -= Transition::DeltaHash[t];
+    Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
 
-    // 2. check backward conflicting enabled transitions for enabledness
+}
+
+/// update enabledness after having backfired a transition
+void Transition::revertEnabled(index_t t)
+{
+    // 1. check backward conflicting enabled transitions for enabledness
     for (index_t i = 0; i < Transition::CardBackConflicting[t]; i++)
     {
         const index_t tt = Transition::BackConflicting[t][i];
@@ -235,27 +247,21 @@ void Transition::backfire(index_t t)
             checkEnabled(tt);
         }
     }
+    checkEnabled(t);
 
-    // 3. check those transitions where the scapegoat received additional tokens
+    // 2. check those transitions where the scapegoat received additional tokens
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {
-        for (index_t j = 0; j < Place::CardDisabled[Transition::DeltaT[PRE][t][i]]; /* tricky increment handling */)
+        const index_t p = Transition::DeltaT[PRE][t][i]; // one place that got new tokens
+        for (index_t j = 0; j < Place::CardDisabled[p]; /* tricky increment handling */)
         {
-            const index_t tt = Transition::DeltaT[PRE][t][i];
-            checkEnabled(Place::Disabled[tt][j]);
-            if (!Transition::Enabled[tt])
+            const index_t tt = Place::Disabled[p][j];
+            checkEnabled(tt);
+            if (Place::Disabled[p][j] == tt)
             {
                 j++; /* tricky increment handling */
-            }
-            else
-            {
-                // in this case, checkEnabled decremente CardDisabled and swaps
-                // another transition to position j
             }
         }
     }
 
-    // 4. update hash value
-    Marking::HashCurrent -= Transition::DeltaHash[t];
-    Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
 }

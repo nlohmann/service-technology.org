@@ -6,6 +6,7 @@
 */
 
 #include <cstdlib>
+#include <cstdio>
 
 #include "Dimensions.h"
 #include "SearchStack.h"
@@ -30,6 +31,8 @@ void SearchStack::push(index_t c,index_t* f)
 
 void  SearchStack::pop(index_t * c, index_t ** f)
 {
+	* c = currentchunk -> current[(--StackPointer) % SIZEOF_STACKCHUNK];
+	* f = currentchunk -> list[StackPointer % SIZEOF_STACKCHUNK]; 
 	if((StackPointer % SIZEOF_STACKCHUNK) == 0)
 	{
 		// need to jump to previous chunk
@@ -37,6 +40,4 @@ void  SearchStack::pop(index_t * c, index_t ** f)
 		currentchunk = currentchunk -> prev;
 		delete tempchunk;
 	}
-	* c = currentchunk -> current[--StackPointer];
-	* f = currentchunk -> list[StackPointer]; 
 }

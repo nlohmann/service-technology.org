@@ -142,4 +142,12 @@ void setSignificantPlaces()
             swapPlaces(p, lastSignificant);
         }
     }
+
+    // adjust Place::SizeOfBitVector
+
+    Place::SizeOfBitVector = 0;
+    for(index_t i = 0; i < Place::CardSignificant;i++)
+    {
+	Place::SizeOfBitVector += Place::CardBits[i];
+    }
 }

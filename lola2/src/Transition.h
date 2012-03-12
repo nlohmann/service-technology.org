@@ -61,11 +61,17 @@ struct Transition
         /// Check transition for activation
         static void checkEnabled(index_t t);
 
-        /// fire a transition and update enabledness of all transitions
+        /// fire a transition 
         static void fire(index_t t);
 
-        /// fire a transition in reverse direction (for backtracking) and update enabledness of all transitions
+        /// update enabledness of all transitions
+        static void updateEnabled(index_t t);
+
+        /// fire a transition in reverse direction (for backtracking) 
         static void backfire(index_t t);
+
+        /// update enabledness of all transitions after backfiring
+        static void revertEnabled(index_t t);
 
         /// Aufräumen der Knoten - Service für valgrind
         static void deleteTransitions();

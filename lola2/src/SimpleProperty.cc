@@ -7,6 +7,7 @@ Actual property is virtual, default (base class) is full exploration
 */
 
 #include <cstring>
+#include <cstdio>
 
 #include "SimpleProperty.h"
 #include "SearchStack.h"
@@ -47,7 +48,6 @@ bool SimpleProperty::depth_first(Store & myStore, Firelist & myFirelist)
     // get first firelist
     index_t * currentFirelist;
     index_t currentEntry = myFirelist.getFirelist(&currentFirelist);
-
     // initialize search stack
     SearchStack stack;
 
@@ -60,17 +60,16 @@ bool SimpleProperty::depth_first(Store & myStore, Firelist & myFirelist)
             // fire this transition to produce new Marking::Current
             Transition::fire(currentFirelist[currentEntry]);
 
-            /// I really mean = and not ==
             if (myStore.searchAndInsert()) 
 	    {
                 // State exists! -->backtracking to previous state
                 Transition::backfire(currentFirelist[currentEntry]);
-
             } 
 	    else 
             {
                      // State does not exist!
 
+		     Transition::updateEnabled(currentFirelist[currentEntry]);
 		    // check current marking for property
 		    checkProperty(currentFirelist[currentEntry]);
 		    if(value)
@@ -87,13 +86,16 @@ bool SimpleProperty::depth_first(Store & myStore, Firelist & myFirelist)
         else 
         {
             // firing list completed -->close state and return to previous state
+	    delete [] currentFirelist;
 	    if(stack.StackPointer == 0)
             {
 		 // have completely processed initial marking --> state not found
 		 return false;
 	    }
 	    stack.pop(&currentEntry, &currentFirelist);
+	    assert(currentEntry < Net::Card[TR]);
             Transition::backfire(currentFirelist[currentEntry]);
+	    Transition::revertEnabled(currentFirelist[currentEntry]);
             updateProperty(currentFirelist[currentEntry]);
         }
     }

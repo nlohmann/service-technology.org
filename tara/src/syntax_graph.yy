@@ -162,11 +162,11 @@ transition:
   {
        if (currentState != $3) { // We do not need self loops
            
-	       unsigned int targetTaraState = getTaraState($3);
+           unsigned int targetTaraState = getTaraState($3);
            
            unsigned int oldTransition = Tara::graph[currentTaraState]->transitions.size();
            
-           for (int i = 0; i < Tara::graph[currentTaraState]->transitions.size(); ++i) {
+           for (unsigned int i = 0; i < Tara::graph[currentTaraState]->transitions.size(); ++i) {
                 if (Tara::graph[currentTaraState]->transitions[i].successor == targetTaraState) {
                     oldTransition = i;
 

@@ -11,8 +11,8 @@
  */
 class Parser {
     public:
-        Parser( int (*_yy_parse)(),  FILE** _file, int (*yy_lex_destroy)())
-            : yy_parse(_yy_parse), file(_file) { };
+        Parser( int (*_yy_parse)(),  FILE** _file, int (*_yy_lex_destroy)())
+            : yy_parse(_yy_parse), file(_file), yy_lex_destroy(_yy_lex_destroy) { };
 
        int parse(const char* filename);
 
@@ -22,11 +22,16 @@ class Parser {
        /// Parser object for costfunction
        static Parser costfunction;
     private:
-       /// The file pointer from yacc/bison file
-       FILE** file;
+
        /// pointer to parse function from yacc/bison file
        int (*yy_parse) ();
+
+       /// The file pointer from yacc/bison file
+       FILE** file;
+
+       /// the lex destroy function
        int (*yy_lex_destroy)();
+
 };
 
 #endif

@@ -51,6 +51,8 @@ public:
     /// evaluate the command line parameters
     static void evaluateParameters(int argc, char** argv);
 
+    static Output tempFile;
+
     /// The system used if the lp-heuristic is used
     static lprec* lp; 
 

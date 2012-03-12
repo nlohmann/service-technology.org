@@ -100,7 +100,7 @@ void iModification::init() {
   
    //iterate over all transitions of the net
    std::set<pnapi::Transition*> allTransitions=net->getTransitions();
-   for(std::set<pnapi::Transition*>::iterator it=allTransitions.begin();it!=allTransitions.end();it++) {
+   for(std::set<pnapi::Transition*>::iterator it=allTransitions.begin();it!=allTransitions.end();++it) {
 
       // the cost of that transition
       int curCost=Tara::cost(*it);

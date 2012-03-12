@@ -56,7 +56,7 @@ void terminationHandler() {
     if(Tara::args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
-        int i = system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+        int i=system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
     }
 }
 
@@ -64,8 +64,6 @@ void terminationHandler() {
 /// main-function
 int main(int argc, char** argv) {
     
-    time_t start_time, end_time;
-
     /*--------------------------------------.
     | 0. parse the command line parameters  |
     `--------------------------------------*/
@@ -109,31 +107,16 @@ int main(int argc, char** argv) {
     | 2. get most permissive Partner MP |
     `----------------------------------*/
 
-// TODO: renice this temp file stuff, maybe use Output class in an appropiate way?
-    std::string tempFN;
-     // create a temporary file
-#if defined(__MINGW32__)
-        tempFN = mktemp(basename(Tara::args_info.tmpfile_arg));
-#else
-        tempFN = mktemp(Tara::args_info.tmpfile_arg);
-#endif
-
-
-    std::string partnerTemp=tempFN+"-mp-partner.sa";
-
-    if(!isControllable((*Tara::net), partnerTemp, false) ) {
-	    message("Tara::net is not controllable. Exit.");
-	    exit(EXIT_FAILURE); // TODO maybe change return status, is this a failure ??
-    }
+    computeMP(*Tara::net, Tara::tempFile.name());
      
     // first create automaton partner
     pnapi::Automaton partner;
     std::ifstream partnerStream;
 
     //stream automaton
-    partnerStream.open(partnerTemp.c_str(), std::ifstream::in);
-    if(!partnerStream) { //TODO: is this check necessary ?
-        message("Tara::net is not controllable. Exit.");
+    partnerStream.open(Tara::tempFile.name().c_str(), std::ifstream::in);
+    if(!partnerStream) { 
+        message("net is not controllable. Exit.");
         exit(EXIT_FAILURE);
     }
 
@@ -151,11 +134,8 @@ int main(int argc, char** argv) {
 
     message("Step 2: Build the state space of '%s' and its most-permissive partner", Tara::args_info.net_arg);    
 
-    // create a temporary file
-    std::string lolaFN=tempFN+ "-lola.rg";
-
     // run lola-statespace from the service tools
-    getLolaStatespace(composition,lolaFN);
+    getLolaStatespace(composition,Tara::tempFile.name());
 
     /*-------------------------------------.
     | 4. Parse Costfunction to partial map |
@@ -168,19 +148,21 @@ int main(int argc, char** argv) {
     else {  // if costfunction should be random
        status("generating random costfunction");
        const std::set<pnapi::Transition*> transitions=Tara::net->getTransitions();
+   
+       //get argument
+       unsigned int min=(Tara::args_info.minrandomcost_given)?Tara::args_info.minrandomcost_arg:0;
+       unsigned int mod=(Tara::args_info.maxrandomcost_given)?Tara::args_info.maxrandomcost_arg-min+1:101-min;
+       unsigned int cur=0;
+
        for(std::set<pnapi::Transition*>::iterator it=transitions.begin();it!=transitions.end();++it) {
-
-            //get argument
-            unsigned int min=(Tara::args_info.minrandomcost_given)?Tara::args_info.minrandomcost_arg:0;
-            unsigned int mod=(Tara::args_info.maxrandomcost_given)?Tara::args_info.maxrandomcost_arg-min+1:101-min;
-            unsigned int cur;
-
             // seed random by time and last random
             srand(time(NULL)+cur+1);
  
             //get next rand and pass it to partial cost function
             cur=min+(rand() % mod);
             Tara::partialCostFunction[*it]= cur; 
+            if(cur>Tara::highestTransitionCosts) Tara::highestTransitionCosts=cur;
+            status("random costfunction:  %s -> %d", (*it)->getName().c_str(), cur);
        }
     }
 
@@ -188,7 +170,7 @@ int main(int argc, char** argv) {
     | 5. Parse the inner Graph |
     \-------------------------*/
     status("parsing inner graph");
-    Parser::lola.parse(lolaFN.c_str()); 
+    Parser::lola.parse(Tara::tempFile.name().c_str()); 
 
     /*------------------------------------------.
     | 5. Compute MaxCosts from the parsed graph | 
@@ -209,31 +191,20 @@ int main(int argc, char** argv) {
     iModification iMod(Tara::net, maxCostOfComposition);
 
     // Check whether N is controllable under budget maxCostOfComposition. If not, return the most permissive partner.
-    std::stringstream ssi;
-    ssi << maxCostOfComposition;
-    std::string minCostPartner=tempFN+"-min-partner-";  
-    std::string curMinCostPartner=minCostPartner+ssi.str()+".sa";
-   //std::cout << pnapi::io::owfn << *Tara::net << std::endl;
-   //return 0;
-    bool bounded = isControllable(*Tara::net, curMinCostPartner, true); 
-
-    // output file of the min cost partner
-    std::ifstream minCostPartnerStream;
+   bool bounded = isControllable(*Tara::net, true); 
 
     // If N is not controllable under budget maxCostofComposition, return the mpp. 
-    
     if (!bounded) {
         // Every partner is trivially cost-minimal. Thus, return the mpp
         if (Tara::args_info.sa_given) {
 		    message("Any partner is cost-minimal, returning the most-permissive partner.");
-		    minCostPartnerStream.open(partnerTemp.c_str());
             if (std::string(Tara::args_info.sa_arg).compare("-") != 0) {
                 std::ofstream outputFile;
                 outputFile.open(Tara::args_info.sa_arg);
-                outputFile << minCostPartnerStream.rdbuf();
+                outputFile << partnerStream.rdbuf();
                 outputFile.close();
             } else {
-    		    cout << minCostPartnerStream.rdbuf();
+    		    cout << partnerStream.rdbuf();
             }
     	}
         if (Tara::args_info.og_given) {
@@ -274,13 +245,8 @@ int main(int argc, char** argv) {
                     // Set the new budget to the middle of the interval
                     iMod.setToValue((bsLower + bsUpper) / 2);
                         
-                    // Prepare the Wendy Call
-                    ssi.str("");
-                    ssi << iMod.getI();
-                    curMinCostPartner=minCostPartner+ssi.str()+".sa";
-
                     status("Checking budget %d (lower bound: %d, upper bound: %d)", iMod.getI(), bsLower, bsUpper);             
-                    bool bsControllable = isControllable(*Tara::net, curMinCostPartner, true);
+                    bool bsControllable = isControllable(*Tara::net, true);
                     if (bsControllable) {
                         minBudget = iMod.getI();        
                         bsUpper = iMod.getI()-1;
@@ -297,23 +263,17 @@ int main(int argc, char** argv) {
         message("Minimal budget found: %d", minBudget);
 
 
-        if (Tara::args_info.sa_given) {
-		    message("Synthesized a cost-minimal partner. (Costs = %d)", minBudget);
-            ssi.str("");
-            ssi << minBudget;
-            curMinCostPartner=minCostPartner+ssi.str()+".sa";
-            minCostPartnerStream.open(curMinCostPartner.c_str());
-            if (std::string(Tara::args_info.sa_arg).compare("-") != 0) {
-    		    message("Writing partner to file '%s'.",Tara::args_info.sa_arg);
-                std::ofstream outputFile;
-                outputFile.open(Tara::args_info.sa_arg);
-                outputFile << minCostPartnerStream.rdbuf();
-                outputFile.close();
+        if(Tara::args_info.sa_given) {
+            message("Synthesized a cost-minimal partner. (Costs = %d)", minBudget);
+            std::string s = "writing partner to ";
+            if (std::string(Tara::args_info.og_arg).compare("-") == 0) {
+                s += "standard out";             
             } else {
-    		    message("Writing partner to standard out.");
-                std::ofstream outputFile;
-    		    cout << minCostPartnerStream.rdbuf();
+                s += "file '" + std::string(Tara::args_info.og_arg) + "'";
             }
+            message("Computing cost-minimal partner, %s.", s.c_str());
+            iMod.setToValue(minBudget);
+            computeMP(*Tara::net, Tara::args_info.og_arg);
     	}
         if (Tara::args_info.og_given) {
             std::string s = "writing operating guidelines to ";
@@ -322,11 +282,10 @@ int main(int argc, char** argv) {
             } else {
                 s += "file '" + std::string(Tara::args_info.og_arg) + "'";
             }
-		    message("Computing representation of all cost-minimal partners, %s.", s.c_str());
+            message("Computing representation of all cost-minimal partners, %s.", s.c_str());
             iMod.setToValue(minBudget);
             computeOG(*Tara::net, Tara::args_info.og_arg);
         }
-
     } 
 
     // A partner was written to standard out. Let's do the clean up and exit with success.    

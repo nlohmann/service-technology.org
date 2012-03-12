@@ -26,6 +26,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <stdio.h>
 
 #include <pnapi/pnapi.h>
 #include "Output.h"
@@ -39,13 +40,13 @@ inline bool fileExists(const std::string& filename) {
 }
 
 
-bool isControllable(pnapi::PetriNet &net, std::string &outputFile, bool useWendyOptimization) {
+bool isControllable(pnapi::PetriNet &net, bool useWendyOptimization) {
     
     std::string wendyCommand("wendy --correctness=livelock ");
     if (useWendyOptimization) {
         wendyCommand+= " --waitstatesOnly --receivingBeforeSending --seqReceivingEvents   --succeedingSendingEvent  --quitAsSoonAsPossible ";
     }
-    wendyCommand+=" --sa="+outputFile;
+    wendyCommand+=" --resultFile="+Tara::tempFile.name();
     
 //    message("creating a pipe to wendy by calling '%s'", wendyCommand.c_str());
 
@@ -74,11 +75,26 @@ bool isControllable(pnapi::PetriNet &net, std::string &outputFile, bool useWendy
 	exit(EXIT_FAILURE);
     }
 
-    // Check if output file exists
-    if(!fileExists(outputFile)) {
-        return false;
+    // Check the result file
+    // This could be more general and aware of other versions,
+    // if regex were used...
+    bool inControllability=false;
+    std::fstream result(Tara::tempFile.name().c_str());
+    std::string line;
+    while(getline(result,line)) {
+        if(line.compare("controllability: {")==0) {
+		inControllability=true;
+        }
+	if(line.compare("};")==0)
+		inControllability=false;
+	if(inControllability && line.compare("  result = true;")==0)
+		return true;
+	if(inControllability && line.compare("  result = false;")==0)
+		return false;
     }
-    return true;
+    printf(" moooeep \n");
+    exit(-1);
+    return false;
 }
 
 
@@ -104,13 +120,36 @@ void computeOG(pnapi::PetriNet &net, std::string outputFile) {
 
 }
 
+/** computes most permissive partner */
+void computeMP(pnapi::PetriNet &net, std::string outputFile) {
 
+    // delete existing files...
+    std::remove(outputFile.c_str());
+
+    std::string wendyCommand("wendy --correctness=livelock ");
+    wendyCommand+=" --sa="+outputFile;
+
+    // create stringstream to store the open net
+    std::stringstream ss;
+
+    // ss << pnapi::io::lola << *(net) << std::flush;
+    ss << pnapi::io::owfn << net << std::flush;
+
+    // call wendy and open a pipe
+    FILE* fp = popen(wendyCommand.c_str(), "w");
+
+    // send the net to wendy
+    fprintf(fp, "%s", ss.str().c_str());
+
+    // close the pipe
+    pclose(fp);
+}
 /**
 This function calls lola-statespace with the given net and returns a file pointer to the state automaton
 of the inner graph.
 The second argument  is used as temporary filename.
  */
-void getLolaStatespace(pnapi::PetriNet &net, std::string &tempFileName) {
+void getLolaStatespace(pnapi::PetriNet &net, const std::string &tempFileName) {
 
     std::string command="lola-statespace -m"; //TODO: as cmd-param
 

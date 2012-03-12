@@ -65,7 +65,7 @@ unsigned int CCSearch::search() {
 
     //create the processes and assign them their fract
     std::vector<tthread::thread*> pv(prozesse);
-    for(int i=1;i<=prozesse;++i) {
+    for(unsigned int i=1;i<=prozesse;++i) {
         bruch* b=new bruch();
         b->z=i;
         b->n=prozesse+1;

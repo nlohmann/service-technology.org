@@ -23,6 +23,9 @@ unsigned int Tara::cost(pnapi::Transition* t) {
    return cost->second;
 }
 
+/// The global temp file, used for lola & wendy calls
+Output Tara::tempFile=Output();
+
 
 /// check if a file exists and can be opened for reading
 inline bool fileExists(const std::string& filename) {
@@ -117,11 +120,11 @@ void Tara::constructLP() {
 
     int currentEdge = 1;
 
-    for (int vertexCounter = 0; vertexCounter < graph.size(); ++vertexCounter) {
+    for (unsigned int vertexCounter = 0; vertexCounter < graph.size(); ++vertexCounter) {
     
         innerState* currentVertex = graph[vertexCounter];        
 
-        for (int edgeCounter = 0; edgeCounter < currentVertex->transitions.size(); ++edgeCounter) {
+        for (unsigned int edgeCounter = 0; edgeCounter < currentVertex->transitions.size(); ++edgeCounter) {
             REAL sparsecolumn[3]; /* one element per non-zero value -- always exactly three: objective function, source vertex and target vertex. self loops are eliminated while parsing */
             int rowno[3];
 

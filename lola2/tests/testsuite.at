@@ -216,7 +216,7 @@ AT_CHECK([cp TESTFILES/syntax_full.lola .])
 AT_CHECK([LOLA syntax_full.lola --printNet],0,stdout)
 AT_CHECK([GREP -q "6 places" stdout])
 AT_CHECK([GREP -q "4  transitions" stdout])
-AT_KEYWORDS(reporter)
+AT_KEYWORDS(debug)
 AT_CLEANUP
 
 AT_SETUP([Random walk])
@@ -224,7 +224,14 @@ AT_CHECK([cp TESTFILES/process.lola .])
 AT_CHECK([LOLA process.lola --randomWalk=10000],0,stdout)
 AT_CHECK([GREP -q "firing" stdout])
 AT_CHECK([GREP -q "*************" stdout])
-AT_KEYWORDS(reporter)
+AT_KEYWORDS(debug)
+AT_CLEANUP
+
+AT_SETUP([Simple property])
+AT_CHECK([cp TESTFILES/process.lola .])
+AT_CHECK([LOLA process.lola --simpleProperty],0,stdout)
+AT_CHECK([GREP -q "no" stdout])
+AT_KEYWORDS(debug)
 AT_CLEANUP
 
 

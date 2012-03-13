@@ -190,22 +190,30 @@ int main(int argc, char** argv)
     }
 
 
-    	 if (args_info.randomWalk_given)
-   {
-   rep->status("random walk");
-   randomWalk(args_info.randomWalk_arg);
-   }
+    if (args_info.randomWalk_given)
+    {
+        rep->status("random walk");
+        randomWalk(args_info.randomWalk_arg);
+    }
 
     if (args_info.simpleProperty_given)
     {
-        BinStore bs;
+        Store *s;
         Firelist fl;
-
         SimpleProperty p;
-    if(p.depth_first(bs,fl)) printf("\nyes\n"); else printf("\nno\n");
-    printf("\n%llu %llu\n",bs.markings,bs.calls);
-    }
+        
+        if (args_info.bdd_given) {
+            s = new BDDStore();
+        } else {
+            s = new BinStore();
+        }
 
+        const bool result = p.depth_first(*s, fl);
+        rep->message("result: %s", result ? rep->markup(MARKUP_GOOD, "yes").str() : rep->markup(MARKUP_BAD, "no").str());
+        rep->message("%d markings, %d edges", s->markings, s->calls-1);
+
+        delete s;
+    }
 
     return EXIT_SUCCESS;
 }

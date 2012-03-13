@@ -73,7 +73,11 @@ option "randomWalk" -
   argoptional
 
 option "simpleProperty" -
-  "Random firing of transitions"
+  "Check a simple reachability property"
+  flag off
+
+option "bdd" -
+  "Use a BDD to store markings"
   flag off
 
 option "printNet" -

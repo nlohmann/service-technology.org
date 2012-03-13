@@ -5,6 +5,9 @@
 #include "Net.h"
 #include "Place.h"
 #include "Marking.h"
+#include "Reporter.h"
+
+extern Reporter* rep;
 
 unsigned int BDDStore::bitsNeeded(int val)
 {
@@ -28,14 +31,15 @@ BDDStore::BDDStore() : variables(0), currentVariable(0), manager(NULL)
 
     // create an empty BDD
     manager = new Cudd(variables);
-    manager->AutodynEnable(CUDD_REORDER_GROUP_SIFT_CONV);
+//    manager->AutodynEnable(CUDD_REORDER_GROUP_SIFT_CONV);
 
     bdd = manager->bddZero();
+    rep->status("created BDD with %d nodes and %d variables", bdd.nodeCount(), variables);
 }
 
 BDDStore::~BDDStore()
 {
-    delete manager;
+//    delete manager;
 }
 
 void BDDStore::storePlaceMarking(index_t p, BDD &temp)
@@ -48,35 +52,41 @@ void BDDStore::storePlaceMarking(index_t p, BDD &temp)
     for (size_t bit = 0; bit < bitsNeeded(Place::Capacity[p]); ++bit, ++currentVariable, tokens >>= 1)
     {
         // check if bit is set
-        if (tokens & 1)
-        {
-            temp *= manager->bddVar(currentVariable);
-        }
-        else
-        {
-            temp *= not manager->bddVar(currentVariable);
-        }
+        temp *= (tokens & 1)
+            ? manager->bddVar(currentVariable)
+            : not manager->bddVar(currentVariable);
     }
 }
 
 bool BDDStore::searchAndInsert()
 {
-    BDD temp = manager->bddOne();
-    currentVariable = 0;
+    ++calls;
 
+    BDD temp = manager->bddOne();
+
+    currentVariable = 0;
     for (index_t p = 0; p < Net::Card[PL]; ++p)
     {
         storePlaceMarking(p, temp);
     }
 
+    BDD bdd_old = bdd;
     bdd += temp;
 
-    // debug dot output
-    //std::vector<BDD> nodes;
-    //nodes.push_back(bdd);
-    //manager->DumpDot(nodes);
+    if (bdd_old == bdd) {
+        return true;
+    }
 
-    return true;
+    ++markings;
+
+    if (markings % 10000 == 0 and markings > 0) {
+        const int nodeCountOld = bdd.nodeCount();
+        manager->ReduceHeap(CUDD_REORDER_GROUP_SIFT_CONV, 0);
+        const int nodeCountNew = bdd.nodeCount();
+        rep->status("reordering BDD: saved %d nodes - %d nodes now", nodeCountOld - nodeCountNew, nodeCountNew);
+    }
+
+    return false;
 }
 
 bool BDDStore::searchAndInsert(State** s)

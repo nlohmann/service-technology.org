@@ -229,8 +229,9 @@ AT_CLEANUP
 
 AT_SETUP([Simple property])
 AT_CHECK([cp TESTFILES/process.lola .])
-AT_CHECK([LOLA process.lola --simpleProperty],0,stdout)
-AT_CHECK([GREP -q "no" stdout])
+AT_CHECK([LOLA process.lola --simpleProperty],0,stdout,stderr)
+AT_CHECK([GREP -q "result: no" stderr])
+AT_CHECK([GREP -q "6 markings, 5 edges" stderr])
 AT_KEYWORDS(debug)
 AT_CLEANUP
 

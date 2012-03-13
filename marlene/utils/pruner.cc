@@ -185,17 +185,29 @@ int main(int argc, char* argv[]) {
     status("running lola done [%.0f sec]", difftime(end_time, start_time));
     status("lola found %d states.", State::stateSpace.size());
 
+    time_t start_parttime, end_parttime;
 
     status("starting pruning of reachability graph");
     time(&start_time);
+    time(&start_parttime);
     /* do the pruning here and now */
     State::checkFinalReachable();
+    time(&end_parttime);
+    status("reachability of final states done [%.0f sec]", difftime(end_parttime, start_parttime));
 
+    time(&start_parttime);
     // now: tau abstraction
+    State::tauFolding();
+    time(&end_parttime);
+    status("tau folding done [%.0f sec]", difftime(end_parttime, start_parttime));
+
+    time(&start_parttime);
     // now: actual pruning
     State::prune();
+    time(&end_parttime);
+    status("pruning done [%.0f sec]", difftime(end_parttime, start_parttime));
     time(&end_time);
-    status("pruning done [%.0f sec]", difftime(end_time, start_time));
+    status("all phases done [%.0f sec]", difftime(end_time, start_time));
 
     //State::calculateSCC();
     State::output();

@@ -46,6 +46,7 @@ public:
     ~List();
 
     void push_back(Keytype value);
+    void push_back(List_ptr list);
     Keytype getValue();
     List_ptr getNext();
 
@@ -94,6 +95,17 @@ void List<Keytype>::push_back(Keytype value) {
     }
     else {
         next->push_back(value);
+    }
+}
+
+template <typename Keytype>
+void List<Keytype>::push_back(List_ptr list) {
+
+    if ( next.get() == 0) {
+        next = list;
+    }
+    else {
+        next->push_back(list);
     }
 }
 

@@ -29,20 +29,16 @@ public:
 
     static unsigned int messageBound;
 
-    static void
-    output();
+    static void output();
 
-    static bool
-    checkFinalReachable();
+    static bool checkFinalReachable();
 
-    static void
-    calculateSCC();
+    static void calculateSCC();
 
-    static void
-    tauFolding();
+    static void tauFolding();
 
-    static void
-    prune();
+    static void prune();
+
 
 private:
     long number;
@@ -65,9 +61,14 @@ private:
 
     void output(std::map<unsigned int, bool>& seen);
 
-    ListOfPairs::List_ptr taufolding(std::map<unsigned int, bool>& seen, std::map<unsigned int, bool>& statesFolded);
+    void tauFolding(std::map<unsigned int, bool>& seen);
+
+    ListOfPairs::List_ptr followTau(std::map<unsigned int, bool>& dfsSeen);
 
     void prune(std::map<unsigned int, bool>& seen
           , std::map<unsigned int, bool>& active, unsigned int & count);
 
+    static bool transitionsIsTau(std::string);
+
+    bool isSCCNode();
 };

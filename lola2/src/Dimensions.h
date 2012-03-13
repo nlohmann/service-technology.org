@@ -87,3 +87,6 @@ typedef enum
     EXIT_ERROR       = 2, ///< error
     EXIT_TERMINATION = 3  ///< premature termination
 } exit_t;
+
+/// number of seconds between report outputs
+#define REPORT_FREQUENCY 5

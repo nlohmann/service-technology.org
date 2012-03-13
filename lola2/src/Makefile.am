@@ -29,7 +29,7 @@ lola_SOURCES = \
                 StructuralReduction.cc StructuralReduction.h \
                 Socket.cc Socket.h \
                 SimpleString.cc SimpleString.h \
-                Store.h \
+                Store.cc Store.h \
                 swap.h swap.cc \
                 Symbol.cc Symbol.h \
                 SymbolTable.cc SymbolTable.h \

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <config.h>
+#include <pthread.h>
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -23,6 +24,16 @@ else
 */
 class Store
 {
+    private:
+        /// a thread that runs the frequent reports
+        pthread_t reporter_thread;
+
+        /// the reporter function
+        void* reporter_internal(void);
+
+        /// a helper function to start the reporter thread
+        static void* reporter_helper(void* context);
+
     public:
         /// the number of stored markings
         uint64_t markings;
@@ -30,9 +41,9 @@ class Store
         /// the number of calles to searchAndInsert()
         uint64_t calls;
 
-        Store() : markings(0), calls(0) {}
+        Store();
 
-        virtual ~Store() {};
+        virtual ~Store();
 
         /// check whether current marking is stored
         virtual bool searchAndInsert() = 0;

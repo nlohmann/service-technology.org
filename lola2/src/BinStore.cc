@@ -113,7 +113,7 @@ bool BinStore::searchAndInsert()
 		while(true) // dive down in currentvector to first mismatch. No mismatch = state found
 		{
 		     // comparison of one bit between current marking and current vector
-		    if (((Marking::Current[place_index] & (1 << placebit_index))>>placebit_index) != ((currentvector[vector_byte] & (1 << vector_bit))>>vector_bit))
+		    if (((Marking::Current[place_index] >> placebit_index) & 1 ) != ((currentvector[vector_byte] >> vector_bit) & 1))
 		    {
 			// This is the mismatch we were looking for
 			break;

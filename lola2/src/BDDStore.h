@@ -16,8 +16,6 @@ class BDDStore : public Store
         Cudd* manager;
         BDD bdd;
 
-        void storePlaceMarking(index_t, BDD &);
-
     public:
         BDDStore();
         ~BDDStore();

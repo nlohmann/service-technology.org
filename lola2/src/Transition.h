@@ -61,13 +61,13 @@ struct Transition
         /// Check transition for activation
         static void checkEnabled(index_t t);
 
-        /// fire a transition 
+        /// fire a transition
         static void fire(index_t t);
 
         /// update enabledness of all transitions
         static void updateEnabled(index_t t);
 
-        /// fire a transition in reverse direction (for backtracking) 
+        /// fire a transition in reverse direction (for backtracking)
         static void backfire(index_t t);
 
         /// update enabledness of all transitions after backfiring

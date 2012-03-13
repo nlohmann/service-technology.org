@@ -391,22 +391,22 @@ void ReadNetFile(FILE* f)
         }
     }
 
-	/*********************
-	* 7b. Set DeltaHash *
+    /*********************
+    * 7b. Set DeltaHash *
         **********************/
 
-    for(index_t t = 0; t < Net::Card[TR]; t++)
+    for (index_t t = 0; t < Net::Card[TR]; t++)
     {
-	for(index_t i = 0; i < Transition::CardDeltaT[PRE][t];i++)
-	{
-		Transition::DeltaHash[t] = (Transition::DeltaHash[t] - Transition::MultDeltaT[PRE][t][i] * 
-                                           Place::Hash[Transition::DeltaT[PRE][t][i]]) % SIZEOF_MARKINGTABLE;
-	}
-	for(index_t i = 0; i < Transition::CardDeltaT[POST][t];i++)
-	{
-		Transition::DeltaHash[t] = (Transition::DeltaHash[t] + Transition::MultDeltaT[POST][t][i] * 
-                                           Place::Hash[Transition::DeltaT[POST][t][i]]) % SIZEOF_MARKINGTABLE;
-	}
+        for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
+        {
+            Transition::DeltaHash[t] = (Transition::DeltaHash[t] - Transition::MultDeltaT[PRE][t][i] *
+                                        Place::Hash[Transition::DeltaT[PRE][t][i]]) % SIZEOF_MARKINGTABLE;
+        }
+        for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
+        {
+            Transition::DeltaHash[t] = (Transition::DeltaHash[t] + Transition::MultDeltaT[POST][t][i] *
+                                        Place::Hash[Transition::DeltaT[POST][t][i]]) % SIZEOF_MARKINGTABLE;
+        }
     }
 
     // initialize Conflicting arrays

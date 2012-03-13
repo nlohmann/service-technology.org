@@ -22,8 +22,8 @@ class BinStore : public Store
 
         /// check whether current marking is sted and return state
         virtual bool searchAndInsert(State** s);
-	void pbs(unsigned int, unsigned int, unsigned char *, void *);
-	void printBinStore();
+        void pbs(unsigned int, unsigned int, unsigned char*, void*);
+        void printBinStore();
     private:
         /// a binary decision node
         class Decision

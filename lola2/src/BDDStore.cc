@@ -39,7 +39,7 @@ BDDStore::BDDStore() : variables(0), currentVariable(0), manager(NULL)
 
 BDDStore::~BDDStore()
 {
-//    delete manager;
+    //    delete manager;
 }
 
 bool BDDStore::searchAndInsert()
@@ -60,15 +60,16 @@ bool BDDStore::searchAndInsert()
         {
             // check if bit is set
             temp *= (tokens & 1)
-                ? manager->bddVar(currentVariable)
-                : not manager->bddVar(currentVariable);
+                    ? manager->bddVar(currentVariable)
+                    : not manager->bddVar(currentVariable);
         }
     }
 
     BDD bdd_old = bdd;
     bdd += temp;
 
-    if (bdd_old == bdd) {
+    if (bdd_old == bdd)
+    {
         return true;
     }
     else

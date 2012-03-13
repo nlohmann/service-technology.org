@@ -28,7 +28,8 @@ void setSignificantPlaces()
     // save number of places
     const index_t cardPL = Net::Card[PL];
 
-    if (cardPL < 2) {
+    if (cardPL < 2)
+    {
         // nohing to do
         Place::CardSignificant = cardPL;
         return;
@@ -118,23 +119,26 @@ void setSignificantPlaces()
 
     // reduce matrix
     m.reduce();
-    
+
     // gather significant places
     Place::CardSignificant = 0;
     index_t lastSignificant = cardPL - 1;
     for (index_t p = 0; p < cardPL; ++p)
-    { 
+    {
         if (m.isSignificant(p))
         {
             Place::CardSignificant++;
         }
-        else {
+        else
+        {
             // p needs to be swapped
             // find first significant place from the right end of all places
-            while (!m.isSignificant(lastSignificant)) {
+            while (!m.isSignificant(lastSignificant))
+            {
                 lastSignificant--;
             }
-            if (lastSignificant <= p) {
+            if (lastSignificant <= p)
+            {
                 // we are finished
                 break;
             }
@@ -146,8 +150,8 @@ void setSignificantPlaces()
     // adjust Place::SizeOfBitVector
 
     Place::SizeOfBitVector = 0;
-    for(index_t i = 0; i < Place::CardSignificant;i++)
+    for (index_t i = 0; i < Place::CardSignificant; i++)
     {
-	Place::SizeOfBitVector += Place::CardBits[i];
+        Place::SizeOfBitVector += Place::CardBits[i];
     }
 }

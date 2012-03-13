@@ -89,7 +89,7 @@ void Transition::checkEnabled(index_t t)
                 // enabled --> disabled: insert to scapegoat's disabled list
                 Transition::Enabled[t] = false;
                 --Transition::CardEnabled;
- 		assert(Place::CardDisabled[scapegoat] <= Net::CardArcs[PL][POST][scapegoat]);
+                assert(Place::CardDisabled[scapegoat] <= Net::CardArcs[PL][POST][scapegoat]);
                 Place::Disabled[scapegoat][Transition::PositionScapegoat[t] = Place::CardDisabled[scapegoat]++] = t;
 
                 // swap scapegoat to front of transition's PRE list
@@ -158,7 +158,7 @@ void Transition::checkEnabled(index_t t)
 }
 
 
-/// fire a transition and 
+/// fire a transition and
 void Transition::fire(index_t t)
 
 {
@@ -180,14 +180,14 @@ void Transition::fire(index_t t)
     // 2. update hash value
     Marking::HashCurrent += Transition::DeltaHash[t];
     Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
-    while( Marking::HashCurrent < 0)
+    while (Marking::HashCurrent < 0)
     {
-	Marking::HashCurrent += SIZEOF_MARKINGTABLE;
+        Marking::HashCurrent += SIZEOF_MARKINGTABLE;
     }
 }
 
 /// update enabledness information after having fired a transition
-void Transition::updateEnabled( index_t t)
+void Transition::updateEnabled(index_t t)
 {
     // 1. check conflicting enabled transitions (tt) for enabledness
     for (index_t i = 0; i < Transition::CardConflicting[t]; i++)
@@ -236,9 +236,9 @@ void Transition::backfire(index_t t)
     // 2. update hash value
     Marking::HashCurrent -= Transition::DeltaHash[t];
     Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
-    while( Marking::HashCurrent < 0)
+    while (Marking::HashCurrent < 0)
     {
-	Marking::HashCurrent += SIZEOF_MARKINGTABLE;
+        Marking::HashCurrent += SIZEOF_MARKINGTABLE;
     }
 
 }
@@ -276,18 +276,24 @@ void Transition::revertEnabled(index_t t)
 
 bool testEnabled(index_t t)
 {
-	if(Transition::Enabled[t])
-	{
-		for(index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
-		{
-			index_t p = Net::Arc[TR][PRE][t][i];
-			if(Marking::Current[p] < Net::Mult[TR][PRE][t][i]) return false;
-		}
-	}
-	else
-	{
-		index_t p = Net::Arc[TR][PRE][t][0];
-		if(Marking::Current[p] >= Net::Mult[TR][PRE][t][0]) return false;
-	}
-	return true;
+    if (Transition::Enabled[t])
+    {
+        for (index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
+        {
+            index_t p = Net::Arc[TR][PRE][t][i];
+            if (Marking::Current[p] < Net::Mult[TR][PRE][t][i])
+            {
+                return false;
+            }
+        }
+    }
+    else
+    {
+        index_t p = Net::Arc[TR][PRE][t][0];
+        if (Marking::Current[p] >= Net::Mult[TR][PRE][t][0])
+        {
+            return false;
+        }
+    }
+    return true;
 }

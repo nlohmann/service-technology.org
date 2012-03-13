@@ -8,23 +8,23 @@
 /// serves as a chunk of SIZEOF_STACKCHUNK elements in a search stack
 class Chunk
 {
-	public:
-		Chunk(){}
-		/// previous chunk
-		Chunk * prev;
-		/// stores loop variable for firelists
-		index_t current[SIZEOF_STACKCHUNK];
-		/// stores firelists
-		index_t * list[SIZEOF_STACKCHUNK];
+    public:
+        Chunk() {}
+        /// previous chunk
+        Chunk* prev;
+        /// stores loop variable for firelists
+        index_t current[SIZEOF_STACKCHUNK];
+        /// stores firelists
+        index_t* list[SIZEOF_STACKCHUNK];
 };
 
 class SearchStack
 {
-	public:
-		SearchStack();
-		void push(index_t,index_t*);
-		void  pop(index_t *, index_t **);
-		unsigned int StackPointer;
-	private:
-		Chunk * currentchunk;
+    public:
+        SearchStack();
+        void push(index_t, index_t*);
+        void  pop(index_t*, index_t**);
+        unsigned int StackPointer;
+    private:
+        Chunk* currentchunk;
 };

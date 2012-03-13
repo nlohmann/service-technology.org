@@ -13,9 +13,9 @@
 
 class Firelist
 {
-	public: 
-		/// return value contains number of elements in fire list, argument is reference
-		/// parameter for actual list
-		virtual index_t getFirelist(index_t **);
+    public:
+        /// return value contains number of elements in fire list, argument is reference
+        /// parameter for actual list
+        virtual index_t getFirelist(index_t**);
 };
 

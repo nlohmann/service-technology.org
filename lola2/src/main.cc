@@ -198,19 +198,22 @@ int main(int argc, char** argv)
 
     if (args_info.simpleProperty_given)
     {
-        Store *s;
+        Store* s;
         Firelist fl;
         SimpleProperty p;
-        
-        if (args_info.bdd_given) {
+
+        if (args_info.bdd_given)
+        {
             s = new BDDStore();
-        } else {
+        }
+        else
+        {
             s = new BinStore();
         }
 
         const bool result = p.depth_first(*s, fl);
         rep->message("result: %s", result ? rep->markup(MARKUP_GOOD, "yes").str() : rep->markup(MARKUP_BAD, "no").str());
-        rep->message("%d markings, %d edges", s->markings, s->calls-1);
+        rep->message("%d markings, %d edges", s->markings, s->calls - 1);
 
         delete s;
     }

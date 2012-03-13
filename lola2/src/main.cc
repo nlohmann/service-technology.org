@@ -30,12 +30,11 @@
 
 #include "Store.h"
 #include "BinStore.h"
-#include "Firelist.h"
-#include "SimpleProperty.h"
 #include "BDDStore.h"
-#include "BinStore.h"
+#include "SQLStore.h"
 
 #include "Firelist.h"
+#include "SimpleProperty.h"
 
 
 extern ParserPTNet* ParserPTNetLoLA();
@@ -198,19 +197,24 @@ int main(int argc, char** argv)
 
     if (args_info.simpleProperty_given)
     {
-        Store* s;
+        Store* s = NULL;
         Firelist fl;
         SimpleProperty p;
 
-        if (args_info.bdd_given)
+        switch (args_info.store_arg)
         {
-            s = new BDDStore();
-        }
-        else
-        {
-            s = new BinStore();
+            case store_arg_bin:
+                s = new BinStore();
+                break;
+            case store_arg_bdd:
+                s = new BDDStore();
+                break;
+            case store_arg_sql:
+                s = new SQLStore();
+                break;
         }
 
+        assert(s);
         const bool result = p.depth_first(*s, fl);
         rep->message("result: %s", result ? rep->markup(MARKUP_GOOD, "yes").str() : rep->markup(MARKUP_BAD, "no").str());
         rep->message("%d markings, %d edges", s->markings, s->calls - 1);

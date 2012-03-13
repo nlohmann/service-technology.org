@@ -26,7 +26,4 @@ class SimpleProperty
         virtual void checkProperty(index_t) {}
         /// check property in Marking::Current, use after backfire. Argument is transition just backfired.
         virtual void updateProperty(index_t) {}
-
-
-
 };

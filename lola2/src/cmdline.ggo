@@ -76,9 +76,12 @@ option "simpleProperty" -
   "Check a simple reachability property"
   flag off
 
-option "bdd" -
-  "Use a BDD to store markings"
-  flag off
+option "store" -
+  "Store"
+  values="bin","bdd","sql" enum
+  typestr="STORE"
+  default="bin"
+  optional
 
 option "printNet" -
   "Print the net"

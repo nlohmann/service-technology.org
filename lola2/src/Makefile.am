@@ -28,6 +28,7 @@ lola_SOURCES = \
                 SimpleProperty.cc SimpleProperty.h \
                 StructuralReduction.cc StructuralReduction.h \
                 Socket.cc Socket.h \
+                SQLStore.cc SQLStore.h \
                 SimpleString.cc SimpleString.h \
                 Store.cc Store.h \
                 swap.h swap.cc \
@@ -44,9 +45,10 @@ lola_LDADD = $(builddir)/../libs/cudd/libobj.a \
 	$(builddir)/../libs/cudd/libmtr.a \
 	$(builddir)/../libs/cudd/libst.a \
 	$(builddir)/../libs/cudd/libutil.a \
-	$(builddir)/../libs/cudd/libepd.a
+	$(builddir)/../libs/cudd/libepd.a \
+	$(builddir)/../libs/sqlite/libsqlite.a
 
-lola_CPPFLAGS = -I$(top_srcdir)/libs/cudd/include
+lola_CPPFLAGS = -I$(top_srcdir)/libs/cudd/include -I$(top_srcdir)/libs/sqlite
 
 listener_SOURCES = Listener.cc \
                    Reporter.cc Reporter.h \

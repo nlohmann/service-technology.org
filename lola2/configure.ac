@@ -114,6 +114,6 @@ AC_SUBST(CUDD_XFLAGS)
 # write files
 AC_CONFIG_FILES([
 	Makefile src/Makefile doc/Doxyfile doc/Doxydetails
-	tests/Makefile tests/package.m4 libs/cudd/Makefile])
+	tests/Makefile tests/package.m4 libs/cudd/Makefile libs/sqlite/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

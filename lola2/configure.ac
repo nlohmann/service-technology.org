@@ -110,6 +110,7 @@ CUDD_XFLAGS="-DSIZEOF_VOID_P=$ac_cv_sizeof_voidp"
 AC_SUBST(CUDD_XFLAGS)
 ####################################################################
 
+AC_CHECK_LIB([dl], [main])
 
 # write files
 AC_CONFIG_FILES([

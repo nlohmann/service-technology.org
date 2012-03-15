@@ -28,6 +28,7 @@ lola_SOURCES = \
                 SimpleProperty.cc SimpleProperty.h \
                 StructuralReduction.cc StructuralReduction.h \
                 Socket.cc Socket.h \
+                STLStore.cc STLStore.h \
                 SQLStore.cc SQLStore.h \
                 SimpleString.cc SimpleString.h \
                 Store.cc Store.h \

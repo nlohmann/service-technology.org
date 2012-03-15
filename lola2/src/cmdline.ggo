@@ -78,7 +78,7 @@ option "simpleProperty" -
 
 option "store" -
   "Store"
-  values="bin","bdd","sql" enum
+  values="bin","bdd","sql","stl" enum
   typestr="STORE"
   default="bin"
   optional

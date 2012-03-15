@@ -32,6 +32,7 @@
 #include "BinStore.h"
 #include "BDDStore.h"
 #include "SQLStore.h"
+#include "STLStore.h"
 
 #include "Firelist.h"
 #include "SimpleProperty.h"
@@ -211,6 +212,9 @@ int main(int argc, char** argv)
                 break;
             case store_arg_sql:
                 s = new SQLStore();
+                break;
+            case store_arg_stl:
+                s = new STLStore();
                 break;
         }
 

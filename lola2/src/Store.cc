@@ -7,11 +7,12 @@ extern Reporter* rep;
 
 void* Store::reporter_internal(void)
 {
+    static unsigned int intervals = 0;
     uint64_t last_markings = 0;
     while (true)
     {
         sleep(REPORT_FREQUENCY);
-        rep->status("%10d markings, %10d edges, %8.0f markings/sec", markings, calls - 1, ((markings - last_markings) / (float)REPORT_FREQUENCY));
+        rep->status("%10d markings, %10d edges, %8.0f markings/sec, %5d secs", markings, calls - 1, ((markings - last_markings) / (float)REPORT_FREQUENCY), (++intervals * REPORT_FREQUENCY));
         last_markings = markings;
     }
 }

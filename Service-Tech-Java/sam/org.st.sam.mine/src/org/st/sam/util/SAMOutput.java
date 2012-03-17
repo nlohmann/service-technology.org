@@ -16,22 +16,6 @@ import lscminer.datastructure.LSCEvent;
 
 public class SAMOutput {
   
-  public static void shortenLSCnames(LSC l) {
-    shortenLSCnames(l.getPreChart());
-    shortenLSCnames(l.getMainChart());
-  }
-  
-  public static void shortenLSCnames(LSCEvent[] chart) {
-    for (int i=0; i < chart.length; i++) {
-      
-      String caller = shortenNames(chart[i].getCaller());
-      String callee = shortenNames(chart[i].getCallee());
-      String method = shortenNames(chart[i].getMethod());
-    
-      chart[i] = new LSCEvent(caller, callee, method);
-    }
-  }
-  
   public static String shortenNames(String lscString) {
   
     if (lscString.indexOf('(') >= 0) {
@@ -54,12 +38,12 @@ public class SAMOutput {
     List<String> components = new LinkedList<String>();
     
     for (LSCEvent e  : l.getPreChart()) {
-      if (!components.contains(e.getCaller())) components.add(e.getCaller());
-      if (!components.contains(e.getCallee())) components.add(e.getCallee());
+      if (!components.contains(e.getCallerName())) components.add(e.getCallerName());
+      if (!components.contains(e.getCalleeName())) components.add(e.getCalleeName());
     }
     for (LSCEvent e  : l.getMainChart()) {
-      if (!components.contains(e.getCaller())) components.add(e.getCaller());
-      if (!components.contains(e.getCallee())) components.add(e.getCallee());
+      if (!components.contains(e.getCallerName())) components.add(e.getCallerName());
+      if (!components.contains(e.getCalleeName())) components.add(e.getCalleeName());
     }
     return components;
   }
@@ -92,7 +76,7 @@ public class SAMOutput {
     
     // list pre-chart events
     for (LSCEvent e  : l.getPreChart()) {
-      sb.append("  "+e.getCaller()+"=>"+e.getCallee()+" [ label = \""+e.getMethod()+"\", linecolor = \"blue\" ];\n");
+      sb.append("  "+e.getCallerName()+"=>"+e.getCalleeName()+" [ label = \""+e.getMethodName()+"\", linecolor = \"blue\" ];\n");
     }
     
     // separate pre- and main-chart
@@ -100,7 +84,7 @@ public class SAMOutput {
     
     // list main-chart events
     for (LSCEvent e  : l.getMainChart()) {
-      sb.append("  "+e.getCaller()+"=>"+e.getCallee()+" [ label = \""+e.getMethod()+"\", linecolor = \"red\" ];\n");
+      sb.append("  "+e.getCallerName()+"=>"+e.getCalleeName()+" [ label = \""+e.getMethodName()+"\", linecolor = \"red\" ];\n");
     }
 
     // add name of chart

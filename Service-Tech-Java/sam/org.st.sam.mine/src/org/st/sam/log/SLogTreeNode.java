@@ -11,6 +11,12 @@ public class SLogTreeNode {
   
   public final short id;
   public final int globalID;
+  
+  /**
+   * Field set for the last letter of a word to remember the number of
+   * occurrences of that word in the tree.
+   */
+  public int occurrences = -1;
 
   public SLogTreeNode(short id, SLogTreeNode pre) {
     this.id = id;

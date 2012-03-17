@@ -33,12 +33,13 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
 
     // this node is labeled with the current letter or with an invisible letter
     if (n.id == word[pos] || !visible[n.id]) {
+
+      // if the current node is labeled with the current event, move to the next event
+      // otherwise search for the current event at the successors
+      int nextLetter = (n.id == word[pos]) ? 1 : 0;
+      if (n.id == word[pos]) occurrence[pos] = n;
       // find the successors that continues the word
       for (SLogTreeNode n2 : n.post) {
-        // if the current node is labeled with the current event, move to the next event
-        // otherwise search for the current event at the successors
-        int nextLetter = (n.id == word[pos]) ? 1 : 0;
-        if (n.id == word[pos]) occurrence[pos] = n;
         continuesWith(n2, word, pos+nextLetter, visible, occurrence, occurrences, partialOccurrences, violators, stuck_at);
       }
     } else if (visible[n.id]) {
@@ -145,7 +146,6 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
         word[e+s.pre.length] = s.main[e];
       }
       s.support = support(word, OPTIONS_WEIGHTED_OCCURRENCE);
-      
     }
     
     return s.support;
@@ -174,8 +174,8 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
         SLogTreeNode pre_occurrence[] = new SLogTreeNode[s.pre.length];
         if (endsWith(n, s.pre, s.pre.length-1, visible, pre_occurrence)) {
           
-          //preMatch += nodeCount.get(n);
-          preMatch++;
+          preMatch += nodeCount.get(n);
+          //preMatch++;
           
           if (markTree) {
             for (SLogTreeNode n3 : pre_occurrence) {
@@ -231,8 +231,7 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
               //mainMatch_pos += total_occurrences;
               this_mainMatch_pos++;
               
-            } /*
-              else if (partialOccurrences.size() > 0) {
+            } else if (partialOccurrences.size() > 0) {
               weakNegative = true;
               if (markTree) {
                 for (SLogTreeNode[] witness : partialOccurrences) {
@@ -252,9 +251,10 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
                   total_occurrences += nodeCount.get(n);
                 }
               }
-              mainMatch_weak_neg += total_occurrences;
+              //mainMatch_weak_neg += total_occurrences;
+              this_mainMatch_weak_neg++;
               
-            } */ else {
+            } else {
               // pre-chart not followed by main-chart. mark this specifically
               if (markTree) {
                 for (SLogTreeNode n3 : pre_occurrence) {
@@ -262,17 +262,21 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
                   preChartCoverage_fail.put(n3, preChartCoverage_fail.get(n3)+nodeCount.get(n3));
                 }
               }
+              this_mainMatch_weak_neg++;
+              this_mainMatch_neg++;
             }
           }
           
-          if (!positive && !weakNegative) {
+          if (!positive) {
             //mainMatch_neg += nodeCount.get(n);
             this_mainMatch_neg++;
           }
           
-          if (this_mainMatch_pos > 0) mainMatch_pos++;
-          if (this_mainMatch_neg > 0) mainMatch_neg++;
-          if (this_mainMatch_weak_neg > 0) mainMatch_weak_neg++;
+          if (this_mainMatch_pos > 0) mainMatch_pos += nodeCount.get(n);
+          else {
+            if (this_mainMatch_weak_neg > 0) mainMatch_weak_neg += nodeCount.get(n);
+            if (this_mainMatch_neg > 0) mainMatch_neg += nodeCount.get(n);
+          }
         }
       }
     }
@@ -280,7 +284,9 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     //return (double)(mainMatch_pos + mainMatch_weak_neg - mainMatch_neg)/(double)preMatch;
     //System.out.println(mainMatch_pos+" + "+mainMatch_weak_neg+" / "+preMatch);
     
-    return (double)(mainMatch_pos + mainMatch_weak_neg)/(double)preMatch;
+    //System.out.println(s +" --> " +(double)(mainMatch_pos + (mainMatch_weak_neg-mainMatch_neg))+"/"+(double)preMatch);
+    
+    return (double)(mainMatch_pos + (mainMatch_weak_neg-mainMatch_neg))/(double)preMatch;
   }
   
   private Map<SLogTreeNode, Integer> preChartCoverage = new HashMap<SLogTreeNode, Integer>();
@@ -344,6 +350,8 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
       
       String nodeLabel = names.get(n.id)+" ["+n.id+"]";
       String fillColor = null;
+      
+      nodeLabel += "\\n "+nodeCount.get(n);
       
       if (preChartCoverage.containsKey(n) || mainChartCoverage.containsKey(n) || mainChartCoverage_partial.containsKey(n)) {
         String l1 = preChartCoverage.containsKey(n) ? preChartCoverage.get(n).toString() : "";

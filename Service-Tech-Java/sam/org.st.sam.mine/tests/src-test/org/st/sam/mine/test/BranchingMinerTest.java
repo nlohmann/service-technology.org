@@ -79,23 +79,8 @@ public class BranchingMinerTest extends TestSuite {
     MineLSC miner = new MineBranchingLSC();
     miner.mineLSCs_writeResults(sourceFile, 80, 1.0);
     
-    checkOutputGeneral(sourceFile, 109);
+    checkOutputGeneral(sourceFile, 44);
   }
-	
-	@Test
-	public void test_scenario_subsumption() {
-	  
-	  short[] pre1 = new short[] { 15 };
-	  short[] main1 = new short[] { 16, 17, 18, 19, 20, 30, 31, 32, 35, 36, 42, 43, 44, 57, 58, 59, 60, 61, 62, 13, 14 };
-	  
-	  short[] pre2 = new short[] { 19 };
-    short[] main2 = new short[] {                 20, 30, 31, 32, 35, 36, 42, 43, 44, 57, 58, 59, 60, 61, 62, 13, 14 };
-    
-    SScenario s1 = new SScenario(pre1, main1);
-    SScenario s2 = new SScenario(pre2, main2);
-	  
-    Assert.assertEquals(true, s1.implies(s2));
-	}
 	
 	@Test
   public void mine_test_jeti_invariants () throws Exception {
@@ -106,6 +91,6 @@ public class BranchingMinerTest extends TestSuite {
     MineLSC miner = new MineBranchingLSC();
     miner.mineLSCs_writeResults(sourceFile, 10, 1.0);
     
-    checkOutputGeneral(sourceFile, 95);
+    checkOutputGeneral(sourceFile, 120);
   }
 }

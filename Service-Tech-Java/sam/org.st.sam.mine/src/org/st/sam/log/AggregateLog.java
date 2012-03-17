@@ -144,9 +144,9 @@ public class AggregateLog {
   
   public static void main(String[] args) throws IOException {
     
-    if (args.length != 1) {
+    if (args.length != 2) {
       System.out.println("error. wrong number of arguments. required:");
-      System.out.println("   <logfile.xes>");
+      System.out.println("   <logfile.xes.gz> <result.xes.gz>");
       return;
     }
     
@@ -155,7 +155,7 @@ public class AggregateLog {
     
     XLog resampled = filter.resample();
     
-    String outputFileName = XESImport.getLogFileName(args[0])+"_agg"+XESImport.getLogFileExtension(".xes.gz");
+    String outputFileName = XESImport.getLogFileName(args[1])+XESImport.getLogFileExtension(args[1]);
     XESExport.writeLog(resampled, outputFileName);
   }
 }

@@ -1,6 +1,7 @@
 package org.st.sam.mine;
 
-import org.st.sam.log.SLogTree;
+import org.st.sam.log.SLogTree.SupportedWord;
+import org.st.sam.mine.collect.SimpleArrayList;
 
 public class MineLinearLSC extends MineLSC {
   
@@ -8,8 +9,8 @@ public class MineLinearLSC extends MineLSC {
     super(Configuration.mineLinear());
   }
   
-  public MineLinearLSC(SLogTree tree) {
-    super(Configuration.mineLinear(), tree);
+  public MineLinearLSC(SimpleArrayList<SupportedWord> supportedWords) {
+    super(Configuration.mineLinear(), supportedWords);
   }
 
   public static void main(String args[]) throws Exception {

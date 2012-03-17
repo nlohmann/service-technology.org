@@ -1,6 +1,7 @@
 package org.st.sam.mine;
 
-import org.st.sam.log.SLogTree;
+import org.st.sam.log.SLogTree.SupportedWord;
+import org.st.sam.mine.collect.SimpleArrayList;
 
 public class MineBranchingLSC extends MineLSC {
   
@@ -8,8 +9,8 @@ public class MineBranchingLSC extends MineLSC {
     super(Configuration.mineBranching());
   }
   
-  public MineBranchingLSC(SLogTree tree) {
-    super(Configuration.mineBranching(), tree);
+  public MineBranchingLSC(SimpleArrayList<SupportedWord> supportedWords) {
+    super(Configuration.mineBranching(), supportedWords);
   }
 
   public static void main(String args[]) throws Exception {

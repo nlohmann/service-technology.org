@@ -24,6 +24,7 @@ import lscminer.datastructure.LSCEvent;
 import org.deckfour.xes.model.XLog;
 import org.st.sam.log.SLog;
 import org.st.sam.log.SLogTree;
+import org.st.sam.log.SLogTree.SupportedWord;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.log.XESImport;
@@ -42,6 +43,9 @@ public class MineLSC {
     public boolean allowEventRepetitions = false;
     public List<short[]> triggers = null;
     public List<short[]> effects = null;
+    public boolean discoverScenarios = true;
+    
+    public boolean removeSubsumed = true;
     
     public static Configuration mineBranching() {
       Configuration c = new Configuration();
@@ -58,7 +62,7 @@ public class MineLSC {
     public static Configuration mineEffect(short[] trigger) {
       Configuration c = new Configuration();
       c.mode = MODE_BRANCHING;
-      c.triggers = new LinkedList<short[]>();
+      c.triggers = new ArrayList<short[]>();
       c.triggers.add(trigger);
       return c;
     }
@@ -80,11 +84,13 @@ public class MineLSC {
   
   public  long number_of_candidate_words;
   
+  public  long total_number_of_scenarios = 0;
+  
   public MineLSC(Configuration config) {
     this(config, null);
   }
 
-  public MineLSC(Configuration config, SLogTree supportedWords) {
+  public MineLSC(Configuration config, SimpleArrayList<SupportedWord> supportedWords) {
     this.config = config;
     setSupportedWords(supportedWords);
   }
@@ -134,18 +140,24 @@ public class MineLSC {
   
   public void mineLSCs(final XLog xlog, int minSupportThreshold, double confidence, String targetFilePrefix) throws IOException {
     System.out.println("log contains "+xlog.size()+" traces");
-    setSLog(new SLog(xlog));
     
+    SLog slog = new SLog(xlog);
     boolean mergeTraces = (config.mode == Configuration.MODE_BRANCHING) ? true : false;
+    tree = new MineBranchingTree(slog, mergeTraces);
     
-    long time_start_candiate_words = System.currentTimeMillis();
+    mineLSCs(slog, tree, minSupportThreshold, confidence, targetFilePrefix);
+  }
     
-    tree = new MineBranchingTree(getSLog(), mergeTraces);
+  public void mineLSCs(final SLog slog, final MineBranchingTree tree, int minSupportThreshold, double confidence, String targetFilePrefix) throws IOException {
+    
+    setSLog(slog);
     
     String stat = tree.getStatistics().toString();
     System.out.println("tree statistics: "+stat);
     
-    List<short[]> supportedWords = getSupportedWords(tree, minSupportThreshold);
+    long time_start_candiate_words = System.currentTimeMillis();
+    
+    SimpleArrayList<SupportedWord> supportedWords = getSupportedWords(tree, minSupportThreshold);
     System.out.println("found "+supportedWords.size()+" supported words");
     number_of_candidate_words = supportedWords.size();
     
@@ -169,7 +181,8 @@ public class MineLSC {
     long time_start_scenario_discovery = System.currentTimeMillis();
     
     ArrayList<SScenario> scenarios = new ArrayList<SScenario>();
-    discoverScenariosFromWords(supportedWords, confidence, scenarios);
+    if (config.discoverScenarios)
+      discoverScenariosFromWords(supportedWords, confidence, scenarios);
       
     long time_end_scenario_discovery = System.currentTimeMillis();
     
@@ -179,17 +192,17 @@ public class MineLSC {
     System.out.println("tree statistics: "+stat);
   }
   
-  private void discoverScenariosFromWords(List<short[]> supportedWords, double confidence, ArrayList<SScenario> scenarios) {
+  private void discoverScenariosFromWords(SimpleArrayList<SupportedWord> supportedWords, double confidence, ArrayList<SScenario> scenarios) {
     
     int total = 0;
-    Map<Integer, LinkedList<short[]>> supportedWordsClasses = new HashMap<Integer, LinkedList<short[]>>();
+    Map<Integer, SimpleArrayList<SupportedWord>> supportedWordsClasses = new HashMap<Integer, SimpleArrayList<SupportedWord>>();
     int largestWordSize = 0;
-    for (short[] w : supportedWords) {
-      if (!supportedWordsClasses.containsKey(w.length)) {
-        supportedWordsClasses.put(w.length, new LinkedList<short[]>());
+    for (SupportedWord w : supportedWords) {
+      if (!supportedWordsClasses.containsKey(w.word.length)) {
+        supportedWordsClasses.put(w.word.length, new SimpleArrayList<SupportedWord>());
       }
-      supportedWordsClasses.get(w.length).add(w);
-      if (largestWordSize < w.length) largestWordSize = w.length;
+      supportedWordsClasses.get(w.word.length).add(w);
+      if (largestWordSize < w.word.length) largestWordSize = w.word.length;
       total += 1; //w.length;
     }
 
@@ -198,7 +211,8 @@ public class MineLSC {
 
     
     int done = 0;
-    supportedWords.clear();
+    
+    SimpleArrayList<SScenario> toRemove = new SimpleArrayList<SScenario>();
     
     //for (int splitPos=1;splitPos < largestWordSize; splitPos++) {
       for (int size = largestWordSize; size > 0; size--) {
@@ -210,12 +224,14 @@ public class MineLSC {
         if (!supportedWordsClasses.containsKey(size)) continue;
         
         //LinkedList<short[]> mined = new LinkedList<short[]>();
-        for (short[] cand : supportedWordsClasses.get(size)) {
+        for (SupportedWord _cand : supportedWordsClasses.get(size)) {
+          
+          short[] cand = _cand.word;
   
           done++;
           if (done % 100 == 0) System.out.print(".");
           if (done % 7000 == 0) { 
-            System.out.println(done*100/total);
+            System.out.println(done*100/total+"% (found "+scenarios.size()+" so far)");
           }
         
           for (int splitPos=1; splitPos<cand.length; splitPos++)
@@ -253,7 +269,7 @@ public class MineLSC {
               
               boolean skip = false;
               
-              SScenario s = new SScenario(pre, main_cand);
+              SScenario s = new SScenario(pre, main_cand, slog.originalNames.length);
               
               LSC l_test = slog.toLSC(s, 0, 0);
               if (!l_test.isConnected()) {
@@ -300,11 +316,16 @@ public class MineLSC {
                   System.out.println(s+" satisfies confidence");
                 }
                 
-                SimpleArrayList<SLogTreeNode[]> occ = tree.countOccurrences(cand, null, null);
-                int total_occurrences = tree.getTotalOccurrences(occ, OPTIONS_WEIGHTED_OCCURRENCE);
+                total_number_of_scenarios++;
                 
-                LSC l = slog.toLSC(s, total_occurrences, c);
-                s.support = total_occurrences;
+                //if (_cand.support == -1)
+                {
+                  SimpleArrayList<SLogTreeNode[]> occ = tree.countOccurrences(cand, null, null);
+                  _cand.support = tree.getTotalOccurrences(occ, OPTIONS_WEIGHTED_OCCURRENCE);
+                }
+                
+                LSC l = slog.toLSC(s, _cand.support, c);
+                s.support = _cand.support;
                 
                 if (l.isConnected()) {
                   if (showDebug(cand, null)) {
@@ -312,40 +333,59 @@ public class MineLSC {
                   }
                   
                   boolean s_weaker = false;
-                  List<SScenario> toRemove = new LinkedList<SScenario>();
-                  for (SScenario s2 : scenarios) {
-                    if (s.weakerThan(s2) || implies(s2, s)
-                        && l.getSupport() <= s2l.get(s2).getSupport() 
-                        //&& l.getConfidence() <= s2l.get(s2).getConfidence()
-                        )
-                    {
-                      if (showDebug(cand, null)) {
-                        System.out.println("  subsubmed by "+s2);
+                  toRemove.quickClear();
+                  
+                  if (config.removeSubsumed) {
+                    for (SScenario s2 : scenarios) {
+                      if (subsumes(s2, s)  
+                          //&& l.getConfidence() <= s2l.get(s2).getConfidence()
+                          )
+                      {
+                        if (showDebug(cand, null)) {
+                          System.out.println("  subsubmed by "+s2);
+                        }
+                        s_weaker = true;
+                        break;
                       }
-                      s_weaker = true;
-                      break;
-                    }
-                    if (s2.weakerThan(s) || implies(s, s2)
-                        && l.getSupport() >= s2l.get(s2).getSupport() 
-                        //&& l.getConfidence() >= s2l.get(s2).getConfidence()
-                        )
-                    {
-                      if (showDebug(cand, null)) {
-                        System.out.println("  subsubmes "+s2);
-                      }
-                      toRemove.add(s2);
                     }
                   }
+                  
                   if (!s_weaker) {
+                    int insertAt = -1;
+                    
+                    if (config.removeSubsumed) {
+                      for (int s2_index=0; s2_index<scenarios.size(); s2_index++) { 
+                        SScenario s2 = scenarios.get(s2_index);
+                        if (subsumes(s, s2)
+                            //&& l.getConfidence() >= s2l.get(s2).getConfidence()
+                            )
+                        {
+                          if (showDebug(cand, null)) {
+                            System.out.println("  subsubmes "+s2);
+                          }
+                          toRemove.add(s2);
+                          if (insertAt != -1) insertAt =  s2_index;
+                        }
+                      }
+                    }
+
                     //System.out.println("removing all "+toRemove);
-                    scenarios.removeAll(toRemove);
                     for (SScenario s_toRemove : toRemove) {
+                      
+                      if (showDebug(s_toRemove.word, null)) {
+                        System.out.println(s_toRemove+"  subsubmed by "+s);
+                      }
+                      
+                      scenarios.remove(s_toRemove);
                       originalScenarios.remove(s2l.get(s_toRemove));
                       lscs.remove(s2l.get(s_toRemove));
                       s2l.remove(s_toRemove);
                     }
   
-                    scenarios.add(s);
+                    if (insertAt != -1) // insert at the position where it subsumed the first scenario
+                      scenarios.add(insertAt, s);
+                    else
+                      scenarios.add(s);
                     lscs.add(l);
                     originalScenarios.put(l, s);
                     s2l.put(s, l);
@@ -357,7 +397,7 @@ public class MineLSC {
                   break;  
                   // we found a scenario for this candidate word. any other scenario
                   // will only contain longer pre-charts and Shorter main charts
-                  // approximative optimization: stop exploring other scenarios
+
                 } else {
                   
                   if (showDebug(cand, null)) {
@@ -377,6 +417,38 @@ public class MineLSC {
       }
     //}
       
+    if (config.removeSubsumed) {
+      System.out.println("\nRemoving remaining implied scenarios ("+scenarios.size()+")...");  
+      boolean changed = true;
+      while(changed) {
+        changed = false;
+  
+        toRemove.quickClear();
+        
+        for (SScenario s : scenarios) {
+          for (SScenario s2 : scenarios) {
+            if (s == s2) continue;
+            if (implies(s, s2)) {
+              System.out.println(s+"  implies  "+s2);
+              toRemove.add(s2);
+            }
+          }
+          if (toRemove.size() > 0) {
+            break;
+          }
+        }
+        
+        //System.out.println("removing all "+toRemove);
+        for (SScenario s_toRemove : toRemove) {
+          scenarios.remove(s_toRemove);
+          originalScenarios.remove(s2l.get(s_toRemove));
+          lscs.remove(s2l.get(s_toRemove));
+          s2l.remove(s_toRemove);
+          changed = true;
+        }
+      }
+    }
+      
     for (SScenario s : scenarios) {
       System.out.println(s);
     }
@@ -386,7 +458,24 @@ public class MineLSC {
   
   public boolean implies(SScenario s1, SScenario s2) {
     //if (s1.implies(s2) && s2l.get(s1).getSupport() >= s2l.get(s2).getSupport())
-    if (s1.implies(s2) && tree.support(s1, OPTIONS_WEIGHTED_OCCURRENCE) >= tree.support(s2, OPTIONS_WEIGHTED_OCCURRENCE))
+    
+    assert s1.support > 0;
+    assert s2.support > 0;
+    
+    if (s1.support >= s2.support && s1.implies(s2)
+        )
+      return true;
+    else
+      return false;
+  }
+  
+  public boolean subsumes(SScenario s1, SScenario s2) {
+    //if (s1.implies(s2) && s2l.get(s1).getSupport() >= s2l.get(s2).getSupport())
+    
+    assert s1.support > 0;
+    assert s2.support > 0;
+    
+    if (s1.support >= s2.support && s1.subsumes(s2))
       return true;
     else
       return false;
@@ -398,8 +487,8 @@ public class MineLSC {
     
     Map<Short, String> ShortenedNames = new HashMap<Short, String>();
     for (Short i=0; i<getSLog().originalNames.length; i++) {
-      LSCEvent e = getSLog().toLSCEvent(i);
-      ShortenedNames.put(i, SAMOutput.shortenNames(e.getMethod()));
+      String[] e = getSLog().toLSCEventNames(i);
+      ShortenedNames.put(i, SAMOutput.shortenNames(e[SLog.LSC_METHOD]));
     }
     
     return ShortenedNames;
@@ -476,30 +565,32 @@ public class MineLSC {
     return slog;
   }
   
-  private SLogTree supportedWords = null;
+  private SLogTree supportedWordsTree = null;
+  private SimpleArrayList<SupportedWord> supportedWords = null;
   
-  private void setSupportedWords(SLogTree supportedWords) {
+  private void setSupportedWords(SimpleArrayList<SupportedWord> supportedWords) {
     this.supportedWords = supportedWords; 
   }
   
-  public SLogTree getSupportedWords() {
+  public SimpleArrayList<SupportedWord> getSupportedWords() {
     return supportedWords;
   }
   
-  private List<short[]> getSupportedWords(MineBranchingTree tree, int minSupThreshold) {
+  private SimpleArrayList<SupportedWord> getSupportedWords(MineBranchingTree tree, int minSupThreshold) {
     if (supportedWords == null) {
       mineSupportedWords(tree, minSupThreshold);
+      supportedWords = supportedWordsTree.getAllWords();
     }
-    return supportedWords.getAllWords(); 
+    return supportedWords; 
   }
   
   private void mineSupportedWords(MineBranchingTree tree, int minSupThreshold) {
     
     log_new(log_msw, "");
     
-    List<Short> singleEvents = new LinkedList<Short>();
+    List<Short> singleEvents = new ArrayList<Short>();
     
-    supportedWords = new SLogTree();
+    supportedWordsTree = new SLogTree();
     int maxEventId = getSLog().originalNames.length;
     for (int e=0; e<maxEventId; e++) {
       
@@ -518,26 +609,37 @@ public class MineLSC {
     // copy all events to an array
     short[] allEvents = toArray(singleEvents);
 
-    for (short e : singleEvents) {
-      
-      if (config.triggers != null) {
-        boolean isTriggerEvent = false;
-        for (short[] trig : config.triggers) {
-          if (trig[0] == e) isTriggerEvent = true;
+    if (config.effects == null) { // no effect mining
+      for (short e : singleEvents) {
+        
+        if (config.triggers != null) {
+          boolean isTriggerEvent = false;
+          for (short[] trig : config.triggers) {
+            if (trig[0] == e) isTriggerEvent = true;
+          }
+          // when mining triggers, skip words that do not start like a trigger
+          if (!isTriggerEvent) continue;
         }
-        // when mining triggers, skip words that do not start like a trigger
-        if (!isTriggerEvent) continue;
+        
+        System.out.println("mining for "+e);
+        short remainingEvents[] = removeFrom(allEvents, e);
+        
+        if (config.optimizedSearch)
+          mineSupportedWords_optimized(tree, minSupThreshold, new short[] { e }, remainingEvents, remainingEvents, supportedWordsTree, false);
+        else
+          mineSupportedWords(tree, minSupThreshold, new short[] { e }, singleEvents, supportedWordsTree, false);
+        System.out.println(supportedWordsTree.nodes.size());
+      }
+    } else { // effect mining
+      
+      for (short[] effect : config.effects) {
+        System.out.println("mining for "+toString(effect));
+        // search backwards
+        mineSupportedWords(tree, minSupThreshold, effect, singleEvents, supportedWordsTree, true);
       }
       
-      System.out.println("mining for "+e);
-      short remainingEvents[] = removeFrom(allEvents, e);
-      
-      if (config.optimizedSearch)
-        mineSupportedWords_optimized(tree, minSupThreshold, new short[] { e }, remainingEvents, remainingEvents, supportedWords, false);
-      else
-        mineSupportedWords(tree, minSupThreshold, new short[] { e }, singleEvents, supportedWords);
-      System.out.println(supportedWords.nodes.size());
     }
+    
 
   }
   
@@ -558,7 +660,7 @@ public class MineLSC {
   private HashMap<SLogTreeNode,boolean[]> checkSuccessors = new HashMap<SLogTreeNode,boolean[]>();
   private HashMap<Short,boolean[]> retryMap = new HashMap<Short, boolean[]>(); 
   
-  private void mineSupportedWords_optimized(MineBranchingTree tree, int minSupThreshold, final short word[], final short[] ev, final short[] preferedSucc, SLogTree words, boolean check) {
+  private SLogTreeNode mineSupportedWords_optimized(MineBranchingTree tree, int minSupThreshold, final short word[], final short[] ev, final short[] preferedSucc, SLogTree words, boolean check) {
 
     short[] newPreferedSucc = preferedSucc;
     SLogTreeNode leaf = words.contains(word);
@@ -577,7 +679,7 @@ public class MineLSC {
         if (showDebug(word, preferedSucc)) {
           log(log_msw, "already seen "+toString(word)+" "+checkSuccessors.get(leaf)+"\n");
         }
-        return;
+        return null;
       }
     }
     
@@ -641,9 +743,9 @@ public class MineLSC {
         }
       }
       
-      int total_occurrences = tree.getTotalOccurrences(occ, OPTIONS_WEIGHTED_OCCURRENCE);
+      int occurrences_nextWord = tree.getTotalOccurrences(occ, OPTIONS_WEIGHTED_OCCURRENCE);
       
-      if (total_occurrences >= minSupThreshold) {
+      if (occurrences_nextWord >= minSupThreshold) {
       
         // compute list of available events for continuation in the recursion
         short ev_avail[];
@@ -661,10 +763,12 @@ public class MineLSC {
         final short[] preferedSuccNext = getPreferredSuccessors(ev_avail, occ, violatingSuccessors);
 
         if (showDebug(nextWord, preferedSucc)) {
-          log(log_msw, " IS IN "+total_occurrences+" prefered succ: "+preferedSuccNext+" violating succ: "+violatingSuccessors+"\n");
+          log(log_msw, " IS IN "+occurrences_nextWord+" prefered succ: "+preferedSuccNext+" violating succ: "+violatingSuccessors+"\n");
         }
         
-        mineSupportedWords_optimized(tree, minSupThreshold, nextWord, ev_avail, preferedSuccNext, words, false);
+        SLogTreeNode node_nextWord = mineSupportedWords_optimized(tree, minSupThreshold, nextWord, ev_avail, preferedSuccNext, words, false);
+        if (node_nextWord != null) node_nextWord.occurrences = occurrences_nextWord;
+        
         if (nextWord.length > 1) {
           for (Short ignore : violatingSuccessors) {
             
@@ -732,7 +836,7 @@ public class MineLSC {
       } else {
         
         if (showDebug(nextWord, preferedSucc)) {
-          log(log_msw, " IS OUT "+total_occurrences+" violators: "+violators+" stuck: "+stuck_at+"\n");
+          log(log_msw, " IS OUT "+occurrences_nextWord+" violators: "+violators+" stuck: "+stuck_at+"\n");
         }
         
         if (!Arrays.equals(newPreferedSucc,ev)) {
@@ -778,11 +882,15 @@ public class MineLSC {
     if (showDebug(word, preferedSucc)) {
       log(log_msw, "finish "+toString(word)+" succ: "+preferedSucc+"\n");
     }
+    
+    return n;
   }
   
-  private void mineSupportedWords(MineBranchingTree tree, int minSupThreshold, final short word[], List<Short> ev, SLogTree words) {
+  private void mineSupportedWords(MineBranchingTree tree, int minSupThreshold, final short word[], List<Short> ev, SLogTree words, boolean prepend_events) {
 
     words.addTrace(word);
+    
+    //if (prepend_events && word.length > 8) return;
     
     dot_count++;
     if (dot_count % 100 == 0) System.out.print(".");
@@ -812,8 +920,18 @@ public class MineLSC {
         continue;
       }
       
-      short[] nextWord = Arrays.copyOf(word, word.length+1);
-      nextWord[word.length] = e;
+      short[] nextWord;
+      if (!prepend_events) {
+        nextWord = Arrays.copyOf(word, word.length+1);
+        nextWord[word.length] = e;
+      } else {
+        nextWord = new short[word.length+1];
+        nextWord[0] = e;
+        for (int i=0; i<word.length; i++) {
+          nextWord[i+1] = word[i];
+        }
+      }
+      
       
       SimpleArrayList<SLogTreeNode[]> occ = (config.skipEvents_invisible)
           ? tree.countOccurrences(nextWord, null, null) 
@@ -823,11 +941,10 @@ public class MineLSC {
       
       if (total_occurrences >= minSupThreshold) {
       
-        mineSupportedWords(tree, minSupThreshold, nextWord, ev, words);
+        mineSupportedWords(tree, minSupThreshold, nextWord, ev, words, prepend_events);
 
       }
     }
-        
   }
 
   /**
@@ -901,11 +1018,12 @@ public class MineLSC {
   }
 
   private static boolean showDebug(short[] word, short[] preferedSucc) {
-
-    return false;
-    /*
-    short[] to_check = new short [] {1,4,5,14,15,30,31,41,42,43,44,45,46};
     
+    return false;
+
+    /*
+    short[] to_check = new short [] {28, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26};
+     
     if (word.length < to_check.length) return false;
     
     for (int i=0; i<to_check.length; i++) {

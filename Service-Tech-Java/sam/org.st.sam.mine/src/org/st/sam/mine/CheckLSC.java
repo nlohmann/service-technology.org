@@ -98,7 +98,7 @@ public class CheckLSC {
       main[e] = Short.parseShort(mainEvents[e]);
     }
     
-    return new SScenario(pre, main);
+    return new SScenario(pre, main, slog.originalNames.length);
   }
   
   public void checkLSC(XLog xlog, String targetFilePrefix, String scenario) throws IOException {

@@ -19,7 +19,7 @@ public class RunExperimentCompareBatch {
 //    exp.experiment();
 //    
     exp = new RunExperimentCompare();
-    exp.setParameters("./experiments/crossftp_succinct/", "crossftp_succinct_traceset.xes.gz", 1.0 /*fract*/, 12 /*supp*/, 1.0 /* conf */);
+    exp.setParameters("./experiments/crossftp_succinct/", "crossftp_succinct_traceset.xes.gz", 1.0 /*fract*/, 12 /*supp*/, 1.0 /* conf B */, 1.0 /* conf L */);
     exp.experiment();
 
 //    exp = new RunExperimentCompare();

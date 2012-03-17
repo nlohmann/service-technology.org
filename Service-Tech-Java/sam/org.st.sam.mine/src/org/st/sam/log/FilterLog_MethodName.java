@@ -60,8 +60,8 @@ public class FilterLog_MethodName {
     
     Map<Short, String> ShortenedNames = new HashMap<Short, String>();
     for (Short i=0; i<getSLog().originalNames.length; i++) {
-      LSCEvent e = getSLog().toLSCEvent(i);
-      ShortenedNames.put(i, SAMOutput.shortenNames(e.getMethod()));
+      String[] e = getSLog().toLSCEventNames(i);
+      ShortenedNames.put(i, SAMOutput.shortenNames(e[SLog.LSC_METHOD]));
     }
 
     for (short[] trace : slog.traces) {
@@ -82,8 +82,8 @@ public class FilterLog_MethodName {
     
     Map<Short, String> ShortenedNames = new HashMap<Short, String>();
     for (Short i=0; i<getSLog().originalNames.length; i++) {
-      LSCEvent e = getSLog().toLSCEvent(i);
-      ShortenedNames.put(i, SAMOutput.shortenNames(e.getMethod()));
+      String[] e = getSLog().toLSCEventNames(i);
+      ShortenedNames.put(i, SAMOutput.shortenNames(e[SLog.LSC_METHOD]));
     }
     
     computeLogSummary();
@@ -100,8 +100,8 @@ public class FilterLog_MethodName {
     
     Map<Short, String> ShortenedNames = new HashMap<Short, String>();
     for (Short i=0; i<getSLog().originalNames.length; i++) {
-      LSCEvent e = getSLog().toLSCEvent(i);
-      ShortenedNames.put(i, SAMOutput.shortenNames(e.getMethod()));
+      String[] e = getSLog().toLSCEventNames(i);
+      ShortenedNames.put(i, SAMOutput.shortenNames(e[SLog.LSC_METHOD]));
     }
     
     boolean[] nonFrequent = new boolean[slog.originalNames.length];

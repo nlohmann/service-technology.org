@@ -13,9 +13,9 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.st.sam.util.SAMOutput;
 
-public class FilterLog_ByComponents {
+public class FilterLog_ByMethods {
   
-  public FilterLog_ByComponents(String logFile) throws IOException {
+  public FilterLog_ByMethods(String logFile) throws IOException {
     loadLog(logFile);
   }
 
@@ -52,7 +52,7 @@ public class FilterLog_ByComponents {
     return slog;
   }
   
-  public boolean[] getEventFilter(String componentNames[]) {
+  public boolean[] getEventFilter(String methodNames[]) {
     
     boolean[] nonFrequent = new boolean[slog.originalNames.length];
   
@@ -61,8 +61,8 @@ public class FilterLog_ByComponents {
       String[] event = getSLog().toLSCEventNames(e);
       
       boolean doFilter = false;
-      for (String componentName : componentNames) {
-        if (event[SLog.LSC_CALLEE].indexOf(componentName) >= 0 || event[SLog.LSC_CALLER].indexOf(componentName) >= 0)
+      for (String methodName : methodNames) {
+        if (event[SLog.LSC_METHOD].indexOf(methodName) >= 0)
           doFilter = true;
       }
 
@@ -98,7 +98,7 @@ public class FilterLog_ByComponents {
       return;
     }
     
-    FilterLog_ByComponents filter = new FilterLog_ByComponents(args[0]);
+    FilterLog_ByMethods filter = new FilterLog_ByMethods(args[0]);
     String componentNames[] = args[1].split(",");
     boolean keepClass[] = filter.getEventFilter(componentNames);
     filter.filterEventClasses(keepClass);

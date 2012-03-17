@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.st.sam.mine.collect.SimpleArrayList;
+
 public class SLogTree {
   
   public List<SLogTreeNode> nodes = new LinkedList<SLogTreeNode>();
@@ -83,16 +85,25 @@ public class SLogTree {
     return result;
   }
   
-  public List<short[]> getAllWords() {
-    List<short[]> words = new LinkedList<short[]>();
+  public static class SupportedWord {
+    public short[] word;
+    public int support;
+    public SupportedWord(short[] word, int support) {
+      this.word = word;
+      this.support = support;
+    }
+  }
+  
+  public SimpleArrayList<SupportedWord> getAllWords() {
+    SimpleArrayList<SupportedWord> words = new SimpleArrayList<SupportedWord>();
     for (SLogTreeNode r : roots) {
       getAllWords(r, words);
     }
     return words;
   } 
   
-  public void getAllWords(SLogTreeNode n, List<short[]> words) {
-    words.add(getWord(n));
+  public void getAllWords(SLogTreeNode n, SimpleArrayList<SupportedWord> words) {
+    words.add(new SupportedWord(getWord(n), n.occurrences));
     for (SLogTreeNode s : n.post) {
       getAllWords(s, words);
     }
@@ -167,10 +178,11 @@ public class SLogTree {
     public int depth;
     public int width;
     public int alphabetSize;
+    public int size;
     
     @Override
     public String toString() {
-      return "out(max): "+maxOutDegree+" out(avg): "+averageOutDegree+" depth: "+depth+" width: "+width;
+      return "size: "+size+" out(max): "+maxOutDegree+" out(avg): "+averageOutDegree+" depth: "+depth+" width: "+width;
     }
   }
   
@@ -248,6 +260,7 @@ public class SLogTree {
       alphabet.add(n.id);
     }
     
+    s.size = nodes.size();
     s.alphabetSize = alphabet.size();
     s.averageOutDegree = (double)arcs / (double)nodes.size();
     s.maxOutDegree = maxArcs;

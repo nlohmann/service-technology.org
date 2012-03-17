@@ -13,12 +13,28 @@ public class LSC {
   LSCEvent[] mainChart;
   int support;
   double confidence;
-
-  public LSC(LSCEvent[] preChart, LSCEvent[] mainChart, int support, double confidence){
+  
+  LSCEvent[] lsc;
+  
+  private LSCEventTable table;
+  
+  public LSC(LSCEvent[] preChart, LSCEvent[] mainChart, int support, double confidence, LSCEventTable table){
     this.preChart = preChart;
     this.mainChart = mainChart;
     this.support = support;
     this.confidence = confidence;
+    this.table = table;
+    
+    lsc = new LSCEvent[preChart.length + mainChart.length];
+    int j=0;
+    int i=0;
+    while (i<preChart.length) {
+      lsc[j++] = preChart[i++]; 
+    }
+    i=0;
+    while (i<mainChart.length) {
+      lsc[j++] = mainChart[i++];
+    }
   }
 
   public LSCEvent[] getPreChart(){
@@ -40,12 +56,12 @@ public class LSC {
   public int getMethodStringMaxLength(){
       int maxLength = 0;
       for (LSCEvent event : preChart) {
-          if (event.method.length() > maxLength)
-              maxLength = event.method.length();
+          if (event.getMethodName().length() > maxLength)
+              maxLength = event.getMethodName().length();
       }
       for (LSCEvent event : mainChart) {
-          if (event.method.length() > maxLength)
-              maxLength = event.method.length();
+          if (event.getMethodName().length() > maxLength)
+              maxLength = event.getMethodName().length();
       }
       return maxLength;
   }
@@ -53,16 +69,16 @@ public class LSC {
   public int getObjectStringMaxLength(){
       int maxLength = 0;
       for (LSCEvent event : preChart) {
-          if (event.callee.length() > maxLength)
-              maxLength = event.callee.length();
-          if (event.caller.length() > maxLength)
-              maxLength = event.callee.length();
+          if (event.getCalleeName().length() > maxLength)
+              maxLength = event.getCalleeName().length();
+          if (event.getCallerName().length() > maxLength)
+              maxLength = event.getCallerName().length();
       }
       for (LSCEvent event : mainChart) {
-          if (event.callee.length() > maxLength)
-              maxLength = event.callee.length();
-          if (event.caller.length() > maxLength)
-              maxLength = event.callee.length();
+          if (event.getCalleeName().length() > maxLength)
+              maxLength = event.getCalleeName().length();
+          if (event.getCallerName().length() > maxLength)
+              maxLength = event.getCallerName().length();
       }
 
       return maxLength;
@@ -82,17 +98,20 @@ public class LSC {
   public int getDistinctObjectNo() {
     if (objectsNumber != -1) return objectsNumber;
     
-    Set<String> objects = new HashSet<String>();
+    boolean[] objects = new boolean[table.component_names.length];
+    
     for (LSCEvent event : preChart) {
-      objects.add(event.caller);
-      objects.add(event.callee);
+      objects[event.caller] = true;
+      objects[event.callee] = true;
     }
     for (LSCEvent event : mainChart) {
-      objects.add(event.caller);
-      objects.add(event.callee);
+      objects[event.caller] = true;
+      objects[event.callee] = true;
     }
     
-    objectsNumber = objects.size();
+    objectsNumber = 0;
+    for (int i=0; i<objects.length; i++)
+      if (objects[i]) objectsNumber++;
     
     return objectsNumber;
   }
@@ -103,36 +122,34 @@ public class LSC {
    * @return true if all events are connected; false otherwise
    */
   public boolean[] getUnConnectedEvents() {
-    LSCEvent[] lsc = new LSCEvent[preChart.length + mainChart.length];
-    System.arraycopy(preChart, 0, lsc, 0, preChart.length);
-    System.arraycopy(mainChart, 0, lsc, preChart.length, mainChart.length);
-    
+
     boolean[] unConnectedEvents = new boolean[lsc.length];
-    Set<String> metObjects = new HashSet<String>();
+    boolean[] metObjects = new boolean[table.component_names.length];
 
     /* lsc[0] is the first connected events */
     for (int inx = 1; inx < lsc.length; inx++) unConnectedEvents[inx] = true;
-    metObjects.add(lsc[0].caller);
-    metObjects.add(lsc[0].callee);
+    metObjects[lsc[0].caller] = true;
+    metObjects[lsc[0].callee] = true;
 
+    
     /* add those events that are connected with lsc[0] deductively */
-    while (true) {
-      int metObjectNoBefore = metObjects.size();
+    boolean added = true;
+    while (added) {
+      added = false;
       for (int inx = 1; inx < lsc.length; inx++) {
         if (unConnectedEvents[inx]) {
-          String caller = lsc[inx].getCaller();
-          String callee = lsc[inx].getCallee();
-          if (metObjects.contains(caller) || metObjects.contains(callee)) {
+          short caller = lsc[inx].getCaller();
+          short callee = lsc[inx].getCallee();
+          if (metObjects[caller] || metObjects[callee]) {
             unConnectedEvents[inx] = false;
-            metObjects.add(caller);
-            metObjects.add(callee);
+            if (!metObjects[caller]) added = true;
+            if (!metObjects[callee]) added = true;
+            
+            metObjects[caller] = true;
+            metObjects[callee] = true;
           }
         }
       }
-      int metObjectNoAfter = metObjects.size();
-      
-      if (metObjectNoAfter == metObjectNoBefore)
-        break;
     }
     return unConnectedEvents;
   }

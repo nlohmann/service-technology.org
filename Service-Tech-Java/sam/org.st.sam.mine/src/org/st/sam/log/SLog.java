@@ -7,6 +7,7 @@ import java.util.Map;
 
 import lscminer.datastructure.LSC;
 import lscminer.datastructure.LSCEvent;
+import lscminer.datastructure.LSCEventTable;
 
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
@@ -18,6 +19,7 @@ public class SLog {
   
   public String originalNames[];
   public Map<String, Short> name2id;
+  public LSCEventTable lscEventTable;
   
   public Map<SEvent, XEvent> event2event;
   public Map<XEvent, Short> event2id;
@@ -25,10 +27,14 @@ public class SLog {
   public short[][] traces;
   
   public SLog(XLog xLog) {
-    translateLog(xLog);
+    translateLog(xLog, false);
   }
   
-  private void translateLog(XLog xLog) {
+  public SLog(XLog xLog, boolean backwards) {
+    translateLog(xLog, backwards);
+  }
+  
+  private void translateLog(XLog xLog, boolean backwards) {
     List<String> allNamesOrdered = new LinkedList<String>();
     
     name2id = new HashMap<String, Short>();
@@ -72,11 +78,21 @@ public class SLog {
         }
         eventNum++;
       }
+      if (backwards) traces[traceNum] = invert(traces[traceNum]);
       traceNum++;
     }
     originalNames = allNamesOrdered.toArray(new String[allNamesOrdered.size()]);
     
     computeLSCEventNames();
+    lscEventTable = new LSCEventTable(event_id_to_lsc_events);
+  }
+  
+  public static short[] invert(short[] word) {
+    short[] inverted = new short[word.length];
+    for (int i=0; i<word.length; i++) {
+      inverted[word.length-i-1] = word[i];
+    }
+    return inverted;
   }
 
   public String toString_native() {
@@ -91,9 +107,9 @@ public class SLog {
     return sb.toString();
   }
   
-  private final static int LSC_CALLER = 0;
-  private final static int LSC_CALLEE = 1;
-  private final static int LSC_METHOD = 2;
+  public final static int LSC_CALLER = 0;
+  public final static int LSC_CALLEE = 1;
+  public final static int LSC_METHOD = 2;
   private String[][] event_id_to_lsc_events;
   
   public void computeLSCEventNames() {
@@ -109,14 +125,18 @@ public class SLog {
       event_id_to_lsc_events[event][LSC_METHOD] = originalNames[event].substring(i2+1);
     }
   }
-
+  
+  public String[] toLSCEventNames(short event) {
+    return event_id_to_lsc_events[event];
+  }
 
   public LSCEvent toLSCEvent(short event) {
 
     return new LSCEvent(
-        event_id_to_lsc_events[event][LSC_CALLER],
-        event_id_to_lsc_events[event][LSC_CALLEE],
-        event_id_to_lsc_events[event][LSC_METHOD]);
+        lscEventTable.name2id_component.get(event_id_to_lsc_events[event][LSC_CALLER]),
+        lscEventTable.name2id_component.get(event_id_to_lsc_events[event][LSC_CALLEE]),
+        lscEventTable.name2id_method.get(event_id_to_lsc_events[event][LSC_METHOD]),
+        lscEventTable);
   }
   
   public LSC toLSC(SScenario s, int support, double confidence) {
@@ -128,7 +148,7 @@ public class SLog {
     for (int i=0; i<s.main.length; i++) {
       mainChart[i] = toLSCEvent(s.main[i]); 
     }
-    LSC l = new LSC(preChart, mainChart, support, confidence);
+    LSC l = new LSC(preChart, mainChart, support, confidence, lscEventTable);
     return l;
   }
   

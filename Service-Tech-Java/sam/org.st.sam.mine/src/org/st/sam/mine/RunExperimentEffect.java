@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import lscminer.datastructure.LSC;
 import lscminer.datastructure.LSCEvent;
@@ -13,10 +14,12 @@ import lscminer.datastructure.LSCEvent;
 import org.deckfour.xes.model.XLog;
 import org.st.sam.log.SLog;
 import org.st.sam.log.SLogTree;
+import org.st.sam.log.SLogTree.SupportedWord;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.log.XESImport;
 import org.st.sam.mine.MineLSC.Configuration;
+import org.st.sam.mine.collect.SimpleArrayList;
 
 import com.google.gwt.dev.util.collect.HashMap;
 
@@ -49,38 +52,90 @@ public class RunExperimentEffect extends RunExperimentCompare {
     return triggers;
   }
   
+  List<short[]> effects = null;
+  
+  
+  
   @Override
-  public void runMiners(String logFile, XLog xlog, int minSupportThreshold, double confidence) throws IOException {
-    
-    List<short[]> effects = getCanonicalEffects(xlog);
-    
+  public ArrayList<LSC> runMiner_Branch(String logFile, XLog xlog, int minSupportThreshold, double confidence) throws IOException {
+
     Configuration c_br = Configuration.mineBranching();
     c_br.effects = effects;
-    minerBranch = new MineLSC(c_br);
+    c_br.optimizedSearch = true;
+    c_br.removeSubsumed = true;
+    minerBranch = new MineLSC(c_br, supportedWords);
     minerBranch.OPTIONS_WEIGHTED_OCCURRENCE = true;
     System.out.println("mining branching lscs from "+logFile);
     minerBranch.mineLSCs(logFile, minSupportThreshold, confidence);
     
-    Configuration c_lin = Configuration.mineLinear();
-    c_lin.effects = effects;
-    minerLinear = new MineLSC(c_lin, minerBranch.getSupportedWords());
-    minerLinear.OPTIONS_WEIGHTED_OCCURRENCE = true;
-    System.out.println("mining linear lscs from "+logFile);
-    //LSCEvent[][] dataSet = MineLinearLSC.readInput(experimentFileRoot+"/"+inputFile);
-    //if (dataSet == null)
-    //  return;
-    //LSCMiner minerLinear = new LSCMiner();
-    //minerLinear.mineLSCs(dataSet, support, confidence, density);
-    minerLinear.mineLSCs(logFile, minSupportThreshold, confidence);
-    
     originalScenarios_branch = new HashMap<LSC, SScenario>();
-    originalScenarios_linear = new HashMap<LSC, SScenario>();
     for (LSC l : minerBranch.getScenarios().keySet()) {
       originalScenarios_branch.put(l, minerBranch.getScenarios().get(l));
     }
+    
+    minerBranch.time_candiate_words = time_supported_words;
+    
+    return minerBranch.getLSCs();
+  }
+  
+  @Override
+  public ArrayList<LSC> runMiner_Linear(String logFile, XLog xlog, int minSupportThreshold, double confidence) throws IOException {
+
+    Configuration c_lin = Configuration.mineLinear();
+    c_lin.effects = effects;
+    c_lin.optimizedSearch = true;
+    c_lin.removeSubsumed = true;
+    minerLinear = new MineLSC(c_lin, supportedWords);
+    minerLinear.OPTIONS_WEIGHTED_OCCURRENCE = true;
+    System.out.println("mining linear lscs from "+logFile);
+    minerLinear.mineLSCs(logFile, minSupportThreshold, confidence);
+    
+    originalScenarios_linear = new HashMap<LSC, SScenario>();
+
     for (LSC l : minerLinear.getScenarios().keySet()) {
       originalScenarios_linear.put(l, minerLinear.getScenarios().get(l));
-    }  
+    }
+    
+    return minerLinear.getLSCs();
+  }
+  
+  private SimpleArrayList<SupportedWord> supportedWords;
+  private long time_supported_words;
+  
+  private void computeSupportedWordsOnInvertedTree(String logFile, XLog xlog, int minSupportThreshold, double confidence_branch, double confidence_linear) throws IOException {
+    SLog invertedLog = new SLog(xlog, true);
+    MineBranchingTree inverseTree = new MineBranchingTree(invertedLog, false);
+    
+    List<short[]> inverted_effects = new LinkedList<short[]>();
+    for (short[] effect : effects) {
+      inverted_effects.add(SLog.invert(effect));
+    }
+    
+    Configuration c_br = Configuration.mineBranching();
+    c_br.triggers = inverted_effects; // inverted effects are triggers on inverted trees
+    c_br.optimizedSearch = true;
+    c_br.discoverScenarios = false;
+    MineLSC miner = new MineLSC(c_br);
+    miner.OPTIONS_WEIGHTED_OCCURRENCE = true;
+    System.out.println("discovering words from inverted tree of "+logFile);
+    miner.mineLSCs(invertedLog, inverseTree, minSupportThreshold, confidence_branch, null);
+    
+    supportedWords = new SimpleArrayList<SLogTree.SupportedWord>();
+    for (SupportedWord w : miner.getSupportedWords()) {
+      SupportedWord _w = new SupportedWord(SLog.invert(w.word), w.support);
+      supportedWords.add(_w);
+    }
+    
+    time_supported_words = miner.time_candiate_words;
+    
+  }
+
+  @Override
+  public void runMiners(String logFile, XLog xlog, int minSupportThreshold, double confidence_branch, double confidence_linear) throws IOException {
+    if (effects == null) effects = getCanonicalEffects(xlog);
+    
+    computeSupportedWordsOnInvertedTree(logFile, xlog, minSupportThreshold, confidence_branch, confidence_linear);
+    super.runMiners(logFile, xlog, minSupportThreshold, confidence_branch, confidence_linear);
   }
   
   @Override
@@ -89,6 +144,11 @@ public class RunExperimentEffect extends RunExperimentCompare {
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
     return dir+SLASH+"results_"+logFileName+"_"+traceNum+"_EFF_"+minSupportThreshold+"_"+confidence+"_"+dateFormat.format(now);
   
+  }
+  
+  @Override
+  protected ArrayList<LSC> getNonSubsumedScenarios(ArrayList<LSC> lscs, Map<LSC, SScenario> originalScenarios, MineLSC miner_for_subsumption) {
+    return lscs;
   }
   
   @Override
@@ -101,23 +161,21 @@ public class RunExperimentEffect extends RunExperimentCompare {
     if (minerBranch == null) render_trees = false;
 
     String title = "";
-    for (LSCEvent e : preChart) title += " "+e.getMethod();
+    for (LSCEvent e : preChart) title += " "+e.getMethodName();
     
     ArrayList<LSC> both_match = new ArrayList<LSC>();
     ArrayList<LSC> branching_match = new ArrayList<LSC>();
     ArrayList<LSC> linear_match = new ArrayList<LSC>();
     
     for (LSC l : both) {
-      if (pre_chart_comp.compare(l.getPreChart(), preChart) == 0
-          /*&& !isSubsumed(l, minerBranch, originalScenarios)*/)
+      if (ml && pre_chart_comp.compare(l.getPreChart(), preChart) == 0)
       {
         both_match.add(l);
-        System.out.println(originalScenarios_linear.get(l));
+        //System.out.println(originalScenarios_branch.get(l));
       }
     }
     for (LSC l : onlyLinear) {
-      if (pre_chart_comp.compare(l.getPreChart(), preChart) == 0
-          /*&& !isSubsumed(l, minerBranch, originalScenarios)*/)
+      if (ml && pre_chart_comp.compare(l.getPreChart(), preChart) == 0)
       {
         //linear_match.add(l);
         // strictly linear scenarios (not discovered by branching miner)
@@ -127,8 +185,7 @@ public class RunExperimentEffect extends RunExperimentCompare {
       }
     }
     for (LSC l : onlyBranching) {
-      if (pre_chart_comp.compare(l.getPreChart(), preChart) == 0
-          /*&& !isSubsumed(l, minerBranch, originalScenarios)*/)
+      if (mb && pre_chart_comp.compare(l.getPreChart(), preChart) == 0)
       {
         branching_match.add(l);
       }
@@ -168,8 +225,12 @@ public class RunExperimentEffect extends RunExperimentCompare {
     
     RunExperimentEffect exp = new RunExperimentEffect();
     //if (!exp.readCommandLine(args)) return;
-    exp.setParameters("./experiments/columba_v3/", "columba_v3_resampled_agg_filtered3c.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
-
+    exp.setParameters("./experiments_fse2012/", "crossftp_filtered.xes.gz", 1.0 /*fract*/, 10 /*supp*/, .45 /* conf B */, .45 /* conf L */);
+    exp.effects = new LinkedList<short[]>();
+    //exp.effects.add(new short[] { 49, 50, 51, 52 });
+    //exp.effects.add(new short[] { 40, 41, 45 });
+    //exp.effects.add(new short[] {41, 27});
+    exp.effects.add(new short[] { 19 });
     exp.experiment();
   }
 

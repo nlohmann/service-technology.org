@@ -833,9 +833,9 @@ public class PtnetLoLAPackageImpl extends EPackageImpl implements PtnetLoLAPacka
     addEEnumLiteral(nodeTypeEEnum, NodeType.INOUT);
 
     initEEnum(confidenceEEnum, Confidence.class, "Confidence");
+    addEEnumLiteral(confidenceEEnum, Confidence.UNKNOWN);
     addEEnumLiteral(confidenceEEnum, Confidence.LOW);
     addEEnumLiteral(confidenceEEnum, Confidence.HIGH);
-    addEEnumLiteral(confidenceEEnum, Confidence.UNKNOWN);
 
     // Create resource
     createResource(eNS_URI);

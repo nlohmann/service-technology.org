@@ -52,26 +52,6 @@ import org.eclipse.emf.common.util.Enumerator;
  */
 public enum Confidence implements Enumerator {
   /**
-   * The '<em><b>LOW</b></em>' literal object.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see #LOW_VALUE
-   * @generated
-   * @ordered
-   */
-  LOW(1, "LOW", "LOW"),
-
-  /**
-   * The '<em><b>HIGH</b></em>' literal object.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see #HIGH_VALUE
-   * @generated
-   * @ordered
-   */
-  HIGH(2, "HIGH", "HIGH"),
-
-  /**
    * The '<em><b>UNKNOWN</b></em>' literal object.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -79,7 +59,38 @@ public enum Confidence implements Enumerator {
    * @generated
    * @ordered
    */
-  UNKNOWN(0, "UNKNOWN", "");
+  UNKNOWN(0, "UNKNOWN", ""), /**
+   * The '<em><b>LOW</b></em>' literal object.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #LOW_VALUE
+   * @generated
+   * @ordered
+   */
+  LOW(1, "LOW", "LOW"), /**
+   * The '<em><b>HIGH</b></em>' literal object.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #HIGH_VALUE
+   * @generated
+   * @ordered
+   */
+  HIGH(2, "HIGH", "HIGH");
+
+  /**
+   * The '<em><b>UNKNOWN</b></em>' literal value.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of '<em><b>UNKNOWN</b></em>' literal object isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @see #UNKNOWN
+   * @model literal=""
+   * @generated
+   * @ordered
+   */
+  public static final int UNKNOWN_VALUE = 0;
 
   /**
    * The '<em><b>LOW</b></em>' literal value.
@@ -112,21 +123,6 @@ public enum Confidence implements Enumerator {
   public static final int HIGH_VALUE = 2;
 
   /**
-   * The '<em><b>UNKNOWN</b></em>' literal value.
-   * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of '<em><b>UNKNOWN</b></em>' literal object isn't clear,
-   * there really should be more of a description here...
-   * </p>
-   * <!-- end-user-doc -->
-   * @see #UNKNOWN
-   * @model literal=""
-   * @generated
-   * @ordered
-   */
-  public static final int UNKNOWN_VALUE = 0;
-
-  /**
    * An array of all the '<em><b>Confidence</b></em>' enumerators.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -134,9 +130,9 @@ public enum Confidence implements Enumerator {
    */
   private static final Confidence[] VALUES_ARRAY =
     new Confidence[] {
+      UNKNOWN,
       LOW,
       HIGH,
-      UNKNOWN,
     };
 
   /**
@@ -187,9 +183,9 @@ public enum Confidence implements Enumerator {
    */
   public static Confidence get(int value) {
     switch (value) {
+      case UNKNOWN_VALUE: return UNKNOWN;
       case LOW_VALUE: return LOW;
       case HIGH_VALUE: return HIGH;
-      case UNKNOWN_VALUE: return UNKNOWN;
     }
     return null;
   }

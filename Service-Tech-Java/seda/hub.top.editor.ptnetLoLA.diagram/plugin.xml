@@ -132,9 +132,10 @@
    <extension point="org.eclipse.ui.preferencePages" id="prefpages">
       <?gmfgen generated="true"?>
       <page
+            category="hub.top.editor.preferences.Seda_PetriNetsPreferencePage"
+            class="hub.top.editor.ptnetLoLA.diagram.preferences.DiagramGeneralPreferencePage"
             id="hub.top.editor.ptnetLoLA.diagram.general"
-            name="%prefpage.hub.top.editor.ptnetLoLA.diagram.general"
-            class="hub.top.editor.ptnetLoLA.diagram.preferences.DiagramGeneralPreferencePage">
+            name="%prefpage.hub.top.editor.ptnetLoLA.diagram.general">
       </page>
       <page
             id="hub.top.editor.ptnetLoLA.diagram.appearance"

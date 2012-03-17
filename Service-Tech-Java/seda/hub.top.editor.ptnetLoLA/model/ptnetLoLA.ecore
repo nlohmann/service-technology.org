@@ -92,8 +92,8 @@
         defaultValueLiteral="1.0"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="Confidence">
+    <eLiterals name="UNKNOWN" literal=""/>
     <eLiterals name="LOW" value="1"/>
     <eLiterals name="HIGH" value="2"/>
-    <eLiterals name="UNKNOWN" literal=""/>
   </eClassifiers>
 </ecore:EPackage>

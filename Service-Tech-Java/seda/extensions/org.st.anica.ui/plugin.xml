@@ -43,5 +43,22 @@
             </command>
          </toolbar>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.st.anica.ui.preferences.PreferenceInitializer">
+      </initializer>
    </extension>   
+   
+      <!-- the preferences page for Anica -->
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="hub.top.editor.preferences.Seda_PetriNetsPreferencePage"
+            class="org.st.anica.ui.preferences.AnicaUI_PreferencePage"
+            id="org.st.anica.ui.preferences.AnicaUI_PreferencePage"
+            name="Anica">
+      </page>
+   </extension>
 </plugin>

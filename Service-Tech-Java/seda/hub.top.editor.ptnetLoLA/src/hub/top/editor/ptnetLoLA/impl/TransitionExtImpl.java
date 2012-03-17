@@ -156,7 +156,7 @@ public class TransitionExtImpl extends TransitionImpl implements TransitionExt {
    * @generated
    * @ordered
    */
-  protected static final Confidence CONFIDENCE_EDEFAULT = Confidence.LOW;
+  protected static final Confidence CONFIDENCE_EDEFAULT = Confidence.UNKNOWN;
 
     /**
    * The cached value of the '{@link #getConfidence() <em>Confidence</em>}' attribute.

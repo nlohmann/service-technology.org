@@ -1,9 +1,8 @@
 package org.st.anica.ui;
 
-import java.io.IOException;
-
 import hub.top.editor.eclipse.EditorUtil;
 import hub.top.editor.eclipse.IFrameWorkEditor;
+import hub.top.editor.eclipse.emf.EMFHelper;
 import hub.top.editor.lola.text.ModelEditor;
 import hub.top.editor.ptnetLoLA.Confidence;
 import hub.top.editor.ptnetLoLA.PtNet;
@@ -11,24 +10,30 @@ import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.Transition;
 import hub.top.editor.ptnetLoLA.TransitionExt;
 
+import java.io.IOException;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EContentAdapter;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gmf.runtime.notation.Diagram;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.st.anica.ui.preferences.PreferenceConstants;
 
 import sunlabs.brazil.util.Base64;
 
@@ -46,14 +51,14 @@ public class CheckConfidence implements IHandler {
 
   }
   
-  public static int MY_PORT = 5555;
-  public static int SERVER_PORT = 5556;
-  public static String SERVER_URL = "localhost";
-  
   private PtNet previousNet = null;
   private boolean confidenceChanged = false;
   
-  private void checkNet(PtNet net) {
+  private void checkNet(PtNet net, IWorkbenchWindow window, EditingDomain domain) {
+    
+    String SERVER_URL = Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_ANICA_SERVER_URL);
+    int SERVER_PORT = Integer.parseInt(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_ANICA_SERVER_PORT));
+    int MY_PORT = Integer.parseInt(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_ANICA_LOCAL_PORT));
     
     try {
       UDPClient client = null;
@@ -91,6 +96,7 @@ public class CheckConfidence implements IHandler {
           j_net.put("command", "net");
           j_net.put("net", lola_base64);
         } catch (JSONException e) {
+          MessageDialog.openError(window.getShell(), "Seda/Anica UI", "Could not create command to server:\n"+e.getMessage());
           Activator.getPluginHelper().logError("Could not create command to server.", e);
           return;
         }
@@ -110,24 +116,26 @@ public class CheckConfidence implements IHandler {
         JSONObject j_assignment = new JSONObject();
         try {
           j_assignment.put("command", "assignment");
+          JSONObject j_values = new JSONObject();
           for (Transition t : previousNet.getTransitions()) {
             if (t instanceof TransitionExt) {
               // transitions with a confidence value
               TransitionExt t_ext = (TransitionExt)t;
               if (t_ext.getConfidence() == Confidence.HIGH) {
-                j_assignment.put(t_ext.getName(), "HIGH");
+                j_values.put(t_ext.getName(), "HIGH");
               } else if (t_ext.getConfidence() == Confidence.LOW) {
-                j_assignment.put(t_ext.getName(), "LOW");
+                j_values.put(t_ext.getName(), "LOW");
               } else {
-                j_assignment.put(t_ext.getName(), "");
+                j_values.put(t_ext.getName(), "");
               }
             } else {
               // transitions without a confidence value
-              j_assignment.put(t.getName(), "");
+              j_values.put(t.getName(), "");
             }
-  
           }
+          j_assignment.put("assignment", j_values);
         } catch (JSONException e) {
+          MessageDialog.openError(window.getShell(), "Seda/Anica UI", "Could not create command to server:\n"+e.getMessage());
           Activator.getPluginHelper().logError("Could not create command to server.", e);
           return;
         }
@@ -145,12 +153,20 @@ public class CheckConfidence implements IHandler {
           // if the reply is a new assignment
           JSONObject j_reply = new JSONObject(reply);
           if (j_reply.has("command") && j_reply.get("command").equals("assignment")) {
+            JSONObject j_values = j_reply.getJSONObject("assignment");
+            
             // update confidence values of transitions by the new assignment
-            updateConfidenceInNet(net, j_reply);
+            updateConfidenceInNet(net, j_values, domain);
           }
           
         } catch (JSONException e) {
+          // reset net information to send net again in case server has a problem
+          previousNet = null;
+          confidenceChanged = true;
+          
+          MessageDialog.openError(window.getShell(), "Seda/Anica UI", "Could not read message from server:\n"+e.getMessage());
           Activator.getPluginHelper().logError("Could not read message from server.", e);
+
           return;
         }
         server.finalize(); // done
@@ -162,7 +178,13 @@ public class CheckConfidence implements IHandler {
       if (client != null) client.finalize();
       
     } catch (IOException e) {
-      Activator.getPluginHelper().logError("Could not connects to server.", e);
+      
+      // reset net information to send net again in case server has a problem
+      previousNet = null;
+      confidenceChanged = true;
+      
+      Activator.getPluginHelper().logError("Could not connect to server.", e);
+      MessageDialog.openError(window.getShell(), "Seda/Anica UI", "Could not connect to server:\n"+e.getMessage());
     }
   }
   
@@ -172,15 +194,13 @@ public class CheckConfidence implements IHandler {
    * @param net
    * @param assignment
    */
-  private void updateConfidenceInNet(PtNet net, JSONObject assignment) {
+  private void updateConfidenceInNet(PtNet net, JSONObject assignment, EditingDomain domain) {
     
     // to update transition attributes, we need to execute commands
     // list of all commands, each command sets one transition attribute
     EList<org.eclipse.emf.common.command.Command> cmdList = new BasicEList<org.eclipse.emf.common.command.Command>();
     // the feature that command will change: transition confidence
     EStructuralFeature featConfidence = PtnetLoLAPackage.eINSTANCE.getTransitionExt_Confidence();
-    // get an editing domain to execute the commands in
-    EditingDomain domain = TransactionalEditingDomain.Factory.INSTANCE.getEditingDomain(net.eResource().getResourceSet());
     
     // for each transition of the net
     for (Transition t : net.getTransitions()) {
@@ -217,14 +237,31 @@ public class CheckConfidence implements IHandler {
     if (window.getActivePage().getActiveEditor() instanceof hub.top.editor.eclipse.IFrameWorkEditor ) {
       
       EditorUtil util = ((IFrameWorkEditor)window.getActivePage().getActiveEditor()).getEditorUtil();
+      System.out.println(util);
       for (EObject o : util.getCurrentModel()) {
         if (o instanceof org.eclipse.gmf.runtime.notation.Diagram) {
           Diagram d = (Diagram)o;
           if (d.getElement() instanceof PtNet) {
             PtNet net = (PtNet)d.getElement();
-            
-            checkNet(net);
+
+            EditingDomain domain = TransactionalEditingDomain.Factory.INSTANCE.getEditingDomain(net.eResource().getResourceSet());
+            checkNet(net, window, domain);
+            util.refreshEditorView();
           }
+        } else if (o instanceof PtNet) {
+          
+          PtNet net = (PtNet)o;
+          
+          // get an editing domain to execute the commands in
+          EditingDomain domain;
+          domain = TransactionalEditingDomain.Registry.INSTANCE.getEditingDomain("hub.top.editor.ptnetLoLA.editingDomain");
+          if (domain == null) domain = TransactionalEditingDomain.Factory.INSTANCE.getEditingDomain(net.eResource().getResourceSet());
+          if (domain == null) domain = EMFHelper.getEditingDomainFor(net);
+          if (domain == null) domain = TransactionalEditingDomain.Factory.INSTANCE.createEditingDomain(net.eResource().getResourceSet());
+          //if (domain == null) domain = TransactionalEditingDomain.Factory.INSTANCE.createEditingDomain(net.eResource().getResourceSet());
+
+          checkNet((PtNet)o, window, domain);
+          util.refreshEditorView();
         }
       }
 

@@ -38,5 +38,16 @@
             name="%_UI_Wizard_category">
       </category>
    </extension>
+  <extension point="org.eclipse.core.runtime.preferences" id="prefs">
+    <initializer class="hub.top.editor.preferences.Seda_PetriNetsPreferenceInitializer"/>
+  </extension>
+  <extension
+     point="org.eclipse.ui.preferencePages">
+      <page
+            class="hub.top.editor.preferences.Seda_PetriNetsPreferencePage"
+            id="hub.top.editor.preferences.Seda_PetriNetsPreferencePage"
+            name="Petri Nets">
+      </page>
+   </extension>
 
 </plugin>

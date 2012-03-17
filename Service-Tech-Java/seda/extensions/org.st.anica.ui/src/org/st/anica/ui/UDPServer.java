@@ -41,17 +41,18 @@ public class UDPServer {
             JSONObject j_s = new JSONObject(s);
             
             if (j_s.has("command") && j_s.get("command").equals("assignment")) {
-            
-              JSONObject reply = new JSONObject();
               
-              String names[] = JSONObject.getNames(j_s);
+              JSONObject values = j_s.getJSONObject("assignment");
+              JSONObject reply = new JSONObject();
+              JSONObject reply_values = new JSONObject();
+              
+              String names[] = JSONObject.getNames(values);
               for (String a : names) {
-                if (a.equals("command")) continue;
-                
-                reply.put(a, "HIGH");
+                reply_values.put(a, "HIGH");
               }
               
               reply.put("command", "assignment");
+              reply.put("assignment", reply_values);
               
               UDPClient c = new UDPClient("localhost", 5555);
               c.send(reply.toString());

@@ -16,8 +16,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -27,7 +25,6 @@ import org.eclipse.emf.ecore.util.EContentAdapter;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gmf.runtime.notation.Diagram;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -157,6 +154,10 @@ public class CheckConfidence implements IHandler {
             
             // update confidence values of transitions by the new assignment
             updateConfidenceInNet(net, j_values, domain);
+          } else if (j_reply.has("error")) {
+            MessageDialog.openError(window.getShell(), "Message from Anica",
+                "Anica found a problem in your net:\n"+j_reply.getString("error"));            
+            
           }
           
         } catch (JSONException e) {

@@ -277,10 +277,12 @@ void updateNonInterference() {
                         case 0:
                             // variable must be false
                             rep->status("%s -> LOW", transitionName.c_str());
+                            assignment[transitionName] = anica::CONFIDENCE_LOW;
                             break;
                         case 1:
                             // variable must be true
                             rep->status("%s -> HIGH", transitionName.c_str());
+                            assignment[transitionName] = anica::CONFIDENCE_HIGH;
                             break;
                         case 2:
                             // variable is "free"
@@ -298,7 +300,7 @@ void updateNonInterference() {
             delete myBDD;
             myBDD = NULL;
             cuddVariables.clear();
-            
+
             // send back all implications (-> new assignment)
             sendAssignment();
         }

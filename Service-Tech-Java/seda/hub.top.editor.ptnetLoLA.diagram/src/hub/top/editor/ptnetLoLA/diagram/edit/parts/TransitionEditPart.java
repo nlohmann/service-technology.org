@@ -38,9 +38,12 @@ package hub.top.editor.ptnetLoLA.diagram.edit.parts;
 
 import hub.top.editor.petrinets.diagram.tool.FireTool;
 import hub.top.editor.ptnetLoLA.Arc;
+import hub.top.editor.ptnetLoLA.Confidence;
+import hub.top.editor.ptnetLoLA.NodeType;
 import hub.top.editor.ptnetLoLA.Place;
 import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.Transition;
+import hub.top.editor.ptnetLoLA.TransitionExt;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,10 +55,12 @@ import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
@@ -376,6 +381,8 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
       this.setBackgroundColor(THIS_BACK);
       this.setPreferredSize(new Dimension(getMapMode().DPtoLP(25), getMapMode()
           .DPtoLP(25)));
+      
+      recolorFigure();
     }
 
     /**
@@ -396,6 +403,27 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
     protected void setUseLocalCoordinates(boolean useLocalCoordinates) {
       myUseLocalCoordinates = useLocalCoordinates;
     }
+    
+    /**
+     * must be called in the constructor of this class
+     * @generated not
+     */
+    protected void recolorFigure() {
+      Transition t = (Transition) ((org.eclipse.gmf.runtime.notation.Node) (TransitionEditPart.this)
+          .getModel()).getElement();
+      if (t instanceof TransitionExt) {
+        TransitionExt t_ext = (TransitionExt)t;
+        if (t_ext.getConfidence() == Confidence.HIGH) {
+          setBackgroundColor(THIS_BACK_ORANGE);
+        } else if (t_ext.getConfidence() == Confidence.LOW) {
+          setBackgroundColor(THIS_BACK_GREEN);
+        } else {
+          setBackgroundColor(THIS_BACK);
+        }
+      } else {
+        setBackgroundColor(THIS_BACK);
+      }
+    }
 
   }
 
@@ -408,6 +436,16 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
    * @generated
    */
   static final Color THIS_BACK = new Color(null, 255, 255, 255);
+  
+  /**
+   * @generated not
+   */
+  static final Color THIS_BACK_ORANGE = new Color(null, 230, 145, 52);
+
+  /**
+   * @generated not
+   */
+  static final Color THIS_BACK_GREEN = new Color(null, 24, 228, 24);
 
   /**
    * @see org.eclipse.gef.editparts.AbstractEditPart#getTargetEditPart(org.eclipse.gef.Request)
@@ -496,5 +534,27 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
       }
     } else
       super.performRequest(request);
+  }
+  
+  /**
+   * @generated not
+   */
+  @Override
+  protected void handleNotificationEvent(Notification notification) {
+    Object feature = notification.getFeature();
+    //do something after changing model 
+    if (notification.getNotifier() instanceof Transition) {
+      //System.out.println("feature " + feature);
+      if (feature instanceof EAttribute) {
+        EAttribute attribute = (EAttribute) feature;
+        System.out.println("is EAttribute, " + attribute.getName()
+            + " ?= "
+            + PtnetLoLAPackage.eINSTANCE.getNode_Type().getName());
+        if (attribute == PtnetLoLAPackage.eINSTANCE.getTransitionExt_Confidence()) {
+          this.getPrimaryShape().recolorFigure();
+        }
+      }
+    }
+    super.handleNotificationEvent(notification);
   }
 }

@@ -244,7 +244,9 @@ public class PlaceEditPart extends AbstractBorderedShapeEditPart {
    * @generated
    */
   protected NodeFigure createNodePlate() {
-    DefaultSizeNodeFigure result = new DefaultSizeNodeFigure(25, 25);
+		DefaultSizeNodeFigure result = /*new DefaultSizeNodeFigure(getMapMode()
+				.DPtoLP(25), getMapMode().DPtoLP(25));*/
+		new CircleFigure(getMapMode().DPtoLP(25), getMapMode().DPtoLP(25));
     return result;
   }
 
@@ -480,6 +482,7 @@ public class PlaceEditPart extends AbstractBorderedShapeEditPart {
       fFigurePlaceTokenLabel.setText("0");
 
       fFigurePlaceTokenLabel.setFont(FFIGUREPLACETOKENLABEL_FONT);
+      fFigurePlaceTokenLabel.setAlignment(PositionConstants.CENTER);
 
       this.add(fFigurePlaceTokenLabel, BorderLayout.CENTER);
 

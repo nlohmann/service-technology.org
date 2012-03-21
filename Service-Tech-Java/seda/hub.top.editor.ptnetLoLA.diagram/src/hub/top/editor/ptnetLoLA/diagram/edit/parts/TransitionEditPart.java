@@ -414,7 +414,7 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
       if (t instanceof TransitionExt) {
         TransitionExt t_ext = (TransitionExt)t;
         if (t_ext.getConfidence() == Confidence.HIGH) {
-          setBackgroundColor(THIS_BACK_ORANGE);
+          setBackgroundColor(THIS_BACK_RED);
         } else if (t_ext.getConfidence() == Confidence.LOW) {
           setBackgroundColor(THIS_BACK_GREEN);
         } else {
@@ -440,12 +440,12 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
   /**
    * @generated not
    */
-  static final Color THIS_BACK_ORANGE = new Color(null, 230, 145, 52);
+  static final Color THIS_BACK_RED = new Color(null, 255, 0, 0);
 
   /**
    * @generated not
    */
-  static final Color THIS_BACK_GREEN = new Color(null, 24, 228, 24);
+  static final Color THIS_BACK_GREEN = new Color(null, 102, 255, 102);
 
   /**
    * @see org.eclipse.gef.editparts.AbstractEditPart#getTargetEditPart(org.eclipse.gef.Request)

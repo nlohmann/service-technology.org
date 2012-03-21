@@ -149,7 +149,7 @@ public class CheckConfidence implements IHandler {
         try {
           // if the reply is a new assignment
           JSONObject j_reply = new JSONObject(reply);
-          if (j_reply.has("command") && j_reply.get("command").equals("assignment")) {
+          if (j_reply.has("assignment")) {
             JSONObject j_values = j_reply.getJSONObject("assignment");
             
             // update confidence values of transitions by the new assignment

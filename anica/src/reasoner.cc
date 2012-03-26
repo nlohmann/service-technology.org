@@ -278,6 +278,7 @@ void updateNonInterference() {
             cuddOutput->FirstCube(&cube, &value); // get an assignment
             
             // report implied assignments
+            /*
             PNAPI_FOREACH(t, net.getTransitions()) {
                 if ((**t).getConfidence() == anica::CONFIDENCE_NONE) {
                     const std::string transitionName = (**t).getName();
@@ -300,6 +301,30 @@ void updateNonInterference() {
                         default:
                             // should not happen
                             assert(false);
+                    }
+                }
+            }
+            */
+            
+            PNAPI_FOREACH(t, net.getTransitions()) { 
+                if ((**t).getConfidence() == anica::CONFIDENCE_NONE) { 
+                    const std::string transitionName = (**t).getName(); 
+                    const int bddIndex = cuddVariables[transitionName]; 
+                    rep->status("..checking: %s", transitionName.c_str()); 
+                    
+                    // is high implied? 
+                    if ((!*cuddOutput + myBDD->bddVar(bddIndex)) == myBDD->bddOne()) { 
+                        // yes 
+                        rep->status("....HIGH"); 
+                        assignment[transitionName] = anica::CONFIDENCE_HIGH; 
+                    } 
+                    else { 
+                        // no 
+                        // is low implied? 
+                        if ((!*cuddOutput + !myBDD->bddVar(bddIndex)) == myBDD->bddOne()) { 
+                            rep->status("....LOW"); 
+                            assignment[transitionName] = anica::CONFIDENCE_LOW; 
+                        }
                     }
                 }
             }

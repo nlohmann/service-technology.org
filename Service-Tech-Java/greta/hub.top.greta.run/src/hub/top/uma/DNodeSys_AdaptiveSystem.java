@@ -47,6 +47,7 @@ import hub.top.adaptiveSystem.Oclet;
 import hub.top.adaptiveSystem.Orientation;
 import hub.top.adaptiveSystem.PreNet;
 import hub.top.adaptiveSystem.Temp;
+import hub.top.greta.cpn.ColoredConditionVisitor;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -72,6 +73,8 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	private Map<Oclet, DNodeSet> ocletEncoding;   // encoding of oclets to DNodeSets
 	
 	private INameProcessor   namePostProcessor; // post-processor for names of nodes
+	
+	private boolean isDataDependent;
 
 /**
    * Construct DNode representation of an {@link AdaptiveSystem}. Every event
@@ -84,13 +87,15 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
    * @param namePostProcessor helper to change names of nodes before materializing strings
    *                as identities, used to map a high-level oclet specification to a
    *                low-level oclet specification
+   * @param isDataDependent whether the behavior of the system is data-dependent
    */
-	 public DNodeSys_AdaptiveSystem(AdaptiveSystem as, INameProcessor namePostProcessor) throws InvalidModelException {
+	 public DNodeSys_AdaptiveSystem(AdaptiveSystem as, INameProcessor namePostProcessor, boolean isDataDependent) throws InvalidModelException {
 
 	    // initialize the standard data structures
 	    super();
 	    
 	    this.namePostProcessor = namePostProcessor;
+	    this.isDataDependent = isDataDependent;
 	    
 	    // create a name table initialize the translation tables
 	    buildNameTable(as);
@@ -112,6 +117,11 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	    finalize_setPreConditions();
 	    finalize_initialRun();
 	    finalize_generateIndexes();
+	    
+	    for (Map.Entry<Node, DNode> m : nodeEncoding.entrySet()) {
+	      if (m.getKey().eContainer().eContainer() instanceof Oclet)
+	        System.out.println(m.getKey().getName()+"/"+((Oclet)m.getKey().eContainer().eContainer()).getName()+" --> "+m.getValue());
+	    }
 	 }
 	
 	/**
@@ -124,7 +134,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	 * @param as
 	 */
 	public DNodeSys_AdaptiveSystem(AdaptiveSystem as) throws InvalidModelException {
-	  this(as, INameProcessor.IDENTITY);
+	  this(as, INameProcessor.IDENTITY, false);
 	}
 
 	/**
@@ -285,11 +295,16 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 			// create new DNode d for Node n
       String name = namePostProcessor.process(n, n.getName());
 			DNode d;
-			if (preTrans.length == 0)
-			  d = new DNode(nameToID.get(name), pre);
-			else
-			  d = new DNodeTransitive(nameToID.get(name), pre, preTrans);
-      //allNodes.add(d);
+			if (nodeEncoding.containsKey(n)) {
+			  System.out.println("visiting "+n+" again ");
+			  d = nodeEncoding.get(n);
+		  } else {
+  			if (preTrans.length == 0)
+  			  d = new DNode(nameToID.get(name), pre);
+  			else
+  			  d = new DNodeTransitive(nameToID.get(name), pre, preTrans);
+  			//allNodes.add(d);
+			}
 			
 			//System.out.println(d+" has predecessors "+DNode.toString(pre)+" and "+DNode.toString(preTrans));
       
@@ -482,6 +497,14 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
    */
   public DNode getResultNode(Node n) {
     return nodeEncoding.get(n);
+  }
+  
+  @Override
+  public DNodeEmbeddingVisitor getEmbeddingVisitor() {
+    if (isDataDependent)
+      return new ColoredConditionVisitor(this);
+    else
+      return super.getEmbeddingVisitor();
   }
 	
 	@Override

@@ -979,13 +979,13 @@ public class AdaptiveSystemToCPN {
     return null;
   }
   
-  private boolean isSingleVariable(String arcExpression, String idsInArcExpression[] ) {
+  protected boolean isSingleVariable(String arcExpression, String idsInArcExpression[] ) {
     return (idsInArcExpression != null
         && idsInArcExpression.length == 1
         && arcExpression.equals(getVariableNameForID(idsInArcExpression[0])));
   }
   
-  private String[] getTupleParts(String exp) {
+  protected static String[] getTupleParts(String exp) {
     if (exp.length() > 2) {
       
       try {
@@ -1017,7 +1017,7 @@ public class AdaptiveSystemToCPN {
     return new String[] { exp };
   }
   
-  private String[] getGuardParts(String exp) {
+  private static String[] getGuardParts(String exp) {
     if (exp.length() > 2) {
       
       try {
@@ -1041,7 +1041,7 @@ public class AdaptiveSystemToCPN {
     return new String[] { exp };
   }
   
-  private String[] getGuardAssignment(String exp) {
+  private static String[] getGuardAssignment(String exp) {
     try {
       String[] arguments = exp.split("=");
       for (int j=0; j<arguments.length; j++) {

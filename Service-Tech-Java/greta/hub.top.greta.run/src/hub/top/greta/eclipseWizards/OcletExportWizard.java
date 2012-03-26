@@ -37,33 +37,16 @@ package hub.top.greta.eclipseWizards;
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.eclipse.PluginHelper;
-import hub.top.editor.eclipse.ResourceHelper;
 import hub.top.editor.eclipse.ui.UIhelper;
 import hub.top.greta.run.Activator;
-import hub.top.scenario.OcletIO;
+import hub.top.scenario.OcletIO_Out;
 import hub.top.scenario.OcletSpecification;
 import hub.top.scenario.OcletSpecification_AdaptiveSystem;
 
 import java.io.IOException;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IOperationHistory;
-import org.eclipse.core.commands.operations.OperationHistoryFactory;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.emf.transaction.util.TransactionUtil;
-import org.eclipse.emf.workspace.AbstractEMFOperation;
-import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -211,9 +194,9 @@ public class OcletExportWizard extends Wizard implements IExportWizard {
 		
 		String exportString = "";
 		if (page1.getTargetFileName().endsWith(".dot"))
-		  exportString = OcletIO.toDot(os);
+		  exportString = OcletIO_Out.toDot(os);
 		else if (page1.getTargetFileName().endsWith(".oclets"))
-		  exportString = OcletIO.toLoLA(os);
+		  exportString = OcletIO_Out.toLoLA(os);
 		
     try {
       FileIOHelper.writeFile(page1.getTargetFileName(), exportString);

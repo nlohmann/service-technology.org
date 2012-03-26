@@ -135,10 +135,9 @@ public class CheckOclets extends Action implements
 					}
 				}
 				
-				if (!wellFormedSpec) {
-	        ActionHelper.showMarkers(errors, adaptiveSystemDiagramEditor);
+        ActionHelper.showMarkers(errors, adaptiveSystemDiagramEditor);
 	        
-				} else {
+				if (wellFormedSpec) {
 				  if (AdaptiveSystemToCPN.isHighLevelSpecification(adaptiveSystem)) {
 				    
 				    final AdaptiveSystemDiagramEditor ed = adaptiveSystemDiagramEditor;

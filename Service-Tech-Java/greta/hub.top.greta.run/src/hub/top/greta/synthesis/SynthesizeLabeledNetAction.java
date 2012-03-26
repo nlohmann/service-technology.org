@@ -176,7 +176,7 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
             //String netFileName = selectedFile.getRawLocation().removeFileExtension().toString();
             //hub.top.petrinet.PetriNetIO.writeToFile(net2, netFileName, hub.top.petrinet.PetriNetIO.FORMAT_LOLA, 0);
             IPath targetPath = selectedFile.getFullPath().removeFileExtension().addFileExtension("lola");
-            ActionHelper.writeFile(targetPath, hub.top.petrinet.PetriNetIO.toLoLA(net2));
+            ActionHelper.writeFile(targetPath, hub.top.petrinet.PetriNetIO_Out.toLoLA(net2));
             /*
             for (Place p : net2.getPlaces()) {
               if (p.getName().startsWith("controller"))
@@ -218,20 +218,20 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
                 "request vehicle", "granted vehicle", "jeep", 
                 "support", "letter of recommendation", 
                 "req missing docs", "missing docs" } );
-            hub.top.petrinet.PetriNetIO.writeToFile(eq_cust, selectedFile.getRawLocation().removeFileExtension().toString()+"_eq", hub.top.petrinet.PetriNetIO.FORMAT_LOLA, 0);
+            hub.top.petrinet.PetriNetIO_Out.writeToFile(eq_cust, selectedFile.getRawLocation().removeFileExtension().toString()+"_eq", hub.top.petrinet.PetriNetIO_Out.FORMAT_LOLA, 0);
 
             hub.top.petrinet.PetriNet gfz = computeComponent(net2, 
                 new String[] { 
                 "GFZ",
                 "support", "letter of recommendation", 
                 "req missing docs", "missing docs" } );
-            hub.top.petrinet.PetriNetIO.writeToFile(gfz, selectedFile.getRawLocation().removeFileExtension().toString()+"_gfz", hub.top.petrinet.PetriNetIO.FORMAT_LOLA, 0);
+            hub.top.petrinet.PetriNetIO_Out.writeToFile(gfz, selectedFile.getRawLocation().removeFileExtension().toString()+"_gfz", hub.top.petrinet.PetriNetIO_Out.FORMAT_LOLA, 0);
 
             hub.top.petrinet.PetriNet partner = computeComponent(net2, 
                 new String[] { 
                 "partner", "partner[avail]",
                 "request vehicle", "granted vehicle", "map", "map req" });
-            hub.top.petrinet.PetriNetIO.writeToFile(partner, selectedFile.getRawLocation().removeFileExtension().toString()+"_partner", hub.top.petrinet.PetriNetIO.FORMAT_LOLA, 0);
+            hub.top.petrinet.PetriNetIO_Out.writeToFile(partner, selectedFile.getRawLocation().removeFileExtension().toString()+"_partner", hub.top.petrinet.PetriNetIO_Out.FORMAT_LOLA, 0);
 
             /*
             hub.top.petrinet.PetriNet net_controller = new hub.top.petrinet.PetriNet(net2);

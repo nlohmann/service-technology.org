@@ -46,6 +46,7 @@ import hub.top.greta.run.actions.ActionHelper;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeBP_Scenario;
+import hub.top.uma.DNodeEmbeddingVisitor;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys_AdaptiveSystem;
 import hub.top.uma.INameProcessor;
@@ -124,7 +125,8 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     // transform current system model and process instance into Uma's input format
     // TODO: compute system when starting simulation, update adaptive process only
     try {
-      system = new DNodeSys_AdaptiveSystem(simView.adaptiveSystem, INameProcessor.HLtoLL);
+      boolean coloredSpec = (rc.a2c != null) ? true : false; 
+      system = new DNodeSys_AdaptiveSystem(simView.adaptiveSystem, INameProcessor.HLtoLL, coloredSpec);
     } catch (InvalidModelException e) {
       MessageDialog.openError(this.workbenchWindow.getShell(), "Animated one step.", "Failed to animate. "+e.getMessage());
       return;
@@ -202,7 +204,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
                 
                 System.out.println("causedBy "+e_system);
 
-                Map<DNode, DNode> embedding = new HashMap<DNode, DNode>();
+                DNodeEmbeddingVisitor embedding = system.getEmbeddingVisitor();
                 if (!e_system.suffixOf(e, embedding)) {
                   System.err.println("ERROR. Could not embed causing event "+e_system+" at "+e);
                 }
@@ -217,7 +219,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
                 for (AdaptiveSystemToCPN.ExtraPlace ep : extraPlaces) {
                   System.out.println("looking for "+ep.condition+" in "+embedding);
                   
-                  for (Map.Entry<DNode, DNode> m : embedding.entrySet()) {
+                  for (Map.Entry<DNode, DNode> m : embedding.getEmbedding().entrySet()) {
                     if (m.getKey().isEvent) continue;
                     
                     // system condition that defines an extra place for the CPN Tools transition

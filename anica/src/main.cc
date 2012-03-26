@@ -219,7 +219,7 @@ void terminationHandler() {
 
     // print statistics
     if (args_info.stats_flag) {
-        message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
+        message("runtime: %.3f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
 		int ret = system((string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
     }
@@ -294,11 +294,17 @@ int main(int argc, char** argv) {
     `---------------------------------*/
     anica::AnicaLib alib(net);
     
+    message("transitions: %d", net.getTransitions().size());
+    
     // configure library
     alib.setLolaPath(string(args_info.lola_arg));
     alib.setLolaWitnessPath(args_info.witnessPath_flag);
+    alib.setLolaVerbose(args_info.verbose_flag);
     alib.setRepresantiveNames(args_info.useRepresantiveNames_flag);
     alib.setKeepTempFiles(args_info.noClean_flag);
+    alib.setOneActiveOnly(args_info.oneActiveOnly_flag);
+    alib.setOneTripleOnly(args_info.oneTripleOnly_flag);
+    
     switch (args_info.property_arg) {
         case property_arg_PBNIPLUS_:
             alib.setProperty(anica::PROPERTY_PBNIPLUS);
@@ -348,6 +354,9 @@ int main(int argc, char** argv) {
         std::map<std::string, int> cuddVariables;
         
         Cudd* myBDD = alib.getCharacterization(cuddVariableNames, cuddOutput, cuddVariables);
+        
+        myBDD->info();
+        message("%s - nodes: %d", _ctool_("Cudd"), myBDD->nodeCount(vector<BDD>(1, *cuddOutput)));
         
         //myBDD->DumpDot(vector<BDD>(1, *cuddOutput), cuddVariableNames);
         

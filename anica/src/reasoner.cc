@@ -262,6 +262,16 @@ void updateNonInterference() {
             
             rep->status("characterization calculated");
             
+            // check if valid
+            if (cuddOutput->IsZero()) {
+                sendError("assignment is not secure");
+                rep->status("assignment is NOT secure");
+                return;
+            }
+            else if (cuddOutput->IsOne()) {
+                return;
+            }
+            
             // check implications for all transitions
             int* cube; // a pointer to an array of ints
             CUDD_VALUE_TYPE value; // useless required variable

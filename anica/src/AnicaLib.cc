@@ -526,9 +526,9 @@ int anica::AnicaLib::callLoLA(const pnapi::PetriNet& net, const pnapi::Place* go
 	// select LoLA binary and build LoLA command 
     #if defined(__MINGW32__) 
     // // MinGW does not understand pathnames with "/", so we use the basename 
-    const std::string command_line = "\"" + lolaPath + (lolaWitnessPath ? " -p " : "") + (lolaVerbose ? "" : " 2> nul"); 
+    const std::string command_line = "\"" + lolaPath + (lolaWitnessPath ? " -p " : "") + (lolaVerbose ? "" : " 2> \dev\null"); 
     #else 
-    const std::string command_line = lolaPath + (lolaWitnessPath ? " -p " : "") + (lolaVerbose ? "" : " 2> nul"); 
+    const std::string command_line = lolaPath + (lolaWitnessPath ? " -p " : "") + (lolaVerbose ? "" : " 2> /dev/null"); 
     #endif 
 
 	FILE *fp = popen(command_line.c_str(), "w");
@@ -935,7 +935,8 @@ Cudd* anica::AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOu
     Cudd* cuddManager = new Cudd();
 	cuddVariables.clear();
 	
-    cuddManager->AutodynEnable(CUDD_REORDER_GROUP_SIFT_CONV);
+	cuddManager->AutodynEnable(CUDD_REORDER_GROUP_SIFT_CONV);
+    //cuddManager->AutodynEnable(CUDD_REORDER_EXACT);
     *cuddOutput = cuddManager->bddOne();
     size_t i = 0;
     PNAPI_FOREACH(t, initialNet->getTransitions()) {

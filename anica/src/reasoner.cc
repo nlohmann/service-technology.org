@@ -306,9 +306,9 @@ void updateNonInterference() {
             }
             */
             
-            PNAPI_FOREACH(t, net.getTransitions()) { 
-                if ((**t).getConfidence() == anica::CONFIDENCE_NONE) { 
-                    const std::string transitionName = (**t).getName(); 
+            PNAPI_FOREACH(t, net.getTransitions()) {
+                const std::string transitionName = (**t).getName(); 
+                if (assignment[transitionName] == anica::CONFIDENCE_NONE) { 
                     const int bddIndex = cuddVariables[transitionName]; 
                     rep->status("..checking: %s", transitionName.c_str()); 
                     

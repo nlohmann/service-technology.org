@@ -13,3 +13,5 @@ Bundle-Vendor: service-technology.org
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: hub.top.petrinet,
  org.antlr.runtime
+Bundle-ClassPath: uma.jar,
+ libs-external/lpsolve55j.jar

@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g 2010-08-25 15:13:56
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g 2011-12-08 14:01:12
 
     package hub.top.petrinet;
 
@@ -9,19 +9,19 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class TPNLexer extends Lexer {
-    public static final int SEMICOLON=8;
-    public static final int KEY_PLACE=6;
-    public static final int EOF=-1;
-    public static final int NUMBER=5;
     public static final int STRING_LITERAL=4;
     public static final int KEY_INIT=7;
-    public static final int KEY_IN=11;
     public static final int KEY_TRANSITION=9;
-    public static final int COMMENT_CONTENTS=13;
-    public static final int DIGIT=14;
-    public static final int KEY_OUT=12;
+    public static final int NUMBER=5;
     public static final int TILDE=10;
+    public static final int KEY_OUT=12;
+    public static final int KEY_IN=11;
     public static final int WHITESPACE=15;
+    public static final int SEMICOLON=8;
+    public static final int DIGIT=14;
+    public static final int COMMENT_CONTENTS=13;
+    public static final int EOF=-1;
+    public static final int KEY_PLACE=6;
 
     // delegates
     // delegators
@@ -34,22 +34,22 @@ public class TPNLexer extends Lexer {
         super(input,state);
 
     }
-    public String getGrammarFileName() { return "D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g"; }
+    public String getGrammarFileName() { return "D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g"; }
 
     // $ANTLR start "COMMENT_CONTENTS"
     public final void mCOMMENT_CONTENTS() throws RecognitionException {
         try {
             int _type = COMMENT_CONTENTS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:149:18: ( '--' (~ ( '\\n' | '\\r' ) )* '\\n' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:150:2: '--' (~ ( '\\n' | '\\r' ) )* '\\n'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:149:18: ( '--' (~ ( '\\n' | '\\r' ) )* '\\n' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:150:2: '--' (~ ( '\\n' | '\\r' ) )* '\\n'
             {
             match("--"); 
 
 
                 	_channel=98;
                 
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:154:5: (~ ( '\\n' | '\\r' ) )*
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:154:5: (~ ( '\\n' | '\\r' ) )*
             loop1:
             do {
                 int alt1=2;
@@ -62,7 +62,7 @@ public class TPNLexer extends Lexer {
 
                 switch (alt1) {
             	case 1 :
-            	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:154:7: ~ ( '\\n' | '\\r' )
+            	    // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:154:7: ~ ( '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -99,8 +99,8 @@ public class TPNLexer extends Lexer {
         try {
             int _type = KEY_PLACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:157:11: ( 'place' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:157:13: 'place'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:157:11: ( 'place' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:157:13: 'place'
             {
             match("place"); 
 
@@ -120,8 +120,8 @@ public class TPNLexer extends Lexer {
         try {
             int _type = KEY_INIT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:158:10: ( 'init' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:158:12: 'init'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:158:10: ( 'init' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:158:12: 'init'
             {
             match("init"); 
 
@@ -141,8 +141,8 @@ public class TPNLexer extends Lexer {
         try {
             int _type = KEY_TRANSITION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:159:17: ( 'trans' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:159:19: 'trans'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:159:17: ( 'trans' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:159:19: 'trans'
             {
             match("trans"); 
 
@@ -162,8 +162,8 @@ public class TPNLexer extends Lexer {
         try {
             int _type = KEY_IN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:160:9: ( 'in' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:160:11: 'in'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:160:9: ( 'in' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:160:11: 'in'
             {
             match("in"); 
 
@@ -183,8 +183,8 @@ public class TPNLexer extends Lexer {
         try {
             int _type = KEY_OUT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:161:10: ( 'out' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:161:12: 'out'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:161:10: ( 'out' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:161:12: 'out'
             {
             match("out"); 
 
@@ -204,8 +204,8 @@ public class TPNLexer extends Lexer {
         try {
             int _type = SEMICOLON;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:163:11: ( ';' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:163:13: ';'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:163:11: ( ';' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:163:13: ';'
             {
             match(';'); 
 
@@ -224,8 +224,8 @@ public class TPNLexer extends Lexer {
         try {
             int _type = TILDE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:164:7: ( '~' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:164:9: '~'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:164:7: ( '~' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:164:9: '~'
             {
             match('~'); 
 
@@ -242,8 +242,8 @@ public class TPNLexer extends Lexer {
     // $ANTLR start "DIGIT"
     public final void mDIGIT() throws RecognitionException {
         try {
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:166:16: ( '0' .. '9' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:166:18: '0' .. '9'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:166:16: ( '0' .. '9' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:166:18: '0' .. '9'
             {
             matchRange('0','9'); 
 
@@ -260,10 +260,10 @@ public class TPNLexer extends Lexer {
         try {
             int _type = NUMBER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:167:8: ( ( DIGIT )+ )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:167:10: ( DIGIT )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:167:8: ( ( DIGIT )+ )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:167:10: ( DIGIT )+
             {
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:167:10: ( DIGIT )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:167:10: ( DIGIT )+
             int cnt2=0;
             loop2:
             do {
@@ -277,7 +277,7 @@ public class TPNLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:167:11: DIGIT
+            	    // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:167:11: DIGIT
             	    {
             	    mDIGIT(); 
 
@@ -309,11 +309,11 @@ public class TPNLexer extends Lexer {
         try {
             int _type = STRING_LITERAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:170:3: ( '\"' (~ ( '\"' | '\\n' | '\\r' ) )* '\"' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:170:5: '\"' (~ ( '\"' | '\\n' | '\\r' ) )* '\"'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:170:3: ( '\"' (~ ( '\"' | '\\n' | '\\r' ) )* '\"' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:170:5: '\"' (~ ( '\"' | '\\n' | '\\r' ) )* '\"'
             {
             match('\"'); 
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:171:5: (~ ( '\"' | '\\n' | '\\r' ) )*
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:171:5: (~ ( '\"' | '\\n' | '\\r' ) )*
             loop3:
             do {
                 int alt3=2;
@@ -326,7 +326,7 @@ public class TPNLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:171:7: ~ ( '\"' | '\\n' | '\\r' )
+            	    // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:171:7: ~ ( '\"' | '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -363,10 +363,10 @@ public class TPNLexer extends Lexer {
         try {
             int _type = WHITESPACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:176:12: ( ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+ )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:176:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:176:12: ( ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+ )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:176:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
             {
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:176:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:176:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
             int cnt4=0;
             loop4:
             do {
@@ -380,7 +380,7 @@ public class TPNLexer extends Lexer {
 
                 switch (alt4) {
             	case 1 :
-            	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:
+            	    // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:
             	    {
             	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
             	        input.consume();
@@ -417,82 +417,82 @@ public class TPNLexer extends Lexer {
     // $ANTLR end "WHITESPACE"
 
     public void mTokens() throws RecognitionException {
-        // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:8: ( COMMENT_CONTENTS | KEY_PLACE | KEY_INIT | KEY_TRANSITION | KEY_IN | KEY_OUT | SEMICOLON | TILDE | NUMBER | STRING_LITERAL | WHITESPACE )
+        // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:8: ( COMMENT_CONTENTS | KEY_PLACE | KEY_INIT | KEY_TRANSITION | KEY_IN | KEY_OUT | SEMICOLON | TILDE | NUMBER | STRING_LITERAL | WHITESPACE )
         int alt5=11;
         alt5 = dfa5.predict(input);
         switch (alt5) {
             case 1 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:10: COMMENT_CONTENTS
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:10: COMMENT_CONTENTS
                 {
                 mCOMMENT_CONTENTS(); 
 
                 }
                 break;
             case 2 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:27: KEY_PLACE
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:27: KEY_PLACE
                 {
                 mKEY_PLACE(); 
 
                 }
                 break;
             case 3 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:37: KEY_INIT
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:37: KEY_INIT
                 {
                 mKEY_INIT(); 
 
                 }
                 break;
             case 4 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:46: KEY_TRANSITION
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:46: KEY_TRANSITION
                 {
                 mKEY_TRANSITION(); 
 
                 }
                 break;
             case 5 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:61: KEY_IN
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:61: KEY_IN
                 {
                 mKEY_IN(); 
 
                 }
                 break;
             case 6 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:68: KEY_OUT
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:68: KEY_OUT
                 {
                 mKEY_OUT(); 
 
                 }
                 break;
             case 7 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:76: SEMICOLON
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:76: SEMICOLON
                 {
                 mSEMICOLON(); 
 
                 }
                 break;
             case 8 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:86: TILDE
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:86: TILDE
                 {
                 mTILDE(); 
 
                 }
                 break;
             case 9 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:92: NUMBER
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:92: NUMBER
                 {
                 mNUMBER(); 
 
                 }
                 break;
             case 10 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:99: STRING_LITERAL
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:99: STRING_LITERAL
                 {
                 mSTRING_LITERAL(); 
 
                 }
                 break;
             case 11 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:114: WHITESPACE
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\TPN.g:1:114: WHITESPACE
                 {
                 mWHITESPACE(); 
 

@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g 2011-10-06 19:57:52
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g 2011-12-08 14:01:11
 
     package hub.top.petrinet;
 
@@ -44,21 +44,21 @@ public class OWFNLexer extends Lexer {
         super(input,state);
 
     }
-    public String getGrammarFileName() { return "D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g"; }
+    public String getGrammarFileName() { return "D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g"; }
 
     // $ANTLR start "COMMENT_CONTENTS"
     public final void mCOMMENT_CONTENTS() throws RecognitionException {
         try {
             int _type = COMMENT_CONTENTS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:241:18: ( '\\{' (~ ( '\\}' ) )* '\\}' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:242:2: '\\{' (~ ( '\\}' ) )* '\\}'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:241:18: ( '\\{' (~ ( '\\}' ) )* '\\}' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:242:2: '\\{' (~ ( '\\}' ) )* '\\}'
             {
             match('{'); 
 
                 	_channel=98;
                 
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:246:5: (~ ( '\\}' ) )*
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:246:5: (~ ( '\\}' ) )*
             loop1:
             do {
                 int alt1=2;
@@ -71,7 +71,7 @@ public class OWFNLexer extends Lexer {
 
                 switch (alt1) {
             	case 1 :
-            	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:246:7: ~ ( '\\}' )
+            	    // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:246:7: ~ ( '\\}' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='|')||(input.LA(1)>='~' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -108,8 +108,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_PLACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:249:11: ( 'PLACE' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:249:13: 'PLACE'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:249:11: ( 'PLACE' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:249:13: 'PLACE'
             {
             match("PLACE"); 
 
@@ -129,8 +129,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_ROLES;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:250:11: ( 'ROLES' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:250:13: 'ROLES'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:250:11: ( 'ROLES' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:250:13: 'ROLES'
             {
             match("ROLES"); 
 
@@ -150,8 +150,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_INTERNAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:251:14: ( 'INTERNAL' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:251:16: 'INTERNAL'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:251:14: ( 'INTERNAL' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:251:16: 'INTERNAL'
             {
             match("INTERNAL"); 
 
@@ -171,8 +171,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_INPUT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:252:11: ( 'INPUT' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:252:13: 'INPUT'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:252:11: ( 'INPUT' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:252:13: 'INPUT'
             {
             match("INPUT"); 
 
@@ -192,8 +192,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_OUTPUT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:253:12: ( 'OUTPUT' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:253:14: 'OUTPUT'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:253:12: ( 'OUTPUT' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:253:14: 'OUTPUT'
             {
             match("OUTPUT"); 
 
@@ -213,8 +213,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_SAFE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:254:10: ( 'SAFE' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:254:12: 'SAFE'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:254:10: ( 'SAFE' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:254:12: 'SAFE'
             {
             match("SAFE"); 
 
@@ -234,8 +234,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_INITIALMARKING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:255:21: ( 'INITIALMARKING' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:255:23: 'INITIALMARKING'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:255:21: ( 'INITIALMARKING' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:255:23: 'INITIALMARKING'
             {
             match("INITIALMARKING"); 
 
@@ -255,8 +255,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_TRANSITION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:256:17: ( 'TRANSITION' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:256:19: 'TRANSITION'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:256:17: ( 'TRANSITION' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:256:19: 'TRANSITION'
             {
             match("TRANSITION"); 
 
@@ -276,8 +276,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_CONSUME;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:257:14: ( 'CONSUME' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:257:16: 'CONSUME'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:257:14: ( 'CONSUME' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:257:16: 'CONSUME'
             {
             match("CONSUME"); 
 
@@ -297,8 +297,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_PRODUCE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:258:14: ( 'PRODUCE' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:258:16: 'PRODUCE'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:258:14: ( 'PRODUCE' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:258:16: 'PRODUCE'
             {
             match("PRODUCE"); 
 
@@ -318,8 +318,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_FINALCONDITION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:260:21: ( 'FINALCONDITION' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:260:23: 'FINALCONDITION'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:260:21: ( 'FINALCONDITION' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:260:23: 'FINALCONDITION'
             {
             match("FINALCONDITION"); 
 
@@ -339,8 +339,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_TRUE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:261:10: ( 'TRUE' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:261:12: 'TRUE'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:261:10: ( 'TRUE' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:261:12: 'TRUE'
             {
             match("TRUE"); 
 
@@ -360,8 +360,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_AND;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:262:9: ( 'AND' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:262:11: 'AND'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:262:9: ( 'AND' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:262:11: 'AND'
             {
             match("AND"); 
 
@@ -381,8 +381,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = KEY_EMPTY;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:263:11: ( 'ALL_OTHER_PLACES_EMPTY' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:263:13: 'ALL_OTHER_PLACES_EMPTY'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:263:11: ( 'ALL_OTHER_PLACES_EMPTY' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:263:13: 'ALL_OTHER_PLACES_EMPTY'
             {
             match("ALL_OTHER_PLACES_EMPTY"); 
 
@@ -402,8 +402,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = COLON;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:265:7: ( ':' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:265:9: ':'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:265:7: ( ':' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:265:9: ':'
             {
             match(':'); 
 
@@ -422,8 +422,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = COMMA;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:266:7: ( ',' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:266:9: ','
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:266:7: ( ',' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:266:9: ','
             {
             match(','); 
 
@@ -442,8 +442,8 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = SEMICOLON;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:267:11: ( ';' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:267:13: ';'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:267:11: ( ';' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:267:13: ';'
             {
             match(';'); 
 
@@ -460,8 +460,8 @@ public class OWFNLexer extends Lexer {
     // $ANTLR start "DIGIT"
     public final void mDIGIT() throws RecognitionException {
         try {
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:269:16: ( '0' .. '9' )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:269:18: '0' .. '9'
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:269:16: ( '0' .. '9' )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:269:18: '0' .. '9'
             {
             matchRange('0','9'); 
 
@@ -478,10 +478,10 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = NUMBER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:270:8: ( ( DIGIT )+ )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:270:10: ( DIGIT )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:270:8: ( ( DIGIT )+ )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:270:10: ( DIGIT )+
             {
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:270:10: ( DIGIT )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:270:10: ( DIGIT )+
             int cnt2=0;
             loop2:
             do {
@@ -495,7 +495,7 @@ public class OWFNLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:270:11: DIGIT
+            	    // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:270:11: DIGIT
             	    {
             	    mDIGIT(); 
 
@@ -527,10 +527,10 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = IDENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:271:7: ( (~ ( ',' | ';' | ':' | '(' | ')' | '\\t' | ' ' | '\\n' | '\\r' | '\\{' | '\\}' ) )+ )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:271:9: (~ ( ',' | ';' | ':' | '(' | ')' | '\\t' | ' ' | '\\n' | '\\r' | '\\{' | '\\}' ) )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:271:7: ( (~ ( ',' | ';' | ':' | '(' | ')' | '\\t' | ' ' | '\\n' | '\\r' | '\\{' | '\\}' ) )+ )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:271:9: (~ ( ',' | ';' | ':' | '(' | ')' | '\\t' | ' ' | '\\n' | '\\r' | '\\{' | '\\}' ) )+
             {
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:271:9: (~ ( ',' | ';' | ':' | '(' | ')' | '\\t' | ' ' | '\\n' | '\\r' | '\\{' | '\\}' ) )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:271:9: (~ ( ',' | ';' | ':' | '(' | ')' | '\\t' | ' ' | '\\n' | '\\r' | '\\{' | '\\}' ) )+
             int cnt3=0;
             loop3:
             do {
@@ -544,7 +544,7 @@ public class OWFNLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:271:9: ~ ( ',' | ';' | ':' | '(' | ')' | '\\t' | ' ' | '\\n' | '\\r' | '\\{' | '\\}' )
+            	    // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:271:9: ~ ( ',' | ';' | ':' | '(' | ')' | '\\t' | ' ' | '\\n' | '\\r' | '\\{' | '\\}' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\b')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\u001F')||(input.LA(1)>='!' && input.LA(1)<='\'')||(input.LA(1)>='*' && input.LA(1)<='+')||(input.LA(1)>='-' && input.LA(1)<='9')||(input.LA(1)>='<' && input.LA(1)<='z')||input.LA(1)=='|'||(input.LA(1)>='~' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -584,10 +584,10 @@ public class OWFNLexer extends Lexer {
         try {
             int _type = WHITESPACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:273:12: ( ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+ )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:273:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:273:12: ( ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+ )
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:273:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
             {
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:273:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:273:14: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
             int cnt4=0;
             loop4:
             do {
@@ -601,7 +601,7 @@ public class OWFNLexer extends Lexer {
 
                 switch (alt4) {
             	case 1 :
-            	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:
+            	    // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:
             	    {
             	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
             	        input.consume();
@@ -638,152 +638,152 @@ public class OWFNLexer extends Lexer {
     // $ANTLR end "WHITESPACE"
 
     public void mTokens() throws RecognitionException {
-        // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:8: ( COMMENT_CONTENTS | KEY_PLACE | KEY_ROLES | KEY_INTERNAL | KEY_INPUT | KEY_OUTPUT | KEY_SAFE | KEY_INITIALMARKING | KEY_TRANSITION | KEY_CONSUME | KEY_PRODUCE | KEY_FINALCONDITION | KEY_TRUE | KEY_AND | KEY_EMPTY | COLON | COMMA | SEMICOLON | NUMBER | IDENT | WHITESPACE )
+        // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:8: ( COMMENT_CONTENTS | KEY_PLACE | KEY_ROLES | KEY_INTERNAL | KEY_INPUT | KEY_OUTPUT | KEY_SAFE | KEY_INITIALMARKING | KEY_TRANSITION | KEY_CONSUME | KEY_PRODUCE | KEY_FINALCONDITION | KEY_TRUE | KEY_AND | KEY_EMPTY | COLON | COMMA | SEMICOLON | NUMBER | IDENT | WHITESPACE )
         int alt5=21;
         alt5 = dfa5.predict(input);
         switch (alt5) {
             case 1 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:10: COMMENT_CONTENTS
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:10: COMMENT_CONTENTS
                 {
                 mCOMMENT_CONTENTS(); 
 
                 }
                 break;
             case 2 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:27: KEY_PLACE
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:27: KEY_PLACE
                 {
                 mKEY_PLACE(); 
 
                 }
                 break;
             case 3 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:37: KEY_ROLES
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:37: KEY_ROLES
                 {
                 mKEY_ROLES(); 
 
                 }
                 break;
             case 4 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:47: KEY_INTERNAL
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:47: KEY_INTERNAL
                 {
                 mKEY_INTERNAL(); 
 
                 }
                 break;
             case 5 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:60: KEY_INPUT
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:60: KEY_INPUT
                 {
                 mKEY_INPUT(); 
 
                 }
                 break;
             case 6 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:70: KEY_OUTPUT
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:70: KEY_OUTPUT
                 {
                 mKEY_OUTPUT(); 
 
                 }
                 break;
             case 7 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:81: KEY_SAFE
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:81: KEY_SAFE
                 {
                 mKEY_SAFE(); 
 
                 }
                 break;
             case 8 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:90: KEY_INITIALMARKING
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:90: KEY_INITIALMARKING
                 {
                 mKEY_INITIALMARKING(); 
 
                 }
                 break;
             case 9 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:109: KEY_TRANSITION
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:109: KEY_TRANSITION
                 {
                 mKEY_TRANSITION(); 
 
                 }
                 break;
             case 10 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:124: KEY_CONSUME
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:124: KEY_CONSUME
                 {
                 mKEY_CONSUME(); 
 
                 }
                 break;
             case 11 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:136: KEY_PRODUCE
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:136: KEY_PRODUCE
                 {
                 mKEY_PRODUCE(); 
 
                 }
                 break;
             case 12 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:148: KEY_FINALCONDITION
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:148: KEY_FINALCONDITION
                 {
                 mKEY_FINALCONDITION(); 
 
                 }
                 break;
             case 13 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:167: KEY_TRUE
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:167: KEY_TRUE
                 {
                 mKEY_TRUE(); 
 
                 }
                 break;
             case 14 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:176: KEY_AND
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:176: KEY_AND
                 {
                 mKEY_AND(); 
 
                 }
                 break;
             case 15 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:184: KEY_EMPTY
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:184: KEY_EMPTY
                 {
                 mKEY_EMPTY(); 
 
                 }
                 break;
             case 16 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:194: COLON
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:194: COLON
                 {
                 mCOLON(); 
 
                 }
                 break;
             case 17 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:200: COMMA
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:200: COMMA
                 {
                 mCOMMA(); 
 
                 }
                 break;
             case 18 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:206: SEMICOLON
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:206: SEMICOLON
                 {
                 mSEMICOLON(); 
 
                 }
                 break;
             case 19 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:216: NUMBER
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:216: NUMBER
                 {
                 mNUMBER(); 
 
                 }
                 break;
             case 20 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:223: IDENT
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:223: IDENT
                 {
                 mIDENT(); 
 
                 }
                 break;
             case 21 :
-                // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:229: WHITESPACE
+                // D:\\LinuxShared\\eclipseWorkspace-greta-validate\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:1:229: WHITESPACE
                 {
                 mWHITESPACE(); 
 

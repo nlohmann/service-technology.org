@@ -562,7 +562,7 @@
                name="Lowest">
          </Priority>
          <object
-               class="org.eclipse.gmf.runtime.notation.Node(org.eclipse.gmf.runtime.notation)"
+               class="org.eclipse.gmf.runtime.notation.Node"
                id="NODE">
          </object>
          <context

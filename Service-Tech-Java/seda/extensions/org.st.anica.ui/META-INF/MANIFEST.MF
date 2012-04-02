@@ -7,7 +7,7 @@ Bundle-Activator: org.st.anica.ui.Activator
 Bundle-Vendor: service-technology.org
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- hub.top.editor.ptnetLoLA.diagram;bundle-version="1.0.4",
+ hub.top.editor.ptnetLoLA.diagram,
  org.eclipse.gmf.runtime.notation,
  hub.top.editor.lola.text
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

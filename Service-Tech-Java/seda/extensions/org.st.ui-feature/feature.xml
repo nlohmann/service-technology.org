@@ -978,7 +978,7 @@ For more information on this, and how to apply and follow the GNU AGPL, see
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="hub.top.editor.ptnetLoLA.diagram" version="1.0.4" match="greaterOrEqual"/>
+      <import plugin="hub.top.editor.ptnetLoLA.diagram"/>
       <import plugin="org.eclipse.gmf.runtime.notation"/>
       <import plugin="hub.top.editor.lola.text"/>
    </requires>

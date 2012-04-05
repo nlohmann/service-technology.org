@@ -309,7 +309,7 @@ int main(int argc, char* argv[]) {
          \*******************************************************************/
 
         if (not args_info.diagnosis_flag) {
-            engine.compose(*controller, "engine.");
+            engine.compose(*controller, "engine.", "controller.");
 
             engine.reduce(pnapi::PetriNet::LEVEL_5
                     | pnapi::PetriNet::SET_PILLAT); //

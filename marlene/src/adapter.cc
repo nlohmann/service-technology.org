@@ -93,7 +93,7 @@ Adapter::buildEngine() {
     FUNCIN
 
     // create port to the controller
-    if(not args_info.useasif_given) {
+    if(true || not args_info.useasif_given) {
     _engine->createPort( "controller" );
     }
     // create engine and transitions for the transformation rules
@@ -293,68 +293,6 @@ Adapter::buildController() {
 
     owfn_temp.stream() << pnapi::io::owfn << *_composition << std::flush;
 
-    if ( args_info.useasif_given ) {
-        // writing prunter information
-        pruner_temp.stream() << "INTERFACE TO BE ABSTRACTED" << std::endl;
-        if ( not controllerInterfaceSync.empty() ) {
-            pruner_temp.stream() << "SYNC" << std::endl;
-            bool first = true;
-            for ( std::map< std::string, std::string >::const_iterator mapping =
-                    controllerInterfaceSync.begin();
-                    mapping != controllerInterfaceSync.end(); ++mapping, first =
-                            false ) {
-                if ( not first ) {
-                    pruner_temp.stream() << ", ";
-                }
-                pruner_temp.stream() << "engine." << mapping->first << "="
-                        << mapping->second;
-            }
-            pruner_temp.stream() << ";" << std::endl << std::endl;
-        }
-        pruner_temp.stream() << "REMAINING INTERFACE" << std::endl;
-        if ( not netInterfaceIn.empty() ) {
-            pruner_temp.stream() << "IN" << std::endl;
-            bool first = true;
-            for ( std::map< std::string, std::string >::const_iterator mapping =
-                    netInterfaceIn.begin(); mapping != netInterfaceIn.end();
-                    ++mapping, first = false ) {
-                if ( not first ) {
-                    pruner_temp.stream() << ", ";
-                }
-                pruner_temp.stream() << "engine." << mapping->first << "="
-                        << mapping->second;
-            }
-            pruner_temp.stream() << ";" << std::endl << std::endl;
-        }
-        if ( not netInterfaceOut.empty() ) {
-            pruner_temp.stream() << "OUT" << std::endl;
-            bool first = true;
-            for ( std::map< std::string, std::string >::const_iterator mapping =
-                    netInterfaceOut.begin(); mapping != netInterfaceOut.end();
-                    ++mapping, first = false ) {
-                if ( not first ) {
-                    pruner_temp.stream() << ", ";
-                }
-                pruner_temp.stream() << "engine." << mapping->first << "="
-                        << mapping->second;
-            }
-            pruner_temp.stream() << ";" << std::endl << std::endl;
-        }
-        /*
-        pruner_temp.stream() << "FINALCONDITION" << std::endl;
-
-        try {
-            using pnapi::io::util::operator<<;
-
-            pruner_temp.stream() << pnapi::io::owfn << _composition->getFinalCondition().getFormula() << std::endl;
-        }catch (pnapi::exception::AssertionFailedError ex) {
-            std::cerr << ex << std::endl;
-        }
-        */
-
-        pruner_temp.stream() << std::flush;
-    } // end output to pruner information
-
     std::string wendy_command;
     std::string candy_command;
 
@@ -388,20 +326,9 @@ Adapter::buildController() {
             if ( args_info.property_arg == property_arg_livelock ) {
                 property = "livelock";
             }
-// default behavior
-#warning EXPERIMENTAL CODE for adaptable service characterization
-            if ( args_info.useasif_given == true ) {
-                wendy_command = path2wendy + " " + "--correctness=" + property
-                        + " " + owfn_filename // + " --sa=" + sa_filename;
-                + " --dot=" + dot_filename + " --og=" + og_filename
-                        + " --lola=\"" + args_info.pruner_arg + " -v -i"
-                        + pruner_filename + " -n" + owfn_filename + "\""
-                        + " --noClean";
-
-            } else {
-                wendy_command = path2wendy + " " + "--correctness=" + property
-                        + " " + owfn_filename + " --sa=" + sa_filename;
-            }
+            // default behavior
+            wendy_command = path2wendy + " " + "--correctness=" + property
+                    + " " + owfn_filename + " --sa=" + sa_filename;
         }
     }
     wendy_command += " -m" + toString( _messageBound );
@@ -445,25 +372,6 @@ Adapter::buildController() {
         message(
                 "Controller could not be built! No adapter was created, exiting." );
         exit( EXIT_FAILURE );
-    }
-
-    if ( args_info.useasif_given == true ) {
-#warning EXPERIMENTAL CODE: always copies the resulting OG & dot into cwd as controller.og/.dot
-        message(
-                "EXPERIMENTAL: copying \"%s\" and \"%s\" to \"controller.og\" and \"controller.dot\" (resp.) in cwd.",
-                og_filename.c_str(), dot_filename.c_str() );
-        {
-            std::ifstream ifs( og_filename.c_str(), std::ios::binary );
-            std::ofstream ofs( "controller.og", std::ios::binary );
-            ofs << ifs.rdbuf();
-        }
-        {
-            std::ifstream ifs( dot_filename.c_str(), std::ios::binary );
-            std::ofstream ofs( "controller.dot", std::ios::binary );
-            ofs << ifs.rdbuf() << std::flush;
-        }
-        system( "dot -Tpng -ocontroller.png controller.dot" );
-//################################################################################################
     }
 
     // bool diagnosis_superfluous = false;
@@ -652,9 +560,6 @@ Adapter::createEngineInterface() {
             pnapi::Label::Type labeltype = ( *place )->getType();
             const std::string labelname( ( *place )->getName() );
 
-// get interface name
-//const std::string & ifname = (*place)->getName();
-// internal name
             std::string internalname;
             if ( args_info.withprefix_flag ) {
                 internalname = ( labelname.substr(
@@ -677,26 +582,16 @@ Adapter::createEngineInterface() {
                         _messageBound );
 
             }
-//! name of sending/receiving transition
+            //! name of sending/receiving transition
             std::string inttransname(
                     ( ( labeltype == Label::INPUT ) ? "t_send_" : "t_receive_" )
                             + labelname );
 
-            if (args_info.useasif_given) {
-                if (args_info.useasif_arg == netindex + 1) {
-                    if (labeltype == Label::INPUT) {
-                        netInterfaceOut[inttransname] = labelname;
-                    } else {
-                        netInterfaceIn[inttransname] = labelname;
-                    }
-                }
-            }
-
             //! transition which moves the token between the interface place and its copy
             Transition & inttrans = _engine->createTransition( inttransname );
 
-// create arcs between the internal place, the transition
-// and the interface place
+            // create arcs between the internal place, the transition
+            // and the interface place
             if ( labeltype == Label::INPUT ) {
                 _engine->createArc( *intplace, inttrans );
                 // _engine->createArc(inttrans, ifplace);
@@ -706,42 +601,31 @@ Adapter::createEngineInterface() {
             }
             inttrans.addLabel( *iflabel );
 
-// if we have a synchronous interface, create label for transition
-          if (not args_info.useasif_given)
+            // if we have a synchronous interface, create label for transition
+            if (_contType == SYNCHRONOUS)
             {
+              Label & contLabel = contport.addSynchronousLabel(
+                  "sync_" + inttransname);
+              inttrans.addLabel(contLabel);
 
-              if (_contType == SYNCHRONOUS)
+              cost_file_content += "sync_" + inttransname + " 0;\n";
+
+            }
+            // else create interface place to the controller
+            else
+            {
+              if (labeltype == Label::INPUT)
                 {
-                  Label & contLabel = contport.addSynchronousLabel(
-                      "sync_" + inttransname);
-                  inttrans.addLabel(contLabel);
-
-                  cost_file_content += "sync_" + inttransname + " 0;\n";
-
+                  Label & inputLabel = contport.addInputLabel(
+                      "send_" + labelname);
+                  inttrans.addLabel(inputLabel);
                 }
-              // else create interface place to the controller
               else
                 {
-                  if (labeltype == Label::INPUT)
-                    {
-                      Label & inputLabel = contport.addInputLabel(
-                          "send_" + labelname);
-                      inttrans.addLabel(inputLabel);
-                    }
-                  else
-                    {
-                      Label & outputLabel = contport.addOutputLabel(
-                          "receive_" + labelname);
-                      inttrans.addLabel(outputLabel);
-                    }
+                  Label & outputLabel = contport.addOutputLabel(
+                      "receive_" + labelname);
+                  inttrans.addLabel(outputLabel);
                 }
-            }
-          else
-            {
-              /* \TODO: add information about controller interface to pruner input */
-#warning        "To be implemented as a list of pairs"
-              controllerInterfaceSync[inttransname] = "sync_"
-                  + inttransname;
             }
 
         }
@@ -842,7 +726,6 @@ Adapter::createRuleTransitions() {
         }
 
         // get synchronouns labels for this rule.
-#warning "Needs to be added to remaining interface for adaptability"
         std::set< std::string > syncLabel;
         messageList = rule.getSyncList();
         messageIter = messageList.begin();
@@ -865,38 +748,29 @@ Adapter::createRuleTransitions() {
             ++messageIter;
         }
 
-        if ( not args_info.useasif_given ) {
-            // if we have a synchronous interface, create label for transition
-            if ( _contType == SYNCHRONOUS ) {
-                Label & synclabel = contport.addSynchronousLabel(
-                        "sync_" + transName );
-                trans->addLabel( synclabel );
+        // if we have a synchronous interface, create label for transition
+        if ( _contType == SYNCHRONOUS ) {
+            Label & synclabel = contport.addSynchronousLabel(
+                    "sync_" + transName );
+            trans->addLabel( synclabel );
+        }
+        // else create interface place to the controller
+        else {
+            if ( rule.getMode() == RuleSet::AdapterRule::AR_NORMAL
+                    || rule.getMode()
+                            == RuleSet::AdapterRule::AR_CONTROLLABLE ) {
+                Label & inputlabel = contport.addInputLabel(
+                        "control_" + transName );
+                trans->addLabel( inputlabel );
             }
-            // else create interface place to the controller
-            else {
-                if ( rule.getMode() == RuleSet::AdapterRule::AR_NORMAL
-                        || rule.getMode()
-                                == RuleSet::AdapterRule::AR_CONTROLLABLE ) {
-                    Label & inputlabel = contport.addInputLabel(
-                            "control_" + transName );
-                    trans->addLabel( inputlabel );
-                }
 
-                if ( rule.getMode() == RuleSet::AdapterRule::AR_NORMAL
-                        || rule.getMode() == RuleSet::AdapterRule::AR_OBSERVABLE ) {
-                    Label & outputlabel = contport.addOutputLabel(
-                            "observe_" + transName );
-                    trans->addLabel( outputlabel );
-                }
-
+            if ( rule.getMode() == RuleSet::AdapterRule::AR_NORMAL
+                    || rule.getMode() == RuleSet::AdapterRule::AR_OBSERVABLE ) {
+                Label & outputlabel = contport.addOutputLabel(
+                        "observe_" + transName );
+                trans->addLabel( outputlabel );
             }
-        } else {
-            /* \TODO: add information about controller interface to pruner input */
-#warning	"To be implemented as a list of pairs"
-            controllerInterfaceSync[trans->getName()] = "sync_" + transName;
-//      status( "adding transition to controller interface: %s = %s",
-//          trans->getName().c_str(),
-//          controllerInterfaceSync[trans->getName()].c_str() );
+
         }
         // next Tansition
         ++transNumber;
@@ -915,36 +789,20 @@ Adapter::createComplementaryPlaces( pnapi::PetriNet & net ) {
     std::set< Place * > intPlaces = net.getPlaces();
     std::set< Place * >::iterator placeIter = intPlaces.begin();
 
-    /*
-     Place & dictatorPlace = net.createPlace("comp_thegreatdictator", 1, 1);
-
-     {
-     // update final condition
-     Condition & finalCond = net.getFinalCondition();
-
-     formula::FormulaEqual prop (formula::FormulaEqual(dictatorPlace, 1));
-     finalCond.addProposition(prop);
-
-     //connect every transition to the dictator place via read arc
-     std::set< Transition * > transes = net.getTransitions();
-     for ( std::set< Transition * >::iterator trans = transes.begin(); trans != transes.end(); ++trans)
-     {
-     net.createArc(**trans, dictatorPlace);
-     net.createArc(dictatorPlace, **trans);
-     }
-     }
-     */
-
     while ( placeIter != intPlaces.end() ) {
         Place & place = * *placeIter;
+
+        // in case of synchronous interface, complement places are simple
+        unsigned int comp_capacity = (args_info.asyncif_flag == 0) ? place.getCapacity() : place.getCapacity() + 1;
+
         Place & compPlace = net.createPlace( "comp_" + place.getName(),
-                place.getCapacity() + 1, place.getCapacity() + 1 );
+                comp_capacity, comp_capacity );
 
         // update final condition
         Condition & finalCond = net.getFinalCondition();
 
         formula::FormulaEqual prop(
-                formula::FormulaEqual( compPlace, place.getCapacity() + 1 ) );
+                formula::FormulaEqual( compPlace, comp_capacity ) );
         finalCond.addProposition( prop );
 
         std::set< Node * > preSet = place.getPreset();
@@ -970,19 +828,15 @@ Adapter::createComplementaryPlaces( pnapi::PetriNet & net ) {
             int y = ( b != NULL ) ? b->getWeight() : 0;
             unsigned int weight = std::max( y - x, 0 );
             if ( weight > 0 ) {
-                net.createArc( * *nodeIter, compPlace, weight + 1 );
-                net.createArc( compPlace, * *nodeIter, 1 );
+                if (args_info.asyncif_flag == 0) {
+                    net.createArc( * *nodeIter, compPlace, weight);
+                } else {
+                    net.createArc( * *nodeIter, compPlace, weight + 1 );
+                    net.createArc( compPlace, * *nodeIter, 1 );
+                }
             }
             ++nodeIter;
         }
-
-        /*
-         // deadlock transition
-         Transition & trans = net.createTransition("dl_" + place.getName());
-
-         net.createArc(place, trans, place.getCapacity() + 1);
-         net.createArc(dictatorPlace, trans);
-         */
 
         ++placeIter;
     }

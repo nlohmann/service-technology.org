@@ -135,7 +135,6 @@ AC_CONFIG_FILES([Makefile
                  libs/pnapi/Makefile
                  src/marlene.conf
                  src/Makefile
-		 utils/Makefile
                  tests/Makefile
                  tests/package.m4
                  doc/Doxyfile

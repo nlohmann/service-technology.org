@@ -27,8 +27,11 @@ should be independent from the format (LoLA / PNML / ...)
 #include "Transition.h"
 #include "TransitionSymbol.h"
 #include "Symbol.h"
+#include "Reporter.h"
 
 #include "StructuralReduction.h"
+
+extern Reporter *rep;
 
 ParserPTNet::ParserPTNet()
 {
@@ -365,7 +368,7 @@ void ParserPTNet::symboltable2net()
 
     /*********************
     * 7b. Set DeltaHash *
-        **********************/
+    **********************/
 
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
@@ -474,6 +477,7 @@ void ParserPTNet::symboltable2net()
     * 9. Set significant places *
     ****************************/
     setSignificantPlaces();
+    rep->status("%d places, %d transitions, %d significant places", Net::Card[PL], Net::Card[TR], Place::CardSignificant);
 
     /********************************
     * 10. Initial enabledness check *

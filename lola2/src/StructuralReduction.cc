@@ -149,6 +149,8 @@ void setSignificantPlaces()
 
     // adjust Place::SizeOfBitVector
 
+
+    /*! /TODO Wer hat das hier geschrieben? */
     Place::SizeOfBitVector = 0;
     for (index_t i = 0; i < Place::CardSignificant; i++)
     {

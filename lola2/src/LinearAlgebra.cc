@@ -42,6 +42,7 @@ inline int64_t safeMult(int64_t a, int64_t b)
 {
     //overflow handling
     ///\todo overflow handling
+    ///\todo Add a URL where this magic numbers come from
     if (b > 0 && a > 9223372036854775807 / b)
     {
         assert(false);
@@ -251,6 +252,7 @@ void Matrix::printMatrix() const
 
 /// creates a new matrix
 /// size depicts the number of variables (=columns)
+/// \todo use initializer
 Matrix::Matrix(index_t size)
 {
     matrix = new Row*[size];
@@ -287,11 +289,7 @@ void Matrix::addRow(index_t length, const index_t* var, const int64_t* coef)
 void Matrix::deleteRow(Row* row)
 {
     // if row or its successor is NULL, do nothing
-    if (row == NULL)
-    {
-        return;
-    }
-    if (row->next == NULL)
+    if (row == NULL or row->next == NULL)
     {
         return;
     }

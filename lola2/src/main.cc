@@ -33,6 +33,7 @@
 #include "BDDStore.h"
 #include "SQLStore.h"
 #include "STLStore.h"
+#include "BitStore.h"
 
 #include "Firelist.h"
 #include "SimpleProperty.h"
@@ -190,12 +191,6 @@ int main(int argc, char** argv)
     }
 
 
-    if (args_info.randomWalk_given)
-    {
-        rep->status("random walk");
-        randomWalk(args_info.randomWalk_arg);
-    }
-
     if (args_info.simpleProperty_given)
     {
         Store* s = NULL;
@@ -215,6 +210,9 @@ int main(int argc, char** argv)
                 break;
             case store_arg_stl:
                 s = new STLStore();
+                break;
+            case store_arg_bit:
+                s = new BitStore();
                 break;
         }
 

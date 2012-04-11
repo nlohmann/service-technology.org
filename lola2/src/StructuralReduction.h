@@ -3,7 +3,7 @@
 \author Andreas
 \status new
 
-
+\todo Diese Funktion in die Klasse Net verschieben?
 */
 
 #pragma once

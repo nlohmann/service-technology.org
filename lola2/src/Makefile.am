@@ -8,6 +8,7 @@ lola_CXXFLAGS = -g
 lola_SOURCES = \
                 ArcList.cc ArcList.h \
                 BinStore.h BinStore.cc \
+                BitStore.cc BitStore.h \
                 BDDStore.cc BDDStore.h \
                 CompressedIO.cc CompressedIO.h \
                 Dimensions.h \

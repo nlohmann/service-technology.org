@@ -18,9 +18,9 @@ file where data are separated by spaces and newlines
 #endif
 
 #include "InputOutput/CompressedIO.h"
+#include "Parser/ParserPTNet.h"
 #include "Net/Net.h"
 #include "Net/Marking.h"
-#include "Parser/ParserPTNet.h"
 #include "Net/Place.h"
 #include "Net/Transition.h"
 

@@ -1,7 +1,7 @@
 #include <unistd.h>
+#include "Dimensions.h"
 #include "Stores/Store.h"
 #include "InputOutput/Reporter.h"
-#include "Dimensions.h"
 
 extern Reporter* rep;
 

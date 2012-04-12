@@ -1,10 +1,8 @@
 /*!
-
 \file Firelist.h
 \author Karsten
 \status new
 \brief class for firelist generation. Default is firelist consisting of all enabled transitions.
-
 */
 
 #pragma once
@@ -18,4 +16,3 @@ class Firelist
         /// parameter for actual list
         virtual index_t getFirelist(index_t**);
 };
-

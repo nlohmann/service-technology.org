@@ -1,10 +1,10 @@
 #include <cmath>
 #include <vector>
 
-#include "Stores/BDDStore.h"
 #include "Net/Net.h"
 #include "Net/Place.h"
 #include "Net/Marking.h"
+#include "Stores/BDDStore.h"
 #include "InputOutput/Reporter.h"
 
 extern Reporter* rep;

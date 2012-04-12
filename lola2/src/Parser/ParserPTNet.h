@@ -9,7 +9,7 @@ should be independent from the format (LoLA / PNML / ...)
 
 #pragma once
 
-#include "SymbolTable.h"
+#include "Parser/SymbolTable.h"
 
 class ParserPTNet
 {

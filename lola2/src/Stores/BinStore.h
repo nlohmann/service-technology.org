@@ -6,10 +6,10 @@
 */
 #pragma once
 
-class State;
-
 #include "Dimensions.h"
 #include "Stores/Store.h"
+
+class State;
 
 class BinStore : public Store
 {

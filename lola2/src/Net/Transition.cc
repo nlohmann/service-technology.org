@@ -11,12 +11,12 @@ information for a transition in its role as a node, ar contained in Node.*
 */
 
 #include <cstdlib>
+#include "Dimensions.h"
+#include "Parser/FairnessAssumptions.h"
 #include "Net/Net.h"
 #include "Net/Place.h"
 #include "Net/Transition.h"
 #include "Net/Marking.h"
-#include "Dimensions.h"
-#include "Parser/FairnessAssumptions.h"
 
 fairnessAssumption_t* Transition::Fairness = NULL;
 bool* Transition::Enabled = NULL;

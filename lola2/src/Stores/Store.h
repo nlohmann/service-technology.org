@@ -51,8 +51,3 @@ class Store
         /// check whether current marking is stored and return state
         virtual bool searchAndInsert(State** s) = 0;
 };
-
-// class BinStore : public Store;
-// class BDDStore : public Store;
-// class HashStore : public Store;
-// class NaiveStore : public Store;

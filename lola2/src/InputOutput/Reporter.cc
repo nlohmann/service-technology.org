@@ -11,8 +11,8 @@
 #include <cerrno>
 #include <cstring>
 
-#include "InputOutput/Reporter.h"
 #include "Dimensions.h"
+#include "InputOutput/Reporter.h"
 
 const char* Reporter::error_messages[] =
 {

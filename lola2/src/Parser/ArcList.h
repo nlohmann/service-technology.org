@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include "Parser/PlaceSymbol.h"
 #include "Dimensions.h"
+#include "Parser/PlaceSymbol.h"
 
 /*!
 This class is used as an intermediate storage between parser and the actual

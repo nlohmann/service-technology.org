@@ -8,8 +8,8 @@
 */
 
 #include "Dimensions.h"
-#include "Net/Net.h"
 #include "Firelist.h"
+#include "Net/Net.h"
 #include "Net/Transition.h"
 
 index_t Firelist::getFirelist(index_t** result)

@@ -8,8 +8,8 @@ All data that describe attributes of markings can be found here.
 */
 
 #include <cstdlib>
-#include "Net/Marking.h"
 #include "Dimensions.h"
+#include "Net/Marking.h"
 
 capacity_t* Marking::Initial = NULL;
 hash_t Marking::HashInitial = 0;

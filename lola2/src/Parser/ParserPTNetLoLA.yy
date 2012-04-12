@@ -15,13 +15,13 @@ Parses a place transition net in LoLA syntax.
 #include <libgen.h>
 #include <cstdarg>
 #include <cstdio>
+#include "Dimensions.h"
 #include "Parser/PlaceSymbol.h"
 #include "Parser/TransitionSymbol.h"
 #include "Parser/SymbolTable.h"
 #include "Parser/ParserPTNet.h"
 #include "Parser/FairnessAssumptions.h"
 #include "Parser/ArcList.h"
-#include "Dimensions.h"
 #include "InputOutput/Reporter.h"
 #include "InputOutput/InputOutput.h"
 

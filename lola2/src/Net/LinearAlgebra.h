@@ -2,8 +2,6 @@
 \file LinearAlgebra.h
 \author Andreas
 \status new
-
-
 */
 
 #pragma once

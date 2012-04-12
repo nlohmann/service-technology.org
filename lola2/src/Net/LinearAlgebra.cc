@@ -2,15 +2,12 @@
 \file LinearAlgebra.cc
 \author Andreas
 \status new
-
-
 */
+
 #include <cstdlib>
 #include <cstring>
 
 #include <iostream>
-using std::cout;
-using std::endl;
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
@@ -18,6 +15,9 @@ using std::endl;
 
 #include "Net/LinearAlgebra.h"
 #include "Net/Net.h"
+
+using std::cout;
+using std::endl;
 
 /// computes the ggt of two unsigned integers
 inline int64_t ggt(int64_t a, int64_t b)

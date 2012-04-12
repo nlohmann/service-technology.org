@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "Symbol.h"
 #include "Dimensions.h"
+#include "Parser/Symbol.h"
 
 /*!
 Place symbols carry name as key, and

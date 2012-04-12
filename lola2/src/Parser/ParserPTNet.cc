@@ -18,20 +18,19 @@ should be independent from the format (LoLA / PNML / ...)
 #include <cstring>
 #include <cstdlib>
 
-#include "Parser/SymbolTable.h"
-#include "Parser/ParserPTNet.h"
 #include "Net/Net.h"
 #include "Net/Place.h"
-#include "Net/Marking.h"
-#include "PlaceSymbol.h"
 #include "Net/Transition.h"
+#include "Net/StructuralReduction.h"
+#include "Net/Marking.h"
+#include "Parser/SymbolTable.h"
+#include "Parser/ParserPTNet.h"
+#include "Parser/PlaceSymbol.h"
 #include "Parser/TransitionSymbol.h"
 #include "Parser/Symbol.h"
 #include "InputOutput/Reporter.h"
 
-#include "Net/StructuralReduction.h"
-
-extern Reporter *rep;
+extern Reporter* rep;
 
 ParserPTNet::ParserPTNet()
 {

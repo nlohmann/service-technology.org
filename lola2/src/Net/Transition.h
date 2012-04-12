@@ -14,11 +14,8 @@ information for a transition in its role as a node, ar contained in Node.*
 #include "Parser/FairnessAssumptions.h"
 
 /*!
-
 \brief collection of information related to transitions
-
 */
-
 struct Transition
 {
     public:

@@ -17,14 +17,17 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "InputOutput/Reporter.h"
 #include "cmdline.h"
+#include "Handlers.h"
+#include "RandomWalk.h"
+#include "Firelist.h"
+#include "SimpleProperty.h"
+
 #include "Parser/ParserPTNet.h"
 
 #include "Net/Net.h"
-#include "Handlers.h"
-#include "RandomWalk.h"
 
+#include "InputOutput/Reporter.h"
 #include "InputOutput/CompressedIO.h"
 #include "InputOutput/InputOutput.h"
 
@@ -34,9 +37,6 @@
 #include "Stores/SQLStore.h"
 #include "Stores/STLStore.h"
 #include "Stores/BitStore.h"
-
-#include "Firelist.h"
-#include "SimpleProperty.h"
 
 
 extern ParserPTNet* ParserPTNetLoLA();

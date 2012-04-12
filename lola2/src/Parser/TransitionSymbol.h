@@ -9,9 +9,9 @@
 
 #pragma once
 
-#include "Symbol.h"
-#include "FairnessAssumptions.h"
-#include "ArcList.h"
+#include "Parser/Symbol.h"
+#include "Parser/FairnessAssumptions.h"
+#include "Parser/ArcList.h"
 
 /*!
 Transition symbols carry name as key, and

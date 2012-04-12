@@ -8,10 +8,10 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "Stores/BinStore.h"
 #include "Net/Marking.h"
 #include "Net/Net.h"
 #include "Net/Place.h"
+#include "Stores/BinStore.h"
 
 class State;
 
@@ -115,71 +115,32 @@ freshvector:
 #error BINSTORE_LOOP_BODY already defined
 #else
 #define BINSTORE_LOOP_BODY(N, I)\
-                /* comparison of one bit between current marking and current vector*/\
-                if (((Marking::Current[place_index] >> placebit_index) & 1) != ((currentvector[vector_byte] N) & 1))\
-                {\
-                    /* This is the mismatch we were looking for*/\
-                    /* --> evaluate the branching tree:*/\
-                    /* Mismatch between two branches: state not found*/\
-                    /* Mismatch at some branch: switch to other currentvector*/\
-                    while (true)\
-                    {\
-                        if (!*anchor)\
-                        {\
-                            goto insert; /* no further branch*/\
-                        }\
-                        /* mismatch exactly at branch?*/\
-                        if (position == (*anchor)->bit)\
-                        {\
-                            /* switch to other currentvector*/\
-                            currentvector = (* anchor) -> vector;\
-                            anchor = &((* anchor) -> nextnew);\
-                            /* Indices in new vector start at msb in byte 0*/\
-                            vector_byte = 0;\
-                            ++position;  /* the mismatching bit is not represented in new vector*/\
-                            /* as it must be the opposite of the mismatching one in old vector*/\
-\
-                            /* forward one bit in current marking, as mismatching one is implicitly*/\
-                            /* matched by the switch to new vector*/\
-                            if (placebit_index == 0)\
-                            {\
-                                place_index++;\
-                                if (place_index >= Place::CardSignificant)\
-                                {\
-                                    /* no mismatch --> state found*/\
-                                    return true;\
-                                }\
-                                placebit_index = Place::CardBits[place_index] - 1;\
-                            }\
-                            else\
-                            {\
-                                --placebit_index;\
-                            }\
-                            goto freshvector; /*goto next iteration of "for various currentvectors do"*/\
-                            /* since we need a new mismatch in new vector*/\
-\
-                        }\
-                        /* mismatch beyond branch*/\
-                        if (position > (*anchor)->bit)\
-                        {\
-                            /* dive down in nextold list for next branch descending from current vector*/\
-                            anchor = &((*anchor)->nextold);\
-                        }\
-                        else\
-                        {\
-                            /* arriving here, the mismatch is before next branch off current vector*/\
-                            assert(position < (*anchor)->bit);\
-                            goto insert;\
-                        }\
-                    }\
-                }\
-\
-                /* increment global bit counter*/\
-                ++position;\
-\
-                /* increment index in currentvector*/\
-                I\
-                /*increment index in currentmarking*/\
+    /* comparison of one bit between current marking and current vector*/\
+    if (((Marking::Current[place_index] >> placebit_index) & 1) != ((currentvector[vector_byte] N) & 1))\
+    {\
+        /* This is the mismatch we were looking for*/\
+        /* --> evaluate the branching tree:*/\
+        /* Mismatch between two branches: state not found*/\
+        /* Mismatch at some branch: switch to other currentvector*/\
+        while (true)\
+        {\
+            if (!*anchor)\
+            {\
+                goto insert; /* no further branch*/\
+            }\
+            /* mismatch exactly at branch?*/\
+            if (position == (*anchor)->bit)\
+            {\
+                /* switch to other currentvector*/\
+                currentvector = (* anchor) -> vector;\
+                anchor = &((* anchor) -> nextnew);\
+                /* Indices in new vector start at msb in byte 0*/\
+                vector_byte = 0;\
+                ++position;  /* the mismatching bit is not represented in new vector*/\
+                /* as it must be the opposite of the mismatching one in old vector*/\
+                \
+                /* forward one bit in current marking, as mismatching one is implicitly*/\
+                /* matched by the switch to new vector*/\
                 if (placebit_index == 0)\
                 {\
                     place_index++;\
@@ -193,15 +154,54 @@ freshvector:
                 else\
                 {\
                     --placebit_index;\
-                }
+                }\
+                goto freshvector; /*goto next iteration of "for various currentvectors do"*/\
+                /* since we need a new mismatch in new vector*/\
+                \
+            }\
+            /* mismatch beyond branch*/\
+            if (position > (*anchor)->bit)\
+            {\
+                /* dive down in nextold list for next branch descending from current vector*/\
+                anchor = &((*anchor)->nextold);\
+            }\
+            else\
+            {\
+                /* arriving here, the mismatch is before next branch off current vector*/\
+                assert(position < (*anchor)->bit);\
+                goto insert;\
+            }\
+        }\
+    }\
+    \
+    /* increment global bit counter*/\
+    ++position;\
+    \
+    /* increment index in currentvector*/\
+    I\
+    /*increment index in currentmarking*/\
+    if (placebit_index == 0)\
+    {\
+        place_index++;\
+        if (place_index >= Place::CardSignificant)\
+        {\
+            /* no mismatch --> state found*/\
+            return true;\
+        }\
+        placebit_index = Place::CardBits[place_index] - 1;\
+    }\
+    else\
+    {\
+        --placebit_index;\
+    }
 #endif
-                BINSTORE_LOOP_BODY(>> 7,);
-                BINSTORE_LOOP_BODY(>> 6,);
-                BINSTORE_LOOP_BODY(>> 5,);
-                BINSTORE_LOOP_BODY(>> 4,);
-                BINSTORE_LOOP_BODY(>> 3,);
-                BINSTORE_LOOP_BODY(>> 2,);
-                BINSTORE_LOOP_BODY(>> 1,);
+                BINSTORE_LOOP_BODY( >> 7,);
+                BINSTORE_LOOP_BODY( >> 6,);
+                BINSTORE_LOOP_BODY( >> 5,);
+                BINSTORE_LOOP_BODY( >> 4,);
+                BINSTORE_LOOP_BODY( >> 3,);
+                BINSTORE_LOOP_BODY( >> 2,);
+                BINSTORE_LOOP_BODY( >> 1,);
                 BINSTORE_LOOP_BODY(, ++vector_byte;);
             }
         }

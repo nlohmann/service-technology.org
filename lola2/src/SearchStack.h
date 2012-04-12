@@ -5,6 +5,8 @@
 \brief organizes the search stack for dfs or bfs
 */
 
+#pragma once
+
 /// serves as a chunk of SIZEOF_STACKCHUNK elements in a search stack
 class Chunk
 {

@@ -3,10 +3,10 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "Stores/SQLStore.h"
 #include "Net/Net.h"
 #include "Net/Place.h"
 #include "Net/Marking.h"
+#include "Stores/SQLStore.h"
 #include "InputOutput/Reporter.h"
 
 extern Reporter* rep;

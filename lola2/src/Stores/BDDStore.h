@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cuddObj.hh>
-#include "Stores/Store.h"
 #include "Dimensions.h"
+#include "Stores/Store.h"
 
 class BDDStore : public Store
 {

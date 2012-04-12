@@ -1,8 +1,8 @@
 #include <algorithm>
 
-#include "Stores/STLStore.h"
 #include "Net/Net.h"
 #include "Net/Marking.h"
+#include "Stores/STLStore.h"
 
 bool STLStore::searchAndInsert()
 {

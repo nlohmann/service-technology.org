@@ -12,15 +12,15 @@
 #include <cstring>
 #include <unistd.h>
 
+#include "Dimensions.h"
+#include "cmdline.h"
+#include "Handlers.h"
 #include "Net/Net.h"
 #include "Net/Place.h"
 #include "Net/Marking.h"
 #include "Net/Transition.h"
-#include "Handlers.h"
 #include "InputOutput/Socket.h"
 #include "InputOutput/Reporter.h"
-#include "Dimensions.h"
-#include "cmdline.h"
 #include "InputOutput/SimpleString.h"
 
 extern Reporter* rep;

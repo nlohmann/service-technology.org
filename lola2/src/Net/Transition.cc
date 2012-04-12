@@ -11,7 +11,7 @@ information for a transition in its role as a node, ar contained in Node.*
 */
 
 #include <cstdlib>
-#include "Dimensions.h"
+#include "Core/Dimensions.h"
 #include "Parser/FairnessAssumptions.h"
 #include "Net/Net.h"
 #include "Net/Place.h"

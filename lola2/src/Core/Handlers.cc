@@ -12,9 +12,9 @@
 #include <cstring>
 #include <unistd.h>
 
-#include "Dimensions.h"
 #include "cmdline.h"
-#include "Handlers.h"
+#include "Core/Dimensions.h"
+#include "Core/Handlers.h"
 #include "Net/Net.h"
 #include "Net/Place.h"
 #include "Net/Marking.h"

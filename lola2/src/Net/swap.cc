@@ -7,12 +7,12 @@
 
 /// swap two places
 
-#include "Dimensions.h"
+#include "Core/Dimensions.h"
 #include "Net/Net.h"
 #include "Net/Place.h"
 #include "Net/Transition.h"
 #include "Net/Marking.h"
-#include "swap.h"
+#include "Net/swap.h"
 
 bool is_consistent();
 void swapPlaces(index_t left, index_t right)

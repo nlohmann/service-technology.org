@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "Dimensions.h"
+#include "Core/Dimensions.h"
 
 /*!
 A symbol is an entry in a symbol table (class SymbolTable). It has a string as

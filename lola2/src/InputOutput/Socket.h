@@ -11,7 +11,7 @@
 
 #include <config.h>
 #include <sys/types.h>
-#include "Dimensions.h"
+#include "Core/Dimensions.h"
 
 #ifdef WIN32
 #include <winsock.h>

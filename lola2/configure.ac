@@ -10,7 +10,7 @@ AC_MSG_NOTICE([http://service-technology.org/lola])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
 AC_MSG_NOTICE()
 
-AC_CONFIG_SRCDIR(src/main.cc)
+AC_CONFIG_SRCDIR(src/Core/main.cc)
 AC_CONFIG_HEADER(src/config.h)
 AC_CONFIG_AUX_DIR([build-aux])
 

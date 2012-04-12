@@ -7,7 +7,7 @@ Actual property is virtual, default (base class) is full exploration
 */
 #pragma once
 
-#include "Firelist.h"
+#include "Exploration/Firelist.h"
 #include "Stores/Store.h"
 
 class SimpleProperty

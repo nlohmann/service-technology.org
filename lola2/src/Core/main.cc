@@ -18,10 +18,8 @@
 #include <cstdio>
 
 #include "cmdline.h"
-#include "Handlers.h"
-#include "RandomWalk.h"
-#include "Firelist.h"
-#include "SimpleProperty.h"
+
+#include "Core/Handlers.h"
 
 #include "Parser/ParserPTNet.h"
 
@@ -30,6 +28,10 @@
 #include "InputOutput/Reporter.h"
 #include "InputOutput/CompressedIO.h"
 #include "InputOutput/InputOutput.h"
+
+#include "Exploration/RandomWalk.h"
+#include "Exploration/Firelist.h"
+#include "Exploration/SimpleProperty.h"
 
 #include "Stores/Store.h"
 #include "Stores/BinStore.h"

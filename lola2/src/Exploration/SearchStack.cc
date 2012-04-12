@@ -8,8 +8,8 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "Dimensions.h"
-#include "SearchStack.h"
+#include "Core/Dimensions.h"
+#include "Exploration/SearchStack.h"
 
 SearchStack::SearchStack()
 {

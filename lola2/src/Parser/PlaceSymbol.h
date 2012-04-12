@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Dimensions.h"
+#include "Core/Dimensions.h"
 #include "Parser/Symbol.h"
 
 /*!

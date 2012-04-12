@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Dimensions.h"
+#include "Core/Dimensions.h"
 
 /*!
 A matrix is used to store variables (=columns) and their equations (=rows).

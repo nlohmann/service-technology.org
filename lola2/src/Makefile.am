@@ -1,19 +1,24 @@
 # the main program
-bin_PROGRAMS = lola listener killer
+bin_PROGRAMS = lola
 
 lola_CFLAGS = -g
 lola_CXXFLAGS = -g
 
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
-                Dimensions.h \
-                Firelist.cc Firelist.h \
-                Handlers.cc Handlers.h \
-                RandomWalk.cc RandomWalk.h \
-                SearchStack.cc SearchStack.h \
-                SimpleProperty.cc SimpleProperty.h \
                 cmdline.c cmdline.h \
-                main.cc \
+                \
+                Core/Dimensions.h \
+                Core/Handlers.cc Core/Handlers.h \
+                Core/main.cc \
+                \
+                Parser/ArcList.cc Parser/ArcList.h \
+                Parser/ParserPTNet.h Parser/ParserPTNet.cc \
+                Parser/ParserPTNetLoLA.yy Parser/Lexic.ll \
+                Parser/PlaceSymbol.cc Parser/PlaceSymbol.h \
+                Parser/Symbol.cc Parser/Symbol.h \
+                Parser/SymbolTable.cc Parser/SymbolTable.h \
+                Parser/TransitionSymbol.h Parser/TransitionSymbol.cc \
                 \
                 Net/swap.h Net/swap.cc \
                 Net/FairnessAssumptions.h \
@@ -24,19 +29,16 @@ lola_SOURCES = \
                 Net/StructuralReduction.cc Net/StructuralReduction.h \
                 Net/Transition.cc Net/Transition.h \
                 \
-                Parser/ArcList.cc Parser/ArcList.h \
-                Parser/ParserPTNet.h Parser/ParserPTNet.cc \
-                Parser/ParserPTNetLoLA.yy Parser/Lexic.ll \
-                Parser/PlaceSymbol.cc Parser/PlaceSymbol.h \
-                Parser/Symbol.cc Parser/Symbol.h \
-                Parser/SymbolTable.cc Parser/SymbolTable.h \
-                Parser/TransitionSymbol.h Parser/TransitionSymbol.cc \
-                \
                 InputOutput/CompressedIO.cc InputOutput/CompressedIO.h \
                 InputOutput/InputOutput.cc InputOutput/InputOutput.h \
                 InputOutput/Reporter.cc InputOutput/Reporter.h \
                 InputOutput/SimpleString.cc InputOutput/SimpleString.h \
                 InputOutput/Socket.cc InputOutput/Socket.h \
+                \
+                Exploration/Firelist.cc Exploration/Firelist.h \
+                Exploration/RandomWalk.cc Exploration/RandomWalk.h \
+                Exploration/SearchStack.cc Exploration/SearchStack.h \
+                Exploration/SimpleProperty.cc Exploration/SimpleProperty.h \
                 \
                 Stores/Store.cc Stores/Store.h \
                 Stores/BinStore.h Stores/BinStore.cc \
@@ -56,15 +58,22 @@ lola_LDADD = $(builddir)/../libs/cudd/libobj.a \
 
 lola_CPPFLAGS = -I$(top_srcdir)/libs/cudd/include -I$(top_srcdir)/libs/sqlite
 
-listener_SOURCES = Listener.cc \
+###
+
+noinst_PROGRAMS = listener killer
+
+listener_SOURCES = utils/Listener.cc \
                    InputOutput/Reporter.cc InputOutput/Reporter.h \
                    InputOutput/SimpleString.cc InputOutput/SimpleString.h \
                    InputOutput/Socket.cc InputOutput/Socket.h
 
-killer_SOURCES = Killer.cc \
+killer_SOURCES = utils/Killer.cc \
                  InputOutput/Reporter.cc InputOutput/Reporter.h \
                  InputOutput/SimpleString.cc InputOutput/SimpleString.h \
                  InputOutput/Socket.cc InputOutput/Socket.h
+
+
+
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

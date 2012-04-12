@@ -6,7 +6,7 @@
 */
 #pragma once
 
-#include "Dimensions.h"
+#include "Core/Dimensions.h"
 #include "Stores/Store.h"
 
 class State;

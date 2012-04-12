@@ -12,7 +12,7 @@
 #include <inttypes.h>
 #include <cstring>
 #include <cstdlib>
-#include "Dimensions.h"
+#include "Core/Dimensions.h"
 #include "Parser/SymbolTable.h"
 
 /// Intialization amounts to setting all entries to NULL

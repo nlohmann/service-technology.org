@@ -10,7 +10,7 @@ information for a place in its role as a node, ar contained in Node.*
 
 #pragma once
 
-#include "Dimensions.h"
+#include "Core/Dimensions.h"
 
 /*!
 \brief collection of information related to places

@@ -10,7 +10,7 @@ information for a place in its role as a node, ar contained in Node.*
 */
 
 #include <cstdlib>
-#include "Dimensions.h"
+#include "Core/Dimensions.h"
 #include "Net/Place.h"
 #include "Net/Net.h"
 

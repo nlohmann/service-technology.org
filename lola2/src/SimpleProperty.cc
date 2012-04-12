@@ -11,11 +11,11 @@ Actual property is virtual, default (base class) is full exploration
 
 #include "SimpleProperty.h"
 #include "SearchStack.h"
-#include "Store.h"
+#include "Stores/Store.h"
 #include "Firelist.h"
-#include "Marking.h"
-#include "Transition.h"
-#include "Net.h"
+#include "Net/Marking.h"
+#include "Net/Transition.h"
+#include "Net/Net.h"
 
 
 void SimpleProperty::initProperty()

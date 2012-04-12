@@ -3,8 +3,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <csignal>
-#include "Socket.h"
-#include "Reporter.h"
+#include "InputOutput/Socket.h"
+#include "InputOutput/Reporter.h"
 
 /// the reporter
 Reporter* rep = new ReporterStream();

@@ -14,7 +14,7 @@ AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADER(src/config.h)
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE(gnits)
+AM_INIT_AUTOMAKE([gnits subdir-objects])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 ${CFLAGS="-g"}

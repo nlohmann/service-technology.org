@@ -17,23 +17,23 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "Reporter.h"
+#include "InputOutput/Reporter.h"
 #include "cmdline.h"
-#include "ParserPTNet.h"
+#include "Parser/ParserPTNet.h"
 
-#include "Net.h"
+#include "Net/Net.h"
 #include "Handlers.h"
 #include "RandomWalk.h"
-#include "CompressedIO.h"
 
-#include "InputOutput.h"
+#include "InputOutput/CompressedIO.h"
+#include "InputOutput/InputOutput.h"
 
-#include "Store.h"
-#include "BinStore.h"
-#include "BDDStore.h"
-#include "SQLStore.h"
-#include "STLStore.h"
-#include "BitStore.h"
+#include "Stores/Store.h"
+#include "Stores/BinStore.h"
+#include "Stores/BDDStore.h"
+#include "Stores/SQLStore.h"
+#include "Stores/STLStore.h"
+#include "Stores/BitStore.h"
 
 #include "Firelist.h"
 #include "SimpleProperty.h"

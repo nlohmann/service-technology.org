@@ -8,10 +8,10 @@ repeatedly fire random transitions
 
 #include <cstdio>
 #include <cstdlib>
-#include "Net.h"
-#include "Transition.h"
-#include "Place.h"
-#include "Marking.h"
+#include "Net/Net.h"
+#include "Net/Transition.h"
+#include "Net/Place.h"
+#include "Net/Marking.h"
 
 
 void randomWalk(int transitions)

@@ -12,16 +12,16 @@
 #include <cstring>
 #include <unistd.h>
 
-#include "Net.h"
-#include "Place.h"
-#include "Marking.h"
-#include "Transition.h"
+#include "Net/Net.h"
+#include "Net/Place.h"
+#include "Net/Marking.h"
+#include "Net/Transition.h"
 #include "Handlers.h"
-#include "Socket.h"
-#include "Reporter.h"
+#include "InputOutput/Socket.h"
+#include "InputOutput/Reporter.h"
 #include "Dimensions.h"
 #include "cmdline.h"
-#include "SimpleString.h"
+#include "InputOutput/SimpleString.h"
 
 extern Reporter* rep;
 extern gengetopt_args_info args_info;

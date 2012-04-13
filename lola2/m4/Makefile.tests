@@ -39,7 +39,7 @@ cover-prepare:
 	  AM_CPPFLAGS+="-DNDEBUG" \
 	  AM_CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
 	  AM_CFLAGS+="-fprofile-arcs -ftest-coverage" \
-	  AM_LDFLAGS+="-lgcov"
+	  AM_LDFLAGS+="-fprofile-arcs -lgcov"
 
 # get descriptions from the testsuite
 descriptions: $(TESTSUITE)

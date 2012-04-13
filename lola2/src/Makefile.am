@@ -13,6 +13,7 @@ lola_SOURCES = \
                 Core/main.cc \
                 \
                 Parser/ArcList.cc Parser/ArcList.h \
+                Parser/FairnessAssumptions.h \
                 Parser/ParserPTNet.h Parser/ParserPTNet.cc \
                 Parser/ParserPTNetLoLA.yy Parser/Lexic.ll \
                 Parser/PlaceSymbol.cc Parser/PlaceSymbol.h \
@@ -21,7 +22,6 @@ lola_SOURCES = \
                 Parser/TransitionSymbol.h Parser/TransitionSymbol.cc \
                 \
                 Net/swap.h Net/swap.cc \
-                Net/FairnessAssumptions.h \
                 Net/LinearAlgebra.cc Net/LinearAlgebra.h \
                 Net/Marking.cc Net/Marking.h \
                 Net/Net.cc Net/Net.h \

@@ -3,9 +3,9 @@
 \author Karsten
 \status approved 21.02.2012
 
-Input and outout from/to a file in compressed format. We generate two separate
-files that can be read in arbitrary order. In this version, we use an ASCII
-file where data are separated by spaces and newlines
+\brief Input and outout from/to a file in compressed format. We generate two
+separate files that can be read in arbitrary order. In this version, we use an
+ASCII file where data are separated by spaces and newlines
 */
 
 #include <config.h>
@@ -23,6 +23,7 @@ file where data are separated by spaces and newlines
 #include "Net/Marking.h"
 #include "Net/Place.h"
 #include "Net/Transition.h"
+
 
 void WriteNameFile(FILE* f)
 {

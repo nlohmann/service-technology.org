@@ -1,16 +1,11 @@
 /*!
 \file StructuralReduction.cc
 \author Andreas
-\status new
-
-
+\status approved 11.04.2012
 */
+
 #include <cstdlib>
 #include <cstring>
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>

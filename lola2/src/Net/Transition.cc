@@ -6,8 +6,6 @@
 
 All data that describe attributes of transitions can be found here. General
 information for a transition in its role as a node, ar contained in Node.*
-
-\todo Lohnt es sich, Integers als Referenz zu übergeben? -> Nein (Andreas)
 */
 
 #include <cstdlib>

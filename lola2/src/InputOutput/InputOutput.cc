@@ -1,4 +1,11 @@
+/*!
+\file InputOutput.cc
+\author Niels
+\status new
+*/
+
 #include "InputOutput/InputOutput.h"
+#include "InputOutput/Reporter.h"
 
 Reporter* IO::r = NULL;
 

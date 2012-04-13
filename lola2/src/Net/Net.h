@@ -10,8 +10,8 @@ Place.* and Transition.*
 */
 
 #pragma once
-
 #include "Core/Dimensions.h"
+
 
 /*!
 \brief collection of information related to nodes
@@ -43,5 +43,6 @@ struct Net
     /// Aufräumen der Knoten - Service für valgrind
     static void deleteNodes();
 
-    static void print(); // for debugging
+    /// for debugging
+    static void print();
 };

@@ -2,12 +2,11 @@
 \file BinStore.cc
 \author Karsten
 \status new
-\brief implement Store as a decision tree with bitvectors..
+\brief implement Store as a decision tree with bitvectors.
 */
 
 #include <cstdlib>
 #include <cstdio>
-
 #include "Net/Marking.h"
 #include "Net/Net.h"
 #include "Net/Place.h"

@@ -1,8 +1,15 @@
-#pragma once
+/*!
+\file InputOutput.cc
+\author Niels
+\status new
+*/
 
+#pragma once
 #include <string>
 #include <cstdio>
-#include "InputOutput/Reporter.h"
+
+
+class Reporter;
 
 class IO
 {

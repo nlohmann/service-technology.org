@@ -2,11 +2,13 @@
 \file Place.cc
 \author Karsten
 \status approved 27.01.2012
+
 \brief Useful rooutines for place specific information
-\todo Tränsläte the comments to Inglisch pliez.
 
 All data that describe attributes of places can be found here. General
 information for a place in its role as a node, ar contained in Node.*
+
+\todo Tränsläte the comments to Inglisch pliez.
 */
 
 #include <cstdlib>
@@ -17,7 +19,6 @@ information for a place in its role as a node, ar contained in Node.*
 /*!
 \brief collection of information related to places
 */
-
 index_t Place::CardSignificant = 0;
 hash_t* Place::Hash = NULL;
 

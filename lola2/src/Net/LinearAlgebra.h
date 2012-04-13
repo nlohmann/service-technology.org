@@ -1,23 +1,22 @@
 /*!
 \file LinearAlgebra.h
 \author Andreas
-\status new
+\status approved 11.04.2012
 */
 
 #pragma once
-
 #include "Core/Dimensions.h"
+
 
 /*!
 A matrix is used to store variables (=columns) and their equations (=rows).
-Using places (transitions) as variables and their effect to the net as rows, the reduce() method can find the significant places (transitions).
+Using places (transitions) as variables and their effect to the net as rows,
+the reduce() method can find the significant places (transitions).
 */
 class Matrix
 {
     private:
-        /*!
-        A row is used to store a row.
-        */
+        /// A row is used to store a row.
         class Row
         {
             public:

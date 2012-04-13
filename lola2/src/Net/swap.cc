@@ -2,7 +2,11 @@
 \file swap.cc
 \author karsten
 \status new
-\brief swap two place indices in all Marking, Transition, Place, and Net data structures
+
+\brief swap two place indices in all Marking, Transition, Place, and Net data
+structures
+
+\todo Diese Funktion in die Klasse Net verschieben?
 */
 
 /// swap two places

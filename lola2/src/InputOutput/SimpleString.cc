@@ -1,3 +1,9 @@
+/*!
+\file SimpleString.cc
+\author Niels
+\status new
+*/
+
 #include <config.h>
 #include <cstdlib>
 #include <cstring>

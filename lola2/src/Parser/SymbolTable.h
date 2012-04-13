@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "Parser/Symbol.h"
+class Symbol;
 
 
 /*!
@@ -22,6 +22,10 @@ lists.
 */
 class SymbolTable
 {
+    public:
+        /// overall hash table collisions
+        static unsigned int collisions;
+
     public:
         /// If symbol with same key is in table: return false
         /// If symbol with same key is not in table: return true and insert it
@@ -44,15 +48,15 @@ class SymbolTable
         /// Get number of entries in table
         unsigned int getCard() const;
 
+        /// The number of entries in table
+        unsigned int card;
+
     private:
         /// The actual symbol table. It gets pointers as we use lists for collisions.
         Symbol** table;
 
         /// The hash function to be used
         unsigned int hash(const char*) const;
-
-        /// The number of entrie in table
-        unsigned int card;
 
         /// The index of the current element in iteration
         unsigned int currentIndex;

@@ -1,12 +1,13 @@
 /*!
 \file Reporter.h
+\author Niels
 \status approved 25.01.2012
 */
 
 #pragma once
-
 #include "InputOutput/SimpleString.h"
 #include "InputOutput/Socket.h"
+
 
 /// error codes for the Reporter::abort() function
 typedef enum
@@ -39,7 +40,7 @@ typedef enum
 class Reporter
 {
     protected:
-        /// error messages
+        /// error messages (indexed by errorcode_t)
         static const char* error_messages[];
 
     public:

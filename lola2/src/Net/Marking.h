@@ -2,14 +2,15 @@
 \file Marking.h
 \author Karsten
 \status approved 27.01.2012
+
 \brief Global data for marking specific information
 
 All data that describe attributes of markings can be found here.
 */
 
 #pragma once
-
 #include "Core/Dimensions.h"
+
 
 /*!
 \brief collection of information related to markings

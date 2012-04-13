@@ -1,10 +1,9 @@
 /*!
 \file main.cc
-
-\brief main entry point for LoLA.
-
 \author Niels
 \status approved 25.01.2012
+
+\brief Main entry point for LoLA.
 
 \todo ParserPTNetLoLA() exportieren
 \todo Parser/Lexer-Kram in h-Datei (yyin, ...)
@@ -160,10 +159,16 @@ int main(int argc, char** argv)
         // close net file
         delete netFile;
 
+        // tidy parser
         yylex_destroy();
+
+        rep->status("processing net");
 
         // translate into general net structures
         symbolTables->symboltable2net();
+
+        // report hash table usage (size would be SIZEOF_SYMBOLTABLE)
+        rep->status("%d symbol table entries, %d collisions", symbolTables->PlaceTable->card + symbolTables->TransitionTable->card, SymbolTable::collisions);
 
         delete symbolTables;
     }

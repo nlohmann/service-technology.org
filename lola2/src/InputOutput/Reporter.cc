@@ -1,5 +1,6 @@
 /*!
 \file Reporter.cc
+\author Niels
 \status approved 25.01.2012
 */
 
@@ -10,10 +11,11 @@
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
-
 #include "Core/Dimensions.h"
 #include "InputOutput/Reporter.h"
 
+
+// initialize error messages
 const char* Reporter::error_messages[] =
 {
     "syntax error",

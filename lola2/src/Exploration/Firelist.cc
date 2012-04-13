@@ -1,10 +1,9 @@
 /*!
-
 \file Firelist.cc
 \author Karsten
 \status new
-\brief class for firelist generation. Default is firelist consisting of all enabled transitions.
 
+\brief Class for firelist generation. Default is firelist consisting of all enabled transitions.
 */
 
 #include "Core/Dimensions.h"
@@ -12,10 +11,12 @@
 #include "Net/Transition.h"
 #include "Exploration/Firelist.h"
 
+
 index_t Firelist::getFirelist(index_t** result)
 {
     assert(Transition::CardEnabled <= Net::Card[TR]);
-    * result = new index_t[Transition::CardEnabled];
+
+    *result = new index_t[Transition::CardEnabled];
     index_t i = 0;
     for (index_t t = 0; t < Net::Card[TR]; ++t)
     {
@@ -27,4 +28,3 @@ index_t Firelist::getFirelist(index_t** result)
     }
     return Transition::CardEnabled;
 }
-

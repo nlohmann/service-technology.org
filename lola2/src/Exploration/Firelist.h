@@ -6,8 +6,8 @@
 */
 
 #pragma once
-
 #include "Core/Dimensions.h"
+
 
 class Firelist
 {

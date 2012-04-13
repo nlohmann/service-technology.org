@@ -10,7 +10,6 @@ should be independent from the format (LoLA / PNML / ...)
 */
 
 #include <config.h>
-
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -23,12 +22,14 @@ should be independent from the format (LoLA / PNML / ...)
 #include "Net/Transition.h"
 #include "Net/StructuralReduction.h"
 #include "Net/Marking.h"
+#include "Parser/ArcList.h"
 #include "Parser/SymbolTable.h"
 #include "Parser/ParserPTNet.h"
 #include "Parser/PlaceSymbol.h"
 #include "Parser/TransitionSymbol.h"
 #include "Parser/Symbol.h"
 #include "InputOutput/Reporter.h"
+
 
 extern Reporter* rep;
 

@@ -3,7 +3,7 @@
 \author Karsten
 \status new
 
-repeatedly fire random transitions
+\brief Repeatedly fire random transitions.
 */
 
 #include <cstdio>

@@ -1,6 +1,11 @@
+/*!
+\author Niels
+\file BDDStore.cc
+\status new
+*/
+
 #include <cmath>
 #include <vector>
-
 #include "Net/Net.h"
 #include "Net/Place.h"
 #include "Net/Marking.h"

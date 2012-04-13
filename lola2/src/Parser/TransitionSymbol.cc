@@ -8,8 +8,10 @@
 */
 
 #include "Parser/TransitionSymbol.h"
+#include "Parser/ArcList.h"
 #include "Parser/PlaceSymbol.h"
 #include "Parser/FairnessAssumptions.h"
+
 
 /// Generate and initialize a symbol
 TransitionSymbol::TransitionSymbol(char* k, fairnessAssumption_t f, ArcList* pr, ArcList* po)

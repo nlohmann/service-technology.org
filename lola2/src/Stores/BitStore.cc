@@ -1,13 +1,20 @@
+/*!
+\author Niels
+\file BitStore.cc
+\status new
+*/
+
 #include <cmath>
 #include <iostream>
-
 #include "Net/Net.h"
 #include "Net/Place.h"
 #include "Net/Marking.h"
 #include "Stores/BitStore.h"
 #include "InputOutput/Reporter.h"
 
+
 extern Reporter* rep;
+
 
 unsigned int BitStore::bitsNeeded(int val)
 {

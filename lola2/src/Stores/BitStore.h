@@ -1,8 +1,14 @@
-#pragma once
+/*!
+\author Niels
+\file BitStore.h
+\status new
+*/
 
+#pragma once
 #include <set>
 #include <vector>
 #include "Stores/Store.h"
+
 
 class BitStore : public Store
 {

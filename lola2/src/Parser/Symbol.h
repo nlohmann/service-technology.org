@@ -8,8 +8,8 @@
 */
 
 #pragma once
-
 #include "Core/Dimensions.h"
+
 
 /*!
 A symbol is an entry in a symbol table (class SymbolTable). It has a string as
@@ -21,13 +21,16 @@ class Symbol
     public:
         /// Getter for key
         char* getKey() const;
+
         /// Getter for next
         Symbol* getNext() const;
+
         /// Setter for next
         void setNext(Symbol*);
 
         /// Generate and initialize a symbol
         explicit Symbol(const char*);
+
         /// Delete a symbol
         virtual ~Symbol() {};
 
@@ -38,8 +41,9 @@ class Symbol
         void setIndex(index_t);
 
     private:
-        ///The key. Used for insertion in symbol table
+        /// The key. Used for insertion in symbol table
         char* key;
+
         /// Symbols with same hash value are organized as lists.
         Symbol* next;
 

@@ -1,7 +1,14 @@
+/*!
+\author Niels
+\file Store.cc
+\status new
+*/
+
 #include <unistd.h>
 #include "Core/Dimensions.h"
 #include "Stores/Store.h"
 #include "InputOutput/Reporter.h"
+
 
 extern Reporter* rep;
 

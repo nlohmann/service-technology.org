@@ -9,6 +9,8 @@
 
 #include <cstdlib>
 #include "Parser/ArcList.h"
+#include "Parser/PlaceSymbol.h"
+
 
 /// Getter for place
 PlaceSymbol* ArcList::getPlace() const

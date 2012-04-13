@@ -3,7 +3,6 @@
 \file SymbolTable.cc
 \status approved 25.01.2012
 \ingroup g_frontend g_symboltable
-\todo Mal Kollisionen zählen
 
 \brief class implementation for a symbol table
 */
@@ -13,7 +12,11 @@
 #include <cstring>
 #include <cstdlib>
 #include "Core/Dimensions.h"
+#include "Parser/Symbol.h"
 #include "Parser/SymbolTable.h"
+
+
+unsigned int SymbolTable::collisions = 0;
 
 /// Intialization amounts to setting all entries to NULL
 SymbolTable::SymbolTable()
@@ -83,6 +86,12 @@ if input is correct, insert is used when key is not yet present
 bool SymbolTable::insert(Symbol* sym)
 {
     const unsigned int index = hash(sym->getKey());
+
+    if (table[index] != NULL)
+    {
+        ++collisions;
+    }
+
     for (Symbol* othersym = table[index]; othersym; othersym = othersym->getNext())
     {
         if (!strcmp(othersym->getKey(), sym->getKey()))
@@ -90,9 +99,11 @@ bool SymbolTable::insert(Symbol* sym)
             return false;
         }
     }
+
     sym->setNext(table[index]);
     table[index] = sym;
     ++card;
+
     return true;
 }
 

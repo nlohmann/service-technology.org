@@ -2,6 +2,7 @@
 \file Net.cc
 \author Karsten
 \status approved 27.01.2012
+
 \brief basic routines for handling nodes
 */
 
@@ -12,6 +13,7 @@
 #include "Net/Place.h"
 #include "Net/Transition.h"
 #include "Parser/FairnessAssumptions.h"
+
 
 index_t Net::Card[2] = {0, 0};
 index_t* Net::CardArcs[2][2] = {{NULL, NULL}, {NULL, NULL}};

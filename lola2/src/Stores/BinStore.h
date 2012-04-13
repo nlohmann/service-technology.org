@@ -2,14 +2,13 @@
 \file BinStore.h
 \author Karsten
 \status new
-\brief implement Store as a decision tree with bitvectors..
+\brief implement Store as a decision tree with bitvectors.
 */
-#pragma once
 
+#pragma once
 #include "Core/Dimensions.h"
 #include "Stores/Store.h"
 
-class State;
 
 class BinStore : public Store
 {

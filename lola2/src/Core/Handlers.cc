@@ -1,8 +1,9 @@
 /*!
 \file Handlers.cc
-
 \author Niels
 \status new
+
+\brief Implementation of exit and termination handlers.
 */
 
 #include <config.h>

@@ -1,8 +1,14 @@
-#include <algorithm>
+/*!
+\author Niels
+\file STLStore.cc
+\status new
+*/
 
+#include <algorithm>
 #include "Net/Net.h"
 #include "Net/Marking.h"
 #include "Stores/STLStore.h"
+
 
 bool STLStore::searchAndInsert()
 {

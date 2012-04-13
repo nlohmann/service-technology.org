@@ -1,8 +1,14 @@
-#pragma once
+/*!
+\author Niels
+\file BDDStore.h
+\status new
+*/
 
+#pragma once
 #include <cuddObj.hh>
 #include "Core/Dimensions.h"
 #include "Stores/Store.h"
+
 
 class BDDStore : public Store
 {

@@ -1,13 +1,14 @@
 /*!
 \file LinearAlgebra.cc
 \author Andreas
-\status new
+\status approved 11.04.2012
+
+\todo remove debug code
+\todo finalize overflow handling
 */
 
 #include <cstdlib>
 #include <cstring>
-
-#include <iostream>
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
@@ -16,6 +17,8 @@
 #include "Net/LinearAlgebra.h"
 #include "Net/Net.h"
 
+// for debug purposes
+#include <iostream>
 using std::cout;
 using std::endl;
 

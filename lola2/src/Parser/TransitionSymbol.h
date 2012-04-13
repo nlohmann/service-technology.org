@@ -8,10 +8,11 @@
 */
 
 #pragma once
-
 #include "Parser/Symbol.h"
 #include "Parser/FairnessAssumptions.h"
-#include "Parser/ArcList.h"
+
+class ArcList;
+
 
 /*!
 Transition symbols carry name as key, and

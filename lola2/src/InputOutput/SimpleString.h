@@ -1,4 +1,11 @@
+/*!
+\file SimpleString.h
+\author Niels
+\status new
+*/
+
 #pragma once
+
 
 /// string class to avoid STL's std::string
 class String

@@ -1,10 +1,17 @@
-#pragma once
+/*!
+\author Niels
+\file Store.h
+\status new
+*/
 
+#pragma once
 #include <config.h>
 #include <pthread.h>
+
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
+
 
 class State;
 

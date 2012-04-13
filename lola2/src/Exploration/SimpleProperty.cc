@@ -2,13 +2,13 @@
 \file SimpleProperty.cc
 \author Karsten
 \status new
+
 \brief Evaluates simple property (only SET of states needs to be computed).
 Actual property is virtual, default (base class) is full exploration
 */
 
 #include <cstring>
 #include <cstdio>
-
 #include "Net/Marking.h"
 #include "Net/Transition.h"
 #include "Net/Net.h"
@@ -25,8 +25,6 @@ void SimpleProperty::initProperty()
 
 bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
 {
-
-
     // copy initial marking into current marking
     memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
     Marking::HashCurrent = Marking::HashInitial;

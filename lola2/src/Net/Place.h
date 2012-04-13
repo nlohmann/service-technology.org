@@ -2,6 +2,7 @@
 \file Place.h
 \author Karsten
 \status approved 27.01.2012
+
 \brief Global data for place specific information
 
 All data that describe attributes of places can be found here. General
@@ -9,8 +10,8 @@ information for a place in its role as a node, ar contained in Node.*
 */
 
 #pragma once
-
 #include "Core/Dimensions.h"
+
 
 /*!
 \brief collection of information related to places

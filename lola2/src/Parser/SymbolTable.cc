@@ -42,15 +42,28 @@ SymbolTable::~SymbolTable()
     free(table);
 }
 
-/// We use sum of ASCII values as hash value
+/// sdbm hashing algorithm
 unsigned int SymbolTable::hash(const char* s) const
 {
     uint64_t result = 0;
 
+
+    // SDBM Algorithm from
+    // http://www.ntecs.de/projects/guugelhupf/doc/html/x435.html
+    int c;
+    while ((c = *s++))
+    {
+        result = c + (result << 6) + (result << 16) - result;
+    }
+
+/*
+    // We use sum of ASCII values as hash value
     for (size_t i = 0; s[i]; i++)
     {
         result += (uint64_t)s[i];
     }
+*/
+
     result %= SIZEOF_SYMBOLTABLE;
     return (unsigned int) result;
 }

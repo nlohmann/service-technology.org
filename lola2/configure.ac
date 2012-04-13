@@ -62,17 +62,17 @@ AC_CHECK_SIZEOF(char)
 
 AC_LANG_PUSH(C++)
 AC_CHECK_SIZEOF(index_t,, [#define _CONFIGURING
-#include "$srcdir/src/Dimensions.h"])
+#include "$srcdir/src/Core/Dimensions.h"])
 AC_CHECK_SIZEOF(mult_t,, [#define _CONFIGURING
-#include "$srcdir/src/Dimensions.h"])
+#include "$srcdir/src/Core/Dimensions.h"])
 AC_CHECK_SIZEOF(capacity_t,, [#define _CONFIGURING
-#include "$srcdir/src/Dimensions.h"])
+#include "$srcdir/src/Core/Dimensions.h"])
 AC_CHECK_SIZEOF(cardbit_t,, [#define _CONFIGURING
-#include "$srcdir/src/Dimensions.h"])
+#include "$srcdir/src/Core/Dimensions.h"])
 AC_CHECK_SIZEOF(hash_t,, [#define _CONFIGURING
-#include "$srcdir/src/Dimensions.h"])
+#include "$srcdir/src/Core/Dimensions.h"])
 AC_CHECK_SIZEOF(fairnessAssumption_t,, [#define _CONFIGURING
-#include "$srcdir/src/FairnessAssumptions.h"])
+#include "$srcdir/src/Parser/FairnessAssumptions.h"])
 AC_CHECK_SIZEOF(sockaddr_in,, [#include <sys/types.h>
 #ifdef WIN32
 #include <winsock.h>

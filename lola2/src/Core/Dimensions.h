@@ -12,6 +12,11 @@
 // inclusion of config.h before creating it
 #ifndef _CONFIGURING
 #include <config.h>
+
+// make sure this bug will never happen again
+#if SIZEOF_INDEX_T == 0 || SIZEOF_MULT_T == 0 || SIZEOF_CAPACITY_T == 0 || SIZEOF_CARDBIT_T == 0 || SIZEOF_HASH_T == 0 || SIZEOF_FAIRNESSASSUMPTION_T == 0 || SIZEOF_SOCKADDR_IN == 0
+#error The size of a user-defined data type could not be determined by the configure script.
+#endif
 #endif
 
 #ifdef HAVE_STDINT_H

@@ -36,7 +36,7 @@ TESTFILES = Kanban5.pnml.lola \
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sources called 'cmdline.c'.
-NO_COVER_FILES = */ParserPTNetLoLA.cc */Lexic.cc */cmdline.*
+NO_COVER_FILES = */ParserPTNetLoLA.cc */Lexic.cc */cmdline.* */libs/*
 
 
 #--------------------------------------------------------#

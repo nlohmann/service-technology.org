@@ -22,9 +22,11 @@ class SimpleProperty
         /// evaluate property by bfs. Result true = state found, false = state not found
         bool breadth_first(Store &, Firelist &) {}
 
-    private:
+    protected: 
         /// value of property in current state
         bool value;
+	
+    private:
 
         /// prepare for search
         virtual void initProperty();

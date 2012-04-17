@@ -31,6 +31,7 @@
 #include "Exploration/RandomWalk.h"
 #include "Exploration/Firelist.h"
 #include "Exploration/SimpleProperty.h"
+#include "Exploration/Deadlock.h"
 
 #include "Stores/Store.h"
 #include "Stores/BinStore.h"
@@ -202,7 +203,7 @@ int main(int argc, char** argv)
     {
         Store* s = NULL;
         Firelist fl;
-        SimpleProperty p;
+        Deadlock p;
 
         switch (args_info.store_arg)
         {

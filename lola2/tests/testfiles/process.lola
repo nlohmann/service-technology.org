@@ -1,6 +1,6 @@
 { Petri net created by UML2OWFN 1.02 reading a3.xml.s00000121##s00002887 }
 
-PLACE
+PLACE SAFE 1 :
   decision.s00002888.output.s00000631,
   decision.s00002888.output.s00000632,
   process.inputCriterion.s00000775.used,

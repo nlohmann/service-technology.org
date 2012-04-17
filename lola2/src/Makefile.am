@@ -39,6 +39,7 @@ lola_SOURCES = \
                 Exploration/RandomWalk.cc Exploration/RandomWalk.h \
                 Exploration/SearchStack.cc Exploration/SearchStack.h \
                 Exploration/SimpleProperty.cc Exploration/SimpleProperty.h \
+                Exploration/Deadlock.cc Exploration/Deadlock.h \
                 \
                 Stores/Store.cc Stores/Store.h \
                 Stores/BinStore.h Stores/BinStore.cc \

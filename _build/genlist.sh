@@ -3,12 +3,12 @@
 cd ..
 
 HOMEPWD=$(pwd)
-COLLECTION=$(pwd)/_build/tools.xml
+COLLECTION=$(pwd)/_build/tools.json
 
-echo "generating tool list..."
+echo -n "generating tool list..."
 TOOLS=$(find * -name configure.ac | grep -v "_build" | sed 's|/configure.ac||')
 
-echo "<tools>" > $COLLECTION
+echo "{\"tools\": [" > $COLLECTION
 
 for TOOL in $TOOLS
 do
@@ -46,4 +46,6 @@ do
   cd $HOMEPWD
 done
 
-echo "</tools>" >> $COLLECTION
+echo "]}" >> $COLLECTION
+
+gsed -i '2,2d' $COLLECTION

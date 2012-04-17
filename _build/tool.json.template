@@ -1,10 +1,11 @@
-    <tool id="@TOOLID@">
-        <name>@PACKAGE_NAME@</name>
-        <shortname>@PACKAGE_TARNAME@</shortname>
-        <path>@TRUNK@</path>
-        <lastVersion>@PACKAGE_VERSION@</lastVersion>
-        <officialVersion>@OFFICIAL_VERSION@</officialVersion>
-        <url>@PACKAGE_URL@</url>
-        <email>@PACKAGE_BUGREPORT@</email>
-    </tool>
-
+,
+{
+  "id": "@TOOLID@",
+  "name": "@PACKAGE_NAME@",
+  "shortname": "@PACKAGE_TARNAME@",
+  "path": "@TRUNK@",
+  "lastVersion": "@PACKAGE_VERSION@",
+  "officialVersion": "@OFFICIAL_VERSION@",
+  "url": "@PACKAGE_URL@",
+  "email": "@PACKAGE_BUGREPORT@"
+}

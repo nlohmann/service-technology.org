@@ -1,0 +1,424 @@
+{
+  "tools": [
+    {
+      "id": "anastasia",
+      "name": "Anastasia",
+      "shortname": "anastasia",
+      "path": "anastasia",
+      "lastVersion": "1.1",
+      "officialVersion": "1.0",
+      "url": "http://service-technology.org/anastasia",
+      "email": "anastasia@service-technology.org"
+    },
+    {
+      "id": "anica",
+      "name": "Anica",
+      "shortname": "anica",
+      "path": "anica",
+      "lastVersion": "1.3-unreleased",
+      "officialVersion": "1.2",
+      "url": "http://service-technology.org/anica",
+      "email": "anica@service-technology.org"
+    },
+    {
+      "id": "bpel2owfn",
+      "name": "GNU BPEL2oWFN",
+      "shortname": "bpel2owfn",
+      "path": "bpel2owfn",
+      "lastVersion": "2.4",
+      "officialVersion": "2.4",
+      "url": "http://service-technology.org/bpel2owfn",
+      "email": "bpel2owfn@service-technology.org"
+    },
+    {
+      "id": "candy",
+      "name": "Candy",
+      "shortname": "candy",
+      "path": "candy",
+      "lastVersion": "1.0",
+      "officialVersion": "",
+      "url": "http://service-technology.org/candy",
+      "email": "candy@service-technology.org"
+    },
+    {
+      "id": "chie",
+      "name": "Chie",
+      "shortname": "chie",
+      "path": "chie",
+      "lastVersion": "1.0-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/chie",
+      "email": "chie@service-technology.org"
+    },
+    {
+      "id": "cora",
+      "name": "Cora",
+      "shortname": "cora",
+      "path": "cora",
+      "lastVersion": "0.3-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/cora",
+      "email": "cora@service-technology.org"
+    },
+    {
+      "id": "cosme",
+      "name": "Cosme",
+      "shortname": "cosme",
+      "path": "cosme",
+      "lastVersion": "1.0",
+      "officialVersion": "1.0",
+      "url": "http://service-technology.org/cosme",
+      "email": "cosme@service-technology.org"
+    },
+    {
+      "id": "diane",
+      "name": "Diane",
+      "shortname": "diane",
+      "path": "diane",
+      "lastVersion": "1.1",
+      "officialVersion": "1.0",
+      "url": "http://service-technology.org/diane",
+      "email": "diane@service-technology.org"
+    },
+    {
+      "id": "domino",
+      "name": "Domino",
+      "shortname": "domino",
+      "path": "domino",
+      "lastVersion": "0.9-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/domino",
+      "email": "domino@service-technology.org"
+    },
+    {
+      "id": "evans",
+      "name": "Evans",
+      "shortname": "evans",
+      "path": "evans",
+      "lastVersion": "0.1-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/evans ",
+      "email": "parnjai@informatik.hu-berlin.de"
+    },
+    {
+      "id": "fiona",
+      "name": "Fiona",
+      "shortname": "fiona",
+      "path": "fiona",
+      "lastVersion": "3.2-unreleased",
+      "officialVersion": "3.1",
+      "url": "",
+      "email": "fiona@service-technology.org"
+    },
+    {
+      "id": "genet",
+      "name": "Genet",
+      "shortname": "genet",
+      "path": "genet",
+      "lastVersion": "1.2-unreleased",
+      "officialVersion": "",
+      "url": "http://www.lsi.upc.edu/~jcarmona/genet.html",
+      "email": "jcarmona@lsi.upc.edu"
+    },
+    {
+      "id": "linda",
+      "name": "Linda",
+      "shortname": "linda",
+      "path": "linda",
+      "lastVersion": "0.6-unreleased",
+      "officialVersion": "0.5",
+      "url": "http://service-technology.org/linda",
+      "email": "linda@service-technology.org"
+    },
+    {
+      "id": "lisa",
+      "name": "Lisa",
+      "shortname": "lisa",
+      "path": "lisa",
+      "lastVersion": "1.0-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/lisa",
+      "email": "lisa@service-technology.org"
+    },
+    {
+      "id": "lola",
+      "name": "LoLA",
+      "shortname": "lola",
+      "path": "lola",
+      "lastVersion": "1.17-unreleased",
+      "officialVersion": "1.16",
+      "url": "http://service-technology.org/lola",
+      "email": "lola@service-technology.org"
+    },
+    {
+      "id": "lola2",
+      "name": "LoLA",
+      "shortname": "lola",
+      "path": "lola2",
+      "lastVersion": "2.0-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/lola",
+      "email": "lola@service-technology.org"
+    },
+    {
+      "id": "marlene",
+      "name": "Marlene",
+      "shortname": "marlene",
+      "path": "marlene",
+      "lastVersion": "1.3-unreleased",
+      "officialVersion": "1.2",
+      "url": "http://service-technology.org/tools/marlene",
+      "email": "marlene@service-technology.org"
+    },
+    {
+      "id": "maxis",
+      "name": "Maxis",
+      "shortname": "maxis",
+      "path": "maxis",
+      "lastVersion": "0.2-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/maxis ",
+      "email": "parnjai@informatik.hu-berlin.de"
+    },
+    {
+      "id": "meta_compilers",
+      "name": "compilers",
+      "shortname": "compilers",
+      "path": "meta/compilers",
+      "lastVersion": "1.00",
+      "officialVersion": "",
+      "url": "http://service-technology.org/compilers",
+      "email": "compilers@service-technology.org"
+    },
+    {
+      "id": "meta_formats",
+      "name": "File Formats",
+      "shortname": "formats",
+      "path": "meta/formats",
+      "lastVersion": "1.0-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org",
+      "email": "formats@service-technology.org"
+    },
+    {
+      "id": "meta_hello",
+      "name": "Hello",
+      "shortname": "hello",
+      "path": "meta/hello",
+      "lastVersion": "1.1-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/hello",
+      "email": "hello@service-technology.org"
+    },
+    {
+      "id": "meta_reference",
+      "name": "syntax",
+      "shortname": "syntax",
+      "path": "meta/reference",
+      "lastVersion": "1.0",
+      "officialVersion": "",
+      "url": "",
+      "email": "niels@service-technology.org"
+    },
+    {
+      "id": "meta_x2dot",
+      "name": "x2dot",
+      "shortname": "x2dot",
+      "path": "meta/x2dot",
+      "lastVersion": "1.0",
+      "officialVersion": "",
+      "url": "",
+      "email": "georgstraube@service-technology.org"
+    },
+    {
+      "id": "mia",
+      "name": "Mia",
+      "shortname": "mia",
+      "path": "mia",
+      "lastVersion": "1.3-unreleased",
+      "officialVersion": "1.2",
+      "url": "http://service-technology.org/mia",
+      "email": "mia@service-technology.org"
+    },
+    {
+      "id": "ogapi",
+      "name": "OGAPI",
+      "shortname": "ogapi",
+      "path": "ogapi",
+      "lastVersion": "1.00-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/ogapi",
+      "email": "ogapi@service-technology.org"
+    },
+    {
+      "id": "ondine",
+      "name": "Ondine",
+      "shortname": "ondine",
+      "path": "ondine",
+      "lastVersion": "1.0",
+      "officialVersion": "",
+      "url": "http://service-technology.org/ondine",
+      "email": "ondine@service-technology.org"
+    },
+    {
+      "id": "owfn2bpel",
+      "name": "oWFN2BPEL",
+      "shortname": "owfn2bpel",
+      "path": "owfn2bpel",
+      "lastVersion": "4.9-unreleased",
+      "officialVersion": "4.8",
+      "url": "",
+      "email": "owfn2bpel@service-technology.org"
+    },
+    {
+      "id": "patricia",
+      "name": "Patricia",
+      "shortname": "patricia",
+      "path": "patricia",
+      "lastVersion": "1.0",
+      "officialVersion": "",
+      "url": "http://service-technology.org/patricia",
+      "email": "patricia@service-technology.org"
+    },
+    {
+      "id": "petia",
+      "name": "Petia",
+      "shortname": "petia",
+      "path": "petia",
+      "lastVersion": "1.3",
+      "officialVersion": "",
+      "url": "http://service-technology.org/petia",
+      "email": "petia@service-technology.org"
+    },
+    {
+      "id": "pnapi",
+      "name": "Petri Net API",
+      "shortname": "pnapi",
+      "path": "pnapi",
+      "lastVersion": "4.03-unreleased",
+      "officialVersion": "4.02",
+      "url": "http://service-technology.org/pnapi",
+      "email": "pnapi@service-technology.org"
+    },
+    {
+      "id": "rachel",
+      "name": "Rachel",
+      "shortname": "rachel",
+      "path": "rachel",
+      "lastVersion": "1.15-unreleased",
+      "officialVersion": "1.14",
+      "url": "http://service-technology.org/rachel",
+      "email": "rachel@service-technology.org"
+    },
+    {
+      "id": "rebecca",
+      "name": "Rebecca",
+      "shortname": "rebecca",
+      "path": "rebecca",
+      "lastVersion": "1.0-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/rebecca",
+      "email": "rebecca@service-technology.org"
+    },
+    {
+      "id": "safira",
+      "name": "Safira",
+      "shortname": "safira",
+      "path": "safira",
+      "lastVersion": "2.0",
+      "officialVersion": "2.0",
+      "url": "http://service-technology.org/safira",
+      "email": "safira@service-technology.org"
+    },
+    {
+      "id": "sara",
+      "name": "Sara",
+      "shortname": "sara",
+      "path": "sara",
+      "lastVersion": "1.08",
+      "officialVersion": "1.0",
+      "url": "http://service-technology.org/sara",
+      "email": "sara@service-technology.org"
+    },
+    {
+      "id": "sayo",
+      "name": "Sayo",
+      "shortname": "sayo",
+      "path": "sayo",
+      "lastVersion": "1.2",
+      "officialVersion": "1.2",
+      "url": "http://service-technology.org/sayo",
+      "email": "sayo@service-technology.org"
+    },
+    {
+      "id": "stanca",
+      "name": "Stanca",
+      "shortname": "stanca",
+      "path": "stanca",
+      "lastVersion": "1.1-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/stanca",
+      "email": "stanca@service-technology.org"
+    },
+    {
+      "id": "tara",
+      "name": "Tara",
+      "shortname": "tara",
+      "path": "tara",
+      "lastVersion": "0.1",
+      "officialVersion": "0.1",
+      "url": "http://service-technology.org/tara",
+      "email": "tara@service-technology.org"
+    },
+    {
+      "id": "tess",
+      "name": "Tess",
+      "shortname": "tess",
+      "path": "tess",
+      "lastVersion": "1.0-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/tess",
+      "email": "tess@service-technology.org"
+    },
+    {
+      "id": "uml2owfn",
+      "name": "UML2oWFN",
+      "shortname": "uml2owfn",
+      "path": "uml2owfn",
+      "lastVersion": "2.11",
+      "officialVersion": "2.10",
+      "url": "http://service-technology.org/uml2owfn",
+      "email": "uml2owfn@service-technology.org"
+    },
+    {
+      "id": "wendy",
+      "name": "Wendy",
+      "shortname": "wendy",
+      "path": "wendy",
+      "lastVersion": "3.4-unreleased",
+      "officialVersion": "3.3",
+      "url": "http://service-technology.org/wendy",
+      "email": "wendy@service-technology.org"
+    },
+    {
+      "id": "yasmina",
+      "name": "Yasmina",
+      "shortname": "yasmina",
+      "path": "yasmina",
+      "lastVersion": "1.1-unreleased",
+      "officialVersion": "1.0",
+      "url": "http://service-technology.org/yasmina",
+      "email": "yasmina@service-technology.org"
+    },
+    {
+      "id": "yasmina2",
+      "name": "Yasmina",
+      "shortname": "yasmina",
+      "path": "yasmina2",
+      "lastVersion": "2.0-unreleased",
+      "officialVersion": "",
+      "url": "http://service-technology.org/yasmina",
+      "email": "yasmina@service-technology.org"
+    }
+  ]
+}

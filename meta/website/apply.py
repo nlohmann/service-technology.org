@@ -23,9 +23,9 @@ if (len(j['authors'])) > 2:
         authors = authors + j['authors'][i] + ", "
     authors = authors + 'and ' + j['authors'][len(j['authors'])-1]
 
-acknowledgements = ''
-for ack in j['thanks']:
-    acknowledgements = acknowledgements + '<li>' + ack + '</li>' + "\n"
+thanks = ''
+for thank in j['thanks']:
+    thanks = thanks + '<li>' + thank + '</li>' + "\n"
 
 t = t.replace('@SHORTNAME@', j['shortname'])
 t = t.replace('@TOOLNAME@',  j['toolname'])
@@ -33,9 +33,10 @@ t = t.replace('@TAGLINE@',   j['tagline'])
 t = t.replace('@PURPOSE@',   j['purpose'])
 t = t.replace('@AUTHORS@',   authors)
 t = t.replace('@MAINTAINER@', j['maintainer'])
-t = t.replace('@ACKNOWLEDGEMENTS@', acknowledgements)
+t = t.replace('@THANKS@', thanks)
 t = t.replace('@BUCKTRACKERLINK@', j['bugtracker'])
-t = t.replace('@TASKLINK@', j['tasktracker'])
+t = t.replace('@TASKTRACKERLINK@', j['tasktracker'])
 t = t.replace('@LICENSE@', j['license'])
+t = t.replace('@RUNTIME@', j['runtime'])
 f.write(t)
 f.close()

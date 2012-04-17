@@ -27,6 +27,15 @@ thanks = ''
 for thank in j['thanks']:
     thanks = thanks + '<li>' + thank + '</li>' + "\n"
 
+contributors = ''
+for cont in j['commits']: 
+    contributors = contributors + '<li>' + cont['user'] + " (" + str(cont['commits'])
+    if cont['commits'] > 1:
+        contributors = contributors + " commits"
+    else: 
+        contributors = contributors + " commit"
+    contributors = contributors + ")" + '</li>' + "\n"
+
 t = t.replace('@SHORTNAME@', j['shortname'])
 t = t.replace('@TOOLNAME@',  j['toolname'])
 t = t.replace('@TAGLINE@',   j['tagline'])
@@ -39,5 +48,6 @@ t = t.replace('@TASKTRACKERLINK@', j['tasktracker'])
 t = t.replace('@LICENSE@', j['license'])
 t = t.replace('@RUNTIME@', j['runtime'])    
 t = t.replace('@OFFICIALVERSION@', j['officialVersion'])    
+t = t.replace('@CONTRIBUTORS@', contributors)
 f.write(t)
 f.close()

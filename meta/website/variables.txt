@@ -3,7 +3,7 @@ SHORTNAME - "Wendy" (BPEL2oWFN)
 SVNNAME - "wendy"
 TAGLINE - "synthesizing partners for services" (klein anfangend, "...ing")
 PURPOSE - "Wendy is a tool to synthesize partners for services. This includes a finite characterization of all partners (called "operating guidelines"). Wendy uses a vast set of reduction rules to synthesize (small) partners. These rules may, however, not preserve all partners of the service under consideration, but will synthesize a partner if one exists."
-LATESTVERSION - "3.3"
+OFFICIALVERSION - "3.3"
 LIVELINK - "http://service-technology.org/live/wendy"
 FEATURES - "# Correct Partners
 Each synthesized partner is correct by construction!

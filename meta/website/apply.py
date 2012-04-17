@@ -36,6 +36,6 @@ t = t.replace('@MAINTAINER@', j['maintainer'])
 t = t.replace('@ACKNOWLEDGEMENTS@', acknowledgements)
 t = t.replace('@BUCKTRACKERLINK@', j['bugtracker'])
 t = t.replace('@TASKLINK@', j['tasktracker'])
-
+t = t.replace('@LICENSE@', j['license'])
 f.write(t)
 f.close()

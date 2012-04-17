@@ -162,7 +162,7 @@ int main(int argc, char** argv)
         // tidy parser
         yylex_destroy();
 
-        rep->status("processing net");
+        rep->status("preprocessing net");
 
         // translate into general net structures
         symbolTables->symboltable2net();

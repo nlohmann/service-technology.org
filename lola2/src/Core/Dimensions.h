@@ -95,3 +95,6 @@ typedef enum
 
 /// number of seconds between report outputs
 #define REPORT_FREQUENCY 5
+
+/// the size of the bloom filter (2 GB)
+#define BLOOM_FILTER_SIZE 0x400000000

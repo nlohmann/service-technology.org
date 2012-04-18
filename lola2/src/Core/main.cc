@@ -36,6 +36,7 @@
 
 #include "Stores/Store.h"
 #include "Stores/BinStore.h"
+#include "Stores/BloomStore.h"
 #include "Stores/BDDStore.h"
 #include "Stores/SQLStore.h"
 #include "Stores/STLStore.h"
@@ -213,6 +214,9 @@ int main(int argc, char** argv)
                 break;
             case store_arg_bdd:
                 s = new BDDStore();
+                break;
+            case store_arg_bloom:
+                s = new BloomStore();
                 break;
             case store_arg_sql:
                 s = new SQLStore();

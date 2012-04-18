@@ -42,6 +42,7 @@ lola_SOURCES = \
                 Exploration/Deadlock.cc Exploration/Deadlock.h \
                 \
                 Stores/Store.cc Stores/Store.h \
+                Stores/BloomStore.cc Stores/BloomStore.h \
                 Stores/BinStore.h Stores/BinStore.cc \
                 Stores/BitStore.cc Stores/BitStore.h \
                 Stores/BDDStore.cc Stores/BDDStore.h \

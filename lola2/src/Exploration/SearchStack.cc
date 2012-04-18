@@ -48,5 +48,5 @@ void SearchStack::pop(index_t* c, index_t** f)
 
 index_t SearchStack::topTransition() const
 {
-    return currentchunk->list[(StackPointer -1) % SIZEOF_STACKCHUNK][currentchunk->current[(StackPointer-1)%SIZEOF_STACKCHUNK]];
+    return currentchunk->list[(StackPointer - 1) % SIZEOF_STACKCHUNK][currentchunk->current[(StackPointer - 1) % SIZEOF_STACKCHUNK]];
 }

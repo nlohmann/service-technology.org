@@ -3,7 +3,7 @@
 \author Karsten
 \status approved 18.04.2012
 
-\brief Evaluates deadlocks 
+\brief Evaluates deadlocks
 */
 
 #include <cstring>
@@ -14,10 +14,10 @@
 
 void Deadlock::initProperty()
 {
-	value = !Transition::CardEnabled;
+    value = !Transition::CardEnabled;
 }
 
 void Deadlock::checkProperty(index_t t)
 {
-	value = !Transition::CardEnabled;
+    value = !Transition::CardEnabled;
 }

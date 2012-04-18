@@ -70,10 +70,10 @@ bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
                 if (value)
                 {
                     // current  marking satisfies property
-			// push put current transition on stack
- 			// this way, the stack contains ALL transitions
-			// of witnss path
-			stack.push(currentEntry, currentFirelist);
+                    // push put current transition on stack
+                    // this way, the stack contains ALL transitions
+                    // of witnss path
+                    stack.push(currentEntry, currentFirelist);
                     return true;
                 }
 

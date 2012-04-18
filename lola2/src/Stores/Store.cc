@@ -23,7 +23,8 @@ void* Store::reporter_internal(void)
     {
         sleep(REPORT_FREQUENCY);
 
-        if (benchmark == 0) {
+        if (benchmark == 0)
+        {
             benchmark = markings;
         }
 

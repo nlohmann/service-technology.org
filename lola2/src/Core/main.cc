@@ -228,7 +228,7 @@ int main(int argc, char** argv)
         assert(s);
 
         // choose a simple property
-        SimpleProperty *p;
+        SimpleProperty* p;
         switch (args_info.check_arg)
         {
             case check_arg_none:
@@ -255,7 +255,8 @@ int main(int argc, char** argv)
             rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness state:").str());
             for (index_t p = 0; p < Net::Card[PL]; ++p)
             {
-                if (Marking::Current[p] > 0) {
+                if (Marking::Current[p] > 0)
+                {
                     rep->message("%s : %d", Net::Name[PL][p], Marking::Current[p]);
                 }
             }

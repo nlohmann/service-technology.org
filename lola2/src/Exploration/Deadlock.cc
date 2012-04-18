@@ -14,7 +14,7 @@
 
 void Deadlock::initProperty()
 {
-	value = false;
+	value = !Transition::CardEnabled;
 }
 
 void Deadlock::checkProperty(index_t t)

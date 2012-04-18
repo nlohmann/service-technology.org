@@ -45,8 +45,6 @@ bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
     // get first firelist
     index_t* currentFirelist;
     index_t currentEntry = myFirelist.getFirelist(&currentFirelist);
-    // initialize search stack
-//    SearchStack stack;
 
     while (true) // exit when trying to pop from empty stack
     {
@@ -72,6 +70,10 @@ bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
                 if (value)
                 {
                     // current  marking satisfies property
+			// push put current transition on stack
+ 			// this way, the stack contains ALL transitions
+			// of witnss path
+			stack.push(currentEntry, currentFirelist);
                     return true;
                 }
 

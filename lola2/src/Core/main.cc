@@ -265,13 +265,13 @@ int main(int argc, char** argv)
         if (result and args_info.path_given)
         {
             rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness path:").str());
-            index_t* c;
-            index_t** f;
+            index_t c;
+            index_t* f;
             while (p->stack.StackPointer > 0)
             {
                 index_t t = p->stack.topTransition();
                 rep->message("%s", Net::Name[TR][t]);
-                p->stack.pop(c, f);
+                p->stack.pop(& c, & f);
             }
         }
 

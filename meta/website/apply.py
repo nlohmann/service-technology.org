@@ -29,12 +29,27 @@ thanks = ''
 for thank in j['thanks']:
     thanks = thanks + '<li>' + thank + '</li>' + "\n"
 
+contribDict = dict()
 contributors = ''
 contribImages = ''
-for cont in j['commits']: 
-    contributors = contributors + '<li>' + p['data'][cont['user']]['name'] + " (" + str(cont['commits'])
-    contribImages = contribImages + '<img width="75" src="../people/g/' + cont['user'] + '.jpg" title="' + p['data'][cont['user']]['name'] + '" alt="' + p['data'][cont['user']]['name'] +  '" class="portrait"> '
-    if cont['commits'] > 1:
+for cont in j['commits']:
+    curuser = cont['user']
+    if cont['user'] in p['refs']:
+        curuser = p['refs'][curuser]
+
+    if curuser in contribDict: 
+       contribDict[curuser] = contribDict[curuser] + cont['commits']
+    else:
+       contribDict[curuser] = cont['commits']
+ 
+for cont in contribDict:
+    actname = cont 
+    if cont in p['data']:
+        actname = p['data'][cont]['name']
+
+    contributors = contributors + '<li>' + actname + " (" + str(contribDict[cont])
+    contribImages = contribImages + '<img width="75" src="../people/g/' + cont + '.jpg" title="' + actname + '" alt="' + actname +  '" class="portrait"> '
+    if contribDict[cont] > 1:
         contributors = contributors + " commits"
     else: 
         contributors = contributors + " commit"

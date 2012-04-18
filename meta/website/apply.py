@@ -41,8 +41,10 @@ for cont in j['commits']:
        contribDict[curuser] = contribDict[curuser] + cont['commits']
     else:
        contribDict[curuser] = cont['commits']
+
+contribList = sorted(contribDict, key = contribDict.get, reverse=True)
  
-for cont in contribDict:
+for cont in contribList:
     actname = cont 
     if cont in p['data']:
         actname = p['data'][cont]['name']

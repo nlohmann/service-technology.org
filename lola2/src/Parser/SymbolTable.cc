@@ -43,30 +43,18 @@ SymbolTable::~SymbolTable()
 }
 
 /// sdbm hashing algorithm
-///\todo: von vorneherein mit 32 Bit ausprobieren
 unsigned int SymbolTable::hash(const char* s) const
 {
-    uint64_t result = 0;
-
-
     // SDBM Algorithm from
     // http://www.ntecs.de/projects/guugelhupf/doc/html/x435.html
+    unsigned int hash = 0;
     int c;
     while ((c = *s++))
     {
-        result = c + (result << 6) + (result << 16) - result;
+        hash = c + (hash << 6) + (hash << 16) - hash;
     }
 
-/*
-    // We use sum of ASCII values as hash value
-    for (size_t i = 0; s[i]; i++)
-    {
-        result += (uint64_t)s[i];
-    }
-*/
-
-    result %= SIZEOF_SYMBOLTABLE;
-    return (unsigned int) result;
+    return hash % SIZEOF_SYMBOLTABLE;
 }
 
 /*!

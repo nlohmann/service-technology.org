@@ -61,7 +61,14 @@ people = ''
 for username in p['people']:
     people = people + '<li><img src="g/' + username + '.jpg" height="150" class="portrait"><br><a href="' + p['data'][username]['url'] + '">' + p['data'][username]['name'] + '</a><br> ' + p['data'][username]['affiliation'] + '</li>'
 
-
+maintainerUserName = ''
+maintainerMail = ''
+maintainerURL = ''
+for username in p['data']:
+    if p['data'][username]['name'] == j['maintainer']:
+       maintainerUserName = username
+       maintainerMail = p['data'][username]['url']
+       maintainerURL = p['data'][username]['url']
 
 t = t.replace('@SHORTNAME@', j['shortname'])
 t = t.replace('@TOOLNAME@',  j['toolname'])
@@ -69,6 +76,9 @@ t = t.replace('@TAGLINE@',   j['tagline'])
 t = t.replace('@PURPOSE@',   j['purpose'])
 t = t.replace('@AUTHORS@',   authors)
 t = t.replace('@MAINTAINER@', j['maintainer'])
+t = t.replace('@MAINTAINERUSERNAME@', maintainerUserName)
+t = t.replace('@MAINTAINERMAIL@', maintainerMail)
+t = t.replace('@MAINTAINERURL@', maintainerURL)
 t = t.replace('@THANKS@', thanks)
 t = t.replace('@BUCKTRACKERLINK@', j['bugtracker'])
 t = t.replace('@TASKTRACKERLINK@', j['tasktracker'])

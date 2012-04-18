@@ -33,7 +33,7 @@ contributors = ''
 contribImages = ''
 for cont in j['commits']: 
     contributors = contributors + '<li>' + p['data'][cont['user']]['name'] + " (" + str(cont['commits'])
-    contribImages = contribImages + '<img width="75" src="../people/g/' + cont['user'] + '.jpg" class="portrait"> '
+    contribImages = contribImages + '<img width="75" src="../people/g/' + cont['user'] + '.jpg" title="' + p['data'][cont['user']]['name'] + '" alt="' + p['data'][cont['user']]['name'] +  '" class="portrait"> '
     if cont['commits'] > 1:
         contributors = contributors + " commits"
     else: 

@@ -34,7 +34,7 @@ SQLStore::SQLStore()
     }
 
     std::ostringstream s;
-    s << Net::Card[PL];
+    s << Place::CardSignificant;
 
     std::string statement = "create table store (m varchar(" + s.str() + "))";
     char* zErrMsg = NULL;
@@ -74,7 +74,7 @@ bool SQLStore::searchAndInsert()
     ++calls;
 
     std::string m = "";
-    for (index_t p = 0; p < Net::Card[PL]; ++p)
+    for (index_t p = 0; p < Place::CardSignificant; ++p)
     {
         std::ostringstream s;
         s << Marking::Current[p];

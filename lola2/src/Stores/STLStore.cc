@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include "Net/Net.h"
+#include "Net/Place.h"
 #include "Net/Marking.h"
 #include "Stores/STLStore.h"
 
@@ -16,13 +17,13 @@ bool STLStore::searchAndInsert()
     static std::vector<capacity_t> m;
     if (calls == 0)
     {
-        m.resize(Net::Card[PL]);
+        m.resize(Place::CardSignificant);
     }
 
     ++calls;
 
     // copy current marking to vector
-    std::copy(Marking::Current, Marking::Current + Net::Card[PL], m.begin());
+    std::copy(Marking::Current, Marking::Current + Place::CardSignificant, m.begin());
 
     // add vector to marking store
     const std::pair<std::set<std::vector<capacity_t> >::iterator, bool> res = store.insert(m);

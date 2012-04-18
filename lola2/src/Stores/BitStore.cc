@@ -31,7 +31,7 @@ unsigned int BitStore::bitsNeeded(int val)
 BitStore::BitStore() : bit_count(0), bit_current(0), byte_count(0), byte_current(0)
 {
     // determine number of Boolean variables need to store one marking
-    for (index_t p = 0; p < Net::Card[PL]; ++p)
+    for (index_t p = 0; p < Place::CardSignificant; ++p)
     {
         bit_count += bitsNeeded(Place::Capacity[p]);
     }
@@ -50,7 +50,7 @@ bool BitStore::searchAndInsert()
 
     bit_current = 0;
     byte_current = 0;
-    for (index_t p = 0; p < Net::Card[PL]; ++p)
+    for (index_t p = 0; p < Place::CardSignificant; ++p)
     {
         // get copy of the token number as the later loop destroys it
         capacity_t tokens = Marking::Current[p];

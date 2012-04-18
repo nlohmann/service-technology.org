@@ -9,9 +9,10 @@ Actual property is virtual, default (base class) is full exploration
 
 #pragma once
 
+#include "Exploration/SearchStack.h"
+
 class Firelist;
 class Store;
-
 
 class SimpleProperty
 {
@@ -22,12 +23,14 @@ class SimpleProperty
         /// evaluate property by bfs. Result true = state found, false = state not found
         bool breadth_first(Store &, Firelist &) {}
 
+        /// the search stack
+        SearchStack stack;
+
     protected: 
         /// value of property in current state
         bool value;
-	
-    private:
 
+    private:
         /// prepare for search
         virtual void initProperty();
 

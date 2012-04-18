@@ -43,6 +43,7 @@ SymbolTable::~SymbolTable()
 }
 
 /// sdbm hashing algorithm
+///\todo: von vorneherein mit 32 Bit ausprobieren
 unsigned int SymbolTable::hash(const char* s) const
 {
     uint64_t result = 0;

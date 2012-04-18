@@ -1,7 +1,7 @@
 /*!
 \file Deadlock.h
 \author Karsten
-\status new
+\status approved 18.04.2012
 
 \brief derives deadlock checking from SimpleProperty
 */
@@ -17,16 +17,15 @@ class Store;
 class Deadlock : public SimpleProperty
 {
     public:
-	Deadlock(){}
+        Deadlock() {}
 
     private:
-
         /// prepare for search
         virtual void initProperty();
 
         /// check property in Marking::Current, use after fire. Argument is transition just fired.
-        virtual void checkProperty(index_t); 
+        virtual void checkProperty(index_t);
 
         /// check property in Marking::Current, use after backfire. Argument is transition just backfired.
-        void updateProperty(index_t){} 
+        void updateProperty(index_t) {} 
 };

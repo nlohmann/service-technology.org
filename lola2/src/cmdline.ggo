@@ -1,9 +1,35 @@
 args "--include-getopt --show-required --unamed-opts=FILES --no-handle-error"
 
+section "Check a property"
+
+option "check" -
+  "Check a property"
+  values="none","full","deadlock" enum
+  typestr="PROPERTY"
+  default="none"
+  optional
+
+option "store" -
+  "Store"
+  values="bin","bdd","sql","stl","bit" enum
+  typestr="STORE"
+  default="bin"
+  optional
+
+option "path" p
+  "Print witness path"
+  flag off
+
+option "state" s
+  "Print witness state"
+  flag off
+
+
 section "Input/Output"
 
 option "compressed" -
   "Read a compressed file"
+  hidden
   flag off
 
 option "writeCompressed" -
@@ -13,6 +39,7 @@ option "writeCompressed" -
   optional
   default="compressedOutput"
   argoptional
+  hidden
 
 
 section "Reporter"
@@ -37,6 +64,7 @@ option "outputport" -
   typestr="PORT"
   default="5555"
   optional
+  hidden
 
 option "inputport" -
   "Input port number"
@@ -45,6 +73,7 @@ option "inputport" -
   typestr="PORT"
   default="5556"
   optional
+  hidden
 
 option "address" -
   "Hostname or IP for reports"
@@ -71,18 +100,9 @@ option "randomWalk" -
   default="0"
   optional
   argoptional
-
-option "simpleProperty" -
-  "Check a simple reachability property"
-  flag off
-
-option "store" -
-  "Store"
-  values="bin","bdd","sql","stl","bit" enum
-  typestr="STORE"
-  default="bin"
-  optional
+  hidden
 
 option "printNet" -
   "Print the net"
   flag off
+  hidden

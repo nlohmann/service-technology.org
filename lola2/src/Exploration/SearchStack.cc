@@ -29,6 +29,10 @@ void SearchStack::push(index_t c, index_t* f)
     currentchunk->list[StackPointer++ % SIZEOF_STACKCHUNK] = f;
 }
 
+/*!
+\param[in,out] c  index within firelist
+\param[in,out] f  firelist
+*/
 void SearchStack::pop(index_t* c, index_t** f)
 {
     *c = currentchunk->current[(--StackPointer) % SIZEOF_STACKCHUNK];
@@ -40,4 +44,9 @@ void SearchStack::pop(index_t* c, index_t** f)
         currentchunk = currentchunk->prev;
         delete tempchunk;
     }
+}
+
+index_t SearchStack::topTransition() const
+{
+    return currentchunk->list[StackPointer -1 % SIZEOF_STACKCHUNK][currentchunk->current[StackPointer-1]];
 }

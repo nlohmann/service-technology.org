@@ -1,7 +1,7 @@
 /*!
 \file Deadlock.cc
 \author Karsten
-\status new
+\status approved 18.04.2012
 
 \brief Evaluates deadlocks 
 */

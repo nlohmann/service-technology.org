@@ -30,7 +30,7 @@ void* Store::reporter_internal(void)
         const uint64_t last_period = markings - last_markings;
 
         rep->status("%10d markings, %10d edges, %8.0f markings/sec, %5d secs", markings, calls - 1, (last_period / (float)REPORT_FREQUENCY), (++intervals * REPORT_FREQUENCY));
-//        rep->status("%2.2f %%", 100.0 * (1.0 - ((last_period / (float)benchmark))));
+        rep->status("%2.2f %%", 100.0 * (1.0 - ((last_period / (float)benchmark))));
         last_markings = markings;
     }
 }

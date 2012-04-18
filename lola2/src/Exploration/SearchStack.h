@@ -31,6 +31,7 @@ class SearchStack
         void push(index_t, index_t*);
         void pop(index_t*, index_t**);
         unsigned int StackPointer;
+        index_t topTransition() const;
 
         SearchStack();
 

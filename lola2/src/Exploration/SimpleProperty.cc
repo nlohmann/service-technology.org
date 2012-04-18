@@ -13,7 +13,6 @@ Actual property is virtual, default (base class) is full exploration
 #include "Net/Transition.h"
 #include "Net/Net.h"
 #include "Exploration/SimpleProperty.h"
-#include "Exploration/SearchStack.h"
 #include "Exploration/Firelist.h"
 #include "Stores/Store.h"
 
@@ -47,7 +46,7 @@ bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
     index_t* currentFirelist;
     index_t currentEntry = myFirelist.getFirelist(&currentFirelist);
     // initialize search stack
-    SearchStack stack;
+//    SearchStack stack;
 
     while (true) // exit when trying to pop from empty stack
     {

@@ -23,6 +23,7 @@
 #include "Parser/ParserPTNet.h"
 
 #include "Net/Net.h"
+#include "Net/Marking.h"
 
 #include "InputOutput/Reporter.h"
 #include "InputOutput/CompressedIO.h"
@@ -199,12 +200,12 @@ int main(int argc, char** argv)
     }
 
 
-    if (args_info.simpleProperty_given)
+    if (args_info.check_given)
     {
         Store* s = NULL;
         Firelist fl;
-        Deadlock p;
 
+        // choose a store
         switch (args_info.store_arg)
         {
             case store_arg_bin:
@@ -225,11 +226,59 @@ int main(int argc, char** argv)
         }
 
         assert(s);
-        const bool result = p.depth_first(*s, fl);
+
+        // choose a simple property
+        SimpleProperty *p;
+        switch (args_info.check_arg)
+        {
+            case check_arg_none:
+                return EXIT_SUCCESS;
+
+            case check_arg_full:
+                p = new SimpleProperty();
+                break;
+
+            case check_arg_deadlock:
+                p = new Deadlock();
+                break;
+        }
+
+        assert(p);
+
+        const bool result = p->depth_first(*s, fl);
+
         rep->message("result: %s", result ? rep->markup(MARKUP_GOOD, "yes").str() : rep->markup(MARKUP_BAD, "no").str());
+
+        // print current marking
+        if (result and args_info.state_given)
+        {
+            rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness state:").str());
+            for (index_t p = 0; p < Net::Card[PL]; ++p)
+            {
+                if (Marking::Current[p] > 0) {
+                    rep->message("%s : %d", Net::Name[PL][p], Marking::Current[p]);
+                }
+            }
+        }
+
+        // print witness path
+        if (result and args_info.path_given)
+        {
+            rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness path:").str());
+            index_t* c;
+            index_t** f;
+            while (p->stack.StackPointer > 0)
+            {
+                index_t t = p->stack.topTransition();
+                rep->message("%s", Net::Name[TR][t]);
+                p->stack.pop(c, f);
+            }
+        }
+
         rep->message("%d markings, %d edges", s->markings, s->calls - 1);
 
         delete s;
+        delete p;
     }
 
     return EXIT_SUCCESS;

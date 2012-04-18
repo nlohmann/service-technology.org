@@ -4,14 +4,15 @@ import sys
 import json
 
 if (len(sys.argv) < 4):
-    sys.stderr.write("Usage: " + sys.argv[0] + " jsonfile peoplefile template target" + "\n")
+    sys.stderr.write("Usage: " + sys.argv[0] + " jsonfile peoplefile reqfile template target" + "\n")
     sys.exit(1)
 
 j = json.loads(open(sys.argv[1], 'r').read())
 p = json.loads(open(sys.argv[2], 'r').read())
+r = json.loads(open(sys.argv[3], 'r').read())
 
-t = open(sys.argv[3], 'r').read()
-f = open(sys.argv[4], 'w')
+t = open(sys.argv[4], 'r').read()
+f = open(sys.argv[5], 'w')
 
 replDict = dict();
 
@@ -63,6 +64,29 @@ for cont in contribList:
 replDict['@PEOPLE@'] = ''
 for username in p['people']:
     replDict['@PEOPLE@'] = replDict['@PEOPLE@'] + '<li><img src="g/' + username + '.jpg" height="150" class="portrait"><br><a href="' + p['data'][username]['url'] + '">' + p['data'][username]['name'] + '</a><br> ' + p['data'][username]['affiliation'] + '</li>'
+
+
+replDict['@REQ_COMPILE@'] = ''
+for req in j['req_compile']:
+    curReq = req
+    if req in r:
+        curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
+    replDict['@REQ_COMPILE@'] = replDict['@REQ_COMPILE@'] + '<li>' + curReq + '</li>'
+
+
+replDict['@REQ_TESTS@'] = ''
+for req in j['req_tests']:
+    curReq = req
+    if req in r:
+        curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
+    replDict['@REQ_TESTS@'] = replDict['@REQ_TESTS@'] + '<li>' + curReq + '</li>'
+
+replDict['@REQ_EDIT@'] = ''
+for req in j['req_edit']:
+    curReq = req
+    if req in r:
+        curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
+    replDict['@REQ_EDIT@'] = replDict['@REQ_EDIT@'] + '<li>' + curReq + '</li>'
 
 replDict['@MAINTAINERUSERNAME@'] = ''
 replDict['@MAINTAINERMAIL@'] = ''

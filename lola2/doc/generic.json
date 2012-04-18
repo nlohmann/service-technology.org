@@ -1,0 +1,1 @@
+{"officialVersion":"","lastVersion":"2.0-unreleased","url":"http://service-technology.org/lola","email":"lola@service-technology.org","commits":[{"user":"niels","commits":113},{"user":"karstenwolf","commits":38},{"user":"al020","commits":19},{"user":"cas","commits":1}],"req_compile":["g++"],"req_tests":["autotest","lcov","valgrind"],"req_edit":["bison","flex","gengetopt"]}

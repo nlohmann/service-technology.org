@@ -1,0 +1,18 @@
+{
+  "toolname": "LoLA",
+  "shortname": "lola2",
+  "status": "active",
+  "tagline": "a low-level Petri net analyzer",
+  "purpose": "LoLA (a Low Level Petri Net Analyzer) has been implemented for the validation of reduction techniques for place/transition net state spaces.",
+  "copyright": "2012 Karsten Wolf, Andreas Lehmann, and Niels Lohmann",
+  "authors": [
+    "Karsten Wolf",
+    "Andreas Lehmann",
+    "Niels Lohmann"
+  ],
+  "maintainer": "Niels Lohmann",
+  "license": "AGPL3+",
+  "thanks": [],
+  "bugtracker": "https://gna.org/bugs/?group=service-tech",
+  "tasktracker": "https://gna.org/task/?group=service-tech"
+}

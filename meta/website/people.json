@@ -1,0 +1,66 @@
+{ 
+  "people" : ["niels", "kathrin", "weinberg"],
+
+
+  "data" : {
+
+    "niels": 
+        { 
+          "name": "Niels Lohmann",
+          "url": "http://about.me/nlohmann", 
+          "affiliation": "Universität Rostock"
+        } , 
+
+      "kathrin":
+        { 
+          "name": "Kathrin Kaschner",
+          "url": "", 
+          "affiliation": "Universität Rostock"
+         } , 
+
+     
+      "weinberg":
+        { 
+          "name": "Daniela Weinberg",
+          "url": "", 
+          "affiliation": "Universität Rostock"
+         } , 
+
+      "gierds": 
+        { 
+          "name": "Christian Gierds",
+          "url": "", 
+          "affiliation": "Humboldt-Universität zu Berlin"
+         } , 
+
+
+      "cas": 
+        { 
+          "name": "Christian Sura",
+          "url": "", 
+          "affiliation": "Universität Rostock"
+         } , 
+
+      "rimueller": 
+        { 
+          "name": "Richard Müller",
+          "url": "", 
+          "affiliation": "Humboldt-Universität zu Berlin"
+         } , 
+     
+      "stephan": 
+        { 
+          "name": "Stephan Mennicke",
+          "url": "", 
+          "affiliation": "Universität Rostock"
+         } ,  
+
+      "al020": 
+        { 
+          "name": "Andreas Lehmann",
+          "url": "", 
+          "affiliation": "Universität Rostock"
+         } 
+
+   } } 
+

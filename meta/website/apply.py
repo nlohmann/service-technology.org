@@ -65,28 +65,41 @@ replDict['@PEOPLE@'] = ''
 for username in p['people']:
     replDict['@PEOPLE@'] = replDict['@PEOPLE@'] + '<li><img src="g/' + username + '.jpg" height="150" class="portrait"><br><a href="' + p['data'][username]['url'] + '">' + p['data'][username]['name'] + '</a><br> ' + p['data'][username]['affiliation'] + '</li>'
 
+replDict['@REQ_COMPILE@'] = 'none'
+if 'req_compile' in j: 
+    replDict['@REQ_COMPILE@'] = ''
+    for req in j['req_compile']:
+        curReq = req
+        if req in r:
+            curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
+        replDict['@REQ_COMPILE@'] = replDict['@REQ_COMPILE@'] + '<li>' + curReq + '</li>'
 
-replDict['@REQ_COMPILE@'] = ''
-for req in j['req_compile']:
-    curReq = req
-    if req in r:
-        curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
-    replDict['@REQ_COMPILE@'] = replDict['@REQ_COMPILE@'] + '<li>' + curReq + '</li>'
+replDict['@REQ_TESTS@'] = 'none'
+if 'req_tests' in j: 
+    replDict['@REQ_TESTS@'] = ''
+    for req in j['req_tests']:
+        curReq = req
+        if req in r:
+            curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
+        replDict['@REQ_TESTS@'] = replDict['@REQ_TESTS@'] + '<li>' + curReq + '</li>'
 
+replDict['@REQ_EDIT@'] = 'none'
+if 'req_edit' in j: 
+    replDict['@REQ_EDIT@'] = ''
+    for req in j['req_edit']:
+        curReq = req
+        if req in r:
+            curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
+        replDict['@REQ_EDIT@'] = replDict['@REQ_EDIT@'] + '<li>' + curReq + '</li>'
 
-replDict['@REQ_TESTS@'] = ''
-for req in j['req_tests']:
-    curReq = req
-    if req in r:
-        curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
-    replDict['@REQ_TESTS@'] = replDict['@REQ_TESTS@'] + '<li>' + curReq + '</li>'
-
-replDict['@REQ_EDIT@'] = ''
-for req in j['req_edit']:
-    curReq = req
-    if req in r:
-        curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
-    replDict['@REQ_EDIT@'] = replDict['@REQ_EDIT@'] + '<li>' + curReq + '</li>'
+replDict['@RUNTIME@'] = 'none'
+if 'runtime' in j: 
+    replDict['@RUNTIME@'] = ''
+    for req in j['runtime']:
+        curReq = req
+        if req in r:
+            curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
+        replDict['@RUNTIME@'] = replDict['@RUNTIME@'] + '<li>' + curReq + '</li>'
 
 replDict['@MAINTAINERUSERNAME@'] = ''
 replDict['@MAINTAINERMAIL@'] = ''
@@ -105,7 +118,6 @@ replDict['@MAINTAINER@'] = j['maintainer']
 replDict['@BUCKTRACKERLINK@'] = j['bugtracker']
 replDict['@TASKTRACKERLINK@'] = j['tasktracker']
 replDict['@LICENSE@'] = j['license']
-replDict['@RUNTIME@'] = j['runtime']    
 replDict['@OFFICIALVERSION@'] = j['officialVersion']
 
 for someKey in replDict: 

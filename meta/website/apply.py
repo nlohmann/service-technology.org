@@ -13,25 +13,26 @@ p = json.loads(open(sys.argv[2], 'r').read())
 t = open(sys.argv[3], 'r').read()
 f = open(sys.argv[4], 'w')
 
+replDict = dict();
+
 if (len(j['authors'])) == 1:
-    authors = j['authors'][0]
+    replDict['@AUTHORS@'] = j['authors'][0]
 
 if (len(j['authors'])) == 2:
-    authors = j['authors'][0] + ' and ' + j['authors'][1]
+    replDict['@AUTHORS@'] = j['authors'][0] + ' and ' + j['authors'][1]
 
 if (len(j['authors'])) > 2:
-    authors = ''
+    replDict['@AUTHORS@']  = ''
     for i in range(0, len(j['authors'])-1):
-        authors = authors + j['authors'][i] + ", "
-    authors = authors + 'and ' + j['authors'][len(j['authors'])-1]
+        replDict['@AUTHORS@']  = replDict['@AUTHORS@'] + j['authors'][i] + ", "
+    replDict['@AUTHORS@']  = replDict['@AUTHORS@'] + 'and ' + j['authors'][len(j['authors'])-1]
 
-thanks = ''
+replDict['@THANKS@']  = ''
 for thank in j['thanks']:
-    thanks = thanks + '<li>' + thank + '</li>' + "\n"
+    replDict['@THANKS@'] = replDict['@THANKS@'] + '<li>' + thank + '</li>' + "\n"
 
 contribDict = dict()
-contributors = ''
-contribImages = ''
+
 for cont in j['commits']:
     curuser = cont['user']
     if cont['user'] in p['refs']:
@@ -43,50 +44,48 @@ for cont in j['commits']:
        contribDict[curuser] = cont['commits']
 
 contribList = sorted(contribDict, key = contribDict.get, reverse=True)
- 
+
+replDict['@CONTRIBUTORS@'] = ''
+replDict['@CONTRIBUTORIMAGES@'] = '' 
 for cont in contribList:
     actname = cont 
     if cont in p['data']:
         actname = p['data'][cont]['name']
 
-    contributors = contributors + '<li>' + actname + " (" + str(contribDict[cont])
-    contribImages = contribImages + '<img width="75" src="../people/g/' + cont + '.jpg" title="' + actname + '" alt="' + actname +  '" class="portrait"> '
+    replDict['@CONTRIBUTORS@'] = replDict['@CONTRIBUTORS@'] + '<li>' + actname + " (" + str(contribDict[cont])
+    replDict['@CONTRIBUTORIMAGES@'] = replDict['@CONTRIBUTORIMAGES@'] + '<img width="75" src="../people/g/' + cont + '.jpg" title="' + actname + '" alt="' + actname +  '" class="portrait"> '
     if contribDict[cont] > 1:
-        contributors = contributors + " commits"
+        replDict['@CONTRIBUTORS@'] = replDict['@CONTRIBUTORS@'] + " commits"
     else: 
-        contributors = contributors + " commit"
-    contributors = contributors + ")" + '</li>' + "\n"
+        replDict['@CONTRIBUTORS@'] = replDict['@CONTRIBUTORS@'] + " commit"
+    replDict['@CONTRIBUTORS@'] = replDict['@CONTRIBUTORS@'] + ")" + '</li>' + "\n"
 
-people = ''
+replDict['@PEOPLE@'] = ''
 for username in p['people']:
-    people = people + '<li><img src="g/' + username + '.jpg" height="150" class="portrait"><br><a href="' + p['data'][username]['url'] + '">' + p['data'][username]['name'] + '</a><br> ' + p['data'][username]['affiliation'] + '</li>'
+    replDict['@PEOPLE@'] = replDict['@PEOPLE@'] + '<li><img src="g/' + username + '.jpg" height="150" class="portrait"><br><a href="' + p['data'][username]['url'] + '">' + p['data'][username]['name'] + '</a><br> ' + p['data'][username]['affiliation'] + '</li>'
 
-maintainerUserName = ''
-maintainerMail = ''
-maintainerURL = ''
+replDict['@MAINTAINERUSERNAME@'] = ''
+replDict['@MAINTAINERMAIL@'] = ''
+replDict['@MAINTAINERURL@'] = ''
 for username in p['data']:
     if p['data'][username]['name'] == j['maintainer']:
-       maintainerUserName = username
-       maintainerMail = p['data'][username]['url']
-       maintainerURL = p['data'][username]['url']
+       replDict['@MAINTAINERUSERNAME@'] = username
+       replDict['@MAINTAINERMAIL@'] = p['data'][username]['url']
+       replDict['@MAINTAINERURL@'] = p['data'][username]['url']
 
-t = t.replace('@SHORTNAME@', j['shortname'])
-t = t.replace('@TOOLNAME@',  j['toolname'])
-t = t.replace('@TAGLINE@',   j['tagline'])
-t = t.replace('@PURPOSE@',   j['purpose'])
-t = t.replace('@AUTHORS@',   authors)
-t = t.replace('@MAINTAINER@', j['maintainer'])
-t = t.replace('@MAINTAINERUSERNAME@', maintainerUserName)
-t = t.replace('@MAINTAINERMAIL@', maintainerMail)
-t = t.replace('@MAINTAINERURL@', maintainerURL)
-t = t.replace('@THANKS@', thanks)
-t = t.replace('@BUCKTRACKERLINK@', j['bugtracker'])
-t = t.replace('@TASKTRACKERLINK@', j['tasktracker'])
-t = t.replace('@LICENSE@', j['license'])
-t = t.replace('@RUNTIME@', j['runtime'])    
-t = t.replace('@OFFICIALVERSION@', j['officialVersion'])    
-t = t.replace('@CONTRIBUTORS@', contributors)
-t = t.replace('@CONTRIBUTORIMAGES@', contribImages)
-t = t.replace('@PEOPLE@', people)
+replDict['@SHORTNAME@'] = j['shortname']
+replDict['@TOOLNAME@'] = j['toolname']
+replDict['@TAGLINE@' ] = j['tagline']
+replDict['@PURPOSE@']  =  j['purpose']
+replDict['@MAINTAINER@'] = j['maintainer']
+replDict['@BUCKTRACKERLINK@'] = j['bugtracker']
+replDict['@TASKTRACKERLINK@'] = j['tasktracker']
+replDict['@LICENSE@'] = j['license']
+replDict['@RUNTIME@'] = j['runtime']    
+replDict['@OFFICIALVERSION@'] = j['officialVersion']
+
+for someKey in replDict: 
+    t = t.replace(someKey, replDict[someKey])    
+
 f.write(t)
 f.close()

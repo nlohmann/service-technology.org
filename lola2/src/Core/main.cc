@@ -33,6 +33,7 @@
 #include "Exploration/Firelist.h"
 #include "Exploration/SimpleProperty.h"
 #include "Exploration/Deadlock.h"
+#include "Exploration/FirelistStubbornDeadlock.h"
 
 #include "Stores/Store.h"
 #include "Stores/BinStore.h"
@@ -204,7 +205,7 @@ int main(int argc, char** argv)
     if (args_info.check_given)
     {
         Store* s = NULL;
-        Firelist fl;
+        Firelist * fl = new Firelist();
 
         // choose a store
         switch (args_info.store_arg)
@@ -244,12 +245,14 @@ int main(int argc, char** argv)
 
             case check_arg_deadlock:
                 p = new Deadlock();
+		delete fl;
+		fl = new FirelistStubbornDeadlock();
                 break;
         }
 
         assert(p);
 
-        const bool result = p->depth_first(*s, fl);
+        const bool result = p->depth_first(*s, * fl);
 
         rep->message("result: %s", result ? rep->markup(MARKUP_GOOD, "yes").str() : rep->markup(MARKUP_BAD, "no").str());
 

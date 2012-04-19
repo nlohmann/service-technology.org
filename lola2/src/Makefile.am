@@ -40,6 +40,7 @@ lola_SOURCES = \
                 Exploration/SearchStack.cc Exploration/SearchStack.h \
                 Exploration/SimpleProperty.cc Exploration/SimpleProperty.h \
                 Exploration/Deadlock.cc Exploration/Deadlock.h \
+                Exploration/FirelistStubbornDeadlock.cc Exploration/FirelistStubbornDeadlock.h \
                 \
                 Stores/Store.cc Stores/Store.h \
                 Stores/BloomStore.cc Stores/BloomStore.h \

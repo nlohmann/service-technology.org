@@ -2,6 +2,8 @@
 
 import sys
 import json
+import misaka
+
 
 if (len(sys.argv) < 4):
     sys.stderr.write("Usage: " + sys.argv[0] + " jsonfile peoplefile reqfile template target" + "\n")
@@ -124,7 +126,7 @@ else:
     replDict['@SVNNAME@'] = replDict['@SHORTNAME@']
 
 replDict['@TAGLINE@' ] = j['tagline']
-replDict['@PURPOSE@']  =  j['purpose']
+replDict['@PURPOSE@']  =  misaka.html(j['purpose'])
 replDict['@MAINTAINER@'] = j['maintainer']
 replDict['@BUCKTRACKERLINK@'] = j['bugtracker']
 replDict['@TASKTRACKERLINK@'] = j['tasktracker']
@@ -133,7 +135,7 @@ replDict['@OFFICIALVERSION@'] = j['officialVersion']
 
 if 'faq' in j:
     replDict['@FAQGIVEN@'] = 'normal'
-    replDict['@FAQ@'] = j['faq']
+    replDict['@FAQ@'] = misaka.html(j['faq'])
 else:
     replDict['@FAQGIVEN@'] = 'none'
 
@@ -145,7 +147,7 @@ else:
 
 
 if 'features' in j:
-    replDict['@FEATURES@'] = j['features']
+    replDict['@FEATURES@'] = misaka.html(j['features'])
 else:
     replDict['@FEATURES@'] = ''
 

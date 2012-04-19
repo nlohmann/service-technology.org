@@ -18,6 +18,20 @@ f = open(sys.argv[5], 'w')
 
 replDict = dict();
 
+
+replDict['@TOOLNAME@'] = j['toolname']
+
+if 'shortname' in j:
+    replDict['@SHORTNAME@'] = j['shortname']
+else:
+    replDict['@SHORTNAME@'] = replDict['@TOOLNAME@']
+
+if 'svnname' in j:
+    replDict['@SVNNAME@'] = j['svnname']
+else:
+    replDict['@SVNNAME@'] = replDict['@SHORTNAME@']
+
+
 if (len(j['authors'])) == 1:
     replDict['@AUTHORS@'] = j['authors'][0]
 
@@ -121,18 +135,6 @@ for username in p['data']:
        replDict['@MAINTAINERURL@'] = p['data'][username]['url']
 
 
-replDict['@TOOLNAME@'] = j['toolname']
-
-if 'shortname' in j:
-    replDict['@SHORTNAME@'] = j['shortname']
-else:
-    replDict['@SHORTNAME@'] = replDict['@TOOLNAME@']
-
-if 'svnname' in j:
-    replDict['@SVNNAME@'] = j['svnname']
-else:
-    replDict['@SVNNAME@'] = replDict['@SHORTNAME@']
-
 if 'livelink' in j: 
     replDict['@LIVELINK@'] = j['livelink']
 else: 
@@ -163,6 +165,13 @@ if 'features' in j:
     replDict['@FEATURES@'] = misaka.html(j['features'])
 else:
     replDict['@FEATURES@'] = ''
+
+if 'quickstart' in j:
+    replDict['@QUICKSTART@'] = misaka.html(j['quickstart'])
+    replDict['@QUICKSTARTGIVEN@'] = 'normal'
+else:
+    replDict['@QUICKSTART@'] = ''
+    replDict['@QUICKSTARTGIVEN@'] = 'none'
 
 
 for someKey in replDict: 

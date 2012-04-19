@@ -1,6 +1,7 @@
 {
   "toolname": "LoLA",
-  "shortname": "lola2",
+  "shortname": "lola",
+  "svnname": "lola2",
   "status": "active",
   "tagline": "a low-level Petri net analyzer",
   "purpose": "LoLA (a Low Level Petri Net Analyzer) has been implemented for the validation of reduction techniques for place/transition net state spaces.",

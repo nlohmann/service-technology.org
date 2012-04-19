@@ -110,8 +110,19 @@ for username in p['data']:
        replDict['@MAINTAINERMAIL@'] = p['data'][username]['url']
        replDict['@MAINTAINERURL@'] = p['data'][username]['url']
 
-replDict['@SHORTNAME@'] = j['shortname']
+
 replDict['@TOOLNAME@'] = j['toolname']
+
+if 'shortname' in j:
+    replDict['@SHORTNAME@'] = j['shortname']
+else:
+    replDict['@SHORTNAME@'] = replDict['@TOOLNAME@']
+
+if 'svnname' in j:
+    replDict['@SVNNAME@'] = j['svnname']
+else:
+    replDict['@SVNNAME@'] = replDict['@SHORTNAME@']
+
 replDict['@TAGLINE@' ] = j['tagline']
 replDict['@PURPOSE@']  =  j['purpose']
 replDict['@MAINTAINER@'] = j['maintainer']
@@ -119,6 +130,25 @@ replDict['@BUCKTRACKERLINK@'] = j['bugtracker']
 replDict['@TASKTRACKERLINK@'] = j['tasktracker']
 replDict['@LICENSE@'] = j['license']
 replDict['@OFFICIALVERSION@'] = j['officialVersion']
+
+if 'faq' in j:
+    replDict['@FAQGIVEN@'] = 'normal'
+    replDict['@FAQ@'] = j['faq']
+else:
+    replDict['@FAQGIVEN@'] = 'none'
+
+if 'screencast' in j:
+    replDict['@SCREENCASTGIVEN@'] = 'normal'
+    replDict['@SCREENCAST@'] = j['screencast']
+else:
+    replDict['@SCREENCASTGIVEN@'] = 'none'
+
+
+if 'features' in j:
+    replDict['@FEATURES@'] = j['features']
+else:
+    replDict['@FEATURES@'] = ''
+
 
 for someKey in replDict: 
     t = t.replace(someKey, replDict[someKey])    

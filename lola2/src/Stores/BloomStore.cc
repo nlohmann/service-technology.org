@@ -1,20 +1,20 @@
+#include <cmath>
 #include "Stores/BloomStore.h"
 #include "Net/Net.h"
 #include "Net/Place.h"
 #include "Net/Marking.h"
 
-BloomStore::BloomStore()
+BloomStore::BloomStore(size_t hashes) : hash_functions(hashes), hash_values(new uint64_t[hash_functions]), filter(new std::bitset<BLOOM_FILTER_SIZE>())
 {
-    filter = new std::bitset<BLOOM_FILTER_SIZE>();
 }
 
 BloomStore::~BloomStore()
 {
     delete filter;
+    delete[] hash_values;
 }
 
-/// SDBM
-inline uint64_t BloomStore::hash1() const
+inline uint64_t BloomStore::hash_sdbm() const
 {
     uint64_t hash = 0;
 
@@ -26,8 +26,7 @@ inline uint64_t BloomStore::hash1() const
     return hash % BLOOM_FILTER_SIZE;
 }
 
-/// FNV
-inline uint64_t BloomStore::hash2() const
+inline uint64_t BloomStore::hash_fnv() const
 {
     const unsigned int fnv_prime = 0x811C9DC5;
     uint64_t hash = 0;
@@ -45,22 +44,55 @@ bool BloomStore::searchAndInsert()
 {
     ++calls;
 
-    const size_t h1 = hash1();
-    const size_t h2 = hash2();
-
-    if ((*filter)[h1] == 1 and (*filter)[h2] == 1)
+    if (calls % 10000000 == 0)
     {
-        return true;
+        const size_t m = BLOOM_FILTER_SIZE;
+        const size_t k = hash_functions;
+        const size_t n = filter->count();
+        const double p = pow(1.0 - pow((1.0 - 1.0/m), k*n ) , k);
+        printf("fill: %ld, error = %.4f\n", n, p) ;
     }
-    else
+
+
+    /*************************
+     * calculate hash values *
+     *************************/
+
+    // the first two hash functions are given explicitly
+    const size_t hash_0 = hash_sdbm();
+    const size_t hash_1 = hash_fnv();
+    hash_values[0] = hash_0;
+    hash_values[1] = hash_1;
+
+    // the other hash functions can be derived: h_i(x) = h_1(x) + i * h_2(x)
+    for (size_t h = 2; h < hash_functions; ++h)
     {
-        (*filter)[h1] = 1;
-        (*filter)[h2] = 1;
-
-        ++markings;
-
-        return false;
+        hash_values[h] = (hash_0 + h * hash_1) % BLOOM_FILTER_SIZE;
     }
+
+
+    /*****************************************
+     * check whether marking has been stored *
+     *****************************************/
+
+    for (size_t h = 0; h < hash_functions; ++h)
+    {
+        // found an unset bit -> marking is new and must be stored
+        if ((*filter)[hash_values[h]] == 0)
+        {
+            // set this and all subsequent bits to 1 (previous bits were already 1)
+            for (size_t h_ = h; h_ < hash_functions; ++h_)
+            {
+                (*filter)[hash_values[h_]] = 1;
+            }
+
+            ++markings;
+            return false;
+        }
+    }
+
+    // all bits were 1 -> marking was probably stored already
+    return true;
 }
 
 bool BloomStore::searchAndInsert(State**)

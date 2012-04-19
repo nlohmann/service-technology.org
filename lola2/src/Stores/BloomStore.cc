@@ -9,8 +9,9 @@
 extern Reporter* rep;
 
 
-BloomStore::BloomStore(size_t hashes) : hash_functions(hashes), hash_values(new uint64_t[hash_functions]), filter(new std::bitset<BLOOM_FILTER_SIZE>())
+BloomStore::BloomStore(size_t hashes) : hash_functions(hashes), hash_values(new unsigned int[hash_functions]), filter(new std::bitset<BLOOM_FILTER_SIZE>())
 {
+    rep->status("using Bloom filter of length %lu with %d hash functions", BLOOM_FILTER_SIZE, hash_functions);
 }
 
 BloomStore::~BloomStore()
@@ -19,9 +20,9 @@ BloomStore::~BloomStore()
     delete[] hash_values;
 }
 
-inline uint64_t BloomStore::hash_sdbm() const
+inline unsigned int BloomStore::hash_sdbm() const
 {
-    uint64_t hash = 0;
+    unsigned int hash = 0;
 
     for (index_t p = 0; p < Place::CardSignificant; ++p)
     {
@@ -31,10 +32,10 @@ inline uint64_t BloomStore::hash_sdbm() const
     return hash % BLOOM_FILTER_SIZE;
 }
 
-inline uint64_t BloomStore::hash_fnv() const
+inline unsigned int BloomStore::hash_fnv() const
 {
     const unsigned int fnv_prime = 0x811C9DC5;
-    uint64_t hash = 0;
+    unsigned int hash = 0;
 
     for (index_t p = 0; p < Place::CardSignificant; ++p)
     {
@@ -64,8 +65,8 @@ bool BloomStore::searchAndInsert()
      *************************/
 
     // the first two hash functions are given explicitly
-    const size_t hash_0 = hash_sdbm();
-    const size_t hash_1 = hash_fnv();
+    const unsigned int hash_0 = hash_sdbm();
+    const unsigned int hash_1 = hash_fnv();
     hash_values[0] = hash_0;
     hash_values[1] = hash_1;
 

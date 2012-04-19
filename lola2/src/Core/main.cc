@@ -216,7 +216,7 @@ int main(int argc, char** argv)
                 s = new BDDStore();
                 break;
             case store_arg_bloom:
-                s = new BloomStore();
+                s = new BloomStore(args_info.hashfunctions_arg);
                 break;
             case store_arg_sql:
                 s = new SQLStore();

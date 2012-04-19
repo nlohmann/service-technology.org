@@ -16,6 +16,13 @@ option "store" -
   default="bin"
   optional
 
+option "hashfunctions" -
+  "Hash functions for the bloom filter"
+  int
+  default="2"
+  optional
+  hidden
+
 option "path" p
   "Print witness path"
   flag off
@@ -104,5 +111,10 @@ option "randomWalk" -
 
 option "printNet" -
   "Print the net"
+  flag off
+  hidden
+
+option "stats" -
+  "Print memory statistics"
   flag off
   hidden

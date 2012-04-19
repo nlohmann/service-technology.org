@@ -4,7 +4,9 @@
 \status new
 */
 
+#include <string>
 #include <cmath>
+#include <algorithm>
 #include <unistd.h>
 #include "Core/Dimensions.h"
 #include "Stores/Store.h"
@@ -23,15 +25,25 @@ void* Store::reporter_internal(void)
     {
         sleep(REPORT_FREQUENCY);
 
+        const uint64_t last_period = markings - last_markings;
+
+        rep->status("%10d markings, %10d edges, %8.0f markings/sec, %5d secs", markings, calls - 1, (last_period / (float)REPORT_FREQUENCY), (++intervals * REPORT_FREQUENCY));
+
+/*
         if (benchmark == 0)
         {
             benchmark = markings;
         }
+        
+        std::string p = "";
+        for (size_t i = 0; i < size_t(60.0 * (1.0 - ((last_period / (float)benchmark)))); ++i)
+        {
+            p += "*";
+        }
 
-        const uint64_t last_period = markings - last_markings;
+        rep->status("%s %2.2f%%", rep->markup(MARKUP_UNIMPORTANT, p.c_str()).str(), fabs(100.0 * (1.0 - ((last_period / (float)benchmark)))));
 
-        rep->status("%10d markings, %10d edges, %8.0f markings/sec, %5d secs", markings, calls - 1, (last_period / (float)REPORT_FREQUENCY), (++intervals * REPORT_FREQUENCY));
-        rep->status("%2.2f %%", 100.0 * (1.0 - ((last_period / (float)benchmark))));
+*/
         last_markings = markings;
     }
 }

@@ -3,6 +3,11 @@
 #include "Net/Net.h"
 #include "Net/Place.h"
 #include "Net/Marking.h"
+#include "InputOutput/Reporter.h"
+
+
+extern Reporter* rep;
+
 
 BloomStore::BloomStore(size_t hashes) : hash_functions(hashes), hash_values(new uint64_t[hash_functions]), filter(new std::bitset<BLOOM_FILTER_SIZE>())
 {
@@ -50,7 +55,7 @@ bool BloomStore::searchAndInsert()
         const size_t k = hash_functions;
         const size_t n = filter->count();
         const double p = pow(1.0 - pow((1.0 - 1.0/m), k*n ) , k);
-        printf("fill: %ld, error = %.4f\n", n, p) ;
+        rep->status("fill: %ld, error = %.4f", n, p) ;
     }
 
 

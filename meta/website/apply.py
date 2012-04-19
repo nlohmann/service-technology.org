@@ -68,8 +68,10 @@ for username in p['people']:
     replDict['@PEOPLE@'] = replDict['@PEOPLE@'] + '<li><img src="g/' + username + '.jpg" height="150" class="portrait"><br><a href="' + p['data'][username]['url'] + '">' + p['data'][username]['name'] + '</a><br> ' + p['data'][username]['affiliation'] + '</li>'
 
 replDict['@REQ_COMPILE@'] = 'none'
+replDict['@REQ_COMPILEGIVEN@'] = 'none'
 if 'req_compile' in j: 
     replDict['@REQ_COMPILE@'] = ''
+    replDict['@REQ_COMPILEGIVEN@'] = 'normal'
     for req in j['req_compile']:
         curReq = req
         if req in r:
@@ -77,8 +79,10 @@ if 'req_compile' in j:
         replDict['@REQ_COMPILE@'] = replDict['@REQ_COMPILE@'] + '<li>' + curReq + '</li>'
 
 replDict['@REQ_TESTS@'] = 'none'
+replDict['@REQ_TESTSGIVEN@'] = 'none'
 if 'req_tests' in j: 
     replDict['@REQ_TESTS@'] = ''
+    replDict['@REQ_TESTSGIVEN@'] = 'normal'
     for req in j['req_tests']:
         curReq = req
         if req in r:
@@ -86,8 +90,10 @@ if 'req_tests' in j:
         replDict['@REQ_TESTS@'] = replDict['@REQ_TESTS@'] + '<li>' + curReq + '</li>'
 
 replDict['@REQ_EDIT@'] = 'none'
+replDict['@REQ_EDITGIVEN@'] = 'none'
 if 'req_edit' in j: 
     replDict['@REQ_EDIT@'] = ''
+    replDict['@REQ_EDITGIVEN@'] = 'normal'
     for req in j['req_edit']:
         curReq = req
         if req in r:
@@ -95,8 +101,10 @@ if 'req_edit' in j:
         replDict['@REQ_EDIT@'] = replDict['@REQ_EDIT@'] + '<li>' + curReq + '</li>'
 
 replDict['@RUNTIME@'] = 'none'
+replDict['@REQ_RUNTIMEGIVEN@'] = 'none'
 if 'runtime' in j: 
     replDict['@RUNTIME@'] = ''
+    replDict['@REQ_RUNTIMEGIVEN@'] = 'normal'
     for req in j['runtime']:
         curReq = req
         if req in r:

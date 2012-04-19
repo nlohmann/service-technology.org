@@ -151,10 +151,15 @@
             Installing and running @TOOLNAME@ requires a bunch of other tools:
           </p>
           <div id="required-tools">
-            At runtime, you require: <ul>@RUNTIME@</ul>
-            At compile time, you require: <ul>@REQ_COMPILE@</ul>
-            At test time, you require: <ul>@REQ_TESTS@</ul>
-            At edit time, you require: <ul>@REQ_EDIT@</ul>
+            <div style="display: @RUNTIMEGIVEN@;">
+            Running requires: <ul>@RUNTIME@</ul>
+            </div><div style="display: @REQ_COMPILEGIVEN@;">
+            Compiling requires: <ul>@REQ_COMPILE@</ul>
+            </div><div style="display: @REQ_TESTSGIVEN@;">
+            Testing requires: <ul>@REQ_TESTS@</ul>
+            </div><div style="display: @REQ_EDITGIVEN@;">
+            <a href="getInvolved.html">Contributing</a> requires: <ul>@REQ_EDIT@</ul>
+            </div>
           </div>
 
 

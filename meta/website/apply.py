@@ -136,7 +136,7 @@ else:
 if 'livelink' in j: 
     replDict['@LIVELINK@'] = j['livelink']
 else: 
-    replDict['@LIVELINK@'] = "http://esla.informatik.uni-rostock.de/service-tech/live/#" + replDict['@TOOLNAME@']
+    replDict['@LIVELINK@'] = "http://esla.informatik.uni-rostock.de/service-tech/live/#" + replDict['@SHORTNAME@']
 
 replDict['@TAGLINE@' ] = j['tagline']
 replDict['@PURPOSE@']  =  misaka.html(j['purpose'])

@@ -4,14 +4,16 @@ import sys
 import json
 import misaka
 
-def condInsert(key,f):
+# FUNCTIONS
+
+def condInsert(key,f,default=''):
     global j
     global replDict    
     if key in j:
         setFlag(key)
         f(key)
     else:
-        blank(key)
+        replDict[key] = default
         remFlag(key)
 
 
@@ -27,176 +29,195 @@ def getHTML(md):
 def simpleInsert(key):
     global replDict
     global j
-    replDict['@' + key.upper() + '@'] = j[key]
+    replDict[key] = j[key]
 
 def htmlInsert(key):
     global replDict
     global j
-    replDict['@' + key.upper() + '@'] = getHTML(j[key])
-
-def blank(key):
-    global replDict
-    replDict['@' + key.upper() + '@'] = ''
+    replDict[key] = getHTML(j[key])
 
 def setFlag(key):
     global replDict
-    replDict['@' + key.upper() + 'GIVEN@'] = 'normal'
+    replDict[key+ 'GIVEN'] = 'normal'
 
 def remFlag(key):
     global replDict
-    replDict['@' + key.upper() + 'GIVEN@'] = 'none'
+    replDict[key + 'GIVEN'] = 'none'
+
+def buildReqList(key): 
+    result = ''
+    for req in j[key]:
+        curReq = req
+        if req in r:
+            curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
+        result += listThis(curReq)    
+    return result
+
+def setRequirements(key):
+    if key in j:
+        replDict[key] = buildReqList(key)
+        setFlag(key)
+    else:
+        replDict['key'] = 'none'
+        remFlag(key)
+
+def setAuthors(): 
+    global j
+    global replDict
+    if (len(j['authors'])) == 1:
+        replDict['authors'] = j['authors'][0]
+
+    if (len(j['authors'])) == 2:
+        replDict['authors'] = j['authors'][0] + ' and ' + j['authors'][1]
+
+    if (len(j['authors'])) > 2:
+        replDict['authors']  = ''
+        for i in range(0, len(j['authors'])-1):
+            replDict['authors']  = replDict['authors'] + j['authors'][i] + ", "
+        replDict['authors']  = replDict['authors'] + 'and ' + j['authors'][len(j['authors'])-1]
+
+def setThanks():
+    global j
+    global replDict
+    replDict['thanks']  = ''
+    if 'thanks' in j:
+        for thank in j['thanks']:
+            replDict['thanks'] = replDict['thanks'] + listThis(thank)
+        setFlag('thanks')
+    else:
+        remFlag('thanks')
+
+def setContributors():
+    global j
+    global p
+    global replDict
+    contribDict = dict()
+
+    for cont in j['commits']:
+        curuser = cont['user']
+        if cont['user'] in p['refs']:
+            curuser = p['refs'][curuser]
+
+        if curuser in contribDict: 
+           contribDict[curuser] = contribDict[curuser] + cont['commits']
+        else:
+           contribDict[curuser] = cont['commits']
+
+    contribList = sorted(contribDict, key = contribDict.get, reverse=True)
+
+    replDict['contributors'] = ''
+    replDict['contributorimages'] = '' 
+    for cont in contribList:
+        actname = cont 
+        if cont in p['data']:
+            actname = p['data'][cont]['name']
+            replDict['contributorimages'] = replDict['contributorimages'] + getImageTag('../people/g/' + cont + '.jpg', actname, actname, 'class="portrait" width="75"')
+        else:
+            replDict['contributorimages'] = replDict['contributorimages'] + getImageTag('../people/g/dummy.jpg', actname, actname, 'class="portrait" width="75"')
+        replDict['contributors'] = replDict['contributors'] + listThis( actname + " (" + getCommitString(contribDict[cont]) + ")")
+
+
+def getImageTag(filename, alt, title, additional = ''):
+    return '<img src="' + filename + '" alt="' + alt + '" title="' + title + '" ' + additional + '>'
+
+def listThis(someString):
+    return '<li>' + someString + '</li>' + "\n"
+
+# INITIALIZATION
 
 if (len(sys.argv) < 4):
     sys.stderr.write("Usage: " + sys.argv[0] + " jsonfile peoplefile reqfile template target" + "\n")
     sys.exit(1)
 
+
 j = json.loads(open(sys.argv[1], 'r').read())
 p = json.loads(open(sys.argv[2], 'r').read())
 r = json.loads(open(sys.argv[3], 'r').read())
-
-t = open(sys.argv[4], 'r').read()
-f = open(sys.argv[5], 'w')
-
 replDict = dict();
 
+# BUILDING THE REPLACEMENT DICTIONARY
 
-replDict['@TOOLNAME@'] = j['toolname']
+# Tool names
+simpleInsert('toolname')
+condInsert('shortname', simpleInsert, replDict['toolname'])
+condInsert('svnname', simpleInsert, replDict['shortname'])
 
-if 'shortname' in j:
-    replDict['@SHORTNAME@'] = j['shortname']
-else:
-    replDict['@SHORTNAME@'] = replDict['@TOOLNAME@']
+# Tagline, purpose, features
 
-if 'svnname' in j:
-    replDict['@SVNNAME@'] = j['svnname']
-else:
-    replDict['@SVNNAME@'] = replDict['@SHORTNAME@']
-
-
-if (len(j['authors'])) == 1:
-    replDict['@AUTHORS@'] = j['authors'][0]
-
-if (len(j['authors'])) == 2:
-    replDict['@AUTHORS@'] = j['authors'][0] + ' and ' + j['authors'][1]
-
-if (len(j['authors'])) > 2:
-    replDict['@AUTHORS@']  = ''
-    for i in range(0, len(j['authors'])-1):
-        replDict['@AUTHORS@']  = replDict['@AUTHORS@'] + j['authors'][i] + ", "
-    replDict['@AUTHORS@']  = replDict['@AUTHORS@'] + 'and ' + j['authors'][len(j['authors'])-1]
-
-replDict['@THANKS@']  = ''
-if 'thanks' in j:
-    for thank in j['thanks']:
-        replDict['@THANKS@'] = replDict['@THANKS@'] + '<li>' + thank + '</li>' + "\n"
-    replDict['@THANKSGIVEN@'] = 'normal'
-else:
-    replDict['@THANKSGIVEN@'] = 'none'
-
-contribDict = dict()
-
-for cont in j['commits']:
-    curuser = cont['user']
-    if cont['user'] in p['refs']:
-        curuser = p['refs'][curuser]
-
-    if curuser in contribDict: 
-       contribDict[curuser] = contribDict[curuser] + cont['commits']
-    else:
-       contribDict[curuser] = cont['commits']
-
-contribList = sorted(contribDict, key = contribDict.get, reverse=True)
-
-replDict['@CONTRIBUTORS@'] = ''
-replDict['@CONTRIBUTORIMAGES@'] = '' 
-for cont in contribList:
-    actname = cont 
-    if cont in p['data']:
-        actname = p['data'][cont]['name']
-        replDict['@CONTRIBUTORIMAGES@'] = replDict['@CONTRIBUTORIMAGES@'] + '<img width="75" src="../people/g/' + cont + '.jpg" title="' + actname + ' (' + getCommitString(contribDict[cont]) +  ')" alt="' + actname +  '" class="portrait"> '
-    else:
-        replDict['@CONTRIBUTORIMAGES@'] = replDict['@CONTRIBUTORIMAGES@'] + '<img width="75" src="../people/g/dummy.jpg" title="' + actname + ' (' + getCommitString(contribDict[cont]) + '" alt=")' + actname +  '" class="portrait"> '
-    replDict['@CONTRIBUTORS@'] = replDict['@CONTRIBUTORS@'] + '<li>' + actname + " (" + getCommitString(contribDict[cont]) + ")" + '</li>' + "\n"
-
-replDict['@PEOPLE@'] = ''
-for username in p['people']:
-    replDict['@PEOPLE@'] = replDict['@PEOPLE@'] + '<li><img src="g/' + username + '.jpg" height="150" class="portrait"><br><a href="' + p['data'][username]['url'] + '">' + p['data'][username]['name'] + '</a><br> ' + p['data'][username]['affiliation'] + '</li>'
-
-replDict['@REQ_COMPILE@'] = 'none'
-replDict['@REQ_COMPILEGIVEN@'] = 'none'
-if 'req_compile' in j: 
-    replDict['@REQ_COMPILE@'] = ''
-    replDict['@REQ_COMPILEGIVEN@'] = 'normal'
-    for req in j['req_compile']:
-        curReq = req
-        if req in r:
-            curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
-        replDict['@REQ_COMPILE@'] = replDict['@REQ_COMPILE@'] + '<li>' + curReq + '</li>'
-
-replDict['@REQ_TESTS@'] = 'none'
-replDict['@REQ_TESTSGIVEN@'] = 'none'
-if 'req_tests' in j: 
-    replDict['@REQ_TESTS@'] = ''
-    replDict['@REQ_TESTSGIVEN@'] = 'normal'
-    for req in j['req_tests']:
-        curReq = req
-        if req in r:
-            curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
-        replDict['@REQ_TESTS@'] = replDict['@REQ_TESTS@'] + '<li>' + curReq + '</li>'
-
-replDict['@REQ_EDIT@'] = 'none'
-replDict['@REQ_EDITGIVEN@'] = 'none'
-if 'req_edit' in j: 
-    replDict['@REQ_EDIT@'] = ''
-    replDict['@REQ_EDITGIVEN@'] = 'normal'
-    for req in j['req_edit']:
-        curReq = req
-        if req in r:
-            curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
-        replDict['@REQ_EDIT@'] = replDict['@REQ_EDIT@'] + '<li>' + curReq + '</li>'
-
-replDict['@RUNTIME@'] = 'none'
-replDict['@RUNTIMEGIVEN@'] = 'none'
-if 'runtime' in j: 
-    replDict['@RUNTIME@'] = ''
-    replDict['@RUNTIMEGIVEN@'] = 'normal'
-    for req in j['runtime']:
-        curReq = req
-        if req in r:
-            curReq = '<a href="' + r[req]['url'] + '" title="' + r[req]['name'] + '">' + r[req]['name'] + '</a> - ' + r[req]['desc']
-        replDict['@RUNTIME@'] = replDict['@RUNTIME@'] + '<li>' + curReq + '</li>'
-
-replDict['@MAINTAINERUSERNAME@'] = ''
-replDict['@MAINTAINERMAIL@'] = ''
-replDict['@MAINTAINERURL@'] = ''
-for username in p['data']:
-    if p['data'][username]['name'] == j['maintainer']:
-       replDict['@MAINTAINERUSERNAME@'] = username
-       replDict['@MAINTAINERMAIL@'] = p['data'][username]['url']
-       replDict['@MAINTAINERURL@'] = p['data'][username]['url']
-
-if 'livelink' in j: 
-    replDict['@LIVELINK@'] = j['livelink']
-else: 
-    replDict['@LIVELINK@'] = "http://esla.informatik.uni-rostock.de/service-tech/live/#" + replDict['@SHORTNAME@']
-
-simpleInsert('bugtracker')
-simpleInsert('tasktracker')
 simpleInsert('tagline')
-simpleInsert('license')
-simpleInsert('officialVersion')
-simpleInsert('maintainer')
-
 htmlInsert('purpose')
+condInsert('features', htmlInsert)
+
+# Help
 
 condInsert('faq', htmlInsert)
 condInsert('screencast', simpleInsert)
-condInsert('features', htmlInsert)
 condInsert('quickstart', htmlInsert)
 
+# Maintainer and support 
+
+simpleInsert('maintainer')
+simpleInsert('bugtracker')
+simpleInsert('tasktracker')
+replDict['maintainerusername'] = ''
+replDict['maintainermail'] = ''
+replDict['maintainerurl'] = ''
+for username in p['data']:
+    if p['data'][username]['name'] == j['maintainer']:
+       replDict['maintainerusername'] = username
+       replDict['maintainermail'] = p['data'][username]['url']
+       replDict['maintainerurl'] = p['data'][username]['url']
+
+
+# Download / Live 
+
+simpleInsert('officialVersion')
+simpleInsert('license')
+condInsert('livelink', simpleInsert, "http://esla.informatik.uni-rostock.de/service-tech/live/#" + replDict['shortname'])
+setRequirements('req_compile')
+setRequirements('req_tests')
+setRequirements('req_edit')
+setRequirements('runtime')
+
+
+
+# Authors, Contributors, Ackknowledgements
+setAuthors()
+setThanks()
+setContributors()
+
+
+
+# People page
+
+replDict['people'] = ''
+for username in p['people']:
+    replDict['people'] = replDict['people'] + listThis( getImageTag('g/' + username + '.jpg', p['data'][username]['name'], p['data'][username]['name'], 'height="150" class="portrait"') + '<br><a href="' + p['data'][username]['url'] + '">' + p['data'][username]['name'] + '</a><br> ' + p['data'][username]['affiliation'])
+
+
+
+
+
+
+
+# READ AND CLOSE TEMPLATE FILE
+
+tfile = open(sys.argv[4], 'r')
+t = tfile.read()
+tfile.close()
+
+# REPLACE ALL OCCURRENCES IN THE TARGET FILE 
+
+f = open(sys.argv[5], 'w')
 
 for someKey in replDict: 
-    t = t.replace(someKey, replDict[someKey])    
+    t = t.replace('@' + someKey.upper() + '@', replDict[someKey])    
 
 f.write(t)
 f.close()
+
+
+
+
+
+

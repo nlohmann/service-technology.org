@@ -154,6 +154,10 @@ condInsert('faq', htmlInsert)
 condInsert('screencast', simpleInsert)
 condInsert('quickstart', htmlInsert)
 
+# Science
+
+condInsert('science', htmlInsert)
+
 # Maintainer and support 
 
 simpleInsert('maintainer')

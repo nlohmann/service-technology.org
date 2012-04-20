@@ -32,6 +32,13 @@ option "state" s
   flag off
 
 
+section "Reductions"
+
+option "nostructural" -
+  "Switch off structural reduction"
+  flag off
+
+
 section "Input/Output"
 
 option "compressed" -

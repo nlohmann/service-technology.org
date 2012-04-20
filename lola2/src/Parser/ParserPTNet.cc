@@ -17,6 +17,7 @@ should be independent from the format (LoLA / PNML / ...)
 #include <cstring>
 #include <cstdlib>
 
+#include "cmdline.h"
 #include "Net/Net.h"
 #include "Net/Place.h"
 #include "Net/Transition.h"
@@ -31,6 +32,7 @@ should be independent from the format (LoLA / PNML / ...)
 #include "InputOutput/Reporter.h"
 
 
+extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
 ParserPTNet::ParserPTNet()
@@ -476,8 +478,11 @@ void ParserPTNet::symboltable2net()
     /****************************
     * 9. Set significant places *
     ****************************/
-    setSignificantPlaces();
-    rep->status("%d places, %d transitions, %d significant places", Net::Card[PL], Net::Card[TR], Place::CardSignificant);
+    if (not args_info.nostructural_flag)
+    {
+        setSignificantPlaces();
+        rep->status("%d places, %d transitions, %d significant places", Net::Card[PL], Net::Card[TR], Place::CardSignificant);
+    }
 
     /********************************
     * 10. Initial enabledness check *

@@ -204,8 +204,9 @@ int main(int argc, char** argv)
 
     if (args_info.check_given)
     {
+        SimpleProperty* p = NULL;
         Store* s = NULL;
-        Firelist * fl = new Firelist();
+        Firelist * fl = NULL;
 
         // choose a store
         switch (args_info.store_arg)
@@ -230,10 +231,7 @@ int main(int argc, char** argv)
                 break;
         }
 
-        assert(s);
-
         // choose a simple property
-        SimpleProperty* p;
         switch (args_info.check_arg)
         {
             case check_arg_none:
@@ -245,13 +243,18 @@ int main(int argc, char** argv)
 
             case check_arg_deadlock:
                 p = new Deadlock();
-		delete fl;
-		fl = new FirelistStubbornDeadlock();
+                fl = new FirelistStubbornDeadlock();
                 break;
         }
 
-        assert(p);
+        if (fl == NULL)
+        {
+            fl = new Firelist();
+        }
 
+        assert(s);
+        assert(p);
+        assert(fl);
         const bool result = p->depth_first(*s, * fl);
 
         rep->message("result: %s", result ? rep->markup(MARKUP_GOOD, "yes").str() : rep->markup(MARKUP_BAD, "no").str());

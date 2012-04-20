@@ -4,6 +4,47 @@ import sys
 import json
 import misaka
 
+def condInsert(key,f):
+    global j
+    global replDict    
+    if key in j:
+        setFlag(key)
+        f(key)
+    else:
+        blank(key)
+        remFlag(key)
+
+
+def getCommitString(nrOfCommits):
+    if nrOfCommits == 1:
+        return str(nrOfCommits) + " commit"
+    else:
+        return str(nrOfCommits) + " commits"
+
+def getHTML(md):
+    return misaka.html(md)
+
+def simpleInsert(key):
+    global replDict
+    global j
+    replDict['@' + key.upper() + '@'] = j[key]
+
+def htmlInsert(key):
+    global replDict
+    global j
+    replDict['@' + key.upper() + '@'] = getHTML(j[key])
+
+def blank(key):
+    global replDict
+    replDict['@' + key.upper() + '@'] = ''
+
+def setFlag(key):
+    global replDict
+    replDict['@' + key.upper() + 'GIVEN@'] = 'normal'
+
+def remFlag(key):
+    global replDict
+    replDict['@' + key.upper() + 'GIVEN@'] = 'none'
 
 if (len(sys.argv) < 4):
     sys.stderr.write("Usage: " + sys.argv[0] + " jsonfile peoplefile reqfile template target" + "\n")
@@ -45,8 +86,12 @@ if (len(j['authors'])) > 2:
     replDict['@AUTHORS@']  = replDict['@AUTHORS@'] + 'and ' + j['authors'][len(j['authors'])-1]
 
 replDict['@THANKS@']  = ''
-for thank in j['thanks']:
-    replDict['@THANKS@'] = replDict['@THANKS@'] + '<li>' + thank + '</li>' + "\n"
+if 'thanks' in j:
+    for thank in j['thanks']:
+        replDict['@THANKS@'] = replDict['@THANKS@'] + '<li>' + thank + '</li>' + "\n"
+    replDict['@THANKSGIVEN@'] = 'normal'
+else:
+    replDict['@THANKSGIVEN@'] = 'none'
 
 contribDict = dict()
 
@@ -68,14 +113,10 @@ for cont in contribList:
     actname = cont 
     if cont in p['data']:
         actname = p['data'][cont]['name']
-
-    replDict['@CONTRIBUTORS@'] = replDict['@CONTRIBUTORS@'] + '<li>' + actname + " (" + str(contribDict[cont])
-    replDict['@CONTRIBUTORIMAGES@'] = replDict['@CONTRIBUTORIMAGES@'] + '<img width="75" src="../people/g/' + cont + '.jpg" title="' + actname + '" alt="' + actname +  '" class="portrait"> '
-    if contribDict[cont] > 1:
-        replDict['@CONTRIBUTORS@'] = replDict['@CONTRIBUTORS@'] + " commits"
-    else: 
-        replDict['@CONTRIBUTORS@'] = replDict['@CONTRIBUTORS@'] + " commit"
-    replDict['@CONTRIBUTORS@'] = replDict['@CONTRIBUTORS@'] + ")" + '</li>' + "\n"
+        replDict['@CONTRIBUTORIMAGES@'] = replDict['@CONTRIBUTORIMAGES@'] + '<img width="75" src="../people/g/' + cont + '.jpg" title="' + actname + ' (' + getCommitString(contribDict[cont]) +  ')" alt="' + actname +  '" class="portrait"> '
+    else:
+        replDict['@CONTRIBUTORIMAGES@'] = replDict['@CONTRIBUTORIMAGES@'] + '<img width="75" src="../people/g/dummy.jpg" title="' + actname + ' (' + getCommitString(contribDict[cont]) + '" alt=")' + actname +  '" class="portrait"> '
+    replDict['@CONTRIBUTORS@'] = replDict['@CONTRIBUTORS@'] + '<li>' + actname + " (" + getCommitString(contribDict[cont]) + ")" + '</li>' + "\n"
 
 replDict['@PEOPLE@'] = ''
 for username in p['people']:
@@ -115,10 +156,10 @@ if 'req_edit' in j:
         replDict['@REQ_EDIT@'] = replDict['@REQ_EDIT@'] + '<li>' + curReq + '</li>'
 
 replDict['@RUNTIME@'] = 'none'
-replDict['@REQ_RUNTIMEGIVEN@'] = 'none'
+replDict['@RUNTIMEGIVEN@'] = 'none'
 if 'runtime' in j: 
     replDict['@RUNTIME@'] = ''
-    replDict['@REQ_RUNTIMEGIVEN@'] = 'normal'
+    replDict['@RUNTIMEGIVEN@'] = 'normal'
     for req in j['runtime']:
         curReq = req
         if req in r:
@@ -134,44 +175,24 @@ for username in p['data']:
        replDict['@MAINTAINERMAIL@'] = p['data'][username]['url']
        replDict['@MAINTAINERURL@'] = p['data'][username]['url']
 
-
 if 'livelink' in j: 
     replDict['@LIVELINK@'] = j['livelink']
 else: 
     replDict['@LIVELINK@'] = "http://esla.informatik.uni-rostock.de/service-tech/live/#" + replDict['@SHORTNAME@']
 
-replDict['@TAGLINE@' ] = j['tagline']
-replDict['@PURPOSE@']  =  misaka.html(j['purpose'])
-replDict['@MAINTAINER@'] = j['maintainer']
-replDict['@BUCKTRACKERLINK@'] = j['bugtracker']
-replDict['@TASKTRACKERLINK@'] = j['tasktracker']
-replDict['@LICENSE@'] = j['license']
-replDict['@OFFICIALVERSION@'] = j['officialVersion']
+simpleInsert('bugtracker')
+simpleInsert('tasktracker')
+simpleInsert('tagline')
+simpleInsert('license')
+simpleInsert('officialVersion')
+simpleInsert('maintainer')
 
-if 'faq' in j:
-    replDict['@FAQGIVEN@'] = 'normal'
-    replDict['@FAQ@'] = misaka.html(j['faq'])
-else:
-    replDict['@FAQGIVEN@'] = 'none'
+htmlInsert('purpose')
 
-if 'screencast' in j:
-    replDict['@SCREENCASTGIVEN@'] = 'normal'
-    replDict['@SCREENCAST@'] = j['screencast']
-else:
-    replDict['@SCREENCASTGIVEN@'] = 'none'
-
-
-if 'features' in j:
-    replDict['@FEATURES@'] = misaka.html(j['features'])
-else:
-    replDict['@FEATURES@'] = ''
-
-if 'quickstart' in j:
-    replDict['@QUICKSTART@'] = misaka.html(j['quickstart'])
-    replDict['@QUICKSTARTGIVEN@'] = 'normal'
-else:
-    replDict['@QUICKSTART@'] = ''
-    replDict['@QUICKSTARTGIVEN@'] = 'none'
+condInsert('faq', htmlInsert)
+condInsert('screencast', simpleInsert)
+condInsert('features', htmlInsert)
+condInsert('quickstart', htmlInsert)
 
 
 for someKey in replDict: 

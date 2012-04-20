@@ -109,11 +109,12 @@ def setContributors():
     replDict['contributorimages'] = '' 
     for cont in contribList:
         actname = cont 
-        if cont in p['data']:
+        if cont in p['people']:
             actname = p['data'][cont]['name']
+        if cont in p['people']:
             replDict['contributorimages'] = replDict['contributorimages'] + getImageTag('../people/g/' + cont + '.jpg', actname, actname, 'class="portrait" width="75"')
         else:
-            replDict['contributorimages'] = replDict['contributorimages'] + getImageTag('../people/g/dummy.jpg', actname, actname, 'class="portrait" width="75"')
+                replDict['contributorimages'] = replDict['contributorimages'] + getImageTag('../people/g/dummy.jpg', actname, actname, 'class="portrait" width="75"')
         replDict['contributors'] = replDict['contributors'] + listThis( actname + " (" + getCommitString(contribDict[cont]) + ")")
 
 

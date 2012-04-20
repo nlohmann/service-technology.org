@@ -125,7 +125,7 @@ def listThis(someString):
 
 # INITIALIZATION
 
-if (len(sys.argv) < 4):
+if (len(sys.argv) < 5):
     sys.stderr.write("Usage: " + sys.argv[0] + " jsonfile peoplefile reqfile template target" + "\n")
     sys.exit(1)
 
@@ -189,19 +189,6 @@ setRequirements('runtime')
 setAuthors()
 setThanks()
 setContributors()
-
-
-
-# People page
-
-replDict['people'] = ''
-for username in p['people']:
-    replDict['people'] = replDict['people'] + listThis( getImageTag('g/' + username + '.jpg', p['data'][username]['name'], p['data'][username]['name'], 'height="150" class="portrait"') + '<br><a href="' + p['data'][username]['url'] + '">' + p['data'][username]['name'] + '</a><br> ' + p['data'][username]['affiliation'])
-
-
-
-
-
 
 
 # READ AND CLOSE TEMPLATE FILE

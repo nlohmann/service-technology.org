@@ -162,8 +162,8 @@ condInsert('science', htmlInsert)
 # Maintainer and support 
 
 simpleInsert('maintainer')
-simpleInsert('bugtracker')
-simpleInsert('tasktracker')
+condInsert('bugtracker', simpleInsert, "http://gna.org/task/?group=service-tech")
+condInsert('tasktracker', simpleInsert, "http://gna.org/bugs/?group=service-tech")
 replDict['maintainerusername'] = ''
 replDict['maintainermail'] = ''
 replDict['maintainerurl'] = ''

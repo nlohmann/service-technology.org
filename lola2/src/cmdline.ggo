@@ -34,9 +34,6 @@ option "state" s
 
 section "Reductions"
 
-option "nostructural" -
-  "Switch off structural reduction"
-  flag off
 
 
 section "Input/Output"

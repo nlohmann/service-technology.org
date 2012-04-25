@@ -478,11 +478,9 @@ void ParserPTNet::symboltable2net()
     /****************************
     * 9. Set significant places *
     ****************************/
-    if (not args_info.nostructural_flag)
-    {
-        setSignificantPlaces();
-        rep->status("%d places, %d transitions, %d significant places", Net::Card[PL], Net::Card[TR], Place::CardSignificant);
-    }
+    setSignificantPlaces();
+    rep->status("%d places, %d transitions, %d significant places", Net::Card[PL], Net::Card[TR], Place::CardSignificant);
+
 
     /********************************
     * 10. Initial enabledness check *

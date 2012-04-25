@@ -48,6 +48,8 @@ class Matrix
         index_t rowCount;
         /// Number of stored columns in current matrix
         index_t colCount;
+        /// Number of non empty columns
+        index_t significantColCount;
 
     public:
         /// Generate and initialize a matrix
@@ -69,4 +71,7 @@ class Matrix
 
         /// Returns true iff place with given index is significant
         bool isSignificant(index_t) const;
+        
+        /// Returns the number of significant (= not empty) columns
+        index_t getSignificantColCount() const;
 };

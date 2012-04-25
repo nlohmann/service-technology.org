@@ -24,9 +24,6 @@ extern Reporter* rep;
 
 void setSignificantPlaces()
 {
-    //rep->status("calculate significant places");
-    //rep->status("..create");
-    
     // save number of places
     const index_t cardPL = Net::Card[PL];
 
@@ -118,28 +115,16 @@ void setSignificantPlaces()
 
     free(newVar);
     free(newCoef);
-    //rep->status("..created");
 
     // reduce matrix
-    //rep->status("..reduce");
     m.reduce();
-    //rep->status("..reduced");
 
-    index_t sig = 0;
-    for (index_t i = 0; i < cardPL; i++) {
-        if (m.isSignificant(i)) {sig++;}
-    }
-    //rep->status("%d significant places", sig);
-    
-    //rep->status("..reorder");
     // gather significant places
-    Place::CardSignificant = 0;
+    Place::CardSignificant = m.getSignificantColCount();
     index_t lastSignificant = cardPL - 1;
     index_t p = 0;
     while (lastSignificant >= p)
     {
-        rep->status("%d, %d", p, lastSignificant);
-        Place::CardSignificant++;
         if (!m.isSignificant(p))
         {
             // p needs to be swapped
@@ -153,7 +138,6 @@ void setSignificantPlaces()
         }
         p++;
     }
-    //rep->status("..reordered");
 
     // adjust Place::SizeOfBitVector
     Place::SizeOfBitVector = 0;
@@ -161,5 +145,4 @@ void setSignificantPlaces()
     {
         Place::SizeOfBitVector += Place::CardBits[i];
     }
-    //rep->status("significant places calculated");
 }

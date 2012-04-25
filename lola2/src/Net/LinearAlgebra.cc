@@ -255,13 +255,10 @@ void Matrix::printMatrix() const
 
 /// creates a new matrix
 /// size depicts the number of variables (=columns)
-/// \todo use initializer
-Matrix::Matrix(index_t size)
+Matrix::Matrix(index_t size) : rowCount(0), colCount(size), significantColCount(0)
 {
     matrix = new Row*[size];
-    rowCount = 0;
-    colCount = size;
-
+    
     for (index_t i = 0; i < size; ++i)
     {
         matrix[i] = NULL;
@@ -321,6 +318,10 @@ void Matrix::reduce()
     // for each variable i (=column)
     for (index_t i = 0; i < colCount; ++i)
     {
+        if (matrix[i] != NULL)
+        {
+            significantColCount++;
+        }
         // if there at least two rows with variable i as first variable
         while ((matrix[i] != NULL) && (matrix[i]->next != NULL))
         {
@@ -335,4 +336,11 @@ bool Matrix::isSignificant(index_t place) const
 {
     assert(place < colCount);
     return (matrix[place] != NULL);
+}
+
+/// Returns the number of significant (= not empty) columns
+index_t Matrix::getSignificantColCount() const
+{
+    assert(significantColCount <= colCount);
+    return significantColCount;
 }

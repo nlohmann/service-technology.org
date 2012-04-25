@@ -139,6 +139,11 @@ void setSignificantPlaces()
             }
             // swap lastSignificant with p
             swapPlaces(p, lastSignificant);
+
+            // first guess
+            Place::CardSignificant++;
+            lastSignificant--;
+
         }
     }
 

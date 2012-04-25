@@ -11,6 +11,8 @@
 #include <stdint.h>
 #endif
 
+#include "InputOutput/Reporter.h"
+
 #include "Net/StructuralReduction.h"
 #include "Net/LinearAlgebra.h"
 #include "Net/Net.h"
@@ -18,8 +20,13 @@
 #include "Net/Place.h"
 #include "Net/swap.h"
 
+extern Reporter* rep;
+
 void setSignificantPlaces()
 {
+    rep->status("calculate significant places");
+    rep->status("..create");
+    
     // save number of places
     const index_t cardPL = Net::Card[PL];
 
@@ -111,20 +118,23 @@ void setSignificantPlaces()
 
     free(newVar);
     free(newCoef);
+    rep->status("..created");
 
     // reduce matrix
+    rep->status("..reduce");
     m.reduce();
+    rep->status("..reduced");
 
+    
+    rep->status("..reorder");
     // gather significant places
     Place::CardSignificant = 0;
     index_t lastSignificant = cardPL - 1;
-    for (index_t p = 0; p < cardPL; ++p)
+    index_t p = 0;
+    while (lastSignificant >= p)
     {
-        if (m.isSignificant(p))
-        {
-            Place::CardSignificant++;
-        }
-        else
+        Place::CardSignificant++;
+        if (!m.isSignificant(p))
         {
             // p needs to be swapped
             // find first significant place from the right end of all places
@@ -132,28 +142,18 @@ void setSignificantPlaces()
             {
                 lastSignificant--;
             }
-            if (lastSignificant <= p)
-            {
-                // we are finished
-                break;
-            }
             // swap lastSignificant with p
-            swapPlaces(p, lastSignificant);
-
-            // first guess
-            Place::CardSignificant++;
-            lastSignificant--;
-
+            swapPlaces(p, lastSignificant--);
         }
+        p++;
     }
+    rep->status("..reordered");
 
     // adjust Place::SizeOfBitVector
-
-
-    /*! /TODO Wer hat das hier geschrieben? */
     Place::SizeOfBitVector = 0;
     for (index_t i = 0; i < Place::CardSignificant; i++)
     {
         Place::SizeOfBitVector += Place::CardBits[i];
     }
+    rep->status("significant places calculated");
 }

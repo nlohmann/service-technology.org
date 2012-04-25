@@ -123,7 +123,7 @@ void setSignificantPlaces()
     Place::CardSignificant = m.getSignificantColCount();
     index_t lastSignificant = cardPL - 1;
     index_t p = 0;
-    while (lastSignificant > p)
+    while (p < Place::CardSignificant)
     {
         if (!m.isSignificant(p))
         {

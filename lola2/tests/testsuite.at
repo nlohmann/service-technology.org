@@ -223,7 +223,7 @@ AT_SETUP([Random walk])
 AT_CHECK([cp TESTFILES/process.lola .])
 AT_CHECK([LOLA process.lola --randomWalk=10000],0,stdout)
 AT_CHECK([GREP -q "firing" stdout])
-AT_CHECK([GREP -q "*************" stdout])
+AT_CHECK([GREP -q "\*\*\*\*\*\*\*\*\*\*\*\*\*" stdout])
 AT_KEYWORDS(debug)
 AT_CLEANUP
 

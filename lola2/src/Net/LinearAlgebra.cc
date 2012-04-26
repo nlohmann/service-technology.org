@@ -159,7 +159,6 @@ void Matrix::Row::apply(Matrix &matrix)
             firstRow++;
             secondRow++;
         }
-
         // increase newSize
         newSize++;
     }
@@ -192,6 +191,7 @@ void Matrix::Row::apply(Matrix &matrix)
     // new row has been calculated
     // decrease coefficients
     // calculate ggt of new row
+    
     ggtFactor = newCoef[0];
     for (index_t i = 1; i < newSize; ++i)
     {

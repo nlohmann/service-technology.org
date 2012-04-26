@@ -235,6 +235,13 @@ AT_CHECK([GREP -q "6 markings, 5 edges" stderr])
 AT_KEYWORDS(debug)
 AT_CLEANUP
 
+AT_SETUP([Significant places])
+AT_CHECK([cp TESTFILES/test_significant.lola .])
+AT_CHECK([LOLA test_significant.lola --check=full -v],0,stdout,stderr)
+AT_CHECK([GREP -q "3 places, 1 transitions, 0 significant places" stderr])
+AT_KEYWORDS(debug)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Reporter])

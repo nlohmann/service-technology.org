@@ -6,6 +6,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
@@ -87,7 +88,7 @@ void setSignificantPlaces()
                     memmove(&newCoef[possiblePosition], &newCoef[possiblePosition + 1], (newSize - possiblePosition) * sizeof(int64_t));
                     // assumption: decreasing 0 will lead to maxInt but
                     //              upcoming increase will result in 0 again
-                    ----newSize;
+                    --newSize;
                 }
             }
             else
@@ -101,9 +102,9 @@ void setSignificantPlaces()
                 // store the multiplicity (from t to p)
                 // negative numbers
                 newCoef[possiblePosition] = -Net::Mult[TR][POST][t][p];
+                // increase newSize
+                ++newSize;
             }
-            // increase newSize
-            ++newSize;
         }
         // save current arrays as new row
         m.addRow(newSize, newVar, newCoef);

@@ -98,6 +98,8 @@ void ParserPTNet::sort_arcs(index_t* arcs, mult_t* mults, const index_t from, co
 }
 
 
+
+
 /*!
 \todo comment me
 \todo Brauchen wir wirklich Marking::Initial oder können wir das mit Marking::Current abhandeln?
@@ -393,6 +395,7 @@ void ParserPTNet::symboltable2net()
 
     // initialize Conflicting arrays
     index_t* conflicting = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
+    index_t* new_conflicting = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
 
     ///\todo make search for conflicting transitions a function to avoid code duplication
     for (index_t t = 0; t < cardTR; t++)
@@ -406,28 +409,50 @@ void ParserPTNet::symboltable2net()
             // p is a pre-place
             const index_t p = Net::Arc[TR][PRE][t][i];
 
-            for (index_t j = 0; j < Net::CardArcs[PL][POST][p]; j++)
+	    // assertion: array of known conflictings is sorted
+	    // assertion: all arc lists are sorted
+
+	    index_t j = 0; // index through list of post transitions of p
+	    index_t k = 0; // index through list of known transitions
+	    const index_t old_cardconflicting = card_conflicting;
+	     card_conflicting = 0;
+
+            while(j < Net::CardArcs[PL][POST][p] && k < old_cardconflicting)
             {
+		
                 // tt is a conflicting transition
                 const index_t tt = Net::Arc[PL][POST][p][j];
-                if (t == tt)
-                {
-                    continue;    // no conflict between t and itself
-                }
-                bool included = false;
-                for (index_t k = 0; k < card_conflicting; k++)
-                {
-                    if (tt == conflicting[k])
-                    {
-                        included = true;
-                        break;
-                    }
-                }
-                if (!included)
-                {
-                    conflicting[card_conflicting++] = tt;
-                }
+
+	  	if(tt < conflicting[k])
+		{
+			++j;
+			if (t == tt)
+			{
+			    continue;    // no conflict between t and itself
+			}
+                        new_conflicting[card_conflicting++] = tt;
+			continue;
+		}
+		if(tt > conflicting[k])
+		{
+			new_conflicting[card_conflicting++] = conflicting[k];
+			++k;	
+			continue;
+		}
+		assert(tt == conflicting[k]);
+		new_conflicting[card_conflicting++] = conflicting[k];
+		++j;
+		++k;
+	
             }
+	   // there may be transitions left greater than all known conflicting
+	   for(; j<Net::CardArcs[PL][POST][p];j++)
+	   {
+		new_conflicting[card_conflicting++]= Net::Arc[PL][POST][p][j];
+	   }
+	   index_t * tmp = conflicting;
+	   conflicting = new_conflicting;
+	   new_conflicting = tmp;
         }
 
         Transition::CardConflicting[t] = card_conflicting;

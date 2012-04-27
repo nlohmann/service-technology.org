@@ -14,8 +14,8 @@
 {Section 1: Declare data types and operations }
 
 SORT 
-	phil = [ 1 , 5 ];   { range from 1 to #phil }
-	fork = [ 1 , 5 ];   { range from 1 to #phil }
+	phil = [ 1 , 10 ];   { range from 1 to #phil }
+	fork = [ 1 , 10 ];   { range from 1 to #phil }
 
 FUNCTION L ( x : phil ) : fork 
 { Given a philosopher, assign its left fork }

@@ -1,0 +1,10 @@
+PLACE
+  a, b, c;
+
+MARKING
+  ;
+
+
+TRANSITION t1
+  CONSUME a:1, b:1, c:1;
+  PRODUCE a:1, b:1, c:1;

@@ -413,90 +413,136 @@ void ReadNetFile(FILE* f)
     // initialize Conflicting arrays
     // free or rename temporary data structures
     index_t* conflicting = delta_pre;
+    index_t* new_conflicting = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
     free(delta_post);
     free(mult_pre);
     free(mult_post);
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
+        // 8.1 conflicting transitions
         index_t card_conflicting = 0;
 
-        // 1. collect all conflicting transitions (bullet t)bullet
+        /// 1. collect all conflicting transitions \f$(\null^\bullet t)^\bullet\f$
         for (index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
         {
             // p is a pre-place
-            index_t p = Net::Arc[TR][PRE][t][i];
+            const index_t p = Net::Arc[TR][PRE][t][i];
 
-            for (index_t j = 0; j < Net::CardArcs[PL][POST][p]; j++)
+	    // assertion: array of known conflictings is sorted
+	    // assertion: all arc lists are sorted
+
+	    index_t j = 0; // index through list of post transitions of p
+	    index_t k = 0; // index through list of known transitions
+	    const index_t old_cardconflicting = card_conflicting;
+	     card_conflicting = 0;
+
+            while(j < Net::CardArcs[PL][POST][p] && k < old_cardconflicting)
             {
+		
                 // tt is a conflicting transition
-                index_t tt = Net::Arc[PL][POST][p][j];
-                if (t == tt)
-                {
-                    continue;    // no conflict between t and itself
-                }
-                bool included = false;
-                for (index_t k = 0; k < card_conflicting; k++)
-                {
-                    if (tt == conflicting[k])
-                    {
-                        included = true;
-                        break;
-                    }
-                }
-                if (!included)
-                {
-                    conflicting[card_conflicting++] = tt;
-                }
+                const index_t tt = Net::Arc[PL][POST][p][j];
 
+	  	if(tt < conflicting[k])
+		{
+			++j;
+			if (t == tt)
+			{
+			    continue;    // no conflict between t and itself
+			}
+                        new_conflicting[card_conflicting++] = tt;
+			continue;
+		}
+		if(tt > conflicting[k])
+		{
+			new_conflicting[card_conflicting++] = conflicting[k];
+			++k;	
+			continue;
+		}
+		assert(tt == conflicting[k]);
+		new_conflicting[card_conflicting++] = conflicting[k];
+		++j;
+		++k;
+	
             }
+	   // there may be transitions left greater than all known conflicting
+	   for(; j<Net::CardArcs[PL][POST][p];j++)
+	   {
+		new_conflicting[card_conflicting++]= Net::Arc[PL][POST][p][j];
+	   }
+	   index_t * tmp = conflicting;
+	   conflicting = new_conflicting;
+	   new_conflicting = tmp;
         }
+
         Transition::CardConflicting[t] = card_conflicting;
         Transition::Conflicting[t] = (index_t*) malloc(card_conflicting * SIZEOF_INDEX_T);
-        for (index_t k = 0; k < card_conflicting; k++)
-        {
-            Transition::Conflicting[t][k] = conflicting[k];
-        }
+        memcpy(Transition::Conflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
 
+
+        // 8.2 backward conflicting transitions
         card_conflicting = 0;
 
-        // 1. collect all backward conflicting transitions (t bullet)bullet
+        /// 1. collect all backward conflicting transitions \f$(t^\bullet)^\bullet\f$
         for (index_t i = 0; i < Net::CardArcs[TR][POST][t]; i++)
         {
             // p is a post-place
-            index_t p = Net::Arc[TR][POST][t][i];
+            const index_t p = Net::Arc[TR][POST][t][i];
 
-            for (index_t j = 0; j < Net::CardArcs[PL][POST][p]; j++)
+	    // assertion: array of known conflictings is sorted
+	    // assertion: all arc lists are sorted
+
+	    index_t j = 0; // index through list of post transitions of p
+	    index_t k = 0; // index through list of known transitions
+	    const index_t old_cardconflicting = card_conflicting;
+	     card_conflicting = 0;
+
+            while(j < Net::CardArcs[PL][POST][p] && k < old_cardconflicting)
             {
-                // tt is a backward conflicting transition
-                index_t tt = Net::Arc[PL][POST][p][j];
-                if (t == tt)
-                {
-                    continue;    // no conflict between t and itself
-                }
-                bool included = false;
-                for (index_t k = 0; k < card_conflicting; k++)
-                {
-                    if (tt == conflicting[k])
-                    {
-                        included = true;
-                        break;
-                    }
-                }
-                if (!included)
-                {
-                    conflicting[card_conflicting++] = tt;
-                }
+		
+                // tt is a conflicting transition
+                const index_t tt = Net::Arc[PL][POST][p][j];
 
+	  	if(tt < conflicting[k])
+		{
+			++j;
+			if (t == tt)
+			{
+			    continue;    // no conflict between t and itself
+			}
+                        new_conflicting[card_conflicting++] = tt;
+			continue;
+		}
+		if(tt > conflicting[k])
+		{
+			new_conflicting[card_conflicting++] = conflicting[k];
+			++k;	
+			continue;
+		}
+		assert(tt == conflicting[k]);
+		new_conflicting[card_conflicting++] = conflicting[k];
+		++j;
+		++k;
+	
             }
+	   // there may be transitions left greater than all known conflicting
+	   for(; j<Net::CardArcs[PL][POST][p];j++)
+	   {
+		new_conflicting[card_conflicting++]= Net::Arc[PL][POST][p][j];
+	   }
+	   index_t * tmp = conflicting;
+	   conflicting = new_conflicting;
+	   new_conflicting = tmp;
+
         }
+
         Transition::CardBackConflicting[t] = card_conflicting;
         Transition::BackConflicting[t] = (index_t*) malloc(card_conflicting * SIZEOF_INDEX_T);
-        for (index_t k = 0; k < card_conflicting; k++)
-        {
-            Transition::BackConflicting[t][k] = conflicting[k];
-        }
+        memcpy(Transition::BackConflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
     }
+
     free(conflicting);
+    free(new_conflicting);
+
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
         Transition::checkEnabled(t);

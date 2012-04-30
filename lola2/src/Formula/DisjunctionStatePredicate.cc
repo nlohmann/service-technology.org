@@ -7,6 +7,7 @@
 */
 
 #include "Formula/DisjunctionStatePredicate.h"
+#include <cstdlib>
 
 DisjunctionStatePredicate::DisjunctionStatePredicate(unsigned int n)
 {

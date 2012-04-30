@@ -7,6 +7,7 @@
 */
 
 #include "Formula/ConjunctionStatePredicate.h"
+#include <cstdlib>
 
 ConjunctionStatePredicate::ConjunctionStatePredicate(unsigned int n)
 {

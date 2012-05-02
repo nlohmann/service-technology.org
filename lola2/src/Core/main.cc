@@ -199,16 +199,16 @@ int main(int argc, char** argv)
         ptformula_parse();
         rep->status("parsed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
 
-        TheFormula->print();
-
-//        TheFormula = TheFormula->rewrite(kc::neg);
+        TheFormula = TheFormula->rewrite(kc::arrows);
+        TheFormula = TheFormula->rewrite(kc::neg);
+        TheFormula = TheFormula->rewrite(kc::sides);
 //        TheFormula = TheFormula->rewrite(kc::lists);
 
-        TheFormula->print();
         TheFormula->unparse(myprinter, kc::out);
 
         // tidy parser
         ptformula_lex_destroy();
+        fclose(ptformula_in);
     }
 
 

@@ -68,8 +68,8 @@ bool BloomStore::searchAndInsert()
     const unsigned int hash_0 = hash_sdbm();
     hash_values[0] = hash_0;
 
-    if (hash_functions > 1)
-    {
+//    if (hash_functions > 1)
+//    {
         const unsigned int hash_1 = hash_fnv();
         hash_values[1] = hash_1;
 
@@ -78,7 +78,7 @@ bool BloomStore::searchAndInsert()
         {
             hash_values[h] = (hash_0 + h * hash_1) % BLOOM_FILTER_SIZE;
         }
-    }
+//    }
 
 
     /*****************************************

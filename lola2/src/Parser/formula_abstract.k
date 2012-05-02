@@ -8,17 +8,36 @@ tFormula:
 
 tStatePredicate:
   AtomicProposition(tAtomicProposition)
+| Negation(tStatePredicate)
 | Conjunction(tStatePredicate tStatePredicate)
 | Disjunction(tStatePredicate tStatePredicate)
-| Negation(tStatePredicate)
+| Implication(tStatePredicate tStatePredicate)
+| Equivalence(tStatePredicate tStatePredicate)
 | ConjunctionList(tConjunction_list)
+| DisjunctionList(tDisjunction_list)
 ;
 
 tConjunction_list:
   list tStatePredicate
 ;
 
+tDisjunction_list:
+  list tStatePredicate
+;
+
 tAtomicProposition:
-  EqualsAtomicProposition(casestring integer)
-| NotEqualsAtomicProposition(casestring integer)
+  EqualsAtomicProposition(tTerm tTerm)
+| NotEqualsAtomicProposition(tTerm tTerm)
+| GreaterAtomicProposition(tTerm tTerm)
+| GreaterEqualAtomicProposition(tTerm tTerm)
+| LessAtomicProposition(tTerm tTerm)
+| LessEqualAtomicProposition(tTerm tTerm)
+;
+
+tTerm:
+  Node(casestring)
+| Number(integer)
+| Sum(tTerm tTerm)
+| Difference(tTerm tTerm)
+| Product(integer tTerm)
 ;

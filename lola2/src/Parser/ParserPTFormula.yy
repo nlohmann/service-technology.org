@@ -38,9 +38,12 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %type <yt_tFormula> formula
 %type <yt_tStatePredicate> statepredicate
 %type <yt_tAtomicProposition> atomic_proposition
+%type <yt_tStatePredicate> negation
 %type <yt_tStatePredicate> conjunction
 %type <yt_tStatePredicate> disjunction
-%type <yt_tStatePredicate> negation
+%type <yt_tStatePredicate> implication
+%type <yt_tStatePredicate> equivalence
+%type <yt_tTerm> term
 
 %token IDENTIFIER NUMBER
 %token _FORMULA_ _AND_ _NOT_ _OR_ _iff_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_
@@ -69,12 +72,21 @@ formula:
 statepredicate:
   atomic_proposition
     { $$ = AtomicProposition($1); }
+| negation
+    { $$ = $1; }
 | conjunction
     { $$ = $1; }
 | disjunction
     { $$ = $1; }
-| negation
+| implication
     { $$ = $1; }
+| equivalence
+    { $$ = $1; }
+;
+
+negation:
+  _NOT_ _leftparenthesis_ statepredicate _rightparenthesis_
+    { $$ = Negation($3); }
 ;
 
 conjunction:
@@ -87,17 +99,44 @@ disjunction:
     { $$ = Disjunction($2, $4); }
 ;
 
-negation:
-  _NOT_ _leftparenthesis_ statepredicate _rightparenthesis_
-    { $$ = Negation($3); }
+implication:
+  _leftparenthesis_ statepredicate _implies_ statepredicate _rightparenthesis_
+    { $$ = Implication($2, $4); }
+;
+
+equivalence:
+  _leftparenthesis_ statepredicate _iff_ statepredicate _rightparenthesis_
+    { $$ = Equivalence($2, $4); }
 ;
 
 atomic_proposition:
-  IDENTIFIER _equals_ NUMBER
+  term _equals_ term
     { $$ = EqualsAtomicProposition($1, $3); }
-| IDENTIFIER _notequal_ NUMBER
+| term _notequal_ term
     { $$ = NotEqualsAtomicProposition($1, $3); }
+| term _greaterthan_ term
+    { $$ = GreaterAtomicProposition($1, $3); }
+| term _greaterorequal_ term
+    { $$ = GreaterEqualAtomicProposition($1, $3); }
+| term _lessthan_ term
+    { $$ = LessAtomicProposition($1, $3); }
+| term _lessorequal_ term
+    { $$ = LessEqualAtomicProposition($1, $3); }
 ;
+
+term:
+  IDENTIFIER
+    { $$ = Node($1); }
+| NUMBER
+    { $$ = Number($1); }
+| _leftparenthesis_ term _plus_ term _rightparenthesis_
+    { $$ = Sum($2, $4); }
+| _leftparenthesis_ term _minus_ term _rightparenthesis_
+    { $$ = Difference($2, $4); }
+| _leftparenthesis_ NUMBER _times_ term _rightparenthesis_
+    { $$ = Product($2, $4); }
+;
+
 
 %%
 

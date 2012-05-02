@@ -15,11 +15,15 @@ Mainly copied from LoLA1
 /* we don't neet yyunput() */
 %option nounput
 
+%option outfile="lex.yy.c"
+%option prefix="ptnetlola_"
+
+
 %{
 #include "cmdline.h"
 #include "Parser/ArcList.h"
 #include "Parser/FairnessAssumptions.h"
-#include "Parser/ParserPTNetLoLA.h"
+#include "Parser/ParserPTNetLoLA.hh"
 #include "InputOutput/Reporter.h"
 #include "InputOutput/InputOutput.h"
 
@@ -30,8 +34,8 @@ extern Input *netFile;
 
 void setlval();
 void setcol();
-extern void yyerror(char const* mess);
-int yycolno = 1;
+extern void ptnetlola_error(char const* mess);
+int ptnetlola_colno = 1;
 %}
 
 %s IN_COMMENT
@@ -124,7 +128,7 @@ UNTIL                                    { setcol(); return _UNTIL_; }
 [>]=                                     { setcol(); return _greaterorequal_; }
 [<]=                                     { setcol(); return _lessorequal_; }
 
-[\n\r]                                   { yycolno = 1; /* whitespace */ }
+[\n\r]                                   { ptnetlola_colno = 1; /* whitespace */ }
 [\t ]                                    { setcol();  /* whitespace */ }
 
 [0-9]+                                   { setcol(); setlval(); return NUMBER; }
@@ -134,22 +138,22 @@ UNTIL                                    { setcol(); return _UNTIL_; }
 
 [^,;:()\t \n\r\{\}]+                     { setcol(); setlval(); return IDENTIFIER; }
 
-.                                        { setcol(); yyerror("lexical error"); }
+.                                        { setcol(); ptnetlola_error("lexical error"); }
 
 %%
 
 /*! pass token string as attribute to bison */
 inline void setlval()
 {
-    yylval.attributeString = strdup(yytext);
+    ptnetlola_lval.attributeString = strdup(ptnetlola_text);
 }
 
 inline void setcol()
 {
-    yycolno += yyleng;
+    ptnetlola_colno += ptnetlola_leng;
 }
 
-int yywrap()
+int ptnetlola_wrap()
 {
     if (currentFile == (int)args_info.inputs_num-1 or currentFile == -1)
     {
@@ -162,8 +166,8 @@ int yywrap()
         delete netFile;
         netFile = new Input("net", args_info.inputs[++currentFile]);
 
-        yycolno = 1;
-        yylineno = 1;
+        ptnetlola_colno = 1;
+        ptnetlola_lineno = 1;
         return 0;
     }
 }

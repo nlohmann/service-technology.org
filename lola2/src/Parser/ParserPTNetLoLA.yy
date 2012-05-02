@@ -30,9 +30,9 @@ extern Reporter* rep;
 extern Input* netFile;
 
 /// the current token text from Flex
-extern char* yytext;
+extern char* ptnetlola_text;
 
-void yyerror(char const*);
+void ptnetlola_error(char const*);
 void yyerrors(char* token, const char* format, ...);
 %}
 
@@ -42,15 +42,16 @@ void yyerrors(char* token, const char* format, ...);
     ArcList* attributeArcList;
 }
 
+%error-verbose /* more verbose and specific error message string */
+%defines       /* write an output file containing macro definitions for the token types */
+%name-prefix="ptnetlola_"
+
 %type <attributeString> nodeident
 %type <attributeFairness> fairness
 %type <attributeArcList> arclist
 %type <attributeArcList> arc
 %type <attributeString> NUMBER
 %type <attributeString> IDENTIFIER
-
-%error-verbose /* more verbose and specific error message string */
-%defines       /* write an output file containing macro definitions for the token types */
 
 %token _FINAL_ _AUTOMATON_ _SAFE_ _NEXT_ _ANALYSE_ _PLACE_ _MARKING_
 _TRANSITION_ _CONSUME_ _PRODUCE_ _comma_ _colon_ _semicolon_ IDENTIFIER NUMBER
@@ -64,11 +65,11 @@ _rightbracket_ _dot_ _plus_ _minus_ _times_ _divide_ _slash_ _EXISTS_ _STRONG_
 _WEAK_ _FAIR_
 
 %{
-extern YYSTYPE yylval;
-extern int yylex();
-extern FILE* yyin;
-extern int yylineno;
-extern int yycolno;
+extern YYSTYPE ptnetlola_lval;
+extern int ptnetlola_lex();
+extern FILE* ptnetlola_in;
+extern int ptnetlola_lineno;
+extern int ptnetlola_colno;
 %}
 
 %{
@@ -278,7 +279,7 @@ arc:
 ParserPTNet* ParserPTNetLoLA()
 {
     TheResult = new ParserPTNet();
-    yyparse();
+    ptnetlola_parse();
     return(TheResult);
 }
 
@@ -293,12 +294,12 @@ __attribute__((noreturn)) void yyerrors(char* token, const char* format, ...) {
     free(errormessage);
     va_end(args);
 
-    rep->status("%s:%d:%d - error near '%s'", rep->markup(MARKUP_FILE, basename((char*)netFile->getFilename())).str(), yylineno, yycolno, token);
+    rep->status("%s:%d:%d - error near '%s'", rep->markup(MARKUP_FILE, basename((char*)netFile->getFilename())).str(), ptnetlola_lineno, ptnetlola_colno, token);
 
     rep->abort(ERROR_SYNTAX);
 }
 
 /// display a parser error and exit
-__attribute__((noreturn)) void yyerror(char const* mess) {
-    yyerrors(yytext, mess);
+__attribute__((noreturn)) void ptnetlola_error(char const* mess) {
+    yyerrors(ptnetlola_text, mess);
 }

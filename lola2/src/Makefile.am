@@ -42,11 +42,11 @@ lola_SOURCES = \
                 Exploration/Deadlock.cc Exploration/Deadlock.h \
                 Exploration/FirelistStubbornDeadlock.cc Exploration/FirelistStubbornDeadlock.h \
                 \
-		Formula/StatePredicate.h \
-		Formula/AtomicStatePredicate.cc Formula/AtomicStatePredicate.h \
-		Formula/ConjunctionStatePredicate.cc Formula/ConjunctionStatePredicate.h \
-		Formula/DisjunctionStatePredicate.cc Formula/DisjunctionStatePredicate.h \
-		\
+                Formula/StatePredicate.h \
+                Formula/AtomicStatePredicate.cc Formula/AtomicStatePredicate.h \
+                Formula/ConjunctionStatePredicate.cc Formula/ConjunctionStatePredicate.h \
+                Formula/DisjunctionStatePredicate.cc Formula/DisjunctionStatePredicate.h \
+                \
                 Stores/Store.cc Stores/Store.h \
                 Stores/BloomStore.cc Stores/BloomStore.h \
                 Stores/BinStore.h Stores/BinStore.cc \

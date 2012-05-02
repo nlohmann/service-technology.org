@@ -50,7 +50,7 @@ extern ParserPTNet* ParserPTNetLoLA();
 gengetopt_args_info args_info;
 
 // input files
-extern FILE* yyin;
+extern FILE* ptnetlola_in;
 
 /// the reporter
 Reporter* rep = NULL;
@@ -68,8 +68,8 @@ Input* netFile;
 
 
 // the parsers
-extern int yyparse();
-extern int yylex_destroy();
+extern int ptnetlola_parse();
+extern int ptnetlola_lex_destroy();
 
 
 /// evaluate the command line parameters
@@ -153,7 +153,7 @@ int main(int argc, char** argv)
         }
 
         // pass the opened file pointer to flex via FILE *yyin
-        yyin = *netFile;
+        ptnetlola_in = *netFile;
 
         // read the input file(s)
         ParserPTNet* symbolTables = ParserPTNetLoLA();
@@ -164,7 +164,7 @@ int main(int argc, char** argv)
         delete netFile;
 
         // tidy parser
-        yylex_destroy();
+        ptnetlola_lex_destroy();
 
         rep->status("preprocessing net");
 

@@ -27,5 +27,5 @@ class Deadlock : public SimpleProperty
         virtual void checkProperty(index_t);
 
         /// check property in Marking::Current, use after backfire. Argument is transition just backfired.
-        void updateProperty(index_t) {} 
+        void updateProperty(index_t) {}
 };

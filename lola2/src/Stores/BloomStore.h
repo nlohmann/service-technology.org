@@ -6,11 +6,11 @@
 class BloomStore : public Store
 {
     private:
-        std::bitset<BLOOM_FILTER_SIZE> *filter;
+        std::bitset<BLOOM_FILTER_SIZE>* filter;
         inline unsigned int hash_sdbm() const;
         inline unsigned int hash_fnv() const;
 
-        unsigned int *hash_values;
+        unsigned int* hash_values;
         size_t hash_functions;
 
     public:

@@ -14,35 +14,35 @@
 class ConjunctionStatePredicate : public StatePredicate
 {
     public:
-	/// arg is number of subformulas
-	ConjunctionStatePredicate(unsigned int);
+        /// arg is number of subformulas
+        explicit ConjunctionStatePredicate(index_t);
 
-	/// adds i-th subformula
-	void addSub(unsigned int i, StatePredicate * f);
+        /// adds i-th subformula
+        void addSub(index_t i, StatePredicate* f);
 
-	virtual index_t getUpSet(index_t * stack, bool * onstack); 
-                                 
-	/// If value of this changes, the parent formula is 
-	/// triggered for updating. This means that updating is started at the leafs of the formula tree.
-	/// Parts of the formula that did not change are not examined.
-	/// The parameter is the position of this in the parent's subformula list
+        virtual index_t getUpSet(index_t* stack, bool* onstack);
 
-	virtual void updateTF(index_t);
-	virtual void updateFT(index_t);
+        /// If value of this changes, the parent formula is
+        /// triggered for updating. This means that updating is started at the leafs of the formula tree.
+        /// Parts of the formula that did not change are not examined.
+        /// The parameter is the position of this in the parent's subformula list
 
-	/// evaluates a formula, e.g. upon initialization. Evaluation starts top/down, so the whole formula is 
-	/// examined.
-	virtual void evaluate();
+        virtual void updateTF(index_t);
+        virtual void updateFT(index_t);
 
-	StatePredicate * parent;
+        /// evaluates a formula, e.g. upon initialization. Evaluation starts top/down, so the whole formula is
+        /// examined.
+        virtual void evaluate();
 
-private:
-	/// the list of subformulas
-	StatePredicate ** sub;
-	
-	/// The number of subformulas;
-	unsigned int cardSub;
+        StatePredicate* parent;
 
-	/// The number of satisfied subformulas
-	unsigned int cardSat;
+    private:
+        /// the list of subformulas
+        StatePredicate** sub;
+
+        /// The number of subformulas;
+        index_t cardSub;
+
+        /// The number of satisfied subformulas
+        index_t cardSat;
 };

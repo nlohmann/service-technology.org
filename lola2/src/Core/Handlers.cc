@@ -70,7 +70,8 @@ closing files, reporting exit, and releasing memory.
 void Handlers::exitHandler()
 {
     // print statistics
-    if (args_info.stats_flag) {
+    if (args_info.stats_flag)
+    {
         std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
         FILE* ps = popen(call.c_str(), "r");
         unsigned int memory;

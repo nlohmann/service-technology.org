@@ -191,7 +191,7 @@ void Matrix::Row::apply(Matrix &matrix)
     // new row has been calculated
     // decrease coefficients
     // calculate ggt of new row
-    
+
     ggtFactor = newCoef[0];
     for (index_t i = 1; i < newSize; ++i)
     {
@@ -258,7 +258,7 @@ void Matrix::printMatrix() const
 Matrix::Matrix(index_t size) : rowCount(0), colCount(size), significantColCount(0)
 {
     matrix = new Row*[size];
-    
+
     for (index_t i = 0; i < size; ++i)
     {
         matrix[i] = NULL;

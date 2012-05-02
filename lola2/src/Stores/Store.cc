@@ -29,21 +29,21 @@ void* Store::reporter_internal(void)
 
         rep->status("%10lu markings, %10lu edges, %8.0f markings/sec, %5d secs", markings, calls - 1, (last_period / (float)REPORT_FREQUENCY), (++intervals * REPORT_FREQUENCY));
 
-/*
-        if (benchmark == 0)
-        {
-            benchmark = markings;
-        }
-        
-        std::string p = "";
-        for (size_t i = 0; i < size_t(60.0 * (1.0 - ((last_period / (float)benchmark)))); ++i)
-        {
-            p += "*";
-        }
+        /*
+                if (benchmark == 0)
+                {
+                    benchmark = markings;
+                }
 
-        rep->status("%s %2.2f%%", rep->markup(MARKUP_UNIMPORTANT, p.c_str()).str(), fabs(100.0 * (1.0 - ((last_period / (float)benchmark)))));
+                std::string p = "";
+                for (size_t i = 0; i < size_t(60.0 * (1.0 - ((last_period / (float)benchmark)))); ++i)
+                {
+                    p += "*";
+                }
 
-*/
+                rep->status("%s %2.2f%%", rep->markup(MARKUP_UNIMPORTANT, p.c_str()).str(), fabs(100.0 * (1.0 - ((last_period / (float)benchmark)))));
+
+        */
         last_markings = markings;
     }
 }

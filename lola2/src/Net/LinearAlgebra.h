@@ -71,7 +71,7 @@ class Matrix
 
         /// Returns true iff place with given index is significant
         bool isSignificant(index_t) const;
-        
+
         /// Returns the number of significant (= not empty) columns
         index_t getSignificantColCount() const;
 };

@@ -26,7 +26,7 @@ class SimpleProperty
         /// the search stack
         SearchStack stack;
 
-    protected: 
+    protected:
         /// value of property in current state
         bool value;
 

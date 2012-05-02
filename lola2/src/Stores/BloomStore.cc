@@ -55,7 +55,7 @@ bool BloomStore::searchAndInsert()
         const size_t m = BLOOM_FILTER_SIZE;
         const size_t k = hash_functions;
         const size_t n = filter->count();
-        const double p = pow(1.0 - pow((1.0 - 1.0/m), k*n ) , k);
+        const double p = pow(1.0 - pow((1.0 - 1.0 / m), k * n) , k);
         rep->status("fill: %ld, error = %.4f", n, p) ;
     }
 

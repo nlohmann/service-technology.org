@@ -413,7 +413,7 @@ void ReadNetFile(FILE* f)
     // initialize Conflicting arrays
     // free or rename temporary data structures
     index_t* conflicting = delta_pre;
-    index_t* new_conflicting = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    index_t* new_conflicting = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
     free(delta_post);
     free(mult_pre);
     free(mult_post);
@@ -428,50 +428,50 @@ void ReadNetFile(FILE* f)
             // p is a pre-place
             const index_t p = Net::Arc[TR][PRE][t][i];
 
-	    // assertion: array of known conflictings is sorted
-	    // assertion: all arc lists are sorted
+            // assertion: array of known conflictings is sorted
+            // assertion: all arc lists are sorted
 
-	    index_t j = 0; // index through list of post transitions of p
-	    index_t k = 0; // index through list of known transitions
-	    const index_t old_cardconflicting = card_conflicting;
-	     card_conflicting = 0;
+            index_t j = 0; // index through list of post transitions of p
+            index_t k = 0; // index through list of known transitions
+            const index_t old_cardconflicting = card_conflicting;
+            card_conflicting = 0;
 
-            while(j < Net::CardArcs[PL][POST][p] && k < old_cardconflicting)
+            while (j < Net::CardArcs[PL][POST][p] && k < old_cardconflicting)
             {
-		
+
                 // tt is a conflicting transition
                 const index_t tt = Net::Arc[PL][POST][p][j];
 
-	  	if(tt < conflicting[k])
-		{
-			++j;
-			if (t == tt)
-			{
-			    continue;    // no conflict between t and itself
-			}
-                        new_conflicting[card_conflicting++] = tt;
-			continue;
-		}
-		if(tt > conflicting[k])
-		{
-			new_conflicting[card_conflicting++] = conflicting[k];
-			++k;	
-			continue;
-		}
-		assert(tt == conflicting[k]);
-		new_conflicting[card_conflicting++] = conflicting[k];
-		++j;
-		++k;
-	
+                if (tt < conflicting[k])
+                {
+                    ++j;
+                    if (t == tt)
+                    {
+                        continue;    // no conflict between t and itself
+                    }
+                    new_conflicting[card_conflicting++] = tt;
+                    continue;
+                }
+                if (tt > conflicting[k])
+                {
+                    new_conflicting[card_conflicting++] = conflicting[k];
+                    ++k;
+                    continue;
+                }
+                assert(tt == conflicting[k]);
+                new_conflicting[card_conflicting++] = conflicting[k];
+                ++j;
+                ++k;
+
             }
-	   // there may be transitions left greater than all known conflicting
-	   for(; j<Net::CardArcs[PL][POST][p];j++)
-	   {
-		new_conflicting[card_conflicting++]= Net::Arc[PL][POST][p][j];
-	   }
-	   index_t * tmp = conflicting;
-	   conflicting = new_conflicting;
-	   new_conflicting = tmp;
+            // there may be transitions left greater than all known conflicting
+            for (; j < Net::CardArcs[PL][POST][p]; j++)
+            {
+                new_conflicting[card_conflicting++] = Net::Arc[PL][POST][p][j];
+            }
+            index_t* tmp = conflicting;
+            conflicting = new_conflicting;
+            new_conflicting = tmp;
         }
 
         Transition::CardConflicting[t] = card_conflicting;
@@ -488,50 +488,50 @@ void ReadNetFile(FILE* f)
             // p is a post-place
             const index_t p = Net::Arc[TR][POST][t][i];
 
-	    // assertion: array of known conflictings is sorted
-	    // assertion: all arc lists are sorted
+            // assertion: array of known conflictings is sorted
+            // assertion: all arc lists are sorted
 
-	    index_t j = 0; // index through list of post transitions of p
-	    index_t k = 0; // index through list of known transitions
-	    const index_t old_cardconflicting = card_conflicting;
-	     card_conflicting = 0;
+            index_t j = 0; // index through list of post transitions of p
+            index_t k = 0; // index through list of known transitions
+            const index_t old_cardconflicting = card_conflicting;
+            card_conflicting = 0;
 
-            while(j < Net::CardArcs[PL][POST][p] && k < old_cardconflicting)
+            while (j < Net::CardArcs[PL][POST][p] && k < old_cardconflicting)
             {
-		
+
                 // tt is a conflicting transition
                 const index_t tt = Net::Arc[PL][POST][p][j];
 
-	  	if(tt < conflicting[k])
-		{
-			++j;
-			if (t == tt)
-			{
-			    continue;    // no conflict between t and itself
-			}
-                        new_conflicting[card_conflicting++] = tt;
-			continue;
-		}
-		if(tt > conflicting[k])
-		{
-			new_conflicting[card_conflicting++] = conflicting[k];
-			++k;	
-			continue;
-		}
-		assert(tt == conflicting[k]);
-		new_conflicting[card_conflicting++] = conflicting[k];
-		++j;
-		++k;
-	
+                if (tt < conflicting[k])
+                {
+                    ++j;
+                    if (t == tt)
+                    {
+                        continue;    // no conflict between t and itself
+                    }
+                    new_conflicting[card_conflicting++] = tt;
+                    continue;
+                }
+                if (tt > conflicting[k])
+                {
+                    new_conflicting[card_conflicting++] = conflicting[k];
+                    ++k;
+                    continue;
+                }
+                assert(tt == conflicting[k]);
+                new_conflicting[card_conflicting++] = conflicting[k];
+                ++j;
+                ++k;
+
             }
-	   // there may be transitions left greater than all known conflicting
-	   for(; j<Net::CardArcs[PL][POST][p];j++)
-	   {
-		new_conflicting[card_conflicting++]= Net::Arc[PL][POST][p][j];
-	   }
-	   index_t * tmp = conflicting;
-	   conflicting = new_conflicting;
-	   new_conflicting = tmp;
+            // there may be transitions left greater than all known conflicting
+            for (; j < Net::CardArcs[PL][POST][p]; j++)
+            {
+                new_conflicting[card_conflicting++] = Net::Arc[PL][POST][p][j];
+            }
+            index_t* tmp = conflicting;
+            conflicting = new_conflicting;
+            new_conflicting = tmp;
 
         }
 

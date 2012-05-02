@@ -206,7 +206,7 @@ int main(int argc, char** argv)
     {
         SimpleProperty* p = NULL;
         Store* s = NULL;
-        Firelist * fl = NULL;
+        Firelist* fl = NULL;
 
         // choose a store
         switch (args_info.store_arg)

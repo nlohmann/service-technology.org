@@ -320,7 +320,7 @@ int main(int argc, char** argv)
             }
         }
 
-        rep->message("%d markings, %d edges", s->markings, s->calls - 1);
+        rep->message("%lu markings, %lu edges", s->markings, s->calls - 1);
 
         delete s;
         delete p;

@@ -52,6 +52,11 @@ option "writeCompressed" -
   argoptional
   hidden
 
+option "formula" f
+  "Random firing of transitions"
+  string
+  optional
+
 
 section "Reporter"
 

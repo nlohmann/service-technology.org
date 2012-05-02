@@ -21,6 +21,9 @@
 #include "Core/Handlers.h"
 
 #include "Parser/ParserPTNet.h"
+#include "Parser/ast-system-k.h"
+#include "Parser/ast-system-rk.h"
+#include "Parser/ast-system-unpk.h"
 
 #include "Net/Net.h"
 #include "Net/Marking.h"
@@ -44,6 +47,14 @@
 #include "Stores/BitStore.h"
 
 
+/// printer-function for output on stdout
+void myprinter(const char *s, kc::uview v)
+{
+  printf("%s", s);
+}
+
+
+
 extern ParserPTNet* ParserPTNetLoLA();
 
 /// the command line parameters
@@ -51,6 +62,9 @@ gengetopt_args_info args_info;
 
 // input files
 extern FILE* ptnetlola_in;
+extern FILE* ptformula_in;
+
+extern kc::tFormula TheFormula;
 
 /// the reporter
 Reporter* rep = NULL;
@@ -70,6 +84,8 @@ Input* netFile;
 // the parsers
 extern int ptnetlola_parse();
 extern int ptnetlola_lex_destroy();
+extern int ptformula_parse();
+extern int ptformula_lex_destroy();
 
 
 /// evaluate the command line parameters
@@ -175,6 +191,24 @@ int main(int argc, char** argv)
         rep->status("%d symbol table entries, %d collisions", symbolTables->PlaceTable->card + symbolTables->TransitionTable->card, SymbolTable::collisions);
 
         delete symbolTables;
+    }
+
+    if (args_info.formula_given)
+    {
+        ptformula_in = fopen(args_info.formula_arg, "r");
+        ptformula_parse();
+        rep->status("parsed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
+
+        TheFormula->print();
+
+//        TheFormula = TheFormula->rewrite(kc::neg);
+//        TheFormula = TheFormula->rewrite(kc::lists);
+
+        TheFormula->print();
+        TheFormula->unparse(myprinter, kc::out);
+
+        // tidy parser
+        ptformula_lex_destroy();
     }
 
 

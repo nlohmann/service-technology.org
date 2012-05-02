@@ -32,6 +32,8 @@ AC_ST_BASIC
 AC_ST_AUTOTEST
 AC_ST_VERBOSE
 
+# look for Kimwitu++
+AM_MISSING_PROG(KC, kc++)
 
 # check for POSIX threads
 AX_PTHREAD()

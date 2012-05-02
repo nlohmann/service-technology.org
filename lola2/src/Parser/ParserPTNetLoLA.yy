@@ -53,16 +53,8 @@ void yyerrors(char* token, const char* format, ...);
 %type <attributeString> NUMBER
 %type <attributeString> IDENTIFIER
 
-%token _FINAL_ _AUTOMATON_ _SAFE_ _NEXT_ _ANALYSE_ _PLACE_ _MARKING_
-_TRANSITION_ _CONSUME_ _PRODUCE_ _comma_ _colon_ _semicolon_ IDENTIFIER NUMBER
-_equals_ _AND_ _OR_ _EXPATH_ _ALLPATH_ _ALWAYS_ _EVENTUALLY_ _UNTIL_ _NOT_
-_greaterorequal_ _greaterthan_ _lessorequal_ _lessthan_ _notequal_ _FORMULA_
-_leftparenthesis_ _rightparenthesis_ _STATE_ _PATH_ _GENERATOR_ _RECORD_ _END_
-_SORT_ _FUNCTION_ _DO_ _ARRAY_ _ENUMERATE_ _CONSTANT_ _BOOLEAN_ _OF_ _BEGIN_
-_WHILE_ _IF_ _THEN_ _ELSE_ _SWITCH_ _CASE_ _REPEAT_ _FOR_ _TO_ _ALL_ _EXIT_
-_RETURN_ _TRUE_ _FALSE_ _MOD_ _VAR_ _GUARD_ _iff_ _implies_ _leftbracket_
-_rightbracket_ _dot_ _plus_ _minus_ _times_ _divide_ _slash_ _EXISTS_ _STRONG_
-_WEAK_ _FAIR_
+%token IDENTIFIER NUMBER _CONSUME_ _FAIR_ _PLACE_ _MARKING_ _PRODUCE_ _SAFE_ _STRONG_ _TRANSITION_ _WEAK_ _colon_ _comma_ _semicolon_
+
 
 %{
 extern YYSTYPE ptnetlola_lval;

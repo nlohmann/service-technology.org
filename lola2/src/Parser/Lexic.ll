@@ -49,84 +49,19 @@ int ptnetlola_colno = 1;
 <IN_COMMENT>"*"                          { setcol(); /* comments */ }
 <IN_COMMENT>[\n\r]                       { setcol(); /* comments */ }
 
-ALL                                      { setcol(); return _ALL_; }
-ANALYSE                                  { setcol(); return _ANALYSE_; }
-ARRAY                                    { setcol(); return _ARRAY_; }
-AUTOMATON                                { setcol(); return _AUTOMATON_; }
-BEGIN                                    { setcol(); return _BEGIN_; }
-BOOLEAN                                  { setcol(); return _BOOLEAN_; }
-CASE                                     { setcol(); return _CASE_; }
-CONSTANT                                 { setcol(); return _CONSTANT_; }
 CONSUME                                  { setcol(); return _CONSUME_; }
-DO                                       { setcol(); return _DO_; }
-ELSE                                     { setcol(); return _ELSE_; }
-END                                      { setcol(); return _END_; }
-ENUMERATE                                { setcol(); return _ENUMERATE_; }
-EXISTS                                   { setcol(); return _EXISTS_; }
-EXIT                                     { setcol(); return _EXIT_; }
 FAIR                                     { setcol(); return _FAIR_; }
-FALSE                                    { setcol(); return _FALSE_; }
-FINAL                                    { setcol(); return _FINAL_; }
-FOR                                      { setcol(); return _FOR_; }
-FORMULA                                  { setcol(); return _FORMULA_; }
-FUNCTION                                 { setcol(); return _FUNCTION_; }
-GENERATOR                                { setcol(); return _GENERATOR_; }
-GUARD                                    { setcol(); return _GUARD_; }
-IF                                       { setcol(); return _IF_; }
 MARKING                                  { setcol(); return _MARKING_; }
-MOD                                      { setcol(); return _MOD_; }
-NEXTSTEP                                 { setcol(); return _NEXT_; }
-OF                                       { setcol(); return _OF_; }
-PATH                                     { setcol(); return _PATH_; }
 PLACE                                    { setcol(); return _PLACE_; }
 PRODUCE                                  { setcol(); return _PRODUCE_; }
-RECORD                                   { setcol(); return _RECORD_; }
-REPEAT                                   { setcol(); return _REPEAT_; }
-RETURN                                   { setcol(); return _RETURN_; }
 SAFE                                     { setcol(); return _SAFE_; }
-SORT                                     { setcol(); return _SORT_; }
-STATE                                    { setcol(); return _STATE_; }
 STRONG                                   { setcol(); return _STRONG_; }
-SWITCH                                   { setcol(); return _SWITCH_; }
-THEN                                     { setcol(); return _THEN_; }
-TO                                       { setcol(); return _TO_; }
 TRANSITION                               { setcol(); return _TRANSITION_; }
-TRUE                                     { setcol(); return _TRUE_; }
-VAR                                      { setcol(); return _VAR_; }
 WEAK                                     { setcol(); return _WEAK_; }
-WHILE                                    { setcol(); return _WHILE_; }
 
-ALLPATH                                  { setcol(); return _ALLPATH_; }
-ALWAYS                                   { setcol(); return _ALWAYS_; }
-AND                                      { setcol(); return _AND_; }
-EVENTUALLY                               { setcol(); return _EVENTUALLY_; }
-EXPATH                                   { setcol(); return _EXPATH_; }
-NOT                                      { setcol(); return _NOT_; }
-OR                                       { setcol(); return _OR_; }
-UNTIL                                    { setcol(); return _UNTIL_; }
-
-\<\-\>                                   { setcol(); return _iff_; }
-\<\>                                     { setcol(); return _notequal_; }
-\-\>                                     { setcol(); return _implies_; }
-=                                        { setcol(); return _equals_; }
-\[                                       { setcol(); return _leftbracket_; }
-\]                                       { setcol(); return _rightbracket_; }
-\.                                       { setcol(); return _dot_; }
-\+                                       { setcol(); return _plus_; }
-\-                                       { setcol(); return _minus_; }
-\*                                       { setcol(); return _times_; }
-\/                                       { setcol(); return _divide_; }
 \:                                       { setcol(); return _colon_; }
-\;                                       { setcol(); return _semicolon_; }
-\|                                       { setcol(); return _slash_; }
-\(                                       { setcol(); return _leftparenthesis_; }
-\)                                       { setcol(); return _rightparenthesis_; }
 ,                                        { setcol(); return _comma_; }
-[>]                                      { setcol(); return _greaterthan_; }
-[<]                                      { setcol(); return _lessthan_; }
-[#]                                      { setcol(); return _notequal_; }
-[>]=                                     { setcol(); return _greaterorequal_; }
-[<]=                                     { setcol(); return _lessorequal_; }
+\;                                       { setcol(); return _semicolon_; }
 
 [\n\r]                                   { ptnetlola_colno = 1; /* whitespace */ }
 [\t ]                                    { setcol();  /* whitespace */ }

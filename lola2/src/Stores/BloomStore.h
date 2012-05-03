@@ -11,7 +11,7 @@ class BloomStore : public Store
         inline unsigned int hash_fnv() const;
 
         unsigned int* hash_values;
-        size_t hash_functions;
+        const size_t hash_functions;
 
     public:
         explicit BloomStore(size_t = 2);

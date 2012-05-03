@@ -68,17 +68,17 @@ bool BloomStore::searchAndInsert()
     const unsigned int hash_0 = hash_sdbm();
     hash_values[0] = hash_0;
 
-//    if (hash_functions > 1)
-//    {
-        const unsigned int hash_1 = hash_fnv();
-        hash_values[1] = hash_1;
+    //    if (hash_functions > 1)
+    //    {
+    const unsigned int hash_1 = hash_fnv();
+    hash_values[1] = hash_1;
 
-        // the other hash functions can be derived: h_i(x) = h_1(x) + i * h_2(x)
-        for (size_t h = 2; h < hash_functions; ++h)
-        {
-            hash_values[h] = (hash_0 + h * hash_1) % BLOOM_FILTER_SIZE;
-        }
-//    }
+    // the other hash functions can be derived: h_i(x) = h_1(x) + i * h_2(x)
+    for (size_t h = 2; h < hash_functions; ++h)
+    {
+        hash_values[h] = (hash_0 + h * hash_1) % BLOOM_FILTER_SIZE;
+    }
+    //    }
 
 
     /*****************************************

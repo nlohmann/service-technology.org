@@ -464,14 +464,24 @@ void ReadNetFile(FILE* f)
                 ++k;
 
             }
-            // there may be transitions left greater than all known conflicting
-            for (; j < Net::CardArcs[PL][POST][p]; j++)
-            {
-                new_conflicting[card_conflicting++] = Net::Arc[PL][POST][p][j];
-            }
-            index_t* tmp = conflicting;
-            conflicting = new_conflicting;
-            new_conflicting = tmp;
+	   // there may be transitions left greater than all known conflicting
+	   for(; j<Net::CardArcs[PL][POST][p];j++)
+	   {
+		const index_t tt = Net::Arc[PL][POST][p][j];
+		if(tt == t)
+		{
+			continue;
+		}
+		new_conflicting[card_conflicting++]= tt;
+	   }
+	   // there may be conflicting transitions left greater than last post-transition of p
+	   for(; k<old_cardconflicting;k++)
+	   {
+		new_conflicting[card_conflicting++]= conflicting[k];
+	   }
+	   index_t * tmp = conflicting;
+	   conflicting = new_conflicting;
+	   new_conflicting = tmp;
         }
 
         Transition::CardConflicting[t] = card_conflicting;
@@ -524,14 +534,24 @@ void ReadNetFile(FILE* f)
                 ++k;
 
             }
-            // there may be transitions left greater than all known conflicting
-            for (; j < Net::CardArcs[PL][POST][p]; j++)
-            {
-                new_conflicting[card_conflicting++] = Net::Arc[PL][POST][p][j];
-            }
-            index_t* tmp = conflicting;
-            conflicting = new_conflicting;
-            new_conflicting = tmp;
+	   // there may be transitions left greater than all known conflicting
+	   for(; j<Net::CardArcs[PL][POST][p];j++)
+	   {
+		const index_t tt = Net::Arc[PL][POST][p][j];
+		if(tt == t)
+		{
+			continue;
+		}
+		new_conflicting[card_conflicting++]= tt;
+	   }
+	   // there may be conflicting transitions left greater than last post-transition of p
+	   for(; k<old_cardconflicting;k++)
+	   {
+		new_conflicting[card_conflicting++]= conflicting[k];
+	   }
+	   index_t * tmp = conflicting;
+	   conflicting = new_conflicting;
+	   new_conflicting = tmp;
 
         }
 

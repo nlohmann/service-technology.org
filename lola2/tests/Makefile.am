@@ -21,7 +21,7 @@
 # 4. Add the file to the SVN repository.
 TESTFILES = Kanban5.pnml.lola \
             garavel.lola process.lola \
-            phils1000.lola phils10000.lola \
+            phils10.lola phils1000.lola phils10000.lola \
             syntax_min.lola syntax_full.lola syntax_utf8.lola \
             test_significant.lola
 

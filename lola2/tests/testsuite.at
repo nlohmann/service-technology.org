@@ -244,6 +244,46 @@ AT_CLEANUP
 
 
 ############################################################################
+AT_BANNER([Deadlock])
+############################################################################
+
+AT_SETUP([Phils 10])
+AT_CHECK([cp TESTFILES/phils10.lola .])
+AT_CHECK([LOLA phils10.lola --check=deadlock -v --state --path],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: witness state:" stderr])
+AT_CHECK([GREP -q "lola: hl.1 : 1" stderr])
+AT_CHECK([GREP -q "lola: witness path:" stderr])
+AT_CHECK([GREP -q "lola: tl.\[[y=9\]]" stderr])
+AT_CHECK([GREP -q "lola: 29 markings, 37 edges" stderr])
+AT_KEYWORDS(deadlock)
+AT_CLEANUP
+
+AT_SETUP([Kanban 5])
+AT_CHECK([cp TESTFILES/Kanban5.pnml.lola .])
+AT_CHECK([LOLA Kanban5.pnml.lola --check=deadlock -v --state --path],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: witness state:" stderr], 1)
+AT_CHECK([GREP -q "lola: witness path:" stderr], 1)
+AT_CHECK([GREP -q "lola: 2573 markings, 4302 edges" stderr])
+AT_KEYWORDS(deadlock)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Full])
+############################################################################
+
+AT_SETUP([Phils 10])
+AT_CHECK([cp TESTFILES/phils10.lola .])
+AT_CHECK([LOLA phils10.lola --check=full -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 59048 markings, 393650 edges" stderr])
+AT_KEYWORDS(deadlock)
+AT_CLEANUP
+
+
+############################################################################
 AT_BANNER([Reporter])
 ############################################################################
 

@@ -301,7 +301,6 @@ int main(int argc, char** argv) {
     alib.setLolaWitnessPath(args_info.witnessPath_flag);
     alib.setLolaVerbose(args_info.verbose_flag);
     alib.setRepresantiveNames(args_info.useRepresantiveNames_flag);
-    alib.setKeepTempFiles(args_info.noClean_flag);
     alib.setOneActiveOnly(args_info.oneActiveOnly_flag);
     alib.setOneTripleOnly(args_info.oneTripleOnly_flag);
     
@@ -390,22 +389,21 @@ int main(int argc, char** argv) {
     
     // Dot output
     if (args_info.dotConfidence_given) {
+        PetriNet* curLibraryNet;
         switch (args_info.dotConfidence_arg) {
             case dotConfidence_arg_low:
-                alib.colorConfidence(anica::COLOR_CONFIDENCE_TASK_LOW);
+                curLibraryNet = alib.colorConfidence(anica::COLOR_CONFIDENCE_TASK_LOW);
                 break;
             case dotConfidence_arg_high:
-                alib.colorConfidence(anica::COLOR_CONFIDENCE_TASK_HIGH);
+                curLibraryNet = alib.colorConfidence(anica::COLOR_CONFIDENCE_TASK_HIGH);
                 break;
             case dotConfidence_arg_down:
-                alib.colorConfidence(anica::COLOR_CONFIDENCE_TASK_DOWN);
+                curLibraryNet = alib.colorConfidence(anica::COLOR_CONFIDENCE_TASK_DOWN);
                 break;
             case dotConfidence_arg_all:
-                alib.colorConfidence(anica::COLOR_CONFIDENCE_TASK_ALL);
+                curLibraryNet = alib.colorConfidence(anica::COLOR_CONFIDENCE_TASK_ALL);
                 break;
         }
-        
-        PetriNet* curLibraryNet = alib.getCurrentNet();
         createDotFile(string(fileName + ".confidence"), *curLibraryNet, fileName);
         if (args_info.finalize_flag) {
             delete curLibraryNet;
@@ -413,19 +411,18 @@ int main(int argc, char** argv) {
     }
     
     if (args_info.dotPotential_given) {
+        PetriNet* curLibraryNet;
         switch (args_info.dotPotential_arg) {
             case dotPotential_arg_conflict:
-                alib.colorPotentialPlaces(anica::COLOR_PLACE_TASK_CONFLICT);
+                curLibraryNet = alib.colorPotentialPlaces(anica::COLOR_PLACE_TASK_CONFLICT);
                 break;
             case dotPotential_arg_causal:
-                alib.colorPotentialPlaces(anica::COLOR_PLACE_TASK_CAUSAL);
+                curLibraryNet = alib.colorPotentialPlaces(anica::COLOR_PLACE_TASK_CAUSAL);
                 break;
             case dotPotential_arg_both:
-                alib.colorPotentialPlaces(anica::COLOR_PLACE_TASK_ALL);
+                curLibraryNet = alib.colorPotentialPlaces(anica::COLOR_PLACE_TASK_ALL);
                 break;
         }
-        
-        PetriNet* curLibraryNet = alib.getCurrentNet();
 	    createDotFile(string(fileName + ".potential"), *curLibraryNet, fileName);
 	    if (args_info.finalize_flag) {
             delete curLibraryNet;
@@ -433,20 +430,19 @@ int main(int argc, char** argv) {
     }
     
     if (args_info.dotActive_given) {
+        PetriNet* curLibraryNet;
         switch (args_info.dotPotential_arg) {
             case dotPotential_arg_conflict:
-                alib.colorActivePlaces(anica::COLOR_PLACE_TASK_CONFLICT);
+                curLibraryNet = alib.colorActivePlaces(anica::COLOR_PLACE_TASK_CONFLICT);
                 break;
             case dotPotential_arg_causal:
-                alib.colorActivePlaces(anica::COLOR_PLACE_TASK_CAUSAL);
+                curLibraryNet = alib.colorActivePlaces(anica::COLOR_PLACE_TASK_CAUSAL);
                 break;
             case dotPotential_arg_both:
-                alib.colorActivePlaces(anica::COLOR_PLACE_TASK_ALL);
+                curLibraryNet = alib.colorActivePlaces(anica::COLOR_PLACE_TASK_ALL);
                 break;
         }
-
-        PetriNet* curLibraryNet = alib.getCurrentNet();
-	    createDotFile(string(fileName + ".active"), *curLibraryNet, fileName);
+        createDotFile(string(fileName + ".active"), *curLibraryNet, fileName);
 	    if (args_info.finalize_flag) {
             delete curLibraryNet;
         }

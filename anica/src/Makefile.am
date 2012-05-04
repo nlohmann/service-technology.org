@@ -5,13 +5,14 @@ bin_PROGRAMS = anica reasoner GUI GUIsendfile
 # <<-- CHANGE START (the program's sources) -->>
 anica_SOURCES = main.cc \
                 verbose.cc verbose.h \
+                exceptions.cc exceptions.h \
                 cmdline.c cmdline.h \
                 Output.cc Output.h \
 				Results.cc Results.h \
                 AnicaLib.cc AnicaLib.h \
 				anica-util.h
 
-reasoner_SOURCES = reasoner.cc Socket.cc Socket.h Reporter.cc Reporter.h AnicaLib.cc AnicaLib.h SimpleString.h SimpleString.cc
+reasoner_SOURCES = reasoner.cc Socket.cc Socket.h Reporter.cc Reporter.h AnicaLib.cc AnicaLib.h SimpleString.h SimpleString.cc exceptions.cc exceptions.h
 
 GUI_SOURCES = GUI.cc \
                  Reporter.cc Reporter.h \

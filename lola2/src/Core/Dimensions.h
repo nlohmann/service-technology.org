@@ -62,7 +62,7 @@ typedef uint16_t mult_t;
 /// sizeof(used type) -1, since max(type) is needed for representing
 /// unboundedness in coverability graphs
 typedef uint32_t capacity_t;
-#define MAX_CAPACITY (unsigned)(((1 << 31)-1) + (1 << 31))
+#define MAX_CAPACITY ((uint32_t)-1)
 
 /// Type for hash values (32 bit plus enough space to calculate)
 typedef int64_t hash_t;

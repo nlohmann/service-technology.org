@@ -4,7 +4,7 @@
 
 * Checkout your tool into the directory *<tool>*
 
-* Create *<tool>/<tool>.json* with at least the following objects:
+* Create *<tool>/doc/<tool>.json* with at least the following objects:
   * *toolname* -- the actual name of the tool
   * *svnname* -- the name of the tool in the SVN; required iff it differs from *toolname*
   * *authors* -- a list of authors, optionally with their specific accomplishments
@@ -14,7 +14,11 @@
   * *license* -- the license under which the tool is published
 
 * Checkout *svn.gna.org/service-tech/trunk/meta/geninfo*
-* Create *<tool>/generic.json* by calling *geninfo/update_json.sh*
+* Add *geninfo* to the PATH
+* Create *<tool>/doc/generic.json* 
+  * *cd <tool> && autoreconf -i && ./configure && cd doc*
+  * *update_json.sh <tool>.json*
+  * *cd ../../*
 
 * Optional: Create a picture *overview.png* visualizing the tool's purpose
 
@@ -24,8 +28,8 @@
 
 ## Create tool pages
 
-* Aggregate *<tool>/<tool>.json* and *<tool>/generic.json* by invoking *cat <tool>/<tool.json> <tool>/generic.json <tool>/complete.json*
-* Invoke *genwebsite/createToolPages.sh <tool>/complete.json genwebsite/template/tool website/<tool>* 
+* *cd genwebsite*
+* Invoke *./createToolPages.sh <tool> ../<tool>/doc/ template/tool/ ../website/<tool>/* 
 
 ## Change static content
 

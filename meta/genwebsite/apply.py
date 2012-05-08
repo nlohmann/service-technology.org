@@ -126,14 +126,16 @@ def listThis(someString):
 
 # INITIALIZATION
 
-if (len(sys.argv) < 5):
-    sys.stderr.write("Usage: " + sys.argv[0] + " jsonfile peoplefile reqfile template target" + "\n")
+if (len(sys.argv) < 6):
+    sys.stderr.write("Usage: " + sys.argv[0] + " jsonfile genericfile peoplefile reqfile template target" + "\n")
     sys.exit(1)
 
 
-j = json.loads(open(sys.argv[1], 'r').read())
-p = json.loads(open(sys.argv[2], 'r').read())
-r = json.loads(open(sys.argv[3], 'r').read())
+j1 = json.loads(open(sys.argv[1], 'r').read())
+j2 = json.loads(open(sys.argv[2], 'r').read())
+j = dict(list(j1.items()) + list(j2.items()))
+p = json.loads(open(sys.argv[3], 'r').read())
+r = json.loads(open(sys.argv[4], 'r').read())
 replDict = dict();
 
 # BUILDING THE REPLACEMENT DICTIONARY
@@ -194,7 +196,7 @@ setContributors()
 
 # READ AND CLOSE TEMPLATE FILE
 
-tfile = open(sys.argv[4], 'r')
+tfile = open(sys.argv[5], 'r')
 t = tfile.read()
 tfile.close()
 

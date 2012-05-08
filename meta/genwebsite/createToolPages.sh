@@ -1,8 +1,9 @@
 #!/bin/sh
 
-JSON=$1
-TEMPLATE=$2
-TARGET=$3
+TOOL=$1
+JSONDIR=$2
+TEMPLATE=$3
+TARGET=$4
 
 FILES="download getInvolved help index science support"
 ADDITIONALS="style.css"
@@ -19,14 +20,14 @@ then
     mkdir ${TARGET}/g
 fi
 
-if [ ! -d ${TARGET}/g/overview.png ]
+if [ ! -f ${TARGET}/g/overview.png ]
 then
     cp ${TEMPLATE}/g/overview.png ${TARGET}/g/overview.png
 fi
 
 for file in $FILES 
 do
-    ./apply.py ${JSON} people.json requirements.json ${TEMPLATE}/${file}.html ${TARGET}/${file}.html 
+    apply.py ${JSONDIR}/${TOOL}.json ${JSONDIR}/generic.json people.json requirements.json ${TEMPLATE}/${file}.html ${TARGET}/${file}.html 
 done
 
 for file in $ADDITIONALS 

@@ -22,41 +22,5 @@
     "Thanks to Mike Hordecki for a post on Stack Overflow with a portable preprocessor macro to iterate C++ containers (see 'src/util.h')."
   ],
   "bugtracker": "https://gna.org/bugs/?group=service-tech",
-  "tasktracker": "https://gna.org/task/?group=service-tech",
-  "officialVersion": "3.3",
-  "lastVersion": "3.4-unreleased",
-  "commits": [
-    {
-      "user": "niels",
-      "commits": 305
-    },
-    {
-      "user": "weinberg",
-      "commits": 64
-    },
-    {
-      "user": "gierds",
-      "commits": 8
-    },
-    {
-      "user": "cas",
-      "commits": 8
-    },
-    {
-      "user": "kathrin",
-      "commits": 7
-    },
-    {
-      "user": "rimueller",
-      "commits": 4
-    },
-    {
-      "user": "stephan",
-      "commits": 1
-    },
-    {
-      "user": "al020",
-      "commits": 1
-    }
-  ]
+  "tasktracker": "https://gna.org/task/?group=service-tech"
 }

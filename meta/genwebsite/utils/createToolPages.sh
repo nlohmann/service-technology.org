@@ -4,6 +4,8 @@ TOOL=$1
 JSONDIR=$2
 TEMPLATE=$3
 TARGET=$4
+UTILDIR=$5
+DATADIR=$6
 
 FILES="download getInvolved help index science support"
 ADDITIONALS="style.css"
@@ -27,7 +29,7 @@ fi
 
 for file in $FILES 
 do
-    ./apply.py ${JSONDIR}/${TOOL}.json ${JSONDIR}/generic.json people.json requirements.json ${TEMPLATE}/${file}.html ${TARGET}/${file}.html 
+    ${UTILDIR}/apply.py ${JSONDIR}/${TOOL}.json ${JSONDIR}/generic.json ${DATADIR}/people.json ${DATADIR}/requirements.json ${TEMPLATE}/${file}.html ${TARGET}/${file}.html 
 done
 
 for file in $ADDITIONALS 

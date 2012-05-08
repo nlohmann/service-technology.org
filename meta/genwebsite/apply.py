@@ -202,7 +202,7 @@ tfile.close()
 
 # REPLACE ALL OCCURRENCES IN THE TARGET FILE 
 
-f = open(sys.argv[5], 'w')
+f = open(sys.argv[6], 'w')
 
 for someKey in replDict: 
     t = t.replace('@' + someKey.upper() + '@', replDict[someKey])    

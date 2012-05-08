@@ -27,7 +27,7 @@ fi
 
 for file in $FILES 
 do
-    apply.py ${JSONDIR}/${TOOL}.json ${JSONDIR}/generic.json people.json requirements.json ${TEMPLATE}/${file}.html ${TARGET}/${file}.html 
+    ./apply.py ${JSONDIR}/${TOOL}.json ${JSONDIR}/generic.json people.json requirements.json ${TEMPLATE}/${file}.html ${TARGET}/${file}.html 
 done
 
 for file in $ADDITIONALS 

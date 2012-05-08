@@ -1,0 +1,224 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy for Windows (vers 14 February 2006), see www.w3.org">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <link href='' rel='stylesheet' type='text/css'>
+    <link href="../main.css" rel="stylesheet" type="text/css">
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <title>
+      service-technology.org/@SHORTNAME@ - download
+    </title>
+  </head>
+  <body>
+    <div id="mainframe">
+      <div id="topspacer"></div>
+      <div id="shadowbox">
+        <div id="navigation">
+          <div id="titlenav">
+            <div id="pagetitle">
+              <h1>
+                <a href="../index.html">service-technology.org</a>/<a href="index.html">@SHORTNAME@</a>
+              </h1>
+            </div>
+            <div id="nav">
+              <ul>
+                <li>
+                  <a href="../people/index.html" id="people" class="ncurrent" name="people">People</a>
+                </li>
+                <li style="list-style: none">
+                  <div class="seperator"></div>
+                </li>
+                <li>
+                  <a href="../pub/index.html" id="pub" class="ncurrent" name="pub">Publications</a>
+                </li>
+                <li style="list-style: none">
+                  <div class="seperator"></div>
+                </li>
+                <li>
+                  <a href="../tools/index.html" id="tools" class="current" name="tools">Tools</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div id="tabs">
+            <ul>
+              <li>
+                <a href="index.html" class="ncurrent">About</a>
+              </li>
+              <li>
+                <a href="help.html" class="ncurrent">Help</a>
+              </li>
+              <li style="display: @SCIENCEGIVEN@;">
+                <a href="science.html" class="ncurrent">Science</a>
+              </li>
+              <li>
+                <a href="download.html" class="current">Download</a>
+              </li>
+              <li>
+                <a href="getInvolved.html" class="ncurrent">Get involved</a>
+              </li>
+              <li>
+                <a href="support.html" class="ncurrent">Support</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div id="content">
+          <h2>
+            Download @TOOLNAME@
+          </h2>
+
+          <table width="90%" id="stable-versions">
+            <tr>
+              <th class="theader" width="*">
+                Version
+              </th>
+              <th class="linux-header">
+                Source Code
+              </th>
+              <th class="apple-header">
+                MacOS X
+              </th>
+              <th class="windows-header">
+                Windows
+              </th>
+            </tr>
+
+            <tr>
+              <td class="text">
+                @TOOLNAME@ @OFFICIALVERSION@
+              </td>
+              <td>
+                <a href="test" title="Source Code">Download</a>
+              </td>
+              <td>
+                <a href="test" title="MacOS X Binary">Download</a>
+              </td>
+              <td>
+                <a href="test" title="Windows Binary">Download</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="text">
+                Nightly Build
+              </td>
+              <td>
+                <a href="test" title="Source Code">Download</a>
+              </td>
+              <td>
+                <a href="test" title="MacOS X Binary">Download</a>
+              </td>
+              <td>
+                <a href="test" title="Windows Binary">Download</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="text">
+                Older versions
+              </td>
+              <td>
+                <a href="test" title="Source Code">Download</a>
+              </td>
+              <td>
+                <a href="test" title="MacOS X Binary">Download</a>
+              </td>
+              <td>
+                <a href="test" title="Windows Binary">Download</a>
+              </td>
+            </tr>
+
+          </table>
+          <h3>
+            Version history
+          </h3>
+          <div id="version_history">
+            @TOOLNAME@ has been developed for quite some time now. See the <a href="@CHANGELOGLINK@">ChangeLog</a> for details.
+          </div>
+          <h3>
+            License
+          </h3>
+          <p>
+            @TOOLNAME@ is open source software, licensed under the @LICENSE@.
+          </p>
+          <h2>
+            Install @TOOLNAME@
+          </h2>
+          <h3>
+            Requirements
+          </h3>
+          <p>
+            Installing and running @TOOLNAME@ requires a bunch of other tools:
+          </p>
+          <div id="required-tools">
+            <div style="display: @RUNTIMEGIVEN@;">
+            Running requires: <ul>@RUNTIME@</ul>
+            </div><div style="display: @REQ_COMPILEGIVEN@;">
+            Compiling requires: <ul>@REQ_COMPILE@</ul>
+            </div><div style="display: @REQ_TESTSGIVEN@;">
+            Testing requires: <ul>@REQ_TESTS@</ul>
+            </div><div style="display: @REQ_EDITGIVEN@;">
+            <a href="getInvolved.html">Contributing</a> requires: <ul>@REQ_EDIT@</ul>
+            </div>
+          </div>
+
+
+          <h3>
+            Quick install
+          </h3>
+          <p>
+            If you have obtained a binary, copy the file into a folder of your choice. You may want to add this folder to the system path. If you have obtained the source code, extract it into a folder of your choice, and follow the steps below.
+          </p>
+          <div id="quick_install">
+            <ol>
+              <li>Configure<br>
+                <code>./configure</code>
+              </li>
+              <li>Compile<br>
+                <code>make</code>
+              </li>
+              <li>Test (optional, but recommended)<br>
+                <code>make check</code>
+              </li>
+              <li>Install<br>
+                <code>sudo make install</code>
+              </li>
+            </ol>
+          </div>
+          <h2>
+            Maintainer
+          </h2>
+          <p>
+            The current maintainer of @TOOLNAME@ is <a href="@MAINTAINERURL@">@MAINTAINER@</a>.
+          </p>
+          <h2>
+            Authors
+          </h2>
+          <div id="authors">
+          @AUTHORS@
+          </div>
+          <h2>
+            Contributors
+          </h2>
+          <p>
+            Several people have committed time, code, and advice to the development of Wendy.
+          </p>
+          <div id="contributors">
+        <ul>  
+	@CONTRIBUTORS@
+        </ul>
+          </div>
+          <h2 style="display: @THANKSGIVEN@;">
+            Acknowledgements
+          </h2>
+          <div id="acknowledgements" style="display: @THANKSGIVEN@;"> 
+          @TOOLNAME@'s development team thanks: 
+        <ul>	 
+	@THANKS@
+	</ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

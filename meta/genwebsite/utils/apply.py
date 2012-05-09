@@ -109,7 +109,7 @@ def setContributors():
     replDict['contributorimages'] = '' 
     for cont in contribList:
         actname = cont 
-        if cont in p['people']:
+        if cont in p['data']:
             actname = p['data'][cont]['name']
         if cont in p['people']:
             replDict['contributorimages'] = replDict['contributorimages'] + getImageTag('../people/g/' + cont + '.jpg', actname, actname, 'class="portrait" width="75"')

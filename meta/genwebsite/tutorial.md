@@ -1,5 +1,13 @@
 # How to include your tool <tool> in service-technology.org
 
+## Prerequisites
+
+* *Python 3*
+* The *misaka* module (http://misaka.61924.nl/)
+* *SVN*
+* *GNA service-tech* repository *svn+ssh* access
+* A *JavaScript* interpreter (named js) compatible with *jsawk*, e.g. *Mozilla Spidermonkey*
+
 ## Preparation
 
 * Checkout your tool *<tool>* from GNA

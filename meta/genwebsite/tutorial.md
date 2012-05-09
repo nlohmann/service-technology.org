@@ -2,9 +2,9 @@
 
 ## Preparation
 
-* Checkout your tool into the directory *<tool>*
+* Checkout your tool *<tool>* from GNA
 
-* Create *<tool>/doc/<tool>.json* with at least the following objects:
+* In the tool's *doc*-directory, create *<tool>.json* with at least the following objects:
   * *toolname* -- the actual name of the tool
   * *svnname* -- the name of the tool in the SVN; required iff it differs from *toolname*
   * *authors* -- a list of authors, optionally with their specific accomplishments
@@ -13,23 +13,36 @@
   * *purpose* -- a description of the tool's purpose (markdown allowed)
   * *license* -- the license under which the tool is published
 
-* Checkout *svn.gna.org/service-tech/trunk/meta/geninfo*
-* Add *geninfo* to the PATH
-* Create *<tool>/doc/generic.json* 
-  * *cd <tool> && autoreconf -i && ./configure && cd doc*
-  * *update_json.sh <tool>.json*
-  * *cd ../../*
+* Add *doc/<tool>.json* to version control and commit. 
 
 * Optional: Create a picture *overview.png* visualizing the tool's purpose
 
-* Checkout *svn.gna.org/service-tech/website*
-* Checkout *svn.gna.org/service-tech/trunk/meta/genwebsite*
-
-
 ## Create tool pages
 
-* *cd genwebsite*
-* Invoke *./createToolPages.sh <tool> ../<tool>/doc/ template/tool/ ../website/<tool>/* 
+You may choose to either use the automatic script or do the steps manually. Anyway, begin with creating an empty directory *<workspace>* 
+
+### Automatic script
+
+* Change to a *genwebsite* directory
+* Call *./autoGenToolPage.sh <tool> <svnname> <username> <workspace>* where 
+  * *<svnname>* is the name of the svn folder containing *<tool>* on GNA
+  * *<username>* is your GNA username
+
+### Manual steps
+
+* Checkout your tool into *<workspace>/<tool>*
+* Checkout *svn.gna.org/service-tech/trunk/meta/geninfo* into *<workspace>*
+* Add *<workspace>/geninfo* to the PATH
+* Create *<workspace>/<tool>/doc/generic.json* 
+  * *cd <workspace>/<tool> && autoreconf -i && ./configure && cd doc*
+  * *update_json.sh <tool>.json*
+
+* Checkout *svn.gna.org/service-tech/website* into *<workspace>*
+* Checkout *svn.gna.org/service-tech/trunk/meta/genwebsite* into *<workspace>*
+
+* *cd <workspace>/genwebsite*
+* Invoke *./createToolPages.sh <tool> <workspace>/<tool>/doc/ template/tool/ <workspace>/website/<tool>/ ../utils/ ../data/* 
+
 
 ## Change static content
 

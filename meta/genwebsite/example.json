@@ -1,0 +1,13 @@
+{
+"toolname": "lifechanger", 
+"svnname": "lfc123", 
+"authors": [
+    "Niels Lohmann implemented ...",
+    "Daniela Weinberg implemented ...",
+    "Christian Sura implemented ..."
+], 
+"maintainer": "Niels Lohmann", 
+"tagline": "Making life easier", 
+"purpose": "Life is *hard*. Let's make life *easier*...", 
+"license": "AGPL3"
+}

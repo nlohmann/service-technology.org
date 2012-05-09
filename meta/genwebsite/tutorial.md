@@ -4,7 +4,7 @@
 
 * Checkout your tool *<tool>* from GNA
 
-* In the tool's *doc*-directory, create *<tool>.json* with at least the following objects:
+* In the tool's *doc*-directory, create *<tool>.json* with at least the following objects (take *example.json* as template):
   * *toolname* -- the actual name of the tool
   * *svnname* -- the name of the tool in the SVN; required iff it differs from *toolname*
   * *authors* -- a list of authors, optionally with their specific accomplishments

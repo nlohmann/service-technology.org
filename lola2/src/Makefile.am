@@ -44,6 +44,7 @@ lola_SOURCES = \
                 Exploration/Deadlock.cc Exploration/Deadlock.h \
                 Exploration/StatePredicateProperty.cc Exploration/StatePredicateProperty.h \
                 Exploration/FirelistStubbornDeadlock.cc Exploration/FirelistStubbornDeadlock.h \
+                Exploration/FirelistStubbornStatePredicate.cc Exploration/FirelistStubbornStatePredicate.h \
                 \
                 Formula/StatePredicate.h \
                 Formula/AtomicStatePredicate.cc Formula/AtomicStatePredicate.h \

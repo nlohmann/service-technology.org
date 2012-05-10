@@ -10,6 +10,8 @@
 
 #include "Formula/StatePredicate.h"
 
+class AtomicStatePredicate;
+
 /// A conjunction state predicate is a AND formula with multiple children that assigns a Boolean value to Marking::Current
 class ConjunctionStatePredicate : public StatePredicate
 {
@@ -45,4 +47,11 @@ class ConjunctionStatePredicate : public StatePredicate
 
         /// The number of satisfied subformulas
         index_t cardSat;
+
+	/// counts atomic subformulas
+	virtual index_t countAtomic();
+
+	/// collects atomic subformulas; array must be malloced beforehand
+	/// result is number of inserted elements
+	virtual index_t collectAtomic(AtomicStatePredicate **);
 };

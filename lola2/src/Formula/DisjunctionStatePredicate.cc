@@ -115,3 +115,24 @@ void DisjunctionStatePredicate::evaluate()
         sub[i]->position = i;
     }
 }
+
+index_t DisjunctionStatePredicate::countAtomic()
+{
+	index_t result = 0;
+
+	for(index_t i = 0; i < cardSub; i++)
+	{
+		result += sub[i] -> countAtomic();
+	}
+	return result;
+}
+
+index_t DisjunctionStatePredicate::collectAtomic(AtomicStatePredicate** p)
+{
+	index_t offset = 0;
+	for(index_t i = 0; i < cardSub; i++)
+	{
+		offset += collectAtomic(p + offset);
+	}		
+	return offset;
+}

@@ -42,6 +42,7 @@ lola_SOURCES = \
                 Exploration/SearchStack.cc Exploration/SearchStack.h \
                 Exploration/SimpleProperty.cc Exploration/SimpleProperty.h \
                 Exploration/Deadlock.cc Exploration/Deadlock.h \
+                Exploration/StatePredicateProperty.cc Exploration/StatePredicateProperty.h \
                 Exploration/FirelistStubbornDeadlock.cc Exploration/FirelistStubbornDeadlock.h \
                 \
                 Formula/StatePredicate.h \

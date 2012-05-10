@@ -171,3 +171,13 @@ void AtomicStatePredicate::evaluate()
     value = (sum <= threshold);
 }
 
+index_t AtomicStatePredicate::countAtomic()
+{
+	return 1;
+}
+
+index_t AtomicStatePredicate::collectAtomic(AtomicStatePredicate ** c)
+{
+	c[0] = this;
+	return 1;
+}

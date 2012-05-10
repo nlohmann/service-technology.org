@@ -10,6 +10,8 @@
 
 #include "Core/Dimensions.h"
 
+class AtomicStatePredicate;
+
 /// A state predicate is a formula that assigns a Boolean value to Marking::Current
 class StatePredicate
 {
@@ -42,4 +44,11 @@ class StatePredicate
 
         /// the position of this in parent's subformula list
         index_t position;
+
+	/// counts atomic subformulas
+	virtual index_t countAtomic() = 0;
+
+	/// collects atomic subformulas; array must be malloced beforehand
+	/// result is number of inserted elements
+	virtual index_t collectAtomic(AtomicStatePredicate **) = 0;
 };

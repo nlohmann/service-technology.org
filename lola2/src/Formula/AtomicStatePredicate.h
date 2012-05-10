@@ -17,6 +17,7 @@
 class AtomicStatePredicate : public StatePredicate
 {
     public:
+	virtual ~AtomicStatePredicate();
 
         /// creates a state predicate with a formal sum of #arg1 places with positive factor,
         /// #arg2 places with negative factor, and constant #arg3

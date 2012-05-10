@@ -16,6 +16,7 @@ class FirelistStubbornDeadlock : public Firelist
 {
     public:
         FirelistStubbornDeadlock();
+        ~FirelistStubbornDeadlock();
         /// return value contains number of elements in fire list, argument is reference
         /// parameter for actual list
         virtual index_t getFirelist(index_t**);

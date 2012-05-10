@@ -17,6 +17,15 @@ DisjunctionStatePredicate::DisjunctionStatePredicate(index_t n)
     cardSub = n;
 }
 
+DisjunctionStatePredicate::~DisjunctionStatePredicate()
+{
+    for(index_t i = 0; i < cardSub; i++)
+    {
+	delete(sub[i]);
+    }
+    free(sub);
+}
+
 void DisjunctionStatePredicate::addSub(index_t i, StatePredicate* f)
 {
     assert(i < cardSub);

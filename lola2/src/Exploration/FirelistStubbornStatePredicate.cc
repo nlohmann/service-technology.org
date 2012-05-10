@@ -19,6 +19,12 @@ FirelistStubbornStatePredicate::FirelistStubbornStatePredicate(StatePredicate* p
     onStack = (bool*) calloc(Net::Card[TR] , sizeof(bool));
 }
 
+FirelistStubbornStatePredicate::~FirelistStubbornStatePredicate()
+{
+    free(dfsStack);
+    free(onStack); 
+}
+
 index_t FirelistStubbornStatePredicate::getFirelist(index_t** result)
 {
 

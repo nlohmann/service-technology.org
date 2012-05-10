@@ -20,6 +20,7 @@ class StatePredicateProperty: public SimpleProperty
 
     public:
         StatePredicateProperty(StatePredicate*);
+        ~StatePredicateProperty();
     private:
         /// prepare for search
         virtual void initProperty();

@@ -16,6 +16,15 @@ ConjunctionStatePredicate::ConjunctionStatePredicate(index_t n)
     cardSub = n;
 }
 
+ConjunctionStatePredicate::~ConjunctionStatePredicate()
+{
+    for(index_t i = 0; i < cardSub;++i)
+    {
+	delete sub[i];
+    }
+    free(sub);
+}
+
 void ConjunctionStatePredicate::addSub(index_t i, StatePredicate* f)
 {
     assert(i < cardSub);

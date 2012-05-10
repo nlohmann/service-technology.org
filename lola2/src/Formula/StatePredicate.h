@@ -16,6 +16,7 @@ class AtomicStatePredicate;
 class StatePredicate
 {
     public:
+	virtual ~StatePredicate() {};
         /// Stack is an array of distinct transition indices. onstack is an array of booleans, initially all false.
         /// getUpSet fills stack with an up set of the predicate. Added elements are marked true in onstack.
         /// getUpSet can be called only if the predicate is not satisfied. The returned set of transitions has the

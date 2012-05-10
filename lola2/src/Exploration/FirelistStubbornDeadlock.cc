@@ -25,6 +25,18 @@ FirelistStubbornDeadlock::FirelistStubbornDeadlock()
     stamp = 0;
 }
 
+FirelistStubbornDeadlock::~FirelistStubbornDeadlock()
+{
+    free(dfsStack);
+    free(dfs);
+    free(lowlink);
+    free(currentIndex);
+    free(TarjanStack);
+    free(mustBeIncluded);
+    free(visited);
+    free(onTarjanStack);
+}
+
 uint32_t FirelistStubbornDeadlock::newStamp()
 {
     if (++stamp == 0xFFFFFFFF)

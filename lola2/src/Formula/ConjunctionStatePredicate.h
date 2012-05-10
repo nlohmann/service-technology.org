@@ -18,6 +18,7 @@ class ConjunctionStatePredicate : public StatePredicate
     public:
         /// arg is number of subformulas
         explicit ConjunctionStatePredicate(index_t);
+        virtual ~ConjunctionStatePredicate();
 
         /// adds i-th subformula
         void addSub(index_t i, StatePredicate* f);

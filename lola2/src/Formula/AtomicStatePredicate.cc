@@ -26,6 +26,14 @@ AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k)
     threshold = k;
 }
 
+AtomicStatePredicate::~AtomicStatePredicate()
+{
+    free(posPlaces);
+    free(negPlaces);
+    free(posMult);
+    free(negMult);
+}
+
 void AtomicStatePredicate::addPos(index_t i, index_t p, capacity_t m)
 {
     assert(i < cardPos);

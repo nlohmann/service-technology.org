@@ -15,6 +15,7 @@ class FirelistStubbornStatePredicate : public Firelist
 {
     public:
         FirelistStubbornStatePredicate(StatePredicate*);
+	~FirelistStubbornStatePredicate();
 
         /// return value contains number of elements in fire list, argument is reference
         /// parameter for actual list

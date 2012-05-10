@@ -97,6 +97,19 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate* f)
     free(atomic);
 }
 
+StatePredicateProperty::~StatePredicateProperty()
+{
+
+    for(index_t t = 0; t < Net::Card[TR]; ++t)
+    {
+	free(changedPredicate[t]);
+	free(changedSum[t]);
+    }
+    free(cardChanged);
+    free(changedPredicate);
+    free(changedSum);
+}
+
 void StatePredicateProperty::initProperty()
 {
     predicate -> evaluate();

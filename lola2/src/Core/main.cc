@@ -214,7 +214,6 @@ int main(int argc, char** argv)
                 TheFormula = TheFormula->rewrite(kc::sides);
                 TheFormula = TheFormula->rewrite(kc::lists);
 
-                TheFormula->print();
         //        TheFormula->unparse(myprinter, kc::out);
 
                 TheFormula->unparse(myprinter, kc::internal);

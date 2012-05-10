@@ -78,7 +78,7 @@ GreaterEqualAtomicProposition(x,y) -> <leq: LessEqualAtomicProposition(y,x) >;
 // x > y    ->   y+1 <= x
 GreaterAtomicProposition(x,y) -> <leq: LessEqualAtomicProposition(Sum(y, Number(mkinteger(1))), x) >;
 // x < y    ->   x+1 <= y
-LessAtomicProposition(x,y) -> <leq: LessAtomicProposition(Sum(x, Number(mkinteger(1))), y) >;
+LessAtomicProposition(x,y) -> <leq: LessEqualAtomicProposition(Sum(x, Number(mkinteger(1))), y) >;
 
 
 /****************************************************

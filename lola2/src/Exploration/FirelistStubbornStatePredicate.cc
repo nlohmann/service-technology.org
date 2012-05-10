@@ -32,9 +32,8 @@ index_t FirelistStubbornStatePredicate::getFirelist(index_t** result)
         return 0;
     }
 
-    index_t firstunprocessed = 0;
     // loop until all stack elements processed
-    while (firstunprocessed < stackpointer)
+    for (index_t firstunprocessed = 0; firstunprocessed < stackpointer; ++firstunprocessed)
     {
         index_t currenttransition = dfsStack[firstunprocessed];
 	index_t * mustbeincluded;
@@ -62,6 +61,7 @@ index_t FirelistStubbornStatePredicate::getFirelist(index_t** result)
 	}
 	
     }
+    index_t size = cardEnabled;
     * result = new index_t [cardEnabled];
     for(index_t i = 0; i< stackpointer; ++i)
     {
@@ -72,4 +72,5 @@ index_t FirelistStubbornStatePredicate::getFirelist(index_t** result)
 	}
 	onStack[t] = false;
     }
+    return size;
 }

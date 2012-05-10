@@ -301,7 +301,7 @@ rep->status("%u", MAX_CAPACITY);
             
             case check_arg_statepredicate:
                 p = new StatePredicateProperty(sp);
-//                fl = new FirelistStubbornStatePredicate(sp);
+                fl = new FirelistStubbornStatePredicate(sp);
                 break;
         }
 

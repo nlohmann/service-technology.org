@@ -24,6 +24,12 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate * f)
 	AtomicStatePredicate ** atomic = (AtomicStatePredicate **) malloc(cardAtomic * SIZEOF_VOIDP);	
 	f -> collectAtomic(atomic);
 
+	// initialize up sets
+	for(index_t i = 0; i < cardAtomic; i++)
+	{
+		atomic[i]->setUpSet();
+	}
+
 	cardChanged = (index_t *) calloc(Net::Card[TR],SIZEOF_INDEX_T);
 	changedPredicate = (AtomicStatePredicate ***) malloc(SIZEOF_VOIDP * Net::Card[TR]);
 	changedSum = (index_t **) malloc(SIZEOF_VOIDP * Net::Card[TR]);

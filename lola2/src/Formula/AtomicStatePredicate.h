@@ -46,7 +46,7 @@ class AtomicStatePredicate : public StatePredicate
         /// examined. Evaluation is done w.r.t. Marking::Current
         virtual void evaluate();
 
-
+	void setUpSet();
 
         /// lists place p_i indices that occur with positive multiplicity k_i
         index_t* posPlaces;

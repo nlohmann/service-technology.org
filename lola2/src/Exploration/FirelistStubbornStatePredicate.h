@@ -14,14 +14,14 @@
 class FirelistStubbornStatePredicate : public Firelist
 {
     public:
-	FirelistStubbornStatePredicate(StatePredicate *);
+        FirelistStubbornStatePredicate(StatePredicate*);
 
         /// return value contains number of elements in fire list, argument is reference
         /// parameter for actual list
         virtual index_t getFirelist(index_t**);
 
     private:
-	StatePredicate * predicate;
-	index_t * dfsStack;
-	bool * onStack;
+        StatePredicate* predicate;
+        index_t* dfsStack;
+        bool* onStack;
 };

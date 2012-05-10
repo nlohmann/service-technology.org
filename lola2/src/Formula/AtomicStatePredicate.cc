@@ -63,19 +63,19 @@ void AtomicStatePredicate::update(int delta)
     if (sum <= threshold && !value)
     {
         value = true;
-        if(parent) 
-	{
-		parent -> updateFT(position);
-	}
+        if (parent)
+        {
+            parent -> updateFT(position);
+        }
         return;
     }
     if (sum > threshold && value)
     {
         value = false;
-	if(parent)
-	{
-		parent -> updateTF(position);
-	}
+        if (parent)
+        {
+            parent -> updateTF(position);
+        }
         return;
     }
 }
@@ -96,13 +96,13 @@ void AtomicStatePredicate::evaluate()
 
 index_t AtomicStatePredicate::countAtomic()
 {
-	return 1;
+    return 1;
 }
 
-index_t AtomicStatePredicate::collectAtomic(AtomicStatePredicate ** c)
+index_t AtomicStatePredicate::collectAtomic(AtomicStatePredicate** c)
 {
-	c[0] = this;
-	return 1;
+    c[0] = this;
+    return 1;
 }
 
 void AtomicStatePredicate::setUpSet()
@@ -148,7 +148,7 @@ void AtomicStatePredicate::setUpSet()
         index_t* tmp = up1;
         up1 = up2;
         up2 = tmp;
-	cardUp = c;
+        cardUp = c;
     }
     for (index_t i = 0; i < cardNeg; i++)
     {

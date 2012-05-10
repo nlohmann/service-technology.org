@@ -39,10 +39,10 @@ void ConjunctionStatePredicate::updateTF(index_t i)
     if (cardSat-- == cardSub)
     {
         value = false;
-	if(parent)
-	{
-		parent -> updateTF(position);
-	}
+        if (parent)
+        {
+            parent -> updateTF(position);
+        }
     }
 
     StatePredicate* tmp = sub[cardSat];
@@ -66,10 +66,10 @@ void ConjunctionStatePredicate::updateFT(index_t i)
     if (++cardSat == cardSub)
     {
         value = true;
-	if(parent)
-	{
-		parent -> updateFT(position);
-	}
+        if (parent)
+        {
+            parent -> updateFT(position);
+        }
     }
 }
 
@@ -118,21 +118,21 @@ void ConjunctionStatePredicate::evaluate()
 
 index_t ConjunctionStatePredicate::countAtomic()
 {
-	index_t result = 0;
+    index_t result = 0;
 
-	for(index_t i = 0; i < cardSub; i++)
-	{
-		result += sub[i] -> countAtomic();
-	}
-	return result;
+    for (index_t i = 0; i < cardSub; i++)
+    {
+        result += sub[i] -> countAtomic();
+    }
+    return result;
 }
 
 index_t ConjunctionStatePredicate::collectAtomic(AtomicStatePredicate** p)
 {
-	index_t offset = 0;
-	for(index_t i = 0; i < cardSub; i++)
-	{
-		offset += collectAtomic(p + offset);
-	}		
-	return offset;
+    index_t offset = 0;
+    for (index_t i = 0; i < cardSub; i++)
+    {
+        offset += collectAtomic(p + offset);
+    }
+    return offset;
 }

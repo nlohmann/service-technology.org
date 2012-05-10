@@ -19,7 +19,7 @@ class StatePredicateProperty: public SimpleProperty
 {
 
     public:
-	StatePredicateProperty(StatePredicate *);
+        StatePredicateProperty(StatePredicate*);
     private:
         /// prepare for search
         virtual void initProperty();
@@ -30,19 +30,19 @@ class StatePredicateProperty: public SimpleProperty
         /// check property in Marking::Current, use after backfire. Argument is transition just backfired.
         virtual void updateProperty(index_t);
 
-	// the actual formula to be verified; 
-	StatePredicate * predicate;
+        // the actual formula to be verified;
+        StatePredicate* predicate;
 
-	// for each transition t, number of state predicates that need to be checked
-	// when t is fired
-	index_t * cardChanged;
+        // for each transition t, number of state predicates that need to be checked
+        // when t is fired
+        index_t* cardChanged;
 
-	// for each transition t, an array with all state predicates that 
-	// need to be checked
-	// when t is fired
-	AtomicStatePredicate *** changedPredicate;
+        // for each transition t, an array with all state predicates that
+        // need to be checked
+        // when t is fired
+        AtomicStatePredicate*** changedPredicate;
 
-	// changedSum[t][i] is the difference that t causes in the formal sum of 
-	// state predicate changedPredicate[t][i]
-	index_t ** changedSum;
+        // changedSum[t][i] is the difference that t causes in the formal sum of
+        // state predicate changedPredicate[t][i]
+        index_t** changedSum;
 };

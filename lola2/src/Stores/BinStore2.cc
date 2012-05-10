@@ -60,8 +60,9 @@ BinStore2::Decision::~Decision()
 }
 
 
-bitindex_t max(bitindex_t a, bitindex_t b) {
-	return a>b?a:b;
+bitindex_t max(bitindex_t a, bitindex_t b)
+{
+    return a > b ? a : b;
 }
 
 /// search for a state in the binStore and insert it, if it is not there
@@ -89,7 +90,7 @@ bool BinStore2::searchAndInsert()
     /// the place we are currently dealing with
     index_t place_index = 0;
 
-//    index_t place_byteoffest = (PLACE_WIDTH - Place::CardBits[0]) / 8;
+    //    index_t place_byteoffest = (PLACE_WIDTH - Place::CardBits[0]) / 8;
     /// the bit of the place's marking we are currently dealing with
     bitindex_t place_bitoffset = (PLACE_WIDTH - Place::CardBits[0]); // indicates start with msb
 
@@ -112,50 +113,71 @@ bool BinStore2::searchAndInsert()
         // Here, hash bucket is not empty.
         anchor = branch + Marking::HashCurrent;
 
-        while(true) {
-			bitindex_t comparebits = 8-max(place_bitoffset&7,vector_bitoffset);
-			bool founddiff = false;
-			while(comparebits) {
-				if((capacity_t(Marking::Current[place_index] << place_bitoffset) >> (PLACE_WIDTH-comparebits))
-						!=
-						(uchar(currentvector[vector_byte] << vector_bitoffset) >> (8-comparebits))) {
-					founddiff = true;
-					comparebits >>= 1;
-				} else {
-					position += comparebits;
-					vector_bitoffset += comparebits;
-					if(vector_bitoffset >= 8)
-						vector_byte++, vector_bitoffset=0;
-					place_bitoffset += comparebits;
-					if(place_bitoffset >= PLACE_WIDTH) {
-						place_index++;
-						if(place_index >= Place::CardSignificant)
-							return true;
-						place_bitoffset=(PLACE_WIDTH - Place::CardBits[place_index]);
-					}
-					if(!founddiff)
-						comparebits = 8-max(place_bitoffset&7,vector_bitoffset);
-				}
-			}
-			while((*anchor) && position > (*anchor)->bit)
-				anchor = &((*anchor)->nextold);
-			if((*anchor) && (*anchor)->bit == position) {
-				currentvector = (* anchor) -> vector;
-				anchor = &((* anchor) -> nextnew);
+        while (true)
+        {
+            bitindex_t comparebits = 8 - max(place_bitoffset & 7, vector_bitoffset);
+            bool founddiff = false;
+            while (comparebits)
+            {
+                if ((capacity_t(Marking::Current[place_index] << place_bitoffset) >> (PLACE_WIDTH - comparebits))
+                        !=
+                        (uchar(currentvector[vector_byte] << vector_bitoffset) >> (8 - comparebits)))
+                {
+                    founddiff = true;
+                    comparebits >>= 1;
+                }
+                else
+                {
+                    position += comparebits;
+                    vector_bitoffset += comparebits;
+                    if (vector_bitoffset >= 8)
+                    {
+                        vector_byte++, vector_bitoffset = 0;
+                    }
+                    place_bitoffset += comparebits;
+                    if (place_bitoffset >= PLACE_WIDTH)
+                    {
+                        place_index++;
+                        if (place_index >= Place::CardSignificant)
+                        {
+                            return true;
+                        }
+                        place_bitoffset = (PLACE_WIDTH - Place::CardBits[place_index]);
+                    }
+                    if (!founddiff)
+                    {
+                        comparebits = 8 - max(place_bitoffset & 7, vector_bitoffset);
+                    }
+                }
+            }
+            while ((*anchor) && position > (*anchor)->bit)
+            {
+                anchor = &((*anchor)->nextold);
+            }
+            if ((*anchor) && (*anchor)->bit == position)
+            {
+                currentvector = (* anchor) -> vector;
+                anchor = &((* anchor) -> nextnew);
 
-				vector_byte = 0;
-				vector_bitoffset = 0;
-				++position;
+                vector_byte = 0;
+                vector_bitoffset = 0;
+                ++position;
 
-				place_bitoffset++;
-				if(place_bitoffset >= PLACE_WIDTH) {
-					place_index++;
-					if(place_index >= Place::CardSignificant)
-						return true;
-					place_bitoffset=(PLACE_WIDTH - Place::CardBits[place_index]);
-				}
-			} else
-				break;
+                place_bitoffset++;
+                if (place_bitoffset >= PLACE_WIDTH)
+                {
+                    place_index++;
+                    if (place_index >= Place::CardSignificant)
+                    {
+                        return true;
+                    }
+                    place_bitoffset = (PLACE_WIDTH - Place::CardBits[place_index]);
+                }
+            }
+            else
+            {
+                break;
+            }
         }
 
         // state not found --> prepare for insertion
@@ -165,20 +187,22 @@ bool BinStore2::searchAndInsert()
         newdecision -> nextnew = NULL;
         newvector = &(newdecision -> vector);
         // the mismatching bit itself is not represented in the new vector
-		vector_byte = 0;
-		vector_bitoffset = 0;
-		++position;
+        vector_byte = 0;
+        vector_bitoffset = 0;
+        ++position;
 
-		place_bitoffset++;
-		if(place_bitoffset >= PLACE_WIDTH) {
-			place_index++;
-			if(place_index >= Place::CardSignificant) {
+        place_bitoffset++;
+        if (place_bitoffset >= PLACE_WIDTH)
+        {
+            place_index++;
+            if (place_index >= Place::CardSignificant)
+            {
                 * newvector = NULL;
                 ++markings;
                 return false;
-			}
-			place_bitoffset=(PLACE_WIDTH - Place::CardBits[place_index]);
-		}
+            }
+            place_bitoffset = (PLACE_WIDTH - Place::CardBits[place_index]);
+        }
     }
 
     // compress current marking into bitvector
@@ -186,22 +210,27 @@ bool BinStore2::searchAndInsert()
     // initial values
     *newvector = (uchar*) calloc(((Place::SizeOfBitVector - position) + 7) / 8, sizeof(uchar));
 
-    while(true) {
-		bitindex_t insertbits = 8-max(place_bitoffset&7,vector_bitoffset);
-		(*newvector)[vector_byte] |= uchar((capacity_t(Marking::Current[place_index] << place_bitoffset) >> (PLACE_WIDTH-insertbits)) << (8-insertbits-vector_bitoffset));
+    while (true)
+    {
+        bitindex_t insertbits = 8 - max(place_bitoffset & 7, vector_bitoffset);
+        (*newvector)[vector_byte] |= uchar((capacity_t(Marking::Current[place_index] << place_bitoffset) >> (PLACE_WIDTH - insertbits)) << (8 - insertbits - vector_bitoffset));
 
-		vector_bitoffset += insertbits;
-		if(vector_bitoffset >= 8)
-			vector_byte++, vector_bitoffset=0;
-		place_bitoffset += insertbits;
-		if(place_bitoffset >= PLACE_WIDTH) {
-			place_index++;
-			if(place_index >= Place::CardSignificant) {
-				++markings;
-				return false;
-			}
-			place_bitoffset=(PLACE_WIDTH - Place::CardBits[place_index]);
-		}
+        vector_bitoffset += insertbits;
+        if (vector_bitoffset >= 8)
+        {
+            vector_byte++, vector_bitoffset = 0;
+        }
+        place_bitoffset += insertbits;
+        if (place_bitoffset >= PLACE_WIDTH)
+        {
+            place_index++;
+            if (place_index >= Place::CardSignificant)
+            {
+                ++markings;
+                return false;
+            }
+            place_bitoffset = (PLACE_WIDTH - Place::CardBits[place_index]);
+        }
     }
 }
 

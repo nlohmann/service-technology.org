@@ -45,10 +45,10 @@ class StatePredicate
         /// the position of this in parent's subformula list
         index_t position;
 
-	/// counts atomic subformulas
-	virtual index_t countAtomic() = 0;
+        /// counts atomic subformulas
+        virtual index_t countAtomic() = 0;
 
-	/// collects atomic subformulas; array must be malloced beforehand
-	/// result is number of inserted elements
-	virtual index_t collectAtomic(AtomicStatePredicate **) = 0;
+        /// collects atomic subformulas; array must be malloced beforehand
+        /// result is number of inserted elements
+        virtual index_t collectAtomic(AtomicStatePredicate**) = 0;
 };

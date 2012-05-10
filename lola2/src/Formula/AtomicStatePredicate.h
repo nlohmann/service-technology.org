@@ -46,7 +46,7 @@ class AtomicStatePredicate : public StatePredicate
         /// examined. Evaluation is done w.r.t. Marking::Current
         virtual void evaluate();
 
-	void setUpSet();
+        void setUpSet();
 
         /// lists place p_i indices that occur with positive multiplicity k_i
         index_t* posPlaces;
@@ -78,10 +78,10 @@ class AtomicStatePredicate : public StatePredicate
         /// The size of the up set
         index_t cardUp;
 
-	/// counts atomic subformulas
-	virtual index_t countAtomic();
+        /// counts atomic subformulas
+        virtual index_t countAtomic();
 
-	/// collects atomic subformulas; array must be malloced beforehand
-	/// result is number of inserted elements
-	virtual index_t collectAtomic(AtomicStatePredicate **);
+        /// collects atomic subformulas; array must be malloced beforehand
+        /// result is number of inserted elements
+        virtual index_t collectAtomic(AtomicStatePredicate**);
 };

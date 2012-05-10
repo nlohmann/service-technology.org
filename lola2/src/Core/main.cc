@@ -75,7 +75,7 @@ extern kc::tFormula TheFormula;
 Reporter* rep = NULL;
 
 /// the top state predicate
-StatePredicate *sp = NULL;
+StatePredicate* sp = NULL;
 
 ParserPTNet* symbolTables;
 
@@ -202,28 +202,28 @@ int main(int argc, char** argv)
 
 
 
-            if (args_info.formula_given)
-            {
-                ptformula_in = fopen(args_info.formula_arg, "r");
-                ptformula_parse();
-                rep->status("parsed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
+        if (args_info.formula_given)
+        {
+            ptformula_in = fopen(args_info.formula_arg, "r");
+            ptformula_parse();
+            rep->status("parsed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
 
-                TheFormula = TheFormula->rewrite(kc::arrows);
-                TheFormula = TheFormula->rewrite(kc::neg);
-                TheFormula = TheFormula->rewrite(kc::leq);
-                TheFormula = TheFormula->rewrite(kc::sides);
-                TheFormula = TheFormula->rewrite(kc::lists);
+            TheFormula = TheFormula->rewrite(kc::arrows);
+            TheFormula = TheFormula->rewrite(kc::neg);
+            TheFormula = TheFormula->rewrite(kc::leq);
+            TheFormula = TheFormula->rewrite(kc::sides);
+            TheFormula = TheFormula->rewrite(kc::lists);
 
-        //        TheFormula->unparse(myprinter, kc::out);
+            //        TheFormula->unparse(myprinter, kc::out);
 
-                TheFormula->unparse(myprinter, kc::internal);
+            TheFormula->unparse(myprinter, kc::internal);
 
-                assert(sp);
-                
-                // tidy parser
-                ptformula_lex_destroy();
-                fclose(ptformula_in);
-            }
+            assert(sp);
+
+            // tidy parser
+            ptformula_lex_destroy();
+            fclose(ptformula_in);
+        }
 
 
 
@@ -231,7 +231,7 @@ int main(int argc, char** argv)
         delete symbolTables;
     }
 
-rep->status("%u", MAX_CAPACITY);
+    rep->status("%u", MAX_CAPACITY);
     if (args_info.randomWalk_given)
     {
         rep->status("random walk");
@@ -302,7 +302,7 @@ rep->status("%u", MAX_CAPACITY);
                 p = new Deadlock();
                 fl = new FirelistStubbornDeadlock();
                 break;
-            
+
             case check_arg_statepredicate:
                 p = new StatePredicateProperty(sp);
                 fl = new FirelistStubbornStatePredicate(sp);
@@ -349,7 +349,7 @@ rep->status("%u", MAX_CAPACITY);
         }
 
         rep->message("%llu markings, %llu edges", s->markings, s->calls - 1);
-        
+
         delete s;
         delete p;
         delete sp;

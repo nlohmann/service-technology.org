@@ -48,10 +48,10 @@ class ConjunctionStatePredicate : public StatePredicate
         /// The number of satisfied subformulas
         index_t cardSat;
 
-	/// counts atomic subformulas
-	virtual index_t countAtomic();
+        /// counts atomic subformulas
+        virtual index_t countAtomic();
 
-	/// collects atomic subformulas; array must be malloced beforehand
-	/// result is number of inserted elements
-	virtual index_t collectAtomic(AtomicStatePredicate **);
+        /// collects atomic subformulas; array must be malloced beforehand
+        /// result is number of inserted elements
+        virtual index_t collectAtomic(AtomicStatePredicate**);
 };

@@ -57,7 +57,8 @@ lola_SOURCES = \
                 Stores/BitStore.cc Stores/BitStore.h \
                 Stores/BDDStore.cc Stores/BDDStore.h \
                 Stores/STLStore.cc Stores/STLStore.h \
-                Stores/SQLStore.cc Stores/SQLStore.h
+                Stores/SQLStore.cc Stores/SQLStore.h \
+                Stores/BinStore2.cc Stores/BinStore2.h
 
 lola_LDADD = $(builddir)/../libs/cudd/libobj.a \
 	$(builddir)/../libs/cudd/libdddmp.a \

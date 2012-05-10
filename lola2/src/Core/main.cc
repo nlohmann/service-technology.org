@@ -49,6 +49,7 @@
 #include "Stores/SQLStore.h"
 #include "Stores/STLStore.h"
 #include "Stores/BitStore.h"
+#include "Stores/BinStore2.h"
 
 
 /// printer-function for output on stdout
@@ -282,6 +283,9 @@ rep->status("%u", MAX_CAPACITY);
                 break;
             case store_arg_bit:
                 s = new BitStore();
+                break;
+            case store_arg_bin2:
+                s = new BinStore2();
                 break;
         }
 

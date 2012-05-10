@@ -61,21 +61,31 @@ Negation(AtomicProposition(LessAtomicProposition(p,n))) -> <neg: AtomicPropositi
 Negation(AtomicProposition(LessEqualAtomicProposition(p,n))) -> <neg: AtomicProposition(GreaterAtomicProposition(p, n))>;
 
 
-%rview sides;
+/****************************
+ * EVERYTHING SHOULD BE <= *
+ ***************************/
+
+%rview leq;
 
 // transform everything to <=
+
 // x == y   ->   x <= y && y <= x 
-AtomicProposition(EqualsAtomicProposition(x,y)) -> <sides: Conjunction(AtomicProposition(LessEqualAtomicProposition(x,y)), AtomicProposition(LessEqualAtomicProposition(y,x))) >;
+AtomicProposition(EqualsAtomicProposition(x,y)) -> <leq: Conjunction(AtomicProposition(LessEqualAtomicProposition(x,y)), AtomicProposition(LessEqualAtomicProposition(y,x))) >;
 // x != y   ->   x+1 <= y || y+1 <= x
-AtomicProposition(NotEqualsAtomicProposition(x,y)) -> <sides: Disjunction(AtomicProposition(LessEqualAtomicProposition(Sum(x, Number(mkinteger(1))),y)), AtomicProposition(LessEqualAtomicProposition(Sum(y, Number(mkinteger(1))),x))) >;
+AtomicProposition(NotEqualsAtomicProposition(x,y)) -> <leq: Disjunction(AtomicProposition(LessEqualAtomicProposition(Sum(x, Number(mkinteger(1))),y)), AtomicProposition(LessEqualAtomicProposition(Sum(y, Number(mkinteger(1))),x))) >;
 // x >= y   ->   y <= x
-GreaterEqualAtomicProposition(x,y) -> <sides: LessEqualAtomicProposition(y,x) >;
+GreaterEqualAtomicProposition(x,y) -> <leq: LessEqualAtomicProposition(y,x) >;
 // x > y    ->   y+1 <= x
-GreaterAtomicProposition(x,y) -> <sides: LessEqualAtomicProposition(Sum(y, Number(mkinteger(1))), x) >;
+GreaterAtomicProposition(x,y) -> <leq: LessEqualAtomicProposition(Sum(y, Number(mkinteger(1))), x) >;
 // x < y    ->   x+1 <= y
-LessAtomicProposition(x,y) -> <sides: LessAtomicProposition(Sum(x, Number(mkinteger(1))), y) >;
+LessAtomicProposition(x,y) -> <leq: LessAtomicProposition(Sum(x, Number(mkinteger(1))), y) >;
 
 
+/****************************************************
+ * LEFT SIDE: SUM OF PRODUCTS, RIGHT SIDE: 1 NUMBER *
+ ****************************************************/
+
+%rview sides;
 
 
 // take right side to left
@@ -86,11 +96,14 @@ LessEqualAtomicProposition(x, Product(y,z))    -> <sides: LessEqualAtomicProposi
 LessEqualAtomicProposition(Sum(Number(x), y), Number(z) )    provided (z->value == 0) -> <sides: LessEqualAtomicProposition(y, Number(mult(mkinteger(-1),x))) >;
 
 
-LessEqualAtomicProposition(Node(x), Number(z)) -> <sides: LessEqualAtomicProposition(Product(mkinteger(1), Node(x)), Number(z)) >;
 
+// x <= z    ->   1*x <= z
+LessEqualAtomicProposition(Node(x), Number(z)) -> <sides: LessEqualAtomicProposition(Product(mkinteger(1), Node(x)), Number(z)) >;
 
 // replace differences by sums
 Difference(x,y) -> <sides: Sum(x, Product(mkinteger(-1), y)) >;
+
+
 
 // calculate values if possible
 Sum(Number(x), Number(y)) -> <sides: Number(plus(x,y)) >;

@@ -209,6 +209,7 @@ int main(int argc, char** argv)
 
                 TheFormula = TheFormula->rewrite(kc::arrows);
                 TheFormula = TheFormula->rewrite(kc::neg);
+                TheFormula = TheFormula->rewrite(kc::leq);
                 TheFormula = TheFormula->rewrite(kc::sides);
                 TheFormula = TheFormula->rewrite(kc::lists);
 

@@ -86,6 +86,10 @@ MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-location.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-position.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-stack.h)
 
+# fix for Automake 1.12
+$(BISON_FILES:.yy=.hh):
+	$(AM_V_GEN) mv $(@:.hh=.h) $@
+
 #-------------------------------------------------------------#
 # NOT GENERIC: Hack to fix include directive in bison parsers #
 #                                                             #

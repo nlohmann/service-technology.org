@@ -18,9 +18,6 @@ Runtime
    * Genet (`http://genet.sourceforge.net/') to convert service automata in
      petri nets (used by default, if Petrify was not found but Genet was).
 
-   * LoLA (`http://service-technology.org/files/lola/') to unfold high-level
-     petri nets.
-
 The configure script will search for them an set the default paths.
 
 Compilation

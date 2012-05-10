@@ -16,7 +16,7 @@
 %{
 #include <cstdlib>
 #include <string>
-#include "syntax_llowfn_initial.h"
+#include "syntax_llowfn_initial.hh"
 #include "types.h"
 
 extern int llowfn_initial_parse();

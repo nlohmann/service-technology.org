@@ -16,7 +16,7 @@
 %{
 #include <cstdlib>
 #include <string>
-#include "syntax_hlowfn_final.h"
+#include "syntax_hlowfn_final.hh"
 #include "types.h"
 
 extern FILE *pipe_out_final;

@@ -26,7 +26,7 @@
 
 %{
 #include <cstring>
-#include "cdnf-syntax.h"
+#include "cdnf-syntax.hh"
 #include "verbose.h"
 
 int yyerror(const char*);

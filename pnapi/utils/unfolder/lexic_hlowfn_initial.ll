@@ -16,7 +16,7 @@
 %{
 #include <cstdlib>
 #include <string>
-#include "syntax_hlowfn_initial.h"
+#include "syntax_hlowfn_initial.hh"
 #include "types.h"
 
 extern FILE *pipe_out_initial;

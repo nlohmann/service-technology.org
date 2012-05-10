@@ -8,6 +8,7 @@ Actual property is virtual, default (base class) is full exploration
 */
 
 
+#include <cstdlib>
 #include "Exploration/StatePredicateProperty.h"
 #include "Formula/StatePredicate.h"
 #include "Formula/AtomicStatePredicate.h"

@@ -14,6 +14,7 @@
 ///!\todo Schleifen behandeln - können evtl. rausgenommen werden
 AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k)
 {
+    parent = NULL;
     posPlaces = (index_t*) malloc(p * SIZEOF_INDEX_T);
     negPlaces = (index_t*) malloc(n * SIZEOF_INDEX_T);
     posMult = (capacity_t*) malloc(p * SIZEOF_CAPACITY_T);
@@ -146,13 +147,19 @@ void AtomicStatePredicate::update(int delta)
     if (sum <= threshold && !value)
     {
         value = true;
-        parent -> updateFT(position);
+        if(parent) 
+	{
+		parent -> updateFT(position);
+	}
         return;
     }
     if (sum > threshold && value)
     {
         value = false;
-        parent -> updateTF(position);
+	if(parent)
+	{
+		parent -> updateTF(position);
+	}
         return;
     }
 }

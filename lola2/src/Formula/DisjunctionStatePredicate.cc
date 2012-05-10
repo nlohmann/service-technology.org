@@ -12,6 +12,7 @@
 
 DisjunctionStatePredicate::DisjunctionStatePredicate(index_t n)
 {
+    parent = NULL;
     sub = (StatePredicate**) malloc(n * SIZEOF_VOIDP);
     cardSub = n;
 }
@@ -21,6 +22,7 @@ void DisjunctionStatePredicate::addSub(index_t i, StatePredicate* f)
     assert(i < cardSub);
     sub[i] = f;
     sub[i] -> position = i;
+    sub[i]-> parent = this;
 }
 
 index_t DisjunctionStatePredicate::getUpSet(index_t* stack, bool* onstack)
@@ -45,7 +47,10 @@ void DisjunctionStatePredicate::updateTF(index_t i)
     if (cardSat-- == 1)
     {
         value = false;
-        parent -> updateTF(position);
+	if(parent)
+	{
+		parent -> updateTF(position);
+	}
     }
 
     StatePredicate* tmp = sub[cardSat];
@@ -69,7 +74,10 @@ void DisjunctionStatePredicate::updateFT(index_t i)
     if (++cardSat == 1)
     {
         value = true;
-        parent -> updateFT(position);
+	if(parent)
+	{
+		parent -> updateFT(position);
+	}
     }
 }
 

@@ -94,6 +94,7 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate * f)
 void StatePredicateProperty::initProperty()
 {
 	predicate -> evaluate();
+	value = predicate -> value;
 }
 
 void StatePredicateProperty::checkProperty(index_t t) 
@@ -102,6 +103,7 @@ void StatePredicateProperty::checkProperty(index_t t)
 	{
 		changedPredicate[t][i]->update(changedSum[t][i]);
 	}
+	value = predicate -> value;
 }
 
 void StatePredicateProperty::updateProperty(index_t t) 
@@ -110,5 +112,6 @@ void StatePredicateProperty::updateProperty(index_t t)
 	{
 		changedPredicate[t][i]->update(-changedSum[t][i]);
 	}
+	value = predicate -> value;
 }
 

@@ -95,11 +95,32 @@ Sum(Sum(u,v), Sum(w,y)) -> <sides: Sum(u, Sum(v, Sum(w,y))) >;
 // calculate nested multiplications
 Product(x, Product(y, z)) -> <sides: Product(mult(x,y), z) >;
 Product(x, Sum(Number(y), z)) -> <sides: Sum(Number(mult(x,y)), Product(x, z)) >;
+Product(x, Sum(y,z)) -> <sides: Sum(Product(x,y), Product(x,z)) >;
 
 
+// transform everything to <=
+// x == y   ->   x <= y && y <= x 
+AtomicProposition(EqualsAtomicProposition(x,y)) -> <sides: Conjunction(AtomicProposition(LessEqualAtomicProposition(x,y)), AtomicProposition(LessEqualAtomicProposition(y,x))) >;
+// x != y   ->   x+1 <= y || y+1 <= x
+AtomicProposition(NotEqualsAtomicProposition(x,y)) -> <sides: Disjunction(AtomicProposition(LessEqualAtomicProposition(Sum(x, Number(mkinteger(1))),y)), AtomicProposition(LessEqualAtomicProposition(Sum(y, Number(mkinteger(1))),x))) >;
+// x >= y   ->   y <= x
+GreaterEqualAtomicProposition(x,y) -> <sides: LessEqualAtomicProposition(y,x) >;
+// x > y    ->   y+1 <= x
+GreaterAtomicProposition(x,y) -> <sides: LessEqualAtomicProposition(Sum(y, Number(mkinteger(1))), x) >;
+// x < y    ->   x+1 <= y
+LessAtomicProposition(x,y) -> <sides: LessAtomicProposition(Sum(x, Number(mkinteger(1))), y) >;
+
+
+// take numbers back to right (again?)
+LessEqualAtomicProposition(Sum(Number(x), y), Number(z)) -> <sides: LessEqualAtomicProposition(y, Number(minus(z, x))) >;
 
 %rview lists;
 
+// collect sums of products in a product list
+Sum(x,y) -> <lists: ProductList(ConstProduct_list(x, ConstProduct_list(y, NiltProduct_list())))>;
+
+// collect conjunctions in a conjunction list
 Conjunction(x,y) -> <lists: ConjunctionList(ConstConjunction_list(x, ConstConjunction_list(y, NiltConjunction_list())))>;
 
+// collect disjunctions in a disjunction list
 Disjunction(x,y) -> <lists: DisjunctionList(ConstDisjunction_list(x, ConstDisjunction_list(y, NiltDisjunction_list())))>;

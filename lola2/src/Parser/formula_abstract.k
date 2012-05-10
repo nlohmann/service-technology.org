@@ -1,5 +1,7 @@
 %{ KC_TYPES_HEADER
 #include <cstring>
+#include <map>
+#include <string>
 %}
 
 tFormula:
@@ -40,4 +42,9 @@ tTerm:
 | Sum(tTerm tTerm)
 | Difference(tTerm tTerm)
 | Product(integer tTerm)
+| ProductList(tProduct_list)
+;
+
+tProduct_list:
+  list tTerm
 ;

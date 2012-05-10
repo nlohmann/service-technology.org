@@ -37,6 +37,10 @@
 #include "Exploration/SimpleProperty.h"
 #include "Exploration/Deadlock.h"
 #include "Exploration/FirelistStubbornDeadlock.h"
+#include "Exploration/FirelistStubbornStatePredicate.h"
+#include "Exploration/StatePredicateProperty.h"
+
+#include "Formula/StatePredicate.h"
 
 #include "Stores/Store.h"
 #include "Stores/BinStore.h"
@@ -69,6 +73,10 @@ extern kc::tFormula TheFormula;
 /// the reporter
 Reporter* rep = NULL;
 
+/// the top state predicate
+StatePredicate *sp = NULL;
+
+ParserPTNet* symbolTables;
 
 /*!
 \brief variable to manage multiple files
@@ -172,7 +180,7 @@ int main(int argc, char** argv)
         ptnetlola_in = *netFile;
 
         // read the input file(s)
-        ParserPTNet* symbolTables = ParserPTNetLoLA();
+        symbolTables = ParserPTNetLoLA();
 
         rep->status("finished parsing");
 
@@ -190,25 +198,36 @@ int main(int argc, char** argv)
         // report hash table usage (size would be SIZEOF_SYMBOLTABLE)
         rep->status("%d symbol table entries, %d collisions", symbolTables->PlaceTable->card + symbolTables->TransitionTable->card, SymbolTable::collisions);
 
+
+
+
+            if (args_info.formula_given)
+            {
+                ptformula_in = fopen(args_info.formula_arg, "r");
+                ptformula_parse();
+                rep->status("parsed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
+
+                TheFormula = TheFormula->rewrite(kc::arrows);
+                TheFormula = TheFormula->rewrite(kc::neg);
+                TheFormula = TheFormula->rewrite(kc::sides);
+                TheFormula = TheFormula->rewrite(kc::lists);
+
+                TheFormula->print();
+        //        TheFormula->unparse(myprinter, kc::out);
+
+                TheFormula->unparse(myprinter, kc::internal);
+
+                assert(sp);
+                
+                // tidy parser
+                ptformula_lex_destroy();
+                fclose(ptformula_in);
+            }
+
+
+
+
         delete symbolTables;
-    }
-
-    if (args_info.formula_given)
-    {
-        ptformula_in = fopen(args_info.formula_arg, "r");
-        ptformula_parse();
-        rep->status("parsed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
-
-        TheFormula = TheFormula->rewrite(kc::arrows);
-        TheFormula = TheFormula->rewrite(kc::neg);
-        TheFormula = TheFormula->rewrite(kc::sides);
-        //        TheFormula = TheFormula->rewrite(kc::lists);
-
-        TheFormula->unparse(myprinter, kc::out);
-
-        // tidy parser
-        ptformula_lex_destroy();
-        fclose(ptformula_in);
     }
 
 
@@ -279,6 +298,11 @@ int main(int argc, char** argv)
                 p = new Deadlock();
                 fl = new FirelistStubbornDeadlock();
                 break;
+            
+            case check_arg_statepredicate:
+                p = new StatePredicateProperty(sp);
+//                fl = new FirelistStubbornStatePredicate(sp);
+                break;
         }
 
         if (fl == NULL)
@@ -324,6 +348,7 @@ int main(int argc, char** argv)
 
         delete s;
         delete p;
+        delete sp;
     }
 
     return EXIT_SUCCESS;

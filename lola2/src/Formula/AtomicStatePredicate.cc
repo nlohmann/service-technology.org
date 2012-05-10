@@ -6,10 +6,12 @@
 \brief class implementation for atomic state predicates
 */
 
+#include <config.h>
 #include "Formula/AtomicStatePredicate.h"
 #include "Net/Net.h"
 #include "Net/Marking.h"
 #include <cstdlib>
+#include <cstdio>
 
 ///!\todo Schleifen behandeln - können evtl. rausgenommen werden
 AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k)

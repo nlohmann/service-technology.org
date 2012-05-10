@@ -76,11 +76,13 @@ LessEqualAtomicProposition(x, Number(y)) -> [internal: x {
         }
         if (it->second > 0)
         {
+            assert(it->second > 0);
             ((AtomicStatePredicate*)sp)->addPos(position_pos++, it->first, it->second);
         }
         else
         {
-            ((AtomicStatePredicate*)sp)->addNeg(position_neg++, it->first, it->second);
+            assert(-it->second > 0);
+            ((AtomicStatePredicate*)sp)->addNeg(position_neg++, it->first, -it->second);
         }
     }
 } ];

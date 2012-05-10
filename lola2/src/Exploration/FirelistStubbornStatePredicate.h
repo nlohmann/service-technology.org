@@ -1,0 +1,27 @@
+/*!
+\file FirelistStubbornStatePredicate.h
+\author Karsten
+\status new
+\brief class for firelist generation. Use up sets.
+*/
+
+#pragma once
+#include "Core/Dimensions.h"
+#include "Formula/StatePredicate.h"
+#include "Exploration/Firelist.h"
+
+
+class FirelistStubbornStatePredicate : public Firelist
+{
+    public:
+	FirelistStubbornStatePredicate(StatePredicate *);
+
+        /// return value contains number of elements in fire list, argument is reference
+        /// parameter for actual list
+        virtual index_t getFirelist(index_t**);
+
+    private:
+	StatePredicate * predicate;
+	index_t * dfsStack;
+	bool * onStack;
+};

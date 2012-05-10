@@ -86,3 +86,4 @@ LessEqualAtomicProposition(x, Number(y)) -> [internal: x {
 } ];
 
 Product(x, Node(p)) -> [internal: { current[p->value] += x->value; } ];
+Node(p) -> [internal: { current[p->value] += 1; } ];

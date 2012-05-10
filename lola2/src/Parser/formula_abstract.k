@@ -1,3 +1,9 @@
+%{ KC_TYPES_HEADER
+#include <cstring>
+#include <map>
+#include <string>
+%}
+
 tFormula:
   StatePredicateFormula(tStatePredicate)
 ;

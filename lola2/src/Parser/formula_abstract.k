@@ -1,9 +1,3 @@
-%{ KC_TYPES_HEADER
-#include <cstring>
-#include <map>
-#include <string>
-%}
-
 tFormula:
   StatePredicateFormula(tStatePredicate)
 ;
@@ -37,7 +31,7 @@ tAtomicProposition:
 ;
 
 tTerm:
-  Node(casestring)
+  Node(integer)
 | Number(integer)
 | Sum(tTerm tTerm)
 | Difference(tTerm tTerm)

@@ -4,6 +4,7 @@
 #include <libgen.h>
 #include <cstdarg>
 #include <cstdio>
+#include "cmdline.h"
 #include "Core/Dimensions.h"
 #include "Parser/PlaceSymbol.h"
 #include "Parser/TransitionSymbol.h"
@@ -16,6 +17,10 @@
 
 #include "Parser/ast-system-k.h"
 #include "Parser/ast-system-yystype.h"
+
+extern ParserPTNet* symbolTables;
+
+extern gengetopt_args_info args_info;
 
 using namespace kc;
 
@@ -126,7 +131,14 @@ atomic_proposition:
 
 term:
   IDENTIFIER
-    { $$ = Node($1); }
+    {
+      Symbol *p = symbolTables->PlaceTable->lookup($1->name);
+      if (p == NULL)
+      {
+          ptformula_yyerrors(ptformula_text, "place unknown");
+      }
+      $$ = Node(mkinteger(p->getIndex()));
+    }
 | NUMBER
     { $$ = Number($1); }
 | _leftparenthesis_ term _plus_ term _rightparenthesis_
@@ -151,8 +163,8 @@ __attribute__((noreturn)) void ptformula_yyerrors(char* token, const char* forma
     free(errormessage);
     va_end(args);
 
-//    rep->status("%s:%d:%d - error near '%s'", rep->markup(MARKUP_FILE, basename((char*)netFile->getFilename())).str(), ptformula_lineno, ptformula_colno, token);
-    rep->status("%d:%d - error near '%s'", ptformula_lineno, ptformula_colno, token);
+    rep->status("%s:%d:%d - error near '%s'", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str(), ptformula_lineno, ptformula_colno, token);
+//    rep->status("%d:%d - error near '%s'", ptformula_lineno, ptformula_colno, token);
 
     rep->abort(ERROR_SYNTAX);
 }

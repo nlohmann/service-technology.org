@@ -32,16 +32,12 @@ ConstDisjunction_list(h, l) -> [out: h " OR " l];
 %uview internal;
 
 %{ KC_UNPARSE
-#include <string>
 #include <map>
 #include "Formula/StatePredicate.h"
 #include "Formula/AtomicStatePredicate.h"
-#include "Parser/ParserPTNet.h"
-#include "Parser/Symbol.h"
 extern StatePredicate *sp;
-extern ParserPTNet* symbolTables;
 
-std::map<std::string, int> current;
+std::map<int, int> current;
 %}
 
 StatePredicateFormula(x) -> [internal: x ];
@@ -52,7 +48,7 @@ LessEqualAtomicProposition(x, Number(y)) -> [internal: x {
     int factors_positive = 0;
     int factors_negative = 0;
 
-    for (std::map<std::string, int>::const_iterator it = current.begin(); it != current.end(); ++it)
+    for (std::map<int, int>::const_iterator it = current.begin(); it != current.end(); ++it)
     {
         if (it->second == 0)
         {
@@ -72,28 +68,21 @@ LessEqualAtomicProposition(x, Number(y)) -> [internal: x {
     int position_pos = 0;
     int position_neg = 0;
 
-    for (std::map<std::string, int>::const_iterator it = current.begin(); it != current.end(); ++it)
+    for (std::map<int, int>::const_iterator it = current.begin(); it != current.end(); ++it)
     {
-        Symbol *p = symbolTables->PlaceTable->lookup(it->first.c_str());
-        if (p == NULL)
-        {
-            fprintf(stderr, "place %s not found\n", it->first.c_str());
-            assert(p);
-        }
-
         if (it->second == 0)
         {
             continue;
         }
         if (it->second > 0)
         {
-            ((AtomicStatePredicate*)sp)->addPos(position_pos++, p->getIndex(), it->second);
+            ((AtomicStatePredicate*)sp)->addPos(position_pos++, it->first, it->second);
         }
         else
         {
-            ((AtomicStatePredicate*)sp)->addNeg(position_neg++, p->getIndex(), it->second);
+            ((AtomicStatePredicate*)sp)->addNeg(position_neg++, it->first, it->second);
         }
     }
 } ];
 
-Product(x, Node(p)) -> [internal: { current[p->name] += x->value; } ];
+Product(x, Node(p)) -> [internal: { current[p->value] += x->value; } ];

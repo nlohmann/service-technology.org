@@ -39,7 +39,7 @@ extern gengetopt_args_info args_info;
 extern Reporter* rep;
 extern Input *netFile;
 
-void setcol();
+void ptformula_setcol();
 extern void ptformula_error(char const* mess);
 int ptformula_colno = 1;
 %}
@@ -49,50 +49,50 @@ int ptformula_colno = 1;
 %%
 
  /* from http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html */
-"/*"                                     { setcol(); BEGIN(IN_COMMENT); }
-<IN_COMMENT>"*/"                         { setcol(); BEGIN(INITIAL); }
-<IN_COMMENT>[^*\n\r]+                    { setcol(); /* comments */ }
-<IN_COMMENT>"*"                          { setcol(); /* comments */ }
-<IN_COMMENT>[\n\r]                       { setcol(); /* comments */ }
+"/*"                                     { ptformula_setcol(); BEGIN(IN_COMMENT); }
+<IN_COMMENT>"*/"                         { ptformula_setcol(); BEGIN(INITIAL); }
+<IN_COMMENT>[^*\n\r]+                    { ptformula_setcol(); /* comments */ }
+<IN_COMMENT>"*"                          { ptformula_setcol(); /* comments */ }
+<IN_COMMENT>[\n\r]                       { ptformula_setcol(); /* comments */ }
 
-FORMULA                                  { setcol(); return _FORMULA_; }
-AND                                      { setcol(); return _AND_; }
-NOT                                      { setcol(); return _NOT_; }
-OR                                       { setcol(); return _OR_; }
+FORMULA                                  { ptformula_setcol(); return _FORMULA_; }
+AND                                      { ptformula_setcol(); return _AND_; }
+NOT                                      { ptformula_setcol(); return _NOT_; }
+OR                                       { ptformula_setcol(); return _OR_; }
 
-\;                                       { setcol(); return _semicolon_; }
-\<\-\>                                   { setcol(); return _iff_; }
-!=                                       { setcol(); return _notequal_; }
-\<\>                                     { setcol(); return _notequal_; }
-\-\>                                     { setcol(); return _implies_; }
-=                                        { setcol(); return _equals_; }
-\+                                       { setcol(); return _plus_; }
-\-                                       { setcol(); return _minus_; }
-\*                                       { setcol(); return _times_; }
-\(                                       { setcol(); return _leftparenthesis_; }
-\)                                       { setcol(); return _rightparenthesis_; }
-[>]                                      { setcol(); return _greaterthan_; }
-[<]                                      { setcol(); return _lessthan_; }
-[#]                                      { setcol(); return _notequal_; }
-[>]=                                     { setcol(); return _greaterorequal_; }
-[<]=                                     { setcol(); return _lessorequal_; }
+\;                                       { ptformula_setcol(); return _semicolon_; }
+\<\-\>                                   { ptformula_setcol(); return _iff_; }
+!=                                       { ptformula_setcol(); return _notequal_; }
+\<\>                                     { ptformula_setcol(); return _notequal_; }
+\-\>                                     { ptformula_setcol(); return _implies_; }
+=                                        { ptformula_setcol(); return _equals_; }
+\+                                       { ptformula_setcol(); return _plus_; }
+\-                                       { ptformula_setcol(); return _minus_; }
+\*                                       { ptformula_setcol(); return _times_; }
+\(                                       { ptformula_setcol(); return _leftparenthesis_; }
+\)                                       { ptformula_setcol(); return _rightparenthesis_; }
+[>]                                      { ptformula_setcol(); return _greaterthan_; }
+[<]                                      { ptformula_setcol(); return _lessthan_; }
+[#]                                      { ptformula_setcol(); return _notequal_; }
+[>]=                                     { ptformula_setcol(); return _greaterorequal_; }
+[<]=                                     { ptformula_setcol(); return _lessorequal_; }
 
 
 [\n\r]                                   { ptformula_colno = 1; /* whitespace */ }
-[\t ]                                    { setcol();  /* whitespace */ }
+[\t ]                                    { ptformula_setcol();  /* whitespace */ }
 
-[0-9]+                                   { setcol(); ptformula_lval.yt_integer = kc::mkinteger(atoi(ptformula_text)); return NUMBER; }
+[0-9]+                                   { ptformula_setcol(); ptformula_lval.yt_integer = kc::mkinteger(atoi(ptformula_text)); return NUMBER; }
 
-"{"[^\n\r]*"}"                           { setcol(); /* comments */ }
+"{"[^\n\r]*"}"                           { ptformula_setcol(); /* comments */ }
 
 
-[^,;:()\t \n\r\{\}]+                     { setcol(); ptformula_lval.yt_casestring = kc::mkcasestring(ptformula_text); return IDENTIFIER; }
+[^,;:()\t \n\r\{\}]+                     { ptformula_setcol(); ptformula_lval.yt_casestring = kc::mkcasestring(ptformula_text); return IDENTIFIER; }
 
-.                                        { setcol(); ptformula_error("lexical error"); }
+.                                        { ptformula_setcol(); ptformula_error("lexical error"); }
 
 %%
 
-inline void setcol()
+inline void ptformula_setcol()
 {
     ptformula_colno += ptformula_leng;
 }

@@ -214,7 +214,8 @@ int main(int argc, char** argv)
             TheFormula = TheFormula->rewrite(kc::sides);
             TheFormula = TheFormula->rewrite(kc::lists);
 
-            //        TheFormula->unparse(myprinter, kc::out);
+            // TheFormula->print();
+            // TheFormula->unparse(myprinter, kc::out);
 
             TheFormula->unparse(myprinter, kc::internal);
 
@@ -225,13 +226,9 @@ int main(int argc, char** argv)
             fclose(ptformula_in);
         }
 
-
-
-
         delete symbolTables;
     }
 
-    rep->status("%u", MAX_CAPACITY);
     if (args_info.randomWalk_given)
     {
         rep->status("random walk");
@@ -348,7 +345,7 @@ int main(int argc, char** argv)
             }
         }
 
-        rep->message("%llu markings, %llu edges", s->markings, s->calls - 1);
+        rep->message("%llu markings, %llu edges", s->markings, (s->calls > 0) ? s->calls - 1 : 0);
 
         delete s;
         delete p;

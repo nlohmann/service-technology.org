@@ -230,7 +230,7 @@ int main(int argc, char** argv)
         delete symbolTables;
     }
 
-
+rep->status("%u", MAX_CAPACITY);
     if (args_info.randomWalk_given)
     {
         rep->status("random walk");
@@ -344,8 +344,8 @@ int main(int argc, char** argv)
             }
         }
 
-        rep->message("%lu markings, %lu edges", s->markings, s->calls - 1);
-
+        rep->message("%llu markings, %llu edges", s->markings, s->calls - 1);
+        
         delete s;
         delete p;
         delete sp;

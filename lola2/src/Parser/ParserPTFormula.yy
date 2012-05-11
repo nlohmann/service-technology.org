@@ -115,7 +115,9 @@ equivalence:
 ;
 
 atomic_proposition:
-  term _equals_ term
+  _leftparenthesis_ atomic_proposition _rightparenthesis_
+    { $$ = $2; }
+| term _equals_ term
     { $$ = EqualsAtomicProposition($1, $3); }
 | term _notequal_ term
     { $$ = NotEqualsAtomicProposition($1, $3); }

@@ -67,11 +67,13 @@ Negation(AtomicProposition(True())) -> <neg: AtomicProposition(False()) >;
 Negation(AtomicProposition(False())) -> <neg: AtomicProposition(True()) >;
 
 
+// AND + TRUE/FALSE
 Conjunction(a, AtomicProposition(True())) -> <neg: a >;
 Conjunction(AtomicProposition(True()), a) -> <neg: a >;
 Conjunction(a, f = AtomicProposition(False())) -> <neg: f >;
 Conjunction(f = AtomicProposition(False()), a) -> <neg: f >;
 
+// OR + TRUE/FALSE
 Disjunction(a, AtomicProposition(False())) -> <neg: a >;
 Disjunction(AtomicProposition(False()), a) -> <neg: a >;
 Disjunction(a, t = AtomicProposition(True())) -> <neg: t >;
@@ -121,14 +123,16 @@ LessEqualAtomicProposition(Node(x), Number(z)) -> <sides: LessEqualAtomicProposi
 Difference(x,y) -> <sides: Sum(x, Product(mkinteger(-1), y)) >;
 
 
+// move numbers to left
+Sum(x, Number(y)) -> <sides: Sum(Number(y), x) >;
+Sum(x, Sum(n=Number(y), z)) -> <sides: Sum(n, Sum(x,z)) >;
 
 // calculate values if possible
 Sum(Number(x), Number(y)) -> <sides: Number(plus(x,y)) >;
 Sum(Number(x), Sum(Number(y), z)) -> <sides: Sum(Number(plus(x,y)), z) >;
-
-// move numbers to left
-Sum(x, Number(y)) -> <sides: Sum(Number(y), x) >;
-Sum(x, Sum(n=Number(y), z)) -> <sides: Sum(n, Sum(x,z)) >;
+Sum(Number(x), y) provided (x->value == 0) -> <sides: y >;
+Product(x, y) provided (x->value == 0) -> <sides: Number(0) >;
+Product(x, y) provided (x->value == 1) -> <sides: y >;
 
 // move parentheses
 Sum(Sum(x,y), z) -> <sides: Sum(x, Sum(y, z)) >;

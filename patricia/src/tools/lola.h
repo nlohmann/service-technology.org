@@ -1,11 +1,28 @@
 #ifndef TOOLS_LOLA_H
 #define TOOLS_LOLA_H
 
-#include "types.h"
+#include "problem.h"
+#include "tools.h"
 
-int lola_prepare(struct problem* problem);
-enum VerificationState lola_interpret(int code, char* logfile);
-struct tool* findpath_tool(struct problem* problem);
-struct tool* statepredicate_tool(struct problem* problem);
+class Lola : public Tool {
+public:
+
+	int prepare(Problem& problem);
+	enum Outcome::State interpret(int code, string logfile);
+};
+
+class Findpath : public Lola {
+public:
+
+	Findpath(Problem& p);
+	~Findpath();
+};
+
+class Statepredicate : public Lola {
+public:
+
+	Statepredicate(Problem& p);
+	~Statepredicate();
+};
 
 #endif

@@ -1,4 +1,4 @@
-AC_INIT([Patricia], 1.0, patricia@service-technology.org, patricia, http://service-technology.org/patricia)
+AC_INIT([Patricia], 1.1, patricia@service-technology.org, patricia, http://service-technology.org/patricia)
 
 AC_MSG_NOTICE([ ____       _        _      _       ])
 AC_MSG_NOTICE([|  _ \ __ _| |_ _ __(_) ___(_) __ _ ])
@@ -10,9 +10,13 @@ AC_MSG_NOTICE([${PACKAGE_URL}])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
 AC_MSG_NOTICE()
 
-AC_CONFIG_SRCDIR([src/main.c])
+AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_AUX_DIR([build-aux])
+
+# check for standard programs needed to compile
+AC_PROG_CXX
+AM_PROG_CC_C_O
 
 # use the service-technology.org macros
 AC_ST_BASIC
@@ -36,6 +40,6 @@ AC_CHECK_FUNCS([popen pclose],,AC_MSG_ERROR([cannot use required functions]))
 
 # write files
 AC_CONFIG_FILES([
-	Makefile src/Makefile doc/Doxyfile doc/Doxydetails tests/Makefile tests/package.m4])
+	Makefile src/Makefile src/patricia.conf doc/Doxyfile doc/Doxydetails tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

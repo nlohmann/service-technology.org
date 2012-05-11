@@ -1,0 +1,16 @@
+# Configuration file for @PACKAGE_STRING@
+# @configure_input@
+
+# This file configures the paths to binaries needed by Patricia. The configure
+# script already tried to suggest paths, but its entries might have been left
+# empty. In that case, you need to manually add the path to the respective
+# tool.
+
+# <<-- CHANGE START (needed binaries, etc. in config-file) -->>
+
+# Patricia might (in the future) need to create a temporary file to pass it on.
+# The filename Patricia should use can be specified below. The filename should
+# end with 'XXXXXX' which is replaced at runtime with a random string.
+
+tmpfile = /tmp/Patricia-XXXXXX
+# <<-- CHANGE END -->>

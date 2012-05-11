@@ -187,7 +187,7 @@ void AtomicStatePredicate::setUpSet()
         {
             up2[c++] = up1[a];
         }
-        for (; b < cardUp; b++)
+        for (; b < cardP; b++)
         {
             up2[c++] = Net::Arc[PL][PRE][p][b];
         }

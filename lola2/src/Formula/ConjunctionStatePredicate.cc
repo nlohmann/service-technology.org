@@ -141,7 +141,7 @@ index_t ConjunctionStatePredicate::collectAtomic(AtomicStatePredicate** p)
     index_t offset = 0;
     for (index_t i = 0; i < cardSub; i++)
     {
-        offset += collectAtomic(p + offset);
+        offset += sub[i]->collectAtomic(p + offset);
     }
     return offset;
 }

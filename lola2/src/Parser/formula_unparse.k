@@ -57,6 +57,7 @@ StatePredicateFormula(x) -> [internal:
         assert(currentId == 0);
         assert(formulas[0].size() == 1);
         sp = formulas[0][0];
+        // printf("I am a state predicate. Done!\n");
     }
 ];
 

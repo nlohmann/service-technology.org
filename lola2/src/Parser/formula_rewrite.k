@@ -89,8 +89,8 @@ LessAtomicProposition(x,y) -> <leq: LessEqualAtomicProposition(Sum(x, Number(mki
 
 
 // take right side to left
-LessEqualAtomicProposition(x, Sum(y,z))        -> <sides: LessEqualAtomicProposition(Difference(x, Sum(y,z)), Number(mkinteger(0))) >;
-LessEqualAtomicProposition(x, Product(y,z))    -> <sides: LessEqualAtomicProposition(Difference(x, Product(y,z)), Number(mkinteger(0))) >;
+LessEqualAtomicProposition(x, s=Sum(y,z))        -> <sides: LessEqualAtomicProposition(Difference(x, s), Number(mkinteger(0))) >;
+LessEqualAtomicProposition(x, p=Product(y,z))    -> <sides: LessEqualAtomicProposition(Difference(x, p), Number(mkinteger(0))) >;
 
 // take number back to right
 LessEqualAtomicProposition(Sum(Number(x), y), Number(z) )    provided (z->value == 0) -> <sides: LessEqualAtomicProposition(y, Number(mult(mkinteger(-1),x))) >;
@@ -111,10 +111,10 @@ Sum(Number(x), Sum(Number(y), z)) -> <sides: Sum(Number(plus(x,y)), z) >;
 
 // move numbers to left
 Sum(x, Number(y)) -> <sides: Sum(Number(y), x) >;
-Sum(x, Sum(Number(y), z)) -> <sides: Sum(Number(y), Sum(x,z)) >;
+Sum(x, Sum(n=Number(y), z)) -> <sides: Sum(n, Sum(x,z)) >;
 
 // move parentheses
-Sum(Sum(u,v), Sum(w,y)) -> <sides: Sum(u, Sum(v, Sum(w,y))) >;
+Sum(Sum(x,y), z) -> <sides: Sum(x, Sum(y, z)) >;
 
 // calculate nested multiplications
 Product(x, Product(y, z)) -> <sides: Product(mult(x,y), z) >;

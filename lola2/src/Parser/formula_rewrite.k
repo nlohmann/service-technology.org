@@ -25,6 +25,9 @@ Equivalence(x, y) -> <arrows: Conjunction(Implication(x,y), Implication(y,x))>;
 // (x => y)    ->   (!x || y)
 Implication(x, y) -> <arrows: Disjunction(Negation(x), y)>;
 
+// (x XOR y)   ->   ((x AND !y) OR (!x AND y))
+ExclusiveDisjunction(x, y) -> <arrows: Disjunction(Conjunction(x, Negation(y)), Conjunction(Negation(x), y)) >;
+
 
 /*************************
  * MOVE NEGATIONS INSIDE *

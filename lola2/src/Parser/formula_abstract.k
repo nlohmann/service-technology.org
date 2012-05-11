@@ -16,6 +16,7 @@ tStatePredicate:
 | Negation(tStatePredicate)
 | Conjunction(tStatePredicate tStatePredicate)
 | Disjunction(tStatePredicate tStatePredicate)
+| ExclusiveDisjunction(tStatePredicate tStatePredicate)
 | Implication(tStatePredicate tStatePredicate)
 | Equivalence(tStatePredicate tStatePredicate)
 | ConjunctionList(tConjunction_list)

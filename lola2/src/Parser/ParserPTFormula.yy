@@ -45,13 +45,14 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %type <yt_tAtomicProposition> atomic_proposition
 %type <yt_tStatePredicate> negation
 %type <yt_tStatePredicate> conjunction
+%type <yt_tStatePredicate> exclusivedisjunction
 %type <yt_tStatePredicate> disjunction
 %type <yt_tStatePredicate> implication
 %type <yt_tStatePredicate> equivalence
 %type <yt_tTerm> term
 
 %token IDENTIFIER NUMBER
-%token _FORMULA_ _AND_ _NOT_ _OR_ _iff_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_
+%token _FORMULA_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_
 
 
 %{
@@ -83,6 +84,8 @@ statepredicate:
     { $$ = $1; }
 | disjunction
     { $$ = $1; }
+| exclusivedisjunction
+    { $$ = $1; }
 | implication
     { $$ = $1; }
 | equivalence
@@ -102,6 +105,11 @@ conjunction:
 disjunction:
   _leftparenthesis_ statepredicate _OR_ statepredicate _rightparenthesis_
     { $$ = Disjunction($2, $4); }
+;
+
+exclusivedisjunction:
+  _leftparenthesis_ statepredicate _XOR_ statepredicate _rightparenthesis_
+    { $$ = ExclusiveDisjunction($2, $4); }
 ;
 
 implication:

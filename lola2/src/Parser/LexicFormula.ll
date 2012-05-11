@@ -59,6 +59,8 @@ FORMULA                                  { ptformula_setcol(); return _FORMULA_;
 AND                                      { ptformula_setcol(); return _AND_; }
 NOT                                      { ptformula_setcol(); return _NOT_; }
 OR                                       { ptformula_setcol(); return _OR_; }
+TRUE                                     { ptformula_setcol(); return _TRUE_; }
+FALSE                                    { ptformula_setcol(); return _FALSE_; }
 
 \;                                       { ptformula_setcol(); return _semicolon_; }
 \<\-\>                                   { ptformula_setcol(); return _iff_; }

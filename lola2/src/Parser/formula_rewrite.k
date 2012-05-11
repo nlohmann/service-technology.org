@@ -60,6 +60,23 @@ Negation(AtomicProposition(LessAtomicProposition(p,n))) -> <neg: AtomicPropositi
 // NOT (p <= n)   ->    p > n
 Negation(AtomicProposition(LessEqualAtomicProposition(p,n))) -> <neg: AtomicProposition(GreaterAtomicProposition(p, n))>;
 
+// NOT TRUE  ->  FALSE
+Negation(AtomicProposition(True())) -> <neg: AtomicProposition(False()) >;
+
+// NOT FALSE  ->  FALSE
+Negation(AtomicProposition(False())) -> <neg: AtomicProposition(True()) >;
+
+
+Conjunction(a, AtomicProposition(True())) -> <neg: a >;
+Conjunction(AtomicProposition(True()), a) -> <neg: a >;
+Conjunction(a, f = AtomicProposition(False())) -> <neg: f >;
+Conjunction(f = AtomicProposition(False()), a) -> <neg: f >;
+
+Disjunction(a, AtomicProposition(False())) -> <neg: a >;
+Disjunction(AtomicProposition(False()), a) -> <neg: a >;
+Disjunction(a, t = AtomicProposition(True())) -> <neg: t >;
+Disjunction(t = AtomicProposition(True()), a) -> <neg: t >;
+
 
 /****************************
  * EVERYTHING SHOULD BE <= *

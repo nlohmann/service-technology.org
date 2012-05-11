@@ -37,6 +37,8 @@ tAtomicProposition:
 | GreaterEqualAtomicProposition(tTerm tTerm)
 | LessAtomicProposition(tTerm tTerm)
 | LessEqualAtomicProposition(tTerm tTerm)
+| True()
+| False()
 ;
 
 tTerm:

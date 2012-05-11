@@ -51,7 +51,7 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %type <yt_tTerm> term
 
 %token IDENTIFIER NUMBER
-%token _FORMULA_ _AND_ _NOT_ _OR_ _iff_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_
+%token _FORMULA_ _AND_ _NOT_ _OR_ _iff_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_
 
 
 %{
@@ -127,6 +127,18 @@ atomic_proposition:
     { $$ = LessAtomicProposition($1, $3); }
 | term _lessorequal_ term
     { $$ = LessEqualAtomicProposition($1, $3); }
+| true
+    { $$ = True(); }
+| false
+    { $$ = False(); }
+;
+
+true:
+  _TRUE_
+;
+
+false:
+  _FALSE_
 ;
 
 term:

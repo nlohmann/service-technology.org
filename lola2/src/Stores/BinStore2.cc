@@ -19,7 +19,7 @@ class State;
 BinStore2::BinStore2()
 {
     branch = (Decision**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
-    firstvector = (uchar**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
+    firstvector = (vectordata_t**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
 }
 
 BinStore2::~BinStore2()
@@ -59,18 +59,14 @@ BinStore2::Decision::~Decision()
 
 }
 
+// maximum size (in bits) of a place
+const int PLACE_WIDTH = sizeof(capacity_t) * 8;
 
-bitindex_t max(bitindex_t a, bitindex_t b)
-{
-    return a > b ? a : b;
-}
+// maximum size (in bits) of a vector item
+const int VECTOR_WIDTH = sizeof(vectordata_t) * 8;
 
 /// search for a state in the binStore and insert it, if it is not there
 /// Do not care about states
-
-const int PLACE_WIDTH = sizeof(capacity_t) * 8;
-
-int collcounter = 0;
 bool BinStore2::searchAndInsert()
 {
     ++calls;;
@@ -82,24 +78,24 @@ bool BinStore2::searchAndInsert()
     Decision** anchor;
 
     /// the vector we are currently investigating
-    uchar* currentvector;
+    vectordata_t* currentvector;
 
     /// the place where the new vector goes to
-    uchar** newvector;
+    vectordata_t** newvector;
 
     /// the place we are currently dealing with
     index_t place_index = 0;
 
-    //    index_t place_byteoffest = (PLACE_WIDTH - Place::CardBits[0]) / 8;
-    /// the bit of the place's marking we are currently dealing with
-    bitindex_t place_bitoffset = (PLACE_WIDTH - Place::CardBits[0]); // indicates start with msb
+    /// the bits of the place's marking we have NOT dealt with so far
+    bitindex_t place_bitstogo = Place::CardBits[0]; // indicates start with msb
 
-    /// the byte in the vector we are currently dealing with
-    index_t vector_byte = 0;
-    uchar vector_bitoffset = 0;
+    /// the index in the vector we are currently dealing with
+    index_t vector_index = 0;
 
-    ///  the current bit if bits are counted through all places
-    /// This means, position is the current global depth in the decision tree
+    /// the bits of the current vector's data we have NOT dealt with so far
+    bitindex_t vector_bitstogo = VECTOR_WIDTH;
+
+    /// the number of bits processed until reaching the current branch
     bitindex_t position = 0;
 
     // Is hash bucket empty? If so, assign to currentvector
@@ -115,63 +111,74 @@ bool BinStore2::searchAndInsert()
 
         while (true)
         {
-            bitindex_t comparebits = 8 - max(place_bitoffset & 7, vector_bitoffset);
+            bitindex_t comparebits = place_bitstogo < vector_bitstogo ? place_bitstogo : vector_bitstogo;
             bool founddiff = false;
             while (comparebits)
             {
-                if ((capacity_t(Marking::Current[place_index] << place_bitoffset) >> (PLACE_WIDTH - comparebits))
-                        !=
-                        (uchar(currentvector[vector_byte] << vector_bitoffset) >> (8 - comparebits)))
+                if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - comparebits))
+                        ==
+                        (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - comparebits)))
+                {
+                    if (vector_bitstogo == comparebits)
+                    {
+                        vector_index++, vector_bitstogo = VECTOR_WIDTH;
+                    }
+                    else
+                    {
+                        vector_bitstogo -= comparebits;
+                    }
+                    if (place_bitstogo == comparebits)
+                    {
+                        place_index++;
+                        if (place_index < Place::CardSignificant)
+                        {
+                            place_bitstogo = Place::CardBits[place_index];
+                        }
+                        else
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        place_bitstogo -= comparebits;
+                    }
+                    if (!founddiff)
+                    {
+                        comparebits = place_bitstogo < vector_bitstogo ? place_bitstogo : vector_bitstogo;
+                    }
+                }
+                else
                 {
                     founddiff = true;
                     comparebits >>= 1;
                 }
-                else
-                {
-                    position += comparebits;
-                    vector_bitoffset += comparebits;
-                    if (vector_bitoffset >= 8)
-                    {
-                        vector_byte++, vector_bitoffset = 0;
-                    }
-                    place_bitoffset += comparebits;
-                    if (place_bitoffset >= PLACE_WIDTH)
-                    {
-                        place_index++;
-                        if (place_index >= Place::CardSignificant)
-                        {
-                            return true;
-                        }
-                        place_bitoffset = (PLACE_WIDTH - Place::CardBits[place_index]);
-                    }
-                    if (!founddiff)
-                    {
-                        comparebits = 8 - max(place_bitoffset & 7, vector_bitoffset);
-                    }
-                }
             }
-            while ((*anchor) && position > (*anchor)->bit)
+            while ((*anchor) && (position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo)) > (*anchor)->bit)
             {
                 anchor = &((*anchor)->nextold);
             }
-            if ((*anchor) && (*anchor)->bit == position)
+            if ((*anchor) && (*anchor)->bit == (position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo)))
             {
                 currentvector = (* anchor) -> vector;
                 anchor = &((* anchor) -> nextnew);
 
-                vector_byte = 0;
-                vector_bitoffset = 0;
-                ++position;
+                position += (vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo))+1;
+                vector_index = 0;
+                vector_bitstogo = VECTOR_WIDTH;
 
-                place_bitoffset++;
-                if (place_bitoffset >= PLACE_WIDTH)
+                place_bitstogo--;
+                if (!place_bitstogo)
                 {
                     place_index++;
-                    if (place_index >= Place::CardSignificant)
+                    if (place_index < Place::CardSignificant)
+                    {
+                        place_bitstogo = Place::CardBits[place_index];
+                    }
+                    else
                     {
                         return true;
                     }
-                    place_bitoffset = (PLACE_WIDTH - Place::CardBits[place_index]);
                 }
             }
             else
@@ -181,63 +188,76 @@ bool BinStore2::searchAndInsert()
         }
 
         // state not found --> prepare for insertion
-        Decision* newdecision = new Decision(position);
+        Decision* newdecision = new Decision(position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo));
         newdecision -> nextold = * anchor;
         * anchor = newdecision;
         newdecision -> nextnew = NULL;
         newvector = &(newdecision -> vector);
         // the mismatching bit itself is not represented in the new vector
-        vector_byte = 0;
-        vector_bitoffset = 0;
-        ++position;
+        position += (vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo))+1;
+        vector_index = 0;
+        vector_bitstogo = VECTOR_WIDTH;
 
-        place_bitoffset++;
-        if (place_bitoffset >= PLACE_WIDTH)
+        place_bitstogo--;
+        if (!place_bitstogo)
         {
             place_index++;
-            if (place_index >= Place::CardSignificant)
+            if (place_index < Place::CardSignificant)
+            {
+                place_bitstogo = Place::CardBits[place_index];
+            }
+            else
             {
                 * newvector = NULL;
                 ++markings;
                 return false;
             }
-            place_bitoffset = (PLACE_WIDTH - Place::CardBits[place_index]);
         }
     }
 
     // compress current marking into bitvector
     // we assume that place_index, placebit_index, position have the correct
     // initial values
-    *newvector = (uchar*) calloc(((Place::SizeOfBitVector - position) + 7) / 8, sizeof(uchar));
+    *newvector = (vectordata_t*) calloc(((Place::SizeOfBitVector - (position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo))) + (VECTOR_WIDTH-1)) / VECTOR_WIDTH, sizeof(vectordata_t));
 
     while (true)
     {
-        bitindex_t insertbits = 8 - max(place_bitoffset & 7, vector_bitoffset);
-        (*newvector)[vector_byte] |= uchar((capacity_t(Marking::Current[place_index] << place_bitoffset) >> (PLACE_WIDTH - insertbits)) << (8 - insertbits - vector_bitoffset));
+        bitindex_t insertbits = place_bitstogo < vector_bitstogo ? place_bitstogo : vector_bitstogo;
+        (*newvector)[vector_index] |= vectordata_t((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - insertbits)) << (vector_bitstogo - insertbits));
 
-        vector_bitoffset += insertbits;
-        if (vector_bitoffset >= 8)
+        if (vector_bitstogo == insertbits)
         {
-            vector_byte++, vector_bitoffset = 0;
+            vector_index++, vector_bitstogo = VECTOR_WIDTH;
         }
-        place_bitoffset += insertbits;
-        if (place_bitoffset >= PLACE_WIDTH)
+        else
+        {
+            vector_bitstogo -= insertbits;
+        }
+        if (place_bitstogo == insertbits)
         {
             place_index++;
-            if (place_index >= Place::CardSignificant)
+            if (place_index < Place::CardSignificant)
+            {
+                place_bitstogo = Place::CardBits[place_index];
+            }
+            else
             {
                 ++markings;
                 return false;
             }
-            place_bitoffset = (PLACE_WIDTH - Place::CardBits[place_index]);
+        }
+        else
+        {
+            place_bitstogo -= insertbits;
         }
     }
 }
 
 bool BinStore2::searchAndInsert(State** result) {}
 
+/** may not work anymore due to variable vector data size
 
-void BinStore2::pbs(unsigned int b, unsigned int p, unsigned char* f, void* v)
+void BinStore2::pbs(unsigned int b, unsigned int p, vectordata_t* f, void* v)
 {
 
     int i;
@@ -285,4 +305,5 @@ void BinStore2::printBinStore()
             printf("\n");
         }
     }
-}
+
+}*/

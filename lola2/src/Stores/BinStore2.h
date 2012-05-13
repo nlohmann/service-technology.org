@@ -9,7 +9,7 @@
 #include "Core/Dimensions.h"
 #include "Stores/Store.h"
 
-typedef unsigned char uchar;
+typedef uint32_t vectordata_t;
 
 
 class BinStore2 : public Store
@@ -23,8 +23,8 @@ class BinStore2 : public Store
 
         /// check whether current marking is sted and return state
         virtual bool searchAndInsert(State** s);
-        void pbs(unsigned int, unsigned int, uchar*, void*);
-        void printBinStore();
+        //void pbs(unsigned int, unsigned int, vectordata_t*, void*);
+        //void printBinStore();
     private:
         /// a binary decision node
         class Decision
@@ -32,7 +32,7 @@ class BinStore2 : public Store
             public:
                 Decision(bitindex_t);
                 bitindex_t bit;
-                uchar* vector;
+                vectordata_t* vector;
                 Decision* nextold;
                 Decision* nextnew;
                 State* state;
@@ -43,6 +43,6 @@ class BinStore2 : public Store
         Decision** branch;
 
         // first vector in bucket; null as long as bucket empty
-        uchar** firstvector;
+        vectordata_t** firstvector;
 };
 

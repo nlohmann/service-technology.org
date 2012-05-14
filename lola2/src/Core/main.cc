@@ -314,7 +314,22 @@ int main(int argc, char** argv)
         assert(s);
         assert(p);
         assert(fl);
-        const bool result = p->depth_first(*s, * fl);
+
+        bool result;
+
+        switch(args_info.search_arg)
+        {
+            case search_arg_depth:
+                result = p->depth_first(*s, * fl);
+                break;
+            
+            case search_arg_findpath:
+                result = p->find_path(0, 1000000, *fl);
+                break;
+            
+            default:
+                assert(false);
+        }
 
         rep->message("result: %s", result ? rep->markup(MARKUP_GOOD, "yes").str() : rep->markup(MARKUP_BAD, "no").str());
 

@@ -23,6 +23,13 @@ option "hashfunctions" -
   optional
   hidden
 
+option "search" -
+  "Search strategy"
+  values="depth","breadth","findpath" enum
+  typestr="STRATEGY"
+  default="depth"
+  optional
+
 option "path" p
   "Print witness path"
   flag off

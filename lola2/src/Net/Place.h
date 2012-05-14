@@ -6,7 +6,7 @@
 \brief Global data for place specific information
 
 All data that describe attributes of places can be found here. General
-information for a place in its role as a node, ar contained in Node.*
+information for a place in its role as a node, or contained in Node.*
 */
 
 #pragma once

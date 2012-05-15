@@ -1,14 +1,17 @@
 # the main program
-bin_PROGRAMS = owfn2sara form2sara
+bin_PROGRAMS = owfn2sara form2sara lola2sara
 
 # the plain sources you need to compile (no generated code)
 owfn2sara_SOURCES = owfn2sara.cc problem.h problem.cc verbose.h verbose.cc cmdline.h cmdline.c
 form2sara_SOURCES = form2sara.cc BFNode.h BFNode.cc verbose.h verbose.cc cmdline-form2sara.h \
 			cmdline-form2sara.c syntax_form2sara.yy lexic_form2sara.ll
+lola2sara_SOURCES = lola2sara.cc l2sBFNOde.h l2sBFNode.cc verbose.h verbose.cc cmdline-lola2sara.h \
+			cmdline-lola2sara.c syntax_lola2sara.yy lexic_lola2sara.ll
 
 # pass the sysconfdir to Sara (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 owfn2sara_CPPFLAGS = -I$(top_srcdir)/libs
 form2sara_CPPFLAGS = -I$(top_srcdir)/libs
+lola2sara_CPPFLAGS = -I$(top_srcdir)/libs
 # owfn2sara_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.la
 
 # only add the local Petri net API if necessary
@@ -38,6 +41,7 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 
 BISON_FILES = $(filter %.yy,$(form2sara_SOURCES))
+BISON_FILES += $(filter %.yy,$(lola2sara_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
@@ -64,7 +68,7 @@ DISTCLEANFILES += config-log.h
 
 .ggo.c:
 	$(AM_V_GEN)$(GENGETOPT) --input=$< --file-name=$(@:.c=)
-GENGETOPT_FILES = cmdline.ggo cmdline-form2sara.ggo
+GENGETOPT_FILES = cmdline.ggo cmdline-form2sara.ggo cmdline-lola2sara.ggo
 BUILT_SOURCES += $(GENGETOPT_FILES:.ggo=.c)
 EXTRA_DIST += $(GENGETOPT_FILES)
 MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)

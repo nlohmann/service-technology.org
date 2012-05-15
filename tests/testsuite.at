@@ -1,0 +1,126 @@
+AT_INIT
+AT_COLOR_TESTS
+
+m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([LOCRETIA --help],0,ignore)
+AT_CHECK([LOCRETIA --detailed-help],0,ignore)
+AT_CHECK([LOCRETIA --full-help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([LOCRETIA --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Memory Management])
+############################################################################
+
+AT_SETUP([Checking for memory leaks with Valgrind])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK_LOLA
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOCRETIA_RAW myCoffee.owfn --finalize -n 1 -u 20 -l 1],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks with Valgrind])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK_LOLA
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOCRETIA_RAW myCoffee.owfn --finalize -n 1 -u 20 -l 1 -p -m 1],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Errors])
+############################################################################
+
+AT_SETUP([Input file not found])
+AT_CHECK([LOCRETIA foo.owfn --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#01\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+#AT_SETUP([Syntax error])
+#AT_CHECK([cp TESTFILES/error02.* .])
+#AT_CHECK([LOCRETIA error02.owfn --lola=],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#02\]]" stderr])
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+
+#AT_SETUP([Un-normal input net])
+#AT_CHECK([cp TESTFILES/error03.* .])
+#AT_CHECK([LOCRETIA error03.owfn --lola=],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#03\]]" stderr])
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+
+#AT_SETUP([Multiple file input])
+#AT_CHECK([cp TESTFILES/error04* .])
+#AT_CHECK([LOCRETIA error04-1.owfn error04-2.owfn --lola=],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#04\]]" stderr])
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+
+#AT_SETUP([Error building the reachability graph])
+#AT_CHECK([cp TESTFILES/error06.* .])
+#AT_CHECK([LOCRETIA error06.owfn --lola=foo],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#06\]]" stderr])
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+
+AT_SETUP([Invalid command line parameter])
+AT_CHECK([LOCRETIA --foo],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#07\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+#AT_SETUP([Cannot write to file])
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+#AT_CHECK([touch myCoffee.og myCoffee.dot myCoffee.sa myCoffee.im])
+#AT_CHECK([chmod a-w myCoffee.og myCoffee.dot myCoffee.sa myCoffee.im])
+#AT_CHECK([LOCRETIA myCoffee.owfn --og --verbose],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
+#AT_CHECK([LOCRETIA myCoffee.owfn --sa --verbose],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
+#AT_CHECK([LOCRETIA myCoffee.owfn --im --verbose],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
+#AT_CHECK([LOCRETIA myCoffee.owfn --dot --verbose],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+
+#AT_SETUP([Cannot create tempfile])
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+#AT_CHECK([touch foo])
+#AT_CHECK([chmod a-w foo])
+#AT_CHECK([LOCRETIA myCoffee.owfn --verbose --tmpfile=foo],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#13\]]" stderr])
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+
+AT_SETUP([Missing configuration file])
+AT_CHECK([LOCRETIA --config=foo],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+#AT_SETUP([Invalid configuration file])
+#AT_DATA([locretia.conf], [invalid="PARAMETER"])
+#AT_CHECK([LOCRETIA -v],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+

@@ -86,6 +86,7 @@ changeit ./doc/ChangeLog.texi
 changeit ./doc/Makefile.am
 
 changeit ./tests/testsuite.at
+changeit ./tests/package.m4.in
 
 # these 2 files have 'hello' in their filenames, so we just rename them
 changeit ./src/hello.conf.in

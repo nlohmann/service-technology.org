@@ -30,9 +30,6 @@
 
 using std::set;
 
-/// the command line parameters
-extern gengetopt_args_info args_info;
-
 
 /******************
  * STATIC MEMBERS *

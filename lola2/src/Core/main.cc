@@ -204,15 +204,10 @@ int main(int argc, char** argv)
 
         if (args_info.formula_given)
         {
-            ptformula_in = fopen(args_info.formula_arg, "r");
-            if (ptformula_in == NULL)
-            {
-                rep->message("cannot open formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
-                rep->abort(ERROR_FILE);
-            }
+            Input *formulaFile = new Input("formula", args_info.formula_arg);
+            ptformula_in = *formulaFile;
 
             ptformula_parse();
-            rep->status("parsed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
 
             TheFormula = TheFormula->rewrite(kc::arrows);
             TheFormula = TheFormula->rewrite(kc::neg);
@@ -229,7 +224,9 @@ int main(int argc, char** argv)
 
             // tidy parser
             ptformula_lex_destroy();
-            fclose(ptformula_in);
+            delete formulaFile;
+
+            rep->status("processed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
         }
 
         delete symbolTables;

@@ -205,6 +205,12 @@ int main(int argc, char** argv)
         if (args_info.formula_given)
         {
             ptformula_in = fopen(args_info.formula_arg, "r");
+            if (ptformula_in == NULL)
+            {
+                rep->message("cannot open formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
+                rep->abort(ERROR_FILE);
+            }
+
             ptformula_parse();
             rep->status("parsed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
 

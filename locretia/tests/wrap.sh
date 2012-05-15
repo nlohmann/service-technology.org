@@ -12,7 +12,6 @@
 # If the executable is found, it is executed with all given parameters and its
 # exit code is passed to the caller of this script.
 
-
 if test -f $1
   then eval $*
   else exit 77

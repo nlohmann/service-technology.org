@@ -682,7 +682,7 @@ additional debugging output.
 @section Additional Utilities
 
 Additional utilities can be found in the utils directory. At this time there are
-two of them: owfn2sara and form2sara. Owfn2sara takes a list of Petri net files from stdin,
+three of them: owfn2sara, form2sara, and lola2sara. Owfn2sara takes a list of Petri net files from stdin,
 computes a final marking for each net (containing each place with an empty postset)
 and creates a list of problem instances, at least one for each net, which are written to stdout. 
 This list can be piped to the main tool Sara to check if certain properties hold.
@@ -705,6 +705,23 @@ All options can be combined to check for all properties at once.
 The tool form2sara was written for a model checking contest and can create Sara problem
 files from a Petri net and a formula specifying the final marking given in the contest's
 syntax.
+
+The tool lola2sara translates a LoLA task file (containing a formula) to a Sara problem
+file. At the moment, only standard propositional formulae over weighted sums of places
+and transitions can be translated. As boolean operators NOT, AND, OR, XOR, ->, and <->
+are allowed. The tool has to be called with the name of the Petri net file (which will
+not be opened by the tool) and the name of the formula file. The type of the Petri net
+can (and should) be declared by one of the options @option{--lola}, @option{--owfn},
+or @option{--pnml}.
+
+@cartouche
+@smallexample
+lola2sara -n <net file> -f <formula file>
+@end smallexample
+@end cartouche
+
+The tool lola2sara will print its output to stdout from where it can be piped either
+to a .sara-file or directly to Sara (using the option @option{-p}).
 
 @section Using Sara as a library
 
@@ -790,9 +807,14 @@ H.Wimmel. @b{Entscheidbarkeit bei Petri Netzen}. Springer, ISBN 978-3-540-85470-
 
 Sara solves the reachability problem by first solving (a possibly extended version of)
 the Marking Equation and then trying to transform a solution vector (if found) into
-a firing sequence. At the moment, there are no publications yet showing the details
-of Sara's algorithm and how it works. There are publications about the tools and
-general methods used by Sara, though. 
+a firing sequence. The following paper describes in more detail how Sara works:
+
+@quotation
+H. Wimmel, K. Wolf. @b{Applying CEGAR to the Petri Net State Equation}. @i{Proceedings of TACAS 2010}, Lecture Notes in Computer Science @b{6605}, pp.224--238, Springer, 2011.
+@end quotation
+
+There also are publications about the tools and
+general methods used by Sara. 
 
 @subsubheading Solving the Marking Equation
 
@@ -961,7 +983,7 @@ sara: solved, but no solution found -- aborting [#14]
 @end smallexample
 
 @item #31
-The utility form2sara could not parse the file containing the formula.
+One of the utilities form2sara, lola2sara, or owfn2sara could not parse the file containing the formula.
 
 @smallexample
 @cartouche
@@ -970,7 +992,7 @@ sara: error while parsing the formula file -- aborting [#31]
 @end smallexample
 
 @item #32
-The utility form2sara could not access the file containing the formula.
+One of the utilities form2sara, lola2sara, or owfn2sara could not access the file containing the formula.
 
 @smallexample
 @cartouche

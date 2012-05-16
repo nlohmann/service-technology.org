@@ -66,7 +66,7 @@ Negation(AtomicProposition(LessEqualAtomicProposition(p,n))) -> <neg: AtomicProp
 // NOT TRUE  ->  FALSE
 Negation(AtomicProposition(True())) -> <neg: AtomicProposition(False()) >;
 
-// NOT FALSE  ->  FALSE
+// NOT FALSE  ->  TRUE
 Negation(AtomicProposition(False())) -> <neg: AtomicProposition(True()) >;
 
 
@@ -113,14 +113,18 @@ LessAtomicProposition(x,y) -> <leq: LessEqualAtomicProposition(Sum(x, Number(mki
 // take right side to left
 LessEqualAtomicProposition(x, s=Sum(y,z))        -> <sides: LessEqualAtomicProposition(Difference(x, s), Number(mkinteger(0))) >;
 LessEqualAtomicProposition(x, p=Product(y,z))    -> <sides: LessEqualAtomicProposition(Difference(x, p), Number(mkinteger(0))) >;
+LessEqualAtomicProposition(x, n=Node(y))    -> <sides: LessEqualAtomicProposition(Difference(x, n), Number(mkinteger(0))) >;
 
 // take number back to right
-LessEqualAtomicProposition(Sum(Number(x), y), Number(z) )    provided (z->value == 0) -> <sides: LessEqualAtomicProposition(y, Number(mult(mkinteger(-1),x))) >;
+//LessEqualAtomicProposition(Sum(Number(x), y), Number(z) )    provided (z->value == 0) -> <sides: LessEqualAtomicProposition(y, Number(mult(mkinteger(-1),x))) >;
+LessEqualAtomicProposition(Sum(Number(x), y), Number(z) )    -> <sides: LessEqualAtomicProposition(y, Number(plus(mult(mkinteger(-1),x),z))) >;
 
 
 
 // x <= z    ->   1*x <= z
 LessEqualAtomicProposition(Node(x), Number(z)) -> <sides: LessEqualAtomicProposition(Product(mkinteger(1), Node(x)), Number(z)) >;
+Sum(n=Node(x),y) -> <sides: Sum(Product(mkinteger(1),n),y)>;
+Sum(x,n=Node(y)) -> <sides: Sum(x,Product(mkinteger(1),n))>;
 
 // replace differences by sums
 Difference(x,y) -> <sides: Sum(x, Product(mkinteger(-1), y)) >;

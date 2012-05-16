@@ -16,6 +16,8 @@
 ///!\todo Schleifen behandeln - können evtl. rausgenommen werden
 AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k)
 {
+    //printf("+ %p->AtomicStatePredicate(p=%d, n=%d, k=%d)\n", this, p, n, k);
+
     parent = NULL;
     posPlaces = (index_t*) malloc(p * SIZEOF_INDEX_T);
     negPlaces = (index_t*) malloc(n * SIZEOF_INDEX_T);
@@ -36,6 +38,8 @@ AtomicStatePredicate::~AtomicStatePredicate()
 
 void AtomicStatePredicate::addPos(index_t i, index_t p, capacity_t m)
 {
+    //printf("+ %p->addPos(i=%d, p=%d, m=%d)\n", this, i, p, m);
+
     assert(i < cardPos);
     posPlaces[i] = p;
     posMult[i] = m;
@@ -43,6 +47,8 @@ void AtomicStatePredicate::addPos(index_t i, index_t p, capacity_t m)
 
 void AtomicStatePredicate::addNeg(index_t i, index_t p, capacity_t m)
 {
+    //printf("+ %p->addNeg(i=%d, p=%d, m=%d)\n", this, i, p, m);
+
     assert(i < cardNeg);
     negPlaces[i] = p;
     negMult[i] = m;

@@ -7,11 +7,14 @@
 */
 
 #include <cstdlib>
+#include <cstdio>
 #include "Formula/DisjunctionStatePredicate.h"
 #include "Net/Net.h"
 
 DisjunctionStatePredicate::DisjunctionStatePredicate(index_t n)
 {
+    //printf("+ %p->DisjunctionStatePredicate(n=%d)\n", this, n);
+
     parent = NULL;
     sub = (StatePredicate**) malloc(n * SIZEOF_VOIDP);
     cardSub = n;
@@ -28,6 +31,8 @@ DisjunctionStatePredicate::~DisjunctionStatePredicate()
 
 void DisjunctionStatePredicate::addSub(index_t i, StatePredicate* f)
 {
+    //printf("+ %p->addSub(i=%d, f=%p)\n", this, i, f);
+
     assert(i < cardSub);
     sub[i] = f;
     sub[i] -> position = i;

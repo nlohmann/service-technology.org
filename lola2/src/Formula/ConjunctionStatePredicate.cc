@@ -6,11 +6,14 @@
 \brief class implementation for conjunction state predicates
 */
 
-#include "Formula/ConjunctionStatePredicate.h"
 #include <cstdlib>
+#include <cstdio>
+#include "Formula/ConjunctionStatePredicate.h"
 
 ConjunctionStatePredicate::ConjunctionStatePredicate(index_t n)
 {
+    //printf("+ %p->ConjunctionStatePredicate(n=%d)\n", this, n);
+
     parent = NULL;
     sub = (StatePredicate**) malloc(n * SIZEOF_VOIDP);
     cardSub = n;
@@ -27,6 +30,8 @@ ConjunctionStatePredicate::~ConjunctionStatePredicate()
 
 void ConjunctionStatePredicate::addSub(index_t i, StatePredicate* f)
 {
+    //printf("+ %p->addSub(i=%d, f=%p)\n", this, i, f);
+
     assert(i < cardSub);
     sub[i] = f;
     sub[i] -> position = i;

@@ -24,10 +24,12 @@ Product(x,y) -> [out: x "*" y];
 
 
 ConstConjunction_list(h, NiltConjunction_list()) -> [out: h];
-ConstConjunction_list(h, l) -> [out: h " AND " l];
+ConstConjunction_list(h, l) -> [out: h "\nAND\n" l];
 
 ConstDisjunction_list(h, NiltDisjunction_list()) -> [out: h];
 ConstDisjunction_list(h, l) -> [out: h " OR " l];
+
+Node(x) -> [out: "n" x ];
 
 //////////////////////////////////////////////////////////////////////////
 %uview internal;
@@ -35,6 +37,7 @@ ConstDisjunction_list(h, l) -> [out: h " OR " l];
 %{ KC_UNPARSE
 #include <map>
 #include <vector>
+#include <stack>
 #include "Formula/StatePredicate.h"
 #include "Formula/AtomicStatePredicate.h"
 #include "Formula/ConjunctionStatePredicate.h"
@@ -44,66 +47,127 @@ extern StatePredicate *sp;
 std::map<int, int> current;
 std::map<int, std::vector<StatePredicate *> > formulas;
 
-int currentId = 0;
+// invariant: top is always my parent
+std::stack<size_t> id_stack;
+
+// next free id
+size_t nextId = 0;
 %}
 
 StatePredicateFormula(x) -> [internal:
     {
-        // printf("I am a state predicate. I am %d\n", currentId);
+        //printf("I am a state predicate. I am %d\n", nextId);
+        id_stack.push(nextId++);
     }
     x
     {
+        nextId = id_stack.top();
+        id_stack.pop();
         // return the only entry for the root
-        assert(currentId == 0);
+        assert(nextId == 0);
         assert(formulas[0].size() == 1);
         sp = formulas[0][0];
-        // printf("I am a state predicate. Done!\n");
+        //printf("I am a state predicate. Done!\n");
+    }
+];
+
+
+Conjunction(a,b) -> [internal:
+    {
+        //printf("I am %d (a conjunction). My parent is %d\n", nextId, id_stack.top());
+        id_stack.push(nextId++);
+    }
+    a
+    b
+    {
+        // after returning from my childs, I am the top of the stack
+        const int myId = id_stack.top();
+        id_stack.pop();
+
+        StatePredicate *f = new ConjunctionStatePredicate(formulas[myId].size());
+        for (size_t i = 0; i < formulas[myId].size(); ++i)
+        {
+            //printf("conjunction %d: added a subformula to index %d\n", myId, i);
+            assert(formulas[myId][i]);
+            ((ConjunctionStatePredicate*)f)->addSub(i, formulas[myId][i]);
+        }
+
+        //printf("told my parent %d about me %d\n", id_stack.top(), myId);
+        formulas[id_stack.top()].push_back(f);
+    }
+];
+
+Disjunction(a,b) -> [internal:
+    {
+        //printf("I am %d (a disjunction). My parent is %d\n", nextId, id_stack.top());
+        id_stack.push(nextId++);
+    }
+    a
+    b
+    {
+        // after returning from my childs, I am the top of the stack
+        const int myId = id_stack.top();
+        id_stack.pop();
+
+        StatePredicate *f = new DisjunctionStatePredicate(formulas[myId].size());
+        for (size_t i = 0; i < formulas[myId].size(); ++i)
+        {
+            //printf("disjunction %d: added a subformula to index %d\n", myId, i);
+            assert(formulas[myId][i]);
+            ((DisjunctionStatePredicate*)f)->addSub(i, formulas[myId][i]);
+        }
+
+        //printf("told my parent %d about me %d\n", id_stack.top(), myId);
+        formulas[id_stack.top()].push_back(f);
     }
 ];
 
 
 ConjunctionList(l) -> [internal:
     {
-        // printf("I am %d (a conjunction list). My parent is %d\n", currentId+1, currentId);
-        currentId++;
+        //printf("I am %d (a conjunction list). My parent is %d\n", nextId+1, nextId);
+        nextId++;
     }
     l
     {
-        StatePredicate *f = new ConjunctionStatePredicate(formulas[currentId].size());
-        for (size_t i = 0; i < formulas[currentId].size(); ++i)
+        StatePredicate *f = new ConjunctionStatePredicate(formulas[nextId].size());
+        for (size_t i = 0; i < formulas[nextId].size(); ++i)
         {
-            // printf("added a subformula to index %d\n", i);
-            assert(formulas[currentId][i]);
-            ((ConjunctionStatePredicate*)f)->addSub(i, formulas[currentId][i]);
+            //printf("added a subformula to index %d\n", i);
+            assert(formulas[nextId][i]);
+            ((ConjunctionStatePredicate*)f)->addSub(i, formulas[nextId][i]);
         }
-        currentId--;
-        formulas[currentId].push_back(f);
+        nextId--;
+        formulas[nextId].push_back(f);
     }
 ];
 
 DisjunctionList(l) -> [internal:
     {
-        // printf("I am %d (a disjunction list). My parent is %d\n", currentId+1, currentId);
-        currentId++;
+        //printf("I am %d (a disjunction list). My parent is %d\n", nextId+1, nextId);
+        nextId++;
     }
     l
     {
-        StatePredicate *f = new DisjunctionStatePredicate(formulas[currentId].size());
-        for (size_t i = 0; i < formulas[currentId].size(); ++i)
+        StatePredicate *f = new DisjunctionStatePredicate(formulas[nextId].size());
+        for (size_t i = 0; i < formulas[nextId].size(); ++i)
         {
-            // printf("added a subformula to index %d\n", i);
-            assert(formulas[currentId][i]);
-            ((DisjunctionStatePredicate*)f)->addSub(i, formulas[currentId][i]);
+            //printf("added a subformula to index %d\n", i);
+            assert(formulas[nextId][i]);
+            ((DisjunctionStatePredicate*)f)->addSub(i, formulas[nextId][i]);
         }
-        currentId--;
-        formulas[currentId].push_back(f);
+        nextId--;
+        formulas[nextId].push_back(f);
     }
 ];
 
 
-LessEqualAtomicProposition(x, Number(y)) -> [internal: x {
-    // printf("I am an atomic proposition. My parent is %d\n", currentId);
-    
+AtomicProposition(a) -> [internal: a ];
+
+LessEqualAtomicProposition(x, y) -> [internal: x y
+{
+    //printf("I am an atomic proposition. My parent is %d\n", id_stack.top());
+
     int factors_positive = 0;
     int factors_negative = 0;
 
@@ -124,8 +188,26 @@ LessEqualAtomicProposition(x, Number(y)) -> [internal: x {
         }
     }
 
+    // collect numeric value either from x or from y
+    int val;
+    with(x) {
+        // x is number
+        Number(n): {
+            val = n->value;
+        }
+
+        // x is not a number
+        default: {
+            with(y) {
+                // y is a number
+                Number(n): { val = n->value; }
+                default:   { assert(false); }
+            }
+        }
+    }
+
     // create formula object
-    StatePredicate *f = new AtomicStatePredicate(factors_positive, factors_negative, y->value);
+    StatePredicate *f = new AtomicStatePredicate(factors_positive, factors_negative, val);
     int position_pos = 0;
     int position_neg = 0;
 
@@ -147,11 +229,17 @@ LessEqualAtomicProposition(x, Number(y)) -> [internal: x {
             ((AtomicStatePredicate*)f)->addNeg(position_neg++, it->first, -it->second);
         }
     }
+
+    // reset current
     current.clear();
-    formulas[currentId].push_back(f);
+
+    // register formula at parent
+    //printf("told my parent %d about me; %p\n", id_stack.top(), f);
+    formulas[id_stack.top()].push_back(f);
 }
 ];
 
+
 Product(x, Node(p)) -> [internal: { current[p->value] += x->value; } ];
 Node(p) -> [internal: { current[p->value] += 1; } ];
-Number(x) -> [internal: ];
+Number(x) -> [internal: /* do not print values */ ];

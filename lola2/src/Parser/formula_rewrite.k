@@ -145,6 +145,11 @@ Product(x, Product(y, z)) -> <sides: Product(mult(x,y), z) >;
 Product(x, Sum(Number(y), z)) -> <sides: Sum(Number(mult(x,y)), Product(x, z)) >;
 Product(x, Sum(y,z)) -> <sides: Sum(Product(x,y), Product(x,z)) >;
 
+// sort atomic propositions to back
+Disjunction(x=AtomicProposition(z),y=Disjunction(u,v)) -> <sides: Disjunction(y,x) >;
+Conjunction(x=AtomicProposition(z),y=Disjunction(u,v)) -> <sides: Conjunction(y,x) >;
+Disjunction(x=AtomicProposition(z),y=Conjunction(u,v)) -> <sides: Disjunction(y,x) >;
+Conjunction(x=AtomicProposition(z),y=Conjunction(u,v)) -> <sides: Conjunction(y,x) >;
 
 
 /****************************
@@ -157,7 +162,7 @@ Product(x, Sum(y,z)) -> <sides: Sum(Product(x,y), Product(x,z)) >;
 Sum(x,y) -> <lists: ProductList(ConstProduct_list(x, ConstProduct_list(y, NiltProduct_list())))>;
 
 // collect conjunctions in a conjunction list
-Conjunction(x,y) -> <lists: ConjunctionList(ConstConjunction_list(x, ConstConjunction_list(y, NiltConjunction_list())))>;
+//Conjunction(x,y) -> <lists: ConjunctionList(ConstConjunction_list(x, ConstConjunction_list(y, NiltConjunction_list())))>;
 
 // collect disjunctions in a disjunction list
-Disjunction(x,y) -> <lists: DisjunctionList(ConstDisjunction_list(x, ConstDisjunction_list(y, NiltDisjunction_list())))>;
+//Disjunction(x,y) -> <lists: DisjunctionList(ConstDisjunction_list(x, ConstDisjunction_list(y, NiltDisjunction_list())))>;

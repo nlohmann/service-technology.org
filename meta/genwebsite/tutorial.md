@@ -7,13 +7,15 @@
 * *SVN*
 * *GNA service-tech* repository *svn+ssh* access
 * A *JavaScript* interpreter (named js) compatible with *jsawk*, e.g. *Mozilla Spidermonkey*
+* *curl*
 
 ## Preparation
 
 * Checkout your tool *<tool>* from GNA
 
 * In the tool's *doc*-directory, create *<tool>.json* with at least the following objects (take *example.json* as template):
-  * *toolname* -- the actual name of the tool
+  * *toolname* -- the actual name of the tool - usually starting with an uppercase letter
+  * *shortname* -- the name of the executable
   * *svnname* -- the name of the tool in the SVN; required iff it differs from *toolname*
   * *authors* -- a list of authors, optionally with their specific accomplishments
   * *maintainer* -- a single person's real name who maintains *tools*

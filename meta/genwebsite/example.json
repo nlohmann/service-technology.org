@@ -1,5 +1,6 @@
 {
-"toolname": "lifechanger", 
+"toolname": "Lifechanger", 
+"shortname": "lifechanger", 
 "svnname": "lfc123", 
 "authors": [
     "Niels Lohmann implemented ...",
@@ -9,5 +10,5 @@
 "maintainer": "Niels Lohmann", 
 "tagline": "Making life easier", 
 "purpose": "Life is *hard*. Let's make life *easier*...", 
-"license": "AGPL3"
+"license": "AGPL3+"
 }

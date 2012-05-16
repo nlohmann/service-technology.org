@@ -5,7 +5,7 @@ bin_PROGRAMS = owfn2sara form2sara lola2sara
 owfn2sara_SOURCES = owfn2sara.cc problem.h problem.cc verbose.h verbose.cc cmdline.h cmdline.c
 form2sara_SOURCES = form2sara.cc BFNode.h BFNode.cc verbose.h verbose.cc cmdline-form2sara.h \
 			cmdline-form2sara.c syntax_form2sara.yy lexic_form2sara.ll
-lola2sara_SOURCES = lola2sara.cc l2sBFNOde.h l2sBFNode.cc verbose.h verbose.cc cmdline-lola2sara.h \
+lola2sara_SOURCES = lola2sara.cc l2sBFNode.h l2sBFNode.cc verbose.h verbose.cc cmdline-lola2sara.h \
 			cmdline-lola2sara.c syntax_lola2sara.yy lexic_lola2sara.ll
 
 # pass the sysconfdir to Sara (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)

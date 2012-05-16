@@ -514,6 +514,7 @@ AT_KEYWORDS([bug])
 AT_CLEANUP
 
 AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968), Petrify])
+AT_CHECK_PETRIFY
 m4_define([NET], [bug13968.sa])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI -isa -oowfn --petrify=PETRIFY NET], 0, ignore, stderr)
@@ -1254,6 +1255,7 @@ AT_KEYWORDS([automaton])
 AT_CLEANUP
 
 AT_SETUP([Behavior preservation (asynchronous, Petrify)])
+AT_CHECK_PETRIFY
 m4_define([NET], [test_automaton_behavior_async.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET -osa], 0, ignore, ignore)

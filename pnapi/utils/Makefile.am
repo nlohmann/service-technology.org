@@ -66,7 +66,7 @@ MAINTAINERCLEANFILES =
 # GENERIC: organize distribution and cleaning of Bison sources #
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$(cdnf_SOURCES))
-BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
+BUILT_SOURCES += $(BISON_FILES:.yy=.cc) $(BISON_FILES:.yy=.hh)
 EXTRA_DIST += $(BISON_FILES:.yy=.hh)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
 

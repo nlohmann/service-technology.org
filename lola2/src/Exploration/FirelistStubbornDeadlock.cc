@@ -147,20 +147,20 @@ index_t FirelistStubbornDeadlock::getFirelist(index_t** result)
                     assert(CardStubborn > 0);
                     assert(CardStubborn <= Transition::CardEnabled);
                     * result = new index_t [CardStubborn];
-                    index_t resultindex = 0;
+                    index_t resultindex = CardStubborn;
                     while (currenttransition != TarjanStack[tarjanstackpointer])
                     {
                         index_t poppedTransition = TarjanStack[tarjanstackpointer--];
                         if (Transition::Enabled[poppedTransition])
                         {
-                            (*result)[resultindex++] = poppedTransition;
+                            (*result)[--resultindex] = poppedTransition;
                         }
                     }
                     if (Transition::Enabled[currenttransition])
                     {
-                        (*result)[resultindex++] = currenttransition;
+                        (*result)[--resultindex] = currenttransition;
                     }
-                    assert(resultindex == CardStubborn);
+                    assert(resultindex == 0);
                     return(CardStubborn);
                 }
                 else

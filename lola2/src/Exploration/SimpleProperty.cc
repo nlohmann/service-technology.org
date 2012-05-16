@@ -181,8 +181,8 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
 	    // phase 1
 	    for(index_t i = cardFirelist; i > 0; )
 	    {
-		index_t t = currentFirelist[i];
 		--i;
+		index_t t = currentFirelist[i];
 		// compute hash value for t successor
 		hash_t h = (Marking::HashCurrent + Transition::DeltaHash[t]) % SIZEOF_MARKINGTABLE;
 		if(((float) rand()/ (float) RAND_MAX) <= 1.0 / (1.0 + hashtable[h]))

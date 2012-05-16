@@ -475,6 +475,7 @@ AT_BANNER([Composition and Product])
 ############################################################################
 
 AT_SETUP([Product with constraint net])
+AT_CHECK_FIONA
 AT_CHECK([cp TESTFILES/test_produce.onlineshop.constraint.owfn TESTFILES/test_produce.onlineshop.owfn .])
 AT_CHECK([PETRI test_produce.onlineshop.owfn --produce=test_produce.onlineshop.constraint.owfn --output=owfn],0)
 AT_CHECK([GREP -q "|P|= 20  |P_in|= 3  |P_out|= 5  |T|= 11  |F|= 43" test_produce.onlineshop.owfn.owfn])
@@ -1172,6 +1173,7 @@ AT_BANNER([Normalize])
 ############################################################################
 
 AT_SETUP([Fiona: Abnormal Input])
+AT_CHECK_FIONA
 m4_define([NET], [fiona_abnormal_input])
 m4_define([EXPECTED], [NET.normalized.expected.owfn])
 AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
@@ -1181,6 +1183,7 @@ AT_KEYWORDS([normalize fiona])
 AT_CLEANUP
 
 AT_SETUP([Fiona: Abnormal Output])
+AT_CHECK_FIONA
 m4_define([NET], [fiona_abnormal_output])
 m4_define([EXPECTED], [NET.normalized.expected.owfn])
 AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
@@ -1190,6 +1193,7 @@ AT_KEYWORDS([normalize fiona])
 AT_CLEANUP
 
 AT_SETUP([Fiona: Abnormal Input and Output])
+AT_CHECK_FIONA
 m4_define([NET], [fiona_abnormal_both])
 m4_define([EXPECTED], [NET.normalized.expected.owfn])
 AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
@@ -1199,6 +1203,7 @@ AT_KEYWORDS([normalize fiona])
 AT_CLEANUP
 
 AT_SETUP([Fiona: Abnormal Input and Output])
+AT_CHECK_FIONA
 m4_define([NET], [fiona_abnormal_both2])
 m4_define([EXPECTED], [NET.normalized.expected.owfn])
 AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
@@ -1208,6 +1213,7 @@ AT_KEYWORDS([normalize fiona])
 AT_CLEANUP
 
 AT_SETUP([Fiona: Coffee Automaton])
+AT_CHECK_FIONA
 m4_define([NET], [fiona_coffee])
 m4_define([EXPECTED], [NET.normalized.expected.owfn])
 AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
@@ -1256,6 +1262,7 @@ AT_CLEANUP
 
 AT_SETUP([Behavior preservation (asynchronous, Petrify)])
 AT_CHECK_PETRIFY
+AT_CHECK_FIONA
 m4_define([NET], [test_automaton_behavior_async.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
@@ -1265,6 +1272,7 @@ AT_KEYWORDS([automaton synthesis])
 AT_CLEANUP
 
 AT_SETUP([Behavior preservation (asynchronous, SM)])
+AT_CHECK_FIONA
 m4_define([NET], [test_automaton_behavior_async.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
@@ -1474,6 +1482,7 @@ AT_BANNER([Net Synthesis])
 ############################################################################
 
 AT_SETUP([Synthesis using state machine transition])
+AT_CHECK_FIONA
 m4_define([AUTOMATON], [test_myCoffee.sa])
 AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-syn.owfn .])
 AT_CHECK([PETRI -isa -oowfn AUTOMATON],0,ignore,ignore)
@@ -1485,6 +1494,7 @@ AT_KEYWORDS([synthesis])
 AT_CLEANUP
 
 AT_SETUP([Synthesis using Petrify])
+AT_CHECK_FIONA
 m4_define([AUTOMATON], [test_myCoffee.sa])
 AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-sm.owfn .])
 AT_CHECK_PETRIFY

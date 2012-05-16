@@ -104,7 +104,8 @@ int main(int argc, char *argv[]) {
 	
     
     // parse high-level net and pipe it to LoLA (initial marking)
-    pipe_out_initial = popen("lola-statespace -nllnet1 2> /dev/null", "w");
+    std::string call1 = std::string(CONFIG_LOLA) + " -nllnet1 2> /dev/null";
+    pipe_out_initial = popen(call1.c_str(), "w");
     hlowfn_initial_in = fopen(tmpFileName, "r");
     hlowfn_initial_out = pipe_out_initial;
     hlowfn_initial_parse();
@@ -112,7 +113,8 @@ int main(int argc, char *argv[]) {
     fclose(hlowfn_initial_in);
       
     // parse high-level net and pipe it to LoLA (final marking)
-    pipe_out_final = popen("lola-statespace -nllnet2 2> /dev/null", "w");
+    std::string call2 = std::string(CONFIG_LOLA) + " -nllnet2 2> /dev/null";
+    pipe_out_final = popen(call2.c_str(), "w");
     hlowfn_final_in = fopen(tmpFileName, "r");
     hlowfn_final_out = pipe_out_final;
     hlowfn_final_parse();

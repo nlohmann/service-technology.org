@@ -43,4 +43,6 @@ AC_MSG_RESULT([${ac_cv_path_LOLAVERSION}])
 echo ${ac_cv_path_LOLAVERSION} | ${AWK} '{if (@S|@1 >= $1) exit 0; else exit 1}' || AC_MSG_WARN([${PACKAGE_NAME} needs at least LoLA $1! See file REQUIREMENTS.])
 fi
 
+AC_DEFINE_UNQUOTED(CONFIG_LOLA, "\"${ac_cv_path_LOLAVERSION}\"", [LoLA can be used.])
+
 ])

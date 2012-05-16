@@ -1537,6 +1537,7 @@ AT_BANNER([Unfolder])
 ############################################################################
 
 AT_SETUP([Unfolding high-level oWFN 1])
+AT_CHECK_LOLA
 m4_define([NET], [phils.hlowfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([cat NET | UNFOLDER], 0, stdout, ignore)
@@ -1547,6 +1548,7 @@ AT_KEYWORDS([unfold hlowfn])
 AT_CLEANUP
 
 AT_SETUP([Unfolding high-level oWFN 2])
+AT_CHECK_LOLA
 m4_define([NET], [data.hlowfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([cat NET | UNFOLDER], 0, stdout, ignore)
@@ -1558,6 +1560,7 @@ AT_KEYWORDS([unfold hlowfn])
 AT_CLEANUP
 
 AT_SETUP([Unfolding high-level oWFN 3])
+AT_CHECK_LOLA
 m4_define([NET], [eisen.hlowfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([cat NET | UNFOLDER], 0, stdout, ignore)

@@ -135,7 +135,7 @@ Sum(Number(x), Number(y)) -> <sides: Number(plus(x,y)) >;
 Sum(Number(x), Sum(Number(y), z)) -> <sides: Sum(Number(plus(x,y)), z) >;
 Sum(Number(x), y) provided (x->value == 0) -> <sides: y >;
 Product(x, y) provided (x->value == 0) -> <sides: Number(0) >;
-Product(x, y) provided (x->value == 1) -> <sides: y >;
+//Product(x, y) provided (x->value == 1) -> <sides: y >;
 
 // move parentheses
 Sum(Sum(x,y), z) -> <sides: Sum(x, Sum(y, z)) >;

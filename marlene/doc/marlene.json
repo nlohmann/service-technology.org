@@ -1,0 +1,12 @@
+{
+"toolname": "Marlene", 
+"svnname": "marlene", 
+"authors": [
+    "Christian Gierds implemented ...",
+    "Richard Müller implemented ..."
+], 
+"maintainer": "Christian Gierds", 
+"tagline": "Making adapters behave well.", 
+"purpose": "Synthesizes adapters for open net services.", 
+"license": "AGPL3"
+}

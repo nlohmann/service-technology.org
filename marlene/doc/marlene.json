@@ -1,9 +1,10 @@
 {
 "toolname": "Marlene", 
+"shortname": "marlene",
 "svnname": "marlene", 
 "authors": [
     "Christian Gierds implemented ...",
-    "Richard Mueller implemented ..."
+    "Richard Müller implemented ..."
 ], 
 "maintainer": "Christian Gierds", 
 "tagline": "Making adapters behave well.", 

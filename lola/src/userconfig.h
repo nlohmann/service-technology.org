@@ -151,9 +151,9 @@
 //#define HOME
 //#define FINDPATH
 //#define FULL
-#define DEADLOCK
+//#define DEADLOCK
 //#define NONE
-//#define STATEPREDICATE
+#define STATEPREDICATE
 //#define LIVEPROP
 //#define FAIRPROP
 //#define STABLEPROP

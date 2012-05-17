@@ -129,7 +129,7 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
     index_t currentEntry = myFirelist.getFirelist(&currentFirelist);
 
     // loop #attempts times
-    while (attempts && currentattempt++ < attempts)
+    while (!attempts || currentattempt++ < attempts)
     {
 	    // copy initial marking into current marking
 	    memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);

@@ -85,4 +85,5 @@ class AtomicStatePredicate : public StatePredicate
         /// collects atomic subformulas; array must be malloced beforehand
         /// result is number of inserted elements
         virtual index_t collectAtomic(AtomicStatePredicate**);
+	virtual void consistency();
 };

@@ -37,7 +37,7 @@ class ConjunctionStatePredicate : public StatePredicate
         /// examined.
         virtual void evaluate();
 
-        StatePredicate* parent;
+	virtual void consistency();
 
     private:
         /// the list of subformulas

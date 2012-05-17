@@ -16,6 +16,7 @@ class AtomicStatePredicate;
 class StatePredicate
 {
     public:
+	static StatePredicate *  top; // for debugging only
 	virtual ~StatePredicate() {};
         /// Stack is an array of distinct transition indices. onstack is an array of booleans, initially all false.
         /// getUpSet fills stack with an up set of the predicate. Added elements are marked true in onstack.
@@ -52,4 +53,5 @@ class StatePredicate
         /// collects atomic subformulas; array must be malloced beforehand
         /// result is number of inserted elements
         virtual index_t collectAtomic(AtomicStatePredicate**) = 0;
+	virtual void consistency() = 0;
 };

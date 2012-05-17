@@ -45,5 +45,5 @@ class StatePredicateProperty: public SimpleProperty
 
         // changedSum[t][i] is the difference that t causes in the formal sum of
         // state predicate changedPredicate[t][i]
-        index_t** changedSum;
+        int** changedSum;
 };

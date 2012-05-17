@@ -7,9 +7,11 @@
 */
 
 #include <cstdlib>
+#include <cstdio>
 #include "Core/Dimensions.h"
 #include "Net/Net.h"
 #include "Net/Transition.h"
+#include "Net/Marking.h"
 #include "Exploration/FirelistStubbornStatePredicate.h"
 
 FirelistStubbornStatePredicate::FirelistStubbornStatePredicate(StatePredicate* p)
@@ -28,15 +30,17 @@ FirelistStubbornStatePredicate::~FirelistStubbornStatePredicate()
 index_t FirelistStubbornStatePredicate::getFirelist(index_t** result)
 {
 
-    index_t stackpointer = predicate->getUpSet(dfsStack, onStack);
-    index_t cardEnabled = 0;
-
 
     if (Transition::CardEnabled == 0)
     {
         * result = new index_t[1];
         return 0;
     }
+
+    index_t stackpointer = predicate->getUpSet(dfsStack, onStack);
+    index_t cardEnabled = 0;
+  
+
 
     // loop until all stack elements processed
     for (index_t firstunprocessed = 0; firstunprocessed < stackpointer; ++firstunprocessed)

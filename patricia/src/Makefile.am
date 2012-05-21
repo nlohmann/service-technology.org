@@ -10,7 +10,7 @@ patricia_SOURCES = cmdline.c cmdline.h main.cc \
                    tools.cc tools.h \
                    outcome.cc outcome.h \
                    problem.cc problem.h \
-                   tools/lola.cc tools/lola.h tools/sara.cc tools/sara.h
+                   tools/lola.cc tools/lola.h tools/sara.cc tools/sara.h tools/lola2.cc tools/lola2.h
 
 # pass the sysconfdir to Patricia (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 patricia_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"

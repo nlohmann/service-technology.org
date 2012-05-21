@@ -9,9 +9,7 @@
 #include "action.h"
 #include "tools/sara.h"
 #include "tools/lola.h"
-
-using std::cerr;
-using std::endl;
+#include "tools/lola2.h"
 
 extern gengetopt_args_info args_info;
 
@@ -48,6 +46,7 @@ Action* Problem::plan() {
 	/* Existing plans so far:
 		- SL:  Call Sara and Lola-Statepredicate concurrently.
 		- FSL: Call Lola-Findpath first. If no solution is found, continue as in SL.
+		- FSL2: Same as FSL, but calling the new LoLA (LoLA2).
 		If new plans are added, their name must also be added to the enum list found
 		under the option -p (--plan) in cmdline.ggo. */
 	switch (args_info.plan_arg) {
@@ -62,6 +61,14 @@ Action* Problem::plan() {
 		    findpath = new Action(new Findpath(*this), 200);
 		    sara = new Action(new Sara(*this), 0);
 		    statepredicate = new Action(new Statepredicate(*this), 0);
+			par = new Action(true, sara, statepredicate);
+			result = new Action(false, findpath, par);
+			break;
+
+		case plan_arg_FSL2:
+		    findpath = new Action(new Findpath2(*this), 200);
+		    sara = new Action(new Sara(*this), 0);
+		    statepredicate = new Action(new Statepredicate2(*this), 0);
 			par = new Action(true, sara, statepredicate);
 			result = new Action(false, findpath, par);
 	}

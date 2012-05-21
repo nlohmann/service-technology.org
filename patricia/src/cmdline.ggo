@@ -18,8 +18,8 @@ sectiondesc="Patricia takes two or three default input parameters, a problem nam
 
 option "plan" p
   "Selects which tools to call and their ordering (if any)."
-  details="So far two plans exists: SL calls Sara and Lola-Statepredicate in parallel, FSL (the default) first calls Lola-Findpath and, if unsuccessful, then SL.\n"
-  values="FSL","SL" enum
+  details="So far three plans exists: SL calls Sara and Lola-Statepredicate in parallel, FSL (the default) first calls Lola-Findpath and, if unsuccessful, then SL. FSL2 works like FSL but uses LoLA2.\n"
+  values="FSL","SL","FSL2" enum
   typestr="PLAN"
   default="FSL"
   optional

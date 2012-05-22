@@ -72,3 +72,10 @@ Store::~Store()
         rep->status("killed reporter thread");
     }
 }
+
+bool Store::searchAndInsert(int thread)
+{
+	// by default this function is not supported by a store
+	assert(false);
+	return false;
+}

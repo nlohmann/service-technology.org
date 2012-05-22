@@ -52,13 +52,16 @@ lola_SOURCES = \
                 Formula/DisjunctionStatePredicate.cc Formula/DisjunctionStatePredicate.h \
                 \
                 Stores/Store.cc Stores/Store.h \
+                Stores/SIStore.h \
                 Stores/BloomStore.cc Stores/BloomStore.h \
                 Stores/BinStore.h Stores/BinStore.cc \
                 Stores/BitStore.cc Stores/BitStore.h \
                 Stores/BDDStore.cc Stores/BDDStore.h \
                 Stores/STLStore.cc Stores/STLStore.h \
+                Stores/ThreadSafeStore.cc Stores/ThreadSafeStore.h \
                 Stores/SQLStore.cc Stores/SQLStore.h \
-                Stores/BinStore2.cc Stores/BinStore2.h
+                Stores/BinStore2.cc Stores/BinStore2.h \
+                Stores/SIBinStore2.cc Stores/SIBinStore2.h
 
 lola_LDADD = $(builddir)/../libs/cudd/libobj.a \
 	$(builddir)/../libs/cudd/libdddmp.a \

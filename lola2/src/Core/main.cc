@@ -47,9 +47,11 @@
 #include "Stores/BloomStore.h"
 #include "Stores/BDDStore.h"
 #include "Stores/SQLStore.h"
+#include "Stores/ThreadSafeStore.h"
 #include "Stores/STLStore.h"
 #include "Stores/BitStore.h"
 #include "Stores/BinStore2.h"
+#include "Stores/SIBinStore2.h"
 
 
 /// printer-function for output on stdout
@@ -258,7 +260,7 @@ int main(int argc, char** argv)
 
     if (args_info.check_given)
     {
-        SimpleProperty* p = NULL;
+    	SimpleProperty* p = NULL;
         Store* s = NULL;
         Firelist* fl = NULL;
 
@@ -286,6 +288,9 @@ int main(int argc, char** argv)
             case store_arg_bin2:
                 s = new BinStore2();
                 break;
+            case store_arg_tsbin2:
+                 s = new ThreadSafeStore(new SIBinStore2(10));
+                 break;
         }
 
         // choose a simple property

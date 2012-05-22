@@ -345,9 +345,9 @@ int main(int argc, char** argv) {
     Output output2(pnml_filename, "PNML File");
     output2.stream() << pnapi::io::pnml << *InnerMarking::net;
 
-    std::string dot_filename = filename + ".dot";
-    Output output3(dot_filename, "DOT File");
-    output3.stream() << pnapi::io::dot << *InnerMarking::net;
+//    std::string dot_filename = filename + ".dot";
+//    Output output3(dot_filename, "DOT File");
+//    output3.stream() << pnapi::io::dot << *InnerMarking::net;
 
 
     /*-------------------.

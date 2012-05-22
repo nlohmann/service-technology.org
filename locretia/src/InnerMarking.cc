@@ -226,7 +226,7 @@ void InnerMarking::traverse(const InnerMarking_ID& markingID) {
  \param[in]		trace_maxlength	the maximal length of the trace
  */
 void InnerMarking::create_trace(std::ostream& file, const int trace_number, const int trace_maxlength) {
-	//status("creating trace %i with maximal length %i", trace_number, trace_maxlength);
+	status("creating trace %i with maximal length %i", trace_number, trace_maxlength);
 
 	InnerMarking_ID id = 0;
 	int counter = 0, choose = 0;
@@ -253,7 +253,7 @@ void InnerMarking::create_trace(std::ostream& file, const int trace_number, cons
 		 << "\t</trace>\n";
 
 	tempstring.clear();
-	//status("done with trace %i, length: %i", trace_number, counter);
+	status("done with trace %i, length: %i", trace_number, counter);
 }
 
 /*!
@@ -272,18 +272,23 @@ void InnerMarking::create_log(std::ostream& file, const int trace_count ,
 
     fileHeader(file);
 
+    status("file header done");
     // initialize the random number generator
     std::srand(time(NULL));
 
+    status("random initialized");
     int length, counter = 0;
     // create 'trace_count' traces
-    for (int i; i < trace_count; ++i) {
+    for (int i = 0; i < trace_count; ++i) {
     	// randomize the (maximal) length of the next trace
     	length = (std::rand() % (trace_max_length + 1 - trace_min_length)) + trace_min_length;
+    	status("create trace...");
     	create_trace(file, ++counter, length);
     }
 
+    status("for-loop done");
     fileFooter(file);
+    status("footer done");
 
 //    status("log-file done with %i traces, each with lengths %i to %i",
 //    			trace_count, trace_min_length, trace_max_length);

@@ -2,7 +2,7 @@
 
 #============================================================================#
 # AUTOTEST WRAPPER SCRIPT FOR EXTERNAL TOOLS                                 #
-# written by Niels Lohmann <niels.lohmann@uni-rostock.de>                    #
+# written by Niels Lohmann <niels.lohmann@uni-rostock.de>               		     #
 #============================================================================#
 
 # This script is used to call executables in optional tests of the testsuite.

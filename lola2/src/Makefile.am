@@ -61,7 +61,9 @@ lola_SOURCES = \
                 Stores/ThreadSafeStore.cc Stores/ThreadSafeStore.h \
                 Stores/SQLStore.cc Stores/SQLStore.h \
                 Stores/BinStore2.cc Stores/BinStore2.h \
-                Stores/SIBinStore2.cc Stores/SIBinStore2.h
+                Stores/SIBinStore2.cc Stores/SIBinStore2.h \
+                Stores/ListStore.cc Stores/ListStore.h \
+                Stores/CompressedStore.cc Stores/CompressedStore.h
 
 lola_LDADD = $(builddir)/../libs/cudd/libobj.a \
 	$(builddir)/../libs/cudd/libdddmp.a \

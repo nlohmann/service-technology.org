@@ -52,6 +52,8 @@
 #include "Stores/BitStore.h"
 #include "Stores/BinStore2.h"
 #include "Stores/SIBinStore2.h"
+#include "Stores/ListStore.h"
+#include "Stores/CompressedStore.h"
 
 
 /// printer-function for output on stdout
@@ -292,6 +294,12 @@ int main(int argc, char** argv)
             case store_arg_tsbin2:
                 s = new ThreadSafeStore(new SIBinStore2(10));
                 break;
+            case store_arg_list:
+            	s = new ListStore();
+            	break;
+            case store_arg_compr:
+            	s = new CompressedStore();
+            	break;
         }
 
         // choose a simple property

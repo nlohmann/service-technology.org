@@ -240,166 +240,39 @@ insert:
     while (true)
     {
         // the body of this loop exists in 8 incarnations, once for each bit of vector byte
-        /*** incarnation for bit 7 ********/
-        if (Marking::Current[place_index] & (1 << placebit_index))
-        {
-            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);
-            (*newvector)[vector_byte] |= 128;
+#ifdef BINSTORE_LOOP_BODY_2
+#error BINSTORE_LOOP_BODY_2 already defined
+#else
+#define BINSTORE_LOOP_BODY_2(N, I)\
+        if (Marking::Current[place_index] & (1 << placebit_index))\
+        {\
+            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);\
+            (*newvector)[vector_byte] |= N;\
+        }\
+        /* increment vector byte */\
+        I\
+        if (placebit_index == 0)\
+        {\
+            ++place_index;\
+            if (place_index >= Place::CardSignificant)\
+            {\
+                break;\
+            }\
+            placebit_index = Place::CardBits[place_index] - 1;\
+        }\
+        else\
+        {\
+            --placebit_index;\
         }
-        if (placebit_index == 0)
-        {
-            ++place_index;
-            if (place_index >= Place::CardSignificant)
-            {
-                break;
-            }
-            placebit_index = Place::CardBits[place_index] - 1;
-        }
-        else
-        {
-            --placebit_index;
-        }
-        /*** incarnation for bit 6 ********/
-        if (Marking::Current[place_index] & (1 << placebit_index))
-        {
-            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);
-            //\todo conversion to ‘unsigned char’ from ‘int’ may alter its value
-            (*newvector)[vector_byte] |= 64;
-        }
-        if (placebit_index == 0)
-        {
-            ++place_index;
-            if (place_index >= Place::CardSignificant)
-            {
-                break;
-            }
-            placebit_index = Place::CardBits[place_index] - 1;
-        }
-        else
-        {
-            --placebit_index;
-        }
-        /*** incarnation for bit 5 ********/
-        if (Marking::Current[place_index] & (1 << placebit_index))
-        {
-            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);
-            //\todo conversion to ‘unsigned char’ from ‘int’ may alter its value
-            (*newvector)[vector_byte] |= 32;
-        }
-        if (placebit_index == 0)
-        {
-            ++place_index;
-            if (place_index >= Place::CardSignificant)
-            {
-                break;
-            }
-            placebit_index = Place::CardBits[place_index] - 1;
-        }
-        else
-        {
-            --placebit_index;
-        }
-        /*** incarnation for bit 4 ********/
-        if (Marking::Current[place_index] & (1 << placebit_index))
-        {
-            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);
-            //\todo conversion to ‘unsigned char’ from ‘int’ may alter its value
-            (*newvector)[vector_byte] |= 16;
-        }
-        if (placebit_index == 0)
-        {
-            ++place_index;
-            if (place_index >= Place::CardSignificant)
-            {
-                break;
-            }
-            placebit_index = Place::CardBits[place_index] - 1;
-        }
-        else
-        {
-            --placebit_index;
-        }
-        /*** incarnation for bit 3 ********/
-        if (Marking::Current[place_index] & (1 << placebit_index))
-        {
-            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);
-            //\todo conversion to ‘unsigned char’ from ‘int’ may alter its value
-            (*newvector)[vector_byte] |= 8;
-        }
-        if (placebit_index == 0)
-        {
-            ++place_index;
-            if (place_index >= Place::CardSignificant)
-            {
-                break;
-            }
-            placebit_index = Place::CardBits[place_index] - 1;
-        }
-        else
-        {
-            --placebit_index;
-        }
-        /*** incarnation for bit 2 ********/
-        if (Marking::Current[place_index] & (1 << placebit_index))
-        {
-            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);
-            //\todo conversion to ‘unsigned char’ from ‘int’ may alter its value
-            (*newvector)[vector_byte] |= 4;
-        }
-        if (placebit_index == 0)
-        {
-            ++place_index;
-            if (place_index >= Place::CardSignificant)
-            {
-                break;
-            }
-            placebit_index = Place::CardBits[place_index] - 1;
-        }
-        else
-        {
-            --placebit_index;
-        }
-        /*** incarnation for bit 1 ********/
-        if (Marking::Current[place_index] & (1 << placebit_index))
-        {
-            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);
-            //\todo conversion to ‘unsigned char’ from ‘int’ may alter its value
-            (*newvector)[vector_byte] |= 2;
-        }
-        if (placebit_index == 0)
-        {
-            ++place_index;
-            if (place_index >= Place::CardSignificant)
-            {
-                break;
-            }
-            placebit_index = Place::CardBits[place_index] - 1;
-        }
-        else
-        {
-            --placebit_index;
-        }
-        /*** incarnation for bit 0 ********/
-        if (Marking::Current[place_index] & (1 << placebit_index))
-        {
-            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);
-            //\todo conversion to ‘unsigned char’ from ‘int’ may alter its value
-            (*newvector)[vector_byte] |= 1;
-        }
-        ++vector_byte ;
-        if (placebit_index == 0)
-        {
-            ++place_index;
-            if (place_index >= Place::CardSignificant)
-            {
-                break;
-            }
-            placebit_index = Place::CardBits[place_index] - 1;
-        }
-        else
-        {
-            --placebit_index;
-        }
+#endif
+        BINSTORE_LOOP_BODY_2(128,); /*** incarnation for bit 7 ********/\
+        BINSTORE_LOOP_BODY_2(64,);
+        BINSTORE_LOOP_BODY_2(32,);
+        BINSTORE_LOOP_BODY_2(16,);
+        BINSTORE_LOOP_BODY_2(8,);
+        BINSTORE_LOOP_BODY_2(4,);
+        BINSTORE_LOOP_BODY_2(2,);
+        BINSTORE_LOOP_BODY_2(1, ++vector_byte;); /*** incarnation for bit 0 ********/\
     }
 
     ++markings;

@@ -63,24 +63,6 @@ Negation(AtomicProposition(LessAtomicProposition(p,n))) -> <neg: AtomicPropositi
 // NOT (p <= n)   ->    p > n
 Negation(AtomicProposition(LessEqualAtomicProposition(p,n))) -> <neg: AtomicProposition(GreaterAtomicProposition(p, n))>;
 
-// NOT TRUE  ->  FALSE
-Negation(AtomicProposition(True())) -> <neg: AtomicProposition(False()) >;
-
-// NOT FALSE  ->  TRUE
-Negation(AtomicProposition(False())) -> <neg: AtomicProposition(True()) >;
-
-
-// AND + TRUE/FALSE
-Conjunction(a, AtomicProposition(True())) -> <neg: a >;
-Conjunction(AtomicProposition(True()), a) -> <neg: a >;
-Conjunction(a, f = AtomicProposition(False())) -> <neg: f >;
-Conjunction(f = AtomicProposition(False()), a) -> <neg: f >;
-
-// OR + TRUE/FALSE
-Disjunction(a, AtomicProposition(False())) -> <neg: a >;
-Disjunction(AtomicProposition(False()), a) -> <neg: a >;
-Disjunction(a, t = AtomicProposition(True())) -> <neg: t >;
-Disjunction(t = AtomicProposition(True()), a) -> <neg: t >;
 
 
 /****************************
@@ -136,6 +118,7 @@ Sum(Number(x), Sum(Number(y), z)) -> <sides: Sum(Number(plus(x,y)), z) >;
 Sum(Number(x), y) provided (x->value == 0) -> <sides: y >;
 Product(x, y) provided (x->value == 0) -> <sides: Number(0) >;
 Product(x, y=Sum(u,v)) provided (x->value == 1) -> <sides: y >;
+Product(x, Number(y)) -> <sides: Number(mult(x,y)) >;
 
 // move parentheses
 Sum(Sum(x,y), z) -> <sides: Sum(x, Sum(y, z)) >;
@@ -150,6 +133,29 @@ Disjunction(x=AtomicProposition(z),y=Disjunction(u,v)) -> <sides: Disjunction(y,
 Conjunction(x=AtomicProposition(z),y=Disjunction(u,v)) -> <sides: Conjunction(y,x) >;
 Disjunction(x=AtomicProposition(z),y=Conjunction(u,v)) -> <sides: Disjunction(y,x) >;
 Conjunction(x=AtomicProposition(z),y=Conjunction(u,v)) -> <sides: Conjunction(y,x) >;
+
+
+// NOT TRUE  ->  FALSE
+Negation(AtomicProposition(True())) -> <sides: AtomicProposition(False()) >;
+
+// NOT FALSE  ->  TRUE
+Negation(AtomicProposition(False())) -> <sides: AtomicProposition(True()) >;
+
+// AND + TRUE/FALSE
+Conjunction(a, AtomicProposition(True())) -> <sides: a >;
+Conjunction(AtomicProposition(True()), a) -> <sides: a >;
+Conjunction(a, f = AtomicProposition(False())) -> <sides: f >;
+Conjunction(f = AtomicProposition(False()), a) -> <sides: f >;
+
+// OR + TRUE/FALSE
+Disjunction(a, AtomicProposition(False())) -> <sides: a >;
+Disjunction(AtomicProposition(False()), a) -> <sides: a >;
+Disjunction(a, t = AtomicProposition(True())) -> <sides: t >;
+Disjunction(t = AtomicProposition(True()), a) -> <sides: t >;
+
+// if only numbers are left, we can immediately calculate the formula's value
+LessEqualAtomicProposition(Number(x), Number(y)) provided (x->value >= y->value) -> <sides: True() >;
+LessEqualAtomicProposition(Number(x), Number(y)) provided (x->value < y->value) -> <sides: False() >;
 
 
 /****************************

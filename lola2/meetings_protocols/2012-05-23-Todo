@@ -2,8 +2,6 @@
 
 * Andreas: Algorithmus für positive/negative Faktoren aus <algorithms> raussuchen
 
-* Niels: Regeln für "FORMULA 1 = 2;" anpassen -> Nur True/False erzeugen
-
 * Karsten: Klassen für TRUE/FALSE; Abfrage vor Tiefensuche, ob Wert konstant
 
 * Niels: im Unparser Typen anpassen (index_t, size_t, ...)

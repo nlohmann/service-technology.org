@@ -46,7 +46,7 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %type <yt_tTerm> term
 
 %token IDENTIFIER NUMBER
-%token _FORMULA_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_
+%token _FORMULA_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_ _FIREABLE_ _DEADLOCK_
 
 // precedences (lowest written first, e.g. PLUS/MINUS) and precedences
 %left _OR_ _XOR_
@@ -116,6 +116,17 @@ atomic_proposition:
     { $$ = True(); }
 | _FALSE_
     { $$ = False(); }
+| _FIREABLE_ _leftparenthesis_ IDENTIFIER _rightparenthesis_
+    {
+        Symbol *t = symbolTables->TransitionTable->lookup($3->name);
+        if (t == NULL)
+        {
+            ptformula_yyerrors(ptformula_text, "transition %s unknown", $3->name);
+        }
+        $$ = Fireable(mkinteger(t->getIndex()));
+    }
+| _DEADLOCK_
+    { $$ = aDeadlock(); }
 ;
 
 term:
@@ -123,12 +134,12 @@ term:
     { $$ = $2; }
 | IDENTIFIER
     {
-      Symbol *p = symbolTables->PlaceTable->lookup($1->name);
-      if (p == NULL)
-      {
-          ptformula_yyerrors(ptformula_text, "place %s unknown", $1->name);
-      }
-      $$ = Node(mkinteger(p->getIndex()));
+        Symbol *p = symbolTables->PlaceTable->lookup($1->name);
+        if (p == NULL)
+        {
+            ptformula_yyerrors(ptformula_text, "place %s unknown", $1->name);
+        }
+        $$ = Node(mkinteger(p->getIndex()));
     }
 | NUMBER
     { $$ = Number($1); }

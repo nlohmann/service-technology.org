@@ -37,6 +37,8 @@ tAtomicProposition:
 | LessEqualAtomicProposition(tTerm tTerm)
 | True()
 | False()
+| aDeadlock()
+| Fireable(integer)
 ;
 
 tTerm:

@@ -40,6 +40,7 @@ Node(x) -> [out: "n" x ];
 #include <map>
 #include <vector>
 #include <stack>
+#include "Net/Net.h"
 #include "Formula/StatePredicate.h"
 #include "Formula/AtomicStatePredicate.h"
 #include "Formula/ConjunctionStatePredicate.h"
@@ -169,7 +170,7 @@ DisjunctionList(l) -> [internal:
 
 AtomicProposition(a) -> [internal: a ];
 
-LessEqualAtomicProposition(x, y) -> [internal: x y
+LessEqualAtomicProposition(x, Number(y)) -> [internal: x
 {
     //printf("I am an atomic proposition. My parent is %d\n", id_stack.top());
 
@@ -189,26 +190,8 @@ LessEqualAtomicProposition(x, y) -> [internal: x y
         }
     }
 
-    // collect numeric value either from x or from y
-    int val;
-    with(x) {
-        // x is number
-        Number(n): {
-            val = - n->value;
-        }
-
-        // x is not a number
-        default: {
-            with(y) {
-                // y is a number
-                Number(n): { val = n->value; }
-                default:   { assert(false); }
-            }
-        }
-    }
-
     // create formula object
-    StatePredicate *f = new AtomicStatePredicate(factors_positive, factors_negative, val);
+    StatePredicate *f = new AtomicStatePredicate(factors_positive, factors_negative, y->value);
     int position_pos = 0;
     int position_neg = 0;
 
@@ -230,6 +213,32 @@ LessEqualAtomicProposition(x, y) -> [internal: x y
 
     // register formula at parent
     //printf("told my parent %d about me; %p\n", id_stack.top(), f);
+    formulas[id_stack.top()].push_back(f);
+}
+];
+
+Fireable(x) -> [internal:
+{
+    // create a conjunction with #preset elements
+    StatePredicate *f = new ConjunctionStatePredicate(Net::CardArcs[TR][PRE][x->value]);
+    printf("%p=ConjunctionStatePredicate(Net::CardArcs[TR][PRE][x->value]=%d)\n", f, Net::CardArcs[TR][PRE][x->value]);
+
+    // iterate preset
+    for (index_t p = 0; p < Net::CardArcs[TR][PRE][x->value]; ++p)
+    {
+        // create atomic state predicate with 1 positive factor and the arc weight
+        AtomicStatePredicate *a = new AtomicStatePredicate(1, 0, Net::Mult[TR][PRE][x->value][p]);
+        printf("%p=AtomicStatePredicate(1, 0, Net::Mult[TR][PRE][x->value][p]=%d)\n", a, Net::Mult[TR][PRE][x->value][p]);
+
+        // add place p to index 0 with factor 1
+        a->addPos(0, Net::Arc[TR][PRE][x->value][p], 1);
+        printf("%p->addPos(0, Net::Arc[TR][PRE][x->value][p]=%d, 1)\n", a, Net::Arc[TR][PRE][x->value][p]);
+
+        // add atomic state predicate to conjunction
+        ((ConjunctionStatePredicate*)f)->addSub(p, a);
+        printf("%p->addSub(p=%d, a=%p)\n", f, p, a);
+    }
+
     formulas[id_stack.top()].push_back(f);
 }
 ];

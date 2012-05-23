@@ -55,6 +55,9 @@ int ptformula_colno = 1;
 <IN_COMMENT>"*"                          { ptformula_setcol(); /* comments */ }
 <IN_COMMENT>[\n\r]                       { ptformula_setcol(); /* comments */ }
 
+FIREABLE                                 { ptformula_setcol(); return _FIREABLE_; }
+DEADLOCK                                 { ptformula_setcol(); return _DEADLOCK_; }
+
 FORMULA                                  { ptformula_setcol(); return _FORMULA_; }
 AND                                      { ptformula_setcol(); return _AND_; }
 NOT                                      { ptformula_setcol(); return _NOT_; }

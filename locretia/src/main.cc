@@ -57,16 +57,16 @@ Output* markingoutput = NULL;
 clock_t start_clock = clock();
 
 
-/// replace one occurrence of a substring in a string
-std::string replaceOnce(std::string result, const std::string& replaceWhat,
-                        const std::string& replaceWithWhat) {
-    const size_t pos = result.find(replaceWhat);
-    if (pos == std::string::npos) {
-        return result;
-    }
-    result.replace(pos, replaceWhat.size(), replaceWithWhat);
-    return result;
-}
+///// replace one occurrence of a substring in a string
+//std::string replaceOnce(std::string result, const std::string& replaceWhat,
+//                        const std::string& replaceWithWhat) {
+//    const size_t pos = result.find(replaceWhat);
+//    if (pos == std::string::npos) {
+//        return result;
+//    }
+//    result.replace(pos, replaceWhat.size(), replaceWithWhat);
+//    return result;
+//}
 
 
 /// check if a file exists and can be opened for reading
@@ -209,7 +209,7 @@ int main(int argc, char** argv) {
         // parse either from standard input or from a given file
         if (args_info.inputs_num == 0) {
             status("reading from stdin...");
-            std::cin >> (args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::owfn) >> *InnerMarking::net;
+            std::cin >> (args_info.tpn_flag ? pnapi::io::woflan : pnapi::io::owfn) >> *InnerMarking::net;
         } else {
             // strip suffix from input filename
             filename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
@@ -219,7 +219,7 @@ int main(int argc, char** argv) {
                 abort(1, "could not open file '%s'", args_info.inputs[0]);
             }
             inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-                        >> (args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::owfn)
+                        >> (args_info.tpn_flag ? pnapi::io::woflan : pnapi::io::owfn)
                         >> *InnerMarking::net;
         }
         if (args_info.verbose_flag) {

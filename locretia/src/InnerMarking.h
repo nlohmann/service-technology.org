@@ -152,8 +152,9 @@ class InnerMarking {
         Label_ID* labels;
 };
 
-#define TRACE_CLASSIFIER "traces"
-#define TRACE_KEY_NUMBER "trace:number"
-#define TRACE_KEY_LENGTH "trace:length"
-#define EVENT_KEY_LABEL "event:label"
-#define EVENT_KEY_NUMBER "event:number"
+#define TRACE_CLASSIFIER "Trace Name"
+#define TRACE_KEY_NAME "concept:name"
+#define TRACE_KEY_LENGTH "length"
+#define EVENT_CLASSIFIER "Event Name"
+#define EVENT_KEY_LABEL "concept:name"
+#define EVENT_KEY_NUMBER "number"

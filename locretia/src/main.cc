@@ -332,7 +332,7 @@ int main(int argc, char** argv) {
     `-------------------------------*/
 //    InnerMarking::traverse(0);
 
-    std::string log_filename = filename + ".log";
+    std::string log_filename = filename + ".xes";
     Output output(log_filename, "XES Log");
     InnerMarking::create_log(output, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);
 

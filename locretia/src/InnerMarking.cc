@@ -197,8 +197,17 @@ void InnerMarking::deleteCounterPlaces() {
  * the header of the XES log
  */
 void InnerMarking::fileHeader(std::ostream& file) {
-    file << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<log xes.version=\"1.0\" xes.features=\"arbitrary-depth\" xmlns=\"http://code.fluxicon.com/xes\">\n"
-    	 << "\t<classifier name=\"" << TRACE_CLASSIFIER << "\" keys=\"" << TRACE_KEY_NUMBER << "\"/>\n";
+    file << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<log xes.version=\"1.0\" xes.features=\"arbitrary-depth\" xmlns=\"http://www.xes-standard.org\">\n"
+    	 << "\t<extension name=\"Concept\" prefix=\"concept\" uri=\"http://www.xes-standard.org/concept.xesext\"/>\n"
+    	 << "\t<global scope=\"trace\">\n"
+    	 << "\t\t<string key=\"" << TRACE_KEY_NAME << "\" value=\"__INVALID__\"/>\n"
+    	 << "\t\t<int key=\"" << TRACE_KEY_LENGTH << "\" value=\"0\"/>\n"
+    	 <<	"\t</global>\n"
+    	 <<	"\t<global scope=\"event\">\n"
+    	 <<	"\t\t<string key=\"" << EVENT_KEY_LABEL << "\" value=\"__INVALID__\"/>\n"
+    	 <<	"\t\t<int key=\"" << EVENT_KEY_NUMBER << "\" value=\"0\"/>\n"
+    	 <<	"\t</global>\n"
+    	 << "\t<classifier name=\"" << EVENT_CLASSIFIER << "\" keys=\"" << EVENT_KEY_LABEL << "\"/>\n";
 }
 
 /*
@@ -238,8 +247,8 @@ void InnerMarking::create_trace(std::ostream& file, const int trace_number, cons
 		choose = std::rand() % inner_markings[id]->out_degree;
 		//create log entry for event
 		tempstring << "\t\t<event>\n"
-				   << "\t\t\t<int key=\"" << EVENT_KEY_NUMBER << "\" value=\"" << counter << "\"/>\n"
 				   << "\t\t\t<string key=\"" << EVENT_KEY_LABEL << "\" value=\"" << Label::id2name[inner_markings[id]->labels[choose]] << "\"/>\n"
+				   << "\t\t\t<int key=\"" << EVENT_KEY_NUMBER << "\" value=\"" << counter << "\"/>\n"
 				   << "\t\t</event>\n";
 		//set successor marking id
 		id = inner_markings[id]->successors[choose];
@@ -247,13 +256,13 @@ void InnerMarking::create_trace(std::ostream& file, const int trace_number, cons
 
 	// write the trace to the output stream
 	file << "\t<trace>\n"
-		 << "\t\t<int key=\"" << TRACE_KEY_NUMBER << "\" value=\"" << trace_number << "\"/>\n"
+		 << "\t\t<string key=\"" << TRACE_KEY_NAME << "\" value=\"Trace " << trace_number << "\"/>\n"
 		 << "\t\t<int key=\"" << TRACE_KEY_LENGTH << "\" value=\"" << counter << "\"/>\n"
 		 << tempstring.str()
 		 << "\t</trace>\n";
 
 	tempstring.clear();
-	status("done with trace %i, length: %i", trace_number, counter);
+//	status("done with trace %i, length: %i", trace_number, counter);
 }
 
 /*!
@@ -272,23 +281,18 @@ void InnerMarking::create_log(std::ostream& file, const int trace_count ,
 
     fileHeader(file);
 
-    status("file header done");
     // initialize the random number generator
     std::srand(time(NULL));
 
-    status("random initialized");
     int length, counter = 0;
     // create 'trace_count' traces
     for (int i = 0; i < trace_count; ++i) {
     	// randomize the (maximal) length of the next trace
     	length = (std::rand() % (trace_max_length + 1 - trace_min_length)) + trace_min_length;
-    	status("create trace...");
     	create_trace(file, ++counter, length);
     }
 
-    status("for-loop done");
     fileFooter(file);
-    status("footer done");
 
 //    status("log-file done with %i traces, each with lengths %i to %i",
 //    			trace_count, trace_min_length, trace_max_length);

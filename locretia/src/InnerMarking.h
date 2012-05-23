@@ -67,6 +67,9 @@ class InnerMarking {
         /// traverse reachability graph
         static void traverse(const InnerMarking_ID& markingID);
 
+        /// add a (more or less) random interface to the net
+        static void addInterface();
+
     public: /* static attributes */
         /// a temporary storage used during parsing of the reachability graph
         static std::map<InnerMarking_ID, InnerMarking*> markingMap;
@@ -158,3 +161,5 @@ class InnerMarking {
 #define EVENT_CLASSIFIER "Event Name"
 #define EVENT_KEY_LABEL "concept:name"
 #define EVENT_KEY_NUMBER "number"
+
+#define PORT_NAME "port"

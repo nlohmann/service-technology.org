@@ -275,6 +275,10 @@ int main(int argc, char** argv) {
 //    pnapi::Label *l2 = &InnerMarking::net->createInputLabel("bernd","port1");
 //    InnerMarking::net->findTransition("stoff")->addLabel(*l2);
 
+    if (args_info.tpn_flag) {
+    	InnerMarking::addInterface();
+    }
+
     if (args_info.partnerView_flag) {
     	InnerMarking::changeView(args_info.messagebound_arg);
     }

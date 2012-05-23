@@ -298,6 +298,35 @@ void InnerMarking::create_log(std::ostream& file, const int trace_count ,
 //    			trace_count, trace_min_length, trace_max_length);
 }
 
+/*!
+ \brief Adds a random Interface to the net. Every transition gets either an input or an output label.
+ */
+void InnerMarking::addInterface() {
+	net->createPort(PORT_NAME);
+	// iterate through all transitions
+	set<pnapi::Transition *> t_in = net->getTransitions();
+	pnapi::Label * l = NULL;
+	PNAPI_FOREACH(t, t_in)
+	{
+		std::string s = (*t)->getName();
+		// if on the end of the transition's name is a '$', the transition is invisible
+		// -> "... $invisible$"
+		if (*(--s.end()) != '$') {
+			// remove the "\n"
+			s.erase(s.length()-2, 2);
+			// choose randomly between input and output labels
+			if (std::rand() % 2) {
+				l = &net->createInputLabel(s, PORT_NAME);
+			} else {
+				l = &net->createOutputLabel(s, PORT_NAME);
+			}
+
+			// add the label to the transition
+			(*t)->addLabel(*l);
+		}
+	}
+}
+
 void InnerMarking::finalize() {
     delete net;
     for (InnerMarking_ID i = 0; i < stats.markings; ++i) {

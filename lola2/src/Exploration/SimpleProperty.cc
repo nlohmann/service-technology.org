@@ -1,7 +1,7 @@
 /*!
 \file SimpleProperty.cc
 \author Karsten
-\status new
+\status approved 23.05.2012
 
 \brief Evaluates simple property (only SET of states needs to be computed).
 Actual property is virtual, default (base class) is full exploration
@@ -104,7 +104,6 @@ bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
 
 bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist)
 {
-
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.
     unsigned long int* hashtable = (unsigned long int*) calloc(SIZEOF_MARKINGTABLE, sizeof(unsigned long int));
@@ -130,12 +129,13 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
     index_t currentEntry = myFirelist.getFirelist(&currentFirelist);
 
     // loop #attempts times
-    while (!attempts || currentattempt++ < attempts)
+    while (attempts == 0 || currentattempt++ < attempts)
     {
         // copy initial marking into current marking
         memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
         Marking::HashCurrent = Marking::HashInitial;
 
+        // reset enabledness information
         for (index_t i = 0; i < Net::Card[PL]; i++)
         {
             Marking::Current[i] = Marking::Initial[i];
@@ -158,6 +158,7 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
         if (value)
         {
             // initial marking satisfies property
+            free(hashtable);
             return true;
         }
 
@@ -173,6 +174,7 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
                 // deadlock or empty up set (i.e. property not reachable)
                 break; // go to next attempt
             }
+
             // 1. select transition
             // Selection proceeds in two phases. In phase one, we give priority to transitions
             // that 1. enter rarely visited hash buckets and 2. are early members of the fire list
@@ -199,18 +201,20 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
                 chosen = currentFirelist[ rand() % cardFirelist];
             }
             free(currentFirelist);
+
             Transition::fire(chosen);
             ++(hashtable[Marking::HashCurrent]);
             Transition::updateEnabled(chosen);
+
             checkProperty(chosen);
             if (value)
             {
                 free(hashtable);
                 return true;
             }
-
         }
     }
+
     free(hashtable);
     return false;
 }

@@ -113,15 +113,12 @@ LessAtomicProposition(x,y) -> <leq: LessEqualAtomicProposition(Sum(x, Number(mki
 // take right side to left
 LessEqualAtomicProposition(x, s=Sum(y,z))        -> <sides: LessEqualAtomicProposition(Difference(x, s), Number(mkinteger(0))) >;
 LessEqualAtomicProposition(x, p=Product(y,z))    -> <sides: LessEqualAtomicProposition(Difference(x, p), Number(mkinteger(0))) >;
-LessEqualAtomicProposition(x, n=Node(y))    -> <sides: LessEqualAtomicProposition(Difference(x, n), Number(mkinteger(0))) >;
+LessEqualAtomicProposition(x, n=Node(y))         -> <sides: LessEqualAtomicProposition(Difference(x, n), Number(mkinteger(0))) >;
 
-// take number back to right
-//LessEqualAtomicProposition(Sum(Number(x), y), Number(z) )    provided (z->value == 0) -> <sides: LessEqualAtomicProposition(y, Number(mult(mkinteger(-1),x))) >;
-LessEqualAtomicProposition(Sum(Number(x), y), Number(z) )    -> <sides: LessEqualAtomicProposition(y, Number(plus(mult(mkinteger(-1),x),z))) >;
+// take numbers back to right
+LessEqualAtomicProposition(Sum(Number(x), y), Number(z) )    -> <sides: LessEqualAtomicProposition(y, Number(minus(z,x))) >;
 
-
-
-// x <= z    ->   1*x <= z
+// any node should be multiplied by 1 to have products everywhere
 LessEqualAtomicProposition(Node(x), Number(z)) -> <sides: LessEqualAtomicProposition(Product(mkinteger(1), Node(x)), Number(z)) >;
 Sum(n=Node(x),y) -> <sides: Sum(Product(mkinteger(1),n),y)>;
 Sum(x,n=Node(y)) -> <sides: Sum(x,Product(mkinteger(1),n))>;
@@ -129,9 +126,8 @@ Sum(x,n=Node(y)) -> <sides: Sum(x,Product(mkinteger(1),n))>;
 // replace differences by sums
 Difference(x,y) -> <sides: Sum(x, Product(mkinteger(-1), y)) >;
 
-
 // move numbers to left
-Sum(x, Number(y)) -> <sides: Sum(Number(y), x) >;
+Sum(x, n=Number(y)) -> <sides: Sum(n, x) >;
 Sum(x, Sum(n=Number(y), z)) -> <sides: Sum(n, Sum(x,z)) >;
 
 // calculate values if possible
@@ -139,7 +135,7 @@ Sum(Number(x), Number(y)) -> <sides: Number(plus(x,y)) >;
 Sum(Number(x), Sum(Number(y), z)) -> <sides: Sum(Number(plus(x,y)), z) >;
 Sum(Number(x), y) provided (x->value == 0) -> <sides: y >;
 Product(x, y) provided (x->value == 0) -> <sides: Number(0) >;
-//Product(x, y) provided (x->value == 1) -> <sides: y >;
+Product(x, y=Sum(u,v)) provided (x->value == 1) -> <sides: y >;
 
 // move parentheses
 Sum(Sum(x,y), z) -> <sides: Sum(x, Sum(y, z)) >;

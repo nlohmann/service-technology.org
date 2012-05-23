@@ -22,6 +22,8 @@ Sum(x,y) -> [out: x " + " y ];
 Difference(x,y) -> [out: x " - " y " SNH"];
 Product(x,y) -> [out: x "*" y];
 
+ConstProduct_list(h, NiltProduct_list()) -> [out: h];
+ConstProduct_list(h, l) -> [out: h "+" l];
 
 ConstConjunction_list(h, NiltConjunction_list()) -> [out: h];
 ConstConjunction_list(h, l) -> [out: h "\nAND\n" l];
@@ -44,7 +46,10 @@ Node(x) -> [out: "n" x ];
 #include "Formula/DisjunctionStatePredicate.h"
 extern StatePredicate *sp;
 
+// mapping from node ids to factors
 std::map<int, int> current;
+
+// mapping from tree node ids to list of intermediate formulas
 std::map<int, std::vector<StatePredicate *> > formulas;
 
 // invariant: top is always my parent
@@ -174,15 +179,11 @@ LessEqualAtomicProposition(x, y) -> [internal: x y
     // count positive and negative entries
     for (std::map<int, int>::const_iterator it = current.begin(); it != current.end(); ++it)
     {
-        if (it->second == 0)
-        {
-            continue;
-        }
         if (it->second > 0)
         {
             factors_positive++;
         }
-        else
+        else if (it->second < 0)
         {
             factors_negative++;
         }
@@ -193,7 +194,7 @@ LessEqualAtomicProposition(x, y) -> [internal: x y
     with(x) {
         // x is number
         Number(n): {
-            val = n->value;
+            val = - n->value;
         }
 
         // x is not a number
@@ -214,18 +215,12 @@ LessEqualAtomicProposition(x, y) -> [internal: x y
     // add positive and negative entries
     for (std::map<int, int>::const_iterator it = current.begin(); it != current.end(); ++it)
     {
-        if (it->second == 0)
-        {
-            continue;
-        }
         if (it->second > 0)
         {
-            assert(it->second > 0);
             ((AtomicStatePredicate*)f)->addPos(position_pos++, it->first, it->second);
         }
-        else
+        else if (it->second < 0)
         {
-            assert(-it->second > 0);
             ((AtomicStatePredicate*)f)->addNeg(position_neg++, it->first, -it->second);
         }
     }
@@ -241,5 +236,5 @@ LessEqualAtomicProposition(x, y) -> [internal: x y
 
 
 Product(x, Node(p)) -> [internal: { current[p->value] += x->value; } ];
-Node(p) -> [internal: { current[p->value] += 1; } ];
+Node(p) -> [internal: { assert(false /* sollte nicht mehr vorkommen */); current[p->value] += 1; } ];
 Number(x) -> [internal: /* do not print values */ ];

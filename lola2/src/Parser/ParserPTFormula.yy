@@ -157,7 +157,7 @@ term:
       Symbol *p = symbolTables->PlaceTable->lookup($1->name);
       if (p == NULL)
       {
-          ptformula_yyerrors(ptformula_text, "place unknown");
+          ptformula_yyerrors(ptformula_text, "place %s unknown", $1->name);
       }
       $$ = Node(mkinteger(p->getIndex()));
     }

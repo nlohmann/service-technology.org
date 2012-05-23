@@ -1,0 +1,61 @@
+* Niels: Rewriting: Bei Elimination von Negationen direkt auf <= erzeugen.
+
+* Andreas: Algorithmus für positive/negative Faktoren aus <algorithms> raussuchen
+
+* Niels: Regeln für "FORMULA 1 = 2;" anpassen -> Nur True/False erzeugen
+
+* Karsten: Klassen für TRUE/FALSE; Abfrage vor Tiefensuche, ob Wert konstant
+
+* Niels: im Unparser Typen anpassen (index_t, size_t, ...)
+
+* Syntax: FIREABLE(t) AND p >= 0
+
+Statepredicate -> FORMULA ...
+Deadlock
+Liveness
+LTL-Ausschnitt FG GF F
+CTL
+Reversibility
+Boundedness
+Boundedplace
+Deadtransition -> Atomic Proposition "FIREABLE" in FORMULA
+Homestates
+
+
+Neu:
+
+REACHABLE (EF) / INVARIANT (AG) / IMPOSSIBLE (AG NOT) -> Statepredicate
+
+FORMULA
+
+
+
+EF (FIREABLE(t))
+EXPATH EVENTUALLY FIREABLE(t)
+REACHABLE FIREABLE(t)
+
+AG NOT DEADLOCK
+ALLPATH ALWAYS (NOT DEADLOCK XOR 1=3*p4)
+
+
+* Niels: Zeitlimit/ Zustandslimit
+* Niels: Commandline-Parameter für Findpath
+* Findpath: Keinen Store anlegen; Statusmeldungen
+
+
+* Andreas:
+
+// copy initial marking into current marking
+memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
+Marking::HashCurrent = Marking::HashInitial;
+
+in Funktion auslagern.
+
+
+
+* Karsten: Deadlocks und Findpath
+
+* Karsten: Transitionsauswahl auslagern wie bei Store
+
+* Niels: Dreiwertige Logik für Ausgaben (Bloom, Findpath, Memory-Overflow, ...)
+

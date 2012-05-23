@@ -227,11 +227,11 @@ Fireable(x) -> [internal:
     for (index_t p = 0; p < Net::CardArcs[TR][PRE][x->value]; ++p)
     {
         // create atomic state predicate with 1 positive factor and the arc weight
-        AtomicStatePredicate *a = new AtomicStatePredicate(1, 0, Net::Mult[TR][PRE][x->value][p]);
+        StatePredicate *a = new AtomicStatePredicate(1, 0, Net::Mult[TR][PRE][x->value][p]);
         printf("%p=AtomicStatePredicate(1, 0, Net::Mult[TR][PRE][x->value][p]=%d)\n", a, Net::Mult[TR][PRE][x->value][p]);
 
         // add place p to index 0 with factor 1
-        a->addPos(0, Net::Arc[TR][PRE][x->value][p], 1);
+        ((AtomicStatePredicate*)a)->addPos(0, Net::Arc[TR][PRE][x->value][p], 1);
         printf("%p->addPos(0, Net::Arc[TR][PRE][x->value][p]=%d, 1)\n", a, Net::Arc[TR][PRE][x->value][p]);
 
         // add atomic state predicate to conjunction

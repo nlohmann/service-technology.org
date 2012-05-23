@@ -19,10 +19,10 @@ SIBinStore2::SIBinStore2(int threadnum)  : SIStore(threadnum)
 {
     branch = (Decision**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
     firstvector = (vectordata_t**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
-    
-    
-    
-    
+
+
+
+
     g_anchor = (Decision***)calloc(threadnum, sizeof(Decision**));
     g_currentvector = (vectordata_t**)calloc(threadnum, sizeof(vectordata_t*));
     g_newvector = (vectordata_t***)calloc(threadnum, sizeof(vectordata_t**));
@@ -33,22 +33,22 @@ SIBinStore2::SIBinStore2(int threadnum)  : SIStore(threadnum)
     g_position = (bitindex_t*)calloc(threadnum, sizeof(bitindex_t));
     g_prepareInsertion = (bool*)calloc(threadnum, sizeof(bool));
     g_validInsertInformation = (bool*)calloc(threadnum, sizeof(bool));
-    g_currentHashs= (hash_t*)calloc(threadnum, sizeof(hash_t));
+    g_currentHashs = (hash_t*)calloc(threadnum, sizeof(hash_t));
 
     // initialize bit masks
- //   capacity_t tmp1=1;
-//    for(int i=1; i<PLACE_WIDTH; i++) {
-//        tmp1 <<= 1;
-//        place_bitmask[i] = tmp1-1;
-//    }
- //   place_bitmask[PLACE_WIDTH] = (tmp1-1)+tmp1;
+    //   capacity_t tmp1=1;
+    //    for(int i=1; i<PLACE_WIDTH; i++) {
+    //        tmp1 <<= 1;
+    //        place_bitmask[i] = tmp1-1;
+    //    }
+    //   place_bitmask[PLACE_WIDTH] = (tmp1-1)+tmp1;
 
-//    vectordata_t tmp2=1;
-//    for(int i=1; i<VECTOR_WIDTH; i++) {
-//        tmp2 <<= 1;
-//        vector_bitmask[i] = tmp2-1;
-//    }
-//    vector_bitmask[VECTOR_WIDTH] = (tmp2-1)+tmp2;
+    //    vectordata_t tmp2=1;
+    //    for(int i=1; i<VECTOR_WIDTH; i++) {
+    //        tmp2 <<= 1;
+    //        vector_bitmask[i] = tmp2-1;
+    //    }
+    //    vector_bitmask[VECTOR_WIDTH] = (tmp2-1)+tmp2;
 }
 
 SIBinStore2::~SIBinStore2()
@@ -117,7 +117,7 @@ uint64_t SIBinStore2::search(int threadNumber)
     vector_bitstogo = VECTOR_WIDTH;
     position = 0;
 
-	prepareInsertion = false;
+    prepareInsertion = false;
 
     // Is hash bucket empty? If so, assign to currentvector
     if (!(currentvector = (firstvector[Marking::HashCurrent])))
@@ -133,10 +133,12 @@ uint64_t SIBinStore2::search(int threadNumber)
         while (true)
         {
             bitindex_t comparebits;
-            while(true) {
-                if(place_bitstogo < vector_bitstogo) {
+            while (true)
+            {
+                if (place_bitstogo < vector_bitstogo)
+                {
                     if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
-//                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
+                            //                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
                             ==
                             (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - place_bitstogo)))
                     {
@@ -148,7 +150,7 @@ uint64_t SIBinStore2::search(int threadNumber)
                         }
                         else
                         {
-                           return 0;
+                            return 0;
                         }
                     }
                     else
@@ -156,11 +158,13 @@ uint64_t SIBinStore2::search(int threadNumber)
                         comparebits = place_bitstogo >> 1;
                         break;
                     }
-                } else if(place_bitstogo > vector_bitstogo) {
+                }
+                else if (place_bitstogo > vector_bitstogo)
+                {
                     if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (place_bitstogo - vector_bitstogo))
                             ==
-                          (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
-//                            (currentvector[vector_index] & vector_bitmask[vector_bitstogo]))
+                            (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
+                        //                            (currentvector[vector_index] & vector_bitmask[vector_bitstogo]))
                     {
                         place_bitstogo -= vector_bitstogo;
                         vector_index++, vector_bitstogo = VECTOR_WIDTH;
@@ -170,12 +174,14 @@ uint64_t SIBinStore2::search(int threadNumber)
                         comparebits = vector_bitstogo >> 1;
                         break;
                     }
-                } else {
-                  if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
-//                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
+                }
+                else
+                {
+                    if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
+                            //                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
                             ==
-                          (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
-//                            (currentvector[vector_index] & vector_bitmask[vector_bitstogo]))
+                            (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
+                        //                            (currentvector[vector_index] & vector_bitmask[vector_bitstogo]))
                     {
                         vector_index++, vector_bitstogo = VECTOR_WIDTH;
                         place_index++;
@@ -185,7 +191,7 @@ uint64_t SIBinStore2::search(int threadNumber)
                         }
                         else
                         {
-                        	return 0;
+                            return 0;
                         }
                     }
                     else
@@ -203,26 +209,30 @@ uint64_t SIBinStore2::search(int threadNumber)
                 {
                     vector_bitstogo -= comparebits;
                     place_bitstogo -= comparebits;
-                    if(comparebits > vector_bitstogo)
-                    	comparebits = vector_bitstogo;
-                    if(comparebits > place_bitstogo)
-                    	comparebits = place_bitstogo;
+                    if (comparebits > vector_bitstogo)
+                    {
+                        comparebits = vector_bitstogo;
+                    }
+                    if (comparebits > place_bitstogo)
+                    {
+                        comparebits = place_bitstogo;
+                    }
                 }
                 else
                 {
                     comparebits >>= 1;
                 }
             }
-            while ((*anchor) && (position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo)) > (*anchor)->bit)
+            while ((*anchor) && (position + vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo)) > (*anchor)->bit)
             {
                 anchor = &((*anchor)->nextold);
             }
-            if ((*anchor) && (*anchor)->bit == (position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo)))
+            if ((*anchor) && (*anchor)->bit == (position + vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo)))
             {
                 currentvector = (* anchor) -> vector;
                 anchor = &((* anchor) -> nextnew);
 
-                position += (vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo))+1;
+                position += (vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo)) + 1;
                 vector_index = 0;
                 vector_bitstogo = VECTOR_WIDTH;
 
@@ -248,7 +258,7 @@ uint64_t SIBinStore2::search(int threadNumber)
 
         prepareInsertion = true;
     }
-    
+
     g_anchor[threadNumber] = anchor;
     g_currentvector[threadNumber] = currentvector;
     g_newvector[threadNumber] = newvector;
@@ -261,12 +271,13 @@ uint64_t SIBinStore2::search(int threadNumber)
     g_validInsertInformation[threadNumber] = true;
     g_currentHashs[threadNumber] = Marking::HashCurrent;
 
-	return 1;
+    return 1;
 }
 
 
 
-void SIBinStore2::insert(int threadNumber){
+void SIBinStore2::insert(int threadNumber)
+{
 
     Decision** anchor;
     vectordata_t* currentvector;
@@ -277,17 +288,20 @@ void SIBinStore2::insert(int threadNumber){
     bitindex_t vector_bitstogo;
     bitindex_t position;
     bool prepareInsertion;
-    
+
     // if the currently stored informations are not valid we need a new search run to get them
-    if (!g_validInsertInformation[threadNumber]){
-    	uint64_t searchResult = search(threadNumber);
-    	// maybe the value is not acutally in the store
-    	if (searchResult == 0)
-    		return;
+    if (!g_validInsertInformation[threadNumber])
+    {
+        uint64_t searchResult = search(threadNumber);
+        // maybe the value is not acutally in the store
+        if (searchResult == 0)
+        {
+            return;
+        }
     }
-    
-    
-    
+
+
+
 
     anchor = g_anchor[threadNumber];
     currentvector = g_currentvector[threadNumber];
@@ -298,22 +312,25 @@ void SIBinStore2::insert(int threadNumber){
     vector_bitstogo = g_vector_bitstogo[threadNumber];
     position = g_position[threadNumber];
     prepareInsertion = g_prepareInsertion[threadNumber];
-    
+
     for (int i = 0; i < number_of_threads; i++)
-    	if (g_currentHashs[i] == g_currentHashs[threadNumber])
-    		g_validInsertInformation[i] = false;
+        if (g_currentHashs[i] == g_currentHashs[threadNumber])
+        {
+            g_validInsertInformation[i] = false;
+        }
 
 
-	if (prepareInsertion){
+    if (prepareInsertion)
+    {
 
-// state not found --> prepare for insertion
-        Decision* newdecision = new Decision(position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo));
+        // state not found --> prepare for insertion
+        Decision* newdecision = new Decision(position + vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo));
         newdecision -> nextold = * anchor;
         * anchor = newdecision;
         newdecision -> nextnew = NULL;
         newvector = &(newdecision -> vector);
         // the mismatching bit itself is not represented in the new vector
-        position += (vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo))+1;
+        position += (vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo)) + 1;
         vector_index = 0;
         vector_bitstogo = VECTOR_WIDTH;
 
@@ -332,12 +349,12 @@ void SIBinStore2::insert(int threadNumber){
                 return;
             }
         }
-	}
-	
-	// compress current marking into bitvector
+    }
+
+    // compress current marking into bitvector
     // we assume that place_index, placebit_index, position have the correct
     // initial values
-    *newvector = (vectordata_t*) calloc(((Place::SizeOfBitVector - (position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo))) + (VECTOR_WIDTH-1)) / VECTOR_WIDTH, sizeof(vectordata_t));
+    *newvector = (vectordata_t*) calloc(((Place::SizeOfBitVector - (position + vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo))) + (VECTOR_WIDTH - 1)) / VECTOR_WIDTH, sizeof(vectordata_t));
 
 
     while (true)
@@ -371,10 +388,10 @@ void SIBinStore2::insert(int threadNumber){
             place_bitstogo -= insertbits;
         }
     }
-	
-	
-	
-	
+
+
+
+
 }
 
 
@@ -438,6 +455,7 @@ void SIBinStore2::printBinStore()
 
 
 
-SIBinStore2* createSIBinStore2(int threads){
-	return new SIBinStore2(threads);
+SIBinStore2* createSIBinStore2(int threads)
+{
+    return new SIBinStore2(threads);
 }

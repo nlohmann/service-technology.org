@@ -206,7 +206,7 @@ int main(int argc, char** argv)
 
         if (args_info.formula_given)
         {
-            Input *formulaFile = new Input("formula", args_info.formula_arg);
+            Input* formulaFile = new Input("formula", args_info.formula_arg);
             ptformula_in = *formulaFile;
 
             ptformula_parse();
@@ -217,7 +217,7 @@ int main(int argc, char** argv)
             TheFormula = TheFormula->rewrite(kc::sides);
             TheFormula = TheFormula->rewrite(kc::lists);
 
-             //TheFormula->print();
+            //TheFormula->print();
             // TheFormula->unparse(myprinter, kc::out);
 
             TheFormula->unparse(myprinter, kc::internal);
@@ -260,7 +260,7 @@ int main(int argc, char** argv)
 
     if (args_info.check_given)
     {
-    	SimpleProperty* p = NULL;
+        SimpleProperty* p = NULL;
         Store* s = NULL;
         Firelist* fl = NULL;
 
@@ -289,8 +289,8 @@ int main(int argc, char** argv)
                 s = new BinStore2();
                 break;
             case store_arg_tsbin2:
-                 s = new ThreadSafeStore(new SIBinStore2(10));
-                 break;
+                s = new ThreadSafeStore(new SIBinStore2(10));
+                break;
         }
 
         // choose a simple property
@@ -325,16 +325,16 @@ int main(int argc, char** argv)
 
         bool result;
 
-        switch(args_info.search_arg)
+        switch (args_info.search_arg)
         {
             case search_arg_depth:
                 result = p->depth_first(*s, * fl);
                 break;
-            
+
             case search_arg_findpath:
                 result = p->find_path(0, 1000000, *fl);
                 break;
-            
+
             default:
                 assert(false);
         }

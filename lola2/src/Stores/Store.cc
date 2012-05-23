@@ -75,7 +75,7 @@ Store::~Store()
 
 bool Store::searchAndInsert(int thread)
 {
-	// by default this function is not supported by a store
-	assert(false);
-	return false;
+    // by default this function is not supported by a store
+    assert(false);
+    return false;
 }

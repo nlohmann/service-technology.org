@@ -21,19 +21,19 @@ BinStore2::BinStore2()
     firstvector = (vectordata_t**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
 
     // initialize bit masks
- //   capacity_t tmp1=1;
-//    for(int i=1; i<PLACE_WIDTH; i++) {
-//        tmp1 <<= 1;
-//        place_bitmask[i] = tmp1-1;
-//    }
- //   place_bitmask[PLACE_WIDTH] = (tmp1-1)+tmp1;
+    //   capacity_t tmp1=1;
+    //    for(int i=1; i<PLACE_WIDTH; i++) {
+    //        tmp1 <<= 1;
+    //        place_bitmask[i] = tmp1-1;
+    //    }
+    //   place_bitmask[PLACE_WIDTH] = (tmp1-1)+tmp1;
 
-//    vectordata_t tmp2=1;
-//    for(int i=1; i<VECTOR_WIDTH; i++) {
-//        tmp2 <<= 1;
-//        vector_bitmask[i] = tmp2-1;
-//    }
-//    vector_bitmask[VECTOR_WIDTH] = (tmp2-1)+tmp2;
+    //    vectordata_t tmp2=1;
+    //    for(int i=1; i<VECTOR_WIDTH; i++) {
+    //        tmp2 <<= 1;
+    //        vector_bitmask[i] = tmp2-1;
+    //    }
+    //    vector_bitmask[VECTOR_WIDTH] = (tmp2-1)+tmp2;
 }
 
 BinStore2::~BinStore2()
@@ -120,10 +120,12 @@ bool BinStore2::searchAndInsert()
         while (true)
         {
             bitindex_t comparebits;
-            while(true) {
-                if(place_bitstogo < vector_bitstogo) {
+            while (true)
+            {
+                if (place_bitstogo < vector_bitstogo)
+                {
                     if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
-//                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
+                            //                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
                             ==
                             (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - place_bitstogo)))
                     {
@@ -143,11 +145,13 @@ bool BinStore2::searchAndInsert()
                         comparebits = place_bitstogo >> 1;
                         break;
                     }
-                } else if(place_bitstogo > vector_bitstogo) {
+                }
+                else if (place_bitstogo > vector_bitstogo)
+                {
                     if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (place_bitstogo - vector_bitstogo))
                             ==
-                          (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
-//                            (currentvector[vector_index] & vector_bitmask[vector_bitstogo]))
+                            (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
+                        //                            (currentvector[vector_index] & vector_bitmask[vector_bitstogo]))
                     {
                         place_bitstogo -= vector_bitstogo;
                         vector_index++, vector_bitstogo = VECTOR_WIDTH;
@@ -157,12 +161,14 @@ bool BinStore2::searchAndInsert()
                         comparebits = vector_bitstogo >> 1;
                         break;
                     }
-                } else {
-                  if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
-//                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
+                }
+                else
+                {
+                    if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
+                            //                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
                             ==
-                          (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
-//                            (currentvector[vector_index] & vector_bitmask[vector_bitstogo]))
+                            (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
+                        //                            (currentvector[vector_index] & vector_bitmask[vector_bitstogo]))
                     {
                         vector_index++, vector_bitstogo = VECTOR_WIDTH;
                         place_index++;
@@ -190,26 +196,30 @@ bool BinStore2::searchAndInsert()
                 {
                     vector_bitstogo -= comparebits;
                     place_bitstogo -= comparebits;
-                    if(comparebits > vector_bitstogo)
-                    	comparebits = vector_bitstogo;
-                    if(comparebits > place_bitstogo)
-                    	comparebits = place_bitstogo;
+                    if (comparebits > vector_bitstogo)
+                    {
+                        comparebits = vector_bitstogo;
+                    }
+                    if (comparebits > place_bitstogo)
+                    {
+                        comparebits = place_bitstogo;
+                    }
                 }
                 else
                 {
                     comparebits >>= 1;
                 }
             }
-            while ((*anchor) && (position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo)) > (*anchor)->bit)
+            while ((*anchor) && (position + vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo)) > (*anchor)->bit)
             {
                 anchor = &((*anchor)->nextold);
             }
-            if ((*anchor) && (*anchor)->bit == (position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo)))
+            if ((*anchor) && (*anchor)->bit == (position + vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo)))
             {
                 currentvector = (* anchor) -> vector;
                 anchor = &((* anchor) -> nextnew);
 
-                position += (vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo))+1;
+                position += (vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo)) + 1;
                 vector_index = 0;
                 vector_bitstogo = VECTOR_WIDTH;
 
@@ -234,13 +244,13 @@ bool BinStore2::searchAndInsert()
         }
 
         // state not found --> prepare for insertion
-        Decision* newdecision = new Decision(position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo));
+        Decision* newdecision = new Decision(position + vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo));
         newdecision -> nextold = * anchor;
         * anchor = newdecision;
         newdecision -> nextnew = NULL;
         newvector = &(newdecision -> vector);
         // the mismatching bit itself is not represented in the new vector
-        position += (vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo))+1;
+        position += (vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo)) + 1;
         vector_index = 0;
         vector_bitstogo = VECTOR_WIDTH;
 
@@ -261,10 +271,10 @@ bool BinStore2::searchAndInsert()
         }
     }
 
-   	// compress current marking into bitvector
+    // compress current marking into bitvector
     // we assume that place_index, placebit_index, position have the correct
     // initial values
-    *newvector = (vectordata_t*) calloc(((Place::SizeOfBitVector - (position + vector_index*VECTOR_WIDTH+(VECTOR_WIDTH-vector_bitstogo))) + (VECTOR_WIDTH-1)) / VECTOR_WIDTH, sizeof(vectordata_t));
+    *newvector = (vectordata_t*) calloc(((Place::SizeOfBitVector - (position + vector_index * VECTOR_WIDTH + (VECTOR_WIDTH - vector_bitstogo))) + (VECTOR_WIDTH - 1)) / VECTOR_WIDTH, sizeof(vectordata_t));
 
 
     while (true)

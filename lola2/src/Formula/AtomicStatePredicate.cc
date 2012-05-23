@@ -208,24 +208,27 @@ void AtomicStatePredicate::setUpSet()
 
 void AtomicStatePredicate::consistency()
 {
-	// 1. check sum
-	int s = 0;
-	for(index_t i = 0; i < cardPos; i++)
-	{
-		s += posMult[i] * Marking::Current[posPlaces[i]];
-	}
-	for(index_t i = 0; i < cardNeg; i++)
-	{
-		s -= negMult[i] * Marking::Current[negPlaces[i]];
-	}
-	assert(s == sum);
-	if(value)
-	{
-		assert(sum <= threshold);
-	}
-	else
-	{
-		assert(sum > threshold);
-	}
-	if(this != top) assert(parent);
+    // 1. check sum
+    int s = 0;
+    for (index_t i = 0; i < cardPos; i++)
+    {
+        s += posMult[i] * Marking::Current[posPlaces[i]];
+    }
+    for (index_t i = 0; i < cardNeg; i++)
+    {
+        s -= negMult[i] * Marking::Current[negPlaces[i]];
+    }
+    assert(s == sum);
+    if (value)
+    {
+        assert(sum <= threshold);
+    }
+    else
+    {
+        assert(sum > threshold);
+    }
+    if (this != top)
+    {
+        assert(parent);
+    }
 }

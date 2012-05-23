@@ -1,3 +1,3 @@
 #include "Formula/StatePredicate.h"
 
-StatePredicate * StatePredicate::top = (StatePredicate *) 0;
+StatePredicate* StatePredicate::top = (StatePredicate*) 0;

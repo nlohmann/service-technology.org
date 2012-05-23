@@ -17,12 +17,12 @@ class State;
 class SIStore
 {
     public:
-		SIStore(int numberOfThreads):number_of_threads(numberOfThreads){};
-        virtual ~SIStore(){};
+        SIStore(int numberOfThreads): number_of_threads(numberOfThreads) {};
+        virtual ~SIStore() {};
 
         /// check whether current marking is stored
         virtual uint64_t search(int threadNumber) = 0;
         virtual void insert(int threadNumber) = 0;
-	protected:
-   		int number_of_threads;
+    protected:
+        int number_of_threads;
 };

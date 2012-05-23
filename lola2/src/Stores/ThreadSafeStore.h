@@ -15,8 +15,8 @@
 class ThreadSafeStore : public Store
 {
     private:
-		pthread_rwlock_t readWriteLock;
-		// the internal store
+        pthread_rwlock_t readWriteLock;
+        // the internal store
         SIStore* store;
 
     public:

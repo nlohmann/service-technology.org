@@ -53,7 +53,7 @@ class Store
         virtual ~Store();
 
         /// check whether current marking is stored
-         virtual bool searchAndInsert() = 0;
+        virtual bool searchAndInsert() = 0;
 
         /// check whether current marking is stored
         /// threaded version, this have not to be implemented by each store

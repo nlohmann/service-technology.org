@@ -1,1 +1,1 @@
-FORMULA 1 >= (1 * ea.1);
+FORMULA 1 = (ea.1 + ea.2);

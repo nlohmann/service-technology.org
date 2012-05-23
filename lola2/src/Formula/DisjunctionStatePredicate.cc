@@ -22,9 +22,9 @@ DisjunctionStatePredicate::DisjunctionStatePredicate(index_t n)
 
 DisjunctionStatePredicate::~DisjunctionStatePredicate()
 {
-    for(index_t i = 0; i < cardSub; i++)
+    for (index_t i = 0; i < cardSub; i++)
     {
-	delete(sub[i]);
+        delete(sub[i]);
     }
     free(sub);
 }
@@ -123,9 +123,9 @@ void DisjunctionStatePredicate::evaluate()
         {
             break;
         }
-	assert(left < cardSub);
-	assert(right > 0);
-	assert(right <= cardSub);
+        assert(left < cardSub);
+        assert(right > 0);
+        assert(right <= cardSub);
         StatePredicate* tmp = sub[left];
         sub[left++] = sub[--right];
         sub[right] = tmp;
@@ -164,21 +164,39 @@ index_t DisjunctionStatePredicate::collectAtomic(AtomicStatePredicate** p)
 
 void DisjunctionStatePredicate::consistency()
 {
-	for(index_t i = 0; i < cardSub; i++)
-	{
-		sub[i]->consistency();
-		assert(sub[i]->position == i);
-		assert(sub[i]->parent == this);
-		assert(sub[i] != this);
-		for(index_t j = 0; j < cardSub; j++)
-		{
-			if(i!=j) assert(sub[i] != sub[j]);
-		}
-		if(i < cardSat) assert(sub[i]->value);
-		if(i >= cardSat) assert(!sub[i]->value);
-	}
-	assert(cardSat <= cardSub);
-	if(cardSat) assert(value);
-	else assert(!value);
-	if(this != top) assert(parent);
+    for (index_t i = 0; i < cardSub; i++)
+    {
+        sub[i]->consistency();
+        assert(sub[i]->position == i);
+        assert(sub[i]->parent == this);
+        assert(sub[i] != this);
+        for (index_t j = 0; j < cardSub; j++)
+        {
+            if (i != j)
+            {
+                assert(sub[i] != sub[j]);
+            }
+        }
+        if (i < cardSat)
+        {
+            assert(sub[i]->value);
+        }
+        if (i >= cardSat)
+        {
+            assert(!sub[i]->value);
+        }
+    }
+    assert(cardSat <= cardSub);
+    if (cardSat)
+    {
+        assert(value);
+    }
+    else
+    {
+        assert(!value);
+    }
+    if (this != top)
+    {
+        assert(parent);
+    }
 }

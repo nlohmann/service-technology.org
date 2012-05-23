@@ -101,10 +101,10 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate* f)
 StatePredicateProperty::~StatePredicateProperty()
 {
 
-    for(index_t t = 0; t < Net::Card[TR]; ++t)
+    for (index_t t = 0; t < Net::Card[TR]; ++t)
     {
-	free(changedPredicate[t]);
-	free(changedSum[t]);
+        free(changedPredicate[t]);
+        free(changedSum[t]);
     }
     free(cardChanged);
     free(changedPredicate);

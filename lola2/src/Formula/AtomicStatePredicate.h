@@ -17,7 +17,7 @@
 class AtomicStatePredicate : public StatePredicate
 {
     public:
-	virtual ~AtomicStatePredicate();
+        virtual ~AtomicStatePredicate();
 
         /// creates a state predicate with a formal sum of #arg1 places with positive factor,
         /// #arg2 places with negative factor, and constant #arg3
@@ -85,5 +85,5 @@ class AtomicStatePredicate : public StatePredicate
         /// collects atomic subformulas; array must be malloced beforehand
         /// result is number of inserted elements
         virtual index_t collectAtomic(AtomicStatePredicate**);
-	virtual void consistency();
+        virtual void consistency();
 };

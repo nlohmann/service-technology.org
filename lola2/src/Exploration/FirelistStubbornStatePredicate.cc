@@ -24,7 +24,7 @@ FirelistStubbornStatePredicate::FirelistStubbornStatePredicate(StatePredicate* p
 FirelistStubbornStatePredicate::~FirelistStubbornStatePredicate()
 {
     free(dfsStack);
-    free(onStack); 
+    free(onStack);
 }
 
 index_t FirelistStubbornStatePredicate::getFirelist(index_t** result)
@@ -39,7 +39,7 @@ index_t FirelistStubbornStatePredicate::getFirelist(index_t** result)
 
     index_t stackpointer = predicate->getUpSet(dfsStack, onStack);
     index_t cardEnabled = 0;
-  
+
 
 
     // loop until all stack elements processed

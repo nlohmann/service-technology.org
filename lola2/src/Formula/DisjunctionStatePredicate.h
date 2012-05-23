@@ -37,7 +37,7 @@ class DisjunctionStatePredicate : public StatePredicate
         /// examined.
         virtual void evaluate();
 
-	virtual void consistency();
+        virtual void consistency();
 
     private:
         /// the list of subformulas

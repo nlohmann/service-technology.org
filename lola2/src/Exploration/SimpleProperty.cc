@@ -121,7 +121,7 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
     if (value)
     {
         // initial marking satisfies property
-        free hashtable;
+        free(hashtable);
         return true;
     }
 

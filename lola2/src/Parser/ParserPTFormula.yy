@@ -43,16 +43,21 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %type <yt_tFormula> formula
 %type <yt_tStatePredicate> statepredicate
 %type <yt_tAtomicProposition> atomic_proposition
-%type <yt_tStatePredicate> negation
-%type <yt_tStatePredicate> conjunction
-%type <yt_tStatePredicate> exclusivedisjunction
-%type <yt_tStatePredicate> disjunction
-%type <yt_tStatePredicate> implication
-%type <yt_tStatePredicate> equivalence
 %type <yt_tTerm> term
 
 %token IDENTIFIER NUMBER
 %token _FORMULA_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_
+
+// precedences (lowest written first, e.g. PLUS/MINUS) and precedences
+%left _OR_ _XOR_
+%left _AND_
+%left _implies_
+%left _iff_
+%left _equals_ _notequal_
+%left _lessthan_ _lessorequal_ _greaterthan_ _greaterorequal_
+%left _plus_ _minus_
+%left _times_
+%right _NOT_
 
 
 %{
@@ -76,56 +81,26 @@ formula:
 ;
 
 statepredicate:
-  atomic_proposition
+  _leftparenthesis_ statepredicate _rightparenthesis_
+    { $$ = $2; }
+| atomic_proposition
     { $$ = AtomicProposition($1); }
-| negation
-    { $$ = $1; }
-| conjunction
-    { $$ = $1; }
-| disjunction
-    { $$ = $1; }
-| exclusivedisjunction
-    { $$ = $1; }
-| implication
-    { $$ = $1; }
-| equivalence
-    { $$ = $1; }
-;
-
-negation:
-  _NOT_ _leftparenthesis_ statepredicate _rightparenthesis_
-    { $$ = Negation($3); }
-;
-
-conjunction:
-  _leftparenthesis_ statepredicate _AND_ statepredicate _rightparenthesis_
-    { $$ = Conjunction($2, $4); }
-;
-
-disjunction:
-  _leftparenthesis_ statepredicate _OR_ statepredicate _rightparenthesis_
-    { $$ = Disjunction($2, $4); }
-;
-
-exclusivedisjunction:
-  _leftparenthesis_ statepredicate _XOR_ statepredicate _rightparenthesis_
-    { $$ = ExclusiveDisjunction($2, $4); }
-;
-
-implication:
-  _leftparenthesis_ statepredicate _implies_ statepredicate _rightparenthesis_
-    { $$ = Implication($2, $4); }
-;
-
-equivalence:
-  _leftparenthesis_ statepredicate _iff_ statepredicate _rightparenthesis_
-    { $$ = Equivalence($2, $4); }
+| _NOT_ statepredicate
+    { $$ = Negation($2); }
+| statepredicate _AND_ statepredicate
+    { $$ = Conjunction($1, $3); }
+| statepredicate _OR_ statepredicate
+    { $$ = Disjunction($1, $3); }
+| statepredicate _XOR_ statepredicate
+    { $$ = ExclusiveDisjunction($1, $3); }
+| statepredicate _implies_ statepredicate
+    { $$ = Implication($1, $3); }
+| statepredicate _iff_ statepredicate
+    { $$ = Equivalence($1, $3); }
 ;
 
 atomic_proposition:
-  _leftparenthesis_ atomic_proposition _rightparenthesis_
-    { $$ = $2; }
-| term _equals_ term
+  term _equals_ term
     { $$ = EqualsAtomicProposition($1, $3); }
 | term _notequal_ term
     { $$ = NotEqualsAtomicProposition($1, $3); }
@@ -137,22 +112,16 @@ atomic_proposition:
     { $$ = LessAtomicProposition($1, $3); }
 | term _lessorequal_ term
     { $$ = LessEqualAtomicProposition($1, $3); }
-| true
+| _TRUE_
     { $$ = True(); }
-| false
+| _FALSE_
     { $$ = False(); }
 ;
 
-true:
-  _TRUE_
-;
-
-false:
-  _FALSE_
-;
-
 term:
-  IDENTIFIER
+  _leftparenthesis_ term _rightparenthesis_
+    { $$ = $2; }
+| IDENTIFIER
     {
       Symbol *p = symbolTables->PlaceTable->lookup($1->name);
       if (p == NULL)
@@ -163,12 +132,12 @@ term:
     }
 | NUMBER
     { $$ = Number($1); }
-| _leftparenthesis_ term _plus_ term _rightparenthesis_
-    { $$ = Sum($2, $4); }
-| _leftparenthesis_ term _minus_ term _rightparenthesis_
-    { $$ = Difference($2, $4); }
-| _leftparenthesis_ NUMBER _times_ term _rightparenthesis_
-    { $$ = Product($2, $4); }
+| term _plus_ term
+    { $$ = Sum($1, $3); }
+| term _minus_ term
+    { $$ = Difference($1, $3); }
+| NUMBER _times_ term
+    { $$ = Product($1, $3); }
 ;
 
 

@@ -221,22 +221,22 @@ Fireable(x) -> [internal:
 {
     // create a conjunction with #preset elements
     StatePredicate *f = new ConjunctionStatePredicate(Net::CardArcs[TR][PRE][x->value]);
-    printf("%p=ConjunctionStatePredicate(Net::CardArcs[TR][PRE][x->value]=%d)\n", f, Net::CardArcs[TR][PRE][x->value]);
+    //printf("%p=ConjunctionStatePredicate(Net::CardArcs[TR][PRE][x->value]=%d)\n", f, Net::CardArcs[TR][PRE][x->value]);
 
     // iterate preset
     for (index_t p = 0; p < Net::CardArcs[TR][PRE][x->value]; ++p)
     {
         // create atomic state predicate with 1 positive factor and the arc weight
-        StatePredicate *a = new AtomicStatePredicate(1, 0, Net::Mult[TR][PRE][x->value][p]);
-        printf("%p=AtomicStatePredicate(1, 0, Net::Mult[TR][PRE][x->value][p]=%d)\n", a, Net::Mult[TR][PRE][x->value][p]);
+        StatePredicate *a = new AtomicStatePredicate(0, 1, - Net::Mult[TR][PRE][x->value][p]);
+        //printf("%p=AtomicStatePredicate(0, 1, - Net::Mult[TR][PRE][x->value][p]=%d)\n", a, - Net::Mult[TR][PRE][x->value][p]);
 
         // add place p to index 0 with factor 1
-        ((AtomicStatePredicate*)a)->addPos(0, Net::Arc[TR][PRE][x->value][p], 1);
-        printf("%p->addPos(0, Net::Arc[TR][PRE][x->value][p]=%d, 1)\n", a, Net::Arc[TR][PRE][x->value][p]);
+        ((AtomicStatePredicate*)a)->addNeg(0, Net::Arc[TR][PRE][x->value][p], 1);
+        //printf("%p->addNeg(0, Net::Arc[TR][PRE][x->value][p]=%d, 1)\n", a, Net::Arc[TR][PRE][x->value][p]);
 
         // add atomic state predicate to conjunction
         ((ConjunctionStatePredicate*)f)->addSub(p, a);
-        printf("%p->addSub(p=%d, a=%p)\n", f, p, a);
+        //printf("%p->addSub(p=%d, a=%p)\n", f, p, a);
     }
 
     formulas[id_stack.top()].push_back(f);

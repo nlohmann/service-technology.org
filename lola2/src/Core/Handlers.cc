@@ -46,8 +46,8 @@ __attribute__((noreturn)) void Handlers::signalTerminationHandler(int signum)
 /*!
 The termination handler allows to terminate LoLA by sending a predefined
 secret via socket. Once the message is received, LoLA's execution is
-terminated by calling sending the SIGUSR1 signal which is processed in
-Handlers::signalTerminationHandler().
+terminated by calling sending the SIGUSR1/SIGUSR2 signals which are processed
+in Handlers::signalTerminationHandler().
 */
 void* Handlers::remoteTerminationHandler(void*)
 {
@@ -120,6 +120,8 @@ void Handlers::installTerminationHandlers()
     signal(SIGINT, signalTerminationHandler);
     // listen to user-defined signal 1 (used for remote termination)
     signal(SIGUSR1, signalTerminationHandler);
+    // listen to user-defined signal 2 (used for self termination)
+    signal(SIGUSR2, signalTerminationHandler);
 
     // start up listener thread
     if (args_info.remoteTermination_given)

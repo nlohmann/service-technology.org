@@ -8,11 +8,13 @@
 #include <cmath>
 #include <algorithm>
 #include <unistd.h>
+#include <csignal>
 #include "Core/Dimensions.h"
 #include "Stores/Store.h"
 #include "InputOutput/Reporter.h"
+#include "cmdline.h"
 
-
+extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
 void* Store::reporter_internal(void)
@@ -26,25 +28,24 @@ void* Store::reporter_internal(void)
         sleep(REPORT_FREQUENCY);
 
         const uint64_t last_period = markings - last_markings;
-
-        rep->status("%10llu markings, %10llu edges, %8.0f markings/sec, %5d secs", markings, calls - 1, (last_period / (float)REPORT_FREQUENCY), (++intervals * REPORT_FREQUENCY));
-
-        /*
-                if (benchmark == 0)
-                {
-                    benchmark = markings;
-                }
-
-                std::string p = "";
-                for (size_t i = 0; i < size_t(60.0 * (1.0 - ((last_period / (float)benchmark)))); ++i)
-                {
-                    p += "*";
-                }
-
-                rep->status("%s %2.2f%%", rep->markup(MARKUP_UNIMPORTANT, p.c_str()).str(), fabs(100.0 * (1.0 - ((last_period / (float)benchmark)))));
-
-        */
+        const unsigned int time_elapsed = intervals * REPORT_FREQUENCY;
         last_markings = markings;
+        ++intervals;
+
+        rep->status("%10llu markings, %10llu edges, %8.0f markings/sec, %5d secs", markings, calls - 1, (last_period / (float)REPORT_FREQUENCY), time_elapsed);
+
+        // early abortion
+        if (args_info.timelimit_given and time_elapsed > args_info.timelimit_arg)
+        {
+            rep->status(rep->markup(MARKUP_IMPORTANT, "time limit reached - aborting").str());
+            kill(getpid(), SIGUSR2);
+        }
+
+        if (args_info.markinglimit_given and markings > args_info.markinglimit_arg)
+        {
+            rep->status(rep->markup(MARKUP_IMPORTANT, "marking limit reached - aborting").str());
+            kill(getpid(), SIGUSR2);
+        }
     }
 }
 

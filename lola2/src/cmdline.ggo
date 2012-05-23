@@ -11,7 +11,7 @@ option "check" -
 
 option "store" -
   "Store"
-  values="bin","bdd","sql","stl","bit","bloom","bin2","tsbin2" enum
+  values="bin","bdd","sql","stl","bit","bloom","bin2","tsbin2","list","compr" enum
   typestr="STORE"
   default="bin"
   optional
@@ -134,3 +134,15 @@ option "stats" -
   "Print memory statistics"
   flag off
   hidden
+
+option "timelimit" -
+  "Abort LoLA after the given time has passed"
+  int
+  typestr="SECONDS"
+  optional
+
+option "markinglimit" -
+  "Abort LoLA after the given number of markings have been explored"
+  int
+  typestr="MARKINGS"
+  optional

@@ -52,6 +52,8 @@ in Funktion auslagern.
 
 * Karsten: Deadlocks und Findpath
 
+* Karsten: Findpath und Zeugenpfad
+
 * Karsten: Transitionsauswahl auslagern wie bei Store
 
 * Niels: Dreiwertige Logik für Ausgaben (Bloom, Findpath, Memory-Overflow, ...)

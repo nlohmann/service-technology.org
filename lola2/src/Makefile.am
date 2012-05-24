@@ -57,6 +57,7 @@ lola_SOURCES = \
                 Stores/BinStore.h Stores/BinStore.cc \
                 Stores/BitStore.cc Stores/BitStore.h \
                 Stores/BDDStore.cc Stores/BDDStore.h \
+                Stores/EmptyStore.cc Stores/EmptyStore.h \
                 Stores/STLStore.cc Stores/STLStore.h \
                 Stores/ThreadSafeStore.cc Stores/ThreadSafeStore.h \
                 Stores/SQLStore.cc Stores/SQLStore.h \

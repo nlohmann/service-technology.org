@@ -42,18 +42,19 @@
 
 #include "Formula/StatePredicate.h"
 
-#include "Stores/Store.h"
-#include "Stores/BinStore.h"
-#include "Stores/BloomStore.h"
 #include "Stores/BDDStore.h"
-#include "Stores/SQLStore.h"
-#include "Stores/ThreadSafeStore.h"
-#include "Stores/STLStore.h"
-#include "Stores/BitStore.h"
+#include "Stores/BinStore.h"
 #include "Stores/BinStore2.h"
-#include "Stores/SIBinStore2.h"
-#include "Stores/ListStore.h"
+#include "Stores/BitStore.h"
+#include "Stores/BloomStore.h"
 #include "Stores/CompressedStore.h"
+#include "Stores/EmptyStore.h"
+#include "Stores/ListStore.h"
+#include "Stores/SIBinStore2.h"
+#include "Stores/SQLStore.h"
+#include "Stores/STLStore.h"
+#include "Stores/Store.h"
+#include "Stores/ThreadSafeStore.h"
 
 
 /// printer-function for output on stdout
@@ -267,39 +268,46 @@ int main(int argc, char** argv)
         Store* s = NULL;
         Firelist* fl = NULL;
 
-        // choose a store
-        switch (args_info.store_arg)
+        if (args_info.search_arg == search_arg_findpath)
         {
-            case store_arg_bin:
-                s = new BinStore();
-                break;
-            case store_arg_bdd:
-                s = new BDDStore();
-                break;
-            case store_arg_bloom:
-                s = new BloomStore(args_info.hashfunctions_arg);
-                break;
-            case store_arg_sql:
-                s = new SQLStore();
-                break;
-            case store_arg_stl:
-                s = new STLStore();
-                break;
-            case store_arg_bit:
-                s = new BitStore();
-                break;
-            case store_arg_bin2:
-                s = new BinStore2();
-                break;
-            case store_arg_tsbin2:
-                s = new ThreadSafeStore(new SIBinStore2(10));
-                break;
-            case store_arg_list:
-            	s = new ListStore();
-            	break;
-            case store_arg_compr:
-            	s = new CompressedStore();
-            	break;
+            s = new EmptyStore();
+        }
+        else
+        {
+            // choose a store
+            switch (args_info.store_arg)
+            {
+                case store_arg_bin:
+                    s = new BinStore();
+                    break;
+                case store_arg_bdd:
+                    s = new BDDStore();
+                    break;
+                case store_arg_bloom:
+                    s = new BloomStore(args_info.hashfunctions_arg);
+                    break;
+                case store_arg_sql:
+                    s = new SQLStore();
+                    break;
+                case store_arg_stl:
+                    s = new STLStore();
+                    break;
+                case store_arg_bit:
+                    s = new BitStore();
+                    break;
+                case store_arg_bin2:
+                    s = new BinStore2();
+                    break;
+                case store_arg_tsbin2:
+                    s = new ThreadSafeStore(new SIBinStore2(10));
+                    break;
+                case store_arg_list:
+                	s = new ListStore();
+                	break;
+                case store_arg_compr:
+                	s = new CompressedStore();
+                	break;
+            }
         }
 
         // choose a simple property
@@ -341,7 +349,16 @@ int main(int argc, char** argv)
                 break;
 
             case search_arg_findpath:
-                result = p->find_path(0, 1000000, *fl);
+                if (args_info.retrylimit_arg == 0)
+                {
+                    rep->status("starting infinite tries of depth %d", args_info.depthlimit_arg);
+                }
+                else
+                {
+                    rep->status("starting at most %d tries of depth %d", args_info.retrylimit_arg, args_info.depthlimit_arg);
+                }
+
+                result = p->find_path(args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore*)s));
                 break;
 
             default:
@@ -377,7 +394,10 @@ int main(int argc, char** argv)
             }
         }
 
-        rep->message("%llu markings, %llu edges", s->markings, (s->calls > 0) ? s->calls - 1 : 0);
+        if (args_info.search_arg != search_arg_findpath)
+        {
+            rep->message("%llu markings, %llu edges", s->markings, (s->calls > 0) ? s->calls - 1 : 0);
+        }
 
         delete s;
         delete p;

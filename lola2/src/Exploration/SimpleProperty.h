@@ -13,6 +13,7 @@ Actual property is virtual, default (base class) is full exploration
 
 class Firelist;
 class Store;
+class EmptyStore;
 
 class SimpleProperty
 {
@@ -27,7 +28,7 @@ class SimpleProperty
         /// Arguments: 1 = number of attempts 2 = depth of attempt 3 = firelist generator
         /// result true = state found, result false = max attempt exhausted without having found state
         /// 1st argument 0 = unlimited number of attempts: no return if property not satisfiable
-        bool find_path(unsigned int, unsigned int, Firelist &);
+        bool find_path(unsigned int, unsigned int, Firelist &, EmptyStore &);
 
         /// the search stack
         SearchStack stack;

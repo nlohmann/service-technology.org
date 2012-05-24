@@ -11,6 +11,7 @@
 #include <csignal>
 #include "Core/Dimensions.h"
 #include "Stores/Store.h"
+#include "Stores/EmptyStore.h"
 #include "InputOutput/Reporter.h"
 #include "cmdline.h"
 
@@ -32,7 +33,14 @@ void* Store::reporter_internal(void)
         last_markings = markings;
         ++intervals;
 
-        rep->status("%10llu markings, %10llu edges, %8.0f markings/sec, %5d secs", markings, calls - 1, (last_period / (float)REPORT_FREQUENCY), time_elapsed);
+        if (args_info.search_arg == search_arg_findpath)
+        {
+            rep->status("%10llu tries, %10llu fired transitions, %5d secs", ((EmptyStore*)this)->tries, calls - 1, time_elapsed);
+        }
+        else
+        {
+            rep->status("%10llu markings, %10llu edges, %8.0f markings/sec, %5d secs", markings, calls - 1, (last_period / (float)REPORT_FREQUENCY), time_elapsed);
+        }
 
         // early abortion
         if (args_info.timelimit_given and time_elapsed > args_info.timelimit_arg)

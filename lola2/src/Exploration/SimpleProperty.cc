@@ -17,7 +17,12 @@ Actual property is virtual, default (base class) is full exploration
 #include "Exploration/SimpleProperty.h"
 #include "Exploration/Firelist.h"
 #include "Stores/Store.h"
+#include "Stores/EmptyStore.h"
+#include "InputOutput/Reporter.h"
+#include "cmdline.h"
 
+extern gengetopt_args_info args_info;
+extern Reporter *rep;
 
 void SimpleProperty::initProperty()
 {
@@ -102,7 +107,7 @@ bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
     }
 }
 
-bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist)
+bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s)
 {
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.
@@ -131,6 +136,9 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
     // loop #attempts times
     while (attempts == 0 || currentattempt++ < attempts)
     {
+        // register this try
+        s.tries++;
+
         // copy initial marking into current marking
         memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
         Marking::HashCurrent = Marking::HashInitial;
@@ -166,6 +174,9 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
         // generate a firing sequence until given depth or deadlock is reached
         for (index_t depth = 0; depth < maxdepth; ++depth)
         {
+            // register this transition's firing
+            s.searchAndInsert();
+
             // get firelist
             index_t* currentFirelist;
             index_t cardFirelist = myFirelist.getFirelist(&currentFirelist);

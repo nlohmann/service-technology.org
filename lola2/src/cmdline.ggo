@@ -135,6 +135,8 @@ option "stats" -
   flag off
   hidden
 
+section "Limits"
+
 option "timelimit" -
   "Abort LoLA after the given time has passed"
   int
@@ -146,3 +148,17 @@ option "markinglimit" -
   int
   typestr="MARKINGS"
   optional
+
+option "retrylimit" -
+  "Number of retries for findpath (0 for infinite retries)"
+  int
+  typestr="RETRIES"
+  optional
+  default="0"
+
+option "depthlimit" -
+  "Number of transitions to fire before search is aborted or retried (findpath). The default value only applies to findpath."
+  int
+  typestr="DEPTH"
+  optional
+  default="1000000"

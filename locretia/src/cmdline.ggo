@@ -28,7 +28,7 @@ option "icount" -
   default="-1"
   optional
 
-section "XES log generation"
+section "OWFN to XES (XES log generation)"
 sectiondesc="Options which are used if the 'log'-flag is set...\n"
 
 option "count" n

@@ -35,11 +35,8 @@ cover-covertura: cover-prepare $(TESTSUITE)
 # compile the code for code coverage
 cover-prepare:
 	$(LCOV) -v >/dev/null
-	$(MAKE) --directory=$(top_srcdir)/src clean all \
-	  AM_CPPFLAGS+="-DNDEBUG" \
-	  AM_CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
-	  AM_CFLAGS+="-fprofile-arcs -ftest-coverage" \
-	  AM_LDFLAGS+="-fprofile-arcs -lgcov"
+	cd $(top_srcdir) ; LIBS="-lgcov" CXXFLAGS="-fprofile-arcs -ftest-coverage" CFLAGS="-fprofile-arcs -ftest-coverage" ./configure --disable-assert
+	$(MAKE) --directory=$(top_srcdir) clean all
 
 # get descriptions from the testsuite
 descriptions: $(TESTSUITE)

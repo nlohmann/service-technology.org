@@ -70,6 +70,9 @@ class InnerMarking {
         /// add a (more or less) random interface to the net
         static void addInterface();
 
+        /// add the final condition to the (special) tpn
+        static void addFinalCondition();
+
     public: /* static attributes */
         /// a temporary storage used during parsing of the reachability graph
         static std::map<InnerMarking_ID, InnerMarking*> markingMap;

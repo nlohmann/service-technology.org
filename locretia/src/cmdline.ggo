@@ -1,26 +1,25 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About Locretia:"
-purpose "Locretia: synthesizing partners for services.\n\n  Report bugs to locretia@service-technology.org.\n  Visit Locretia's home page at http://service-technology.org/locretia"
+purpose "Locretia: generating logs...\n\n  Report bugs to locretia@service-technology.org.\n  Visit Locretia's home page at http://service-technology.org/locretia"
 
-section "View"
-sectiondesc="put real description here...\n"
 
-option "partnerView" p
-  "Change to the environment's point of view."
-  details="This generates transitions sticking to the interface of the given net and imitating the behaviour of the environment."
+section "Basic functionality"
+sectiondesc="Options which change the basic functionality of the tool.\n"
+
+option "tpn" -
+  "TPN -> OWFN."
+  details="Using this option, the input file is expected to be in a (special) TPN file format. An output file (.owfn) is generated which is the given net plus a random generated interface."
   flag off
   
-option "messagebound" m
-  "Set the message bound."
-  details="The message bound sets the maximal number of messages to be sent by the environment. Values within the range of 1..255 are allowed.\n"
-  int
-  typestr="BOUND"
-  default="1"
-  optional
-  
+option "log" -
+  "OWFN -> XES log."
+  details="Using this option, a XES log is generated from the underlying OWFN which was either just generated from a TPN or given as an input file."
+  flag off
+
+
 section "XES log generation"
-sectiondesc="put real description here...\n"
+sectiondesc="Options which are used if the 'log'-flag is set...\n"
 
 option "count" n
   "Number of traces to appear in the log-file."
@@ -47,20 +46,54 @@ option "minLength" l
   optional
 
 
-section "Input/Output"
-sectiondesc="When called without an input file, Locretia reads from the standard input stream. When called without an output parameter, Locretia does not create an output file, but exits after synthesis. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.og'). If the filename `-' is given, Locretia will pipe the respective output to the standard output stream.\n"
+section "View"
+sectiondesc="If the 'log'-flag is set one can set the viewpoint to the environment's point of view.\n"
 
+option "partnerView" p
+  "Change to the environment's point of view."
+  details="This generates transitions sticking to the interface of the given net and imitating the behaviour of the environment."
+  flag off
+  
+option "messagebound" m
+  "Set the message bound."
+  details="The message bound sets the maximal number of messages to be sent by the environment. Values within the range of 1..255 are allowed.\n"
+  int
+  typestr="BOUND"
+  default="1"
+  optional
+  
+
+
+section "Input/Output"
+sectiondesc="When called without an input file, Locretia reads from the standard input stream. When called without an output parameter, Locretia creates a log file and/or an OWFN file based on the chosen options. If no filename is given for one of the options below, the input filename's suffix (`.owfn'/`.tpn') is replaced by the name of the respective option (e.g., `.xes'). If the filename `-' is given, Locretia will pipe the respective output to the standard output stream.\n"
+
+option "owfnFile" -
+  "Filename for the OWFN file."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+  
+option "logFile" -
+  "Filename for the XES log-file."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+  
+option "pnmlFile" -
+  "PNML output of either the labeled inner net or the labeled environment of the inner net."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+  
 option "resultFile" r
   "Results output."
   string
   typestr="FILENAME"
   argoptional
   optional
-
-option "tpn" -
-  "Read open nets in TPN file format."
-  details="Using this option, the input file is expected to be in a TPN file format."
-  flag off
 
 
 section "Debugging"

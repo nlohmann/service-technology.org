@@ -276,82 +276,94 @@ int main(int argc, char** argv) {
 //    InnerMarking::net->findTransition("stoff")->addLabel(*l2);
 
     if (args_info.tpn_flag) {
+
     	InnerMarking::addInterface();
+
+    	std::string owfn_filename = filename + ".owfn";
+    	Output output2(owfn_filename, "OWFN File");
+    	output2.stream() << pnapi::io::owfn << *InnerMarking::net;
+
     }
 
     if (args_info.partnerView_flag) {
     	InnerMarking::changeView(args_info.messagebound_arg);
     }
 
-    /*--------------------------------------------.
-    | 2. initialize labels and interface markings |
-    `--------------------------------------------*/
-    Label::initialize();
+    if (args_info.log_flag) {
+
+    	/*--------------------------------------------.
+    	| 2. initialize labels and interface markings |
+    	`--------------------------------------------*/
+    	Label::initialize();
 
 
-    /*--------------------------------------------.
-    | 3. write inner of the open net to LoLA file |
-    `--------------------------------------------*/
-    Output* temp = new Output();
-    std::stringstream ss;
-    ss << pnapi::io::lola << *InnerMarking::net;
-    std::string lola_net = ss.str();
-    //test output!!
-    //status("%s", lola_net.c_str());
-    temp->stream() << lola_net << std::endl;
+    	/*--------------------------------------------.
+    	| 3. write inner of the open net to LoLA file |
+    	`--------------------------------------------*/
+    	Output* temp = new Output();
+    	std::stringstream ss;
+    	ss << pnapi::io::lola << *InnerMarking::net;
+    	std::string lola_net = ss.str();
+    	//test output!!
+    	//status("%s", lola_net.c_str());
+    	temp->stream() << lola_net << std::endl;
 
 
-    /*------------------------------------------.
-    | 4. call LoLA and parse reachability graph |
-    `------------------------------------------*/
-    // select LoLA binary and build LoLA command
+    	/*------------------------------------------.
+    	| 4. call LoLA and parse reachability graph |
+    	`------------------------------------------*/
+    	// select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
-//    // MinGW does not understand pathnames with "/", so we use the basename
-    const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
+    	//    // MinGW does not understand pathnames with "/", so we use the basename
+    	const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
 #else
-    const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
+    	const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
 #endif
 
-    // call LoLA
-    status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
-    time(&start_time);
-    graph_in = popen(command_line.c_str(), "r");
+    	// call LoLA
+    	status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
+    	time(&start_time);
+    	graph_in = popen(command_line.c_str(), "r");
 
-    graph_parse();
-    pclose(graph_in);
-    graph_lex_destroy();
-    time(&end_time);
-    status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
-    delete temp;
-
-
-    /*-------------------------------.
-    | 5. organize reachability graph |
-    `-------------------------------*/
-    InnerMarking::initialize();
+    	graph_parse();
+    	pclose(graph_in);
+    	graph_lex_destroy();
+    	time(&end_time);
+    	status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
+    	delete temp;
 
 
-    /*-------------------------------.
-    | 6. do stuff and such...        |
-    `-------------------------------*/
-//    InnerMarking::traverse(0);
+    	/*-------------------------------.
+    	| 5. organize reachability graph |
+    	`-------------------------------*/
+    	InnerMarking::initialize();
 
-    std::string log_filename = filename + ".xes";
-    Output output(log_filename, "XES Log");
-    InnerMarking::create_log(output, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);
 
-    // delete the "counter places" which were former created
+    	/*-------------------------------.
+    	| 6. create the XES log          |
+    	`-------------------------------*/
+    	//    InnerMarking::traverse(0);
+
+    	std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename + ".xes";
+    	Output output(log_filename, "XES Log");
+    	InnerMarking::create_log(output, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);
+
+    }
+
+    // delete the "counter places" if they were formerly created
     if (args_info.partnerView_flag) {
     	InnerMarking::deleteCounterPlaces();
     }
 
-    std::string pnml_filename = filename + ".pnml";
-    Output output2(pnml_filename, "PNML File");
-    output2.stream() << pnapi::io::pnml << *InnerMarking::net;
+    if (args_info.pnmlFile_given) {
+    	std::string pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename + ".pnml";
+    	Output output2(pnml_filename, "PNML File");
+    	output2.stream() << pnapi::io::pnml << *InnerMarking::net;
+    }
 
-//    std::string dot_filename = filename + ".dot";
-//    Output output3(dot_filename, "DOT File");
-//    output3.stream() << pnapi::io::dot << *InnerMarking::net;
+    //    std::string dot_filename = filename + ".dot";
+    //    Output output3(dot_filename, "DOT File");
+    //    output3.stream() << pnapi::io::dot << *InnerMarking::net;
 
 
     /*-------------------.
@@ -359,15 +371,15 @@ int main(int argc, char** argv) {
     `-------------------*/
     // results output
     if (args_info.resultFile_given) {
-        std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";
-        Results results(results_filename);
-        InnerMarking::output_results(results);
-        Label::output_results(results);
+    	std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";
+    	Results results(results_filename);
+    	InnerMarking::output_results(results);
+    	Label::output_results(results);
 
-        results.add("meta.package_name", (const char*)PACKAGE_NAME);
-        results.add("meta.package_version", (const char*)PACKAGE_VERSION);
-        results.add("meta.svn_version", (const char*)VERSION_SVN);
-        results.add("meta.invocation", invocation);
+    	results.add("meta.package_name", (const char*)PACKAGE_NAME);
+    	results.add("meta.package_version", (const char*)PACKAGE_VERSION);
+    	results.add("meta.svn_version", (const char*)VERSION_SVN);
+    	results.add("meta.invocation", invocation);
     }
 
     return EXIT_SUCCESS;

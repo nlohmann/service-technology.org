@@ -303,6 +303,9 @@ void InnerMarking::create_log(std::ostream& file, const int trace_count ,
  */
 void InnerMarking::addInterface() {
 	net->createPort(PORT_NAME);
+	// initialize the random number generator
+	std::srand(time(NULL));
+
 	// iterate through all transitions
 	set<pnapi::Transition *> t_in = net->getTransitions();
 	pnapi::Label * l = NULL;
@@ -325,6 +328,13 @@ void InnerMarking::addInterface() {
 			(*t)->addLabel(*l);
 		}
 	}
+}
+
+/*!
+ \brief Adds a random Interface to the net. Every transition gets either an input or an output label.
+ */
+void InnerMarking::addFinalCondition() {
+	//net->getFinalCondition();
 }
 
 void InnerMarking::finalize() {

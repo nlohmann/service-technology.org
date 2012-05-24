@@ -29,6 +29,7 @@
 #include "util.h"
 
 using std::set;
+using std::vector;
 
 
 /******************
@@ -338,20 +339,49 @@ void InnerMarking::create_log(std::ostream& file, std::string& filename,
 /*!
  \brief Adds a random Interface to the net. Every transition gets either an input or an output label.
  */
-void InnerMarking::addInterface() {
+void InnerMarking::addInterface(const int count) {
 	net->createPort(PORT_NAME);
 	// initialize the random number generator
 	std::srand(time(NULL));
 
+	// vector of visible transitions
+	vector<pnapi::Transition *> visible_trans;
+
+	std::string s;
+	pnapi::Label * l = NULL;
+
 	// iterate through all transitions
 	set<pnapi::Transition *> t_in = net->getTransitions();
-	pnapi::Label * l = NULL;
 	PNAPI_FOREACH(t, t_in)
 	{
-		std::string s = (*t)->getName();
+		s = (*t)->getName();
 		// if on the end of the transition's name is a '$', the transition is invisible
 		// -> "... $invisible$"
 		if (*(--s.end()) != '$') {
+			visible_trans.push_back(*t);
+		}
+	}
+
+	int choose = 0;
+
+	// the following is split up for reasons of performance...
+	if (count > visible_trans.size()/2 || count == -1) {
+		// if there are more than half of the visible transitions to be added to the interface
+		// delete randomly transitions until there are only <count> transitions left
+
+		if (count != -1 && count < visible_trans.size()) {
+			int border = visible_trans.size() - count;
+			for (int i=0; i < border; i++) {
+				choose = std::rand() % visible_trans.size();
+				visible_trans.erase(visible_trans.begin() + choose);
+			}
+		}
+
+		// add the remaining transitions to the interface
+		for (int i=0; i < visible_trans.size(); i++) {
+			pnapi::Transition * t = visible_trans[i];
+			s = t->getName();
+
 			// remove the "\n"
 			s.erase(s.length()-2, 2);
 			// choose randomly between input and output labels
@@ -362,13 +392,36 @@ void InnerMarking::addInterface() {
 			}
 
 			// add the label to the transition
-			(*t)->addLabel(*l);
+			t->addLabel(*l);
+		}
+	} else {
+		// else choose randomly transitions and add them to the interface
+
+		for (int i=0; i < count; i++) {
+			choose = std::rand() % visible_trans.size();
+			pnapi::Transition * t = visible_trans[choose];
+			s = t->getName();
+
+			// remove the "\n"
+			s.erase(s.length()-2, 2);
+			// choose randomly between input and output labels
+			if (std::rand() % 2) {
+				l = &net->createInputLabel(s, PORT_NAME);
+			} else {
+				l = &net->createOutputLabel(s, PORT_NAME);
+			}
+
+			// add the label to the transition
+			t->addLabel(*l);
+
+			// erase already used transitions
+			visible_trans.erase(visible_trans.begin() + choose);
 		}
 	}
 }
 
 /*!
- \brief Adds a random Interface to the net. Every transition gets either an input or an output label.
+ \brief Adds the final condition to the net. \TODO
  */
 void InnerMarking::addFinalCondition() {
 	//net->getFinalCondition();

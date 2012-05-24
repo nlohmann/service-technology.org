@@ -154,6 +154,16 @@ void evaluateParameters(int argc, char** argv) {
         abort(4, "at most one input file must be given");
     }
 
+    // \TODO: error codes
+    if (args_info.count_arg < 0) {
+    	abort(123, "Trace count has to be a positive integer.");
+    }
+
+    // \TODO: error codes
+    if (args_info.icount_arg < -1) {
+    	abort(123, "Interface count has to be a positive integer or '-1'.");
+    }
+
     free(params);
 }
 
@@ -247,7 +257,12 @@ int main(int argc, char** argv) {
 
     if (args_info.tpn_flag) {
 
-    	InnerMarking::addInterface();
+    	InnerMarking::addInterface(args_info.icount_arg);
+
+//    	std::stringstream tempstring (std::stringstream::in | std::stringstream::out);
+//    	tempstring << pnapi::io::owfn << *InnerMarking::net;
+//
+//    	tempstring.str().find("FINALCONDITION");
 
     	std::string owfn_filename = filename + ".owfn";
     	Output output2(owfn_filename, "OWFN File");

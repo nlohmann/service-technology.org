@@ -69,7 +69,7 @@ class InnerMarking {
         static void traverse(const InnerMarking_ID& markingID);
 
         /// add a (more or less) random interface to the net
-        static void addInterface();
+        static void addInterface(const int count);
 
         /// add the final condition to the (special) tpn
         static void addFinalCondition();

@@ -17,6 +17,16 @@ option "log" -
   details="Using this option, a XES log is generated from the underlying OWFN which was either just generated from a TPN or given as an input file."
   flag off
 
+section "TPN to OWFN"
+sectiondesc="Options which are used if the 'tpn'-flag is set....\n"
+
+option "icount" -
+  "Maximal number of interface places to be randomly generated."
+  details="icount sets the maximal number of interface places to be created. At most 1 interface place per transition is generated. The default is set to -1 which means every visible transition gets an interface place.\n"
+  int
+  typestr="COUNT"
+  default="-1"
+  optional
 
 section "XES log generation"
 sectiondesc="Options which are used if the 'log'-flag is set...\n"

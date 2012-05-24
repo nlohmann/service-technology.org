@@ -57,7 +57,7 @@ option "minLength" l
 
 
 section "View"
-sectiondesc="If the 'log'-flag is set one can set the viewpoint to the environment's point of view.\n"
+sectiondesc="If the 'log'-flag is set, one can set the viewpoint to the environment's point of view.\n"
 
 option "partnerView" p
   "Change to the environment's point of view."

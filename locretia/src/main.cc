@@ -346,7 +346,7 @@ int main(int argc, char** argv) {
 
     	std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename + ".xes";
     	Output output(log_filename, "XES Log");
-    	InnerMarking::create_log(output, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);
+    	InnerMarking::create_log(output, filename, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);
 
     }
 

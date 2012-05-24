@@ -54,7 +54,8 @@ class InnerMarking {
         static void deleteCounterPlaces();
 
         /// print the knowledges as OG
-        static void create_log(std::ostream& file, const int trace_count ,
+        static void create_log(std::ostream& file, std::string & filename,
+        										   const int trace_count ,
 				  	  	  	  	  	  	  	  	   const int trace_min_length,
 				  	  	  	  	  	  	  	  	   const int trace_max_length);
 
@@ -118,7 +119,7 @@ class InnerMarking {
 
     private: /* static functions */
             /// creates the header for the output file
-            static void fileHeader(std::ostream&);
+            static void fileHeader(std::ostream&, std::string& filename);
 
             /// creates the footer for the output file
             static void fileFooter(std::ostream&);

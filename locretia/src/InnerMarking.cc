@@ -278,9 +278,6 @@ void InnerMarking::create_trace(std::ostream& file, const int trace_number, cons
 		//choose a transition from outgoing transitions
 		choose = std::rand() % inner_markings[id]->out_degree;
 
-//		time(&rawtime);
-//		ti = localtime ( &rawtime );
-
 		//create log entry for event
 		tempstring << "\t\t<event>\n"
 				   << "\t\t\t<string key=\"org:resource\" value=\"UNDEFINED\"/>\n"
@@ -334,8 +331,8 @@ void InnerMarking::create_log(std::ostream& file, std::string& filename,
 
     fileFooter(file);
 
-//    status("log-file done with %i traces, each with lengths %i to %i",
-//    			trace_count, trace_min_length, trace_max_length);
+    status("log-file done with %i traces, each with lengths %i to %i",
+    			trace_count, trace_min_length, trace_max_length);
 }
 
 /*!

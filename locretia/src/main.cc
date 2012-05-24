@@ -244,36 +244,6 @@ int main(int argc, char** argv) {
         abort(3, "the input open net must be normal");
     }
 
-//    InnerMarking::net = new pnapi::PetriNet();
-//
-//
-//    InnerMarking::net->createArc(InnerMarking::net->createPlace("aa",1,1),InnerMarking::net->createTransition("aaatr"));
-//    InnerMarking::net->createArc(InnerMarking::net->createPlace("b",1,1),InnerMarking::net->createTransition("stoff"));
-//
-//   // pnapi::Transition = InnerMarking::net->createTransition("sdf");
-//
-//    InnerMarking::net->createPort("port1");
-//    //InnerMarking::net->createTransition("a").addLabel(InnerMarking::net->createOutputLabel("a","port1"));
-//
-//    pnapi::Transition *t = &InnerMarking::net->createTransition("sdf");
-//    pnapi::Label *l = &InnerMarking::net->createOutputLabel("aadsdsf","port1");
-//    //t->addLabel(*l);
-//
-//    //l->removeTransition(*t);
-//    t->addLabel(*l,1);
-//
-//    pnapi::Transition *t2 = &InnerMarking::net->createTransition("abc");
-//    t2->addLabel(*l,1);
-//    t2->removeLabel(*l);
-//    //l->removeTransition(*t2);
-//
-//    //l->removeTransition(*t);
-//    //t->addLabel(*l,1);
-//    //t->removeLabel(*l);
-//    //t->addLabel(*l,1);
-//    //InnerMarking::net->createOutputLabel("aadsdsf","port1").addTransition(InnerMarking::net->createTransition("sdf"));
-//    pnapi::Label *l2 = &InnerMarking::net->createInputLabel("bernd","port1");
-//    InnerMarking::net->findTransition("stoff")->addLabel(*l2);
 
     if (args_info.tpn_flag) {
 
@@ -342,8 +312,6 @@ int main(int argc, char** argv) {
     	/*-------------------------------.
     	| 6. create the XES log          |
     	`-------------------------------*/
-    	//    InnerMarking::traverse(0);
-
     	std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename + ".xes";
     	Output output(log_filename, "XES Log");
     	InnerMarking::create_log(output, filename, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);

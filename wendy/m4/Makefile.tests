@@ -31,10 +31,8 @@ $(TESTSUITE): $(srcdir)/testsuite.at package.m4
 # compile the code for code coverage
 cover-prepare:
 	$(LCOV) -v >/dev/null
-	$(MAKE) --directory=$(top_srcdir) clean all \
-	  CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
-	  CFLAGS+="-fprofile-arcs -ftest-coverage" \
-	  LDFLAGS+="-lgcov"
+	cd $(top_srcdir) ; LIBS="-lgcov" CXXFLAGS="-fprofile-arcs -ftest-coverage" CFLAGS="-fprofile-arcs -ftest-coverage" ./configure --disable-assert
+	$(MAKE) --directory=$(top_srcdir) clean all
 
 # get descriptions from the testsuite
 descriptions: $(TESTSUITE)

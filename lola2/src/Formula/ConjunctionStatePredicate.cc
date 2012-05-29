@@ -8,7 +8,7 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include "Formula/ConjunctionStatePredicate.h"
+#include <Formula/ConjunctionStatePredicate.h>
 
 ConjunctionStatePredicate::ConjunctionStatePredicate(index_t n)
 {

@@ -11,9 +11,9 @@
 #include <inttypes.h>
 #include <cstring>
 #include <cstdlib>
-#include "Core/Dimensions.h"
-#include "Parser/Symbol.h"
-#include "Parser/SymbolTable.h"
+#include <Core/Dimensions.h>
+#include <Parser/Symbol.h>
+#include <Parser/SymbolTable.h>
 
 
 unsigned int SymbolTable::collisions = 0;

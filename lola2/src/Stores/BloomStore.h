@@ -1,7 +1,7 @@
 #pragma once
 #include <bitset>
-#include "Core/Dimensions.h"
-#include "Stores/Store.h"
+#include <Core/Dimensions.h>
+#include <Stores/Store.h>
 
 class BloomStore : public Store
 {

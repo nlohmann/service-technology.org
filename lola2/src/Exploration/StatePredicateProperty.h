@@ -9,8 +9,8 @@ Actual property is virtual, default (base class) is full exploration
 
 #pragma once
 
-#include "Formula/AtomicStatePredicate.h"
-#include "Exploration/SimpleProperty.h"
+#include <Formula/AtomicStatePredicate.h>
+#include <Exploration/SimpleProperty.h>
 
 class Firelist;
 class Store;

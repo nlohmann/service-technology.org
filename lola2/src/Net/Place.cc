@@ -12,9 +12,9 @@ information for a place in its role as a node, ar contained in Node.*
 */
 
 #include <cstdlib>
-#include "Core/Dimensions.h"
-#include "Net/Place.h"
-#include "Net/Net.h"
+#include <Core/Dimensions.h>
+#include <Net/Place.h>
+#include <Net/Net.h>
 
 /*!
 \brief collection of information related to places

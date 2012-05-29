@@ -6,11 +6,11 @@
 
 #include <cmath>
 #include <iostream>
-#include "Net/Net.h"
-#include "Net/Place.h"
-#include "Net/Marking.h"
-#include "Stores/BitStore.h"
-#include "InputOutput/Reporter.h"
+#include <Net/Net.h>
+#include <Net/Place.h>
+#include <Net/Marking.h>
+#include <Stores/BitStore.h>
+#include <InputOutput/Reporter.h>
 
 
 extern Reporter* rep;

@@ -10,7 +10,7 @@ Place.* and Transition.*
 */
 
 #pragma once
-#include "Core/Dimensions.h"
+#include <Core/Dimensions.h>
 
 
 /*!

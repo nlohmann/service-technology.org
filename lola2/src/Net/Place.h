@@ -10,7 +10,7 @@ information for a place in its role as a node, or contained in Node.*
 */
 
 #pragma once
-#include "Core/Dimensions.h"
+#include <Core/Dimensions.h>
 
 
 /*!

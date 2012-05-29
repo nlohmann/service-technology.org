@@ -17,12 +17,12 @@ ASCII file where data are separated by spaces and newlines
 #include <stdint.h>
 #endif
 
-#include "InputOutput/CompressedIO.h"
-#include "Parser/ParserPTNet.h"
-#include "Net/Net.h"
-#include "Net/Marking.h"
-#include "Net/Place.h"
-#include "Net/Transition.h"
+#include <InputOutput/CompressedIO.h>
+#include <Parser/ParserPTNet.h>
+#include <Net/Net.h>
+#include <Net/Marking.h>
+#include <Net/Place.h>
+#include <Net/Transition.h>
 
 
 void WriteNameFile(FILE* f)

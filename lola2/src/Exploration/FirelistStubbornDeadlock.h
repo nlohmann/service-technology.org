@@ -8,8 +8,8 @@ enabled transitions.
 */
 
 #pragma once
-#include "Core/Dimensions.h"
-#include "Exploration/Firelist.h"
+#include <Core/Dimensions.h>
+#include <Exploration/Firelist.h>
 
 
 class FirelistStubbornDeadlock : public Firelist

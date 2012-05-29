@@ -8,7 +8,7 @@
 */
 
 #include <cstdlib>
-#include "Parser/Symbol.h"
+#include <Parser/Symbol.h>
 
 /// Getter for index
 index_t Symbol::getIndex() const

@@ -40,11 +40,11 @@ Node(x) -> [out: "n" x ];
 #include <map>
 #include <vector>
 #include <stack>
-#include "Net/Net.h"
-#include "Formula/StatePredicate.h"
-#include "Formula/AtomicStatePredicate.h"
-#include "Formula/ConjunctionStatePredicate.h"
-#include "Formula/DisjunctionStatePredicate.h"
+#include <Net/Net.h>
+#include <Formula/StatePredicate.h>
+#include <Formula/AtomicStatePredicate.h>
+#include <Formula/ConjunctionStatePredicate.h>
+#include <Formula/DisjunctionStatePredicate.h>
 extern StatePredicate *sp;
 
 // mapping from node ids to factors

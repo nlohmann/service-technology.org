@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
-#include "InputOutput/SimpleString.h"
+#include <InputOutput/SimpleString.h>
 
 
 String::String() : s(strdup(""))

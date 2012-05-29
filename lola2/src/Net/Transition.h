@@ -9,8 +9,8 @@ information for a transition in its role as a node, ar contained in Node.*
 */
 
 #pragma once
-#include "Core/Dimensions.h"
-#include "Parser/FairnessAssumptions.h"
+#include <Core/Dimensions.h>
+#include <Parser/FairnessAssumptions.h>
 
 
 /*!

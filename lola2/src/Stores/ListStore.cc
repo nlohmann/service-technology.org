@@ -6,10 +6,10 @@
 
 #include <algorithm>
 #include <iostream>
-#include "Net/Net.h"
-#include "Net/Place.h"
-#include "Net/Marking.h"
-#include "Stores/ListStore.h"
+#include <Net/Net.h>
+#include <Net/Place.h>
+#include <Net/Marking.h>
+#include <Stores/ListStore.h>
 
 bool ListStore::searchAndInsert()
 {
@@ -25,12 +25,13 @@ bool ListStore::searchAndInsert()
     std::copy(Marking::Current, Marking::Current + Place::CardSignificant, m.begin());
 
     // add vector to marking store
-   if(!contains(m)){
-	   ++markings;
-	   store.push_back(m);
-	   return false; //marking was new
-   }
-   return true; //marking was old
+    if (!contains(m))
+    {
+        ++markings;
+        store.push_back(m);
+        return false; //marking was new
+    }
+    return true; //marking was old
 }
 
 bool ListStore::searchAndInsert(State**)
@@ -39,9 +40,14 @@ bool ListStore::searchAndInsert(State**)
     return false;
 }
 
-bool ListStore::contains(std::vector<capacity_t> elem){
-	for(std::list<std::vector<capacity_t> >::iterator it = store.begin(); it != store.end(); it++){
-		if(*it == elem) return true;
-	}
-	return false;
+bool ListStore::contains(std::vector<capacity_t> elem)
+{
+    for (std::list<std::vector<capacity_t> >::iterator it = store.begin(); it != store.end(); it++)
+    {
+        if (*it == elem)
+        {
+            return true;
+        }
+    }
+    return false;
 }

@@ -6,9 +6,9 @@
  */
 
 #pragma once
-#include "Core/Dimensions.h"
-#include "Stores/SIStore.h"
-#include "Stores/BinStore2.h"
+#include <Core/Dimensions.h>
+#include <Stores/SIStore.h>
+#include <Stores/BinStore2.h>
 
 
 

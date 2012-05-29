@@ -25,8 +25,8 @@
 #include <ctime>
 #include <pthread.h>
 
-#include "InputOutput/Socket.h"
-#include "InputOutput/Reporter.h"
+#include <InputOutput/Socket.h>
+#include <InputOutput/Reporter.h>
 
 
 /*!

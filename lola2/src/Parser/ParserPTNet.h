@@ -8,8 +8,8 @@ should be independent from the format (LoLA / PNML / ...)
 */
 
 #pragma once
-#include "Core/Dimensions.h"
-#include "Parser/SymbolTable.h"
+#include <Core/Dimensions.h>
+#include <Parser/SymbolTable.h>
 
 class ParserPTNet
 {

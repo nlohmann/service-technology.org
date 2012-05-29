@@ -8,8 +8,8 @@
 */
 
 #include <cstdlib>
-#include "Parser/ArcList.h"
-#include "Parser/PlaceSymbol.h"
+#include <Parser/ArcList.h>
+#include <Parser/PlaceSymbol.h>
 
 
 /// Getter for place

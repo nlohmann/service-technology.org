@@ -8,10 +8,10 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include "Net/Net.h"
-#include "Net/Transition.h"
-#include "Net/Place.h"
-#include "Net/Marking.h"
+#include <Net/Net.h>
+#include <Net/Transition.h>
+#include <Net/Place.h>
+#include <Net/Marking.h>
 
 
 void randomWalk(int transitions)

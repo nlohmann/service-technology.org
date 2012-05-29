@@ -6,9 +6,9 @@
 */
 
 #pragma once
-#include "Core/Dimensions.h"
-#include "Formula/StatePredicate.h"
-#include "Exploration/Firelist.h"
+#include <Core/Dimensions.h>
+#include <Formula/StatePredicate.h>
+#include <Exploration/Firelist.h>
 
 
 class FirelistStubbornStatePredicate : public Firelist

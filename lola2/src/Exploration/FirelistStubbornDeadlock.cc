@@ -7,10 +7,10 @@
 */
 
 #include <cstdlib>
-#include "Core/Dimensions.h"
-#include "Net/Net.h"
-#include "Net/Transition.h"
-#include "Exploration/FirelistStubbornDeadlock.h"
+#include <Core/Dimensions.h>
+#include <Net/Net.h>
+#include <Net/Transition.h>
+#include <Exploration/FirelistStubbornDeadlock.h>
 
 FirelistStubbornDeadlock::FirelistStubbornDeadlock()
 {

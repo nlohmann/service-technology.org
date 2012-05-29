@@ -7,7 +7,7 @@
 #pragma once
 #include <set>
 #include <vector>
-#include "Stores/Store.h"
+#include <Stores/Store.h>
 
 
 class BitStore : public Store

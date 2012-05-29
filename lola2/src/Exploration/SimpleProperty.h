@@ -9,7 +9,7 @@ Actual property is virtual, default (base class) is full exploration
 
 #pragma once
 
-#include "Exploration/SearchStack.h"
+#include <Exploration/SearchStack.h>
 
 class Firelist;
 class Store;

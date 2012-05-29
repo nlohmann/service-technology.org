@@ -8,11 +8,11 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include "Net/Net.h"
-#include "Net/Marking.h"
-#include "Net/Place.h"
-#include "Net/Transition.h"
-#include "Parser/FairnessAssumptions.h"
+#include <Net/Net.h>
+#include <Net/Marking.h>
+#include <Net/Place.h>
+#include <Net/Transition.h>
+#include <Parser/FairnessAssumptions.h>
 
 
 index_t Net::Card[2] = {0, 0};

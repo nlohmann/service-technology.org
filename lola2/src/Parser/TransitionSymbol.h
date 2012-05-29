@@ -8,8 +8,8 @@
 */
 
 #pragma once
-#include "Parser/Symbol.h"
-#include "Parser/FairnessAssumptions.h"
+#include <Parser/Symbol.h>
+#include <Parser/FairnessAssumptions.h>
 
 class ArcList;
 

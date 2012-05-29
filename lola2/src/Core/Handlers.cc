@@ -14,16 +14,16 @@
 #include <cstring>
 #include <unistd.h>
 
-#include "cmdline.h"
-#include "Core/Dimensions.h"
-#include "Core/Handlers.h"
-#include "Net/Net.h"
-#include "Net/Place.h"
-#include "Net/Marking.h"
-#include "Net/Transition.h"
-#include "InputOutput/Socket.h"
-#include "InputOutput/Reporter.h"
-#include "InputOutput/SimpleString.h"
+#include <cmdline.h>
+#include <Core/Dimensions.h>
+#include <Core/Handlers.h>
+#include <Net/Net.h>
+#include <Net/Place.h>
+#include <Net/Marking.h>
+#include <Net/Transition.h>
+#include <InputOutput/Socket.h>
+#include <InputOutput/Reporter.h>
+#include <InputOutput/SimpleString.h>
 
 extern Reporter* rep;
 extern gengetopt_args_info args_info;

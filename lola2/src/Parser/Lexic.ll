@@ -20,12 +20,12 @@ Mainly copied from LoLA1
 
 
 %{
-#include "cmdline.h"
-#include "Parser/ArcList.h"
-#include "Parser/FairnessAssumptions.h"
-#include "Parser/ParserPTNetLoLA.hh"
-#include "InputOutput/Reporter.h"
-#include "InputOutput/InputOutput.h"
+#include <cmdline.h>
+#include <Parser/ArcList.h>
+#include <Parser/FairnessAssumptions.h>
+#include <Parser/ParserPTNetLoLA.hh>
+#include <InputOutput/Reporter.h>
+#include <InputOutput/InputOutput.h>
 
 extern int currentFile;
 extern gengetopt_args_info args_info;

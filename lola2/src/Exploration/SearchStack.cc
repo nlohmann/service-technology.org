@@ -8,8 +8,8 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include "Core/Dimensions.h"
-#include "Exploration/SearchStack.h"
+#include <Core/Dimensions.h>
+#include <Exploration/SearchStack.h>
 
 
 SearchStack::SearchStack() : StackPointer(0), currentchunk(NULL)

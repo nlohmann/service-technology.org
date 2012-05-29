@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Exploration/SimpleProperty.h"
+#include <Exploration/SimpleProperty.h>
 
 class Firelist;
 class Store;

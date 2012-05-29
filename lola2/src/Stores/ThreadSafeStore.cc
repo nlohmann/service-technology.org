@@ -6,10 +6,10 @@
 
 #include <algorithm>
 #include <iostream>
-#include "Net/Net.h"
-#include "Net/Place.h"
-#include "Net/Marking.h"
-#include "Stores/ThreadSafeStore.h"
+#include <Net/Net.h>
+#include <Net/Place.h>
+#include <Net/Marking.h>
+#include <Stores/ThreadSafeStore.h>
 
 using namespace std;
 

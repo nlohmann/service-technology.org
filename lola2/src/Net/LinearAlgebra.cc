@@ -14,8 +14,8 @@
 #include <stdint.h>
 #endif
 
-#include "Net/LinearAlgebra.h"
-#include "Net/Net.h"
+#include <Net/LinearAlgebra.h>
+#include <Net/Net.h>
 
 // for debug purposes
 #include <iostream>

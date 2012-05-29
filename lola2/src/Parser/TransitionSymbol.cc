@@ -7,10 +7,10 @@
 \brief class implementation for a symbol with payload for transition
 */
 
-#include "Parser/TransitionSymbol.h"
-#include "Parser/ArcList.h"
-#include "Parser/PlaceSymbol.h"
-#include "Parser/FairnessAssumptions.h"
+#include <Parser/TransitionSymbol.h>
+#include <Parser/ArcList.h>
+#include <Parser/PlaceSymbol.h>
+#include <Parser/FairnessAssumptions.h>
 
 
 /// Generate and initialize a symbol

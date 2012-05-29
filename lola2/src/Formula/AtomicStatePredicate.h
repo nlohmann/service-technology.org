@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Formula/StatePredicate.h"
+#include <Formula/StatePredicate.h>
 
 /// A state predicate is a formula that assigns a Boolean value to Marking::Current
 /// An atomic predicate compares a formal sum of places with a constant

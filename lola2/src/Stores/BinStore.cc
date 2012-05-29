@@ -7,10 +7,10 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include "Net/Marking.h"
-#include "Net/Net.h"
-#include "Net/Place.h"
-#include "Stores/BinStore.h"
+#include <Net/Marking.h>
+#include <Net/Net.h>
+#include <Net/Place.h>
+#include <Stores/BinStore.h>
 
 class State;
 
@@ -244,35 +244,37 @@ insert:
 #error BINSTORE_LOOP_BODY_2 already defined
 #else
 #define BINSTORE_LOOP_BODY_2(N, I)\
-        if (Marking::Current[place_index] & (1 << placebit_index))\
+    if (Marking::Current[place_index] & (1 << placebit_index))\
+    {\
+        assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);\
+        (*newvector)[vector_byte] |= N;\
+    }\
+    /* increment vector byte */\
+    I\
+    if (placebit_index == 0)\
+    {\
+        ++place_index;\
+        if (place_index >= Place::CardSignificant)\
         {\
-            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);\
-            (*newvector)[vector_byte] |= N;\
+            break;\
         }\
-        /* increment vector byte */\
-        I\
-        if (placebit_index == 0)\
-        {\
-            ++place_index;\
-            if (place_index >= Place::CardSignificant)\
-            {\
-                break;\
-            }\
-            placebit_index = Place::CardBits[place_index] - 1;\
-        }\
-        else\
-        {\
-            --placebit_index;\
-        }
+        placebit_index = Place::CardBits[place_index] - 1;\
+    }\
+    else\
+    {\
+        --placebit_index;\
+    }
 #endif
-        BINSTORE_LOOP_BODY_2(128,); /*** incarnation for bit 7 ********/\
+        BINSTORE_LOOP_BODY_2(128,); /*** incarnation for bit 7 ********/
+        \
         BINSTORE_LOOP_BODY_2(64,);
         BINSTORE_LOOP_BODY_2(32,);
         BINSTORE_LOOP_BODY_2(16,);
         BINSTORE_LOOP_BODY_2(8,);
         BINSTORE_LOOP_BODY_2(4,);
         BINSTORE_LOOP_BODY_2(2,);
-        BINSTORE_LOOP_BODY_2(1, ++vector_byte;); /*** incarnation for bit 0 ********/\
+        BINSTORE_LOOP_BODY_2(1, ++vector_byte;); /*** incarnation for bit 0 ********/
+        \
     }
 
     ++markings;

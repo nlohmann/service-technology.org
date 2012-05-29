@@ -10,19 +10,19 @@ Actual property is virtual, default (base class) is full exploration
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
-#include "Net/Marking.h"
-#include "Net/Place.h"
-#include "Net/Transition.h"
-#include "Net/Net.h"
-#include "Exploration/SimpleProperty.h"
-#include "Exploration/Firelist.h"
-#include "Stores/Store.h"
-#include "Stores/EmptyStore.h"
-#include "InputOutput/Reporter.h"
-#include "cmdline.h"
+#include <Net/Marking.h>
+#include <Net/Place.h>
+#include <Net/Transition.h>
+#include <Net/Net.h>
+#include <Exploration/SimpleProperty.h>
+#include <Exploration/Firelist.h>
+#include <Stores/Store.h>
+#include <Stores/EmptyStore.h>
+#include <InputOutput/Reporter.h>
+#include <cmdline.h>
 
 extern gengetopt_args_info args_info;
-extern Reporter *rep;
+extern Reporter* rep;
 
 void SimpleProperty::initProperty()
 {

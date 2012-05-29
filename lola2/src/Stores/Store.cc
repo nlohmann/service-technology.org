@@ -9,11 +9,11 @@
 #include <algorithm>
 #include <unistd.h>
 #include <csignal>
-#include "Core/Dimensions.h"
-#include "Stores/Store.h"
-#include "Stores/EmptyStore.h"
-#include "InputOutput/Reporter.h"
-#include "cmdline.h"
+#include <Core/Dimensions.h>
+#include <Stores/Store.h>
+#include <Stores/EmptyStore.h>
+#include <InputOutput/Reporter.h>
+#include <cmdline.h>
 
 extern gengetopt_args_info args_info;
 extern Reporter* rep;

@@ -7,8 +7,8 @@
 #pragma once
 #include <set>
 #include <vector>
-#include "Core/Dimensions.h"
-#include "Stores/Store.h"
+#include <Core/Dimensions.h>
+#include <Stores/Store.h>
 
 
 class STLStore : public Store

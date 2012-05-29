@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Formula/StatePredicate.h"
+#include <Formula/StatePredicate.h>
 
 class AtomicStatePredicate;
 

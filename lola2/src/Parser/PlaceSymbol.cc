@@ -6,7 +6,7 @@
 \brief class implementation for a symbol with payload for place
 */
 
-#include "Parser/PlaceSymbol.h"
+#include <Parser/PlaceSymbol.h>
 
 /// Constructor. Capacity available in context, the other ingredients are not
 PlaceSymbol::PlaceSymbol(char* k, capacity_t cap)

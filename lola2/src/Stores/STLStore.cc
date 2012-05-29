@@ -5,10 +5,10 @@
 */
 
 #include <algorithm>
-#include "Net/Net.h"
-#include "Net/Place.h"
-#include "Net/Marking.h"
-#include "Stores/STLStore.h"
+#include <Net/Net.h>
+#include <Net/Place.h>
+#include <Net/Marking.h>
+#include <Stores/STLStore.h>
 
 
 bool STLStore::searchAndInsert()

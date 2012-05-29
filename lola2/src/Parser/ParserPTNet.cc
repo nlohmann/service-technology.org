@@ -17,19 +17,19 @@ should be independent from the format (LoLA / PNML / ...)
 #include <cstring>
 #include <cstdlib>
 
-#include "cmdline.h"
-#include "Net/Net.h"
-#include "Net/Place.h"
-#include "Net/Transition.h"
-#include "Net/StructuralReduction.h"
-#include "Net/Marking.h"
-#include "Parser/ArcList.h"
-#include "Parser/SymbolTable.h"
-#include "Parser/ParserPTNet.h"
-#include "Parser/PlaceSymbol.h"
-#include "Parser/TransitionSymbol.h"
-#include "Parser/Symbol.h"
-#include "InputOutput/Reporter.h"
+#include <cmdline.h>
+#include <Net/Net.h>
+#include <Net/Place.h>
+#include <Net/Transition.h>
+#include <Net/StructuralReduction.h>
+#include <Net/Marking.h>
+#include <Parser/ArcList.h>
+#include <Parser/SymbolTable.h>
+#include <Parser/ParserPTNet.h>
+#include <Parser/PlaceSymbol.h>
+#include <Parser/TransitionSymbol.h>
+#include <Parser/Symbol.h>
+#include <InputOutput/Reporter.h>
 
 
 extern gengetopt_args_info args_info;

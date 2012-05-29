@@ -11,8 +11,8 @@
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
-#include "Core/Dimensions.h"
-#include "InputOutput/Reporter.h"
+#include <Core/Dimensions.h>
+#include <InputOutput/Reporter.h>
 
 
 // initialize error messages

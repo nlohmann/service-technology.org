@@ -8,8 +8,8 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include "Formula/DisjunctionStatePredicate.h"
-#include "Net/Net.h"
+#include <Formula/DisjunctionStatePredicate.h>
+#include <Net/Net.h>
 
 DisjunctionStatePredicate::DisjunctionStatePredicate(index_t n)
 {

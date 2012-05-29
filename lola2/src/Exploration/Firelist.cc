@@ -6,10 +6,10 @@
 \brief Class for firelist generation. Default is firelist consisting of all enabled transitions.
 */
 
-#include "Core/Dimensions.h"
-#include "Net/Net.h"
-#include "Net/Transition.h"
-#include "Exploration/Firelist.h"
+#include <Core/Dimensions.h>
+#include <Net/Net.h>
+#include <Net/Transition.h>
+#include <Exploration/Firelist.h>
 
 
 index_t Firelist::getFirelist(index_t** result)

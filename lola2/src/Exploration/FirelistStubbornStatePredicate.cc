@@ -8,11 +8,11 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include "Core/Dimensions.h"
-#include "Net/Net.h"
-#include "Net/Transition.h"
-#include "Net/Marking.h"
-#include "Exploration/FirelistStubbornStatePredicate.h"
+#include <Core/Dimensions.h>
+#include <Net/Net.h>
+#include <Net/Transition.h>
+#include <Net/Marking.h>
+#include <Exploration/FirelistStubbornStatePredicate.h>
 
 FirelistStubbornStatePredicate::FirelistStubbornStatePredicate(StatePredicate* p)
 {

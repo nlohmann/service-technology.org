@@ -28,6 +28,47 @@ $(TESTSUITE): $(srcdir)/testsuite.at package.m4
 # test coverage #
 #---------------#
 
+## Compile with coverage flags
+# Actually calls the configure script to set flags for the C/C++ compiler
+# and the linker. Note that assertions are switched off. Then cleans the
+# build and recompiles. lcov is called just to provoke an error message if
+# it is not found by the configure script. In that case, the Automake's
+# missing script handles the error message.
+newcover-compile:
+	$(LCOV) -v >/dev/null
+	cd $(top_srcdir) ; LIBS="-lgcov" CXXFLAGS="-fprofile-arcs -ftest-coverage" CFLAGS="-fprofile-arcs -ftest-coverage" ./configure --disable-assert
+	$(MAKE) --directory=$(top_srcdir) clean all
+
+## Execute tests using coverage:
+# This target creats for each test case a directory in which coverage data is
+# collected. This is done by the cover.sh script. It does not call lcov to
+# process the data.
+newcover-check: newcover-compile $(TESTSUITE)
+	test ! -d cover || rm -fr cover
+	$(MKDIR_P) cover
+	-$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=YES
+
+## Clean up cover directories:
+# Makes sure that each cover directory contains only instrumented object files
+# and coverage data of the files in the src directory. Files for which no
+# instrumented object files are missing or files that do not stem from the src
+# directory (e.g., libraries) are removed.
+newcover-process: newcover-check
+	cd cover ; \
+    for TESTCASE in `ls -1`; do \
+      for GCNOFILE in `find $(abs_top_builddir)/src -type f -name '*.gcno' -print`; do \
+        cp $$GCNOFILE $$TESTCASE ; \
+      done ; \
+      cd $$TESTCASE; \
+      for FILE in `ls -1 *.gcda`; do \
+        if [ ! -f `basename $$FILE .gcda`.gcno ]; then \
+          rm $$FILE; \
+        fi \
+      done; \
+      cd ..; \
+    done
+
+
 cover-covertura: cover-prepare $(TESTSUITE)
 	-$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)
 	cd $(top_srcdir) ; gcovr -r src -b -x > covertura.xml

@@ -6,8 +6,8 @@
 */
 
 #pragma once
-#include "Core/Dimensions.h"
-#include "Stores/Store.h"
+#include <Core/Dimensions.h>
+#include <Stores/Store.h>
 
 typedef uint32_t vectordata_t;
 

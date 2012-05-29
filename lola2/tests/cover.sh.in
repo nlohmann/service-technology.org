@@ -11,7 +11,13 @@
 #    Test project (http://ltp.sourceforge.net/coverage/lcov.php) is used to
 #    collect test case coverage results for the given executable
 #
-# 2. otherwise, the given executable is called without code coverage tool
+# 2. if the environment variable COVER is set to YES, the test cases are
+#    called as is, but before each test case, the environment variables of
+#    gcov are set to store all coverage data of the executable in a newly
+#    created directory. The data is not yet processed - this is done by
+#    other Makefile targets.
+#
+# 3. otherwise, the given executable is called without code coverage tool
 
 
 # evaluate COVER variable
@@ -36,6 +42,28 @@ case $COVER in
 
     # remove profile information on C++ sources and headers
     @LCOV@ --quiet --extract $INFOFILE "@abs_top_builddir@/*" -o $INFOFILE
+
+    # exit with executable's exit code
+    exit $result  
+  ;;
+
+  "YES")
+    # derive test name from current directory (assuming GNU Autotest); the
+    # info filename is suffixed with a random number to allow for multiple
+    # invokations of this script for the same test
+    dir=`pwd`
+    TESTNAME=`basename $dir`
+    COVERDIR=@abs_top_builddir@/tests/cover/$TESTNAME-$RANDOM
+    mkdir -p $COVERDIR
+
+    # set flags for gcov to store all runtime cover information in the cover
+    # directory
+    export GCOV_PREFIX_STRIP=1000
+    export GCOV_PREFIX=$COVERDIR
+
+    # execute executable and remember exit code
+    $*
+    result=$?
 
     # exit with executable's exit code
     exit $result  

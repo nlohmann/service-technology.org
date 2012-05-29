@@ -16,45 +16,45 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "cmdline.h"
+#include <cmdline.h>
 
-#include "Core/Handlers.h"
+#include <Core/Handlers.h>
 
-#include "Parser/ParserPTNet.h"
-#include "Parser/ast-system-k.h"
-#include "Parser/ast-system-rk.h"
-#include "Parser/ast-system-unpk.h"
+#include <Parser/ParserPTNet.h>
+#include <Parser/ast-system-k.h>
+#include <Parser/ast-system-rk.h>
+#include <Parser/ast-system-unpk.h>
 
-#include "Net/Net.h"
-#include "Net/Marking.h"
+#include <Net/Net.h>
+#include <Net/Marking.h>
 
-#include "InputOutput/Reporter.h"
-#include "InputOutput/CompressedIO.h"
-#include "InputOutput/InputOutput.h"
+#include <InputOutput/Reporter.h>
+#include <InputOutput/CompressedIO.h>
+#include <InputOutput/InputOutput.h>
 
-#include "Exploration/RandomWalk.h"
-#include "Exploration/Firelist.h"
-#include "Exploration/SimpleProperty.h"
-#include "Exploration/Deadlock.h"
-#include "Exploration/FirelistStubbornDeadlock.h"
-#include "Exploration/FirelistStubbornStatePredicate.h"
-#include "Exploration/StatePredicateProperty.h"
+#include <Exploration/RandomWalk.h>
+#include <Exploration/Firelist.h>
+#include <Exploration/SimpleProperty.h>
+#include <Exploration/Deadlock.h>
+#include <Exploration/FirelistStubbornDeadlock.h>
+#include <Exploration/FirelistStubbornStatePredicate.h>
+#include <Exploration/StatePredicateProperty.h>
 
-#include "Formula/StatePredicate.h"
+#include <Formula/StatePredicate.h>
 
-#include "Stores/BDDStore.h"
-#include "Stores/BinStore.h"
-#include "Stores/BinStore2.h"
-#include "Stores/BitStore.h"
-#include "Stores/BloomStore.h"
-#include "Stores/CompressedStore.h"
-#include "Stores/EmptyStore.h"
-#include "Stores/ListStore.h"
-#include "Stores/SIBinStore2.h"
-#include "Stores/SQLStore.h"
-#include "Stores/STLStore.h"
-#include "Stores/Store.h"
-#include "Stores/ThreadSafeStore.h"
+#include <Stores/BDDStore.h>
+#include <Stores/BinStore.h>
+#include <Stores/BinStore2.h>
+#include <Stores/BitStore.h>
+#include <Stores/BloomStore.h>
+#include <Stores/CompressedStore.h>
+#include <Stores/EmptyStore.h>
+#include <Stores/ListStore.h>
+#include <Stores/SIBinStore2.h>
+#include <Stores/SQLStore.h>
+#include <Stores/STLStore.h>
+#include <Stores/Store.h>
+#include <Stores/ThreadSafeStore.h>
 
 
 /// printer-function for output on stdout
@@ -302,11 +302,11 @@ int main(int argc, char** argv)
                     s = new ThreadSafeStore(new SIBinStore2(10));
                     break;
                 case store_arg_list:
-                	s = new ListStore();
-                	break;
+                    s = new ListStore();
+                    break;
                 case store_arg_compr:
-                	s = new CompressedStore();
-                	break;
+                    s = new CompressedStore();
+                    break;
             }
         }
 

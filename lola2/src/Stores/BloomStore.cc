@@ -1,9 +1,9 @@
 #include <cmath>
-#include "Stores/BloomStore.h"
-#include "Net/Net.h"
-#include "Net/Place.h"
-#include "Net/Marking.h"
-#include "InputOutput/Reporter.h"
+#include <Stores/BloomStore.h>
+#include <Net/Net.h>
+#include <Net/Place.h>
+#include <Net/Marking.h>
+#include <InputOutput/Reporter.h>
 
 
 extern Reporter* rep;

@@ -6,7 +6,7 @@
 
 #pragma once
 #include <sqlite3.h>
-#include "Stores/Store.h"
+#include <Stores/Store.h>
 
 
 class SQLStore : public Store

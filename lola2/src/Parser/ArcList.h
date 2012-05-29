@@ -8,7 +8,7 @@
 */
 
 #pragma once
-#include "Core/Dimensions.h"
+#include <Core/Dimensions.h>
 
 class Symbol;
 class PlaceSymbol;

@@ -12,14 +12,14 @@
 #include <stdint.h>
 #endif
 
-#include "InputOutput/Reporter.h"
+#include <InputOutput/Reporter.h>
 
-#include "Net/StructuralReduction.h"
-#include "Net/LinearAlgebra.h"
-#include "Net/Net.h"
-#include "Net/Transition.h"
-#include "Net/Place.h"
-#include "Net/swap.h"
+#include <Net/StructuralReduction.h>
+#include <Net/LinearAlgebra.h>
+#include <Net/Net.h>
+#include <Net/Transition.h>
+#include <Net/Place.h>
+#include <Net/swap.h>
 
 extern Reporter* rep;
 

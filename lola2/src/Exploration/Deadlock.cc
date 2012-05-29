@@ -8,8 +8,8 @@
 
 #include <cstring>
 #include <cstdio>
-#include "Net/Transition.h"
-#include "Exploration/Deadlock.h"
+#include <Net/Transition.h>
+#include <Exploration/Deadlock.h>
 
 
 void Deadlock::initProperty()

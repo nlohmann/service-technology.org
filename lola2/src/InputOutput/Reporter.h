@@ -5,8 +5,8 @@
 */
 
 #pragma once
-#include "InputOutput/SimpleString.h"
-#include "InputOutput/Socket.h"
+#include <InputOutput/SimpleString.h>
+#include <InputOutput/Socket.h>
 
 
 /// error codes for the Reporter::abort() function

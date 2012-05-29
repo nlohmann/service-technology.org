@@ -7,8 +7,8 @@
 #pragma once
 #include <vector>
 #include <list>
-#include "Core/Dimensions.h"
-#include "Stores/Store.h"
+#include <Core/Dimensions.h>
+#include <Stores/Store.h>
 
 
 class ListStore : public Store

@@ -21,16 +21,16 @@ Mainly copied from LoLA1
 
 
 %{
-#include "cmdline.h"
+#include <cmdline.h>
 
-#include "Parser/ast-system-k.h"
-#include "Parser/ast-system-yystype.h"
+#include <Parser/ast-system-k.h>
+#include <Parser/ast-system-yystype.h>
 
-#include "Parser/ArcList.h"
-#include "Parser/FairnessAssumptions.h"
-#include "Parser/ParserPTFormula.hh"
-#include "InputOutput/Reporter.h"
-#include "InputOutput/InputOutput.h"
+#include <Parser/ArcList.h>
+#include <Parser/FairnessAssumptions.h>
+#include <Parser/ParserPTFormula.hh>
+#include <InputOutput/Reporter.h>
+#include <InputOutput/InputOutput.h>
 
 using namespace kc;
 

@@ -7,9 +7,9 @@
 */
 
 #include <config.h>
-#include "Formula/AtomicStatePredicate.h"
-#include "Net/Net.h"
-#include "Net/Marking.h"
+#include <Formula/AtomicStatePredicate.h>
+#include <Net/Net.h>
+#include <Net/Marking.h>
 #include <cstdlib>
 #include <cstdio>
 

@@ -7,10 +7,10 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include "Net/Marking.h"
-#include "Net/Net.h"
-#include "Net/Place.h"
-#include "Stores/BinStore2.h"
+#include <Net/Marking.h>
+#include <Net/Net.h>
+#include <Net/Place.h>
+#include <Stores/BinStore2.h>
 
 class State;
 

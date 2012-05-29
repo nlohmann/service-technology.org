@@ -7,9 +7,9 @@
 #pragma once
 #include <set>
 #include <vector>
-#include "Core/Dimensions.h"
-#include "Stores/Store.h"
-#include "Stores/SIStore.h"
+#include <Core/Dimensions.h>
+#include <Stores/Store.h>
+#include <Stores/SIStore.h>
 #include <pthread.h>
 
 class ThreadSafeStore : public Store

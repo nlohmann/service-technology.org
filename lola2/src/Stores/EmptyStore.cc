@@ -1,5 +1,5 @@
 #include <cmath>
-#include "Stores/EmptyStore.h"
+#include <Stores/EmptyStore.h>
 
 EmptyStore::EmptyStore() : tries(0)
 {
@@ -11,4 +11,7 @@ inline bool EmptyStore::searchAndInsert()
     return true;
 }
 
-bool EmptyStore::searchAndInsert(State**) { return true; }
+bool EmptyStore::searchAndInsert(State**)
+{
+    return true;
+}

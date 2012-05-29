@@ -8,9 +8,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <csignal>
-#include "InputOutput/SimpleString.h"
-#include "InputOutput/Socket.h"
-#include "InputOutput/Reporter.h"
+#include <InputOutput/SimpleString.h>
+#include <InputOutput/Socket.h>
+#include <InputOutput/Reporter.h>
 
 /// the reporter
 Reporter* rep = new ReporterStream();

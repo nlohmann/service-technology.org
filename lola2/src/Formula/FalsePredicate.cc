@@ -6,7 +6,6 @@
 \brief derives constant predicate TRUE
 */
 
-#pragma once
 
 #include <Core/Dimensions.h>
 #include <Formula/FalsePredicate.h>

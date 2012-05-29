@@ -39,6 +39,8 @@
 #include <Exploration/FirelistStubbornDeadlock.h>
 #include <Exploration/FirelistStubbornStatePredicate.h>
 #include <Exploration/StatePredicateProperty.h>
+#include <Exploration/ChooseTransition.h>
+#include <Exploration/ChooseTransitionHashDriven.h>
 
 #include <Formula/StatePredicate.h>
 
@@ -341,6 +343,7 @@ int main(int argc, char** argv)
         assert(fl);
 
         bool result;
+	ChooseTransition * choose;
 
         switch (args_info.search_arg)
         {
@@ -358,7 +361,9 @@ int main(int argc, char** argv)
                     rep->status("starting at most %d tries of depth %d", args_info.retrylimit_arg, args_info.depthlimit_arg);
                 }
 
-                result = p->find_path(args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore*)s));
+		choose = new ChooseTransitionHashDriven();
+                result = p->find_path(args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore*)s),*choose);
+		delete choose;
                 break;
 
             default:

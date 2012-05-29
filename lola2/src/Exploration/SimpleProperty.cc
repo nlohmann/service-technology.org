@@ -16,6 +16,8 @@ Actual property is virtual, default (base class) is full exploration
 #include <Net/Net.h>
 #include <Exploration/SimpleProperty.h>
 #include <Exploration/Firelist.h>
+#include <Exploration/ChooseTransition.h>
+
 #include <Stores/Store.h>
 #include <Stores/EmptyStore.h>
 #include <InputOutput/Reporter.h>
@@ -107,11 +109,10 @@ bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
     }
 }
 
-bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s)
+bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition & c)
 {
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.
-    unsigned long int* hashtable = (unsigned long int*) calloc(SIZEOF_MARKINGTABLE, sizeof(unsigned long int));
 
     unsigned int currentattempt = 0;
 
@@ -127,7 +128,6 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
 //    if (value)
 //    {
 //        // initial marking satisfies property
-//        free(hashtable);
 //        return true;
 //    }
 //
@@ -168,7 +168,6 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
         if (value)
         {
             // initial marking satisfies property
-            free(hashtable);
 	    // witness path is empty path
             return true;
         }
@@ -189,48 +188,20 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
                 break; // go to next attempt
             }
 
-            // 1. select transition
-            // Selection proceeds in two phases. In phase one, we give priority to transitions
-            // that 1. enter rarely visited hash buckets and 2. are early members of the fire list
-            // If no transition is selected in phase 1, phase 2 selects a transition randomly.
-
-            index_t chosen = Net::Card[TR];
-            // phase 1
-            for (index_t i = cardFirelist; i > 0;)
-            {
-                --i;
-                index_t t = currentFirelist[i];
-                // compute hash value for t successor
-                hash_t h = (Marking::HashCurrent + Transition::DeltaHash[t]) % SIZEOF_MARKINGTABLE;
-                if (((float) rand() / (float) RAND_MAX) <= 1.0 / (1.0 + hashtable[h]))
-                {
-                    chosen = t;
-                    break;
-                }
-            }
-
-            // phase 2
-            if (chosen == Net::Card[TR])
-            {
-                chosen = currentFirelist[ rand() % cardFirelist];
-            }
+	    index_t chosen = c.choose(cardFirelist,currentFirelist);
             free(currentFirelist);
 
 	    path[depth] = chosen;
             Transition::fire(chosen);
-            ++(hashtable[Marking::HashCurrent]);
             Transition::updateEnabled(chosen);
 
             checkProperty(chosen);
             if (value)
             {
-                free(hashtable);
 		// witness path is path[0] .... path[depth-1] path[depth]
                 return true;
             }
         }
     }
-
-    free(hashtable);
     return false;
 }

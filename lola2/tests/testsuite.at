@@ -271,6 +271,31 @@ AT_CLEANUP
 
 
 ############################################################################
+AT_BANNER([State Predicate])
+############################################################################
+
+AT_SETUP([Garavel])
+AT_CHECK([cp TESTFILES/garavel.lola TESTFILES/garavel.task .])
+AT_CHECK([LOLA garavel.lola --formula=garavel.task --check=statepredicate -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 17 markings, 16 edges" stderr])
+AT_KEYWORDS(statepredicate)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Find Path])
+############################################################################
+
+AT_SETUP([Garavel])
+AT_CHECK([cp TESTFILES/garavel.lola TESTFILES/garavel.task .])
+AT_CHECK([LOLA garavel.lola --formula=garavel.task --search=findpath --check=statepredicate -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_KEYWORDS(findpath)
+AT_CLEANUP
+
+
+############################################################################
 AT_BANNER([Full])
 ############################################################################
 

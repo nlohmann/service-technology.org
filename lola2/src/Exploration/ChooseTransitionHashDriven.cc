@@ -7,6 +7,7 @@
 a priority imposed on the fire list
 */
 
+#include <cstdlib>
 #include "Exploration/ChooseTransitionHashDriven.h"
 #include "Net/Net.h"
 #include "Net/Marking.h"

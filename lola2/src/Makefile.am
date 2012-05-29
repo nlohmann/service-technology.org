@@ -50,6 +50,8 @@ lola_SOURCES = \
                 Formula/AtomicStatePredicate.cc Formula/AtomicStatePredicate.h \
                 Formula/ConjunctionStatePredicate.cc Formula/ConjunctionStatePredicate.h \
                 Formula/DisjunctionStatePredicate.cc Formula/DisjunctionStatePredicate.h \
+                Formula/TruePredicate.cc Formula/TruePredicate.h \
+                Formula/FalsePredicate.cc Formula/FalsePredicate.h \
                 \
                 Stores/Store.cc Stores/Store.h \
                 Stores/SIStore.h \

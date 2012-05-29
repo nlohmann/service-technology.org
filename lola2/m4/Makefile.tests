@@ -68,6 +68,19 @@ newcover-process: newcover-check
       cd ..; \
     done
 
+## Collect coverage data
+newcover-collect: newcover-process
+	for TESTCASE in `ls -1 cover`; do \
+          echo "Generating $$TESTCASE" ; \
+          ( $(LCOV) --quiet --capture --directory cover/$$TESTCASE -b $(top_srcdir)/src --output-file cover/$$TESTCASE.info --derive-func-data ) 2> cover/$$TESTCASE-error.log; \
+          if [ -f cover/$$TESTCASE-error.log ]; then \
+            $(LCOV) --quiet --remove cover/$$TESTCASE.info `cat cover/$$TESTCASE-error.log | awk -F: '{print $$1}' | sort | uniq | xargs` -o cover/$$TESTCASE.info ; \
+            $(LCOV) --quiet --extract cover/$$TESTCASE.info "@abs_top_builddir@/src/*" -o cover/$$TESTCASE.info ; \
+          fi; \
+        done
+
+newcover-html: newcover-collect
+	$(LCOV_GENHTML) --title "$(PACKAGE_STRING)" --show-details --legend cover/*.info --demangle-cpp --prefix $(abs_top_builddir) --output-directory cover-html
 
 cover-covertura: cover-prepare $(TESTSUITE)
 	-$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)

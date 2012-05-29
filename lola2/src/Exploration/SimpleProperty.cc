@@ -115,23 +115,25 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
 
     unsigned int currentattempt = 0;
 
-    // copy initial marking into current marking
-    memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
-    Marking::HashCurrent = Marking::HashInitial;
-
-    // prepare property
-    initProperty();
-
-    if (value)
-    {
-        // initial marking satisfies property
-        free(hashtable);
-        return true;
-    }
-
-    // get first firelist
-    index_t* currentFirelist;
-    index_t currentEntry = myFirelist.getFirelist(&currentFirelist);
+	// get memory for path info
+      index_t * path = (index_t *) malloc(SIZEOF_INDEX_T * maxdepth);
+//    // copy initial marking into current marking
+//    memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
+//    Marking::HashCurrent = Marking::HashInitial;
+//
+//    // prepare property
+//    initProperty();
+//
+//    if (value)
+//    {
+//        // initial marking satisfies property
+//        free(hashtable);
+//        return true;
+//    }
+//
+//    // get first firelist
+//    index_t* currentFirelist;
+//    index_t currentEntry = myFirelist.getFirelist(&currentFirelist);
 
     // loop #attempts times
     while (attempts == 0 || currentattempt++ < attempts)
@@ -167,6 +169,7 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
         {
             // initial marking satisfies property
             free(hashtable);
+	    // witness path is empty path
             return true;
         }
 
@@ -213,6 +216,7 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
             }
             free(currentFirelist);
 
+	    path[depth] = chosen;
             Transition::fire(chosen);
             ++(hashtable[Marking::HashCurrent]);
             Transition::updateEnabled(chosen);
@@ -221,6 +225,7 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
             if (value)
             {
                 free(hashtable);
+		// witness path is path[0] .... path[depth-1] path[depth]
                 return true;
             }
         }

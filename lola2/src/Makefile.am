@@ -43,7 +43,7 @@ lola_SOURCES = \
                 Exploration/SimpleProperty.cc Exploration/SimpleProperty.h \
                 Exploration/Deadlock.cc Exploration/Deadlock.h \
                 Exploration/ChooseTransition.h \
-                Exploration/ChooseTransitionHashDriven.cc Exploration ChooseTransitionHashDriven.h \
+                Exploration/ChooseTransitionHashDriven.cc Exploration/ChooseTransitionHashDriven.h \
                 Exploration/StatePredicateProperty.cc Exploration/StatePredicateProperty.h \
                 Exploration/FirelistStubbornDeadlock.cc Exploration/FirelistStubbornDeadlock.h \
                 Exploration/FirelistStubbornStatePredicate.cc Exploration/FirelistStubbornStatePredicate.h \

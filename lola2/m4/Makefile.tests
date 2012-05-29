@@ -69,18 +69,28 @@ newcover-process: newcover-check
     done
 
 ## Collect coverage data
+# Collect the coverage data from each test case. In case source files are
+# not found, errors are collected in an error file which is then used to
+# remove the missing entries. Finally, any source files that are outside the
+# src folder (system headers, libraries) are removed.
 newcover-collect: newcover-process
 	for TESTCASE in `ls -1 cover`; do \
-          echo "Generating $$TESTCASE" ; \
-          ( $(LCOV) --quiet --capture --directory cover/$$TESTCASE -b $(top_srcdir)/src --output-file cover/$$TESTCASE.info --derive-func-data ) 2> cover/$$TESTCASE-error.log; \
-          if [ -f cover/$$TESTCASE-error.log ]; then \
-            $(LCOV) --quiet --remove cover/$$TESTCASE.info `cat cover/$$TESTCASE-error.log | awk -F: '{print $$1}' | sort | uniq | xargs` -o cover/$$TESTCASE.info ; \
-            $(LCOV) --quiet --extract cover/$$TESTCASE.info "@abs_top_builddir@/src/*" -o cover/$$TESTCASE.info ; \
-          fi; \
-        done
+      echo "Generating $$TESTCASE" ; \
+      TESTNAME=`echo $$TESTCASE | awk -F- '{print $$1}'` ; \
+      ( $(LCOV) --quiet --capture --directory cover/$$TESTCASE --base-directory $(top_srcdir)/src --output-file cover/$$TESTCASE.info --derive-func-data --test-name $$TESTNAME ) 2> cover/$$TESTCASE-error.log; \
+      if [ -f cover/$$TESTCASE-error.log ]; then \
+        $(LCOV) --quiet --remove cover/$$TESTCASE.info `cat cover/$$TESTCASE-error.log | awk -F: '{print $$1}' | sort | uniq | xargs` -o cover/$$TESTCASE.info ; \
+        $(LCOV) --quiet --extract cover/$$TESTCASE.info "@abs_top_builddir@/src/*" -o cover/$$TESTCASE.info ; \
+        rm -f cover/$$TESTCASE-error.log ; \
+      fi; \
+    done
 
-newcover-html: newcover-collect
-	$(LCOV_GENHTML) --title "$(PACKAGE_STRING)" --show-details --legend cover/*.info --demangle-cpp --prefix $(abs_top_builddir) --output-directory cover-html
+## Generate an HTML overview
+newcover-html: newcover-collect descriptions
+	$(LCOV_GENHTML) --title "$(PACKAGE_STRING)" --sort --description-file descriptions --show-details --legend cover/*.info --demangle-cpp --prefix $(abs_top_builddir) --output-directory cover-html
+	@echo see `pwd`/cover-html/index.html for a coverage report
+
+cover: newcover-html
 
 cover-covertura: cover-prepare $(TESTSUITE)
 	-$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)
@@ -123,7 +133,7 @@ cover-html: descriptions
 	   --demangle-cpp --prefix $(abs_top_builddir)
 	@echo see `pwd`/cover-html/index.html for a coverage report
 
-cover: cover-check cover-html
+#cover: cover-check cover-html
 
 # clean also the temp files in the src directory
 CLEANFILES = -fr cover descriptions 

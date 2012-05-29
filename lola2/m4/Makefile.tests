@@ -53,37 +53,34 @@ newcover-check: newcover-compile $(TESTSUITE)
 # and coverage data of the files in the src directory. Files for which no
 # instrumented object files are missing or files that do not stem from the src
 # directory (e.g., libraries) are removed.
-newcover-process: newcover-check
-	cd cover ; \
-    for TESTCASE in `ls -1`; do \
-      for GCNOFILE in `find $(abs_top_builddir)/src -type f -name '*.gcno' -print`; do \
-        cp $$GCNOFILE $$TESTCASE ; \
-      done ; \
-      cd $$TESTCASE; \
-      for FILE in `ls -1 *.gcda`; do \
-        if [ ! -f `basename $$FILE .gcda`.gcno ]; then \
-          rm $$FILE; \
-        fi \
-      done; \
-      cd ..; \
-    done
-
 ## Collect coverage data
 # Collect the coverage data from each test case. In case source files are
 # not found, errors are collected in an error file which is then used to
 # remove the missing entries. Finally, any source files that are outside the
 # src folder (system headers, libraries) are removed.
-newcover-collect: newcover-process
-	for TESTCASE in `ls -1 cover`; do \
-      echo "Generating $$TESTCASE" ; \
-      TESTNAME=`echo $$TESTCASE | awk -F- '{print $$1}'` ; \
-      ( $(LCOV) --quiet --capture --directory cover/$$TESTCASE --base-directory $(top_srcdir)/src --output-file cover/$$TESTCASE.info --derive-func-data --test-name $$TESTNAME ) 2> cover/$$TESTCASE-error.log; \
-      if [ -f cover/$$TESTCASE-error.log ]; then \
-        $(LCOV) --quiet --remove cover/$$TESTCASE.info `cat cover/$$TESTCASE-error.log | awk -F: '{print $$1}' | sort | uniq | xargs` -o cover/$$TESTCASE.info ; \
-        $(LCOV) --quiet --extract cover/$$TESTCASE.info "@abs_top_builddir@/src/*" -o cover/$$TESTCASE.info ; \
-        rm -f cover/$$TESTCASE-error.log ; \
-      fi; \
-    done
+cover/%.info:
+	$(AM_V_GEN)
+	$(AM_V_at) TESTCASE=`echo $@ | sed 's|cover/||;s|.info||'` ; \
+    for GCNOFILE in `find $(abs_top_builddir)/src -type f -name '*.gcno' -print`; do \
+      cp $$GCNOFILE cover/$$TESTCASE ; \
+    done ; \
+    cd cover/$$TESTCASE; \
+    for FILE in `ls -1 *.gcda`; do \
+      if [ ! -f `basename $$FILE .gcda`.gcno ]; then \
+        rm $$FILE; \
+      fi \
+    done; \
+    cd ../..; \
+    TESTNAME=`echo $$TESTCASE | awk -F- '{print $$1}'` ; \
+    ( $(LCOV) --quiet --capture --directory cover/$$TESTCASE --base-directory $(top_srcdir)/src --output-file cover/$$TESTCASE.info --derive-func-data --test-name $$TESTNAME ) 2> cover/$$TESTCASE-error.log; \
+    if [ -f cover/$$TESTCASE-error.log ]; then \
+      $(LCOV) --quiet --remove cover/$$TESTCASE.info `cat cover/$$TESTCASE-error.log | awk -F: '{print $$1}' | sort | uniq | xargs` -o cover/$$TESTCASE.info ; \
+      $(LCOV) --quiet --extract cover/$$TESTCASE.info "@abs_top_builddir@/src/*" -o cover/$$TESTCASE.info ; \
+      rm -f cover/$$TESTCASE-error.log ; \
+    fi;
+
+newcover-collect: newcover-check
+	$(AM_V_at)$(MAKE) -j4 $(patsubst %,%.info, $(wildcard cover/*))
 
 ## Generate an HTML overview
 newcover-html: newcover-collect descriptions

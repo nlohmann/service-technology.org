@@ -41,8 +41,10 @@ bool STLStore::searchAndInsert()
     }
 }
 
+// LCOV_EXCL_START
 bool STLStore::searchAndInsert(State**)
 {
     assert(false);
     return false;
 }
+// LCOV_EXCL_STOP

@@ -16,39 +16,39 @@ a priority imposed on the fire list
 
 ChooseTransitionHashDriven::ChooseTransitionHashDriven()
 {
-	table = (unsigned long int *) calloc(sizeof(unsigned long int),SIZEOF_MARKINGTABLE);
+    table = (unsigned long int*) calloc(sizeof(unsigned long int), SIZEOF_MARKINGTABLE);
 }
 
 ChooseTransitionHashDriven::~ChooseTransitionHashDriven()
 {
-	free(table);
+    free(table);
 }
 
-index_t ChooseTransitionHashDriven::choose(index_t cardfirelist, index_t * firelist) 
+index_t ChooseTransitionHashDriven::choose(index_t cardfirelist, index_t* firelist)
 {
-            // Selection proceeds in two phases. In phase one, we give priority to transitions
-            // that 1. enter rarely visited hash buckets and 2. are early members of the fire list
-            // If no transition is selected in phase 1, phase 2 selects a transition randomly.
+    // Selection proceeds in two phases. In phase one, we give priority to transitions
+    // that 1. enter rarely visited hash buckets and 2. are early members of the fire list
+    // If no transition is selected in phase 1, phase 2 selects a transition randomly.
 
-            index_t chosen = Net::Card[TR];
-            // phase 1
-            for (index_t i = cardfirelist; i > 0;)
-            {
-                --i;
-                index_t t = firelist[i];
-                // compute hash value for t successor
-                hash_t h = (Marking::HashCurrent + Transition::DeltaHash[t]) % SIZEOF_MARKINGTABLE;
-                if (((float) rand() / (float) RAND_MAX) <= 1.0 / (1.0 + table[h]))
-                {
-                    chosen = t;
-                }
-            }
+    index_t chosen = Net::Card[TR];
+    // phase 1
+    for (index_t i = cardfirelist; i > 0;)
+    {
+        --i;
+        index_t t = firelist[i];
+        // compute hash value for t successor
+        hash_t h = (Marking::HashCurrent + Transition::DeltaHash[t]) % SIZEOF_MARKINGTABLE;
+        if (((float) rand() / (float) RAND_MAX) <= 1.0 / (1.0 + table[h]))
+        {
+            chosen = t;
+        }
+    }
 
-            // phase 2
-	if(chosen == Net::Card[TR])
-	{
-		 chosen = firelist[ rand() % cardfirelist];
-	}
-	++(table[(Marking::HashCurrent + Transition::DeltaHash[chosen])%SIZEOF_MARKINGTABLE]);
-	return chosen;
+    // phase 2
+    if (chosen == Net::Card[TR])
+    {
+        chosen = firelist[ rand() % cardfirelist];
+    }
+    ++(table[(Marking::HashCurrent + Transition::DeltaHash[chosen]) % SIZEOF_MARKINGTABLE]);
+    return chosen;
 }

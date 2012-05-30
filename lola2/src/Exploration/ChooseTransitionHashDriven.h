@@ -13,11 +13,11 @@ a priority imposed on the fire list
 
 class ChooseTransitionHashDriven : public ChooseTransition
 {
-public:
-	ChooseTransitionHashDriven();
-	~ChooseTransitionHashDriven();
+    public:
+        ChooseTransitionHashDriven();
+        ~ChooseTransitionHashDriven();
 
-	virtual index_t choose(index_t cardfirelist, index_t * firelist);
-private:
-	unsigned long int * table;
+        virtual index_t choose(index_t cardfirelist, index_t* firelist);
+    private:
+        unsigned long int* table;
 };

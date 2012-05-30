@@ -3,29 +3,28 @@
 \author Karsten
 \status new
 
-\brief derives constant predicate TRUE
+\brief derives constant predicate FALSE
 */
-
 
 #include <Core/Dimensions.h>
 #include <Formula/FalsePredicate.h>
 
 FalsePredicate::FalsePredicate()
 {
-	value = false;
+    value = false;
 }
 
 index_t FalsePredicate::getUpSet(index_t* stack, bool* onstack)
 {
-	return 0;
+    return 0;
 }
 
 index_t FalsePredicate::countAtomic()
 {
-	return 0;
+    return 0;
 }
 
 index_t FalsePredicate::collectAtomic(AtomicStatePredicate**)
 {
-	return 0;
+    return 0;
 }

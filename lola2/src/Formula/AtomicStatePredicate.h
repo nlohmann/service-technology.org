@@ -10,10 +10,11 @@
 
 #include <Formula/StatePredicate.h>
 
-/// A state predicate is a formula that assigns a Boolean value to Marking::Current
-/// An atomic predicate compares a formal sum of places with a constant
-/// The general shape is: k_1 p_1 + .... + k_n p_n \leq k
-
+/*!
+A state predicate is a formula that assigns a Boolean value to
+Marking::Current An atomic predicate compares a formal sum of places with a
+constant The general shape is: \f$ k_1 \cdot p_1 + \cdots + k_n \cdot p_n \leq k \f$
+*/
 class AtomicStatePredicate : public StatePredicate
 {
     public:

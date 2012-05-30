@@ -109,31 +109,31 @@ bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
     }
 }
 
-bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition & c)
+bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition &c)
 {
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.
 
     unsigned int currentattempt = 0;
 
-	// get memory for path info
-      index_t * path = (index_t *) malloc(SIZEOF_INDEX_T * maxdepth);
-//    // copy initial marking into current marking
-//    memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
-//    Marking::HashCurrent = Marking::HashInitial;
-//
-//    // prepare property
-//    initProperty();
-//
-//    if (value)
-//    {
-//        // initial marking satisfies property
-//        return true;
-//    }
-//
-//    // get first firelist
-//    index_t* currentFirelist;
-//    index_t currentEntry = myFirelist.getFirelist(&currentFirelist);
+    // get memory for path info
+    index_t* path = (index_t*) malloc(SIZEOF_INDEX_T * maxdepth);
+    //    // copy initial marking into current marking
+    //    memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
+    //    Marking::HashCurrent = Marking::HashInitial;
+    //
+    //    // prepare property
+    //    initProperty();
+    //
+    //    if (value)
+    //    {
+    //        // initial marking satisfies property
+    //        return true;
+    //    }
+    //
+    //    // get first firelist
+    //    index_t* currentFirelist;
+    //    index_t currentEntry = myFirelist.getFirelist(&currentFirelist);
 
     // loop #attempts times
     while (attempts == 0 || currentattempt++ < attempts)
@@ -168,7 +168,7 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
         if (value)
         {
             // initial marking satisfies property
-	    // witness path is empty path
+            // witness path is empty path
             return true;
         }
 
@@ -188,17 +188,17 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
                 break; // go to next attempt
             }
 
-	    index_t chosen = c.choose(cardFirelist,currentFirelist);
+            index_t chosen = c.choose(cardFirelist, currentFirelist);
             free(currentFirelist);
 
-	    path[depth] = chosen;
+            path[depth] = chosen;
             Transition::fire(chosen);
             Transition::updateEnabled(chosen);
 
             checkProperty(chosen);
             if (value)
             {
-		// witness path is path[0] .... path[depth-1] path[depth]
+                // witness path is path[0] .... path[depth-1] path[depth]
                 return true;
             }
         }

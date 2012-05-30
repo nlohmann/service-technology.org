@@ -31,20 +31,10 @@ sysconf_DATA = anica.conf
 
 # pass the sysconfdir to Anica (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 anica_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
-anica_LDADD = 
 
 reasoner_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
-reasoner_LDADD = 
 
-# only add the local Petri net API if necessary
-if COMPILE_PNAPI
-anica_CPPFLAGS += -I$(top_srcdir)/libs
-reasoner_CPPFLAGS += -I$(top_srcdir)/libs
-anica_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
-reasoner_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
-endif
-
-anica_LDADD += $(builddir)/../libs/cudd/libobj.a \
+anica_LDADD = $(builddir)/../libs/cudd/libobj.a \
 	$(builddir)/../libs/cudd/libdddmp.a \
 	$(builddir)/../libs/cudd/libcudd.a \
 	$(builddir)/../libs/cudd/libmtr.a \
@@ -54,7 +44,7 @@ anica_LDADD += $(builddir)/../libs/cudd/libobj.a \
 
 anica_CPPFLAGS += -I$(top_srcdir)/libs/cudd/include
 
-reasoner_LDADD += $(builddir)/../libs/cudd/libobj.a \
+reasoner_LDADD = $(builddir)/../libs/cudd/libobj.a \
 	$(builddir)/../libs/cudd/libdddmp.a \
 	$(builddir)/../libs/cudd/libcudd.a \
 	$(builddir)/../libs/cudd/libmtr.a \
@@ -65,6 +55,14 @@ reasoner_LDADD += $(builddir)/../libs/cudd/libobj.a \
 	$(builddir)/../libs/base64/libbase64.a
 
 reasoner_CPPFLAGS += -I$(top_srcdir)/libs/cudd/include -I$(top_srcdir)/libs/vjson -I$(top_srcdir)/libs/base64/include -DBUFFERSIZE=16777216
+
+# only add the local Petri net API if necessary
+if COMPILE_PNAPI
+anica_CPPFLAGS += -I$(top_srcdir)/libs
+reasoner_CPPFLAGS += -I$(top_srcdir)/libs
+anica_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
+reasoner_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
+endif
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

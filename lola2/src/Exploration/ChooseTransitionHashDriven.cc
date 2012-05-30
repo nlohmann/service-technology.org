@@ -14,9 +14,8 @@ a priority imposed on the fire list
 #include "Net/Place.h"
 #include "Net/Transition.h"
 
-ChooseTransitionHashDriven::ChooseTransitionHashDriven()
+ChooseTransitionHashDriven::ChooseTransitionHashDriven() : table((unsigned long int*) calloc(sizeof(unsigned long int), SIZEOF_MARKINGTABLE))
 {
-    table = (unsigned long int*) calloc(sizeof(unsigned long int), SIZEOF_MARKINGTABLE);
 }
 
 ChooseTransitionHashDriven::~ChooseTransitionHashDriven()
@@ -30,7 +29,9 @@ index_t ChooseTransitionHashDriven::choose(index_t cardfirelist, index_t* fireli
     // that 1. enter rarely visited hash buckets and 2. are early members of the fire list
     // If no transition is selected in phase 1, phase 2 selects a transition randomly.
 
+    // initialize with a number that we can be sure it is not an index of a transition
     index_t chosen = Net::Card[TR];
+
     // phase 1
     for (index_t i = cardfirelist; i > 0;)
     {
@@ -41,14 +42,16 @@ index_t ChooseTransitionHashDriven::choose(index_t cardfirelist, index_t* fireli
         if (((float) rand() / (float) RAND_MAX) <= 1.0 / (1.0 + table[h]))
         {
             chosen = t;
+            break;
         }
     }
 
     // phase 2
     if (chosen == Net::Card[TR])
     {
-        chosen = firelist[ rand() % cardfirelist];
+        chosen = firelist[rand() % cardfirelist];
     }
     ++(table[(Marking::HashCurrent + Transition::DeltaHash[chosen]) % SIZEOF_MARKINGTABLE]);
+
     return chosen;
 }

@@ -1,8 +1,6 @@
 * Niels: Rewriting: Bei Elimination von Negationen direkt auf <= erzeugen.
 
-* Andreas: Algorithmus für positive/negative Faktoren aus <algorithms> raussuchen
-
-* Karsten: Klassen für TRUE/FALSE; Abfrage vor Tiefensuche, ob Wert konstant
+* Karsten: Abfrage vor Tiefensuche, ob Wert konstant
 
 * Niels: im Unparser Typen anpassen (index_t, size_t, ...)
 
@@ -36,8 +34,6 @@ AG NOT DEADLOCK
 ALLPATH ALWAYS (NOT DEADLOCK XOR 1=3*p4)
 
 
-* Niels: Commandline-Parameter für Findpath
-* Findpath: Keinen Store anlegen; Statusmeldungen
 
 
 * Andreas:

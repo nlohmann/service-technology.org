@@ -60,26 +60,13 @@ lola_SOURCES = \
                 Stores/BloomStore.cc Stores/BloomStore.h \
                 Stores/BinStore.h Stores/BinStore.cc \
                 Stores/BitStore.cc Stores/BitStore.h \
-                Stores/BDDStore.cc Stores/BDDStore.h \
                 Stores/EmptyStore.cc Stores/EmptyStore.h \
                 Stores/STLStore.cc Stores/STLStore.h \
                 Stores/ThreadSafeStore.cc Stores/ThreadSafeStore.h \
-                Stores/SQLStore.cc Stores/SQLStore.h \
                 Stores/BinStore2.cc Stores/BinStore2.h \
                 Stores/SIBinStore2.cc Stores/SIBinStore2.h \
                 Stores/ListStore.cc Stores/ListStore.h \
                 Stores/CompressedStore.cc Stores/CompressedStore.h
-
-lola_LDADD = $(builddir)/../libs/cudd/libobj.a \
-	$(builddir)/../libs/cudd/libdddmp.a \
-	$(builddir)/../libs/cudd/libcudd.a \
-	$(builddir)/../libs/cudd/libmtr.a \
-	$(builddir)/../libs/cudd/libst.a \
-	$(builddir)/../libs/cudd/libutil.a \
-	$(builddir)/../libs/cudd/libepd.a \
-	$(builddir)/../libs/sqlite/libsqlite.a
-
-lola_CPPFLAGS = -I$(top_srcdir)/libs/cudd/include -I$(top_srcdir)/libs/sqlite
 
 ###
 

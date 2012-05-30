@@ -44,7 +44,6 @@
 
 #include <Formula/StatePredicate.h>
 
-#include <Stores/BDDStore.h>
 #include <Stores/BinStore.h>
 #include <Stores/BinStore2.h>
 #include <Stores/BitStore.h>
@@ -53,7 +52,6 @@
 #include <Stores/EmptyStore.h>
 #include <Stores/ListStore.h>
 #include <Stores/SIBinStore2.h>
-#include <Stores/SQLStore.h>
 #include <Stores/STLStore.h>
 #include <Stores/Store.h>
 #include <Stores/ThreadSafeStore.h>
@@ -282,14 +280,8 @@ int main(int argc, char** argv)
                 case store_arg_bin:
                     s = new BinStore();
                     break;
-                case store_arg_bdd:
-                    s = new BDDStore();
-                    break;
                 case store_arg_bloom:
                     s = new BloomStore(args_info.hashfunctions_arg);
-                    break;
-                case store_arg_sql:
-                    s = new SQLStore();
                     break;
                 case store_arg_stl:
                     s = new STLStore();

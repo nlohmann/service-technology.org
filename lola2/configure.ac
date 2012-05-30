@@ -101,23 +101,9 @@ AC_CHECK_FUNCS([asprintf vasprintf snprintf vsnprintf atexit memset socket strch
 AC_CHECK_FUNC(gethostent, , AC_CHECK_LIB(nsl, gethostent))
 AC_CHECK_FUNC(setsockopt, , AC_CHECK_LIB(socket, setsockopt))
 
-
-####################################################################
-# Checks for libraries.
-# FIXME: Replace `main' with a function in `-lm':
-AC_CHECK_LIB([m], [main])
-
-# needed to compile CUDD on x86_64 machines
-AC_CHECK_SIZEOF([void*])
-CUDD_XFLAGS="-DSIZEOF_VOID_P=$ac_cv_sizeof_voidp"
-AC_SUBST(CUDD_XFLAGS)
-####################################################################
-
-AC_CHECK_LIB([dl], [main])
-
 # write files
 AC_CONFIG_FILES([
 	Makefile src/Makefile doc/Doxyfile doc/Doxydetails
-	tests/Makefile tests/package.m4 libs/cudd/Makefile libs/sqlite/Makefile])
+	tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

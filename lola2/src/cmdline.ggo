@@ -11,7 +11,7 @@ option "check" -
 
 option "store" -
   "Store"
-  values="bin","bdd","sql","stl","bit","bloom","bin2","tsbin2","list","compr" enum
+  values="bin","stl","bit","bloom","bin2","tsbin2","list","compr" enum
   typestr="STORE"
   default="bin"
   optional

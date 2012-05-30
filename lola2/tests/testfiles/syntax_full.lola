@@ -31,3 +31,7 @@ PRODUCE ;   /* may be empty */
 TRANSITION */* STRONG FAIR    /* strong fair transition */
 CONSUME ;
 PRODUCE ;
+
+TRANSITION circles
+CONSUME p1 : 1, 4 : 3, p3 : 5;
+PRODUCE p1 : 1, 4 : 2, p3 : 8;

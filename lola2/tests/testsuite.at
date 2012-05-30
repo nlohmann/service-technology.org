@@ -215,7 +215,7 @@ AT_SETUP([Print net])
 AT_CHECK([cp TESTFILES/syntax_full.lola .])
 AT_CHECK([LOLA syntax_full.lola --printNet],0,stdout)
 AT_CHECK([GREP -q "6 places" stdout])
-AT_CHECK([GREP -q "4  transitions" stdout])
+AT_CHECK([GREP -q "5  transitions" stdout])
 AT_KEYWORDS(debug)
 AT_CLEANUP
 

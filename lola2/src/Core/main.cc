@@ -355,6 +355,7 @@ int main(int argc, char** argv)
 
                 choose = new ChooseTransitionHashDriven();
                 result = p->find_path(args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore*)s), *choose);
+		printf("hai\n");
                 delete choose;
                 break;
 

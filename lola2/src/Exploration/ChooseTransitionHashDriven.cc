@@ -8,6 +8,7 @@ a priority imposed on the fire list
 */
 
 #include <cstdlib>
+#include <cstdio>
 #include "Exploration/ChooseTransitionHashDriven.h"
 #include "Net/Net.h"
 #include "Net/Marking.h"
@@ -20,6 +21,7 @@ ChooseTransitionHashDriven::ChooseTransitionHashDriven() : table((unsigned long 
 
 ChooseTransitionHashDriven::~ChooseTransitionHashDriven()
 {
+    printf("hallo\n");
     free(table);
 }
 

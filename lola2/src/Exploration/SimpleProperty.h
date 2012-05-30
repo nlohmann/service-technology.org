@@ -33,6 +33,7 @@ class SimpleProperty
 
         /// the search stack
         SearchStack stack;
+	virtual ~SimpleProperty(){}
 
     protected:
         /// value of property in current state

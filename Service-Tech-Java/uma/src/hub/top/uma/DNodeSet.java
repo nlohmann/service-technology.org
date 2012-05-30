@@ -607,7 +607,7 @@ public class DNodeSet {
 		newEvent.causedBy = new int[1];
 		newEvent.causedBy[0] = ocletEvent.globalId;
 		
-		System.out.println("fired "+newEvent+" cause: "+newEvent.causedBy);
+		//System.out.println("fired "+newEvent+" cause: "+newEvent.causedBy);
 		
 		// set post-node of conditions
 		for (DNode preNode : fireLocation) {
@@ -694,7 +694,7 @@ public class DNodeSet {
     }
     // now convert the boolean array to a short array of IDs 
 		
-		System.out.println("fired* "+newEvent+" cause: "+newEvent.causedBy);
+		//System.out.println("fired* "+newEvent+" cause: "+newEvent.causedBy);
 		
 		// instantiate the remaining post-conditions of the new oclet event
 		DNode postConditions[] = new DNode[postCount];

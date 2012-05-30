@@ -1761,6 +1761,7 @@ public class DNodeRefold extends DNodeBP {
       for (int l=k+1; l<eventList.size(); l++) {
         DNode e2 = eventList.get(l);
         if (e.id != e2.id) continue;
+        if (e.pre.length != e2.pre.length) continue;
         // We update the equivalence relation in this loop. So it may
         // happen that some event in 'eventList' is no longer a canonical
         // event when we reach it. In this case, skip the event.

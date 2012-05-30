@@ -251,12 +251,12 @@ public abstract class DNodeSys {
 			  for (EventPreSet existing : eventPreSetIDs) {
 			    if (existing.equals(e_preSetIDs)) {
 			      e_preSetIDs = existing;
-			      System.out.println(e+" gets existing pre-set abstraction "+existing);
+			      //System.out.println(e+" gets existing pre-set abstraction "+existing);
 			      break;
 			    }
 			  }
 			}
-      System.out.println(e+" gets pre-set abstraction "+e_preSetIDs);
+      //System.out.println(e+" gets pre-set abstraction "+e_preSetIDs);
 			eventPreSetAbstraction.put(e, e_preSetIDs);
 		}
 

@@ -234,7 +234,10 @@ public class DNodeSys_PetriNet extends DNodeSys {
 				pre = new DNode[n.getIncoming().size()];
 				int i = 0;
 				for (Arc a : n.getIncoming()) {
-					pre[i++] = new DNode(nameToID.get(a.getSource().getName()), (DNode[])null);
+				  DNode b = new DNode(nameToID.get(a.getSource().getName()), (DNode[])null);
+					pre[i++] = b;
+			    nodeEncoding.put(a.getSource(), b);   // store new pair
+			    nodeOrigin.put(b, a.getSource());     // and its reverse mapping
 				}
 				DNode.sortIDs(pre);
 			} else {
@@ -262,7 +265,10 @@ public class DNodeSys_PetriNet extends DNodeSys {
 
 				int i = 0;
 				for (Arc a : n.getOutgoing()) {
-					d.post[i++] = new DNode(nameToID.get(a.getTarget().getName()), dPostPre);
+				  DNode b = new DNode(nameToID.get(a.getTarget().getName()), dPostPre); 
+					d.post[i++] = b;
+	        nodeEncoding.put(a.getTarget(), b);   // store new pair
+	        nodeOrigin.put(b, a.getTarget());     // and its reverse mapping
 				}
 				// sort all successors of DNode d
 				DNode.sortIDs(d.post);
@@ -289,8 +295,13 @@ public class DNodeSys_PetriNet extends DNodeSys {
 
 		// create a new DNode for every token on every place in the net
 		for (Place p : net.getPlaces()) {
-			for (int i=0; i<p.getTokens(); i++)
-				ds.add(new DNode(nameToID.get(p.getName()), new DNode[0]));
+			for (int i=0; i<p.getTokens(); i++) {
+			  DNode d = new DNode(nameToID.get(p.getName()), new DNode[0]);
+				ds.add(d);
+				
+	      nodeEncoding.put(p, d);   // store new pair
+	      nodeOrigin.put(d, p);     // and its reverse mapping
+			}
 		}
 		
 		return ds;

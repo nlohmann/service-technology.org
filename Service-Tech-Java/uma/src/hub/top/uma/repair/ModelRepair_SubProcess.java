@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright (c) 2008, 2009, 2010. Dirk Fahland. AGPL3.0
+ * Copyright (c) 2008-2012. Dirk Fahland. AGPL3.0
  * All rights reserved. 
  * 
  * ServiceTechnology.org - Uma, an Unfolding-based Model Analyzer
@@ -18,10 +18,10 @@
 
 package hub.top.uma.repair;
 
+import hub.top.petrinet.Arc;
 import hub.top.petrinet.ISystemModel;
+import hub.top.petrinet.Node;
 import hub.top.petrinet.PetriNet;
-import hub.top.petrinet.PetriNetIO;
-import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 import hub.top.petrinet.unfold.DNodeSys_PetriNet;
@@ -35,17 +35,11 @@ import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
-import hub.top.uma.synthesis.NetSynthesis;
-import hub.top.uma.view.DNodeBP_View;
+import hub.top.uma.view.ViewGeneration;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -53,7 +47,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.SortedSet;
@@ -65,7 +58,9 @@ import com.google.gwt.dev.util.collect.HashSet;
 public class ModelRepair_SubProcess {
   
   private DNodeRefold   build;
-  private DNodeSet  bp;
+  private DNodeSet      bp;
+  
+  private PetriNet      net;
   
   private Map<DNode, Integer> nodeOccurrences;
   private Map<HashSet<DNode>, LinkedList<String[]>> equivalentTraces;
@@ -93,15 +88,16 @@ public class ModelRepair_SubProcess {
   private State initialState;
   
   /**
-   * Standard constructor for view generation. The argument takes a branching
-   * process construction object {@link DNodeBP} after the branching process has
-   * been constructed.
+   * Standard constructor for view generation. The argument takes a {@link PetriNet}
+   * and a branching process construction object {@link DNodeBP} of this net. 
    *  
+   * @param net
    * @param build
    */
-  public ModelRepair_SubProcess (DNodeRefold build) {
+  public ModelRepair_SubProcess (PetriNet net, DNodeRefold build) {
     this.build = build;
     this.bp = build.getBranchingProcess();
+    this.net = net;
     
     nodeOccurrences = new HashMap<DNode, Integer>();
     equivalentTraces = new HashMap<HashSet<DNode>, LinkedList<String[]>>();
@@ -128,6 +124,9 @@ public class ModelRepair_SubProcess {
   
   private List<List<String>> moveOnLogSequences = new LinkedList<List<String>>();
   private List<Set<Place>> visitedMarkings = new LinkedList<Set<Place>>();
+  
+  private List<List<Transition>> moveOnModelSequences = new LinkedList<List<Transition>>();
+
   
   /**
    * Extend the branching process by the partially ordered run of the given
@@ -156,6 +155,7 @@ public class ModelRepair_SubProcess {
     State state = initialState;
     state.seen++;
     
+    List<Transition> currentMoveOnModel = new LinkedList<Transition>();
     List<String> currentMoveOnLog = new LinkedList<String>();
     Set<Place> currentMoveOnLogTokens = null;
     
@@ -165,12 +165,12 @@ public class ModelRepair_SubProcess {
       if (e2t == null || !e2t.containsKey(trace[i])) eventName = trace[i];
       else eventName = e2t.get(trace[i]);
       
-      boolean isTauStep = false;
+      boolean isSkipStep = false;
       
       String transitionName;
       if (eventName.startsWith("tau_")) {
         transitionName = eventName.substring(4);
-        isTauStep = true;
+        isSkipStep = true;
       } else {
         transitionName = eventName;
       }
@@ -206,7 +206,15 @@ public class ModelRepair_SubProcess {
           }
         }
         
-        if (isTauStep) fireEvent.isImplied = true;
+        if (isSkipStep) {
+          fireEvent.isImplied = true;
+          currentMoveOnModel.add(getOriginalTransitions(fireEvent).get(0));
+        } else {
+          if (currentMoveOnModel.size() > 0) {
+            this.moveOnModelSequences.add(currentMoveOnModel);
+            currentMoveOnModel = new LinkedList<Transition>();
+          }
+        }
         
         produced = new LinkedList<DNode>();
         for (DNode b : fireEvent.post) {
@@ -216,19 +224,24 @@ public class ModelRepair_SubProcess {
         if (currentMoveOnLog.size() > 0) {
           DNodeSys_PetriNet sysModel = (DNodeSys_PetriNet)this.build.getSystem();
           Set<Place> consuming = new HashSet<Place>();
-          for (DNode d : fireEvent.post) {
+          for (DNode d : fireEvent.pre) {
             for (DNode org : this.conditionOrigin.get(d)) {
               consuming.add((Place)sysModel.getOriginalNode(org));
             }              
           }
           
-          boolean end = true;
+          /*
+          boolean end = false;
           for (Place p : consuming) {
             if (currentMoveOnLogTokens.contains(p)) {
               end = true;
               break;
             }
           }
+          */
+          HashSet<Place> remaining = new HashSet<Place>(currentMoveOnLogTokens);
+          remaining.removeAll(consuming);
+          boolean end = remaining.isEmpty();
           
           if (end) {
             this.moveOnLogSequences.add(currentMoveOnLog);
@@ -237,6 +250,9 @@ public class ModelRepair_SubProcess {
             this.visitedMarkings.add(currentMoveOnLogTokens);
             currentMoveOnLog = new LinkedList<String>();
             currentMoveOnLogTokens = null;
+          } else {
+            System.out.println(currentMoveOnLogTokens+" --"+transitionName+"--> "+remaining+" "+(DNode.toString(fireEvent.pre)));
+            currentMoveOnLogTokens.removeAll(consuming);
           }
         }
       }
@@ -285,13 +301,19 @@ public class ModelRepair_SubProcess {
                   consuming.add((Place)sysModel.getOriginalNode(org));
                 }              
               }
-              boolean end = true;
+              
+              /*
+              boolean end = false;
               for (Place p : consuming) {
                 if (currentMoveOnLogTokens.contains(p)) {
                   end = true;
                   break;
                 }
               }
+              */
+              HashSet<Place> remaining = new HashSet<Place>(currentMoveOnLogTokens);
+              remaining.removeAll(consuming);
+              boolean end = remaining.isEmpty();
               
               if (end) {
                 this.moveOnLogSequences.add(currentMoveOnLog);
@@ -300,6 +322,10 @@ public class ModelRepair_SubProcess {
                 this.visitedMarkings.add(currentMoveOnLogTokens);
                 currentMoveOnLog = new LinkedList<String>();
                 currentMoveOnLogTokens = null;
+                
+              } else {
+                System.out.println(currentMoveOnLogTokens+" --"+transitionName+"--> "+remaining+" "+(DNode.toString(loc)));
+                currentMoveOnLogTokens.removeAll(consuming);
               }
             }
             
@@ -308,8 +334,17 @@ public class ModelRepair_SubProcess {
             if (postConditions != null && postConditions.length > 0) {
               fireEvent = postConditions[0].pre[0];          
               
-              if (isTauStep) fireEvent.isImplied = true;
-              else fireEvent.isImplied = false;
+              if (isSkipStep) {
+                fireEvent.isImplied = true;
+                currentMoveOnModel.add(getOriginalTransitions(fireEvent).get(0));
+              }
+              else {
+                fireEvent.isImplied = false;
+                if (currentMoveOnModel.size() > 0) {
+                  this.moveOnModelSequences.add(currentMoveOnModel);
+                  currentMoveOnModel = new LinkedList<Transition>();
+                }
+              }
               
               for (int b=0; b<postConditions.length; b++) {
                 DNode []causedBy = new DNode[events.length];
@@ -329,6 +364,11 @@ public class ModelRepair_SubProcess {
               System.out.println("fired event with empty post-set");
             }
           } else {
+            if (currentMoveOnModel.size() > 0) {
+              this.moveOnModelSequences.add(currentMoveOnModel);
+              currentMoveOnModel = new LinkedList<Transition>();
+            }
+            
             if (currentMoveOnLogTokens == null) {
               DNodeSys_PetriNet sysModel = (DNodeSys_PetriNet)this.build.getSystem();
               Set<Place> mark = new HashSet<Place>();
@@ -738,109 +778,192 @@ public class ModelRepair_SubProcess {
    
    
    
-   public Map<Set<Place>, List<List<String>>> getLocationsForExtension() {
+   public Map<Set<Place>, List<List<String>>> getExtensions() {
      
+     // collect all markings at which an extension was added
      ArrayList<Set<Place>> markingClasses = new ArrayList<Set<Place>>();
      for (int i=0; i<moveOnLogSequences.size();i++) {
-      Set<Place> thisIDs = new HashSet<Place>(visitedMarkings.get(i));
-
-      int bestMatchIndex = -1;
-      /*
-      int bestMatchSize = 0;
-      for (int j = 0; j < markingClasses.size(); j++) {
-        int matchSize = 0;
-        for (Place p : thisIDs) {
-          if (markingClasses.get(j).contains(p))
-            matchSize++;
-        }
-        if (matchSize > bestMatchSize) {
-          bestMatchSize = matchSize;
-          bestMatchIndex = j;
-        }
-      }
-      */
-      if (bestMatchIndex == -1) {
-        markingClasses.add(thisIDs);
-      } else {
-        markingClasses.get(bestMatchIndex).retainAll(thisIDs);
-      }
-    }
+       Set<Place> thisIDs = new HashSet<Place>(visitedMarkings.get(i));
+       markingClasses.add(thisIDs);
+     }
      
-    HashMap<Set<Place>, List<List<String>>> logClasses = new HashMap<Set<Place>, List<List<String>>>();
-
-    for (int i = 0; i < moveOnLogSequences.size(); i++) {
-      List<String> seq = moveOnLogSequences.get(i);
-      Set<Place> marking = visitedMarkings.get(i);
-
-      Set<Place> bestMatchIndex = null;
-      int bestMatchSize = 0;
-      for (Set<Place> m : markingClasses) {
-        int matchSize = 0;
-        for (Place p : marking) {
-          if (m.contains(p))
-            matchSize++;
-        }
-        if (matchSize > bestMatchSize) {
-          bestMatchSize = matchSize;
-          bestMatchIndex = m;
-        }
-      }
-
-      if (!logClasses.containsKey(bestMatchIndex)) logClasses.put(bestMatchIndex, new LinkedList<List<String>>());
-      logClasses.get(bestMatchIndex).add(seq);
-    }
-    
-    boolean changed = true;
-    while (changed) {
-      Set<Place> merge1 = null;
-      Set<Place> merge2 = null;
-      for (Set<Place> m1 : logClasses.keySet()) {
-        changed = false;
-        Set<Place> maxSet = null;
-        int maxOverlap = 0;
-        
-        for (Set<Place> m2 : logClasses.keySet()) {
-          if (m2 == m1) continue;
-          int matchSize = 0;
-          for (Place p : m1) {
-            if (m2.contains(p))
-              matchSize++;
-          }
-          if (matchSize > maxOverlap) {
-            maxOverlap = matchSize;
-            maxSet = m2;
-          }
-        }
-        
-        if (maxSet != null) {
-          merge1 = m1;
-          merge2 = maxSet;
-          break;
-        }
-      }
-      if (merge1 != null) {
-        changed = true;
-        HashSet<Place> reduced = new HashSet<Place>(merge1);
-        reduced.retainAll(merge2);
-        if (!logClasses.containsKey(reduced)) logClasses.put(reduced, new LinkedList<List<String>>());
-        logClasses.get(reduced).addAll(logClasses.get(merge1));
-        logClasses.get(reduced).addAll(logClasses.get(merge2));
-        logClasses.remove(merge1);
-        logClasses.remove(merge2);
-      }
-    }
+     System.out.println("locations: "+ markingClasses);
      
-    for (Set<Place> m : logClasses.keySet()) {
-      System.out.println(m+" has traces");
-      for (List<String> tr : logClasses.get(m)) {
-        System.out.println("  "+tr);
+
+     // cluster the found L-sequences on their location, put a trace to an
+     // existing cluster
+     HashMap<Set<Place>, List<List<String>>> sublogClasses = new HashMap<Set<Place>, List<List<String>>>();
+
+     for (int i = 0; i < moveOnLogSequences.size(); i++) {
+       List<String> seq = moveOnLogSequences.get(i);
+       Set<Place> marking = visitedMarkings.get(i);
+       
+       System.out.println("found "+ moveOnLogSequences.get(i) +" @ "+visitedMarkings.get(i));
+
+       // scan all marking classes for the class with the largest overlap
+       // in the worst case, this is the very marking the L-sequence occurred at
+       Set<Place> largestOverlapOn = null;
+       int largestOverlap = 0;
+       for (Set<Place> m : markingClasses) {
+         int matchSize = 0;
+         for (Place p : marking) {
+           if (m.contains(p))
+             matchSize++;
+         }
+         if (matchSize > largestOverlap) {
+           largestOverlap = matchSize;
+           largestOverlapOn = m;
+         }
+       }
+
+       // put L-sequence to this cluster
+       if (!sublogClasses.containsKey(largestOverlapOn)) sublogClasses.put(largestOverlapOn, new LinkedList<List<String>>());
+       sublogClasses.get(largestOverlapOn).add(seq);
+     }
+     
+     // merge clusters of L-sequences if their locations overlap
+     // start merging with the L-sequences with the largest overlap
+     // and repeat until there is still two clusters that can be merged
+     boolean changed = true;
+     while (changed) {
+       Set<Place> merge1 = null;  // location of cluster1 that shall be merged with
+       Set<Place> merge2 = null;  // cluster2 at this location
+       
+       // largest overlap found so far
+       int maxOverLap_m1_m2 = 0;
+
+       changed = false;
+       
+       // iterate over all pairs of clusters and find the pair with the largest overlap 
+       for (Set<Place> m1 : sublogClasses.keySet()) {
+
+         for (Set<Place> m2 : sublogClasses.keySet()) {
+           if (m2 == m1) continue;
+           
+           // count number of places in 'm1' and 'm2'
+           int overlap_m1_m2 = 0;
+           for (Place p : m1) {
+             if (m2.contains(p))
+               overlap_m1_m2++;
+           }
+           // remember largest overlap and the overlapping locations 'm1' and 'm2'
+           if (overlap_m1_m2 > maxOverLap_m1_m2) {
+             maxOverLap_m1_m2 = overlap_m1_m2;
+             merge1 = m1;
+             merge2 = m2;
+           }
+         }
+       }
+       
+       // if we found any overlapping locations, then they are largest and we can merge them
+       if (merge1 != null && merge2 != null && maxOverLap_m1_m2 > 0) {
+         
+         // compute overlap of both clusters
+         HashSet<Place> m1_intersect_m2 = new HashSet<Place>(merge1);
+         m1_intersect_m2.retainAll(merge2);
+         
+         System.out.println(merge1+" + "+merge2+" -> "+m1_intersect_m2);
+
+         // add all traces to the overlap
+         if (!sublogClasses.containsKey(m1_intersect_m2)) sublogClasses.put(m1_intersect_m2, new LinkedList<List<String>>());
+         if (!merge1.equals(m1_intersect_m2)) sublogClasses.get(m1_intersect_m2).addAll(sublogClasses.get(merge1));
+         if (!merge1.equals(m1_intersect_m2)) sublogClasses.get(m1_intersect_m2).addAll(sublogClasses.get(merge2));
+         
+         // remove original classes from the map
+         if (!merge1.equals(m1_intersect_m2)) sublogClasses.remove(merge1);
+         if (!merge2.equals(m1_intersect_m2)) sublogClasses.remove(merge2);
+         
+         // and find the next overlap
+         changed = true;
+       }
+    }
+
+    for (Set<Place> m : sublogClasses.keySet()) {
+      System.out.println(m + " has traces");
+      for (List<String> tr : sublogClasses.get(m)) {
+        System.out.println("  " + tr);
       }
     }
-     
-     return logClasses;
+
+    return sublogClasses;
    }
    
-   private void extendModelWithMoveOnModel(PetriNet net) {
+   private List<Transition> getOriginalTransitions(DNode d) {
+     DNodeSys_PetriNet sysModel = (DNodeSys_PetriNet)this.build.getSystem();
+     List<Transition> d_origin = new LinkedList<Transition>();
+     // for events, the causedBy field contains the ids of fireable transitions involved in the event
+     for (int e_index : d.causedBy) {
+       DNode e = build.getSystem().getTransitionForID(e_index);
+       Node t = sysModel.getOriginalNode(e);
+       d_origin.add((Transition)t);
+     }
+     return d_origin;
+   }
+   
+   private List<Place> getOriginalPlaces(DNode d) {
+     DNodeSys_PetriNet sysModel = (DNodeSys_PetriNet)this.build.getSystem();
+     List<Place> d_origin = new LinkedList<Place>();
+     // for conditions, the involved places were recorded explicitly during unfolding
+     for (DNode b : this.conditionOrigin.get(d)) {
+       Node p = sysModel.getOriginalNode(b);
+       d_origin.add((Place)p);
+     }
+     return d_origin;
+   }
+   
+   private Map<Node, Integer> pn_nodeOccurrences;
+
+   /**
+   * @return a map that tells for each node of the original system model that
+   *         occurred at least once in the unfolding, the number of occurrences
+   *         of this node (across all conditions/events that represent this
+   *         node)
+   */
+   private Map<Node, Integer> computeNodeOccurrences() {
+
+     pn_nodeOccurrences = new HashMap<Node, Integer>();
+     
+     // sum up the occurrences of the nodes in the unfolding by their original node 
+     for (Map.Entry<DNode, Integer> occ : this.nodeOccurrences.entrySet()) {
+       // for each node d, identify the set of nodes that caused 'd' to exist in the unfolding
+       DNode d = occ.getKey();
+       
+       List<? extends Node> d_origin;
+       if (d.isEvent) d_origin = getOriginalTransitions(d);
+       else d_origin = getOriginalPlaces(d);
+       
+       // add the number of occurrences of 'd' to the original nodes
+       for (Node n : d_origin) {
+         if (!pn_nodeOccurrences.containsKey(n)) pn_nodeOccurrences.put(n, 0);
+         pn_nodeOccurrences.put(n, pn_nodeOccurrences.get(n)+occ.getValue());
+       }
+     }
+     
+     return pn_nodeOccurrences;
+   }
+
+   /**
+    * @param net
+    * @param minOccurrences
+    * @return the nodes of {@code net} that did not more than {@code minOccurrences} time
+    */
+   public Set<Node> getInfrequentNodes(int minOccurrences) {
+     HashSet<Node> infrequent = new HashSet<Node>();
+     
+     for (Place p : net.getPlaces()) {
+       if (!pn_nodeOccurrences.containsKey(p) || pn_nodeOccurrences.get(p) <= minOccurrences) {
+         infrequent.add(p);
+       }
+     }
+     for (Transition t : net.getTransitions()) {
+       if (!pn_nodeOccurrences.containsKey(t) || pn_nodeOccurrences.get(t) <= minOccurrences) {
+         infrequent.add(t);
+       }
+     }     
+     return infrequent;
+   }
+
+   public void extendModelWithMoveOnModel() {
      if (!(this.build.getSystem() instanceof DNodeSys_PetriNet)) return;
      
      DNodeSys_PetriNet sysModel = (DNodeSys_PetriNet)this.build.getSystem();
@@ -854,6 +977,13 @@ public class ModelRepair_SubProcess {
      }
      
      for (Transition t : need_tau) {
+       
+       // count how often t has to be skipped
+       int t_tau_occurrences = 0;
+       for (List<Transition> seq : moveOnModelSequences) {
+         for (Transition t2 : seq) if (t == t2) t_tau_occurrences++;
+       }
+       
        Transition t_tau = net.addTransition("SILENT "+t.getName());
        for (Place p : t.getPreSet()) {
          net.addArc(p, t_tau);
@@ -861,8 +991,139 @@ public class ModelRepair_SubProcess {
        for (Place p : t.getPostSet()) {
          net.addArc(t_tau, p);
        }
-       System.out.println("tau for "+t);
+       System.out.println("tau for "+t+" occurred "+t_tau_occurrences+" times");
+       pn_nodeOccurrences.put(t_tau, t_tau_occurrences);
+       if (pn_nodeOccurrences.containsKey(t)) {
+         pn_nodeOccurrences.put(t, pn_nodeOccurrences.get(t)-t_tau_occurrences);
+       }
      }
+   }
+   
+   /**
+    * Extend Petri net with a subNet that can replay the given subLog add the given
+    * location. The subNet has well-defined start and end transitions that consume from
+    * and produce on the location, respectively.
+    * 
+    * The method sets {@link #pn_nodeOccurrences} for all new transitions and places.
+    * 
+    * @param subNet
+    * @param start
+    * @param end
+    * @param subLog
+    * @param location
+    * @param subName
+    * @param weight
+    */
+   public void extendModelWithMoveOnLog(PetriNet subNet, Transition start, Transition end, 
+       Collection<List<String>> subLog,
+       Collection<Place> location,
+       String subName,
+       int weight)
+   {
+     
+     boolean inSequence = true;
+     for (Place p : location) {
+       if (!pn_nodeOccurrences.containsKey(p)) {
+         inSequence = false;
+         break;
+       }
+       if (pn_nodeOccurrences.get(p) != weight) {
+         inSequence = false;
+         break;
+       }
+     }
+     
+     List<hub.top.petrinet.Arc> toRemove = new ArrayList<hub.top.petrinet.Arc>();
+     toRemove.addAll(start.getIncoming());
+     toRemove.addAll(end.getOutgoing());
+     for (hub.top.petrinet.Arc a : toRemove) {
+       subNet.removeArc(a);
+     }
+     
+     List<Place> isolated = new ArrayList<Place>();
+     for (Place p : subNet.getPlaces()) {
+       if (p.getIncoming().size() == 0 && p.getOutgoing().size() == 0) {
+         isolated.add(p);
+       }
+     }
+     for (Place p : isolated) {
+       subNet.removePlace(p);
+     }
+     
+     Map<Place,Place> movedPlaces = new HashMap<Place, Place>();
+     Map<Transition, Transition> movedTransitions = new HashMap<Transition, Transition>();
+     
+     net.addRole(subName);
+     for (Place p : subNet.getPlaces()) {
+       Place _p = net.addPlace(p.getName());
+       _p.addRole(subName);
+       net.setTokens(_p, p.getTokens());
+       movedPlaces.put(p, _p);
+     }
+     for (Transition t : subNet.getTransitions()) {
+       
+       int _t_occurrence_count = 0;
+       for (List<String> tr : subLog) {
+         for (String e : tr) if (e.equals(t.getName())) _t_occurrence_count++;
+       }
+       
+       Transition _t = net.addTransition(t.getName());
+       _t.addRole(subName);
+       movedTransitions.put(t, _t);
+       pn_nodeOccurrences.put(_t, _t_occurrence_count);
+       
+       for (Place p : t.getPreSet()) {
+         Place _p = movedPlaces.get(p);
+         net.addArc(_p, _t);
+       }
+       for (Place p : t.getPostSet()) {
+         Place _p = movedPlaces.get(p);
+         net.addArc(_t, _p);
+         
+         if (!pn_nodeOccurrences.containsKey(_p)) pn_nodeOccurrences.put(_p, 0);
+         pn_nodeOccurrences.put(_p, pn_nodeOccurrences.get(_p) + _t_occurrence_count);
+       }
+     }
+     
+     if (inSequence) {
+       Map<Place, Place> postMap = new HashMap<Place, Place>();
+       for (Place p : location) {
+         Place p2 = net.addPlace(p.getName()+"_post");
+         postMap.put(p, p2);
+         if (pn_nodeOccurrences.containsKey(p)) pn_nodeOccurrences.put(p2, pn_nodeOccurrences.get(p));
+         for (Transition t : p.getPostSet()) {
+           net.addArc(p2, t);
+           
+         }
+       }
+       for (Place p : location) {
+         for (Arc a : p.getOutgoing()) net.removeArc(a);
+       }
+       for (Place p : location) {
+         net.addArc(p, movedTransitions.get(start));
+         net.addArc(movedTransitions.get(end), postMap.get(p));
+       }
+       
+     } else {
+       for (Place p : location) {
+         net.addArc(p, movedTransitions.get(start));
+         net.addArc(movedTransitions.get(end), p);
+       }
+     }
+   }
+   
+   public void removeInfrequentNodes(int occurrence_threshold) {
+     Set<Node> unusedNodes = getInfrequentNodes(occurrence_threshold);
+     List<Place> p_toRemove = new ArrayList<Place>();
+     for (Place p : net.getPlaces()) {
+       if (unusedNodes.contains(p)) p_toRemove.add(p);
+     }
+     List<Transition> t_toRemove = new ArrayList<Transition>();
+     for (Transition t : net.getTransitions()) {
+       if (unusedNodes.contains(t)) t_toRemove.add(t);
+     }
+     for (Place p : p_toRemove) net.removePlace(p);
+     for (Transition t : t_toRemove) net.removeTransition(t);
    }
    
    public static DNodeRefold getInitialUnfolding(ISystemModel sysModel) throws InvalidModelException {
@@ -876,21 +1137,27 @@ public class ModelRepair_SubProcess {
    }
 
    
-   public void repairModel(String systemFile, PetriNet sysModel, Collection<String[]> traces, Map<String, String> e2t) throws InvalidModelException, IOException {
+   public void replayAlignment(String systemFile, Collection<String[]> traces, Map<String, String> e2t) throws InvalidModelException, IOException {
 
      for (DNode b : build.getBranchingProcess().allConditions) {
        conditionOrigin.put(b, new DNode[] { b });
      }
      
      extendByTraces(traces, e2t);
+     computeNodeOccurrences();
      
      OcletIO_Out.writeFile(build.toDot(), systemFile+".unfolding.dot");
-     extendModelWithMoveOnModel((PetriNet)sysModel);
-     //extendModelWithMoveOnLog((PetriNet)sysModel, getLocationsForExtension());
-
+   }
+   
+   public void repair(String systemFile, Collection<String[]> traces, Map<String, String> e2t) throws InvalidModelException, IOException {
+     replayAlignment(systemFile, traces, e2t);
      
-     OcletIO_Out.writeToFile((PetriNet)sysModel, systemFile+"_repaired.lola", OcletIO_Out.FORMAT_LOLA, 0);
-     OcletIO_Out.writeToFile((PetriNet)sysModel, systemFile+"_repaired.dot", OcletIO_Out.FORMAT_DOT, 0);
+     extendModelWithMoveOnModel();
+     //extendModelWithMoveOnLog(getLocationsForExtension());
+     
+     OcletIO_Out.writeToFile((PetriNet)net, systemFile+"_repaired.lola", OcletIO_Out.FORMAT_LOLA, 0);
+     OcletIO_Out.writeToFile((PetriNet)net, systemFile+"_repaired.dot", OcletIO_Out.FORMAT_DOT, 0);
+
    }
    
    public static void main(String[] args) {
@@ -913,8 +1180,8 @@ public class ModelRepair_SubProcess {
          LinkedList<String[]> traces = readTraces(traceFile);
 
          DNodeRefold build = getInitialUnfolding(sysModel);
-         ModelRepair_SubProcess viewGen = new ModelRepair_SubProcess(build);
-         viewGen.repairModel(systemFile, (PetriNet)sysModel, traces, null);
+         ModelRepair_SubProcess viewGen = new ModelRepair_SubProcess((PetriNet) sysModel, build);
+         viewGen.replayAlignment(systemFile, traces, null);
          
        } catch (IOException e) {
          System.err.println(e);

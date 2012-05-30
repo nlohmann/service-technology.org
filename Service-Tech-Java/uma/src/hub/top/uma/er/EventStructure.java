@@ -257,6 +257,7 @@ public class EventStructure {
     _setDirectConflict(e1, e2);
     _setDirectConflict(e2, e1);
   }
+
   
   public void removeFromConflicts(Event n) {
     if (directConflict.containsKey(n)) {
@@ -709,8 +710,6 @@ public class EventStructure {
       
       for (Event e : eq) {
         canonical.put(e, minEvent);
-        queue.addLast(e);
-        //System.out.println("add "+e);
       }
       equiv.put(minEvent, eq);
     }
@@ -767,7 +766,6 @@ public class EventStructure {
       // partition equivalence classes by equivalent successors
       for (Set<Event> label_eq : label_equiv.values()) {
         Map<Set<Event>,Set<Event>> succ_classes = new HashMap<Set<Event>, Set<Event>>();
-        
 
         for (Event e_label : label_eq) {
           Set<Event> succ = new HashSet<Event>();
@@ -837,6 +835,41 @@ public class EventStructure {
       System.out.println(eq);
     }
   }
+  
+  public void foldByLabel() {
+    
+    canonical = new HashMap<Event, Event>();
+    equiv = new HashMap<Event, Set<Event>>();
+    
+    // partition into classes of events of the same label
+    Map<Short, Set<Event>> label_equiv = new HashMap<Short, Set<Event>>();
+    for (Event e : allEvents) {
+      if (!label_equiv.containsKey(e.id)) label_equiv.put(e.id, new HashSet<Event>());
+      label_equiv.get(e.id).add(e);
+    }
+    
+    // make each class an equivalence class with the event with the smallest global id
+    // as canonical representative, add the canonical representative to the queue
+    for (Set<Event> eq : label_equiv.values()) {
+      Event minEvent = null;
+      for (Event e : eq) {
+        if (minEvent == null) minEvent = e;
+        else if (minEvent.globalId > e.globalId) minEvent = e;
+      }
+      
+      for (Event e : eq) {
+        canonical.put(e, minEvent);
+        //System.out.println("add "+e);
+      }
+      equiv.put(minEvent, eq);
+    }
+    
+    System.out.println("-------------------> folding relation on events");
+    for (Set<Event> eq : equiv.values()) {
+      System.out.println(eq);
+    }
+  }
+
   
   public void refineFoldingByConflicts() {
     

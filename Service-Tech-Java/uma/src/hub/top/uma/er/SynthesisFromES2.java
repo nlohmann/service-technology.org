@@ -17,6 +17,8 @@ import hub.top.uma.synthesis.TransitiveDependencies;
 import hub.top.uma.view.ViewGeneration2;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -278,6 +280,7 @@ public class SynthesisFromES2 {
     Map<Transition, Event> E2 = new LinkedHashMap<Transition, Event>();
     Map<Integer, Event> E_index = new LinkedHashMap<Integer, Event>();
     
+    System.out.println("---------- generating transitions ------------");
     for (Event n: equiv.keySet()) {
       
       String transitionLabel = properNames[n.id];
@@ -285,6 +288,8 @@ public class SynthesisFromES2 {
       Transition t = pnet.addTransition(transitionLabel);
       E.put(n, t);
       E2.put(t, n);
+      
+      System.out.println(equiv.get(n)+" --> "+t);
     }
     
     //System.out.println(reducedFlow);
@@ -355,14 +360,111 @@ public class SynthesisFromES2 {
       }
       */
       
-      Map<Pair, Place> B = new LinkedHashMap<Pair, Place>();
-      Map<Place, Pair> B2 = new LinkedHashMap<Place,Pair>();
+      
+      Map<Set<Event>, List<Set<Event>>> places = new HashMap<Set<Event>, List<Set<Event>>>();
       
       for (Map.Entry<Set<Event>,Set<Event>> dep : dependencyMap.entrySet()) {
-
-        addPlace(pnet, es, dep.getValue(), dep.getKey(), implicitPlaces, implicitPlaces_2ormore, B, B2);
         
-        System.out.println(dep.getValue() +" --> "+dep.getKey());
+        //System.out.println(dep.getValue() +" --> "+dep.getKey());
+        
+        Event[] pre_events = dep.getValue().toArray(new Event[dep.getValue().size()]);
+        boolean co[][] = new boolean[pre_events.length][pre_events.length];
+        for (int i=0; i<pre_events.length; i++) {
+          for (int j=0; j<pre_events.length; j++) {
+            if (j == i) co[i][j] = true;
+            co[i][j] = es.inConflict(pre_events[i], pre_events[j]);
+            //if (i < j) System.out.println(pre_events[i]+" # "+pre_events[j]+" == "+co[i][j]);
+          }
+        }
+        
+        //BronKerbosch bk_confl = new BronKerbosch();
+        //TreeSet<int[]> cosets = bk_confl.findCliques(co);
+        
+        List<Set<Event>> confs = es.getConflictClusters(dep.getValue(), false);
+        
+        for (Set<Event> _preSet: confs) {
+          //System.out.println("  "+_preSet +" --> "+dep.getKey());
+          if (!places.containsKey(_preSet)) places.put(_preSet, new ArrayList<Set<Event>>());
+          places.get(_preSet).add(dep.getKey());
+        }
+        
+        Set<Event> addMissing = new HashSet<Event>();
+        for (Set<Event> _preSet: confs) {
+          for (Event preEvent : _preSet) {
+
+            for (Event e : dep.getKey()) {
+              boolean add_to_others = false;
+              for (Event eEquiv : equiv.get(e)) {
+                boolean hasPre = false;
+                if (eEquiv.pre != null)
+                  for (int i=0; i<eEquiv.pre.length; i++) {
+                    if (eEquiv.pre[i].id == preEvent.id) {
+                      hasPre = true;
+                    }
+                  }
+                
+                if (!hasPre) {
+                  //System.out.println(">> "+preEvent+" of "+_preSet+" is not known to "+eEquiv);
+                  add_to_others = true;
+                }
+
+              }
+              
+              if (add_to_others) {
+                addMissing.add(preEvent);
+              }
+            }
+          }
+        }
+        
+        for (Event missing : addMissing) {
+          for (Set<Event> _preSet: confs) {
+            _preSet.add(missing);
+          }
+        }
+
+        
+        for (Set<Event> _preSet: confs) {
+          //System.out.println("  "+_preSet +" --> "+dep.getKey());
+          if (!places.containsKey(_preSet)) places.put(_preSet, new ArrayList<Set<Event>>());
+          places.get(_preSet).add(dep.getKey());
+        }
+
+        /*
+        int[][] _cosets = cosets.toArray(new int[cosets.size()][]);
+        List<int[]> preSets = getAllCombinations(_cosets);
+        for (int[] preSet : preSets) {
+          Set<Event> _preSet = new HashSet<Event>();
+          for (int i=0; i<preSet.length; i++) {
+            _preSet.add(pre_events[preSet[i]]);
+          }
+          System.out.println("  "+_preSet +" --> "+dep.getKey());
+        }*/
+      }
+      
+      Map<Pair, Place> B = new LinkedHashMap<Pair, Place>();
+      Map<Place, Pair> B2 = new LinkedHashMap<Place,Pair>();
+
+      for (Set<Event> preSet : places.keySet()) {
+
+        // filter subsumed places
+        List<Set<Event>> postSets = new ArrayList<Set<Event>>();
+        for (Set<Event> postSet : places.get(preSet)) {
+          boolean subsumed = false;
+          for (Set<Event> postSet2 : places.get(preSet)) {
+            if (postSet2 == postSet) continue;
+            if (postSet2.containsAll(postSet)) {
+              subsumed = true;
+              break;
+            }
+          }
+          if (!subsumed) postSets.add(postSet);
+        }
+        
+        for (Set<Event> postSet : postSets) {
+          //System.out.println("  "+preSet +" -nonsubSumed-> "+postSet);
+          addPlace(pnet, es, preSet, postSet, implicitPlaces, implicitPlaces_2ormore, B, B2);
+        }
       }
     
     System.out.println("generate arcs");
@@ -387,6 +489,7 @@ public class SynthesisFromES2 {
     }
     
     
+    /*
     // --- Remove transitive conflicts
     // A condition b is a transitive conflict between two events e_1 and e_2, iff there exist events f_1 < e_1 and f_2 < e_2 that are in conflict.
     // A condition b is a transitive conflict, iff it is a transitive conflict between e_1 and e_2 for any two different post-events e_1, e_2 of b.
@@ -448,6 +551,17 @@ public class SynthesisFromES2 {
       System.out.println("removing transitive conflicts "+place);
       pnet.removePlace(place);
     }
+    */
+    
+    LinkedList<Place> toRemove = new LinkedList<Place>();
+    for (Place p : pnet.getPlaces()) {
+      if (p.getIncoming().size() == 0 && p.getOutgoing().size() == 0) {
+        toRemove.add(p);
+      }
+    }
+    for (Place p : toRemove) {
+      pnet.removePlace(p);
+    }
     
     
     // --- Add source place
@@ -480,6 +594,25 @@ public class SynthesisFromES2 {
     
     return pnet;
   }
+  
+  private List<int[]> getAllCombinations(int[][] sets) {
+    ArrayList<int[]> combinations = new ArrayList<int[]>();
+    int [] comb = new int[sets.length];
+    addCombination(sets, 0, comb, combinations);
+    return combinations;
+  }
+  
+  private void addCombination(int[][] sets, int level, int[] current, ArrayList<int[]> combinations) {
+    if (level == current.length) {
+      combinations.add(Arrays.copyOf(current, current.length));
+      return;
+    }
+    for (int i=0; i<sets[level].length; i++) {
+      current[level] = sets[level][i];
+      addCombination(sets, level+1, current, combinations);
+    }
+  }
+  
   
   
   private boolean existsPathWithoutCondition(Transition t1, Transition t2, Place b, PetriNet pnet, Set<Place> toRemove) {

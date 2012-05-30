@@ -31,6 +31,8 @@ import hub.top.uma.DNode;
 public class Event extends DNode {
   
   public boolean originalModelEvent = false;
+  
+  public int level = -1;
 
   public Event(short id, int preSize) {
     super(id, preSize);

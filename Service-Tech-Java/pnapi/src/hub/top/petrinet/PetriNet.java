@@ -990,6 +990,16 @@ public class PetriNet implements ISystemModel {
    * @return
    */
   public String toDot_swimlanes() {
+    return toDot_swimlanes(new HashMap<Object, String>());
+  }
+  
+  /**
+   * Write the Petri net in GraphViz dot format
+   * 
+   * @param net
+   * @return
+   */
+  public String toDot_swimlanes(HashMap<Object, String> colorMap) {
     StringBuilder b = new StringBuilder();
     b.append("digraph BP {\n");
     
@@ -1030,8 +1040,14 @@ public class PetriNet implements ISystemModel {
         nodeID++;
         nodeIDs.put(p, nodeID);
         
+        String colorString = "";
+        if (p.getTokens() > 0 )
+          colorString = tokenFillString;
+        else if (colorMap.containsKey(p))
+          colorString = "fillcolor=\""+colorMap.get(p)+"\"";
+        
         if (p.getTokens() > 0)
-          b.append("  p"+nodeID+" ["+tokenFillString+"]\n");
+          b.append("  p"+nodeID+" ["+colorString+"]\n");
         else if (p.getIncoming().isEmpty())
           b.append("  p"+nodeID+" ["+preconditionFillString+"]\n");
         else
@@ -1052,8 +1068,12 @@ public class PetriNet implements ISystemModel {
         
         nodeID++;
         nodeIDs.put(t, nodeID);
+        
+        String colorString = "";
+        if (colorMap.containsKey(t))
+          colorString = "fillcolor=\""+colorMap.get(t)+"\"";
   
-        b.append("  t"+nodeID+" []\n");
+        b.append("  t"+nodeID+" ["+colorString+"]\n");
         
         String auxLabel  = "";//"ROLES: "+toString(t.getRoles());
         

@@ -294,8 +294,6 @@ int main(int argc, char** argv) {
     `---------------------------------*/
     anica::AnicaLib alib(net);
     
-    message("transitions: %d", net.getTransitions().size());
-    
     // configure library
     alib.setLolaPath(string(args_info.lola_arg));
     alib.setLolaWitnessPath(args_info.witnessPath_flag);
@@ -346,6 +344,12 @@ int main(int argc, char** argv) {
     // perform task
     if (args_info.task_arg == task_arg_verification) {
         result = alib.isSecure();
+        if (result == 0) {
+            message(_cgood_("net is secure"));
+        }
+        else {
+            message(_cbad_("net is unsecure"));
+        }
     }
     else if (args_info.task_arg == task_arg_characterization) {
         char** cuddVariableNames = new char*[net.getTransitions().size()];

@@ -1115,17 +1115,17 @@ void AnicaLib::colorConfidence(pnapi::PetriNet& net, colorConfidenceTask_e task)
     PNAPI_FOREACH(t, net.getTransitions()) {
 	    switch ((**t).getConfidence()) {
 		    case CONFIDENCE_LOW:
-		        if ((task == COLOR_CONFIDENCE_TASK_LOW) || (task = COLOR_CONFIDENCE_TASK_ALL)) {
+		        if ((task == COLOR_CONFIDENCE_TASK_LOW) || (task == COLOR_CONFIDENCE_TASK_ALL)) {
 			        (**t).setColor("green");
 			    }
 			    break;
 		    case CONFIDENCE_HIGH:
-		        if ((task == COLOR_CONFIDENCE_TASK_HIGH) || (task = COLOR_CONFIDENCE_TASK_ALL)) {
+		        if ((task == COLOR_CONFIDENCE_TASK_HIGH) || (task == COLOR_CONFIDENCE_TASK_ALL)) {
 			        (**t).setColor("red");
 			    }
 			    break;
 		    case CONFIDENCE_DOWN:
-		        if ((task == COLOR_CONFIDENCE_TASK_DOWN) || (task = COLOR_CONFIDENCE_TASK_ALL)) {
+		        if ((task == COLOR_CONFIDENCE_TASK_DOWN) || (task == COLOR_CONFIDENCE_TASK_ALL)) {
 			        (**t).setColor("yellow");
 			    }
 			    break;

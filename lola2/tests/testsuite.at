@@ -464,3 +464,11 @@ AT_CHECK([GREP -q -E "776" compressedOutput.names])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
+AT_SETUP([Writing and reading compressed files])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA --writeCompressed phils5.lola],0,ignore,stderr)
+AT_CHECK([LOLA --compressed compressedOutput.net --check=deadlock -v],0,ignore,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+

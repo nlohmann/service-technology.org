@@ -105,8 +105,10 @@ bool BloomStore::searchAndInsert()
     return true;
 }
 
+// LCOV_EXCL_START
 bool BloomStore::searchAndInsert(State**)
 {
     assert(false);
     return false;
 }
+// LCOV_EXCL_STOP

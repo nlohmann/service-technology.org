@@ -294,22 +294,6 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([List])
-AT_CHECK([cp TESTFILES/phils5.lola .])
-AT_CHECK([LOLA phils5.lola --check=full --store=list -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: no" stderr])
-AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
-AT_KEYWORDS(stores)
-AT_CLEANUP
-
-#AT_SETUP([Compressed])
-#AT_CHECK([cp TESTFILES/phils5.lola .])
-#AT_CHECK([LOLA phils5.lola --check=full --store=compr -v],0,stdout,stderr)
-#AT_CHECK([GREP -q "lola: result: no" stderr])
-#AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
-#AT_KEYWORDS(stores)
-#AT_CLEANUP
-
 
 ############################################################################
 AT_BANNER([Deadlock])

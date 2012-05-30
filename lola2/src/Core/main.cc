@@ -48,9 +48,7 @@
 #include <Stores/BinStore2.h>
 #include <Stores/BitStore.h>
 #include <Stores/BloomStore.h>
-#include <Stores/CompressedStore.h>
 #include <Stores/EmptyStore.h>
-#include <Stores/ListStore.h>
 #include <Stores/SIBinStore2.h>
 #include <Stores/STLStore.h>
 #include <Stores/Store.h>
@@ -294,12 +292,6 @@ int main(int argc, char** argv)
                     break;
                 case store_arg_tsbin2:
                     s = new ThreadSafeStore(new SIBinStore2(10));
-                    break;
-                case store_arg_list:
-                    s = new ListStore();
-                    break;
-                case store_arg_compr:
-                    s = new CompressedStore();
                     break;
             }
         }

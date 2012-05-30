@@ -64,9 +64,7 @@ lola_SOURCES = \
                 Stores/STLStore.cc Stores/STLStore.h \
                 Stores/ThreadSafeStore.cc Stores/ThreadSafeStore.h \
                 Stores/BinStore2.cc Stores/BinStore2.h \
-                Stores/SIBinStore2.cc Stores/SIBinStore2.h \
-                Stores/ListStore.cc Stores/ListStore.h \
-                Stores/CompressedStore.cc Stores/CompressedStore.h
+                Stores/SIBinStore2.cc Stores/SIBinStore2.h
 
 ###
 

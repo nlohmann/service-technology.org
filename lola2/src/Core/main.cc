@@ -400,6 +400,7 @@ int main(int argc, char** argv)
         delete s;
         delete p;
         delete sp;
+        delete fl;
     }
 
     return EXIT_SUCCESS;

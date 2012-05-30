@@ -19,6 +19,9 @@ ASCII file where data are separated by spaces and newlines
 
 #include <InputOutput/CompressedIO.h>
 #include <Parser/ParserPTNet.h>
+#include <Parser/PlaceSymbol.h>
+#include <Parser/TransitionSymbol.h>
+#include <Parser/FairnessAssumptions.h>
 #include <Net/Net.h>
 #include <Net/Marking.h>
 #include <Net/Place.h>
@@ -52,7 +55,7 @@ void WriteNameFile(FILE* f)
 \todo Use strdup instead of malloc/strcpy.
 \todo Scanf mit Maximalbreite nutzen um cppcheck-Fehler zu umgehen.
 */
-void ReadNameFile(FILE* f)
+void ReadNameFile(FILE* f,ParserPTNet * symboltables)
 {
     assert(Net::Name[PL]);
     assert(Net::Name[TR]);
@@ -70,6 +73,9 @@ void ReadNameFile(FILE* f)
         fscanf(f, "%s", buffer);
         Net::Name[PL][p] = (char*) malloc((strlen(buffer) + 1) * sizeof(char)) ;
         strcpy(Net::Name[PL][p], buffer);
+	PlaceSymbol * ps = new PlaceSymbol(Net::Name[PL][p],Place::Capacity[p]);
+	ps -> setIndex(p);
+	symboltables->PlaceTable->insert(ps);
     }
 
     // 3. Number of transition
@@ -82,6 +88,9 @@ void ReadNameFile(FILE* f)
         fscanf(f, "%s", buffer);
         Net::Name[TR][t] = (char*) malloc((strlen(buffer) + 1) * sizeof(char)) ;
         strcpy(Net::Name[TR][t], buffer);
+	TransitionSymbol * ts = new TransitionSymbol(Net::Name[TR][t],Transition::Fairness[t],NULL,NULL);
+	ts -> setIndex(t);
+	symboltables->TransitionTable->insert(ts);
     }
 }
 

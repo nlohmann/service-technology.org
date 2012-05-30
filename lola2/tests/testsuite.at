@@ -472,3 +472,12 @@ AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
+AT_SETUP([Writing and reading compressed files])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([cp TESTFILES/garavel.task .])
+AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
+AT_CHECK([LOLA --compressed compressedOutput.net compressedOutput.names --check=statepredicate --formula=garavel.task -v],0,ignore,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+

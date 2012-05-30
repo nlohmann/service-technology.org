@@ -165,7 +165,8 @@ int main(int argc, char** argv)
             Input netfile("compressed net", args_info.inputs[0]);
             ReadNetFile(netfile);
             Input namefile("compress net", args_info.inputs[1]);
-            ReadNameFile(namefile);
+	     symbolTables = new ParserPTNet(); // initializes a symbol table that is rudimentary filled such that mapping name->id is possible
+            ReadNameFile(namefile,symbolTables);
         }
     }
     else
@@ -206,7 +207,7 @@ int main(int argc, char** argv)
 
 
 
-
+	}
         if (args_info.formula_given)
         {
             Input* formulaFile = new Input("formula", args_info.formula_arg);
@@ -236,7 +237,6 @@ int main(int argc, char** argv)
         }
 
         delete symbolTables;
-    }
 
     if (args_info.randomWalk_given)
     {

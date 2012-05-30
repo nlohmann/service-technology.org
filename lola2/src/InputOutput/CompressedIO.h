@@ -12,9 +12,9 @@ ASCII file where data are separated by spaces and newlines.
 
 #pragma once
 #include <cstdio>
-
+#include"Parser/ParserPTNet.h"
 
 void WriteNameFile(FILE*);
 void WriteNetFile(FILE*);
-void ReadNameFile(FILE*);
+void ReadNameFile(FILE*,ParserPTNet *);
 void ReadNetFile(FILE*);

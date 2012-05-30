@@ -80,7 +80,7 @@ cover/%.info:
     fi;
 
 newcover-collect: newcover-check
-	$(AM_V_at)$(MAKE) -j4 $(patsubst %,%.info, $(wildcard cover/*))
+	$(AM_V_at)$(MAKE) $(patsubst %,%.info, $(wildcard cover/*))
 
 ## Generate an HTML overview
 newcover-html: newcover-collect descriptions

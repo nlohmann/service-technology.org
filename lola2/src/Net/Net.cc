@@ -83,7 +83,9 @@ void Net::print()
                 printf(" strong ");
                 break;
             default:
+		// LCOV_EXCL_START
                 printf("error");
+		// LCOV_EXCL_STOP
         }
         printf(" %s ", (Transition::Enabled[i] ? "enabled" : "disabled"));
 

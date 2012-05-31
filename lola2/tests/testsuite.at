@@ -95,7 +95,7 @@ AT_CHECK([GREP -q -E "776" compressedOutput.names])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
-AT_SETUP([Writing and reading compressed files (1/3)])
+AT_SETUP([Writing and reading compressed files (1/4)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA --writeCompressed phils5.lola],0,ignore,stderr)
 AT_CHECK([LOLA --compressed --check=deadlock -v < compressedOutput.net],0,ignore,stderr)
@@ -103,7 +103,7 @@ AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
-AT_SETUP([Writing and reading compressed files (2/3)])
+AT_SETUP([Writing and reading compressed files (2/4)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA --writeCompressed phils5.lola],0,ignore,stderr)
 AT_CHECK([LOLA --compressed compressedOutput.net --check=deadlock -v],0,ignore,stderr)
@@ -111,12 +111,20 @@ AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
-AT_SETUP([Writing and reading compressed files (3/3)])
+AT_SETUP([Writing and reading compressed files (3/4)])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([cp TESTFILES/garavel.task .])
 AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
 AT_CHECK([LOLA --compressed compressedOutput.net compressedOutput.names --check=statepredicate --formula=garavel.task -v],0,ignore,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Writing and reading compressed files (4/4)])
+AT_CHECK([cp TESTFILES/syntax_full.lola .])
+AT_CHECK([LOLA --writeCompressed syntax_full.lola],0,ignore,stderr)
+AT_CHECK([LOLA --compressed compressedOutput.net compressedOutput.names --check=deadlock -v],0,ignore,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 

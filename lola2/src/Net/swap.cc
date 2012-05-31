@@ -138,12 +138,16 @@ void swapPlaces(index_t left, index_t right)
         Marking::Current[right] = tempmarking;
     }
 
+// so far, target markings are not in use, and perhaps never will be
+// since we focus on predicates
+// LCOV_EXCL_START
     if (Marking::Target)
     {
         tempmarking = Marking::Target[left];
         Marking::Target[left] = Marking::Target[right];
         Marking::Target[right] = tempmarking;
     }
+// LCOV_EXCL_STOP
 
     // 4. Transition data structures
 
@@ -200,7 +204,8 @@ void swapPlaces(index_t left, index_t right)
     }
     assert(is_consistent());
 }
-
+// just debugging
+// LCOV_EXCL_START
 bool is_consistent()
 {
     for (int type = PL; type <= TR; ++type)
@@ -233,3 +238,4 @@ bool is_consistent()
     }
     return true;
 }
+// LCOV_EXCL_STOP

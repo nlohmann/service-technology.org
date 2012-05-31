@@ -206,6 +206,8 @@ void AtomicStatePredicate::setUpSet()
     free(up2);
 }
 
+// only for debugging:
+// LCOV_EXCL_START
 void AtomicStatePredicate::consistency()
 {
     // 1. check sum
@@ -232,3 +234,5 @@ void AtomicStatePredicate::consistency()
         assert(parent);
     }
 }
+
+// LCOV_EXCL_STOP

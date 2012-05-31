@@ -180,7 +180,10 @@ void Transition::fire(index_t t)
     Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
     while (Marking::HashCurrent < 0)
     {
+	// just safety belt, if % returns negative value
+	// LCOV_EXCL_START
         Marking::HashCurrent += SIZEOF_MARKINGTABLE;
+	// LCOV_EXCL_STOP
     }
 }
 
@@ -271,7 +274,8 @@ void Transition::revertEnabled(index_t t)
     }
 
 }
-
+// just debugging
+// LCOV_EXCL_START
 bool testEnabled(index_t t)
 {
     if (Transition::Enabled[t])
@@ -295,3 +299,4 @@ bool testEnabled(index_t t)
     }
     return true;
 }
+// LCOV_EXCL_STOP

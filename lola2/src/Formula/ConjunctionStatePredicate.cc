@@ -154,6 +154,8 @@ index_t ConjunctionStatePredicate::collectAtomic(AtomicStatePredicate** p)
     return offset;
 }
 
+// only for debugging:
+// LCOV_EXCL_START
 void ConjunctionStatePredicate::consistency()
 {
     for (index_t i = 0; i < cardSub; i++)
@@ -192,3 +194,4 @@ void ConjunctionStatePredicate::consistency()
         assert(parent);
     }
 }
+// LCOV_EXCL_STOP

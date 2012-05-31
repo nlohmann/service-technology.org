@@ -330,6 +330,12 @@ AT_CHECK([GREP -q "6 markings, 5 edges" stderr])
 AT_KEYWORDS(debug)
 AT_CLEANUP
 
+AT_SETUP([Check nothing])
+AT_CHECK([cp TESTFILES/process.lola .])
+AT_CHECK([LOLA process.lola --check=none],0)
+AT_KEYWORDS(debug)
+AT_CLEANUP
+
 AT_SETUP([Significant places])
 AT_CHECK([cp TESTFILES/test_significant.lola .])
 AT_CHECK([LOLA test_significant.lola --check=full -v],0,stdout,stderr)
@@ -384,6 +390,14 @@ AT_CLEANUP
 AT_SETUP([STL])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=stl -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Bit])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=bit -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)

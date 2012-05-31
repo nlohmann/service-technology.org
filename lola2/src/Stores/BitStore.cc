@@ -85,8 +85,10 @@ bool BitStore::searchAndInsert()
     }
 }
 
+// LCOV_EXCL_START
 bool BitStore::searchAndInsert(State**)
 {
     assert(false);
     return false;
 }
+// LCOV_EXCL_STOP

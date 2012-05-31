@@ -11,7 +11,9 @@ inline bool EmptyStore::searchAndInsert()
     return true;
 }
 
+// LCOV_EXCL_START
 bool EmptyStore::searchAndInsert(State**)
 {
     return true;
 }
+// LCOV_EXCL_STOP

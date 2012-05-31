@@ -45,12 +45,14 @@ Socket::Socket(u_short port, const char* hostname) :
     sock(socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)),
     listening((hostname == NULL))
 {
+    // LCOV_EXCL_START
     if (UNLIKELY(sock == -1))
     {
         ReporterStream rep(true);
         rep.message("could not initialize socket at port %s", rep.markup(MARKUP_FILE, "%d", port).str());
         rep.abort(ERROR_NETWORK);
     }
+    // LCOV_EXCL_STOP
 
     // specify the address
     memset(&address, 0, SIZEOF_SOCKADDR_IN);
@@ -62,6 +64,7 @@ Socket::Socket(u_short port, const char* hostname) :
         address.sin_addr.s_addr = INADDR_ANY;
 
         // bind the socket sock to the address specified in address
+        // LCOV_EXCL_START
         if (UNLIKELY(bind(sock, (struct sockaddr*)&address, SIZEOF_SOCKADDR_IN) == -1))
         {
             close(sock);
@@ -69,17 +72,21 @@ Socket::Socket(u_short port, const char* hostname) :
             rep.message("could not bind socket at port %s", rep.markup(MARKUP_FILE, "%d", port).str());
             rep.abort(ERROR_NETWORK);
         }
+        // LCOV_EXCL_STOP
     }
     else
     {
         // resolve the hostname
         const hostent* record = gethostbyname(hostname);
+
+        // LCOV_EXCL_START
         if (UNLIKELY(record == NULL))
         {
             ReporterStream rep(true);
             rep.message("host %s is not available", rep.markup(MARKUP_FILE, "%s", hostname).str());
             rep.abort(ERROR_NETWORK);
         }
+        // LCOV_EXCL_STOP
 
         const in_addr* resolved_address = (in_addr*)record->h_addr;
         address.sin_addr.s_addr = inet_addr(inet_ntoa(* resolved_address));
@@ -119,11 +126,13 @@ __attribute__((noreturn)) void Socket::receive() const
         // specified in sa with length fromlen
         const ssize_t recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
 
+        // LCOV_EXCL_START
         if (UNLIKELY(recsize < 0))
         {
             rep.message("could not receive message");
             rep.abort(ERROR_NETWORK);
         }
+        // LCOV_EXCL_STOP
 
         // get sender IP
         char display[INET_ADDRSTRLEN] = {0};
@@ -150,12 +159,14 @@ void Socket::send(const char* message) const
 {
     const ssize_t bytes_sent = sendto(sock, message, strlen(message), 0, (const struct sockaddr*)&address, SIZEOF_SOCKADDR_IN);
 
+    // LCOV_EXCL_START
     if (UNLIKELY(bytes_sent < 0))
     {
         ReporterStream rep(true);
         rep.message("could not send message '%s'", message);
         rep.abort(ERROR_NETWORK);
     }
+    // LCOV_EXCL_STOP
 }
 
 /*!
@@ -182,12 +193,14 @@ char* Socket::waitFor(const char* message) const
         // specified in sa with length fromlen
         const ssize_t recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
 
+        // LCOV_EXCL_START
         if (UNLIKELY(recsize < 0))
         {
             ReporterStream rep(true);
             rep.message("could not receive message");
             rep.abort(ERROR_NETWORK);
         }
+        // LCOV_EXCL_STOP
 
         char* received = NULL;
         const int bytes = asprintf(&received, "%.*s", static_cast<int>(recsize), buffer);

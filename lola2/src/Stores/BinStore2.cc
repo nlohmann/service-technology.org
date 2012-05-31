@@ -310,7 +310,9 @@ bool BinStore2::searchAndInsert()
     }
 }
 
+// LCOV_EXCL_START
 bool BinStore2::searchAndInsert(State** result) {}
+// LCOV_EXCL_STOP
 
 /** may not work anymore due to variable vector data size
 

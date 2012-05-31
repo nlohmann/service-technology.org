@@ -454,8 +454,9 @@ void SIBinStore2::printBinStore()
 
 
 
-
+// LCOV_EXCL_START
 SIBinStore2* createSIBinStore2(int threads)
 {
     return new SIBinStore2(threads);
 }
+// LCOV_EXCL_STOP

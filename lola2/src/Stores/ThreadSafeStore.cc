@@ -54,9 +54,10 @@ bool ThreadSafeStore::searchAndInsert()
     return searchAndInsert(0);
 }
 
+// LCOV_EXCL_START
 bool ThreadSafeStore::searchAndInsert(State**)
 {
     assert(false);
     return false;
-
 }
+// LCOV_EXCL_STOP

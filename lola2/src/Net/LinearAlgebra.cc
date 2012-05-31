@@ -55,6 +55,8 @@ inline int64_t safeMult(int64_t a, int64_t b)
 }
 
 /// writes current row on cout
+// This is for debug purposes
+// LCOV_EXCL_START
 void Matrix::Row::printRow() const
 {
     for (index_t i = 0; i < varCount; ++i)
@@ -71,6 +73,7 @@ void Matrix::Row::printRow() const
     cout << endl;
     */
 }
+// LCOV_EXCL_END
 
 /// frees memory of current row
 Matrix::Row::~Row()
@@ -239,6 +242,8 @@ Matrix::~Matrix()
 }
 
 /// writes current matrix on cout
+// This is for debug purposes
+// LCOV_EXCL_START
 void Matrix::printMatrix() const
 {
     for (index_t c = 0; c < colCount; ++c)
@@ -252,6 +257,7 @@ void Matrix::printMatrix() const
         }
     }
 }
+// LCOV_EXCL_END
 
 /// creates a new matrix
 /// size depicts the number of variables (=columns)

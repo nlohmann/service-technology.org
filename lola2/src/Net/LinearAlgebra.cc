@@ -73,6 +73,20 @@ void Matrix::Row::printRow() const
     cout << endl;
     */
 }
+/// writes current matrix on cout
+void Matrix::printMatrix() const
+{
+    for (index_t c = 0; c < colCount; ++c)
+    {
+        cout << "place " << c << endl;
+        Row* curRow = matrix[c];
+        while (curRow != NULL)
+        {
+            curRow->printRow();
+            curRow = curRow->next;
+        }
+    }
+}
 // LCOV_EXCL_END
 
 /// frees memory of current row
@@ -240,24 +254,6 @@ Matrix::~Matrix()
     // delete array for variables (and their rows)
     delete[] matrix;
 }
-
-/// writes current matrix on cout
-// This is for debug purposes
-// LCOV_EXCL_START
-void Matrix::printMatrix() const
-{
-    for (index_t c = 0; c < colCount; ++c)
-    {
-        cout << "place " << c << endl;
-        Row* curRow = matrix[c];
-        while (curRow != NULL)
-        {
-            curRow->printRow();
-            curRow = curRow->next;
-        }
-    }
-}
-// LCOV_EXCL_END
 
 /// creates a new matrix
 /// size depicts the number of variables (=columns)

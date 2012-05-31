@@ -281,9 +281,13 @@ insert:
     return false;
 }
 
+// not implemented yet
+// LCOV_EXCL_START
 bool BinStore::searchAndInsert(State** result) {}
+//LCOV_EXCL_STOP
 
-
+// debugging only
+// LCOV_EXCL_START
 void BinStore::pbs(unsigned int b, unsigned int p, unsigned char* f, void* v)
 {
 
@@ -333,3 +337,4 @@ void BinStore::printBinStore()
         printf("\n");
     }
 }
+// LCOV_EXCL_STOP

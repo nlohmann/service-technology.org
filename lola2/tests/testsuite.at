@@ -465,3 +465,44 @@ AT_CLEANUP
 #AT_KEYWORDS(frontend)
 #AT_CLEANUP
 
+############################################################################
+AT_BANNER([Initially Satisfied Predicates])
+############################################################################
+
+AT_SETUP([State predicate initially satisfied])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([cp TESTFILES/philsinitial.task .])
+AT_CHECK([LOLA --check=statepredicate --formula=philsinitial.task phils5.lola -v],0,ignore,stderr)
+AT_CHECK([GREP -q -E "0 markings, 0 edges" stderr])
+AT_KEYWORDS(statepredicate)
+AT_CLEANUP
+
+AT_SETUP([Findpath initially satisfied])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([cp TESTFILES/philsinitial.task .])
+AT_CHECK([LOLA --check=statepredicate --formula=philsinitial.task --search=findpath phils5.lola -v],0,ignore,stderr)
+AT_CHECK([GREP -q -E "result: yes" stderr])
+AT_KEYWORDS(findpath)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Unsatisfiable Predicates])
+############################################################################
+
+AT_SETUP([State predicate unsatisfiable])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([cp TESTFILES/philsunsat.task .])
+AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task phils5.lola -v],0,ignore,stderr)
+AT_CHECK([GREP -q -E "result: no" stderr])
+AT_KEYWORDS(statepredicate)
+AT_CLEANUP
+
+AT_SETUP([Findpath unsatisfiable])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([cp TESTFILES/philsunsat.task .])
+AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task --search=findpath --retrylimit=100 --depthlimit=1000 phils5.lola -v],0,ignore,stderr)
+AT_CHECK([GREP -q -E "result: no" stderr])
+AT_KEYWORDS(findpath)
+AT_CLEANUP
+

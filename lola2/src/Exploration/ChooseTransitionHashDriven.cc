@@ -21,7 +21,6 @@ ChooseTransitionHashDriven::ChooseTransitionHashDriven() : table((unsigned long 
 
 ChooseTransitionHashDriven::~ChooseTransitionHashDriven()
 {
-    printf("hallo\n");
     free(table);
 }
 

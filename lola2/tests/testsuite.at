@@ -420,6 +420,13 @@ AT_CHECK([GREP -q "lola: 17 markings, 16 edges" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
 
+AT_SETUP([positive formula])
+AT_CHECK([cp TESTFILES/phils5.lola TESTFILES/philpos.task .])
+AT_CHECK([LOLA phils5.lola --formula=philpos.task --check=statepredicate -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_KEYWORDS(statepredicate)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Find Path])

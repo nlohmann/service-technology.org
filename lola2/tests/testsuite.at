@@ -95,7 +95,15 @@ AT_CHECK([GREP -q -E "776" compressedOutput.names])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
-AT_SETUP([Writing and reading compressed files (1/2)])
+AT_SETUP([Writing and reading compressed files (1/3)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA --writeCompressed phils5.lola],0,ignore,stderr)
+AT_CHECK([LOLA --compressed --check=deadlock -v < compressedOutput.net],0,ignore,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Writing and reading compressed files (2/3)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA --writeCompressed phils5.lola],0,ignore,stderr)
 AT_CHECK([LOLA --compressed compressedOutput.net --check=deadlock -v],0,ignore,stderr)
@@ -103,7 +111,7 @@ AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
-AT_SETUP([Writing and reading compressed files (2/2)])
+AT_SETUP([Writing and reading compressed files (3/3)])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([cp TESTFILES/garavel.task .])
 AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
@@ -476,6 +484,18 @@ AT_CHECK([cp TESTFILES/philsunsat.task .])
 AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task --search=findpath --retrylimit=100 --depthlimit=1000 phils5.lola -v],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
 AT_KEYWORDS(findpath)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Stubborn])
+############################################################################
+
+AT_SETUP(disabled tscc in deadlock stubborn sets)
+AT_CHECK([cp TESTFILES/m.lola .])
+AT_CHECK([LOLA --check=deadlock m.lola -v],0,ignore,stderr)
+AT_CHECK([GREP -q -E "result: yes" stderr])
+AT_KEYWORDS(stubborn)
 AT_CLEANUP
 
 ############################################################################

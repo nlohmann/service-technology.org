@@ -22,6 +22,41 @@
 using std::cout;
 using std::endl;
 
+// This is for debug purposes
+// LCOV_EXCL_START
+/// writes current row on cout
+void Matrix::Row::printRow() const
+{
+    for (index_t i = 0; i < varCount; ++i)
+    {
+        cout << coefficients[i] << "*" << variables[i] << " ";
+        //cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
+    }
+    cout << endl;
+    /*
+    for (index_t i = 0; i < varCount; ++i) {
+       //cout << coefficients[i] << "*" << variables[i] << " ";
+       cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
+    }
+    cout << endl;
+    */
+}
+/// writes current matrix on cout
+void Matrix::printMatrix() const
+{
+    for (index_t c = 0; c < colCount; ++c)
+    {
+        cout << "place " << c << endl;
+        Row* curRow = matrix[c];
+        while (curRow != NULL)
+        {
+            curRow->printRow();
+            curRow = curRow->next;
+        }
+    }
+}
+// LCOV_EXCL_STOP
+
 /// computes the ggt of two unsigned integers
 inline int64_t ggt(int64_t a, int64_t b)
 {
@@ -53,41 +88,6 @@ inline int64_t safeMult(int64_t a, int64_t b)
 
     return (a * b);
 }
-
-/// writes current row on cout
-// This is for debug purposes
-// LCOV_EXCL_START
-void Matrix::Row::printRow() const
-{
-    for (index_t i = 0; i < varCount; ++i)
-    {
-        cout << coefficients[i] << "*" << variables[i] << " ";
-        //cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
-    }
-    cout << endl;
-    /*
-    for (index_t i = 0; i < varCount; ++i) {
-       //cout << coefficients[i] << "*" << variables[i] << " ";
-       cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
-    }
-    cout << endl;
-    */
-}
-/// writes current matrix on cout
-void Matrix::printMatrix() const
-{
-    for (index_t c = 0; c < colCount; ++c)
-    {
-        cout << "place " << c << endl;
-        Row* curRow = matrix[c];
-        while (curRow != NULL)
-        {
-            curRow->printRow();
-            curRow = curRow->next;
-        }
-    }
-}
-// LCOV_EXCL_END
 
 /// frees memory of current row
 Matrix::Row::~Row()

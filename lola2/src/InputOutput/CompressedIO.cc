@@ -419,13 +419,14 @@ void ReadNetFile(FILE* f)
         }
     }
 
-    // initialize Conflicting arrays
-    // free or rename temporary data structures
-    index_t* conflicting = delta_pre;
-    index_t* new_conflicting = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    free(delta_pre);
     free(delta_post);
     free(mult_pre);
     free(mult_post);
+    // initialize Conflicting arrays
+    // free or rename temporary data structures
+    index_t* conflicting = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    index_t* new_conflicting = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
         // 8.1 conflicting transitions

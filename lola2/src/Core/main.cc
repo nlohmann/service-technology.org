@@ -163,8 +163,8 @@ int main(int argc, char** argv)
             Input netfile("compressed net", args_info.inputs[0]);
             ReadNetFile(netfile);
             Input namefile("compress net", args_info.inputs[1]);
-	     symbolTables = new ParserPTNet(); // initializes a symbol table that is rudimentary filled such that mapping name->id is possible
-            ReadNameFile(namefile,symbolTables);
+            symbolTables = new ParserPTNet(); // initializes a symbol table that is rudimentary filled such that mapping name->id is possible
+            ReadNameFile(namefile, symbolTables);
         }
     }
     else
@@ -205,36 +205,36 @@ int main(int argc, char** argv)
 
 
 
-	}
-        if (args_info.formula_given)
-        {
-            Input* formulaFile = new Input("formula", args_info.formula_arg);
-            ptformula_in = *formulaFile;
+    }
+    if (args_info.formula_given)
+    {
+        Input* formulaFile = new Input("formula", args_info.formula_arg);
+        ptformula_in = *formulaFile;
 
-            ptformula_parse();
+        ptformula_parse();
 
-            TheFormula = TheFormula->rewrite(kc::arrows);
-            TheFormula = TheFormula->rewrite(kc::neg);
-            TheFormula = TheFormula->rewrite(kc::leq);
-            TheFormula = TheFormula->rewrite(kc::sides);
-            TheFormula = TheFormula->rewrite(kc::lists);
+        TheFormula = TheFormula->rewrite(kc::arrows);
+        TheFormula = TheFormula->rewrite(kc::neg);
+        TheFormula = TheFormula->rewrite(kc::leq);
+        TheFormula = TheFormula->rewrite(kc::sides);
+        TheFormula = TheFormula->rewrite(kc::lists);
 
-            // TheFormula->print();
-            // TheFormula->unparse(myprinter, kc::out);
+        // TheFormula->print();
+        // TheFormula->unparse(myprinter, kc::out);
 
-            TheFormula->unparse(myprinter, kc::internal);
+        TheFormula->unparse(myprinter, kc::internal);
 
-            assert(sp);
+        assert(sp);
 
-            // tidy parser
-            ptformula_lex_destroy();
-            delete formulaFile;
-            delete TheFormula;
+        // tidy parser
+        ptformula_lex_destroy();
+        delete formulaFile;
+        delete TheFormula;
 
-            rep->status("processed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
-        }
+        rep->status("processed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
+    }
 
-        delete symbolTables;
+    delete symbolTables;
 
     if (args_info.randomWalk_given)
     {

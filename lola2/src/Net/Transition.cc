@@ -180,10 +180,10 @@ void Transition::fire(index_t t)
     Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
     while (Marking::HashCurrent < 0)
     {
-	// just safety belt, if % returns negative value
-	// LCOV_EXCL_START
+        // just safety belt, if % returns negative value
+        // LCOV_EXCL_START
         Marking::HashCurrent += SIZEOF_MARKINGTABLE;
-	// LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
     }
 }
 

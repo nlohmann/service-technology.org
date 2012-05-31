@@ -55,7 +55,7 @@ void WriteNameFile(FILE* f)
 \todo Use strdup instead of malloc/strcpy.
 \todo Scanf mit Maximalbreite nutzen um cppcheck-Fehler zu umgehen.
 */
-void ReadNameFile(FILE* f,ParserPTNet * symboltables)
+void ReadNameFile(FILE* f, ParserPTNet* symboltables)
 {
     assert(Net::Name[PL]);
     assert(Net::Name[TR]);
@@ -73,9 +73,9 @@ void ReadNameFile(FILE* f,ParserPTNet * symboltables)
         fscanf(f, "%s", buffer);
         Net::Name[PL][p] = (char*) malloc((strlen(buffer) + 1) * sizeof(char)) ;
         strcpy(Net::Name[PL][p], buffer);
-	PlaceSymbol * ps = new PlaceSymbol(Net::Name[PL][p],Place::Capacity[p]);
-	ps -> setIndex(p);
-	symboltables->PlaceTable->insert(ps);
+        PlaceSymbol* ps = new PlaceSymbol(Net::Name[PL][p], Place::Capacity[p]);
+        ps -> setIndex(p);
+        symboltables->PlaceTable->insert(ps);
     }
 
     // 3. Number of transition
@@ -88,9 +88,9 @@ void ReadNameFile(FILE* f,ParserPTNet * symboltables)
         fscanf(f, "%s", buffer);
         Net::Name[TR][t] = (char*) malloc((strlen(buffer) + 1) * sizeof(char)) ;
         strcpy(Net::Name[TR][t], buffer);
-	TransitionSymbol * ts = new TransitionSymbol(Net::Name[TR][t],Transition::Fairness[t],NULL,NULL);
-	ts -> setIndex(t);
-	symboltables->TransitionTable->insert(ts);
+        TransitionSymbol* ts = new TransitionSymbol(Net::Name[TR][t], Transition::Fairness[t], NULL, NULL);
+        ts -> setIndex(t);
+        symboltables->TransitionTable->insert(ts);
     }
 }
 
@@ -251,7 +251,7 @@ void ReadNetFile(FILE* f)
         Net::Arc[TR][direction] = (index_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
         Net::Mult[TR][direction] = (mult_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
     }
-    
+
     Transition::Fairness = (fairnessAssumption_t*) malloc(Net::Card[TR] * SIZEOF_FAIRNESSASSUMPTION_T);
     Transition::Enabled = (bool*) malloc(Net::Card[TR] * SIZEOF_BOOL);
     Transition::DeltaHash = (hash_t*) calloc(Net::Card[TR] , SIZEOF_HASH_T);

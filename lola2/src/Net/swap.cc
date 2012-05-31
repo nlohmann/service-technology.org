@@ -138,16 +138,16 @@ void swapPlaces(index_t left, index_t right)
         Marking::Current[right] = tempmarking;
     }
 
-// so far, target markings are not in use, and perhaps never will be
-// since we focus on predicates
-// LCOV_EXCL_START
+    // so far, target markings are not in use, and perhaps never will be
+    // since we focus on predicates
+    // LCOV_EXCL_START
     if (Marking::Target)
     {
         tempmarking = Marking::Target[left];
         Marking::Target[left] = Marking::Target[right];
         Marking::Target[right] = tempmarking;
     }
-// LCOV_EXCL_STOP
+    // LCOV_EXCL_STOP
 
     // 4. Transition data structures
 

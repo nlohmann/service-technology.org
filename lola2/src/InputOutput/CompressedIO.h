@@ -16,5 +16,5 @@ ASCII file where data are separated by spaces and newlines.
 
 void WriteNameFile(FILE*);
 void WriteNetFile(FILE*);
-void ReadNameFile(FILE*,ParserPTNet *);
+void ReadNameFile(FILE*, ParserPTNet*);
 void ReadNetFile(FILE*);

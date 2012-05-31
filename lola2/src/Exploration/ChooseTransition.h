@@ -14,5 +14,5 @@ class ChooseTransition
 {
     public:
         virtual index_t choose(index_t cardfirelist, index_t* firelist) = 0;
-	virtual ~ChooseTransition(){}
+        virtual ~ChooseTransition() {}
 };

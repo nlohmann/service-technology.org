@@ -34,10 +34,10 @@ class AtomicStatePredicate : public StatePredicate
         virtual index_t getUpSet(index_t* stack, bool* onstack);
 
         /// These will only be called for non-atomic formulas.
-	// LCOV_EXCL_START
+        // LCOV_EXCL_START
         virtual void updateTF(index_t) {}
         virtual void updateFT(index_t) {}
-	// LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
 
 
         /// updates the value of this sub formula. If value of this changes, it needs to be propagated to its parent

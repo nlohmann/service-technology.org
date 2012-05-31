@@ -41,16 +41,16 @@ uint32_t FirelistStubbornDeadlock::newStamp()
 {
     if (++stamp == 0xFFFFFFFF)
     {
-	// This happens rarely and only in long runs. Thus it is
-	// hard to be tested
-	// LCOV_EXCL_START
+        // This happens rarely and only in long runs. Thus it is
+        // hard to be tested
+        // LCOV_EXCL_START
         for (index_t i = 0; i < Net::Card[TR]; ++i)
         {
             visited[i] = 0;
             onTarjanStack[i] = 0;
         }
         stamp = 1;
-	// LCOV_EXCL_STOP
+        // LCOV_EXCL_STOP
     }
 }
 
@@ -67,12 +67,12 @@ index_t FirelistStubbornDeadlock::getFirelist(index_t** result)
 
     // This branch is here only for the case that exploration continues
     // after having found a deadlock. In current LoLA, it cannot happen
-    // since check property will raise its flag before firelist is 
+    // since check property will raise its flag before firelist is
     // requested
     // LCOV_EXCL_START
     if (Transition::CardEnabled == 0)
     {
-	assert(false);
+        assert(false);
         * result = new index_t[1];
         return 0;
     }

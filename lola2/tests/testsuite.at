@@ -85,6 +85,32 @@ AT_CHECK([GREP -q "lola: could not open net file netfile" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
+AT_SETUP([Writing compressed files])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
+AT_CHECK([GREP -q -E "485 419" compressedOutput.net])
+AT_CHECK([GREP -q -E "776" compressedOutput.net])
+AT_CHECK([GREP -q -E "485" compressedOutput.names])
+AT_CHECK([GREP -q -E "776" compressedOutput.names])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Writing and reading compressed files (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA --writeCompressed phils5.lola],0,ignore,stderr)
+AT_CHECK([LOLA --compressed compressedOutput.net --check=deadlock -v],0,ignore,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Writing and reading compressed files (2/2)])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([cp TESTFILES/garavel.task .])
+AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
+AT_CHECK([LOLA --compressed compressedOutput.net compressedOutput.names --check=statepredicate --formula=garavel.task -v],0,ignore,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
 
 
 ############################################################################
@@ -205,38 +231,6 @@ AT_CHECK([GREP -q "lola: transition name 't1' used twice" stderr])
 AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
-
-############################################################################
-AT_BANNER([Compressed IO])
-############################################################################
-
-AT_SETUP([Writing compressed files])
-AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
-AT_CHECK([GREP -q -E "485 419" compressedOutput.net])
-AT_CHECK([GREP -q -E "776" compressedOutput.net])
-AT_CHECK([GREP -q -E "485" compressedOutput.names])
-AT_CHECK([GREP -q -E "776" compressedOutput.names])
-AT_KEYWORDS(frontend)
-AT_CLEANUP
-
-AT_SETUP([Writing and reading compressed files (1/2)])
-AT_CHECK([cp TESTFILES/phils5.lola .])
-AT_CHECK([LOLA --writeCompressed phils5.lola],0,ignore,stderr)
-AT_CHECK([LOLA --compressed compressedOutput.net --check=deadlock -v],0,ignore,stderr)
-AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(frontend)
-AT_CLEANUP
-
-AT_SETUP([Writing and reading compressed files (2/2)])
-AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([cp TESTFILES/garavel.task .])
-AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
-AT_CHECK([LOLA --compressed compressedOutput.net compressedOutput.names --check=statepredicate --formula=garavel.task -v],0,ignore,stderr)
-AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(frontend)
-AT_CLEANUP
-
 
 ############################################################################
 AT_BANNER([Reporter])

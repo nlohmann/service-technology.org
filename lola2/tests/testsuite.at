@@ -206,6 +206,91 @@ AT_CHECK([GREP -q "lola: syntax error -- aborting \[[#00\|]]" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
 
+############################################################################
+AT_BANNER([Compressed IO])
+############################################################################
+
+AT_SETUP([Writing compressed files])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
+AT_CHECK([GREP -q -E "485 419" compressedOutput.net])
+AT_CHECK([GREP -q -E "776" compressedOutput.net])
+AT_CHECK([GREP -q -E "485" compressedOutput.names])
+AT_CHECK([GREP -q -E "776" compressedOutput.names])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Writing and reading compressed files (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA --writeCompressed phils5.lola],0,ignore,stderr)
+AT_CHECK([LOLA --compressed compressedOutput.net --check=deadlock -v],0,ignore,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+AT_SETUP([Writing and reading compressed files (2/2)])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([cp TESTFILES/garavel.task .])
+AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
+AT_CHECK([LOLA --compressed compressedOutput.net compressedOutput.names --check=statepredicate --formula=garavel.task -v],0,ignore,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_KEYWORDS(frontend)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Reporter])
+############################################################################
+
+AT_SETUP([ReporterStream: stdout])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([LOLA garavel.lola --reporter=stream --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "reading net from garavel.lola" stderr])
+AT_KEYWORDS(reporter)
+AT_CLEANUP
+
+AT_SETUP([ReporterStream: file])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([LOLA garavel.lola --reporter=stream --verbose >& output],0)
+AT_CHECK([test -f output])
+AT_CHECK([GREP -q "reading net from garavel.lola" output])
+AT_KEYWORDS(reporter)
+AT_CLEANUP
+
+AT_SETUP([ReporterSocket: sending only (1/2)])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([LOLA garavel.lola --reporter=socket],0,ignore,ignore)
+AT_KEYWORDS(reporter)
+AT_CLEANUP
+
+AT_SETUP([ReporterSocket: sending only (2/2)])
+AT_CHECK([LOLA garavel.lola --reporter=socket],2,ignore,ignore)
+AT_KEYWORDS(reporter)
+AT_CLEANUP
+
+#AT_SETUP([ReporterSocket: sending/receiving])
+#AT_CHECK([cp TESTFILES/garavel.lola .])
+#AT_CHECK([LISTENER 2> listener.log &],0)
+#AT_CHECK([LOLA garavel.lola --reporter=socket --verbose],0,ignore,ignore)
+#AT_CHECK([killall listener],0,stdout,stderr)
+#AT_CHECK([GREP -q "lola: caught signal" listener.log])
+#AT_CHECK([GREP -q "finished parsing" listener.log])
+#AT_KEYWORDS(reporter)
+#AT_CLEANUP
+
+#AT_SETUP([ReporterSocket: killer thread])
+#AT_CHECK([cp TESTFILES/garavel.lola .])
+#AT_CHECK([LOLA garavel.lola --randomWalk --remoteTermination & 2> /dev/null],0,ignore,ignore)
+#AT_CHECK([KILLER],0,stdout,stderr)
+#AT_CHECK([KILLER],0,stdout,stderr)
+#AT_CHECK([KILLER],0,stdout,stderr)
+#AT_CHECK([KILLER],0,stdout,stderr)
+#AT_CHECK([KILLER],0,stdout,stderr)
+#AT_CHECK([KILLER],0,stdout,stderr)
+#AT_CHECK([KILLER],0,stdout,stderr)
+#AT_KEYWORDS(reporter)
+#AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Debugging])
@@ -270,14 +355,6 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([STL])
-AT_CHECK([cp TESTFILES/phils5.lola .])
-AT_CHECK([LOLA phils5.lola --check=full --store=stl -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: no" stderr])
-AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
-AT_KEYWORDS(stores)
-AT_CLEANUP
-
 AT_SETUP([Bloom (2 hash functions)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=bloom --hashfunctions=2 -v],0,stdout,stderr)
@@ -294,6 +371,13 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
+AT_SETUP([STL])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=stl -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Deadlock])
@@ -359,112 +443,6 @@ AT_CHECK([GREP -q "lola: 59048 markings, 393650 edges" stderr])
 AT_KEYWORDS(deadlock)
 AT_CLEANUP
 
-
-############################################################################
-AT_BANNER([Reporter])
-############################################################################
-
-AT_SETUP([ReporterStream: stdout])
-AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([LOLA garavel.lola --reporter=stream --verbose],0,stdout,stderr)
-AT_CHECK([GREP -q "reading net from garavel.lola" stderr])
-AT_KEYWORDS(reporter)
-AT_CLEANUP
-
-AT_SETUP([ReporterStream: file])
-AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([LOLA garavel.lola --reporter=stream --verbose >& output],0)
-AT_CHECK([test -f output])
-AT_CHECK([GREP -q "reading net from garavel.lola" output])
-AT_KEYWORDS(reporter)
-AT_CLEANUP
-
-AT_SETUP([ReporterSocket: sending only (1/2)])
-AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([LOLA garavel.lola --reporter=socket],0,ignore,ignore)
-AT_KEYWORDS(reporter)
-AT_CLEANUP
-
-AT_SETUP([ReporterSocket: sending only (2/2)])
-AT_CHECK([LOLA garavel.lola --reporter=socket],2,ignore,ignore)
-AT_KEYWORDS(reporter)
-AT_CLEANUP
-
-#AT_SETUP([ReporterSocket: sending/receiving])
-#AT_CHECK([cp TESTFILES/garavel.lola .])
-#AT_CHECK([LISTENER 2> listener.log &],0)
-#AT_CHECK([LOLA garavel.lola --reporter=socket --verbose],0,ignore,ignore)
-#AT_CHECK([killall listener],0,stdout,stderr)
-#AT_CHECK([GREP -q "lola: caught signal" listener.log])
-#AT_CHECK([GREP -q "finished parsing" listener.log])
-#AT_KEYWORDS(reporter)
-#AT_CLEANUP
-
-#AT_SETUP([ReporterSocket: killer thread])
-#AT_CHECK([cp TESTFILES/garavel.lola .])
-#AT_CHECK([LOLA garavel.lola --randomWalk --remoteTermination & 2> /dev/null],0,ignore,ignore)
-#AT_CHECK([KILLER],0,stdout,stderr)
-#AT_CHECK([KILLER],0,stdout,stderr)
-#AT_CHECK([KILLER],0,stdout,stderr)
-#AT_CHECK([KILLER],0,stdout,stderr)
-#AT_CHECK([KILLER],0,stdout,stderr)
-#AT_CHECK([KILLER],0,stdout,stderr)
-#AT_CHECK([KILLER],0,stdout,stderr)
-#AT_KEYWORDS(reporter)
-#AT_CLEANUP
-
-
-############################################################################
-AT_BANNER([Memory Management])
-############################################################################
-
-AT_SETUP([Checking for memory leaks: Garavel])
-AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW garavel.lola],0,ignore,stderr)
-AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(valgrind)
-AT_CLEANUP
-
-AT_SETUP([Checking for memory leaks: Phils 1000])
-AT_CHECK([cp TESTFILES/phils1000.lola .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW phils1000.lola],0,ignore,stderr)
-AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(valgrind)
-AT_CLEANUP
-
-
-
-############################################################################
-AT_BANNER([Compressed IO])
-############################################################################
-
-AT_SETUP([Writing compressed files])
-AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
-AT_CHECK([GREP -q -E "485 419" compressedOutput.net])
-AT_CHECK([GREP -q -E "776" compressedOutput.net])
-AT_CHECK([GREP -q -E "485" compressedOutput.names])
-AT_CHECK([GREP -q -E "776" compressedOutput.names])
-AT_KEYWORDS(frontend)
-AT_CLEANUP
-
-AT_SETUP([Writing and reading compressed files])
-AT_CHECK([cp TESTFILES/phils5.lola .])
-AT_CHECK([LOLA --writeCompressed phils5.lola],0,ignore,stderr)
-AT_CHECK([LOLA --compressed compressedOutput.net --check=deadlock -v],0,ignore,stderr)
-AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(frontend)
-AT_CLEANUP
-
-#AT_SETUP([Writing and reading compressed files])
-#AT_CHECK([cp TESTFILES/garavel.lola .])
-#AT_CHECK([cp TESTFILES/garavel.task .])
-#AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
-#AT_CHECK([LOLA --compressed compressedOutput.net compressedOutput.names --check=statepredicate --formula=garavel.task -v],0,ignore,stderr)
-#AT_CHECK([GREP -q "lola: result: yes" stderr])
-#AT_KEYWORDS(frontend)
-#AT_CLEANUP
-
 ############################################################################
 AT_BANNER([Initially Satisfied Predicates])
 ############################################################################
@@ -504,5 +482,23 @@ AT_CHECK([cp TESTFILES/philsunsat.task .])
 AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task --search=findpath --retrylimit=100 --depthlimit=1000 phils5.lola -v],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
 AT_KEYWORDS(findpath)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Memory Management])
+############################################################################
+
+AT_SETUP([Checking for memory leaks: Garavel])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW garavel.lola],0,ignore,stderr)
+AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks: Phils 1000])
+AT_CHECK([cp TESTFILES/phils1000.lola .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW phils1000.lola],0,ignore,stderr)
+AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
 AT_CLEANUP
 

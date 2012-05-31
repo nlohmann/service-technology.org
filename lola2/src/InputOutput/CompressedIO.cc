@@ -251,9 +251,7 @@ void ReadNetFile(FILE* f)
         Net::Arc[TR][direction] = (index_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
         Net::Mult[TR][direction] = (mult_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
     }
-
-    index_t* current_arc_post = (index_t*) calloc(Net::Card[PL], SIZEOF_INDEX_T);
-    index_t* current_arc_pre = (index_t*) calloc(Net::Card[PL], SIZEOF_INDEX_T);
+    
     Transition::Fairness = (fairnessAssumption_t*) malloc(Net::Card[TR] * SIZEOF_FAIRNESSASSUMPTION_T);
     Transition::Enabled = (bool*) malloc(Net::Card[TR] * SIZEOF_BOOL);
     Transition::DeltaHash = (hash_t*) calloc(Net::Card[TR] , SIZEOF_HASH_T);
@@ -313,11 +311,9 @@ void ReadNetFile(FILE* f)
 
     // logically, current_arc_* can be freed here, physically, we just rename them to
     // their new purpose
-    //free(current_arc_pre);
-    //free(current_arc_post);
-    index_t* delta_pre = current_arc_pre;   // temporarily collect places where a transition
+    index_t* delta_pre = (index_t*) calloc(Net::Card[PL], SIZEOF_INDEX_T);   // temporarily collect places where a transition
     // has negative token balance
-    index_t* delta_post = current_arc_post; // temporarily collect places where a transition
+    index_t* delta_post = (index_t*) calloc(Net::Card[PL], SIZEOF_INDEX_T); // temporarily collect places where a transition
     // has positive token balance.
     mult_t* mult_pre = (mult_t*) malloc(Net::Card[PL] * SIZEOF_MULT_T);   // same for multiplicities
     mult_t* mult_post = (mult_t*) malloc(Net::Card[PL] * SIZEOF_MULT_T);   // same for multiplicities

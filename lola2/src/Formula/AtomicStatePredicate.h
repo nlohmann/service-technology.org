@@ -20,9 +20,7 @@ class AtomicStatePredicate : public StatePredicate
     public:
         virtual ~AtomicStatePredicate();
 
-        /// creates a state predicate with a formal sum of #arg1 places with positive factor,
-        /// #arg2 places with negative factor, and constant #arg3
-        /// particular places are added using addPos and addNeg
+        /// creates a state predicate
         AtomicStatePredicate(index_t, index_t, int);
 
         /// adds a place (arg2) with positive factor (arg3) at position arg1

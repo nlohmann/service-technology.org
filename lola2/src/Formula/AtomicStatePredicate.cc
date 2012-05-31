@@ -13,7 +13,17 @@
 #include <cstdlib>
 #include <cstdio>
 
-///!\todo Schleifen behandeln - können evtl. rausgenommen werden
+/*!
+creates a state predicate with a formal sum of #p places with positive factor,
+#n places with negative factor, and constant #k particular places are added
+using addPos and addNeg
+
+\param p  number of places with positive factor
+\param n  number of places with negative factor
+\param k  constant
+
+\todo Schleifen behandeln - können evtl. rausgenommen werden
+*/
 AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k)
 {
     //printf("+ %p->AtomicStatePredicate(p=%d, n=%d, k=%d)\n", this, p, n, k);

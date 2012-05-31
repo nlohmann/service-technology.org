@@ -53,7 +53,7 @@ void Net::print()
 
     for (index_t i = 0; i < Net::Card[PL]; i++)
     {
-        printf("Place %u :%s, %u tokens hash %lld capacity %u bits %u\n", i, Net::Name[PL][i], Marking::Initial[i], Place::Hash[i], Place::Capacity[i], Place::CardBits[i]);
+        printf("Place %u :%s, %u tokens hash %ld capacity %u bits %u\n", i, Net::Name[PL][i], Marking::Initial[i], Place::Hash[i], Place::Capacity[i], Place::CardBits[i]);
         printf("From (%u):\n", Net::CardArcs[PL][PRE][i]);
         for (index_t j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
         {

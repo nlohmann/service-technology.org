@@ -102,7 +102,7 @@ ReporterSocket::~ReporterSocket()
 \post Passed string format is formatted according to markup.
 \note Memory for res is released by Reporter::~String().
 */
-String ReporterSocket::markup(markup_t, const char* format, ...) const
+String ReporterSocket::markup(markup_t markup, const char* format, ...) const
 {
     va_list args;
     va_start(args, format);
@@ -221,7 +221,7 @@ __attribute__((noreturn)) void ReporterStream::abort(errorcode_t code) const
 \param markup  how to markup the string
 \param[in] format  the string to format
 \post Passed string format is formatted according to markup.
-\note Memory for res is released by ~Reporter::String().
+\note Memory for res is released by ~String::String().
 */
 String ReporterStream::markup(markup_t markup, const char* format, ...) const
 {

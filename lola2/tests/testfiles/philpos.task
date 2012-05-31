@@ -1,0 +1,1 @@
+FORMULA th.1 < 1 OR th.2 < 1 OR th.3 < 1 AND th.4 < 1;

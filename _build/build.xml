@@ -21,7 +21,7 @@
         <delete dir="statsvn" failonerror="false" />
         <delete dir="doc/doxygen" failonerror="false" />
         <delete file="statsvn.log" failonerror="false" />
-        <delete file="cppcheck-result.xml" failonerror="false" />
+        <delete file="src/cppcheck-result.xml" failonerror="false" />
         <delete failonerror="false">
             <fileset dir="." includes="plot_*"/>
         </delete>
@@ -41,8 +41,8 @@
 
     <target name="cppcheck" depends="prepare">
         <touch file="src/tmpfile.c" />
-        <exec executable="cppcheck" failonerror="false" error="cppcheck-result.xml">
-            <arg line="src/* --enable=all --force --verbose --report-progress --xml" />
+        <exec executable="sh" dir="src" failonerror="false" error="src/cppcheck-result.xml">
+          <arg line="-c 'svn ls -R | grep -E &quot;\.(c|h)&quot; | xargs cppcheck --enable=all --force --verbose --report-progress --xml'" />
         </exec>
         <delete file="src/tmpfile.c" />
     </target>

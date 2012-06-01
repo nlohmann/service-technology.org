@@ -55,11 +55,13 @@
 #include <Stores/ThreadSafeStore.h>
 
 
-/// printer-function for output on stdout
+/// printer-function for Kimiwtu's output on stdout
+// LCOV_EXCL_START
 void myprinter(const char* s, kc::uview v)
 {
     printf("%s", s);
 }
+// LCOV_EXCL_STOP
 
 
 

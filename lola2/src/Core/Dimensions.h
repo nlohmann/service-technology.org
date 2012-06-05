@@ -23,6 +23,10 @@
 #include <stdint.h>
 #endif
 
+#ifdef HAVE_INDEX_T
+#include <sys/types.h>
+#endif
+
 /// number of entries in a symbol table
 #define SIZEOF_SYMBOLTABLE 0x10000
 

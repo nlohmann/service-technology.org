@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <cstdio>
+#include <new>
 
 #include <cmdline.h>
 
@@ -132,7 +133,6 @@ void evaluateParameters(int argc, char** argv)
     free(params);
 }
 
-
 int main(int argc, char** argv)
 {
     // install exit handler for ordered exit()
@@ -144,6 +144,8 @@ int main(int argc, char** argv)
     // install termination handler for ordered premature termination
     Handlers::installTerminationHandlers();
 
+    // install new handler
+    std::set_new_handler(Handlers::newHandler);
 
     // file input
     if (args_info.compressed_given)

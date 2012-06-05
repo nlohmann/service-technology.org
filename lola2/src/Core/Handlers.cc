@@ -43,6 +43,13 @@ __attribute__((noreturn)) void Handlers::signalTerminationHandler(int signum)
 }
 
 
+void Handlers::newHandler()
+{
+    rep->message("memory allocation failed");
+    exit(EXIT_TERMINATION);
+}
+
+
 /*!
 The termination handler allows to terminate LoLA by sending a predefined
 secret via socket. Once the message is received, LoLA's execution is

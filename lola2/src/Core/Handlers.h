@@ -29,6 +29,9 @@ struct Handlers
         static void exitHandler();
 
     public:
+        /// handler for new
+        static void newHandler();
+
         /// install the exit handler
         static void installExitHandler();
 

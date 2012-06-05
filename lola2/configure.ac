@@ -59,6 +59,9 @@ AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 
+# check whether index_t is already present
+AC_CHECK_TYPES(index_t)
+
 AC_CHECK_SIZEOF(void*)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(char)

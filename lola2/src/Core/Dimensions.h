@@ -49,7 +49,9 @@ typedef enum
 // Some type definitions for dimensioning index structures
 
 /// Type for node indices, limit the number of places/ transitions
+#ifndef HAVE_INDEX_T /* need to cover this line from Solaris */
 typedef uint32_t index_t;
+#endif
 
 /// Type for bitvector indices, should be large enough for card(places) * log maxcapacity
 

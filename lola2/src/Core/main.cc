@@ -54,9 +54,6 @@
 #include <Stores/Store.h>
 #include <Stores/ThreadSafeStore.h>
 
-#include <new>
-#define new new (std::nothrow)
-
 /// printer-function for Kimiwtu's output on stdout
 // LCOV_EXCL_START
 void myprinter(const char* s, kc::uview v)

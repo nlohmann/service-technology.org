@@ -43,6 +43,11 @@ __attribute__((noreturn)) void Handlers::signalTerminationHandler(int signum)
 }
 
 
+/*!
+The new handler is called in case memory allocation using "new" or "malloc"
+fails. This function has little possibility to fix the problem, but can at
+least end LoLA systematically.
+*/
 void Handlers::newHandler()
 {
     rep->message("memory allocation failed");

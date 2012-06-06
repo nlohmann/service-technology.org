@@ -56,6 +56,8 @@ std::map<int, std::vector<StatePredicate *> > formulas;
 // invariant: top is always my parent
 std::stack<size_t> id_stack;
 
+int atomicPropositions = 0;
+
 // next free id
 size_t nextId = 0;
 %}
@@ -73,6 +75,7 @@ StatePredicateFormula(x) -> [internal:
         assert(nextId == 0);
         assert(formulas[0].size() == 1);
         sp = formulas[0][0];
+        $0->atomicPropositions = atomicPropositions;
         //printf("I am a state predicate. Done!\n");
     }
 ];
@@ -172,6 +175,8 @@ AtomicProposition(a) -> [internal: a ];
 
 LessEqualAtomicProposition(x, Number(y)) -> [internal: x
 {
+    ++atomicPropositions;
+
     //printf("I am an atomic proposition. My parent is %d\n", id_stack.top());
 
     int factors_positive = 0;
@@ -226,6 +231,8 @@ Fireable(x) -> [internal:
     // iterate preset
     for (index_t p = 0; p < Net::CardArcs[TR][PRE][x->value]; ++p)
     {
+        ++atomicPropositions;
+
         // create atomic state predicate with 1 positive factor and the arc weight
         StatePredicate *a = new AtomicStatePredicate(0, 1, - Net::Mult[TR][PRE][x->value][p]);
         //printf("%p=AtomicStatePredicate(0, 1, - Net::Mult[TR][PRE][x->value][p]=%d)\n", a, - Net::Mult[TR][PRE][x->value][p]);

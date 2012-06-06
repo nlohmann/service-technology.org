@@ -60,10 +60,16 @@ option "writeCompressed" -
   hidden
 
 option "formula" f
-  "Random firing of transitions"
+  "A formula to check, read from file"
   string
+  typestr="FILE"
   optional
 
+option "formulastring" -
+  "A formula to check"
+  string
+  typestr="FORMULA"
+  optional
 
 section "Reporter"
 

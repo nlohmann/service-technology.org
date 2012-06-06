@@ -101,6 +101,11 @@ extern int ptnetlola_lex_destroy();
 extern int ptformula_parse();
 extern int ptformula_lex_destroy();
 
+// code to parse from a string
+struct yy_buffer_state;
+typedef yy_buffer_state* YY_BUFFER_STATE;
+extern YY_BUFFER_STATE ptformula__scan_string(const char* yy_str);
+extern void ptformula__delete_buffer(YY_BUFFER_STATE);
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv)
@@ -209,13 +214,28 @@ int main(int argc, char** argv)
 
 
     }
-    if (args_info.formula_given)
-    {
-        Input* formulaFile = new Input("formula", args_info.formula_arg);
-        ptformula_in = *formulaFile;
 
+    if (args_info.formula_given or args_info.formulastring_given)
+    {
+        Input* formulaFile = NULL;
+
+        // if a file is given: read it
+        if (args_info.formula_given)
+        {
+            formulaFile = new Input("formula", args_info.formula_arg);
+            ptformula_in = *formulaFile;
+        }
+
+        // if a string is given, put it into the buffer
+        if (args_info.formulastring_given)
+        {
+            YY_BUFFER_STATE my_string_buffer = ptformula__scan_string(args_info.formulastring_arg);
+        }
+
+        // parse the formula
         ptformula_parse();
 
+        // restructure the formula
         TheFormula = TheFormula->rewrite(kc::arrows);
         TheFormula = TheFormula->rewrite(kc::neg);
         TheFormula = TheFormula->rewrite(kc::leq);
@@ -225,16 +245,20 @@ int main(int argc, char** argv)
         // TheFormula->print();
         // TheFormula->unparse(myprinter, kc::out);
 
+        // copy restructured formula into internal data structures
         TheFormula->unparse(myprinter, kc::internal);
-
         assert(sp);
 
         // tidy parser
         ptformula_lex_destroy();
-        delete formulaFile;
         delete TheFormula;
 
-        rep->status("processed formula file %s", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str());
+        if (args_info.formula_given)
+        {
+            delete formulaFile;
+        }
+
+        rep->status("processed formula with %d atomic propositions", TheFormula->atomicPropositions);
     }
 
     delete symbolTables;

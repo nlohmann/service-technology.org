@@ -45,6 +45,8 @@ Node(x) -> [out: "n" x ];
 #include <Formula/AtomicStatePredicate.h>
 #include <Formula/ConjunctionStatePredicate.h>
 #include <Formula/DisjunctionStatePredicate.h>
+#include <Formula/TruePredicate.h>
+#include <Formula/FalsePredicate.h>
 extern StatePredicate *sp;
 
 // mapping from node ids to factors
@@ -90,7 +92,7 @@ Conjunction(a,b) -> [internal:
     b
     {
         // after returning from my childs, I am the top of the stack
-        const int myId = id_stack.top();
+        const index_t myId = id_stack.top();
         id_stack.pop();
 
         StatePredicate *f = new ConjunctionStatePredicate(formulas[myId].size());
@@ -115,7 +117,7 @@ Disjunction(a,b) -> [internal:
     b
     {
         // after returning from my childs, I am the top of the stack
-        const int myId = id_stack.top();
+        const index_t  myId = id_stack.top();
         id_stack.pop();
 
         StatePredicate *f = new DisjunctionStatePredicate(formulas[myId].size());
@@ -179,8 +181,8 @@ LessEqualAtomicProposition(x, Number(y)) -> [internal: x
 
     //printf("I am an atomic proposition. My parent is %d\n", id_stack.top());
 
-    int factors_positive = 0;
-    int factors_negative = 0;
+    index_t factors_positive = 0;
+    index_t factors_negative = 0;
 
     // count positive and negative entries
     for (std::map<int, int>::const_iterator it = current.begin(); it != current.end(); ++it)
@@ -197,8 +199,8 @@ LessEqualAtomicProposition(x, Number(y)) -> [internal: x
 
     // create formula object
     StatePredicate *f = new AtomicStatePredicate(factors_positive, factors_negative, y->value);
-    int position_pos = 0;
-    int position_neg = 0;
+    index_t position_pos = 0;
+    index_t position_neg = 0;
 
     // add positive and negative entries
     for (std::map<int, int>::const_iterator it = current.begin(); it != current.end(); ++it)
@@ -219,6 +221,24 @@ LessEqualAtomicProposition(x, Number(y)) -> [internal: x
     // register formula at parent
     //printf("told my parent %d about me; %p\n", id_stack.top(), f);
     formulas[id_stack.top()].push_back(f);
+}
+];
+
+True() -> [internal:
+{
+    ++atomicPropositions;
+    StatePredicate *f = new TruePredicate();
+    // register formula at parent
+    formulas[id_stack.top()].push_back(f);    
+}
+];
+
+False() -> [internal:
+{
+    ++atomicPropositions;
+    StatePredicate *f = new FalsePredicate();
+    // register formula at parent
+    formulas[id_stack.top()].push_back(f);    
 }
 ];
 

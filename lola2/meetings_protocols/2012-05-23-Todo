@@ -2,8 +2,6 @@
 
 * Karsten: Abfrage vor Tiefensuche, ob Wert konstant
 
-* Niels: im Unparser Typen anpassen (index_t, size_t, ...)
-
 * Syntax: FIREABLE(t) AND p >= 0
 
 Statepredicate -> FORMULA ...

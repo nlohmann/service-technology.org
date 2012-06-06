@@ -249,6 +249,146 @@ AT_KEYWORDS(frontend)
 AT_CLEANUP
 
 ############################################################################
+AT_BANNER([Formula Input])
+############################################################################
+
+AT_SETUP([TRUE])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA TRUE;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 0 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([FALSE])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA FALSE;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 0 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([<=])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 <= 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 1 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([<])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 < 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 1 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([>])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 > 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 1 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([>=])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 > 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 1 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([=])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 = 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 2 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([!=])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 != 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 2 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([AND])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 >= 1 AND p.2 >= 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 2 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([OR])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 >= 1 AND p.2 >= 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 2 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([NOT])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA NOT p.1 >= 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 1 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([XOR])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 >= 1 XOR p.2 >= 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 4 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([->])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 >= 1 -> p.2 >= 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 2 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([<->])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 >= 1 <-> p.2 >= 1;
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 4 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+AT_SETUP([complex formula])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_DATA(formula.task,[FORMULA p.1 != 1 AND (3 * p.1 + 2 * p.2) >= (4 * p.3) - (1 * p.1);
+])
+AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: processed formula with 3 atomic propositions" stderr])
+AT_KEYWORDS(formula)
+AT_CLEANUP
+
+
+############################################################################
 AT_BANNER([Reporter])
 ############################################################################
 

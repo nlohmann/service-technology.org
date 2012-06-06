@@ -6,9 +6,6 @@
 
 tFormula:
   StatePredicateFormula(tStatePredicate)
-  {
-      int atomicPropositions = 0;
-  }
 ;
 
 tStatePredicate:

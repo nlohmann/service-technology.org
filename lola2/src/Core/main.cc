@@ -258,7 +258,7 @@ int main(int argc, char** argv)
             delete formulaFile;
         }
 
-        rep->status("processed formula with %d atomic propositions", TheFormula->atomicPropositions);
+        rep->status("processed formula with %d atomic propositions", sp->countAtomic());
     }
 
     delete symbolTables;

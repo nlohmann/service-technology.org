@@ -7,6 +7,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <config.h>
 #include <Net/Marking.h>
 #include <Net/Net.h>
 #include <Net/Place.h>
@@ -311,7 +312,10 @@ bool BinStore2::searchAndInsert()
 }
 
 // LCOV_EXCL_START
-bool BinStore2::searchAndInsert(State** result) {}
+bool BinStore2::searchAndInsert(State** result)
+{
+    assert(false);
+}
 // LCOV_EXCL_STOP
 
 /** may not work anymore due to variable vector data size

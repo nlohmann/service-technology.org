@@ -22,7 +22,6 @@ void* Store::reporter_internal(void)
 {
     static unsigned int intervals = 0;
     uint64_t last_markings = 0;
-    uint64_t benchmark = 0;
 
     while (true)
     {
@@ -43,13 +42,13 @@ void* Store::reporter_internal(void)
         }
 
         // early abortion
-        if (args_info.timelimit_given and time_elapsed > args_info.timelimit_arg)
+        if (args_info.timelimit_given and time_elapsed > (unsigned)args_info.timelimit_arg)
         {
             rep->status(rep->markup(MARKUP_IMPORTANT, "time limit reached - aborting").str());
             kill(getpid(), SIGUSR2);
         }
 
-        if (args_info.markinglimit_given and markings > args_info.markinglimit_arg)
+        if (args_info.markinglimit_given and markings > (unsigned)args_info.markinglimit_arg)
         {
             rep->status(rep->markup(MARKUP_IMPORTANT, "marking limit reached - aborting").str());
             kill(getpid(), SIGUSR2);

@@ -34,7 +34,7 @@ IO::~IO()
 }
 
 IO::IO(FILE* fp, std::string kind, std::string filename) :
-    fp(fp), kind(kind), filename(filename)
+    filename(filename), kind(kind), fp(fp)
 {
     if (UNLIKELY(!fp))
     {

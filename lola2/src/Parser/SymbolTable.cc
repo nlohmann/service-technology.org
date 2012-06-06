@@ -20,8 +20,8 @@ unsigned int SymbolTable::collisions = 0;
 
 /// Intialization amounts to setting all entries to NULL
 SymbolTable::SymbolTable()
-    : table(reinterpret_cast<Symbol**>(calloc(SIZEOF_SYMBOLTABLE, SIZEOF_VOIDP))),
-      card(0),
+    : card(0),
+      table(reinterpret_cast<Symbol**>(calloc(SIZEOF_SYMBOLTABLE, SIZEOF_VOIDP))),
       currentIndex(0),
       currentSymbol(NULL)
 {

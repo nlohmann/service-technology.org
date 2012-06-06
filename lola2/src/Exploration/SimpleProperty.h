@@ -9,6 +9,7 @@ Actual property is virtual, default (base class) is full exploration
 
 #pragma once
 
+#include <config.h>
 #include <Exploration/SearchStack.h>
 #include <Exploration/ChooseTransition.h>
 
@@ -23,7 +24,10 @@ class SimpleProperty
         bool depth_first(Store &, Firelist &);
 
         /// evaluate property by bfs. Result true = state found, false = state not found
-        bool breadth_first(Store &, Firelist &) {}
+        bool breadth_first(Store &, Firelist &)
+        {
+            assert(false);
+        }
 
         /// evaluate property by random walk without storing states.
         /// Arguments: 1 = number of attempts 2 = depth of attempt 3 = firelist generator

@@ -37,7 +37,7 @@ FirelistStubbornDeadlock::~FirelistStubbornDeadlock()
     free(onTarjanStack);
 }
 
-uint32_t FirelistStubbornDeadlock::newStamp()
+void FirelistStubbornDeadlock::newStamp()
 {
     if (++stamp == 0xFFFFFFFF)
     {

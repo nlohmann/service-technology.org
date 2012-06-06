@@ -7,6 +7,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <config.h>
 #include <Net/Marking.h>
 #include <Net/Net.h>
 #include <Net/Place.h>
@@ -283,7 +284,10 @@ insert:
 
 // not implemented yet
 // LCOV_EXCL_START
-bool BinStore::searchAndInsert(State** result) {}
+bool BinStore::searchAndInsert(State** result)
+{
+    assert(false);
+}
 //LCOV_EXCL_STOP
 
 // debugging only

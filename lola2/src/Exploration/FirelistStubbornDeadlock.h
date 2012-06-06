@@ -31,5 +31,5 @@ class FirelistStubbornDeadlock : public Firelist
         uint32_t* visited;
         uint32_t* onTarjanStack;
         uint32_t stamp;
-        uint32_t newStamp();
+        void newStamp();
 };

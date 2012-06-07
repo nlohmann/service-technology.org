@@ -29,6 +29,7 @@ extern Reporter* rep;
 extern gengetopt_args_info args_info;
 
 pthread_t Handlers::terminationHandler_thread;
+time_t Handlers::start_time;
 
 
 /*!
@@ -75,24 +76,28 @@ void* Handlers::remoteTerminationHandler(void*)
 }
 
 
+void Handlers::statistics()
+{
+    std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
+    FILE* ps = popen(call.c_str(), "r");
+    unsigned int memory;
+    int res = fscanf(ps, "%u", &memory);
+    assert(res != EOF);
+    pclose(ps);
+    rep->message("memory consumption: %u KB", memory);
+
+    time_t now;
+    time(&now);
+    rep->message("time consumption: %.0lf seconds", difftime(now, start_time));
+}
+
+
 /*!
 The exit handler allows to organize the termination of LoLA. This includes
 closing files, reporting exit, and releasing memory.
 */
 void Handlers::exitHandler()
 {
-    // print statistics
-    if (args_info.stats_flag)
-    {
-        std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
-        FILE* ps = popen(call.c_str(), "r");
-        unsigned int memory;
-        int res = fscanf(ps, "%u", &memory);
-        assert(res != EOF);
-        pclose(ps);
-        rep->message("memory consumption: %u KB", memory);
-    }
-
     // release memory from command line parser
     cmdline_parser_free(&args_info);
 
@@ -121,6 +126,8 @@ void Handlers::installExitHandler()
 {
     // set the function to call on normal termination
     atexit(exitHandler);
+
+    time(&start_time);
 }
 
 

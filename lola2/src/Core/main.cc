@@ -415,6 +415,12 @@ int main(int argc, char** argv)
             rep->message("%llu markings, %llu edges", s->markings, (s->calls > 0) ? s->calls - 1 : 0);
         }
 
+        // print statistics
+        if (args_info.stats_flag)
+        {
+            Handlers::statistics();
+        }
+
         delete s;
         delete p;
         delete sp;

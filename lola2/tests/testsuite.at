@@ -261,9 +261,7 @@ AT_CLEANUP
 
 AT_SETUP([TRUE])
 AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_DATA(formula.task,[FORMULA TRUE;
-])
-AT_CHECK([LOLA garavel.lola --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --formulastring='"FORMULA TRUE;"' --verbose],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: processed formula with 0 atomic propositions" stderr])
 AT_KEYWORDS(formula)
 AT_CLEANUP

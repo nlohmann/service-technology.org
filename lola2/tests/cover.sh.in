@@ -34,7 +34,7 @@ case $COVER in
     @LCOV@ --quiet --zerocounters -directory @abs_top_builddir@
 
     # execute executable and remember exit code
-    $*
+    exec bash -c "$*"
     result=$?
 
     # evaluate coverage result of LCOV
@@ -62,7 +62,7 @@ case $COVER in
     export GCOV_PREFIX=$COVERDIR
 
     # execute executable and remember exit code
-    $*
+    exec bash -c "$*"
     result=$?
 
     # exit with executable's exit code
@@ -70,7 +70,7 @@ case $COVER in
   ;;
 
   *)
-    $*
+    exec bash -c "$*"
     exit $?
   ;;
 esac

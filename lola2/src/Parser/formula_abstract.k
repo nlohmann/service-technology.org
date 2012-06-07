@@ -16,16 +16,13 @@ tStatePredicate:
 | ExclusiveDisjunction(tStatePredicate tStatePredicate)
 | Implication(tStatePredicate tStatePredicate)
 | Equivalence(tStatePredicate tStatePredicate)
-| ConjunctionList(tConjunction_list)
-| DisjunctionList(tDisjunction_list)
-;
-
-tConjunction_list:
-  list tStatePredicate
-;
-
-tDisjunction_list:
-  list tStatePredicate
+| AllPath(tStatePredicate)
+| ExPath(tStatePredicate)
+| Always(tStatePredicate)
+| Eventually(tStatePredicate)
+{
+    bool containsTemporal = false;
+}
 ;
 
 tAtomicProposition:

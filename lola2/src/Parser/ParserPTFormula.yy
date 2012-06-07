@@ -46,7 +46,7 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %type <yt_tTerm> term
 
 %token IDENTIFIER NUMBER
-%token _FORMULA_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_ _FIREABLE_ _DEADLOCK_
+%token _FORMULA_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _ALLPATH_ _ALWAYS_ _EVENTUALLY_ _EXPATH_ _UNTIL_ _REACHABLE_ _INVARIANT_ _IMPOSSIBLE_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_ _FIREABLE_ _DEADLOCK_
 
 // precedences (lowest written first, e.g. PLUS/MINUS) and precedences
 %left _OR_ _XOR_
@@ -58,6 +58,9 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %left _plus_ _minus_
 %left _times_
 %right _NOT_
+%right _ALWAYS_ _EVENTUALLY_
+%right _ALLPATH_ _EXPATH_
+%right _REACHABLE_ _INVARIANT_ _IMPOSSIBLE_
 
 
 %{
@@ -84,19 +87,53 @@ statepredicate:
   _leftparenthesis_ statepredicate _rightparenthesis_
     { $$ = $2; }
 | atomic_proposition
-    { $$ = AtomicProposition($1); }
+    { $$ = AtomicProposition($1);
+      $$->containsTemporal = false; }
 | _NOT_ statepredicate
-    { $$ = Negation($2); }
+    { $$ = Negation($2);
+      $$->containsTemporal = $2->containsTemporal; }
 | statepredicate _AND_ statepredicate
-    { $$ = Conjunction($1, $3); }
+    { $$ = Conjunction($1, $3); 
+      $$->containsTemporal = ($1->containsTemporal or $3->containsTemporal); }
 | statepredicate _OR_ statepredicate
-    { $$ = Disjunction($1, $3); }
+    { $$ = Disjunction($1, $3);
+      $$->containsTemporal = ($1->containsTemporal or $3->containsTemporal); }
 | statepredicate _XOR_ statepredicate
-    { $$ = ExclusiveDisjunction($1, $3); }
+    { $$ = ExclusiveDisjunction($1, $3);
+      $$->containsTemporal = ($1->containsTemporal or $3->containsTemporal); }
 | statepredicate _implies_ statepredicate
-    { $$ = Implication($1, $3); }
+    { $$ = Implication($1, $3);
+      $$->containsTemporal = ($1->containsTemporal or $3->containsTemporal); }
 | statepredicate _iff_ statepredicate
-    { $$ = Equivalence($1, $3); }
+    { $$ = Equivalence($1, $3);
+      $$->containsTemporal = ($1->containsTemporal or $3->containsTemporal); }
+| _ALLPATH_ _ALWAYS_ statepredicate
+    { $$ = AllPath(Always($3));
+      $$->containsTemporal = true; }
+| _ALLPATH_ _EVENTUALLY_ statepredicate
+    { $$ = AllPath(Eventually($3));
+      $$->containsTemporal = true; }
+| _EXPATH_ _ALWAYS_ statepredicate
+    { $$ = ExPath(Always($3));
+      $$->containsTemporal = true; }
+| _EXPATH_ _EVENTUALLY_ statepredicate
+    { $$ = ExPath(Eventually($3));
+      $$->containsTemporal = true; }
+| _ALWAYS_ statepredicate
+    { $$ = Always($2);
+      $$->containsTemporal = true; }
+| _EVENTUALLY_ statepredicate
+    { $$ = Eventually($2);
+      $$->containsTemporal = true; }
+| _REACHABLE_ statepredicate
+    { $$ = ExPath(Eventually($2));
+      $$->containsTemporal = true; }
+| _INVARIANT_ statepredicate
+    { $$ = AllPath(Always($2));
+      $$->containsTemporal = true; }
+| _IMPOSSIBLE_ statepredicate
+    { $$ = AllPath(Always(Negation($2)));
+      $$->containsTemporal = true; }
 ;
 
 atomic_proposition:

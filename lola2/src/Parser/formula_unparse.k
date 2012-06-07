@@ -25,12 +25,6 @@ Product(x,y) -> [out: x "*" y];
 ConstProduct_list(h, NiltProduct_list()) -> [out: h];
 ConstProduct_list(h, l) -> [out: h "+" l];
 
-ConstConjunction_list(h, NiltConjunction_list()) -> [out: h];
-ConstConjunction_list(h, l) -> [out: h "\nAND\n" l];
-
-ConstDisjunction_list(h, NiltDisjunction_list()) -> [out: h];
-ConstDisjunction_list(h, l) -> [out: h " OR " l];
-
 Node(x) -> [out: "n" x ];
 
 //////////////////////////////////////////////////////////////////////////
@@ -129,46 +123,6 @@ Disjunction(a,b) -> [internal:
         formulas[id_stack.top()].push_back(f);
     }
 ];
-
-
-ConjunctionList(l) -> [internal:
-    {
-        //printf("I am %d (a conjunction list). My parent is %d\n", nextId+1, nextId);
-        nextId++;
-    }
-    l
-    {
-        StatePredicate *f = new ConjunctionStatePredicate(formulas[nextId].size());
-        for (size_t i = 0; i < formulas[nextId].size(); ++i)
-        {
-            //printf("added a subformula to index %d\n", i);
-            assert(formulas[nextId][i]);
-            ((ConjunctionStatePredicate*)f)->addSub(i, formulas[nextId][i]);
-        }
-        nextId--;
-        formulas[nextId].push_back(f);
-    }
-];
-
-DisjunctionList(l) -> [internal:
-    {
-        //printf("I am %d (a disjunction list). My parent is %d\n", nextId+1, nextId);
-        nextId++;
-    }
-    l
-    {
-        StatePredicate *f = new DisjunctionStatePredicate(formulas[nextId].size());
-        for (size_t i = 0; i < formulas[nextId].size(); ++i)
-        {
-            //printf("added a subformula to index %d\n", i);
-            assert(formulas[nextId][i]);
-            ((DisjunctionStatePredicate*)f)->addSub(i, formulas[nextId][i]);
-        }
-        nextId--;
-        formulas[nextId].push_back(f);
-    }
-];
-
 
 AtomicProposition(a) -> [internal: a ];
 

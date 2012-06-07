@@ -64,6 +64,31 @@ Negation(AtomicProposition(LessAtomicProposition(p,n))) -> <neg: AtomicPropositi
 Negation(AtomicProposition(LessEqualAtomicProposition(p,n))) -> <neg: AtomicProposition(GreaterAtomicProposition(p, n))>;
 
 
+// NOT A   <->   E NOT
+Negation(AllPath(x)) -> <neg: ExPath(Negation(x))>;
+
+// NOT E   <->   A NOT
+Negation(ExPath(x)) -> <neg: AllPath(Negation(x))>;
+
+// NOT F   <->   G NOT
+Negation(Eventually(x)) -> <neg: Always(Negation(x))>;
+
+// NOT G   <->   F NOT
+Negation(Always(x)) -> <neg: Eventually(Negation(x))>;
+
+// FF a        <->  Fa
+Eventually(a=Eventually(x)) -> <neg: a>;
+
+// F (a AND b) ->   (Fa AND Fb)
+// F (a OR b)  <->  (Fa OR Fb)
+// G (a AND b) <->  (Ga AND Gb)
+
+// FGF a       <->  GFa
+Eventually(a=Always(Eventually(x))) -> <neg: a>;
+
+// GFG a       <->  FGa
+Always(a=Eventually(Always(x))) -> <neg: a>;
+
 
 /****************************
  * EVERYTHING SHOULD BE <= *
@@ -166,9 +191,3 @@ LessEqualAtomicProposition(Number(x), Number(y)) provided (x->value < y->value) 
 
 // collect sums of products in a product list
 Sum(x,y) -> <lists: ProductList(ConstProduct_list(x, ConstProduct_list(y, NiltProduct_list())))>;
-
-// collect conjunctions in a conjunction list
-//Conjunction(x,y) -> <lists: ConjunctionList(ConstConjunction_list(x, ConstConjunction_list(y, NiltConjunction_list())))>;
-
-// collect disjunctions in a disjunction list
-//Disjunction(x,y) -> <lists: DisjunctionList(ConstDisjunction_list(x, ConstDisjunction_list(y, NiltDisjunction_list())))>;

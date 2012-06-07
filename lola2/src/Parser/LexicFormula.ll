@@ -66,6 +66,16 @@ XOR                                      { ptformula_setcol(); return _XOR_; }
 TRUE                                     { ptformula_setcol(); return _TRUE_; }
 FALSE                                    { ptformula_setcol(); return _FALSE_; }
 
+ALLPATH                                  { ptformula_setcol(); return _ALLPATH_; }
+ALWAYS                                   { ptformula_setcol(); return _ALWAYS_; }
+EVENTUALLY                               { ptformula_setcol(); return _EVENTUALLY_; }
+EXPATH                                   { ptformula_setcol(); return _EXPATH_; }
+UNTIL                                    { ptformula_setcol(); return _UNTIL_; }
+
+REACHABLE                                { ptformula_setcol(); return _REACHABLE_; }
+INVARIANT                                { ptformula_setcol(); return _INVARIANT_; }
+IMPOSSIBLE                               { ptformula_setcol(); return _IMPOSSIBLE_; }
+
 \;                                       { ptformula_setcol(); return _semicolon_; }
 \<\-\>                                   { ptformula_setcol(); return _iff_; }
 !=                                       { ptformula_setcol(); return _notequal_; }

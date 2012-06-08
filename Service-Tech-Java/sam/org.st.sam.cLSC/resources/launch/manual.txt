@@ -1,0 +1,116 @@
+This release of Sam/Synthesis provides techniques to synthesize decentralized
+components from dLSC specifications.
+
+Contents
+--------
+
+  1. Using Sam/Synthesis
+  2. Specification File Format
+  2. System Requirements
+  
+  
+1. USING Sam/Synthesis
+----------------------
+
+Sam/Synthesis is a command-line tool that reads dLSC specifications in a simple
+textual syntax and synthesizes components as CPN Tools model. To run the tool,
+call
+
+  sam -i <inputfile.clsc> <parameters>
+  
+where the following <parameters> are available:
+
+ -m <mode>           'translate' : translate specification to Colored Petri net
+                                   (default)
+                     'render'    : write system model in another format
+
+ -f <format>         output format for result files ('dot', 'cpn')
+                      (default: 'cpn')
+
+ -s <switch>         'flat' - produce a flat Petri net without hierarchies
+                     'components' - produce Petri net separated into
+                                    components
+                     'control'    - each component may control activation
+                                    of any scenario it is involved
+                     'noselfloops' - remove places with self-loops from the
+                                     model applies only with '-f dot'
+                                     
+Several example specifications are available in ./examples/. Example calls:
+
+  sam -i ./input.clsc -s components
+    (synthesizes a CPN Tools model of the specification where components are
+     extracted, activation of scenarios is not assigned to a specific
+     components)
+  
+  sam -i ./input.clsc -s components -s control
+    (synthesizes a CPN Tools model of the specification where components are
+     extracted, if two components can initiate a scenario, then both can
+     activate the scenario)
+     
+  sam -i ./input.clsc -s flat
+    (synthesizes a CPN Tools model of the specification without extracting
+     components, but where the interconnections of the different scenarios
+     are shown)
+     
+  sam -i ./input.clsc -f dot -s flat -s noselfloops
+    (synthesizes a Petri net in Graphviz Dot format where the entire model is
+     flattened (no components shown) and technical places required for the
+     CPN Tools model are omitted)
+  
+2. SPECIFICATION FILE FORMAT
+----------------------------
+
+Several example specification files are provided in ./examples/ that have the
+following syntax.
+
+A specification consists of several scenarios, each specified as follows:
+
+cLSC <scenario_name>
+PRE
+  EVENT <event_id> <event_name>;
+  EVENT <event_id> <event_name>;
+  DEPENDENCIES
+    <event_id> -> <event_id>,
+    <event_id> -> <event_id>;
+MAIN
+  EVENT <event_id> <event_name>;
+  EVENT <event_id> <event_name>;
+  DEPENDENCIES
+    <event_id> -> <event_id>,
+    <event_id> -> <event_id>;
+
+The initial run is a scenario without prechart:
+
+cLSC <scenario_name>
+MAIN
+  EVENT <event_id> <event_name>;
+  EVENT <event_id> <event_name>;
+  DEPENDENCIES
+    <event_id> -> <event_id>,
+    <event_id> -> <event_id>;
+    
+The specification can distribute events to components, each component is
+specified as follows:
+
+COMPONENT <component_name>
+	<event_name>,
+	<event_name>,
+	<event_name>;
+    
+3. REQUIREMENTS
+---------------
+
+The tool is ready to run on Windows and Linux 32bit or 64bit and has no
+specific memory requirements.  The tool is written in Standard Java and runs
+on all Java Virtual Machines provided by Sun/Oracle that support Java 1.6
+Update 22 or higher. 
+
+To show result files one of the following tools is needed:
+
+  1. CPN Tools, available from http://www.cpntools.org/, is a graphical 
+     modeling tool for Coloured Petri Nets. Models produced by Sam/Synthesis
+     can be opened and simulated with CPN Tools right away.
+     
+  2. GraphViz Dot can be used to show synthesized nets.
+     GraphViz Dot is available from http://www.graphviz.org/
+  

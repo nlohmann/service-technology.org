@@ -1,0 +1,148 @@
+cLSC ems0
+MAIN
+  EVENT ems0_e0 ems/ready;
+  EVENT ems0_e1 medic/ready;
+  EVENT ems0_e2 medic/ready;
+  EVENT ems0_e3 clinic/ready;
+  DEPENDENCIES ;
+  
+cLSC ems1
+PRE
+  EVENT ems1_e0 ems/ready;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems1_e1 ems/ready;
+  EVENT ems1_e2 ems/alert;
+  DEPENDENCIES ;
+  
+cLSC ems2
+PRE
+  EVENT ems2_e0 ems/alert;
+  EVENT ems2_e1 medic/ready;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems2_e2 medic/go;
+  EVENT ems2_e3 medic/treat_A;
+  EVENT ems2_e4 medic/check;
+  EVENT ems2_e5 medic/ready;
+  DEPENDENCIES
+  	ems2_e2 -> ems2_e3,
+  	ems2_e3 -> ems2_e4,
+  	ems2_e4 -> ems2_e5;
+  	
+cLSC ems3
+PRE
+  EVENT ems3_e0 ems/alert;
+  EVENT ems3_e1 medic/ready;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems3_e2 medic/go;
+  EVENT ems3_e3 medic/treat_B;
+  EVENT ems3_e3b medic/transport;
+  EVENT ems3_e4 medic/check;
+  EVENT ems3_e5 medic/ready;
+  EVENT ems3_e6 patient/pending;
+  DEPENDENCIES
+  	ems3_e2 -> ems3_e3,
+  	ems3_e2 -> ems3_e3b,
+  	ems3_e3 -> ems3_e4,
+  	ems3_e3b -> ems3_e4,
+  	ems3_e4 -> ems3_e5,
+  	ems3_e3 -> ems3_e6,
+  	ems3_e3b -> ems3_e6;
+  	
+cLSC ems4
+PRE
+  EVENT ems4_e0 medic/treat_B;
+  EVENT ems4_e1 patient/pending;
+  EVENT ems4_e2 clinic/ready;
+  DEPENDENCIES
+  	ems4_e0 -> ems4_e1;
+MAIN
+  EVENT ems4_e3 clinic/treat;
+  EVENT ems4_e4 clinic/ready;
+  DEPENDENCIES
+    ems4_e3 -> ems4_e4;
+  
+cLSC ems5
+PRE
+  EVENT ems5_e0 ems/alert;
+  EVENT ems5_e1 medic/ready;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems5_e2 medic/go;
+  EVENT ems5_e3 medic/treat_C;
+  EVENT ems5_e3b medic/transport;
+  EVENT ems5_e3c ems/notify;
+  EVENT ems5_e4 medic/check;
+  EVENT ems5_e5 medic/ready;
+  EVENT ems5_e6 patient/pending;
+  DEPENDENCIES
+  	ems5_e2 -> ems5_e3,
+  	ems5_e2 -> ems5_e3b,
+  	ems5_e2 -> ems5_e3c,
+  	ems5_e3 -> ems5_e4,
+  	ems5_e3b -> ems5_e4,
+  	ems5_e4 -> ems5_e5,
+  	ems5_e3 -> ems5_e6,
+  	ems5_e3b -> ems5_e6;
+  
+cLSC ems6
+PRE
+  EVENT ems6_e0 ems/notify;
+  EVENT ems6_e1 clinic/ready;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems6_e2 clinic/prepare;
+  EVENT ems6_e3 clinic/ready;
+  EVENT ems6_e4 tr/ready;
+  DEPENDENCIES
+    ems6_e2 -> ems6_e3,
+    ems6_e2 -> ems6_e4;
+    
+cLSC ems7
+PRE
+  EVENT ems7_e0 medic/notify;
+  EVENT ems7_e1 ems/notify;
+  EVENT ems7_e2 clinic/prepare;
+  EVENT ems7_e3 tr/ready;
+  EVENT ems7_e4 medic/treat_C;
+  EVENT ems7_e5 patient/pending;
+  DEPENDENCIES
+  	ems7_e0 -> ems7_e1,
+  	ems7_e1 -> ems7_e2,
+  	ems7_e2 -> ems7_e3,
+  	ems7_e0 -> ems7_e4,
+  	ems7_e4 -> ems7_e5;
+MAIN
+  EVENT ems7_e6 tr/treat;
+  EVENT ems7_e7 tr/done;
+  DEPENDENCIES
+    ems7_e6 -> ems7_e7;
+  
+COMPONENT medic
+	medic/ready,
+	medic/go,
+	medic/treat_A,
+	medic/treat_B,
+	medic/treat_C,
+	medic/transport,
+	medic/check;
+	
+COMPONENT clinic
+	clinic/ready,
+	clinic/treat,
+	clinic/prepare;
+	
+COMPONENT ems
+	ems/ready,
+	ems/alert,
+	ems/notify;
+
+COMPONENT tr
+	tr/ready,
+	tr/treat,
+	tr/done;
+	
+COMPONENT patient
+	patient/pending;

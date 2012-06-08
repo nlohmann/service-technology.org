@@ -160,6 +160,11 @@
 		<!-- mkdir dir="${dir.distbindir}/${libs}" / -->
 		<!-- copy file="${dir.builddir}/${build.target}.jar" todir="${dir.distbindir}/${libs}" / -->
 		<copy file="${dir.builddir}/${build.target}.jar" todir="${dir.distbindir}" />
+		<copy todir="${dir.distbindir}">
+			<fileset dir="${home}">
+				<include name="sam.properties" />
+			</fileset>
+		</copy>
 		
 		<mkdir dir="${dir.distbindir}/${libs.external}" />
 		<copy todir="${dir.distbindir}/${libs.external}">
@@ -188,6 +193,7 @@
 			<fileset dir="${home}/resources/launch">
 				<include name="sam.bat" />
 				<include name="sam.sh" />
+				<include name="manual.txt" />
 			</fileset>
 		</copy>
 

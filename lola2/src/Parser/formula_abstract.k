@@ -1,13 +1,16 @@
 %{ KC_TYPES_HEADER
-#include <cstring>
-#include <map>
-#include <string>
+#include <Core/Dimensions.h>
+#include <Formula/StatePredicate.h>
+
+// required, because the abstract grammar does not allow pointer types
+typedef StatePredicate* StatePredicate_p;
 %}
 
 tFormula:
   StatePredicateFormula(tStatePredicate)
 {
-    int formulaType;
+    formula_t type;
+    StatePredicate_p formula = NULL;
 }
 ;
 
@@ -38,6 +41,7 @@ tAtomicProposition:
 | True()
 | False()
 | aDeadlock()
+| Initial()
 | Fireable(integer)
 ;
 

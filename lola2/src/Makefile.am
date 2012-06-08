@@ -37,6 +37,8 @@ lola_SOURCES = \
                 InputOutput/SimpleString.cc InputOutput/SimpleString.h \
                 InputOutput/Socket.cc InputOutput/Socket.h \
                 \
+                Planning/Task.cc Planning/Task.h \
+                \
                 Exploration/Firelist.cc Exploration/Firelist.h \
                 Exploration/RandomWalk.cc Exploration/RandomWalk.h \
                 Exploration/SearchStack.cc Exploration/SearchStack.h \

@@ -193,11 +193,14 @@ LessEqualAtomicProposition(Number(x), Number(y)) provided (x->value < y->value) 
 
 %rview reachability;
 
-// AG f -> NOT EF NOT f   (the outmost negation is handled by LoLA)
-StatePredicateFormula(AllPath(Always(y))) -> <reachability: StatePredicateFormula(ExPath(Eventually(Negation(y))))>;
+// EF f -> f
+StatePredicateFormula(ExPath(Eventually(y))) -> <reachability: StatePredicateFormula(y)>;
 
-// AG NOT f -> NOT EF f   (the outmost negation is handled by LoLA)
-StatePredicateFormula(AllPath(Always(Negation(y)))) -> <reachability: StatePredicateFormula(ExPath(Eventually(y)))>;
+// AG f -> NOT EF NOT f -> NOT f   (the outmost negation is handled by LoLA)
+StatePredicateFormula(AllPath(Always(y))) -> <reachability: StatePredicateFormula(Negation(y))>;
+
+// AG NOT f -> NOT EF f -> f   (the outmost negation is handled by LoLA)
+StatePredicateFormula(AllPath(Always(Negation(y)))) -> <reachability: StatePredicateFormula(y)>;
 
 
 

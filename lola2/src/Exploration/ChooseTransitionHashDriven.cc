@@ -40,6 +40,8 @@ index_t ChooseTransitionHashDriven::choose(index_t cardfirelist, index_t* fireli
         index_t t = firelist[i];
         // compute hash value for t successor
         hash_t h = (Marking::HashCurrent + Transition::DeltaHash[t]) % SIZEOF_MARKINGTABLE;
+        h = (h < 0) ? h + SIZEOF_MARKINGTABLE : h;
+
         if (((float) rand() / (float) RAND_MAX) <= 1.0 / (1.0 + table[h]))
         {
             chosen = t;
@@ -52,7 +54,10 @@ index_t ChooseTransitionHashDriven::choose(index_t cardfirelist, index_t* fireli
     {
         chosen = firelist[rand() % cardfirelist];
     }
-    ++(table[(Marking::HashCurrent + Transition::DeltaHash[chosen]) % SIZEOF_MARKINGTABLE]);
+
+    hash_t h = (Marking::HashCurrent + Transition::DeltaHash[chosen]) % SIZEOF_MARKINGTABLE;
+    h = (h < 0) ? h + SIZEOF_MARKINGTABLE : h;
+    ++(table[h]);
 
     return chosen;
 }

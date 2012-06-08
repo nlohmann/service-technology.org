@@ -57,6 +57,7 @@ int ptformula_colno = 1;
 
 FIREABLE                                 { ptformula_setcol(); return _FIREABLE_; }
 DEADLOCK                                 { ptformula_setcol(); return _DEADLOCK_; }
+INITIAL                                  { ptformula_setcol(); return _INITIAL_; }
 
 FORMULA                                  { ptformula_setcol(); return _FORMULA_; }
 AND                                      { ptformula_setcol(); return _AND_; }

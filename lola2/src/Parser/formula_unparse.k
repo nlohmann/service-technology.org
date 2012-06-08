@@ -40,23 +40,23 @@ f=StatePredicateFormula(x) -> [temporal: x
 {
     with(x) {
         ExPath(Eventually(y)) provided (not y->containsTemporal) :
-            { f->formulaType = FORMULA_REACHABLE; }
+            { f->type = FORMULA_REACHABLE; }
         AllPath(Always(y)) provided (not y->containsTemporal) :
-            { f->formulaType = FORMULA_INVARIANT; }
+            { f->type = FORMULA_INVARIANT; }
         AllPath(Always(Negation(y))) provided (not y->containsTemporal) :
-            { f->formulaType = FORMULA_IMPOSSIBLE; }
+            { f->type = FORMULA_IMPOSSIBLE; }
         AllPath(Always(ExPath(Eventually(y)))) provided (not y->containsTemporal) :
-            { f->formulaType = FORMULA_LIVENESS; }
+            { f->type = FORMULA_LIVENESS; }
         Always(Eventually(y)) provided (not y->containsTemporal) :
-            { f->formulaType = FORMULA_FAIRNESS; }
+            { f->type = FORMULA_FAIRNESS; }
         Eventually(Always(y)) provided (not y->containsTemporal) :
-            { f->formulaType = FORMULA_STABILIZATION; }
+            { f->type = FORMULA_STABILIZATION; }
         Eventually(y) provided (not y->containsTemporal) :
-            { f->formulaType = FORMULA_EVENTUALLY; }
+            { f->type = FORMULA_EVENTUALLY; }
         default provided (not x->containsTemporal) :
-            { f->formulaType = FORMULA_INITIAL; }
+            { f->type = FORMULA_INITIAL; }
         default :
-            { f->formulaType = FORMULA_MODELCHECKING; }
+            { f->type = FORMULA_MODELCHECKING; }
     }
 }
 ];
@@ -85,7 +85,6 @@ f=Eventually(x)        -> [temporal: x   { f->containsTemporal = true; } ];
 #include <Formula/DisjunctionStatePredicate.h>
 #include <Formula/TruePredicate.h>
 #include <Formula/FalsePredicate.h>
-extern StatePredicate *sp;
 
 // mapping from node ids to factors
 std::map<int, int> current;
@@ -100,7 +99,7 @@ std::stack<size_t> id_stack;
 size_t nextId = 0;
 %}
 
-StatePredicateFormula(x) -> [internal:
+f=StatePredicateFormula(x) -> [internal:
     {
         //printf("I am a state predicate. I am %d\n", nextId);
         id_stack.push(nextId++);
@@ -112,7 +111,7 @@ StatePredicateFormula(x) -> [internal:
         // return the only entry for the root
         assert(nextId == 0);
         assert(formulas[0].size() == 1);
-        sp = formulas[0][0];
+        f->formula = formulas[0][0];
         //printf("I am a state predicate. Done!\n");
     }
 ];
@@ -253,6 +252,19 @@ Fireable(x) -> [internal:
         // add atomic state predicate to conjunction
         ((ConjunctionStatePredicate*)f)->addSub(p, a);
         //printf("%p->addSub(p=%d, a=%p)\n", f, p, a);
+    }
+
+    formulas[id_stack.top()].push_back(f);
+}
+];
+
+Initial() -> [internal:
+{
+    StatePredicate *f = new ConjunctionStatePredicate(Net::Card[PL]);
+    // iterate places
+    for (index_t p = 0; p < Net::Card[PL]; ++p)
+    {
+        /* TODO */
     }
 
     formulas[id_stack.top()].push_back(f);

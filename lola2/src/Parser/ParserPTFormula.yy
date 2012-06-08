@@ -46,7 +46,7 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %type <yt_tTerm> term
 
 %token IDENTIFIER NUMBER
-%token _FORMULA_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _ALLPATH_ _ALWAYS_ _EVENTUALLY_ _EXPATH_ _UNTIL_ _REACHABLE_ _INVARIANT_ _IMPOSSIBLE_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_ _FIREABLE_ _DEADLOCK_
+%token _INITIAL_ _FORMULA_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _ALLPATH_ _ALWAYS_ _EVENTUALLY_ _EXPATH_ _UNTIL_ _REACHABLE_ _INVARIANT_ _IMPOSSIBLE_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_ _FIREABLE_ _DEADLOCK_
 
 // precedences (lowest written first, e.g. PLUS/MINUS) and precedences
 %left _OR_ _XOR_
@@ -148,6 +148,8 @@ atomic_proposition:
     }
 | _DEADLOCK_
     { $$ = aDeadlock(); }
+| _INITIAL_
+    { $$ = Initial(); }
 ;
 
 term:

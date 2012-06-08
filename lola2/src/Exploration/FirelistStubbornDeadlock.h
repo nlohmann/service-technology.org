@@ -10,6 +10,7 @@ enabled transitions.
 #pragma once
 #include <Core/Dimensions.h>
 #include <Exploration/Firelist.h>
+#include <pthread.h>
 
 
 class FirelistStubbornDeadlock : public Firelist
@@ -19,7 +20,7 @@ class FirelistStubbornDeadlock : public Firelist
         ~FirelistStubbornDeadlock();
         /// return value contains number of elements in fire list, argument is reference
         /// parameter for actual list
-        virtual index_t getFirelist(index_t**);
+        virtual index_t getFirelist(NetState* ns,index_t**);
 
     private:
         index_t* dfsStack;
@@ -32,4 +33,9 @@ class FirelistStubbornDeadlock : public Firelist
         uint32_t* onTarjanStack;
         uint32_t stamp;
         void newStamp();
+};
+
+class FireListStubbornDeadlockCreator : public FireListCreator{
+	public:
+		virtual Firelist* createFireList();
 };

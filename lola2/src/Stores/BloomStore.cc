@@ -20,19 +20,19 @@ BloomStore::~BloomStore()
     delete[] hash_values;
 }
 
-inline unsigned int BloomStore::hash_sdbm() const
+inline unsigned int BloomStore::hash_sdbm(NetState* ns) const
 {
     unsigned int hash = 0;
 
     for (index_t p = 0; p < Place::CardSignificant; ++p)
     {
-        hash = Marking::Current[p] + (hash << 6) + (hash << 16) - hash;
+        hash = ns->Current[p] + (hash << 6) + (hash << 16) - hash;
     }
 
     return hash % BLOOM_FILTER_SIZE;
 }
 
-inline unsigned int BloomStore::hash_fnv() const
+inline unsigned int BloomStore::hash_fnv(NetState* ns) const
 {
     const unsigned int fnv_prime = 0x811C9DC5;
     unsigned int hash = 0;
@@ -40,13 +40,13 @@ inline unsigned int BloomStore::hash_fnv() const
     for (index_t p = 0; p < Place::CardSignificant; ++p)
     {
         hash *= fnv_prime;
-        hash ^= Marking::Current[p];
+        hash ^= ns->Current[p];
     }
 
     return hash % BLOOM_FILTER_SIZE;
 }
 
-bool BloomStore::searchAndInsert()
+bool BloomStore::searchAndInsert(NetState* ns)
 {
     ++calls;
 
@@ -65,12 +65,12 @@ bool BloomStore::searchAndInsert()
      *************************/
 
     // the first two hash functions are given explicitly
-    const unsigned int hash_0 = hash_sdbm();
+    const unsigned int hash_0 = hash_sdbm(ns);
     hash_values[0] = hash_0;
 
     //    if (hash_functions > 1)
     //    {
-    const unsigned int hash_1 = hash_fnv();
+    const unsigned int hash_1 = hash_fnv(ns);
     hash_values[1] = hash_1;
 
     // the other hash functions can be derived: h_i(x) = h_1(x) + i * h_2(x)
@@ -106,7 +106,7 @@ bool BloomStore::searchAndInsert()
 }
 
 // LCOV_EXCL_START
-bool BloomStore::searchAndInsert(State**)
+bool BloomStore::searchAndInsert(NetState* ns,State**)
 {
     assert(false);
     return false;

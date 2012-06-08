@@ -27,11 +27,10 @@ FirelistStubbornStatePredicate::~FirelistStubbornStatePredicate()
     free(onStack);
 }
 
-index_t FirelistStubbornStatePredicate::getFirelist(index_t** result)
+index_t FirelistStubbornStatePredicate::getFirelist(NetState* ns,index_t** result)
 {
 
-
-    if (Transition::CardEnabled == 0)
+    if (ns->CardEnabled == 0)
     {
         * result = new index_t[1];
         return 0;
@@ -48,7 +47,7 @@ index_t FirelistStubbornStatePredicate::getFirelist(index_t** result)
         index_t currenttransition = dfsStack[firstunprocessed];
         index_t* mustbeincluded;
         index_t  cardmustbeincluded;
-        if (Transition::Enabled[currenttransition])
+        if (ns->Enabled[currenttransition])
         {
             ++cardEnabled;
             mustbeincluded = Transition::Conflicting[currenttransition];
@@ -56,8 +55,8 @@ index_t FirelistStubbornStatePredicate::getFirelist(index_t** result)
         }
         else
         {
-            const index_t scapegoat = Net::Arc[TR][PRE][currenttransition][0];
-            mustbeincluded = Net::Arc[PL][PRE][scapegoat];
+            const index_t scapegoat = ns->Arc[TR][PRE][currenttransition][0];
+            mustbeincluded = ns->Arc[PL][PRE][scapegoat];
             cardmustbeincluded = Net::CardArcs[PL][PRE][scapegoat];
         }
         for (index_t i = 0; i < cardmustbeincluded; ++i)
@@ -76,11 +75,20 @@ index_t FirelistStubbornStatePredicate::getFirelist(index_t** result)
     for (index_t i = 0; i < stackpointer; ++i)
     {
         const index_t t = dfsStack[i];
-        if (Transition::Enabled[t])
+        if (ns->Enabled[t])
         {
             (*result)[--cardEnabled] = t;
         }
         onStack[t] = false;
     }
     return size;
+}
+
+
+FirelistStubbornStatePredicateCreator::FirelistStubbornStatePredicateCreator(StatePredicate* statePredicate){
+	predicate = statePredicate;
+}
+
+Firelist* FirelistStubbornStatePredicateCreator::createFireList(){
+	return new FirelistStubbornStatePredicate(predicate);
 }

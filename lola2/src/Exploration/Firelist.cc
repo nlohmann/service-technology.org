@@ -10,21 +10,28 @@
 #include <Net/Net.h>
 #include <Net/Transition.h>
 #include <Exploration/Firelist.h>
+#include <cstdio>
 
 
-index_t Firelist::getFirelist(index_t** result)
+index_t Firelist::getFirelist(NetState* ns,index_t** result)
 {
-    assert(Transition::CardEnabled <= Net::Card[TR]);
+    assert(ns->CardEnabled <= Net::Card[TR]);
 
-    *result = new index_t[Transition::CardEnabled];
+    *result = new index_t[ns->CardEnabled];
     index_t i = 0;
     for (index_t t = 0; t < Net::Card[TR]; ++t)
     {
-        if (Transition::Enabled[t])
+        if (ns->Enabled[t])
         {
-            assert(i < Transition::CardEnabled);
+            assert(i < ns->CardEnabled);
             (*result)[i++] = t;
         }
     }
-    return Transition::CardEnabled;
+    return ns->CardEnabled;
+}
+
+
+
+Firelist* FireListCreator::createFireList(){
+	return new Firelist();
 }

@@ -571,6 +571,6 @@ void ReadNetFile(FILE* f)
 
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
-        Transition::checkEnabled(t);
+        Transition::checkEnabled_Initial(t);
     }
 }

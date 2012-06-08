@@ -42,11 +42,11 @@ class AtomicStatePredicate : public StatePredicate
         /// The parameter is the change in the formal sum
         /// k_1 p_1 + ... + k_n p_n between the previously considered marking and the current marking.
         /// Having a precomputed value for this change, evaluation of the formula is accelerated
-        void update(int);
+        void update(NetState &ns,int);
 
         /// evaluates a formula, e.g. upon initialization. Evaluation starts top/down, so the whole formula is
         /// examined. Evaluation is done w.r.t. Marking::Current
-        virtual void evaluate();
+        virtual void evaluate(NetState &ns);
 
         void setUpSet();
 
@@ -86,5 +86,8 @@ class AtomicStatePredicate : public StatePredicate
         /// collects atomic subformulas; array must be malloced beforehand
         /// result is number of inserted elements
         virtual index_t collectAtomic(AtomicStatePredicate**);
-        virtual void consistency();
+        virtual void consistency(NetState &ns);
+
+        // copy function
+        virtual StatePredicate* copy(StatePredicate* parent);
 };

@@ -562,6 +562,6 @@ void ParserPTNet::symboltable2net()
 
     for (index_t t = 0; t < cardTR; t++)
     {
-        Transition::checkEnabled(t);
+        Transition::checkEnabled_Initial(t);
     }
 }

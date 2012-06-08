@@ -617,7 +617,7 @@ AT_BANNER([Deadlock])
 
 AT_SETUP([Phils 10])
 AT_CHECK([cp TESTFILES/phils10.lola .])
-AT_CHECK([LOLA phils10.lola --check=deadlock -v --state --path],0,stdout,stderr)
+AT_CHECK([LOLA phils10.lola --check=deadlock --store=bin2 -v --state --path],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_CHECK([GREP -q "lola: witness state:" stderr])
 AT_CHECK([GREP -q "lola: hl.1 : 1" stderr])

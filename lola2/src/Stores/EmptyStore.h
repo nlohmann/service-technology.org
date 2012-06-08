@@ -14,6 +14,6 @@ class EmptyStore : public Store
         int tries;
 
         EmptyStore();
-        bool searchAndInsert();
-        bool searchAndInsert(State**);
+        bool searchAndInsert(NetState* ns);
+        bool searchAndInsert(NetState* ns, State**);
 };

@@ -13,6 +13,7 @@ Place.* and Transition.*
 #include <Core/Dimensions.h>
 
 
+
 /*!
 \brief collection of information related to nodes
 

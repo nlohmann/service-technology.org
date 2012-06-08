@@ -9,6 +9,7 @@
 #include <config.h>
 #include <Formula/AtomicStatePredicate.h>
 #include <Net/Net.h>
+#include <Net/NetState.h>
 #include <Net/Marking.h>
 #include <cstdlib>
 #include <cstdio>
@@ -81,7 +82,7 @@ index_t AtomicStatePredicate::getUpSet(index_t* stack, bool* onstack)
 }
 
 
-void AtomicStatePredicate::update(int delta)
+void AtomicStatePredicate::update(NetState &ns, int delta)
 {
     sum += delta;
     if (sum <= threshold && !value)
@@ -104,16 +105,16 @@ void AtomicStatePredicate::update(int delta)
     }
 }
 
-void AtomicStatePredicate::evaluate()
+void AtomicStatePredicate::evaluate(NetState &ns)
 {
     sum = 0;
     for (index_t i = 0; i < cardPos; ++i)
     {
-        sum += Marking::Current[posPlaces[i]] * posMult[i];
+        sum += ns.Current[posPlaces[i]] * posMult[i];
     }
     for (index_t i = 0; i < cardNeg; ++i)
     {
-        sum -= Marking::Current[negPlaces[i]] * negMult[i];
+        sum -= ns.Current[negPlaces[i]] * negMult[i];
     }
     value = (sum <= threshold);
 }
@@ -218,17 +219,17 @@ void AtomicStatePredicate::setUpSet()
 
 // only for debugging:
 // LCOV_EXCL_START
-void AtomicStatePredicate::consistency()
+void AtomicStatePredicate::consistency(NetState& ns)
 {
     // 1. check sum
     int s = 0;
     for (index_t i = 0; i < cardPos; i++)
     {
-        s += posMult[i] * Marking::Current[posPlaces[i]];
+        s += posMult[i] * ns.Current[posPlaces[i]];
     }
     for (index_t i = 0; i < cardNeg; i++)
     {
-        s -= negMult[i] * Marking::Current[negPlaces[i]];
+        s -= negMult[i] * ns.Current[negPlaces[i]];
     }
     assert(s == sum);
     if (value)
@@ -244,5 +245,24 @@ void AtomicStatePredicate::consistency()
         assert(parent);
     }
 }
-
 // LCOV_EXCL_STOP
+
+
+StatePredicate* AtomicStatePredicate::copy(StatePredicate* parent){
+	AtomicStatePredicate* af = new AtomicStatePredicate(0,0,0);
+	af->value = value;
+	af->position = position;
+	af->parent = parent;
+	// we can copy the pointers, so use the same arrays as they are not changed!
+	af->posPlaces = posPlaces;
+	af->negPlaces =negPlaces;
+	af->posMult = posMult;
+	af->negMult = negMult;
+	af->cardPos = cardPos;
+	af->cardNeg = cardNeg;
+	af->threshold = threshold;
+	af->sum = sum;
+	af->up = up;
+	af->cardUp = cardUp;
+	return af;
+}

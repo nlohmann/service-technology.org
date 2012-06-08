@@ -72,32 +72,32 @@ void Transition::deleteTransitions()
 /// 3. if disabled->enabled, Remove from Disabled list of scapegoat
 /// 4. if disabled->disabled, perhaps move to other scapegoat
 /// \todo swap of values to be done with XOR (ineffektiv(er) bei heutigen Compilern! Außerdem haben wir zwei Swaps verschränkt...)
-void Transition::checkEnabled(index_t t)
+void Transition::checkEnabled(NetState* ns,index_t t)
 {
     // scan through all pre-places
     for (index_t i = 0; i < Net::CardArcs[TR][PRE][t]; ++i)
     {
-        if (Marking::Current[Net::Arc[TR][PRE][t][i]] < Net::Mult[TR][PRE][t][i])
+        if (ns->Current[ns->Arc[TR][PRE][t][i]] < ns->Mult[TR][PRE][t][i])
         {
-            // transition is disabled, Net::Arc[TR][PRE][t][i] is the
+            // transition is disabled, ns->Arc[TR][PRE][t][i] is the
             // first place that is not sufficiently marked -> it is the new scapegpat
-            const index_t scapegoat = Net::Arc[TR][PRE][t][i];
-            if (Transition::Enabled[t])
+            const index_t scapegoat = ns->Arc[TR][PRE][t][i];
+            if (ns->Enabled[t])
             {
                 // enabled --> disabled: insert to scapegoat's disabled list
-                Transition::Enabled[t] = false;
-                --Transition::CardEnabled;
-                assert(Place::CardDisabled[scapegoat] <= Net::CardArcs[PL][POST][scapegoat]);
-                Place::Disabled[scapegoat][Transition::PositionScapegoat[t] = Place::CardDisabled[scapegoat]++] = t;
+                ns->Enabled[t] = false;
+                --ns->CardEnabled;
+                assert(ns->CardDisabled[scapegoat] <= Net::CardArcs[PL][POST][scapegoat]);
+                ns->Disabled[scapegoat][ns->PositionScapegoat[t] = ns->CardDisabled[scapegoat]++] = t;
 
                 // swap scapegoat to front of transition's PRE list
                 if (i > 0)
                 {
-                    mult_t tmp = Net::Mult[TR][PRE][t][i];
-                    Net::Arc[TR][PRE][t][i] = Net::Arc[TR][PRE][t][0];
-                    Net::Mult[TR][PRE][t][i] = Net::Mult[TR][PRE][t][0];
-                    Net::Arc[TR][PRE][t][0] = scapegoat;
-                    Net::Mult[TR][PRE][t][0] = tmp;
+                    mult_t tmp = ns->Mult[TR][PRE][t][i];
+                    ns->Arc[TR][PRE][t][i] = ns->Arc[TR][PRE][t][0];
+                    ns->Mult[TR][PRE][t][i] = ns->Mult[TR][PRE][t][0];
+                    ns->Arc[TR][PRE][t][0] = scapegoat;
+                    ns->Mult[TR][PRE][t][0] = tmp;
                 }
             }
             else
@@ -107,14 +107,14 @@ void Transition::checkEnabled(index_t t)
                 {
                     // indeed, scapegoat has changed.
                     // remove from old scapegoat's Disabled list
-                    const index_t old_scapegoat = Net::Arc[TR][PRE][t][0];
-                    index_t c = --Place::CardDisabled[old_scapegoat];
-                    if (Transition::PositionScapegoat[t] != c)
+                    const index_t old_scapegoat = ns->Arc[TR][PRE][t][0];
+                    index_t c = --ns->CardDisabled[old_scapegoat];
+                    if (ns->PositionScapegoat[t] != c)
                     {
                         // transition not last in scapegoat's disabled list--> swap with last
-                        const index_t other_t = Place::Disabled[old_scapegoat][c];
-                        Transition::PositionScapegoat[other_t] = Transition::PositionScapegoat[t];
-                        Place::Disabled[old_scapegoat][Transition::PositionScapegoat[t]] = other_t;
+                        const index_t other_t = ns->Disabled[old_scapegoat][c];
+                        ns->PositionScapegoat[other_t] = ns->PositionScapegoat[t];
+                        ns->Disabled[old_scapegoat][ns->PositionScapegoat[t]] = other_t;
                     }
                     else
                     {
@@ -123,13 +123,13 @@ void Transition::checkEnabled(index_t t)
                     }
 
                     // insert to new scapegoat's disabled list
-                    Place::Disabled[scapegoat][Transition::PositionScapegoat[t] = Place::CardDisabled[scapegoat]++] = t;
+                    ns->Disabled[scapegoat][ns->PositionScapegoat[t] = ns->CardDisabled[scapegoat]++] = t;
                     // swap new scapegoat to front of transition's PRE list
-                    const mult_t tmp = Net::Mult[TR][PRE][t][i];
-                    Net::Arc[TR][PRE][t][i] = Net::Arc[TR][PRE][t][0];
-                    Net::Mult[TR][PRE][t][i] = Net::Mult[TR][PRE][t][0];
-                    Net::Arc[TR][PRE][t][0] = scapegoat;
-                    Net::Mult[TR][PRE][t][0] = tmp;
+                    const mult_t tmp = ns->Mult[TR][PRE][t][i];
+                    ns->Arc[TR][PRE][t][i] = ns->Arc[TR][PRE][t][0];
+                    ns->Mult[TR][PRE][t][i] = ns->Mult[TR][PRE][t][0];
+                    ns->Arc[TR][PRE][t][0] = scapegoat;
+                    ns->Mult[TR][PRE][t][0] = tmp;
                 }
             }
             // case of deactivated transition is complete
@@ -138,79 +138,102 @@ void Transition::checkEnabled(index_t t)
     }
     // for loop completed: we did not find an insufficiently marked place
     // => transition enabled
-    if (!Transition::Enabled[t])
+    if (!ns->Enabled[t])
     {
         // disabled-->enabled: remove from scapegoat's disabled list
-        Transition::Enabled[t] = true;
-        ++Transition::CardEnabled;
-        const index_t old_scapegoat = Net::Arc[TR][PRE][t][0];
-        const index_t c = --Place::CardDisabled[old_scapegoat];
-        if (Transition::PositionScapegoat[t] != c)
+        ns->Enabled[t] = true;
+        ++ns->CardEnabled;
+        const index_t old_scapegoat = ns->Arc[TR][PRE][t][0];
+        const index_t c = --ns->CardDisabled[old_scapegoat];
+        if (ns->PositionScapegoat[t] != c)
         {
             // transition not last in scapegoat's disabed list--> swap with last
-            const index_t other_t = Place::Disabled[old_scapegoat][c];
-            Transition::PositionScapegoat[other_t] = Transition::PositionScapegoat[t];
-            Place::Disabled[old_scapegoat][Transition::PositionScapegoat[t]] = other_t;
+            const index_t other_t = ns->Disabled[old_scapegoat][c];
+            ns->PositionScapegoat[other_t] = ns->PositionScapegoat[t];
+            ns->Disabled[old_scapegoat][ns->PositionScapegoat[t]] = other_t;
         }
     }
 }
 
 
+void Transition::checkEnabled_Initial(index_t t){
+	NetState ns;
+	ns.Current = Marking::Current;
+	ns.HashCurrent = Marking::HashCurrent;
+	ns.Enabled = Transition::Enabled;
+	ns.CardEnabled = Transition::CardEnabled;
+	ns.PositionScapegoat = Transition::PositionScapegoat;
+	ns.Arc[0][0] = Net::Arc[0][0];
+	ns.Arc[0][1] = Net::Arc[0][1];
+	ns.Arc[1][0] = Net::Arc[1][0];
+	ns.Arc[1][1] = Net::Arc[1][1];
+	ns.Mult[0][0] = Net::Mult[0][0];
+	ns.Mult[0][1] = Net::Mult[0][1];
+	ns.Mult[1][0] = Net::Mult[1][0];
+	ns.Mult[1][1] = Net::Mult[1][1];
+	ns.CardDisabled = Place::CardDisabled;
+	ns.Disabled = Place::Disabled;
+	checkEnabled(&ns,t);
+	Marking::HashCurrent = ns.HashCurrent;
+	Transition::CardEnabled = ns.CardEnabled;
+}
+
+
 /// fire a transition and
-void Transition::fire(index_t t)
+void Transition::fire(NetState* ns, index_t t)
 
 {
     //  Don't even think about firing a disabled transition!
-    assert(Transition::Enabled[t]);
+    assert(ns->Enabled[t]);
 
     // 1. Update current marking
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {
         // there should be enough tokens to fire this transition
-        assert(Marking::Current[Transition::DeltaT[PRE][t][i]] >= Transition::MultDeltaT[PRE][t][i]);
+        assert(ns->Current[Transition::DeltaT[PRE][t][i]] >= Transition::MultDeltaT[PRE][t][i]);
 
-        Marking::Current[Transition::DeltaT[PRE][t][i]] -= Transition::MultDeltaT[PRE][t][i];
+        ns->Current[Transition::DeltaT[PRE][t][i]] -= Transition::MultDeltaT[PRE][t][i];
     }
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
     {
-        Marking::Current[Transition::DeltaT[POST][t][i]] += Transition::MultDeltaT[POST][t][i];
+        ns->Current[Transition::DeltaT[POST][t][i]] += Transition::MultDeltaT[POST][t][i];
     }
     // 2. update hash value
-    Marking::HashCurrent += Transition::DeltaHash[t];
-    Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
-    while (Marking::HashCurrent < 0)
+    ns->HashCurrent += Transition::DeltaHash[t];
+    ns->HashCurrent %= SIZEOF_MARKINGTABLE;
+    while (ns->HashCurrent < 0)
     {
         // just safety belt, if % returns negative value
         // LCOV_EXCL_START
-        Marking::HashCurrent += SIZEOF_MARKINGTABLE;
+        ns->HashCurrent += SIZEOF_MARKINGTABLE;
         // LCOV_EXCL_STOP
     }
 }
 
 /// update enabledness information after having fired a transition
-void Transition::updateEnabled(index_t t)
+void Transition::updateEnabled(NetState* ns,index_t t)
 {
     // 1. check conflicting enabled transitions (tt) for enabledness
     for (index_t i = 0; i < Transition::CardConflicting[t]; i++)
     {
         const index_t tt = Transition::Conflicting[t][i];
-        if (Transition::Enabled[tt])
+        if (ns->Enabled[tt])
         {
-            checkEnabled(tt);
+            checkEnabled(ns,tt);
         }
     }
     // 1a. Don't forget to check t itself! It is not member of the conflicting list!
-    checkEnabled(t);
+    checkEnabled(ns,t);
 
     // 2. check those transitions where the scapegoat received additional tokens
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
     {
         const index_t p = Transition::DeltaT[POST][t][i]; // one place that got new tokens
-        for (index_t j = 0; j < Place::CardDisabled[p]; /* tricky increment handling */)
+        for (index_t j = 0; j < ns->CardDisabled[p]; /* tricky increment handling */)
         {
-            const index_t tt = Place::Disabled[p][j];
-            checkEnabled(tt);
-            if (Place::Disabled[p][j] == tt)
+            const index_t tt = ns->Disabled[p][j];
+            checkEnabled(ns,tt);
+            if (ns->Disabled[p][j] == tt)
             {
                 j++; /* tricky increment handling */
             }
@@ -220,53 +243,53 @@ void Transition::updateEnabled(index_t t)
 }
 
 /// fire a transition in reverse direction (for backtracking) and update enabledness of all transitions
-void Transition::backfire(index_t t)
+void Transition::backfire(NetState* ns,index_t t)
 {
     // 1. Update current marking
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {
-        Marking::Current[Transition::DeltaT[PRE][t][i]] += Transition::MultDeltaT[PRE][t][i];
+        ns->Current[Transition::DeltaT[PRE][t][i]] += Transition::MultDeltaT[PRE][t][i];
     }
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
     {
         // there should be enough tokens to backfire this transition
-        assert(Marking::Current[Transition::DeltaT[POST][t][i]] >= Transition::MultDeltaT[POST][t][i]);
+        assert(ns->Current[Transition::DeltaT[POST][t][i]] >= Transition::MultDeltaT[POST][t][i]);
 
-        Marking::Current[Transition::DeltaT[POST][t][i]] -= Transition::MultDeltaT[POST][t][i];
+        ns->Current[Transition::DeltaT[POST][t][i]] -= Transition::MultDeltaT[POST][t][i];
     }
     // 2. update hash value
-    Marking::HashCurrent -= Transition::DeltaHash[t];
-    Marking::HashCurrent %= SIZEOF_MARKINGTABLE;
-    while (Marking::HashCurrent < 0)
+    ns->HashCurrent -= Transition::DeltaHash[t];
+    ns->HashCurrent %= SIZEOF_MARKINGTABLE;
+    while (ns->HashCurrent < 0)
     {
-        Marking::HashCurrent += SIZEOF_MARKINGTABLE;
+        ns->HashCurrent += SIZEOF_MARKINGTABLE;
     }
 
 }
 
 /// update enabledness after having backfired a transition
-void Transition::revertEnabled(index_t t)
+void Transition::revertEnabled(NetState* ns,index_t t)
 {
     // 1. check backward conflicting enabled transitions for enabledness
     for (index_t i = 0; i < Transition::CardBackConflicting[t]; i++)
     {
         const index_t tt = Transition::BackConflicting[t][i];
-        if (Transition::Enabled[tt])
+        if (ns->Enabled[tt])
         {
-            checkEnabled(tt);
+            checkEnabled(ns,tt);
         }
     }
-    checkEnabled(t);
+    checkEnabled(ns,t);
 
     // 2. check those transitions where the scapegoat received additional tokens
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {
         const index_t p = Transition::DeltaT[PRE][t][i]; // one place that got new tokens
-        for (index_t j = 0; j < Place::CardDisabled[p]; /* tricky increment handling */)
+        for (index_t j = 0; j < ns->CardDisabled[p]; /* tricky increment handling */)
         {
-            const index_t tt = Place::Disabled[p][j];
-            checkEnabled(tt);
-            if (Place::Disabled[p][j] == tt)
+            const index_t tt = ns->Disabled[p][j];
+            checkEnabled(ns,tt);
+            if (ns->Disabled[p][j] == tt)
             {
                 j++; /* tricky increment handling */
             }
@@ -276,14 +299,14 @@ void Transition::revertEnabled(index_t t)
 }
 // just debugging
 // LCOV_EXCL_START
-bool testEnabled(index_t t)
+bool testEnabled(NetState* ns,index_t t)
 {
-    if (Transition::Enabled[t])
+    if (ns->Enabled[t])
     {
         for (index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
         {
-            index_t p = Net::Arc[TR][PRE][t][i];
-            if (Marking::Current[p] < Net::Mult[TR][PRE][t][i])
+            index_t p = ns->Arc[TR][PRE][t][i];
+            if (ns->Current[p] < ns->Mult[TR][PRE][t][i])
             {
                 return false;
             }
@@ -291,8 +314,8 @@ bool testEnabled(index_t t)
     }
     else
     {
-        index_t p = Net::Arc[TR][PRE][t][0];
-        if (Marking::Current[p] >= Net::Mult[TR][PRE][t][0])
+        index_t p = ns->Arc[TR][PRE][t][0];
+        if (ns->Current[p] >= ns->Mult[TR][PRE][t][0])
         {
             return false;
         }

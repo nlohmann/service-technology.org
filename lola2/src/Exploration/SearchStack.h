@@ -22,7 +22,8 @@ class Chunk
         /// stores firelists
         index_t* list[SIZEOF_STACKCHUNK];
 
-        Chunk() {}
+        Chunk();
+        Chunk& operator=(const Chunk& chunk);
 };
 
 class SearchStack
@@ -34,6 +35,8 @@ class SearchStack
         index_t topTransition() const;
 
         SearchStack();
+
+        SearchStack& operator=(const SearchStack&);
 
     private:
         Chunk* currentchunk;

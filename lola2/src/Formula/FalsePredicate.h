@@ -36,7 +36,7 @@ class FalsePredicate: public StatePredicate
 
         /// evaluates a formula, e.g. upon initialization. Evaluation starts top/down, so the whole formula is
         /// examined.
-        virtual void evaluate() {}
+        virtual void evaluate(NetState &ns) {}
 
         /// counts atomic subformulas
         virtual index_t countAtomic();
@@ -44,5 +44,8 @@ class FalsePredicate: public StatePredicate
         /// collects atomic subformulas; array must be malloced beforehand
         /// result is number of inserted elements
         virtual index_t collectAtomic(AtomicStatePredicate**);
-        virtual void consistency() {}
+        virtual void consistency(NetState &ns) {}
+
+        // copy function
+        virtual StatePredicate* copy(StatePredicate* parent);
 };

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <Core/Dimensions.h>
+#include <Net/NetState.h>
 
 class AtomicStatePredicate;
 
@@ -39,7 +40,7 @@ class StatePredicate
 
         /// evaluates a formula, e.g. upon initialization. Evaluation starts top/down, so the whole formula is
         /// examined.
-        virtual void evaluate() = 0;
+        virtual void evaluate(NetState &ns) = 0;
 
         /// The parent formula in the syntax tree of the formula
         StatePredicate* parent;
@@ -53,5 +54,9 @@ class StatePredicate
         /// collects atomic subformulas; array must be malloced beforehand
         /// result is number of inserted elements
         virtual index_t collectAtomic(AtomicStatePredicate**) = 0;
-        virtual void consistency() = 0;
+        virtual void consistency(NetState &ns) = 0;
+
+        // copy function
+        virtual StatePredicate* copy(StatePredicate* parent) = 0;
+        virtual StatePredicate* copy();
 };

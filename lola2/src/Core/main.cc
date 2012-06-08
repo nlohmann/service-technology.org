@@ -172,8 +172,11 @@ int main(int argc, char** argv)
         rep->status("%d symbol table entries, %d collisions", symbolTables->PlaceTable->card + symbolTables->TransitionTable->card, SymbolTable::collisions);
     }
 
-    // get formula
+
     Task task;
+    // get thread number
+    task.setThreads();
+    // get formula
     task.setFormula();
 
     delete symbolTables;

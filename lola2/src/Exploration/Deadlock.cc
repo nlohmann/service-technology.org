@@ -12,12 +12,12 @@
 #include <Exploration/Deadlock.h>
 
 
-void Deadlock::initProperty()
+bool Deadlock::initProperty(NetState &ns)
 {
-    value = !Transition::CardEnabled;
+    return !ns.CardEnabled;
 }
 
-void Deadlock::checkProperty(index_t t)
+bool Deadlock::checkProperty(NetState &ns,index_t t)
 {
-    value = !Transition::CardEnabled;
+    return !ns.CardEnabled;
 }

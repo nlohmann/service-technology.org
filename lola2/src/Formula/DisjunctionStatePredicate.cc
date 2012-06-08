@@ -97,11 +97,11 @@ void DisjunctionStatePredicate::updateFT(index_t i)
 
 
 
-void DisjunctionStatePredicate::evaluate()
+void DisjunctionStatePredicate::evaluate(NetState &ns)
 {
     for (index_t i = 0; i < cardSub; i++)
     {
-        sub[i] -> evaluate();
+        sub[i] -> evaluate(ns);
     }
     index_t left = 0;
     index_t right = cardSub;
@@ -164,11 +164,11 @@ index_t DisjunctionStatePredicate::collectAtomic(AtomicStatePredicate** p)
 
 // only for debugging:
 // LCOV_EXCL_START
-void DisjunctionStatePredicate::consistency()
+void DisjunctionStatePredicate::consistency(NetState &ns)
 {
     for (index_t i = 0; i < cardSub; i++)
     {
-        sub[i]->consistency();
+        sub[i]->consistency(ns);
         assert(sub[i]->position == i);
         assert(sub[i]->parent == this);
         assert(sub[i] != this);
@@ -204,3 +204,16 @@ void DisjunctionStatePredicate::consistency()
 }
 
 // LCOV_EXCL_STOP
+
+
+StatePredicate* DisjunctionStatePredicate::copy(StatePredicate* parent){
+	DisjunctionStatePredicate* dsp = new DisjunctionStatePredicate(cardSub);
+	dsp->cardSub = cardSub;
+	dsp->cardSat = cardSat;
+	dsp->value = value;
+	dsp->position = position;
+	dsp->parent = parent;
+	for (index_t i = 0; i < cardSub; i++)
+		dsp->sub[i] = sub[i]->copy();
+	return dsp;
+}

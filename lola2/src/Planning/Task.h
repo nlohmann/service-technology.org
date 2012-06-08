@@ -5,8 +5,9 @@
 class StatePredicate;
 class SimpleProperty;
 class Store;
-class Firelist;
+class FireListCreator;
 class ChooseTransition;
+
 
 class Task
 {
@@ -14,8 +15,9 @@ class Task
         StatePredicate* sp;
         ChooseTransition* choose;
         enum_search search;
-        Firelist* fl;
+        FireListCreator* flc;
         SimpleProperty* p;
+        int number_of_threads;
 
     public:
         Store* s;
@@ -25,6 +27,7 @@ class Task
 
         bool getResult();
 
+        void setThreads();
         void setFormula();
         void setStore();
         void setProperty();

@@ -12,6 +12,9 @@
 #include <stdint.h>
 #endif
 
+#include "Net/NetState.h"
+
+
 class State;
 
 class SIStore
@@ -21,8 +24,8 @@ class SIStore
         virtual ~SIStore() {};
 
         /// check whether current marking is stored
-        virtual uint64_t search(int threadNumber) = 0;
-        virtual void insert(int threadNumber) = 0;
+        virtual bool search(NetState* ns, int threadNumber) = 0;
+        virtual bool insert(NetState* ns, int threadNumber) = 0;
     protected:
         int number_of_threads;
 };

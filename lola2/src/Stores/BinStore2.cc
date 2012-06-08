@@ -20,6 +20,11 @@ BinStore2::BinStore2()
 {
     branch = (Decision**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
     firstvector = (vectordata_t**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
+    rwlocks =(pthread_rwlock_t*) calloc(sizeof(pthread_rwlock_t), SIZEOF_MARKINGTABLE);
+
+    pthread_mutex_init(&inc_mutex, NULL);
+    for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
+    	pthread_rwlock_init(rwlocks+i, NULL);
 
     // initialize bit masks
     //   capacity_t tmp1=1;
@@ -76,9 +81,11 @@ BinStore2::Decision::~Decision()
 
 /// search for a state in the binStore and insert it, if it is not there
 /// Do not care about states
-bool BinStore2::searchAndInsert()
+bool BinStore2::searchAndInsert(NetState* ns)
 {
-    ++calls;;
+	pthread_mutex_lock(&inc_mutex);
+    ++calls;
+	pthread_mutex_unlock(&inc_mutex);
     // the general assumption is that we read marking, vectors etc. left to right, with
     // low indices left, high indices right,
     // msb left and lsb right.
@@ -107,16 +114,20 @@ bool BinStore2::searchAndInsert()
     /// the number of bits processed until reaching the current branch
     bitindex_t position = 0;
 
+
+    // first searching, so lock the search lock
+    pthread_rwlock_wrlock(rwlocks + ns->HashCurrent);
+
     // Is hash bucket empty? If so, assign to currentvector
-    if (!(currentvector = (firstvector[Marking::HashCurrent])))
+    if (!(currentvector = (firstvector[ns->HashCurrent])))
     {
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
-        newvector = firstvector + Marking::HashCurrent;
+        newvector = firstvector + ns->HashCurrent;
     }
     else
     {
         // Here, hash bucket is not empty.
-        anchor = branch + Marking::HashCurrent;
+        anchor = branch + ns->HashCurrent;
 
         while (true)
         {
@@ -125,7 +136,7 @@ bool BinStore2::searchAndInsert()
             {
                 if (place_bitstogo < vector_bitstogo)
                 {
-                    if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
+                    if ((capacity_t(ns->Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
                             //                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
                             ==
                             (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - place_bitstogo)))
@@ -138,6 +149,7 @@ bool BinStore2::searchAndInsert()
                         }
                         else
                         {
+                        	pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
                             return true;
                         }
                     }
@@ -149,7 +161,7 @@ bool BinStore2::searchAndInsert()
                 }
                 else if (place_bitstogo > vector_bitstogo)
                 {
-                    if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (place_bitstogo - vector_bitstogo))
+                    if ((capacity_t(ns->Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - vector_bitstogo))
                             ==
                             (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
                         //                            (currentvector[vector_index] & vector_bitmask[vector_bitstogo]))
@@ -165,7 +177,7 @@ bool BinStore2::searchAndInsert()
                 }
                 else
                 {
-                    if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
+                    if ((capacity_t(ns->Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
                             //                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
                             ==
                             (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
@@ -179,6 +191,7 @@ bool BinStore2::searchAndInsert()
                         }
                         else
                         {
+                        	pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
                             return true;
                         }
                     }
@@ -191,7 +204,7 @@ bool BinStore2::searchAndInsert()
             }
             while (comparebits)
             {
-                if ((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - comparebits))
+                if ((capacity_t(ns->Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - comparebits))
                         ==
                         (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - comparebits)))
                 {
@@ -234,6 +247,7 @@ bool BinStore2::searchAndInsert()
                     }
                     else
                     {
+                    	pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
                         return true;
                     }
                 }
@@ -266,8 +280,11 @@ bool BinStore2::searchAndInsert()
             else
             {
                 * newvector = NULL;
+                pthread_mutex_lock(&inc_mutex);
                 ++markings;
-                return false;
+                pthread_mutex_unlock(&inc_mutex);
+            	pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+               return false;
             }
         }
     }
@@ -281,7 +298,7 @@ bool BinStore2::searchAndInsert()
     while (true)
     {
         bitindex_t insertbits = place_bitstogo < vector_bitstogo ? place_bitstogo : vector_bitstogo;
-        (*newvector)[vector_index] |= vectordata_t((capacity_t(Marking::Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - insertbits)) << (vector_bitstogo - insertbits));
+        (*newvector)[vector_index] |= vectordata_t((capacity_t(ns->Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - insertbits)) << (vector_bitstogo - insertbits));
 
         if (vector_bitstogo == insertbits)
         {
@@ -300,7 +317,10 @@ bool BinStore2::searchAndInsert()
             }
             else
             {
+            	pthread_mutex_lock(&inc_mutex);
                 ++markings;
+                pthread_mutex_unlock(&inc_mutex);
+            	pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
                 return false;
             }
         }
@@ -312,7 +332,7 @@ bool BinStore2::searchAndInsert()
 }
 
 // LCOV_EXCL_START
-bool BinStore2::searchAndInsert(State** result)
+bool BinStore2::searchAndInsert(NetState* ns,State** result)
 {
     assert(false);
 }

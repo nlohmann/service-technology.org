@@ -10,8 +10,7 @@
 #include <Net/Marking.h>
 #include <Stores/STLStore.h>
 
-
-bool STLStore::searchAndInsert()
+bool STLStore::searchAndInsert(NetState* ns)
 {
     // organize vector as intermediate data structure: set size on first call
     static std::vector<capacity_t> m;
@@ -23,7 +22,7 @@ bool STLStore::searchAndInsert()
     ++calls;
 
     // copy current marking to vector
-    std::copy(Marking::Current, Marking::Current + Place::CardSignificant, m.begin());
+    std::copy(ns->Current, ns->Current + Place::CardSignificant, m.begin());
 
     // add vector to marking store
     const std::pair<std::set<std::vector<capacity_t> >::iterator, bool> res = store.insert(m);
@@ -42,7 +41,7 @@ bool STLStore::searchAndInsert()
 }
 
 // LCOV_EXCL_START
-bool STLStore::searchAndInsert(State**)
+bool STLStore::searchAndInsert(NetState* ns,State**)
 {
     assert(false);
     return false;

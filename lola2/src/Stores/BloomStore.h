@@ -7,8 +7,8 @@ class BloomStore : public Store
 {
     private:
         std::bitset<BLOOM_FILTER_SIZE>* filter;
-        inline unsigned int hash_sdbm() const;
-        inline unsigned int hash_fnv() const;
+        inline unsigned int hash_sdbm(NetState* ns) const;
+        inline unsigned int hash_fnv(NetState* ns) const;
 
         unsigned int* hash_values;
         const size_t hash_functions;
@@ -17,6 +17,6 @@ class BloomStore : public Store
         explicit BloomStore(size_t = 2);
         ~BloomStore();
 
-        bool searchAndInsert();
-        bool searchAndInsert(State**);
+        bool searchAndInsert(NetState* ns);
+        bool searchAndInsert(NetState* ns,State**);
 };

@@ -17,7 +17,6 @@ Actual property is virtual, default (base class) is full exploration
 #include <Exploration/SimpleProperty.h>
 #include <Exploration/Firelist.h>
 #include <Exploration/ChooseTransition.h>
-
 #include <Stores/Store.h>
 #include <Stores/EmptyStore.h>
 #include <InputOutput/Reporter.h>
@@ -26,34 +25,40 @@ Actual property is virtual, default (base class) is full exploration
 extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
-void SimpleProperty::initProperty()
+bool SimpleProperty::initProperty(NetState &ns)
 {
-    value = false;
+    return false;
 }
 
-bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
+bool SimpleProperty::depth_first(Store &myStore, FireListCreator& firelistcreator, int threadNumber)
 {
+	Firelist &myFirelist = *firelistcreator.createFireList();
     // copy initial marking into current marking
     memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
     Marking::HashCurrent = Marking::HashInitial;
 
+	NetState* ns = NetState::createNetStateFromCurrent();
+
     // prepare property
-    initProperty();
+    value = initProperty(*ns);
 
     if (value)
     {
         // initial marking satisfies property
+        free(Marking::Current);
+        Marking::Current = ns->Current;
+        myStore.finalize();
         return true;
     }
 
     // add initial marking to store
     // we do not care about return value since we know that store is empty
 
-    myStore.searchAndInsert();
+    myStore.searchAndInsert(ns);
 
     // get first firelist
     index_t* currentFirelist;
-    index_t currentEntry = myFirelist.getFirelist(&currentFirelist);
+    index_t currentEntry = myFirelist.getFirelist(ns,&currentFirelist);
 
     while (true) // exit when trying to pop from empty stack
     {
@@ -62,33 +67,36 @@ bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
             // there is a next transition that needs to be explored in current marking
 
             // fire this transition to produce new Marking::Current
-            Transition::fire(currentFirelist[currentEntry]);
+            Transition::fire(ns,currentFirelist[currentEntry]);
 
-            if (myStore.searchAndInsert())
+            if (myStore.searchAndInsert(ns))
             {
                 // State exists! -->backtracking to previous state
-                Transition::backfire(currentFirelist[currentEntry]);
+                Transition::backfire(ns,currentFirelist[currentEntry]);
             }
             else
             {
                 // State does not exist!
 
-                Transition::updateEnabled(currentFirelist[currentEntry]);
+                Transition::updateEnabled(ns,currentFirelist[currentEntry]);
                 // check current marking for property
-                checkProperty(currentFirelist[currentEntry]);
+                value = checkProperty(*ns,currentFirelist[currentEntry]);
                 if (value)
                 {
                     // current  marking satisfies property
                     // push put current transition on stack
                     // this way, the stack contains ALL transitions
-                    // of witnss path
+                    // of witness path
                     stack.push(currentEntry, currentFirelist);
-                    return true;
+                    free(Marking::Current);
+                    Marking::Current = ns->Current;
+                    myStore.finalize();
+                   return true;
                 }
 
                 // Here: current marking does not satisfy property --> continue search
                 stack.push(currentEntry, currentFirelist);
-                currentEntry = myFirelist.getFirelist(&currentFirelist);
+                currentEntry = myFirelist.getFirelist(ns,&currentFirelist);
             } // end else branch for "if state exists"
         }
         else
@@ -98,13 +106,16 @@ bool SimpleProperty::depth_first(Store &myStore, Firelist &myFirelist)
             if (stack.StackPointer == 0)
             {
                 // have completely processed initial marking --> state not found
+                free(Marking::Current);
+                Marking::Current = ns->Current;
+                myStore.finalize();
                 return false;
             }
             stack.pop(&currentEntry, &currentFirelist);
             assert(currentEntry < Net::Card[TR]);
-            Transition::backfire(currentFirelist[currentEntry]);
-            Transition::revertEnabled(currentFirelist[currentEntry]);
-            updateProperty(currentFirelist[currentEntry]);
+            Transition::backfire(ns,currentFirelist[currentEntry]);
+            Transition::revertEnabled(ns,currentFirelist[currentEntry]);
+            value = updateProperty(*ns,currentFirelist[currentEntry]);
         }
     }
 }
@@ -114,6 +125,7 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.
 
+	NetState* ns = NetState::createNetStateFromCurrent();
     unsigned int currentattempt = 0;
 
     // get memory for path info
@@ -142,33 +154,37 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
         s.tries++;
 
         // copy initial marking into current marking
-        memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
-        Marking::HashCurrent = Marking::HashInitial;
+        memcpy(ns->Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
+        ns->HashCurrent = Marking::HashInitial;
 
         // reset enabledness information
         for (index_t i = 0; i < Net::Card[PL]; i++)
         {
-            Marking::Current[i] = Marking::Initial[i];
-            Place::CardDisabled[i] = 0;
+        	ns->Current[i] = Marking::Initial[i];
+        	ns->CardDisabled[i] = 0;
         }
-        Transition::CardEnabled = Net::Card[TR];
+        ns->CardEnabled = Net::Card[TR];
         for (index_t t = 0; t < Net::Card[TR]; ++t)
         {
-            Transition::Enabled[t] = true;
+        	ns->Enabled[t] = true;
         }
 
         for (index_t t = 0; t < Net::Card[TR]; ++t)
         {
-            Transition::checkEnabled(t);
+            Transition::checkEnabled(ns,t);
         }
 
         // prepare property
-        initProperty();
+        value = initProperty(*ns);
 
         if (value)
         {
             // initial marking satisfies property
             // witness path is empty path
+            // initial marking satisfies property
+            free(Marking::Current);
+            Marking::Current = ns->Current;
+
             return true;
         }
 
@@ -177,31 +193,38 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
         for (index_t depth = 0; depth < maxdepth; ++depth)
         {
             // register this transition's firing
-            s.searchAndInsert();
+            s.searchAndInsert(ns);
 
             // get firelist
             index_t* currentFirelist;
-            index_t cardFirelist = myFirelist.getFirelist(&currentFirelist);
+            index_t cardFirelist = myFirelist.getFirelist(ns,&currentFirelist);
             if (!cardFirelist)
             {
                 // deadlock or empty up set (i.e. property not reachable)
                 break; // go to next attempt
             }
 
-            index_t chosen = c.choose(cardFirelist, currentFirelist);
+            index_t chosen = c.choose(ns,cardFirelist, currentFirelist);
             free(currentFirelist);
 
             path[depth] = chosen;
-            Transition::fire(chosen);
-            Transition::updateEnabled(chosen);
+            Transition::fire(ns,chosen);
+            Transition::updateEnabled(ns,chosen);
 
-            checkProperty(chosen);
+            value = checkProperty(*ns,chosen);
             if (value)
             {
                 // witness path is path[0] .... path[depth-1] path[depth]
+                // initial marking satisfies property
+                free(Marking::Current);
+                Marking::Current = ns->Current;
+
                 return true;
             }
         }
     }
+    // initial marking satisfies property
+    free(Marking::Current);
+    Marking::Current = ns->Current;
     return false;
 }

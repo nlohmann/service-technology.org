@@ -7,6 +7,7 @@
 
 #pragma once
 #include <Core/Dimensions.h>
+#include <Net/NetState.h>
 
 
 class Firelist
@@ -14,6 +15,11 @@ class Firelist
     public:
         /// return value contains number of elements in fire list, argument is reference
         /// parameter for actual list
-        virtual index_t getFirelist(index_t**);
+        virtual index_t getFirelist(NetState* ns, index_t**);
         virtual ~Firelist() {}
+};
+
+class FireListCreator {
+	public:
+		virtual Firelist* createFireList();
 };

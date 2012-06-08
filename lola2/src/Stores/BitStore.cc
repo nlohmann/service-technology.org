@@ -41,7 +41,7 @@ BitStore::BitStore() : bit_count(0), bit_current(0), byte_count(0), byte_current
     rep->status("using %d bytes per marking, wasting %d bits per marking", byte_count, bit_count % 8);
 }
 
-bool BitStore::searchAndInsert()
+bool BitStore::searchAndInsert(NetState* ns)
 {
     ++calls;
 
@@ -53,7 +53,7 @@ bool BitStore::searchAndInsert()
     for (index_t p = 0; p < Place::CardSignificant; ++p)
     {
         // get copy of the token number as the later loop destroys it
-        capacity_t tokens = Marking::Current[p];
+        capacity_t tokens = ns->Current[p];
 
         // iterate to the width of the marking according to the place capacity
         // see http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive
@@ -86,7 +86,7 @@ bool BitStore::searchAndInsert()
 }
 
 // LCOV_EXCL_START
-bool BitStore::searchAndInsert(State**)
+bool BitStore::searchAndInsert(NetState* ns,State**)
 {
     assert(false);
     return false;

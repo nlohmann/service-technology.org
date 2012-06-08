@@ -27,6 +27,7 @@ lola_SOURCES = \
                 Net/LinearAlgebra.cc Net/LinearAlgebra.h \
                 Net/Marking.cc Net/Marking.h \
                 Net/Net.cc Net/Net.h \
+               	Net/NetState.cc Net/NetState.h \
                 Net/Place.cc Net/Place.h \
                 Net/StructuralReduction.cc Net/StructuralReduction.h \
                 Net/Transition.cc Net/Transition.h \
@@ -43,6 +44,7 @@ lola_SOURCES = \
                 Exploration/RandomWalk.cc Exploration/RandomWalk.h \
                 Exploration/SearchStack.cc Exploration/SearchStack.h \
                 Exploration/SimpleProperty.cc Exploration/SimpleProperty.h \
+                Exploration/ParallelSimpleProperty.cc Exploration/ParallelSimpleProperty.h \
                 Exploration/Deadlock.cc Exploration/Deadlock.h \
                 Exploration/ChooseTransition.h \
                 Exploration/ChooseTransitionHashDriven.cc Exploration/ChooseTransitionHashDriven.h \

@@ -58,7 +58,7 @@ void myprinter(const char* s, kc::uview v)
 
 extern kc::tFormula TheFormula;
 
-Task::Task() : sp(NULL), p(NULL), s(NULL), fl(NULL), choose(NULL), search(args_info.search_arg)
+Task::Task() : sp(NULL), p(NULL), s(NULL), flc(NULL), choose(NULL), search(args_info.search_arg)
 {}
 
 Task::~Task()
@@ -66,7 +66,7 @@ Task::~Task()
     delete s;
     delete p;
     delete sp;
-    delete fl;
+    delete flc;
 }
 
 void Task::setFormula()
@@ -204,7 +204,7 @@ void Task::setStore()
                 s = new BinStore2();
                 break;
             case store_arg_tsbin2:
-                s = new ThreadSafeStore(new SIBinStore2(10));
+                s = new ThreadSafeStore(new SIBinStore2(number_of_threads),number_of_threads);
                 break;
         }
     }
@@ -220,32 +220,36 @@ void Task::setProperty()
 
         case check_arg_full:
             p = new SimpleProperty();
-            fl = new Firelist();
+            flc = new FireListCreator();
             break;
 
         case check_arg_deadlock:
             p = new Deadlock();
-            fl = new FirelistStubbornDeadlock();
+            flc = new FireListStubbornDeadlockCreator();
             break;
 
         case check_arg_statepredicate:
             p = new StatePredicateProperty(sp);
-            fl = new FirelistStubbornStatePredicate(sp);
+            flc = new FirelistStubbornStatePredicateCreator(sp);
             break;
     }
+}
+
+void Task::setThreads(){
+	number_of_threads = args_info.threads_arg;
 }
 
 bool Task::getResult()
 {
     assert(s);
     assert(p);
-    assert(fl);
+    assert(flc);
 
     bool result;
     switch (args_info.search_arg)
     {
         case search_arg_depth:
-            result = p->depth_first(*s, * fl);
+            result = p->depth_first(*s, * flc, number_of_threads);
             break;
 
         case search_arg_findpath:
@@ -259,7 +263,7 @@ bool Task::getResult()
             }
 
             choose = new ChooseTransitionHashDriven();
-            result = p->find_path(args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore*)s), *choose);
+            result = p->find_path(args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(), *((EmptyStore*)s), *choose);
             delete choose;
             break;
 

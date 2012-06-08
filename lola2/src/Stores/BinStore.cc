@@ -12,7 +12,6 @@
 #include <Net/Net.h>
 #include <Net/Place.h>
 #include <Stores/BinStore.h>
-
 class State;
 
 
@@ -63,7 +62,7 @@ BinStore::Decision::~Decision()
 /// search for a state in the binStore and insert it, if it is not there
 /// Do not care about states
 
-bool BinStore::searchAndInsert()
+bool BinStore::searchAndInsert(NetState* ns)
 {
     ++calls;;
     // the general assumption is that we read marking, vectors etc. left to right, with
@@ -93,15 +92,15 @@ bool BinStore::searchAndInsert()
     bitindex_t position = 0;
 
     // Is hash bucket empty? If so, assign to currentvector
-    if (!(currentvector = (firstvector[Marking::HashCurrent])))
+    if (!(currentvector = (firstvector[ns->HashCurrent])))
     {
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
-        newvector = firstvector + Marking::HashCurrent;
+        newvector = firstvector + ns->HashCurrent;
     }
     else
     {
         // Here, hash bucket is not empty.
-        anchor = branch + Marking::HashCurrent;
+        anchor = branch + ns->HashCurrent;
 
 
         while (true) // for various currentvectors do...
@@ -116,7 +115,7 @@ freshvector:
 #else
 #define BINSTORE_LOOP_BODY(N, I)\
     /* comparison of one bit between current marking and current vector*/\
-    if (((Marking::Current[place_index] >> placebit_index) & 1) != ((currentvector[vector_byte] N) & 1))\
+    if (((ns->Current[place_index] >> placebit_index) & 1) != ((currentvector[vector_byte] N) & 1))\
     {\
         /* This is the mismatch we were looking for*/\
         /* --> evaluate the branching tree:*/\
@@ -245,26 +244,26 @@ insert:
 #error BINSTORE_LOOP_BODY_2 already defined
 #else
 #define BINSTORE_LOOP_BODY_2(N, I)\
-    if (Marking::Current[place_index] & (1 << placebit_index))\
-    {\
-        assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);\
-        (*newvector)[vector_byte] |= N;\
-    }\
-    /* increment vector byte */\
-    I\
-    if (placebit_index == 0)\
-    {\
-        ++place_index;\
-        if (place_index >= Place::CardSignificant)\
+        if (ns->Current[place_index] & (1 << placebit_index))\
         {\
-            break;\
+            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);\
+            (*newvector)[vector_byte] |= N;\
         }\
-        placebit_index = Place::CardBits[place_index] - 1;\
-    }\
-    else\
-    {\
-        --placebit_index;\
-    }
+        /* increment vector byte */\
+        I\
+        if (placebit_index == 0)\
+        {\
+            ++place_index;\
+            if (place_index >= Place::CardSignificant)\
+            {\
+                break;\
+            }\
+            placebit_index = Place::CardBits[place_index] - 1;\
+        }\
+        else\
+        {\
+            --placebit_index;\
+        }
 #endif
         BINSTORE_LOOP_BODY_2(128,); /*** incarnation for bit 7 ********/
         \
@@ -284,7 +283,7 @@ insert:
 
 // not implemented yet
 // LCOV_EXCL_START
-bool BinStore::searchAndInsert(State** result)
+bool BinStore::searchAndInsert(NetState* ns,State** result)
 {
     assert(false);
 }

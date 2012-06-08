@@ -19,10 +19,18 @@ class FirelistStubbornStatePredicate : public Firelist
 
         /// return value contains number of elements in fire list, argument is reference
         /// parameter for actual list
-        virtual index_t getFirelist(index_t**);
+        virtual index_t getFirelist(NetState*, index_t**);
 
     private:
         StatePredicate* predicate;
         index_t* dfsStack;
         bool* onStack;
+};
+
+class FirelistStubbornStatePredicateCreator : public FireListCreator{
+	public:
+		FirelistStubbornStatePredicateCreator(StatePredicate*);
+		virtual Firelist* createFireList();
+	private:
+		StatePredicate* predicate;
 };

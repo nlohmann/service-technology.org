@@ -27,10 +27,10 @@ class BinStore2 : public Store
         ~BinStore2();
 
         /// check whether current marking is stored
-        virtual bool searchAndInsert();
+        virtual bool searchAndInsert(NetState* ns);
 
         /// check whether current marking is sted and return state
-        virtual bool searchAndInsert(State** s);
+        virtual bool searchAndInsert(NetState* ns,State** s);
         //void pbs(unsigned int, unsigned int, vectordata_t*, void*);
         //void printBinStore();
     private:
@@ -49,6 +49,12 @@ class BinStore2 : public Store
         };
         // first branch in decision tree; NULL as long as less than two elements in bucket
         Decision** branch;
+
+        // the read-write mutexes
+        pthread_rwlock_t* rwlocks;
+
+        // a mutex for incrementing
+        pthread_mutex_t inc_mutex;
 
         // first vector in bucket; null as long as bucket empty
         vectordata_t** firstvector;

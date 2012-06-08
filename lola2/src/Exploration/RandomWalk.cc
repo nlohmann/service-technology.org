@@ -12,35 +12,37 @@
 #include <Net/Transition.h>
 #include <Net/Place.h>
 #include <Net/Marking.h>
+#include <Net/NetState.h>
 
 
 void randomWalk(int transitions)
 {
+	NetState* ns = NetState::createNetStateFromCurrent();
     int firedTransitions = 0;
 
     // repeat forever
     while (true)
     {
         // one iteration is for one execution (either infinite or ending in deadlock)
-        while (Transition::CardEnabled > 0)
+        while (ns->CardEnabled > 0)
         {
             // one iteration is for firing a single transition
             // 1. select transition
             index_t y = 0;
             for (index_t z = 0; z < Net::Card[TR]; z++)
             {
-                if (Transition::Enabled[z])
+                if (ns->Enabled[z])
                 {
                     y++;
                 }
             }
-            assert(y == Transition::CardEnabled);
-            index_t nr = rand() % Transition::CardEnabled; // uniform distribution
-            assert(nr < Transition::CardEnabled);
+            assert(y ==ns->CardEnabled);
+            index_t nr = rand() % ns->CardEnabled; // uniform distribution
+            assert(nr < ns->CardEnabled);
             index_t t; // the transition to be fired
             for (t = 0; t < Net::Card[TR]; ++t)
             {
-                if (Transition::Enabled[t])
+                if (ns->Enabled[t])
                 {
                     if (nr == 0)
                     {
@@ -50,10 +52,10 @@ void randomWalk(int transitions)
                 }
             }
             assert(t < Net::Card[TR]);
-            assert(Transition::Enabled[t]);
+            assert(ns->Enabled[t]);
             printf(" firing %s\n", Net::Name[TR][t]);
-            Transition::fire(t);
-            Transition::updateEnabled(t);
+            Transition::fire(ns,t);
+            Transition::updateEnabled(ns,t);
 
             // early abortion
             if (transitions != 0 and (++firedTransitions >= transitions))
@@ -65,18 +67,18 @@ void randomWalk(int transitions)
         // reset initial marking
         for (index_t i = 0; i < Net::Card[PL]; i++)
         {
-            Marking::Current[i] = Marking::Initial[i];
-            Place::CardDisabled[i] = 0;
+        	ns->Current[i] = Marking::Initial[i];
+        	ns->CardDisabled[i] = 0;
         }
         Marking::HashCurrent = Marking::HashInitial;
-        Transition::CardEnabled = Net::Card[TR];
+        ns->CardEnabled = Net::Card[TR];
         for (index_t i = 0; i < Net::Card[TR]; i++)
         {
-            Transition::Enabled[i] = true;
+        	ns->Enabled[i] = true;
         }
         for (index_t i = 0; i < Net::Card[TR]; i++)
         {
-            Transition::checkEnabled(i);
+            Transition::checkEnabled(ns,i);
         }
     }
 }

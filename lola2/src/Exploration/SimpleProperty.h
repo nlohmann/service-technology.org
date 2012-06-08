@@ -12,6 +12,8 @@ Actual property is virtual, default (base class) is full exploration
 #include <config.h>
 #include <Exploration/SearchStack.h>
 #include <Exploration/ChooseTransition.h>
+#include <Net/NetState.h>
+#include <Exploration/Firelist.h>
 
 class Firelist;
 class Store;
@@ -21,12 +23,13 @@ class SimpleProperty
 {
     public:
         /// evaluate property by dfs. Result true = state found, false = state not found
-        bool depth_first(Store &, Firelist &);
+        bool virtual depth_first(Store &, FireListCreator&, int threadNumber);
 
         /// evaluate property by bfs. Result true = state found, false = state not found
         bool breadth_first(Store &, Firelist &)
         {
             assert(false);
+            return false;
         }
 
         /// evaluate property by random walk without storing states.
@@ -39,17 +42,17 @@ class SimpleProperty
         SearchStack stack;
         virtual ~SimpleProperty() {}
 
-    protected:
+    public:
         /// value of property in current state
         bool value;
 
-    private:
+    public:
         /// prepare for search
-        virtual void initProperty();
+        virtual bool initProperty(NetState &ns);
 
         /// check property in Marking::Current, use after fire. Argument is transition just fired.
-        virtual void checkProperty(index_t) {}
+        virtual bool checkProperty(NetState &ns, index_t) {return false;}
 
         /// check property in Marking::Current, use after backfire. Argument is transition just backfired.
-        virtual void updateProperty(index_t) {}
+        virtual bool updateProperty(NetState &ns, index_t) {return false;}
 };

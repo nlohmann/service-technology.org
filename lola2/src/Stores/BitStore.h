@@ -24,6 +24,6 @@ class BitStore : public Store
 
     public:
         BitStore();
-        bool searchAndInsert();
-        bool searchAndInsert(State**);
+        bool searchAndInsert(NetState* ns);
+        bool searchAndInsert(NetState* ns,State**);
 };

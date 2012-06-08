@@ -10,7 +10,7 @@ Actual property is virtual, default (base class) is full exploration
 #pragma once
 
 #include <Formula/AtomicStatePredicate.h>
-#include <Exploration/SimpleProperty.h>
+#include <Exploration/ParallelSimpleProperty.h>
 
 class Firelist;
 class Store;
@@ -23,13 +23,13 @@ class StatePredicateProperty: public SimpleProperty
         ~StatePredicateProperty();
     private:
         /// prepare for search
-        virtual void initProperty();
+        virtual bool initProperty(NetState &ns);
 
         /// check property in Marking::Current, use after fire. Argument is transition just fired.
-        virtual void checkProperty(index_t);
+        virtual bool checkProperty(NetState &ns,index_t);
 
         /// check property in Marking::Current, use after backfire. Argument is transition just backfired.
-        virtual void updateProperty(index_t);
+        virtual bool updateProperty(NetState &ns,index_t);
 
         // the actual formula to be verified;
         StatePredicate* predicate;

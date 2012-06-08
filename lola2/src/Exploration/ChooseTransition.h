@@ -9,10 +9,11 @@
 #pragma once
 
 #include <Core/Dimensions.h>
+#include <Net/NetState.h>
 
 class ChooseTransition
 {
     public:
-        virtual index_t choose(index_t cardfirelist, index_t* firelist) = 0;
+        virtual index_t choose(NetState* ns, index_t cardfirelist, index_t* firelist) = 0;
         virtual ~ChooseTransition() {}
 };

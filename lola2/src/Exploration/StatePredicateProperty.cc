@@ -14,6 +14,8 @@ Actual property is virtual, default (base class) is full exploration
 #include <Formula/AtomicStatePredicate.h>
 #include <Net/Net.h>
 #include <Net/Transition.h>
+#include <stdlib.h>
+
 
 StatePredicateProperty::StatePredicateProperty(StatePredicate* f)
 {
@@ -30,6 +32,7 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate* f)
     {
         atomic[i]->setUpSet();
     }
+
 
     cardChanged = (index_t*) calloc(Net::Card[TR], SIZEOF_INDEX_T);
     changedPredicate = (AtomicStatePredicate***) malloc(SIZEOF_VOIDP * Net::Card[TR]);
@@ -111,27 +114,27 @@ StatePredicateProperty::~StatePredicateProperty()
     free(changedSum);
 }
 
-void StatePredicateProperty::initProperty()
+bool StatePredicateProperty::initProperty(NetState &ns)
 {
-    predicate -> evaluate();
-    value = predicate -> value;
+    predicate -> evaluate(ns);
+    return  predicate -> value;
 }
 
-void StatePredicateProperty::checkProperty(index_t t)
+bool StatePredicateProperty::checkProperty(NetState &ns,index_t t)
 {
     for (index_t i = 0; i < cardChanged[t]; i++)
     {
-        changedPredicate[t][i]->update(changedSum[t][i]);
+        changedPredicate[t][i]->update(ns,changedSum[t][i]);
     }
-    value = predicate -> value;
+    return predicate -> value;
 }
 
-void StatePredicateProperty::updateProperty(index_t t)
+bool StatePredicateProperty::updateProperty(NetState &ns,index_t t)
 {
     for (index_t i = 0; i < cardChanged[t]; i++)
     {
-        changedPredicate[t][i]->update(-changedSum[t][i]);
+        changedPredicate[t][i]->update(ns,-changedSum[t][i]);
     }
-    value = predicate -> value;
+    return predicate -> value;
 }
 

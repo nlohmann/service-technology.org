@@ -21,8 +21,8 @@ class SIBinStore2: public SIStore
         SIBinStore2(int numberOfThreads);
         ~SIBinStore2();
 
-        uint64_t search(int threadNumber);
-        void insert(int threadNumber);
+        bool search(NetState* ns,int threadNumber);
+        bool insert(NetState* ns,int threadNumber);
     private:
         // original binstore 2 members
         /// a binary decision node
@@ -38,6 +38,12 @@ class SIBinStore2: public SIStore
                 ~Decision();
 
         };
+        // the inner search function, we are able to tell whether to lock the rw-mutex or not
+        bool search(NetState* ns,int threadNumber,bool lock_rw_mutex);
+
+        // the read-write mutexes
+        pthread_rwlock_t* rwlocks;
+
         // first branch in decision tree; NULL as long as less than two elements in bucket
         Decision** branch;
 

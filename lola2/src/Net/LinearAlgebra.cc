@@ -9,18 +9,10 @@
 
 #include <cstdlib>
 #include <cstring>
-
-#ifdef HAVE_STDINT_H
-#include <stdint.h>
-#endif
-
-#include <Net/LinearAlgebra.h>
-#include <Net/Net.h>
-
-// for debug purposes
 #include <iostream>
-using std::cout;
-using std::endl;
+#include <Net/LinearAlgebra.h>
+
+using namespace std;
 
 // This is for debug purposes
 // LCOV_EXCL_START
@@ -56,6 +48,11 @@ void Matrix::printMatrix() const
     }
 }
 // LCOV_EXCL_STOP
+
+// for debug purposes
+#include <iostream>
+using std::cout;
+using std::endl;
 
 /// computes the ggt of two unsigned integers
 inline int64_t ggt(int64_t a, int64_t b)

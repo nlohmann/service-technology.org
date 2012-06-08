@@ -22,6 +22,7 @@ void* Store::reporter_internal(void)
 {
     static unsigned int intervals = 0;
     uint64_t last_markings = 0;
+    uint64_t benchmark = 0;
 
     while (true)
     {
@@ -81,9 +82,11 @@ Store::~Store()
     }
 }
 
-bool Store::searchAndInsert(int thread)
+bool Store::searchAndInsert(NetState* ns, int thread)
 {
-    // by default this function is not supported by a store
-    assert(false);
-    return false;
+    return searchAndInsert(ns);
+}
+
+void Store::finalize(){
+
 }

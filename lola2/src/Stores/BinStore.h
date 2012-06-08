@@ -9,7 +9,6 @@
 #include <Core/Dimensions.h>
 #include <Stores/Store.h>
 
-
 class BinStore : public Store
 {
     public:
@@ -17,10 +16,10 @@ class BinStore : public Store
         ~BinStore();
 
         /// check whether current marking is stored
-        virtual bool searchAndInsert();
+        virtual bool searchAndInsert(NetState* ns);
 
         /// check whether current marking is sted and return state
-        virtual bool searchAndInsert(State** s);
+        virtual bool searchAndInsert(NetState* ns,State** s);
         void pbs(unsigned int, unsigned int, unsigned char*, void*);
         void printBinStore();
     private:

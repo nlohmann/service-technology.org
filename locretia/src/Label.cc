@@ -73,7 +73,7 @@ void Label::initialize() {
 
         const set<Transition*> preset((**l).getTransitions());
         FOREACH(t, preset) {
-        	status("label: %s, transition: %s", (**l).getName().c_str(), (**t).getName().c_str());
+        	//status("label: %s, transition: %s", (**l).getName().c_str(), (**t).getName().c_str());
             visible_transitions += (visible_transitions.empty() ? "" : " OR ") + (**t).getName();
             name2id[(**t).getName()] = events;
         }
@@ -92,7 +92,7 @@ void Label::initialize() {
 
         const set<Transition*> postset((**l).getTransitions());
         FOREACH(t, postset) {
-        	status("label: %s, transition: %s", (**l).getName().c_str(), (**t).getName().c_str());
+        	//status("label: %s, transition: %s", (**l).getName().c_str(), (**t).getName().c_str());
             visible_transitions += (visible_transitions.empty() ? "" : " OR ") + (**t).getName();
             name2id[(**t).getName()] = events;
         }

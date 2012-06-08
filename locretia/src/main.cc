@@ -271,7 +271,7 @@ int main(int argc, char** argv) {
     }
 
     if (args_info.partnerView_flag) {
-    	InnerMarking::changeView(args_info.messagebound_arg);
+    	InnerMarking::changeView(args_info.maxLength_arg);
     }
 
     if (args_info.log_flag) {
@@ -289,8 +289,12 @@ int main(int argc, char** argv) {
     	std::stringstream ss;
     	ss << pnapi::io::lola << *InnerMarking::net;
     	std::string lola_net = ss.str();
-    	//test output!!
-    	//status("%s", lola_net.c_str());
+
+//    	//test output!!
+//    	std::string lola_filename = filename + ".lola";
+//    	Output outputLola(lola_filename, "LoLa Net");
+//    	outputLola << lola_net << std::endl;
+
     	temp->stream() << lola_net << std::endl;
 
 
@@ -330,18 +334,21 @@ int main(int argc, char** argv) {
     	std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename + ".xes";
     	Output output(log_filename, "XES Log");
     	InnerMarking::create_log(output, filename, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);
-
     }
 
     // delete the "counter places" if they were formerly created
     if (args_info.partnerView_flag) {
-    	InnerMarking::deleteCounterPlaces();
+    	InnerMarking::deleteCounterPlace();
     }
 
     if (args_info.pnmlFile_given) {
+
+    	//InnerMarking::createLabeledEnvironment();
+
     	std::string pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename + ".pnml";
     	Output output2(pnml_filename, "PNML File");
-    	output2.stream() << pnapi::io::pnml << *InnerMarking::net;
+    	output2.stream() << pnapi::io::pnml;
+    	Output::output(output2.stream(), *InnerMarking::net, filename);
     }
 
     //    std::string dot_filename = filename + ".dot";

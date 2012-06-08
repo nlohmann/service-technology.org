@@ -51,7 +51,9 @@ class InnerMarking {
 
         static void changeView(const int c);
 
-        static void deleteCounterPlaces();
+        static void deleteCounterPlace();
+
+        static void createLabeledEnvironment();
 
         /// print the knowledges as OG
         static void create_log(std::ostream& file, std::string & filename,
@@ -99,7 +101,7 @@ class InnerMarking {
         /// remember if the reachability graph of the inner is acyclic
         static bool is_acyclic;
 
-        static std::set<pnapi::Place *> counterPlaces;
+        static pnapi::Place* counterPlace;
 
     private: /* static attributes */
         /// struct combining the statistics on the class InnerMarking

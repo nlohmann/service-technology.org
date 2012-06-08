@@ -29,6 +29,11 @@
 #include <cstdlib>
 #include "verbose.h"
 #include "Output.h"
+#include "pnapi/util.h"
+
+using std::endl;
+using std::set;
+using std::vector;
 
 
 /******************
@@ -172,3 +177,289 @@ void Output::setTempfileTemplate(std::string s) {
 void Output::setKeepTempfiles(bool b) {
     keepTempfiles = b;
 }
+
+
+/*************************************************************************
+ ***** PNML output
+ *************************************************************************/
+
+/*!
+ * \brief special petri net output in pnml for use in Prom
+ */
+std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, std::string & filename)
+{
+  os //< output everything to this stream
+
+  << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"
+  << "<!--\n"
+  << "  generator:   " << "Locretia 1.0-unreleased" << endl //net.getMetaInformation(os, pnapi::io::CREATOR, PACKAGE_STRING) << endl
+  << "  input file:  " << filename << endl
+//  << "  invocation:  " << net.getMetaInformation(os, pnapi::io::INVOCATION) << endl
+  << "  net size:    " << pnapi::io::stat << net << pnapi::io::pnml
+  << "\n-->\n\n"
+
+  << "<pnml>\n"
+
+  << "  <module>\n";
+
+  output(os, net.getInterface());
+
+  os << "\n    <net id=\"n1\" type=\"PTNet\">\n"
+
+  << "    <name>\n"
+  << "      <text>" << filename << "</text>\n"
+  << "    </name>\n";
+
+  outputSet(os, net.getPlaces());
+
+  outputSet(os, net.getTransitions());
+
+  outputSet(os, net.getArcs());
+
+  os << "    </net>\n"
+
+  << "    <finalmarkings>\n"
+  << "      <marking>\n";
+
+  net.getFinalCondition().getFormula().output(os);
+
+  os << "      </marking>\n"
+  << "    </finalmarkings>\n"
+
+  << "  </module>\n"
+
+  << "</pnml>\n";
+
+  return os << endl;
+}
+
+/*!
+ * \brief place output
+ */
+std::ostream & Output::output(std::ostream & os, const pnapi::Place & p)
+{
+  os << "      <place id=\"" << p.getName() << "\"";
+
+  if (p.getTokenCount())
+  {
+    os << ">\n"
+       << "        <initialMarking>\n"
+       << "          <text>" << p.getTokenCount() << "</text>\n"
+       << "        </initialMarking>\n"
+       << "      </place>\n";
+  } else {
+    os << " />\n";
+  }
+
+  return os;
+}
+
+/*!
+ * \brief transition output
+ */
+std::ostream & Output::output(std::ostream & os, const pnapi::Transition & t)
+{
+  os << "      <transition id=\"" << t.getName() << "\">\n"
+	 << "        <name><text>";
+
+  if(t.getLabels().empty()) {
+	  os << "";
+  } else {
+	  os << t.getLabels().begin()->first->getName();
+  }
+
+  os << "</text></name>\n";
+
+  return (os << "      </transition>\n");
+}
+
+/*!
+ * \brief arc output
+ */
+std::ostream & Output::output(std::ostream & os, const pnapi::Arc & arc)
+{
+  static pnapi::PetriNet * net = NULL;
+  static unsigned int arcId = 0;
+
+  // check for different nets
+  if(net != &arc.getPetriNet())
+  {
+    net = &arc.getPetriNet();
+    arcId = 0;
+  }
+
+  os << "      <arc id=\"arcId" << (++arcId)
+     << "\" source=\"" << arc.getSourceNode().getName()
+     << "\" target=\"" << arc.getTargetNode().getName()
+     << "\"";
+
+  if (arc.getWeight() > 1)
+  {
+    os << ">\n"
+       << "        <inscription>\n"
+       << "          <text>" << arc.getWeight() << "</text>\n"
+       << "        </inscription>\n"
+       << "      </arc>\n";
+  }
+  else
+  {
+    os << " />\n";
+  }
+
+  return os;
+}
+
+/*!
+ * \brief interface output
+ */
+std::ostream & Output::output(std::ostream & os, const pnapi::Interface & interface)
+{
+//  os << "    <ports>\n";
+//
+//  PNAPI_FOREACH(port, interface.getPorts())
+//  {
+//    os << "      <port id=\"" << port->first << "\">\n";
+//
+//    output(os, *port->second);
+//
+//    os << "      </port>\n";
+//  }
+//
+//  return (os << "    </ports>\n");
+	return os;
+}
+
+/*!
+ * \brief port output
+ */
+std::ostream & Output::output(std::ostream & os, const pnapi::Port & port)
+{
+  os << pnapi::io::util::delim("\n");
+  outputSet(os, port.getAllLabels());
+  os << pnapi::io::util::delim("") << "\n";
+
+  return os;
+}
+
+/*!
+ * \brief label output
+ */
+std::ostream & Output::output(std::ostream & os, const pnapi::Label & l)
+{
+  os << "        <";
+
+  switch(l.getType())
+  {
+  case pnapi::Label::INPUT: os << "input"; break;
+  case pnapi::Label::OUTPUT: os << "output"; break;
+  case pnapi::Label::SYNCHRONOUS: os << "synchronous"; break;
+  default: break;
+  }
+
+  return (os << " id=\"" << l.getName() << "\" />");
+}
+
+///*!
+// * \brief negation output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::formula::Negation & f)
+//{
+//  if(f.getChildren().empty())
+//    throw pnapi::exception::NotImplementedError("don't know how to print a negation of nothing");
+//  else
+//    return (os << "NOT (" << (**f.getChildren().begin()) << ")");
+//}
+//
+///*!
+// * \brief Conjunction output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::formula::Conjunction & f)
+//{
+//  if(f.getChildren().empty())
+//  {
+//    //return os << formula::FormulaTrue();
+//    throw pnapi::exception::NotImplementedError("don't know how to print an empty conjunction");
+//  }
+//  else
+//    return (os << f.getChildren());
+//}
+//
+///*!
+// * \brief Disjunction output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::formula::Disjunction & f)
+//{
+//  if(f.getChildren().empty())
+//  {
+//    //return os << formula::FormulaFalse();
+//    throw pnapi::exception::NotImplementedError("don't know how to print an empty disjunction");
+//  }
+//  else
+//    return (os << pnapi::io::util::delim("      </marking>\n      <marking>\n") << f.getChildren());
+//}
+//
+///*!
+// * \brief FormulaTrue output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::formula::FormulaTrue &)
+//{
+//    return os;// << "TRUE";  // TODO: nothing to write?
+//}
+//
+///*!
+// * \brief FormulaFalse output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::formula::FormulaFalse &)
+//{
+//  return os;// << "FALSE"; // TODO: nothing to write?
+//}
+//
+///*!
+// * \brief FormulaEqual output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::formula::FormulaEqual & f)
+//{
+//  return (os << "        <place idref=\"" << f.getPlace().getName()
+//             << "\">\n          <text>" << f.getTokens()
+//             << "</text>\n       </place>\n");
+//}
+//
+///*!
+// * \brief FormulaNotEqual output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::formula::FormulaNotEqual & f)
+//{
+//  return (os << f.getPlace().getName() << " # " << f.getTokens());
+//}
+//
+///*!
+// * \brief FormulaGreater output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::formula::FormulaGreater & f)
+//{
+//  return (os << f.getPlace().getName() << " > " << f.getTokens());
+//}
+//
+///*!
+// * \brief FormulaGreaterEqual output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::formula::FormulaGreaterEqual & f)
+//{
+//  return (os << f.getPlace().getName() << " >= " << f.getTokens());
+//}
+//
+///*!
+// * \brief FormulaLess output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::formula::FormulaLess & f)
+//{
+//  return (os << f.getPlace().getName() << " < " << f.getTokens());
+//}
+//
+///*!
+// * \brief FormulaLessEqual output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::formula::FormulaLessEqual & f)
+//{
+//  return (os << f.getPlace().getName() << " <= " << f.getTokens());
+//}

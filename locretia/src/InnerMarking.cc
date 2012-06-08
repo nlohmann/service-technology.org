@@ -45,7 +45,7 @@ std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::receivers;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::senders;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::synchs;
 InnerMarking::_stats InnerMarking::stats;
-std::set<pnapi::Place *> InnerMarking::counterPlaces;
+pnapi::Place* InnerMarking::counterPlace;
 
 /******************
  * STATIC METHODS *
@@ -112,17 +112,16 @@ void InnerMarking::initialize() {
  */
 void InnerMarking::changeView(const int c) {
 	status("changing viewpoint to environment...");
+
+	// create a place which represents the maximal count of messages to be sent...
+	counterPlace = &net->createPlace("input_count", c);
+
 	// iterate through input labels
 	set<pnapi::Label *> inputs = net->getInterface().getInputLabels();
 	PNAPI_FOREACH(label, inputs)
 	{
 		// create a place which represents the interface
 		pnapi::Place *p = &net->createPlace((*label)->getName() + "_input");
-
-		// create a place which represents the maximal count of messages to be sent...
-		// (working with capacities didn't work...)
-	    pnapi::Place *cp = &net->createPlace((*label)->getName() + "_input_count", c);
-	    counterPlaces.insert(cp);
 
 		// iterate through all transitions belonging to the current label
 		set<pnapi::Transition *> t_in = (*label)->getTransitions();
@@ -134,7 +133,7 @@ void InnerMarking::changeView(const int c) {
 
 			// add an arc from the "interface place" to the transition
 			// \TODO: weight????!!!
-			net->createArc(*p,**t);
+			net->createArc(*p,**t, 1);
 		}
 
 		// create a new transition (new input transition)
@@ -144,9 +143,9 @@ void InnerMarking::changeView(const int c) {
 		t->addLabel(**label, 1);
 
 		// add an arc from the new transition to the "interface place"
-		net->createArc(*t, *p);
+		net->createArc(*t, *p, 1);
 		// ...and one from the "counter place" to the new transition
-		net->createArc(*cp, *t);
+		net->createArc(*counterPlace, *t, 1);
 	}
 
 	// iterate through output labels
@@ -166,7 +165,7 @@ void InnerMarking::changeView(const int c) {
 
 			// add an arc from the transition to the "interface place"
 			// \TODO: weight????!!!
-			net->createArc(**t, *p);
+			net->createArc(**t, *p, 1);
 		}
 
 		// create a new transition (new output transition)
@@ -176,18 +175,58 @@ void InnerMarking::changeView(const int c) {
 		t->addLabel(**label,1);
 
 		// add an arc from the "interface place" to the new transition
-		net->createArc(*p,*t);
+		net->createArc(*p, *t, 1);
 	}
 
 	//\TODO: what about synchronous labels?...
 }
 
-void InnerMarking::deleteCounterPlaces() {
-	// iterate through "counter places" and delete them (for output)
-	PNAPI_FOREACH(place, counterPlaces)
+void InnerMarking::deleteCounterPlace() {
+	// delete the counter place (for output)
+		net->deletePlace(*counterPlace);
+}
+
+void InnerMarking::createLabeledEnvironment() {
+	status("creating labeled sync/async environment...");
+
+	// iterate through input labels
+	set<pnapi::Label *> inputs = net->getInterface().getInputLabels();
+	PNAPI_FOREACH(label, inputs)
 	{
-		net->deletePlace(**place);
+		// iterate through all transitions belonging to the current label
+		set<pnapi::Transition *> t_in = (*label)->getTransitions();
+		PNAPI_FOREACH(t, t_in)
+		{
+			// remove the transitions from the current label
+			(*t)->removeLabel(**label);
+			(*label)->removeTransition(**t);
+
+			// label the transition with the input label
+			(*t)->setName((*label)->getName());
+		}
 	}
+
+	// iterate through output labels
+	inputs = net->getInterface().getOutputLabels();
+	PNAPI_FOREACH(label, inputs)
+	{
+		// iterate through all transitions belonging to the current label
+		set<pnapi::Transition *> t_in = (*label)->getTransitions();
+		PNAPI_FOREACH(t, t_in)
+		{
+			// remove the transitions from the current label
+			(*t)->removeLabel(**label);
+			(*label)->removeTransition(**t);
+
+			// label the transition with the output label
+			(*t)->setName((*label)->getName());
+		}
+	}
+	//\TODO: what about synchronous labels?...
+
+	net->getInterface().clear();
+
+	status("done with creating labeled sync/async environment...");
 }
 
 /****************************************

@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <string>
+#include <pnapi/pnapi.h>
 
 
 /*!
@@ -77,6 +78,78 @@ class Output {
 
         /// returns the stream of this object
         std::ostream& stream() const;
+
+        /// petri net output
+        static std::ostream & output(std::ostream &, const pnapi::PetriNet &, std::string & filename);
+        /// arc output
+        static std::ostream & output(std::ostream &, const pnapi::Arc &);
+        /// place output
+        static std::ostream & output(std::ostream &, const pnapi::Place &);
+        /// transition output
+        static std::ostream & output(std::ostream &, const pnapi::Transition &);
+        /// interface output
+        static std::ostream & output(std::ostream &, const pnapi::Interface &);
+        /// port output
+        static std::ostream & output(std::ostream &, const pnapi::Port &);
+        /// label output
+        static std::ostream & output(std::ostream &, const pnapi::Label &);
+//        /// negation output
+//        std::ostream & output(std::ostream &, const pnapi::formula::Negation &);
+//        /// conjunction output
+//        std::ostream & output(std::ostream &, const pnapi::formula::Conjunction &);
+//        /// disjunction output
+//        std::ostream & output(std::ostream &, const pnapi::formula::Disjunction &);
+//        /// FormulaTrue output
+//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaTrue &);
+//        /// FormulaFalse output
+//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaFalse &);
+//        /// FormulaEqual output
+//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaEqual &);
+//        /// FormulaNotEqual output
+//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaNotEqual &);
+//        /// FormulaLess output
+//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaLess &);
+//        /// FormulaLessEqual output
+//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaLessEqual &);
+//        /// FormulaGreater output
+//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaGreater &);
+//        /// FormulaGreaterEqual output
+//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaGreaterEqual &);
+
+        /*!
+         * \brief write vector elements, seperated by given delimeter, to stream
+         */
+        template <typename T>
+        static std::ostream & outputVector(std::ostream & os, const std::vector<T> & v)
+        {
+          std::string delim = pnapi::io::util::DelimData::data(os).delim;
+          if (v.empty())
+            return os;
+          for(typename std::vector<T>::const_iterator it = v.begin(); it != --v.end(); ++it)
+          {
+            output(os, **it) << delim;
+          }
+          return output(os, **--v.end());
+        }
+
+        /*!
+         * \brief write set elements, seperated by given delimeter, to stream
+         */
+        template <typename T>
+        static std::ostream & outputSet(std::ostream & os, const std::set<T> & s)
+        {
+          // sort the elements
+          std::vector<T> v;
+          PNAPI_FOREACH(it, s)
+          {
+            v.push_back(*it);
+          }
+          bool (*c)(T, T) = pnapi::io::util::compareContainerElements;
+          std::sort(v.begin(), v.end(), c);
+
+          // output the sorted vector
+          return outputVector(os, v);
+        }
 
     private: /* member attributes */
         /// the stream itself

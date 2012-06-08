@@ -99,6 +99,22 @@ typedef enum
     EXIT_TERMINATION = 3  ///< premature termination
 } exit_t;
 
+/*!
+The most special type of a formula, so LoLA can use dedicated routines.
+*/
+typedef enum
+{
+    FORMULA_REACHABLE     = 0, ///< EF
+    FORMULA_INVARIANT     = 1, ///< AG
+    FORMULA_IMPOSSIBLE    = 2, ///< AG not
+    FORMULA_LIVENESS      = 3, ///< AGEF
+    FORMULA_FAIRNESS      = 4, ///< GF
+    FORMULA_STABILIZATION = 5, ///< FG
+    FORMULA_EVENTUALLY    = 6, ///< F
+    FORMULA_INITIAL       = 7, ///< no temporal operator
+    FORMULA_MODELCHECKING = 8  ///< CTL formulae
+} formula_t;
+
 /// number of seconds between report outputs
 #define REPORT_FREQUENCY 5
 

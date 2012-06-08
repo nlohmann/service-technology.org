@@ -235,19 +235,61 @@ int main(int argc, char** argv)
         // parse the formula
         ptformula_parse();
 
-        // restructure the formula
+        // restructure the formula: remove arrows and handle negations and tautologies
         TheFormula = TheFormula->rewrite(kc::arrows);
+        TheFormula = TheFormula->rewrite(kc::neg);
+
+        // check temporal status
+        TheFormula->unparse(myprinter, kc::temporal);
+
+        switch(TheFormula->formulaType)
+        {
+            case(FORMULA_REACHABLE):
+                rep->status("checking reachability");
+                break;
+            case(FORMULA_INVARIANT):
+                rep->status("checking invariance");
+                TheFormula = TheFormula->rewrite(kc::reachability);
+                break;
+            case(FORMULA_IMPOSSIBLE):
+                rep->status("checking impossibility");
+                TheFormula = TheFormula->rewrite(kc::reachability);
+                break;
+            case(FORMULA_LIVENESS):
+                rep->status("checking liveness");
+                break;
+            case(FORMULA_FAIRNESS):
+                rep->status("checking fairness");
+                break;
+            case(FORMULA_STABILIZATION):
+                rep->status("checking stabilization");
+                break;
+            case(FORMULA_EVENTUALLY):
+                rep->status("checking eventual occurrence");
+                break;
+            case(FORMULA_INITIAL):
+                rep->status("checking initial satisfiability");
+                break;
+            case(FORMULA_MODELCHECKING):
+                rep->status("checking CTL");
+                break;
+        }
+
+        // restructure the formula: again tautoglies and simplification
         TheFormula = TheFormula->rewrite(kc::neg);
         TheFormula = TheFormula->rewrite(kc::leq);
         TheFormula = TheFormula->rewrite(kc::sides);
         TheFormula = TheFormula->rewrite(kc::lists);
 
+        // debug
         // TheFormula->print();
-        // TheFormula->unparse(myprinter, kc::out);
+        TheFormula->unparse(myprinter, kc::out);
 
         // copy restructured formula into internal data structures
         TheFormula->unparse(myprinter, kc::internal);
         assert(sp);
+
+        rep->status("processed formula with %d atomic propositions", sp->countAtomic());
 
         // tidy parser
         ptformula_lex_destroy();
@@ -257,8 +299,6 @@ int main(int argc, char** argv)
         {
             delete formulaFile;
         }
-
-        rep->status("processed formula with %d atomic propositions", sp->countAtomic());
     }
 
     delete symbolTables;

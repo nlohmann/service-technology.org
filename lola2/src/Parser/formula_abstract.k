@@ -6,6 +6,9 @@
 
 tFormula:
   StatePredicateFormula(tStatePredicate)
+{
+    int formulaType;
+}
 ;
 
 tStatePredicate:

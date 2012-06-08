@@ -87,53 +87,37 @@ statepredicate:
   _leftparenthesis_ statepredicate _rightparenthesis_
     { $$ = $2; }
 | atomic_proposition
-    { $$ = AtomicProposition($1);
-      $$->containsTemporal = false; }
+    { $$ = AtomicProposition($1); }
 | _NOT_ statepredicate
-    { $$ = Negation($2);
-      $$->containsTemporal = $2->containsTemporal; }
+    { $$ = Negation($2); }
 | statepredicate _AND_ statepredicate
-    { $$ = Conjunction($1, $3); 
-      $$->containsTemporal = ($1->containsTemporal or $3->containsTemporal); }
+    { $$ = Conjunction($1, $3); }
 | statepredicate _OR_ statepredicate
-    { $$ = Disjunction($1, $3);
-      $$->containsTemporal = ($1->containsTemporal or $3->containsTemporal); }
+    { $$ = Disjunction($1, $3); }
 | statepredicate _XOR_ statepredicate
-    { $$ = ExclusiveDisjunction($1, $3);
-      $$->containsTemporal = ($1->containsTemporal or $3->containsTemporal); }
+    { $$ = ExclusiveDisjunction($1, $3); }
 | statepredicate _implies_ statepredicate
-    { $$ = Implication($1, $3);
-      $$->containsTemporal = ($1->containsTemporal or $3->containsTemporal); }
+    { $$ = Implication($1, $3); }
 | statepredicate _iff_ statepredicate
-    { $$ = Equivalence($1, $3);
-      $$->containsTemporal = ($1->containsTemporal or $3->containsTemporal); }
+    { $$ = Equivalence($1, $3); }
 | _ALLPATH_ _ALWAYS_ statepredicate
-    { $$ = AllPath(Always($3));
-      $$->containsTemporal = true; }
+    { $$ = AllPath(Always($3)); }
 | _ALLPATH_ _EVENTUALLY_ statepredicate
-    { $$ = AllPath(Eventually($3));
-      $$->containsTemporal = true; }
+    { $$ = AllPath(Eventually($3)); }
 | _EXPATH_ _ALWAYS_ statepredicate
-    { $$ = ExPath(Always($3));
-      $$->containsTemporal = true; }
+    { $$ = ExPath(Always($3)); }
 | _EXPATH_ _EVENTUALLY_ statepredicate
-    { $$ = ExPath(Eventually($3));
-      $$->containsTemporal = true; }
+    { $$ = ExPath(Eventually($3)); }
 | _ALWAYS_ statepredicate
-    { $$ = Always($2);
-      $$->containsTemporal = true; }
+    { $$ = Always($2); }
 | _EVENTUALLY_ statepredicate
-    { $$ = Eventually($2);
-      $$->containsTemporal = true; }
+    { $$ = Eventually($2); }
 | _REACHABLE_ statepredicate
-    { $$ = ExPath(Eventually($2));
-      $$->containsTemporal = true; }
+    { $$ = ExPath(Eventually($2)); }
 | _INVARIANT_ statepredicate
-    { $$ = AllPath(Always($2));
-      $$->containsTemporal = true; }
+    { $$ = AllPath(Always($2)); }
 | _IMPOSSIBLE_ statepredicate
-    { $$ = AllPath(Always(Negation($2)));
-      $$->containsTemporal = true; }
+    { $$ = AllPath(Always(Negation($2))); }
 ;
 
 atomic_proposition:

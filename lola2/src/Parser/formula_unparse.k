@@ -5,6 +5,12 @@ StatePredicateFormula(x) -> [out: x "\n"];
 
 AtomicProposition(x) -> [out: x];
 
+AllPath(x) -> [out: "A" x ];
+ExPath(x)  -> [out: "E" x ];
+
+Eventually(x) -> [out: "F (" x ")" ];
+Always(x)     -> [out: "G (" x ")" ];
+
 Negation(x) -> [out: "! (" x ")"];
 Conjunction(x, y) -> [out: "(" x " && " y ")"];
 Disjunction(x, y) -> [out: "(" x " || " y ")"];
@@ -28,12 +34,50 @@ ConstProduct_list(h, l) -> [out: h "+" l];
 Node(x) -> [out: "n" x ];
 
 //////////////////////////////////////////////////////////////////////////
+%uview temporal;
+
+f=StatePredicateFormula(x) -> [temporal: x
+{
+    with(x) {
+        ExPath(Eventually(y)) provided (not y->containsTemporal) :
+            { f->formulaType = FORMULA_REACHABLE; }
+        AllPath(Always(y)) provided (not y->containsTemporal) :
+            { f->formulaType = FORMULA_INVARIANT; }
+        AllPath(Always(Negation(y))) provided (not y->containsTemporal) :
+            { f->formulaType = FORMULA_IMPOSSIBLE; }
+        AllPath(Always(ExPath(Eventually(y)))) provided (not y->containsTemporal) :
+            { f->formulaType = FORMULA_LIVENESS; }
+        Always(Eventually(y)) provided (not y->containsTemporal) :
+            { f->formulaType = FORMULA_FAIRNESS; }
+        Eventually(Always(y)) provided (not y->containsTemporal) :
+            { f->formulaType = FORMULA_STABILIZATION; }
+        Eventually(y) provided (not y->containsTemporal) :
+            { f->formulaType = FORMULA_EVENTUALLY; }
+        default provided (not x->containsTemporal) :
+            { f->formulaType = FORMULA_INITIAL; }
+        default :
+            { f->formulaType = FORMULA_MODELCHECKING; }
+    }
+}
+];
+
+f=AtomicProposition(x) -> [temporal:     { f->containsTemporal = false; } ];
+f=Negation(x)          -> [temporal: x   { f->containsTemporal = x->containsTemporal; } ];
+f=Conjunction(x,y)     -> [temporal: x y { f->containsTemporal = (x->containsTemporal || y->containsTemporal); } ];
+f=Disjunction(x,y)     -> [temporal: x y { f->containsTemporal = (x->containsTemporal || y->containsTemporal); } ];
+f=AllPath(x)           -> [temporal: x   { f->containsTemporal = true; assert(x->containsTemporal); } ];
+f=ExPath(x)            -> [temporal: x   { f->containsTemporal = true; assert(x->containsTemporal); } ];
+f=Always(x)            -> [temporal: x   { f->containsTemporal = true; } ];
+f=Eventually(x)        -> [temporal: x   { f->containsTemporal = true; } ];
+
+//////////////////////////////////////////////////////////////////////////
 %uview internal;
 
 %{ KC_UNPARSE
 #include <map>
 #include <vector>
 #include <stack>
+#include <Core/Dimensions.h>
 #include <Net/Net.h>
 #include <Formula/StatePredicate.h>
 #include <Formula/AtomicStatePredicate.h>

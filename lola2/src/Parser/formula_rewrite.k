@@ -64,6 +64,8 @@ Negation(AtomicProposition(LessAtomicProposition(p,n))) -> <neg: AtomicPropositi
 Negation(AtomicProposition(LessEqualAtomicProposition(p,n))) -> <neg: AtomicProposition(GreaterAtomicProposition(p, n))>;
 
 
+// Temporal Tautologies
+
 // NOT A   <->   E NOT
 Negation(AllPath(x)) -> <neg: ExPath(Negation(x))>;
 
@@ -79,9 +81,11 @@ Negation(Always(x)) -> <neg: Eventually(Negation(x))>;
 // FF a        <->  Fa
 Eventually(a=Eventually(x)) -> <neg: a>;
 
-// F (a AND b) ->   (Fa AND Fb)
 // F (a OR b)  <->  (Fa OR Fb)
+Disjunction(Eventually(x), Eventually(y)) -> <neg: Eventually(Disjunction(x,y))>;
+
 // G (a AND b) <->  (Ga AND Gb)
+Conjunction(Always(x), Always(y)) -> <neg: Always(Conjunction(x,y))>;
 
 // FGF a       <->  GFa
 Eventually(a=Always(Eventually(x))) -> <neg: a>;
@@ -181,6 +185,20 @@ Disjunction(t = AtomicProposition(True()), a) -> <sides: t >;
 // if only numbers are left, we can immediately calculate the formula's value
 LessEqualAtomicProposition(Number(x), Number(y)) provided (x->value >= y->value) -> <sides: True() >;
 LessEqualAtomicProposition(Number(x), Number(y)) provided (x->value < y->value) -> <sides: False() >;
+
+
+/**********************************************************
+ * TRANSFORM IMPOSSIBILITY AND INVARIANTS TO REACHABILITY *
+ **********************************************************/
+
+%rview reachability;
+
+// AG f -> NOT EF NOT f   (the outmost negation is handled by LoLA)
+StatePredicateFormula(AllPath(Always(y))) -> <reachability: StatePredicateFormula(ExPath(Eventually(Negation(y))))>;
+
+// AG NOT f -> NOT EF f   (the outmost negation is handled by LoLA)
+StatePredicateFormula(AllPath(Always(Negation(y)))) -> <reachability: StatePredicateFormula(ExPath(Eventually(y)))>;
+
 
 
 /****************************

@@ -1,4 +1,7 @@
 %{ KC_TYPES_HEADER
+#include <cstring>
+#include <map>
+#include <string>
 #include <Core/Dimensions.h>
 #include <Formula/StatePredicate.h>
 

@@ -114,7 +114,7 @@ void InnerMarking::changeView(const int c) {
 	status("changing viewpoint to environment...");
 
 	// create a place which represents the maximal count of messages to be sent...
-	counterPlace = &net->createPlace("input_count", c);
+	counterPlace = &net->createPlace("counter_place", c);
 
 	// iterate through input labels
 	set<pnapi::Label *> inputs = net->getInterface().getInputLabels();
@@ -166,6 +166,8 @@ void InnerMarking::changeView(const int c) {
 			// add an arc from the transition to the "interface place"
 			// \TODO: weight????!!!
 			net->createArc(**t, *p, 1);
+			// ...and one from the "counter place" to the transition
+			net->createArc(*counterPlace, **t, 1);
 		}
 
 		// create a new transition (new output transition)
@@ -398,6 +400,8 @@ void InnerMarking::addInterface(const int count) {
 		// -> "... $invisible$"
 		if (*(--s.end()) != '$') {
 			visible_trans.push_back(*t);
+		} else {
+			//(*t)->setName(s.erase(s.length()-13));
 		}
 	}
 

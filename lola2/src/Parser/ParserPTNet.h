@@ -13,16 +13,16 @@ should be independent from the format (LoLA / PNML / ...)
 
 class ParserPTNet
 {
-    private:
+private:
 
-    public:
-        static void sort_arcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to);
-        SymbolTable* PlaceTable;
-        SymbolTable* TransitionTable;
+public:
+    static void sort_arcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to);
+    SymbolTable* PlaceTable;
+    SymbolTable* TransitionTable;
 
-        /// translation into main net structures Node, Place, Transition, and Marking
-        void symboltable2net();
+    /// translation into main net structures Node, Place, Transition, and Marking
+    void symboltable2net();
 
-        ParserPTNet();
-        ~ParserPTNet();
+    ParserPTNet();
+    ~ParserPTNet();
 };

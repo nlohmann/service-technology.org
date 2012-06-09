@@ -13,20 +13,20 @@
 
 
 ArrayStore::ArrayStore() {
-	store = (capacity_t*)malloc((size_t)2*1024*1024*1024);
-	numElems = 0;
+    store = (capacity_t*)malloc((size_t)2*1024*1024*1024);
+    numElems = 0;
 }
 
 bool ArrayStore::searchAndInsert(NetState* ns)
 {
     ++calls;
-	size_t stateBytes = Place::CardSignificant*sizeof(capacity_t);
-	for(int i=0;i<numElems;i++) {
-		if(!memcmp(store+(i*Place::CardSignificant), ns->Current, stateBytes))
-			return true;
-	}
-	memcpy(store+(numElems*Place::CardSignificant), ns->Current, stateBytes);
-	numElems++;
+    size_t stateBytes = Place::CardSignificant*sizeof(capacity_t);
+    for(int i=0; i<numElems; i++) {
+        if(!memcmp(store+(i*Place::CardSignificant), ns->Current, stateBytes))
+            return true;
+    }
+    memcpy(store+(numElems*Place::CardSignificant), ns->Current, stateBytes);
+    numElems++;
     ++markings;
     return false;
 }

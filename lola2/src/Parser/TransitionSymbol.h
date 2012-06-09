@@ -27,40 +27,40 @@ information is provided in constructor
 */
 class TransitionSymbol: public Symbol
 {
-    public:
-        /// Generate and initialize a symbol
-        TransitionSymbol(char*, fairnessAssumption_t, ArcList*, ArcList*);
-        /// Delete Transition symbol
-        ~TransitionSymbol();
+public:
+    /// Generate and initialize a symbol
+    TransitionSymbol(char*, fairnessAssumption_t, ArcList*, ArcList*);
+    /// Delete Transition symbol
+    ~TransitionSymbol();
 
-        /// Getter for number of incoming arcs
-        unsigned int getCardPre() const;
-        /// Getter for number of outgoing arcs
-        unsigned int getCardPost() const;
-        /// Getter for incoming arcs
-        ArcList* getPre() const;
-        /// Getter for number of post-places
-        ArcList* getPost() const;
-        /// Getter for fairness assumption
-        fairnessAssumption_t getFairness() const;
+    /// Getter for number of incoming arcs
+    unsigned int getCardPre() const;
+    /// Getter for number of outgoing arcs
+    unsigned int getCardPost() const;
+    /// Getter for incoming arcs
+    ArcList* getPre() const;
+    /// Getter for number of post-places
+    ArcList* getPost() const;
+    /// Getter for fairness assumption
+    fairnessAssumption_t getFairness() const;
 
-    private:
-        /// The fairness assumption specified for this tarnsition
-        fairnessAssumption_t fairness;
+private:
+    /// The fairness assumption specified for this tarnsition
+    fairnessAssumption_t fairness;
 
-        /// The number of transitions that consume from this place
-        /// Used for creating arc data structures
-        unsigned int cardPost;
+    /// The number of transitions that consume from this place
+    /// Used for creating arc data structures
+    unsigned int cardPost;
 
-        /// The number of transitions that produce on this place
-        /// used for creating arc data structures
-        unsigned int cardPre;
+    /// The number of transitions that produce on this place
+    /// used for creating arc data structures
+    unsigned int cardPre;
 
-        /// The number of transitions that consume from this place
-        /// Used for creating arc data structures
-        ArcList* Post;
+    /// The number of transitions that consume from this place
+    /// Used for creating arc data structures
+    ArcList* Post;
 
-        /// The number of transitions that produce on this place
-        /// used for creating arc data structures
-        ArcList* Pre;
+    /// The number of transitions that produce on this place
+    /// used for creating arc data structures
+    ArcList* Pre;
 };

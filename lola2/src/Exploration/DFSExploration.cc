@@ -26,12 +26,12 @@ extern Reporter* rep;
 
 bool DFSExploration::depth_first(SimpleProperty& property,Store &myStore, FireListCreator& firelistcreator, int threadNumber)
 {
-	Firelist &myFirelist = *firelistcreator.createFireList(&property);
+    Firelist &myFirelist = *firelistcreator.createFireList(&property);
     // copy initial marking into current marking
     memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
     Marking::HashCurrent = Marking::HashInitial;
 
-	NetState* ns = NetState::createNetStateFromCurrent();
+    NetState* ns = NetState::createNetStateFromCurrent();
 
     // prepare property
     property.value = property.initProperty(*ns);
@@ -81,11 +81,11 @@ bool DFSExploration::depth_first(SimpleProperty& property,Store &myStore, FireLi
                     // push put current transition on stack
                     // this way, the stack contains ALL transitions
                     // of witness path
-                	property.stack.push(currentEntry, currentFirelist);
+                    property.stack.push(currentEntry, currentFirelist);
                     free(Marking::Current);
                     Marking::Current = ns->Current;
                     myStore.finalize();
-                   return true;
+                    return true;
                 }
 
                 // Here: current marking does not satisfy property --> continue search
@@ -119,7 +119,7 @@ bool DFSExploration::find_path(SimpleProperty& property, unsigned int attempts, 
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.
 
-	NetState* ns = NetState::createNetStateFromCurrent();
+    NetState* ns = NetState::createNetStateFromCurrent();
     unsigned int currentattempt = 0;
 
     // get memory for path info
@@ -154,13 +154,13 @@ bool DFSExploration::find_path(SimpleProperty& property, unsigned int attempts, 
         // reset enabledness information
         for (index_t i = 0; i < Net::Card[PL]; i++)
         {
-        	ns->Current[i] = Marking::Initial[i];
-        	ns->CardDisabled[i] = 0;
+            ns->Current[i] = Marking::Initial[i];
+            ns->CardDisabled[i] = 0;
         }
         ns->CardEnabled = Net::Card[TR];
         for (index_t t = 0; t < Net::Card[TR]; ++t)
         {
-        	ns->Enabled[t] = true;
+            ns->Enabled[t] = true;
         }
 
         for (index_t t = 0; t < Net::Card[TR]; ++t)

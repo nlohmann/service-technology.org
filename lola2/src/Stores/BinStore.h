@@ -11,35 +11,35 @@
 
 class BinStore : public Store
 {
+public:
+    BinStore();
+    ~BinStore();
+
+    /// check whether current marking is stored
+    virtual bool searchAndInsert(NetState* ns);
+
+    /// check whether current marking is sted and return state
+    virtual bool searchAndInsert(NetState* ns,State** s);
+    void pbs(unsigned int, unsigned int, unsigned char*, void*);
+    void printBinStore();
+private:
+    /// a binary decision node
+    class Decision
+    {
     public:
-        BinStore();
-        ~BinStore();
+        Decision(bitindex_t);
+        bitindex_t bit;
+        unsigned char* vector;
+        Decision* nextold;
+        Decision* nextnew;
+        State* state;
+        ~Decision();
 
-        /// check whether current marking is stored
-        virtual bool searchAndInsert(NetState* ns);
+    };
+    // first branch in decision tree; NULL as long as less than two elements in bucket
+    Decision** branch;
 
-        /// check whether current marking is sted and return state
-        virtual bool searchAndInsert(NetState* ns,State** s);
-        void pbs(unsigned int, unsigned int, unsigned char*, void*);
-        void printBinStore();
-    private:
-        /// a binary decision node
-        class Decision
-        {
-            public:
-                Decision(bitindex_t);
-                bitindex_t bit;
-                unsigned char* vector;
-                Decision* nextold;
-                Decision* nextnew;
-                State* state;
-                ~Decision();
-
-        };
-        // first branch in decision tree; NULL as long as less than two elements in bucket
-        Decision** branch;
-
-        // first vector in bucket; null as long as bucket empty
-        unsigned char** firstvector;
+    // first vector in bucket; null as long as bucket empty
+    unsigned char** firstvector;
 };
 

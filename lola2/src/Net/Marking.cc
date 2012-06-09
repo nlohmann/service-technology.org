@@ -30,10 +30,10 @@ void Marking::deleteMarkings()
     free(Marking::Target);
 }
 
-void Marking::printMarking(capacity_t* marking){
-	return;
-	printf("PRINTING MARKING %x:\n",marking);
-	for (int i = 0; i < Net::Card[PL]; i++)
-		printf("\t%s:%d\n",Net::Name[PL][i], marking[i]);
-	printf("==============\n");
+void Marking::printMarking(capacity_t* marking) {
+    return;
+    printf("PRINTING MARKING %x:\n",marking);
+    for (int i = 0; i < Net::Card[PL]; i++)
+        printf("\t%s:%d\n",Net::Name[PL][i], marking[i]);
+    printf("==============\n");
 }

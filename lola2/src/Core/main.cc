@@ -83,14 +83,14 @@ void evaluateParameters(int argc, char** argv)
 
     switch (args_info.reporter_arg)
     {
-        case reporter_arg_stream:
-            rep = new ReporterStream(args_info.verbose_given);
-            break;
+    case reporter_arg_stream:
+        rep = new ReporterStream(args_info.verbose_given);
+        break;
 
-        case reporter_arg_socket:
-            rep = new ReporterSocket((u_short)args_info.outputport_arg, args_info.address_arg, args_info.verbose_given);
-            rep->message("pid = %d", getpid());
-            break;
+    case reporter_arg_socket:
+        rep = new ReporterSocket((u_short)args_info.outputport_arg, args_info.address_arg, args_info.verbose_given);
+        rep->message("pid = %d", getpid());
+        break;
     }
 
     IO::setReporter(rep);

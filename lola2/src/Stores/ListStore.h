@@ -14,15 +14,15 @@
 
 class ListStore : public Store
 {
-    private:
-		long long elemCount;
-		capacity_t* store;
-        bool contains(std::vector<capacity_t>);
-        void storeElements(std::vector<capacity_t>);
+private:
+    long long elemCount;
+    capacity_t* store;
+    bool contains(std::vector<capacity_t>);
+    void storeElements(std::vector<capacity_t>);
 
-    public:
-        ListStore();
-        ~ ListStore();
-        bool searchAndInsert(NetState* ns);
-        bool searchAndInsert(NetState* ns,State**);
+public:
+    ListStore();
+    ~ ListStore();
+    bool searchAndInsert(NetState* ns);
+    bool searchAndInsert(NetState* ns,State**);
 };

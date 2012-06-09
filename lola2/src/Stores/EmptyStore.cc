@@ -12,4 +12,6 @@ inline bool EmptyStore::searchAndInsert(NetState* ns)
 }
 
 // LCOV_EXCL_STOP
-bool EmptyStore::searchAndInsert(NetState* ns, State**) { return true; }
+bool EmptyStore::searchAndInsert(NetState* ns, State**) {
+    return true;
+}

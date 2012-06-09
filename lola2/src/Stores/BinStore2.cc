@@ -24,7 +24,7 @@ BinStore2::BinStore2()
 
     pthread_mutex_init(&inc_mutex, NULL);
     for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
-    	pthread_rwlock_init(rwlocks+i, NULL);
+        pthread_rwlock_init(rwlocks+i, NULL);
 
     // initialize bit masks
     //   capacity_t tmp1=1;
@@ -83,9 +83,9 @@ BinStore2::Decision::~Decision()
 /// Do not care about states
 bool BinStore2::searchAndInsert(NetState* ns)
 {
-	pthread_mutex_lock(&inc_mutex);
+    pthread_mutex_lock(&inc_mutex);
     ++calls;
-	pthread_mutex_unlock(&inc_mutex);
+    pthread_mutex_unlock(&inc_mutex);
     // the general assumption is that we read marking, vectors etc. left to right, with
     // low indices left, high indices right,
     // msb left and lsb right.
@@ -149,7 +149,7 @@ bool BinStore2::searchAndInsert(NetState* ns)
                         }
                         else
                         {
-                        	pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                            pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
                             return true;
                         }
                     }
@@ -191,7 +191,7 @@ bool BinStore2::searchAndInsert(NetState* ns)
                         }
                         else
                         {
-                        	pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                            pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
                             return true;
                         }
                     }
@@ -247,7 +247,7 @@ bool BinStore2::searchAndInsert(NetState* ns)
                     }
                     else
                     {
-                    	pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                        pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
                         return true;
                     }
                 }
@@ -283,8 +283,8 @@ bool BinStore2::searchAndInsert(NetState* ns)
                 pthread_mutex_lock(&inc_mutex);
                 ++markings;
                 pthread_mutex_unlock(&inc_mutex);
-            	pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
-               return false;
+                pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                return false;
             }
         }
     }
@@ -317,10 +317,10 @@ bool BinStore2::searchAndInsert(NetState* ns)
             }
             else
             {
-            	pthread_mutex_lock(&inc_mutex);
+                pthread_mutex_lock(&inc_mutex);
                 ++markings;
                 pthread_mutex_unlock(&inc_mutex);
-            	pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
                 return false;
             }
         }

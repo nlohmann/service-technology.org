@@ -15,27 +15,27 @@
 
 class ThreadSafeStore : public Store
 {
-    private:
-	uint16_t threadNumber;
-        pthread_rwlock_t readWriteLock;
-        // the internal store
-        SIStore* store;
-        capacity_t*** localStoresMarkings;
-        hash_t** localStoreHashs;
-        NetState** netStates;
-        uint16_t write_finished_threads;
+private:
+    uint16_t threadNumber;
+    pthread_rwlock_t readWriteLock;
+    // the internal store
+    SIStore* store;
+    capacity_t*** localStoresMarkings;
+    hash_t** localStoreHashs;
+    NetState** netStates;
+    uint16_t write_finished_threads;
 
-        pthread_mutex_t mutex1;
+    pthread_mutex_t mutex1;
 
 
-        sem_t writeSemaphore;
-        void writeToGlobalStore(int thread);
+    sem_t writeSemaphore;
+    void writeToGlobalStore(int thread);
 
-    public:
-        ThreadSafeStore(SIStore* sistore, uint16_t threadnumber);
-        ~ThreadSafeStore();
-        bool searchAndInsert(NetState* ns, int thread);
-        bool searchAndInsert(NetState* ns);
-        bool searchAndInsert(NetState* ns,State**);
-        void finalize();
+public:
+    ThreadSafeStore(SIStore* sistore, uint16_t threadnumber);
+    ~ThreadSafeStore();
+    bool searchAndInsert(NetState* ns, int thread);
+    bool searchAndInsert(NetState* ns);
+    bool searchAndInsert(NetState* ns,State**);
+    void finalize();
 };

@@ -29,9 +29,9 @@ index_t TruePredicate::collectAtomic(AtomicStatePredicate**)
     return 0;
 }
 
-StatePredicate* TruePredicate::copy(StatePredicate* parent){
-	TruePredicate* p = new TruePredicate();
-	p->parent = parent;
-	p->position = position;
-	return p;
+StatePredicate* TruePredicate::copy(StatePredicate* parent) {
+    TruePredicate* p = new TruePredicate();
+    p->parent = parent;
+    p->position = position;
+    return p;
 }

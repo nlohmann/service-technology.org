@@ -156,26 +156,26 @@ void Transition::checkEnabled(NetState* ns,index_t t)
 }
 
 
-void Transition::checkEnabled_Initial(index_t t){
-	NetState ns;
-	ns.Current = Marking::Current;
-	ns.HashCurrent = Marking::HashCurrent;
-	ns.Enabled = Transition::Enabled;
-	ns.CardEnabled = Transition::CardEnabled;
-	ns.PositionScapegoat = Transition::PositionScapegoat;
-	ns.Arc[0][0] = Net::Arc[0][0];
-	ns.Arc[0][1] = Net::Arc[0][1];
-	ns.Arc[1][0] = Net::Arc[1][0];
-	ns.Arc[1][1] = Net::Arc[1][1];
-	ns.Mult[0][0] = Net::Mult[0][0];
-	ns.Mult[0][1] = Net::Mult[0][1];
-	ns.Mult[1][0] = Net::Mult[1][0];
-	ns.Mult[1][1] = Net::Mult[1][1];
-	ns.CardDisabled = Place::CardDisabled;
-	ns.Disabled = Place::Disabled;
-	checkEnabled(&ns,t);
-	Marking::HashCurrent = ns.HashCurrent;
-	Transition::CardEnabled = ns.CardEnabled;
+void Transition::checkEnabled_Initial(index_t t) {
+    NetState ns;
+    ns.Current = Marking::Current;
+    ns.HashCurrent = Marking::HashCurrent;
+    ns.Enabled = Transition::Enabled;
+    ns.CardEnabled = Transition::CardEnabled;
+    ns.PositionScapegoat = Transition::PositionScapegoat;
+    ns.Arc[0][0] = Net::Arc[0][0];
+    ns.Arc[0][1] = Net::Arc[0][1];
+    ns.Arc[1][0] = Net::Arc[1][0];
+    ns.Arc[1][1] = Net::Arc[1][1];
+    ns.Mult[0][0] = Net::Mult[0][0];
+    ns.Mult[0][1] = Net::Mult[0][1];
+    ns.Mult[1][0] = Net::Mult[1][0];
+    ns.Mult[1][1] = Net::Mult[1][1];
+    ns.CardDisabled = Place::CardDisabled;
+    ns.Disabled = Place::Disabled;
+    checkEnabled(&ns,t);
+    Marking::HashCurrent = ns.HashCurrent;
+    Transition::CardEnabled = ns.CardEnabled;
 }
 
 

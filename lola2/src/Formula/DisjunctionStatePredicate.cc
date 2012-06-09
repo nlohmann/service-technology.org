@@ -206,14 +206,14 @@ void DisjunctionStatePredicate::consistency(NetState &ns)
 // LCOV_EXCL_STOP
 
 
-StatePredicate* DisjunctionStatePredicate::copy(StatePredicate* parent){
-	DisjunctionStatePredicate* dsp = new DisjunctionStatePredicate(cardSub);
-	dsp->cardSub = cardSub;
-	dsp->cardSat = cardSat;
-	dsp->value = value;
-	dsp->position = position;
-	dsp->parent = parent;
-	for (index_t i = 0; i < cardSub; i++)
-		dsp->sub[i] = sub[i]->copy(dsp);
-	return dsp;
+StatePredicate* DisjunctionStatePredicate::copy(StatePredicate* parent) {
+    DisjunctionStatePredicate* dsp = new DisjunctionStatePredicate(cardSub);
+    dsp->cardSub = cardSub;
+    dsp->cardSat = cardSat;
+    dsp->value = value;
+    dsp->position = position;
+    dsp->parent = parent;
+    for (index_t i = 0; i < cardSub; i++)
+        dsp->sub[i] = sub[i]->copy(dsp);
+    return dsp;
 }

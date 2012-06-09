@@ -13,10 +13,10 @@
 class NetState {
 
 public:
-	NetState():created_by_function(false){}
-	~NetState();
+    NetState():created_by_function(false) {}
+    ~NetState();
 
-	/////// COPIED FOR MARKING.h
+    /////// COPIED FOR MARKING.h
     /// current  marking
     capacity_t* Current;
 
@@ -55,5 +55,5 @@ public:
     static NetState* createNetStateFromCurrent(NetState* ns);
 
 private:
-	bool created_by_function;
+    bool created_by_function;
 };

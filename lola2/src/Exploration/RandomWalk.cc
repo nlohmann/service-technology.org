@@ -17,7 +17,7 @@
 
 void randomWalk(int transitions)
 {
-	NetState* ns = NetState::createNetStateFromCurrent();
+    NetState* ns = NetState::createNetStateFromCurrent();
     int firedTransitions = 0;
 
     // repeat forever
@@ -67,14 +67,14 @@ void randomWalk(int transitions)
         // reset initial marking
         for (index_t i = 0; i < Net::Card[PL]; i++)
         {
-        	ns->Current[i] = Marking::Initial[i];
-        	ns->CardDisabled[i] = 0;
+            ns->Current[i] = Marking::Initial[i];
+            ns->CardDisabled[i] = 0;
         }
         Marking::HashCurrent = Marking::HashInitial;
         ns->CardEnabled = Net::Card[TR];
         for (index_t i = 0; i < Net::Card[TR]; i++)
         {
-        	ns->Enabled[i] = true;
+            ns->Enabled[i] = true;
         }
         for (index_t i = 0; i < Net::Card[TR]; i++)
         {

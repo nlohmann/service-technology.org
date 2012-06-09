@@ -11,12 +11,12 @@
 
 class ArrayStore : public Store
 {
-    private:
-        capacity_t* store;
-        size_t numElems;
+private:
+    capacity_t* store;
+    size_t numElems;
 
-    public:
-        ArrayStore();
-        bool searchAndInsert(NetState* ns);
-        bool searchAndInsert(NetState* ns,State**);
+public:
+    ArrayStore();
+    bool searchAndInsert(NetState* ns);
+    bool searchAndInsert(NetState* ns,State**);
 };

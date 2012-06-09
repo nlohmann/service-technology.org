@@ -22,28 +22,28 @@ class EmptyStore;
 class SimpleProperty {
 public:
 
-	/// the witness path
-	SearchStack stack;
+    /// the witness path
+    SearchStack stack;
 
-	/// value of property in current state
-	bool value;
+    /// value of property in current state
+    bool value;
 
-	/// prepare for search
-	virtual bool initProperty(NetState &ns) {
-		return false;
-	}
+    /// prepare for search
+    virtual bool initProperty(NetState &ns) {
+        return false;
+    }
 
-	/// check property in Marking::Current, use after fire. Argument is transition just fired.
-	virtual bool checkProperty(NetState &ns, index_t) {
-		return false;
-	}
+    /// check property in Marking::Current, use after fire. Argument is transition just fired.
+    virtual bool checkProperty(NetState &ns, index_t) {
+        return false;
+    }
 
-	/// check property in Marking::Current, use after backfire. Argument is transition just backfired.
-	virtual bool updateProperty(NetState &ns, index_t) {
-		return false;
-	}
+    /// check property in Marking::Current, use after backfire. Argument is transition just backfired.
+    virtual bool updateProperty(NetState &ns, index_t) {
+        return false;
+    }
 
-	virtual SimpleProperty* copy(){
-		return new SimpleProperty();
-	}
+    virtual SimpleProperty* copy() {
+        return new SimpleProperty();
+    }
 };

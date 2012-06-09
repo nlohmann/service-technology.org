@@ -240,29 +240,29 @@ void AtomicStatePredicate::consistency(NetState& ns)
     {
         assert(sum > threshold);
     }
-   /* if (this != top)
-    {
-        assert(parent);
-    }*/
+    /* if (this != top)
+     {
+         assert(parent);
+     }*/
 }
 // LCOV_EXCL_STOP
 
 
-StatePredicate* AtomicStatePredicate::copy(StatePredicate* parent){
-	AtomicStatePredicate* af = new AtomicStatePredicate(0,0,0);
-	af->value = value;
-	af->position = position;
-	af->parent = parent;
-	// we can copy the pointers, so use the same arrays as they are not changed!
-	af->posPlaces = posPlaces;
-	af->negPlaces =negPlaces;
-	af->posMult = posMult;
-	af->negMult = negMult;
-	af->cardPos = cardPos;
-	af->cardNeg = cardNeg;
-	af->threshold = threshold;
-	af->sum = sum;
-	af->up = up;
-	af->cardUp = cardUp;
-	return af;
+StatePredicate* AtomicStatePredicate::copy(StatePredicate* parent) {
+    AtomicStatePredicate* af = new AtomicStatePredicate(0,0,0);
+    af->value = value;
+    af->position = position;
+    af->parent = parent;
+    // we can copy the pointers, so use the same arrays as they are not changed!
+    af->posPlaces = posPlaces;
+    af->negPlaces =negPlaces;
+    af->posMult = posMult;
+    af->negMult = negMult;
+    af->cardPos = cardPos;
+    af->cardNeg = cardNeg;
+    af->threshold = threshold;
+    af->sum = sum;
+    af->up = up;
+    af->cardUp = cardUp;
+    return af;
 }

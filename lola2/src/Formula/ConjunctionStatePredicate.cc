@@ -197,14 +197,14 @@ void ConjunctionStatePredicate::consistency(NetState &ns)
 // LCOV_EXCL_STOP
 
 
-StatePredicate* ConjunctionStatePredicate::copy(StatePredicate* parent){
-	ConjunctionStatePredicate* csp = new ConjunctionStatePredicate(cardSub);
-	csp->cardSub = cardSub;
-	csp->cardSat = cardSat;
-	csp->value = value;
-	csp->position = position;
-	csp->parent = parent;
-	for (index_t i = 0; i < cardSub; i++)
-		csp->sub[i] = sub[i]->copy(csp);
-	return csp;
+StatePredicate* ConjunctionStatePredicate::copy(StatePredicate* parent) {
+    ConjunctionStatePredicate* csp = new ConjunctionStatePredicate(cardSub);
+    csp->cardSub = cardSub;
+    csp->cardSat = cardSat;
+    csp->value = value;
+    csp->position = position;
+    csp->parent = parent;
+    for (index_t i = 0; i < cardSub; i++)
+        csp->sub[i] = sub[i]->copy(csp);
+    return csp;
 }

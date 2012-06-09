@@ -14,13 +14,13 @@
 class HuffmanStoreAVL: public Store {
 
 private:
-	//Store* store2;
-	HuffmanEncoding he;
-	std::set<std::vector<bool> > store;
+    //Store* store2;
+    HuffmanEncoding he;
+    std::set<std::vector<bool> > store;
 
 public:
-	HuffmanStoreAVL();
-	~HuffmanStoreAVL();
-	bool searchAndInsert(NetState* ns);
-	bool searchAndInsert(NetState* ns,State**);
+    HuffmanStoreAVL();
+    ~HuffmanStoreAVL();
+    bool searchAndInsert(NetState* ns);
+    bool searchAndInsert(NetState* ns,State**);
 };

@@ -30,6 +30,6 @@ index_t Firelist::getFirelist(NetState* ns,index_t** result)
 }
 
 
-Firelist* FireListCreator::createFireList(SimpleProperty*){
-	return new Firelist();
+Firelist* FireListCreator::createFireList(SimpleProperty*) {
+    return new Firelist();
 }

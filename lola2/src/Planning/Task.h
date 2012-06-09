@@ -12,28 +12,28 @@ class DFSExploration;
 
 class Task
 {
-    private:
-        StatePredicate* sp;
-        ChooseTransition* choose;
-        enum_search search;
-        FireListCreator* flc;
-        SimpleProperty* p;
-        DFSExploration* exploration;
-        int number_of_threads;
+private:
+    StatePredicate* sp;
+    ChooseTransition* choose;
+    enum_search search;
+    FireListCreator* flc;
+    SimpleProperty* p;
+    DFSExploration* exploration;
+    int number_of_threads;
 
-    public:
-        Store* s;
+public:
+    Store* s;
 
-        Task();
-        ~Task();
+    Task();
+    ~Task();
 
-        bool getResult();
+    bool getResult();
 
-        void setThreads();
-        void setFormula();
-        void setStore();
-        void setProperty();
+    void setThreads();
+    void setFormula();
+    void setStore();
+    void setProperty();
 
-        void printWitness();
-        void printMarking();
+    void printWitness();
+    void printMarking();
 };

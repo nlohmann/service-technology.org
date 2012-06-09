@@ -10,7 +10,7 @@ Actual property is virtual, default (base class) is full exploration
 #pragma once
 
 #include "Exploration/SearchStack.h"
-#include "Exploration/SimpleProperty.h"
+#include "Exploration/DFSExploration.h"
 #include <semaphore.h>
 #include <Net/NetState.h>
 
@@ -18,11 +18,11 @@ class Firelist;
 class Store;
 class EmptyStore;
 
-class ParallelSimpleProperty : public SimpleProperty
+class ParallelExploration : public DFSExploration
 {
     public:
         /// evaluate property by dfs. Result true = state found, false = state not found
-        virtual bool depth_first(Store &, FireListCreator &firelistcreator, int threadNumber);
+        virtual bool depth_first(SimpleProperty& property, Store &, FireListCreator &firelistcreator, int threadNumber);
 
 
         sem_t restartSemaphore;
@@ -35,6 +35,7 @@ class ParallelSimpleProperty : public SimpleProperty
         sem_t transfer_finished_mutex;
         SearchStack transfer_stack;
         NetState* transfer_netstate;
+        SimpleProperty* transfer_property;
 
         // mutex to control writing back to current marking
         pthread_mutex_t write_current_back_mutex;
@@ -43,4 +44,7 @@ class ParallelSimpleProperty : public SimpleProperty
 
     private:
         pthread_t* runner_thread;
+        static void* threadPrivateDFS(void* container);
+
+        bool threadedExploration(NetState* ns,Store &myStore, FireListCreator &fireListCreator, SimpleProperty* sp, int threadNumber, int number_of_threads, SimpleProperty* resultProperty);
 };

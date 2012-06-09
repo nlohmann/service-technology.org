@@ -9,6 +9,7 @@
 #include <Core/Dimensions.h>
 #include <Net/NetState.h>
 
+class SimpleProperty;
 
 class Firelist
 {
@@ -19,7 +20,8 @@ class Firelist
         virtual ~Firelist() {}
 };
 
-class FireListCreator {
+class FireListCreator
+{
 	public:
-		virtual Firelist* createFireList();
+		virtual Firelist* createFireList(SimpleProperty* sp);
 };

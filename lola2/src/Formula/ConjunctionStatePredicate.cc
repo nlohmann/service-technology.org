@@ -189,10 +189,10 @@ void ConjunctionStatePredicate::consistency(NetState &ns)
         assert(value);
     }
     assert(cardSat <= cardSub);
-    if (this != top)
+    /*if (this != top)
     {
         assert(parent);
-    }
+    }*/
 }
 // LCOV_EXCL_STOP
 
@@ -205,6 +205,6 @@ StatePredicate* ConjunctionStatePredicate::copy(StatePredicate* parent){
 	csp->position = position;
 	csp->parent = parent;
 	for (index_t i = 0; i < cardSub; i++)
-		csp->sub[i] = sub[i]->copy();
+		csp->sub[i] = sub[i]->copy(csp);
 	return csp;
 }

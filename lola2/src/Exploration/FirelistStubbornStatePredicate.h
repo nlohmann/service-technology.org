@@ -29,8 +29,5 @@ class FirelistStubbornStatePredicate : public Firelist
 
 class FirelistStubbornStatePredicateCreator : public FireListCreator{
 	public:
-		FirelistStubbornStatePredicateCreator(StatePredicate*);
-		virtual Firelist* createFireList();
-	private:
-		StatePredicate* predicate;
+		virtual Firelist* createFireList(SimpleProperty*);
 };

@@ -37,5 +37,5 @@ class FirelistStubbornDeadlock : public Firelist
 
 class FireListStubbornDeadlockCreator : public FireListCreator{
 	public:
-		virtual Firelist* createFireList();
+		virtual Firelist* createFireList(SimpleProperty*);
 };

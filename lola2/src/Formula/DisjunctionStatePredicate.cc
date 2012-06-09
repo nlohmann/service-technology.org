@@ -197,10 +197,10 @@ void DisjunctionStatePredicate::consistency(NetState &ns)
     {
         assert(!value);
     }
-    if (this != top)
+    /*if (this != top)
     {
         assert(parent);
-    }
+    }*/
 }
 
 // LCOV_EXCL_STOP
@@ -214,6 +214,6 @@ StatePredicate* DisjunctionStatePredicate::copy(StatePredicate* parent){
 	dsp->position = position;
 	dsp->parent = parent;
 	for (index_t i = 0; i < cardSub; i++)
-		dsp->sub[i] = sub[i]->copy();
+		dsp->sub[i] = sub[i]->copy(dsp);
 	return dsp;
 }

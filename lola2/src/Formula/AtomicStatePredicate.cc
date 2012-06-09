@@ -240,10 +240,10 @@ void AtomicStatePredicate::consistency(NetState& ns)
     {
         assert(sum > threshold);
     }
-    if (this != top)
+   /* if (this != top)
     {
         assert(parent);
-    }
+    }*/
 }
 // LCOV_EXCL_STOP
 

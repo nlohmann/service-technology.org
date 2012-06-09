@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include <Exploration/ParallelSimpleProperty.h>
+#include <Exploration/SimpleProperty.h>
 
 class Firelist;
 class Store;
 
 /// derives deadlock checking from SimpleProperty
-class Deadlock : public ParallelSimpleProperty
+class Deadlock : public SimpleProperty
 {
     public:
         Deadlock() {}
@@ -28,4 +28,6 @@ class Deadlock : public ParallelSimpleProperty
 
         /// check property in Marking::Current, use after backfire. Argument is transition just backfired.
         bool updateProperty(NetState &ns,index_t) {return false;}
+
+        virtual SimpleProperty* copy(){return new Deadlock();}
 };

@@ -181,7 +181,6 @@ void Transition::checkEnabled_Initial(index_t t){
 
 /// fire a transition and
 void Transition::fire(NetState* ns, index_t t)
-
 {
     //  Don't even think about firing a disabled transition!
     assert(ns->Enabled[t]);

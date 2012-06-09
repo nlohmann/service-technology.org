@@ -10,7 +10,11 @@
 #include "Core/Dimensions.h"
 
 
-struct NetState {
+class NetState {
+
+public:
+	NetState():created_by_function(false){}
+	~NetState();
 
 	/////// COPIED FOR MARKING.h
     /// current  marking
@@ -49,4 +53,7 @@ struct NetState {
 
     static NetState* createNetStateFromCurrent();
     static NetState* createNetStateFromCurrent(NetState* ns);
+
+private:
+	bool created_by_function;
 };

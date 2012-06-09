@@ -1,8 +1,8 @@
 # the main program
 bin_PROGRAMS = lola
 
-lola_CFLAGS = -g
-lola_CXXFLAGS = -g
+lola_CFLAGS = -g -ggdb
+lola_CXXFLAGS = -g -ggdb
 
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
@@ -40,11 +40,12 @@ lola_SOURCES = \
                 \
                 Planning/Task.cc Planning/Task.h \
                 \
+                Exploration/DFSExploration.cc Exploration/DFSExploration.h \
+                Exploration/ParallelExploration.cc Exploration/ParallelExploration.h \
                 Exploration/Firelist.cc Exploration/Firelist.h \
                 Exploration/RandomWalk.cc Exploration/RandomWalk.h \
                 Exploration/SearchStack.cc Exploration/SearchStack.h \
-                Exploration/SimpleProperty.cc Exploration/SimpleProperty.h \
-                Exploration/ParallelSimpleProperty.cc Exploration/ParallelSimpleProperty.h \
+                Exploration/SimpleProperty.h \
                 Exploration/Deadlock.cc Exploration/Deadlock.h \
                 Exploration/ChooseTransition.h \
                 Exploration/ChooseTransitionHashDriven.cc Exploration/ChooseTransitionHashDriven.h \

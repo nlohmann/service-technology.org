@@ -36,4 +36,6 @@ public:
 
 	/// Aufräumen der Knoten - Service für valgrind
 	static void deleteMarkings();
+
+	static void printMarking(capacity_t* marking);
 };

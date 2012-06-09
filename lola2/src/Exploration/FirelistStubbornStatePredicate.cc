@@ -13,6 +13,7 @@
 #include <Net/Transition.h>
 #include <Net/Marking.h>
 #include <Exploration/FirelistStubbornStatePredicate.h>
+#include <Exploration/StatePredicateProperty.h>
 
 FirelistStubbornStatePredicate::FirelistStubbornStatePredicate(StatePredicate* p)
 {
@@ -29,7 +30,6 @@ FirelistStubbornStatePredicate::~FirelistStubbornStatePredicate()
 
 index_t FirelistStubbornStatePredicate::getFirelist(NetState* ns,index_t** result)
 {
-
     if (ns->CardEnabled == 0)
     {
         * result = new index_t[1];
@@ -84,11 +84,6 @@ index_t FirelistStubbornStatePredicate::getFirelist(NetState* ns,index_t** resul
     return size;
 }
 
-
-FirelistStubbornStatePredicateCreator::FirelistStubbornStatePredicateCreator(StatePredicate* statePredicate){
-	predicate = statePredicate;
-}
-
-Firelist* FirelistStubbornStatePredicateCreator::createFireList(){
-	return new FirelistStubbornStatePredicate(predicate);
+Firelist* FirelistStubbornStatePredicateCreator::createFireList(SimpleProperty* property){
+	return new FirelistStubbornStatePredicate(((StatePredicateProperty*)property)->getPredicate());
 }

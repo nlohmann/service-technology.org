@@ -16,6 +16,7 @@
 
 NetState* NetState::createNetStateFromCurrent() {
 	NetState* ns = (NetState*) malloc(sizeof(NetState));
+	ns->created_by_function = true;
 	// copy the current marking at its hash
 	ns->Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
 	for (int i = 0; i < Net::Card[PL]; i++)
@@ -113,6 +114,7 @@ NetState* NetState::createNetStateFromCurrent() {
 
 NetState* NetState::createNetStateFromCurrent(NetState* ons){
 	NetState* ns = (NetState*) malloc(sizeof(NetState));
+	ns->created_by_function = true;
 	// copy the current marking at its hash
 	ns->Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
 	for (int i = 0; i < Net::Card[PL]; i++)
@@ -201,3 +203,36 @@ NetState* NetState::createNetStateFromCurrent(NetState* ons){
 }
 
 
+NetState::~NetState(){
+	if (!created_by_function)
+		return;
+	free(Current);
+	free(Enabled);
+	free(PositionScapegoat);
+
+	// for places
+	for (int i = 0; i < Net::Card[PL]; i++) {
+		free(Arc[PL][PRE][i]);
+		free(Mult[PL][PRE][i]);
+		free(Arc[PL][POST][i]);
+		free(Mult[PL][POST][i]);
+	}
+
+	// for transitions
+	for (int i = 0; i < Net::Card[TR]; i++) {
+		free(Arc[TR][PRE][i]);
+		free(Mult[TR][PRE][i]);
+		free(Arc[TR][POST][i]);
+		free(Mult[TR][POST][i]);
+	}
+
+	for (int type = PL; type <= TR; type++) {
+		for (int direction = PRE; direction <= POST; direction++) {
+			free(Arc[type][direction]);
+			free(Mult[type][direction]);
+		}
+	}
+	free(CardDisabled);
+	free(Disabled);
+
+}

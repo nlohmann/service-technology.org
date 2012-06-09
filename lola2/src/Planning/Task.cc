@@ -10,6 +10,9 @@
 #include <Net/Net.h>
 #include <Net/Marking.h>
 
+#include <Exploration/DFSExploration.h>
+#include <Exploration/ParallelExploration.h>
+
 #include <Exploration/RandomWalk.h>
 #include <Exploration/Firelist.h>
 #include <Exploration/SimpleProperty.h>
@@ -58,7 +61,7 @@ void myprinter(const char* s, kc::uview v)
 
 extern kc::tFormula TheFormula;
 
-Task::Task() : sp(NULL), p(NULL), s(NULL), flc(NULL), choose(NULL), search(args_info.search_arg)
+Task::Task() : sp(NULL), p(NULL), s(NULL), flc(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg)
 {}
 
 Task::~Task()
@@ -67,6 +70,7 @@ Task::~Task()
     delete p;
     delete sp;
     delete flc;
+    delete exploration;
 }
 
 void Task::setFormula()
@@ -226,13 +230,32 @@ void Task::setProperty()
         case check_arg_deadlock:
             p = new Deadlock();
             flc = new FireListStubbornDeadlockCreator();
+            exploration = new DFSExploration();
             break;
 
         case check_arg_statepredicate:
             p = new StatePredicateProperty(sp);
-            flc = new FirelistStubbornStatePredicateCreator(sp);
+            flc = new FirelistStubbornStatePredicateCreator();
+            exploration = new DFSExploration();
             break;
     }
+
+
+    // set the correct exploration algorithm
+    switch (args_info.check_arg)
+    {
+        case check_arg_full:
+        case check_arg_deadlock:
+        case check_arg_statepredicate:
+        	if (number_of_threads == 1)
+        	    	exploration = new DFSExploration();
+        	    else
+        	    	exploration = new ParallelExploration();
+            break;
+        // now there is only one, but who knows...
+    }
+
+    exploration = new ParallelExploration();
 }
 
 void Task::setThreads(){
@@ -243,13 +266,14 @@ bool Task::getResult()
 {
     assert(s);
     assert(p);
+    assert(exploration);
     assert(flc);
 
     bool result;
     switch (args_info.search_arg)
     {
         case search_arg_depth:
-            result = p->depth_first(*s, * flc, number_of_threads);
+            result = exploration->depth_first(*p, *s, * flc, number_of_threads);
             break;
 
         case search_arg_findpath:
@@ -263,12 +287,13 @@ bool Task::getResult()
             }
 
             choose = new ChooseTransitionHashDriven();
-            result = p->find_path(args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(), *((EmptyStore*)s), *choose);
+            result = exploration->find_path(*p, args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(p), *((EmptyStore*)s), *choose);
             delete choose;
             break;
 
         default:
             assert(false);
+            break;
     }
 
     return result;

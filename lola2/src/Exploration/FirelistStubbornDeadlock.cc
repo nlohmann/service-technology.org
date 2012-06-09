@@ -204,6 +204,6 @@ index_t FirelistStubbornDeadlock::getFirelist(NetState* ns,index_t** result)
     }
 }
 
-Firelist* FireListStubbornDeadlockCreator::createFireList(){
+Firelist* FireListStubbornDeadlockCreator::createFireList(SimpleProperty*){
 	return new FirelistStubbornDeadlock();
 }

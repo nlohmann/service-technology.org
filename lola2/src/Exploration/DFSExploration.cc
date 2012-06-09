@@ -14,9 +14,7 @@ Actual property is virtual, default (base class) is full exploration
 #include <Net/Place.h>
 #include <Net/Transition.h>
 #include <Net/Net.h>
-#include <Exploration/SimpleProperty.h>
-#include <Exploration/Firelist.h>
-#include <Exploration/ChooseTransition.h>
+#include <Exploration/DFSExploration.h>
 #include <Stores/Store.h>
 #include <Stores/EmptyStore.h>
 #include <InputOutput/Reporter.h>
@@ -25,14 +23,10 @@ Actual property is virtual, default (base class) is full exploration
 extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
-bool SimpleProperty::initProperty(NetState &ns)
-{
-    return false;
-}
 
-bool SimpleProperty::depth_first(Store &myStore, FireListCreator& firelistcreator, int threadNumber)
+bool DFSExploration::depth_first(SimpleProperty& property,Store &myStore, FireListCreator& firelistcreator, int threadNumber)
 {
-	Firelist &myFirelist = *firelistcreator.createFireList();
+	Firelist &myFirelist = *firelistcreator.createFireList(&property);
     // copy initial marking into current marking
     memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
     Marking::HashCurrent = Marking::HashInitial;
@@ -40,9 +34,9 @@ bool SimpleProperty::depth_first(Store &myStore, FireListCreator& firelistcreato
 	NetState* ns = NetState::createNetStateFromCurrent();
 
     // prepare property
-    value = initProperty(*ns);
+    property.value = property.initProperty(*ns);
 
-    if (value)
+    if (property.value)
     {
         // initial marking satisfies property
         free(Marking::Current);
@@ -80,14 +74,14 @@ bool SimpleProperty::depth_first(Store &myStore, FireListCreator& firelistcreato
 
                 Transition::updateEnabled(ns,currentFirelist[currentEntry]);
                 // check current marking for property
-                value = checkProperty(*ns,currentFirelist[currentEntry]);
-                if (value)
+                property.value = property.checkProperty(*ns,currentFirelist[currentEntry]);
+                if (property.value)
                 {
                     // current  marking satisfies property
                     // push put current transition on stack
                     // this way, the stack contains ALL transitions
                     // of witness path
-                    stack.push(currentEntry, currentFirelist);
+                	property.stack.push(currentEntry, currentFirelist);
                     free(Marking::Current);
                     Marking::Current = ns->Current;
                     myStore.finalize();
@@ -95,7 +89,7 @@ bool SimpleProperty::depth_first(Store &myStore, FireListCreator& firelistcreato
                 }
 
                 // Here: current marking does not satisfy property --> continue search
-                stack.push(currentEntry, currentFirelist);
+                property.stack.push(currentEntry, currentFirelist);
                 currentEntry = myFirelist.getFirelist(ns,&currentFirelist);
             } // end else branch for "if state exists"
         }
@@ -103,7 +97,7 @@ bool SimpleProperty::depth_first(Store &myStore, FireListCreator& firelistcreato
         {
             // firing list completed -->close state and return to previous state
             delete [] currentFirelist;
-            if (stack.StackPointer == 0)
+            if (property.stack.StackPointer == 0)
             {
                 // have completely processed initial marking --> state not found
                 free(Marking::Current);
@@ -111,16 +105,16 @@ bool SimpleProperty::depth_first(Store &myStore, FireListCreator& firelistcreato
                 myStore.finalize();
                 return false;
             }
-            stack.pop(&currentEntry, &currentFirelist);
+            property.stack.pop(&currentEntry, &currentFirelist);
             assert(currentEntry < Net::Card[TR]);
             Transition::backfire(ns,currentFirelist[currentEntry]);
             Transition::revertEnabled(ns,currentFirelist[currentEntry]);
-            value = updateProperty(*ns,currentFirelist[currentEntry]);
+            property.value = property.updateProperty(*ns,currentFirelist[currentEntry]);
         }
     }
 }
 
-bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition &c)
+bool DFSExploration::find_path(SimpleProperty& property, unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition &c)
 {
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.
@@ -175,9 +169,9 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
         }
 
         // prepare property
-        value = initProperty(*ns);
+        property.value = property.initProperty(*ns);
 
-        if (value)
+        if (property.value)
         {
             // initial marking satisfies property
             // witness path is empty path
@@ -211,8 +205,8 @@ bool SimpleProperty::find_path(unsigned int attempts, unsigned int maxdepth, Fir
             Transition::fire(ns,chosen);
             Transition::updateEnabled(ns,chosen);
 
-            value = checkProperty(*ns,chosen);
-            if (value)
+            property.value = property.checkProperty(*ns,chosen);
+            if (property.value)
             {
                 // witness path is path[0] .... path[depth-1] path[depth]
                 // initial marking satisfies property

@@ -10,7 +10,6 @@
 #include <Net/Net.h>
 #include <Net/Transition.h>
 #include <Exploration/Firelist.h>
-#include <cstdio>
 
 
 index_t Firelist::getFirelist(NetState* ns,index_t** result)
@@ -31,7 +30,6 @@ index_t Firelist::getFirelist(NetState* ns,index_t** result)
 }
 
 
-
-Firelist* FireListCreator::createFireList(){
+Firelist* FireListCreator::createFireList(SimpleProperty*){
 	return new Firelist();
 }

@@ -20,6 +20,5 @@ private:
 public:
     HuffmanStoreList();
     ~HuffmanStoreList();
-    bool searchAndInsert(NetState* ns);
-    bool searchAndInsert(NetState* ns,State**);
+    bool searchAndInsert(NetState* ns, void**);
 };

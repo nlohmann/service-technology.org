@@ -68,7 +68,8 @@ SIBinStore2::~SIBinStore2() {
 
 /// create a new branch in the decision tree at depth b.
 SIBinStore2::Decision::Decision(bitindex_t b) :
-    bit(b), nextold(NULL), nextnew(NULL), state(0) {
+    bit(b), nextold(NULL), nextnew(NULL)//, state(0)
+{
 }
 
 SIBinStore2::Decision::~Decision() {

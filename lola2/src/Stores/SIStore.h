@@ -14,9 +14,6 @@
 
 #include "Net/NetState.h"
 
-
-class State;
-
 class SIStore
 {
 public:

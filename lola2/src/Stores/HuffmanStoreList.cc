@@ -23,7 +23,7 @@ HuffmanStoreList::~HuffmanStoreList() {
     delete &he;
 }
 
-bool HuffmanStoreList::searchAndInsert(NetState* ns) {
+bool HuffmanStoreList::searchAndInsert(NetState* ns, void**) {
     bool erg = store2->searchAndInsert(ns);
     if(!he.contains(ns->Current,&store)) {
         markings++;
@@ -36,9 +36,4 @@ bool HuffmanStoreList::searchAndInsert(NetState* ns) {
     }
     assert(erg);
     return true; //marking was seen
-}
-
-bool HuffmanStoreList::searchAndInsert(NetState* ns,State**) {
-    assert(false);
-    return(false);
 }

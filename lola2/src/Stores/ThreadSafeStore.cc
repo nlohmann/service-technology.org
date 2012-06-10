@@ -138,14 +138,8 @@ bool ThreadSafeStore::searchAndInsert(NetState* ns, int thread) {
 }
 
 // LCOV_EXCL_START
-bool ThreadSafeStore::searchAndInsert(NetState* ns) {
+bool ThreadSafeStore::searchAndInsert(NetState* ns, void**) {
     return searchAndInsert(ns, 0);
-}
-
-
-bool ThreadSafeStore::searchAndInsert(NetState* ns, State**) {
-    assert(false);
-    return false;
 }
 // LCOV_EXCL_STOP
 

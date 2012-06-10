@@ -23,6 +23,5 @@ private:
 public:
     ListStore();
     ~ ListStore();
-    bool searchAndInsert(NetState* ns);
-    bool searchAndInsert(NetState* ns,State**);
+    bool searchAndInsert(NetState* ns, void**);
 };

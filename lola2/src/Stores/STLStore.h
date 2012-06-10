@@ -17,6 +17,5 @@ private:
     std::set<std::vector<capacity_t> > store;
 
 public:
-    bool searchAndInsert(NetState* ns);
-    bool searchAndInsert(NetState* ns,State**);
+    bool searchAndInsert(NetState* ns, void**);
 };

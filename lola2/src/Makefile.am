@@ -63,7 +63,7 @@ lola_SOURCES = \
                 Stores/Store.cc Stores/Store.h \
                 Stores/SIStore.h \
                 Stores/BloomStore.cc Stores/BloomStore.h \
-                Stores/BinStore.h Stores/BinStore.cc \
+                Stores/BinStore.h Stores/BinStore.cc Stores/LoadedBinStore.h \
                 Stores/BitStore.cc Stores/BitStore.h \
                 Stores/EmptyStore.cc Stores/EmptyStore.h \
                 Stores/STLStore.cc Stores/STLStore.h \

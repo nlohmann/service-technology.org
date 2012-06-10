@@ -14,8 +14,6 @@
 
 #include "Net/NetState.h"
 
-class State;
-
 /*!
 \example
 
@@ -54,14 +52,11 @@ public:
     virtual ~Store();
 
     /// check whether current marking is stored
-    virtual bool searchAndInsert(NetState* ns) = 0;
-
-    /// check whether current marking is stored
     /// threaded version, this have not to be implemented by each store
     virtual bool searchAndInsert(NetState* ns, int thread);
 
     /// check whether current marking is stored and return state
-    virtual bool searchAndInsert(NetState* ns, State** s) = 0;
+    virtual bool searchAndInsert(NetState* ns, void** s = NULL) = 0;
 
     /// with this method the store will calculate the actual number of markings
     virtual void finalize();

@@ -40,7 +40,7 @@ BinStore::~BinStore()
 }
 
 /// create a new branch in the decision tree at depth b.
-BinStore::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL), state(0)
+BinStore::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL)//, state(0)
 {
 }
 
@@ -58,11 +58,17 @@ BinStore::Decision::~Decision()
 
 }
 
+/// create a decision node
+BinStore::Decision * BinStore::createDecision(bitindex_t b)
+{
+  return new Decision(b);
+}
+
 
 /// search for a state in the binStore and insert it, if it is not there
 /// Do not care about states
 
-bool BinStore::searchAndInsert(NetState* ns)
+bool BinStore::searchAndInsert(NetState* ns, void** result)
 {
     ++calls;;
     // the general assumption is that we read marking, vectors etc. left to right, with
@@ -71,6 +77,9 @@ bool BinStore::searchAndInsert(NetState* ns)
 
     /// If a new decision record is inserted, * anchor must point to it
     Decision** anchor;
+
+    /// pointer to last decision taken (stores result if record found)
+    Decision* lastDecision = NULL;
 
     /// the vector we are currently investigating
     unsigned char* currentvector;
@@ -96,6 +105,7 @@ bool BinStore::searchAndInsert(NetState* ns)
     {
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
         newvector = firstvector + ns->HashCurrent;
+        getAndCreateFirstPayload(ns->HashCurrent, result);
     }
     else
     {
@@ -131,7 +141,7 @@ freshvector:
             if (position == (*anchor)->bit)\
             {\
                 /* switch to other currentvector*/\
-                currentvector = (* anchor) -> vector;\
+                currentvector = (lastDecision = * anchor) -> vector;\
                 anchor = &((* anchor) -> nextnew);\
                 /* Indices in new vector start at msb in byte 0*/\
                 vector_byte = 0;\
@@ -146,6 +156,8 @@ freshvector:
                     if (place_index >= Place::CardSignificant)\
                     {\
                         /* no mismatch --> state found*/\
+                        /* we currently set this pointer so no test for NULL necessary */\
+                        lastDecision->getPayload(result);\
                         return true;\
                     }\
                     placebit_index = Place::CardBits[place_index] - 1;\
@@ -163,6 +175,8 @@ freshvector:
             {\
                 /* dive down in nextold list for next branch descending from current vector*/\
                 anchor = &((*anchor)->nextold);\
+                /* if anchor is not NULL it will hold the result for a possible match*/\
+                lastDecision = anchor ? *anchor : NULL;\
             }\
             else\
             {\
@@ -185,6 +199,14 @@ freshvector:
         if (place_index >= Place::CardSignificant)\
         {\
             /* no mismatch --> state found*/\
+            if(lastDecision)\
+            {\
+                lastDecision->getPayload(result);\
+            }\
+            else\
+            {\
+                getFirstPayload(ns->HashCurrent, result);\
+            }\
             return true;\
         }\
         placebit_index = Place::CardBits[place_index] - 1;\
@@ -206,11 +228,12 @@ freshvector:
         }
 insert:
         // state not found --> prepare for insertion
-        Decision* newdecision = new Decision(position);
+        Decision* newdecision = createDecision(position);
         newdecision -> nextold = * anchor;
         * anchor = newdecision;
         newdecision -> nextnew = NULL;
         newvector = &(newdecision -> vector);
+        newdecision->getPayload(result); // return result
         // the mismatching bit itself is not represented in the new vector
         ++position;
         if (placebit_index == 0)
@@ -280,14 +303,6 @@ insert:
     ++markings;
     return false;
 }
-
-// not implemented yet
-// LCOV_EXCL_START
-bool BinStore::searchAndInsert(NetState* ns,State** result)
-{
-    assert(false);
-}
-//LCOV_EXCL_STOP
 
 // debugging only
 // LCOV_EXCL_START

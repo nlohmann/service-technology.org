@@ -26,11 +26,8 @@ public:
     BinStore2();
     ~BinStore2();
 
-    /// check whether current marking is stored
-    virtual bool searchAndInsert(NetState* ns);
-
-    /// check whether current marking is sted and return state
-    virtual bool searchAndInsert(NetState* ns,State** s);
+    /// check whether current marking is stored and return state
+    virtual bool searchAndInsert(NetState* ns, void** s);
     //void pbs(unsigned int, unsigned int, vectordata_t*, void*);
     //void printBinStore();
 private:
@@ -43,7 +40,7 @@ private:
         vectordata_t* vector;
         Decision* nextold;
         Decision* nextnew;
-        State* state;
+        //State* state;
         ~Decision();
 
     };

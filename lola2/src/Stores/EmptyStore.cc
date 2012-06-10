@@ -5,13 +5,8 @@ EmptyStore::EmptyStore() : tries(0)
 {
 }
 
-inline bool EmptyStore::searchAndInsert(NetState* ns)
+inline bool EmptyStore::searchAndInsert(NetState* ns, void**)
 {
     ++calls;
-    return true;
-}
-
-// LCOV_EXCL_STOP
-bool EmptyStore::searchAndInsert(NetState* ns, State**) {
     return true;
 }

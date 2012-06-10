@@ -20,7 +20,7 @@ ListStore::~ListStore() {
     free(store);
 }
 
-bool ListStore::searchAndInsert(NetState* ns)
+bool ListStore::searchAndInsert(NetState* ns, void**)
 {
     // organize vector as intermediate data structure: set size on first call
     static std::vector<capacity_t> m;
@@ -40,12 +40,6 @@ bool ListStore::searchAndInsert(NetState* ns)
         return false; //marking was new
     }
     return true; //marking was old
-}
-
-bool ListStore::searchAndInsert(NetState* ns,State**)
-{
-    assert(false);
-    return false;
 }
 
 bool ListStore::contains(std::vector<capacity_t> elem) {

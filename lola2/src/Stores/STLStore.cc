@@ -10,7 +10,7 @@
 #include <Net/Marking.h>
 #include <Stores/STLStore.h>
 
-bool STLStore::searchAndInsert(NetState* ns)
+bool STLStore::searchAndInsert(NetState* ns, void**)
 {
     // organize vector as intermediate data structure: set size on first call
     static std::vector<capacity_t> m;
@@ -39,11 +39,3 @@ bool STLStore::searchAndInsert(NetState* ns)
         return true;
     }
 }
-
-// LCOV_EXCL_START
-bool STLStore::searchAndInsert(NetState* ns,State**)
-{
-    assert(false);
-    return false;
-}
-// LCOV_EXCL_STOP

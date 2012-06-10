@@ -35,7 +35,6 @@ public:
     ThreadSafeStore(SIStore* sistore, uint16_t threadnumber);
     ~ThreadSafeStore();
     bool searchAndInsert(NetState* ns, int thread);
-    bool searchAndInsert(NetState* ns);
-    bool searchAndInsert(NetState* ns,State**);
+    virtual bool searchAndInsert(NetState* ns, void**);
     void finalize();
 };

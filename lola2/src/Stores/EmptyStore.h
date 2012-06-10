@@ -14,6 +14,5 @@ public:
     int tries;
 
     EmptyStore();
-    bool searchAndInsert(NetState* ns);
-    bool searchAndInsert(NetState* ns, State**);
+    bool searchAndInsert(NetState* ns, void** = NULL);
 };

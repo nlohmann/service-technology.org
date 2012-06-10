@@ -17,7 +17,7 @@ ArrayStore::ArrayStore() {
     numElems = 0;
 }
 
-bool ArrayStore::searchAndInsert(NetState* ns)
+bool ArrayStore::searchAndInsert(NetState* ns, void**)
 {
     ++calls;
     size_t stateBytes = Place::CardSignificant*sizeof(capacity_t);
@@ -28,11 +28,5 @@ bool ArrayStore::searchAndInsert(NetState* ns)
     memcpy(store+(numElems*Place::CardSignificant), ns->Current, stateBytes);
     numElems++;
     ++markings;
-    return false;
-}
-
-bool ArrayStore::searchAndInsert(NetState* ns,State**)
-{
-    assert(false);
     return false;
 }

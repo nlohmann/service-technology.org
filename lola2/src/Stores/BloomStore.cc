@@ -46,7 +46,7 @@ inline unsigned int BloomStore::hash_fnv(NetState* ns) const
     return hash % BLOOM_FILTER_SIZE;
 }
 
-bool BloomStore::searchAndInsert(NetState* ns)
+bool BloomStore::searchAndInsert(NetState* ns, void**)
 {
     ++calls;
 
@@ -104,11 +104,3 @@ bool BloomStore::searchAndInsert(NetState* ns)
     // all bits were 1 -> marking was probably stored already
     return true;
 }
-
-// LCOV_EXCL_START
-bool BloomStore::searchAndInsert(NetState* ns,State**)
-{
-    assert(false);
-    return false;
-}
-// LCOV_EXCL_STOP

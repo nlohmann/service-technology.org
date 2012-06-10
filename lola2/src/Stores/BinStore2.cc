@@ -61,7 +61,7 @@ BinStore2::~BinStore2()
 }
 
 /// create a new branch in the decision tree at depth b.
-BinStore2::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL), state(0)
+BinStore2::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL)//, state(0)
 {
 }
 
@@ -81,7 +81,7 @@ BinStore2::Decision::~Decision()
 
 /// search for a state in the binStore and insert it, if it is not there
 /// Do not care about states
-bool BinStore2::searchAndInsert(NetState* ns)
+bool BinStore2::searchAndInsert(NetState* ns, void**)
 {
     pthread_mutex_lock(&inc_mutex);
     ++calls;
@@ -330,13 +330,6 @@ bool BinStore2::searchAndInsert(NetState* ns)
         }
     }
 }
-
-// LCOV_EXCL_START
-bool BinStore2::searchAndInsert(NetState* ns,State** result)
-{
-    assert(false);
-}
-// LCOV_EXCL_STOP
 
 /** may not work anymore due to variable vector data size
 

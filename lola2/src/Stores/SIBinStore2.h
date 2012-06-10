@@ -34,7 +34,7 @@ private:
         vectordata_t* vector;
         Decision* nextold;
         Decision* nextnew;
-        State* state;
+        //State* state;
         ~Decision();
 
     };

@@ -17,6 +17,5 @@ public:
     explicit BloomStore(size_t = 2);
     ~BloomStore();
 
-    bool searchAndInsert(NetState* ns);
-    bool searchAndInsert(NetState* ns,State**);
+    bool searchAndInsert(NetState* ns, void**);
 };

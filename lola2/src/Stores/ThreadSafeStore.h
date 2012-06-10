@@ -1,6 +1,6 @@
 /*!
 \author Gregor
-\file ParallelSTLStore.cc
+\file ThreadSafeStore.cc
 \status new
 */
 

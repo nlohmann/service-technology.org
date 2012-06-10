@@ -254,8 +254,6 @@ void Task::setProperty()
         break;
         // now there is only one, but who knows...
     }
-
-    exploration = new ParallelExploration();
 }
 
 void Task::setThreads() {

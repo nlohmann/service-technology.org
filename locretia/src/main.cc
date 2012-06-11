@@ -255,7 +255,9 @@ int main(int argc, char** argv) {
     }
 
 
+    // TPN -> OWFN
     if (args_info.tpn_flag) {
+    	status("Generating OWFN from TPN...");
 
     	InnerMarking::addInterface(args_info.icount_arg);
 
@@ -265,16 +267,59 @@ int main(int argc, char** argv) {
 //    	tempstring.str().find("FINALCONDITION");
 
     	std::string owfn_filename = filename + ".owfn";
-    	Output output2(owfn_filename, "OWFN File");
-    	output2.stream() << pnapi::io::owfn << *InnerMarking::net;
+    	Output output(owfn_filename, "OWFN File");
+    	output.stream() << pnapi::io::owfn << *InnerMarking::net;
 
     }
 
-    if (args_info.partnerView_flag) {
-    	InnerMarking::changeView(args_info.maxLength_arg);
+    // OWFN -> synchronous environment
+    if (args_info.syncEnv_flag) {
+    	status("Generating synchronous environment...");
+
+    	//InnerMarking::createLabeledEnvironment();
+
+    	std::string pnml_filename = "";
+    	if (args_info.pnmlFileSync_given)
+    		pnml_filename = args_info.pnmlFileSync_arg ? args_info.pnmlFileSync_arg : filename + ".sync.pnml";
+    	else {
+    		pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename;
+    		pnml_filename += ".sync.pnml";
+    	}
+    	Output output(pnml_filename, "PNML File");
+    	output.stream() << pnapi::io::pnml;
+    	Output::output(output.stream(), *InnerMarking::net, filename);
     }
 
+    // OWFN -> asynchronous environment
+    if (args_info.asyncEnv_flag) {
+    	status("Generating asynchronous environment...");
+
+    	pnapi::PetriNet tempNet = pnapi::PetriNet(*InnerMarking::net);
+    	InnerMarking::changeView(&tempNet, args_info.maxLength_arg);
+    	InnerMarking::deleteCounterPlace(&tempNet);
+
+    	//InnerMarking::createLabeledEnvironment();
+
+    	std::string pnml_filename = "";
+    	if (args_info.pnmlFileAsync_given)
+    		pnml_filename = args_info.pnmlFileAsync_arg ? args_info.pnmlFileAsync_arg : filename + ".async.pnml";
+    	else {
+    		pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename;
+    		pnml_filename += ".async.pnml";
+    	}
+    	Output output(pnml_filename, "PNML File");
+    	output.stream() << pnapi::io::pnml;
+    	Output::output(output.stream(), tempNet, filename);
+    }
+
+
+    // OWFN -> XES log
     if (args_info.log_flag) {
+    	status("Generating XES Log...");
+
+    	if (args_info.partnerView_flag) {
+    		InnerMarking::changeView(InnerMarking::net, args_info.maxLength_arg);
+    	}
 
     	/*--------------------------------------------.
     	| 2. initialize labels and interface markings |
@@ -334,31 +379,13 @@ int main(int argc, char** argv) {
     	std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename + ".xes";
     	Output output(log_filename, "XES Log");
     	InnerMarking::create_log(output, filename, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);
+
+//    	// delete the "counter places" if they were formerly created
+//    	if (args_info.partnerView_flag) {
+//    		InnerMarking::deleteCounterPlace();
+//    	}
     }
 
-    // delete the "counter places" if they were formerly created
-    if (args_info.partnerView_flag) {
-    	InnerMarking::deleteCounterPlace();
-    }
-
-    if (args_info.pnmlFile_given) {
-
-    	//InnerMarking::createLabeledEnvironment();
-
-    	std::string pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename + ".pnml";
-    	Output output2(pnml_filename, "PNML File");
-    	output2.stream() << pnapi::io::pnml;
-    	Output::output(output2.stream(), *InnerMarking::net, filename);
-    }
-
-    //    std::string dot_filename = filename + ".dot";
-    //    Output output3(dot_filename, "DOT File");
-    //    output3.stream() << pnapi::io::dot << *InnerMarking::net;
-
-
-    /*-------------------.
-    | 7. output options |
-    `-------------------*/
     // results output
     if (args_info.resultFile_given) {
     	std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";

@@ -49,9 +49,9 @@ class InnerMarking {
         /// copy markings from temporary storage to array
         static void initialize();
 
-        static void changeView(const int c);
+        static void changeView(pnapi::PetriNet* net, const int c);
 
-        static void deleteCounterPlace();
+        static void deleteCounterPlace(pnapi::PetriNet* net);
 
         static void createLabeledEnvironment();
 

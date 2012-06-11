@@ -16,6 +16,16 @@ option "log" -
   "OWFN -> XES log."
   details="Using this option, a XES log is generated from the underlying OWFN which was either just generated from a TPN or given as an input file."
   flag off
+  
+option "syncEnv" -
+  "OWFN -> synchronous environment."
+  details="Using this option, a PNML file will be generated containing the labeled inner of the given OWFN."
+  flag off
+  
+option "asyncEnv" -
+  "OWFN -> asynchronous environment."
+  details="Using this option, a PNML file will be generated containing the labeled inner of the environment of the given OWFN."
+  flag off
 
 section "TPN to OWFN"
 sectiondesc="Options which are used if the 'tpn'-flag is set....\n"
@@ -55,23 +65,10 @@ option "minLength" l
   default="0"
   optional
 
-
-section "View"
-sectiondesc="If the 'log'-flag is set, one can set the viewpoint to the environment's point of view.\n"
-
 option "partnerView" p
   "Change to the environment's point of view."
-  details="This generates transitions sticking to the interface of the given net and imitating the behaviour of the environment."
+  details="Using this option, the log will be generated using the asynchronous environment of the given net."
   flag off
-  
-option "messagebound" m
-  "Set the message bound."
-  details="The message bound sets the maximal number of messages to be sent by the environment. Values within the range of 1..255 are allowed.\n"
-  int
-  typestr="BOUND"
-  default="1"
-  optional
-  
 
 
 section "Input/Output"
@@ -92,7 +89,21 @@ option "logFile" -
   optional
   
 option "pnmlFile" -
-  "PNML output of either the labeled inner net or the labeled environment of the inner net."
+  "Filename for the synchronous environment and the asynchronous environment. (either '.sync.pnml' or '.async.pnml' will be added to the given filename)"
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+option "pnmlFileSync" -
+  "Filename for the labeled inner net. The option 'pnmlFile' will be ignored."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+  
+option "pnmlFileAsync" -
+  "Filename for the labeled environment of the inner net. The option 'pnmlFile' will be ignored."
   string
   typestr="FILENAME"
   argoptional

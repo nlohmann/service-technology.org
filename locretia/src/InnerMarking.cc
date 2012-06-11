@@ -110,7 +110,7 @@ void InnerMarking::initialize() {
  \param[in]	c	maximal number of messages to be sent and received by the environment through each channel
  */
 void InnerMarking::changeView(pnapi::PetriNet* net, const int c) {
-	status("changing viewpoint to environment...");
+	status("changing viewpoint to asynchronous environment...");
 
 	// create a place which represents the maximal count of messages to be sent...
 	counterPlace = &net->createPlace("counter_place", c);
@@ -380,6 +380,7 @@ void InnerMarking::create_log(std::ostream& file, std::string& filename,
  \brief Adds a random Interface to the net. Every transition gets either an input or an output label.
  */
 void InnerMarking::addInterface(const int count) {
+	status("adding %i random interface transitions...", count);
 	net->createPort(PORT_NAME);
 	// initialize the random number generator
 	std::srand(time(NULL));

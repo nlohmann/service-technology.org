@@ -267,7 +267,7 @@ int main(int argc, char** argv) {
 //    	tempstring.str().find("FINALCONDITION");
 
     	std::string owfn_filename = filename + ".owfn";
-    	Output output(owfn_filename, "OWFN File");
+    	Output output(owfn_filename, "OWFN");
     	output.stream() << pnapi::io::owfn << *InnerMarking::net;
 
     }
@@ -285,7 +285,7 @@ int main(int argc, char** argv) {
     		pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename;
     		pnml_filename += ".sync.pnml";
     	}
-    	Output output(pnml_filename, "PNML File");
+    	Output output(pnml_filename, "synchronous environment");
     	output.stream() << pnapi::io::pnml;
     	Output::output(output.stream(), *InnerMarking::net, filename);
     }
@@ -307,7 +307,7 @@ int main(int argc, char** argv) {
     		pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename;
     		pnml_filename += ".async.pnml";
     	}
-    	Output output(pnml_filename, "PNML File");
+    	Output output(pnml_filename, "asynchronous environment");
     	output.stream() << pnapi::io::pnml;
     	Output::output(output.stream(), tempNet, filename);
     }

@@ -10,6 +10,7 @@ All data that describe attributes of markings can be found here.
 
 #include <cstdlib>
 #include <cstdio>
+#include <cstring>
 #include <Core/Dimensions.h>
 #include <Net/Marking.h>
 #include <Net/Net.h>
@@ -21,6 +22,14 @@ capacity_t* Marking::Current = NULL;
 hash_t Marking::HashCurrent = 0;
 capacity_t* Marking::Target = NULL;
 hash_t Marking::HashTarget = 0;
+
+/// init for the behavioral part of the net
+void Marking::init() {
+    assert(Net::Card[PL] > 0);
+    
+    memcpy(Current, Initial, Net::Card[PL] * SIZEOF_INDEX_T);
+    HashCurrent = HashInitial;
+}
 
 /// collection of information related to markings
 void Marking::deleteMarkings()

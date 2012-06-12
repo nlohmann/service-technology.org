@@ -28,8 +28,7 @@ bool DFSExploration::depth_first(SimpleProperty& property,Store &myStore, FireLi
 {
     Firelist &myFirelist = *firelistcreator.createFireList(&property);
     // copy initial marking into current marking
-    memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
-    Marking::HashCurrent = Marking::HashInitial;
+    Marking::init();
 
     NetState* ns = NetState::createNetStateFromCurrent();
 
@@ -125,8 +124,7 @@ bool DFSExploration::find_path(SimpleProperty& property, unsigned int attempts, 
     // get memory for path info
     index_t* path = (index_t*) malloc(SIZEOF_INDEX_T * maxdepth);
     //    // copy initial marking into current marking
-    //    memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
-    //    Marking::HashCurrent = Marking::HashInitial;
+    //    Marking::init();
     //
     //    // prepare property
     //    initProperty();

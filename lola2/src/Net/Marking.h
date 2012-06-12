@@ -34,6 +34,9 @@ public:
     /// hash value of target marking
     static hash_t HashTarget;
 
+    /// init for the behavioral part of the net
+    static void init();
+
     /// Aufräumen der Knoten - Service für valgrind
     static void deleteMarkings();
 

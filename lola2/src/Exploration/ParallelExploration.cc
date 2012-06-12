@@ -244,8 +244,7 @@ bool ParallelExploration:: threadedExploration(NetState* ns,Store &myStore, Fire
 
 bool ParallelExploration::depth_first(SimpleProperty& property, Store &myStore, FireListCreator &firelistcreator, int number_of_threads) {
     // copy initial marking into current marking
-    memcpy(Marking::Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
-    Marking::HashCurrent = Marking::HashInitial;
+    Marking::init();
 
     runner_thread = (pthread_t*) calloc(number_of_threads,
                                         sizeof(pthread_t));

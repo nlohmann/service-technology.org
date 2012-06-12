@@ -52,7 +52,6 @@ void WriteNameFile(FILE* f)
 /*!
 \pre Memory of Name[TR] and Name[PL] is already allocated.
 
-\todo Use strdup instead of malloc/strcpy.
 \todo Scanf mit Maximalbreite nutzen um cppcheck-Fehler zu umgehen.
 */
 void ReadNameFile(FILE* f, ParserPTNet* symboltables)
@@ -71,8 +70,7 @@ void ReadNameFile(FILE* f, ParserPTNet* symboltables)
     for (index_t p = 0; p < Net::Card[PL]; p++)
     {
         fscanf(f, "%s", buffer);
-        Net::Name[PL][p] = (char*) malloc((strlen(buffer) + 1) * sizeof(char)) ;
-        strcpy(Net::Name[PL][p], buffer);
+        Net::Name[PL][p] = strdup(buffer);
         PlaceSymbol* ps = new PlaceSymbol(Net::Name[PL][p], Place::Capacity[p]);
         ps -> setIndex(p);
         symboltables->PlaceTable->insert(ps);
@@ -86,8 +84,7 @@ void ReadNameFile(FILE* f, ParserPTNet* symboltables)
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
         fscanf(f, "%s", buffer);
-        Net::Name[TR][t] = (char*) malloc((strlen(buffer) + 1) * sizeof(char)) ;
-        strcpy(Net::Name[TR][t], buffer);
+        Net::Name[TR][t] = strdup(buffer);
         TransitionSymbol* ts = new TransitionSymbol(Net::Name[TR][t], Transition::Fairness[t], NULL, NULL);
         ts -> setIndex(t);
         symboltables->TransitionTable->insert(ts);

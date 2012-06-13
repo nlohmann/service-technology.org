@@ -40,8 +40,7 @@ void Marking::deleteMarkings()
 }
 
 // LCOV_EXCL_START
-// debugging only
-void Marking::printMarking(capacity_t* marking) {
+void Marking::DEBUG__printMarking(capacity_t* marking) {
     return;
     printf("PRINTING MARKING %x:\n",marking);
     for (int i = 0; i < Net::Card[PL]; i++)

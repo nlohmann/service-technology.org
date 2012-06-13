@@ -18,7 +18,39 @@ structures
 #include <Net/Marking.h>
 #include <Net/swap.h>
 
-bool is_consistent();
+// LCOV_EXCL_START
+bool DEBUG__isConsistent()
+{
+    for (int type = PL; type <= TR; ++type)
+    {
+        node_t othertype = (type == PL) ? TR : PL;
+        for (int direction = PRE; direction <= POST; direction++)
+        {
+            direction_t otherdirection = (direction == PRE) ? POST : PRE;
+            for (index_t n = 0; n < Net::Card[type] ; n ++)
+            {
+                for (index_t a = 0; a < Net::CardArcs[type][direction][n]; a++)
+                {
+                    index_t nn = Net::Arc[type][direction][n][a];
+                    index_t b;
+                    for (b = 0; b < Net::CardArcs[othertype][otherdirection][nn]; b++)
+                    {
+                        if (Net::Arc[othertype][otherdirection][nn][b] == n)
+                        {
+                            break;
+                        }
+                    }
+                    if (b >= Net::CardArcs[othertype][otherdirection][nn])
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+// LCOV_EXCL_STOP
 
 /*!
 \todo remove TargetMarking ?
@@ -30,7 +62,7 @@ void swapPlaces(index_t left, index_t right)
     char* tempname = Net::Name[PL][left];
     Net::Name[PL][left] = Net::Name[PL][right];
     Net::Name[PL][right] = tempname;
-    assert(is_consistent());
+    assert(DEBUG__isConsistent());
 
     for (int direction = PRE; direction <= POST; ++direction)
     {
@@ -105,7 +137,7 @@ void swapPlaces(index_t left, index_t right)
             }
         }
     }
-    assert(is_consistent());
+    assert(DEBUG__isConsistent());
 
     // 2. Place data structures
 
@@ -206,39 +238,5 @@ void swapPlaces(index_t left, index_t right)
             }
         }
     }
-    assert(is_consistent());
+    assert(DEBUG__isConsistent());
 }
-// just debugging
-// LCOV_EXCL_START
-bool is_consistent()
-{
-    for (int type = PL; type <= TR; ++type)
-    {
-        node_t othertype = (type == PL) ? TR : PL;
-        for (int direction = PRE; direction <= POST; direction++)
-        {
-            direction_t otherdirection = (direction == PRE) ? POST : PRE;
-            for (index_t n = 0; n < Net::Card[type] ; n ++)
-            {
-                for (index_t a = 0; a < Net::CardArcs[type][direction][n]; a++)
-                {
-                    index_t nn = Net::Arc[type][direction][n][a];
-                    index_t b;
-                    for (b = 0; b < Net::CardArcs[othertype][otherdirection][nn]; b++)
-                    {
-                        if (Net::Arc[othertype][otherdirection][nn][b] == n)
-                        {
-                            break;
-                        }
-                    }
-                    if (b >= Net::CardArcs[othertype][otherdirection][nn])
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-    }
-    return true;
-}
-// LCOV_EXCL_STOP

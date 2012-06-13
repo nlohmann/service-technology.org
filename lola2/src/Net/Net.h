@@ -44,6 +44,5 @@ struct Net
     /// Aufräumen der Knoten - Service für valgrind
     static void deleteNodes();
 
-    /// for debugging
     static void print();
 };

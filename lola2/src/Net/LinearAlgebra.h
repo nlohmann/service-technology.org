@@ -28,8 +28,8 @@ private:
         /// Eleminate current first variable of a row in its successor row (same first variable)
         void apply(Matrix &);
 
-        /// Write row to cout (for debug purposes)
-        void printRow() const;
+        /// Write row to cout
+        void DEBUG__printRow() const;
 
         /// Number of variables in current row with non zero coefficients
         index_t varCount;
@@ -66,8 +66,8 @@ public:
     /// Generate the triangular form of the matrix (original one gets lost)
     void reduce();
 
-    /// Write matrix to cout (for debug purposes)
-    void printMatrix() const;
+    /// Write matrix to cout
+    void DEBUG__printMatrix() const;
 
     /// Returns true iff place with given index is significant
     bool isSignificant(index_t) const;

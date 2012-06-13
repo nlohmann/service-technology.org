@@ -297,9 +297,9 @@ void Transition::revertEnabled(NetState* ns,index_t t)
     }
 
 }
-// just debugging
+
 // LCOV_EXCL_START
-bool testEnabled(NetState* ns,index_t t)
+bool DEBUG__testEnabled(NetState* ns,index_t t)
 {
     if (ns->Enabled[t])
     {

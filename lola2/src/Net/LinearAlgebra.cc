@@ -3,7 +3,6 @@
 \author Andreas
 \status approved 11.04.2012
 
-\todo remove debug code
 \todo finalize overflow handling
 */
 
@@ -14,13 +13,12 @@
 
 using namespace std;
 
-// This is for debug purposes
+// LCOV_EXCL_START
 #include <iostream>
 using std::cout;
 using std::endl;
-// LCOV_EXCL_START
 /// writes current row on cout
-void Matrix::Row::printRow() const
+void Matrix::Row::DEBUG__printRow() const
 {
     for (index_t i = 0; i < varCount; ++i)
     {
@@ -37,7 +35,7 @@ void Matrix::Row::printRow() const
     */
 }
 /// writes current matrix on cout
-void Matrix::printMatrix() const
+void Matrix::DEBUG__printMatrix() const
 {
     for (index_t c = 0; c < colCount; ++c)
     {
@@ -45,7 +43,7 @@ void Matrix::printMatrix() const
         Row* curRow = matrix[c];
         while (curRow != NULL)
         {
-            curRow->printRow();
+            curRow->DEBUG__printRow();
             curRow = curRow->next;
         }
     }

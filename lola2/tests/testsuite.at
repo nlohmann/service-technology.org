@@ -932,9 +932,9 @@ AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were 
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
 
-AT_SETUP([Checking for memory leaks: Phils 1000])
-AT_CHECK([cp TESTFILES/phils1000.lola .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW phils1000.lola],0,ignore,stderr)
+AT_SETUP([Checking for memory leaks: Phils 10])
+AT_CHECK([cp TESTFILES/phils10.lola .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW phils10.lola],0,ignore,stderr)
 AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
@@ -946,9 +946,9 @@ AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were 
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
 
-AT_SETUP([Checking for memory leaks: Phils 1000 (parallel)])
-AT_CHECK([cp TESTFILES/phils1000.lola .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW phils1000.lola --threads=4 --store=bin2],0,ignore,stderr)
+AT_SETUP([Checking for memory leaks: Phils 10 (parallel)])
+AT_CHECK([cp TESTFILES/phils10.lola .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW phils10.lola --threads=4 --store=bin2],0,ignore,stderr)
 AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP

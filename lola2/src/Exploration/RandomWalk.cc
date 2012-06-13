@@ -36,7 +36,7 @@ void randomWalk(int transitions)
                     y++;
                 }
             }
-            assert(y ==ns->CardEnabled);
+            assert(y == ns->CardEnabled);
             index_t nr = rand() % ns->CardEnabled; // uniform distribution
             assert(nr < ns->CardEnabled);
             index_t t; // the transition to be fired
@@ -54,8 +54,8 @@ void randomWalk(int transitions)
             assert(t < Net::Card[TR]);
             assert(ns->Enabled[t]);
             printf(" firing %s\n", Net::Name[TR][t]);
-            Transition::fire(ns,t);
-            Transition::updateEnabled(ns,t);
+            Transition::fire(ns, t);
+            Transition::updateEnabled(ns, t);
 
             // early abortion
             if (transitions != 0 and (++firedTransitions >= transitions))
@@ -78,7 +78,7 @@ void randomWalk(int transitions)
         }
         for (index_t i = 0; i < Net::Card[TR]; i++)
         {
-            Transition::checkEnabled(ns,i);
+            Transition::checkEnabled(ns, i);
         }
     }
 }

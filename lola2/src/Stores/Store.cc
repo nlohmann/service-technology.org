@@ -87,6 +87,7 @@ bool Store::searchAndInsert(NetState* ns, int thread)
     return searchAndInsert(ns);
 }
 
-void Store::finalize() {
+void Store::finalize()
+{
 
 }

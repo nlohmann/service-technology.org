@@ -24,7 +24,7 @@ extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
 
-bool DFSExploration::depth_first(SimpleProperty& property,Store &myStore, FireListCreator& firelistcreator, int threadNumber)
+bool DFSExploration::depth_first(SimpleProperty &property, Store &myStore, FireListCreator &firelistcreator, int threadNumber)
 {
     Firelist &myFirelist = *firelistcreator.createFireList(&property);
     // copy initial marking into current marking
@@ -51,7 +51,7 @@ bool DFSExploration::depth_first(SimpleProperty& property,Store &myStore, FireLi
 
     // get first firelist
     index_t* currentFirelist;
-    index_t currentEntry = myFirelist.getFirelist(ns,&currentFirelist);
+    index_t currentEntry = myFirelist.getFirelist(ns, &currentFirelist);
 
     while (true) // exit when trying to pop from empty stack
     {
@@ -60,20 +60,20 @@ bool DFSExploration::depth_first(SimpleProperty& property,Store &myStore, FireLi
             // there is a next transition that needs to be explored in current marking
 
             // fire this transition to produce new Marking::Current
-            Transition::fire(ns,currentFirelist[currentEntry]);
+            Transition::fire(ns, currentFirelist[currentEntry]);
 
             if (myStore.searchAndInsert(ns))
             {
                 // State exists! -->backtracking to previous state
-                Transition::backfire(ns,currentFirelist[currentEntry]);
+                Transition::backfire(ns, currentFirelist[currentEntry]);
             }
             else
             {
                 // State does not exist!
 
-                Transition::updateEnabled(ns,currentFirelist[currentEntry]);
+                Transition::updateEnabled(ns, currentFirelist[currentEntry]);
                 // check current marking for property
-                property.value = property.checkProperty(*ns,currentFirelist[currentEntry]);
+                property.value = property.checkProperty(*ns, currentFirelist[currentEntry]);
                 if (property.value)
                 {
                     // current  marking satisfies property
@@ -89,7 +89,7 @@ bool DFSExploration::depth_first(SimpleProperty& property,Store &myStore, FireLi
 
                 // Here: current marking does not satisfy property --> continue search
                 property.stack.push(currentEntry, currentFirelist);
-                currentEntry = myFirelist.getFirelist(ns,&currentFirelist);
+                currentEntry = myFirelist.getFirelist(ns, &currentFirelist);
             } // end else branch for "if state exists"
         }
         else
@@ -106,14 +106,14 @@ bool DFSExploration::depth_first(SimpleProperty& property,Store &myStore, FireLi
             }
             property.stack.pop(&currentEntry, &currentFirelist);
             assert(currentEntry < Net::Card[TR]);
-            Transition::backfire(ns,currentFirelist[currentEntry]);
-            Transition::revertEnabled(ns,currentFirelist[currentEntry]);
-            property.value = property.updateProperty(*ns,currentFirelist[currentEntry]);
+            Transition::backfire(ns, currentFirelist[currentEntry]);
+            Transition::revertEnabled(ns, currentFirelist[currentEntry]);
+            property.value = property.updateProperty(*ns, currentFirelist[currentEntry]);
         }
     }
 }
 
-bool DFSExploration::find_path(SimpleProperty& property, unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition &c)
+bool DFSExploration::find_path(SimpleProperty &property, unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition &c)
 {
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.
@@ -163,7 +163,7 @@ bool DFSExploration::find_path(SimpleProperty& property, unsigned int attempts, 
 
         for (index_t t = 0; t < Net::Card[TR]; ++t)
         {
-            Transition::checkEnabled(ns,t);
+            Transition::checkEnabled(ns, t);
         }
 
         // prepare property
@@ -189,21 +189,21 @@ bool DFSExploration::find_path(SimpleProperty& property, unsigned int attempts, 
 
             // get firelist
             index_t* currentFirelist;
-            index_t cardFirelist = myFirelist.getFirelist(ns,&currentFirelist);
+            index_t cardFirelist = myFirelist.getFirelist(ns, &currentFirelist);
             if (!cardFirelist)
             {
                 // deadlock or empty up set (i.e. property not reachable)
                 break; // go to next attempt
             }
 
-            index_t chosen = c.choose(ns,cardFirelist, currentFirelist);
+            index_t chosen = c.choose(ns, cardFirelist, currentFirelist);
             free(currentFirelist);
 
             path[depth] = chosen;
-            Transition::fire(ns,chosen);
-            Transition::updateEnabled(ns,chosen);
+            Transition::fire(ns, chosen);
+            Transition::updateEnabled(ns, chosen);
 
-            property.value = property.checkProperty(*ns,chosen);
+            property.value = property.checkProperty(*ns, chosen);
             if (property.value)
             {
                 // witness path is path[0] .... path[depth-1] path[depth]

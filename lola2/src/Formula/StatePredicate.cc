@@ -4,6 +4,7 @@
 StatePredicate* StatePredicate::top = (StatePredicate*) 0;
 
 
-StatePredicate* StatePredicate::copy() {
+StatePredicate* StatePredicate::copy()
+{
     return copy(NULL);
 }

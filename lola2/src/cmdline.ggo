@@ -17,7 +17,7 @@ option "store" -
   optional
 
 option "hashfunctions" -
-  "Hash functions for the bloom filter"
+  "Hash functions for the Bloom filter"
   int
   default="2"
   optional
@@ -39,9 +39,6 @@ option "state" s
   flag off
 
 
-section "Reductions"
-
-
 
 section "Input/Output"
 
@@ -60,16 +57,11 @@ option "writeCompressed" -
   hidden
 
 option "formula" f
-  "A formula to check, read from file"
-  string
-  typestr="FILE"
-  optional
-
-option "formulastring" -
-  "A formula to check"
+  "A formula to check, read from file or a string"
   string
   typestr="FORMULA"
   optional
+
 
 section "Reporter"
 

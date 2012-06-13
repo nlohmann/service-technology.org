@@ -11,24 +11,29 @@
 #include <map>
 #include <Stores/BinStore2.h>
 
-HuffmanStoreList::HuffmanStoreList() {
+HuffmanStoreList::HuffmanStoreList()
+{
     store2 = new BinStore2();
-    std::map<capacity_t,int> countMap; //temp table to successfully call the huffmanStore constructor. TODO remove!
+    std::map<capacity_t, int> countMap; //temp table to successfully call the huffmanStore constructor. TODO remove!
     countMap[0] = 1;
     countMap[1] = 1;
     he = HuffmanEncoding(&countMap);
 }
 
-HuffmanStoreList::~HuffmanStoreList() {
+HuffmanStoreList::~HuffmanStoreList()
+{
     delete &he;
 }
 
-bool HuffmanStoreList::searchAndInsert(NetState* ns, void**) {
+bool HuffmanStoreList::searchAndInsert(NetState* ns, void**)
+{
     bool erg = store2->searchAndInsert(ns);
-    if(!he.contains(ns->Current,&store)) {
+    if (!he.contains(ns->Current, &store))
+    {
         markings++;
-        he.encodeMarking(ns->Current,&store);
-        if(markings%100==0) {
+        he.encodeMarking(ns->Current, &store);
+        if (markings % 100 == 0)
+        {
             he.recode(&store);
         }
         assert(!erg);

@@ -57,7 +57,7 @@ void FirelistStubbornDeadlock::newStamp()
     }
 }
 
-index_t FirelistStubbornDeadlock::getFirelist(NetState* ns,index_t** result)
+index_t FirelistStubbornDeadlock::getFirelist(NetState* ns, index_t** result)
 {
     index_t nextDfs = 1;
     index_t stackpointer = 0;
@@ -206,6 +206,7 @@ index_t FirelistStubbornDeadlock::getFirelist(NetState* ns,index_t** result)
     }
 }
 
-Firelist* FireListStubbornDeadlockCreator::createFireList(SimpleProperty*) {
+Firelist* FireListStubbornDeadlockCreator::createFireList(SimpleProperty*)
+{
     return new FirelistStubbornDeadlock();
 }

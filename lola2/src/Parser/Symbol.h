@@ -18,35 +18,35 @@ lists. Payload can be added by deriving subclasses.
 */
 class Symbol
 {
-public:
-    /// Getter for key
-    char* getKey() const;
+    public:
+        /// Getter for key
+        char* getKey() const;
 
-    /// Getter for next
-    Symbol* getNext() const;
+        /// Getter for next
+        Symbol* getNext() const;
 
-    /// Setter for next
-    void setNext(Symbol*);
+        /// Setter for next
+        void setNext(Symbol*);
 
-    /// Generate and initialize a symbol
-    explicit Symbol(const char*);
+        /// Generate and initialize a symbol
+        explicit Symbol(const char*);
 
-    /// Delete a symbol
-    virtual ~Symbol() {}
+        /// Delete a symbol
+        virtual ~Symbol() {}
 
-    /// get index of symbol in net data structures
-    index_t getIndex() const;
+        /// get index of symbol in net data structures
+        index_t getIndex() const;
 
-    /// set index of symbol in net date structures
-    void setIndex(index_t);
+        /// set index of symbol in net date structures
+        void setIndex(index_t);
 
-private:
-    /// The key. Used for insertion in symbol table
-    char* key;
+    private:
+        /// The key. Used for insertion in symbol table
+        char* key;
 
-    /// Symbols with same hash value are organized as lists.
-    Symbol* next;
+        /// Symbols with same hash value are organized as lists.
+        Symbol* next;
 
-    /// Index in net data structure. Set during transformation symbols --> net
-    index_t index;
+        /// Index in net data structure. Set during transformation symbols --> net
+        index_t index;
 };

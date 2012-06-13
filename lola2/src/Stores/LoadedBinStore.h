@@ -11,28 +11,28 @@
 template <typename T>
 class LoadedBinStore : public BinStore
 {
-public:
-    LoadedBinStore();
-    ~LoadedBinStore();
-protected:
-    /// a binary decision node
-    class Decision : public BinStore::Decision
-    {
     public:
-        Decision(bitindex_t);
-        T payload;
-        virtual void getPayload(void**);
-    };
-    // create a decision node
-    virtual BinStore::Decision * createDecision(bitindex_t);
+        LoadedBinStore();
+        ~LoadedBinStore();
+    protected:
+        /// a binary decision node
+        class Decision : public BinStore::Decision
+        {
+            public:
+                Decision(bitindex_t);
+                T payload;
+                virtual void getPayload(void**);
+        };
+        // create a decision node
+        virtual BinStore::Decision* createDecision(bitindex_t);
 
-    // get payload of first vector
-    virtual void getFirstPayload(hash_t, void**);
-    // get payload of first vector
-    virtual void getAndCreateFirstPayload(hash_t, void**);
+        // get payload of first vector
+        virtual void getFirstPayload(hash_t, void**);
+        // get payload of first vector
+        virtual void getAndCreateFirstPayload(hash_t, void**);
 
-    // payload of first states
-    T** payload;
+        // payload of first states
+        T** payload;
 };
 
 
@@ -41,10 +41,10 @@ protected:
 ///////////////////////////////////////
 
 template <typename T>
-LoadedBinStore<T> * BinStore::loadStore(const T&)
+LoadedBinStore<T>* BinStore::loadStore(const T &)
 {
-  delete this;
-  return new LoadedBinStore<T>();
+    delete this;
+    return new LoadedBinStore<T>();
 }
 
 template <typename T>
@@ -74,35 +74,35 @@ LoadedBinStore<T>::Decision::Decision(bitindex_t index) : BinStore::Decision(ind
 template <typename T>
 void LoadedBinStore<T>::Decision::getPayload(void** p)
 {
-  if(p)
-  {
-      *p = &payload;
-  }
+    if (p)
+    {
+        *p = &payload;
+    }
 }
 
 // create a decision node
 template <typename T>
-BinStore::Decision * LoadedBinStore<T>::createDecision(bitindex_t b)
+BinStore::Decision* LoadedBinStore<T>::createDecision(bitindex_t b)
 {
-  return new Decision(b);
+    return new Decision(b);
 }
 
 // get payload of first vector
 template <typename T>
 void LoadedBinStore<T>::getFirstPayload(hash_t index, void** p)
 {
-  if(p)
-  {
-      *p = payload[index];
-  }
+    if (p)
+    {
+        *p = payload[index];
+    }
 }
 
 // get and create payload of first vector
 template <typename T>
 void LoadedBinStore<T>::getAndCreateFirstPayload(hash_t index, void** p)
 {
-  // create payload
-  payload[index] = new T();
-  // get payload
-  getFirstPayload(index, p);
+    // create payload
+    payload[index] = new T();
+    // get payload
+    getFirstPayload(index, p);
 }

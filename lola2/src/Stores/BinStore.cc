@@ -59,9 +59,9 @@ BinStore::Decision::~Decision()
 }
 
 /// create a decision node
-BinStore::Decision * BinStore::createDecision(bitindex_t b)
+BinStore::Decision* BinStore::createDecision(bitindex_t b)
 {
-  return new Decision(b);
+    return new Decision(b);
 }
 
 
@@ -267,26 +267,26 @@ insert:
 #error BINSTORE_LOOP_BODY_2 already defined
 #else
 #define BINSTORE_LOOP_BODY_2(N, I)\
-        if (ns->Current[place_index] & (1 << placebit_index))\
+    if (ns->Current[place_index] & (1 << placebit_index))\
+    {\
+        assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);\
+        (*newvector)[vector_byte] |= N;\
+    }\
+    /* increment vector byte */\
+    I\
+    if (placebit_index == 0)\
+    {\
+        ++place_index;\
+        if (place_index >= Place::CardSignificant)\
         {\
-            assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);\
-            (*newvector)[vector_byte] |= N;\
+            break;\
         }\
-        /* increment vector byte */\
-        I\
-        if (placebit_index == 0)\
-        {\
-            ++place_index;\
-            if (place_index >= Place::CardSignificant)\
-            {\
-                break;\
-            }\
-            placebit_index = Place::CardBits[place_index] - 1;\
-        }\
-        else\
-        {\
-            --placebit_index;\
-        }
+        placebit_index = Place::CardBits[place_index] - 1;\
+    }\
+    else\
+    {\
+        --placebit_index;\
+    }
 #endif
         BINSTORE_LOOP_BODY_2(128,); /*** incarnation for bit 7 ********/
         \

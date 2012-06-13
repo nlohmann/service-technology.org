@@ -73,15 +73,15 @@ void Net::print()
         printf("\nTransition %u :%s\n", i, Net::Name[TR][i]);
         switch (Transition::Fairness[i])
         {
-        case NO_FAIRNESS:
-            printf(" no ");
-            break;
-        case WEAK_FAIRNESS:
-            printf(" weak ");
-            break;
-        case STRONG_FAIRNESS:
-            printf(" strong ");
-            break;
+            case NO_FAIRNESS:
+                printf(" no ");
+                break;
+            case WEAK_FAIRNESS:
+                printf(" weak ");
+                break;
+            case STRONG_FAIRNESS:
+                printf(" strong ");
+                break;
         }
         printf(" %s ", (Transition::Enabled[i] ? "enabled" : "disabled"));
 

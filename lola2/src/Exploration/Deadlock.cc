@@ -17,7 +17,7 @@ bool Deadlock::initProperty(NetState &ns)
     return !ns.CardEnabled;
 }
 
-bool Deadlock::checkProperty(NetState &ns,index_t t)
+bool Deadlock::checkProperty(NetState &ns, index_t t)
 {
     return !ns.CardEnabled;
 }

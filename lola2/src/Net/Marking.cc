@@ -24,9 +24,10 @@ capacity_t* Marking::Target = NULL;
 hash_t Marking::HashTarget = 0;
 
 /// init for the behavioral part of the net
-void Marking::init() {
+void Marking::init()
+{
     assert(Net::Card[PL] > 0);
-    
+
     memcpy(Current, Initial, Net::Card[PL] * SIZEOF_INDEX_T);
     HashCurrent = HashInitial;
 }
@@ -40,11 +41,14 @@ void Marking::deleteMarkings()
 }
 
 // LCOV_EXCL_START
-void Marking::DEBUG__printMarking(capacity_t* marking) {
+void Marking::DEBUG__printMarking(capacity_t* marking)
+{
     return;
-    printf("PRINTING MARKING %x:\n",marking);
+    printf("PRINTING MARKING %x:\n", marking);
     for (int i = 0; i < Net::Card[PL]; i++)
-        printf("\t%s:%d\n",Net::Name[PL][i], marking[i]);
+    {
+        printf("\t%s:%d\n", Net::Name[PL][i], marking[i]);
+    }
     printf("==============\n");
 }
 // LCOV_EXCL_STOP

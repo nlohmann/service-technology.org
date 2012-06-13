@@ -11,15 +11,16 @@
 #include <Stores/Store.h>
 #include <Compressors/Huffman.h>
 
-class HuffmanStoreAVL: public Store {
+class HuffmanStoreAVL: public Store
+{
 
-private:
-    //Store* store2;
-    HuffmanEncoding he;
-    std::set<std::vector<bool> > store;
+    private:
+        //Store* store2;
+        HuffmanEncoding he;
+        std::set<std::vector<bool> > store;
 
-public:
-    HuffmanStoreAVL();
-    ~HuffmanStoreAVL();
-    bool searchAndInsert(NetState* ns, void**);
+    public:
+        HuffmanStoreAVL();
+        ~HuffmanStoreAVL();
+        bool searchAndInsert(NetState* ns, void**);
 };

@@ -206,7 +206,8 @@ bool DisjunctionStatePredicate::DEBUG__consistency(NetState &ns)
 // LCOV_EXCL_STOP
 
 
-StatePredicate* DisjunctionStatePredicate::copy(StatePredicate* parent) {
+StatePredicate* DisjunctionStatePredicate::copy(StatePredicate* parent)
+{
     DisjunctionStatePredicate* dsp = new DisjunctionStatePredicate(cardSub);
     dsp->cardSub = cardSub;
     dsp->cardSat = cardSat;
@@ -214,6 +215,8 @@ StatePredicate* DisjunctionStatePredicate::copy(StatePredicate* parent) {
     dsp->position = position;
     dsp->parent = parent;
     for (index_t i = 0; i < cardSub; i++)
+    {
         dsp->sub[i] = sub[i]->copy(dsp);
+    }
     return dsp;
 }

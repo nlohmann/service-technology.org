@@ -12,7 +12,7 @@
 #include <Exploration/Firelist.h>
 
 
-index_t Firelist::getFirelist(NetState* ns,index_t** result)
+index_t Firelist::getFirelist(NetState* ns, index_t** result)
 {
     assert(ns->CardEnabled <= Net::Card[TR]);
 
@@ -30,6 +30,7 @@ index_t Firelist::getFirelist(NetState* ns,index_t** result)
 }
 
 
-Firelist* FireListCreator::createFireList(SimpleProperty*) {
+Firelist* FireListCreator::createFireList(SimpleProperty*)
+{
     return new Firelist();
 }

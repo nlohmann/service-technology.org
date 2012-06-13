@@ -13,21 +13,22 @@
 
 class FirelistStubbornStatePredicate : public Firelist
 {
-public:
-    FirelistStubbornStatePredicate(StatePredicate*);
-    ~FirelistStubbornStatePredicate();
+    public:
+        FirelistStubbornStatePredicate(StatePredicate*);
+        ~FirelistStubbornStatePredicate();
 
-    /// return value contains number of elements in fire list, argument is reference
-    /// parameter for actual list
-    virtual index_t getFirelist(NetState*, index_t**);
+        /// return value contains number of elements in fire list, argument is reference
+        /// parameter for actual list
+        virtual index_t getFirelist(NetState*, index_t**);
 
-private:
-    StatePredicate* predicate;
-    index_t* dfsStack;
-    bool* onStack;
+    private:
+        StatePredicate* predicate;
+        index_t* dfsStack;
+        bool* onStack;
 };
 
-class FirelistStubbornStatePredicateCreator : public FireListCreator {
-public:
-    virtual Firelist* createFireList(SimpleProperty*);
+class FirelistStubbornStatePredicateCreator : public FireListCreator
+{
+    public:
+        virtual Firelist* createFireList(SimpleProperty*);
 };

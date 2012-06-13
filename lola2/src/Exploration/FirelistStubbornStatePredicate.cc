@@ -28,7 +28,7 @@ FirelistStubbornStatePredicate::~FirelistStubbornStatePredicate()
     free(onStack);
 }
 
-index_t FirelistStubbornStatePredicate::getFirelist(NetState* ns,index_t** result)
+index_t FirelistStubbornStatePredicate::getFirelist(NetState* ns, index_t** result)
 {
     if (ns->CardEnabled == 0)
     {
@@ -84,6 +84,7 @@ index_t FirelistStubbornStatePredicate::getFirelist(NetState* ns,index_t** resul
     return size;
 }
 
-Firelist* FirelistStubbornStatePredicateCreator::createFireList(SimpleProperty* property) {
+Firelist* FirelistStubbornStatePredicateCreator::createFireList(SimpleProperty* property)
+{
     return new FirelistStubbornStatePredicate(((StatePredicateProperty*)property)->getPredicate());
 }

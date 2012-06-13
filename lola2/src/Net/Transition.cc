@@ -73,7 +73,7 @@ void Transition::deleteTransitions()
 /// 3. if disabled->enabled, Remove from Disabled list of scapegoat
 /// 4. if disabled->disabled, perhaps move to other scapegoat
 /// \todo swap of values to be done with XOR (ineffektiv(er) bei heutigen Compilern! Außerdem haben wir zwei Swaps verschränkt...)
-void Transition::checkEnabled(NetState* ns,index_t t)
+void Transition::checkEnabled(NetState* ns, index_t t)
 {
     // scan through all pre-places
     for (index_t i = 0; i < Net::CardArcs[TR][PRE][t]; ++i)
@@ -157,7 +157,8 @@ void Transition::checkEnabled(NetState* ns,index_t t)
 }
 
 
-void Transition::checkEnabled_Initial(index_t t) {
+void Transition::checkEnabled_Initial(index_t t)
+{
     NetState ns;
     ns.Current = Marking::Current;
     ns.HashCurrent = Marking::HashCurrent;
@@ -174,7 +175,7 @@ void Transition::checkEnabled_Initial(index_t t) {
     ns.Mult[1][1] = Net::Mult[1][1];
     ns.CardDisabled = Place::CardDisabled;
     ns.Disabled = Place::Disabled;
-    checkEnabled(&ns,t);
+    checkEnabled(&ns, t);
     Marking::HashCurrent = ns.HashCurrent;
     Transition::CardEnabled = ns.CardEnabled;
 }
@@ -211,7 +212,7 @@ void Transition::fire(NetState* ns, index_t t)
 }
 
 /// update enabledness information after having fired a transition
-void Transition::updateEnabled(NetState* ns,index_t t)
+void Transition::updateEnabled(NetState* ns, index_t t)
 {
     // 1. check conflicting enabled transitions (tt) for enabledness
     for (index_t i = 0; i < Transition::CardConflicting[t]; i++)
@@ -219,11 +220,11 @@ void Transition::updateEnabled(NetState* ns,index_t t)
         const index_t tt = Transition::Conflicting[t][i];
         if (ns->Enabled[tt])
         {
-            checkEnabled(ns,tt);
+            checkEnabled(ns, tt);
         }
     }
     // 1a. Don't forget to check t itself! It is not member of the conflicting list!
-    checkEnabled(ns,t);
+    checkEnabled(ns, t);
 
     // 2. check those transitions where the scapegoat received additional tokens
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
@@ -232,7 +233,7 @@ void Transition::updateEnabled(NetState* ns,index_t t)
         for (index_t j = 0; j < ns->CardDisabled[p]; /* tricky increment handling */)
         {
             const index_t tt = ns->Disabled[p][j];
-            checkEnabled(ns,tt);
+            checkEnabled(ns, tt);
             if (ns->Disabled[p][j] == tt)
             {
                 j++; /* tricky increment handling */
@@ -243,7 +244,7 @@ void Transition::updateEnabled(NetState* ns,index_t t)
 }
 
 /// fire a transition in reverse direction (for backtracking) and update enabledness of all transitions
-void Transition::backfire(NetState* ns,index_t t)
+void Transition::backfire(NetState* ns, index_t t)
 {
     // 1. Update current marking
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
@@ -268,7 +269,7 @@ void Transition::backfire(NetState* ns,index_t t)
 }
 
 /// update enabledness after having backfired a transition
-void Transition::revertEnabled(NetState* ns,index_t t)
+void Transition::revertEnabled(NetState* ns, index_t t)
 {
     // 1. check backward conflicting enabled transitions for enabledness
     for (index_t i = 0; i < Transition::CardBackConflicting[t]; i++)
@@ -276,10 +277,10 @@ void Transition::revertEnabled(NetState* ns,index_t t)
         const index_t tt = Transition::BackConflicting[t][i];
         if (ns->Enabled[tt])
         {
-            checkEnabled(ns,tt);
+            checkEnabled(ns, tt);
         }
     }
-    checkEnabled(ns,t);
+    checkEnabled(ns, t);
 
     // 2. check those transitions where the scapegoat received additional tokens
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
@@ -288,7 +289,7 @@ void Transition::revertEnabled(NetState* ns,index_t t)
         for (index_t j = 0; j < ns->CardDisabled[p]; /* tricky increment handling */)
         {
             const index_t tt = ns->Disabled[p][j];
-            checkEnabled(ns,tt);
+            checkEnabled(ns, tt);
             if (ns->Disabled[p][j] == tt)
             {
                 j++; /* tricky increment handling */
@@ -299,7 +300,7 @@ void Transition::revertEnabled(NetState* ns,index_t t)
 }
 
 // LCOV_EXCL_START
-bool DEBUG__testEnabled(NetState* ns,index_t t)
+bool DEBUG__testEnabled(NetState* ns, index_t t)
 {
     if (ns->Enabled[t])
     {

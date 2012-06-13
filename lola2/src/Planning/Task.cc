@@ -1,3 +1,5 @@
+#include <errno.h>
+
 #include <InputOutput/InputOutput.h>
 #include <InputOutput/Reporter.h>
 #include <Planning/Task.h>
@@ -77,7 +79,7 @@ Task::~Task()
 
 void Task::setFormula()
 {
-    if (not args_info.formula_given and not args_info.formulastring_given)
+    if (not args_info.formula_given)
     {
         return;
     }
@@ -85,17 +87,18 @@ void Task::setFormula()
     StatePredicate* result = NULL;
     Input* formulaFile = NULL;
 
-    // if a file is given: read it
-    if (args_info.formula_given)
+    // Check if the paramter of --formula is a file that we can open: if that
+    // works, parse the file. If not, parse the string.
+    FILE* file;
+    if ((file = fopen(args_info.formula_arg, "r")) == NULL and errno == ENOENT)
     {
+        YY_BUFFER_STATE my_string_buffer = ptformula__scan_string(args_info.formula_arg);
+    }
+    else
+    {
+        fclose(file);
         formulaFile = new Input("formula", args_info.formula_arg);
         ptformula_in = *formulaFile;
-    }
-
-    // if a string is given, put it into the buffer
-    if (args_info.formulastring_given)
-    {
-        YY_BUFFER_STATE my_string_buffer = ptformula__scan_string(args_info.formulastring_arg);
     }
 
     // parse the formula
@@ -111,36 +114,36 @@ void Task::setFormula()
 
     switch (formulaType)
     {
-    case (FORMULA_REACHABLE):
-        rep->status("checking reachability");
-        TheFormula = TheFormula->rewrite(kc::reachability);
-        break;
-    case (FORMULA_INVARIANT):
-        rep->status("checking invariance");
-        TheFormula = TheFormula->rewrite(kc::reachability);
-        break;
-    case (FORMULA_IMPOSSIBLE):
-        rep->status("checking impossibility");
-        TheFormula = TheFormula->rewrite(kc::reachability);
-        break;
-    case (FORMULA_LIVENESS):
-        rep->status("checking liveness");
-        break;
-    case (FORMULA_FAIRNESS):
-        rep->status("checking fairness");
-        break;
-    case (FORMULA_STABILIZATION):
-        rep->status("checking stabilization");
-        break;
-    case (FORMULA_EVENTUALLY):
-        rep->status("checking eventual occurrence");
-        break;
-    case (FORMULA_INITIAL):
-        rep->status("checking initial satisfiability");
-        break;
-    case (FORMULA_MODELCHECKING):
-        rep->status("checking CTL");
-        break;
+        case (FORMULA_REACHABLE):
+            rep->status("checking reachability");
+            TheFormula = TheFormula->rewrite(kc::reachability);
+            break;
+        case (FORMULA_INVARIANT):
+            rep->status("checking invariance");
+            TheFormula = TheFormula->rewrite(kc::reachability);
+            break;
+        case (FORMULA_IMPOSSIBLE):
+            rep->status("checking impossibility");
+            TheFormula = TheFormula->rewrite(kc::reachability);
+            break;
+        case (FORMULA_LIVENESS):
+            rep->status("checking liveness");
+            break;
+        case (FORMULA_FAIRNESS):
+            rep->status("checking fairness");
+            break;
+        case (FORMULA_STABILIZATION):
+            rep->status("checking stabilization");
+            break;
+        case (FORMULA_EVENTUALLY):
+            rep->status("checking eventual occurrence");
+            break;
+        case (FORMULA_INITIAL):
+            rep->status("checking initial satisfiability");
+            break;
+        case (FORMULA_MODELCHECKING):
+            rep->status("checking CTL");
+            break;
     }
 
     // restructure the formula: again tautoglies and simplification
@@ -194,24 +197,24 @@ void Task::setStore()
         // choose a store
         switch (args_info.store_arg)
         {
-        case store_arg_bin:
-            s = new BinStore();
-            break;
-        case store_arg_bloom:
-            s = new BloomStore(args_info.hashfunctions_arg);
-            break;
-        case store_arg_stl:
-            s = new STLStore();
-            break;
-        case store_arg_bit:
-            s = new BitStore();
-            break;
-        case store_arg_bin2:
-            s = new BinStore2();
-            break;
-        case store_arg_tsbin2:
-            s = new ThreadSafeStore(new SIBinStore2(number_of_threads),number_of_threads);
-            break;
+            case store_arg_bin:
+                s = new BinStore();
+                break;
+            case store_arg_bloom:
+                s = new BloomStore(args_info.hashfunctions_arg);
+                break;
+            case store_arg_stl:
+                s = new STLStore();
+                break;
+            case store_arg_bit:
+                s = new BitStore();
+                break;
+            case store_arg_bin2:
+                s = new BinStore2();
+                break;
+            case store_arg_tsbin2:
+                s = new ThreadSafeStore(new SIBinStore2(number_of_threads), number_of_threads);
+                break;
         }
     }
 }
@@ -221,40 +224,44 @@ void Task::setProperty()
     // choose a simple property
     switch (args_info.check_arg)
     {
-        //        case check_arg_none:
-        //            return EXIT_SUCCESS;
+            //        case check_arg_none:
+            //            return EXIT_SUCCESS;
 
-    case check_arg_full:
-        p = new SimpleProperty();
-        flc = new FireListCreator();
-        break;
+        case check_arg_full:
+            p = new SimpleProperty();
+            flc = new FireListCreator();
+            break;
 
-    case check_arg_deadlock:
-        p = new Deadlock();
-        flc = new FireListStubbornDeadlockCreator();
-        exploration = new DFSExploration();
-        break;
+        case check_arg_deadlock:
+            p = new Deadlock();
+            flc = new FireListStubbornDeadlockCreator();
+            exploration = new DFSExploration();
+            break;
 
-    case check_arg_statepredicate:
-        p = new StatePredicateProperty(sp);
-        flc = new FirelistStubbornStatePredicateCreator();
-        exploration = new DFSExploration();
-        break;
+        case check_arg_statepredicate:
+            p = new StatePredicateProperty(sp);
+            flc = new FirelistStubbornStatePredicateCreator();
+            exploration = new DFSExploration();
+            break;
     }
 
 
     // set the correct exploration algorithm
     switch (args_info.check_arg)
     {
-    case check_arg_full:
-    case check_arg_deadlock:
-    case check_arg_statepredicate:
-        if (number_of_threads == 1)
-            exploration = new DFSExploration();
-        else
-            exploration = new ParallelExploration();
-        break;
-        // now there is only one, but who knows...
+        case check_arg_full:
+        case check_arg_deadlock:
+        case check_arg_statepredicate:
+            if (number_of_threads == 1)
+            {
+                exploration = new DFSExploration();
+            }
+            else
+            {
+                exploration = new ParallelExploration();
+            }
+            break;
+            // now there is only one, but who knows...
     }
 }
 
@@ -268,28 +275,28 @@ bool Task::getResult()
     bool result;
     switch (args_info.search_arg)
     {
-    case search_arg_depth:
-        result = exploration->depth_first(*p, *s, * flc, number_of_threads);
-        break;
+        case search_arg_depth:
+            result = exploration->depth_first(*p, *s, * flc, number_of_threads);
+            break;
 
-    case search_arg_findpath:
-        if (args_info.retrylimit_arg == 0)
-        {
-            rep->status("starting infinite tries of depth %d", args_info.depthlimit_arg);
-        }
-        else
-        {
-            rep->status("starting at most %d tries of depth %d", args_info.retrylimit_arg, args_info.depthlimit_arg);
-        }
+        case search_arg_findpath:
+            if (args_info.retrylimit_arg == 0)
+            {
+                rep->status("starting infinite tries of depth %d", args_info.depthlimit_arg);
+            }
+            else
+            {
+                rep->status("starting at most %d tries of depth %d", args_info.retrylimit_arg, args_info.depthlimit_arg);
+            }
 
-        choose = new ChooseTransitionHashDriven();
-        result = exploration->find_path(*p, args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(p), *((EmptyStore*)s), *choose);
-        delete choose;
-        break;
+            choose = new ChooseTransitionHashDriven();
+            result = exploration->find_path(*p, args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(p), *((EmptyStore*)s), *choose);
+            delete choose;
+            break;
 
-    default:
-        assert(false);
-        break;
+        default:
+            assert(false);
+            break;
     }
 
     return result;
@@ -309,10 +316,10 @@ void Task::interpreteResult(bool result)
     // if the Bloom store did not find anything, the result is unknown
     if (args_info.store_arg == store_arg_bloom)
     {
-        switch(args_info.check_arg)
+        switch (args_info.check_arg)
         {
-            case(check_arg_deadlock):
-            case(check_arg_statepredicate):
+            case (check_arg_deadlock):
+            case (check_arg_statepredicate):
                 if (not result)
                 {
                     final_result = TRINARY_UNKNOWN;
@@ -323,13 +330,13 @@ void Task::interpreteResult(bool result)
 
     switch (final_result)
     {
-        case(TRINARY_TRUE):
+        case (TRINARY_TRUE):
             rep->message("result: %s", rep->markup(MARKUP_GOOD, "yes").str());
             break;
-        case(TRINARY_FALSE):
+        case (TRINARY_FALSE):
             rep->message("result: %s", rep->markup(MARKUP_BAD, "no").str());
             break;
-        case(TRINARY_UNKNOWN):
+        case (TRINARY_UNKNOWN):
             rep->message("result: %s", rep->markup(MARKUP_WARNING, "unknown").str());
             break;
     }

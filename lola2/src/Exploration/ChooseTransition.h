@@ -13,7 +13,7 @@
 
 class ChooseTransition
 {
-public:
-    virtual index_t choose(NetState* ns, index_t cardfirelist, index_t* firelist) = 0;
-    virtual ~ChooseTransition() {}
+    public:
+        virtual index_t choose(NetState* ns, index_t cardfirelist, index_t* firelist) = 0;
+        virtual ~ChooseTransition() {}
 };

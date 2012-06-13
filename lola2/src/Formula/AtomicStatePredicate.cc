@@ -218,7 +218,7 @@ void AtomicStatePredicate::setUpSet()
 }
 
 // LCOV_EXCL_START
-bool AtomicStatePredicate::DEBUG__consistency(NetState& ns)
+bool AtomicStatePredicate::DEBUG__consistency(NetState &ns)
 {
     // 1. check sum
     int s = 0;
@@ -243,19 +243,20 @@ bool AtomicStatePredicate::DEBUG__consistency(NetState& ns)
      {
          assert(parent);
      }*/
-     return true;
+    return true;
 }
 // LCOV_EXCL_STOP
 
 
-StatePredicate* AtomicStatePredicate::copy(StatePredicate* parent) {
-    AtomicStatePredicate* af = new AtomicStatePredicate(0,0,0);
+StatePredicate* AtomicStatePredicate::copy(StatePredicate* parent)
+{
+    AtomicStatePredicate* af = new AtomicStatePredicate(0, 0, 0);
     af->value = value;
     af->position = position;
     af->parent = parent;
     // we can copy the pointers, so use the same arrays as they are not changed!
     af->posPlaces = posPlaces;
-    af->negPlaces =negPlaces;
+    af->negPlaces = negPlaces;
     af->posMult = posMult;
     af->negMult = negMult;
     af->cardPos = cardPos;

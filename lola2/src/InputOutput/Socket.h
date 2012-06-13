@@ -30,29 +30,29 @@ typedef uint32_t socklen_t;
 */
 class Socket
 {
-private:
-    /// the socket
-    const int sock;
+    private:
+        /// the socket
+        const int sock;
 
-    /// the address
-    sockaddr_in address;
+        /// the address
+        sockaddr_in address;
 
-    /// whether we are listening (server) or sending (client)
-    const unsigned listening : 1;
+        /// whether we are listening (server) or sending (client)
+        const unsigned listening : 1;
 
-public:
-    /// create a socket - port is mandatory, destination address optional
-    Socket(u_short port, const char* destination = NULL);
+    public:
+        /// create a socket - port is mandatory, destination address optional
+        Socket(u_short port, const char* destination = NULL);
 
-    /// close the socket
-    ~Socket();
+        /// close the socket
+        ~Socket();
 
-    /// receive incoming messages (does not return)
-    __attribute__((noreturn)) void receive() const;
+        /// receive incoming messages (does not return)
+        __attribute__((noreturn)) void receive() const;
 
-    /// wait for a specific message
-    char* waitFor(const char* message) const;
+        /// wait for a specific message
+        char* waitFor(const char* message) const;
 
-    /// send a message
-    void send(const char* message) const;
+        /// send a message
+        void send(const char* message) const;
 };

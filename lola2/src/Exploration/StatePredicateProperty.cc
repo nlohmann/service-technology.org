@@ -16,7 +16,8 @@
 #include <stdlib.h>
 #include <Net/Marking.h>
 
-StatePredicateProperty::StatePredicateProperty(StatePredicate* f) {
+StatePredicateProperty::StatePredicateProperty(StatePredicate* f)
+{
     // set formula
     predicate = f;
     f->top = f;
@@ -27,7 +28,8 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate* f) {
     f->collectAtomic(atomic);
 
     // initialize up sets
-    for (index_t i = 0; i < cardAtomic; i++) {
+    for (index_t i = 0; i < cardAtomic; i++)
+    {
         atomic[i]->setUpSet();
     }
 
@@ -35,25 +37,32 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate* f) {
     changedPredicate = (AtomicStatePredicate***) malloc(
                            SIZEOF_VOIDP * Net::Card[TR]);
     changedSum = (int**) malloc(SIZEOF_VOIDP * Net::Card[TR]);
-    for (index_t t = 0; t < Net::Card[TR]; t++) {
+    for (index_t t = 0; t < Net::Card[TR]; t++)
+    {
         changedPredicate[t] = (AtomicStatePredicate**) malloc(
                                   SIZEOF_VOIDP * cardAtomic);
         changedSum[t] = (int*) malloc(SIZEOF_INDEX_T * cardAtomic);
-        for (index_t i = 0; i < cardAtomic; i++) {
+        for (index_t i = 0; i < cardAtomic; i++)
+        {
             int s = 0;
             // evaluate delta that t causes on this predicate
-            for (index_t j = 0; j < Transition::CardDeltaT[PRE][t]; j++) {
+            for (index_t j = 0; j < Transition::CardDeltaT[PRE][t]; j++)
+            {
                 const index_t p = Transition::DeltaT[PRE][t][j];
-                for (index_t k = 0; k < atomic[i]->cardPos; k++) {
-                    if (atomic[i]->posPlaces[k] == p) {
+                for (index_t k = 0; k < atomic[i]->cardPos; k++)
+                {
+                    if (atomic[i]->posPlaces[k] == p)
+                    {
                         s -= Transition::MultDeltaT[PRE][t][j]
                              * atomic[i]->posMult[k];
                         break;
 
                     }
                 }
-                for (index_t k = 0; k < atomic[i]->cardNeg; k++) {
-                    if (atomic[i]->negPlaces[k] == p) {
+                for (index_t k = 0; k < atomic[i]->cardNeg; k++)
+                {
+                    if (atomic[i]->negPlaces[k] == p)
+                    {
                         s += Transition::MultDeltaT[PRE][t][j]
                              * atomic[i]->negMult[k];
                         break;
@@ -61,18 +70,23 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate* f) {
                     }
                 }
             }
-            for (index_t j = 0; j < Transition::CardDeltaT[POST][t]; j++) {
+            for (index_t j = 0; j < Transition::CardDeltaT[POST][t]; j++)
+            {
                 const index_t p = Transition::DeltaT[POST][t][j];
-                for (index_t k = 0; k < atomic[i]->cardPos; k++) {
-                    if (atomic[i]->posPlaces[k] == p) {
+                for (index_t k = 0; k < atomic[i]->cardPos; k++)
+                {
+                    if (atomic[i]->posPlaces[k] == p)
+                    {
                         s += Transition::MultDeltaT[POST][t][j]
                              * atomic[i]->posMult[k];
                         break;
 
                     }
                 }
-                for (index_t k = 0; k < atomic[i]->cardNeg; k++) {
-                    if (atomic[i]->negPlaces[k] == p) {
+                for (index_t k = 0; k < atomic[i]->cardNeg; k++)
+                {
+                    if (atomic[i]->negPlaces[k] == p)
+                    {
                         s -= Transition::MultDeltaT[POST][t][j]
                              * atomic[i]->negMult[k];
                         break;
@@ -80,7 +94,8 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate* f) {
                     }
                 }
             }
-            if (s) {
+            if (s)
+            {
                 changedPredicate[t][cardChanged[t]] = atomic[i];
                 changedSum[t][cardChanged[t]++] = s;
             }
@@ -94,8 +109,10 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate* f) {
 }
 
 
-StatePredicateProperty::~StatePredicateProperty() {
-    for (index_t t = 0; t < Net::Card[TR]; ++t) {
+StatePredicateProperty::~StatePredicateProperty()
+{
+    for (index_t t = 0; t < Net::Card[TR]; ++t)
+    {
         free(changedPredicate[t]);
         free(changedSum[t]);
     }
@@ -105,22 +122,27 @@ StatePredicateProperty::~StatePredicateProperty() {
 }
 
 
-bool StatePredicateProperty::initProperty(NetState &ns) {
+bool StatePredicateProperty::initProperty(NetState &ns)
+{
     predicate->evaluate(ns);
     assert(predicate->DEBUG__consistency(ns));
     return predicate->value;
 }
 
-bool StatePredicateProperty::checkProperty(NetState &ns, index_t t) {
-    for (index_t i = 0; i < cardChanged[t]; i++) {
+bool StatePredicateProperty::checkProperty(NetState &ns, index_t t)
+{
+    for (index_t i = 0; i < cardChanged[t]; i++)
+    {
         changedPredicate[t][i]->update(ns, changedSum[t][i]);
     }
     assert(predicate->DEBUG__consistency(ns));
     return predicate->value;
 }
 
-bool StatePredicateProperty::updateProperty(NetState &ns, index_t t) {
-    for (index_t i = 0; i < cardChanged[t]; i++) {
+bool StatePredicateProperty::updateProperty(NetState &ns, index_t t)
+{
+    for (index_t i = 0; i < cardChanged[t]; i++)
+    {
         changedPredicate[t][i]->update(ns, -changedSum[t][i]);
     }
     assert(predicate->DEBUG__consistency(ns));
@@ -128,7 +150,8 @@ bool StatePredicateProperty::updateProperty(NetState &ns, index_t t) {
 }
 
 
-SimpleProperty* StatePredicateProperty::copy() {
+SimpleProperty* StatePredicateProperty::copy()
+{
     StatePredicateProperty* spp = new StatePredicateProperty(predicate->copy());
     spp->stack = stack;
     spp->value = value;

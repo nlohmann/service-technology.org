@@ -237,41 +237,41 @@ String ReporterStream::markup(markup_t markup, const char* format, ...) const
 
     switch (markup)
     {
-    case (MARKUP_TOOL):
-        bytes = asprintf(&res, "%s%s%s", _cm_, message, _c_);
-        break;
+        case (MARKUP_TOOL):
+            bytes = asprintf(&res, "%s%s%s", _cm_, message, _c_);
+            break;
 
-    case (MARKUP_FILE):
-        bytes = asprintf(&res, "%s%s%s", _cb__, message, _c_);
-        break;
+        case (MARKUP_FILE):
+            bytes = asprintf(&res, "%s%s%s", _cb__, message, _c_);
+            break;
 
-    case (MARKUP_OUTPUT):
-        bytes = asprintf(&res, "%s%s%s", _cB_, message, _c_);
-        break;
+        case (MARKUP_OUTPUT):
+            bytes = asprintf(&res, "%s%s%s", _cB_, message, _c_);
+            break;
 
-    case (MARKUP_GOOD):
-        bytes = asprintf(&res, "%s%s%s", _cG_, message, _c_);
-        break;
+        case (MARKUP_GOOD):
+            bytes = asprintf(&res, "%s%s%s", _cG_, message, _c_);
+            break;
 
-    case (MARKUP_BAD):
-        bytes = asprintf(&res, "%s%s%s", _cR_, message, _c_);
-        break;
+        case (MARKUP_BAD):
+            bytes = asprintf(&res, "%s%s%s", _cR_, message, _c_);
+            break;
 
-    case (MARKUP_WARNING):
-        bytes = asprintf(&res, "%s%s%s", _cY_, message, _c_);
-        break;
+        case (MARKUP_WARNING):
+            bytes = asprintf(&res, "%s%s%s", _cY_, message, _c_);
+            break;
 
-    case (MARKUP_IMPORTANT):
-        bytes = asprintf(&res, "%s%s%s", _bold_, message, _c_);
-        break;
+        case (MARKUP_IMPORTANT):
+            bytes = asprintf(&res, "%s%s%s", _bold_, message, _c_);
+            break;
 
-    case (MARKUP_PARAMETER):
-        bytes = asprintf(&res, "%s%s%s", _cC_, message, _c_);
-        break;
+        case (MARKUP_PARAMETER):
+            bytes = asprintf(&res, "%s%s%s", _cC_, message, _c_);
+            break;
 
-    case (MARKUP_UNIMPORTANT):
-        bytes = asprintf(&res, "%s%s%s", _cl_, message, _c_);
-        break;
+        case (MARKUP_UNIMPORTANT):
+            bytes = asprintf(&res, "%s%s%s", _cl_, message, _c_);
+            break;
     }
 
     assert(bytes != -1);

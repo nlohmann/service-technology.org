@@ -29,7 +29,7 @@
 #include <sstream>
 #include <cstdio>
 #include "problem.h"
-#include "lp_solve/lp_lib.h"
+#include "lp_solve_5.5/lp_lib.h"
 using std::cerr;
 using std::endl;
 

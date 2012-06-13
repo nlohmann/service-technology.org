@@ -87,11 +87,32 @@ Disjunction(Eventually(x), Eventually(y)) -> <neg: Eventually(Disjunction(x,y))>
 // G (a AND b) <->  (Ga AND Gb)
 Conjunction(Always(x), Always(y)) -> <neg: Always(Conjunction(x,y))>;
 
-// FGF a       <->  GFa
+// FGF x       <->  GF x
 Eventually(a=Always(Eventually(x))) -> <neg: a>;
 
-// GFG a       <->  FGa
+// GFG x       <->  FG x
 Always(a=Eventually(Always(x))) -> <neg: a>;
+
+// AGAG x   <-> AG x
+AllPath(Always(a=AllPath(Always(x)))) -> <neg: a>;
+
+// AFAF x   <-> AF x
+AllPath(Eventually(a=AllPath(Eventually(x)))) -> <neg: a>;
+
+// EFEF x   <-> AG x
+ExPath(Eventually(a=ExPath(Eventually(x)))) -> <neg: a>;
+
+// EGEG x   <-> EG x
+ExPath(Always(a=ExPath(Always(x)))) -> <neg: a>;
+
+// EFEF x   <-> AG x
+ExPath(Eventually(a=ExPath(Eventually(x)))) -> <neg: a>;
+
+// AGEFAGEF x <-> AGEF x
+AllPath(AllPath(Always(ExPath(Eventually(a=AllPath(Always(ExPath(Eventually(x))))))))) -> <neg: a>;
+
+// EFAGEFAG x <-> EFAG x
+ExPath(Eventually(AllPath(Always(a=ExPath(Eventually(AllPath(Always(x)))))))) -> <neg: a>;
 
 
 /****************************

@@ -21,7 +21,7 @@ BinStore3::BinStore3()
 
     memcpylen = 0;
     // memcpy can be used only if input and suffix tree vectors use the same data type
-#if INPUT_WIDTH == PLACE_WITDH
+#if INPUT_WIDTH == PLACE_WIDTH
     while(memcpylen<insize && Place::CardBits[memcpylen] == PLACE_WIDTH)
         memcpylen++;
 #endif
@@ -37,7 +37,7 @@ input_t* BinStore3::getInput(NetState* ns, bitindex_t& bitlen)
     bitlen = Place::SizeOfBitVector;
 
     // use memcpy if possible
-#if INPUT_WIDTH == PLACE_WITDH
+#if INPUT_WIDTH == PLACE_WIDTH
     memcpy(in,ns->Current,memcpylen * sizeof(input_t));
     if(memcpylen >= Place::CardSignificant)
     {

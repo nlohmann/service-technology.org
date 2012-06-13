@@ -139,11 +139,11 @@ typedef uint32_t vectordata_t;
 typedef uint32_t input_t;
 
 // maximum size (in bits) of a place
-const int PLACE_WIDTH = sizeof(capacity_t) * 8;
+#define PLACE_WIDTH (SIZEOF_CAPACITY_T * 8)
 
 // maximum size (in bits) of an input word
-const int INPUT_WIDTH = sizeof(input_t) * 8;
+#define INPUT_WIDTH (SIZEOF_INPUT_T * 8)
 
 // maximum size (in bits) of a vector item
-const int VECTOR_WIDTH = sizeof(vectordata_t) * 8;
+#define VECTOR_WIDTH (SIZEOF_VECTORDATA_T * 8)
 

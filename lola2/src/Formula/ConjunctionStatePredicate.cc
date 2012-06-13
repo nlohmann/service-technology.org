@@ -154,7 +154,6 @@ index_t ConjunctionStatePredicate::collectAtomic(AtomicStatePredicate** p)
     return offset;
 }
 
-// only for debugging:
 // LCOV_EXCL_START
 bool ConjunctionStatePredicate::DEBUG__consistency(NetState &ns)
 {

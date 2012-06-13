@@ -239,7 +239,7 @@ bool AtomicStatePredicate::DEBUG__consistency(NetState& ns)
     {
         assert(sum > threshold);
     }
-    /* if (this != debug__top)
+    /* if (this != top)
      {
          assert(parent);
      }*/

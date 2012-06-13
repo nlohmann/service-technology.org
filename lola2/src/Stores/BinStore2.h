@@ -9,16 +9,6 @@
 #include <Core/Dimensions.h>
 #include <Stores/Store.h>
 
-typedef uint32_t vectordata_t;
-
-
-
-// maximum size (in bits) of a place
-const int PLACE_WIDTH = sizeof(capacity_t) * 8;
-
-// maximum size (in bits) of a vector item
-const int VECTOR_WIDTH = sizeof(vectordata_t) * 8;
-
 
 class BinStore2 : public Store
 {

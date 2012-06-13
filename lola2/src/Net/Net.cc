@@ -82,10 +82,6 @@ void Net::print()
         case STRONG_FAIRNESS:
             printf(" strong ");
             break;
-        default:
-            // LCOV_EXCL_START
-            printf("error");
-            // LCOV_EXCL_STOP
         }
         printf(" %s ", (Transition::Enabled[i] ? "enabled" : "disabled"));
 

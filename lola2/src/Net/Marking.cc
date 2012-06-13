@@ -39,6 +39,8 @@ void Marking::deleteMarkings()
     free(Marking::Target);
 }
 
+// LCOV_EXCL_START
+// debugging only
 void Marking::printMarking(capacity_t* marking) {
     return;
     printf("PRINTING MARKING %x:\n",marking);
@@ -46,3 +48,4 @@ void Marking::printMarking(capacity_t* marking) {
         printf("\t%s:%d\n",Net::Name[PL][i], marking[i]);
     printf("==============\n");
 }
+// LCOV_EXCL_STOP

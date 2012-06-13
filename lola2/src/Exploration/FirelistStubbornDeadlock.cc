@@ -6,6 +6,7 @@
 \brief Class for firelist generation. Default is firelist consisting of all enabled transitions.
 */
 
+#include <config.h>
 #include <cstdlib>
 #include <cstdio>
 #include <Core/Dimensions.h>
@@ -40,7 +41,8 @@ FirelistStubbornDeadlock::~FirelistStubbornDeadlock()
 
 void FirelistStubbornDeadlock::newStamp()
 {
-    if (++stamp == 0xFFFFFFFF)
+    // 0xFFFFFFFF = max uint32_t
+    if (UNLIKELY(++stamp == 0xFFFFFFFF))
     {
         // This happens rarely and only in long runs. Thus it is
         // hard to be tested
@@ -70,7 +72,7 @@ index_t FirelistStubbornDeadlock::getFirelist(NetState* ns,index_t** result)
     // since check property will raise its flag before firelist is
     // requested
     // LCOV_EXCL_START
-    if (ns->CardEnabled == 0)
+    if (UNLIKELY(ns->CardEnabled == 0))
     {
         assert(false);
         * result = new index_t[1];

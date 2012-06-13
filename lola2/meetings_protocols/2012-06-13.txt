@@ -1,0 +1,10 @@
+FireListCreator:
+
+- vernünftiger Construktor
+- aufpassen mit SimpleProperty
+
+~StatePredicateProperty wird nie gerufen!
+
+Kommentare:
+
+- Exploration/SearchStack.cc:33

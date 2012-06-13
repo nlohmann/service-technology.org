@@ -19,6 +19,10 @@ structures
 #include <Net/swap.h>
 
 bool is_consistent();
+
+/*!
+\todo remove TargetMarking ?
+*/
 void swapPlaces(index_t left, index_t right)
 {
     // 1. Net data structures
@@ -232,7 +236,6 @@ bool is_consistent()
                         return false;
                     }
                 }
-
             }
         }
     }

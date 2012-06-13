@@ -9,6 +9,7 @@ information for a transition in its role as a node, ar contained in Node.*
 */
 
 #include <cstdlib>
+#include <config.h>
 #include <Core/Dimensions.h>
 #include <Parser/FairnessAssumptions.h>
 #include <Net/Net.h>
@@ -200,7 +201,7 @@ void Transition::fire(NetState* ns, index_t t)
     // 2. update hash value
     ns->HashCurrent += Transition::DeltaHash[t];
     ns->HashCurrent %= SIZEOF_MARKINGTABLE;
-    while (ns->HashCurrent < 0)
+    if (UNLIKELY(ns->HashCurrent < 0))
     {
         // just safety belt, if % returns negative value
         // LCOV_EXCL_START

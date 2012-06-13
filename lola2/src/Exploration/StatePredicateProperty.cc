@@ -107,7 +107,7 @@ StatePredicateProperty::~StatePredicateProperty() {
 
 bool StatePredicateProperty::initProperty(NetState &ns) {
     predicate->evaluate(ns);
-    predicate->consistency(ns);
+    assert(predicate->DEBUG__consistency(ns));
     return predicate->value;
 }
 
@@ -115,7 +115,7 @@ bool StatePredicateProperty::checkProperty(NetState &ns, index_t t) {
     for (index_t i = 0; i < cardChanged[t]; i++) {
         changedPredicate[t][i]->update(ns, changedSum[t][i]);
     }
-    predicate->consistency(ns);
+    assert(predicate->DEBUG__consistency(ns));
     return predicate->value;
 }
 
@@ -123,7 +123,7 @@ bool StatePredicateProperty::updateProperty(NetState &ns, index_t t) {
     for (index_t i = 0; i < cardChanged[t]; i++) {
         changedPredicate[t][i]->update(ns, -changedSum[t][i]);
     }
-    predicate->consistency(ns);
+    assert(predicate->DEBUG__consistency(ns));
     return predicate->value;
 }
 

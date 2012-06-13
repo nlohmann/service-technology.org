@@ -37,7 +37,7 @@ public:
     /// examined.
     virtual void evaluate(NetState &ns);
 
-    virtual void consistency(NetState &ns);
+    virtual bool DEBUG__consistency(NetState &ns);
 
 private:
     /// the list of subformulas

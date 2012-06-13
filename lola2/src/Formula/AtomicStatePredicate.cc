@@ -217,9 +217,8 @@ void AtomicStatePredicate::setUpSet()
     free(up2);
 }
 
-// only for debugging:
 // LCOV_EXCL_START
-void AtomicStatePredicate::consistency(NetState& ns)
+bool AtomicStatePredicate::DEBUG__consistency(NetState& ns)
 {
     // 1. check sum
     int s = 0;
@@ -240,10 +239,11 @@ void AtomicStatePredicate::consistency(NetState& ns)
     {
         assert(sum > threshold);
     }
-    /* if (this != top)
+    /* if (this != debug__top)
      {
          assert(parent);
      }*/
+     return true;
 }
 // LCOV_EXCL_STOP
 

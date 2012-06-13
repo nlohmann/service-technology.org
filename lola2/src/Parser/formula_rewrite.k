@@ -151,6 +151,7 @@ Product(x, Number(y)) -> <sides: Number(mult(x,y)) >;
 
 // move parentheses
 Sum(Sum(x,y), z) -> <sides: Sum(x, Sum(y, z)) >;
+//Sum(Sum(u,v), w) -> <sides: Sum(u, Sum(v, w)) >;
 
 // calculate nested multiplications
 Product(x, Product(y, z)) -> <sides: Product(mult(x,y), z) >;

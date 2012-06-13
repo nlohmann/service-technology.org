@@ -86,7 +86,7 @@ public:
     /// collects atomic subformulas; array must be malloced beforehand
     /// result is number of inserted elements
     virtual index_t collectAtomic(AtomicStatePredicate**);
-    virtual void consistency(NetState &ns);
+    virtual bool DEBUG__consistency(NetState &ns);
 
     // copy function
     virtual StatePredicate* copy(StatePredicate* parent);

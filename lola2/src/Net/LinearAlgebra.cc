@@ -15,6 +15,9 @@
 using namespace std;
 
 // This is for debug purposes
+#include <iostream>
+using std::cout;
+using std::endl;
 // LCOV_EXCL_START
 /// writes current row on cout
 void Matrix::Row::printRow() const
@@ -48,11 +51,6 @@ void Matrix::printMatrix() const
     }
 }
 // LCOV_EXCL_STOP
-
-// for debug purposes
-#include <iostream>
-using std::cout;
-using std::endl;
 
 /// computes the ggt of two unsigned integers
 inline int64_t ggt(int64_t a, int64_t b)

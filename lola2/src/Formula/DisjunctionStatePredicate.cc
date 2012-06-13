@@ -162,13 +162,12 @@ index_t DisjunctionStatePredicate::collectAtomic(AtomicStatePredicate** p)
     return offset;
 }
 
-// only for debugging:
 // LCOV_EXCL_START
-void DisjunctionStatePredicate::consistency(NetState &ns)
+bool DisjunctionStatePredicate::DEBUG__consistency(NetState &ns)
 {
     for (index_t i = 0; i < cardSub; i++)
     {
-        sub[i]->consistency(ns);
+        assert(sub[i]->DEBUG__consistency(ns));
         assert(sub[i]->position == i);
         assert(sub[i]->parent == this);
         assert(sub[i] != this);
@@ -201,6 +200,7 @@ void DisjunctionStatePredicate::consistency(NetState &ns)
     {
         assert(parent);
     }*/
+    return true;
 }
 
 // LCOV_EXCL_STOP

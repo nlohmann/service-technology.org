@@ -61,8 +61,10 @@ void myprinter(const char* s, kc::uview v)
 
 extern kc::tFormula TheFormula;
 
-Task::Task() : sp(NULL), p(NULL), s(NULL), flc(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg)
-{}
+Task::Task() : sp(NULL), p(NULL), s(NULL), flc(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
+{
+    setFormula();
+}
 
 Task::~Task()
 {
@@ -105,7 +107,7 @@ void Task::setFormula()
 
     // check temporal status
     TheFormula->unparse(myprinter, kc::temporal);
-    formula_t formulaType = TheFormula->type;
+    formulaType = TheFormula->type;
 
     switch (formulaType)
     {
@@ -256,10 +258,6 @@ void Task::setProperty()
     }
 }
 
-void Task::setThreads() {
-    number_of_threads = args_info.threads_arg;
-}
-
 bool Task::getResult()
 {
     assert(s);
@@ -295,6 +293,46 @@ bool Task::getResult()
     }
 
     return result;
+}
+
+void Task::interpreteResult(bool result)
+{
+    // in case AG is used, the result needs to be negated
+    if (formulaType == FORMULA_INVARIANT or formulaType == FORMULA_IMPOSSIBLE)
+    {
+        result = not result;
+    }
+
+    // make result three-valued
+    trinary_t final_result = result ? TRINARY_TRUE : TRINARY_FALSE;
+
+    // if the Bloom store did not find anything, the result is unknown
+    if (args_info.store_arg == store_arg_bloom)
+    {
+        switch(args_info.check_arg)
+        {
+            case(check_arg_deadlock):
+            case(check_arg_statepredicate):
+                if (not result)
+                {
+                    final_result = TRINARY_UNKNOWN;
+                }
+                break;
+        }
+    }
+
+    switch (final_result)
+    {
+        case(TRINARY_TRUE):
+            rep->message("result: %s", rep->markup(MARKUP_GOOD, "yes").str());
+            break;
+        case(TRINARY_FALSE):
+            rep->message("result: %s", rep->markup(MARKUP_BAD, "no").str());
+            break;
+        case(TRINARY_UNKNOWN):
+            rep->message("result: %s", rep->markup(MARKUP_WARNING, "unknown").str());
+            break;
+    }
 }
 
 void Task::printWitness()

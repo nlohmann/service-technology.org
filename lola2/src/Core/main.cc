@@ -174,10 +174,6 @@ int main(int argc, char** argv)
 
 
     Task task;
-    // get thread number
-    task.setThreads();
-    // get formula
-    task.setFormula();
 
     delete symbolTables;
 
@@ -210,8 +206,7 @@ int main(int argc, char** argv)
         task.setProperty();
 
         bool result = task.getResult();
-
-        rep->message("result: %s", result ? rep->markup(MARKUP_GOOD, "yes").str() : rep->markup(MARKUP_BAD, "no").str());
+        task.interpreteResult(result);
 
         // print current marking
         if (result and args_info.state_given)

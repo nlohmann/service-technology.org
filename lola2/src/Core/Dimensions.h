@@ -115,6 +115,14 @@ typedef enum
     FORMULA_MODELCHECKING = 8  ///< CTL formulae
 } formula_t;
 
+/// three-valued logic
+typedef enum
+{
+    TRINARY_FALSE = 0,
+    TRINARY_TRUE = 1,
+    TRINARY_UNKNOWN = 2
+    } trinary_t;
+
 /// number of seconds between report outputs
 #define REPORT_FREQUENCY 5
 

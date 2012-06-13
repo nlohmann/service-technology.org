@@ -89,21 +89,7 @@ option "logFile" -
   optional
   
 option "pnmlFile" -
-  "Filename for the synchronous environment and the asynchronous environment. (either '.sync.pnml' or '.async.pnml' will be added to the given filename)"
-  string
-  typestr="FILENAME"
-  argoptional
-  optional
-
-option "pnmlFileSync" -
-  "Filename for the labeled inner net. The option 'pnmlFile' will be ignored."
-  string
-  typestr="FILENAME"
-  argoptional
-  optional
-  
-option "pnmlFileAsync" -
-  "Filename for the labeled environment of the inner net. The option 'pnmlFile' will be ignored."
+  "Filename for the synchronous environment or the asynchronous environment."
   string
   typestr="FILENAME"
   argoptional

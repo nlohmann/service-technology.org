@@ -161,7 +161,7 @@ void evaluateParameters(int argc, char** argv) {
 
     // \TODO: error codes
     if (args_info.icount_arg < -1) {
-    	abort(123, "Interface count has to be a positive integer or '-1'.");
+    	abort(124, "Interface count has to be a positive integer or '-1'.");
     }
 
     // allow only one of the basic functionalities
@@ -294,13 +294,7 @@ int main(int argc, char** argv) {
 
     	//InnerMarking::createLabeledEnvironment();
 
-    	std::string pnml_filename = "";
-    	if (args_info.pnmlFileSync_given)
-    		pnml_filename = args_info.pnmlFileSync_arg ? args_info.pnmlFileSync_arg : filename + ".sync.pnml";
-    	else {
-    		pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename;
-    		pnml_filename += ".sync.pnml";
-    	}
+    	std::string pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename + ".sync.pnml";
     	Output output(pnml_filename, "synchronous environment");
     	output.stream() << pnapi::io::pnml;
     	Output::output(output.stream(), *InnerMarking::net, filename);
@@ -322,13 +316,7 @@ int main(int argc, char** argv) {
 
     	//InnerMarking::createLabeledEnvironment();
 
-    	std::string pnml_filename = "";
-    	if (args_info.pnmlFileAsync_given)
-    		pnml_filename = args_info.pnmlFileAsync_arg ? args_info.pnmlFileAsync_arg : filename + ".async.pnml";
-    	else {
-    		pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename;
-    		pnml_filename += ".async.pnml";
-    	}
+    	std::string pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename + ".async.pnml";
     	Output output(pnml_filename, "asynchronous environment");
     	output.stream() << pnapi::io::pnml;
     	//Output::output(output.stream(), tempNet, filename);

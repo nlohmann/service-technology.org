@@ -278,7 +278,7 @@ int main(int argc, char** argv) {
 //
 //    	tempstring.str().find("FINALCONDITION");
 
-    	std::string owfn_filename = filename + ".owfn";
+    	std::string owfn_filename = args_info.owfnFile_arg ? args_info.owfnFile_arg : filename + ".owfn";
     	Output output(owfn_filename, "OWFN");
     	output.stream() << pnapi::io::owfn << *InnerMarking::net;
 

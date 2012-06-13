@@ -190,9 +190,6 @@ void Output::setKeepTempfiles(bool b) {
  */
 std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, std::string & filename)
 {
-	// initialize placeID_B
-	placeID_B = "";
-
 	os //< output everything to this stream
 
 	   << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"
@@ -229,7 +226,7 @@ std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, st
 	if (placeID_B == "")
 		net.getFinalCondition().getFormula().output(os);
 	else
-		outputSpecialFinalMarking(os, net.getPlaces());
+		outputFinalMarking(os, net.getPlaces());
 
 	os << "      </marking>\n"
 	   << "    </finalmarkings>\n"
@@ -376,7 +373,7 @@ std::ostream & Output::output(std::ostream & os, const pnapi::Label & l)
 /*!
  * \brief special final marking output (1 token on the place after transition "B\n")
  */
-std::ostream & Output::outputSpecialFinalMarking(std::ostream & os, const std::set<pnapi::Place *> & places)
+std::ostream & Output::outputFinalMarking(std::ostream & os, const std::set<pnapi::Place *> & places)
 {
 	// sort the elements
 	std::vector<pnapi::Place *> v;

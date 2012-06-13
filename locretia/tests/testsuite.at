@@ -111,23 +111,23 @@ AT_CHECK([test -f locretia-*],0)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Using a given configuration file])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_DATA([my_locretia.conf], [verbose])
-AT_CHECK([LOCRETIA --config=my_locretia.conf --log myCoffee.owfn],0,ignore,stderr)
-AT_CHECK([GREP -q "using configuration file 'my_locretia.conf'" stderr])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
+#AT_SETUP([Using a given configuration file])
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+#AT_DATA([my_locretia.conf], [verbose])
+#AT_CHECK([LOCRETIA --config=my_locretia.conf --log myCoffee.owfn],0,ignore,stderr)
+#AT_CHECK([GREP -q "using configuration file 'my_locretia.conf'" stderr])
+#AT_KEYWORDS(infrastructure)
+#AT_CLEANUP
 
-AT_SETUP([Using a present configuration file])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_DATA([locretia.conf], [verbose])
-AT_CHECK([LOCRETIA --log myCoffee.owfn],0,ignore,stderr)
-AT_CHECK([GREP -q "using configuration file 'locretia.conf'" stderr])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
+#AT_SETUP([Using a present configuration file])
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+#AT_DATA([locretia.conf], [verbose])
+#AT_CHECK([LOCRETIA --log myCoffee.owfn],0,ignore,stderr)
+#AT_CHECK([GREP -q "using configuration file 'locretia.conf'" stderr])
+#AT_KEYWORDS(infrastructure)
+#AT_CLEANUP
 
 AT_SETUP([Results output])
 AT_CHECK_LOLA
@@ -193,7 +193,7 @@ AT_CLEANUP
 
 AT_SETUP([Error building the reachability graph])
 AT_CHECK([cp TESTFILES/error06.* .])
-AT_CHECK([LOCRETIA error06.owfn --lola=foo],1,ignore,stderr)
+AT_CHECK([LOCRETIA error06.owfn --log --lola=foo],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#06\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
@@ -236,10 +236,10 @@ AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
-AT_SETUP([Invalid configuration file])
-AT_DATA([locretia.conf], [invalid="PARAMETER"])
-AT_CHECK([LOCRETIA -v],1,ignore,stderr)
-AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
-AT_KEYWORDS(error)
-AT_CLEANUP
+#AT_SETUP([Invalid configuration file])
+#AT_DATA([locretia.conf], [invalid="PARAMETER"])
+#AT_CHECK([LOCRETIA -v],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
+#AT_KEYWORDS(error)
+#AT_CLEANUP
 

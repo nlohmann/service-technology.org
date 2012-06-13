@@ -19,7 +19,7 @@ class StatePredicateProperty: public SimpleProperty {
 
 public:
     StatePredicateProperty(StatePredicate*);
-    ~StatePredicateProperty();
+    virtual ~StatePredicateProperty();
     StatePredicate* getPredicate() {
         return predicate;
     }

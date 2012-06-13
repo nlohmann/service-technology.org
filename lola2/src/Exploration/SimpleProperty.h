@@ -22,6 +22,8 @@ class EmptyStore;
 class SimpleProperty {
 public:
 
+	virtual ~SimpleProperty() {}
+
     /// the witness path
     SearchStack stack;
 

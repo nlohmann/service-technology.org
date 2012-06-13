@@ -36,7 +36,7 @@ AT_SETUP([Piping to stdout])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([LOCRETIA myCoffee.owfn --log --verbose --logFile=-],0,stdout,ignore)
-AT_CHECK([GREP -q "log-file done with 10 traces, each with lengths 0 to 10" stdout])
+AT_CHECK([GREP -q "</log>" stdout])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -44,7 +44,7 @@ AT_SETUP([Piping from stdin to stdout])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([cat myCoffee.owfn | LOCRETIA --verbose --log --logFile=-],0,stdout,ignore)
-AT_CHECK([GREP -q "log-file done with 10 traces, each with lengths 0 to 10" stdout])
+AT_CHECK([GREP -q "</log>" stdout])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -82,7 +82,7 @@ AT_CLEANUP
 
 AT_SETUP([Using given output filenames])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cp TESTFILES/myCoffee.* .])
 AT_CHECK([LOCRETIA myCoffee.tpn --tpn --owfnFile=test.owfn --verbose],0,ignore,ignore)
 AT_CHECK([test -f test.owfn])
 AT_CHECK([LOCRETIA myCoffee.owfn --log --logFile=test.xes --verbose],0,ignore,ignore)
@@ -96,7 +96,7 @@ AT_CLEANUP
 
 AT_SETUP([Bug information output])
 AT_CHECK([LOCRETIA --bug],0,ignore,stderr)
-AT_CHECK([GREP -q "LOCRETIA: Please send file 'bug.log' to LOCRETIA@service-technology.org!" stderr])
+AT_CHECK([GREP -q "locretia: Please send file 'bug.log' to locretia@service-technology.org!" stderr])
 AT_CHECK([test -f bug.log])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -104,10 +104,10 @@ AT_CLEANUP
 AT_SETUP([Cleaning vs. no cleaning of temporary files])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([LOCRETIA myCoffee.owfn --log --tmpfile=LOCRETIA-XXXXXX -v],0,ignore,ignore)
-AT_CHECK([test -f LOCRETIA-*],1)
-AT_CHECK([LOCRETIA myCoffee.owfn --log --tmpfile=LOCRETIA-XXXXXX --noClean -v],0,ignore,ignore)
-AT_CHECK([test -f LOCRETIA-*],0)
+AT_CHECK([LOCRETIA myCoffee.owfn --log --tmpfile=locretia-XXXXXX -v],0,ignore,ignore)
+AT_CHECK([test -f locretia-*],1)
+AT_CHECK([LOCRETIA myCoffee.owfn --log --tmpfile=locretia-XXXXXX --noClean -v],0,ignore,ignore)
+AT_CHECK([test -f locretia-*],0)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 

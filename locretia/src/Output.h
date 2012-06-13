@@ -49,6 +49,9 @@ class Output {
         /// whether tempfiles should be deleted upon termination
         static bool keepTempfiles;
 
+        /// the name of the "B"-place in the net
+        static std::string placeID_B;
+
     public: /* static functions */
         /// set the tempfile template
         static void setTempfileTemplate(std::string);
@@ -93,6 +96,10 @@ class Output {
         static std::ostream & output(std::ostream &, const pnapi::Port &);
         /// label output
         static std::ostream & output(std::ostream &, const pnapi::Label &);
+
+        /// special final marking output (1 token on the place after transition "B\n")
+        static std::ostream & outputSpecialFinalMarking(std::ostream &, const std::set<pnapi::Place *> &);
+
 //        /// negation output
 //        std::ostream & output(std::ostream &, const pnapi::formula::Negation &);
 //        /// conjunction output

@@ -107,6 +107,7 @@ void InnerMarking::initialize() {
  As for input labels, add an additional place with 'c' tokens which restricts the input transitions
  from unbounded firing to a maximum of 'c'.
 
+ \param[in]	net	the petri net on which the function is used on
  \param[in]	c	maximal number of messages to be sent and received by the environment through each channel
  */
 void InnerMarking::changeView(pnapi::PetriNet* net, const int c) {
@@ -182,11 +183,12 @@ void InnerMarking::changeView(pnapi::PetriNet* net, const int c) {
 	//\TODO: what about synchronous labels?...
 }
 
-void InnerMarking::deleteCounterPlace(pnapi::PetriNet* net) {
+void InnerMarking::deleteCounterPlace() {
 	// delete the counter place (for output)
-		net->deletePlace(*counterPlace);
+	net->deletePlace(*counterPlace);
 }
 
+// \TODO: depricated??
 void InnerMarking::createLabeledEnvironment() {
 	status("creating labeled sync/async environment...");
 

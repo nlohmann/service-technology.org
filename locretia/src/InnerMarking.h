@@ -51,7 +51,7 @@ class InnerMarking {
 
         static void changeView(pnapi::PetriNet* net, const int c);
 
-        static void deleteCounterPlace(pnapi::PetriNet* net);
+        static void deleteCounterPlace();
 
         static void createLabeledEnvironment();
 

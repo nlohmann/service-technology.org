@@ -164,6 +164,15 @@ void evaluateParameters(int argc, char** argv) {
     	abort(123, "Interface count has to be a positive integer or '-1'.");
     }
 
+    // allow only one of the basic functionalities
+    if ((args_info.tpn_flag && (args_info.log_flag || args_info.syncEnv_flag || args_info.asyncEnv_flag))
+    	|| (args_info.log_flag && (args_info.tpn_flag || args_info.syncEnv_flag || args_info.asyncEnv_flag))
+    	|| (args_info.syncEnv_flag && (args_info.tpn_flag || args_info.log_flag || args_info.asyncEnv_flag))
+    	|| (args_info.asyncEnv_flag && (args_info.tpn_flag || args_info.syncEnv_flag || args_info.log_flag)))
+    {
+    	abort(1337, "select only one of the basic functionalities");
+    }
+
     free(params);
 }
 
@@ -205,7 +214,7 @@ int main(int argc, char** argv) {
     std::string filename = std::string(PACKAGE) + "_output";
 
     /*--------------------------------------.
-    | 0. parse the command line parameters  |
+    | 1. parse the command line parameters  |
     `--------------------------------------*/
     evaluateParameters(argc, argv);
     Output::setTempfileTemplate(args_info.tmpfile_arg);
@@ -213,7 +222,7 @@ int main(int argc, char** argv) {
 
 
     /*----------------------.
-    | 1. parse the open net |
+    | 2. parse the open net |
     `----------------------*/
     try {
         // parse either from standard input or from a given file
@@ -255,7 +264,10 @@ int main(int argc, char** argv) {
     }
 
 
-    // TPN -> OWFN
+    /*===================================..
+    || TPN -> OWFN with random interface ||
+    ``===================================*/
+
     if (args_info.tpn_flag) {
     	status("Generating OWFN from TPN...");
 
@@ -272,7 +284,11 @@ int main(int argc, char** argv) {
 
     }
 
-    // OWFN -> synchronous environment
+
+    /*===================================..
+    || OWFN -> synchronous environment   ||
+    ``===================================*/
+
     if (args_info.syncEnv_flag) {
     	status("Generating synchronous environment...");
 
@@ -290,13 +306,19 @@ int main(int argc, char** argv) {
     	Output::output(output.stream(), *InnerMarking::net, filename);
     }
 
-    // OWFN -> asynchronous environment
+
+    /*===================================..
+    || OWFN -> asynchronous environment  ||
+    ``===================================*/
+
     if (args_info.asyncEnv_flag) {
     	status("Generating asynchronous environment...");
 
-    	pnapi::PetriNet tempNet = pnapi::PetriNet(*InnerMarking::net);
-    	InnerMarking::changeView(&tempNet, args_info.maxLength_arg);
-    	InnerMarking::deleteCounterPlace(&tempNet);
+//    	pnapi::PetriNet tempNet = pnapi::PetriNet(*InnerMarking::net);
+//    	InnerMarking::changeView(&tempNet, args_info.maxLength_arg);
+
+    	InnerMarking::changeView(InnerMarking::net, args_info.maxLength_arg);
+    	InnerMarking::deleteCounterPlace();
 
     	//InnerMarking::createLabeledEnvironment();
 
@@ -309,11 +331,15 @@ int main(int argc, char** argv) {
     	}
     	Output output(pnml_filename, "asynchronous environment");
     	output.stream() << pnapi::io::pnml;
-    	Output::output(output.stream(), tempNet, filename);
+    	//Output::output(output.stream(), tempNet, filename);
+    	Output::output(output.stream(), *InnerMarking::net, filename);
     }
 
 
-    // OWFN -> XES log
+    /*===================================..
+    || OWFN -> XES log                   ||
+    ``===================================*/
+
     if (args_info.log_flag) {
     	status("Generating XES Log...");
 
@@ -322,13 +348,13 @@ int main(int argc, char** argv) {
     	}
 
     	/*--------------------------------------------.
-    	| 2. initialize labels and interface markings |
+    	| 1. initialize labels and interface markings |
     	`--------------------------------------------*/
     	Label::initialize();
 
 
     	/*--------------------------------------------.
-    	| 3. write inner of the open net to LoLA file |
+    	| 2. write inner of the open net to LoLA file |
     	`--------------------------------------------*/
     	Output* temp = new Output();
     	std::stringstream ss;
@@ -344,7 +370,7 @@ int main(int argc, char** argv) {
 
 
     	/*------------------------------------------.
-    	| 4. call LoLA and parse reachability graph |
+    	| 3. call LoLA and parse reachability graph |
     	`------------------------------------------*/
     	// select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
@@ -368,25 +394,30 @@ int main(int argc, char** argv) {
 
 
     	/*-------------------------------.
-    	| 5. organize reachability graph |
+    	| 4. organize reachability graph |
     	`-------------------------------*/
     	InnerMarking::initialize();
 
 
     	/*-------------------------------.
-    	| 6. create the XES log          |
+    	| 5. create the XES log          |
     	`-------------------------------*/
     	std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename + ".xes";
     	Output output(log_filename, "XES Log");
+
     	InnerMarking::create_log(output, filename, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);
 
-//    	// delete the "counter places" if they were formerly created
+//    	// delete the "counter place" if it was formerly created
 //    	if (args_info.partnerView_flag) {
 //    		InnerMarking::deleteCounterPlace();
 //    	}
     }
 
-    // results output
+
+    /*===================================..
+    || results output                    ||
+    ``===================================*/
+
     if (args_info.resultFile_given) {
     	std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";
     	Results results(results_filename);

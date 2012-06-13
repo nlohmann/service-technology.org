@@ -30,6 +30,7 @@
 #include "verbose.h"
 #include "Output.h"
 #include "pnapi/util.h"
+#include <pnapi/pnapi.h>
 
 using std::endl;
 using std::set;
@@ -46,6 +47,7 @@ std::string Output::tempfileTemplate = std::string("/tmp/") + PACKAGE_TARNAME + 
 std::string Output::tempfileTemplate = "/tmp/temp-XXXXXX";
 #endif
 bool Output::keepTempfiles = true;
+std::string Output::placeID_B = "";
 
 
 /***************
@@ -188,49 +190,55 @@ void Output::setKeepTempfiles(bool b) {
  */
 std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, std::string & filename)
 {
-  os //< output everything to this stream
+	// initialize placeID_B
+	placeID_B = "";
 
-  << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"
-  << "<!--\n"
-  << "  generator:   " << "Locretia 1.0-unreleased" << endl //net.getMetaInformation(os, pnapi::io::CREATOR, PACKAGE_STRING) << endl
-  << "  input file:  " << filename << endl
-//  << "  invocation:  " << net.getMetaInformation(os, pnapi::io::INVOCATION) << endl
-  << "  net size:    " << pnapi::io::stat << net << pnapi::io::pnml
-  << "\n-->\n\n"
+	os //< output everything to this stream
 
-  << "<pnml>\n"
+	   << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"
+	   << "<!--\n"
+	   << "  generator:   " << "Locretia 1.0-unreleased" << endl //net.getMetaInformation(os, pnapi::io::CREATOR, PACKAGE_STRING) << endl
+	   << "  input file:  " << filename << endl
+	   //  << "  invocation:  " << net.getMetaInformation(os, pnapi::io::INVOCATION) << endl
+	   << "  net size:    " << pnapi::io::stat << net << pnapi::io::pnml
+	   << "\n-->\n\n"
 
-  << "  <module>\n";
+	   << "<pnml>\n"
 
-  output(os, net.getInterface());
+	   << "  <module>\n";
 
-  os << "\n    <net id=\"n1\" type=\"PTNet\">\n"
+	output(os, net.getInterface());
 
-  << "    <name>\n"
-  << "      <text>" << filename << "</text>\n"
-  << "    </name>\n";
+	os << "\n    <net id=\"n1\" type=\"PTNet\">\n"
 
-  outputSet(os, net.getPlaces());
+	   << "    <name>\n"
+	   << "      <text>" << filename << ".owfn</text>\n"
+	   << "    </name>\n";
 
-  outputSet(os, net.getTransitions());
+	outputSet(os, net.getPlaces());
 
-  outputSet(os, net.getArcs());
+	outputSet(os, net.getTransitions());
 
-  os << "    </net>\n"
+	outputSet(os, net.getArcs());
 
-  << "    <finalmarkings>\n"
-  << "      <marking>\n";
+	os << "    </net>\n"
 
-  net.getFinalCondition().getFormula().output(os);
+	   << "    <finalmarkings>\n"
+	   << "      <marking>\n";
 
-  os << "      </marking>\n"
-  << "    </finalmarkings>\n"
+	if (placeID_B == "")
+		net.getFinalCondition().getFormula().output(os);
+	else
+		outputSpecialFinalMarking(os, net.getPlaces());
 
-  << "  </module>\n"
+	os << "      </marking>\n"
+	   << "    </finalmarkings>\n"
 
-  << "</pnml>\n";
+	   << "  </module>\n"
 
-  return os << endl;
+	   << "</pnml>\n";
+
+	return os << endl;
 }
 
 /*!
@@ -238,20 +246,20 @@ std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, st
  */
 std::ostream & Output::output(std::ostream & os, const pnapi::Place & p)
 {
-  os << "      <place id=\"" << p.getName() << "\"";
+	os << "      <place id=\"" << p.getName() << "\"";
 
-  if (p.getTokenCount())
-  {
-    os << ">\n"
-       << "        <initialMarking>\n"
-       << "          <text>" << p.getTokenCount() << "</text>\n"
-       << "        </initialMarking>\n"
-       << "      </place>\n";
-  } else {
-    os << " />\n";
-  }
+	if (p.getTokenCount())
+	{
+		os << ">\n"
+		   << "        <initialMarking>\n"
+		   << "          <text>" << p.getTokenCount() << "</text>\n"
+		   << "        </initialMarking>\n"
+		   << "      </place>\n";
+	} else {
+		os << " />\n";
+	}
 
-  return os;
+	return os;
 }
 
 /*!
@@ -259,18 +267,19 @@ std::ostream & Output::output(std::ostream & os, const pnapi::Place & p)
  */
 std::ostream & Output::output(std::ostream & os, const pnapi::Transition & t)
 {
-  os << "      <transition id=\"" << t.getName() << "\">\n"
-	 << "        <name><text>";
+	os << "      <transition id=\"" << t.getName() << "\">\n"
+	   << "        <name><text>";
 
-  if(t.getLabels().empty()) {
-	  os << "";
-  } else {
-	  os << t.getLabels().begin()->first->getName();
-  }
+	// name-tag either empty or containing the corresponding label
+	if(t.getLabels().empty()) {
+		os << "";
+	} else {
+		os << t.getLabels().begin()->first->getName();
+	}
 
-  os << "</text></name>\n";
+	os << "</text></name>\n";
 
-  return (os << "      </transition>\n");
+	return (os << "      </transition>\n");
 }
 
 /*!
@@ -278,35 +287,40 @@ std::ostream & Output::output(std::ostream & os, const pnapi::Transition & t)
  */
 std::ostream & Output::output(std::ostream & os, const pnapi::Arc & arc)
 {
-  static pnapi::PetriNet * net = NULL;
-  static unsigned int arcId = 0;
+	static pnapi::PetriNet * net = NULL;
+	static unsigned int arcId = 0;
 
-  // check for different nets
-  if(net != &arc.getPetriNet())
-  {
-    net = &arc.getPetriNet();
-    arcId = 0;
-  }
+	// check for different nets
+	if(net != &arc.getPetriNet())
+	{
+		net = &arc.getPetriNet();
+		arcId = 0;
+	}
 
-  os << "      <arc id=\"arcId" << (++arcId)
-     << "\" source=\"" << arc.getSourceNode().getName()
-     << "\" target=\"" << arc.getTargetNode().getName()
-     << "\"";
+	os << "      <arc id=\"arcId" << (++arcId)
+       << "\" source=\"" << arc.getSourceNode().getName()
+       << "\" target=\"" << arc.getTargetNode().getName()
+       << "\"";
 
-  if (arc.getWeight() > 1)
-  {
-    os << ">\n"
-       << "        <inscription>\n"
-       << "          <text>" << arc.getWeight() << "</text>\n"
-       << "        </inscription>\n"
-       << "      </arc>\n";
-  }
-  else
-  {
-    os << " />\n";
-  }
+	// the place following the B-transition is the final place
+	if (arc.getSourceNode().getName() == "B\\n") {
+		placeID_B = arc.getTargetNode().getName();
+	}
 
-  return os;
+	if (arc.getWeight() > 1)
+	{
+		os << ">\n"
+		   << "        <inscription>\n"
+		   << "          <text>" << arc.getWeight() << "</text>\n"
+		   << "        </inscription>\n"
+		   << "      </arc>\n";
+	}
+	else
+	{
+		os << " />\n";
+	}
+
+	return os;
 }
 
 /*!
@@ -314,18 +328,18 @@ std::ostream & Output::output(std::ostream & os, const pnapi::Arc & arc)
  */
 std::ostream & Output::output(std::ostream & os, const pnapi::Interface & interface)
 {
-//  os << "    <ports>\n";
-//
-//  PNAPI_FOREACH(port, interface.getPorts())
-//  {
-//    os << "      <port id=\"" << port->first << "\">\n";
-//
-//    output(os, *port->second);
-//
-//    os << "      </port>\n";
-//  }
-//
-//  return (os << "    </ports>\n");
+	//  os << "    <ports>\n";
+	//
+	//  PNAPI_FOREACH(port, interface.getPorts())
+	//  {
+	//    os << "      <port id=\"" << port->first << "\">\n";
+	//
+	//    output(os, *port->second);
+	//
+	//    os << "      </port>\n";
+	//  }
+	//
+	//  return (os << "    </ports>\n");
 	return os;
 }
 
@@ -334,11 +348,11 @@ std::ostream & Output::output(std::ostream & os, const pnapi::Interface & interf
  */
 std::ostream & Output::output(std::ostream & os, const pnapi::Port & port)
 {
-  os << pnapi::io::util::delim("\n");
-  outputSet(os, port.getAllLabels());
-  os << pnapi::io::util::delim("") << "\n";
+	os << pnapi::io::util::delim("\n");
+	outputSet(os, port.getAllLabels());
+	os << pnapi::io::util::delim("") << "\n";
 
-  return os;
+	return os;
 }
 
 /*!
@@ -346,17 +360,57 @@ std::ostream & Output::output(std::ostream & os, const pnapi::Port & port)
  */
 std::ostream & Output::output(std::ostream & os, const pnapi::Label & l)
 {
-  os << "        <";
+	os << "        <";
 
-  switch(l.getType())
-  {
-  case pnapi::Label::INPUT: os << "input"; break;
-  case pnapi::Label::OUTPUT: os << "output"; break;
-  case pnapi::Label::SYNCHRONOUS: os << "synchronous"; break;
-  default: break;
-  }
+	switch(l.getType())
+	{
+	case pnapi::Label::INPUT: os << "input"; break;
+	case pnapi::Label::OUTPUT: os << "output"; break;
+	case pnapi::Label::SYNCHRONOUS: os << "synchronous"; break;
+	default: break;
+	}
 
-  return (os << " id=\"" << l.getName() << "\" />");
+	return (os << " id=\"" << l.getName() << "\" />");
+}
+
+/*!
+ * \brief special final marking output (1 token on the place after transition "B\n")
+ */
+std::ostream & Output::outputSpecialFinalMarking(std::ostream & os, const std::set<pnapi::Place *> & places)
+{
+	// sort the elements
+	std::vector<pnapi::Place *> v;
+	PNAPI_FOREACH(it, places)
+	{
+		v.push_back(*it);
+	}
+	bool (*c)(pnapi::Place *, pnapi::Place *) = pnapi::io::util::compareContainerElements;
+	std::sort(v.begin(), v.end(), c);
+
+	if (v.empty())
+		return os;
+
+	for(typename std::vector<pnapi::Place *>::const_iterator it = v.begin(); it != --v.end(); ++it)
+	{
+        os << "        <place idref=\"" << (*it)->getName() << "\">\n";
+        if ((*it)->getName() == placeID_B) {
+        	os << "          <text>1</text>\n";
+        } else {
+        	os << "          <text>0</text>\n";
+        }
+        os << "        </place>\n";
+
+	}
+
+	os << "        <place idref=\"" << (*--v.end())->getName() << "\">\n";
+	        if ((*--v.end())->getName() == placeID_B) {
+	        	os << "          <text>1</text>\n";
+	        } else {
+	        	os << "          <text>0</text>\n";
+	        }
+	        os << "        </place>\n";
+
+	return os;
 }
 
 ///*!

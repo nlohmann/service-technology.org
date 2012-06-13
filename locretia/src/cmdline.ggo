@@ -5,7 +5,7 @@ purpose "Locretia: generating logs...\n\n  Report bugs to locretia@service-techn
 
 
 section "Basic functionality"
-sectiondesc="Options which change the basic functionality of the tool.\n"
+sectiondesc="Options which change the basic functionality of the tool. Only one option at a time is allowed.\n"
 
 option "tpn" -
   "TPN -> OWFN."
@@ -19,12 +19,12 @@ option "log" -
   
 option "syncEnv" -
   "OWFN -> synchronous environment."
-  details="Using this option, a PNML file will be generated containing the labeled inner of the given OWFN."
+  details="Using this option, a PNML file will be generated containing the synchronous environment of the given OWFN."
   flag off
   
 option "asyncEnv" -
   "OWFN -> asynchronous environment."
-  details="Using this option, a PNML file will be generated containing the labeled inner of the environment of the given OWFN."
+  details="Using this option, a PNML file will be generated containing the asynchronous environment of the given OWFN."
   flag off
 
 section "TPN to OWFN"
@@ -51,7 +51,7 @@ option "count" n
   
 option "maxLength" u
   "maximal length of traces to appear in the log-file."
-  details="The max-trace-length sets the maximal length of traces within the log. The default is set to 10.\n"
+  details="The max-trace-length sets the maximal length of traces within the log. The default is set to 10. Remark: This option also restricts the number of messages to be sent and received in the case of using the asynchronous environment.\n"
   int
   typestr="MAXLENGTH"
   default="10"

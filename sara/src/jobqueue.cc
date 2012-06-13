@@ -9,9 +9,9 @@
  *
  * \since   2010/02/26
  *
- * \date    $Date: 2010-08-20 12:00:00 +0100 (Fr, 20. Aug 2010) $
+ * \date    $Date: 2012-06-13 12:00:00 +0100 (Mi, 13. Jun 2012) $
  *
- * \version $Revision: 1.02 $
+ * \version $Revision: 1.10 $
  */
 
 #include "jobqueue.h"
@@ -40,8 +40,12 @@ using pnapi::Node;
 
 namespace sara {
 
+// command line switches and values
 extern bool flag_droppast, flag_joborder, flag_verbose, flag_show, flag_forceprint;
 extern int val_droppast;
+
+// if there is more than one thread
+extern bool multithreaded;
 
 /** Constructor for the empty queue.
 */
@@ -55,6 +59,12 @@ JobQueue::JobQueue(PartialSolution* job) : cnt(1),active(job) {}
 /** Destructor. Frees the memory for all jobs in the queue, past, active, or future.
 */
 JobQueue::~JobQueue() {
+	flush();
+}
+
+/** Empties the queue.
+*/
+void JobQueue::flush() {
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
 	{
@@ -66,7 +76,11 @@ JobQueue::~JobQueue() {
 		for(unsigned int i=0; i<jit->second.size(); ++i)
 			delete jit->second[i];
 	}
+	queue.clear();
+	past.clear();
 	delete active;
+	active = NULL;
+	cnt = 0;
 }
 
 /** Test whether the job queue is empty.
@@ -99,10 +113,14 @@ PartialSolution* JobQueue::first() { return active; }
 */
 bool JobQueue::pop_front(bool kill) {
 	if (empty()) return false;
+
+	// delete or push to the past?
 	if (kill) delete active;
 	else past[priority(active)].push_back(active); // active job is now past
 	active=NULL;
 	--cnt;
+
+	// a job from the future must now become active
 	if (!almostEmpty()) 
 	{ 
 		active = queue.begin()->second.front();
@@ -110,6 +128,8 @@ bool JobQueue::pop_front(bool kill) {
 		if (queue.begin()->second.empty())
 			queue.erase(queue.begin());
 	}
+
+	// clean up the past if there are too many entries there
 	if (flag_droppast && (unsigned int)(val_droppast)<past.size()) // drop things that are too far in the past and will probably not come up again
 	{
 		cerr << "\r";
@@ -118,6 +138,7 @@ bool JobQueue::pop_front(bool kill) {
 			delete past.begin()->second[i];
 		past.erase(past.begin());
 	}
+
 	return true;
 }
 
@@ -131,18 +152,60 @@ void JobQueue::push_back(PartialSolution* job) {
 	++cnt;
 }
 
+/** Add a job to the past of a queue. The job will be at the latest position available according to its
+	priority. The job will be added even if it is already in the queue.
+	@param job The job to be added to the past of a queue.
+*/
+void JobQueue::push_past(PartialSolution* job) {
+	past[priority(job)].push_back(job);
+
+	// check if the past became too large and needs tidying
+	if (flag_droppast && (unsigned int)(val_droppast)<past.size()) // drop things that are too far in the past and will probably not come up again
+	{
+		cerr << "\r";
+		status("warning: dropped all past jobs with priority %d",past.begin()->first);
+		for(unsigned int i=0; i<past.begin()->second.size(); ++i)
+			delete past.begin()->second[i];
+		past.erase(past.begin());
+	}
+}
+
+/** Appends the queue jbg (but no past jobs) to this queue.
+	@param jbq The queue to append to this one.
+*/
+void JobQueue::transfer(JobQueue& jbq) {
+	// transfer the active job
+	if (jbq.active && find(jbq.active)>=0) {
+		push_back(new PartialSolution(*(jbq.active)));
+	}
+
+	// transfer the future jobs
+	map<int,deque<PartialSolution*> >::iterator jit;
+	for(jit=jbq.queue.begin(); jit!=jbq.queue.end(); ++jit) // walk all internal queues
+		for(unsigned int i=0; i<jit->second.size(); ++i) // and their entries
+			if (jit->second[i] && find(jit->second[i])>=0) {
+					push_back(new PartialSolution(*(jit->second[i])));
+					// and copy them to this queue
+			}
+}
+
 /** Find out if there is an equivalent job in the queue.
 	@param job The job to be checked.
 	@return -1 if the job was found in the queue, its would-be priority otherwise.
 */
 int JobQueue::find(PartialSolution* job) {
+	// check if the queue contains a job with the same priority
 	int pri(priority(job));
 	if (queue.find(pri)==queue.end()) return pri; // it's not in the queue
-	set<Constraint>& cs(job->getConstraints()); // get job's constraints for later comparison
+
+	// get job's constraints for later comparison
+	set<Constraint>& cs(job->getConstraints()); 
+
 	// count the Parikh vector of the transition sequence of job
 	map<Transition*,int> tmap;
 	vector<Transition*>& tseq(job->getSequence());
 	for(unsigned int i=0; i<tseq.size(); ++i) ++tmap[tseq[i]];
+
 	// go through the jobs with the same priority, but leave out active job
 	deque<PartialSolution*>& deq(queue[pri]);
 	for(unsigned int i=0; i<deq.size(); ++i)
@@ -161,19 +224,26 @@ int JobQueue::find(PartialSolution* job) {
 	return pri;
 }
 
-/** Find out if there was an equivalent job in the past.
+/** Find out if there was an equivalent job (having the same constraints) in the past.
 	@param job The job to be checked.
+	@param excl A job that may be in the queue but doesn't count as equivalent (NULL if none).
 	@return True if the job was found in the past.
 */
-bool JobQueue::findPast(PartialSolution* job) {
+bool JobQueue::findPast(PartialSolution* job, PartialSolution* excl) {
+	// get priority and constraints of the job
 	int pri(priority(job));
 	set<Constraint>& cs(job->getConstraints());
+
+	// if jobs of the same priority exist, check them
 	if (past.find(pri)!=past.end())
 	{
 		// go through the past jobs with the same priority
 		deque<PartialSolution*>& deq(past[pri]);
 		for(unsigned int i=0; i<deq.size(); ++i)
 		{
+				// don't check the excluded job
+				if (deq[i]==excl) continue;
+				// compare the constraints
 				set<Constraint>& cs2(deq[i]->getConstraints());
 				if (cs==cs2) return true;
 		}
@@ -191,12 +261,12 @@ int JobQueue::priority(PartialSolution* job) const {
 	int priority(0);
 	if (flag_joborder)
 	{
+		// the alternative ordering by size of the potential solution
 		map<Transition*,int>::iterator it;
 		for(it=job->getFullVector().begin(); it!=job->getFullVector().end(); ++it)
 			priority += it->second;
-		for(it=job->getRemains().begin(); it!=job->getRemains().end(); ++it)
-			priority += it->second;
 	} else {
+		// the standard ordering by number of constraints (jumps count twice)
 		priority += (job->getConstraints().size());
 		set<Constraint>::iterator cit;
 		for(cit=job->getConstraints().begin(); cit!=job->getConstraints().end(); ++cit)
@@ -222,8 +292,10 @@ bool JobQueue::checkMEInfeasible() {
 	@param job The job to be added to the failure queue.
 */
 void JobQueue::push_fail(PartialSolution* job) {
-	if (!flag_verbose && !flag_show && queue.size()>1) { delete job; return; } // user doesn't want to know about failure reasons
+	// if the user doesn't want to know about failure reasons, forget about the job
+	if (!flag_verbose && !flag_show && queue.size()>1) { delete job; return; } 
 	if (!almostEmpty()) job->setFeasibility(true); // first entry: marking equation may be infeasible
+
 	// check if there is an entry in the queue with an equivalent marking
 	bool found = false; // no equivalent entry so far
 	map<const Place*,unsigned int> map1(job->getMarking().getMap()); // the marking of job
@@ -295,10 +367,11 @@ void JobQueue::push_fail(PartialSolution* job) {
 			if (cit->isRecent() && !cit->getPlaces().empty()) 
 				if (cit->cleanConstraintSet(jit->second[i]->getConstraints())) 
 					jit->second[i]->setConstraint(*cit);
+
 		// update the status of the failed job
 		jit->second[i]->setFeasibility(true);
 		map<Transition*,int> parikh(job->calcParikh());
-//		if (job->getSequence().size()<jit->second[i]->getSequence().size()) 
+
 		// and update the firing sequence
 		jit->second[i]->setSequence(job->getSequence());
 		jit->second[i]->addParikh(parikh);
@@ -466,7 +539,7 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr) {
 	@return The size.
 */
 int JobQueue::trueSize() {
-	int counter=0;
+	int counter(0);
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
 		for(unsigned int i=0; i<jit->second.size(); ++i)

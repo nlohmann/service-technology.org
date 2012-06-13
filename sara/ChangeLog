@@ -8,6 +8,16 @@
 
 
 PURPOSE
+Version 1.10-unreleased (13 Jun 2012)
+=====================================
+
+* first steps toward parallelisation: multithreaded search in firing
+  sequence tree
+
+* option -T reassigned, -threads=n tells Sara to use n additional threads
+
+* speed up of code in PathFinder, esp. stubborn sets and diamond checks
+
 Version 1.09 (15 May 2012)
 ==========================
 

@@ -7,7 +7,7 @@
 #ifndef PNAPI_PNAPI_H
 #include "pnapi/pnapi.h"
 #endif
-#include "lp_solve/lp_lib.h"
+#include "lp_solve_5.5/lp_lib.h"
 #include "verbose.h"
 
 #ifndef LPWRAPPER_H
@@ -34,9 +34,10 @@ using pnapi::Transition;
 using pnapi::Marking;
 
 namespace sara {
+// global place and transition orderings imported from main.cc
 extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;
-extern map<Transition*,int> revtorder;
+extern map<const Transition*,int> revtorder;
 }
 
 	/*************************************
@@ -119,11 +120,8 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	}
 
 	//allow only nonnegative solutions
-//	REAL r = 1;
 	for(int y=1; y<=(int)(cols); ++y)
-		set_lowbo(lp,y,0); // doesn't work, contradicting lp_solve manual
-//	for(int y=1; y<=(int)(cols); ++y)
-//		if (!add_constraintex(lp,1,&r,&y,GE,0)) { delete[] colpoint; delete[] mat; return -1; }
+		set_lowbo(lp,y,0);
 
 	// now add the global constraints from the problem file, if a problem file is given
 	unsigned int cnr(0);
@@ -148,13 +146,9 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 //	write_LP(lp,stdout);
 	if (verbose) write_LP(lp,stdout);
 	else set_verbose(lp,CRITICAL);
-//	basicrows = placeorder.size()+cols+cnr;
 	basicrows = placeorder.size()+cnr;
 	delete[] colpoint;
 	delete[] mat;
-//	set_bb_depthlimit(lp,0);
-//	set_BFP(lp, "bfp_LUSOL");
-//	set_presolve(lp,PRESOLVE_ROWS|PRESOLVE_COLS|PRESOLVE_LINDEP,get_presolveloops(lp));
 	return (int)(basicrows);
 }
 
@@ -206,9 +200,6 @@ unsigned char LPWrapper::getVariables(REAL* solution) {
 	@return TRUE if successful.
 */
 bool LPWrapper::addConstraints(PartialSolution& ps) {
-	// clear the RHS of single transitions in the model
-//	for(int i=1; i<=(int)(cols); ++i)
-//		set_rh(lp,(int)(placeorder.size())+i,0);
 	stripConstraints();
 	// add new constraints to lp model
 	REAL *constraint = new REAL[cols+1];
@@ -229,9 +220,6 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 		}
 		// add the constraint to the lp model, normal constraints with >=, jumps with <=
 		if (success && (jump || rhs>0)) {
-//			Transition* t(cit->isSingle());
-//			if (t) set_rh(lp,placeorder.size()+revtorder[t]+1,rhs);
-//			else if (!addConstraint(constraint,(jump?LE:GE),rhs)) 
 			if (!addConstraint(constraint,(jump?LE:GE),rhs)) 
 			{ 
 			  delete[] constraint; 

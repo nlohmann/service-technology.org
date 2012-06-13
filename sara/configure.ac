@@ -1,4 +1,4 @@
-AC_INIT([Sara], 1.09, sara@service-technology.org, sara, http://service-technology.org/sara)
+AC_INIT([Sara], 1.10-unreleased, sara@service-technology.org, sara, http://service-technology.org/sara)
 
 AC_MSG_NOTICE([ ____                  ])
 AC_MSG_NOTICE([/ ___|  __ _ _ __ __ _ ])
@@ -46,7 +46,7 @@ AC_TYPE_UINT32_T
 
 # write files
 AC_CONFIG_FILES([
-	Makefile libs/pnapi/Makefile libs/lp_solve/Makefile src/Makefile tests/Makefile tests/package.m4 doc/Makefile doc/Doxyfile utils/Makefile
+	Makefile libs/pnapi/Makefile libs/lp_solve_5.5/Makefile src/Makefile tests/Makefile tests/package.m4 doc/Makefile doc/Doxyfile utils/Makefile
 	])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

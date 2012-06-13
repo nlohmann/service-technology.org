@@ -9,16 +9,16 @@
  *
  * \since   2009/10/07
  *
- * \date    $Date: 2009-10-07 14:47:01 +0200 (Mi, 6. Okt 2009) $
+ * \date    $Date: 2012-06-13 14:47:01 +0200 (Mi, 13. Jun 2012) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.10 $
  */
 
 #ifndef LPWRAPPER_H
 #define LPWRAPPER_H
 
 #include <map>
-#include "lp_solve/lp_lib.h"
+#include "lp_solve_5.5/lp_lib.h"
 #ifndef PNAPI_PNAPI_H
 #include "pnapi/pnapi.h"
 #endif

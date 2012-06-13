@@ -130,6 +130,12 @@ option "pnml" -
 
 section "Miscellaneous"
 
+option "threads" T
+  "Use a parallelized version of Sara with a given number of threads (at least 1)."
+  typestr="int"
+  int
+  optional
+
 option "time" t
   "Measure time."
   details="Show used time for each problem instance and all problems together.
@@ -186,7 +192,7 @@ option "lookup" L
   optional
   hidden
 
-option "treemaxjob" T
+option "treemaxjob" -
   "Maximal number of jobs per tree."
   details="Stop trying to realize a transition vector after n new partial solutions (jobs) have been found. Solutions may be lost but the program may run faster (or not).
 "

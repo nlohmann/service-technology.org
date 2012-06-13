@@ -9,9 +9,9 @@
  *
  * \since   2010/09/16
  *
- * \date    $Date: 2011-04-08 12:00:00 +0200 (Fr, 08. Apr 2011) $
+ * \date    $Date: 2012-06-13 12:00:00 +0200 (Mi, 13. Jun 2012) $
  *
- * \version $Revision: 1.06 $
+ * \version $Revision: 1.10 $
  */
 
 #ifndef PROBLEM_H
@@ -24,6 +24,7 @@
 #ifndef PNAPI_PNAPI_H
 #include "pnapi/pnapi.h"
 #endif
+#include "imatrix.h"
 
 using std::map;
 using std::string;
@@ -89,10 +90,15 @@ public:
 
 	/// Get the Petri net (will load the net from a file if necessary)
 	PetriNet* getPetriNet();
+
 #ifdef SARALIB
 	/// Set the Petri net (for already loaded nets only)
 	void setPetriNet(PetriNet& net);
 #endif
+
+	/// Get the incidence matrix of the Petri net (which must be loaded already)
+	IMatrix* getIMatrix();
+
 	/// Get the problem goal
 	int getGoal() const;
 
@@ -206,6 +212,9 @@ private:
 
 	/// Whether all or at least one problem has to check out for the property
 	bool resor;
+
+	/// An internal incidence matrix of the net
+	IMatrix* im;
 };
 
 }

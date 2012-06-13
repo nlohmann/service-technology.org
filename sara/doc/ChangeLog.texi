@@ -1,4 +1,11 @@
 @c <<-- CHANGE START (version information) -->>
+@heading Version 1.10-unreleased (13 Jun 2012)
+@itemize
+@item first steps toward parallelisation: multithreaded search in firing sequence tree
+@item option -T reassigned, --threads=n tells Sara to use n additional threads
+@item speed up of code in PathFinder, esp. stubborn sets and diamond checks 
+@end itemize
+
 @heading Version 1.09 (15 May 2012)
 @itemize
 @item added utility to convert LoLA formulae/tasks to Sara problem files

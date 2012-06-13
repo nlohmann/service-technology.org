@@ -41,10 +41,14 @@ Sara's Algorithm
 
 Sara solves the reachability problem by first solving (a possibly extended
 version of) the Marking Equation and then trying to transform a solution
-vector (if found) into a firing sequence. At the moment, there are no
-publications yet showing the details of Sara's algorithm and how it works.
-There are publications about the tools and general methods used by Sara,
-though.
+vector (if found) into a firing sequence. The following paper describes in
+more detail how Sara works:
+
+     H. Wimmel, K. Wolf. Applying CEGAR to the Petri Net State Equation.
+     Proceedings of TACAS 2010, Lecture Notes in Computer Science 6605,
+     pp.224-238, Springer, 2011.
+
+There also are publications about the tools and general methods used by Sara.
 
 Solving the Marking Equation
 ............................

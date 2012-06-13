@@ -9,9 +9,9 @@
  *
  * \since   2010/09/16
  *
- * \date    $Date: 2011-04-08 12:00:00 +0200 (Fr, 08. Apr 2011) $
+ * \date    $Date: 2012-06-13 12:00:00 +0200 (Mi, 13. Jun 2012) $
  *
- * \version $Revision: 1.06 $
+ * \version $Revision: 1.10 $
  */
 
 #include <cstdio>
@@ -33,7 +33,7 @@
 #include "pathfinder.h"
 #include "reachalyzer.h"
 #include "problem.h"
-#include "lp_solve/lp_lib.h"
+#include "lp_solve_5.5/lp_lib.h"
 
 using std::cerr;
 using std::cout;
@@ -49,10 +49,13 @@ using std::ostringstream;
 using std::setw;
 
 namespace sara {
+// global place/transition orderings from main.cc
 extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;
-extern map<Transition*,int> revtorder;
+extern map<const Transition*,int> revtorder;
 extern map<Place*,int> revporder;
+
+// for status messages
 extern bool flag_verbose;
 }
 
@@ -64,7 +67,7 @@ namespace sara {
 
 /** Standard constructor.
 */
-Problem::Problem() : deinit(false),generalcover(false),type(REACHABLE),nettype(LOLA),pn(NULL),negate(false),resor(false) {}
+Problem::Problem() : deinit(false),generalcover(false),type(REACHABLE),nettype(LOLA),pn(NULL),negate(false),resor(false),im(NULL) {}
 
 /** Destructor.
 */
@@ -74,9 +77,10 @@ Problem::~Problem() { clear(); }
 */
 void Problem::clear() {
 	name = "";
-	if (deinit) delete pn;
+	if (deinit) { delete pn; delete im; }
 	deinit = false;
 	pn = NULL;
+	im = NULL;
 	nettype = 0;
 	filename = "";
 	initial.clear();
@@ -250,6 +254,15 @@ PetriNet* Problem::getPetriNet() {
 	return pn;
 }
 
+/** Acquire the incidence matrix (and related data) for the Petri net.
+	@return The incidence matrix object.
+*/
+IMatrix* Problem::getIMatrix() {
+	if (!pn) return NULL;
+	if (!im) im = new IMatrix(*pn);
+	return im;
+}
+
 #ifdef SARALIB
 /** Set the Petri net of a problem and calculate the global ordering of transitions and places.
 	@param The Petri net.
@@ -273,7 +286,12 @@ int Problem::getGoal() const {
 	@param p A problem with a loaded Petri net.
 */
 void Problem::checkForNetReference(Problem& p) {
-	if (filename==p.filename) { pn = p.pn; p.deinit = false; deinit = true; }
+	if (filename==p.filename) { 
+		pn = p.pn; 
+		im = p.im; 
+		p.deinit = false; 
+		deinit = true; 
+	}
 }
 
 /** Calculate the global ordering of transitions and places for this problem.
@@ -522,7 +540,7 @@ void Problem::showConstraints() {
 }
 
 /** When a property needs to be checked by Sara, we can set this flag to tell whether all problem
-	instances belonging to the property to check must have a solution of fail to have one
+	instances belonging to the property to check must have a solution or fail to have one
 	for the property to hold.
 	@param neg False=All problems must have a solution, True=All problems must fail to
 		have a solution.

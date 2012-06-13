@@ -23,6 +23,7 @@
 #endif
 #include "problem.h"
 #include "verbose.h"
+#include "sthread.h"
 
 using std::cerr;
 using std::cout;
@@ -50,7 +51,7 @@ vector<Transition*> transitionorder;
 /// Global ordering of places for lp_solve and determining a scapegoat (in the stubborn set method)
 vector<Place*> placeorder;
 /// inverted transitionorder for back references
-map<Transition*,int> revtorder;
+map<const Transition*,int> revtorder;
 /// inverted placeorder for back references
 map<Place*,int> revporder;
 /// for property checks via owfn2sara: if the properties hold so far
@@ -63,6 +64,7 @@ vector<string> resorder;
 map<string,bool> orresult;
 /// if no computation should be done at all (dummy for model checking contest)
 map<string,bool> donotcompute;
+int debug(0);
 
 bool flag_droppast(false);
 int val_droppast(0);
@@ -313,10 +315,14 @@ if (args_info.input_given || args_info.pipe_given) {
 
 	// set verbosity and debug mode
 	bool verbose(args_info.verbose_given);
-	int debug = 0;
+
 	if (args_info.debug_given) debug = args_info.debug_arg;
 	// determine whether standard output still exists
 	bool out = !(args_info.output_given);
+
+	// start multi-threading
+	initThreadData(args_info.threads_given?args_info.threads_arg:0);
+	startThreads();
 
 	// counters for number of problems and solutions found
 	int loops = 0;
@@ -337,6 +343,7 @@ if (args_info.input_given || args_info.pipe_given) {
 		if (args_info.log_given) // print info also to log file if one has been given
 			cerr << "sara: Problem " << (loops) << ": " << pbls.at(x).getName() << endl;
 		PetriNet* pn(pbls.at(x).getPetriNet()); // obtain the Petri net and its P/T-ordering
+		IMatrix* im(pbls.at(x).getIMatrix());
 		if (x+1<pbls.size()) pbls.at(x+1).checkForNetReference(pbls.at(x)); // possibly advance the net to the next problem (if it has the same net)
 		Marking m1(pbls.at(x).getInitialMarking()); // get the initial marking
 		Marking m2(pbls.at(x).getFinalMarking()); // get the extended final marking (if there is one)
@@ -368,17 +375,20 @@ if (args_info.input_given || args_info.pipe_given) {
 		switch (pbls.at(x).getGoal()) { // check for reachability or realizability?
 			case Problem::REALIZABLE: {
 				map<Transition*,int> tv(pbls.at(x).getVectorToRealize()); // the vector to realize
-				IMatrix im(*pn); // incidence matrix of the net
-				im.verbose = debug;
+//				IMatrix im(*pn); // incidence matrix of the net
+				im->verbose = debug;
+//				im.precompute();
 				PartialSolution* ps(new PartialSolution(m1)); // create the initial job
 				JobQueue tps(ps); // create a job list
 				JobQueue solutions; // create a job list
 				JobQueue failure; // create a dummy job list
 				map<map<Transition*,int>,vector<PartialSolution> > dummy; // dummy, will be filled and immediately free'd
 				// create an instance of the realizability solver
-				PathFinder pf(m1,tv,pn->getTransitions().size(),tps,solutions,failure,im,dummy);
+				PathFinder pf(m1,tv,tps,tps,solutions,failure,*im,dummy,NULL);
 				pf.verbose = debug;
-				pf.recurse();
+				initThread(0,ps,m1,tv,pf);
+				bool solved = pf.recurse(0);
+				pf.waitForThreads(0,solved); // wait for the helper threads (or cancel them in case of a solution)
 				if (!solutions.almostEmpty()) // solve the problem and print a possible solution
 				{ 
 					int mtl = solutions.printSolutions(avetracelen,pbls.at(x),x); // get the solution length for this problem
@@ -396,14 +406,14 @@ if (args_info.input_given || args_info.pipe_given) {
 				// if witnesses are sought and we have no solution, we pass the problem on
 				passedon = true;
 				m2 = m1; // but first, calculate the final marking
-				map<Place*,int> change(im.getChange(tv));
+				map<Place*,int> change(im->getChange(tv));
 				map<Place*,int>::iterator mit;
 				for(mit=change.begin(); mit!=change.end(); ++mit)
 					m2[*(mit->first)]+=mit->second;
 			}
 			case Problem::REACHABLE: {
 				// obtain an instance of the reachability solver
-				Reachalyzer reach(*pn,m1,m2,cover,pbls.at(x),verbose,debug,out,(args_info.break_given?args_info.break_arg:0),passedon);
+				Reachalyzer reach(*pn,m1,m2,cover,pbls.at(x),verbose,debug,out,(args_info.break_given?args_info.break_arg:0),passedon,im);
 				if (reach.getStatus()!=Reachalyzer::LPSOLVE_INIT_ERROR) {
 					reach.start(); // if everything is ok, solve the problem
 					clock_t mytime(reach.getTime()); // ... and measure the CPU time for that
@@ -412,7 +422,8 @@ if (args_info.input_given || args_info.pipe_given) {
 						solcnt+=reach.numberOfSolutions(); 
 						if (pbls.at(x).isNegateResult() ^ pbls.at(x).isOrResult())
 							results[pbls.at(x).getResultText()] = false;
-					} else if (reach.getStatus()==Reachalyzer::SOLUTIONS_LOST) {
+					} else if (reach.getStatus()==Reachalyzer::SOLUTIONS_LOST
+								|| reach.getStatus()==Reachalyzer::LPSOLVE_RUNTIME_ERROR) {
 						indecisive[pbls.at(x).getResultText()] = true;
 					} else {
 						if (!pbls.at(x).isNegateResult() ^ pbls.at(x).isOrResult())
@@ -509,6 +520,10 @@ if (args_info.input_given || args_info.pipe_given) {
 */
 	if (args_info.time_given) // print time use if --time was specified
 		cout << "sara: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;
+
+	// stop the threads (if any)
+	stopThreads();
+	destroyThreadData();
 }
 
 /*************************
@@ -565,15 +580,20 @@ vector<Transition*> ReachabilityTest(PetriNet& pn, Marking& m0, Marking& mf, map
 vector<Transition*> RealizabilityTest(PetriNet& pn, Marking& m0, map<Transition*,int>& parikh) {
 	IMatrix im(pn); // incidence matrix of the net
 	im.verbose = 0;
+	im.precompute();
 	PartialSolution* ps(new PartialSolution(m0)); // create the initial job
 	JobQueue tps(ps); // create a job list
 	JobQueue solutions; // create a job list
 	JobQueue failure; // create a dummy job list
 	map<map<Transition*,int>,vector<PartialSolution> > dummy; // dummy, will be filled and immediately free'd
 	// create an instance of the realizability solver
-	PathFinder pf(m0,parikh,pn.getTransitions().size(),tps,solutions,failure,im,dummy);
+	allocTarjan();
+	PathFinder pf(m0,parikh,tps,tps,solutions,failure,im,dummy,NULL);
 	pf.verbose = 0;
-	pf.recurse();
+	initThread(0,ps,m1,tv,pf);
+	bool solved = pf.recurse(0);
+	pf.waitForThreads(0,solved); // wait for the helper threads (or cancel them in case of a solution)
+	freeTarjan();
 	if (!solutions.almostEmpty()) // solve the problem and print a possible solution
 	{ 
 		status("called Sara, found a firing sequence");

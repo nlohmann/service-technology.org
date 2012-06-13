@@ -36,7 +36,7 @@ namespace sara {
 class Reachalyzer {
 public:
 	/// Constructor
-	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk, bool passedon);
+	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk, bool passedon, IMatrix* im);
 #ifdef SARALIB
 	/// Constructor for use in a library
 	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover);
@@ -46,6 +46,8 @@ public:
 
 	/// Start the reachability analysis
 	void start();
+
+	void doSingleJob(unsigned int threadID);
 
 	/// Print out the result on stdout
 	void printResult(int pbnr);
@@ -60,13 +62,13 @@ public:
 	int getStatus();
 
 	/// Check if a solution has been seen earlier already, using a lookup table
-	bool solutionSeen(map<Transition*,int>& tv);
+	bool solutionSeen(JobQueue& ttps, PartialSolution* excl, map<Transition*,int>& tv);
 
 	/// Calculate all possible jumps and add them to the JobQueue
-	void createJumps(map<Transition*,int>& diff, PartialSolution& ps);
+	void createJumps(JobQueue& ttps, map<Transition*,int>& diff, PartialSolution& ps);
 
 	/// Create the next precalculated jump from the given partial solution
-	void nextJump(PartialSolution ps);
+	void nextJump(JobQueue& ttps, PartialSolution ps);
 
 	/// Get the maximal trace length after the solutions have been printed
 	int getMaxTraceLength() const;
@@ -107,6 +109,9 @@ private:
 
 	/// Solutions of the problem
 	JobQueue solutions;
+
+	/// For these job it is still unclear whether they are part of a counterexample
+	JobQueue unknown;
 
 	/// The debug mode (0-3)
 	int verbose;
@@ -167,6 +172,9 @@ private:
 
 	/// if a solution of lp_solve was suboptimal which means solutions can be lost
 	bool suboptimal;
+
+	int jsum,jmax,jloop,jold,dsum,dmax,dloop;
+
 };
 
 }

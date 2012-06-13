@@ -9,9 +9,9 @@
  *
  * \since   2010/02/26
  *
- * \date    $Date: 2010-08-20 12:00:00 +0100 (Fr, 20. Aug 2010) $
+ * \date    $Date: 2012-06-13 12:00:00 +0100 (Mi, 13. Jun 2012) $
  *
- * \version $Revision: 1.02 $
+ * \version $Revision: 1.10 $
  */
 
 #ifndef JOBQUEUE_H
@@ -48,6 +48,9 @@ public:
 	/// Destructor
 	~JobQueue();
 
+	/// Empty a queue
+	void flush();
+
 	/// Check if a job queue is empty, i.e. has no active and future jobs
 	bool empty() const;
 
@@ -66,11 +69,17 @@ public:
 	/// Add job after the last job with the same (or lower) priority
 	void push_back(PartialSolution* job);
 
+	/// Put a job directly into the past of a queue
+	void push_past(PartialSolution* job);
+
+	/// Transfer the (active and future) entries of another job queue into this one 
+	void transfer(JobQueue&);
+
 	/// Find a job if it is already in the list
 	int find(PartialSolution* job);
 
 	/// Find out if a job has already been done in the past
-	bool findPast(PartialSolution* job);
+	bool findPast(PartialSolution* job, PartialSolution* excl);
 
 	/// Calculate the priority of a job or a failure
 	int priority(PartialSolution* job) const;
@@ -95,10 +104,12 @@ public:
 
 	/// Print all solutions and return the maximal and sum trace length
 	int printSolutions(int& sum, Problem& pb, int pbnr);
+
 #ifdef SARALIB
 	/// Get one solution (or a vector containing NULL pointer).
 	vector<Transition*> getOneSolution();
 #endif
+
 	/// Print a Jobqueue to stderr (possibly including past and active job)
 	void show(bool past);
 

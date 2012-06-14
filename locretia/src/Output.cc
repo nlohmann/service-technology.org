@@ -194,7 +194,7 @@ std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, st
 
 	   << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"
 	   << "<!--\n"
-	   << "  generator:   " << "Locretia 1.0-unreleased" << endl //net.getMetaInformation(os, pnapi::io::CREATOR, PACKAGE_STRING) << endl
+	   << "  generator:   " << PACKAGE_STRING << endl //net.getMetaInformation(os, pnapi::io::CREATOR, PACKAGE_STRING) << endl
 	   << "  input file:  " << filename << endl
 	   //  << "  invocation:  " << net.getMetaInformation(os, pnapi::io::INVOCATION) << endl
 	   << "  net size:    " << pnapi::io::stat << net << pnapi::io::pnml

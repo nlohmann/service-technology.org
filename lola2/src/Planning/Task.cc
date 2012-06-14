@@ -243,13 +243,13 @@ void Task::setProperty()
         case check_arg_deadlock:
             p = new Deadlock();
             flc = new FireListStubbornDeadlockCreator();
-            exploration = new DFSExploration();
+            // exploration = new DFSExploration();
             break;
 
         case check_arg_statepredicate:
             p = new StatePredicateProperty(sp);
             flc = new FirelistStubbornStatePredicateCreator();
-            exploration = new DFSExploration();
+            // exploration = new DFSExploration();
             break;
     }
 

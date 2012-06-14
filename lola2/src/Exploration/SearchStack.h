@@ -35,6 +35,7 @@ class SearchStack
         index_t topTransition() const;
 
         SearchStack();
+        ~SearchStack();
 
         SearchStack &operator=(const SearchStack &);
 

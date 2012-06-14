@@ -933,31 +933,21 @@ AT_CLEANUP
 AT_BANNER([Memory Management])
 ############################################################################
 
-AT_SETUP([Checking for memory leaks: Garavel])
-AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW garavel.lola],0,ignore,stderr)
-AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(valgrind)
-AT_CLEANUP
+# AT_ST_CHECK_MEMORY([Net Name], [Filename], [--check=], [--store=], [--threads=])
+# E.G.: AT_ST_CHECK_MEMORY([Garavel], [garavel.lola], [none], [bin], 1)
 
-AT_SETUP([Checking for memory leaks: Phils 10])
-AT_CHECK([cp TESTFILES/phils10.lola .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW phils10.lola],0,ignore,stderr)
-AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(valgrind)
-AT_CLEANUP
+AT_ST_CHECK_MEMORY([Garavel], [garavel.lola], [none], [bin], 1)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [none], [bin], 1)
 
-AT_SETUP([Checking for memory leaks: Garavel (parallel)])
-AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW garavel.lola --threads=4 --store=bin2],0,ignore,stderr)
-AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(valgrind)
-AT_CLEANUP
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [bin], 1)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [stl], 1)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [bit], 1)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [bloom], 1)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [bin], 1)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [stl], 1)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [bit], 1)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [bloom], 1)
 
-AT_SETUP([Checking for memory leaks: Phils 10 (parallel)])
-AT_CHECK([cp TESTFILES/phils10.lola .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW phils10.lola --threads=4 --store=bin2],0,ignore,stderr)
-AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(valgrind)
-AT_CLEANUP
+#AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [bin2], 4)
+#AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [bin2], 4)
 

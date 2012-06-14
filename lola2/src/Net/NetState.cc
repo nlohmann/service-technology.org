@@ -316,6 +316,9 @@ NetState::~NetState()
         }
     }
     free(CardDisabled);
+    for (int i = 0; i < Net::Card[PL]; i++)
+    {
+      free(Disabled[i]);
+    }
     free(Disabled);
-
 }

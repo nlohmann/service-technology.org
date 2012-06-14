@@ -59,6 +59,17 @@ SearchStack::SearchStack() :
 {
 }
 
+SearchStack::~SearchStack()
+{
+  index_t c;
+  index_t* f;
+  while(StackPointer > 0)
+  {
+    pop(&c, &f);
+    delete f;
+  }
+}
+
 void SearchStack::push(index_t c, index_t* f)
 {
     if ((StackPointer % SIZEOF_STACKCHUNK) == 0)

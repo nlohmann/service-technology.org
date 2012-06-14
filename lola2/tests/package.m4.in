@@ -81,3 +81,17 @@ m4_define([LOLA_RAW],  [@abs_top_builddir@/src/lola])
 #---------------------------------------------#
 
 m4_define([VALGRIND],             [wrap.sh @VALGRIND@])
+
+#---------------------------------#
+# Part 4: Macros used by Autotest #
+#---------------------------------#
+
+# AT_ST_CHECK_MEMORY(label, file, check, store, threads)
+m4_define([AT_ST_CHECK_MEMORY], [
+  AT_SETUP([Checking for memory leaks: $1 (check: $3, store: $4, threads: $5)])
+  AT_CHECK([cp TESTFILES/$2 .])
+  AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW --check=$3 --store=$4 --threads=$5 $2],0,ignore,stderr)
+  AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
+  AT_KEYWORDS(valgrind)
+  AT_CLEANUP
+])

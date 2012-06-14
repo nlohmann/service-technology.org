@@ -81,9 +81,10 @@ bool DFSExploration::depth_first(SimpleProperty &property, Store &myStore, FireL
                     // this way, the stack contains ALL transitions
                     // of witness path
                     property.stack.push(currentEntry, currentFirelist);
-                    free(Marking::Current);
-                    Marking::Current = ns->Current;
+                    memcpy(Marking::Current, ns->Current, Net::Card[PL] * SIZEOF_INDEX_T);
+                    delete ns;
                     myStore.finalize();
+                    delete (&myFirelist);
                     return true;
                 }
 
@@ -99,9 +100,10 @@ bool DFSExploration::depth_first(SimpleProperty &property, Store &myStore, FireL
             if (property.stack.StackPointer == 0)
             {
                 // have completely processed initial marking --> state not found
-                free(Marking::Current);
-                Marking::Current = ns->Current;
+                memcpy(Marking::Current, ns->Current, Net::Card[PL] * SIZEOF_INDEX_T);
+                delete ns;
                 myStore.finalize();
+                delete (&myFirelist);
                 return false;
             }
             property.stack.pop(&currentEntry, &currentFirelist);

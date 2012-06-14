@@ -70,6 +70,7 @@ lola_SOURCES = \
                 Stores/ThreadSafeStore.cc Stores/ThreadSafeStore.h \
                 Stores/BinStore2.cc Stores/BinStore2.h \
                 Stores/BinStore3.cc Stores/BinStore3.h \
+                Stores/LengthCodedBinStore.cc Stores/LengthCodedBinStore.h \
                 Stores/SuffixTreeStore.cc Stores/SuffixTreeStore.h \
                 Stores/SIBinStore2.cc Stores/SIBinStore2.h
 

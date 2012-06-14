@@ -30,6 +30,7 @@
 #include <Stores/BinStore.h>
 #include <Stores/BinStore2.h>
 #include <Stores/BinStore3.h>
+#include <Stores/LengthCodedBinStore.h>
 #include <Stores/BitStore.h>
 #include <Stores/BloomStore.h>
 #include <Stores/EmptyStore.h>
@@ -215,6 +216,9 @@ void Task::setStore()
                 break;
             case store_arg_bin3:
                 s = new BinStore3();
+                break;
+            case store_arg_lcbin:
+                s = new LengthCodedBinStore();
                 break;
             case store_arg_tsbin2:
                 s = new ThreadSafeStore(new SIBinStore2(number_of_threads), number_of_threads);

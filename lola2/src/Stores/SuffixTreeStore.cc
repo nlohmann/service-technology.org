@@ -357,12 +357,13 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
         }
     }
 
+    assert(bitlen > position);
     // vector_bitstogo is always VECTOR_WIDTH here
     int newvectorlen = ((bitlen - position) + (VECTOR_WIDTH - 1)) / VECTOR_WIDTH;
     *newvector = (vectordata_t*) calloc(newvectorlen, sizeof(vectordata_t));
     pVector = *newvector;
 
-// again more efficient implementation
+    // again more efficient implementation
 #if INPUT_WIDTH == VECTOR_WIDTH
     // test for good alignment
     if(input_bitstogo == INPUT_WIDTH)
@@ -373,12 +374,13 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
         return false;
     } else {
         // bad alignment, copy contents manually
-        *pVector |= input_t(*pInput << (INPUT_WIDTH - input_bitstogo));
-        while(--newvectorlen) {
+        while(newvectorlen--) {
+            *pVector |= input_t(*pInput << (INPUT_WIDTH - input_bitstogo));
             pInput++;
+            if(++input_index > max_input_index)
+            	break;
             *pVector |= input_t(*pInput >> input_bitstogo);
             pVector++;
-            *pVector |= input_t(*pInput << (INPUT_WIDTH - input_bitstogo));
         }
         pthread_rwlock_unlock(rwlocks + hash);
         return false;
@@ -387,7 +389,7 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
 #else
     while (newvectorlen && input_index <= max_input_index)
     {
-#if INPUT_WIDTH > VECTOR_WIDTH
+#if INPUT_WIDTH >= VECTOR_WIDTH
         *pVector |= vectordata_t((input_t(*pInput << (INPUT_WIDTH - input_bitstogo)) >> (INPUT_WIDTH - vector_bitstogo)));
 #else
         *pVector |= vectordata_t(vectordata_t(*pInput) << (VECTOR_WIDTH - input_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo);

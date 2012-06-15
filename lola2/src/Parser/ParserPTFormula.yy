@@ -46,7 +46,7 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %type <yt_tTerm> term
 
 %token IDENTIFIER NUMBER
-%token _INITIAL_ _FORMULA_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _ALLPATH_ _ALWAYS_ _EVENTUALLY_ _EXPATH_ _UNTIL_ _REACHABLE_ _INVARIANT_ _IMPOSSIBLE_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_ _FIREABLE_ _DEADLOCK_
+%token _RELEASE_ _NEXTSTATE_ _INITIAL_ _FORMULA_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _ALLPATH_ _ALWAYS_ _EVENTUALLY_ _EXPATH_ _UNTIL_ _REACHABLE_ _INVARIANT_ _IMPOSSIBLE_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_ _FIREABLE_ _DEADLOCK_
 
 // precedences (lowest written first, e.g. PLUS/MINUS) and precedences
 %left _OR_ _XOR_
@@ -58,7 +58,8 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %left _plus_ _minus_
 %left _times_
 %right _NOT_
-%right _ALWAYS_ _EVENTUALLY_
+%right _ALWAYS_ _EVENTUALLY_ _NEXTSTATE_
+%right _UNTIL_
 %right _ALLPATH_ _EXPATH_
 %right _REACHABLE_ _INVARIANT_ _IMPOSSIBLE_
 
@@ -112,6 +113,12 @@ statepredicate:
     { $$ = Always($2); }
 | _EVENTUALLY_ statepredicate
     { $$ = Eventually($2); }
+| _leftparenthesis_ statepredicate _UNTIL_ statepredicate _rightparenthesis_
+    { $$ = Until($2, $4); }
+| _leftparenthesis_ statepredicate _RELEASE_ statepredicate _rightparenthesis_
+    { $$ = Release($2, $4); }
+| _NEXTSTATE_ statepredicate
+    { $$ = NextState($2); }
 | _REACHABLE_ statepredicate
     { $$ = ExPath(Eventually($2)); }
 | _INVARIANT_ statepredicate

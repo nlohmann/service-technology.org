@@ -29,6 +29,9 @@ tStatePredicate:
 | ExPath(tStatePredicate)
 | Always(tStatePredicate)
 | Eventually(tStatePredicate)
+| NextState(tStatePredicate)
+| Until(tStatePredicate tStatePredicate)
+| Release(tStatePredicate tStatePredicate)
 {
     bool containsTemporal = false;
 }

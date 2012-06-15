@@ -78,6 +78,9 @@ Negation(Eventually(x)) -> <neg: Always(Negation(x))>;
 // NOT G   <->   F NOT
 Negation(Always(x)) -> <neg: Eventually(Negation(x))>;
 
+// NOT X   <->   X NOT
+Negation(NextState(x)) -> <neg: NextState(Negation(x))>;
+
 // FF a        <->  Fa
 Eventually(a=Eventually(x)) -> <neg: a>;
 
@@ -86,6 +89,12 @@ Disjunction(Eventually(x), Eventually(y)) -> <neg: Eventually(Disjunction(x,y))>
 
 // G (a AND b) <->  (Ga AND Gb)
 Conjunction(Always(x), Always(y)) -> <neg: Always(Conjunction(x,y))>;
+
+// X (a AND b) <->  (Xa AND Xb)
+Conjunction(NextState(x), NextState(y)) -> <neg: NextState(Conjunction(x,y))>;
+
+// X (a OR b) <->  (Xa OR Xb)
+Disjunction(NextState(x), NextState(y)) -> <neg: NextState(Disjunction(x,y))>;
 
 // FGF x       <->  GF x
 Eventually(a=Always(Eventually(x))) -> <neg: a>;
@@ -99,13 +108,7 @@ AllPath(Always(a=AllPath(Always(x)))) -> <neg: a>;
 // AFAF x   <-> AF x
 AllPath(Eventually(a=AllPath(Eventually(x)))) -> <neg: a>;
 
-// EFEF x   <-> AG x
-ExPath(Eventually(a=ExPath(Eventually(x)))) -> <neg: a>;
-
-// EGEG x   <-> EG x
-ExPath(Always(a=ExPath(Always(x)))) -> <neg: a>;
-
-// EFEF x   <-> AG x
+// EFEF x   <-> EF x
 ExPath(Eventually(a=ExPath(Eventually(x)))) -> <neg: a>;
 
 // AGEFAGEF x <-> AGEF x
@@ -113,6 +116,24 @@ AllPath(AllPath(Always(ExPath(Eventually(a=AllPath(Always(ExPath(Eventually(x)))
 
 // EFAGEFAG x <-> EFAG x
 ExPath(Eventually(AllPath(Always(a=ExPath(Eventually(AllPath(Always(x)))))))) -> <neg: a>;
+
+// TRUE U x <-> F X
+Until(AtomicProposition(True()), x) -> <neg: Eventually(x) >;
+
+// FALSE R x <-> G X
+Release(AtomicProposition(False()), x) -> <neg: Always(x) >;
+
+// NOT (x U y) -> (NOT x R NOT y) 
+Negation(Until(x,y)) -> <neg: Release(Negation(x), Negation(y)) >;
+
+// NOT (x R y) -> (NOT x U NOT y) 
+Negation(Release(x,y)) -> <neg: Until(Negation(x), Negation(y)) >;
+
+// X (x U y) <-> (Xx U Xy)
+Until(NextState(x),NextState(y)) -> <neg: NextState(Until(x,y)) >;
+
+// (x U (x U y)) -> (x U y)
+Until(x, a=Until(x,y)) -> <neg: a >;
 
 
 /****************************

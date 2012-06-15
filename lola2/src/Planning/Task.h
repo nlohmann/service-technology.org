@@ -8,12 +8,14 @@ class Store;
 class FireListCreator;
 class ChooseTransition;
 class DFSExploration;
+class NetState;
 
 
 class Task
 {
     private:
         StatePredicate* sp;
+        NetState* ns;
         ChooseTransition* choose;
         enum_search search;
         FireListCreator* flc;
@@ -21,6 +23,7 @@ class Task
         DFSExploration* exploration;
         int number_of_threads;
         formula_t formulaType;
+        void setNet();
         void setFormula();
 
     public:
@@ -37,4 +40,8 @@ class Task
 
         void printWitness();
         void printMarking();
+
+
+        // this function is needed to allow the random walk in the main function
+        NetState* getNetState();
 };

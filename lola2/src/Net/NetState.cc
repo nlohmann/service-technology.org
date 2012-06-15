@@ -14,17 +14,17 @@
 #include "Net/Marking.h"
 #include <cstdlib>
 
-NetState* NetState::createNetStateFromCurrent()
+NetState* NetState::createNetStateFromInitial()
 {
     NetState* ns = (NetState*) malloc(sizeof(NetState));
-    ns->created_by_function = true;
+    ns->need_to_delete_members_on_delete = true;
     // copy the current marking at its hash
     ns->Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
     for (int i = 0; i < Net::Card[PL]; i++)
     {
-        ns->Current[i] = Marking::Current[i];
+        ns->Current[i] = Marking::Initial[i];
     }
-    ns->HashCurrent = Marking::HashCurrent;
+    ns->HashCurrent = Marking::HashInitial;
 
     // copy the currently enabled transitions
     ns->Enabled = (bool*) malloc(Net::Card[TR] * SIZEOF_BOOL);
@@ -150,31 +150,31 @@ NetState* NetState::createNetStateFromCurrent()
 
 
 
-NetState* NetState::createNetStateFromCurrent(NetState* ons)
+NetState* NetState::createNetStateFromCurrent(NetState& ons)
 {
     NetState* ns = (NetState*) malloc(sizeof(NetState));
-    ns->created_by_function = true;
+    ns->need_to_delete_members_on_delete = true;
     // copy the current marking at its hash
     ns->Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
     for (int i = 0; i < Net::Card[PL]; i++)
     {
-        ns->Current[i] = ons->Current[i];
+        ns->Current[i] = ons.Current[i];
     }
-    ns->HashCurrent = ons->HashCurrent;
+    ns->HashCurrent = ons.HashCurrent;
 
     // copy the currently enabled transitions
     ns->Enabled = (bool*) malloc(Net::Card[TR] * SIZEOF_BOOL);
     for (int i = 0; i < Net::Card[TR]; i++)
     {
-        ns->Enabled[i] = ons->Enabled[i];
+        ns->Enabled[i] = ons.Enabled[i];
     }
-    ns->CardEnabled = ons->CardEnabled;
+    ns->CardEnabled = ons.CardEnabled;
 
     // copy current scapegoats
     ns->PositionScapegoat = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
     for (int i = 0; i < Net::Card[TR]; i++)
     {
-        ns->PositionScapegoat[i] = ons->PositionScapegoat[i];
+        ns->PositionScapegoat[i] = ons.PositionScapegoat[i];
     }
 
     // copy the parts for the current net may be modified
@@ -198,14 +198,14 @@ NetState* NetState::createNetStateFromCurrent(NetState* ons)
                                   Net::CardArcs[PL][PRE][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
         {
-            ns->Arc[PL][PRE][i][j] = ons->Arc[PL][PRE][i][j];
+            ns->Arc[PL][PRE][i][j] = ons.Arc[PL][PRE][i][j];
         }
 
         ns->Mult[PL][PRE][i] = (mult_t*) malloc(
                                    Net::CardArcs[PL][PRE][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
         {
-            ns->Mult[PL][PRE][i][j] = ons->Mult[PL][PRE][i][j];
+            ns->Mult[PL][PRE][i][j] = ons.Mult[PL][PRE][i][j];
         }
 
 
@@ -214,14 +214,14 @@ NetState* NetState::createNetStateFromCurrent(NetState* ons)
                                    Net::CardArcs[PL][POST][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
         {
-            ns->Arc[PL][POST][i][j] = ons->Arc[PL][POST][i][j];
+            ns->Arc[PL][POST][i][j] = ons.Arc[PL][POST][i][j];
         }
 
         ns->Mult[PL][POST][i] = (mult_t*) malloc(
                                     Net::CardArcs[PL][POST][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
         {
-            ns->Mult[PL][POST][i][j] = ons->Mult[PL][POST][i][j];
+            ns->Mult[PL][POST][i][j] = ons.Mult[PL][POST][i][j];
         }
     }
 
@@ -234,14 +234,14 @@ NetState* NetState::createNetStateFromCurrent(NetState* ons)
                                   Net::CardArcs[TR][PRE][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[TR][PRE][i]; j++)
         {
-            ns->Arc[TR][PRE][i][j] = ons->Arc[TR][PRE][i][j];
+            ns->Arc[TR][PRE][i][j] = ons.Arc[TR][PRE][i][j];
         }
 
         ns->Mult[TR][PRE][i] = (mult_t*) malloc(
                                    Net::CardArcs[TR][PRE][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[TR][PRE][i]; j++)
         {
-            ns->Mult[TR][PRE][i][j] = ons->Mult[TR][PRE][i][j];
+            ns->Mult[TR][PRE][i][j] = ons.Mult[TR][PRE][i][j];
         }
 
 
@@ -250,14 +250,14 @@ NetState* NetState::createNetStateFromCurrent(NetState* ons)
                                    Net::CardArcs[TR][POST][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[TR][POST][i]; j++)
         {
-            ns->Arc[TR][POST][i][j] = ons->Arc[TR][POST][i][j];
+            ns->Arc[TR][POST][i][j] = ons.Arc[TR][POST][i][j];
         }
 
         ns->Mult[TR][POST][i] = (mult_t*) malloc(
                                     Net::CardArcs[TR][POST][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[TR][POST][i]; j++)
         {
-            ns->Mult[TR][POST][i][j] = ons->Mult[TR][POST][i][j];
+            ns->Mult[TR][POST][i][j] = ons.Mult[TR][POST][i][j];
         }
     }
 
@@ -267,24 +267,42 @@ NetState* NetState::createNetStateFromCurrent(NetState* ons)
     ns->Disabled = (index_t**) malloc(Net::Card[PL] * SIZEOF_VOIDP);
     for (int i = 0; i < Net::Card[PL]; i++)
     {
-        ns->CardDisabled[i] = ons->CardDisabled[i];
+        ns->CardDisabled[i] = ons.CardDisabled[i];
         ns->Disabled[i] = (index_t*) malloc(Net::CardArcs[PL][POST][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
         {
-            ns->Disabled[i][j] = ons->Disabled[i][j];
+            ns->Disabled[i][j] = ons.Disabled[i][j];
         }
     }
 
     return ns;
 }
 
+void NetState::copyNetState(NetState& ns){
+	deleteAllMembers();
+	Current = ns.Current;
+	HashCurrent = ns.HashCurrent;
+	Enabled = ns.Enabled;
+	CardEnabled = ns.CardEnabled;
+	PositionScapegoat = ns.PositionScapegoat;
+	Arc[0][0] = ns.Arc[0][0];
+	Arc[0][1] = ns.Arc[0][1];
+	Arc[1][0] = ns.Arc[1][0];
+	Arc[1][1] = ns.Arc[1][1];
+	Mult[0][0] = ns.Mult[0][0];
+	Mult[0][1] = ns.Mult[0][1];
+	Mult[1][0] = ns.Mult[1][0];
+	Mult[1][1] = ns.Mult[1][1];
+	CardDisabled = ns.CardDisabled;
+	Disabled = ns.Disabled;
+	// now the old netstate does not need to delete its members on deletions as they are now the members of this netstate;
+	ns.need_to_delete_members_on_delete = false;
+}
 
-NetState::~NetState()
-{
-    if (!created_by_function)
-    {
+
+void NetState::deleteAllMembers(){
+    if (!need_to_delete_members_on_delete)
         return;
-    }
     free(Current);
     free(Enabled);
     free(PositionScapegoat);
@@ -321,4 +339,9 @@ NetState::~NetState()
       free(Disabled[i]);
     }
     free(Disabled);
+}
+
+NetState::~NetState()
+{
+	deleteAllMembers();
 }

@@ -15,7 +15,7 @@ public:
     BinStore3();
     ~BinStore3();
 
-    virtual input_t* getInput(NetState* ns, bitindex_t& bitlen);
+    virtual input_t* getInput(NetState& ns, bitindex_t& bitlen);
 private:
     /// input vector filled in getinput method
     input_t* in;

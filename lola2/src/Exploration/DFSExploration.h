@@ -24,10 +24,10 @@ class DFSExploration
 {
     public:
         /// evaluate property by dfs. Result true = state found, false = state not found
-        bool virtual depth_first(SimpleProperty &property, Store &, FireListCreator &, int threadNumber);
+        bool virtual depth_first(SimpleProperty &property, NetState& ns, Store &, FireListCreator &, int threadNumber);
 
         /// evaluate property by bfs. Result true = state found, false = state not found
-        bool breadth_first(SimpleProperty &property, Store &, Firelist &)
+        bool breadth_first(SimpleProperty &property, NetState& ns, Store &, Firelist &)
         {
             assert(false);
             return false;
@@ -37,7 +37,7 @@ class DFSExploration
         /// Arguments: 1 = number of attempts 2 = depth of attempt 3 = firelist generator
         /// result true = state found, result false = max attempt exhausted without having found state
         /// 1st argument 0 = unlimited number of attempts: no return if property not satisfiable
-        bool find_path(SimpleProperty &property, unsigned int, unsigned int, Firelist &, EmptyStore &, ChooseTransition &);
+        bool find_path(SimpleProperty &property, NetState& ns, unsigned int, unsigned int, Firelist &, EmptyStore &, ChooseTransition &);
 
         virtual ~DFSExploration() {}
 };

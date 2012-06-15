@@ -40,7 +40,7 @@ struct tpDFSArguments
 
 void* ParallelExploration::threadPrivateDFS(void* container)
 {
-    NetState* ns = ((tpDFSArguments*) container)->ns;
+    NetState &ns = *((tpDFSArguments*) container)->ns;
     Store &myStore = *((tpDFSArguments*) container)->myStore;
     FireListCreator &fireListCreator = *((tpDFSArguments*) container)->fireListCreator;
     SimpleProperty* sp = ((tpDFSArguments*) container)->sp;
@@ -48,22 +48,18 @@ void* ParallelExploration::threadPrivateDFS(void* container)
     int number_of_threads = ((tpDFSArguments*) container)->number_of_threads;
     SimpleProperty* resultProperty = ((tpDFSArguments*) container)->resultProperty;
 
-    if (((tpDFSArguments*) container)->pexploration->threadedExploration(ns, myStore, fireListCreator, sp, threadNumber, number_of_threads, resultProperty))
-    {
-        return (void*) 1;
-    }
-    return (void*) 0;
+    return ((tpDFSArguments*) container)->pexploration->threadedExploration(ns, myStore, fireListCreator, sp, threadNumber, number_of_threads, resultProperty);
 }
 
 
-bool ParallelExploration:: threadedExploration(NetState* ns, Store &myStore, FireListCreator &fireListCreator, SimpleProperty* sp, int threadNumber, int number_of_threads, SimpleProperty* resultProperty)
+NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore, FireListCreator &fireListCreator, SimpleProperty* sp, int threadNumber, int number_of_threads, SimpleProperty* resultProperty)
 {
     Firelist* myFirelist = fireListCreator.createFireList(sp);
     /// the search stack
     SearchStack stack;
 
     // prepare property
-    bool localValue = sp->initProperty(*ns);
+    bool localValue = sp->initProperty(ns);
 
     if (localValue)
     {
@@ -78,11 +74,9 @@ bool ParallelExploration:: threadedExploration(NetState* ns, Store &myStore, Fir
         sem_post(&transfer_finished_mutex);
         // return success
         pthread_mutex_lock(&write_current_back_mutex);
-        free(Marking::Current);
-        Marking::Current = ns->Current;
         resultProperty->stack = stack;
         pthread_mutex_unlock(&write_current_back_mutex);
-        return true;
+        return &ns;
     }
 
     // add initial marking to store
@@ -99,7 +93,7 @@ bool ParallelExploration:: threadedExploration(NetState* ns, Store &myStore, Fir
         // if one of the threads send the finished signal this threadis useless and has to abort
         if (finished)
         {
-            return false;
+            return NULL;
         }
         //printf("GOON %x NS %x\n", container, ns);
         if (currentEntry -- > 0)
@@ -122,7 +116,7 @@ bool ParallelExploration:: threadedExploration(NetState* ns, Store &myStore, Fir
                 // test whether it is a transition that satisfies the property and if return
                 Transition::updateEnabled(ns, currentFirelist[currentEntry]);
                 // check current marking for property
-                localValue = sp->checkProperty(*ns, currentFirelist[currentEntry]);
+                localValue = sp->checkProperty(ns, currentFirelist[currentEntry]);
                 if (localValue)
                 {
                     // current  marking satisfies property
@@ -141,12 +135,9 @@ bool ParallelExploration:: threadedExploration(NetState* ns, Store &myStore, Fir
                     sem_post(&transfer_finished_mutex);
                     // return success
                     pthread_mutex_lock(&write_current_back_mutex);
-                    free(Marking::Current);
-                    Marking::Current = ns->Current;
                     resultProperty->stack = stack;
                     pthread_mutex_unlock(&write_current_back_mutex);
-                    //printf("%d SUCC\n", threadNumber);
-                    return true;
+                    return &ns;
                 }
                 // push the transition onto the stack
                 stack.push(currentEntry, currentFirelist);
@@ -156,22 +147,16 @@ bool ParallelExploration:: threadedExploration(NetState* ns, Store &myStore, Fir
                 // but do it only if there are at least two transitions in the firelist left (one for us, and one for the other thread)
                 if (currentEntry >= 2 && num_suspended > 0)
                 {
-                    //printf("%d TRANSFER\n",threadNumber);
                     pthread_mutex_lock(&num_suspend_mutex);
                     if (num_suspended > 0)
                     {
-                        //printf("%d DO TRANSFER\n",threadNumber);
                         //  i know that there is an other thread waiting for my data
                         num_suspended--;
                         pthread_mutex_unlock(&num_suspend_mutex);
                         pthread_mutex_lock(&num_suspend_mutex);
-                        //printf("%d STARTING TRANSFER\n",threadNumber);
+                        // if the end is reached abort this thread
                         if (finished)
-                        {
-                            return false;
-                        }
-                        // locked the transfer variables
-
+                            return NULL;
 
                         // copy the data for the other thread
                         transfer_stack = stack;
@@ -179,14 +164,13 @@ bool ParallelExploration:: threadedExploration(NetState* ns, Store &myStore, Fir
                         transfer_property = sp->copy();
                         sem_post(&restartSemaphore);
                         sem_wait(&transfer_finished_mutex);
-                        //printf("%d FINISHED TRANSFER %d GRANTING %d:%d\n",threadNumber, stack.StackPointer, currentEntry, currentFirelist[currentEntry]);
 
                         // backfire the current transition to return to original state
                         stack.pop(&currentEntry, &currentFirelist);
                         assert(currentEntry < Net::Card[TR]);
                         Transition::backfire(ns, currentFirelist[currentEntry]);
                         Transition::revertEnabled(ns, currentFirelist[currentEntry]);
-                        localValue = sp->updateProperty(*ns, currentFirelist[currentEntry]);
+                        localValue = sp->updateProperty(ns, currentFirelist[currentEntry]);
                         // go on as nothing happened
 
                         pthread_mutex_unlock(&num_suspend_mutex);
@@ -206,9 +190,8 @@ bool ParallelExploration:: threadedExploration(NetState* ns, Store &myStore, Fir
             delete[] currentFirelist;
             if (stack.StackPointer == 0)
             {
-                // have completely processed local initial marking --> state not found
+                // have completely processed local initial marking --> state not found in current sub-tree
 
-                //printf("%d DIE\n",threadNumber);
                 // maybe we have to go into an other sub-tree of the state-space
                 // first get the counter mutex to be able to count the number of threads currently suspended
                 pthread_mutex_lock(&num_suspend_mutex);
@@ -216,7 +199,6 @@ bool ParallelExploration:: threadedExploration(NetState* ns, Store &myStore, Fir
                 // then we are the last thread going asleep and so we have to await all the others and tell them that the search is over
                 if (num_suspended == number_of_threads)
                 {
-                    //printf("%d FINI\n",threadNumber);
                     finished = true;
                     // release all semaphores
                     for (int i = 0; i < number_of_threads; i++)
@@ -229,24 +211,22 @@ bool ParallelExploration:: threadedExploration(NetState* ns, Store &myStore, Fir
                     return false;
                 }
                 pthread_mutex_unlock(&num_suspend_mutex);
-                //printf("%d AWAIT STACK\n",threadNumber);
                 sem_wait(&restartSemaphore);
-                //printf("%d STACK RECEIVED\n",threadNumber);
                 // if the search has come to an end return without success
                 if (finished)
                 {
-                    return false;
+                    return NULL;
                 }
                 // now we have been signaled because one of the threads is able to give us an part of search space
 
-                delete ns;
                 delete sp;
 
                 stack = transfer_stack;
-                ns = transfer_netstate;
                 sp = transfer_property;
+                ns.copyNetState(*transfer_netstate);
+                delete transfer_netstate;
                 // rebuild
-                sp->initProperty(*ns);
+                sp->initProperty(ns);
                 delete myFirelist;
                 myFirelist = fireListCreator.createFireList(sp);
                 // my sender holds the lock that authorizes me to decrease the variable
@@ -255,26 +235,22 @@ bool ParallelExploration:: threadedExploration(NetState* ns, Store &myStore, Fir
                 // re-initialize the current search state
                 currentEntry = myFirelist->getFirelist(ns, &currentFirelist);
 
-                //printf("%d CONT %d\n",threadNumber, currentEntry);
                 continue;
 
             }
-            //stack.printTop5(threadNumber,2);
             stack.pop(&currentEntry, &currentFirelist);
             assert(currentEntry < Net::Card[TR]);
-            //printf("%d BF %d %d:%d \n",threadNumber, stack.StackPointer, currentEntry, currentFirelist[currentEntry]);
             Transition::backfire(ns, currentFirelist[currentEntry]);
-            //printf("%d BFD\n",threadNumber);
             Transition::revertEnabled(ns, currentFirelist[currentEntry]);
-            localValue = sp->updateProperty(*ns, currentFirelist[currentEntry]);
+            localValue = sp->updateProperty(ns, currentFirelist[currentEntry]);
         }
     }
 }
 
-bool ParallelExploration::depth_first(SimpleProperty &property, Store &myStore, FireListCreator &firelistcreator, int number_of_threads)
+bool ParallelExploration::depth_first(SimpleProperty &property, NetState& ns, Store &myStore, FireListCreator &firelistcreator, int number_of_threads)
 {
     // copy initial marking into current marking
-    Marking::init();
+    //Marking::init();
 
     runner_thread = (pthread_t*) calloc(number_of_threads,
                                         sizeof(pthread_t));
@@ -285,7 +261,7 @@ bool ParallelExploration::depth_first(SimpleProperty &property, Store &myStore, 
         args[i].fireListCreator = &firelistcreator;
         args[i].myStore = &myStore;
         args[i].sp = property.copy();
-        args[i].ns = NetState::createNetStateFromCurrent();
+        args[i].ns = NetState::createNetStateFromCurrent(ns);
         args[i].threadNumber = i;
         args[i].number_of_threads = number_of_threads;
         args[i].pexploration = this;
@@ -300,25 +276,34 @@ bool ParallelExploration::depth_first(SimpleProperty &property, Store &myStore, 
     num_suspended = 0;
     finished  = false;
 
+
+    // create the threads
     for (int i = 0; i < number_of_threads; i++)
     {
         pthread_create(runner_thread + i, NULL, threadPrivateDFS, args + i);
     }
 
-    bool found = false;
+    //// THREADS ARE RUNNING AND SEARCHING
+
+
+    // wait for all threads to finish
+    property.value = false;
     for (int i = 0; i < number_of_threads; i++)
     {
         void* return_value;
         pthread_join(runner_thread[i], &return_value);
-        found |= (bool) return_value;
+        if (return_value){
+        	property.value = true;
+        	ns.copyNetState(*(NetState*)return_value);
+        }
+        delete args[i].ns;
     }
 
     pthread_mutex_destroy(&num_suspend_mutex);
     pthread_mutex_destroy(&send_mutex);
     pthread_mutex_destroy(&write_current_back_mutex);
 
-    // finalize the store
+    // finalize the store to thave the corrent number of markings to report
     myStore.finalize();
-    property.value = found;
-    return found;
+    return property.value;
 }

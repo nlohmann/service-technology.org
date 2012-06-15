@@ -83,7 +83,7 @@ BinStore2::Decision::~Decision()
 
 /// search for a state in the binStore and insert it, if it is not there
 /// Do not care about states
-bool BinStore2::searchAndInsert(NetState* ns, void**)
+bool BinStore2::searchAndInsert(NetState &ns, void**)
 {
     pthread_mutex_lock(&inc_mutex);
     ++calls;
@@ -118,18 +118,18 @@ bool BinStore2::searchAndInsert(NetState* ns, void**)
 
 
     // first searching, so lock the search lock
-    pthread_rwlock_wrlock(rwlocks + ns->HashCurrent);
+    pthread_rwlock_wrlock(rwlocks + ns.HashCurrent);
 
     // Is hash bucket empty? If so, assign to currentvector
-    if (!(currentvector = (firstvector[ns->HashCurrent])))
+    if (!(currentvector = (firstvector[ns.HashCurrent])))
     {
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
-        newvector = firstvector + ns->HashCurrent;
+        newvector = firstvector + ns.HashCurrent;
     }
     else
     {
         // Here, hash bucket is not empty.
-        anchor = branch + ns->HashCurrent;
+        anchor = branch + ns.HashCurrent;
 
         while (true)
         {
@@ -138,7 +138,7 @@ bool BinStore2::searchAndInsert(NetState* ns, void**)
             {
                 if (place_bitstogo < vector_bitstogo)
                 {
-                    if ((capacity_t(ns->Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
+                    if ((capacity_t(ns.Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
                             //                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
                             ==
                             (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - place_bitstogo)))
@@ -151,7 +151,7 @@ bool BinStore2::searchAndInsert(NetState* ns, void**)
                         }
                         else
                         {
-                            pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                            pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
                             return true;
                         }
                     }
@@ -163,7 +163,7 @@ bool BinStore2::searchAndInsert(NetState* ns, void**)
                 }
                 else if (place_bitstogo > vector_bitstogo)
                 {
-                    if ((capacity_t(ns->Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - vector_bitstogo))
+                    if ((capacity_t(ns.Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - vector_bitstogo))
                             ==
                             (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
                         //                            (currentvector[vector_index] & vector_bitmask[vector_bitstogo]))
@@ -179,7 +179,7 @@ bool BinStore2::searchAndInsert(NetState* ns, void**)
                 }
                 else
                 {
-                    if ((capacity_t(ns->Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
+                    if ((capacity_t(ns.Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - place_bitstogo))
                             //                    if ((Marking::Current[place_index] & place_bitmask[place_bitstogo])
                             ==
                             (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
@@ -193,7 +193,7 @@ bool BinStore2::searchAndInsert(NetState* ns, void**)
                         }
                         else
                         {
-                            pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                            pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
                             return true;
                         }
                     }
@@ -206,7 +206,7 @@ bool BinStore2::searchAndInsert(NetState* ns, void**)
             }
             while (comparebits)
             {
-                if ((capacity_t(ns->Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - comparebits))
+                if ((capacity_t(ns.Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - comparebits))
                         ==
                         (vectordata_t(currentvector[vector_index] << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - comparebits)))
                 {
@@ -249,7 +249,7 @@ bool BinStore2::searchAndInsert(NetState* ns, void**)
                     }
                     else
                     {
-                        pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                        pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
                         return true;
                     }
                 }
@@ -285,7 +285,7 @@ bool BinStore2::searchAndInsert(NetState* ns, void**)
                 pthread_mutex_lock(&inc_mutex);
                 ++markings;
                 pthread_mutex_unlock(&inc_mutex);
-                pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
                 return false;
             }
         }
@@ -300,7 +300,7 @@ bool BinStore2::searchAndInsert(NetState* ns, void**)
     while (true)
     {
         bitindex_t insertbits = place_bitstogo < vector_bitstogo ? place_bitstogo : vector_bitstogo;
-        (*newvector)[vector_index] |= vectordata_t((capacity_t(ns->Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - insertbits)) << (vector_bitstogo - insertbits));
+        (*newvector)[vector_index] |= vectordata_t((capacity_t(ns.Current[place_index] << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - insertbits)) << (vector_bitstogo - insertbits));
 
         if (vector_bitstogo == insertbits)
         {
@@ -322,7 +322,7 @@ bool BinStore2::searchAndInsert(NetState* ns, void**)
                 pthread_mutex_lock(&inc_mutex);
                 ++markings;
                 pthread_mutex_unlock(&inc_mutex);
-                pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
                 return false;
             }
         }

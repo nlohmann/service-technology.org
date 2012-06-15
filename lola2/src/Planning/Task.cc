@@ -11,6 +11,8 @@
 
 #include <Net/Net.h>
 #include <Net/Marking.h>
+#include <Net/NetState.h>
+#include <Net/Transition.h>
 
 #include <Exploration/DFSExploration.h>
 #include <Exploration/ParallelExploration.h>
@@ -65,18 +67,25 @@ void myprinter(const char* s, kc::uview v)
 
 extern kc::tFormula TheFormula;
 
-Task::Task() : sp(NULL), p(NULL), s(NULL), flc(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
+Task::Task() : sp(NULL), ns(NULL), p(NULL), s(NULL), flc(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
 {
     setFormula();
+    setNet();
 }
 
 Task::~Task()
 {
+	delete ns;
     delete s;
     delete p;
     delete sp;
     delete flc;
     delete exploration;
+}
+
+void Task::setNet(){
+	ns = NetState::createNetStateFromInitial();
+	Transition::checkTransitions(*ns);
 }
 
 void Task::setFormula()
@@ -243,13 +252,11 @@ void Task::setProperty()
         case check_arg_deadlock:
             p = new Deadlock();
             flc = new FireListStubbornDeadlockCreator();
-            // exploration = new DFSExploration();
             break;
 
         case check_arg_statepredicate:
             p = new StatePredicateProperty(sp);
             flc = new FirelistStubbornStatePredicateCreator();
-            // exploration = new DFSExploration();
             break;
     }
 
@@ -275,6 +282,7 @@ void Task::setProperty()
 
 bool Task::getResult()
 {
+	assert(ns);
     assert(s);
     assert(p);
     assert(exploration);
@@ -284,7 +292,7 @@ bool Task::getResult()
     switch (args_info.search_arg)
     {
         case search_arg_depth:
-            result = exploration->depth_first(*p, *s, * flc, number_of_threads);
+            result = exploration->depth_first(*p, *ns,*s, * flc, number_of_threads);
             break;
 
         case search_arg_findpath:
@@ -298,7 +306,7 @@ bool Task::getResult()
             }
 
             choose = new ChooseTransitionHashDriven();
-            result = exploration->find_path(*p, args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(p), *((EmptyStore*)s), *choose);
+            result = exploration->find_path(*p,*ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(p), *((EmptyStore*)s), *choose);
             delete choose;
             break;
 
@@ -368,9 +376,15 @@ void Task::printMarking()
     rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness state:").str());
     for (index_t p = 0; p < Net::Card[PL]; ++p)
     {
-        if (Marking::Current[p] > 0)
+        if (ns->Current[p] > 0)
         {
-            rep->message("%s : %d", Net::Name[PL][p], Marking::Current[p]);
+            rep->message("%s : %d", Net::Name[PL][p], ns->Current[p]);
         }
     }
+}
+
+
+NetState* Task::getNetState()
+{
+	return ns;
 }

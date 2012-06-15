@@ -23,5 +23,5 @@ class ListStore : public Store
     public:
         ListStore();
         ~ ListStore();
-        bool searchAndInsert(NetState* ns, void**);
+        bool searchAndInsert(NetState& ns, void**);
 };

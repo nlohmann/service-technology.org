@@ -23,11 +23,11 @@ HuffmanStoreAVL::~HuffmanStoreAVL()
     delete &he;
 }
 
-bool HuffmanStoreAVL::searchAndInsert(NetState* ns, void**)
+bool HuffmanStoreAVL::searchAndInsert(NetState &ns, void**)
 {
     calls++;
     std::vector<bool> currentMarking;
-    he.encodeMarking(ns->Current, &currentMarking);
+    he.encodeMarking(ns.Current, &currentMarking);
     std::pair<std::set<std::vector<bool> >::iterator, bool> ret = store.insert(currentMarking);
     //bool erg = store2->searchAndInsert(ns);
     if (ret.second)

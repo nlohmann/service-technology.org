@@ -17,5 +17,5 @@ class ArrayStore : public Store
 
     public:
         ArrayStore();
-        bool searchAndInsert(NetState* ns, void**);
+        bool searchAndInsert(NetState &ns, void**);
 };

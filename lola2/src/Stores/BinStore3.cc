@@ -32,13 +32,13 @@ BinStore3::~BinStore3()
     free(in);
 }
 
-input_t* BinStore3::getInput(NetState* ns, bitindex_t& bitlen)
+input_t* BinStore3::getInput(NetState &ns, bitindex_t& bitlen)
 {
     bitlen = Place::SizeOfBitVector;
 
     // use memcpy if possible
 #if INPUT_WIDTH == PLACE_WIDTH
-    memcpy(in,ns->Current,memcpylen * sizeof(input_t));
+    memcpy(in,ns.Current,memcpylen * sizeof(input_t));
     if(memcpylen >= Place::CardSignificant)
     {
         return in;
@@ -48,7 +48,7 @@ input_t* BinStore3::getInput(NetState* ns, bitindex_t& bitlen)
     /// the place we are currently dealing with
     index_t place_index = memcpylen;
     /// pointer to current place
-    capacity_t* pPlace = ns->Current+memcpylen;
+    capacity_t* pPlace = ns.Current+memcpylen;
     /// the bits of the place's marking we have NOT dealt with so far
     bitindex_t place_bitstogo = Place::CardBits[place_index]; // indicates start with msb
 

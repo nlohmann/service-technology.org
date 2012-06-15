@@ -38,7 +38,7 @@ ThreadSafeStore::ThreadSafeStore(SIStore* sistore, uint16_t _threadNumber)
     netStates = (NetState**) malloc(sizeof(NetState*) * threadNumber);
     for (uint16_t i = 0; i < threadNumber; i++)
     {
-        netStates[i] = NetState::createNetStateFromCurrent();
+        netStates[i] = NetState::createNetStateFromInitial();
     }
 }
 
@@ -58,12 +58,12 @@ void ThreadSafeStore::writeToGlobalStore(int thread)
             ns->HashCurrent = localStoreHashs[thread][i];
             ns->Current = localStoresMarkings[thread][i];
 
-            if (store->search(ns, thread))
+            if (store->search(*ns, thread))
             {
                 continue;
             }
 
-            bool isIn = store->insert(ns, thread);
+            bool isIn = store->insert(*ns, thread);
             if (!isIn)
             {
                 pthread_mutex_lock(&mutex1);
@@ -78,7 +78,7 @@ void ThreadSafeStore::writeToGlobalStore(int thread)
         }
 }
 
-bool ThreadSafeStore::searchAndInsert(NetState* ns, int thread)
+bool ThreadSafeStore::searchAndInsert(NetState& ns, int thread)
 {
 
     /*pthread_mutex_lock(&mutex1);
@@ -105,17 +105,17 @@ bool ThreadSafeStore::searchAndInsert(NetState* ns, int thread)
 
 
     // search in the private store
-    if (localStoresMarkings[thread][ns->HashCurrent % HASHBINS])
+    if (localStoresMarkings[thread][ns.HashCurrent % HASHBINS])
     {
         // compare the current marking and the one stored in the local store
         bool equal = true;
         // if the hash is not equal the markings aren't also
-        if (localStoreHashs[thread][ns->HashCurrent % HASHBINS]
-                == ns->HashCurrent)
+        if (localStoreHashs[thread][ns.HashCurrent % HASHBINS]
+                == ns.HashCurrent)
             for (int i = 0; i < Net::Card[PL]; i++)
             {
-                equal &= localStoresMarkings[thread][ns->HashCurrent % HASHBINS][i]
-                         == ns->Current[i];
+                equal &= localStoresMarkings[thread][ns.HashCurrent % HASHBINS][i]
+                         == ns.Current[i];
                 if (!equal)
                 {
                     break;
@@ -151,17 +151,17 @@ bool ThreadSafeStore::searchAndInsert(NetState* ns, int thread)
     }
 
     // write the current marking into the local store
-    localStoreHashs[thread][ns->HashCurrent % HASHBINS] = ns->HashCurrent;
-    localStoresMarkings[thread][ns->HashCurrent % HASHBINS] =
+    localStoreHashs[thread][ns.HashCurrent % HASHBINS] = ns.HashCurrent;
+    localStoresMarkings[thread][ns.HashCurrent % HASHBINS] =
         (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
-    memcpy(localStoresMarkings[thread][ns->HashCurrent % HASHBINS], ns->Current,
+    memcpy(localStoresMarkings[thread][ns.HashCurrent % HASHBINS], ns.Current,
            Net::Card[PL] * SIZEOF_CAPACITY_T);
 
     return false;
 }
 
 // LCOV_EXCL_START
-bool ThreadSafeStore::searchAndInsert(NetState* ns, void**)
+bool ThreadSafeStore::searchAndInsert(NetState& ns, void**)
 {
     return searchAndInsert(ns, 0);
 }

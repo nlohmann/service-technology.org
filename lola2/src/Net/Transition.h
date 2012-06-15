@@ -56,22 +56,28 @@ struct Transition
         static index_t* PositionScapegoat;
 
         /// Check transition for activation
-        static void checkEnabled(NetState* ns, index_t t);
+        static void checkEnabled(NetState& ns, index_t t);
+
+
         /// Check transition for activation
+        /// wrapper function for the paring phase of the net, when no NetState object has been created yet.
         static void checkEnabled_Initial(index_t t);
 
         /// fire a transition
-        static void fire(NetState* ns, index_t t);
+        static void fire(NetState& ns, index_t t);
 
         /// update enabledness of all transitions
-        static void updateEnabled(NetState* ns, index_t t);
+        static void updateEnabled(NetState& ns, index_t t);
 
         /// fire a transition in reverse direction (for backtracking)
-        static void backfire(NetState* ns, index_t t);
+        static void backfire(NetState& ns, index_t t);
 
         /// update enabledness of all transitions after backfiring
-        static void revertEnabled(NetState* ns, index_t t);
+        static void revertEnabled(NetState& ns, index_t t);
 
         /// Aufräumen der Knoten - Service für valgrind
         static void deleteTransitions();
+
+
+        static void checkTransitions(NetState&);
 };

@@ -15,7 +15,7 @@ public:
 	LengthCodedBinStore();
     ~LengthCodedBinStore();
 
-    virtual input_t* getInput(NetState* ns, bitindex_t& bitlen);
+    virtual input_t* getInput(NetState& ns, bitindex_t& bitlen);
 private:
     void addToInput(capacity_t val, bitindex_t numbits);
     index_t input_index;

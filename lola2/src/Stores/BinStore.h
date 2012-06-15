@@ -19,7 +19,7 @@ class BinStore : public Store
         ~BinStore();
 
         /// check whether current marking is stored and return state
-        virtual bool searchAndInsert(NetState* ns, void**);
+        virtual bool searchAndInsert(NetState& ns, void**);
         void pbs(unsigned int, unsigned int, unsigned char*, void*);
         void printBinStore();
 

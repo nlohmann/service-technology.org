@@ -14,7 +14,7 @@ class NetState
 {
 
     public:
-        NetState(): created_by_function(false) {}
+        NetState(): need_to_delete_members_on_delete(false) {}
         ~NetState();
 
         /////// COPIED FOR MARKING.h
@@ -52,9 +52,11 @@ class NetState
         /// These are the transitions for which this place is the scapegoat.
         index_t** Disabled;
 
-        static NetState* createNetStateFromCurrent();
-        static NetState* createNetStateFromCurrent(NetState* ns);
+        static NetState* createNetStateFromInitial();
+        static NetState* createNetStateFromCurrent(NetState &ns);
+        void copyNetState(NetState& ns);
 
     private:
-        bool created_by_function;
+        bool need_to_delete_members_on_delete;
+        void deleteAllMembers();
 };

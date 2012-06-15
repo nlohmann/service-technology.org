@@ -24,7 +24,7 @@ ChooseTransitionHashDriven::~ChooseTransitionHashDriven()
     free(table);
 }
 
-index_t ChooseTransitionHashDriven::choose(NetState* ns, index_t cardfirelist, index_t* firelist)
+index_t ChooseTransitionHashDriven::choose(NetState& ns, index_t cardfirelist, index_t* firelist)
 {
     // Selection proceeds in two phases. In phase one, we give priority to transitions
     // that 1. enter rarely visited hash buckets and 2. are early members of the fire list
@@ -39,7 +39,7 @@ index_t ChooseTransitionHashDriven::choose(NetState* ns, index_t cardfirelist, i
         --i;
         index_t t = firelist[i];
         // compute hash value for t successor
-        hash_t h = (ns->HashCurrent + Transition::DeltaHash[t]) % SIZEOF_MARKINGTABLE;
+        hash_t h = (ns.HashCurrent + Transition::DeltaHash[t]) % SIZEOF_MARKINGTABLE;
         h = (h < 0) ? h + SIZEOF_MARKINGTABLE : h;
 
         if (((float) rand() / (float) RAND_MAX) <= 1.0 / (1.0 + table[h]))

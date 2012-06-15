@@ -172,7 +172,6 @@ int main(int argc, char** argv)
         rep->status("%d symbol table entries, %d collisions", symbolTables->PlaceTable->card + symbolTables->TransitionTable->card, SymbolTable::collisions);
     }
 
-
     Task task;
 
     delete symbolTables;
@@ -180,7 +179,7 @@ int main(int argc, char** argv)
     if (args_info.randomWalk_given)
     {
         rep->status("random walk");
-        randomWalk(args_info.randomWalk_arg);
+        randomWalk(*task.getNetState(), args_info.randomWalk_arg);
     }
 
     if (args_info.printNet_given)

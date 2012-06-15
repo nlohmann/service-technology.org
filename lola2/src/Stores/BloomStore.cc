@@ -20,19 +20,19 @@ BloomStore::~BloomStore()
     delete[] hash_values;
 }
 
-inline unsigned int BloomStore::hash_sdbm(NetState* ns) const
+inline unsigned int BloomStore::hash_sdbm(NetState &ns) const
 {
     unsigned int hash = 0;
 
     for (index_t p = 0; p < Place::CardSignificant; ++p)
     {
-        hash = ns->Current[p] + (hash << 6) + (hash << 16) - hash;
+        hash = ns.Current[p] + (hash << 6) + (hash << 16) - hash;
     }
 
     return hash % BLOOM_FILTER_SIZE;
 }
 
-inline unsigned int BloomStore::hash_fnv(NetState* ns) const
+inline unsigned int BloomStore::hash_fnv(NetState &ns) const
 {
     const unsigned int fnv_prime = 0x811C9DC5;
     unsigned int hash = 0;
@@ -40,13 +40,13 @@ inline unsigned int BloomStore::hash_fnv(NetState* ns) const
     for (index_t p = 0; p < Place::CardSignificant; ++p)
     {
         hash *= fnv_prime;
-        hash ^= ns->Current[p];
+        hash ^= ns.Current[p];
     }
 
     return hash % BLOOM_FILTER_SIZE;
 }
 
-bool BloomStore::searchAndInsert(NetState* ns, void**)
+bool BloomStore::searchAndInsert(NetState &ns, void**)
 {
     ++calls;
 

@@ -24,23 +24,19 @@ extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
 
-bool DFSExploration::depth_first(SimpleProperty &property, Store &myStore, FireListCreator &firelistcreator, int threadNumber)
+bool DFSExploration::depth_first(SimpleProperty &property, NetState& ns, Store &myStore, FireListCreator &firelistcreator, int threadNumber)
 {
     Firelist &myFirelist = *firelistcreator.createFireList(&property);
-    // copy initial marking into current marking
-    Marking::init();
-
-    NetState* ns = NetState::createNetStateFromCurrent();
+    //// copy initial marking into current marking
+    //Marking::init();
 
     // prepare property
-    property.value = property.initProperty(*ns);
+    property.value = property.initProperty(ns);
 
     if (property.value)
     {
+    	myStore.finalize();
         // initial marking satisfies property
-        free(Marking::Current);
-        Marking::Current = ns->Current;
-        myStore.finalize();
         return true;
     }
 
@@ -70,10 +66,9 @@ bool DFSExploration::depth_first(SimpleProperty &property, Store &myStore, FireL
             else
             {
                 // State does not exist!
-
                 Transition::updateEnabled(ns, currentFirelist[currentEntry]);
                 // check current marking for property
-                property.value = property.checkProperty(*ns, currentFirelist[currentEntry]);
+                property.value = property.checkProperty(ns, currentFirelist[currentEntry]);
                 if (property.value)
                 {
                     // current  marking satisfies property
@@ -81,8 +76,6 @@ bool DFSExploration::depth_first(SimpleProperty &property, Store &myStore, FireL
                     // this way, the stack contains ALL transitions
                     // of witness path
                     property.stack.push(currentEntry, currentFirelist);
-                    memcpy(Marking::Current, ns->Current, Net::Card[PL] * SIZEOF_INDEX_T);
-                    delete ns;
                     myStore.finalize();
                     delete (&myFirelist);
                     return true;
@@ -100,8 +93,6 @@ bool DFSExploration::depth_first(SimpleProperty &property, Store &myStore, FireL
             if (property.stack.StackPointer == 0)
             {
                 // have completely processed initial marking --> state not found
-                memcpy(Marking::Current, ns->Current, Net::Card[PL] * SIZEOF_INDEX_T);
-                delete ns;
                 myStore.finalize();
                 delete (&myFirelist);
                 return false;
@@ -110,17 +101,16 @@ bool DFSExploration::depth_first(SimpleProperty &property, Store &myStore, FireL
             assert(currentEntry < Net::Card[TR]);
             Transition::backfire(ns, currentFirelist[currentEntry]);
             Transition::revertEnabled(ns, currentFirelist[currentEntry]);
-            property.value = property.updateProperty(*ns, currentFirelist[currentEntry]);
+            property.value = property.updateProperty(ns, currentFirelist[currentEntry]);
         }
     }
 }
 
-bool DFSExploration::find_path(SimpleProperty &property, unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition &c)
+bool DFSExploration::find_path(SimpleProperty &property, NetState& ns, unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition &c)
 {
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.
 
-    NetState* ns = NetState::createNetStateFromCurrent();
     unsigned int currentattempt = 0;
 
     // get memory for path info
@@ -148,19 +138,19 @@ bool DFSExploration::find_path(SimpleProperty &property, unsigned int attempts, 
         s.tries++;
 
         // copy initial marking into current marking
-        memcpy(ns->Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
-        ns->HashCurrent = Marking::HashInitial;
+        memcpy(ns.Current, Marking::Initial, Net::Card[PL] * SIZEOF_INDEX_T);
+        ns.HashCurrent = Marking::HashInitial;
 
         // reset enabledness information
         for (index_t i = 0; i < Net::Card[PL]; i++)
         {
-            ns->Current[i] = Marking::Initial[i];
-            ns->CardDisabled[i] = 0;
+            ns.Current[i] = Marking::Initial[i];
+            ns.CardDisabled[i] = 0;
         }
-        ns->CardEnabled = Net::Card[TR];
+        ns.CardEnabled = Net::Card[TR];
         for (index_t t = 0; t < Net::Card[TR]; ++t)
         {
-            ns->Enabled[t] = true;
+            ns.Enabled[t] = true;
         }
 
         for (index_t t = 0; t < Net::Card[TR]; ++t)
@@ -169,16 +159,13 @@ bool DFSExploration::find_path(SimpleProperty &property, unsigned int attempts, 
         }
 
         // prepare property
-        property.value = property.initProperty(*ns);
+        property.value = property.initProperty(ns);
 
         if (property.value)
         {
             // initial marking satisfies property
             // witness path is empty path
             // initial marking satisfies property
-            free(Marking::Current);
-            Marking::Current = ns->Current;
-
             return true;
         }
 
@@ -205,20 +192,15 @@ bool DFSExploration::find_path(SimpleProperty &property, unsigned int attempts, 
             Transition::fire(ns, chosen);
             Transition::updateEnabled(ns, chosen);
 
-            property.value = property.checkProperty(*ns, chosen);
+            property.value = property.checkProperty(ns, chosen);
             if (property.value)
             {
                 // witness path is path[0] .... path[depth-1] path[depth]
                 // initial marking satisfies property
-                free(Marking::Current);
-                Marking::Current = ns->Current;
-
                 return true;
             }
         }
     }
     // initial marking satisfies property
-    free(Marking::Current);
-    Marking::Current = ns->Current;
     return false;
 }

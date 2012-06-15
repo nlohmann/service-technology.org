@@ -17,7 +17,7 @@ class ChooseTransitionHashDriven : public ChooseTransition
         ChooseTransitionHashDriven();
         ~ChooseTransitionHashDriven();
 
-        virtual index_t choose(NetState* ns, index_t cardfirelist, index_t* firelist);
+        virtual index_t choose(NetState &ns, index_t cardfirelist, index_t* firelist);
     private:
         unsigned long int* table;
 };

@@ -22,7 +22,7 @@ ListStore::~ListStore()
     free(store);
 }
 
-bool ListStore::searchAndInsert(NetState* ns, void**)
+bool ListStore::searchAndInsert(NetState& ns, void**)
 {
     // organize vector as intermediate data structure: set size on first call
     static std::vector<capacity_t> m;
@@ -33,7 +33,7 @@ bool ListStore::searchAndInsert(NetState* ns, void**)
     ++calls;
 
     // copy current marking to vector
-    std::copy(ns->Current, ns->Current + Place::CardSignificant, m.begin());
+    std::copy(ns.Current, ns.Current + Place::CardSignificant, m.begin());
 
     // add vector to marking store
     if (!contains(m))

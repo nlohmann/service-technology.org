@@ -93,20 +93,20 @@ SIBinStore2::Decision::~Decision()
 
 }
 
-bool SIBinStore2::search(NetState* ns, int threadNumber)
+bool SIBinStore2::search(NetState& ns, int threadNumber)
 {
     return search(ns, threadNumber, true);
 }
 
 /// search for a state in the binStore and insert it, if it is not there
 /// Do not care about states
-bool SIBinStore2::search(NetState* ns, int threadNumber,
+bool SIBinStore2::search(NetState& ns, int threadNumber,
                          bool lock_rw_mutex)
 {
 
     if (lock_rw_mutex)
     {
-        pthread_rwlock_rdlock(rwlocks + ns->HashCurrent);
+        pthread_rwlock_rdlock(rwlocks + ns.HashCurrent);
     }
 
     Decision** anchor;
@@ -135,15 +135,15 @@ bool SIBinStore2::search(NetState* ns, int threadNumber,
     prepareInsertion = false;
 
     // Is hash bucket empty? If so, assign to currentvector
-    if (!(currentvector = (firstvector[ns->HashCurrent])))
+    if (!(currentvector = (firstvector[ns.HashCurrent])))
     {
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
-        newvector = firstvector + ns->HashCurrent;
+        newvector = firstvector + ns.HashCurrent;
     }
     else
     {
         // Here, hash bucket is not empty.
-        anchor = branch + ns->HashCurrent;
+        anchor = branch + ns.HashCurrent;
 
         while (true)
         {
@@ -153,10 +153,10 @@ bool SIBinStore2::search(NetState* ns, int threadNumber,
                 if (place_bitstogo < vector_bitstogo)
                 {
                     if ((capacity_t(
-                                ns->Current[place_index]
+                                ns.Current[place_index]
                                 << (PLACE_WIDTH - place_bitstogo))
                             >> (PLACE_WIDTH - place_bitstogo))
-                            //                    if ((ns->Current[place_index] & place_bitmask[place_bitstogo])
+                            //                    if ((ns.Current[place_index] & place_bitmask[place_bitstogo])
                             == (vectordata_t(
                                     currentvector[vector_index]
                                     << (VECTOR_WIDTH - vector_bitstogo))
@@ -172,7 +172,7 @@ bool SIBinStore2::search(NetState* ns, int threadNumber,
                         {
                             if (lock_rw_mutex)
                                 pthread_rwlock_unlock(
-                                    rwlocks + ns->HashCurrent);
+                                    rwlocks + ns.HashCurrent);
                             return true;
                         }
                     }
@@ -185,7 +185,7 @@ bool SIBinStore2::search(NetState* ns, int threadNumber,
                 else if (place_bitstogo > vector_bitstogo)
                 {
                     if ((capacity_t(
-                                ns->Current[place_index]
+                                ns.Current[place_index]
                                 << (PLACE_WIDTH - place_bitstogo))
                             >> (place_bitstogo - vector_bitstogo))
                             == (vectordata_t(
@@ -206,10 +206,10 @@ bool SIBinStore2::search(NetState* ns, int threadNumber,
                 else
                 {
                     if ((capacity_t(
-                                ns->Current[place_index]
+                                ns.Current[place_index]
                                 << (PLACE_WIDTH - place_bitstogo))
                             >> (PLACE_WIDTH - place_bitstogo))
-                            //                    if ((ns->Current[place_index] & place_bitmask[place_bitstogo])
+                            //                    if ((ns.Current[place_index] & place_bitmask[place_bitstogo])
                             == (vectordata_t(
                                     currentvector[vector_index]
                                     << (VECTOR_WIDTH - vector_bitstogo))
@@ -226,7 +226,7 @@ bool SIBinStore2::search(NetState* ns, int threadNumber,
                         {
                             if (lock_rw_mutex)
                                 pthread_rwlock_unlock(
-                                    rwlocks + ns->HashCurrent);
+                                    rwlocks + ns.HashCurrent);
                             return true;
                         }
                     }
@@ -240,7 +240,7 @@ bool SIBinStore2::search(NetState* ns, int threadNumber,
             while (comparebits)
             {
                 if ((capacity_t(
-                            ns->Current[place_index]
+                            ns.Current[place_index]
                             << (PLACE_WIDTH - place_bitstogo))
                         >> (PLACE_WIDTH - comparebits))
                         == (vectordata_t(
@@ -295,7 +295,7 @@ bool SIBinStore2::search(NetState* ns, int threadNumber,
                     {
                         if (lock_rw_mutex)
                         {
-                            pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                            pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
                         }
                         return true;
                     }
@@ -320,19 +320,19 @@ bool SIBinStore2::search(NetState* ns, int threadNumber,
     g_position[threadNumber] = position;
     g_prepareInsertion[threadNumber] = prepareInsertion;
     g_validInsertInformation[threadNumber] = true;
-    g_currentHashs[threadNumber] = ns->HashCurrent;
+    g_currentHashs[threadNumber] = ns.HashCurrent;
 
     if (lock_rw_mutex)
     {
-        pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+        pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
     }
     return false;
 }
 
-bool SIBinStore2::insert(NetState* ns, int threadNumber)
+bool SIBinStore2::insert(NetState& ns, int threadNumber)
 {
 
-    pthread_rwlock_wrlock(rwlocks + ns->HashCurrent);
+    pthread_rwlock_wrlock(rwlocks + ns.HashCurrent);
 
     // if the currently stored informations are not valid we need a new search run to get them
     if (!g_validInsertInformation[threadNumber])
@@ -342,7 +342,7 @@ bool SIBinStore2::insert(NetState* ns, int threadNumber)
         if (searchResult == 0)
         {
             //printf("INSERT, but is in\n");
-            pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+            pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
             return true;
         }
     }
@@ -403,7 +403,7 @@ bool SIBinStore2::insert(NetState* ns, int threadNumber)
             {
                 *newvector = NULL;
                 //++markings;
-                pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
                 return false;
             }
         }
@@ -425,7 +425,7 @@ bool SIBinStore2::insert(NetState* ns, int threadNumber)
             place_bitstogo : vector_bitstogo;
         (*newvector)[vector_index] |= vectordata_t(
                                           (capacity_t(
-                                               ns->Current[place_index]
+                                               ns.Current[place_index]
                                                << (PLACE_WIDTH - place_bitstogo))
                                            >> (PLACE_WIDTH - insertbits))
                                           << (vector_bitstogo - insertbits));
@@ -448,7 +448,7 @@ bool SIBinStore2::insert(NetState* ns, int threadNumber)
             else
             {
                 //++markings;
-                pthread_rwlock_unlock(rwlocks + ns->HashCurrent);
+                pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
                 return false;
             }
         }
@@ -498,7 +498,7 @@ bool SIBinStore2::insert(NetState* ns, int threadNumber)
  {
  for (unsigned int i = 0; i < Place::CardSignificant; i++)
  {
- printf("%s:%d ", Net::Name[PL][i], ns->Current[i]);
+ printf("%s:%d ", Net::Name[PL][i], ns.Current[i]);
  }
  printf("\n\n");
 

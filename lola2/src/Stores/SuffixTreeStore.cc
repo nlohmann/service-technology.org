@@ -52,7 +52,7 @@ SuffixTreeStore::~SuffixTreeStore()
 }
 
 /// search for a state in the suffix tree and insert it, if it is not present
-bool SuffixTreeStore::searchAndInsert(NetState* ns, void** s)
+bool SuffixTreeStore::searchAndInsert(NetState& ns, void** s)
 {
     pthread_mutex_lock(&inc_mutex);
     ++calls;
@@ -61,7 +61,7 @@ bool SuffixTreeStore::searchAndInsert(NetState* ns, void** s)
     bitindex_t bitlen;
     input_t* in = getInput(ns, bitlen);
 
-    bool ret = searchAndInsert(in,bitlen,ns->HashCurrent);
+    bool ret = searchAndInsert(in,bitlen,ns.HashCurrent);
     if(!ret) {
         pthread_mutex_lock(&inc_mutex);
         ++markings;

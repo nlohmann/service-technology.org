@@ -17,7 +17,7 @@ class BinStore2 : public Store
         ~BinStore2();
 
         /// check whether current marking is stored and return state
-        virtual bool searchAndInsert(NetState* ns, void** s);
+        virtual bool searchAndInsert(NetState &ns, void** s);
         //void pbs(unsigned int, unsigned int, vectordata_t*, void*);
         //void printBinStore();
     private:

@@ -68,7 +68,7 @@ BinStore::Decision* BinStore::createDecision(bitindex_t b)
 /// search for a state in the binStore and insert it, if it is not there
 /// Do not care about states
 
-bool BinStore::searchAndInsert(NetState* ns, void** result)
+bool BinStore::searchAndInsert(NetState& ns, void** result)
 {
     ++calls;;
     // the general assumption is that we read marking, vectors etc. left to right, with
@@ -101,16 +101,16 @@ bool BinStore::searchAndInsert(NetState* ns, void** result)
     bitindex_t position = 0;
 
     // Is hash bucket empty? If so, assign to currentvector
-    if (!(currentvector = (firstvector[ns->HashCurrent])))
+    if (!(currentvector = (firstvector[ns.HashCurrent])))
     {
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
-        newvector = firstvector + ns->HashCurrent;
-        getAndCreateFirstPayload(ns->HashCurrent, result);
+        newvector = firstvector + ns.HashCurrent;
+        getAndCreateFirstPayload(ns.HashCurrent, result);
     }
     else
     {
         // Here, hash bucket is not empty.
-        anchor = branch + ns->HashCurrent;
+        anchor = branch + ns.HashCurrent;
 
 
         while (true) // for various currentvectors do...
@@ -125,7 +125,7 @@ freshvector:
 #else
 #define BINSTORE_LOOP_BODY(N, I)\
     /* comparison of one bit between current marking and current vector*/\
-    if (((ns->Current[place_index] >> placebit_index) & 1) != ((currentvector[vector_byte] N) & 1))\
+    if (((ns.Current[place_index] >> placebit_index) & 1) != ((currentvector[vector_byte] N) & 1))\
     {\
         /* This is the mismatch we were looking for*/\
         /* --> evaluate the branching tree:*/\
@@ -205,7 +205,7 @@ freshvector:
             }\
             else\
             {\
-                getFirstPayload(ns->HashCurrent, result);\
+                getFirstPayload(ns.HashCurrent, result);\
             }\
             return true;\
         }\
@@ -267,7 +267,7 @@ insert:
 #error BINSTORE_LOOP_BODY_2 already defined
 #else
 #define BINSTORE_LOOP_BODY_2(N, I)\
-    if (ns->Current[place_index] & (1 << placebit_index))\
+    if (ns.Current[place_index] & (1 << placebit_index))\
     {\
         assert(vector_byte < ((Place::SizeOfBitVector - position) + 7) / 8);\
         (*newvector)[vector_byte] |= N;\

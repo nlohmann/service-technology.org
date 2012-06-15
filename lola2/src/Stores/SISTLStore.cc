@@ -24,13 +24,13 @@ SISTLStore::SISTLStore(int numberOfThreads) : SIStore(numberOfThreads)
     }
 }
 
-bool SISTLStore::search(NetState* ns, int threadNumber)
+bool SISTLStore::search(NetState& ns, int threadNumber)
 {
     // organize vector as intermediate data structure: set size on first call
 
 
     // copy current marking to vector
-    std::copy(ns->Current, ns->Current + Place::CardSignificant, m[threadNumber].begin());
+    std::copy(ns.Current, ns.Current + Place::CardSignificant, m[threadNumber].begin());
 
     // add vector to marking store
     insertInfo[threadNumber] = store.find(m[threadNumber]);
@@ -38,7 +38,7 @@ bool SISTLStore::search(NetState* ns, int threadNumber)
     return insertInfo[threadNumber] == store.end();
 }
 
-bool SISTLStore::insert(NetState* ns, int threadNumber)
+bool SISTLStore::insert(NetState& ns, int threadNumber)
 {
     store.insert(insertInfo[threadNumber], m[threadNumber]);
     return 1;

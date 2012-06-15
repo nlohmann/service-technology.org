@@ -82,7 +82,7 @@ Store::~Store()
     }
 }
 
-bool Store::searchAndInsert(NetState* ns, int thread)
+bool Store::searchAndInsert(NetState& ns, int thread)
 {
     return searchAndInsert(ns);
 }

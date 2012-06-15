@@ -25,13 +25,13 @@ HuffmanStoreList::~HuffmanStoreList()
     delete &he;
 }
 
-bool HuffmanStoreList::searchAndInsert(NetState* ns, void**)
+bool HuffmanStoreList::searchAndInsert(NetState ns, void**)
 {
     bool erg = store2->searchAndInsert(ns);
-    if (!he.contains(ns->Current, &store))
+    if (!he.contains(ns.Current, &store))
     {
         markings++;
-        he.encodeMarking(ns->Current, &store);
+        he.encodeMarking(ns.Current, &store);
         if (markings % 100 == 0)
         {
             he.recode(&store);

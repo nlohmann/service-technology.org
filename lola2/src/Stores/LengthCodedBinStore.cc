@@ -43,7 +43,7 @@ void LengthCodedBinStore::addToInput(capacity_t val, bitindex_t numbits) {
 	}
 }
 
-input_t* LengthCodedBinStore::getInput(NetState* ns, bitindex_t& bitlen)
+input_t* LengthCodedBinStore::getInput(NetState &ns, bitindex_t& bitlen)
 {
     bitlen = 0;
     input_index = 0;
@@ -53,12 +53,12 @@ input_t* LengthCodedBinStore::getInput(NetState* ns, bitindex_t& bitlen)
 
     for(index_t place_index = 0; place_index < Place::CardSignificant; place_index++) {
     	int marking_length = 0;
-    	capacity_t curMarking = ns->Current[place_index];
+    	capacity_t curMarking = ns.Current[place_index];
     	do {
     		curMarking >>= 1, marking_length++;
     	} while(curMarking);
     	addToInput(1,marking_length);
-    	addToInput(ns->Current[place_index],marking_length);
+    	addToInput(ns.Current[place_index],marking_length);
     	bitlen += 2*marking_length;
     }
     return in;

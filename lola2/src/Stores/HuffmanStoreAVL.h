@@ -22,5 +22,5 @@ class HuffmanStoreAVL: public Store
     public:
         HuffmanStoreAVL();
         ~HuffmanStoreAVL();
-        bool searchAndInsert(NetState* ns, void**);
+        bool searchAndInsert(NetState &ns, void**);
 };

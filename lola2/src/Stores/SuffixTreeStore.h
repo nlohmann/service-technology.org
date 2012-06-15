@@ -16,13 +16,13 @@ public:
     ~SuffixTreeStore();
 
     /// check whether current marking is stored
-    virtual bool searchAndInsert(NetState* ns, void** s = NULL);
+    virtual bool searchAndInsert(NetState& ns, void** s = NULL);
 
     /// converts current NetState to input vector.
     /// This method can basically do anything as long as it obeys two rules:
     /// * different NetStates are mapped to different input vectors
     /// * no input vector is prefix of a different input vector
-    virtual input_t* getInput(NetState* ns, bitindex_t& bitlen) = 0;
+    virtual input_t* getInput(NetState& ns, bitindex_t& bitlen) = 0;
 
     // inserts input vector into suffix tree
     virtual bool searchAndInsert(input_t* in, bitindex_t bitlen, hash_t hash);

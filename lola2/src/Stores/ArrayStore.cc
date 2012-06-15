@@ -18,18 +18,18 @@ ArrayStore::ArrayStore()
     numElems = 0;
 }
 
-bool ArrayStore::searchAndInsert(NetState* ns, void**)
+bool ArrayStore::searchAndInsert(NetState &ns, void**)
 {
     ++calls;
     size_t stateBytes = Place::CardSignificant * sizeof(capacity_t);
     for (int i = 0; i < numElems; i++)
     {
-        if (!memcmp(store + (i * Place::CardSignificant), ns->Current, stateBytes))
+        if (!memcmp(store + (i * Place::CardSignificant), ns.Current, stateBytes))
         {
             return true;
         }
     }
-    memcpy(store + (numElems * Place::CardSignificant), ns->Current, stateBytes);
+    memcpy(store + (numElems * Place::CardSignificant), ns.Current, stateBytes);
     numElems++;
     ++markings;
     return false;

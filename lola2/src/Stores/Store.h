@@ -53,11 +53,12 @@ class Store
 
         /// check whether current marking is stored
         /// threaded version, this have not to be implemented by each store
-        virtual bool searchAndInsert(NetState* ns, int thread);
+        virtual bool searchAndInsert(NetState &ns, int thread);
 
         /// check whether current marking is stored and return state
-        virtual bool searchAndInsert(NetState* ns, void** s = NULL) = 0;
+        virtual bool searchAndInsert(NetState &ns, void** s = NULL) = 0;
 
         /// with this method the store will calculate the actual number of markings
+        /// needed as e.g. the thread-safe-store (local hashing and global bin store) must write back all the local markings to know the exact number
         virtual void finalize();
 };

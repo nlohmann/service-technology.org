@@ -57,7 +57,7 @@ void FirelistStubbornDeadlock::newStamp()
     }
 }
 
-index_t FirelistStubbornDeadlock::getFirelist(NetState* ns, index_t** result)
+index_t FirelistStubbornDeadlock::getFirelist(NetState &ns, index_t** result)
 {
     index_t nextDfs = 1;
     index_t stackpointer = 0;
@@ -72,7 +72,7 @@ index_t FirelistStubbornDeadlock::getFirelist(NetState* ns, index_t** result)
     // since check property will raise its flag before firelist is
     // requested
     // LCOV_EXCL_START
-    if (UNLIKELY(ns->CardEnabled == 0))
+    if (UNLIKELY(ns.CardEnabled == 0))
     {
         assert(false);
         * result = new index_t[1];
@@ -80,7 +80,7 @@ index_t FirelistStubbornDeadlock::getFirelist(NetState* ns, index_t** result)
     }
     // LCOV_EXCL_STOP
     int firstenabled;
-    for (firstenabled = 0; !ns->Enabled[firstenabled]; ++firstenabled);
+    for (firstenabled = 0; !ns.Enabled[firstenabled]; ++firstenabled);
     // Transition #firstenabled is root for search
     dfs[firstenabled] = lowlink[firstenabled] = 0;
     dfsStack[0] = TarjanStack[0] = firstenabled;
@@ -115,7 +115,7 @@ index_t FirelistStubbornDeadlock::getFirelist(NetState* ns, index_t** result)
                 visited[newtransition] = onTarjanStack[newtransition] = stamp;
                 dfsStack[++stackpointer] = newtransition;
                 TarjanStack[++tarjanstackpointer] = newtransition;
-                if (ns->Enabled[newtransition])
+                if (ns.Enabled[newtransition])
                 {
                     // must include conflicting transitions
                     mustBeIncluded[stackpointer] = Transition::Conflicting[newtransition];
@@ -124,9 +124,9 @@ index_t FirelistStubbornDeadlock::getFirelist(NetState* ns, index_t** result)
                 }
                 else
                 {
-                    index_t scapegoat = ns->Arc[TR][PRE][newtransition][0];
+                    index_t scapegoat = ns.Arc[TR][PRE][newtransition][0];
                     // must include pretransitions of scapegoat
-                    mustBeIncluded[stackpointer] = ns->Arc[PL][PRE][scapegoat];
+                    mustBeIncluded[stackpointer] = ns.Arc[PL][PRE][scapegoat];
                     currentIndex[stackpointer] = Net::CardArcs[PL][PRE][scapegoat];
                 }
             }
@@ -148,28 +148,28 @@ index_t FirelistStubbornDeadlock::getFirelist(NetState* ns, index_t** result)
                     index_t CardStubborn = 0;
                     for (index_t i = tarjanstackpointer; TarjanStack[i] != currenttransition;)
                     {
-                        if (ns->Enabled[TarjanStack[i--]])
+                        if (ns.Enabled[TarjanStack[i--]])
                         {
                             ++CardStubborn;
                         }
                     }
-                    if (ns->Enabled[currenttransition])
+                    if (ns.Enabled[currenttransition])
                     {
                         ++CardStubborn;
                     }
                     assert(CardStubborn > 0);
-                    assert(CardStubborn <= ns->CardEnabled);
+                    assert(CardStubborn <= ns.CardEnabled);
                     * result = new index_t [CardStubborn];
                     index_t resultindex = CardStubborn;
                     while (currenttransition != TarjanStack[tarjanstackpointer])
                     {
                         index_t poppedTransition = TarjanStack[tarjanstackpointer--];
-                        if (ns->Enabled[poppedTransition])
+                        if (ns.Enabled[poppedTransition])
                         {
                             (*result)[--resultindex] = poppedTransition;
                         }
                     }
-                    if (ns->Enabled[currenttransition])
+                    if (ns.Enabled[currenttransition])
                     {
                         (*result)[--resultindex] = currenttransition;
                     }

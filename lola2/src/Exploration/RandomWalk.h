@@ -10,4 +10,4 @@ They can later on be used as a starting point for the "findpath" feature
 #pragma once
 
 
-void randomWalk(int = 0);
+void randomWalk(NetState&, int = 0);

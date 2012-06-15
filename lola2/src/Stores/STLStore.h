@@ -17,5 +17,5 @@ class STLStore : public Store
         std::set<std::vector<capacity_t> > store;
 
     public:
-        bool searchAndInsert(NetState* ns, void**);
+        bool searchAndInsert(NetState& ns, void**);
 };

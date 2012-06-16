@@ -38,7 +38,7 @@ BitStore::BitStore() : bit_count(0), bit_current(0), byte_count(0), byte_current
 
     byte_count = ceil(bit_count / 8.0);
 
-    rep->status("using %d bytes per marking, wasting %d bits per marking", byte_count, bit_count % 8);
+    rep->status("using %d bytes per marking, wasting %d bits per marking", byte_count, 8 - bit_count % 8);
 }
 
 bool BitStore::searchAndInsert(NetState &ns, void**)
@@ -57,15 +57,16 @@ bool BitStore::searchAndInsert(NetState &ns, void**)
 
         // iterate to the width of the marking according to the place capacity
         // see http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive
-        for (size_t i = 0; i < bitsNeeded(Place::Capacity[p]); ++i, ++bit_current, tokens >>= 1)
+        for (size_t i = 0; i < Place::CardBits[p]; ++i, ++bit_current, tokens >>= 1)
         {
-            if (bit_current % 8 == 0)
+            if (bit_current == 8)
             {
                 ++byte_current;
+                bit_current = 0;
             }
 
             // check if bit is set
-            m[byte_current] += ((tokens & 1) << (bit_current % 8));
+            m[byte_current] += uint8_t((tokens & 1) << bit_current);
         }
     }
 

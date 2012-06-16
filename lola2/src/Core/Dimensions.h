@@ -136,13 +136,9 @@ typedef enum
 /////////////
 // types used in SuffixTreeStore and in BinStore2
 typedef uint32_t vectordata_t;
-typedef uint32_t input_t;
 
 // maximum size (in bits) of a place
 #define PLACE_WIDTH (SIZEOF_CAPACITY_T * 8)
-
-// maximum size (in bits) of an input word
-#define INPUT_WIDTH (SIZEOF_INPUT_T * 8)
 
 // maximum size (in bits) of a vector item
 #define VECTOR_WIDTH (SIZEOF_VECTORDATA_T * 8)

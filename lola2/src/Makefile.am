@@ -69,9 +69,12 @@ lola_SOURCES = \
                 Stores/STLStore.cc Stores/STLStore.h \
                 Stores/ThreadSafeStore.cc Stores/ThreadSafeStore.h \
                 Stores/BinStore2.cc Stores/BinStore2.h \
-                Stores/BinStore3.cc Stores/BinStore3.h \
-                Stores/LengthCodedBinStore.cc Stores/LengthCodedBinStore.h \
-                Stores/SuffixTreeStore.cc Stores/SuffixTreeStore.h \
+                Stores/NetStateEncoder/BitEncoder.cc Stores/NetStateEncoder/BitEncoder.h \
+                Stores/NetStateEncoder/CopyEncoder.cc Stores/NetStateEncoder/CopyEncoder.h \
+                Stores/NetStateEncoder/SimpleCompressedEncoder.cc Stores/NetStateEncoder/SimpleCompressedEncoder.h \
+                Stores/VectorStores/STLStore.cc Stores/VectorStores/STLStore.h \
+                Stores/VectorStores/SuffixTreeStore.cc Stores/VectorStores/SuffixTreeStore.h \
+                Stores/PluginStore.cc Stores/PluginStore.h \
                 Stores/SIBinStore2.cc Stores/SIBinStore2.h
 
 ###

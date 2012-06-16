@@ -2,7 +2,7 @@
 \file SuffixTreeStore.cc
 \author Christian Koch
 \status new
-\brief abstract Store using binary suffix trees. Based on BinStore. Relies on the assumption that different input vectors (possibly of different length) are not prefix of another.
+\brief VectorStore implementation using binary suffix trees. Based on BinStore. Relies on the assumption that different input vectors (possibly of different length) are not prefix of another.
 */
 
 #include <cstdlib>
@@ -11,15 +11,12 @@
 #include <Net/Marking.h>
 #include <Net/Net.h>
 #include <Net/Place.h>
-#include <Stores/SuffixTreeStore.h>
+#include <Stores/VectorStores/SuffixTreeStore.h>
 
-class State;
 
 
 SuffixTreeStore::SuffixTreeStore()
 {
-    pthread_mutex_init(&inc_mutex, NULL);
-
     branch = (Decision**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
     firstvector = (vectordata_t**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
     rwlocks =(pthread_rwlock_t*) calloc(sizeof(pthread_rwlock_t), SIZEOF_MARKINGTABLE);
@@ -30,7 +27,6 @@ SuffixTreeStore::SuffixTreeStore()
 
 SuffixTreeStore::~SuffixTreeStore()
 {
-    pthread_mutex_destroy(&inc_mutex);
     for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
     {
         if (branch[i])
@@ -50,26 +46,6 @@ SuffixTreeStore::~SuffixTreeStore()
         pthread_rwlock_destroy(rwlocks+i);
     free(rwlocks);
 }
-
-/// search for a state in the suffix tree and insert it, if it is not present
-bool SuffixTreeStore::searchAndInsert(NetState& ns, void** s)
-{
-    pthread_mutex_lock(&inc_mutex);
-    ++calls;
-    pthread_mutex_unlock(&inc_mutex);
-
-    bitindex_t bitlen;
-    input_t* in = getInput(ns, bitlen);
-
-    bool ret = searchAndInsert(in,bitlen,ns.HashCurrent);
-    if(!ret) {
-        pthread_mutex_lock(&inc_mutex);
-        ++markings;
-        pthread_mutex_unlock(&inc_mutex);
-    }
-    return ret;
-}
-
 
 /// create a new branch in the decision tree at depth b.
 SuffixTreeStore::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL)
@@ -91,7 +67,7 @@ SuffixTreeStore::Decision::~Decision()
 }
 
 /// search for an input vector in the suffix tree and insert it, if it is not present
-bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t hash)
+bool SuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash)
 {
     /// If a new decision record is inserted, * anchor must point to it
     Decision** anchor;
@@ -103,17 +79,17 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
     index_t input_index = 0;
 
     /// the last input word to consider.
-    index_t max_input_index = (bitlen - 1) / INPUT_WIDTH;
+    index_t max_input_index = (bitlen - 1) / VECTOR_WIDTH;
 
     /// the number of significant bits in the last input word (aligned at msb)
-    index_t max_input_numbits = bitlen%INPUT_WIDTH;
-    if(!max_input_numbits) max_input_numbits = INPUT_WIDTH;
+    index_t max_input_numbits = bitlen%VECTOR_WIDTH;
+    if(!max_input_numbits) max_input_numbits = VECTOR_WIDTH;
 
     /// the bits of the current input word we have NOT dealt with so far
-    bitindex_t input_bitstogo = INPUT_WIDTH; // indicates start with msb
+    bitindex_t input_bitstogo = VECTOR_WIDTH; // indicates start with msb
 
     // pointer to the current input word
-    input_t* pInput = in;
+    const vectordata_t* pInput = in;
 
 
     /// the vector word we are currently investigating
@@ -147,12 +123,11 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
             // maximum number of vector words to consider. The actual vector (pVector) can be smaller, but in this case a difference is found before reaching the end anyway (see getInput rule 2).
             index_t vectorlen = ((bitlen - position) + (VECTOR_WIDTH - 1)) / VECTOR_WIDTH;
 
-// try to use more efficient implementation relying on input and vector using the same data type
-#if VECTOR_WIDTH == INPUT_WIDTH
+
             // test for good alignment
             if(input_bitstogo == vector_bitstogo) {
                 // good alignment, can use memcmp
-                if(!memcmp(pInput,pVector,vectorlen*sizeof(input_t))) {
+                if(!memcmp(pInput,pVector,vectorlen*sizeof(vectordata_t))) {
                     // match found, we're done
                     pthread_rwlock_unlock(rwlocks + hash);
                     return true;
@@ -167,16 +142,16 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
             }
             else // bad alignment; input_bitstogo < vector_bitstogo, since vector_bitstogo is always VECTOR_WIDTH at this point
             {
-                while(true) { // vector_bitstogo == VECTOR_WIDTH == INPUT_WIDTH
+                while(true) { // vector_bitstogo == VECTOR_WIDTH == VECTOR_WIDTH
                     // compare remaining input bits with msb bits of current vector
-                    if ((input_t(*pInput << (INPUT_WIDTH - input_bitstogo)))
+                    if ((vectordata_t(*pInput << (VECTOR_WIDTH - input_bitstogo)))
                             ==
                             (vectordata_t((*pVector >> (VECTOR_WIDTH - input_bitstogo)) << (VECTOR_WIDTH - input_bitstogo))))
                     {
                         // they're equal, input word done. Test for EOI
                         if(++input_index <= max_input_index) {
                             // compare msb of next input word with the remaining bits of the current vector word
-                            if ((input_t(*(++pInput) >> input_bitstogo) << input_bitstogo)
+                            if ((vectordata_t(*(++pInput) >> input_bitstogo) << input_bitstogo)
                                     ==
                                     (vectordata_t(*pVector << input_bitstogo)))
                             {
@@ -193,7 +168,7 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
                             {
                                 // difference found. Update bitstogo variables and setup binary search for differing bit
                                 vector_bitstogo -= input_bitstogo;
-                                input_bitstogo = INPUT_WIDTH;
+                                input_bitstogo = VECTOR_WIDTH;
                                 comparebits = vector_bitstogo >> 1;
                                 break;
                             }
@@ -211,76 +186,11 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
                 }
             }
 
-// otherwise use default implementation
-#else
-            while (true)
-            {
-                if (input_bitstogo < vector_bitstogo)
-                {
-                    if ((input_t(*pInput << (INPUT_WIDTH - input_bitstogo)) >> (INPUT_WIDTH - input_bitstogo))
-                            ==
-                            (vectordata_t(*pVector << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - input_bitstogo)))
-                    {
-                        if(++input_index > max_input_index) {
-                            pthread_rwlock_unlock(rwlocks + hash);
-                            return true;
-                        }
-                        ++pInput;
-                        vector_bitstogo -= input_bitstogo;
-                        input_bitstogo = INPUT_WIDTH;
-                    }
-                    else
-                    {
-                        comparebits = input_bitstogo >> 1;
-                        break;
-                    }
-                }
-                else if (input_bitstogo > vector_bitstogo)
-                {
-                    if ((input_t(*pInput << (INPUT_WIDTH - input_bitstogo)) >> (INPUT_WIDTH - vector_bitstogo))
-                            ==
-                            (vectordata_t(*pVector << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
-                    {
-                        if(!(--vectorlen)) {
-                            pthread_rwlock_unlock(rwlocks + hash);
-                            return true;
-                        }
-                        input_bitstogo -= vector_bitstogo;
-                        position+=VECTOR_WIDTH, pVector++, vector_bitstogo = VECTOR_WIDTH;
-                    }
-                    else
-                    {
-                        comparebits = vector_bitstogo >> 1;
-                        break;
-                    }
-                }
-                else
-                {
-                    if ((input_t(*pInput << (INPUT_WIDTH - input_bitstogo)) >> (INPUT_WIDTH - input_bitstogo))
-                            ==
-                            (vectordata_t(*pVector << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo)))
-                    {
-                        if(!(--vectorlen)) {
-                            pthread_rwlock_unlock(rwlocks + hash);
-                            return true;
-                        }
-                        position+=VECTOR_WIDTH, pVector++, vector_bitstogo = VECTOR_WIDTH;
-                        input_index++, ++pInput;
-                        input_bitstogo = INPUT_WIDTH;
-                    }
-                    else
-                    {
-                        comparebits = input_bitstogo >> 1;
-                        break;
-                    }
-                }
-            }
-#endif
             // difference was found in current input and vector words. locate the first differing bit using binary search.
             while (comparebits)
             {
                 // test if next <comparebits> bits of input and vector are equal
-                if ((input_t(*pInput << (INPUT_WIDTH - input_bitstogo)) >> (INPUT_WIDTH - comparebits))
+                if ((vectordata_t(*pInput << (VECTOR_WIDTH - input_bitstogo)) >> (VECTOR_WIDTH - comparebits))
                         ==
                         (vectordata_t(*pVector << (VECTOR_WIDTH - vector_bitstogo)) >> (VECTOR_WIDTH - comparebits)))
                 {
@@ -320,13 +230,13 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
 
                 // skip the differing bit. We don't need to store it since its value is determined by the old vector and the branch position.
                 input_bitstogo--;
-                if(input_index == max_input_index && input_bitstogo + max_input_numbits <= INPUT_WIDTH) {
+                if(input_index == max_input_index && input_bitstogo + max_input_numbits <= VECTOR_WIDTH) {
                     pthread_rwlock_unlock(rwlocks + hash);
                     return true;
                 }
                 if (!input_bitstogo)
                 {
-                    input_index++, ++pInput, input_bitstogo = INPUT_WIDTH;
+                    input_index++, ++pInput, input_bitstogo = VECTOR_WIDTH;
                 }
             }
             else
@@ -347,13 +257,13 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
         vector_bitstogo = VECTOR_WIDTH;
 
         input_bitstogo--;
-        if(input_index == max_input_index && input_bitstogo + max_input_numbits == INPUT_WIDTH) {
+        if(input_index == max_input_index && input_bitstogo + max_input_numbits == VECTOR_WIDTH) {
             pthread_rwlock_unlock(rwlocks + hash);
             return false;
         }
         if (!input_bitstogo)
         {
-            input_index++, ++pInput, input_bitstogo = INPUT_WIDTH;
+            input_index++, ++pInput, input_bitstogo = VECTOR_WIDTH;
         }
     }
 
@@ -363,10 +273,9 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
     *newvector = (vectordata_t*) calloc(newvectorlen, sizeof(vectordata_t));
     pVector = *newvector;
 
-    // again more efficient implementation
-#if INPUT_WIDTH == VECTOR_WIDTH
+
     // test for good alignment
-    if(input_bitstogo == INPUT_WIDTH)
+    if(input_bitstogo == VECTOR_WIDTH)
     {
         // good alignment, use memcpy
         memcpy(pVector,pInput,newvectorlen*sizeof(vectordata_t));
@@ -375,40 +284,14 @@ bool SuffixTreeStore::searchAndInsert(input_t* in, bitindex_t bitlen, hash_t has
     } else {
         // bad alignment, copy contents manually
         while(newvectorlen--) {
-            *pVector |= input_t(*pInput << (INPUT_WIDTH - input_bitstogo));
+            *pVector |= vectordata_t(*pInput << (VECTOR_WIDTH - input_bitstogo));
             pInput++;
             if(++input_index > max_input_index)
             	break;
-            *pVector |= input_t(*pInput >> input_bitstogo);
+            *pVector |= vectordata_t(*pInput >> input_bitstogo);
             pVector++;
         }
         pthread_rwlock_unlock(rwlocks + hash);
         return false;
     }
-// default implementation
-#else
-    while (newvectorlen && input_index <= max_input_index)
-    {
-#if INPUT_WIDTH >= VECTOR_WIDTH
-        *pVector |= vectordata_t((input_t(*pInput << (INPUT_WIDTH - input_bitstogo)) >> (INPUT_WIDTH - vector_bitstogo)));
-#else
-        *pVector |= vectordata_t(vectordata_t(*pInput) << (VECTOR_WIDTH - input_bitstogo)) >> (VECTOR_WIDTH - vector_bitstogo);
-#endif
-        if(input_bitstogo < vector_bitstogo) {
-            vector_bitstogo -= input_bitstogo;
-            input_index++, pInput++;
-            input_bitstogo = INPUT_WIDTH;
-        } else if(input_bitstogo > vector_bitstogo) {
-            input_bitstogo -= vector_bitstogo;
-            ++pVector, --newvectorlen;
-            vector_bitstogo = VECTOR_WIDTH;
-        } else {
-            input_index++, pInput++;
-            input_bitstogo = INPUT_WIDTH;
-            ++pVector, --newvectorlen;
-            vector_bitstogo = VECTOR_WIDTH;
-        }
-
-    }
-#endif
 }

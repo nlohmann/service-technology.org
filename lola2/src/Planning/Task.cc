@@ -31,8 +31,12 @@
 
 #include <Stores/BinStore.h>
 #include <Stores/BinStore2.h>
-#include <Stores/BinStore3.h>
-#include <Stores/LengthCodedBinStore.h>
+#include <Stores/NetStateEncoder/BitEncoder.h>
+#include <Stores/NetStateEncoder/CopyEncoder.h>
+#include <Stores/NetStateEncoder/SimpleCompressedEncoder.h>
+#include <Stores/VectorStores/SuffixTreeStore.h>
+#include <Stores/VectorStores/STLStore.h>
+#include <Stores/PluginStore.h>
 #include <Stores/BitStore.h>
 #include <Stores/BloomStore.h>
 #include <Stores/EmptyStore.h>
@@ -223,11 +227,23 @@ void Task::setStore()
             case store_arg_bin2:
                 s = new BinStore2();
                 break;
-            case store_arg_bin3:
-                s = new BinStore3();
+            case store_arg_psbbin:
+                s = new PluginStore(new BitEncoder(number_of_threads),new SuffixTreeStore());
                 break;
-            case store_arg_lcbin:
-                s = new LengthCodedBinStore();
+            case store_arg_pscbin:
+                s = new PluginStore(new CopyEncoder(number_of_threads),new SuffixTreeStore());
+                break;
+            case store_arg_pssbin:
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads),new SuffixTreeStore());
+                break;
+            case store_arg_psbstl:
+                s = new PluginStore(new BitEncoder(number_of_threads),new VSTLStore());
+                break;
+            case store_arg_pscstl:
+                s = new PluginStore(new CopyEncoder(number_of_threads),new VSTLStore());
+                break;
+            case store_arg_pssstl:
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads),new VSTLStore());
                 break;
             case store_arg_tsbin2:
                 s = new ThreadSafeStore(new SIBinStore2(number_of_threads), number_of_threads);

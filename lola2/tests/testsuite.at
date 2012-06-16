@@ -581,7 +581,7 @@ AT_CLEANUP
 AT_BANNER([Stores])
 ############################################################################
 
-AT_SETUP([Binary (bit)])
+AT_SETUP([Binary (bit) (1/2)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=bin -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -589,7 +589,15 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Binary (word)])
+AT_SETUP([Binary (bit) (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=bin -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Binary (word) (1/2)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=bin2 -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -597,15 +605,15 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Binary (generic, word)])
-AT_CHECK([cp TESTFILES/phils5.lola .])
-AT_CHECK([LOLA phils5.lola --check=full --store=bin3 -v],0,stdout,stderr)
+AT_SETUP([Binary (word) (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=bin2 -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
-AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Binary (word, thread safe)])
+AT_SETUP([Binary (word, thread safe) (1/2)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=tsbin2 -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -613,7 +621,15 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Bloom (2 hash functions)])
+AT_SETUP([Binary (word, thread safe) (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=tsbin2 -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Bloom (2 hash functions) (1/2)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=bloom --hashfunctions=2 -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -621,7 +637,15 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Bloom (3 hash functions)])
+AT_SETUP([Bloom (2 hash functions) (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=bloom --hashfunctions=2 -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Bloom (3 hash functions) (1/2)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=bloom --hashfunctions=3 -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -629,7 +653,15 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([STL])
+AT_SETUP([Bloom (3 hash functions) (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=bloom --hashfunctions=3 -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([STL (1/2)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=stl -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -637,11 +669,123 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Bit])
+AT_SETUP([STL (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=stl -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Bit (1/2)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=bit -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Bit (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Bit+Suffix (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=psbbin -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Bit+Suffix (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=psbbin -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Bit+STL (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=psbstl -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Bit+STL (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=psbstl -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Copy+Suffix (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=pscbin -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Copy+Suffix (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=pscbin -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Copy+STL (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=pscstl -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Copy+STL (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=pscstl -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: SimpleCompress+Suffix (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=pssbin -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: SimpleCompress+Suffix (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=pssbin -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: SimpleCompress+STL (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=pssstl -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: SimpleCompress+STL (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=pssstl -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 

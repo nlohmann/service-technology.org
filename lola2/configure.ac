@@ -79,8 +79,6 @@ AC_CHECK_SIZEOF(hash_t,, [#define _CONFIGURING
 #include "$srcdir/src/Core/Dimensions.h"])
 AC_CHECK_SIZEOF(fairnessAssumption_t,, [#define _CONFIGURING
 #include "$srcdir/src/Parser/FairnessAssumptions.h"])
-AC_CHECK_SIZEOF(input_t,, [#define _CONFIGURING
-#include "$srcdir/src/Core/Dimensions.h"])
 AC_CHECK_SIZEOF(vectordata_t,, [#define _CONFIGURING
 #include "$srcdir/src/Core/Dimensions.h"])
 AC_CHECK_SIZEOF(sockaddr_in,, [#include <sys/types.h>

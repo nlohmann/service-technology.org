@@ -2,7 +2,7 @@
 \file SimpleCompressedEncoder.cc
 \author Christian Koch
 \status new
-\brief NetStateEncoder implementation encoding each marking according to its length (in bits). A marking of length n will need 2*n bits of space.
+\brief NetStateEncoder implementation encoding each marking according to it's length (in bits). Furthermore it uses as few as possible bits in the sense that the encodings are tight. So, for example, 2 is encoded as "0100" instead of "0110" and 6 is encoded as "001000" instead of "001110".
 */
 
 #include <cstdlib>
@@ -22,6 +22,11 @@ SimpleCompressedEncoder::SimpleCompressedEncoder(int numThreads) : PluginStore::
     for(int i=0;i<numThreads;i++)
     {
     	inputs[i] = (vectordata_t*) malloc(insize);
+    }
+    //The smallest number that can't be stored with n bits, using thight encoding, is 2^(n+1) - 2.
+    numElems[0] = 0;
+    for(int i = 1; i < 32; i++){
+    	numElems[i] = 2*(numElems[i-1]+2)-2;
     }
 }
 
@@ -64,14 +69,18 @@ vectordata_t* SimpleCompressedEncoder::encodeNetState(NetState& ns, bitindex_t& 
     memset(pCurThreadInput,0,insize);
 
     for(index_t place_index = 0; place_index < Place::CardSignificant; place_index++) {
-    	int marking_length = 0;
     	capacity_t curMarking = ns.Current[place_index];
-    	do {
-    		curMarking >>= 1, marking_length++;
-    	} while(curMarking);
-    	addToInput(1,marking_length,pInput,input_bitstogo);
-    	addToInput(ns.Current[place_index],marking_length,pInput,input_bitstogo);
-    	bitlen += 2*marking_length;
+
+    	//Calculating correct number of needed bits and a subtrahend
+    	int place_length = 0;
+    	while(numElems[place_length] < curMarking) place_length++;
+   		if(numElems[place_length] > curMarking) place_length--;
+   		curMarking -= numElems[place_length];
+    	place_length++;
+
+    	addToInput(1,place_length,pInput,input_bitstogo);
+    	addToInput(ns.Current[place_index],place_length,pInput,input_bitstogo);
+    	bitlen += 2*place_length;
     }
     return pCurThreadInput;
 }

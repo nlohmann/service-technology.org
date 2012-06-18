@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmdline.h>
+#include <Core/Dimensions.h>
 
 class StatePredicate;
 class SimpleProperty;

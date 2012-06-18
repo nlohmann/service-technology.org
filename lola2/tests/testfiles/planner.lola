@@ -1,0 +1,1228 @@
+PLACE
+	BeamerUsed,
+	CanvasUsed.VD1,
+	CanvasUsed.VD2,
+	CanvasUsed.LW1,
+	CanvasUsed.LW2,
+	CanvasUsed.LW3,
+	CanvasUsed.LW4,
+	CanvasUsed.LW5,
+	CanvasUsed.LW6,
+	BeamerNotUsed,
+	DisplayUsed.EPS1,
+	DisplayUsed.EPS3,
+	DisplayUsed.EPS6,
+	DisplayUsed.EPS8,
+	CanvasNotUsed.VD1,
+	CanvasNotUsed.VD2,
+	CanvasNotUsed.LW1,
+	CanvasNotUsed.LW2,
+	CanvasNotUsed.LW3,
+	CanvasNotUsed.LW4,
+	CanvasNotUsed.LW5,
+	CanvasNotUsed.LW6,
+	Present.<Doc1|TRUE>,
+	Present.<Doc2|TRUE>,
+	Sent2Disp.<NEC-MT1065|Doc2|FALSE>,
+	Sent2Disp.<NEC-MT1065|Doc1|FALSE>,
+	LightOn.<Lamp1|TRUE>,
+	LightOn.<Lamp2|TRUE>,
+	LightOn.<Lamp3|TRUE>,
+	LightOn.<Lamp4|TRUE>,
+	LightOn.<Lamp5|TRUE>,
+	LightOn.<Lamp6|TRUE>,
+	DisplayNotUsed.EPS1,
+	DisplayNotUsed.EPS3,
+	DisplayNotUsed.EPS6,
+	DisplayNotUsed.EPS8,
+	LightOn.<Lamp1|FALSE>,
+	LightOn.<Lamp2|FALSE>,
+	LightOn.<Lamp3|FALSE>,
+	LightOn.<Lamp4|FALSE>,
+	LightOn.<Lamp5|FALSE>,
+	LightOn.<Lamp6|FALSE>,
+	DisplayUsed.NEC-MT1065,
+	CanvasDown.<VD1|TRUE>,
+	CanvasDown.<VD2|TRUE>,
+	CanvasDown.<LW1|TRUE>,
+	CanvasDown.<LW2|TRUE>,
+	CanvasDown.<LW3|TRUE>,
+	CanvasDown.<LW4|TRUE>,
+	CanvasDown.<LW5|TRUE>,
+	CanvasDown.<LW6|TRUE>,
+	CanvasDown.<VD1|FALSE>,
+	CanvasDown.<VD2|FALSE>,
+	CanvasDown.<LW1|FALSE>,
+	CanvasDown.<LW2|FALSE>,
+	CanvasDown.<LW3|FALSE>,
+	CanvasDown.<LW4|FALSE>,
+	CanvasDown.<LW5|FALSE>,
+	CanvasDown.<LW6|FALSE>,
+	Sent2Disp.<NEC-MT1065|Doc2|TRUE>,
+	Sent2Disp.<NEC-MT1065|Doc1|TRUE>,
+	Pointing.<LW6|NEC-MT1065|FALSE>,
+	Pointing.<LW5|NEC-MT1065|FALSE>,
+	Pointing.<LW4|NEC-MT1065|FALSE>,
+	Pointing.<LW3|NEC-MT1065|FALSE>,
+	Pointing.<LW2|NEC-MT1065|FALSE>,
+	Pointing.<LW1|NEC-MT1065|FALSE>,
+	Pointing.<VD2|NEC-MT1065|FALSE>,
+	Pointing.<VD1|NEC-MT1065|FALSE>,
+	Pointing.<LW6|NEC-MT1065|TRUE>,
+	Pointing.<LW5|NEC-MT1065|TRUE>,
+	DocShown.<Doc1|VD1|TRUE>,
+	Pointing.<LW4|NEC-MT1065|TRUE>,
+	Pointing.<LW3|NEC-MT1065|TRUE>,
+	DocShown.<Doc2|VD1|TRUE>,
+	DocShown.<Doc1|VD2|TRUE>,
+	Pointing.<LW2|NEC-MT1065|TRUE>,
+	Pointing.<LW1|NEC-MT1065|TRUE>,
+	DocShown.<Doc2|VD2|TRUE>,
+	Pointing.<VD2|NEC-MT1065|TRUE>,
+	Pointing.<VD1|NEC-MT1065|TRUE>,
+	Sent2Disp.<EPS8|Doc2|FALSE>,
+	Sent2Disp.<EPS8|Doc1|FALSE>,
+	Sent2Disp.<EPS6|Doc2|FALSE>,
+	Sent2Disp.<EPS6|Doc1|FALSE>,
+	Sent2Disp.<EPS3|Doc2|FALSE>,
+	Sent2Disp.<EPS3|Doc1|FALSE>,
+	Sent2Disp.<EPS1|Doc2|FALSE>,
+	Sent2Disp.<EPS1|Doc1|FALSE>,
+	Sent2Disp.<EPS8|Doc2|TRUE>,
+	Sent2Disp.<EPS8|Doc1|TRUE>,
+	Sent2Disp.<EPS6|Doc2|TRUE>,
+	Sent2Disp.<EPS6|Doc1|TRUE>,
+	Sent2Disp.<EPS3|Doc2|TRUE>,
+	DocShown.<Doc1|LW1|TRUE>,
+	Sent2Disp.<EPS3|Doc1|TRUE>,
+	DocShown.<Doc2|LW1|TRUE>,
+	DocShown.<Doc1|LW2|TRUE>,
+	DocShown.<Doc2|LW2|TRUE>,
+	DocShown.<Doc1|LW3|TRUE>,
+	DocShown.<Doc2|LW3|TRUE>,
+	DocShown.<Doc1|LW4|TRUE>,
+	DocShown.<Doc2|LW4|TRUE>,
+	DocShown.<Doc1|LW5|TRUE>,
+	DocShown.<Doc2|LW5|TRUE>,
+	DocShown.<Doc1|LW6|TRUE>,
+	DocShown.<Doc2|LW6|TRUE>,
+	DisplayNotUsed.NEC-MT1065,
+	Sent2Disp.<EPS1|Doc2|TRUE>,
+	Sent2Disp.<EPS1|Doc1|TRUE>,
+	DocShown.<Doc2|LW6|FALSE>,
+	DocShown.<Doc1|LW6|FALSE>,
+	DocShown.<Doc2|LW5|FALSE>,
+	DocShown.<Doc1|LW5|FALSE>,
+	DocShown.<Doc2|LW4|FALSE>,
+	DocShown.<Doc1|LW4|FALSE>,
+	DocShown.<Doc2|LW3|FALSE>,
+	DocShown.<Doc1|LW3|FALSE>,
+	DocShown.<Doc2|LW2|FALSE>,
+	DocShown.<Doc1|LW2|FALSE>,
+	DocShown.<Doc1|VD1|FALSE>,
+	DocShown.<Doc2|LW1|FALSE>,
+	DocShown.<Doc1|LW1|FALSE>,
+	DocShown.<Doc2|VD1|FALSE>,
+	DocShown.<Doc1|VD2|FALSE>,
+	DocShown.<Doc2|VD2|FALSE>;
+MARKING
+	BeamerNotUsed : 1,
+	CanvasNotUsed.VD1 : 1,
+	CanvasNotUsed.VD2 : 1,
+	CanvasNotUsed.LW1 : 1,
+	CanvasNotUsed.LW2 : 1,
+	CanvasNotUsed.LW3 : 1,
+	CanvasNotUsed.LW4 : 1,
+	CanvasNotUsed.LW5 : 1,
+	CanvasNotUsed.LW6 : 1,
+	Present.<Doc1|TRUE> : 1,
+	Present.<Doc2|TRUE> : 1,
+	Sent2Disp.<NEC-MT1065|Doc2|FALSE> : 1,
+	Sent2Disp.<NEC-MT1065|Doc1|FALSE> : 1,
+	DisplayNotUsed.EPS1 : 1,
+	DisplayNotUsed.EPS3 : 1,
+	DisplayNotUsed.EPS6 : 1,
+	DisplayNotUsed.EPS8 : 1,
+	LightOn.<Lamp1|FALSE> : 1,
+	LightOn.<Lamp2|FALSE> : 1,
+	LightOn.<Lamp3|FALSE> : 1,
+	LightOn.<Lamp4|FALSE> : 1,
+	LightOn.<Lamp5|FALSE> : 1,
+	LightOn.<Lamp6|FALSE> : 1,
+	CanvasDown.<VD1|FALSE> : 1,
+	CanvasDown.<VD2|FALSE> : 1,
+	CanvasDown.<LW1|FALSE> : 1,
+	CanvasDown.<LW2|FALSE> : 1,
+	CanvasDown.<LW3|FALSE> : 1,
+	CanvasDown.<LW4|FALSE> : 1,
+	CanvasDown.<LW5|FALSE> : 1,
+	CanvasDown.<LW6|FALSE> : 1,
+	Pointing.<LW6|NEC-MT1065|FALSE> : 1,
+	Pointing.<LW4|NEC-MT1065|FALSE> : 1,
+	Pointing.<LW3|NEC-MT1065|FALSE> : 1,
+	Pointing.<LW2|NEC-MT1065|FALSE> : 1,
+	Pointing.<LW1|NEC-MT1065|FALSE> : 1,
+	Pointing.<VD2|NEC-MT1065|FALSE> : 1,
+	Pointing.<VD1|NEC-MT1065|FALSE> : 1,
+	Pointing.<LW5|NEC-MT1065|TRUE> : 1,
+	Sent2Disp.<EPS8|Doc2|FALSE> : 1,
+	Sent2Disp.<EPS8|Doc1|FALSE> : 1,
+	Sent2Disp.<EPS6|Doc2|FALSE> : 1,
+	Sent2Disp.<EPS6|Doc1|FALSE> : 1,
+	Sent2Disp.<EPS3|Doc2|FALSE> : 1,
+	Sent2Disp.<EPS3|Doc1|FALSE> : 1,
+	Sent2Disp.<EPS1|Doc2|FALSE> : 1,
+	Sent2Disp.<EPS1|Doc1|FALSE> : 1,
+	DisplayNotUsed.NEC-MT1065 : 1,
+	DocShown.<Doc2|LW6|FALSE> : 1,
+	DocShown.<Doc1|LW6|FALSE> : 1,
+	DocShown.<Doc2|LW5|FALSE> : 1,
+	DocShown.<Doc1|LW5|FALSE> : 1,
+	DocShown.<Doc2|LW4|FALSE> : 1,
+	DocShown.<Doc1|LW4|FALSE> : 1,
+	DocShown.<Doc2|LW3|FALSE> : 1,
+	DocShown.<Doc1|LW3|FALSE> : 1,
+	DocShown.<Doc2|LW2|FALSE> : 1,
+	DocShown.<Doc1|LW2|FALSE> : 1,
+	DocShown.<Doc1|VD1|FALSE> : 1,
+	DocShown.<Doc2|LW1|FALSE> : 1,
+	DocShown.<Doc1|LW1|FALSE> : 1,
+	DocShown.<Doc2|VD1|FALSE> : 1,
+	DocShown.<Doc1|VD2|FALSE> : 1,
+	DocShown.<Doc2|VD2|FALSE> : 1;
+TRANSITION cm7.[c=VD1]
+	CONSUME
+		CanvasDown.<VD1|TRUE> : 1;
+	PRODUCE
+		CanvasDown.<VD1|FALSE> : 1;
+TRANSITION cm8.[c=VD2]
+	CONSUME
+		CanvasDown.<VD2|TRUE> : 1;
+	PRODUCE
+		CanvasDown.<VD2|FALSE> : 1;
+TRANSITION cm9.[c=LW1]
+	CONSUME
+		CanvasDown.<LW1|TRUE> : 1;
+	PRODUCE
+		CanvasDown.<LW1|FALSE> : 1;
+TRANSITION cm15.[c=VD1]
+	CONSUME
+		CanvasDown.<VD1|FALSE> : 1;
+	PRODUCE
+		CanvasDown.<VD1|TRUE> : 1;
+TRANSITION cm16.[c=VD2]
+	CONSUME
+		CanvasDown.<VD2|FALSE> : 1;
+	PRODUCE
+		CanvasDown.<VD2|TRUE> : 1;
+TRANSITION cm10.[c=LW2]
+	CONSUME
+		CanvasDown.<LW2|TRUE> : 1;
+	PRODUCE
+		CanvasDown.<LW2|FALSE> : 1;
+TRANSITION cm11.[c=LW3]
+	CONSUME
+		CanvasDown.<LW3|TRUE> : 1;
+	PRODUCE
+		CanvasDown.<LW3|FALSE> : 1;
+TRANSITION cm20.[c=LW4]
+	CONSUME
+		CanvasDown.<LW4|FALSE> : 1;
+	PRODUCE
+		CanvasDown.<LW4|TRUE> : 1;
+TRANSITION cm12.[c=LW4]
+	CONSUME
+		CanvasDown.<LW4|TRUE> : 1;
+	PRODUCE
+		CanvasDown.<LW4|FALSE> : 1;
+TRANSITION cm21.[c=LW5]
+	CONSUME
+		CanvasDown.<LW5|FALSE> : 1;
+	PRODUCE
+		CanvasDown.<LW5|TRUE> : 1;
+TRANSITION cm17.[c=LW1]
+	CONSUME
+		CanvasDown.<LW1|FALSE> : 1;
+	PRODUCE
+		CanvasDown.<LW1|TRUE> : 1;
+TRANSITION cm13.[c=LW5]
+	CONSUME
+		CanvasDown.<LW5|TRUE> : 1;
+	PRODUCE
+		CanvasDown.<LW5|FALSE> : 1;
+TRANSITION cm22.[c=LW6]
+	CONSUME
+		CanvasDown.<LW6|FALSE> : 1;
+	PRODUCE
+		CanvasDown.<LW6|TRUE> : 1;
+TRANSITION cm18.[c=LW2]
+	CONSUME
+		CanvasDown.<LW2|FALSE> : 1;
+	PRODUCE
+		CanvasDown.<LW2|TRUE> : 1;
+TRANSITION cm14.[c=LW6]
+	CONSUME
+		CanvasDown.<LW6|TRUE> : 1;
+	PRODUCE
+		CanvasDown.<LW6|FALSE> : 1;
+TRANSITION cm19.[c=LW3]
+	CONSUME
+		CanvasDown.<LW3|FALSE> : 1;
+	PRODUCE
+		CanvasDown.<LW3|TRUE> : 1;
+TRANSITION cm30.[l=Lamp2]
+	CONSUME
+		LightOn.<Lamp2|TRUE> : 1;
+	PRODUCE
+		LightOn.<Lamp2|FALSE> : 1;
+TRANSITION cm23.[l=Lamp1]
+	CONSUME
+		LightOn.<Lamp1|FALSE> : 1;
+	PRODUCE
+		LightOn.<Lamp1|TRUE> : 1;
+TRANSITION cm31.[l=Lamp3]
+	CONSUME
+		LightOn.<Lamp3|TRUE> : 1;
+	PRODUCE
+		LightOn.<Lamp3|FALSE> : 1;
+TRANSITION cm24.[l=Lamp2]
+	CONSUME
+		LightOn.<Lamp2|FALSE> : 1;
+	PRODUCE
+		LightOn.<Lamp2|TRUE> : 1;
+TRANSITION cm32.[l=Lamp4]
+	CONSUME
+		LightOn.<Lamp4|TRUE> : 1;
+	PRODUCE
+		LightOn.<Lamp4|FALSE> : 1;
+TRANSITION cm25.[l=Lamp3]
+	CONSUME
+		LightOn.<Lamp3|FALSE> : 1;
+	PRODUCE
+		LightOn.<Lamp3|TRUE> : 1;
+TRANSITION cm33.[l=Lamp5]
+	CONSUME
+		LightOn.<Lamp5|TRUE> : 1;
+	PRODUCE
+		LightOn.<Lamp5|FALSE> : 1;
+TRANSITION cm29.[l=Lamp1]
+	CONSUME
+		LightOn.<Lamp1|TRUE> : 1;
+	PRODUCE
+		LightOn.<Lamp1|FALSE> : 1;
+TRANSITION cm26.[l=Lamp4]
+	CONSUME
+		LightOn.<Lamp4|FALSE> : 1;
+	PRODUCE
+		LightOn.<Lamp4|TRUE> : 1;
+TRANSITION cm34.[l=Lamp6]
+	CONSUME
+		LightOn.<Lamp6|TRUE> : 1;
+	PRODUCE
+		LightOn.<Lamp6|FALSE> : 1;
+TRANSITION cm27.[l=Lamp5]
+	CONSUME
+		LightOn.<Lamp5|FALSE> : 1;
+	PRODUCE
+		LightOn.<Lamp5|TRUE> : 1;
+TRANSITION cm28.[l=Lamp6]
+	CONSUME
+		LightOn.<Lamp6|FALSE> : 1;
+	PRODUCE
+		LightOn.<Lamp6|TRUE> : 1;
+TRANSITION cm42.[c=VD1|Document_1=Doc1]
+	CONSUME
+		DocShown.<Doc1|VD1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|VD1|FALSE> : 1;
+TRANSITION cm42.[c=VD1|Document_1=Doc2]
+	CONSUME
+		DocShown.<Doc2|VD1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|VD1|FALSE> : 1;
+TRANSITION cm43.[c=VD2|Document_1=Doc1]
+	CONSUME
+		DocShown.<Doc1|VD2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|VD2|FALSE> : 1;
+TRANSITION cm43.[c=VD2|Document_1=Doc2]
+	CONSUME
+		DocShown.<Doc2|VD2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|VD2|FALSE> : 1;
+TRANSITION cm40.[c=LW5|Document_1=Doc1]
+	CONSUME
+		DocShown.<Doc1|LW5|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW5|FALSE> : 1;
+TRANSITION cm40.[c=LW5|Document_1=Doc2]
+	CONSUME
+		DocShown.<Doc2|LW5|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW5|FALSE> : 1;
+TRANSITION cm36.[c=LW1|Document_1=Doc1]
+	CONSUME
+		DocShown.<Doc1|LW1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW1|FALSE> : 1;
+TRANSITION cm41.[c=LW6|Document_1=Doc1]
+	CONSUME
+		DocShown.<Doc1|LW6|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW6|FALSE> : 1;
+TRANSITION cm36.[c=LW1|Document_1=Doc2]
+	CONSUME
+		DocShown.<Doc2|LW1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW1|FALSE> : 1;
+TRANSITION cm41.[c=LW6|Document_1=Doc2]
+	CONSUME
+		DocShown.<Doc2|LW6|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW6|FALSE> : 1;
+TRANSITION cm37.[c=LW2|Document_1=Doc1]
+	CONSUME
+		DocShown.<Doc1|LW2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW2|FALSE> : 1;
+TRANSITION cm37.[c=LW2|Document_1=Doc2]
+	CONSUME
+		DocShown.<Doc2|LW2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW2|FALSE> : 1;
+TRANSITION cm38.[c=LW3|Document_1=Doc1]
+	CONSUME
+		DocShown.<Doc1|LW3|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW3|FALSE> : 1;
+TRANSITION cm38.[c=LW3|Document_1=Doc2]
+	CONSUME
+		DocShown.<Doc2|LW3|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW3|FALSE> : 1;
+TRANSITION cm39.[c=LW4|Document_1=Doc1]
+	CONSUME
+		DocShown.<Doc1|LW4|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW4|FALSE> : 1;
+TRANSITION cm39.[c=LW4|Document_1=Doc2]
+	CONSUME
+		DocShown.<Doc2|LW4|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW4|FALSE> : 1;
+TRANSITION cm35_on.[Surface_1=VD1|d=NEC-MT1065]
+	CONSUME
+		Pointing.<VD1|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+	PRODUCE
+		Pointing.<VD1|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+TRANSITION cm35_on.[Surface_1=VD2|d=NEC-MT1065]
+	CONSUME
+		Pointing.<VD2|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+	PRODUCE
+		Pointing.<VD2|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+TRANSITION cm35_on.[Surface_1=LW1|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW1|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+	PRODUCE
+		Pointing.<LW1|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+TRANSITION cm35_on.[Surface_1=LW2|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW2|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+	PRODUCE
+		Pointing.<LW2|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+TRANSITION cm35_on.[Surface_1=LW3|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW3|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+	PRODUCE
+		Pointing.<LW3|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+TRANSITION cm35_on.[Surface_1=LW4|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW4|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+	PRODUCE
+		Pointing.<LW4|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+TRANSITION cm35_on.[Surface_1=LW5|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW5|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+	PRODUCE
+		Pointing.<LW5|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+TRANSITION cm35_on.[Surface_1=LW6|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW6|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+	PRODUCE
+		Pointing.<LW6|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+TRANSITION cm35_off.[Surface_1=VD1|d=NEC-MT1065]
+	CONSUME
+		Pointing.<VD1|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+	PRODUCE
+		Pointing.<VD1|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+TRANSITION cm35_off.[Surface_1=VD2|d=NEC-MT1065]
+	CONSUME
+		Pointing.<VD2|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+	PRODUCE
+		Pointing.<VD2|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+TRANSITION cm35_off.[Surface_1=LW1|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW1|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+	PRODUCE
+		Pointing.<LW1|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+TRANSITION cm35_off.[Surface_1=LW2|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW2|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+	PRODUCE
+		Pointing.<LW2|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+TRANSITION cm35_off.[Surface_1=LW3|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW3|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+	PRODUCE
+		Pointing.<LW3|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+TRANSITION cm35_off.[Surface_1=LW4|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW4|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+	PRODUCE
+		Pointing.<LW4|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+TRANSITION cm35_off.[Surface_1=LW5|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW5|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+	PRODUCE
+		Pointing.<LW5|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+TRANSITION cm35_off.[Surface_1=LW6|d=NEC-MT1065]
+	CONSUME
+		Pointing.<LW6|NEC-MT1065|TRUE> : 1,
+		BeamerUsed : 1;
+	PRODUCE
+		Pointing.<LW6|NEC-MT1065|FALSE> : 1,
+		BeamerNotUsed : 1;
+TRANSITION cm2_show.[c=LW1|d=EPS1|Document_1=Doc1]
+	CONSUME
+		CanvasNotUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<EPS1|Doc1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW1|TRUE> : 1,
+		CanvasUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<EPS1|Doc1|TRUE> : 1;
+TRANSITION cm2_show.[c=LW1|d=EPS1|Document_1=Doc2]
+	CONSUME
+		CanvasNotUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<EPS1|Doc2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW1|TRUE> : 1,
+		CanvasUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<EPS1|Doc2|TRUE> : 1;
+TRANSITION cm5_show.[c=VD2|d=EPS8|Document_1=Doc1]
+	CONSUME
+		CanvasNotUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<EPS8|Doc1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|VD2|TRUE> : 1,
+		CanvasUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<EPS8|Doc1|TRUE> : 1;
+TRANSITION cm5_show.[c=VD2|d=EPS8|Document_1=Doc2]
+	CONSUME
+		CanvasNotUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<EPS8|Doc2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|VD2|TRUE> : 1,
+		CanvasUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<EPS8|Doc2|TRUE> : 1;
+TRANSITION cm3_show.[c=LW3|d=EPS3|Document_1=Doc1]
+	CONSUME
+		CanvasNotUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<EPS3|Doc1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW3|TRUE> : 1,
+		CanvasUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<EPS3|Doc1|TRUE> : 1;
+TRANSITION cm3_show.[c=LW3|d=EPS3|Document_1=Doc2]
+	CONSUME
+		CanvasNotUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<EPS3|Doc2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW3|TRUE> : 1,
+		CanvasUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<EPS3|Doc2|TRUE> : 1;
+TRANSITION cm4_show.[c=LW6|d=EPS6|Document_1=Doc1]
+	CONSUME
+		CanvasNotUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<EPS6|Doc1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW6|TRUE> : 1,
+		CanvasUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<EPS6|Doc1|TRUE> : 1;
+TRANSITION cm4_show.[c=LW6|d=EPS6|Document_1=Doc2]
+	CONSUME
+		CanvasNotUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<EPS6|Doc2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW6|TRUE> : 1,
+		CanvasUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<EPS6|Doc2|TRUE> : 1;
+TRANSITION cm2_unshow.[c=LW1|d=EPS1|Document_1=Doc1]
+	CONSUME
+		CanvasUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<EPS1|Doc1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW1|FALSE> : 1,
+		CanvasNotUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<EPS1|Doc1|TRUE> : 1;
+TRANSITION cm2_unshow.[c=LW1|d=EPS1|Document_1=Doc2]
+	CONSUME
+		CanvasUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<EPS1|Doc2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW1|FALSE> : 1,
+		CanvasNotUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<EPS1|Doc2|TRUE> : 1;
+TRANSITION cm5_unshow.[c=VD2|d=EPS8|Document_1=Doc1]
+	CONSUME
+		CanvasUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<EPS8|Doc1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|VD2|FALSE> : 1,
+		CanvasNotUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<EPS8|Doc1|TRUE> : 1;
+TRANSITION cm5_unshow.[c=VD2|d=EPS8|Document_1=Doc2]
+	CONSUME
+		CanvasUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<EPS8|Doc2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|VD2|FALSE> : 1,
+		CanvasNotUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<EPS8|Doc2|TRUE> : 1;
+TRANSITION cm3_unshow.[c=LW3|d=EPS3|Document_1=Doc1]
+	CONSUME
+		CanvasUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<EPS3|Doc1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW3|FALSE> : 1,
+		CanvasNotUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<EPS3|Doc1|TRUE> : 1;
+TRANSITION cm3_unshow.[c=LW3|d=EPS3|Document_1=Doc2]
+	CONSUME
+		CanvasUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<EPS3|Doc2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW3|FALSE> : 1,
+		CanvasNotUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<EPS3|Doc2|TRUE> : 1;
+TRANSITION cm4_unshow.[c=LW6|d=EPS6|Document_1=Doc1]
+	CONSUME
+		CanvasUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<EPS6|Doc1|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc1|LW6|FALSE> : 1,
+		CanvasNotUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<EPS6|Doc1|TRUE> : 1;
+TRANSITION cm4_unshow.[c=LW6|d=EPS6|Document_1=Doc2]
+	CONSUME
+		CanvasUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<EPS6|Doc2|TRUE> : 1;
+	PRODUCE
+		DocShown.<Doc2|LW6|FALSE> : 1,
+		CanvasNotUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<EPS6|Doc2|TRUE> : 1;
+TRANSITION cm1_send.[Display_1=EPS1|Document_1=Doc1]
+	CONSUME
+		DisplayNotUsed.EPS1 : 1,
+		Present.<Doc1|TRUE> : 1;
+	PRODUCE
+		DisplayUsed.EPS1 : 1,
+		Sent2Disp.<EPS1|Doc1|TRUE> : 1,
+		Present.<Doc1|TRUE> : 1;
+TRANSITION cm1_send.[Display_1=EPS1|Document_1=Doc2]
+	CONSUME
+		DisplayNotUsed.EPS1 : 1,
+		Present.<Doc2|TRUE> : 1;
+	PRODUCE
+		DisplayUsed.EPS1 : 1,
+		Sent2Disp.<EPS1|Doc2|TRUE> : 1,
+		Present.<Doc2|TRUE> : 1;
+TRANSITION cm1_send.[Display_1=EPS3|Document_1=Doc1]
+	CONSUME
+		DisplayNotUsed.EPS3 : 1,
+		Present.<Doc1|TRUE> : 1;
+	PRODUCE
+		DisplayUsed.EPS3 : 1,
+		Sent2Disp.<EPS3|Doc1|TRUE> : 1,
+		Present.<Doc1|TRUE> : 1;
+TRANSITION cm1_send.[Display_1=EPS3|Document_1=Doc2]
+	CONSUME
+		DisplayNotUsed.EPS3 : 1,
+		Present.<Doc2|TRUE> : 1;
+	PRODUCE
+		DisplayUsed.EPS3 : 1,
+		Sent2Disp.<EPS3|Doc2|TRUE> : 1,
+		Present.<Doc2|TRUE> : 1;
+TRANSITION cm1_send.[Display_1=EPS6|Document_1=Doc1]
+	CONSUME
+		DisplayNotUsed.EPS6 : 1,
+		Present.<Doc1|TRUE> : 1;
+	PRODUCE
+		DisplayUsed.EPS6 : 1,
+		Sent2Disp.<EPS6|Doc1|TRUE> : 1,
+		Present.<Doc1|TRUE> : 1;
+TRANSITION cm1_send.[Display_1=EPS6|Document_1=Doc2]
+	CONSUME
+		DisplayNotUsed.EPS6 : 1,
+		Present.<Doc2|TRUE> : 1;
+	PRODUCE
+		DisplayUsed.EPS6 : 1,
+		Sent2Disp.<EPS6|Doc2|TRUE> : 1,
+		Present.<Doc2|TRUE> : 1;
+TRANSITION cm1_send.[Display_1=EPS8|Document_1=Doc1]
+	CONSUME
+		DisplayNotUsed.EPS8 : 1,
+		Present.<Doc1|TRUE> : 1;
+	PRODUCE
+		DisplayUsed.EPS8 : 1,
+		Sent2Disp.<EPS8|Doc1|TRUE> : 1,
+		Present.<Doc1|TRUE> : 1;
+TRANSITION cm1_send.[Display_1=EPS8|Document_1=Doc2]
+	CONSUME
+		DisplayNotUsed.EPS8 : 1,
+		Present.<Doc2|TRUE> : 1;
+	PRODUCE
+		DisplayUsed.EPS8 : 1,
+		Sent2Disp.<EPS8|Doc2|TRUE> : 1,
+		Present.<Doc2|TRUE> : 1;
+TRANSITION cm1_unsend.[Display_1=EPS1|Document_1=Doc1]
+	CONSUME
+		DisplayUsed.EPS1 : 1,
+		Present.<Doc1|TRUE> : 1;
+	PRODUCE
+		DisplayNotUsed.EPS1 : 1,
+		Sent2Disp.<EPS1|Doc1|FALSE> : 1,
+		Present.<Doc1|TRUE> : 1;
+TRANSITION cm1_unsend.[Display_1=EPS1|Document_1=Doc2]
+	CONSUME
+		DisplayUsed.EPS1 : 1,
+		Present.<Doc2|TRUE> : 1;
+	PRODUCE
+		DisplayNotUsed.EPS1 : 1,
+		Sent2Disp.<EPS1|Doc2|FALSE> : 1,
+		Present.<Doc2|TRUE> : 1;
+TRANSITION cm1_unsend.[Display_1=EPS3|Document_1=Doc1]
+	CONSUME
+		DisplayUsed.EPS3 : 1,
+		Present.<Doc1|TRUE> : 1;
+	PRODUCE
+		DisplayNotUsed.EPS3 : 1,
+		Sent2Disp.<EPS3|Doc1|FALSE> : 1,
+		Present.<Doc1|TRUE> : 1;
+TRANSITION cm1_unsend.[Display_1=EPS3|Document_1=Doc2]
+	CONSUME
+		DisplayUsed.EPS3 : 1,
+		Present.<Doc2|TRUE> : 1;
+	PRODUCE
+		DisplayNotUsed.EPS3 : 1,
+		Sent2Disp.<EPS3|Doc2|FALSE> : 1,
+		Present.<Doc2|TRUE> : 1;
+TRANSITION cm1_unsend.[Display_1=EPS6|Document_1=Doc1]
+	CONSUME
+		DisplayUsed.EPS6 : 1,
+		Present.<Doc1|TRUE> : 1;
+	PRODUCE
+		DisplayNotUsed.EPS6 : 1,
+		Sent2Disp.<EPS6|Doc1|FALSE> : 1,
+		Present.<Doc1|TRUE> : 1;
+TRANSITION cm1_unsend.[Display_1=EPS6|Document_1=Doc2]
+	CONSUME
+		DisplayUsed.EPS6 : 1,
+		Present.<Doc2|TRUE> : 1;
+	PRODUCE
+		DisplayNotUsed.EPS6 : 1,
+		Sent2Disp.<EPS6|Doc2|FALSE> : 1,
+		Present.<Doc2|TRUE> : 1;
+TRANSITION cm1_unsend.[Display_1=EPS8|Document_1=Doc1]
+	CONSUME
+		DisplayUsed.EPS8 : 1,
+		Present.<Doc1|TRUE> : 1;
+	PRODUCE
+		DisplayNotUsed.EPS8 : 1,
+		Sent2Disp.<EPS8|Doc1|FALSE> : 1,
+		Present.<Doc1|TRUE> : 1;
+TRANSITION cm1_unsend.[Display_1=EPS8|Document_1=Doc2]
+	CONSUME
+		DisplayUsed.EPS8 : 1,
+		Present.<Doc2|TRUE> : 1;
+	PRODUCE
+		DisplayNotUsed.EPS8 : 1,
+		Sent2Disp.<EPS8|Doc2|FALSE> : 1,
+		Present.<Doc2|TRUE> : 1;
+TRANSITION cm1_send.[Display_1=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		DisplayNotUsed.NEC-MT1065 : 1,
+		Present.<Doc1|TRUE> : 1;
+	PRODUCE
+		DisplayUsed.NEC-MT1065 : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1,
+		Present.<Doc1|TRUE> : 1;
+TRANSITION cm1_send.[Display_1=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		DisplayNotUsed.NEC-MT1065 : 1,
+		Present.<Doc2|TRUE> : 1;
+	PRODUCE
+		DisplayUsed.NEC-MT1065 : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1,
+		Present.<Doc2|TRUE> : 1;
+TRANSITION cm1_unsend.[Display_1=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		DisplayUsed.NEC-MT1065 : 1,
+		Present.<Doc1|TRUE> : 1;
+	PRODUCE
+		DisplayNotUsed.NEC-MT1065 : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|FALSE> : 1,
+		Present.<Doc1|TRUE> : 1;
+TRANSITION cm1_unsend.[Display_1=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		DisplayUsed.NEC-MT1065 : 1,
+		Present.<Doc2|TRUE> : 1;
+	PRODUCE
+		DisplayNotUsed.NEC-MT1065 : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|FALSE> : 1,
+		Present.<Doc2|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=VD1|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<VD1|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.VD1 : 1,
+		CanvasDown.<VD1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<VD1|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|VD1|TRUE> : 1,
+		CanvasUsed.VD1 : 1,
+		CanvasDown.<VD1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=VD1|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<VD1|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.VD1 : 1,
+		CanvasDown.<VD1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<VD1|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|VD1|TRUE> : 1,
+		CanvasUsed.VD1 : 1,
+		CanvasDown.<VD1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=VD2|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<VD2|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<VD2|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|VD2|TRUE> : 1,
+		CanvasUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=VD2|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<VD2|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<VD2|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|VD2|TRUE> : 1,
+		CanvasUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW1|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW1|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW1|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW1|TRUE> : 1,
+		CanvasUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW1|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW1|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW1|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW1|TRUE> : 1,
+		CanvasUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW2|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW2|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW2 : 1,
+		CanvasDown.<LW2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW2|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW2|TRUE> : 1,
+		CanvasUsed.LW2 : 1,
+		CanvasDown.<LW2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW2|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW2|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW2 : 1,
+		CanvasDown.<LW2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW2|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW2|TRUE> : 1,
+		CanvasUsed.LW2 : 1,
+		CanvasDown.<LW2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW3|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW3|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW3|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW3|TRUE> : 1,
+		CanvasUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW3|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW3|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW3|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW3|TRUE> : 1,
+		CanvasUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW4|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW4|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW4 : 1,
+		CanvasDown.<LW4|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW4|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW4|TRUE> : 1,
+		CanvasUsed.LW4 : 1,
+		CanvasDown.<LW4|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW4|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW4|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW4 : 1,
+		CanvasDown.<LW4|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW4|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW4|TRUE> : 1,
+		CanvasUsed.LW4 : 1,
+		CanvasDown.<LW4|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW5|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW5|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW5 : 1,
+		CanvasDown.<LW5|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW5|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW5|TRUE> : 1,
+		CanvasUsed.LW5 : 1,
+		CanvasDown.<LW5|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW5|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW5|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW5 : 1,
+		CanvasDown.<LW5|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW5|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW5|TRUE> : 1,
+		CanvasUsed.LW5 : 1,
+		CanvasDown.<LW5|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW6|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW6|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW6|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW6|TRUE> : 1,
+		CanvasUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_show.[Surface_1=LW6|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW6|NEC-MT1065|TRUE> : 1,
+		CanvasNotUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW6|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW6|TRUE> : 1,
+		CanvasUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=VD1|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<VD1|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.VD1 : 1,
+		CanvasDown.<VD1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<VD1|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|VD1|FALSE> : 1,
+		CanvasNotUsed.VD1 : 1,
+		CanvasDown.<VD1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=VD1|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<VD1|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.VD1 : 1,
+		CanvasDown.<VD1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<VD1|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|VD1|FALSE> : 1,
+		CanvasNotUsed.VD1 : 1,
+		CanvasDown.<VD1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=VD2|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<VD2|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<VD2|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|VD2|FALSE> : 1,
+		CanvasNotUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=VD2|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<VD2|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<VD2|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|VD2|FALSE> : 1,
+		CanvasNotUsed.VD2 : 1,
+		CanvasDown.<VD2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW1|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW1|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW1|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW1|FALSE> : 1,
+		CanvasNotUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW1|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW1|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW1|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW1|FALSE> : 1,
+		CanvasNotUsed.LW1 : 1,
+		CanvasDown.<LW1|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW2|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW2|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW2 : 1,
+		CanvasDown.<LW2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW2|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW2|FALSE> : 1,
+		CanvasNotUsed.LW2 : 1,
+		CanvasDown.<LW2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW2|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW2|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW2 : 1,
+		CanvasDown.<LW2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW2|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW2|FALSE> : 1,
+		CanvasNotUsed.LW2 : 1,
+		CanvasDown.<LW2|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW3|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW3|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW3|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW3|FALSE> : 1,
+		CanvasNotUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW3|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW3|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW3|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW3|FALSE> : 1,
+		CanvasNotUsed.LW3 : 1,
+		CanvasDown.<LW3|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW4|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW4|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW4 : 1,
+		CanvasDown.<LW4|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW4|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW4|FALSE> : 1,
+		CanvasNotUsed.LW4 : 1,
+		CanvasDown.<LW4|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW4|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW4|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW4 : 1,
+		CanvasDown.<LW4|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW4|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW4|FALSE> : 1,
+		CanvasNotUsed.LW4 : 1,
+		CanvasDown.<LW4|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW5|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW5|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW5 : 1,
+		CanvasDown.<LW5|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW5|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW5|FALSE> : 1,
+		CanvasNotUsed.LW5 : 1,
+		CanvasDown.<LW5|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW5|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW5|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW5 : 1,
+		CanvasDown.<LW5|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW5|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW5|FALSE> : 1,
+		CanvasNotUsed.LW5 : 1,
+		CanvasDown.<LW5|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW6|d=NEC-MT1065|Document_1=Doc1]
+	CONSUME
+		Pointing.<LW6|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW6|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc1|LW6|FALSE> : 1,
+		CanvasNotUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc1|TRUE> : 1;
+TRANSITION cm6_unshow.[Surface_1=LW6|d=NEC-MT1065|Document_1=Doc2]
+	CONSUME
+		Pointing.<LW6|NEC-MT1065|TRUE> : 1,
+		CanvasUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;
+	PRODUCE
+		Pointing.<LW6|NEC-MT1065|TRUE> : 1,
+		DocShown.<Doc2|LW6|FALSE> : 1,
+		CanvasNotUsed.LW6 : 1,
+		CanvasDown.<LW6|TRUE> : 1,
+		Sent2Disp.<NEC-MT1065|Doc2|TRUE> : 1;

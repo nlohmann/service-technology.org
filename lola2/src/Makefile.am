@@ -39,7 +39,6 @@ lola_SOURCES = \
                 InputOutput/Socket.cc InputOutput/Socket.h \
                 \
                 Planning/Task.cc Planning/Task.h \
-                Planning/Callable.cc Planning/Callable.h \
                 \
                 Exploration/DFSExploration.cc Exploration/DFSExploration.h \
                 Exploration/ParallelExploration.cc Exploration/ParallelExploration.h \

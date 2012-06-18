@@ -156,7 +156,9 @@ NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore
                         pthread_mutex_lock(&num_suspend_mutex);
                         // if the end is reached abort this thread
                         if (finished)
+                        {
                             return NULL;
+                        }
 
                         // copy the data for the other thread
                         transfer_stack = stack;
@@ -247,7 +249,7 @@ NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore
     }
 }
 
-bool ParallelExploration::depth_first(SimpleProperty &property, NetState& ns, Store &myStore, FireListCreator &firelistcreator, int number_of_threads)
+bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns, Store &myStore, FireListCreator &firelistcreator, int number_of_threads)
 {
     // copy initial marking into current marking
     //Marking::init();
@@ -292,9 +294,10 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState& ns, St
     {
         void* return_value;
         pthread_join(runner_thread[i], &return_value);
-        if (return_value){
-        	property.value = true;
-        	ns.copyNetState(*(NetState*)return_value);
+        if (return_value)
+        {
+            property.value = true;
+            ns.copyNetState(*(NetState*)return_value);
         }
         delete args[i].ns;
     }

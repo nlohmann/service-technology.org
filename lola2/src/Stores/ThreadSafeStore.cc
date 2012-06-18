@@ -78,7 +78,7 @@ void ThreadSafeStore::writeToGlobalStore(int thread)
         }
 }
 
-bool ThreadSafeStore::searchAndInsert(NetState& ns, int thread)
+bool ThreadSafeStore::searchAndInsert(NetState &ns, int thread)
 {
 
     /*pthread_mutex_lock(&mutex1);
@@ -161,7 +161,7 @@ bool ThreadSafeStore::searchAndInsert(NetState& ns, int thread)
 }
 
 // LCOV_EXCL_START
-bool ThreadSafeStore::searchAndInsert(NetState& ns, void**)
+bool ThreadSafeStore::searchAndInsert(NetState &ns, void**)
 {
     return searchAndInsert(ns, 0);
 }

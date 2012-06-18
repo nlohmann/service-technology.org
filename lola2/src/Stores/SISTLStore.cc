@@ -24,7 +24,7 @@ SISTLStore::SISTLStore(int numberOfThreads) : SIStore(numberOfThreads)
     }
 }
 
-bool SISTLStore::search(NetState& ns, int threadNumber)
+bool SISTLStore::search(NetState &ns, int threadNumber)
 {
     // organize vector as intermediate data structure: set size on first call
 
@@ -38,7 +38,7 @@ bool SISTLStore::search(NetState& ns, int threadNumber)
     return insertInfo[threadNumber] == store.end();
 }
 
-bool SISTLStore::insert(NetState& ns, int threadNumber)
+bool SISTLStore::insert(NetState &ns, int threadNumber)
 {
     store.insert(insertInfo[threadNumber], m[threadNumber]);
     return 1;

@@ -22,6 +22,6 @@ class SISTLStore : public SIStore
         SISTLStore(int threadnum);
         //~SISTLStore();
 
-        bool search(NetState& ns, int threadNumber);
-        bool insert(NetState& ns, int threadNumber);
+        bool search(NetState &ns, int threadNumber);
+        bool insert(NetState &ns, int threadNumber);
 };

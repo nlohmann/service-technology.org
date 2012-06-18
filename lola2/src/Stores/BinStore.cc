@@ -68,7 +68,7 @@ BinStore::Decision* BinStore::createDecision(bitindex_t b)
 /// search for a state in the binStore and insert it, if it is not there
 /// Do not care about states
 
-bool BinStore::searchAndInsert(NetState& ns, void** result)
+bool BinStore::searchAndInsert(NetState &ns, void** result)
 {
     ++calls;;
     // the general assumption is that we read marking, vectors etc. left to right, with

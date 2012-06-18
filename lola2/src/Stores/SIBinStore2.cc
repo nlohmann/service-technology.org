@@ -93,14 +93,14 @@ SIBinStore2::Decision::~Decision()
 
 }
 
-bool SIBinStore2::search(NetState& ns, int threadNumber)
+bool SIBinStore2::search(NetState &ns, int threadNumber)
 {
     return search(ns, threadNumber, true);
 }
 
 /// search for a state in the binStore and insert it, if it is not there
 /// Do not care about states
-bool SIBinStore2::search(NetState& ns, int threadNumber,
+bool SIBinStore2::search(NetState &ns, int threadNumber,
                          bool lock_rw_mutex)
 {
 
@@ -329,7 +329,7 @@ bool SIBinStore2::search(NetState& ns, int threadNumber,
     return false;
 }
 
-bool SIBinStore2::insert(NetState& ns, int threadNumber)
+bool SIBinStore2::insert(NetState &ns, int threadNumber)
 {
 
     pthread_rwlock_wrlock(rwlocks + ns.HashCurrent);

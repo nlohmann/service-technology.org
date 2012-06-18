@@ -19,7 +19,7 @@ class FirelistStubbornStatePredicate : public Firelist
 
         /// return value contains number of elements in fire list, argument is reference
         /// parameter for actual list
-        virtual index_t getFirelist(NetState&, index_t**);
+        virtual index_t getFirelist(NetState &, index_t**);
 
     private:
         StatePredicate* predicate;

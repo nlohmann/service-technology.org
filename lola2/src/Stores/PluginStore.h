@@ -11,40 +11,40 @@
 
 class PluginStore : public Store
 {
-public:
-	class NetStateEncoder
-	{
-	protected:
-		int numThreads;
-	public:
-		NetStateEncoder(int _numThreads);
-		virtual ~NetStateEncoder(){}
-		virtual vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, int threadIndex) = 0;
-	};
+    public:
+        class NetStateEncoder
+        {
+            protected:
+                int numThreads;
+            public:
+                NetStateEncoder(int _numThreads);
+                virtual ~NetStateEncoder() {}
+                virtual vectordata_t* encodeNetState(NetState &ns, bitindex_t &bitlen, int threadIndex) = 0;
+        };
 
-	class VectorStore
-	{
-	public:
-		virtual ~VectorStore(){}
-		virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash) = 0;
-	};
+        class VectorStore
+        {
+            public:
+                virtual ~VectorStore() {}
+                virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash) = 0;
+        };
 
-	/// creates new Store using the specified components. The given components are assumed to be used exclusively and are freed once the PluggableStore gets destructed.
-	PluginStore(NetStateEncoder* _netStateEncoder, VectorStore* _vectorStore);
+        /// creates new Store using the specified components. The given components are assumed to be used exclusively and are freed once the PluggableStore gets destructed.
+        PluginStore(NetStateEncoder* _netStateEncoder, VectorStore* _vectorStore);
 
-	/// frees both components
-	~PluginStore();
+        /// frees both components
+        ~PluginStore();
 
-    /// check whether current marking is stored
-    bool searchAndInsert(NetState& ns, int threadIndex);
+        /// check whether current marking is stored
+        bool searchAndInsert(NetState &ns, int threadIndex);
 
-    /// check whether current marking is stored
-    bool searchAndInsert(NetState& ns, void** s = NULL);
+        /// check whether current marking is stored
+        bool searchAndInsert(NetState &ns, void** s = NULL);
 
-private:
-    // a mutex for incrementing
-    pthread_mutex_t inc_mutex;
-    NetStateEncoder* netStateEncoder;
-    VectorStore* vectorStore;
+    private:
+        // a mutex for incrementing
+        pthread_mutex_t inc_mutex;
+        NetStateEncoder* netStateEncoder;
+        VectorStore* vectorStore;
 };
 

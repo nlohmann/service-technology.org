@@ -79,7 +79,7 @@ Task::Task() : sp(NULL), ns(NULL), p(NULL), s(NULL), flc(NULL), exploration(NULL
 
 Task::~Task()
 {
-	delete ns;
+    delete ns;
     delete s;
     delete p;
     delete sp;
@@ -87,9 +87,10 @@ Task::~Task()
     delete exploration;
 }
 
-void Task::setNet(){
-	ns = NetState::createNetStateFromInitial();
-	Transition::checkTransitions(*ns);
+void Task::setNet()
+{
+    ns = NetState::createNetStateFromInitial();
+    Transition::checkTransitions(*ns);
 }
 
 void Task::setFormula()
@@ -228,22 +229,22 @@ void Task::setStore()
                 s = new BinStore2();
                 break;
             case store_arg_psbbin:
-                s = new PluginStore(new BitEncoder(number_of_threads),new SuffixTreeStore());
+                s = new PluginStore(new BitEncoder(number_of_threads), new SuffixTreeStore());
                 break;
             case store_arg_pscbin:
-                s = new PluginStore(new CopyEncoder(number_of_threads),new SuffixTreeStore());
+                s = new PluginStore(new CopyEncoder(number_of_threads), new SuffixTreeStore());
                 break;
             case store_arg_pssbin:
-                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads),new SuffixTreeStore());
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore());
                 break;
             case store_arg_psbstl:
-                s = new PluginStore(new BitEncoder(number_of_threads),new VSTLStore());
+                s = new PluginStore(new BitEncoder(number_of_threads), new VSTLStore());
                 break;
             case store_arg_pscstl:
-                s = new PluginStore(new CopyEncoder(number_of_threads),new VSTLStore());
+                s = new PluginStore(new CopyEncoder(number_of_threads), new VSTLStore());
                 break;
             case store_arg_pssstl:
-                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads),new VSTLStore());
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VSTLStore());
                 break;
             case store_arg_tsbin2:
                 s = new ThreadSafeStore(new SIBinStore2(number_of_threads), number_of_threads);
@@ -298,7 +299,7 @@ void Task::setProperty()
 
 bool Task::getResult()
 {
-	assert(ns);
+    assert(ns);
     assert(s);
     assert(p);
     assert(exploration);
@@ -308,7 +309,7 @@ bool Task::getResult()
     switch (args_info.search_arg)
     {
         case search_arg_depth:
-            result = exploration->depth_first(*p, *ns,*s, * flc, number_of_threads);
+            result = exploration->depth_first(*p, *ns, *s, * flc, number_of_threads);
             break;
 
         case search_arg_findpath:
@@ -322,7 +323,7 @@ bool Task::getResult()
             }
 
             choose = new ChooseTransitionHashDriven();
-            result = exploration->find_path(*p,*ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(p), *((EmptyStore*)s), *choose);
+            result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(p), *((EmptyStore*)s), *choose);
             delete choose;
             break;
 
@@ -402,5 +403,5 @@ void Task::printMarking()
 
 NetState* Task::getNetState()
 {
-	return ns;
+    return ns;
 }

@@ -35,13 +35,13 @@ PluginStore::~PluginStore()
 }
 
 /// search for a state and insert it, if it is not present
-bool PluginStore::searchAndInsert(NetState& ns, void** s)
+bool PluginStore::searchAndInsert(NetState &ns, void** s)
 {
-	return searchAndInsert(ns,0);
+    return searchAndInsert(ns, 0);
 }
 
 /// search for a state and insert it, if it is not present
-bool PluginStore::searchAndInsert(NetState& ns, int threadIndex)
+bool PluginStore::searchAndInsert(NetState &ns, int threadIndex)
 {
     pthread_mutex_lock(&inc_mutex);
     ++calls;
@@ -52,8 +52,9 @@ bool PluginStore::searchAndInsert(NetState& ns, int threadIndex)
     vectordata_t* input = netStateEncoder->encodeNetState(ns, bitlen, threadIndex);
 
     // check input vector in vector store
-    bool ret = vectorStore->searchAndInsert(input,bitlen,ns.HashCurrent);
-    if(!ret) {
+    bool ret = vectorStore->searchAndInsert(input, bitlen, ns.HashCurrent);
+    if (!ret)
+    {
         pthread_mutex_lock(&inc_mutex);
         ++markings;
         pthread_mutex_unlock(&inc_mutex);

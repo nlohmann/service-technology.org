@@ -24,7 +24,7 @@ extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
 
-bool DFSExploration::depth_first(SimpleProperty &property, NetState& ns, Store &myStore, FireListCreator &firelistcreator, int threadNumber)
+bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store &myStore, FireListCreator &firelistcreator, int threadNumber)
 {
     Firelist &myFirelist = *firelistcreator.createFireList(&property);
     //// copy initial marking into current marking
@@ -35,7 +35,7 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState& ns, Store &
 
     if (property.value)
     {
-    	myStore.finalize();
+        myStore.finalize();
         // initial marking satisfies property
         return true;
     }
@@ -77,7 +77,7 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState& ns, Store &
                     // of witness path
                     property.stack.push(currentEntry, currentFirelist);
                     myStore.finalize();
-                    delete (&myFirelist);
+                    delete(&myFirelist);
                     return true;
                 }
 
@@ -94,7 +94,7 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState& ns, Store &
             {
                 // have completely processed initial marking --> state not found
                 myStore.finalize();
-                delete (&myFirelist);
+                delete(&myFirelist);
                 return false;
             }
             property.stack.pop(&currentEntry, &currentFirelist);
@@ -106,7 +106,7 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState& ns, Store &
     }
 }
 
-bool DFSExploration::find_path(SimpleProperty &property, NetState& ns, unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition &c)
+bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition &c)
 {
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.

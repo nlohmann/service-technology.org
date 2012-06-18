@@ -66,23 +66,32 @@ void Transition::deleteTransitions()
     free(Transition::PositionScapegoat);
 }
 
-void Transition::checkTransitions(NetState&ns){
-	// for places
+void Transition::checkTransitions(NetState &ns)
+{
+    // for places
     for (int i = 0; i < Net::Card[PL]; i++)
     {
         for (int j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
+        {
             assert(ns.Arc[PL][PRE][i][j] < Net::Card[TR]);
+        }
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
-        	assert(ns.Arc[PL][POST][i][j]< Net::Card[TR]);
+        {
+            assert(ns.Arc[PL][POST][i][j] < Net::Card[TR]);
+        }
     }
 
     // for transitions
     for (int i = 0; i < Net::Card[TR]; i++)
     {
         for (int j = 0; j < Net::CardArcs[TR][PRE][i]; j++)
-        	assert(ns.Arc[TR][PRE][i][j] < Net::Card[PL]);
+        {
+            assert(ns.Arc[TR][PRE][i][j] < Net::Card[PL]);
+        }
         for (int j = 0; j < Net::CardArcs[TR][POST][i]; j++)
-        	assert(ns.Arc[TR][POST][i][j] < Net::Card[PL]);
+        {
+            assert(ns.Arc[TR][POST][i][j] < Net::Card[PL]);
+        }
     }
 }
 
@@ -272,7 +281,7 @@ void Transition::updateEnabled(NetState &ns, index_t t)
 }
 
 /// fire a transition in reverse direction (for backtracking) and update enabledness of all transitions
-void Transition::backfire(NetState& ns, index_t t)
+void Transition::backfire(NetState &ns, index_t t)
 {
     // 1. Update current marking
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)

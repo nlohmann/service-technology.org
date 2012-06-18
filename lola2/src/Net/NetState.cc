@@ -150,7 +150,7 @@ NetState* NetState::createNetStateFromInitial()
 
 
 
-NetState* NetState::createNetStateFromCurrent(NetState& ons)
+NetState* NetState::createNetStateFromCurrent(NetState &ons)
 {
     NetState* ns = (NetState*) malloc(sizeof(NetState));
     ns->need_to_delete_members_on_delete = true;
@@ -278,31 +278,35 @@ NetState* NetState::createNetStateFromCurrent(NetState& ons)
     return ns;
 }
 
-void NetState::copyNetState(NetState& ns){
-	deleteAllMembers();
-	Current = ns.Current;
-	HashCurrent = ns.HashCurrent;
-	Enabled = ns.Enabled;
-	CardEnabled = ns.CardEnabled;
-	PositionScapegoat = ns.PositionScapegoat;
-	Arc[0][0] = ns.Arc[0][0];
-	Arc[0][1] = ns.Arc[0][1];
-	Arc[1][0] = ns.Arc[1][0];
-	Arc[1][1] = ns.Arc[1][1];
-	Mult[0][0] = ns.Mult[0][0];
-	Mult[0][1] = ns.Mult[0][1];
-	Mult[1][0] = ns.Mult[1][0];
-	Mult[1][1] = ns.Mult[1][1];
-	CardDisabled = ns.CardDisabled;
-	Disabled = ns.Disabled;
-	// now the old netstate does not need to delete its members on deletions as they are now the members of this netstate;
-	ns.need_to_delete_members_on_delete = false;
+void NetState::copyNetState(NetState &ns)
+{
+    deleteAllMembers();
+    Current = ns.Current;
+    HashCurrent = ns.HashCurrent;
+    Enabled = ns.Enabled;
+    CardEnabled = ns.CardEnabled;
+    PositionScapegoat = ns.PositionScapegoat;
+    Arc[0][0] = ns.Arc[0][0];
+    Arc[0][1] = ns.Arc[0][1];
+    Arc[1][0] = ns.Arc[1][0];
+    Arc[1][1] = ns.Arc[1][1];
+    Mult[0][0] = ns.Mult[0][0];
+    Mult[0][1] = ns.Mult[0][1];
+    Mult[1][0] = ns.Mult[1][0];
+    Mult[1][1] = ns.Mult[1][1];
+    CardDisabled = ns.CardDisabled;
+    Disabled = ns.Disabled;
+    // now the old netstate does not need to delete its members on deletions as they are now the members of this netstate;
+    ns.need_to_delete_members_on_delete = false;
 }
 
 
-void NetState::deleteAllMembers(){
+void NetState::deleteAllMembers()
+{
     if (!need_to_delete_members_on_delete)
+    {
         return;
+    }
     free(Current);
     free(Enabled);
     free(PositionScapegoat);
@@ -336,12 +340,12 @@ void NetState::deleteAllMembers(){
     free(CardDisabled);
     for (int i = 0; i < Net::Card[PL]; i++)
     {
-      free(Disabled[i]);
+        free(Disabled[i]);
     }
     free(Disabled);
 }
 
 NetState::~NetState()
 {
-	deleteAllMembers();
+    deleteAllMembers();
 }

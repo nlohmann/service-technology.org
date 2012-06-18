@@ -54,7 +54,7 @@ class NetState
 
         static NetState* createNetStateFromInitial();
         static NetState* createNetStateFromCurrent(NetState &ns);
-        void copyNetState(NetState& ns);
+        void copyNetState(NetState &ns);
 
     private:
         bool need_to_delete_members_on_delete;

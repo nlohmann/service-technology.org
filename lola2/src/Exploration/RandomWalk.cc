@@ -15,7 +15,7 @@
 #include <Net/NetState.h>
 
 
-void randomWalk(NetState& ns, int transitions)
+void randomWalk(NetState &ns, int transitions)
 {
     int firedTransitions = 0;
 

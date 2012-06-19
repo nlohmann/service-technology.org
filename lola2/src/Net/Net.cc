@@ -484,7 +484,7 @@ void createTransitionEquation(index_t transition, index_t* variables, int64_t* c
             {
                 // erase possiblePosition entry (possiblePosition) in both array
                 memmove(&variables[possiblePosition], &variables[possiblePosition + 1], (size - possiblePosition) * SIZEOF_INDEX_T);
-                memmove(&coefficients[possiblePosition], &coefficients[possiblePosition + 1], (size - possiblePosition) * sizeof(int64_t));
+                memmove(&coefficients[possiblePosition], &coefficients[possiblePosition + 1], (size - possiblePosition) * SIZEOF_INT64_T);
                 // assumption: decreasing 0 will lead to maxInt but
                 //              upcoming increase will result in 0 again
                 --size;
@@ -495,7 +495,7 @@ void createTransitionEquation(index_t transition, index_t* variables, int64_t* c
             // p is not in new row, so add it
             // may be it is necessary to insert in between existing entrys
             memmove(&variables[possiblePosition + 1], &variables[possiblePosition], (size - possiblePosition) * SIZEOF_INDEX_T);
-            memmove(&coefficients[possiblePosition + 1], &coefficients[possiblePosition], (size - possiblePosition) * sizeof(int64_t));
+            memmove(&coefficients[possiblePosition + 1], &coefficients[possiblePosition], (size - possiblePosition) * SIZEOF_INT64_T);
             // store place index
             variables[possiblePosition] = pID;
             // store the multiplicity (from transition to p)
@@ -525,7 +525,7 @@ void Net::setSignificantPlaces()
 
     // request memory for one full row
     index_t* newVar = (index_t*) calloc(cardPL, SIZEOF_INDEX_T);
-    int64_t* newCoef = (int64_t*) calloc(cardPL, sizeof(int64_t));
+    int64_t* newCoef = (int64_t*) calloc(cardPL, SIZEOF_INT64_T);
     index_t newSize;
 
     // create new matrix
@@ -542,7 +542,7 @@ void Net::setSignificantPlaces()
 
         // clear used memory
         memset(newVar, 0, newSize * SIZEOF_INDEX_T);    // necessary?
-        memset(newCoef, 0, newSize * sizeof(int64_t));
+        memset(newCoef, 0, newSize * SIZEOF_INT64_T);
     }
 
     // free memory
@@ -599,7 +599,7 @@ void Net::setProgressMeasure()
 
     // request memory for one full row
     index_t* newVar = (index_t*) calloc(cardPL + 1, SIZEOF_INDEX_T);
-    int64_t* newCoef = (int64_t*) calloc(cardPL + 1 + cardTR, sizeof(int64_t));
+    int64_t* newCoef = (int64_t*) calloc(cardPL + 1 + cardTR, SIZEOF_INT64_T);
     index_t newSize;
 
     // create new matrix
@@ -622,7 +622,7 @@ void Net::setProgressMeasure()
 
         // clear used memory
         memset(newVar, 0, newSize * SIZEOF_INDEX_T);    // necessary?
-        memset(newCoef, 0, newSize * sizeof(int64_t));
+        memset(newCoef, 0, newSize * SIZEOF_INT64_T);
     }
 
     // free memory
@@ -635,8 +635,8 @@ void Net::setProgressMeasure()
     assert(m.getRowCount() == cardTR);
 
     // calculate progress measure
-    Transition::ProgressMeasure = (int64_t*) calloc(cardTR, sizeof(int64_t));
-    int64_t* denominatorValue = (int64_t*) calloc(cardTR, sizeof(int64_t));
+    Transition::ProgressMeasure = (int64_t*) calloc(cardTR, SIZEOF_INT64_T);
+    int64_t* denominatorValue = (int64_t*) calloc(cardTR, SIZEOF_INT64_T);
 
     for (index_t t = 0; t < cardNO; ++t)
     {

@@ -93,11 +93,11 @@ Matrix::Row::Row(index_t length, const index_t* var, const int64_t* coef, index_
     // request memory for new row
     variables = (index_t*) malloc(length * SIZEOF_INDEX_T);
     // coefficients are stored as int64_t
-    coefficients = (int64_t*) malloc(length * sizeof(int64_t));
+    coefficients = (int64_t*) malloc(length * SIZEOF_INT64_T);
 
     // memcpy is used because given and new memory has the same types
     memcpy(variables, var, length * SIZEOF_INDEX_T);
-    memcpy(coefficients, coef, length * sizeof(int64_t));
+    memcpy(coefficients, coef, length * SIZEOF_INT64_T);
 
     assert(DEBUG__checkRow());
 }
@@ -118,7 +118,7 @@ void Matrix::Row::apply(Matrix &matrix)
     // at most |firstRow| + |secondRow| elements are neccessary
     // one less is also suitable
     index_t* newVar = (index_t*) calloc((varCount + next->varCount), SIZEOF_INDEX_T);
-    int64_t* newCoef = (int64_t*) calloc((varCount + next->varCount), sizeof(int64_t));
+    int64_t* newCoef = (int64_t*) calloc((varCount + next->varCount), SIZEOF_INT64_T);
     index_t newSize = 0;
 
     // start with the second element, because the first one is to be ruled out

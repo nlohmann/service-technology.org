@@ -1,0 +1,14 @@
+﻿{
+"toolname": "Yasmina", 
+"shortname": "yasmina", 
+"svnname": "yasmina", 
+"authors": [
+    "Peter Pan implemented ...",
+    "Donald Duck implemented ...",
+    "Daisy Duck implemented ..."
+], 
+"maintainer": "Peter Pan", 
+"tagline": "Making life easier", 
+"purpose": "Life is *hard*. Let's make life *easier*...", 
+"license": "AGPL3+"
+}

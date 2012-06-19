@@ -23,6 +23,66 @@ index_t** Net::Arc[2][2] = {{NULL, NULL}, {NULL, NULL}};
 mult_t** Net::Mult[2][2] = {{NULL, NULL}, {NULL, NULL}};
 char** Net::Name[2] = {NULL, NULL};
 
+// LCOV_EXCL_START
+bool Net::DEBUG__checkConsistency()
+{
+    for (int type = PL; type <= TR; ++type)
+    {
+        node_t othertype = (type == PL) ? TR : PL;
+        for (int direction = PRE; direction <= POST; direction++)
+        {
+            direction_t otherdirection = (direction == PRE) ? POST : PRE;
+            for (index_t n = 0; n < Net::Card[type] ; n ++)
+            {
+                for (index_t a = 0; a < Net::CardArcs[type][direction][n]; a++)
+                {
+                    index_t nn = Net::Arc[type][direction][n][a];
+                    index_t b;
+                    for (b = 0; b < Net::CardArcs[othertype][otherdirection][nn]; b++)
+                    {
+                        if (Net::Arc[othertype][otherdirection][nn][b] == n)
+                        {
+                            break;
+                        }
+                    }
+                    if (b >= Net::CardArcs[othertype][otherdirection][nn])
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
+bool Net::DEBUG__checkArcOrdering()
+{
+    index_t curElem;
+    for (index_t t = 0; t < Net::Card[TR]; ++t) {
+        curElem = Net::Arc[TR][PRE][t][0];
+        for (index_t p = 1; p < Net::CardArcs[TR][PRE][t]; ++p) {
+            assert(curElem < Net::Arc[TR][PRE][t][p]);
+        }
+        curElem = Net::Arc[TR][POST][t][0];
+        for (index_t p = 1; p < Net::CardArcs[TR][POST][t]; ++p) {
+            assert(curElem < Net::Arc[TR][POST][t][p]);
+        }
+    }
+    for (index_t p = 0; p < Net::Card[PL]; ++p) {
+        curElem = Net::Arc[PL][PRE][p][0];
+        for (index_t t = 1; t < Net::CardArcs[PL][PRE][p]; ++t) {
+            assert(curElem < Net::Arc[PL][PRE][p][t]);
+        }
+        curElem = Net::Arc[PL][POST][p][0];
+        for (index_t t = 1; t < Net::CardArcs[PL][POST][p]; ++t) {
+            assert(curElem < Net::Arc[PL][POST][p][t]);
+        }
+    }
+    return true;
+}
+// LCOV_EXCL_STOP
+
 /// sorts array of arc (= node id) plus corresponding array of multiplicities
 /// in the range of from to to (not including to)
 void Net::sortArcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to)
@@ -87,7 +147,7 @@ void Net::sortAllArcs()
     assert(DEBUG__checkArcOrdering());
 }
 
-/// Aufräumen der Netzstruktur -- service für valgrind
+/// Free all allocated memory
 void Net::deleteNodes()
 {
     for (int type = PL; type <= TR; ++type)
@@ -186,66 +246,6 @@ void Net::print()
     }
     printf("done\n");
 }
-
-// LCOV_EXCL_START
-bool Net::DEBUG__checkConsistency()
-{
-    for (int type = PL; type <= TR; ++type)
-    {
-        node_t othertype = (type == PL) ? TR : PL;
-        for (int direction = PRE; direction <= POST; direction++)
-        {
-            direction_t otherdirection = (direction == PRE) ? POST : PRE;
-            for (index_t n = 0; n < Net::Card[type] ; n ++)
-            {
-                for (index_t a = 0; a < Net::CardArcs[type][direction][n]; a++)
-                {
-                    index_t nn = Net::Arc[type][direction][n][a];
-                    index_t b;
-                    for (b = 0; b < Net::CardArcs[othertype][otherdirection][nn]; b++)
-                    {
-                        if (Net::Arc[othertype][otherdirection][nn][b] == n)
-                        {
-                            break;
-                        }
-                    }
-                    if (b >= Net::CardArcs[othertype][otherdirection][nn])
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-    }
-    return true;
-}
-
-bool Net::DEBUG__checkArcOrdering()
-{
-    index_t curElem;
-    for (index_t t = 0; t < Net::Card[TR]; ++t) {
-        curElem = Net::Arc[TR][PRE][t][0];
-        for (index_t p = 1; p < Net::CardArcs[TR][PRE][t]; ++p) {
-            assert(curElem < Net::Arc[TR][PRE][t][p]);
-        }
-        curElem = Net::Arc[TR][POST][t][0];
-        for (index_t p = 1; p < Net::CardArcs[TR][POST][t]; ++p) {
-            assert(curElem < Net::Arc[TR][POST][t][p]);
-        }
-    }
-    for (index_t p = 0; p < Net::Card[PL]; ++p) {
-        curElem = Net::Arc[PL][PRE][p][0];
-        for (index_t t = 1; t < Net::CardArcs[PL][PRE][p]; ++t) {
-            assert(curElem < Net::Arc[PL][PRE][p][t]);
-        }
-        curElem = Net::Arc[PL][POST][p][0];
-        for (index_t t = 1; t < Net::CardArcs[PL][POST][p]; ++t) {
-            assert(curElem < Net::Arc[PL][POST][p][t]);
-        }
-    }
-    return true;
-}
-// LCOV_EXCL_STOP
 
 /*!
 \todo remove TargetMarking ?
@@ -436,8 +436,75 @@ void Net::swapPlaces(index_t left, index_t right)
     assert(DEBUG__checkConsistency());
 }
 
+/// Creates a equation for the given transition (index) in the provided memory
+void createTransitionEquation(index_t transition, index_t* variables, int64_t* coefficients, index_t& size)
+{
+    // index in new row
+    size = 0;
+    // for each place p in the preset of t
+    for (index_t p = 0; p < Net::CardArcs[TR][PRE][transition]; ++p)
+    {
+        // store place index and the it's multiplicity (from p to t)
+        variables[size] = Net::Arc[TR][PRE][transition][p];
+        // positive numbers
+        assert(Net::Mult[TR][PRE][transition][p] != 0);
+        coefficients[size] = Net::Mult[TR][PRE][transition][p];
+        // increase newSize
+        ++size;
+    }
+    // for each place p in the postset of t
+    for (index_t p = 0; p < Net::CardArcs[TR][POST][transition]; ++p)
+    {
+        const index_t pID = Net::Arc[TR][POST][transition][p];
+        assert(Net::Mult[TR][POST][transition][p] != 0);
+
+        // check whether the p is already in the new row
+        // enumerate newVar till p is hit or not inside
+        index_t possiblePosition = 0;
+        for (; possiblePosition < size; ++possiblePosition)
+        {
+            if (variables[possiblePosition] >= pID)
+            {
+                break;
+            }
+        }
+        // distinguish which case is true (hit or not in)
+        if (variables[possiblePosition] == pID)
+        {
+            // p is already inside the new row, so subtract current multiplicity
+            coefficients[possiblePosition] -= Net::Mult[TR][POST][transition][p];
+            // new coefficient may be 0 now
+            if (coefficients[possiblePosition] == 0)
+            {
+                // erase possiblePosition entry (possiblePosition) in both array
+                memmove(&variables[possiblePosition], &variables[possiblePosition + 1], (size - possiblePosition) * SIZEOF_INDEX_T);
+                memmove(&coefficients[possiblePosition], &coefficients[possiblePosition + 1], (size - possiblePosition) * sizeof(int64_t));
+                // assumption: decreasing 0 will lead to maxInt but
+                //              upcoming increase will result in 0 again
+                --size;
+            }
+        }
+        else
+        {
+            // p is not in new row, so add it
+            // may be it is necessary to insert in between existing entrys
+            memmove(&variables[possiblePosition + 1], &variables[possiblePosition], (size - possiblePosition) * SIZEOF_INDEX_T);
+            memmove(&coefficients[possiblePosition + 1], &coefficients[possiblePosition], (size - possiblePosition) * sizeof(int64_t));
+            // store place index
+            variables[possiblePosition] = pID;
+            // store the multiplicity (from transition to p)
+            // negative numbers
+            coefficients[possiblePosition] = -Net::Mult[TR][POST][transition][p];
+            // increase newSize
+            ++size;
+        }
+    }
+}
+
+/// Calculates all signficant places and sorts them to the front of the place array
 void Net::setSignificantPlaces()
 {
+    // arcs must be sorted
     assert(Net::DEBUG__checkArcOrdering());
 
     // save number of places
@@ -453,6 +520,7 @@ void Net::setSignificantPlaces()
     // request memory for one full row
     index_t* newVar = (index_t*) calloc(cardPL, SIZEOF_INDEX_T);
     int64_t* newCoef = (int64_t*) calloc(cardPL, sizeof(int64_t));
+    index_t newSize;
 
     // create new matrix
     Matrix m(cardPL);
@@ -461,66 +529,8 @@ void Net::setSignificantPlaces()
     // for each transition t
     for (index_t t = 0; t < Net::Card[TR]; ++t)
     {
-        // index in new row
-        index_t newSize = 0;
-        // for each place p in the preset of t
-        for (index_t p = 0; p < Net::CardArcs[TR][PRE][t]; ++p)
-        {
-            // store place index and the it's multiplicity (from p to t)
-            newVar[newSize] = Net::Arc[TR][PRE][t][p];
-            // positive numbers
-            assert(Net::Mult[TR][PRE][t][p] != 0);
-            newCoef[newSize] = Net::Mult[TR][PRE][t][p];
-            // increase newSize
-            ++newSize;
-        }
-        // for each place p in the postset of t
-        for (index_t p = 0; p < Net::CardArcs[TR][POST][t]; ++p)
-        {
-            const index_t pID = Net::Arc[TR][POST][t][p];
-            assert(Net::Mult[TR][POST][t][p] != 0);
-
-            // check whether the p is already in the new row
-            // enumerate newVar till p is hit or not inside
-            index_t possiblePosition = 0;
-            for (; possiblePosition < newSize; ++possiblePosition)
-            {
-                if (newVar[possiblePosition] >= pID)
-                {
-                    break;
-                }
-            }
-            // distinguish which case is true (hit or not in)
-            if (newVar[possiblePosition] == pID)
-            {
-                // p is already inside the new row, so subtract current multiplicity
-                newCoef[possiblePosition] -= Net::Mult[TR][POST][t][p];
-                // new coefficient may be 0 now
-                if (newCoef[possiblePosition] == 0)
-                {
-                    // erase possiblePosition entry (possiblePosition) in both array
-                    memmove(&newVar[possiblePosition], &newVar[possiblePosition + 1], (newSize - possiblePosition) * SIZEOF_INDEX_T);
-                    memmove(&newCoef[possiblePosition], &newCoef[possiblePosition + 1], (newSize - possiblePosition) * sizeof(int64_t));
-                    // assumption: decreasing 0 will lead to maxInt but
-                    //              upcoming increase will result in 0 again
-                    --newSize;
-                }
-            }
-            else
-            {
-                // p is not in new row, so add it
-                // may be it is necessary to insert in between existing entrys
-                memmove(&newVar[possiblePosition + 1], &newVar[possiblePosition], (newSize - possiblePosition) * SIZEOF_INDEX_T);
-                memmove(&newCoef[possiblePosition + 1], &newCoef[possiblePosition], (newSize - possiblePosition) * sizeof(int64_t));
-                // store place index
-                newVar[possiblePosition] = pID;
-                // store the multiplicity (from t to p)
-                // negative numbers
-                newCoef[possiblePosition] = -Net::Mult[TR][POST][t][p];
-                // increase newSize
-                ++newSize;
-            }
-        }
+        // create equation for current transition
+        createTransitionEquation(t, newVar, newCoef, newSize);
         // save current arrays as new row
         m.addRow(newSize, newVar, newCoef);
 
@@ -529,6 +539,7 @@ void Net::setSignificantPlaces()
         memset(newCoef, 0, newSize * sizeof(int64_t));
     }
 
+    // free memory
     free(newVar);
     free(newCoef);
 
@@ -539,7 +550,6 @@ void Net::setSignificantPlaces()
     Place::CardSignificant = m.getSignificantColCount();
     index_t lastSignificant = cardPL - 1;
     index_t p = 0;
-    bool usedSwap = false;
     while (p < Place::CardSignificant)
     {
         if (!m.isSignificant(p))
@@ -552,7 +562,6 @@ void Net::setSignificantPlaces()
             }
             // swap lastSignificant with p
             Net::swapPlaces(p, lastSignificant--);
-            usedSwap = true;
         }
         p++;
     }
@@ -563,16 +572,14 @@ void Net::setSignificantPlaces()
     {
         Place::SizeOfBitVector += Place::CardBits[i];
     }
-    
-    // sort arcs after swapping
-    if (usedSwap)
-    {
-        Net::sortAllArcs();
-    }
 }
 
+/// Calculates the progress measure for all transitions
 void Net::setProgressMeasure()
 {
+    // arcs must be sorted
+    // ToDo: remove sortAllArcs() here?
+    Net::sortAllArcs();
     assert(Net::DEBUG__checkArcOrdering());
     
     // save number of places
@@ -587,6 +594,7 @@ void Net::setProgressMeasure()
     // request memory for one full row
     index_t* newVar = (index_t*) calloc(cardPL + 1, SIZEOF_INDEX_T);
     int64_t* newCoef = (int64_t*) calloc(cardPL + 1 + cardTR, sizeof(int64_t));
+    index_t newSize;
 
     // create new matrix
     Matrix m(cardNO);
@@ -595,66 +603,9 @@ void Net::setProgressMeasure()
     // for each transition t
     for (index_t t = 0; t < Net::Card[TR]; ++t)
     {
-        // index in new row
-        index_t newSize = 0;
-        // for each place p in the preset of t
-        for (index_t p = 0; p < Net::CardArcs[TR][PRE][t]; ++p)
-        {
-            // store place index and the it's multiplicity (from p to t)
-            newVar[newSize] = Net::Arc[TR][PRE][t][p];
-            // positive numbers
-            assert(Net::Mult[TR][PRE][t][p] != 0);
-            newCoef[newSize] = Net::Mult[TR][PRE][t][p];
-            // increase newSize
-            ++newSize;
-        }
-        // for each place p in the postset of t
-        for (index_t p = 0; p < Net::CardArcs[TR][POST][t]; ++p)
-        {
-            const index_t pID = Net::Arc[TR][POST][t][p];
-            assert(Net::Mult[TR][POST][t][p] != 0);
-
-            // check whether the p is already in the new row
-            // enumerate newVar till p is hit or not inside
-            index_t possiblePosition = 0;
-            for (; possiblePosition < newSize; ++possiblePosition)
-            {
-                if (newVar[possiblePosition] >= pID)
-                {
-                    break;
-                }
-            }
-            // distinguish which case is true (hit or not in)
-            if (newVar[possiblePosition] == pID)
-            {
-                // p is already inside the new row, so subtract current multiplicity
-                newCoef[possiblePosition] -= Net::Mult[TR][POST][t][p];
-                // new coefficient may be 0 now
-                if (newCoef[possiblePosition] == 0)
-                {
-                    // erase possiblePosition entry (possiblePosition) in both array
-                    memmove(&newVar[possiblePosition], &newVar[possiblePosition + 1], (newSize - possiblePosition) * SIZEOF_INDEX_T);
-                    memmove(&newCoef[possiblePosition], &newCoef[possiblePosition + 1], (newSize - possiblePosition) * sizeof(int64_t));
-                    // assumption: decreasing 0 will lead to maxInt but
-                    //              upcoming increase will result in 0 again
-                    --newSize;
-                }
-            }
-            else
-            {
-                // p is not in new row, so add it
-                // may be it is necessary to insert in between existing entrys
-                memmove(&newVar[possiblePosition + 1], &newVar[possiblePosition], (newSize - possiblePosition) * SIZEOF_INDEX_T);
-                memmove(&newCoef[possiblePosition + 1], &newCoef[possiblePosition], (newSize - possiblePosition) * sizeof(int64_t));
-                // store place index
-                newVar[possiblePosition] = pID;
-                // store the multiplicity (from t to p)
-                // negative numbers
-                newCoef[possiblePosition] = -Net::Mult[TR][POST][t][p];
-                // increase newSize
-                ++newSize;
-            }
-        }
+        // create equation for current transition
+        createTransitionEquation(t, newVar, newCoef, newSize);
+        
         // add entry for the identity matrix
         newVar[newSize] = t + cardPL;
         newCoef[newSize] = 1;
@@ -696,7 +647,6 @@ void Net::setProgressMeasure()
             }
             else {
                 // entry is linear dependent
-            
                 for (index_t v = 0; v < curRow->varCount; ++v) {
                     if (curRow->variables[v] == curReference + cardPL) {
                         // current variable is current transition (=reference)
@@ -707,12 +657,12 @@ void Net::setProgressMeasure()
                         // current variable is any other transition
                         Transition::ProgressMeasure[curReference] -= curRow->coefficients[v];
                     }
-                }     
+                }
+                // normalize current progress measure
                 if (Transition::ProgressMeasure[curReference] != 0) {
                     assert(denominatorValue[curReference] != 0);
-                    const int64_t ggtFactor = ggt(Transition::ProgressMeasure[curReference], denominatorValue[curReference]);
                     Transition::ProgressMeasure[curReference] /= denominatorValue[curReference];
-                    denominatorValue[curReference] /= ggtFactor;
+                    denominatorValue[curReference] /= ggt(Transition::ProgressMeasure[curReference], denominatorValue[curReference]);
                     if (denominatorValue[curReference] < 0) {
                         denominatorValue[curReference] *= -1;
                         Transition::ProgressMeasure[curReference] *= -1;

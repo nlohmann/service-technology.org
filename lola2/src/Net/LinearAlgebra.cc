@@ -49,9 +49,9 @@ void Matrix::DEBUG__printMatrix() const
         }
     }
 }
-
 // LCOV_EXCL_STOP
 
+/// checks whether the reduced matrix has at most one row per column
 bool Matrix::DEBUG__checkReduced() const
 {
     // for each variable i (=column)
@@ -65,6 +65,7 @@ bool Matrix::DEBUG__checkReduced() const
     return true;
 }
 
+/// checks whether the variables in a row a properly ordered
 bool Matrix::Row::DEBUG__checkRow() const
 {
     // for each variable i

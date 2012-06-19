@@ -6,6 +6,7 @@
 
 #pragma once
 #include <Core/Dimensions.h>
+#include <Net/Net.h>
 
 /// computes the ggt of two unsigned integers
 inline int64_t ggt(int64_t a, int64_t b)
@@ -51,6 +52,9 @@ class Matrix
         /// A row is used to store a row.
         class Row
         {
+            friend class Matrix;
+            friend void Net::setProgressMeasure();
+            
             public:
                 /// Generate and initialize a row based on Net.h types
                 Row(index_t, const index_t*, const int64_t*, index_t = 0);
@@ -65,6 +69,7 @@ class Matrix
 
                 bool DEBUG__checkRow() const;
 
+            private:
                 /// Number of variables in current row with non zero coefficients
                 index_t varCount;
                 /// Array of variable indizes in current row with non zero coefficients

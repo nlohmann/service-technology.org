@@ -25,6 +25,7 @@ void Matrix::Row::DEBUG__printRow() const
         cout << coefficients[i] << "*" << variables[i] << " ";
         //cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
     }
+    cout << "[" << reference << "]"; 
     cout << endl;
     /*
     for (index_t i = 0; i < varCount; ++i) {
@@ -48,38 +49,35 @@ void Matrix::DEBUG__printMatrix() const
         }
     }
 }
+
 // LCOV_EXCL_STOP
 
-/// computes the ggt of two unsigned integers
-inline int64_t ggt(int64_t a, int64_t b)
+bool Matrix::DEBUG__checkReduced() const
 {
-    while (true)
+    // for each variable i (=column)
+    for (index_t i = 0; i < colCount; ++i)
     {
-        a %= b;
-        if (!a)
+        if (matrix[i] != NULL)
         {
-            return b;
-        }
-        b %= a;
-        if (!b)
-        {
-            return a;
+            assert(matrix[i]->next == NULL);
         }
     }
+    return true;
 }
 
-/// multiplies two unsigned intergers with respect to overflows
-inline int64_t safeMult(int64_t a, int64_t b)
+bool Matrix::Row::DEBUG__checkRow() const
 {
-    //overflow handling
-    ///\todo overflow handling
-    ///\todo Add a URL where this magic numbers come from
-    if (b > 0 && a > 9223372036854775807 / b)
+    // for each variable i
+    index_t leftElem = 0;
+    for (index_t i = 0; i < varCount; ++i)
     {
-        assert(false);
+        assert(variables[i] >= leftElem);
+        if (i > 0) {
+            assert(variables[i] != leftElem);
+        }
+        leftElem = variables[i];
     }
-
-    return (a * b);
+    return true;
 }
 
 /// frees memory of current row
@@ -90,11 +88,8 @@ Matrix::Row::~Row()
 }
 
 /// creates a new row based on LinearAlgebra.h types
-Matrix::Row::Row(index_t length, const index_t* var, const int64_t* coef)
+Matrix::Row::Row(index_t length, const index_t* var, const int64_t* coef, index_t ref) : varCount(length), next(NULL), reference(ref)
 {
-    varCount = length;
-    next = NULL;
-
     // request memory for new row
     variables = (index_t*) malloc(length * SIZEOF_INDEX_T);
     // coefficients are stored as int64_t
@@ -103,6 +98,8 @@ Matrix::Row::Row(index_t length, const index_t* var, const int64_t* coef)
     // memcpy is used because given and new memory has the same types
     memcpy(variables, var, length * SIZEOF_INDEX_T);
     memcpy(coefficients, coef, length * sizeof(int64_t));
+    
+    assert(DEBUG__checkRow());
 }
 
 /// eleminates the first variable on the second row of the first variable
@@ -213,13 +210,16 @@ void Matrix::Row::apply(Matrix &matrix)
         newCoef[i] /= ggtFactor;
     }
 
+    // save current reference of second row
+    const index_t curReference = this->next->reference;
     // delete second row
     matrix.deleteRow(this);
 
     // create new row based on new arrays
     if (newSize != 0)
     {
-        matrix.addRow(newSize, newVar, newCoef);
+        assert(newVar[0] > variables[0]);
+        matrix.addRow(newSize, newVar, newCoef, curReference);
     }
     // free memory of the new row (data is already processed)
     free(newVar);
@@ -261,7 +261,7 @@ Matrix::Matrix(index_t size) : rowCount(0), colCount(size), significantColCount(
 }
 
 /// adds a row to the current matrix
-void Matrix::addRow(index_t length, const index_t* var, const int64_t* coef)
+void Matrix::addRow(index_t length, const index_t* var, const int64_t* coef, index_t ref)
 {
     // if new row contains no variables, do nothing
     if (length == 0)
@@ -270,7 +270,7 @@ void Matrix::addRow(index_t length, const index_t* var, const int64_t* coef)
     }
 
     // create new row based on given data
-    Row* row = new Row(length, var, coef);
+    Row* row = new Row(length, var, coef, ref);
 
     // insert new row at right position
     row->next = matrix[row->variables[0]];
@@ -303,7 +303,7 @@ void Matrix::deleteRow(Row* row)
 
 /// reduces the current matrix to triangular form
 void Matrix::reduce()
-{
+{   
     // if there no rows, do nothing
     if (rowCount == 0)
     {
@@ -324,6 +324,13 @@ void Matrix::reduce()
             matrix[i]->apply(*this);
         }
     }
+    assert(DEBUG__checkReduced());
+}
+
+/// Returns number of rows
+index_t Matrix::getRowCount() const
+{
+    return rowCount;
 }
 
 /// Returns true iff place with given index is significant
@@ -331,6 +338,20 @@ bool Matrix::isSignificant(index_t place) const
 {
     assert(place < colCount);
     return (matrix[place] != NULL);
+}
+
+/// Returns reference number of first row with given 
+index_t Matrix::getReference(index_t column) const
+{
+    assert(column < colCount);
+    return (matrix[column]->reference);
+}
+
+/// Returns row of the first row with given index
+Matrix::Row* Matrix::getRow(index_t column) const
+{
+    assert(column < colCount);
+    return matrix[column];
 }
 
 /// Returns the number of significant (= not empty) columns

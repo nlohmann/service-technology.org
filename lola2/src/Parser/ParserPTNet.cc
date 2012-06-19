@@ -21,7 +21,6 @@ should be independent from the format (LoLA / PNML / ...)
 #include <Net/Net.h>
 #include <Net/Place.h>
 #include <Net/Transition.h>
-#include <Net/StructuralReduction.h>
 #include <Net/Marking.h>
 #include <Parser/ArcList.h>
 #include <Parser/SymbolTable.h>
@@ -46,58 +45,6 @@ ParserPTNet::~ParserPTNet()
     delete PlaceTable;
     delete TransitionTable;
 }
-
-
-/// sorts array of arc (= node id) plus corresponding array of multiplicities
-/// in the range of from to to (not including to)
-void ParserPTNet::sort_arcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to)
-{
-    if ((to - from) < 2)
-    {
-        return;    // less than 2 elements are always sorted
-    }
-
-    index_t blue = from; // points to first index where element is not known < pivot
-    index_t white = from + 1; // points to first index where element is not know <= pivot
-    index_t red = to; // points to last index (+1) where element is not know to be  pivot
-    const index_t pivot = arcs[from];
-
-    assert(from < to);
-
-    while (red > white)
-    {
-        if (arcs[white] < pivot)
-        {
-            // swap white <->blue
-            const index_t tmp_index = arcs[blue];
-            const mult_t tmp_mult = mults[blue];
-            arcs[blue] = arcs[white];
-            mults[blue++] = mults[white];
-            arcs[white] = tmp_index;
-            mults[white++] = tmp_mult;
-        }
-        else
-        {
-            // there are no duplicates in arc list
-            assert(arcs[white] > pivot);
-
-            // swap white <->red
-            const index_t tmp_index = arcs[--red];
-            const mult_t tmp_mult = mults[red];
-            arcs[red] = arcs[white];
-            mults[red] = mults[white];
-            arcs[white] = tmp_index;
-            mults[white] = tmp_mult;
-        }
-    }
-
-    assert(blue + 1 == red);
-
-    sort_arcs(arcs, mults, from, blue);
-    sort_arcs(arcs, mults, red, to);
-}
-
-
 
 
 /*!
@@ -282,8 +229,8 @@ void ParserPTNet::symboltable2net()
         // initialize DeltaT structures
         index_t card_delta_pre = 0;
         index_t card_delta_post = 0;
-        sort_arcs(Net::Arc[TR][PRE][t], Net::Mult[TR][PRE][t], 0, Net::CardArcs[TR][PRE][t]);
-        sort_arcs(Net::Arc[TR][POST][t], Net::Mult[TR][POST][t], 0, Net::CardArcs[TR][POST][t]);
+        Net::sortArcs(Net::Arc[TR][PRE][t], Net::Mult[TR][PRE][t], 0, Net::CardArcs[TR][PRE][t]);
+        Net::sortArcs(Net::Arc[TR][POST][t], Net::Mult[TR][POST][t], 0, Net::CardArcs[TR][POST][t]);
 
         index_t i; // parallel iteration through sorted pre and post arc sets
         index_t j;
@@ -552,9 +499,10 @@ void ParserPTNet::symboltable2net()
     /****************************
     * 9. Set significant places *
     ****************************/
-    setSignificantPlaces();
+    Net::setSignificantPlaces();
     rep->status("%d places, %d transitions, %d significant places", Net::Card[PL], Net::Card[TR], Place::CardSignificant);
-
+    // ToDo: move to another place?
+    Net::setProgressMeasure();
 
     /********************************
     * 10. Initial enabledness check *

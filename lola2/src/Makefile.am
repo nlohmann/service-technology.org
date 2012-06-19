@@ -23,13 +23,11 @@ lola_SOURCES = \
                 Parser/SymbolTable.cc Parser/SymbolTable.h \
                 Parser/TransitionSymbol.h Parser/TransitionSymbol.cc \
                 \
-                Net/swap.h Net/swap.cc \
                 Net/LinearAlgebra.cc Net/LinearAlgebra.h \
                 Net/Marking.cc Net/Marking.h \
                 Net/Net.cc Net/Net.h \
                	Net/NetState.cc Net/NetState.h \
                 Net/Place.cc Net/Place.h \
-                Net/StructuralReduction.cc Net/StructuralReduction.h \
                 Net/Transition.cc Net/Transition.h \
                 \
                 InputOutput/CompressedIO.cc InputOutput/CompressedIO.h \

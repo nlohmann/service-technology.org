@@ -44,5 +44,19 @@ struct Net
     /// Aufräumen der Knoten - Service für valgrind
     static void deleteNodes();
 
+    static void sortArcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to);
+    
+    static void sortAllArcs();
+    
+    static void swapPlaces(index_t, index_t);
+    
+    static void setSignificantPlaces();
+    
+    static void setProgressMeasure();
+
+    static bool DEBUG__checkConsistency();
+    
+    static bool DEBUG__checkArcOrdering();
+
     static void print();
 };

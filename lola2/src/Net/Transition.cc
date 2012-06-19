@@ -28,6 +28,7 @@ index_t* Transition::CardConflicting = NULL;
 index_t** Transition::Conflicting = NULL;
 index_t* Transition::CardBackConflicting = NULL;
 index_t** Transition::BackConflicting = NULL;
+int64_t* Transition::ProgressMeasure = NULL;
 
 /*!
 Whenever t gets disabled, we sort its Pre list such that the scapegoat is the
@@ -64,6 +65,7 @@ void Transition::deleteTransitions()
     free(Transition::Conflicting);
     free(Transition::BackConflicting);
     free(Transition::PositionScapegoat);
+    free(Transition::ProgressMeasure);
 }
 
 void Transition::checkTransitions(NetState &ns)

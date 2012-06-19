@@ -16,7 +16,6 @@ class ParserPTNet
     private:
 
     public:
-        static void sort_arcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to);
         SymbolTable* PlaceTable;
         SymbolTable* TransitionTable;
 

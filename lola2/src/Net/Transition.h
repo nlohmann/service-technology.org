@@ -55,6 +55,9 @@ struct Transition
         /// If transition i is disabled, this is its position in its scapegpat's Disabled list
         static index_t* PositionScapegoat;
 
+        /// The progress measure for the sweep line method
+        static int64_t* ProgressMeasure;
+
         /// Check transition for activation
         static void checkEnabled(NetState &ns, index_t t);
 

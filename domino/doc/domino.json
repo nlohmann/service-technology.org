@@ -1,0 +1,12 @@
+﻿{
+"toolname": "Domino", 
+"shortname": "domino", 
+"svnname": "domino", 
+"authors": [
+   "* Andreas Lehmann implemented the core functionality of Domino"
+], 
+"maintainer": "Andreas Lehmann", 
+"tagline": "Domino decomposes business processes into services", 
+"purpose": "Domino [d]ec[om]pose bus[in]ess w[o]rkflows (into services) based on a given annotation.", 
+"license": "AGPL3+"
+}

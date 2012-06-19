@@ -62,7 +62,7 @@ struct Net
     /// checks whether all arcs are properly (especially to both directions)
     static bool DEBUG__checkConsistency();
     
-    /// checks whether all arcs are properly ordered
+    /// checks whether all arcs are ordered properly
     static bool DEBUG__checkArcOrdering();
 
     /// print the net (using printf)

@@ -15,24 +15,22 @@ using namespace std;
 
 // LCOV_EXCL_START
 #include <iostream>
-using std::cout;
-using std::endl;
 /// writes current row on cout
 void Matrix::Row::DEBUG__printRow() const
 {
     for (index_t i = 0; i < varCount; ++i)
     {
-        cout << coefficients[i] << "*" << variables[i] << " ";
-        //cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
+        std::cout << coefficients[i] << "*" << variables[i] << " ";
+        //std::cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
     }
-    cout << "[" << reference << "]"; 
-    cout << endl;
+    std::cout << "[" << reference << "]"; 
+    std::cout << std::endl;
     /*
     for (index_t i = 0; i < varCount; ++i) {
-       //cout << coefficients[i] << "*" << variables[i] << " ";
-       cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
+       //std::cout << coefficients[i] << "*" << variables[i] << " ";
+       std::cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
     }
-    cout << endl;
+    std::cout << std::endl;
     */
 }
 /// writes current matrix on cout
@@ -40,7 +38,7 @@ void Matrix::DEBUG__printMatrix() const
 {
     for (index_t c = 0; c < colCount; ++c)
     {
-        cout << "place " << c << endl;
+        std::cout << "column " << c << endl;
         Row* curRow = matrix[c];
         while (curRow != NULL)
         {
@@ -65,7 +63,7 @@ bool Matrix::DEBUG__checkReduced() const
     return true;
 }
 
-/// checks whether the variables in a row a properly ordered
+/// checks whether the variables in a row a ordered properly
 bool Matrix::Row::DEBUG__checkRow() const
 {
     // for each variable i
@@ -334,11 +332,11 @@ index_t Matrix::getRowCount() const
     return rowCount;
 }
 
-/// Returns true iff place with given index is significant
-bool Matrix::isSignificant(index_t place) const
+/// Returns true iff a column with given index is significant
+bool Matrix::isSignificant(index_t column) const
 {
-    assert(place < colCount);
-    return (matrix[place] != NULL);
+    assert(column < colCount);
+    return (matrix[column] != NULL);
 }
 
 /// Returns reference number of first row with given 

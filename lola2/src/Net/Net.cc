@@ -578,7 +578,7 @@ void Net::setSignificantPlaces()
 void Net::setProgressMeasure()
 {
     // arcs must be sorted
-    // ToDo: remove sortAllArcs() here?
+    /// \todo: remove sortAllArcs() here?
     Net::sortAllArcs();
     assert(Net::DEBUG__checkArcOrdering());
     
@@ -589,7 +589,7 @@ void Net::setProgressMeasure()
     // save number of nodes
     const index_t cardNO = cardPL + cardTR;
 
-    // ToDo: handle special cases (only a few places/transitions)
+    /// \todo: handle special cases (only a few places/transitions)
 
     // request memory for one full row
     index_t* newVar = (index_t*) calloc(cardPL + 1, SIZEOF_INDEX_T);

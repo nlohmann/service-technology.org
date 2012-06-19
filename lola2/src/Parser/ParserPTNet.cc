@@ -501,7 +501,7 @@ void ParserPTNet::symboltable2net()
     ****************************/
     Net::setSignificantPlaces();
     rep->status("%d places, %d transitions, %d significant places", Net::Card[PL], Net::Card[TR], Place::CardSignificant);
-    // ToDo: move to another place?
+    /// \todo: move to another place?
     Net::setProgressMeasure();
 
     /********************************

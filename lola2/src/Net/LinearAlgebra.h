@@ -67,6 +67,7 @@ class Matrix
                 /// Write row to cout
                 void DEBUG__printRow() const;
 
+                /// Checks whether the variables are ordered properly
                 bool DEBUG__checkRow() const;
 
             private:
@@ -110,10 +111,7 @@ class Matrix
         /// Generate the triangular form of the matrix (original one gets lost)
         void reduce();
 
-        /// Write matrix to cout
-        void DEBUG__printMatrix() const;
-
-        /// Returns true iff place with given index is significant
+        /// Returns true iff a column with given index is significant
         bool isSignificant(index_t) const;
 
         /// Returns reference number of first row with given index
@@ -127,4 +125,7 @@ class Matrix
 
         /// Returns the number of significant (= not empty) columns
         index_t getSignificantColCount() const;
+        
+        /// Write matrix to cout
+        void DEBUG__printMatrix() const;
 };

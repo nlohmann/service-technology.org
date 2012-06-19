@@ -38,6 +38,13 @@ BUILT_SOURCES = $(KCDUMMY) \
 # These files have to be distributed to compile without compiler generators.
 EXTRA_DIST = $(KCDUMMY) $(KCFILES_TEMP) $(KCFILES_NECESSARY) cmdline.ggo
 
+BISON_FILES = $(filter %.yy,$(bpel2owfn_SOURCES))
+
+# fix for Automake 1.12
+$(BISON_FILES:.yy=.hh):
+	$(AM_V_GEN) mv $(@:.hh=.h) $@
+
+
 
 ##########################################
 # everything about the Kimwitu++ sources #

@@ -1,0 +1,12 @@
+﻿{
+"toolname": "Cosme", 
+"shortname": "cosme", 
+"svnname": "cosme", 
+"authors": [
+    "Andreas Lehmann implemented the core functionality of Cosme"
+], 
+"maintainer": "Andreas Lehmann",
+"tagline": "Cosme decides matchting and substituability for services", 
+"purpose": "Cosme [c]hecks [o]perating guidelines for [s]imulation, [m]atching, and [e]quivalence. Operating guidelines must be given in bit representation.", 
+"license": "AGPL3+"
+}

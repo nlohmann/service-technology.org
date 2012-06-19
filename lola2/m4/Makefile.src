@@ -21,6 +21,7 @@ MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
 $(BISON_FILES:.yy=.hh):
 	$(AM_V_GEN) mv $(@:.hh=.h) $@
 
+
 #----------------------------------------------------------------#
 # GENERIC: copy the content of the config.log file to a C header #
 #----------------------------------------------------------------#

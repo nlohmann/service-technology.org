@@ -23,7 +23,7 @@ void Matrix::Row::DEBUG__printRow() const
         std::cout << coefficients[i] << "*" << variables[i] << " ";
         //std::cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
     }
-    std::cout << "[" << reference << "]"; 
+    std::cout << "[" << reference << "]";
     std::cout << std::endl;
     /*
     for (index_t i = 0; i < varCount; ++i) {
@@ -71,7 +71,8 @@ bool Matrix::Row::DEBUG__checkRow() const
     for (index_t i = 0; i < varCount; ++i)
     {
         assert(variables[i] >= leftElem);
-        if (i > 0) {
+        if (i > 0)
+        {
             assert(variables[i] != leftElem);
         }
         leftElem = variables[i];
@@ -97,7 +98,7 @@ Matrix::Row::Row(index_t length, const index_t* var, const int64_t* coef, index_
     // memcpy is used because given and new memory has the same types
     memcpy(variables, var, length * SIZEOF_INDEX_T);
     memcpy(coefficients, coef, length * sizeof(int64_t));
-    
+
     assert(DEBUG__checkRow());
 }
 
@@ -302,7 +303,7 @@ void Matrix::deleteRow(Row* row)
 
 /// reduces the current matrix to triangular form
 void Matrix::reduce()
-{   
+{
     // if there no rows, do nothing
     if (rowCount == 0)
     {
@@ -339,7 +340,7 @@ bool Matrix::isSignificant(index_t column) const
     return (matrix[column] != NULL);
 }
 
-/// Returns reference number of first row with given 
+/// Returns reference number of first row with given
 index_t Matrix::getReference(index_t column) const
 {
     assert(column < colCount);

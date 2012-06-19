@@ -14,8 +14,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstdlib>
+#include <cstring>
 #include <cstdio>
 #include <new>
+#include <string>
 
 #include <cmdline.h>
 
@@ -67,6 +69,44 @@ Input* netFile;
 extern int ptnetlola_parse();
 extern int ptnetlola_lex_destroy();
 
+void callHome(int argc, char** argv)
+{
+    std::string json = "";
+
+    json += "{";
+    json += "\"package_version\":\"";
+    json += PACKAGE_VERSION;
+    json += "\",";
+    json += "\"svn_version\":\"";
+    json += VERSION_SVN;
+    json += "\",";
+    json += "\"build_system\":\"";
+    json += CONFIG_BUILDSYSTEM;
+    json += "\",";
+    json += "\"hostname\":\"";
+    json += CONFIG_HOSTNAME;
+    json += "\",";
+    json += "\"architecture\":\"";
+    json += (SIZEOF_VOIDP * 8 == 32) ? "32" : "64";
+    json += "\",";
+    json += "\"parameters\":[";
+    for (int i = 1; i < argc; ++i)
+    {
+        if (i != 1)
+        {
+            json += ",";
+        }
+        json += "\"";
+        json += argv[i];
+        json += "\"";
+    }
+    json += "]";
+    json += "}";
+
+    Socket et(5555, "nitpickertool.com");
+    et.send(json.c_str());
+}
+
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv)
 {
@@ -111,6 +151,11 @@ int main(int argc, char** argv)
 
     // install new handler
     std::set_new_handler(Handlers::newHandler);
+
+    if (not args_info.nolog_given)
+    {
+        callHome(argc, argv);
+    }
 
     // file input
     if (args_info.compressed_given)

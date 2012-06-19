@@ -46,22 +46,22 @@ struct Net
 
     /// sorts a concrete pair of arcs and multiplicities (used as helper method for sortAllArcs)
     static void sortArcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to);
-    
+
     /// sorts all arcs
     static void sortAllArcs();
-    
+
     /// swaps two places (does not care about ordering)
     static void swapPlaces(index_t, index_t);
-    
+
     /// calculates all significant places and changes order of places(!)
     static void setSignificantPlaces();
-    
+
     /// calculates progress measure for all transitions (used by sweep line method)
     static void setProgressMeasure();
 
     /// checks whether all arcs are properly (especially to both directions)
     static bool DEBUG__checkConsistency();
-    
+
     /// checks whether all arcs are ordered properly
     static bool DEBUG__checkArcOrdering();
 

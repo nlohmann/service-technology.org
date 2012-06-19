@@ -59,23 +59,29 @@ bool Net::DEBUG__checkConsistency()
 bool Net::DEBUG__checkArcOrdering()
 {
     index_t curElem;
-    for (index_t t = 0; t < Net::Card[TR]; ++t) {
+    for (index_t t = 0; t < Net::Card[TR]; ++t)
+    {
         curElem = Net::Arc[TR][PRE][t][0];
-        for (index_t p = 1; p < Net::CardArcs[TR][PRE][t]; ++p) {
+        for (index_t p = 1; p < Net::CardArcs[TR][PRE][t]; ++p)
+        {
             assert(curElem < Net::Arc[TR][PRE][t][p]);
         }
         curElem = Net::Arc[TR][POST][t][0];
-        for (index_t p = 1; p < Net::CardArcs[TR][POST][t]; ++p) {
+        for (index_t p = 1; p < Net::CardArcs[TR][POST][t]; ++p)
+        {
             assert(curElem < Net::Arc[TR][POST][t][p]);
         }
     }
-    for (index_t p = 0; p < Net::Card[PL]; ++p) {
+    for (index_t p = 0; p < Net::Card[PL]; ++p)
+    {
         curElem = Net::Arc[PL][PRE][p][0];
-        for (index_t t = 1; t < Net::CardArcs[PL][PRE][p]; ++t) {
+        for (index_t t = 1; t < Net::CardArcs[PL][PRE][p]; ++t)
+        {
             assert(curElem < Net::Arc[PL][PRE][p][t]);
         }
         curElem = Net::Arc[PL][POST][p][0];
-        for (index_t t = 1; t < Net::CardArcs[PL][POST][p]; ++t) {
+        for (index_t t = 1; t < Net::CardArcs[PL][POST][p]; ++t)
+        {
             assert(curElem < Net::Arc[PL][POST][p][t]);
         }
     }
@@ -437,7 +443,7 @@ void Net::swapPlaces(index_t left, index_t right)
 }
 
 /// Creates a equation for the given transition (index) in the provided memory
-void createTransitionEquation(index_t transition, index_t* variables, int64_t* coefficients, index_t& size)
+void createTransitionEquation(index_t transition, index_t* variables, int64_t* coefficients, index_t &size)
 {
     // index in new row
     size = 0;
@@ -581,7 +587,7 @@ void Net::setProgressMeasure()
     /// \todo: remove sortAllArcs() here?
     Net::sortAllArcs();
     assert(Net::DEBUG__checkArcOrdering());
-    
+
     // save number of places
     const index_t cardPL = Net::Card[PL];
     // save number of transitions
@@ -605,7 +611,7 @@ void Net::setProgressMeasure()
     {
         // create equation for current transition
         createTransitionEquation(t, newVar, newCoef, newSize);
-        
+
         // add entry for the identity matrix
         newVar[newSize] = t + cardPL;
         newCoef[newSize] = 1;
@@ -627,43 +633,52 @@ void Net::setProgressMeasure()
     assert(m.getRowCount() == cardTR);
     m.reduce();
     assert(m.getRowCount() == cardTR);
-    
+
     // calculate progress measure
     Transition::ProgressMeasure = (int64_t*) calloc(cardTR, sizeof(int64_t));
     int64_t* denominatorValue = (int64_t*) calloc(cardTR, sizeof(int64_t));
-    
-    for (index_t t = 0; t < cardNO; ++t) {
-        if (m.isSignificant(t)) {
+
+    for (index_t t = 0; t < cardNO; ++t)
+    {
+        if (m.isSignificant(t))
+        {
             // entry exists
             const Matrix::Row* curRow = m.getRow(t);
-            const index_t curReference = m.getReference(t); 
-            
+            const index_t curReference = m.getReference(t);
+
             assert(curReference < cardTR);
-            
-            if (curRow->variables[0] < cardPL) {
+
+            if (curRow->variables[0] < cardPL)
+            {
                 // entry is linear independent
                 Transition::ProgressMeasure[curReference] = 1;
                 denominatorValue[curReference] = 1;
             }
-            else {
+            else
+            {
                 // entry is linear dependent
-                for (index_t v = 0; v < curRow->varCount; ++v) {
-                    if (curRow->variables[v] == curReference + cardPL) {
+                for (index_t v = 0; v < curRow->varCount; ++v)
+                {
+                    if (curRow->variables[v] == curReference + cardPL)
+                    {
                         // current variable is current transition (=reference)
                         assert(curRow->coefficients[v] != 0);
                         denominatorValue[curReference] = curRow->coefficients[v];
                     }
-                    else {
+                    else
+                    {
                         // current variable is any other transition
                         Transition::ProgressMeasure[curReference] -= curRow->coefficients[v];
                     }
                 }
                 // normalize current progress measure
-                if (Transition::ProgressMeasure[curReference] != 0) {
+                if (Transition::ProgressMeasure[curReference] != 0)
+                {
                     assert(denominatorValue[curReference] != 0);
                     Transition::ProgressMeasure[curReference] /= denominatorValue[curReference];
                     denominatorValue[curReference] /= ggt(Transition::ProgressMeasure[curReference], denominatorValue[curReference]);
-                    if (denominatorValue[curReference] < 0) {
+                    if (denominatorValue[curReference] < 0)
+                    {
                         denominatorValue[curReference] *= -1;
                         Transition::ProgressMeasure[curReference] *= -1;
                     }
@@ -671,22 +686,25 @@ void Net::setProgressMeasure()
             }
         }
     }
-    
+
     // multiply all values with gcd
     int64_t gcd = 1;
-    for (index_t t = 0; t < cardTR; ++t) {
+    for (index_t t = 0; t < cardTR; ++t)
+    {
         gcd = (gcd / ggt(gcd, denominatorValue[t]));
         gcd *= denominatorValue[t];
     }
-    
+
     // save progress measures
-    for (index_t p = 0; p < cardNO; ++p) {
-        if (m.isSignificant(p)) {
+    for (index_t p = 0; p < cardNO; ++p)
+    {
+        if (m.isSignificant(p))
+        {
             const index_t curReference = m.getReference(p);
             Transition::ProgressMeasure[curReference] *= (gcd / denominatorValue[curReference]);
         }
     }
-    
+
     // free memory
-    free(denominatorValue);        
+    free(denominatorValue);
 }

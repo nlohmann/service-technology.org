@@ -52,9 +52,9 @@ class Matrix
         /// A row is used to store a row.
         class Row
         {
-            friend class Matrix;
-            friend void Net::setProgressMeasure();
-            
+                friend class Matrix;
+                friend void Net::setProgressMeasure();
+
             public:
                 /// Generate and initialize a row based on Net.h types
                 Row(index_t, const index_t*, const int64_t*, index_t = 0);
@@ -93,7 +93,7 @@ class Matrix
         index_t colCount;
         /// Number of non empty columns
         index_t significantColCount;
-        
+
         bool DEBUG__checkReduced() const;
 
     public:
@@ -125,7 +125,7 @@ class Matrix
 
         /// Returns the number of significant (= not empty) columns
         index_t getSignificantColCount() const;
-        
+
         /// Write matrix to cout
         void DEBUG__printMatrix() const;
 };

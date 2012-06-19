@@ -1,14 +1,38 @@
-﻿{
-"toolname": "BPEL2oWFN", 
-"shortname": "bpel2owfn", 
-"svnname": "bpel2owfn", 
-"authors": [
-    "Peter Pan implemented ...",
-    "Donald Duck implemented ...",
-    "Daisy Duck implemented ..."
-], 
-"maintainer": "Peter Pan", 
-"tagline": "Making life easier", 
-"purpose": "Life is *hard*. Let's make life *easier*...", 
-"license": "AGPL3+"
+{
+  "toolname": "GNU BPEL2oWFN",
+  "shortname": "bpel2owfn",
+  "status": "inactive",
+  "tagline": "translating WS-BPEL processes into Petri net models",
+  "purpose": "...",
+  "copyright": "...",
+  "authors": [
+    "Niels Lohmann implemented the original core functionality of Wendy (operating guidelines)",
+    "Daniela Weinberg implemented reduction techniques as well as the synthesis of livelock free strategies",
+    "Christian Sura implemented the functions to cover open nets nodes"
+  ],
+  "maintainer": "Niels Lohmann",
+  "license": "AGPL3+",
+  "thanks": [
+  "Sylvain Beucler (GNU Project) for his help moving BPEL2oWFN to Savannah",
+  "Maarten Boote (Technische Universiteit Eindhoven) for integrating BPEL2oWFN to LaQuSo",
+  "Antoon van Breda a.k.a. Jaded Hobo for the original version of the `colorconsole.h' header",
+  "Jan Bretschneider (Humboldt-Universität zu Berlin) for patient C++ help",
+  "Dirk Fahland (Humboldt-Universität zu Berlin) for fruitful discussions about BPEL's semantics",
+  "Carsten Frenkler (Gedilan Technologies) for challenging BPEL processes",
+  "Mario Karrenbrock (FH Wilhelmshaven/SAP) for finding bugs and testing the consistency mode",
+  "Dieter König (IBM) for valuable advice concerning BPEL",
+  "Oliver Kopp (Universität Stuttgart) for challenging BPEL processes",
+  "Axel Martens (IBM) for valuable advice concerning BPEL",
+  "Harald Meyer (Hasso Plattner Institute) for pointing out a bug in the parser",
+  "Simon Moser (IBM) for valuable advice concerning BPEL",
+  "Chun Ouyang (Queensland University of Technology) for discussion about the Petri net semantics",
+  "Michael Piefel (Humboldt-Universität zu Berlin) for help with Kimwitu++",
+  "Dennis Reinert (Humboldt-Universität zu Berlin) for his work on the first versions of BPEL2oWFN",
+  "Eric Verbeek (Technische Universiteit Eindhoven) for integrating BPEL2oWFN to the ProM framework and valuable comments on BPEL's link semantics",
+  "Ernesto Santana-Diaz for writing a Java-based GUI for BPEL2oWFN",
+  "Matthias Weidlich (Hasso-Plattner-Institute at University of Potsdam) for pointing out a bug in the Petri net patterns",
+  "Jan Martijn van der Werf (Technische Universiteit Eindhoven) for his help with the PNML-oWFN format"
+  ],
+  "bugtracker": "https://gna.org/bugs/?group=service-tech",
+  "tasktracker": "https://gna.org/task/?group=service-tech"
 }

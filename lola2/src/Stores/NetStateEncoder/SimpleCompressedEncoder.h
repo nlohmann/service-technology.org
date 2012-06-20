@@ -23,6 +23,5 @@ private:
     /// input vector filled in getInput method
     vectordata_t** inputs;
     index_t insize;
-    unsigned int numElems[32];
 };
 

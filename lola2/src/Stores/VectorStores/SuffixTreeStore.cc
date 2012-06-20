@@ -137,6 +137,12 @@ bool SuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen,
                 {
                     position+=VECTOR_WIDTH, pVector++;
                     input_index++, ++pInput;
+//                    if(input_index > max_input_index)
+//                    {
+                        // match found, we're done
+//                        pthread_rwlock_unlock(rwlocks + hash);
+//                        return true;
+//                    }
                 }
                 comparebits = VECTOR_WIDTH >> 1; // initialize binary search for differing bit
             }

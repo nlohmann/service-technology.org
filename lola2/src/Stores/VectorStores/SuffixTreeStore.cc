@@ -284,7 +284,11 @@ bool SuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen,
     if(input_bitstogo == VECTOR_WIDTH)
     {
         // good alignment, use memcpy
-        memcpy(pVector,pInput,newvectorlen*sizeof(vectordata_t));
+        while(newvectorlen--) {
+            *(pVector++) = *(pInput++);
+        }
+
+//        memcpy(pVector,pInput,newvectorlen*sizeof(vectordata_t));
         pthread_rwlock_unlock(rwlocks + hash);
         return false;
     } else {

@@ -10,6 +10,8 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <semaphore.h>
+#include <fcntl.h>
 #include "Net/Marking.h"
 #include "Net/Place.h"
 #include "Net/Transition.h"
@@ -67,8 +69,8 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
         finished = true;
         // release all semaphores
         for (int i = 0; i < number_of_threads; i++)
-            sem_post(&restartSemaphore);
-        sem_post(&transfer_finished_mutex);
+            sem_post(restartSemaphore);
+        pthread_mutex_unlock(&transfer_finished_mutex);
         // return success
         pthread_mutex_lock(&write_current_back_mutex);
         resultProperty->stack = stack;
@@ -135,8 +137,8 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
                     finished = true;
                     // release all semaphores
                     for (int i = 0; i < number_of_threads; i++)
-                        sem_post(&restartSemaphore);
-                    sem_post(&transfer_finished_mutex);
+                        sem_post(restartSemaphore);
+                    pthread_mutex_unlock(&transfer_finished_mutex);
                     // return success
                     pthread_mutex_lock(&write_current_back_mutex);
                     resultProperty->stack = stack;
@@ -175,8 +177,8 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
                         transfer_netstate = NetState::createNetStateFromCurrent(ns);
                         transfer_property = sp->copy();
 
-                        sem_post(&restartSemaphore);
-                        sem_wait(&transfer_finished_mutex);
+                        sem_post(restartSemaphore);
+                        pthread_mutex_lock(&transfer_finished_mutex);
 
                         // backfire the current transition to return to original state
                         stack.pop(&currentEntry, &currentFirelist);
@@ -214,8 +216,8 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
                     finished = true;
                     // release all semaphores
                     for (int i = 0; i < number_of_threads; i++)
-                        sem_post(&restartSemaphore);
-                    sem_post(&transfer_finished_mutex);
+                        sem_post(restartSemaphore);
+                    pthread_mutex_unlock(&transfer_finished_mutex);
                     pthread_mutex_unlock(&num_suspend_mutex);
                     // delete the sp&firelist
                     delete myFirelist;
@@ -224,7 +226,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
                     return false;
                 }
                 pthread_mutex_unlock(&num_suspend_mutex);
-                sem_wait(&restartSemaphore);
+                sem_wait(restartSemaphore);
                 // if the search has come to an end return without success
                 if (finished)
                 {
@@ -245,7 +247,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
                 sp->initProperty(ns);
                 myFirelist = fireListCreator.createFireList(sp);
                 // my sender holds the lock that authorizes me to decrease the variable
-                sem_post(&transfer_finished_mutex);
+                pthread_mutex_unlock(&transfer_finished_mutex);
 
                 // re-initialize the current search state
                 currentEntry = myFirelist->getFirelist(ns, &currentFirelist);
@@ -261,6 +263,8 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
         }
     }
 }
+
+
 
 bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns, Store &myStore, FireListCreator &firelistcreator, int number_of_threads)
 {
@@ -282,11 +286,12 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns, St
         args[i].resultProperty = &property;
     }
     // init the restart semaphore
-    sem_init(&restartSemaphore, 0, 0);
-    sem_init(&transfer_finished_mutex, 0, 0);
+    restartSemaphore = sem_open("ParallelExploration_restartSem", O_CREAT, 0600, 0);
+    pthread_mutex_init(&transfer_finished_mutex, NULL);
     pthread_mutex_init(&num_suspend_mutex, NULL);
     pthread_mutex_init(&send_mutex, NULL);
     pthread_mutex_init(&write_current_back_mutex, NULL);
+    pthread_mutex_lock(&transfer_finished_mutex);
     num_suspended = 0;
     finished  = false;
 
@@ -318,6 +323,9 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns, St
     pthread_mutex_destroy(&num_suspend_mutex);
     pthread_mutex_destroy(&send_mutex);
     pthread_mutex_destroy(&write_current_back_mutex);
+    pthread_mutex_destroy(&transfer_finished_mutex);
+    sem_close(restartSemaphore);
+    sem_unlink("ParallelExploration_restartSem");
     free(runner_thread);
     free(args);
 

@@ -25,14 +25,14 @@ class ParallelExploration : public DFSExploration
         virtual bool depth_first(SimpleProperty &property, NetState &ns, Store &, FireListCreator &firelistcreator, int threadNumber);
 
 
-        sem_t restartSemaphore;
+        sem_t* restartSemaphore;
         bool finished;
         // mutex for access to num_suspended AND the two transfer variables
         pthread_mutex_t num_suspend_mutex;
         int num_suspended;
 
         pthread_mutex_t send_mutex;
-        sem_t transfer_finished_mutex;
+        pthread_mutex_t transfer_finished_mutex;
         SearchStack transfer_stack;
         NetState* transfer_netstate;
         SimpleProperty* transfer_property;

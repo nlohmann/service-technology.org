@@ -29,7 +29,8 @@ class ThreadSafeStore : public Store
 
 
         sem_t writeSemaphore;
-        void writeToGlobalStore(int thread);
+        // write back an element ofthe local store into the global one
+        void writeToGlobalStore(int thread, int element);
 
     public:
         ThreadSafeStore(SIStore* sistore, uint16_t threadnumber);

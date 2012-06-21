@@ -15,7 +15,7 @@
 
 using namespace std;
 
-#define HASHBINS 64
+#define HASHBINS 1024
 
 // constructor of the parallel stl store
 ThreadSafeStore::ThreadSafeStore(SIStore* sistore, uint16_t _threadNumber)
@@ -47,21 +47,18 @@ ThreadSafeStore::~ThreadSafeStore()
     // ??
 }
 
-void ThreadSafeStore::writeToGlobalStore(int thread)
+void ThreadSafeStore::writeToGlobalStore(int thread, int element)
 {
 
     NetState* ns = netStates[thread];
 
-    for (int i = 0; i < HASHBINS; i++)
-        if (localStoresMarkings[thread][i])
+        if (localStoresMarkings[thread][element])
         {
-            ns->HashCurrent = localStoreHashs[thread][i];
-            ns->Current = localStoresMarkings[thread][i];
+            ns->HashCurrent = localStoreHashs[thread][element];
+            ns->Current = localStoresMarkings[thread][element];
 
             if (store->search(*ns, thread))
-            {
-                continue;
-            }
+                return;
 
             bool isIn = store->insert(*ns, thread);
             if (!isIn)
@@ -72,9 +69,9 @@ void ThreadSafeStore::writeToGlobalStore(int thread)
             }
 
 
-            free(localStoresMarkings[thread][i]);
-            localStoresMarkings[thread][i] = 0;
-            localStoreHashs[thread][i] = 0;
+            free(localStoresMarkings[thread][element]);
+            localStoresMarkings[thread][element] = 0;
+            localStoreHashs[thread][element] = 0;
         }
 }
 
@@ -130,7 +127,7 @@ bool ThreadSafeStore::searchAndInsert(NetState &ns, int thread)
         {
             return true;
         }
-        // collision, write the local markings in the global store and empty the store
+        // collision, write the colliding marking in the global store
         need_to_write_to_global = true;
     }
 
@@ -147,7 +144,7 @@ bool ThreadSafeStore::searchAndInsert(NetState &ns, int thread)
     // the element is in none of the two stores, insert it into my local one
     if (need_to_write_to_global)
     {
-        writeToGlobalStore(thread);
+        writeToGlobalStore(thread, ns.HashCurrent % HASHBINS);
     }
 
     // write the current marking into the local store
@@ -169,8 +166,7 @@ bool ThreadSafeStore::searchAndInsert(NetState &ns, void**)
 
 void ThreadSafeStore::finalize()
 {
-    for (int i = 0; i < threadNumber; i++)
-    {
-        writeToGlobalStore(i);
-    }
+	for (int i = 0; i < threadNumber; i++)
+		for (int j = 0; j < HASHBINS; j++)
+			writeToGlobalStore(i,j);
 }

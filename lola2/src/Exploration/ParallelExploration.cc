@@ -31,7 +31,6 @@ struct tpDFSArguments
     NetState* ns;
     Store* myStore;
     FireListCreator* fireListCreator;
-    SimpleProperty* sp;
     SimpleProperty* resultProperty;
     int threadNumber;
     int number_of_threads;
@@ -43,17 +42,17 @@ void* ParallelExploration::threadPrivateDFS(void* container)
     NetState &ns = *((tpDFSArguments*) container)->ns;
     Store &myStore = *((tpDFSArguments*) container)->myStore;
     FireListCreator &fireListCreator = *((tpDFSArguments*) container)->fireListCreator;
-    SimpleProperty* sp = ((tpDFSArguments*) container)->sp;
     int threadNumber = ((tpDFSArguments*) container)->threadNumber;
     int number_of_threads = ((tpDFSArguments*) container)->number_of_threads;
     SimpleProperty* resultProperty = ((tpDFSArguments*) container)->resultProperty;
 
-    return ((tpDFSArguments*) container)->pexploration->threadedExploration(ns, myStore, fireListCreator, sp, threadNumber, number_of_threads, resultProperty);
+    return ((tpDFSArguments*) container)->pexploration->threadedExploration(ns, myStore, fireListCreator, resultProperty, threadNumber, number_of_threads);
 }
 
 
-NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore, FireListCreator &fireListCreator, SimpleProperty* sp, int threadNumber, int number_of_threads, SimpleProperty* resultProperty)
+NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore, FireListCreator &fireListCreator, SimpleProperty* resultProperty, int threadNumber, int number_of_threads)
 {
+	SimpleProperty* sp = resultProperty->copy();
     Firelist* myFirelist = fireListCreator.createFireList(sp);
     /// the search stack
     SearchStack stack;
@@ -68,14 +67,16 @@ NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore
         finished = true;
         // release all semaphores
         for (int i = 0; i < number_of_threads; i++)
-        {
             sem_post(&restartSemaphore);
-        }
         sem_post(&transfer_finished_mutex);
         // return success
         pthread_mutex_lock(&write_current_back_mutex);
         resultProperty->stack = stack;
+        resultProperty->initProperty(ns);
         pthread_mutex_unlock(&write_current_back_mutex);
+        // delete the sp&firelist
+        delete myFirelist;
+        delete sp;
         return &ns;
     }
 
@@ -90,9 +91,14 @@ NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore
 
     while (true) // exit when trying to pop from empty stack
     {
-        // if one of the threads send the finished signal this threadis useless and has to abort
+        // if one of the threads sends the finished signal this thread is useless and has to abort
         if (finished)
         {
+        	// the current firelist it at the moment not on the stack, so will not be deleted by the stack
+        	delete[] currentFirelist;
+            // delete the sp&firelist
+            delete myFirelist;
+            delete sp;
             return NULL;
         }
         //printf("GOON %x NS %x\n", container, ns);
@@ -129,14 +135,16 @@ NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore
                     finished = true;
                     // release all semaphores
                     for (int i = 0; i < number_of_threads; i++)
-                    {
                         sem_post(&restartSemaphore);
-                    }
                     sem_post(&transfer_finished_mutex);
                     // return success
                     pthread_mutex_lock(&write_current_back_mutex);
                     resultProperty->stack = stack;
+                    resultProperty->initProperty(ns);
                     pthread_mutex_unlock(&write_current_back_mutex);
+                    // delete the sp&firelist
+                    delete myFirelist;
+                    delete sp;
                     return &ns;
                 }
                 // push the transition onto the stack
@@ -155,8 +163,10 @@ NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore
                         pthread_mutex_unlock(&num_suspend_mutex);
                         pthread_mutex_lock(&num_suspend_mutex);
                         // if the end is reached abort this thread
-                        if (finished)
-                        {
+                        if (finished){
+                            // delete the sp&firelist
+                            delete myFirelist;
+                            delete sp;
                             return NULL;
                         }
 
@@ -164,6 +174,7 @@ NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore
                         transfer_stack = stack;
                         transfer_netstate = NetState::createNetStateFromCurrent(ns);
                         transfer_property = sp->copy();
+
                         sem_post(&restartSemaphore);
                         sem_wait(&transfer_finished_mutex);
 
@@ -174,7 +185,6 @@ NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore
                         Transition::revertEnabled(ns, currentFirelist[currentEntry]);
                         localValue = sp->updateProperty(ns, currentFirelist[currentEntry]);
                         // go on as nothing happened
-
                         pthread_mutex_unlock(&num_suspend_mutex);
                         continue;
                     }
@@ -204,11 +214,12 @@ NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore
                     finished = true;
                     // release all semaphores
                     for (int i = 0; i < number_of_threads; i++)
-                    {
                         sem_post(&restartSemaphore);
-                    }
                     sem_post(&transfer_finished_mutex);
                     pthread_mutex_unlock(&num_suspend_mutex);
+                    // delete the sp&firelist
+                    delete myFirelist;
+                    delete sp;
                     // there is no such state
                     return false;
                 }
@@ -217,19 +228,21 @@ NetState* ParallelExploration:: threadedExploration(NetState &ns, Store &myStore
                 // if the search has come to an end return without success
                 if (finished)
                 {
+                    // delete the sp&firelist
+                    delete myFirelist;
+                    delete sp;
                     return NULL;
                 }
                 // now we have been signaled because one of the threads is able to give us an part of search space
 
                 delete sp;
-
+                delete myFirelist;
                 stack = transfer_stack;
                 sp = transfer_property;
                 ns.copyNetState(*transfer_netstate);
                 delete transfer_netstate;
                 // rebuild
                 sp->initProperty(ns);
-                delete myFirelist;
                 myFirelist = fireListCreator.createFireList(sp);
                 // my sender holds the lock that authorizes me to decrease the variable
                 sem_post(&transfer_finished_mutex);
@@ -262,7 +275,6 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns, St
     {
         args[i].fireListCreator = &firelistcreator;
         args[i].myStore = &myStore;
-        args[i].sp = property.copy();
         args[i].ns = NetState::createNetStateFromCurrent(ns);
         args[i].threadNumber = i;
         args[i].number_of_threads = number_of_threads;
@@ -302,9 +314,12 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns, St
         delete args[i].ns;
     }
 
+    // clean up all variables needed to make the parallel DFS
     pthread_mutex_destroy(&num_suspend_mutex);
     pthread_mutex_destroy(&send_mutex);
     pthread_mutex_destroy(&write_current_back_mutex);
+    free(runner_thread);
+    free(args);
 
     // finalize the store to thave the corrent number of markings to report
     myStore.finalize();

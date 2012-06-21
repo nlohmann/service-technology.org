@@ -8,48 +8,60 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <cstdio>
 #include <Core/Dimensions.h>
 #include <Exploration/SearchStack.h>
 
 
 Chunk::Chunk()
 {
+	created_by_copy = false;
     prev = NULL;
     for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
-    {
         list[i] = NULL;
-    }
+}
+
+Chunk::~Chunk(){
+	if (created_by_copy)
+	for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
+		if (list[i])
+			delete[] list[i];
+}
+
+void Chunk::delete_all_prev_chunks(){
+	if (!prev)
+		return;
+	prev->delete_all_prev_chunks();
+	// if we want to delete all the prev chunks, we have to delete all its lists,
+	// as no one will pop them in the future
+	prev->created_by_copy = true;
+	delete prev;
 }
 
 Chunk &Chunk::operator=(const Chunk &chunk)
 {
     // copy the current values
     memcpy(current, chunk.current, SIZEOF_STACKCHUNK * SIZEOF_INDEX_T);
+    created_by_copy = true;
     for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
-    {
         if (chunk.list[i])
         {
-            list[i] = (index_t*) calloc(current[i] + 1, SIZEOF_INDEX_T);
+        	if (list[i] && created_by_copy)
+        		delete[] list[i];
+            list[i] = new index_t[current[i] + 1];
             for (int j = 0; j <= current[i]; j++)
-            {
                 list[i][j] = chunk.list[i][j];
-            }
         }
-    }
-
-    if (prev != NULL)
-    {
-        delete prev;
-    }
 
     if (chunk.prev != NULL)
     {
-        prev = new Chunk();
+    	// if there is not next element to copy onto create one
+    	if (!prev)
+    		prev = new Chunk();
         *prev = *(chunk.prev);
     }
-    else
-    {
+    else{
+    	if (prev)
+    		delete_all_prev_chunks();
         prev = NULL;
     }
 }
@@ -61,13 +73,11 @@ SearchStack::SearchStack() :
 
 SearchStack::~SearchStack()
 {
-    index_t c;
-    index_t* f;
-    while (StackPointer > 0)
-    {
-        pop(&c, &f);
-        delete f;
-    }
+	if (!currentchunk)
+		return;
+   currentchunk->delete_all_prev_chunks();
+   currentchunk->created_by_copy = true;
+   delete currentchunk;
 }
 
 void SearchStack::push(index_t c, index_t* f)
@@ -111,20 +121,25 @@ index_t SearchStack::topTransition() const
 
 SearchStack &SearchStack::operator=(const SearchStack &stack)
 {
+	// first copy the stack pointer, they must be the same
     StackPointer = stack.StackPointer;
-    //printf("COPY STACK %d\n", StackPointer);
 
-    if (currentchunk != NULL)
-    {
-        delete currentchunk;
-    }
     if (stack.currentchunk != NULL)
     {
-        currentchunk = new Chunk();
+    	// should happen rarely
+    	if (!currentchunk)
+    		currentchunk = new Chunk();
+    	// this almost in all cases
         *currentchunk = *(stack.currentchunk);
     }
     else
     {
+    	if (currentchunk){
+    		currentchunk->delete_all_prev_chunks();
+    		// delete all the lists (see Chunk::delete_all_prev_chunks for explanation)
+    		currentchunk->created_by_copy = true;
+    		delete currentchunk;
+    	}
         currentchunk = NULL;
     }
     return *this;

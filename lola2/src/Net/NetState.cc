@@ -16,7 +16,7 @@
 
 NetState* NetState::createNetStateFromInitial()
 {
-    NetState* ns = (NetState*) malloc(sizeof(NetState));
+    NetState* ns = new NetState();
     ns->need_to_delete_members_on_delete = true;
     // copy the current marking at its hash
     ns->Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
@@ -152,7 +152,7 @@ NetState* NetState::createNetStateFromInitial()
 
 NetState* NetState::createNetStateFromCurrent(NetState &ons)
 {
-    NetState* ns = (NetState*) malloc(sizeof(NetState));
+    NetState* ns = new NetState();
     ns->need_to_delete_members_on_delete = true;
     // copy the current marking at its hash
     ns->Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);

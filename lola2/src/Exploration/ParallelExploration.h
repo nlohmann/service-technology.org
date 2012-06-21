@@ -47,5 +47,5 @@ class ParallelExploration : public DFSExploration
         static void* threadPrivateDFS(void* container);
 
         // this will either return NULL (no state fullfilling the property has been found) or the witness state itself
-        NetState* threadedExploration(NetState &ns, Store &myStore, FireListCreator &fireListCreator, SimpleProperty* sp, int threadNumber, int number_of_threads, SimpleProperty* resultProperty);
+        NetState* threadedExploration(NetState &ns, Store &myStore, FireListCreator &fireListCreator, SimpleProperty* resultProperty, int threadNumber, int number_of_threads);
 };

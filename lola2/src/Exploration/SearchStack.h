@@ -23,7 +23,12 @@ class Chunk
         index_t* list[SIZEOF_STACKCHUNK];
 
         Chunk();
+        ~Chunk();
         Chunk &operator=(const Chunk &chunk);
+        // function needed in copy operation for chunks
+        void delete_all_prev_chunks();
+        // if true this chunk has been created by the = operator, so the lists have been alloced here, and must so be deleted here
+        bool created_by_copy;
 };
 
 class SearchStack

@@ -24,9 +24,7 @@ BinStore2::BinStore2()
 
     pthread_mutex_init(&inc_mutex, NULL);
     for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
-    {
         pthread_rwlock_init(rwlocks + i, NULL);
-    }
 
     // initialize bit masks
     //   capacity_t tmp1=1;
@@ -60,6 +58,9 @@ BinStore2::~BinStore2()
     }
     free(branch);
     free(firstvector);
+    for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
+    	pthread_rwlock_destroy(rwlocks + i);
+    free(rwlocks);
 }
 
 /// create a new branch in the decision tree at depth b.

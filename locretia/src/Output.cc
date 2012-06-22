@@ -33,8 +33,6 @@
 #include <pnapi/pnapi.h>
 
 using std::endl;
-using std::set;
-using std::vector;
 
 
 /******************
@@ -47,7 +45,6 @@ std::string Output::tempfileTemplate = std::string("/tmp/") + PACKAGE_TARNAME + 
 std::string Output::tempfileTemplate = "/tmp/temp-XXXXXX";
 #endif
 bool Output::keepTempfiles = true;
-std::string Output::placeID_B = "";
 
 
 /***************
@@ -223,11 +220,7 @@ std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, st
 	   << "    <finalmarkings>\n"
 	   << "      <marking>\n";
 
-//	// special final marking output?? \TODO
-//	if (placeID_B == "")
 	net.getFinalCondition().getFormula().output(os);
-//	else
-//		outputFinalMarking(os, net.getPlaces());
 
 	os << "      </marking>\n"
 	   << "    </finalmarkings>\n"
@@ -300,11 +293,6 @@ std::ostream & Output::output(std::ostream & os, const pnapi::Arc & arc)
        << "\" target=\"" << arc.getTargetNode().getName()
        << "\"";
 
-	// the place following the B-transition is the final place
-	if (arc.getSourceNode().getName() == "B\\n") {
-		placeID_B = arc.getTargetNode().getName();
-	}
-
 	if (arc.getWeight() > 1)
 	{
 		os << ">\n"
@@ -371,42 +359,3 @@ std::ostream & Output::output(std::ostream & os, const pnapi::Arc & arc)
 //	return (os << " id=\"" << l.getName() << "\" />");
 //}
 
-/*!
- * \brief special final marking output (1 token on the place after transition "B\n")
- */
-std::ostream & Output::outputFinalMarking(std::ostream & os, const std::set<pnapi::Place *> & places)
-{
-	// sort the elements
-	std::vector<pnapi::Place *> v;
-	PNAPI_FOREACH(it, places)
-	{
-		v.push_back(*it);
-	}
-	bool (*c)(pnapi::Place *, pnapi::Place *) = pnapi::io::util::compareContainerElements;
-	std::sort(v.begin(), v.end(), c);
-
-	if (v.empty())
-		return os;
-
-	for(typename std::vector<pnapi::Place *>::const_iterator it = v.begin(); it != --v.end(); ++it)
-	{
-        os << "        <place idref=\"" << (*it)->getName() << "\">\n";
-        if ((*it)->getName() == placeID_B) {
-        	os << "          <text>1</text>\n";
-        } else {
-        	os << "          <text>0</text>\n";
-        }
-        os << "        </place>\n";
-
-	}
-
-	os << "        <place idref=\"" << (*--v.end())->getName() << "\">\n";
-	        if ((*--v.end())->getName() == placeID_B) {
-	        	os << "          <text>1</text>\n";
-	        } else {
-	        	os << "          <text>0</text>\n";
-	        }
-	        os << "        </place>\n";
-
-	return os;
-}

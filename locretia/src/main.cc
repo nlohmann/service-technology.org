@@ -37,8 +37,6 @@
 #include "util.h"
 #include <pnapi/pnapi.h>
 
-using std::set;
-using std::vector;
 
 // input files
 extern FILE* graph_in;

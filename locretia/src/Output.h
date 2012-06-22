@@ -49,9 +49,6 @@ class Output {
         /// whether tempfiles should be deleted upon termination
         static bool keepTempfiles;
 
-        /// the name of the "B"-place in the net
-        static std::string placeID_B;
-
     public: /* static functions */
         /// set the tempfile template
         static void setTempfileTemplate(std::string);
@@ -97,31 +94,6 @@ class Output {
 //        /// label output
 //        static std::ostream & output(std::ostream &, const pnapi::Label &);
 
-        /// special final marking output (1 token on the place after transition "B\n")
-        static std::ostream & outputFinalMarking(std::ostream &, const std::set<pnapi::Place *> &);
-
-//        /// negation output
-//        std::ostream & output(std::ostream &, const pnapi::formula::Negation &);
-//        /// conjunction output
-//        std::ostream & output(std::ostream &, const pnapi::formula::Conjunction &);
-//        /// disjunction output
-//        std::ostream & output(std::ostream &, const pnapi::formula::Disjunction &);
-//        /// FormulaTrue output
-//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaTrue &);
-//        /// FormulaFalse output
-//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaFalse &);
-//        /// FormulaEqual output
-//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaEqual &);
-//        /// FormulaNotEqual output
-//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaNotEqual &);
-//        /// FormulaLess output
-//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaLess &);
-//        /// FormulaLessEqual output
-//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaLessEqual &);
-//        /// FormulaGreater output
-//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaGreater &);
-//        /// FormulaGreaterEqual output
-//        std::ostream & output(std::ostream &, const pnapi::formula::FormulaGreaterEqual &);
 
         /*!
          * \brief write vector elements, seperated by given delimeter, to stream

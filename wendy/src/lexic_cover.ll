@@ -27,7 +27,7 @@
 
 %{
 #include <cstring>
-#include "syntax_cover.hh"
+#include "syntax_cover.h"
 #include "verbose.h"
 
 

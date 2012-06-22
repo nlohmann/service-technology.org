@@ -153,6 +153,7 @@ int main(int argc, char** argv) {
 	flag_yesno = args_info.yesno_given;
 	if (args_info.maxdepth_given) val_maxdepth = args_info.maxdepth_arg;
 
+
 /****************
 * NO ARGS GIVEN *
 ****************/
@@ -386,9 +387,10 @@ if (args_info.input_given || args_info.pipe_given) {
 				// create an instance of the realizability solver
 				PathFinder pf(m1,tv,tps,tps,solutions,failure,*im,dummy,NULL);
 				pf.verbose = debug;
-				initThread(0,ps,m1,tv,pf);
+				initPathFinderThread(0,ps,m1,tv,pf);
 				bool solved = pf.recurse(0);
 				pf.waitForThreads(0,solved); // wait for the helper threads (or cancel them in case of a solution)
+				waitForAllIdle(debug);
 				if (!solutions.almostEmpty()) // solve the problem and print a possible solution
 				{ 
 					int mtl = solutions.printSolutions(avetracelen,pbls.at(x),x); // get the solution length for this problem

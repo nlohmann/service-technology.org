@@ -9,7 +9,7 @@
  *
  * \since   2012/04/20
  *
- * \date    $Date: 2012-06-12 12:00:00 +0200 (Di, 12. Jun 2012) $
+ * \date    $Date: 2012-06-22 12:00:00 +0200 (Fr, 22. Jun 2012) $
  *
  * \version $Revision: 1.10 $
  */
@@ -68,6 +68,8 @@ struct SThread {
 	/// Pointers to the active transitions in the stubborn sets (for helper assignment)
 	vector<unsigned int> tordptr;
 
+	/// The full stubborn sets
+
 	/// Depth to which helpers may be assigned in tord
 	unsigned int tordlocsearchdepth;
 
@@ -76,6 +78,12 @@ struct SThread {
 
 	/// Pointers from transitions to their unique nodes in the conflict graph (Pathfinder recursion)
 	vector<PathFinder::myNode*> tton;
+
+	/// Active instance of the Reachalyzer
+	Reachalyzer* r;
+
+	/// lp_solve Wrapper structure
+	LPWrapper* lp;
 
 	/// Active Instance of the PathFinder
 	PathFinder* pf;
@@ -136,16 +144,16 @@ struct SThread {
 	void startThreads();
 
 	/// Running threads
-	void* concurrentPathFinder(void* arg);
+	void* threadManagement(void* arg);
 
-	/// Initialize a thread with a new job
-	void initThread(unsigned int threadID, PartialSolution* ps, Marking& m, map<Transition*,int>& tv, PathFinder& pf);
+	/// Initialize a thread with a new PathFinder job
+	void initPathFinderThread(unsigned int threadID, PartialSolution* ps, Marking& m, map<Transition*,int>& tv, PathFinder& pf);
 
-	/// Initialize a thread as a helper for a running job
-	bool assignHelper(unsigned int tid);
-
-	/// Restart all depending threads
+	/// Restart all threads
 	void makeThreadsIdle(int debug);
+
+	/// Wait until all threads go idle
+	void waitForAllIdle(int debug);
 
 	/// Kill all threads
 	void stopThreads();

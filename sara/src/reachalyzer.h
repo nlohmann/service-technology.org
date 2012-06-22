@@ -9,9 +9,9 @@
  *
  * \since   2009/10/21
  *
- * \date    $Date: 2010-08-20 12:00:00 +0200 (Fr, 20. Aug 2010) $
+ * \date    $Date: 2012-06-22 12:00:00 +0200 (Fr, 22. Jun 2012) $
  *
- * \version $Revision: 1.02 $
+ * \version $Revision: 1.10 $
  */
 
 #ifndef REACHALYZER_H
@@ -32,6 +32,8 @@ using std::vector;
 
 namespace sara {
 
+class PathFinder;
+
 /*! \brief This class can analyze reachability problems. */
 class Reachalyzer {
 public:
@@ -47,7 +49,11 @@ public:
 	/// Start the reachability analysis
 	void start();
 
-	void doSingleJob(unsigned int threadID);
+	/// Obtain the active job from the main job queue
+	PartialSolution* getSingleJob(unsigned int threadID);
+
+	/// Work on the specified job
+	void doSingleJob(unsigned int threadID, PartialSolution* ps);
 
 	/// Print out the result on stdout
 	void printResult(int pbnr);
@@ -65,10 +71,10 @@ public:
 	bool solutionSeen(JobQueue& ttps, PartialSolution* excl, map<Transition*,int>& tv);
 
 	/// Calculate all possible jumps and add them to the JobQueue
-	void createJumps(JobQueue& ttps, map<Transition*,int>& diff, PartialSolution& ps);
+	void createJumps(JobQueue& ttps, map<Transition*,int>& diff, PartialSolution* ps);
 
 	/// Create the next precalculated jump from the given partial solution
-	void nextJump(JobQueue& ttps, PartialSolution ps);
+	void nextJump(JobQueue& ttps, PartialSolution* ps);
 
 	/// Get the maximal trace length after the solutions have been printed
 	int getMaxTraceLength() const;
@@ -82,6 +88,12 @@ public:
 	/// Check if the allowed maximal solution length is exceeded
 	bool checkSize(map<Transition*,int>& solution);
 
+	/// Transfer the given JobQueue to the main JobQueue
+	void transferJobs(JobQueue& ttps, bool killactive);
+
+	/// Compute the number of threads to be assigned to PathFinder jobs only
+	void adaptNumberOfJobbers(PathFinder& pf);
+
 	/// Status
 	enum errorMessage {
 		SOLUTION_FOUND = 0,
@@ -93,6 +105,9 @@ public:
 		LPSOLVE_RUNTIME_ERROR = 6,
 		SOLUTIONS_LOST = 7
 	};
+
+	/// assign a thread to a new job; implementation in sthread.cc
+	bool assignJobHelper(unsigned int tid);
 
 private:
 	/// for timekeeping
@@ -173,8 +188,11 @@ private:
 	/// if a solution of lp_solve was suboptimal which means solutions can be lost
 	bool suboptimal;
 
+	/// variables used for statistical purposes and to determine the right kind of work for threads
 	int jsum,jmax,jloop,jold,dsum,dmax,dloop;
 
+	/// counter for all recursion steps in all PathFinders created by this instance
+	unsigned int recstepsum;
 };
 
 }

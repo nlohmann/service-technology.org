@@ -1,8 +1,10 @@
 @c <<-- CHANGE START (version information) -->>
-@heading Version 1.10-unreleased (13 Jun 2012)
+@heading Version 1.10 (22 Jun 2012)
 @itemize
-@item first steps toward parallelisation: multithreaded search in firing sequence tree
+@item towards parallelisation: multithreaded search in firing sequence tree
+@item towards parallelisation: multithreaded job execution
 @item option -T reassigned, --threads=n tells Sara to use n additional threads
+@item dynamic assignment of threads to the two different tasks
 @item speed up of code in PathFinder, esp. stubborn sets and diamond checks 
 @item installed thread-safe lp_solve
 @end itemize

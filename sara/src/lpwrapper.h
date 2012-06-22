@@ -9,7 +9,7 @@
  *
  * \since   2009/10/07
  *
- * \date    $Date: 2012-06-13 14:47:01 +0200 (Mi, 13. Jun 2012) $
+ * \date    $Date: 2012-06-15 14:47:01 +0200 (Fr, 15. Jun 2012) $
  *
  * \version $Revision: 1.10 $
  */
@@ -45,6 +45,9 @@ public:
 
 	/// Constructor (int=number of columns/transitions)
 	LPWrapper(unsigned int);
+
+	/// Make a deep copy of the LPWrapper
+	LPWrapper(const LPWrapper& lpw);
 
 	/// Destructor
 	~LPWrapper();

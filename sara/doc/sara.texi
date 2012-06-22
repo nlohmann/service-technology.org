@@ -608,7 +608,18 @@ sara -i test9.sara -v
 @end smallexample
 @end cartouche
 
-@section Optimizations including Non-determinism
+@section Optimizations including Non-determinism and Multithreading
+
+Sara runs sequentially unless invoked with the option @option{-T} followed by the
+number of additional threads Sara should use. It is advised to use not more than
+one thread per core in your system. In general, there are three access
+points for multithreading in Sara: multiple problem definitions in one file,
+the execution of multiple lp_solve jobs, and a parallelized depth-first search
+in trees representing valid firing sequences. The latter two have been implemented
+in Sara and there are examples (e.g. test8_1 to test8_9 from the testfiles directory)
+where parallelisation tests really well. The multithreading for multiple problem
+definitions is not supported at this time, though the user might just start more
+than one instance of Sara and feed each of them a portion of the problems.
 
 Sara normally tries to compute its results deterministically so reproduction of results with the
 same time consumption is possible. There are some algorithms
@@ -668,9 +679,9 @@ sequences to check if the solution can be realized. As a starting limit try 100 
 Sara will put a message to stderr if the limit for one of the above options is reached.
 
 There are other options that influence what Sara does, like @option{-J}, @option{-W}, or
-@option{-T}. These are experimental at best, use them at your own risk. The option @option{-J}
+@option{--treemaxjob}. These are experimental at best, use them at your own risk. The option @option{-J}
 induces a different ordering of the jobs which may result in a better or worse performance;
-@option{-W} will allow to print the failures even if a solution was found; @option{-T}
+@option{-W} will allow to print the failures even if a solution was found; @option{--treemaxjob}
 limits the number of new jobs a single job may generate, effectively chopping off parts
 of the computation. At last, two debugging options need to be mentioned. The option @option{-b}
 stops the computation after a given number of jobs has been done (@option{-b0} not stopping

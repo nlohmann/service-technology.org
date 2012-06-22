@@ -9,7 +9,7 @@
  *
  * \since   2009/10/14
  *
- * \date    $Date: 2012-06-12 12:00:00 +0200 (Di, 12. Jun 2012) $
+ * \date    $Date: 2012-06-22 12:00:00 +0200 (Fr, 22. Jun 2012) $
  *
  * \version $Revision: 1.10 $
  */
@@ -57,7 +57,7 @@ extern vector<Place*> placeorder;
 extern map<Place*,int> revporder; 
 
 // command line switches
-extern bool flag_lookup, flag_verbose, flag_output, flag_treemaxjob, flag_forceprint, flag_continue, flag_scapegoat;
+extern bool flag_lookup, flag_verbose, flag_output, flag_treemaxjob, flag_forceprint, flag_continue, flag_scapegoat, flag_parallel_tree;
 // command line values
 extern int val_lookup, val_treemaxjob;
 
@@ -137,11 +137,11 @@ PathFinder::~PathFinder() {}
 	@return If a firing sequence has been found and the overall algorithm should stop.
 */
 bool PathFinder::recurse(unsigned int tid) {
-	// check if some other thread has already solved the problem
-	if (solved) return true;
-
 	// Get the data fields of this thread
 	SThread* thr(threaddata[tid]);
+
+	// check if some other thread has already solved the problem
+	if (solved || thr->restart) return true;
 
 	// on screen progress indicator
 	++recsteps;
@@ -213,31 +213,21 @@ bool PathFinder::recurse(unsigned int tid) {
 				failure.push_fail(new PartialSolution(newps)); // sequence was not extended, this is part of a counterexample
 				pthread_mutex_unlock(&fail_mutex);
 			} else { // no solution, no failure, so we have a new job to do
-				if (thr->tps.find(&newps)>=0) // check if the job hase been done before
+				if (thr->tps.find(&newps)>=0) { // check if the job hase been done before
 					thr->tps.push_back(new PartialSolution(newps)); // if not, put it into the job queue
-			}
-		}
 
-		// try to add this partial solution to the lookup table
-		if (shortcutmax<0 || (int)(shortcut.size())<shortcutmax) 
-		{ // if the lookup table isn't full
-			if (thr->tps.find(&newps)>=0) { // and the job hasn't been done before
-				pthread_mutex_lock(&sc_mutex);
-				shortcut[fulltvector].push_back(newps); // put it into the lookup table for our lp_solve solution
-				pthread_mutex_unlock(&sc_mutex);
+					// try to add this partial solution to the lookup table
+					pthread_mutex_lock(&(threaddata[thr->rootID]->mutex));
+					sctmp.push_back(newps);
+					pthread_mutex_unlock(&(threaddata[thr->rootID]->mutex));
+				}
 			}
-		} 
-		else if (flag_verbose && (int)(shortcut.size())==shortcutmax) 
-		{ // if the lookup table is full, print a warning
-			cerr << "\r";
-			status("warning: lookup table too large (%d elements)",shortcutmax); 
-			pthread_mutex_lock(&sc_mutex);
-			shortcut[fulltvector].push_back(newps); // and put it into the table as the last element ever
-			pthread_mutex_unlock(&sc_mutex);
 		}
 
 		// status messages, print the new job and to which queue it was added (if any)
 		if (verbose>1) {
+			pthread_mutex_lock(&print_mutex);
+			cerr << "[" << tid << "] ";
 			if (passedon && !isSmaller(fulltvector,torealize)) cerr << "Beyond Passed on TVector:" << endl;
 			else if (terminate) cerr << "Full Solution found:" << endl; 
 			else if (thr->tps.first()->compareSequence(thr->fseq,thr->tv) && !thr->tps.first()->getRemains().empty()) 
@@ -245,6 +235,7 @@ bool PathFinder::recurse(unsigned int tid) {
 			else cerr << "Partial Solution:" << endl;
 			newps.show();
 			cerr << "*** PF ***" << endl;
+			pthread_mutex_unlock(&print_mutex);
 		}
 
 		// tell other threads if we have solved the problem
@@ -300,19 +291,20 @@ bool PathFinder::recurse(unsigned int tid) {
 
 
 	// find strongly connected component(s) with an activated transition in the stubborn set graph
-	vector<Transition*> tord(getSZK(thr)); // get a stubborn set of activated transitions
+	vector<Transition*>& tordtmp(getSZK(thr)); // get a stubborn set of activated transitions
+	vector<Transition*> tord;
+	tord.reserve(tordtmp.size());
 
 	// bring the stubborn set into an order according to our global transition ordering
 	vector<bool>& bucket(thr->tbool); // vector for bucket sort, already allocated
 	bucket.assign(im.numTransitions(),false); // clear the vector
 	// sort the stubborn set
-	for(unsigned int j=0; j<tord.size(); ++j)
-		bucket[revtorder[tord[j]]]=true;
-	// clear the memory
-	tord.clear();
+	for(unsigned int j=0; j<tordtmp.size(); ++j)
+		bucket[revtorder[tordtmp[j]]]=true;
+
 	// and reinsert the stubborn set in the right order
 	for(unsigned int o=0; o<im.numTransitions(); ++o)
-		if (bucket[o]) tord.push_back(transitionorder[o]);
+		if (bucket[o]) tord.push_back(transitionorder[o]); 
 	// finally, put the stubborn set into the thread data,
 	// so it can be accessed when we are deeper in the recursion
 	thr->tord.push_back(tord);
@@ -349,7 +341,7 @@ bool PathFinder::recurse(unsigned int tid) {
 		// subtree twice
 		if (!checkForDiamonds(thr)) { // do not recurse if a diamond has just been completed
 				// if a helper thread is available, assign one to a job of our choice
-				if (!idleID.empty()) assignHelper(tid);
+				if (!idleID.empty()) assignPathFinderHelper(tid);
 
 				// then go deeper into the recursion
 				++(thr->recursedepth); // recursion depth is used to prevent forking deep in the recursion
@@ -368,8 +360,10 @@ bool PathFinder::recurse(unsigned int tid) {
 		// in case helpers were assigned, jump over the transitions they have worked on
 		// so that we don't do anything twice
 		// at the same time, update the partial stubborn set (transitions done)
-		while (o++<thr->tordptr.back())
+		while (o++<thr->tordptr.back()) {
 			thr->stubsets[thr->stubptr-1].push_back(tord[o]);
+		}
+
 	}
 
 	// we are done on this recursion level and need to go up
@@ -819,7 +813,7 @@ bool PathFinder::waitForThreads(unsigned int rtnr, bool solution) {
 		solver = threaddata[rtnr]->solvedHelper;
 		done = threaddata[rtnr]->root.empty();
 		if (solver==-1 && !done) 
-			pthread_cond_wait(&main_cond2,&(threaddata[rtnr]->mutex));
+			pthread_cond_wait(&(threaddata[rtnr]->cond),&(threaddata[rtnr]->mutex));
 		pthread_mutex_unlock(&(threaddata[rtnr]->mutex));
 	}
 
@@ -830,25 +824,46 @@ bool PathFinder::waitForThreads(unsigned int rtnr, bool solution) {
 		pthread_mutex_unlock(&(print_mutex));
 	}
 
-	// tell all threads to quit their momentary job
-	pthread_mutex_lock(&main_mutex);
-	makeThreadsIdle(verbose);
-	pthread_mutex_unlock(&main_mutex);
-	if (verbose) {
-		pthread_mutex_lock(&(print_mutex));
-		cerr << "[M] All Threads signalled to restart." << endl;
-		pthread_mutex_unlock(&(print_mutex));
+	// tell all threads to quit their momentary job if we have a solution
+	if (solver>=0 || solution) {
+		makeThreadsIdle(verbose);
+		if (verbose) {
+			pthread_mutex_lock(&(print_mutex));
+			cerr << "[M] All Threads signalled to restart." << endl;
+			pthread_mutex_unlock(&(print_mutex));
+		}
+		pthread_mutex_lock(&(threaddata[rtnr]->mutex));
+		while (!threaddata[rtnr]->root.empty())
+			pthread_cond_wait(&(threaddata[rtnr]->cond),&(threaddata[rtnr]->mutex));
+		pthread_mutex_unlock(&(threaddata[rtnr]->mutex));
 	}
 
 	// transfer all new jobs found to the global job queue
 	threaddata[rtnr]->tps.pop_front(true);
 	tps.transfer(threaddata[rtnr]->tps);
 
+	if (shortcutmax<0 || (int)(shortcut.size())<=shortcutmax) 
+	{ // if the lookup table isn't full
+		pthread_mutex_lock(&sc_mutex);
+		shortcut[fulltvector] = sctmp; // put it into the lookup table for our lp_solve solution
+		pthread_mutex_unlock(&sc_mutex);
+	} 
+	if (flag_verbose && (int)(shortcut.size())==shortcutmax) 
+	{ // if the lookup table is full, print a warning
+		cerr << "\r";
+		status("warning: lookup table too large (%d elements)",shortcutmax); 
+	}
+
 	// reinit the helper list
-	threaddata[rtnr]->root.clear();
 	threaddata[rtnr]->solvedHelper = -1;
 
 	return (solver>=0 ? true : solution);
 }
+
+/** Get the number of recursion steps done in this PathFinder.
+	All Threads are counted.
+	@return The number of recursion steps.
+*/
+unsigned int PathFinder::getRecSteps() { return recsteps; }
 
 } // end namespace sara

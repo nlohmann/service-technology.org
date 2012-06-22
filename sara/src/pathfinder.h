@@ -9,7 +9,7 @@
  *
  * \since   2009/10/06
  *
- * \date    $Date: 2012-06-12 14:47:01 +0200 (Di, 12. Jun 2012) $
+ * \date    $Date: 2012-06-22 14:47:01 +0200 (Fr, 22. Jun 2012) $
  *
  * \version $Revision: 1.10 $
  */
@@ -43,10 +43,6 @@ namespace sara {
 
 struct SThread;
 
-/** Shorthand types for conflict&dependency tables */
-//typedef map<Transition*,set<Transition*> > Cft;
-//typedef map<Transition*,set<Transition*> >::iterator Cftit;
-
 /** \brief The class responsible for realizing a transition vector into a firable firing sequence
 	if it exists.
 */
@@ -72,6 +68,9 @@ public:
 	/// Wait for other threads to finish their jobs
 	bool waitForThreads(unsigned int rootthread, bool solution);
 
+	/// Get the number of recursion steps done by this PathFinder
+	unsigned int getRecSteps();
+
 	/// Level of verbosity
 	int verbose;
 
@@ -95,9 +94,11 @@ public:
 	};
 
 	// some thread functions need to access private elements in PathFinder
-	friend void* concurrentPathFinder(void* arg);
-	friend bool assignHelper(unsigned int tid);
-	friend void initThread(unsigned int rtnr, PartialSolution* ps, Marking& m, map<Transition*,int>& tv, PathFinder& pf);
+	friend void* threadManagement(void* arg);
+	friend void initPathFinderThread(unsigned int rtnr, PartialSolution* ps, Marking& m, map<Transition*,int>& tv, PathFinder& pf);
+
+	// assign a thread as helper; implementation found in sthread.cc
+	bool assignPathFinderHelper(unsigned int tid);
 
 private:
 	// the initial marking of the problem
@@ -125,10 +126,13 @@ private:
 	map<map<Transition*,int>,vector<PartialSolution> >& shortcut;
 
 	/// Counter of all recursion steps for the progress indicator
-	int recsteps;
+	unsigned int recsteps;
 
 	/// Maximal shortcut size (redefinable per command line switch)
 	int shortcutmax;
+
+	/// Vector of partial solutions, temporarily memorized for the lookup table
+	vector<PartialSolution> sctmp;
 
 	/// Temporary firing sequence pool for complex diamond checks
 	vector<vector<Transition*> > fpool;

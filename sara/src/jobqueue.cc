@@ -46,6 +46,7 @@ extern int val_droppast;
 
 // if there is more than one thread
 extern bool multithreaded;
+extern pthread_mutex_t print_mutex;
 
 /** Constructor for the empty queue.
 */
@@ -109,6 +110,7 @@ PartialSolution* JobQueue::first() { return active; }
 
 /** Remove the active job from the queue, possibly pushing it into the past.
 	@param kill Forbid this job's entry into the past list (e.g. if it is there already).
+			In this case, the job is freed from memory.
 	@return True if a job could be removed.
 */
 bool JobQueue::pop_front(bool kill) {
@@ -140,6 +142,31 @@ bool JobQueue::pop_front(bool kill) {
 	}
 
 	return true;
+}
+
+/** Retrieve the active job from the queue and return it to the caller. The job is removed
+	from the JobQueue and its memory management and will not be deleted upon the JobQueue's
+	destruction.
+	@return The active job (if any).
+*/
+PartialSolution* JobQueue::pop_front() {
+	if (empty()) return NULL;
+
+	// delete or push to the past?
+	PartialSolution* res(active);
+	active=NULL;
+	--cnt;
+
+	// a job from the future must now become active
+	if (!almostEmpty()) 
+	{ 
+		active = queue.begin()->second.front();
+		queue.begin()->second.pop_front();
+		if (queue.begin()->second.empty())
+			queue.erase(queue.begin());
+	}
+
+	return res;
 }
 
 /** Add a job to the queue. The job will be at the latest position available according to its

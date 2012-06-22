@@ -66,6 +66,9 @@ public:
 	/// Remove the active job, possibly shifting it into the past 
 	bool pop_front(bool kill);
 
+	/// Retrieve the active job, remove it from the queue permamently
+	PartialSolution* pop_front();
+
 	/// Add job after the last job with the same (or lower) priority
 	void push_back(PartialSolution* job);
 

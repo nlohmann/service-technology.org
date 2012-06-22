@@ -38,6 +38,7 @@ namespace sara {
 extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;
 extern map<const Transition*,int> revtorder;
+extern pthread_mutex_t print_mutex;
 }
 
 	/*************************************
@@ -53,6 +54,19 @@ namespace sara {
 LPWrapper::LPWrapper(unsigned int columns) : verbose(0),cols(columns),basicrows(0) {
 	lp = make_lp(0,cols);
 	if (!lp) abort(12,"error: could not create LP model");
+}
+
+/** Deep copy constructor for equation systems.
+	@param lpw The LPWrapper object to copy.
+*/
+LPWrapper::LPWrapper(const LPWrapper& lpw) {
+	verbose = lpw.verbose;
+	cols = lpw.cols;
+	basicrows = lpw.basicrows;
+	lp = copy_lp(lpw.lp);
+	if (!lp) abort(12,"error: could not create LP model");
+	tpos = lpw.tpos;
+	tvector = lpw.tvector;
 }
 
 /** Destructor.
@@ -211,12 +225,14 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 		int rhs = cit->getRHS();
 		bool jump = cit->isJump();
 		if (verbose>1) {
+			pthread_mutex_lock(&print_mutex);
 			cerr << "LPWRAPPER: Constraint: ";
 			for(unsigned int j=1; j<=cols; ++j) if (constraint[j]>0) cerr << constraint[j] << getColName(j) << " ";
 			if (jump) cerr << " <= " << rhs << " for ";
 			else      cerr << " >= " << rhs << " for ";
 			cit->showConstraint(cerr);
 			cerr << endl;
+			pthread_mutex_unlock(&print_mutex);
 		}
 		// add the constraint to the lp model, normal constraints with >=, jumps with <=
 		if (success && (jump || rhs>0)) {
@@ -239,13 +255,8 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 map<Transition*,int>& LPWrapper::getTVector(PetriNet& pn) {
 	REAL *sol = new REAL[cols];
 	getVariables(sol);
-	if (verbose>1) cerr << "LPSOLVE: ";
 	for(int y=0; y<(int)(cols); ++y)
-	{
-		if (verbose>1 && sol[y]>0) cerr << getColName(y+1) << "=" << sol[y] << " ";
 		tvector[pn.findTransition(getColName(y+1))] = static_cast<int>(sol[y]);
-	}
-	if (verbose>1) cerr << endl;
 	delete[] sol;
 	return tvector;
 }
@@ -322,5 +333,6 @@ bool LPWrapper::findNearest() {
 		return true; // it worked, we are done.
 	} else return false;
 }
+
 
 } // end namespace sara

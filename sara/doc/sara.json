@@ -3,12 +3,10 @@
 "shortname": "sara", 
 "svnname": "sara", 
 "authors": [
-    "Peter Pan implemented ...",
-    "Donald Duck implemented ...",
-    "Daisy Duck implemented ..."
+    "Harro Wimmel"
 ], 
-"maintainer": "Peter Pan", 
-"tagline": "Making life easier", 
-"purpose": "Life is *hard*. Let's make life *easier*...", 
+"maintainer": "Harro Wimmel", 
+"tagline": "Reachability Analysis", 
+"purpose": "To analyze reachability and similar problems for P/T nets", 
 "license": "AGPL3+"
 }

@@ -14,14 +14,12 @@
 
 Chunk::Chunk()
 {
-	created_by_copy = false;
     prev = NULL;
     for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
         list[i] = NULL;
 }
 
 Chunk::~Chunk(){
-	if (created_by_copy)
 	for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
 		if (list[i])
 			delete[] list[i];
@@ -33,7 +31,6 @@ void Chunk::delete_all_prev_chunks(){
 	prev->delete_all_prev_chunks();
 	// if we want to delete all the prev chunks, we have to delete all its lists,
 	// as no one will pop them in the future
-	prev->created_by_copy = true;
 	delete prev;
 }
 
@@ -41,11 +38,10 @@ Chunk &Chunk::operator=(const Chunk &chunk)
 {
     // copy the current values
     memcpy(current, chunk.current, SIZEOF_STACKCHUNK * SIZEOF_INDEX_T);
-    created_by_copy = true;
     for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
         if (chunk.list[i])
         {
-        	if (list[i] && created_by_copy)
+        	if (list[i])
         		delete[] list[i];
             list[i] = new index_t[current[i] + 1];
             for (int j = 0; j <= current[i]; j++)
@@ -76,7 +72,6 @@ SearchStack::~SearchStack()
 	if (!currentchunk)
 		return;
    currentchunk->delete_all_prev_chunks();
-   currentchunk->created_by_copy = true;
    delete currentchunk;
 }
 
@@ -137,7 +132,6 @@ SearchStack &SearchStack::operator=(const SearchStack &stack)
     	if (currentchunk){
     		currentchunk->delete_all_prev_chunks();
     		// delete all the lists (see Chunk::delete_all_prev_chunks for explanation)
-    		currentchunk->created_by_copy = true;
     		delete currentchunk;
     	}
         currentchunk = NULL;

@@ -204,7 +204,7 @@ std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, st
 
 	   << "  <module>\n";
 
-	output(os, net.getInterface());
+//	output(os, net.getInterface());
 
 	os << "\n    <net id=\"n1\" type=\"PTNet\">\n"
 
@@ -223,10 +223,11 @@ std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, st
 	   << "    <finalmarkings>\n"
 	   << "      <marking>\n";
 
-	if (placeID_B == "")
-		net.getFinalCondition().getFormula().output(os);
-	else
-		outputFinalMarking(os, net.getPlaces());
+//	// special final marking output?? \TODO
+//	if (placeID_B == "")
+	net.getFinalCondition().getFormula().output(os);
+//	else
+//		outputFinalMarking(os, net.getPlaces());
 
 	os << "      </marking>\n"
 	   << "    </finalmarkings>\n"
@@ -320,55 +321,55 @@ std::ostream & Output::output(std::ostream & os, const pnapi::Arc & arc)
 	return os;
 }
 
-/*!
- * \brief interface output
- */
-std::ostream & Output::output(std::ostream & os, const pnapi::Interface & interface)
-{
-	//  os << "    <ports>\n";
-	//
-	//  PNAPI_FOREACH(port, interface.getPorts())
-	//  {
-	//    os << "      <port id=\"" << port->first << "\">\n";
-	//
-	//    output(os, *port->second);
-	//
-	//    os << "      </port>\n";
-	//  }
-	//
-	//  return (os << "    </ports>\n");
-	return os;
-}
+///*!
+// * \brief interface output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::Interface & interface)
+//{
+//	//  os << "    <ports>\n";
+//	//
+//	//  PNAPI_FOREACH(port, interface.getPorts())
+//	//  {
+//	//    os << "      <port id=\"" << port->first << "\">\n";
+//	//
+//	//    output(os, *port->second);
+//	//
+//	//    os << "      </port>\n";
+//	//  }
+//	//
+//	//  return (os << "    </ports>\n");
+//	return os;
+//}
 
-/*!
- * \brief port output
- */
-std::ostream & Output::output(std::ostream & os, const pnapi::Port & port)
-{
-	os << pnapi::io::util::delim("\n");
-	outputSet(os, port.getAllLabels());
-	os << pnapi::io::util::delim("") << "\n";
+///*!
+// * \brief port output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::Port & port)
+//{
+//	os << pnapi::io::util::delim("\n");
+//	outputSet(os, port.getAllLabels());
+//	os << pnapi::io::util::delim("") << "\n";
+//
+//	return os;
+//}
 
-	return os;
-}
-
-/*!
- * \brief label output
- */
-std::ostream & Output::output(std::ostream & os, const pnapi::Label & l)
-{
-	os << "        <";
-
-	switch(l.getType())
-	{
-	case pnapi::Label::INPUT: os << "input"; break;
-	case pnapi::Label::OUTPUT: os << "output"; break;
-	case pnapi::Label::SYNCHRONOUS: os << "synchronous"; break;
-	default: break;
-	}
-
-	return (os << " id=\"" << l.getName() << "\" />");
-}
+///*!
+// * \brief label output
+// */
+//std::ostream & Output::output(std::ostream & os, const pnapi::Label & l)
+//{
+//	os << "        <";
+//
+//	switch(l.getType())
+//	{
+//	case pnapi::Label::INPUT: os << "input"; break;
+//	case pnapi::Label::OUTPUT: os << "output"; break;
+//	case pnapi::Label::SYNCHRONOUS: os << "synchronous"; break;
+//	default: break;
+//	}
+//
+//	return (os << " id=\"" << l.getName() << "\" />");
+//}
 
 /*!
  * \brief special final marking output (1 token on the place after transition "B\n")

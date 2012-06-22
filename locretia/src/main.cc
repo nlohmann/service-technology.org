@@ -35,7 +35,10 @@
 #include "Output.h"
 #include "verbose.h"
 #include "util.h"
+#include <pnapi/pnapi.h>
 
+using std::set;
+using std::vector;
 
 // input files
 extern FILE* graph_in;
@@ -271,16 +274,14 @@ int main(int argc, char** argv) {
     if (args_info.tpn_flag) {
     	status("Generating OWFN from TPN...");
 
+    	// add a random interface
     	InnerMarking::addInterface(args_info.icount_arg);
-
-//    	std::stringstream tempstring (std::stringstream::in | std::stringstream::out);
-//    	tempstring << pnapi::io::owfn << *InnerMarking::net;
-//
-//    	tempstring.str().find("FINALCONDITION");
 
     	std::string owfn_filename = args_info.owfnFile_arg ? args_info.owfnFile_arg : filename + ".owfn";
     	Output output(owfn_filename, "OWFN");
-    	output.stream() << pnapi::io::owfn << *InnerMarking::net;
+
+    	// write the net to the stream with an added final condition
+    	output.stream() << InnerMarking::addFinalCondition();
 
     }
 

@@ -104,7 +104,7 @@ void InnerMarking::initialize() {
 
  For each interface place (or  label), add a real place (interface places are only implicit) and
  a transition which represents the actions of the environment.
- As for input labels, add an additional place with 'c' tokens which restricts the input transitions
+ Add an additional place with 'c' tokens which restricts the input and output transitions
  from unbounded firing to a maximum of 'c'.
 
  \param[in]	net	the petri net on which the function is used on
@@ -188,53 +188,87 @@ void InnerMarking::deleteCounterPlace() {
 	net->deletePlace(*counterPlace);
 }
 
-// \TODO: depricated??
-void InnerMarking::createLabeledEnvironment() {
-	status("creating labeled sync/async environment...");
-
-	// iterate through input labels
-	set<pnapi::Label *> inputs = net->getInterface().getInputLabels();
-	PNAPI_FOREACH(label, inputs)
-	{
-		// iterate through all transitions belonging to the current label
-		set<pnapi::Transition *> t_in = (*label)->getTransitions();
-		PNAPI_FOREACH(t, t_in)
-		{
-			// remove the transitions from the current label
-			(*t)->removeLabel(**label);
-			(*label)->removeTransition(**t);
-
-			// label the transition with the input label
-			(*t)->setName((*label)->getName());
-		}
-	}
-
-	// iterate through output labels
-	inputs = net->getInterface().getOutputLabels();
-	PNAPI_FOREACH(label, inputs)
-	{
-		// iterate through all transitions belonging to the current label
-		set<pnapi::Transition *> t_in = (*label)->getTransitions();
-		PNAPI_FOREACH(t, t_in)
-		{
-			// remove the transitions from the current label
-			(*t)->removeLabel(**label);
-			(*label)->removeTransition(**t);
-
-			// label the transition with the output label
-			(*t)->setName((*label)->getName());
-		}
-	}
-	//\TODO: what about synchronous labels?...
-
-	net->getInterface().clear();
-
-	status("done with creating labeled sync/async environment...");
-}
+//// \TODO: depricated??
+//void InnerMarking::createLabeledEnvironment() {
+//	status("creating labeled sync/async environment...");
+//
+//	// iterate through input labels
+//	set<pnapi::Label *> inputs = net->getInterface().getInputLabels();
+//	PNAPI_FOREACH(label, inputs)
+//	{
+//		// iterate through all transitions belonging to the current label
+//		set<pnapi::Transition *> t_in = (*label)->getTransitions();
+//		PNAPI_FOREACH(t, t_in)
+//		{
+//			// remove the transitions from the current label
+//			(*t)->removeLabel(**label);
+//			(*label)->removeTransition(**t);
+//
+//			// label the transition with the input label
+//			(*t)->setName((*label)->getName());
+//		}
+//	}
+//
+//	// iterate through output labels
+//	inputs = net->getInterface().getOutputLabels();
+//	PNAPI_FOREACH(label, inputs)
+//	{
+//		// iterate through all transitions belonging to the current label
+//		set<pnapi::Transition *> t_in = (*label)->getTransitions();
+//		PNAPI_FOREACH(t, t_in)
+//		{
+//			// remove the transitions from the current label
+//			(*t)->removeLabel(**label);
+//			(*label)->removeTransition(**t);
+//
+//			// label the transition with the output label
+//			(*t)->setName((*label)->getName());
+//		}
+//	}
+//	//\TODO: what about synchronous labels?...
+//
+//	net->getInterface().clear();
+//
+//	status("done with creating labeled sync/async environment...");
+//}
 
 /****************************************
  * OUTPUT FUNCTIONS (STATIC AND MEMBER) *
  ****************************************/
+
+/*!
+ \brief Creates a XES log with traces of the given net and writes it to the given output stream.
+
+ \param[in,out]	file 				the output stream to write the log to
+ \param[in]		trace_count  		the total number of traces to be created
+ \param[in]		trace_min_length	the minimal length of a trace
+ \param[in]		trace_max_length	the maximal length of a trace
+ */
+void InnerMarking::create_log(std::ostream& file, std::string& filename,
+												  const int trace_count ,
+												  const int trace_min_length,
+												  const int trace_max_length) {
+	status("creating log-file with %i traces, each with lengths %i to %i",
+			trace_count, trace_min_length, trace_max_length);
+
+    fileHeader(file, filename);
+
+    // initialize the random number generator
+    std::srand(time(NULL));
+
+    int length, counter = 0;
+    // create 'trace_count' traces
+    for (int i = 0; i < trace_count; ++i) {
+    	// randomize the (maximal) length of the next trace
+    	length = (std::rand() % (trace_max_length + 1 - trace_min_length)) + trace_min_length;
+    	create_trace(file, ++counter, length);
+    }
+
+    fileFooter(file);
+
+    status("log-file done with %i traces, each with lengths %i to %i",
+    			trace_count, trace_min_length, trace_max_length);
+}
 
 /*
  * the header of the XES log
@@ -271,15 +305,6 @@ void InnerMarking::fileFooter(std::ostream& file) {
     file << "</log>";
 }
 
-/*
- * traverses the reachability graph of the net (just for test purposes...)
- */
-void InnerMarking::traverse(const InnerMarking_ID& markingID) {
-	for (InnerMarking_ID i = 0; i < inner_markings[markingID]->out_degree; ++i) {
-		status("edge from node %i to node %i with label %s", markingID, inner_markings[markingID]->successors[i], Label::id2name[inner_markings[markingID]->labels[i]].c_str());
-		traverse(inner_markings[markingID]->successors[i]);
-	}
-}
 
 /*!
  \brief creates a trace of the given net and writes it to the given output stream.
@@ -342,40 +367,6 @@ void InnerMarking::create_trace(std::ostream& file, const int trace_number, cons
 
 	tempstring.clear();
 //	status("done with trace %i, length: %i", trace_number, counter);
-}
-
-/*!
- \brief Creates a XES log with traces of the given net and writes it to the given output stream.
-
- \param[in,out]	file 				the output stream to write the log to
- \param[in]		trace_count  		the total number of traces to be created
- \param[in]		trace_min_length	the minimal length of a trace
- \param[in]		trace_max_length	the maximal length of a trace
- */
-void InnerMarking::create_log(std::ostream& file, std::string& filename,
-												  const int trace_count ,
-												  const int trace_min_length,
-												  const int trace_max_length) {
-	status("creating log-file with %i traces, each with lengths %i to %i",
-			trace_count, trace_min_length, trace_max_length);
-
-    fileHeader(file, filename);
-
-    // initialize the random number generator
-    std::srand(time(NULL));
-
-    int length, counter = 0;
-    // create 'trace_count' traces
-    for (int i = 0; i < trace_count; ++i) {
-    	// randomize the (maximal) length of the next trace
-    	length = (std::rand() % (trace_max_length + 1 - trace_min_length)) + trace_min_length;
-    	create_trace(file, ++counter, length);
-    }
-
-    fileFooter(file);
-
-    status("log-file done with %i traces, each with lengths %i to %i",
-    			trace_count, trace_min_length, trace_max_length);
 }
 
 /*!
@@ -465,11 +456,49 @@ void InnerMarking::addInterface(const int count) {
 	}
 }
 
+
+///*
+// * traverses the reachability graph of the net (just for test purposes...)
+// */
+//void InnerMarking::traverse(const InnerMarking_ID& markingID) {
+//	for (InnerMarking_ID i = 0; i < inner_markings[markingID]->out_degree; ++i) {
+//		status("edge from node %i to node %i with label %s", markingID, inner_markings[markingID]->successors[i], Label::id2name[inner_markings[markingID]->labels[i]].c_str());
+//		traverse(inner_markings[markingID]->successors[i]);
+//	}
+//}
+
 /*!
- \brief Adds the final condition to the net. \TODO
+ \brief Adds the final condition to the OWFN built from the TPN
  */
-void InnerMarking::addFinalCondition() {
-	//net->getFinalCondition();
+std::string InnerMarking::addFinalCondition() {
+	// search for the final place...
+	std::string placeID_B = "";
+	set<pnapi::Arc *> s = net->getArcs();
+	PNAPI_FOREACH(it, s)
+	{
+		if ((*it)->getSourceNode().getName() == "B\\n") {
+			placeID_B = (*it)->getTargetNode().getName();
+			status("final place has the id: '%s'", placeID_B.c_str());
+		}
+	}
+	// the label of the final place is now saved in 'placeID_B'
+	std::stringstream replaceString (std::stringstream::in | std::stringstream::out);
+	replaceString << "FINALMARKING\n" << "  " << placeID_B << ":\t1\n" << " ;";
+
+	// now change the final condition of the OWFN... (hacking... so what?)
+	std::stringstream tempString (std::stringstream::in | std::stringstream::out);
+	tempString << pnapi::io::owfn << *net;
+	std::string netString = tempString.str();
+
+	try {
+		// in the OWFN the final condition is set to TRUE... so replace that bs
+		netString.replace(netString.find("FINALCONDITION"), 22, replaceString.str());
+		status("changed the final marking of the OWFN");
+	} catch (std::exception& e) {
+		status("could not change the final marking...");
+	}
+
+	return netString;
 }
 
 void InnerMarking::finalize() {

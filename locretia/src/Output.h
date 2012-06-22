@@ -90,12 +90,12 @@ class Output {
         static std::ostream & output(std::ostream &, const pnapi::Place &);
         /// transition output
         static std::ostream & output(std::ostream &, const pnapi::Transition &);
-        /// interface output
-        static std::ostream & output(std::ostream &, const pnapi::Interface &);
-        /// port output
-        static std::ostream & output(std::ostream &, const pnapi::Port &);
-        /// label output
-        static std::ostream & output(std::ostream &, const pnapi::Label &);
+//        /// interface output
+//        static std::ostream & output(std::ostream &, const pnapi::Interface &);
+//        /// port output
+//        static std::ostream & output(std::ostream &, const pnapi::Port &);
+//        /// label output
+//        static std::ostream & output(std::ostream &, const pnapi::Label &);
 
         /// special final marking output (1 token on the place after transition "B\n")
         static std::ostream & outputFinalMarking(std::ostream &, const std::set<pnapi::Place *> &);

@@ -53,7 +53,7 @@ class InnerMarking {
 
         static void deleteCounterPlace();
 
-        static void createLabeledEnvironment();
+//        static void createLabeledEnvironment();
 
         /// print the knowledges as OG
         static void create_log(std::ostream& file, std::string & filename,
@@ -67,14 +67,14 @@ class InnerMarking {
         /// print results
         static void output_results(Results&);
 
-        /// traverse reachability graph
-        static void traverse(const InnerMarking_ID& markingID);
+//        /// traverse reachability graph
+//        static void traverse(const InnerMarking_ID& markingID);
 
         /// add a (more or less) random interface to the net
         static void addInterface(const int count);
 
-        /// add the final condition to the (special) tpn
-        static void addFinalCondition();
+        /// add the final condition to the OWFN built from the TPN
+        static std::string addFinalCondition();
 
     public: /* static attributes */
         /// a temporary storage used during parsing of the reachability graph

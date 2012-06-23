@@ -27,13 +27,14 @@ class ParallelExploration : public DFSExploration
 
 
         sem_t* restartSemaphore;
+        // needs to be a semaphore to be able to simply delete it
+        sem_t* transfer_finished_semaphore;
         bool finished;
         // mutex for access to num_suspended AND the two transfer variables
         pthread_mutex_t num_suspend_mutex;
         int num_suspended;
 
         pthread_mutex_t send_mutex;
-        pthread_mutex_t transfer_finished_mutex;
         SearchStack transfer_stack;
         NetState* transfer_netstate;
         SimpleProperty* transfer_property;

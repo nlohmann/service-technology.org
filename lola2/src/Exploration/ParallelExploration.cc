@@ -67,13 +67,14 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 	bool localValue = sp->initProperty(ns);
 
 	if (localValue) {
+		printf("INITIAL TRUE\n");
 		// initial marking satisfies property
 		// inform all threads that we have finished
 		finished = true;
 		// release all semaphores
 		for (int i = 0; i < number_of_threads; i++)
 			sem_post(restartSemaphore);
-		pthread_mutex_unlock(&transfer_finished_mutex);
+		sem_post(transfer_finished_semaphore);
 		// return success
 		pthread_mutex_lock(&write_current_back_mutex);
 		resultProperty->stack = stack;
@@ -136,7 +137,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 					// release all semaphores
 					for (int i = 0; i < number_of_threads; i++)
 						sem_post(restartSemaphore);
-					pthread_mutex_unlock(&transfer_finished_mutex);
+					sem_post(transfer_finished_semaphore);
 					// return success
 					pthread_mutex_lock(&write_current_back_mutex);
 					resultProperty->stack = stack;
@@ -174,7 +175,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 						transfer_property = sp->copy();
 
 						sem_post(restartSemaphore);
-						pthread_mutex_lock(&transfer_finished_mutex);
+						sem_wait(transfer_finished_semaphore);
 
 						// backfire the current transition to return to original state
 						stack.pop(&currentEntry, &currentFirelist);
@@ -211,7 +212,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 					// release all semaphores
 					for (int i = 0; i < number_of_threads; i++)
 						sem_post(restartSemaphore);
-					pthread_mutex_unlock(&transfer_finished_mutex);
+					sem_post(transfer_finished_semaphore);
 					pthread_mutex_unlock(&num_suspend_mutex);
 					// delete the sp&firelist
 					delete myFirelist;
@@ -240,7 +241,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 				sp->initProperty(ns);
 				myFirelist = fireListCreator.createFireList(sp);
 				// my sender holds the lock that authorizes me to decrease the variable
-				pthread_mutex_unlock(&transfer_finished_mutex);
+				sem_post(transfer_finished_semaphore);
 
 				// re-initialize the current search state
 				currentEntry = myFirelist->getFirelist(ns, &currentFirelist);
@@ -256,6 +257,8 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 		}
 	}
 }
+
+#include <errno.h>
 
 bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 		Store &myStore, FireListCreator &firelistcreator,
@@ -279,12 +282,14 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 	sem_unlink("ParallelExploration_restartSem");
 	restartSemaphore = sem_open("ParallelExploration_restartSem", O_CREAT, 0600,
 			0);
+	transfer_finished_semaphore = sem_open("ParallelExploration_transfer_finished_semaphore", O_CREAT, 0600,
+			0);
+
 	if (UNLIKELY(!(long int)restartSemaphore)) {
 		rep->status("named semaphore could not be created");
 		rep->abort(ERROR_THREADING);
 	}
 	int mutex_creation_status = 0;
-	mutex_creation_status |= pthread_mutex_init(&transfer_finished_mutex, NULL);
 	mutex_creation_status |= pthread_mutex_init(&num_suspend_mutex, NULL);
 	mutex_creation_status |= pthread_mutex_init(&send_mutex, NULL);
 	mutex_creation_status |= pthread_mutex_init(&write_current_back_mutex,
@@ -293,7 +298,6 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 		rep->status("mutexes could not be created");
 		rep->abort(ERROR_THREADING);
 	}
-	pthread_mutex_lock(&transfer_finished_mutex);
 	num_suspended = 0;
 	finished = false;
 
@@ -326,12 +330,13 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 	mutex_destruction_status |= pthread_mutex_destroy(&num_suspend_mutex);
 	mutex_destruction_status |= pthread_mutex_destroy(&send_mutex);
 	mutex_destruction_status |= pthread_mutex_destroy(&write_current_back_mutex);
-	mutex_destruction_status |= pthread_mutex_destroy(&transfer_finished_mutex);
 	if (UNLIKELY(mutex_destruction_status)) {
 			rep->status("mutexes could not be destroyed");
 			rep->abort(ERROR_THREADING);
 		}
 	int semaphore_destruction_status = 0;
+	semaphore_destruction_status |= sem_close(transfer_finished_semaphore);
+	semaphore_destruction_status |= sem_unlink("ParallelExploration_transfer_finished_semaphore");
 	semaphore_destruction_status |= sem_close(restartSemaphore);
 	semaphore_destruction_status |= sem_unlink("ParallelExploration_restartSem");
 	if (UNLIKELY(mutex_destruction_status)) {

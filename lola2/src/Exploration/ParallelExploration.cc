@@ -276,6 +276,7 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 		args[i].resultProperty = &property;
 	}
 	// init the restart semaphore
+	sem_unlink("ParallelExploration_restartSem");
 	restartSemaphore = sem_open("ParallelExploration_restartSem", O_CREAT, 0600,
 			0);
 	if (UNLIKELY(!(long int)restartSemaphore)) {

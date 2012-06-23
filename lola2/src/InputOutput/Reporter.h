@@ -167,3 +167,7 @@ class ReporterStream : public Reporter
         /// markup a string
         String markup(markup_t, const char*, ...) const;
 };
+
+// the reporter thread should be declared globally, so that each class can write messages without declaring it itself
+// the reporter thread is defined in main.cc
+extern Reporter* rep;

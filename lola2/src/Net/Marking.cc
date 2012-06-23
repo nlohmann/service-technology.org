@@ -44,7 +44,7 @@ void Marking::deleteMarkings()
 void Marking::DEBUG__printMarking(capacity_t* marking)
 {
     return;
-    printf("PRINTING MARKING %x:\n", marking);
+    printf("PRINTING MARKING %lx:\n", (unsigned long) marking);
     for (int i = 0; i < Net::Card[PL]; i++)
     {
         printf("\t%s:%d\n", Net::Name[PL][i], marking[i]);

@@ -1,10 +1,10 @@
 /*!
-\file SimpleProperty.h
+\file DFSExploration.h
 \author Karsten
 \status new
 
 \brief Evaluates simple property (only SET of states needs to be computed).
-Actual property is virtual, default (base class) is full exploration
+Actual property is a parameter of the constructor
 */
 
 #pragma once

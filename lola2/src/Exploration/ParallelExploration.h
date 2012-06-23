@@ -1,10 +1,11 @@
 /*!
-\file SimpleProperty.h
-\author Karsten
+\file ParallelExploration.h
+\author Gregor
 \status new
 
-\brief Evaluates simple property (only SET of states needs to be computed).
-Actual property is virtual, default (base class) is full exploration
+ \brief Evaluates simple property (only SET of states needs to be computed).
+ The actual property is an parameter. The evaluation of the property will be done
+ by a parallel exploration of the state space.
 */
 
 #pragma once

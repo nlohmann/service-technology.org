@@ -53,7 +53,7 @@ void SimpleCompressedEncoder::addToInput(capacity_t val, bitindex_t numbits, vec
 	}
 }
 
-vectordata_t* SimpleCompressedEncoder::encodeNetState(NetState& ns, bitindex_t& bitlen, int threadIndex)
+vectordata_t* SimpleCompressedEncoder::encodeNetState(NetState& ns, bitindex_t& bitlen, uint32_t threadIndex)
 {
     bitlen = 0;
     vectordata_t* pCurThreadInput = inputs[threadIndex];

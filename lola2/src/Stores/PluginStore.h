@@ -19,7 +19,7 @@ class PluginStore : public Store
             public:
                 NetStateEncoder(int _numThreads);
                 virtual ~NetStateEncoder() {}
-                virtual vectordata_t* encodeNetState(NetState &ns, bitindex_t &bitlen, int threadIndex) = 0;
+                virtual vectordata_t* encodeNetState(NetState &ns, bitindex_t &bitlen, uint32_t threadIndex) = 0;
         };
 
         class VectorStore
@@ -36,7 +36,7 @@ class PluginStore : public Store
         ~PluginStore();
 
         /// check whether current marking is stored
-        bool searchAndInsert(NetState &ns, int threadIndex);
+        bool searchAndInsert(NetState &ns, uint32_t threadIndex);
 
         /// check whether current marking is stored
         bool searchAndInsert(NetState &ns, void** s = NULL);

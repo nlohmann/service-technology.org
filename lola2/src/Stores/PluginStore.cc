@@ -37,11 +37,11 @@ PluginStore::~PluginStore()
 /// search for a state and insert it, if it is not present
 bool PluginStore::searchAndInsert(NetState &ns, void** s)
 {
-    return searchAndInsert(ns, 0);
+    return searchAndInsert(ns, (uint32_t) 0);
 }
 
 /// search for a state and insert it, if it is not present
-bool PluginStore::searchAndInsert(NetState &ns, int threadIndex)
+bool PluginStore::searchAndInsert(NetState &ns, uint32_t threadIndex)
 {
     ++calls[threadIndex];
 

@@ -15,7 +15,7 @@ public:
 	SimpleCompressedEncoder(int numThreads);
     ~SimpleCompressedEncoder();
 
-    vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, int threadIndex);
+    vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, uint32_t threadIndex);
 private:
     void addToInput(capacity_t val, bitindex_t numbits, vectordata_t*& pInput, bitindex_t& input_bitstogo);
     void getSubtrahendAndLength(capacity_t, int*, int*);

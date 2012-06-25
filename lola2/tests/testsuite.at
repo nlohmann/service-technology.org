@@ -813,6 +813,59 @@ AT_KEYWORDS(stores)
 AT_CLEANUP
 
 
+AT_SETUP([Plugin: Bit+Suffix (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=psbbin -v --threads=4],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Bit+Suffix (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=psbbin -v --threads=4],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+
+AT_SETUP([Plugin: Copy+Suffix (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=pscbin -v --threads=4],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Copy+Suffix (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=pscbin -v --threads=4],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+
+AT_SETUP([Plugin: SimpleCompress+Suffix (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=pssbin -v --threads=4],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: SimpleCompress+Suffix (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=pssbin -v --threads=4],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+
+
+
 ############################################################################
 AT_BANNER([Deadlock])
 ############################################################################

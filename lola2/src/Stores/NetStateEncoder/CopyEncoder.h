@@ -15,7 +15,7 @@ public:
     CopyEncoder(int numThreads);
     ~CopyEncoder();
 
-    vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, int threadIndex);
+    vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, uint32_t threadIndex);
 private:
     /// input vector filled in getinput method
     vectordata_t** inputs;

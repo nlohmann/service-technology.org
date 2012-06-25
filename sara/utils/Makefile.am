@@ -43,8 +43,8 @@ DISTCLEANFILES =
 BISON_FILES = $(filter %.yy,$(form2sara_SOURCES))
 BISON_FILES += $(filter %.yy,$(lola2sara_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
-EXTRA_DIST += $(BISON_FILES:.yy=.h)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
+EXTRA_DIST += $(BISON_FILES:.yy=.hh)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
 
 # fix for Automake 1.12
 $(BISON_FILES:.yy=.hh):

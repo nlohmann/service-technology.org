@@ -266,7 +266,7 @@ int main(int argc, char** argv)
 
         if (args_info.search_arg != search_arg_findpath)
         {
-            rep->message("%llu markings, %llu edges", task.s->markings, (task.s->calls > 0) ? task.s->calls - 1 : 0);
+            rep->message("%llu markings, %llu edges", task.s->get_number_of_markings(), (task.s->get_number_of_calls() > 0) ? task.s->get_number_of_calls() - 1 : 0);
         }
 
         // print statistics

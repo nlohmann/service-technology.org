@@ -67,7 +67,6 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 	bool localValue = sp->initProperty(ns);
 
 	if (localValue) {
-		printf("INITIAL TRUE\n");
 		// initial marking satisfies property
 		// inform all threads that we have finished
 		finished = true;

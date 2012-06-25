@@ -12,7 +12,7 @@
 #include <cstdlib>
 
 
-ArrayStore::ArrayStore()
+ArrayStore::ArrayStore() : Store(1)
 {
     store = (capacity_t*)malloc((size_t)2 * 1024 * 1024 * 1024);
     numElems = 0;
@@ -20,7 +20,7 @@ ArrayStore::ArrayStore()
 
 bool ArrayStore::searchAndInsert(NetState &ns, void**)
 {
-    ++calls;
+    ++calls[0];
     size_t stateBytes = Place::CardSignificant * sizeof(capacity_t);
     for (int i = 0; i < numElems; i++)
     {
@@ -31,6 +31,6 @@ bool ArrayStore::searchAndInsert(NetState &ns, void**)
     }
     memcpy(store + (numElems * Place::CardSignificant), ns.Current, stateBytes);
     numElems++;
-    ++markings;
+    ++markings[0];
     return false;
 }

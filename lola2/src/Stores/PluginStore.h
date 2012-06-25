@@ -30,7 +30,7 @@ class PluginStore : public Store
         };
 
         /// creates new Store using the specified components. The given components are assumed to be used exclusively and are freed once the PluggableStore gets destructed.
-        PluginStore(NetStateEncoder* _netStateEncoder, VectorStore* _vectorStore);
+        PluginStore(NetStateEncoder* _netStateEncoder, VectorStore* _vectorStore, uint32_t _number_of_threads);
 
         /// frees both components
         ~PluginStore();

@@ -18,25 +18,23 @@ using namespace std;
 #define HASHBINS 1024
 
 // constructor of the parallel stl store
-ThreadSafeStore::ThreadSafeStore(SIStore* sistore, uint16_t _threadNumber)
+ThreadSafeStore::ThreadSafeStore(SIStore* sistore, uint16_t _threadNumber) : Store(_threadNumber)
 {
-    threadNumber = _threadNumber;
     // create a read-write lock
     pthread_rwlock_init(&readWriteLock, NULL);
-    pthread_mutex_init(&mutex1, NULL);
     sem_init(&writeSemaphore, 0, 0);
     store = sistore;
 
-    localStoresMarkings = (capacity_t***) calloc(threadNumber, SIZEOF_VOIDP);
-    localStoreHashs = (hash_t**) calloc(threadNumber, SIZEOF_VOIDP);
-    for (int i = 0; i < threadNumber; i++)
+    localStoresMarkings = (capacity_t***) calloc(number_of_threads, SIZEOF_VOIDP);
+    localStoreHashs = (hash_t**) calloc(number_of_threads, SIZEOF_VOIDP);
+    for (int i = 0; i < number_of_threads; i++)
     {
         localStoresMarkings[i] = (capacity_t**) calloc(HASHBINS, SIZEOF_VOIDP);
         localStoreHashs[i] = (hash_t*) calloc(HASHBINS, SIZEOF_HASH_T);
     }
 
-    netStates = (NetState**) malloc(sizeof(NetState*) * threadNumber);
-    for (uint16_t i = 0; i < threadNumber; i++)
+    netStates = (NetState**) malloc(sizeof(NetState*) * number_of_threads);
+    for (uint16_t i = 0; i < number_of_threads; i++)
     {
         netStates[i] = NetState::createNetStateFromInitial();
     }
@@ -62,11 +60,7 @@ void ThreadSafeStore::writeToGlobalStore(int thread, int element)
 
             bool isIn = store->insert(*ns, thread);
             if (!isIn)
-            {
-                pthread_mutex_lock(&mutex1);
-                markings++;
-                pthread_mutex_unlock(&mutex1);
-            }
+                markings[thread]++;
 
 
             free(localStoresMarkings[thread][element]);
@@ -96,9 +90,7 @@ bool ThreadSafeStore::searchAndInsert(NetState &ns, int thread)
 
     bool need_to_write_to_global = false;
 
-    pthread_mutex_lock(&mutex1);
-    calls++;
-    pthread_mutex_unlock(&mutex1);
+    calls[thread]++;
 
 
     // search in the private store
@@ -166,7 +158,7 @@ bool ThreadSafeStore::searchAndInsert(NetState &ns, void**)
 
 void ThreadSafeStore::finalize()
 {
-	for (int i = 0; i < threadNumber; i++)
+	for (int i = 0; i < number_of_threads; i++)
 		for (int j = 0; j < HASHBINS; j++)
 			writeToGlobalStore(i,j);
 }

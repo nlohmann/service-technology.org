@@ -15,7 +15,7 @@
 class State;
 
 
-BinStore::BinStore()
+BinStore::BinStore() : Store(1)
 {
     branch = (Decision**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
     firstvector = (unsigned char**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
@@ -70,7 +70,7 @@ BinStore::Decision* BinStore::createDecision(bitindex_t b)
 
 bool BinStore::searchAndInsert(NetState &ns, void** result)
 {
-    ++calls;;
+    ++calls[0];
     // the general assumption is that we read marking, vectors etc. left to right, with
     // low indices left, high indices right,
     // msb left and lsb right.
@@ -244,7 +244,7 @@ insert:
                 // new vector needs only 0 bits.
                 // Handle this manually as effect of malloc(0) is implementation dependent
                 * newvector = NULL;
-                ++markings;
+                ++markings[0];
                 return false;
             }
             placebit_index = Place::CardBits[place_index] - 1;
@@ -300,7 +300,7 @@ insert:
         \
     }
 
-    ++markings;
+    ++markings[0];
     return false;
 }
 

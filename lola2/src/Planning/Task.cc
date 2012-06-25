@@ -226,25 +226,25 @@ void Task::setStore()
                 s = new BitStore();
                 break;
             case store_arg_bin2:
-                s = new BinStore2();
+                s = new BinStore2(number_of_threads);
                 break;
             case store_arg_psbbin:
-                s = new PluginStore(new BitEncoder(number_of_threads), new SuffixTreeStore());
+                s = new PluginStore(new BitEncoder(number_of_threads), new SuffixTreeStore(),number_of_threads);
                 break;
             case store_arg_pscbin:
-                s = new PluginStore(new CopyEncoder(number_of_threads), new SuffixTreeStore());
+                s = new PluginStore(new CopyEncoder(number_of_threads), new SuffixTreeStore(),number_of_threads);
                 break;
             case store_arg_pssbin:
-                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore());
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore(),number_of_threads);
                 break;
             case store_arg_psbstl:
-                s = new PluginStore(new BitEncoder(number_of_threads), new VSTLStore());
+                s = new PluginStore(new BitEncoder(number_of_threads), new VSTLStore(),number_of_threads);
                 break;
             case store_arg_pscstl:
-                s = new PluginStore(new CopyEncoder(number_of_threads), new VSTLStore());
+                s = new PluginStore(new CopyEncoder(number_of_threads), new VSTLStore(),number_of_threads);
                 break;
             case store_arg_pssstl:
-                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VSTLStore());
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VSTLStore(),number_of_threads);
                 break;
             case store_arg_tsbin2:
                 s = new ThreadSafeStore(new SIBinStore2(number_of_threads), number_of_threads);

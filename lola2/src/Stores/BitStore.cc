@@ -28,7 +28,7 @@ unsigned int BitStore::bitsNeeded(int val)
     }
 }
 
-BitStore::BitStore() : bit_count(0), bit_current(0), byte_count(0), byte_current(0)
+BitStore::BitStore() :Store(1), bit_count(0), bit_current(0), byte_count(0), byte_current(0)
 {
     // determine number of Boolean variables need to store one marking
     for (index_t p = 0; p < Place::CardSignificant; ++p)
@@ -43,7 +43,7 @@ BitStore::BitStore() : bit_count(0), bit_current(0), byte_count(0), byte_current
 
 bool BitStore::searchAndInsert(NetState &ns, void**)
 {
-    ++calls;
+    ++calls[0];
 
     // create empty vector
     std::vector<uint8_t> m(byte_count, 0);
@@ -76,7 +76,7 @@ bool BitStore::searchAndInsert(NetState &ns, void**)
     if (res.second)
     {
         // marking was new
-        ++markings;
+        ++markings[0];
         return false;
     }
     else

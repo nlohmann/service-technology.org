@@ -9,7 +9,7 @@
 extern Reporter* rep;
 
 
-BloomStore::BloomStore(size_t hashes) : hash_functions(hashes), hash_values(new unsigned int[hash_functions]), filter(new std::bitset<BLOOM_FILTER_SIZE>())
+BloomStore::BloomStore(size_t hashes) :Store(1), hash_functions(hashes), hash_values(new unsigned int[hash_functions]), filter(new std::bitset<BLOOM_FILTER_SIZE>())
 {
     rep->status("using Bloom filter of length %lu with %d hash functions", BLOOM_FILTER_SIZE, hash_functions);
 }
@@ -48,9 +48,9 @@ inline unsigned int BloomStore::hash_fnv(NetState &ns) const
 
 bool BloomStore::searchAndInsert(NetState &ns, void**)
 {
-    ++calls;
+    ++calls[0];
 
-    if (calls % 10000000 == 0)
+    if (calls[0] % 10000000 == 0)
     {
         const size_t m = BLOOM_FILTER_SIZE;
         const size_t k = hash_functions;
@@ -96,7 +96,7 @@ bool BloomStore::searchAndInsert(NetState &ns, void**)
                 (*filter)[hash_values[h_]] = 1;
             }
 
-            ++markings;
+            ++markings[0];
             return false;
         }
     }

@@ -16,16 +16,12 @@
 
 class State;
 
-BinStore2::BinStore2() {
+BinStore2::BinStore2(uint32_t _number_of_threads) : Store(_number_of_threads) {
 	branch = (Decision**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
 	firstvector = (vectordata_t**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
 	rwlocks = (pthread_rwlock_t*) calloc(sizeof(pthread_rwlock_t),
 			SIZEOF_MARKINGTABLE);
 
-	if (UNLIKELY(pthread_mutex_init(&inc_mutex, NULL))) {
-		rep->status("thread could not be created");
-		rep->abort(ERROR_THREADING);
-	}
 	for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
 		if (UNLIKELY(pthread_rwlock_init(rwlocks + i, NULL))) {
 			rep->status("read-write-lock could not be created");
@@ -84,10 +80,8 @@ BinStore2::Decision::~Decision() {
 
 /// search for a state in the binStore and insert it, if it is not there
 /// Do not care about states
-bool BinStore2::searchAndInsert(NetState &ns, void**) {
-	pthread_mutex_lock(&inc_mutex);
-	++calls;
-	pthread_mutex_unlock(&inc_mutex);
+bool BinStore2::searchAndInsert(NetState &ns, uint32_t thread){
+	++calls[thread];
 	// the general assumption is that we read marking, vectors etc. left to right, with
 	// low indices left, high indices right,
 	// msb left and lsb right.
@@ -270,9 +264,7 @@ bool BinStore2::searchAndInsert(NetState &ns, void**) {
 				place_bitstogo = Place::CardBits[place_index];
 			} else {
 				*newvector = NULL;
-				pthread_mutex_lock(&inc_mutex);
-				++markings;
-				pthread_mutex_unlock(&inc_mutex);
+				++markings[thread];
 				pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
 				return false;
 			}
@@ -309,9 +301,7 @@ bool BinStore2::searchAndInsert(NetState &ns, void**) {
 			if (place_index < Place::CardSignificant) {
 				place_bitstogo = Place::CardBits[place_index];
 			} else {
-				pthread_mutex_lock(&inc_mutex);
-				++markings;
-				pthread_mutex_unlock(&inc_mutex);
+				++markings[thread];
 				pthread_rwlock_unlock(rwlocks + ns.HashCurrent);
 				return false;
 			}
@@ -320,6 +310,14 @@ bool BinStore2::searchAndInsert(NetState &ns, void**) {
 		}
 	}
 }
+
+// LCOV_EXCL_START
+bool BinStore2::searchAndInsert(NetState &ns, void**)
+{
+    return searchAndInsert(ns, (uint32_t)0);
+}
+// LCOV_EXCL_STOP
+
 
 /** may not work anymore due to variable vector data size
 

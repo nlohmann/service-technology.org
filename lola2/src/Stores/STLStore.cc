@@ -14,12 +14,12 @@ bool STLStore::searchAndInsert(NetState &ns, void**)
 {
     // organize vector as intermediate data structure: set size on first call
     static std::vector<capacity_t> m;
-    if (calls == 0)
+    if (calls[0] == 0)
     {
         m.resize(Place::CardSignificant);
     }
 
-    ++calls;
+    ++calls[0];
 
     // copy current marking to vector
     std::copy(ns.Current, ns.Current + Place::CardSignificant, m.begin());
@@ -30,7 +30,7 @@ bool STLStore::searchAndInsert(NetState &ns, void**)
     if (res.second)
     {
         // marking was new
-        ++markings;
+        ++markings[0];
         return false;
     }
     else

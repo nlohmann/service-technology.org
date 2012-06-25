@@ -13,11 +13,12 @@
 class BinStore2 : public Store
 {
     public:
-        BinStore2();
+        BinStore2(uint32_t _number_of_threads);
         ~BinStore2();
 
         /// check whether current marking is stored and return state
-        virtual bool searchAndInsert(NetState &ns, void** s);
+        virtual bool searchAndInsert(NetState &ns, uint32_t thread);
+        virtual bool searchAndInsert(NetState &ns, void**);
         //void pbs(unsigned int, unsigned int, vectordata_t*, void*);
         //void printBinStore();
     private:
@@ -39,9 +40,6 @@ class BinStore2 : public Store
 
         // the read-write mutexes
         pthread_rwlock_t* rwlocks;
-
-        // a mutex for incrementing
-        pthread_mutex_t inc_mutex;
 
         // first vector in bucket; null as long as bucket empty
         vectordata_t** firstvector;

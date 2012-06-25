@@ -40,20 +40,32 @@ class Store
         /// a helper function to start the reporter thread
         static void* reporter_helper(void* context);
 
+    protected:
+        /// the number of threads this store has to work with
+        uint32_t number_of_threads;
+
+        /// the number of stored markings, an array one value per thread
+        uint64_t* markings;
+
+        /// the number of calls to searchAndInsert(), an array one value per thread
+        uint64_t* calls;
+
     public:
-        /// the number of stored markings
-        uint64_t markings;
 
-        /// the number of calles to searchAndInsert()
-        uint64_t calls;
+        // functions to retrieve the current number of markings and calls to this store
+        // while running the search, this functions may differ slightly (+- number_of_threads) fromthe actual value due to threading issues.
+        // after the end of the search there values will be correct
+        uint64_t get_number_of_markings();
+        uint64_t get_number_of_calls();
 
-        Store();
+
+        Store(uint32_t number_of_threads);
 
         virtual ~Store();
 
         /// check whether current marking is stored
         /// threaded version, this have not to be implemented by each store
-        virtual bool searchAndInsert(NetState &ns, int thread);
+        virtual bool searchAndInsert(NetState &ns, uint32_t thread);
 
         /// check whether current marking is stored and return state
         virtual bool searchAndInsert(NetState &ns, void** s = NULL) = 0;

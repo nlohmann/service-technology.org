@@ -19,7 +19,7 @@ PluginStore::NetStateEncoder::NetStateEncoder(int _numThreads) : numThreads(_num
 }
 
 /// creates new Store using the specified components. The given components are assumed to be used exclusively and are freed once the PluggableStore gets destructed.
-PluginStore::PluginStore(NetStateEncoder* _netStateEncoder, VectorStore* _vectorStore)
+PluginStore::PluginStore(NetStateEncoder* _netStateEncoder, VectorStore* _vectorStore, uint32_t _number_of_threads) : Store(_number_of_threads)
 {
     pthread_mutex_init(&inc_mutex, NULL);
     netStateEncoder = _netStateEncoder;
@@ -43,9 +43,7 @@ bool PluginStore::searchAndInsert(NetState &ns, void** s)
 /// search for a state and insert it, if it is not present
 bool PluginStore::searchAndInsert(NetState &ns, int threadIndex)
 {
-    pthread_mutex_lock(&inc_mutex);
-    ++calls;
-    pthread_mutex_unlock(&inc_mutex);
+    ++calls[threadIndex];
 
     // fetch input vector
     bitindex_t bitlen;
@@ -54,10 +52,6 @@ bool PluginStore::searchAndInsert(NetState &ns, int threadIndex)
     // check input vector in vector store
     bool ret = vectorStore->searchAndInsert(input, bitlen, ns.HashCurrent);
     if (!ret)
-    {
-        pthread_mutex_lock(&inc_mutex);
-        ++markings;
-        pthread_mutex_unlock(&inc_mutex);
-    }
+        ++markings[threadIndex];
     return ret;
 }

@@ -27,18 +27,18 @@ void* Store::reporter_internal(void)
     {
         sleep(REPORT_FREQUENCY);
 
-        const uint64_t last_period = markings - last_markings;
+        const uint64_t last_period = get_number_of_markings() - last_markings;
         const unsigned int time_elapsed = intervals * REPORT_FREQUENCY;
-        last_markings = markings;
+        last_markings = get_number_of_markings();
         ++intervals;
 
         if (args_info.search_arg == search_arg_findpath)
         {
-            rep->status("%10llu tries, %10llu fired transitions, %5d secs", ((EmptyStore*)this)->tries, calls - 1, time_elapsed);
+            rep->status("%10llu tries, %10llu fired transitions, %5d secs", ((EmptyStore*)this)->tries, get_number_of_calls() - 1, time_elapsed);
         }
         else
         {
-            rep->status("%10llu markings, %10llu edges, %8.0f markings/sec, %5d secs", markings, calls - 1, (last_period / (float)REPORT_FREQUENCY), time_elapsed);
+            rep->status("%10llu markings, %10llu edges, %8.0f markings/sec, %5d secs", get_number_of_markings(), get_number_of_calls() - 1, (last_period / (float)REPORT_FREQUENCY), time_elapsed);
         }
 
         // early abortion
@@ -48,7 +48,7 @@ void* Store::reporter_internal(void)
             kill(getpid(), SIGUSR2);
         }
 
-        if (args_info.markinglimit_given and markings > (unsigned)args_info.markinglimit_arg)
+        if (args_info.markinglimit_given and get_number_of_markings() > (unsigned)args_info.markinglimit_arg)
         {
             rep->status(rep->markup(MARKUP_IMPORTANT, "marking limit reached - aborting").str());
             kill(getpid(), SIGUSR2);
@@ -62,8 +62,10 @@ void* Store::reporter_helper(void* context)
     return ((Store*)context)->reporter_internal();
 }
 
-Store::Store() : markings(0), calls(0)
+Store::Store(uint32_t _number_of_threads) : markings(0), calls(0), number_of_threads(_number_of_threads)
 {
+	calls = (uint64_t*) calloc(number_of_threads, sizeof(uint64_t));
+	markings = (uint64_t*) calloc(number_of_threads, sizeof(uint64_t));
     const int ret = pthread_create(&reporter_thread, NULL, reporter_helper, this);
     if (UNLIKELY(ret != 0))
     {
@@ -79,9 +81,26 @@ Store::~Store()
     {
         rep->status("killed reporter thread");
     }
+    free(calls);
+    free(markings);
 }
 
-bool Store::searchAndInsert(NetState &ns, int thread)
+uint64_t Store::get_number_of_markings(){
+	uint64_t result = 0;
+	for (uint32_t thread_number = 0; thread_number < number_of_threads; thread_number++)
+		result += markings[thread_number];
+	return result;
+}
+
+uint64_t Store::get_number_of_calls(){
+	uint64_t result = 0;
+	for (uint32_t thread_number = 0; thread_number < number_of_threads; thread_number++)
+		result += calls[thread_number];
+	return result;
+}
+
+
+bool Store::searchAndInsert(NetState &ns, uint32_t thread)
 {
     return searchAndInsert(ns);
 }

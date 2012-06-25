@@ -26,7 +26,7 @@
 %{
 #include <cstring>
 #include <string>
-#include "syntax_lola2sara.h"
+#include "syntax_lola2sara.hh"
 #include "verbose.h"
 
 std::string lola2sara_NAME_token;

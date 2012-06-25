@@ -26,7 +26,7 @@
 %{
 #include <cstring>
 #include <string>
-#include "syntax_form2sara.h"
+#include "syntax_form2sara.hh"
 #include "verbose.h"
 
 std::string form2sara_NAME_token;

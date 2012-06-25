@@ -145,7 +145,7 @@ The manpage of Locretia which can be displayed using @samp{man locretia} after h
 The source code of Locretia.
 
 @item tests
-Testcases for Locretia which check the generated binary. Some test scripts use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.
+Testcases for Locretia which check the generated binary.
 @end table
 
 
@@ -263,62 +263,7 @@ Since Locretia Version 2.6, direct support of Fiona's file format has been disco
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 Locretia implements several algorithms and result published in several scientific articles.
 
-@section Tool Paper
 
-@quotation
-Niels Lohmann and Daniela Weinberg. @b{Locretia: A tool to synthesize partners for services}. In Johan Lilius and Wojciech Penczek, editors, @i{31st International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, PETRI NETS 2010, Braga, Portugal, June 21-25, 2010, Proceedings}, volume 6128 of Lecture Notes in Computer Science, pages 297–307, June 2010. Springer-Verlag.
-@end quotation
-
-
-@section Operating Guidelines
-
-@subsubheading General Algorithm
-
-@quotation
-Niels Lohmann, Peter Massuthe, and Karsten Wolf. @b{Operating Guidelines for Finite-State Services}. In Jetty Kleijn and Alex Yakovlev, editors, @i{28th International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25-29, 2007, Proceedings}, volume 4546 of Lecture Notes in Computer Science, pages 321-341, June 2007. Springer-Verlag.
-@end quotation
-
-@subsubheading Cover Constraints
-
-@quotation
-Christian Stahl and Karsten Wolf. @b{Covering Places and Transitions in Open Nets}. In Marlon Dumas, Manfred Reichert, and Ming-Chien Shan, editors, @i{Business Process Management, 6th International Conference, BPM 2008, Milan, Italy, September 1-4, 2008, Proceedings}, volume 5240 of Lecture Notes in Computer Science, pages 116-131, September 2008. Springer-Verlag. 
-@end quotation
-
-
-@section Interaction Graphs
-
-@subsubheading General Algorithm
-
-@quotation
-Karsten Wolf. @b{Does my service have partners?}. @i{LNCS ToPNoC}, 5460(II):152-171, March 2009. Special Issue on Concurrency in Process-Aware Information Systems.
-@end quotation
-
-@subsubheading Reduction Rules
-
-@quotation
-Daniela Weinberg. @b{Efficient Controllability Analysis of Open Nets}. In Roberto Bruni and Karsten Wolf, editors, @i{Web Services and Formal Methods, Fifth International Workshop, WS-FM 2008, Milan, Italy, September 4--5, 2008, Proceedings}, Lecture Notes in Computer Science, September 2008. Springer-Verlag.
-@end quotation
-
-
-@section Other Features
-
-@subsubheading Diagnosis of uncontrollable nets
-
-@quotation
-Niels Lohmann. @b{Why does my service have no partners?}. In Roberto Bruni and Karsten Wolf, editors, @i{Web Services and Formal Methods, 5th International Workshop, WS-FM 2008, Milan, Italy, September 4-5, 2008, Revised Selected Papers}, volume 5387 of Lecture Notes in Computer Science, pages 191-206, April 2009. Springer-Verlag.
-@end quotation
-
-@subsubheading Runtime Migration
-
-@quotation
-Nannette Liske, Niels Lohmann, Christian Stahl, and Karsten Wolf. @b{Another Approach to Service Instance Migration}. In Luciano Baresi, Chi-Hung Chi, and Jun Suzuki, editors, @i{Service-Oriented Computing - ICSOC 2009, 7th International Conference, Stockholm, Sweden, November 24-27, 2009. Proceedings}, Lecture Notes in Computer Science, November 2009. Springer-Verlag.
-@end quotation
-
-@subsubheading Internal Behavior Reduction
-
-@quotation
-Niels Lohmann. @b{Internal behavior reduction for partner synthesis}. In Daniel Eichhorn, Agnes Koschmider, and Huayu Zhang, editors, @i{Proceedings of the 3rd Central-European Workshop on Services and their Composition, ZEUS 2011, Karlsruhe, Germany, February 21-22, 2011}, volume 705 of CEUR Workshop Proceedings, March 2011. CEUR-WS.org.
-@end quotation
 
 
 @sp 3
@@ -334,99 +279,7 @@ See @url{http://service-technology.org/publications} for more information.
 @node Results
 @chapter Results
 
-@heading @code{controllability}
-@findex controllability
 
-This part lists the main results of the controllability analysis.
-
-@ftable @code
-@item correctness
-The checked correctness criterion of the analysis: @code{"deadlock freedom"} or @code{"weak termination"}. [String]
-
-@item message_bound
-The message bound used during controllability analysis. [Integer]
-
-@item result
-The results of the controllability analysis: @code{true} if the net is controllable and @code{false} if the net is uncontrollable. [Boolean]
-@end ftable
-
-
-@heading @code{meta}
-@findex meta
-
-This part lists information on the tool itself.
-
-@ftable @code
-@item invocation
-The invocation string of the tool. [String]
-
-@item package_name
-@itemx package_version
-@itemx svn_version
-The name of the tool, its version, and (when applicable) the version of the SVN revision. [String]
-@end ftable
-
-
-@heading @code{statistics}
-@findex statistics
-
-This part lists all kind of information and statistics that can be relevant for debugging or optimization purposes. These information are, however, rather technical and might only be interesting for developers.
-
-@ftable @code
-@item edges
-The number of computed edges between nodes. Note: this number may also include edges to insane nodes. [Integer]
-
-@item events
-@itemx events_receive
-@itemx events_send
-@itemx events_synchronous
-The total number of events and the number of receive, send, and synchronous events, respectively. This number is directly derived from the input open net. [Integer]
-
-@item hash_buckets_capacity
-The total number of hash buckets (i.e., the length of the hash table). This number is influenced by the type @samp{hash_t} that is defined in @file{src/types.h}. [Integer]
-
-@item hash_buckets_maximal_size
-The maximal number of entries stored in a single hash bucket. Any value greater than one means that there was a hash collision which might increase runtime. [Integer]
-
-@item hash_buckets_used
-The number of hash buckets used. Useful to evaluate hash functions. [Integer]
-
-@item inner_markings
-The number of inner markings (i.e., the size of the reachability graph) of the input open net. [Integer]
-
-@item inner_markings_bad
-The number of inner markings that are identified as bad during preprocessing. A bad marking can be a non-final deadlock. When the correctness criterion is set to weak termination, also markings of terminal strongly connected components without final markings (i.e., livelocks) are considered bad. [Integer]
-
-@item inner_markings_final
-The number of reachable markings of the inner that satisfy the final condition of the input open net. [Integer]
-
-@item inner_markings_inevitable_bad
-A marking is inevitably bad if it is neither bad nor final, but all its successor markings are bad or inevitably bad. [Integer]
-
-@item nodes
-The total number of stored nodes (i.e., objects of type @samp{StoredKnowledge}) during analysis. [Integer]
-
-@item nodes_insane
-The total number of stored nodes (i.e., objects of type @samp{StoredKnowledge}) that were identified insane after building. [Integer]
-
-@item nodes_sane
-The total number of stored nodes (i.e., objects of type @samp{StoredKnowledge}) that were not identified insane after building. Only these nodes will be considered when creating files. [Integer]
-
-@item queue_maximal_length
-The maximal number of full markings (i.e., objects of type @samp{FullMarking}) that were queued during the calculation of a closure. [Integer]
-
-@item queue_maximal_queues
-The maximal number of queues that were stored at the same time. This number coincides with the depth of the recursion of the main algorithm (i.e., the depth-first building of knowledges) and the number of concurrently stored objects of type @samp{Knowledge}. [Integer]
-
-@item scc_maximal_size
-The size of the largest strongly connected component of the nodes. [Integer]
-
-@item scc_nontrivial
-The number of non-trivial (i.e., non singleton) strongly connected components of nodes. [Integer]
-
-@item scc_trivial
-The number of trivial (i.e., singleton) strongly connected components of nodes. [Integer]
-@end ftable
 
 
 @c --------------------------------------------------------------------------
@@ -440,23 +293,6 @@ The number of trivial (i.e., singleton) strongly connected components of nodes. 
 
 Locretia will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input open net could be read, the reachability graph of the inner could be build, the operating guidelines could be calculated, and---if requested---output files could be successfully written. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
 
-Note that Locretia's exit code is @b{not} related to the result of the controllability result. The messages
-
-@smallexample
-@cartouche
-locretia: net is controllable: YES
-@end cartouche
-@end smallexample
-
-and
-
-@smallexample
-@cartouche
-locretia: net is controllable: NO
-@end cartouche
-@end smallexample
-
-both yield exit code @samp{0} (successful termination).
 
 
 @section Error Codes

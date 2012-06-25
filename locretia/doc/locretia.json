@@ -4,9 +4,8 @@
   "status": "active",
   "tagline": "generating logs...",
   "purpose": "This tool generates XES logs of runs of owfn.",
-  "copyright": "2009, 2010 Niels Lohmann, Christian Sura, and Daniela Weinberg",
+  "copyright": "2012 Simon Heiden",
   "authors": [
-    "Niels Lohmann implemented the original core functionality of Wendy",
     "Simon Heiden implemented the functionality of generating XES logs"
   ],
   "maintainer": "Simon Heiden",

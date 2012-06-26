@@ -120,6 +120,7 @@ void startThreads() {
 	// allocate thread related space for the main process
 	threaddata[0] = new SThread();
 	threaddata[0]->restart = false; // init
+	threaddata[0]->solved = false; // init
 
 	// debug message
 	if (debug) cerr << "[M] Starting Threads ..." << endl;
@@ -249,7 +250,7 @@ void* threadManagement(void* arg) {
 				thread.r->doSingleJob(tid,thread.ps);
 				thread.ps = thread.r->getSingleJob(tid);
 			} while (thread.ps && !thread.restart && !thread.exit && tid<cntthreads);
-			thread.r = NULL;				
+			thread.r = NULL;
 		} else {
 			// lets act as a PathFinder helper
 			++thread.activity;
@@ -330,6 +331,7 @@ void* threadManagement(void* arg) {
 	pthread_mutex_destroy(&(thread.mutex));
 	pthread_cond_destroy(&(thread.cond));
 	delete thread.m;
+	delete thread.lp;
 	freeTarjan(tid);
 	pthread_exit((void *)tid);
 }

@@ -856,6 +856,8 @@ bool PathFinder::waitForThreads(unsigned int rtnr, bool solution) {
 
 	// reinit the helper list
 	threaddata[rtnr]->solvedHelper = -1;
+	delete threaddata[rtnr]->m;
+	threaddata[rtnr]->m = NULL;
 
 	return (solver>=0 ? true : solution);
 }

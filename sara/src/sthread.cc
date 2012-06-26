@@ -119,6 +119,7 @@ void initThreadData(int max) {
 void startThreads() {
 	// allocate thread related space for the main process
 	threaddata[0] = new SThread();
+	threaddata[0]->restart = false; // init
 
 	// debug message
 	if (debug) cerr << "[M] Starting Threads ..." << endl;

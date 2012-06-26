@@ -19,6 +19,8 @@ if COMPILE_PNAPI
 owfn2sara_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
+.hh.h:
+	mv $(@:.hh=.h) $@
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
@@ -47,8 +49,9 @@ EXTRA_DIST += $(BISON_FILES:.yy=.hh)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
 
 # fix for Automake 1.12
-$(BISON_FILES:.yy=.hh):
-	$(AM_V_GEN) mv $(@:.hh=.h) $@
+#$(BISON_FILES:.yy=.hh):
+#	$(AM_V_GEN) mv $(@:.hh=.h) $@
+
 
 
 #----------------------------------------------------------------#
@@ -84,3 +87,5 @@ MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)
 
 clean-local:
 	-for binary in $(bin_PROGRAMS); do rm -rf $$binary.dSYM; done
+
+

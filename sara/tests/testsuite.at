@@ -207,6 +207,25 @@ AT_KEYWORDS(solver)
 AT_CLEANUP
 
 ############################################################################
+AT_BANNER([Multithreading])
+############################################################################
+
+AT_SETUP([Depth-First-Search])
+AT_CHECK([cp TESTFILES/test8_3.sara TESTFILES/test8_3.owfn .])
+AT_CHECK([SARA -i test8_3.sara -v -T1],0,stdout,stderr)
+AT_CHECK([GREP -q "SOLUTION(112)" stdout])
+AT_CHECK([GREP -q "1 Solution produced" stdout])
+AT_KEYWORDS(threads)
+AT_CLEANUP
+
+AT_SETUP([Job Execution])
+AT_CHECK([cp TESTFILES/MAPK320.sara TESTFILES/MAPK320.pnml .])
+AT_CHECK([SARA -i MAPK320.sara -v -T3],0,stdout,stderr)
+AT_CHECK([GREP -q "SOLUTION" stdout])
+AT_KEYWORDS(threads)
+AT_CLEANUP
+
+############################################################################
 AT_BANNER([Error checks])
 ############################################################################
 

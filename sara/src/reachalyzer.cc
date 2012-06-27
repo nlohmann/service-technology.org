@@ -379,6 +379,7 @@ void Reachalyzer::doSingleJob(unsigned int threadID, PartialSolution* ps) {
 
 		if (tps.findPast(ps,NULL)) // check if the transformed job has already been done before
 		{ // i.e. if there is a previous job with the same constraints
+			delete cjps;
 			transferJobs(ttps,true);
 			return; // do not do anything with it
 		}   
@@ -403,8 +404,14 @@ void Reachalyzer::doSingleJob(unsigned int threadID, PartialSolution* ps) {
 				pf.passedon = passedon;
 				if (passedon) pf.torealize = torealize;
 				initPathFinderThread(threadID,ps,m1,fullvector,pf);
-				solved = pf.recurse(threadID); // main call to realize a solution
-				solved = pf.waitForThreads(threadID,solved); // wait for the helper threads (or cancel them in case of a solution)
+				bool issolved(pf.recurse(threadID)); // main call to realize a solution
+				issolved = pf.waitForThreads(threadID,issolved); // wait for the helper threads (or cancel them in case of a solution)
+				if (issolved) {
+					pthread_mutex_lock(&main_mutex);
+					solved = true;
+					if (threadID>0) pthread_cond_signal(&main_cond); // notify the main process (if it's not us)
+					pthread_mutex_unlock(&main_mutex);
+				}
 				adaptNumberOfJobbers(pf);
 		} 
 		transferJobs(ttps,true);

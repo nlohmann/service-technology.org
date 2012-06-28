@@ -41,7 +41,7 @@ using pnapi::Node;
 namespace sara {
 
 // command line switches and values
-extern bool flag_droppast, flag_joborder, flag_verbose, flag_show, flag_forceprint;
+extern bool flag_droppast, flag_joborder, flag_verbose, flag_show, flag_forceprint, flag_continue;
 extern int val_droppast;
 
 // if there is more than one thread
@@ -203,7 +203,9 @@ void JobQueue::push_past(PartialSolution* job) {
 void JobQueue::transfer(JobQueue& jbq) {
 	// transfer the active job
 	if (jbq.active && find(jbq.active)>=0) {
-		push_back(new PartialSolution(*(jbq.active)));
+//		push_back(new PartialSolution(*(jbq.active)));
+		push_back(jbq.active);
+		jbq.active = NULL;
 	}
 
 	// transfer the future jobs
@@ -211,7 +213,9 @@ void JobQueue::transfer(JobQueue& jbq) {
 	for(jit=jbq.queue.begin(); jit!=jbq.queue.end(); ++jit) // walk all internal queues
 		for(unsigned int i=0; i<jit->second.size(); ++i) // and their entries
 			if (jit->second[i] && find(jit->second[i])>=0) {
-					push_back(new PartialSolution(*(jit->second[i])));
+//					push_back(new PartialSolution(*(jit->second[i])));
+					push_back(jit->second[i]);
+					jit->second[i] = NULL;
 					// and copy them to this queue
 			}
 }
@@ -649,8 +653,9 @@ bool JobQueue::push_solved(PartialSolution* job) {
 	@return The maximal length of a solution.
 */
 int JobQueue::printSolutions(int& sum, Problem& pb, int pbnr) {
-	int sollength=0; // solution length
+	int sollength(-1); // solution length
 	int colcnt(0); // counting the solutions for adapting filenames
+	vector<Transition*> tmpsolv;
 	if (flag_forceprint) return -1; // solutions were printed earlier
 	if (queue.empty()) abort(14,"error: solved, but no solution found -- this should not happen");
 	map<int,deque<PartialSolution*> >::iterator jit;
@@ -658,17 +663,33 @@ int JobQueue::printSolutions(int& sum, Problem& pb, int pbnr) {
 		for(unsigned int i=0; i<jit->second.size(); ++i)
 		{
 			PartialSolution* ps(jit->second[i]);
-			vector<Transition*> solution = ps->getSequence();
-			cout << "sara: SOLUTION(" << solution.size() << "): ";
-			if ((int)(solution.size())>sollength) sollength=(int)(solution.size());
-			sum += solution.size();
-			for(unsigned int j=0; j<solution.size(); ++j)
-				cout << solution[j]->getName() << " ";
-			cout << endl;
-			resetColors(*(pb.getPetriNet()));
-			colorSequence(ps->getSequence());
-			saveColoredNet(pb,pbnr,++colcnt);
+			vector<Transition*>& solution(ps->getSequence());
+			if (flag_continue)
+			{
+				cout << "sara: SOLUTION(" << solution.size() << "): ";
+				if ((int)(solution.size())>sollength) sollength=(int)(solution.size());
+				sum += solution.size();
+				for(unsigned int j=0; j<solution.size(); ++j)
+					cout << solution[j]->getName() << " ";
+				cout << endl;
+				resetColors(*(pb.getPetriNet()));
+				colorSequence(solution);
+				saveColoredNet(pb,pbnr,++colcnt);
+			} else if (sollength<0 || solution.size()<tmpsolv.size()) {
+				tmpsolv = solution;
+				sollength = (int)(tmpsolv.size());
+			}
 		}
+	if (!flag_continue) {
+				cout << "sara: SOLUTION(" << tmpsolv.size() << "): ";
+				sum += tmpsolv.size();
+				for(unsigned int j=0; j<tmpsolv.size(); ++j)
+					cout << tmpsolv[j]->getName() << " ";
+				cout << endl;
+				resetColors(*(pb.getPetriNet()));
+				colorSequence(tmpsolv);
+				saveColoredNet(pb,pbnr,++colcnt);
+	}
 	return sollength;
 }
 

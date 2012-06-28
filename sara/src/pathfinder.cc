@@ -342,6 +342,7 @@ bool PathFinder::recurse(unsigned int tid) {
 		if (!checkForDiamonds(thr)) { // do not recurse if a diamond has just been completed
 				// if a helper thread is available, assign one to a job of our choice
 				if (!idleID.empty()) assignPathFinderHelper(tid);
+//				assignPathFinderHelper(tid);
 
 				// then go deeper into the recursion
 				++(thr->recursedepth); // recursion depth is used to prevent forking deep in the recursion
@@ -837,6 +838,8 @@ bool PathFinder::waitForThreads(unsigned int rtnr, bool solution) {
 			pthread_cond_wait(&(threaddata[rtnr]->cond),&(threaddata[rtnr]->mutex));
 		pthread_mutex_unlock(&(threaddata[rtnr]->mutex));
 	}
+
+	if (!threaddata[rtnr]->root.empty()) abort(57,"WaitForThreads: non-empty thread dir");
 
 	// transfer all new jobs found to the global job queue
 	threaddata[rtnr]->tps.pop_front(true);

@@ -240,16 +240,20 @@ void* threadManagement(void* arg) {
 		// no problem solved (by us) on restart signal, no new job waiting
 		if (thread.restart) {
 			solved = false;
+			if (thread.r) delete thread.ps;
 			thread.r = NULL;
 			delete thread.lp;
 			thread.lp = NULL;
 		} else if (thread.r) {
 			// we have a full job to do
-			do {
+			while (thread.ps && !thread.restart && !thread.exit) {
 				thread.r->assignJobHelper(tid);
 				thread.r->doSingleJob(tid,thread.ps);
+				thread.ps = NULL;
+				if (tid>=cntthreads) break;
 				thread.ps = thread.r->getSingleJob(tid);
-			} while (thread.ps && !thread.restart && !thread.exit && tid<cntthreads);
+			};
+			delete thread.ps;
 			thread.r = NULL;
 		} else {
 			// lets act as a PathFinder helper
@@ -381,7 +385,8 @@ void initPathFinderThread(unsigned int rtnr, PartialSolution* ps, Marking& m, ma
 	// we are the root thread
 	threaddata[rtnr]->rootID = rtnr;
 	threaddata[rtnr]->solvedHelper = -1;
-	threaddata[rtnr]->root.clear();
+	if (!threaddata[rtnr]->root.empty()) abort(56,"InitPathFinderThread: non-empty thread dir");
+//	threaddata[rtnr]->root.clear();
 
 	// reserve memory for some vectors used in the recursion
 	threaddata[rtnr]->tseta.reserve(pf.im.numTransitions());
@@ -535,6 +540,7 @@ bool Reachalyzer::assignJobHelper(unsigned int tid) {
 	if (!job) {
 		pthread_mutex_lock(&main_mutex);
 		idleID.insert(helper);
+		pthread_cond_signal(&main_cond);
 		pthread_mutex_unlock(&main_mutex);
 		return false;
 	}

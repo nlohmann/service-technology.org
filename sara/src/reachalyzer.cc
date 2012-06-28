@@ -629,6 +629,8 @@ bool Reachalyzer::checkSize(map<Transition*,int>& solution) {
 	@param killactive If the active job should be killed or pushed to the past.
 */
 void Reachalyzer::transferJobs(JobQueue& ttps, bool killactive) {
+			pthread_mutex_lock(&tps_mutex);
+
 			// delete the active job (true) or push it to the past (false)
 			PartialSolution* ps(ttps.pop_front()); 
 
@@ -636,7 +638,7 @@ void Reachalyzer::transferJobs(JobQueue& ttps, bool killactive) {
 			++loops; 
 
 			// do the transfer
-			pthread_mutex_lock(&tps_mutex);
+//			pthread_mutex_lock(&tps_mutex);
 			if (killactive) delete ps; 
 			else tps.push_past(ps);
 			tps.transfer(ttps);

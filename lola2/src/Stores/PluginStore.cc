@@ -37,11 +37,11 @@ PluginStore::~PluginStore()
 /// search for a state and insert it, if it is not present
 bool PluginStore::searchAndInsert(NetState &ns, void** s)
 {
-    return searchAndInsert(ns, (uint32_t) 0);
+    return searchAndInsert(ns, (index_t) 0);
 }
 
 /// search for a state and insert it, if it is not present
-bool PluginStore::searchAndInsert(NetState &ns, uint32_t threadIndex)
+bool PluginStore::searchAndInsert(NetState &ns, index_t threadIndex)
 {
     ++calls[threadIndex];
 
@@ -50,7 +50,7 @@ bool PluginStore::searchAndInsert(NetState &ns, uint32_t threadIndex)
     vectordata_t* input = netStateEncoder->encodeNetState(ns, bitlen, threadIndex);
 
     // check input vector in vector store
-    bool ret = vectorStore->searchAndInsert(input, bitlen, ns.HashCurrent);
+    bool ret = vectorStore->searchAndInsert(input, bitlen, ns.HashCurrent, threadIndex);
     if (!ret)
         ++markings[threadIndex];
     return ret;

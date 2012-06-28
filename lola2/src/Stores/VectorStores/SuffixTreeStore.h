@@ -16,7 +16,7 @@ public:
     virtual ~SuffixTreeStore();
 
     // inserts input vector into suffix tree
-    virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash);
+    virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex);
 private:
     /// a binary decision node
     class Decision

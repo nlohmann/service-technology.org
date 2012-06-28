@@ -45,7 +45,7 @@ BitEncoder::~BitEncoder()
     free(inputs);
 }
 
-vectordata_t* BitEncoder::encodeNetState(NetState& ns, bitindex_t& bitlen, uint32_t threadIndex)
+vectordata_t* BitEncoder::encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex)
 {
     bitlen = Place::SizeOfBitVector;
     vectordata_t* pCurThreadInput = inputs[threadIndex];

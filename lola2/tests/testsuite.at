@@ -725,6 +725,22 @@ AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
+AT_SETUP([Plugin: Bit+Bloom (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=psbbloom -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Bit+Bloom (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=psbbloom -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
 AT_SETUP([Plugin: Copy+Suffix (1/2)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=pscbin -v],0,stdout,stderr)
@@ -757,6 +773,22 @@ AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
+AT_SETUP([Plugin: Copy+Bloom (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=pscbloom -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Copy+Bloom (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=pscbloom -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
 AT_SETUP([Plugin: SimpleCompress+Suffix (1/2)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=pssbin -v],0,stdout,stderr)
@@ -784,6 +816,22 @@ AT_CLEANUP
 AT_SETUP([Plugin: SimpleCompress+STL (2/2)])
 AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
 AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=pssstl -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: SimpleCompress+Bloom (1/2)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=pssbloom -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: SimpleCompress+Bloom (2/2)])
+AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
+AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=pssbloom -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
 AT_KEYWORDS(stores)

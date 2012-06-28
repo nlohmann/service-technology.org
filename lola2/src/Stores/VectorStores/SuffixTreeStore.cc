@@ -67,7 +67,7 @@ SuffixTreeStore::Decision::~Decision()
 }
 
 /// search for an input vector in the suffix tree and insert it, if it is not present
-bool SuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash)
+bool SuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex)
 {
     /// If a new decision record is inserted, * anchor must point to it
     Decision** anchor;
@@ -137,12 +137,6 @@ bool SuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen,
                 {
                     position+=VECTOR_WIDTH, pVector++;
                     input_index++, ++pInput;
-//                    if(input_index > max_input_index)
-//                    {
-                        // match found, we're done
-//                        pthread_rwlock_unlock(rwlocks + hash);
-//                        return true;
-//                    }
                 }
                 comparebits = VECTOR_WIDTH >> 1; // initialize binary search for differing bit
             }
@@ -284,11 +278,7 @@ bool SuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen,
     if(input_bitstogo == VECTOR_WIDTH)
     {
         // good alignment, use memcpy
-        while(newvectorlen--) {
-            *(pVector++) = *(pInput++);
-        }
-
-//        memcpy(pVector,pInput,newvectorlen*sizeof(vectordata_t));
+        memcpy(pVector,pInput,newvectorlen*sizeof(vectordata_t));
         pthread_rwlock_unlock(rwlocks + hash);
         return false;
     } else {

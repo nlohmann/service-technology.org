@@ -19,14 +19,14 @@ class PluginStore : public Store
             public:
                 NetStateEncoder(int _numThreads);
                 virtual ~NetStateEncoder() {}
-                virtual vectordata_t* encodeNetState(NetState &ns, bitindex_t &bitlen, uint32_t threadIndex) = 0;
+                virtual vectordata_t* encodeNetState(NetState &ns, bitindex_t &bitlen, index_t threadIndex) = 0;
         };
 
         class VectorStore
         {
             public:
                 virtual ~VectorStore() {}
-                virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash) = 0;
+                virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex) = 0;
         };
 
         /// creates new Store using the specified components. The given components are assumed to be used exclusively and are freed once the PluggableStore gets destructed.

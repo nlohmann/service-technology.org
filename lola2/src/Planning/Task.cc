@@ -35,7 +35,8 @@
 #include <Stores/NetStateEncoder/CopyEncoder.h>
 #include <Stores/NetStateEncoder/SimpleCompressedEncoder.h>
 #include <Stores/VectorStores/SuffixTreeStore.h>
-#include <Stores/VectorStores/STLStore.h>
+#include <Stores/VectorStores/VSTLStore.h>
+#include <Stores/VectorStores/VBloomStore.h>
 #include <Stores/PluginStore.h>
 #include <Stores/BitStore.h>
 #include <Stores/BloomStore.h>
@@ -238,13 +239,22 @@ void Task::setStore()
                 s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore(),number_of_threads);
                 break;
             case store_arg_psbstl:
-                s = new PluginStore(new BitEncoder(number_of_threads), new VSTLStore(),number_of_threads);
+                s = new PluginStore(new BitEncoder(number_of_threads), new VSTLStore(number_of_threads),number_of_threads);
                 break;
             case store_arg_pscstl:
-                s = new PluginStore(new CopyEncoder(number_of_threads), new VSTLStore(),number_of_threads);
+                s = new PluginStore(new CopyEncoder(number_of_threads), new VSTLStore(number_of_threads),number_of_threads);
                 break;
             case store_arg_pssstl:
-                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VSTLStore(),number_of_threads);
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VSTLStore(number_of_threads),number_of_threads);
+                break;
+            case store_arg_psbbloom:
+                s = new PluginStore(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads),number_of_threads);
+                break;
+            case store_arg_pscbloom:
+                s = new PluginStore(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads),number_of_threads);
+                break;
+            case store_arg_pssbloom:
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads),number_of_threads);
                 break;
             case store_arg_tsbin2:
                 s = new ThreadSafeStore(new SIBinStore2(number_of_threads), number_of_threads);

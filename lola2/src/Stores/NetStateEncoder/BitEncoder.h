@@ -15,7 +15,7 @@ public:
 	BitEncoder(int numThreads);
     ~BitEncoder();
 
-    vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, uint32_t threadIndex);
+    vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex);
 private:
     /// input vector filled in getinput method
     vectordata_t** inputs;

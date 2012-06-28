@@ -70,7 +70,8 @@ lola_SOURCES = \
                 Stores/NetStateEncoder/BitEncoder.cc Stores/NetStateEncoder/BitEncoder.h \
                 Stores/NetStateEncoder/CopyEncoder.cc Stores/NetStateEncoder/CopyEncoder.h \
                 Stores/NetStateEncoder/SimpleCompressedEncoder.cc Stores/NetStateEncoder/SimpleCompressedEncoder.h \
-                Stores/VectorStores/STLStore.cc Stores/VectorStores/STLStore.h \
+                Stores/VectorStores/VSTLStore.cc Stores/VectorStores/VSTLStore.h \
+                Stores/VectorStores/VBloomStore.cc Stores/VectorStores/VBloomStore.h \
                 Stores/VectorStores/SuffixTreeStore.cc Stores/VectorStores/SuffixTreeStore.h \
                 Stores/PluginStore.cc Stores/PluginStore.h \
                 Stores/SIBinStore2.cc Stores/SIBinStore2.h

@@ -50,7 +50,7 @@ CopyEncoder::~CopyEncoder()
 #endif
 }
 
-vectordata_t* CopyEncoder::encodeNetState(NetState& ns, bitindex_t& bitlen, uint32_t threadIndex)
+vectordata_t* CopyEncoder::encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex)
 {
     bitlen = insize * VECTOR_WIDTH;
 #if SIZEOF_CAPACITY_T % SIZEOF_VECTORDATA_T == 0

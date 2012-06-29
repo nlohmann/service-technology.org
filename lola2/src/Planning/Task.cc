@@ -248,13 +248,13 @@ void Task::setStore()
                 s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VSTLStore(number_of_threads),number_of_threads);
                 break;
             case store_arg_psbbloom:
-                s = new PluginStore(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads),number_of_threads);
+                s = new PluginStore(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads,args_info.hashfunctions_arg),number_of_threads);
                 break;
             case store_arg_pscbloom:
-                s = new PluginStore(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads),number_of_threads);
+                s = new PluginStore(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads,args_info.hashfunctions_arg),number_of_threads);
                 break;
             case store_arg_pssbloom:
-                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads),number_of_threads);
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads,args_info.hashfunctions_arg),number_of_threads);
                 break;
             case store_arg_tsbin2:
                 s = new ThreadSafeStore(new SIBinStore2(number_of_threads), number_of_threads);

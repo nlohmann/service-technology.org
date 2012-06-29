@@ -34,7 +34,7 @@ SimpleCompressedEncoder::~SimpleCompressedEncoder()
     free(inputs);
 }
 
-/// adds the <numbits> least significant bits of <val> to the input vector
+/// adds the [numbits] least significant bits of [val] to the input vector
 void SimpleCompressedEncoder::addToInput(capacity_t val, bitindex_t numbits, vectordata_t*& pInput, bitindex_t& input_bitstogo) {
 	while(numbits) {
 #if PLACE_WIDTH >= VECTOR_WIDTH

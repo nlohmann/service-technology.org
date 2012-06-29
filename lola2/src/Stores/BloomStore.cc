@@ -9,8 +9,9 @@
 extern Reporter* rep;
 
 
-BloomStore::BloomStore(size_t hashes) :Store(1), hash_functions(hashes), hash_values(new unsigned int[hash_functions]), filter(new std::bitset<BLOOM_FILTER_SIZE>())
+BloomStore::BloomStore(size_t hashes) :Store(1), hash_functions(hashes), filter(new std::bitset<BLOOM_FILTER_SIZE>())
 {
+	hash_values = new unsigned int[hash_functions];
     rep->status("using Bloom filter of length %lu with %d hash functions", BLOOM_FILTER_SIZE, hash_functions);
 }
 

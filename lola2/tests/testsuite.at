@@ -581,7 +581,7 @@ AT_CLEANUP
 AT_BANNER([Stores])
 ############################################################################
 
-AT_SETUP([Binary (bit) (1/2)])
+AT_SETUP([Binary (bit) (1/3)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=bin -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -589,7 +589,7 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Binary (bit) (2/2)])
+AT_SETUP([Binary (bit) (2/3)])
 AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
 AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=bin -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -597,7 +597,15 @@ AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Binary (word) (1/2)])
+AT_SETUP([Binary (bit) (3/3)])
+AT_CHECK([cp TESTFILES/Kanban5.5safe.pnml.lola .])
+AT_CHECK([LOLA Kanban5.5safe.pnml.lola --check=full --store=bin -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2546432 markings, 24460016 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Binary (word) (1/3)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=bin2 -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -613,7 +621,15 @@ AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Binary (word, thread safe) (1/2)])
+AT_SETUP([Binary (word) (3/3)])
+AT_CHECK([cp TESTFILES/Kanban5.5safe.pnml.lola .])
+AT_CHECK([LOLA Kanban5.5safe.pnml.lola --check=full --store=bin2 -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2546432 markings, 24460016 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Binary (word, thread safe) (1/3)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=tsbin2 -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -621,13 +637,23 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Binary (word, thread safe) (2/2)])
+AT_SETUP([Binary (word, thread safe) (2/3)])
 AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
 AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=tsbin2 -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
+
+## TODO: ask Gregor why this fails
+#
+#AT_SETUP([Binary (word, thread safe) (3/3)])
+#AT_CHECK([cp TESTFILES/Kanban5.5safe.pnml.lola .])
+#AT_CHECK([LOLA Kanban5.5safe.pnml.lola --check=full --store=tsbin2 -v],0,stdout,stderr)
+#AT_CHECK([GREP -q "lola: result: no" stderr])
+#AT_CHECK([GREP -q "lola: 2546432 markings, 24460016 edges" stderr])
+#AT_KEYWORDS(stores)
+#AT_CLEANUP
 
 AT_SETUP([Bloom (2 hash functions) (1/2)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
@@ -693,7 +719,7 @@ AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Plugin: Bit+Suffix (1/2)])
+AT_SETUP([Plugin: Bit+Suffix (1/3)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=psbbin -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -701,11 +727,19 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Plugin: Bit+Suffix (2/2)])
+AT_SETUP([Plugin: Bit+Suffix (2/3)])
 AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
 AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=psbbin -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Bit+Suffix (3/3)])
+AT_CHECK([cp TESTFILES/Kanban5.5safe.pnml.lola .])
+AT_CHECK([LOLA Kanban5.5safe.pnml.lola --check=full --store=psbbin -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2546432 markings, 24460016 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
@@ -741,7 +775,7 @@ AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Plugin: Copy+Suffix (1/2)])
+AT_SETUP([Plugin: Copy+Suffix (1/3)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=pscbin -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -749,11 +783,19 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Plugin: Copy+Suffix (2/2)])
+AT_SETUP([Plugin: Copy+Suffix (2/3)])
 AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
 AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=pscbin -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: Copy+Suffix (3/3)])
+AT_CHECK([cp TESTFILES/Kanban5.5safe.pnml.lola .])
+AT_CHECK([LOLA Kanban5.5safe.pnml.lola --check=full --store=pscbin -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2546432 markings, 24460016 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
@@ -789,7 +831,7 @@ AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Plugin: SimpleCompress+Suffix (1/2)])
+AT_SETUP([Plugin: SimpleCompress+Suffix (1/3)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --check=full --store=pssbin -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -797,11 +839,19 @@ AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 
-AT_SETUP([Plugin: SimpleCompress+Suffix (2/2)])
+AT_SETUP([Plugin: SimpleCompress+Suffix (2/3)])
 AT_CHECK([cp TESTFILES/eratosthenes-020.pnml.lola .])
 AT_CHECK([LOLA eratosthenes-020.pnml.lola --check=full --store=pssbin -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 2048 markings, 23040 edges" stderr])
+AT_KEYWORDS(stores)
+AT_CLEANUP
+
+AT_SETUP([Plugin: SimpleCompress+Suffix (3/3)])
+AT_CHECK([cp TESTFILES/Kanban5.5safe.pnml.lola .])
+AT_CHECK([LOLA Kanban5.5safe.pnml.lola --check=full --store=pssbin -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2546432 markings, 24460016 edges" stderr])
 AT_KEYWORDS(stores)
 AT_CLEANUP
 

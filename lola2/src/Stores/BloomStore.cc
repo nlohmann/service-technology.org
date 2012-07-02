@@ -51,6 +51,7 @@ bool BloomStore::searchAndInsert(NetState &ns, void**)
 {
     ++calls[0];
 
+	// LCOV_EXCL_START
     if (calls[0] % 10000000 == 0)
     {
         const size_t m = BLOOM_FILTER_SIZE;
@@ -59,6 +60,7 @@ bool BloomStore::searchAndInsert(NetState &ns, void**)
         const double p = pow(1.0 - pow((1.0 - 1.0 / m), k * n) , k);
         rep->status("fill: %ld, error = %.4f", n, p) ;
     }
+    // LCOV_EXCL_STOP
 
 
     /*************************

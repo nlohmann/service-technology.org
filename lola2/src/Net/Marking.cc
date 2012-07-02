@@ -24,6 +24,7 @@ capacity_t* Marking::Target = NULL;
 hash_t Marking::HashTarget = 0;
 
 /// init for the behavioral part of the net
+/* not needed anymore, this is done with NetStates now
 void Marking::init()
 {
     assert(Net::Card[PL] > 0);
@@ -31,6 +32,7 @@ void Marking::init()
     memcpy(Current, Initial, Net::Card[PL] * SIZEOF_INDEX_T);
     HashCurrent = HashInitial;
 }
+*/
 
 /// collection of information related to markings
 void Marking::deleteMarkings()

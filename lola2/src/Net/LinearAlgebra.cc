@@ -47,7 +47,6 @@ void Matrix::DEBUG__printMatrix() const
         }
     }
 }
-// LCOV_EXCL_STOP
 
 /// checks whether the reduced matrix has at most one row per column
 bool Matrix::DEBUG__checkReduced() const
@@ -79,6 +78,7 @@ bool Matrix::Row::DEBUG__checkRow() const
     }
     return true;
 }
+// LCOV_EXCL_STOP
 
 /// frees memory of current row
 Matrix::Row::~Row()

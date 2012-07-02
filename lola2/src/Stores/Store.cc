@@ -76,7 +76,9 @@ Store::Store(uint32_t _number_of_threads) : markings(0), calls(0), number_of_thr
 
 Store::~Store()
 {
-    const int ret = pthread_cancel(reporter_thread);
+	void* void_pointer;
+    int ret = pthread_cancel(reporter_thread);
+    ret |= pthread_join(reporter_thread,&void_pointer);
     if (LIKELY(ret == 0))
     {
         rep->status("killed reporter thread");

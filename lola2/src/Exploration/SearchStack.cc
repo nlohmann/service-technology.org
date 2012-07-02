@@ -39,14 +39,18 @@ Chunk &Chunk::operator=(const Chunk &chunk)
     // copy the current values
     memcpy(current, chunk.current, SIZEOF_STACKCHUNK * SIZEOF_INDEX_T);
     for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
-        if (chunk.list[i])
+    {
+    	if (list[i])
+    		delete[] list[i];
+
+    	if (chunk.list[i])
         {
-        	if (list[i])
-        		delete[] list[i];
             list[i] = new index_t[current[i] + 1];
             for (int j = 0; j <= current[i]; j++)
                 list[i][j] = chunk.list[i][j];
-        }
+        } else
+        	list[i] = 0;
+    }
 
     if (chunk.prev != NULL)
     {

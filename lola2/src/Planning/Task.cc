@@ -1,5 +1,8 @@
 #include <errno.h>
 
+#include <map>
+#include <list>
+
 #include <InputOutput/InputOutput.h>
 #include <InputOutput/Reporter.h>
 #include <Planning/Task.h>
@@ -414,4 +417,79 @@ void Task::printMarking()
 NetState* Task::getNetState()
 {
     return ns;
+}
+
+
+void Task::printDot()
+{
+    FILE *o = stdout;
+    std::map<index_t, unsigned int> conditions;
+    std::map<index_t, unsigned int> events;
+    
+    fprintf(o, "digraph d {\n");
+    fprintf(o, "rankdir=LR;\n\n");
+
+    // put initial marking into a cluster
+    fprintf(o, "subgraph m0 {\n");
+    fprintf(o, "  rank=same;\n");
+    for (index_t i = 0; i < Net::Card[PL]; ++i)
+    {
+        if (Marking::Initial[i] > 0)
+        {
+            fprintf(o, "  p%d_%d [label=\"%s\" shape=circle color=green]\n", i, conditions[i], Net::Name[PL][i]);
+        }
+    }
+    fprintf(o, "}\n\n");
+    
+    // print the witness path
+    std::list<index_t> path;
+    index_t c;
+    index_t* f;
+    while (p->stack.StackPointer > 0)
+    {
+        index_t i = p->stack.topTransition();
+        path.push_front(i);
+        p->stack.pop(& c, & f);
+    }
+
+    for (std::list<index_t>::iterator it = path.begin(); it != path.end(); ++it) {
+        index_t i = *it;
+
+        fprintf(o, "  t%d_%d [label=\"%s\" shape=box]\n", i, events[i], Net::Name[TR][i]);
+
+        for (index_t pre = 0; pre < Net::CardArcs[TR][PRE][i]; ++pre)
+        {
+            fprintf(o, "  p%d_%d -> t%d_%d\n", Net::Arc[TR][PRE][i][pre], conditions[Net::Arc[TR][PRE][i][pre]], i, events[i]);
+        }
+
+        for (index_t post = 0; post < Net::CardArcs[TR][POST][i]; ++post)
+        {
+            fprintf(o, "  t%d_%d -> p%d_%d\n", i, events[i], Net::Arc[TR][POST][i][post], ++conditions[Net::Arc[TR][POST][i][post]]);
+        }
+
+        fprintf(o, "  subgraph post_t%d_%d {\n", i, events[i]);
+        fprintf(o, "    rank=same;\n");
+        for (index_t post = 0; post < Net::CardArcs[TR][POST][i]; ++post)
+        {
+            fprintf(o, "    p%d_%d [label=\"%s\" shape=circle]\n", Net::Arc[TR][POST][i][post], conditions[Net::Arc[TR][POST][i][post]], Net::Name[PL][Net::Arc[TR][POST][i][post]]);
+        }
+        fprintf(o, "}\n\n");
+
+        events[i]++;
+    }
+/*
+    // put the target marking into a cluster
+    fprintf(o, "\nsubgraph mf {\n");
+    fprintf(o, "  rank=same;\n");
+    for (index_t i = 0; i < Net::Card[PL]; ++i)
+    {
+        if (ns->Current[i] > 0)
+        {
+            fprintf(o, "  p%d_%d [label=\"%s\" shape=\"circle\"]\n", i, conditions[i], Net::Name[PL][i]);
+        }
+    }
+    fprintf(o, "}\n\n");
+*/
+
+    fprintf(o, "}\n");
 }

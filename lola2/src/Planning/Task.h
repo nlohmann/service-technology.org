@@ -42,6 +42,7 @@ class Task
         void printWitness();
         void printMarking();
 
+        void printDot();
 
         // this function is needed to allow the random walk in the main function
         NetState* getNetState();

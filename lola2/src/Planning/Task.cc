@@ -2,6 +2,7 @@
 
 #include <map>
 #include <list>
+#include <set>
 
 #include <InputOutput/InputOutput.h>
 #include <InputOutput/Reporter.h>
@@ -48,6 +49,9 @@
 #include <Stores/STLStore.h>
 #include <Stores/Store.h>
 #include <Stores/LocalGlobalStore.h>
+
+#include <Witness/Condition.h>
+#include <Witness/Event.h>
 
 extern gengetopt_args_info args_info;
 extern Reporter* rep;
@@ -233,31 +237,31 @@ void Task::setStore()
                 s = new BinStore2(number_of_threads);
                 break;
             case store_arg_psbbin:
-                s = new PluginStore(new BitEncoder(number_of_threads), new SuffixTreeStore(),number_of_threads);
+                s = new PluginStore(new BitEncoder(number_of_threads), new SuffixTreeStore(), number_of_threads);
                 break;
             case store_arg_pscbin:
-                s = new PluginStore(new CopyEncoder(number_of_threads), new SuffixTreeStore(),number_of_threads);
+                s = new PluginStore(new CopyEncoder(number_of_threads), new SuffixTreeStore(), number_of_threads);
                 break;
             case store_arg_pssbin:
-                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore(),number_of_threads);
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore(), number_of_threads);
                 break;
             case store_arg_psbstl:
-                s = new PluginStore(new BitEncoder(number_of_threads), new VSTLStore(number_of_threads),number_of_threads);
+                s = new PluginStore(new BitEncoder(number_of_threads), new VSTLStore(number_of_threads), number_of_threads);
                 break;
             case store_arg_pscstl:
-                s = new PluginStore(new CopyEncoder(number_of_threads), new VSTLStore(number_of_threads),number_of_threads);
+                s = new PluginStore(new CopyEncoder(number_of_threads), new VSTLStore(number_of_threads), number_of_threads);
                 break;
             case store_arg_pssstl:
-                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VSTLStore(number_of_threads),number_of_threads);
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VSTLStore(number_of_threads), number_of_threads);
                 break;
             case store_arg_psbbloom:
-                s = new PluginStore(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads,args_info.hashfunctions_arg),number_of_threads);
+                s = new PluginStore(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
                 break;
             case store_arg_pscbloom:
-                s = new PluginStore(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads,args_info.hashfunctions_arg),number_of_threads);
+                s = new PluginStore(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
                 break;
             case store_arg_pssbloom:
-                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads,args_info.hashfunctions_arg),number_of_threads);
+                s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
                 break;
             case store_arg_lgbin:
                 s = new LocalGlobalStore(new SISuffixTreeStore(number_of_threads), number_of_threads, new CopyEncoder(number_of_threads));
@@ -425,26 +429,18 @@ NetState* Task::getNetState()
 
 void Task::printDot()
 {
-    FILE *o = stdout;
-    std::map<index_t, unsigned int> conditions;
-    std::map<index_t, unsigned int> events;
-    
-    fprintf(o, "digraph d {\n");
-    fprintf(o, "rankdir=LR;\n\n");
+    FILE* o = stdout;
 
-    // put initial marking into a cluster
-    fprintf(o, "subgraph m0 {\n");
-    fprintf(o, "  rank=same;\n");
+    // add conditions for initial marking
     for (index_t i = 0; i < Net::Card[PL]; ++i)
     {
         if (Marking::Initial[i] > 0)
         {
-            fprintf(o, "  p%d_%d [label=\"%s\" shape=circle color=green]\n", i, conditions[i], Net::Name[PL][i]);
+            new Condition(i);
         }
     }
-    fprintf(o, "}\n\n");
-    
-    // print the witness path
+
+    // process the witness path
     std::list<index_t> path;
     index_t c;
     index_t* f;
@@ -455,44 +451,24 @@ void Task::printDot()
         p->stack.pop(& c, & f);
     }
 
-    for (std::list<index_t>::iterator it = path.begin(); it != path.end(); ++it) {
-        index_t i = *it;
-
-        fprintf(o, "  t%d_%d [label=\"%s\" shape=box]\n", i, events[i], Net::Name[TR][i]);
-
-        for (index_t pre = 0; pre < Net::CardArcs[TR][PRE][i]; ++pre)
-        {
-            fprintf(o, "  p%d_%d -> t%d_%d\n", Net::Arc[TR][PRE][i][pre], conditions[Net::Arc[TR][PRE][i][pre]], i, events[i]);
-        }
-
-        for (index_t post = 0; post < Net::CardArcs[TR][POST][i]; ++post)
-        {
-            fprintf(o, "  t%d_%d -> p%d_%d\n", i, events[i], Net::Arc[TR][POST][i][post], ++conditions[Net::Arc[TR][POST][i][post]]);
-        }
-
-        fprintf(o, "  subgraph post_t%d_%d {\n", i, events[i]);
-        fprintf(o, "    rank=same;\n");
-        for (index_t post = 0; post < Net::CardArcs[TR][POST][i]; ++post)
-        {
-            fprintf(o, "    p%d_%d [label=\"%s\" shape=circle]\n", Net::Arc[TR][POST][i][post], conditions[Net::Arc[TR][POST][i][post]], Net::Name[PL][Net::Arc[TR][POST][i][post]]);
-        }
-        fprintf(o, "}\n\n");
-
-        events[i]++;
-    }
-/*
-    // put the target marking into a cluster
-    fprintf(o, "\nsubgraph mf {\n");
-    fprintf(o, "  rank=same;\n");
-    for (index_t i = 0; i < Net::Card[PL]; ++i)
+    // add all events (with surrounding conditions)
+    for (std::list<index_t>::iterator it = path.begin(); it != path.end(); ++it)
     {
-        if (ns->Current[i] > 0)
-        {
-            fprintf(o, "  p%d_%d [label=\"%s\" shape=\"circle\"]\n", i, conditions[i], Net::Name[PL][i]);
-        }
+        new Event(*it);
     }
-    fprintf(o, "}\n\n");
-*/
 
+    // if a tranision is the target, add it
+    extern std::set<index_t> target_transition;
+    for (std::set<index_t>::iterator it = target_transition.begin(); it != target_transition.end(); ++it)
+    {
+        Event* e = new Event(*it);
+        e->target = true;
+    }
+
+    // actual dot output
+    fprintf(o, "digraph d {\n");
+    fprintf(o, "  rankdir=LR;\n\n");
+    Event::dot(o);
+    Condition::dot(o);
     fprintf(o, "}\n");
 }

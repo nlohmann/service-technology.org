@@ -262,7 +262,11 @@ int main(int argc, char** argv)
         if (result and args_info.path_given)
         {
             task.printWitness();
-//            task.printDot();
+        }
+
+        if (result and args_info.run_given)
+        {
+            task.printDot();
         }
 
         if (args_info.search_arg != search_arg_findpath)

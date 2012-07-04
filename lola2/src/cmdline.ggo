@@ -34,6 +34,20 @@ option "path" p
   "Print witness path"
   flag off
 
+option "run" -
+  "Print witness path as partially ordered run"
+  flag off
+
+option "nofilterrun" -
+  "Only print relevant parts of the partially ordered run"
+  flag off
+  hidden
+
+option "eventstructure" -
+  "Print an event structure instead of a partially ordered run"
+  flag off
+  hidden
+
 option "state" s
   "Print witness state"
   flag off

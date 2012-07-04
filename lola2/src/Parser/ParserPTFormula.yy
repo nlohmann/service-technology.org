@@ -4,6 +4,7 @@
 #include <libgen.h>
 #include <cstdarg>
 #include <cstdio>
+#include <set>
 #include <cmdline.h>
 #include <Core/Dimensions.h>
 #include <Parser/PlaceSymbol.h>
@@ -70,6 +71,9 @@ extern int ptformula_lex();
 extern FILE* ptformula_in;
 extern int ptformula_lineno;
 extern int ptformula_colno;
+
+std::set<index_t> target_place;
+std::set<index_t> target_transition;
 %}
 
 %{
@@ -152,6 +156,7 @@ atomic_proposition:
             ptformula_yyerrors(ptformula_text, "transition %s unknown", $3->name);
         }
         $$ = Fireable(mkinteger(t->getIndex()));
+        target_transition.insert(t->getIndex());
     }
 | _DEADLOCK_
     { $$ = aDeadlock(); }
@@ -170,6 +175,7 @@ term:
             ptformula_yyerrors(ptformula_text, "place %s unknown", $1->name);
         }
         $$ = Node(mkinteger(p->getIndex()));
+        target_place.insert(p->getIndex());
     }
 | NUMBER
     { $$ = Number($1); }

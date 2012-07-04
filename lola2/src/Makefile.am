@@ -74,7 +74,9 @@ lola_SOURCES = \
                 Stores/VectorStores/VSTLStore.cc Stores/VectorStores/VSTLStore.h \
                 Stores/VectorStores/VBloomStore.cc Stores/VectorStores/VBloomStore.h \
                 Stores/VectorStores/SuffixTreeStore.cc Stores/VectorStores/SuffixTreeStore.h \
-                Stores/PluginStore.cc Stores/PluginStore.h
+                Stores/PluginStore.cc Stores/PluginStore.h \
+                \
+                Witness/Event.h Witness/Event.cc Witness/Condition.h Witness/Condition.cc
 
 ###
 

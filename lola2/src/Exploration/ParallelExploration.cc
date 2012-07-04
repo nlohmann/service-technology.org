@@ -23,8 +23,6 @@
 #include <Stores/EmptyStore.h>
 #include <InputOutput/Reporter.h>
 #include <cmdline.h>
-#include <Stores/ThreadSafeStore.h>
-#include <Stores/SIBinStore2.h>
 #include <InputOutput/Reporter.h>
 
 extern gengetopt_args_info args_info;

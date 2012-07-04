@@ -44,10 +44,10 @@
 #include <Stores/BitStore.h>
 #include <Stores/BloomStore.h>
 #include <Stores/EmptyStore.h>
-#include <Stores/SIBinStore2.h>
+#include <Stores/SIStore/SISuffixTreeStore.h>
 #include <Stores/STLStore.h>
 #include <Stores/Store.h>
-#include <Stores/ThreadSafeStore.h>
+#include <Stores/LocalGlobalStore.h>
 
 extern gengetopt_args_info args_info;
 extern Reporter* rep;
@@ -259,8 +259,11 @@ void Task::setStore()
             case store_arg_pssbloom:
                 s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads,args_info.hashfunctions_arg),number_of_threads);
                 break;
-            case store_arg_tsbin2:
-                s = new ThreadSafeStore(new SIBinStore2(number_of_threads), number_of_threads);
+            case store_arg_lgbin:
+                s = new LocalGlobalStore(new SISuffixTreeStore(number_of_threads), number_of_threads, new CopyEncoder(number_of_threads));
+                break;
+            case store_arg_lgwbbin:
+                s = new LocalGlobalStore(new SuffixTreeStore(), number_of_threads, new CopyEncoder(number_of_threads));
                 break;
         }
     }

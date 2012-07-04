@@ -65,7 +65,7 @@ class Store
 
         /// check whether current marking is stored
         /// threaded version, this have not to be implemented by each store
-        virtual bool searchAndInsert(NetState &ns, uint32_t thread);
+        virtual bool searchAndInsert(NetState &ns, index_t thread);
 
         /// check whether current marking is stored and return state
         virtual bool searchAndInsert(NetState &ns, void** s = NULL) = 0;

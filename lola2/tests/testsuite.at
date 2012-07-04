@@ -583,7 +583,8 @@ AT_BANNER([Stores])
 
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bin],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bin2],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[tsbin2],1,2,[no],242,805)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[lgbin],1,2,[no],242,805)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[lgwbbin],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],1,3,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[stl],1,2,[no],242,805)
@@ -600,7 +601,8 @@ AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssbloom],1,2,[no],242,8
 
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bin],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bin2],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[tsbin2],1,2,[no],2048,23040)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[lgbin],1,2,[no],2048,23040)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[lgwbbin],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],1,3,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[stl],1,2,[no],2048,23040)
@@ -617,7 +619,8 @@ AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssbloom],1
 
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bin],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bin2],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[tsbin2],1,2,[no],47905,137280)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[lgbin],1,2,[no],47905,137280)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[lgwbbin],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],1,3,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[stl],1,2,[no],47905,137280)
@@ -633,9 +636,8 @@ AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssbloom],1,2,[no],47905,137280)
 
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bin],1,2,[no],2546432,24460016)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bin2],1,2,[no],2546432,24460016)
-## TODO: ask Gregor why this fails
-#
-#AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[tsbin2],1,2,[no],2546432,24460016)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[lgbin],1,2,[no],2546432,24460016)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[lgwbbin],1,2,[no],2546432,24460016)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[psbbin],1,2,[no],2546432,24460016)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pscbin],1,2,[no],2546432,24460016)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pssbin],1,2,[no],2546432,24460016)
@@ -649,9 +651,8 @@ AT_BANNER([Parallel Stores])
 
 
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bin2],4,2,[no],242,)
-## TODO: ask Gregor why this results in a deadlock
-#
-#AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[tsbin2],4,2,[no],242,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[lgbin],4,2,[no],242,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[lgwbbin],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbbin],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbstl],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbbloom],4,2,[no],242,)
@@ -663,9 +664,8 @@ AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssstl],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssbloom],4,2,[no],242,)
 
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bin2],4,2,[no],2048,)
-## TODO: ask Gregor why this results in a deadlock
-#
-#AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[tsbin2],4,2,[no],2048,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[lgbin],4,2,[no],2048,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[lgwbbin],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psbbin],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psbstl],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psbbloom],4,2,[no],2048,)
@@ -677,9 +677,8 @@ AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssstl],4,2
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssbloom],4,2,[no],2048,)
 
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bin2],4,2,[no],47905,)
-## TODO: ask Gregor why this results in a deadlock
-#
-#AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[tsbin2],4,2,[no],47905,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[lgbin],4,2,[no],47905,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[lgwbbin],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psbbin],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psbstl],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pscbin],4,2,[no],47905,)
@@ -690,9 +689,8 @@ AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssstl],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssbloom],4,2,[no],47905,)
 
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bin2],4,2,[no],2546432,)
-## TODO: ask Gregor why this fails
-#
-#AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[tsbin2],4,2,[no],2546432,)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[lgbin],4,2,[no],2546432,)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[lgwbbin],4,2,[no],2546432,)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[psbbin],4,2,[no],2546432,)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pscbin],4,2,[no],2546432,)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pssbin],4,2,[no],2546432,)
@@ -981,4 +979,9 @@ AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [bloom], 1)
 
 AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [bin2], 4)
 AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [bin2], 4)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [lgbin], 4)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [lgbin], 4)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [pscbin], 4)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [pssbin], 4)
+AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [psbbin], 4)
 

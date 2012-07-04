@@ -59,13 +59,14 @@ lola_SOURCES = \
                 Formula/FalsePredicate.cc Formula/FalsePredicate.h \
                 \
                 Stores/Store.cc Stores/Store.h \
-                Stores/SIStore.h \
+                Stores/SIStore/SIStore.h \
+                Stores/SIStore/SISuffixTreeStore.cc Stores/SIStore/SISuffixTreeStore.h \
                 Stores/BloomStore.cc Stores/BloomStore.h \
                 Stores/BinStore.h Stores/BinStore.cc Stores/LoadedBinStore.h \
                 Stores/BitStore.cc Stores/BitStore.h \
                 Stores/EmptyStore.cc Stores/EmptyStore.h \
                 Stores/STLStore.cc Stores/STLStore.h \
-                Stores/ThreadSafeStore.cc Stores/ThreadSafeStore.h \
+                Stores/LocalGlobalStore.cc Stores/LocalGlobalStore.h \
                 Stores/BinStore2.cc Stores/BinStore2.h \
                 Stores/NetStateEncoder/BitEncoder.cc Stores/NetStateEncoder/BitEncoder.h \
                 Stores/NetStateEncoder/CopyEncoder.cc Stores/NetStateEncoder/CopyEncoder.h \
@@ -73,8 +74,7 @@ lola_SOURCES = \
                 Stores/VectorStores/VSTLStore.cc Stores/VectorStores/VSTLStore.h \
                 Stores/VectorStores/VBloomStore.cc Stores/VectorStores/VBloomStore.h \
                 Stores/VectorStores/SuffixTreeStore.cc Stores/VectorStores/SuffixTreeStore.h \
-                Stores/PluginStore.cc Stores/PluginStore.h \
-                Stores/SIBinStore2.cc Stores/SIBinStore2.h
+                Stores/PluginStore.cc Stores/PluginStore.h
 
 ###
 

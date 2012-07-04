@@ -9,6 +9,7 @@ This Version has been transformed into an search and insert store.
 #pragma once
 #include <Core/Dimensions.h>
 #include <Stores/SIStore/SIStore.h>
+#include <pthread.h>
 
 class SISuffixTreeStore : public SIStore
 {
@@ -20,7 +21,7 @@ public:
     virtual bool search(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex);
     virtual bool insert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex);
 private:
-    bool search(const vectordata_t* in, bitindex_t bitlen, hash_t hash, uint32_t threadIndex, bool lock);
+    bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex, bool doinsert);
     /// a binary decision node
     class Decision
     {

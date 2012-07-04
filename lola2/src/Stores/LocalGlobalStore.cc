@@ -85,12 +85,13 @@ void LocalGlobalStore::writeToGlobalStore(int thread, int element) {
 		vectordata_t* input = netStateEncoder->encodeNetState(*ns, bitlen,
 				thread);
 
-		if (sistore->search(input, bitlen, ns->HashCurrent, thread)){
+		bool isIn = sistore->search(input, bitlen, ns->HashCurrent, thread);
+		if (isIn){
 			ns->Current = old_current;
 			return;
 		}
 
-		bool isIn = sistore->insert(input, bitlen, ns->HashCurrent, thread);
+		isIn = sistore->insert(input, bitlen, ns->HashCurrent, thread);
 		if (!isIn)
 			markings[thread]++;
 

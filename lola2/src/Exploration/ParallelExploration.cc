@@ -345,7 +345,7 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 	free(runner_thread);
 	free(args);
 
-	// finalize the store to thave the corrent number of markings to report
+	// finalize the store to have the correct number of markings to report
 	myStore.finalize();
 	return property.value;
 }

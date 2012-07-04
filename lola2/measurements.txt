@@ -1,0 +1,24 @@
+1. Allocate memory for basic net structure
+2. Allocate memory for places
+3. Allocate memory for markings
+4. Copy data from the symbol table to places
+5. Allocate memory for transitions
+6. Copy data from the symbol table to transitions
+7. Organize Deltas
+8. Organize conflicting transitions
+9. Set significant places
+10. Initial enabledness check
+
+net		1.	2.	3.	4.	5.	6.	7.	8.	9.	10.
+phils10		4	4	6	988	4	950	33	19	187	9
+phils1000	53	47	8	4891	135	7179	2799	2377	31778	862
+phils10000	80	24	10	40107	71	70427	30291	32359	310985	9809
+garavel		37	11	5	1354	56	1605	579	1922	7574	109
+kanban-1000	4	2	2	926	4	891	16	12	116	7
+peterson-7	58	25	9	2228	94	4143	2175	4927	102478	664
+planning	11	4	2	1024	13	1062	120	173	705	21	
+galloc_res-3	33	3	3	1233	132	6158	6319	2sec	414462	884
+tokenring	75	29	9	6244	79	161245	101726	2sec	10sec	19992
+
+
+unit: usec

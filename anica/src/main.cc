@@ -109,7 +109,7 @@ void evaluateParameters(int argc, char** argv) {
             params->initialize = 0;
             params->override = 0;
             if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
-                abort(10, "error reading configuration file '%s'", conf_filename.c_str());
+                abort(10, "error reading configuration file '%s'", _cfilename_(conf_filename));
             } else {
                 status("using configuration file '%s'", _cfilename_(conf_filename));
             }
@@ -156,6 +156,20 @@ void evaluateParameters(int argc, char** argv) {
 		status(_cwarning_("oneTripleOnly has no influence on this task: parameter will be ignored."));
 		args_info.oneTripleOnly_flag = false;
 	}
+
+    status("Reduction techniques:");
+    if (args_info.oneTripleOnly_flag) {
+        status("..oneTripleOnly: %s", _cgood_("yes"));
+    }
+    else {
+        status("..oneTripleOnly: %s", _cwarning_("no"));
+    }
+    if (args_info.oneActiveOnly_flag) {
+        status("..oneActiveOnly: %s", _cwarning_("yes"));
+    }
+    else {
+        status("..oneActiveOnly: no");
+    }
 
     if (args_info.finalize_flag) {free(params);}
 }
@@ -295,6 +309,7 @@ int main(int argc, char** argv) {
     anica::AnicaLib alib(net);
     
     // configure library
+    alib.setInputName(fileName);
     alib.setLolaPath(string(args_info.lola_arg));
     alib.setLolaWitnessPath(args_info.witnessPath_flag);
     alib.setLolaVerbose(args_info.verbose_flag);

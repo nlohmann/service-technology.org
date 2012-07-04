@@ -109,6 +109,9 @@ class AnicaLib
         // deletes colors of all places and tranisitons
         void clearColors(pnapi::PetriNet&);
         
+        
+        // sets the file name of the input net (for output purposes, i.e., witness path)
+        void setInputName(const std::string&);
         // sets the property which should be considered in all tests
         void setProperty(property_e);
         // gets the property which is considered in all tests
@@ -164,6 +167,7 @@ class AnicaLib
     
         // calls lola with the task to check the activation of a given place in a given net (returns exit code of lola)
         int callLoLA(const pnapi::PetriNet&, const pnapi::Place*) const;
+        int callLoLA(const pnapi::PetriNet&, const pnapi::Place*, const std::string&) const;
     
         // assigns a given confidence to a given transition
         void setTransitionAssignment(pnapi::Transition*, confidence_e);
@@ -196,6 +200,8 @@ class AnicaLib
         // M E M B E R S
         // saves current net
         const pnapi::PetriNet* initialNet;
+        // saves input name of current net
+        std::string inputName;
         // stores property to check
         property_e propertyToCheck;
         // indicates whether represantive names should be used

@@ -3,12 +3,10 @@
 "shortname": "anica", 
 "svnname": "anica", 
 "authors": [
-    "Peter Pan implemented ...",
-    "Donald Duck implemented ...",
-    "Daisy Duck implemented ..."
+    "Andreas Lehmann"
 ], 
-"maintainer": "Peter Pan", 
-"tagline": "Making life easier", 
-"purpose": "Life is *hard*. Let's make life *easier*...", 
+"maintainer": "Andreas Lehmann", 
+"tagline": "Automatic Non-Interference Check Assistant", 
+"purpose": "Verification of PBNI+ and PBNID for safe Petri nets.", 
 "license": "AGPL3+"
 }

@@ -39,7 +39,8 @@ AnicaLib::AnicaLib(const pnapi::PetriNet& net)
     oneActiveOnly(true),
     propertyToCheck(PROPERTY_PBNIPLUS),
     highLabeledTransitionsCount(0),
-    lowLabeledTransitionsCount(0)
+    lowLabeledTransitionsCount(0),
+    inputName("_undefined_")
 {
     newArcs.clear();
     downgradeTransitions.clear();
@@ -90,6 +91,11 @@ const size_t AnicaLib::getDownLabeledTransitionsCount() const {
 void AnicaLib::setProperty(property_e property)
 {
     propertyToCheck = property;
+}
+
+void AnicaLib::setInputName(const std::string& name)
+{
+    inputName = name;
 }
 
 const int AnicaLib::getProperty() const
@@ -492,7 +498,14 @@ bool AnicaLib::isActiveCausalTriple(const pnapi::PetriNet& net, const AnicaLib::
     TriplePointer* taskTriple = new TriplePointer(taskNet->findPlace(triple->place->getName()), taskNet->findTransition(triple->high->getName()), taskNet->findTransition(triple->low->getName()));
     TriplePointer* resultTriple = addCausalPattern(*taskNet, taskTriple, true);
     
-    const int ret = callLoLA(*taskNet, resultTriple->place);
+    int ret = -1;
+    
+    if (lolaWitnessPath) {
+        ret = callLoLA(*taskNet, resultTriple->place, std::string(inputName + "_[" + triple->place->getName() + "," + triple->high->getName() + "," + triple->low->getName() + "].path"));
+    }
+    else {
+        ret = callLoLA(*taskNet, resultTriple->place);
+    }
     
     delete taskTriple;
     delete taskNet;
@@ -519,7 +532,14 @@ bool AnicaLib::isActiveConflictTriple(const pnapi::PetriNet& net, const AnicaLib
     TriplePointer* taskTriple = new TriplePointer(taskNet->findPlace(triple->place->getName()), taskNet->findTransition(triple->high->getName()), taskNet->findTransition(triple->low->getName()));
     TriplePointer* resultTriple = addConflictPattern(*taskNet, taskTriple, true);
     
-    const int ret = callLoLA(*taskNet, resultTriple->place);
+    int ret = -1;
+    
+    if (lolaWitnessPath) {
+        ret = callLoLA(*taskNet, resultTriple->place, std::string(inputName + "_[" + triple->place->getName() + "," + triple->high->getName() + "," + triple->low->getName() + "].path"));
+    }
+    else {
+        ret = callLoLA(*taskNet, resultTriple->place);
+    }
     
     delete taskTriple;
     delete taskNet;
@@ -535,7 +555,7 @@ bool AnicaLib::isActiveConflictTriple(const pnapi::PetriNet& net, const AnicaLib
     }
 }
 
-int AnicaLib::callLoLA(const pnapi::PetriNet& net, const pnapi::Place* goal) const {
+int AnicaLib::callLoLA(const pnapi::PetriNet& net, const pnapi::Place* goal, const std::string& fileName) const {
     if (UNLIKELY(lolaPath == "")) {
         throw exceptions::ToolError("loLA", "path not set");
     }
@@ -547,9 +567,9 @@ int AnicaLib::callLoLA(const pnapi::PetriNet& net, const pnapi::Place* goal) con
 	// select LoLA binary and build LoLA command 
     #if defined(__MINGW32__) 
     // // MinGW does not understand pathnames with "/", so we use the basename 
-    const std::string command_line = "\"" + lolaPath + (lolaWitnessPath ? " -p " : "") + (lolaVerbose ? "" : " 2> \dev\null"); 
+    const std::string command_line = "\"" + lolaPath + (lolaWitnessPath ? " --path=" + fileName + " " : "") + (lolaVerbose ? "" : " 2> \dev\null"); 
     #else 
-    const std::string command_line = lolaPath + (lolaWitnessPath ? " -p " : "") + (lolaVerbose ? "" : " 2> /dev/null"); 
+    const std::string command_line = lolaPath + (lolaWitnessPath ? " --path=" + fileName + " " : "") + (lolaVerbose ? "" : " 2> /dev/null"); 
     #endif 
 
 	FILE *fp = popen(command_line.c_str(), "w");
@@ -559,6 +579,14 @@ int AnicaLib::callLoLA(const pnapi::PetriNet& net, const pnapi::Place* goal) con
 	fprintf(fp, "%s", ss.str().c_str());
 
 	return (pclose(fp) / 256);
+}
+
+
+int AnicaLib::callLoLA(const pnapi::PetriNet& net, const pnapi::Place* goal) const {
+    if (UNLIKELY(lolaWitnessPath)) {
+        throw exceptions::UserError("witness paths require unique file names");
+    }
+    return callLoLA(net, goal, inputName);
 }
 
 AnicaLib::TriplePointer* AnicaLib::addCausalPattern(pnapi::PetriNet& extendedNet, const AnicaLib::TriplePointer* triple, bool insertArcs)

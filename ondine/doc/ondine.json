@@ -3,12 +3,10 @@
 "shortname": "ondine", 
 "svnname": "ondine", 
 "authors": [
-    "Peter Pan implemented ...",
-    "Donald Duck implemented ...",
-    "Daisy Duck implemented ..."
+    "Harro Wimmel"
 ], 
-"maintainer": "Peter Pan", 
-"tagline": "Making life easier", 
-"purpose": "Life is *hard*. Let's make life *easier*...", 
+"maintainer": "Harro Wimmel", 
+"tagline": "Open Net Divider with INtErface optimization", 
+"purpose": "Splits an open net into two components with an as small as possible interface", 
 "license": "AGPL3+"
 }

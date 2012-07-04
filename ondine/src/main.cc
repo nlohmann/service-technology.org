@@ -297,7 +297,8 @@ int main(int argc, char** argv) {
 			// ... and those in the postset
 			tmp2 = t->getPostsetArcs();
 			for(ait2=tmp2.begin(); ait2!=tmp2.end(); ++ait2)
-				prei.insert(&((*ait2)->getPlace()));
+				if (*pit!=&((*ait2)->getPlace()))
+					prei.insert(&((*ait2)->getPlace()));
 			// as well as the interface place, input ...
 			ltmp = t->getInputLabels();
 			for(lit=ltmp.begin(); lit!=ltmp.end(); ++lit)
@@ -306,6 +307,14 @@ int main(int argc, char** argv) {
 			ltmp = t->getOutputLabels();
 			for(lit=ltmp.begin(); lit!=ltmp.end(); ++lit)
 				lprei.insert(*lit);
+		}
+		// ban the current place from the interface if it has a loop
+		if (prei.find(*pit)!=prei.end()) {
+			singlecs.clear();
+			singlecs[name]=-1;
+			cs.push_back(singlecs);
+			ineq.push_back(1);
+			rhs.push_back(0);
 		}
 		// but do not collect the current place itself
 		prei.erase(*pit);

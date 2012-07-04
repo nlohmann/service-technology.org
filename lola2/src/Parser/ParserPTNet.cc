@@ -29,7 +29,6 @@ should be independent from the format (LoLA / PNML / ...)
 #include <Parser/TransitionSymbol.h>
 #include <Parser/Symbol.h>
 #include <InputOutput/Reporter.h>
-#include <sys/time.h>
 
 extern gengetopt_args_info args_info;
 extern Reporter* rep;
@@ -47,12 +46,6 @@ ParserPTNet::~ParserPTNet()
 }
 
 
-// Zeitmessungen
-unsigned long diff;
-timeval start, end;
-#define START gettimeofday(&start, NULL);
-#define STOP(msg) gettimeofday(&end, NULL); diff = end.tv_sec - start.tv_sec; printf("%lu\t", diff);
-
 /*!
 \todo comment me
 \todo Brauchen wir wirklich Marking::Initial oder können wir das mit Marking::Current abhandeln?
@@ -63,7 +56,6 @@ void ParserPTNet::symboltable2net()
     * 1. Allocate memory for basic net structure *
     *********************************************/
 
-    START
     // 1.1 set cardinalities
     const index_t cardPL = PlaceTable->getCard();
     const index_t cardTR = TransitionTable->getCard();
@@ -82,38 +74,32 @@ void ParserPTNet::symboltable2net()
             Net::Mult[type][direction] = (mult_t**) malloc(Net::Card[type] * SIZEOF_VOIDP);
         }
     }
-    STOP("1. Allocate memory for basic net structure")
 
 
     /********************************
     * 2. Allocate memory for places *
     *********************************/
 
-    START
     Place::Hash = (hash_t*) malloc(cardPL * SIZEOF_HASH_T);
     Place::Capacity = (capacity_t*) malloc(cardPL * SIZEOF_CAPACITY_T);
     Place::CardBits = (cardbit_t*) malloc(cardPL * SIZEOF_CARDBIT_T);
     Place::CardDisabled = (index_t*) calloc(cardPL , SIZEOF_INDEX_T); // use calloc: initial assumption: no transition is disabled
     Place::Disabled = (index_t**) malloc(cardPL * SIZEOF_VOIDP);
-    STOP("2. Allocate memory for places")
 
 
     /**********************************
     * 3. Allocate memory for markings *
     ***********************************/
 
-    START
     Marking::Initial = (capacity_t*) malloc(cardPL * SIZEOF_CAPACITY_T);
     Marking::Current = (capacity_t*) malloc(cardPL * SIZEOF_CAPACITY_T);
     Marking::HashInitial = 0;
-    STOP("3. Allocate memory for markings")
 
 
     /***********************************************
     * 4. Copy data from the symbol table to places *
     ************************************************/
 
-    START
     // fill all information that is locally available in symbols, allocate node specific arrays
     PlaceSymbol* ps;
     index_t i;
@@ -151,14 +137,12 @@ void ParserPTNet::symboltable2net()
 
     // set hash value for initial marking
     Marking::HashCurrent = Marking::HashInitial;
-    STOP("4. Copy data from the symbol table to places")
 
 
     /*************************************
     * 5. Allocate memory for transitions *
     **************************************/
 
-    START
     // allocate memory for static data
     Transition::Fairness = (fairnessAssumption_t*) malloc(cardTR * SIZEOF_FAIRNESSASSUMPTION_T);
     Transition::Enabled = (bool*) malloc(cardTR * SIZEOF_BOOL);
@@ -177,14 +161,12 @@ void ParserPTNet::symboltable2net()
         Transition::DeltaT[direction] = (index_t**) malloc(cardTR * SIZEOF_VOIDP);
         Transition::MultDeltaT[direction] = (mult_t**) malloc(cardTR * SIZEOF_VOIDP);
     }
-    STOP("5. Allocate memory for transitions")
 
 
     /****************************************************
     * 6. Copy data from the symbol table to transitions *
     *****************************************************/
 
-    START
     // current_arc is used for filling in arcs and multiplicities of places
     index_t* current_arc_post = (index_t*) calloc(cardPL, SIZEOF_INDEX_T); // calloc: no arcs there yet
     index_t* current_arc_pre = (index_t*) calloc(cardPL, SIZEOF_INDEX_T); // calloc: no arcs there yet
@@ -228,14 +210,12 @@ void ParserPTNet::symboltable2net()
             Net::Mult[PL][PRE][k][(current_arc_pre[k])++] = Net::Mult[TR][POST][i][j] = al->getMultiplicity();
         }
     }
-    STOP("6. Copy data from the symbol table to transitions")
 
 
     /*********************
     * 7. Organize Deltas *
     **********************/
 
-    START
     // logically, current_arc_* can be freed here, physically, we just rename them to their new purpose (reuse)
     index_t* delta_pre = current_arc_pre;   // temporarily collect places where a transition has negative token balance
     index_t* delta_post = current_arc_post; // temporarily collect places where a transition has positive token balance.
@@ -353,14 +333,12 @@ void ParserPTNet::symboltable2net()
                                         Place::Hash[Transition::DeltaT[POST][t][i]]) % SIZEOF_MARKINGTABLE;
         }
     }
-    STOP("7. Organize Deltas")
 
 
     /**************************************
     * 8. Organize conflicting transitions *
     ***************************************/
 
-    START
     // initialize Conflicting arrays
     index_t* conflicting = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
     index_t* new_conflicting = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
@@ -516,26 +494,21 @@ void ParserPTNet::symboltable2net()
 
     free(conflicting);
     free(new_conflicting);
-    STOP("8. Organize conflicting transitions")
 
     /****************************
     * 9. Set significant places *
     ****************************/
-    START
     Net::setSignificantPlaces();
     rep->status("%d places, %d transitions, %d significant places", Net::Card[PL], Net::Card[TR], Place::CardSignificant);
     /// \todo: move to another place?
     Net::setProgressMeasure();
-    STOP("9. Set significant places")
 
     /********************************
     * 10. Initial enabledness check *
     *********************************/
 
-    START
     for (index_t t = 0; t < cardTR; t++)
     {
         Transition::checkEnabled_Initial(t);
     }
-    STOP("10. Initial enabledness check")
 }

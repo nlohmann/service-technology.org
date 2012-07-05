@@ -210,10 +210,18 @@ void AnicaLib::assignTransition(const std::string& t, confidence_e c) {
         throw exceptions::InputError(exceptions::InputError::IE_UNKNOWN_TRANSITION, t);
     }
     
+    if (c == CONFIDENCE_DOWN && propertyToCheck == PROPERTY_PBNIPLUS) {
+        throw exceptions::UserError("downgrade transitions and PBNI+ don't fit together");
+    }
+    
     setTransitionAssignment(transition, c);
 }
 
 void AnicaLib::assignUnassignedTransitions(confidence_e c) {
+    if (c == CONFIDENCE_DOWN && propertyToCheck == PROPERTY_PBNIPLUS) {
+        throw exceptions::UserError("downgrade transitions and PBNI+ don't fit together");
+    }
+    
     PNAPI_FOREACH(t, initialNet->getTransitions()) {
         if ((**t).getConfidence() == CONFIDENCE_NONE) {
             setTransitionAssignment(*t, c);
@@ -754,14 +762,13 @@ size_t AnicaLib::isSecure()
     }
        
     PNAPI_FOREACH(p, initialNet->getPlaces()) {
-        const std::string placeName = (**p).getName();
-        if (isActiveCausalPlace(placeName)) {
+        if (isActiveCausalPlace(*initialNet, *p)) {
             ret++;
             if (oneActiveOnly) {
                 break;
             }
         }
-        if (isActiveConflictPlace(placeName)) {
+        if (isActiveConflictPlace(*initialNet, *p)) {
             ret++;
             if (oneActiveOnly) {
                 break;
@@ -957,7 +964,6 @@ Cudd* AnicaLib::getCharacterization(char** cuddVariableNames, BDD* cuddOutput, s
 	cuddVariables.clear();
 	
 	cuddManager->AutodynEnable(CUDD_REORDER_GROUP_SIFT_CONV);
-    //cuddManager->AutodynEnable(CUDD_REORDER_EXACT);
     *cuddOutput = cuddManager->bddOne();
     size_t i = 0;
     PNAPI_FOREACH(t, initialNet->getTransitions()) {

@@ -4,8 +4,14 @@
 \status new
 
  \brief Evaluates simple property (only SET of states needs to be computed).
- The actual property is an parameter. The evaluation of the property will be done
- by a parallel exploration of the state space.
+ 		The actual property is an parameter.
+ 		The evaluation of the property will be done by a parallel exploration of the state space.
+ 		Therefore n threads will be started with the initial marking. The given store has to be thread-safe. If it is not this search may crash.
+		It would be preferable if the store would give the absolute correct answer, but this is not necessary.
+		If the search of an thread has ended (because there are no successor-markings, that have not been visited by none of the threads[Meaning: other threads can cut parts of the search-space of other threads]), the search will be restarted.
+		If so, an other thread will spare one of its transitions currently in the current firelist, but only if this would lead to a new state, and the spearing-thread will have one other transition left. (Assuming there is not always only one transition to fire, but then parallelization is useless)
+		The state resulting in firering this transition will be transfered to the other thread, which will continue the search at this position.
+		All threads will poll a variable to be able to abort if one of the threads has found a solution.
 */
 
 #pragma once

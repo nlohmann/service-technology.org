@@ -4,8 +4,14 @@
  \status new
 
  \brief Evaluates simple property (only SET of states needs to be computed).
- The actual property is an parameter. The evaluation of the property will be done
- by a parallel exploration of the state space.
+ 		The actual property is an parameter.
+ 		The evaluation of the property will be done by a parallel exploration of the state space.
+ 		Therefore n threads will be started with the initial marking. The given store has to be thread-safe. If it is not this search may crash.
+		It would be preferable if the store would give the absolute correct answer, but this is not necessary.
+		If the search of an thread has ended (because there are no successor-markings, that have not been visited by none of the threads[Meaning: other threads can cut parts of the search-space of other threads]), the search will be restarted.
+		If so, an other thread will spare one of its transitions currently in the current firelist, but only if this would lead to a new state, and the spearing-thread will have one other transition left. (Assuming there is not always only one transition to fire, but then parallelization is useless)
+		The state resulting in firering this transition will be transfered to the other thread, which will continue the search at this position.
+		All threads will poll a variable to be able to abort if one of the threads has found a solution.
  */
 
 #include <cstring>
@@ -39,16 +45,15 @@ struct tpDFSArguments {
 };
 
 void* ParallelExploration::threadPrivateDFS(void* container) {
-	NetState &ns = *((tpDFSArguments*) container)->ns;
-	Store &myStore = *((tpDFSArguments*) container)->myStore;
-	FireListCreator &fireListCreator =
-			*((tpDFSArguments*) container)->fireListCreator;
-	int threadNumber = ((tpDFSArguments*) container)->threadNumber;
-	int number_of_threads = ((tpDFSArguments*) container)->number_of_threads;
-	SimpleProperty* resultProperty =
-			((tpDFSArguments*) container)->resultProperty;
+	tpDFSArguments* arguments = (tpDFSArguments*) container;
+	NetState &ns = *arguments->ns;
+	Store &myStore = *arguments->myStore;
+	FireListCreator &fireListCreator = *arguments->fireListCreator;
+	int threadNumber = arguments->threadNumber;
+	int number_of_threads = arguments->number_of_threads;
+	SimpleProperty* resultProperty = arguments->resultProperty;
 
-	return ((tpDFSArguments*) container)->pexploration->threadedExploration(ns,
+	return arguments->pexploration->threadedExploration(ns,
 			myStore, fireListCreator, resultProperty, threadNumber,
 			number_of_threads);
 }
@@ -167,8 +172,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 
 						// copy the data for the other thread
 						transfer_stack = stack;
-						transfer_netstate = NetState::createNetStateFromCurrent(
-								ns);
+						transfer_netstate = new NetState(ns);
 						transfer_property = sp->copy();
 
 						sem_post(restartSemaphore);
@@ -220,19 +224,23 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 				pthread_mutex_unlock(&num_suspend_mutex);
 				sem_wait(restartSemaphore);
 				// if the search has come to an end return without success
+				// exclude this from code coverage, as I can not provoke it, but is necessary in very rare occasions
+				// LCOV_EXCL_START
 				if (finished) {
-					// delete the sp&firelist
+					// delete the firelist
 					delete myFirelist;
 					delete sp;
 					return NULL;
 				}
-				// now we have been signaled because one of the threads is able to give us an part of search space
+				// LCOV_EXCL_STOP
 
+
+				// now we have been signaled because one of the threads is able to give us an part of search space
 				delete sp;
 				delete myFirelist;
 				stack = transfer_stack;
 				sp = transfer_property;
-				ns.copyNetState(*transfer_netstate);
+				ns = *transfer_netstate;
 				delete transfer_netstate;
 				// rebuild
 				sp->initProperty(ns);
@@ -255,8 +263,6 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 	}
 }
 
-#include <errno.h>
-
 bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 		Store &myStore, FireListCreator &firelistcreator,
 		int number_of_threads) {
@@ -269,7 +275,7 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 	for (int i = 0; i < number_of_threads; i++) {
 		args[i].fireListCreator = &firelistcreator;
 		args[i].myStore = &myStore;
-		args[i].ns = NetState::createNetStateFromCurrent(ns);
+		args[i].ns = new NetState(ns);
 		args[i].threadNumber = i;
 		args[i].number_of_threads = number_of_threads;
 		args[i].pexploration = this;
@@ -281,20 +287,24 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 			0);
 	transfer_finished_semaphore = sem_open("ParallelExploration_transfer_finished_semaphore", O_CREAT, 0600,
 			0);
-
+	// LCOV_EXCL_START
 	if (UNLIKELY(!(long int)restartSemaphore)) {
 		rep->status("named semaphore could not be created");
 		rep->abort(ERROR_THREADING);
 	}
+	// LCOV_EXCL_STOP
+
 	int mutex_creation_status = 0;
 	mutex_creation_status |= pthread_mutex_init(&num_suspend_mutex, NULL);
 	mutex_creation_status |= pthread_mutex_init(&send_mutex, NULL);
 	mutex_creation_status |= pthread_mutex_init(&write_current_back_mutex,
 			NULL);
+	// LCOV_EXCL_START
 	if (UNLIKELY(mutex_creation_status)) {
 		rep->status("mutexes could not be created");
 		rep->abort(ERROR_THREADING);
 	}
+	// LCOV_EXCL_STOP
 	num_suspended = 0;
 	finished = false;
 
@@ -317,7 +327,7 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 		}
 		if (return_value) {
 			property.value = true;
-			ns.copyNetState(*(NetState*) return_value);
+			ns = *(NetState*) return_value;
 		}
 		delete args[i].ns;
 	}
@@ -327,19 +337,23 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 	mutex_destruction_status |= pthread_mutex_destroy(&num_suspend_mutex);
 	mutex_destruction_status |= pthread_mutex_destroy(&send_mutex);
 	mutex_destruction_status |= pthread_mutex_destroy(&write_current_back_mutex);
+	// LCOV_EXCL_START
 	if (UNLIKELY(mutex_destruction_status)) {
 			rep->status("mutexes could not be destroyed");
 			rep->abort(ERROR_THREADING);
 		}
+	// LCOV_EXCL_STOP
 	int semaphore_destruction_status = 0;
 	semaphore_destruction_status |= sem_close(transfer_finished_semaphore);
 	semaphore_destruction_status |= sem_unlink("ParallelExploration_transfer_finished_semaphore");
 	semaphore_destruction_status |= sem_close(restartSemaphore);
 	semaphore_destruction_status |= sem_unlink("ParallelExploration_restartSem");
-	if (UNLIKELY(mutex_destruction_status)) {
+	// LCOV_EXCL_START
+	if (UNLIKELY(semaphore_destruction_status)) {
 				rep->status("named semaphore could not be closed and/or unlinked");
 				rep->abort(ERROR_THREADING);
 			}
+	// LCOV_EXCL_STOP
 
 	// free the allocated memory
 	free(runner_thread);

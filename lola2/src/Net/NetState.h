@@ -52,9 +52,12 @@ class NetState
         /// These are the transitions for which this place is the scapegoat.
         index_t** Disabled;
 
+        // create a NetState object from the global variables set by the parsing process
         static NetState* createNetStateFromInitial();
-        static NetState* createNetStateFromCurrent(NetState &ns);
-        void copyNetState(NetState &ns);
+        // copy constructor
+        NetState(NetState &ns);
+        // copy operator, be aware that this changes the given ns (this necessary to ensure proper deallocation of memory)
+        NetState &operator=(NetState &ns);
 
     private:
         bool need_to_delete_members_on_delete;

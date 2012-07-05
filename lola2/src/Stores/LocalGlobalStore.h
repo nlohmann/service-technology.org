@@ -1,7 +1,17 @@
 /*!
 \author Gregor
-\file ThreadSafeStore.cc
+\file LocalGlobalStore.cc
 \status new
+
+ \brief This is a generic store, which introduces a buffer between before the actual store.
+        The assumption is, that a marking may be found the neighbourhood of itself again more often than anywhere else.
+        So if a marking is searched first, the store will look into the local store (based on a hashing table) and then in the global store.
+        If the marking is found true will be returned. If not the search will be continued in the global store.
+        If is found there true will be returned, if not it will be either
+        	a) inserted directly if a VectorStore was given in the constructor
+        	b) inserted on the last possible moment (if it is displaced form the local store) if an SIStore was given
+        If the local hash-table is full the latter option will be identical to the first.
+        At the end finalize() must be called to get the correct number of markings.
 */
 
 #pragma once

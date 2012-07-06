@@ -31,9 +31,22 @@ void Condition::dot(FILE* o)
             continue;
         }
 
+        // whether the condition is initial
         bool initial = ((*b)->in == NULL);
+
+        // whether the condition is the target
         bool target = ((*b)->out == NULL && target_place.find((*b)->place) != target_place.end());
 
+        // set the condition as target if it has no postset and we are looking for deadlocks
+        if (target_place.empty() and (*b)->out == NULL)
+        {
+            if (Condition::current[(*b)->place] == *b)
+            {
+                target = true;
+            }
+        }
+
+        // we filter conditions with empty postset to reduce clutter
         if ((*b)->out == NULL and (not target) and (not args_info.nofilterrun_flag))
         {
             continue;

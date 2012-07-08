@@ -154,7 +154,6 @@ void WriteNetFile(FILE* f)
 
 /*!
 \todo Collapse fscanf calls when possible
-\todo Merge last part with ParserPTNet::symboltable2net()
 */
 void ReadNetFile(FILE* f)
 {
@@ -174,32 +173,21 @@ void ReadNetFile(FILE* f)
         Net::Mult[PL][direction] = (mult_t**) malloc(Net::Card[PL] * SIZEOF_VOIDP);
     }
 
-    Place::Hash = (hash_t*) malloc(Net::Card[PL] * SIZEOF_HASH_T);
     Place::Capacity = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
-    Place::CardBits = (cardbit_t*) malloc(Net::Card[PL] * SIZEOF_CARDBIT_T);
-    Place::CardDisabled = (index_t*) calloc(Net::Card[PL] , SIZEOF_INDEX_T);
-    Place::Disabled = (index_t**) malloc(Net::Card[PL] * SIZEOF_VOIDP);
     Marking::Initial = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
     Marking::Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
-    Marking::HashInitial = 0;
 
     // fill all information that is locally available in symbols, allocate node specific arrays
     for (index_t p = 0; p < Net::Card[PL]; p++)
     {
-        Place::Hash[p] = rand() % MAX_HASH;
-
         // read initial marking
         fscanf(f, "%u", &tmp1);
         Marking::Initial[p] = (capacity_t) tmp1;
         Marking::Current[p] = Marking::Initial[p];
-        Marking::HashInitial += Place::Hash[p] * Marking::Initial[p];
-        Marking::HashInitial %= SIZEOF_MARKINGTABLE;
 
         // read capacity
         fscanf(f, "%u", &tmp1);
         Place::Capacity[p] = (capacity_t)(tmp1 == 0 ? MAX_CAPACITY : tmp1);
-        Place::SizeOfBitVector +=
-            (Place::CardBits[p] = Place::Capacity2Bits(Place::Capacity[p]));
 
         // read number of prearcs
         fscanf(f, "%u", &tmp1);
@@ -228,12 +216,7 @@ void ReadNetFile(FILE* f)
             Net::Arc[PL][POST][p][i] = (index_t) tmp1;
             Net::Mult[PL][POST][p][i] = (mult_t) tmp2;
         }
-
-        // initially: no disabled transistions (through CardDisabled = 0)
-        // correct values will be achieved by initial checkEnabled...
-        Place::Disabled[p] = (index_t*) malloc(Net::CardArcs[PL][POST][p] * SIZEOF_INDEX_T);
     }
-    Marking::HashCurrent = Marking::HashInitial;
     // Allocate arrays for places and transitions
 
     // read number of transitions
@@ -250,20 +233,6 @@ void ReadNetFile(FILE* f)
     }
 
     Transition::Fairness = (fairnessAssumption_t*) malloc(Net::Card[TR] * SIZEOF_FAIRNESSASSUMPTION_T);
-    Transition::Enabled = (bool*) malloc(Net::Card[TR] * SIZEOF_BOOL);
-    Transition::DeltaHash = (hash_t*) calloc(Net::Card[TR] , SIZEOF_HASH_T);
-    Transition::CardConflicting = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    Transition::Conflicting = (index_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
-    Transition::CardBackConflicting = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    Transition::BackConflicting = (index_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
-    Transition::CardEnabled = Net::Card[TR]; // start with assumption that all transitions are enabled
-    Transition::PositionScapegoat = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    for (int direction = PRE; direction <= POST; direction++)
-    {
-        Transition::CardDeltaT[direction] = (index_t*) calloc(Net::Card[TR], SIZEOF_INDEX_T);
-        Transition::DeltaT[direction] = (index_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
-        Transition::MultDeltaT[direction] = (mult_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
-    }
 
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
@@ -276,7 +245,6 @@ void ReadNetFile(FILE* f)
         Net::CardArcs[TR][PRE][t] = (index_t) tmp1;
         Net::Arc[TR][PRE][t] = (index_t*) malloc(Net::CardArcs[TR][PRE][t] * SIZEOF_INDEX_T);
         Net::Mult[TR][PRE][t] = (mult_t*) malloc(Net::CardArcs[TR][PRE][t] * SIZEOF_MULT_T);
-        Transition::Enabled[t] = true;
 
         // read prearcs
         for (index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
@@ -301,273 +269,6 @@ void ReadNetFile(FILE* f)
         }
     }
 
-
-    /////////////////
-    // from here, allocation/reading is done and we only derive information
-    /////////////////
-
-    // logically, current_arc_* can be freed here, physically, we just rename them to
-    // their new purpose
-    index_t* delta_pre = (index_t*) calloc(Net::Card[PL], SIZEOF_INDEX_T);   // temporarily collect places where a transition
-    // has negative token balance
-    index_t* delta_post = (index_t*) calloc(Net::Card[PL], SIZEOF_INDEX_T); // temporarily collect places where a transition
-    // has positive token balance.
-    mult_t* mult_pre = (mult_t*) malloc(Net::Card[PL] * SIZEOF_MULT_T);   // same for multiplicities
-    mult_t* mult_post = (mult_t*) malloc(Net::Card[PL] * SIZEOF_MULT_T);   // same for multiplicities
-    for (index_t t = 0; t < Net::Card[TR]; t++)
-    {
-        // initialize DeltaT structures
-        index_t card_delta_pre = 0;
-        index_t card_delta_post = 0;
-        Net::sortArcs(Net::Arc[TR][PRE][t], Net::Mult[TR][PRE][t], 0, Net::CardArcs[TR][PRE][t]);
-        Net::sortArcs(Net::Arc[TR][POST][t], Net::Mult[TR][POST][t], 0, Net::CardArcs[TR][POST][t]);
-        index_t i; // parallel iteration through sorted pre and post arc sets
-        index_t j;
-        for (i = 0, j = 0; (i < Net::CardArcs[TR][PRE][t]) && (j < Net::CardArcs[TR][POST][t]); /* tricky increment */)
-        {
-            if (Net::Arc[TR][PRE][t][i] == Net::Arc[TR][POST][t][j])
-            {
-                // double arc, compare multiplicities
-                if (Net::Mult[TR][PRE][t][i] == Net::Mult[TR][POST][t][j])
-                {
-                    // test arc, does not contribute to delta t
-                }
-                else if (Net::Mult[TR][PRE][t][i] < Net::Mult[TR][POST][t][j])
-                {
-                    //positive impact --> goes to delta post
-                    delta_post[card_delta_post] = Net::Arc[TR][POST][t][j];
-                    mult_post[card_delta_post++] = (mult_t)(Net::Mult[TR][POST][t][j] - Net::Mult[TR][PRE][t][i]);
-                }
-                else
-                {
-                    // negative impact --> goes to delta pre
-                    delta_pre[card_delta_pre] = Net::Arc[TR][PRE][t][i];
-                    mult_pre[card_delta_pre++] = (mult_t)(Net::Mult[TR][PRE][t][i] - Net::Mult[TR][POST][t][j]);
-                }
-                ++i;
-                ++j;
-            }
-            else
-            {
-                if (Net::Arc[TR][PRE][t][i] < Net::Arc[TR][POST][t][j])
-                {
-                    // single arc goes to PRE
-                    delta_pre[card_delta_pre] = Net::Arc[TR][PRE][t][i];
-                    mult_pre[card_delta_pre++] = Net::Mult[TR][PRE][t][i++];
-                }
-                else
-                {
-                    // single arc goes to POST
-                    delta_post[card_delta_post] = Net::Arc[TR][POST][t][j];
-                    mult_post[card_delta_post++] = Net::Mult[TR][POST][t][j++];
-                }
-            }
-        }
-
-        for (; i < Net::CardArcs[TR][PRE][t]; i++)
-        {
-            // single arc goes to PRE
-            delta_pre[card_delta_pre] = Net::Arc[TR][PRE][t][i];
-            mult_pre[card_delta_pre++] = Net::Mult[TR][PRE][t][i];
-        }
-        for (; j < Net::CardArcs[TR][POST][t]; j++)
-        {
-            // single arc goes to POST
-            delta_post[card_delta_post] = Net::Arc[TR][POST][t][j];
-            mult_post[card_delta_post++] = Net::Mult[TR][POST][t][j];
-        }
-        Transition::CardDeltaT[PRE][t] = card_delta_pre;
-        Transition::CardDeltaT[POST][t] = card_delta_post;
-        Transition::DeltaT[PRE][t] = (index_t*) malloc(card_delta_pre * SIZEOF_INDEX_T);
-        Transition::DeltaT[POST][t] = (index_t*) malloc(card_delta_post * SIZEOF_INDEX_T);
-        Transition::MultDeltaT[PRE][t] = (mult_t*) malloc(card_delta_pre * SIZEOF_MULT_T);
-        Transition::MultDeltaT[POST][t] = (mult_t*) malloc(card_delta_post * SIZEOF_MULT_T);
-        for (i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
-        {
-            Transition::DeltaT[PRE][t][i] = delta_pre[i];
-            Transition::MultDeltaT[PRE][t][i] = mult_pre[i];
-        }
-        for (j = 0; j < Transition::CardDeltaT[POST][t]; j++)
-        {
-            Transition::DeltaT[POST][t][j] = delta_post[j];
-            Transition::MultDeltaT[POST][t][j] = mult_post[j];
-        }
-    }
-
-    /*********************
-    * 7b. Set DeltaHash *
-        **********************/
-
-    for (index_t t = 0; t < Net::Card[TR]; t++)
-    {
-        for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
-        {
-            Transition::DeltaHash[t] = (Transition::DeltaHash[t] - Transition::MultDeltaT[PRE][t][i] *
-                                        Place::Hash[Transition::DeltaT[PRE][t][i]]) % SIZEOF_MARKINGTABLE;
-        }
-        for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
-        {
-            Transition::DeltaHash[t] = (Transition::DeltaHash[t] + Transition::MultDeltaT[POST][t][i] *
-                                        Place::Hash[Transition::DeltaT[POST][t][i]]) % SIZEOF_MARKINGTABLE;
-        }
-    }
-
-    free(delta_pre);
-    free(delta_post);
-    free(mult_pre);
-    free(mult_post);
-    // initialize Conflicting arrays
-    // free or rename temporary data structures
-    index_t* conflicting = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    index_t* new_conflicting = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    for (index_t t = 0; t < Net::Card[TR]; t++)
-    {
-        // 8.1 conflicting transitions
-        index_t card_conflicting = 0;
-
-        /// 1. collect all conflicting transitions \f$(\null^\bullet t)^\bullet\f$
-        for (index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
-        {
-            // p is a pre-place
-            const index_t p = Net::Arc[TR][PRE][t][i];
-
-            // assertion: array of known conflictings is sorted
-            // assertion: all arc lists are sorted
-
-            index_t j = 0; // index through list of post transitions of p
-            index_t k = 0; // index through list of known transitions
-            const index_t old_cardconflicting = card_conflicting;
-            card_conflicting = 0;
-
-            while (j < Net::CardArcs[PL][POST][p] && k < old_cardconflicting)
-            {
-
-                // tt is a conflicting transition
-                const index_t tt = Net::Arc[PL][POST][p][j];
-
-                if (tt < conflicting[k])
-                {
-                    ++j;
-                    if (t == tt)
-                    {
-                        continue;    // no conflict between t and itself
-                    }
-                    new_conflicting[card_conflicting++] = tt;
-                    continue;
-                }
-                if (tt > conflicting[k])
-                {
-                    new_conflicting[card_conflicting++] = conflicting[k];
-                    ++k;
-                    continue;
-                }
-                assert(tt == conflicting[k]);
-                new_conflicting[card_conflicting++] = conflicting[k];
-                ++j;
-                ++k;
-
-            }
-            // there may be transitions left greater than all known conflicting
-            for (; j < Net::CardArcs[PL][POST][p]; j++)
-            {
-                const index_t tt = Net::Arc[PL][POST][p][j];
-                if (tt == t)
-                {
-                    continue;
-                }
-                new_conflicting[card_conflicting++] = tt;
-            }
-            // there may be conflicting transitions left greater than last post-transition of p
-            for (; k < old_cardconflicting; k++)
-            {
-                new_conflicting[card_conflicting++] = conflicting[k];
-            }
-            index_t* tmp = conflicting;
-            conflicting = new_conflicting;
-            new_conflicting = tmp;
-        }
-
-        Transition::CardConflicting[t] = card_conflicting;
-        Transition::Conflicting[t] = (index_t*) malloc(card_conflicting * SIZEOF_INDEX_T);
-        memcpy(Transition::Conflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
-
-
-        // 8.2 backward conflicting transitions
-        card_conflicting = 0;
-
-        /// 1. collect all backward conflicting transitions \f$(t^\bullet)^\bullet\f$
-        for (index_t i = 0; i < Net::CardArcs[TR][POST][t]; i++)
-        {
-            // p is a post-place
-            const index_t p = Net::Arc[TR][POST][t][i];
-
-            // assertion: array of known conflictings is sorted
-            // assertion: all arc lists are sorted
-
-            index_t j = 0; // index through list of post transitions of p
-            index_t k = 0; // index through list of known transitions
-            const index_t old_cardconflicting = card_conflicting;
-            card_conflicting = 0;
-
-            while (j < Net::CardArcs[PL][POST][p] && k < old_cardconflicting)
-            {
-
-                // tt is a conflicting transition
-                const index_t tt = Net::Arc[PL][POST][p][j];
-
-                if (tt < conflicting[k])
-                {
-                    ++j;
-                    if (t == tt)
-                    {
-                        continue;    // no conflict between t and itself
-                    }
-                    new_conflicting[card_conflicting++] = tt;
-                    continue;
-                }
-                if (tt > conflicting[k])
-                {
-                    new_conflicting[card_conflicting++] = conflicting[k];
-                    ++k;
-                    continue;
-                }
-                assert(tt == conflicting[k]);
-                new_conflicting[card_conflicting++] = conflicting[k];
-                ++j;
-                ++k;
-
-            }
-            // there may be transitions left greater than all known conflicting
-            for (; j < Net::CardArcs[PL][POST][p]; j++)
-            {
-                const index_t tt = Net::Arc[PL][POST][p][j];
-                if (tt == t)
-                {
-                    continue;
-                }
-                new_conflicting[card_conflicting++] = tt;
-            }
-            // there may be conflicting transitions left greater than last post-transition of p
-            for (; k < old_cardconflicting; k++)
-            {
-                new_conflicting[card_conflicting++] = conflicting[k];
-            }
-            index_t* tmp = conflicting;
-            conflicting = new_conflicting;
-            new_conflicting = tmp;
-
-        }
-
-        Transition::CardBackConflicting[t] = card_conflicting;
-        Transition::BackConflicting[t] = (index_t*) malloc(card_conflicting * SIZEOF_INDEX_T);
-        memcpy(Transition::BackConflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
-    }
-
-    free(conflicting);
-    free(new_conflicting);
-
-    for (index_t t = 0; t < Net::Card[TR]; t++)
-    {
-        Transition::checkEnabled_Initial(t);
-    }
+    // net is read completely now, time to preprocess
+    Net::preprocess();
 }

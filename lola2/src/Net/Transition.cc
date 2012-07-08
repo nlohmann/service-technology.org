@@ -25,9 +25,11 @@ index_t* Transition::CardDeltaT[2] = {NULL};
 index_t** Transition::DeltaT[2] = {NULL};
 mult_t** Transition::MultDeltaT[2] = {NULL};
 index_t* Transition::CardConflicting = NULL;
+bool* Transition::ConflictingIsOriginal = NULL;
 index_t** Transition::Conflicting = NULL;
 index_t* Transition::CardBackConflicting = NULL;
 index_t** Transition::BackConflicting = NULL;
+bool* Transition::BackConflictingIsOriginal = NULL;
 int64_t* Transition::ProgressMeasure = NULL;
 
 /*!
@@ -59,11 +61,15 @@ void Transition::deleteTransitions()
     free(Transition::CardBackConflicting);
     for (index_t i = 0; i < Net::Card[TR]; i++)
     {
-        free(Transition::Conflicting[i]);
-        free(Transition::BackConflicting[i]);
+    	if(Transition::ConflictingIsOriginal[i])
+    		free(Transition::Conflicting[i]);
+    	if(Transition::BackConflictingIsOriginal[i])
+    		free(Transition::BackConflicting[i]);
     }
     free(Transition::Conflicting);
     free(Transition::BackConflicting);
+    free(Transition::ConflictingIsOriginal);
+    free(Transition::BackConflictingIsOriginal);
     free(Transition::PositionScapegoat);
     free(Transition::ProgressMeasure);
 }
@@ -262,8 +268,6 @@ void Transition::updateEnabled(NetState &ns, index_t t)
             checkEnabled(ns, tt);
         }
     }
-    // 1a. Don't forget to check t itself! It is not member of the conflicting list!
-    checkEnabled(ns, t);
 
     // 2. check those transitions where the scapegoat received additional tokens
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
@@ -319,6 +323,7 @@ void Transition::revertEnabled(NetState &ns, index_t t)
             checkEnabled(ns, tt);
         }
     }
+    // t is not necessarily contained in its own back-conflicting set (unlike the conflicting set)
     checkEnabled(ns, t);
 
     // 2. check those transitions where the scapegoat received additional tokens

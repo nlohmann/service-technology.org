@@ -24,4 +24,6 @@ class ParserPTNet
 
         ParserPTNet();
         ~ParserPTNet();
+
+        static void initializeNet();
 };

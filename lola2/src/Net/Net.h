@@ -12,8 +12,6 @@ Place.* and Transition.*
 #pragma once
 #include <Core/Dimensions.h>
 
-
-
 /*!
 \brief collection of information related to nodes
 
@@ -44,6 +42,9 @@ struct Net
     /// free all allocated memory
     static void deleteNodes();
 
+    /// calculates progress measure for all transitions (used by sweep line method)
+    static void setProgressMeasure();
+
     /// sorts a concrete pair of arcs and multiplicities (used as helper method for sortAllArcs)
     static void sortArcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to);
 
@@ -53,12 +54,6 @@ struct Net
     /// swaps two places (does not care about ordering)
     static void swapPlaces(index_t, index_t);
 
-    /// calculates all significant places and changes order of places(!)
-    static void setSignificantPlaces();
-
-    /// calculates progress measure for all transitions (used by sweep line method)
-    static void setProgressMeasure();
-
     /// checks whether all arcs are properly (especially to both directions)
     static bool DEBUG__checkConsistency();
 
@@ -67,4 +62,13 @@ struct Net
 
     /// print the net (using printf)
     static void print();
+
+    static void preprocess();
+
+private:
+    static void preprocess_organizeDeltas();
+    static void preprocess_organizeConflictingTransitions();
+
+    /// calculates all significant places and changes order of places(!)
+    static void setSignificantPlaces();
 };

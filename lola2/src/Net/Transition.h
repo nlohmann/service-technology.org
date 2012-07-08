@@ -45,12 +45,16 @@ struct Transition
 
         /// After firing transition i, these transitions must be checked for enabledness if they have been enabled before: \f$(DeltaT[PRE]^\bullet)\f$
         static index_t** Conflicting;
+        /// Determines whether a conflicting set is an original or just a reference to some other (identical) set. Important to avoid double-freeing the memory.
+        static bool* ConflictingIsOriginal;
 
         /// After reverse firing transition i, that many transitions must be checked for enabledness if they have been enabled before: \f$card(DeltaT[POST]^\bullet)\f$
         static index_t* CardBackConflicting;
 
-        /// After firing transition i, these transitions must be checked for enabledness if they have been enabled before: \f$(DeltaT[POST]^\bullet)\f$
+        /// After reverse firing transition i, these transitions must be checked for enabledness if they have been enabled before: \f$(DeltaT[POST]^\bullet)\f$
         static index_t** BackConflicting;
+        /// Determines whether a conflicting set is an original or just a reference to some other (identical) set. Important to avoid double-freeing the memory.
+        static bool* BackConflictingIsOriginal;
 
         /// If transition i is disabled, this is its position in its scapegpat's Disabled list
         static index_t* PositionScapegoat;

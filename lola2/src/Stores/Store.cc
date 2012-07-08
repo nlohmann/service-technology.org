@@ -64,8 +64,8 @@ void* Store::reporter_helper(void* context)
 
 Store::Store(uint32_t _number_of_threads) : markings(0), calls(0), number_of_threads(_number_of_threads)
 {
-	calls = (uint64_t*) calloc(number_of_threads, sizeof(uint64_t));
-	markings = (uint64_t*) calloc(number_of_threads, sizeof(uint64_t));
+    calls = (uint64_t*) calloc(number_of_threads, sizeof(uint64_t));
+    markings = (uint64_t*) calloc(number_of_threads, sizeof(uint64_t));
     const int ret = pthread_create(&reporter_thread, NULL, reporter_helper, this);
     if (UNLIKELY(ret != 0))
     {
@@ -76,7 +76,7 @@ Store::Store(uint32_t _number_of_threads) : markings(0), calls(0), number_of_thr
 
 Store::~Store()
 {
-	void* void_pointer;
+    void* void_pointer;
     int ret = pthread_cancel(reporter_thread);
     ret |= pthread_join(reporter_thread,&void_pointer);
     if (LIKELY(ret == 0))
@@ -87,18 +87,18 @@ Store::~Store()
     free(markings);
 }
 
-uint64_t Store::get_number_of_markings(){
-	uint64_t result = 0;
-	for (uint32_t thread_number = 0; thread_number < number_of_threads; thread_number++)
-		result += markings[thread_number];
-	return result;
+uint64_t Store::get_number_of_markings() {
+    uint64_t result = 0;
+    for (uint32_t thread_number = 0; thread_number < number_of_threads; thread_number++)
+        result += markings[thread_number];
+    return result;
 }
 
-uint64_t Store::get_number_of_calls(){
-	uint64_t result = 0;
-	for (uint32_t thread_number = 0; thread_number < number_of_threads; thread_number++)
-		result += calls[thread_number];
-	return result;
+uint64_t Store::get_number_of_calls() {
+    uint64_t result = 0;
+    for (uint32_t thread_number = 0; thread_number < number_of_threads; thread_number++)
+        result += calls[thread_number];
+    return result;
 }
 
 

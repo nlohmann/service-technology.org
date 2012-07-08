@@ -25,28 +25,28 @@ CopyEncoder::CopyEncoder(int numThreads) : PluginStore::NetStateEncoder(numThrea
 
 #if SIZEOF_CAPACITY_T % SIZEOF_VECTORDATA_T != 0
     if(insize * SIZEOF_VECTORDATA_T <= Net::Card[PL] * SIZEOF_CAPACITY_T)
-    	nocopy = true;
-   	else {
-   		nocopy = false;
-   	    inputs = (vectordata_t**) malloc(numThreads * SIZEOF_VOIDP);
-   	    for(int i=0;i<numThreads;i++)
-   	    {
-  	    	inputs[i] = (vectordata_t*) malloc(insize * SIZEOF_VECTORDATA_T);
-  	    }
-  	}
+        nocopy = true;
+    else {
+        nocopy = false;
+        inputs = (vectordata_t**) malloc(numThreads * SIZEOF_VOIDP);
+        for(int i=0; i<numThreads; i++)
+        {
+            inputs[i] = (vectordata_t*) malloc(insize * SIZEOF_VECTORDATA_T);
+        }
+    }
 #endif
 }
 
 CopyEncoder::~CopyEncoder()
 {
 #if SIZEOF_CAPACITY_T % SIZEOF_VECTORDATA_T != 0
-	if(!nocopy) {
-		for(int i=0;i<numThreads;i++)
-		{
-			free(inputs[i]);
-    	}
-    	free(inputs);
-	}
+    if(!nocopy) {
+        for(int i=0; i<numThreads; i++)
+        {
+            free(inputs[i]);
+        }
+        free(inputs);
+    }
 #endif
 }
 

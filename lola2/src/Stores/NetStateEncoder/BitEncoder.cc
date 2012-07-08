@@ -23,9 +23,9 @@ BitEncoder::BitEncoder(int numThreads) : PluginStore::NetStateEncoder(numThreads
     rep->status("using %d bytes per marking, with %d unused bits", insize * SIZEOF_VECTORDATA_T, insize * VECTOR_WIDTH - Place::SizeOfBitVector);
 
     inputs = (vectordata_t**) malloc(numThreads * SIZEOF_VOIDP);
-    for(int i=0;i<numThreads;i++)
+    for(int i=0; i<numThreads; i++)
     {
-    	inputs[i] = (vectordata_t*) malloc(insize * sizeof(vectordata_t));
+        inputs[i] = (vectordata_t*) malloc(insize * sizeof(vectordata_t));
     }
 
     memcpylen = 0;
@@ -38,9 +38,9 @@ BitEncoder::BitEncoder(int numThreads) : PluginStore::NetStateEncoder(numThreads
 
 BitEncoder::~BitEncoder()
 {
-    for(int i=0;i<numThreads;i++)
+    for(int i=0; i<numThreads; i++)
     {
-    	free(inputs[i]);
+        free(inputs[i]);
     }
     free(inputs);
 }

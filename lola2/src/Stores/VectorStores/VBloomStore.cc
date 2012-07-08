@@ -11,8 +11,8 @@ extern Reporter* rep;
 
 VBloomStore::VBloomStore(index_t num_threads, size_t hashes) :hash_functions(hashes), filter(new std::bitset<BLOOM_FILTER_SIZE>())
 {
-	hash_values = new uint32_t[hash_functions*num_threads];
-	pthread_mutex_init(&mutex,NULL);
+    hash_values = new uint32_t[hash_functions*num_threads];
+    pthread_mutex_init(&mutex,NULL);
     rep->status("using Bloom filter of length %lu with %d hash functions", BLOOM_FILTER_SIZE, hash_functions);
 }
 
@@ -20,12 +20,12 @@ VBloomStore::~VBloomStore()
 {
     delete filter;
     delete[] hash_values;
-	pthread_mutex_destroy(&mutex);
+    pthread_mutex_destroy(&mutex);
 }
 
 inline uint32_t VBloomStore::hash_sdbm(const vectordata_t* in, size_t len) const
 {
-	uint32_t hash = 0;
+    uint32_t hash = 0;
 
     while(len--)
     {
@@ -51,8 +51,8 @@ inline uint32_t VBloomStore::hash_fnv(const vectordata_t* in, size_t len) const
 
 bool VBloomStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex)
 {
-	uint32_t* cur_hashes = hash_values + (threadIndex * hash_functions);
-	size_t len = (bitlen+VECTOR_WIDTH-1) / VECTOR_WIDTH;
+    uint32_t* cur_hashes = hash_values + (threadIndex * hash_functions);
+    size_t len = (bitlen+VECTOR_WIDTH-1) / VECTOR_WIDTH;
 
     /*************************
      * calculate hash values *
@@ -68,7 +68,7 @@ bool VBloomStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, has
     // the other hash functions can be derived: h_i(x) = h_1(x) + i * h_2(x)
     for (size_t h = 2; h < hash_functions; ++h)
     {
-    	cur_hashes[h] = (hash_0 + h * hash_1) % BLOOM_FILTER_SIZE;
+        cur_hashes[h] = (hash_0 + h * hash_1) % BLOOM_FILTER_SIZE;
     }
 
 
@@ -81,18 +81,18 @@ bool VBloomStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, has
         // found an unset bit -> vector is new and must be stored
         if ((*filter)[cur_hashes[h]] == 0)
         {
-        	pthread_mutex_lock(&mutex); // some rare occasion where double-checked locking actually works
+            pthread_mutex_lock(&mutex); // some rare occasion where double-checked locking actually works
             if ((*filter)[cur_hashes[h]] == 0)
             {
-			    // set this and all subsequent bits to 1 (previous bits were already 1)
-				while(h < hash_functions)
-				{
-					(*filter)[cur_hashes[h++]] = 1;
-				}
-				pthread_mutex_unlock(&mutex);
-				return false;
+                // set this and all subsequent bits to 1 (previous bits were already 1)
+                while(h < hash_functions)
+                {
+                    (*filter)[cur_hashes[h++]] = 1;
+                }
+                pthread_mutex_unlock(&mutex);
+                return false;
             }
-        	pthread_mutex_unlock(&mutex);
+            pthread_mutex_unlock(&mutex);
         }
     }
 

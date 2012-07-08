@@ -14,18 +14,18 @@
 /// prepended "V" to avoid name clash
 class VSTLStore : public PluginStore::VectorStore
 {
-    private:
-    	pthread_rwlock_t rwlock;
+private:
+    pthread_rwlock_t rwlock;
 
-    	std::set<std::vector<vectordata_t> > store;
-        std::vector<vectordata_t>* intermediate;
+    std::set<std::vector<vectordata_t> > store;
+    std::vector<vectordata_t>* intermediate;
 
-        bool singleThreaded;
+    bool singleThreaded;
 
 
-    public:
-        explicit VSTLStore(index_t num_threads);
-        virtual ~VSTLStore();
+public:
+    explicit VSTLStore(index_t num_threads);
+    virtual ~VSTLStore();
 
-        virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex);
+    virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex);
 };

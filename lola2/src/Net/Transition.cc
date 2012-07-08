@@ -61,10 +61,10 @@ void Transition::deleteTransitions()
     free(Transition::CardBackConflicting);
     for (index_t i = 0; i < Net::Card[TR]; i++)
     {
-    	if(Transition::ConflictingIsOriginal[i])
-    		free(Transition::Conflicting[i]);
-    	if(Transition::BackConflictingIsOriginal[i])
-    		free(Transition::BackConflicting[i]);
+        if(Transition::ConflictingIsOriginal[i])
+            free(Transition::Conflicting[i]);
+        if(Transition::BackConflictingIsOriginal[i])
+            free(Transition::BackConflicting[i]);
     }
     free(Transition::Conflicting);
     free(Transition::BackConflicting);

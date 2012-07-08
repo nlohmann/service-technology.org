@@ -12,7 +12,7 @@
 class BitEncoder : public PluginStore::NetStateEncoder
 {
 public:
-	BitEncoder(int numThreads);
+    BitEncoder(int numThreads);
     ~BitEncoder();
 
     vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex);

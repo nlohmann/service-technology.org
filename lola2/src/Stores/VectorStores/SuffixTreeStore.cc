@@ -287,7 +287,7 @@ bool SuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen,
             *pVector |= vectordata_t(*pInput << (VECTOR_WIDTH - input_bitstogo));
             pInput++;
             if(++input_index > max_input_index)
-            	break;
+                break;
             *pVector |= vectordata_t(*pInput >> input_bitstogo);
             pVector++;
         }

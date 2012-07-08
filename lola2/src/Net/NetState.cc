@@ -182,9 +182,9 @@ NetState::NetState(NetState &ons)
         for (int direction = PRE; direction <= POST; direction++)
         {
             Arc[type][direction] = (index_t**) malloc(
-                                           Net::Card[type] * SIZEOF_VOIDP);
+                                       Net::Card[type] * SIZEOF_VOIDP);
             Mult[type][direction] = (mult_t**) malloc(
-                                            Net::Card[type] * SIZEOF_VOIDP);
+                                        Net::Card[type] * SIZEOF_VOIDP);
         }
     }
 
@@ -194,14 +194,14 @@ NetState::NetState(NetState &ons)
         // allocate memory for place's arcs (is copied later with transitions)
         // pre-Zone
         Arc[PL][PRE][i] = (index_t*) malloc(
-                                  Net::CardArcs[PL][PRE][i] * SIZEOF_INDEX_T);
+                              Net::CardArcs[PL][PRE][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
         {
             Arc[PL][PRE][i][j] = ons.Arc[PL][PRE][i][j];
         }
 
         Mult[PL][PRE][i] = (mult_t*) malloc(
-                                   Net::CardArcs[PL][PRE][i] * SIZEOF_MULT_T);
+                               Net::CardArcs[PL][PRE][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
         {
             Mult[PL][PRE][i][j] = ons.Mult[PL][PRE][i][j];
@@ -210,14 +210,14 @@ NetState::NetState(NetState &ons)
 
         // post-Zone
         Arc[PL][POST][i] = (index_t*) malloc(
-                                   Net::CardArcs[PL][POST][i] * SIZEOF_INDEX_T);
+                               Net::CardArcs[PL][POST][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
         {
             Arc[PL][POST][i][j] = ons.Arc[PL][POST][i][j];
         }
 
         Mult[PL][POST][i] = (mult_t*) malloc(
-                                    Net::CardArcs[PL][POST][i] * SIZEOF_MULT_T);
+                                Net::CardArcs[PL][POST][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
         {
             Mult[PL][POST][i][j] = ons.Mult[PL][POST][i][j];
@@ -230,14 +230,14 @@ NetState::NetState(NetState &ons)
         // allocate memory for place's arcs (is copied later with transitions)
         // pre-Zone
         Arc[TR][PRE][i] = (index_t*) malloc(
-                                  Net::CardArcs[TR][PRE][i] * SIZEOF_INDEX_T);
+                              Net::CardArcs[TR][PRE][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[TR][PRE][i]; j++)
         {
             Arc[TR][PRE][i][j] = ons.Arc[TR][PRE][i][j];
         }
 
         Mult[TR][PRE][i] = (mult_t*) malloc(
-                                   Net::CardArcs[TR][PRE][i] * SIZEOF_MULT_T);
+                               Net::CardArcs[TR][PRE][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[TR][PRE][i]; j++)
         {
             Mult[TR][PRE][i][j] = ons.Mult[TR][PRE][i][j];
@@ -246,14 +246,14 @@ NetState::NetState(NetState &ons)
 
         // post-Zone
         Arc[TR][POST][i] = (index_t*) malloc(
-                                   Net::CardArcs[TR][POST][i] * SIZEOF_INDEX_T);
+                               Net::CardArcs[TR][POST][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[TR][POST][i]; j++)
         {
             Arc[TR][POST][i][j] = ons.Arc[TR][POST][i][j];
         }
 
         Mult[TR][POST][i] = (mult_t*) malloc(
-                                    Net::CardArcs[TR][POST][i] * SIZEOF_MULT_T);
+                                Net::CardArcs[TR][POST][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[TR][POST][i]; j++)
         {
             Mult[TR][POST][i][j] = ons.Mult[TR][POST][i][j];

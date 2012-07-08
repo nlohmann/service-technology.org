@@ -30,47 +30,47 @@ else
 */
 class Store
 {
-    private:
-        /// a thread that runs the frequent reports
-        pthread_t reporter_thread;
+private:
+    /// a thread that runs the frequent reports
+    pthread_t reporter_thread;
 
-        /// the reporter function
-        void* reporter_internal(void);
+    /// the reporter function
+    void* reporter_internal(void);
 
-        /// a helper function to start the reporter thread
-        static void* reporter_helper(void* context);
+    /// a helper function to start the reporter thread
+    static void* reporter_helper(void* context);
 
-    protected:
-        /// the number of threads this store has to work with
-        uint32_t number_of_threads;
+protected:
+    /// the number of threads this store has to work with
+    uint32_t number_of_threads;
 
-        /// the number of stored markings, an array one value per thread
-        uint64_t* markings;
+    /// the number of stored markings, an array one value per thread
+    uint64_t* markings;
 
-        /// the number of calls to searchAndInsert(), an array one value per thread
-        uint64_t* calls;
+    /// the number of calls to searchAndInsert(), an array one value per thread
+    uint64_t* calls;
 
-    public:
+public:
 
-        // functions to retrieve the current number of markings and calls to this store
-        // while running the search, this functions may differ slightly (+- number_of_threads) fromthe actual value due to threading issues.
-        // after the end of the search there values will be correct
-        uint64_t get_number_of_markings();
-        uint64_t get_number_of_calls();
+    // functions to retrieve the current number of markings and calls to this store
+    // while running the search, this functions may differ slightly (+- number_of_threads) fromthe actual value due to threading issues.
+    // after the end of the search there values will be correct
+    uint64_t get_number_of_markings();
+    uint64_t get_number_of_calls();
 
 
-        Store(uint32_t number_of_threads);
+    Store(uint32_t number_of_threads);
 
-        virtual ~Store();
+    virtual ~Store();
 
-        /// check whether current marking is stored
-        /// threaded version, this have not to be implemented by each store
-        virtual bool searchAndInsert(NetState &ns, index_t thread);
+    /// check whether current marking is stored
+    /// threaded version, this have not to be implemented by each store
+    virtual bool searchAndInsert(NetState &ns, index_t thread);
 
-        /// check whether current marking is stored and return state
-        virtual bool searchAndInsert(NetState &ns, void** s = NULL) = 0;
+    /// check whether current marking is stored and return state
+    virtual bool searchAndInsert(NetState &ns, void** s = NULL) = 0;
 
-        /// with this method the store will calculate the actual number of markings
-        /// needed as e.g. the thread-safe-store (local hashing and global bin store) must write back all the local markings to know the exact number
-        virtual void finalize();
+    /// with this method the store will calculate the actual number of markings
+    /// needed as e.g. the thread-safe-store (local hashing and global bin store) must write back all the local markings to know the exact number
+    virtual void finalize();
 };

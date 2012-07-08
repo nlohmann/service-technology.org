@@ -11,28 +11,28 @@
 template <typename T>
 class LoadedBinStore : public BinStore
 {
+public:
+    LoadedBinStore();
+    ~LoadedBinStore();
+protected:
+    /// a binary decision node
+    class Decision : public BinStore::Decision
+    {
     public:
-        LoadedBinStore();
-        ~LoadedBinStore();
-    protected:
-        /// a binary decision node
-        class Decision : public BinStore::Decision
-        {
-            public:
-                Decision(bitindex_t);
-                T payload;
-                virtual void getPayload(void**);
-        };
-        // create a decision node
-        virtual BinStore::Decision* createDecision(bitindex_t);
+        Decision(bitindex_t);
+        T payload;
+        virtual void getPayload(void**);
+    };
+    // create a decision node
+    virtual BinStore::Decision* createDecision(bitindex_t);
 
-        // get payload of first vector
-        virtual void getFirstPayload(hash_t, void**);
-        // get payload of first vector
-        virtual void getAndCreateFirstPayload(hash_t, void**);
+    // get payload of first vector
+    virtual void getFirstPayload(hash_t, void**);
+    // get payload of first vector
+    virtual void getAndCreateFirstPayload(hash_t, void**);
 
-        // payload of first states
-        T** payload;
+    // payload of first states
+    T** payload;
 };
 
 

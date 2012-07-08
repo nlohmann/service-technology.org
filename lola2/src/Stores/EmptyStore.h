@@ -10,9 +10,9 @@
 
 class EmptyStore : public Store
 {
-    public:
-        int tries;
+public:
+    int tries;
 
-        EmptyStore();
-        bool searchAndInsert(NetState &ns, void** = NULL);
+    EmptyStore();
+    bool searchAndInsert(NetState &ns, void** = NULL);
 };

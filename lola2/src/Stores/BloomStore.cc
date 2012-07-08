@@ -11,7 +11,7 @@ extern Reporter* rep;
 
 BloomStore::BloomStore(size_t hashes) :Store(1), hash_functions(hashes), filter(new std::bitset<BLOOM_FILTER_SIZE>())
 {
-	hash_values = new unsigned int[hash_functions];
+    hash_values = new unsigned int[hash_functions];
     rep->status("using Bloom filter of length %lu with %d hash functions", BLOOM_FILTER_SIZE, hash_functions);
 }
 
@@ -51,7 +51,7 @@ bool BloomStore::searchAndInsert(NetState &ns, void**)
 {
     ++calls[0];
 
-	// LCOV_EXCL_START
+    // LCOV_EXCL_START
     if (calls[0] % 10000000 == 0)
     {
         const size_t m = BLOOM_FILTER_SIZE;

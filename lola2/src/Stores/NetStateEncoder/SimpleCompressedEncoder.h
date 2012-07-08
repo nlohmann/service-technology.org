@@ -12,7 +12,7 @@
 class SimpleCompressedEncoder : public PluginStore::NetStateEncoder
 {
 public:
-	SimpleCompressedEncoder(int numThreads);
+    SimpleCompressedEncoder(int numThreads);
     ~SimpleCompressedEncoder();
 
     vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex);

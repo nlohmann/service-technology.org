@@ -13,53 +13,53 @@
 class NetState
 {
 
-    public:
-        NetState(): need_to_delete_members_on_delete(false) {}
-        ~NetState();
+public:
+    NetState(): need_to_delete_members_on_delete(false) {}
+    ~NetState();
 
-        /////// COPIED FOR MARKING.h
-        /// current  marking
-        capacity_t* Current;
+    /////// COPIED FOR MARKING.h
+    /// current  marking
+    capacity_t* Current;
 
-        /// hash value of initial marking
-        hash_t HashCurrent;
-
-
-        ////// COPIED FROM TRANSITION.h
-        /// Activation status
-        bool* Enabled;
-
-        /// number of enabled transitions
-        index_t CardEnabled;
-
-        /// If transition i is disabled, this is its position in its scapegpat's Disabled list
-        index_t* PositionScapegoat;
+    /// hash value of initial marking
+    hash_t HashCurrent;
 
 
-        //////// COPIED FROFM NET.h
-        /// For each node, the indices of nodes in pre- reps. post set.
-        /// Arc[PL][POST][17][4] is the number of the 5th transition that consumes tokens from place 17.
-        index_t** Arc[2][2];
+    ////// COPIED FROM TRANSITION.h
+    /// Activation status
+    bool* Enabled;
 
-        /// for each node, the multiplicities of arcs in pre- resp. post set.
-        mult_t** Mult[2][2];
+    /// number of enabled transitions
+    index_t CardEnabled;
+
+    /// If transition i is disabled, this is its position in its scapegpat's Disabled list
+    index_t* PositionScapegoat;
 
 
-        /////// COPIED PLACE.h
-        /// Number of transitions for which this place is the distinguished insufficiently marked Pre-place (scapegoat)
-        index_t* CardDisabled;
+    //////// COPIED FROFM NET.h
+    /// For each node, the indices of nodes in pre- reps. post set.
+    /// Arc[PL][POST][17][4] is the number of the 5th transition that consumes tokens from place 17.
+    index_t** Arc[2][2];
 
-        /// These are the transitions for which this place is the scapegoat.
-        index_t** Disabled;
+    /// for each node, the multiplicities of arcs in pre- resp. post set.
+    mult_t** Mult[2][2];
 
-        // create a NetState object from the global variables set by the parsing process
-        static NetState* createNetStateFromInitial();
-        // copy constructor
-        NetState(NetState &ns);
-        // copy operator, be aware that this changes the given ns (this necessary to ensure proper deallocation of memory)
-        NetState &operator=(NetState &ns);
 
-    private:
-        bool need_to_delete_members_on_delete;
-        void deleteAllMembers();
+    /////// COPIED PLACE.h
+    /// Number of transitions for which this place is the distinguished insufficiently marked Pre-place (scapegoat)
+    index_t* CardDisabled;
+
+    /// These are the transitions for which this place is the scapegoat.
+    index_t** Disabled;
+
+    // create a NetState object from the global variables set by the parsing process
+    static NetState* createNetStateFromInitial();
+    // copy constructor
+    NetState(NetState &ns);
+    // copy operator, be aware that this changes the given ns (this necessary to ensure proper deallocation of memory)
+    NetState &operator=(NetState &ns);
+
+private:
+    bool need_to_delete_members_on_delete;
+    void deleteAllMembers();
 };

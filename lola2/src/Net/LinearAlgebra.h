@@ -48,84 +48,84 @@ the reduce() method can find the significant places (transitions).
 */
 class Matrix
 {
+public:
+    /// A row is used to store a row.
+    class Row
+    {
+        friend class Matrix;
+        friend void Net::setProgressMeasure();
+
     public:
-        /// A row is used to store a row.
-        class Row
-        {
-                friend class Matrix;
-                friend void Net::setProgressMeasure();
+        /// Generate and initialize a row based on Net.h types
+        Row(index_t, const index_t*, const int64_t*, index_t = 0);
+        /// Delete a row
+        ~Row();
 
-            public:
-                /// Generate and initialize a row based on Net.h types
-                Row(index_t, const index_t*, const int64_t*, index_t = 0);
-                /// Delete a row
-                ~Row();
+        /// Eleminate current first variable of a row in its successor row (same first variable)
+        void apply(Matrix &);
 
-                /// Eleminate current first variable of a row in its successor row (same first variable)
-                void apply(Matrix &);
+        /// Write row to cout
+        void DEBUG__printRow() const;
 
-                /// Write row to cout
-                void DEBUG__printRow() const;
+        /// Checks whether the variables are ordered properly
+        bool DEBUG__checkRow() const;
 
-                /// Checks whether the variables are ordered properly
-                bool DEBUG__checkRow() const;
-
-            private:
-                /// Number of variables in current row with non zero coefficients
-                index_t varCount;
-                /// Array of variable indizes in current row with non zero coefficients
-                index_t* variables;
-                /// Array of non zero coefficients in current row (same order as variables)
-                int64_t* coefficients;
-
-                /// Reference number of current row
-                index_t reference;
-
-                /// Pointer to successor row with same first variable (NULL if none present)
-                Row* next;
-        };
     private:
-        /// Array of rows for number of varibales (columns)
-        Row** matrix;
-        /// Number of stored rows in current matrix
-        index_t rowCount;
-        /// Number of stored columns in current matrix
-        index_t colCount;
-        /// Number of non empty columns
-        index_t significantColCount;
+        /// Number of variables in current row with non zero coefficients
+        index_t varCount;
+        /// Array of variable indizes in current row with non zero coefficients
+        index_t* variables;
+        /// Array of non zero coefficients in current row (same order as variables)
+        int64_t* coefficients;
 
-        bool DEBUG__checkReduced() const;
+        /// Reference number of current row
+        index_t reference;
 
-    public:
-        /// Generate and initialize a matrix
-        explicit Matrix(index_t);
-        /// Delete a matrix
-        ~Matrix();
+        /// Pointer to successor row with same first variable (NULL if none present)
+        Row* next;
+    };
+private:
+    /// Array of rows for number of varibales (columns)
+    Row** matrix;
+    /// Number of stored rows in current matrix
+    index_t rowCount;
+    /// Number of stored columns in current matrix
+    index_t colCount;
+    /// Number of non empty columns
+    index_t significantColCount;
 
-        /// Add a new row to the matrix
-        void addRow(index_t, const index_t*, const int64_t*, index_t = 0);
+    bool DEBUG__checkReduced() const;
 
-        /// Delete the successor of a row in the matrix
-        void deleteRow(Row*);
+public:
+    /// Generate and initialize a matrix
+    explicit Matrix(index_t);
+    /// Delete a matrix
+    ~Matrix();
 
-        /// Generate the triangular form of the matrix (original one gets lost)
-        void reduce();
+    /// Add a new row to the matrix
+    void addRow(index_t, const index_t*, const int64_t*, index_t = 0);
 
-        /// Returns true iff a column with given index is significant
-        bool isSignificant(index_t) const;
+    /// Delete the successor of a row in the matrix
+    void deleteRow(Row*);
 
-        /// Returns reference number of first row with given index
-        index_t getReference(index_t) const;
+    /// Generate the triangular form of the matrix (original one gets lost)
+    void reduce();
 
-        /// Returns row of the first row with given index
-        Row* getRow(index_t) const;
+    /// Returns true iff a column with given index is significant
+    bool isSignificant(index_t) const;
 
-        /// Returns number of rows
-        index_t getRowCount() const;
+    /// Returns reference number of first row with given index
+    index_t getReference(index_t) const;
 
-        /// Returns the number of significant (= not empty) columns
-        index_t getSignificantColCount() const;
+    /// Returns row of the first row with given index
+    Row* getRow(index_t) const;
 
-        /// Write matrix to cout
-        void DEBUG__printMatrix() const;
+    /// Returns number of rows
+    index_t getRowCount() const;
+
+    /// Returns the number of significant (= not empty) columns
+    index_t getSignificantColCount() const;
+
+    /// Write matrix to cout
+    void DEBUG__printMatrix() const;
 };

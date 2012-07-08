@@ -63,11 +63,19 @@ struct Net
     /// print the net (using printf)
     static void print();
 
+    /// assumes that raw net is read and places, transitions and the edges in-between are set properly. Computes additional net information used to speed up the simulation.
     static void preprocess();
 
 private:
+    // calculates DeltaT and DeltaHash for each transition
     static void preprocess_organizeDeltas();
+
+    /// calculates the set of conflicting transitions for each transition
     static void preprocess_organizeConflictingTransitions();
+
+    // moves all elements in the range [first1,last1), that are also in [first2,last2), to result.
+    // returns the number of elements moved.
+    static index_t set_moveall (index_t* first1, index_t* last1, index_t* first2, index_t* last2, index_t* result);
 
     /// calculates all significant places and changes order of places(!)
     static void setSignificantPlaces();

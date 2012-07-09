@@ -188,49 +188,6 @@ void InnerMarking::deleteCounterPlace() {
 	net->deletePlace(*counterPlace);
 }
 
-//// \TODO: depricated??
-//void InnerMarking::createLabeledEnvironment() {
-//	status("creating labeled sync/async environment...");
-//
-//	// iterate through input labels
-//	set<pnapi::Label *> inputs = net->getInterface().getInputLabels();
-//	PNAPI_FOREACH(label, inputs)
-//	{
-//		// iterate through all transitions belonging to the current label
-//		set<pnapi::Transition *> t_in = (*label)->getTransitions();
-//		PNAPI_FOREACH(t, t_in)
-//		{
-//			// remove the transitions from the current label
-//			(*t)->removeLabel(**label);
-//			(*label)->removeTransition(**t);
-//
-//			// label the transition with the input label
-//			(*t)->setName((*label)->getName());
-//		}
-//	}
-//
-//	// iterate through output labels
-//	inputs = net->getInterface().getOutputLabels();
-//	PNAPI_FOREACH(label, inputs)
-//	{
-//		// iterate through all transitions belonging to the current label
-//		set<pnapi::Transition *> t_in = (*label)->getTransitions();
-//		PNAPI_FOREACH(t, t_in)
-//		{
-//			// remove the transitions from the current label
-//			(*t)->removeLabel(**label);
-//			(*label)->removeTransition(**t);
-//
-//			// label the transition with the output label
-//			(*t)->setName((*label)->getName());
-//		}
-//	}
-//	//\TODO: what about synchronous labels?...
-//
-//	net->getInterface().clear();
-//
-//	status("done with creating labeled sync/async environment...");
-//}
 
 /****************************************
  * OUTPUT FUNCTIONS (STATIC AND MEMBER) *
@@ -244,7 +201,7 @@ void InnerMarking::deleteCounterPlace() {
  \param[in]		trace_min_length	the minimal length of a trace
  \param[in]		trace_max_length	the maximal length of a trace
  */
-void InnerMarking::create_log(std::ostream& file, std::string& filename,
+void InnerMarking::createLog(std::ostream& file, std::string& filename,
 												  const int trace_count ,
 												  const int trace_min_length,
 												  const int trace_max_length) {
@@ -314,7 +271,7 @@ void InnerMarking::fileFooter(std::ostream& file) {
  \param[in]		trace_maxlength	the maximal length of the trace
  */
 void InnerMarking::create_trace(std::ostream& file, const int trace_number, const int trace_maxlength) {
-	status("creating trace %i with maximal length %i", trace_number, trace_maxlength);
+	//status("creating trace %i with maximal length %i", trace_number, trace_maxlength);
 
 	time_t rawtime;
 	struct tm * ti;
@@ -366,11 +323,14 @@ void InnerMarking::create_trace(std::ostream& file, const int trace_number, cons
 		 << "\t</trace>\n";
 
 	tempstring.clear();
-//	status("done with trace %i, length: %i", trace_number, counter);
+	status("done with trace %i, length: %i", trace_number, counter);
 }
+
 
 /*!
  \brief Adds a random Interface to the net. Every transition gets either an input or an output label.
+
+ \param[in]	count	the maximal number of created interface labels
  */
 void InnerMarking::addInterface(const int count) {
 	status("adding %i random interface transitions...", count);
@@ -491,9 +451,11 @@ std::string InnerMarking::addFinalCondition() {
 	std::string netString = tempString.str();
 
 	try {
-		// in the OWFN the final condition is set to TRUE... so replace that bs
-		netString.replace(netString.find("FINALCONDITION"), 22, replaceString.str());
-		status("changed the final marking of the OWFN");
+		if (placeID_B != "") {
+			// in the OWFN the final condition is set to TRUE... so replace that bs
+			netString.replace(netString.find("FINALCONDITION"), 22, replaceString.str());
+			status("changed the final marking of the OWFN");
+		}
 	} catch (std::exception& e) {
 		status("could not change the final marking...");
 	}
@@ -626,7 +588,7 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
     }
 }
 
-void InnerMarking::output_results(Results& r) {
+void InnerMarking::outputResults(Results& r) {
     r.add("statistics.inner_markings", InnerMarking::stats.markings);
     r.add("statistics.inner_markings_final", InnerMarking::stats.final_markings);
     r.add("statistics.inner_markings_bad", InnerMarking::stats.bad_states);

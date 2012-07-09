@@ -56,7 +56,7 @@ class InnerMarking {
 //        static void createLabeledEnvironment();
 
         /// print the knowledges as OG
-        static void create_log(std::ostream& file, std::string & filename,
+        static void createLog(std::ostream& file, std::string & filename,
         										   const int trace_count ,
 				  	  	  	  	  	  	  	  	   const int trace_min_length,
 				  	  	  	  	  	  	  	  	   const int trace_max_length);
@@ -65,7 +65,7 @@ class InnerMarking {
         static void finalize();
 
         /// print results
-        static void output_results(Results&);
+        static void outputResults(Results&);
 
 //        /// traverse reachability graph
 //        static void traverse(const InnerMarking_ID& markingID);

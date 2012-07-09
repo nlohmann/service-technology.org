@@ -392,7 +392,7 @@ int main(int argc, char** argv) {
     	std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename + ".xes";
     	Output output(log_filename, "XES Log");
 
-    	InnerMarking::create_log(output, filename, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);
+    	InnerMarking::createLog(output, filename, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);
 
 //    	// delete the "counter place" if it was formerly created
 //    	if (args_info.partnerView_flag) {
@@ -408,7 +408,7 @@ int main(int argc, char** argv) {
     if (args_info.resultFile_given) {
     	std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";
     	Results results(results_filename);
-    	InnerMarking::output_results(results);
+    	InnerMarking::outputResults(results);
     	Label::output_results(results);
 
     	results.add("meta.package_name", (const char*)PACKAGE_NAME);

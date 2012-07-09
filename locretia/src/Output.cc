@@ -29,8 +29,6 @@
 #include <cstdlib>
 #include "verbose.h"
 #include "Output.h"
-#include "pnapi/util.h"
-#include <pnapi/pnapi.h>
 
 using std::endl;
 

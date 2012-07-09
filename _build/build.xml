@@ -155,7 +155,6 @@
         <exec executable="make" failonerror="true">
             <arg value="distcheck" />
             <arg value="distdir=${package}" />
-            <arg value="TEXI2DVI=&quot;`which bash` `which texi2dvi`&quot;"/>
         </exec>
         <copy file="${package}.tar.gz" todir="artifacts" failonerror="false" />
     </target>

@@ -28,7 +28,7 @@
 %{
 
 #include "parser.h"
-#include "parser-pnml.h"
+#include "parser-pnml.hh"
 
 #include <cstring>
 #include <cstdio>

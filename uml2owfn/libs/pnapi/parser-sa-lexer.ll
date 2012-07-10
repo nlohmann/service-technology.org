@@ -28,7 +28,7 @@ using std::cerr;
 using std::endl;
 
 #include "parser.h"
-#include "parser-sa.h"
+#include "parser-sa.hh"
 
 #include <cstring>
 

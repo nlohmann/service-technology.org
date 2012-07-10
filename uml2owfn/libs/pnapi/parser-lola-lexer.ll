@@ -26,7 +26,7 @@
 %{
 
 #include "parser.h"
-#include "parser-lola.h"
+#include "parser-lola.hh"
 
 #include <cstring>
 

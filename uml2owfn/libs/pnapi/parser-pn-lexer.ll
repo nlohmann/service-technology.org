@@ -53,7 +53,7 @@
 %{
 
 #include "parser.h"
-#include "parser-pn.h"
+#include "parser-pn.hh"
 
 #include <cstring>
 

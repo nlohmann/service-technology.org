@@ -26,7 +26,7 @@
 %{
 
 #include "parser.h"
-#include "parser-onwd.h"
+#include "parser-onwd.hh"
 
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line

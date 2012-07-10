@@ -26,7 +26,7 @@
 %{
 
 #include "parser.h"
-#include "parser-owfn.h"
+#include "parser-owfn.hh"
 
 #include <cstring>
 

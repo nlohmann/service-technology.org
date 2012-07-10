@@ -9,7 +9,7 @@
 #define YY_NO_UNPUT         // We don't need yyunput().
 #include <string>
 #include "costs.h"
-#include "syntax_request.h"      // list of all tokens used
+#include "syntax_request.hh"      // list of all tokens used
 
 extern int request_yyerror(const char *msg);
 %}

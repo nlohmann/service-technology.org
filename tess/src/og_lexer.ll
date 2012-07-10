@@ -28,7 +28,7 @@
 #include <cstdio>
 #include "Formula.h"
 #include "Node.h"
-#include "og_syntax.h"
+#include "og_syntax.hh"
 
 extern int og_yyerror(char const *msg);
 %}

@@ -27,7 +27,7 @@
 %{
 #include <cstring>
 #include <string>
-#include "syntax_im.h"
+#include "syntax_im.hh"
 #include "verbose.h"
 
 extern std::string NAME_token;

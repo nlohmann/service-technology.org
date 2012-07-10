@@ -9,7 +9,7 @@
 #define YY_NO_UNPUT         // We don't need yyunput().
 #include <string>
 #include "helpers.h"
-#include "syntax_fingerprint.h"      // list of all tokens used
+#include "syntax_fingerprint.hh"      // list of all tokens used
 
 extern int fingerprint_yyerror(const char *msg);
 %}

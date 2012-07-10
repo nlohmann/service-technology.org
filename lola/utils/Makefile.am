@@ -23,8 +23,8 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$(graph2dot_SOURCES)) $(filter %.yy,$(form_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
-EXTRA_DIST += $(BISON_FILES:.yy=.h)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
+EXTRA_DIST += $(BISON_FILES:.yy=.hh)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
 
 #----------------------------------------------------------#
 # GENERIC: use GNU gengetopt to create command line parser #

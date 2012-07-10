@@ -35,7 +35,7 @@
 
 typedef std::list< unsigned int > uilist;
 
-#include "parser_adapt_rulesmarlene.h"            // list of all tokens used
+#include "parser_adapt_rulesmarlene.hh"            // list of all tokens used
 
 using std::string;
 

@@ -27,7 +27,7 @@
 %{
 #include <cstdio>
 
-#include "og-syntax.h"
+#include "og-syntax.hh"
 #include "verbose.h"
 
 extern int og_yyerror(char const *msg);

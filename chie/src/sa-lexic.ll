@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <string>
 
-#include "sa-syntax.h"
+#include "sa-syntax.hh"
 #include "verbose.h"
 
 extern int sa_yyerror(char const *msg);

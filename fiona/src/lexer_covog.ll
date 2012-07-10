@@ -56,7 +56,7 @@
 
 #include "debug.h"
 #include "AnnotatedGraph.h"
-#include "syntax_covog.h"            // list of all tokens used
+#include "syntax_covog.hh"            // list of all tokens used
 #include <cstring>
 using namespace std;
 

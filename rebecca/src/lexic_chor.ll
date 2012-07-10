@@ -7,7 +7,7 @@
 %{
 #include <cstring>
 #include <string>
-#include "syntax_chor.h"
+#include "syntax_chor.hh"
 #include "verbose.h"
 
 extern std::string NAME_token;

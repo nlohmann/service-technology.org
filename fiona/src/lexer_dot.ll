@@ -36,7 +36,7 @@
 
 %{
 #include "dot2tex.h"
-#include "syntax_dot.h"
+#include "syntax_dot.hh"
 int dot_yyerror(char const *s);
 %}
 

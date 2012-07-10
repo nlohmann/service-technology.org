@@ -25,7 +25,7 @@
 
 %{
 #include <cstring>
-#include "syntax_reducedgraph.h"
+#include "syntax_reducedgraph.hh"
 
 void reducedgraph_error(const char *);
 %}

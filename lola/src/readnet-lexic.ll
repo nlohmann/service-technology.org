@@ -26,7 +26,7 @@
 #include "symboltab.h"
 class arc_list;
 class case_list;
-#include "readnet-syntax.h"
+#include "readnet-syntax.hh"
 #include "verbose.h"
 #include "Globals.h"
 

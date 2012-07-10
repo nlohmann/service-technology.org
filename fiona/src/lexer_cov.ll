@@ -57,7 +57,7 @@
 #define YY_NO_UNPUT
 
 #include "debug.h"
-#include "syntax_cov.h"            // list of all tokens used
+#include "syntax_cov.hh"            // list of all tokens used
 #include <cstring>
 using namespace std;
 

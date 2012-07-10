@@ -27,7 +27,7 @@
 %{
 #include <cstring>
 #include <string>
-#include "graph-syntax.h"
+#include "graph-syntax.hh"
 #include "verbose.h"
 
 int graph_yyerror(const char *);

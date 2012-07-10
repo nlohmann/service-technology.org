@@ -90,7 +90,7 @@
 #include <string>
 
 #include "yystype.h"
-#include "frontend-parser.h" 	// list of all tokens used
+#include "frontend-parser.hh" 	// list of all tokens used
 #include "debug.h"
 
 

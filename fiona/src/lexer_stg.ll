@@ -39,7 +39,7 @@
 %{
 #include <cstring>
 #include <string>
-#include "syntax_stg.h"            // list of all tokens used
+#include "syntax_stg.hh"            // list of all tokens used
 
 using std::string;
 

@@ -9,7 +9,7 @@
 #define YY_NO_UNPUT         // We don't need yyunput().
 #include "eventTerm.h"
 #include <string>
-#include "syntax_etc.h"      // list of all tokens used
+#include "syntax_etc.hh"      // list of all tokens used
 
 extern int etc_yyerror(const char *msg);
 %}

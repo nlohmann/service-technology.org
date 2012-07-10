@@ -6,7 +6,7 @@
 %{
 
 #include "importwizard.h"
-#include "tool_syntax.h"
+#include "tool_syntax.hh"
 #include <QtCore/QString>
 #include <QtGui/QMessageBox>
 #include <string.h>

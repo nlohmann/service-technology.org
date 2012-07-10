@@ -28,7 +28,7 @@
 #include <iostream>
 #include <cstring>
 
-#include "syntax_og.h"
+#include "syntax_og.hh"
 #include "config.h"
 
 extern int og_yyerror(char const *msg);

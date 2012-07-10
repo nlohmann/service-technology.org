@@ -36,7 +36,7 @@
 /* make this class visible for flex as flex uses it in og_yylval. */
 class Formula;
 
-#include "syntax_og.h"
+#include "syntax_og.hh"
 
 extern char* G_filename;
 extern int og_yyerror(char const *msg);

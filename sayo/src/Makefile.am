@@ -24,8 +24,8 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$(sayo_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
-EXTRA_DIST += $(BISON_FILES:.yy=.h)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
+EXTRA_DIST += $(BISON_FILES:.yy=.hh)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
 
 #----------------------------------------------------------------#
 # GENERIC: copy the content of the config.log file to a C header #

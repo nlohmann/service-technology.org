@@ -25,11 +25,24 @@ linda_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
 linda_CPPFLAGS += -I$(top_srcdir)/libs
 endif
 
-BUILT_SOURCES = cmdline.c syntax_et.cc syntax_et.h lexer_et.cc lexer_etc.cc syntax_etc.cc syntax_etc.h 
+BUILT_SOURCES = cmdline.c 
 
-EXTRA_DIST = syntax_et.h syntax_etc.h cmdline.ggo syntax_profile.h syntax_request.h
+EXTRA_DIST = cmdline.ggo
 
-MAINTAINERCLEANFILES = cmdline.c cmdline.h syntax_et.cc syntax_et.h lexer_et.cc syntax_request.h syntax_profile.h
+MAINTAINERCLEANFILES = cmdline.c cmdline.h
+
+#--------------------------------------------------------------#
+# GENERIC: organize distribution and cleaning of Bison sources #
+#--------------------------------------------------------------#
+BISON_FILES = $(filter %.yy,$(linda_SOURCES))
+BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
+EXTRA_DIST += $(BISON_FILES:.yy=.hh)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
+
+# fix for Automake 1.12
+$(BISON_FILES:.yy=.hh):
+	$(AM_V_GEN) mv $(@:.hh=.h) $@
+
 
 ################################################################
 # use GNU gengetopt to create command line parser

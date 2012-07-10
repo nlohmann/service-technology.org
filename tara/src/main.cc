@@ -33,7 +33,7 @@
 #include "Output.h"
 #include "verbose.h"
 #include "Tara.h"
-#include "syntax_graph.h"
+#include "syntax_graph.hh"
 #include "MaxCost.h"
 #include "ServiceTools.h"
 #include "iModification.h"

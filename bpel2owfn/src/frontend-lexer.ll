@@ -112,7 +112,7 @@
 #include <cstring>
 
 #include "ast-config.h"		// all you need from Kimwitu++
-#include "frontend-parser.h" 	// list of all tokens used
+#include "frontend-parser.hh" 	// list of all tokens used
 #include "debug.h"
 
 

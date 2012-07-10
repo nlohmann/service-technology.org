@@ -61,7 +61,7 @@
 #include "ast-details.h"
 #include "ast-config.h"
 #include "globals.h"
-#include "frontend-parser.h"
+#include "frontend-parser.hh"
 %}
 
 

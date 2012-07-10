@@ -57,7 +57,7 @@
 #include "ast-details.h"
 #include "debug.h"
 #include "helpers.h"
-#include "frontend-parser.h"
+#include "frontend-parser.hh"
 #include "globals.h"
 #include "extension-wsdl.h"
 #include "extension-chor.h"

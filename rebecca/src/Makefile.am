@@ -29,8 +29,12 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$($(PACKAGE)_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
-EXTRA_DIST += $(BISON_FILES:.yy=.h)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
+EXTRA_DIST += $(BISON_FILES:.yy=.hh)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
+
+# fix for Automake 1.12
+$(BISON_FILES:.yy=.hh):
+	$(AM_V_GEN) mv $(@:.hh=.h) $@
 
 #----------------------------------------------------------------#
 # GENERIC: copy the content of the config.log file to a C header #

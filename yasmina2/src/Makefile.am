@@ -6,7 +6,7 @@ yasmina_SOURCES = main.cc \
 		verbose.h verbose.cc \
 		Output.h Output.cc \
 		lexer_fingerprint.ll syntax_fingerprint.yy
-	
+
 yasmina_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.la
 yasmina_CPPFLAGS = -I$(top_srcdir)/libs
 
@@ -16,11 +16,23 @@ yasmina_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
 yasmina_CPPFLAGS += -I$(top_srcdir)/libs
 endif
 
-BUILT_SOURCES = cmdline.c lexer_fingerprint.cc syntax_fingerprint.cc syntax_fingerprint.h
+BUILT_SOURCES = cmdline.c
 
-EXTRA_DIST = cmdline.ggo syntax_fingerprint.h
+EXTRA_DIST = cmdline.ggo
 
-MAINTAINERCLEANFILES = cmdline.c cmdline.h syntax_fingerprint.cc syntax_fingerprint.h lexer_fingerprint.cc
+MAINTAINERCLEANFILES = cmdline.c cmdline.h
+
+#--------------------------------------------------------------#
+# GENERIC: organize distribution and cleaning of Bison sources #
+#--------------------------------------------------------------#
+BISON_FILES = $(filter %.yy,$(yasmina_SOURCES))
+BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
+EXTRA_DIST += $(BISON_FILES:.yy=.hh)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
+
+# fix for Automake 1.12
+$(BISON_FILES:.yy=.hh):
+	$(AM_V_GEN) mv $(@:.hh=.h) $@
 
 ################################################################
 # use GNU gengetopt to create command line parser

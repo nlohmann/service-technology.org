@@ -26,7 +26,7 @@
 %{
 #include <cstring>
 #include <string>
-#include "syntax_anastasia.h"
+#include "syntax_anastasia.hh"
 #include "verbose.h"
 
 std::string anastasia_NAME_token;

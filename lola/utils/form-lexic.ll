@@ -4,7 +4,7 @@
 
 %{
 #include <cstring>
-#include "form-syntax.h"
+#include "form-syntax.hh"
 
 void yyerror(const char *);
 %}

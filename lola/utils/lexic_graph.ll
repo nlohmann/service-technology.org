@@ -6,7 +6,7 @@
 
 %{
 #include <cstring>
-#include "syntax_graph.h"
+#include "syntax_graph.hh"
 
 void graph_error(const char *);
 %}

@@ -29,7 +29,7 @@
 #include <cstdio>
 #include <iostream>
 #include "config.h"
-#include "nf-syntax.h"
+#include "nf-syntax.hh"
 
 extern int nf_yyerror(char const *msg);
 %}

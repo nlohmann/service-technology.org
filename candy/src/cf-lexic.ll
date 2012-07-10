@@ -26,7 +26,7 @@
 %option prefix="cf_yy"
 
 %{
-#include "cf-syntax.h" // from parser
+#include "cf-syntax.hh" // from parser
 #include "verbose.h"   // for verbose messages
 
 void cf_yyerror(const char);

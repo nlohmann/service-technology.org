@@ -37,7 +37,7 @@
 // hack: for Formula in parser union
 #include "Formula.h"
 // from parser
-#include "og-syntax.h"
+#include "og-syntax.hh"
 
 extern int og_yyerror(char const *msg);
 %}

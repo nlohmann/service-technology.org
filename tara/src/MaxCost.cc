@@ -23,8 +23,8 @@
 
 #include "MaxCost.h"
 #include "Tara.h"
-#include "syntax_graph.h"
-#include "syntax_costfunction.h"
+#include "syntax_graph.hh"
+#include "syntax_costfunction.hh"
 #include "verbose.h"
 #include "cmdline.h"
 

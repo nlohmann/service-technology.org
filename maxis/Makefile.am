@@ -23,3 +23,6 @@ svn-clean: maintainer-clean
 	@echo To recreate installation status enter
 	@echo "  autoreconf -i"
 	@echo
+
+# remove a built LoLA if present
+DISTCLEANFILES = $(top_builddir)/lola-statespace

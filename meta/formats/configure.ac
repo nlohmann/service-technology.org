@@ -6,5 +6,5 @@ AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # write files
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile])
 AC_OUTPUT

@@ -1,9 +1,5 @@
-# the main Texinfo document (the manual)
-info_TEXINFOS = doc/formats.texi
-
-TEXINFO_TEX = doc/texinfo.tex
-
-formats_TEXINFOS = doc/lola.texi doc/pnml.texi doc/owfn.texi doc/og.texi doc/results.texi
+SUBDIRS = doc
 
 svn-clean: maintainer-clean
-	rm -fr build-aux configure aclocal.m4 Makefile.in
+	rm -fr configure INSTALL aclocal.m4 src/config.h.in doc/mdate-sh src/config-log.h build-aux
+	for DIR in $(DIST_SUBDIRS) .; do rm -f $$DIR/Makefile.in; done

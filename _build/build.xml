@@ -40,7 +40,7 @@
     </target>
 
     <target name="cppcheck" depends="prepare">
-        <touch file="src/tmpfile.c" />
+        <touch file="src/tmpfile.c" mkdirs="true" />
         <exec executable="cppcheck" failonerror="false" error="cppcheck-result.xml">
             <arg line="src/* --enable=all --force --verbose --report-progress --xml" />
         </exec>

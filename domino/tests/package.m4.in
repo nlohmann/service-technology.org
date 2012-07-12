@@ -84,4 +84,4 @@ m4_define([DOMINO_RAW],            [@abs_top_builddir@/src/domino])
 # m4_define([MARLENE],              [wrap.sh @MARLENE@])
 m4_define([LOLA],                 [@LOLA@])
 m4_define([VALGRIND],             [wrap.sh @VALGRIND@])
-
+m4_define([DIANE], [@DIANE@])

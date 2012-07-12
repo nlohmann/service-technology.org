@@ -170,7 +170,8 @@ StateEquation::StateEquation(pnapi::PetriNet* net) {
   for (std::set<pnapi::Transition*>::iterator it =
 				net->getTransitions().begin(); it
 				!= net->getTransitions().end(); ++it) {
-    transitionMap[(*it)] = Universe::addIdentifier(&(*it)->getName());
+    std::string name = (*it)->getName();
+    transitionMap[(*it)] = Universe::addIdentifier(&name);
   }
 
   // Create the lhs of the state equation which is equal in any final marking

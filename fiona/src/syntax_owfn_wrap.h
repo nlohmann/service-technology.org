@@ -40,4 +40,4 @@ class owfnPlace;
 class owfnTransition;
 class formula;
 
-#include "syntax_owfn.h"
+#include "syntax_owfn.hh"

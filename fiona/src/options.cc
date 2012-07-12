@@ -281,8 +281,8 @@ void print_version() {
     trace("Functional InteractiON Analysis of open nets\n\n");
 
     trace("Copyright (c) 2008  Robert Danitz, Christian Gierds, Niels Lohmann,\n");
-    trace("                    Peter Massuthe, Richard Müller, Janine Ott,\n");
-    trace("                    Jan Sürmeli, Daniela Weinberg, Karsten Wolf,\n");
+    trace("                    Peter Massuthe, Richard MÃ¼ller, Janine Ott,\n");
+    trace("                    Jan SÃ¼rmeli, Daniela Weinberg, Karsten Wolf,\n");
     trace("                    Martin Znamirowski\n\n");
 
     trace("Copyright (c) 2007  Jan Bretschneider, Robert Danitz, Christian Gierds,\n");

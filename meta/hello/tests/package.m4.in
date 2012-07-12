@@ -78,7 +78,7 @@ m4_define([HELLO_RAW],            [@abs_top_builddir@/src/hello])
 #---------------------------------------------#
 
 # tools needed by the testscript
-m4_define([WENDY],                [wrap.sh @WENDY@])
+m4_define([WENDY],                [@WENDY@])
 # m4_define([FIONA],                [wrap.sh @FIONA@])
 # m4_define([MIA],                  [wrap.sh @MIA@])
 # m4_define([MARLENE],              [wrap.sh @MARLENE@])

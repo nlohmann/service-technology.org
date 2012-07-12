@@ -39,9 +39,13 @@ DISTCLEANFILES =
 # GENERIC: organize distribution and cleaning of Bison sources #
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$(hello_SOURCES))
-BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
-EXTRA_DIST += $(BISON_FILES:.yy=.h)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
+BUILT_SOURCES += $(BISON_FILES:.yy=.cc) $(BISON_FILES:.yy=.hh)
+EXTRA_DIST += $(BISON_FILES:.yy=.hh)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
+
+# fix for Automake 1.12
+$(BISON_FILES:.yy=.hh):
+	$(AM_V_GEN) mv $(@:.hh=.h) $@
 
 #----------------------------------------------------------------#
 # GENERIC: copy the content of the config.log file to a C header #

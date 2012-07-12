@@ -29,7 +29,7 @@
 #include <iostream>
 #include <cstring>
 
-#include "wendy_syntax.h"
+#include "wendy_syntax.hh"
 #include "config.h"
 
 extern int wendy_yyerror(char const *msg);

@@ -43,14 +43,14 @@ import org.eclipse.emf.common.util.Enumerator;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the literals of the enumeration '<em><b>Confidence</b></em>',
+ * A representation of the literals of the enumeration '<em><b>Confidentiality</b></em>',
  * and utility methods for working with them.
  * <!-- end-user-doc -->
- * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getConfidence()
+ * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getConfidentiality()
  * @model
  * @generated
  */
-public enum Confidence implements Enumerator {
+public enum Confidentiality implements Enumerator {
   /**
    * The '<em><b>UNKNOWN</b></em>' literal object.
    * <!-- begin-user-doc -->
@@ -59,7 +59,9 @@ public enum Confidence implements Enumerator {
    * @generated
    * @ordered
    */
-  UNKNOWN(0, "UNKNOWN", ""), /**
+  UNKNOWN(0, "UNKNOWN", ""),
+
+  /**
    * The '<em><b>LOW</b></em>' literal object.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -67,7 +69,9 @@ public enum Confidence implements Enumerator {
    * @generated
    * @ordered
    */
-  LOW(1, "LOW", "LOW"), /**
+  LOW(1, "LOW", "LOW"),
+
+  /**
    * The '<em><b>HIGH</b></em>' literal object.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -123,35 +127,35 @@ public enum Confidence implements Enumerator {
   public static final int HIGH_VALUE = 2;
 
   /**
-   * An array of all the '<em><b>Confidence</b></em>' enumerators.
+   * An array of all the '<em><b>Confidentiality</b></em>' enumerators.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    */
-  private static final Confidence[] VALUES_ARRAY =
-    new Confidence[] {
+  private static final Confidentiality[] VALUES_ARRAY =
+    new Confidentiality[] {
       UNKNOWN,
       LOW,
       HIGH,
     };
 
   /**
-   * A public read-only list of all the '<em><b>Confidence</b></em>' enumerators.
+   * A public read-only list of all the '<em><b>Confidentiality</b></em>' enumerators.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    */
-  public static final List<Confidence> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+  public static final List<Confidentiality> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
   /**
-   * Returns the '<em><b>Confidence</b></em>' literal with the specified literal value.
+   * Returns the '<em><b>Confidentiality</b></em>' literal with the specified literal value.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    */
-  public static Confidence get(String literal) {
+  public static Confidentiality get(String literal) {
     for (int i = 0; i < VALUES_ARRAY.length; ++i) {
-      Confidence result = VALUES_ARRAY[i];
+      Confidentiality result = VALUES_ARRAY[i];
       if (result.toString().equals(literal)) {
         return result;
       }
@@ -160,14 +164,14 @@ public enum Confidence implements Enumerator {
   }
 
   /**
-   * Returns the '<em><b>Confidence</b></em>' literal with the specified name.
+   * Returns the '<em><b>Confidentiality</b></em>' literal with the specified name.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    */
-  public static Confidence getByName(String name) {
+  public static Confidentiality getByName(String name) {
     for (int i = 0; i < VALUES_ARRAY.length; ++i) {
-      Confidence result = VALUES_ARRAY[i];
+      Confidentiality result = VALUES_ARRAY[i];
       if (result.getName().equals(name)) {
         return result;
       }
@@ -176,12 +180,12 @@ public enum Confidence implements Enumerator {
   }
 
   /**
-   * Returns the '<em><b>Confidence</b></em>' literal with the specified integer value.
+   * Returns the '<em><b>Confidentiality</b></em>' literal with the specified integer value.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    */
-  public static Confidence get(int value) {
+  public static Confidentiality get(int value) {
     switch (value) {
       case UNKNOWN_VALUE: return UNKNOWN;
       case LOW_VALUE: return LOW;
@@ -217,7 +221,7 @@ public enum Confidence implements Enumerator {
    * <!-- end-user-doc -->
    * @generated
    */
-  private Confidence(int value, String name, String literal) {
+  private Confidentiality(int value, String name, String literal) {
     this.value = value;
     this.name = name;
     this.literal = literal;
@@ -261,4 +265,4 @@ public enum Confidence implements Enumerator {
     return literal;
   }
   
-} //Confidence
+} //Confidentiality

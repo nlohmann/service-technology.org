@@ -75,7 +75,7 @@
         defaultValueLiteral="0"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxTime" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
         defaultValueLiteral="0"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="confidence" eType="#//Confidence"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="confidentiality" eType="#//Confidentiality"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="PlaceExt" eSuperTypes="#//Place">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="probability" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
@@ -91,9 +91,9 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="probability" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"
         defaultValueLiteral="1.0"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EEnum" name="Confidence">
+  <eClassifiers xsi:type="ecore:EEnum" name="Confidentiality">
+    <eLiterals name="UNKNOWN" literal=""/>
     <eLiterals name="LOW" value="1"/>
     <eLiterals name="HIGH" value="2"/>
-    <eLiterals name="UNKNOWN" literal=""/>
   </eClassifiers>
 </ecore:EPackage>

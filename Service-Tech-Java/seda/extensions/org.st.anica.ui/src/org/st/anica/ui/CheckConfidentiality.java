@@ -3,36 +3,18 @@ package org.st.anica.ui;
 import hub.top.editor.eclipse.EditorUtil;
 import hub.top.editor.eclipse.IFrameWorkEditor;
 import hub.top.editor.eclipse.emf.EMFHelper;
-import hub.top.editor.lola.text.ModelEditor;
-import hub.top.editor.ptnetLoLA.Confidence;
 import hub.top.editor.ptnetLoLA.PtNet;
-import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
-import hub.top.editor.ptnetLoLA.Transition;
-import hub.top.editor.ptnetLoLA.TransitionExt;
-
-import java.io.IOException;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.IHandlerListener;
-import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.util.EContentAdapter;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gmf.runtime.notation.Diagram;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.st.anica.ui.preferences.PreferenceConstants;
-
-import sunlabs.brazil.util.Base64;
 
 public class CheckConfidentiality implements IHandler {
 

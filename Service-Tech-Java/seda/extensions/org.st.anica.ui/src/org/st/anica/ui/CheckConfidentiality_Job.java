@@ -1,7 +1,7 @@
 package org.st.anica.ui;
 
 import hub.top.editor.lola.text.ModelEditor;
-import hub.top.editor.ptnetLoLA.Confidence;
+import hub.top.editor.ptnetLoLA.Confidentiality;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.Transition;
@@ -70,7 +70,7 @@ public class CheckConfidentiality_Job extends Job {
         state.setPreviousNet(net);
         EContentAdapter  adapter = new EContentAdapter () {
           public void notifyChanged(Notification notification) {
-            if (notification.getFeatureID(TransitionExt.class) == PtnetLoLAPackage.TRANSITION_EXT__CONFIDENCE) {
+            if (notification.getFeatureID(TransitionExt.class) == PtnetLoLAPackage.TRANSITION_EXT__CONFIDENTIALITY) {
               // confidence changed: check confidence again
               state.setConfidenceChanged(true);
             } else {
@@ -116,9 +116,9 @@ public class CheckConfidentiality_Job extends Job {
             if (t instanceof TransitionExt) {
               // transitions with a confidence value
               TransitionExt t_ext = (TransitionExt)t;
-              if (t_ext.getConfidence() == Confidence.HIGH) {
+              if (t_ext.getConfidentiality() == Confidentiality.HIGH) {
                 j_values.put(t_ext.getName(), "HIGH");
-              } else if (t_ext.getConfidence() == Confidence.LOW) {
+              } else if (t_ext.getConfidentiality() == Confidentiality.LOW) {
                 j_values.put(t_ext.getName(), "LOW");
               } else {
                 j_values.put(t_ext.getName(), "");
@@ -197,7 +197,7 @@ public class CheckConfidentiality_Job extends Job {
     // list of all commands, each command sets one transition attribute
     EList<org.eclipse.emf.common.command.Command> cmdList = new BasicEList<org.eclipse.emf.common.command.Command>();
     // the feature that command will change: transition confidence
-    EStructuralFeature featConfidence = PtnetLoLAPackage.eINSTANCE.getTransitionExt_Confidence();
+    EStructuralFeature featConfidence = PtnetLoLAPackage.eINSTANCE.getTransitionExt_Confidentiality();
     
     // for each transition of the net
     for (Transition t : net.getTransitions()) {
@@ -209,7 +209,7 @@ public class CheckConfidentiality_Job extends Job {
           
           // and create a command to set the value
           org.eclipse.emf.edit.command.SetCommand cmd = new org.eclipse.emf.edit.command.SetCommand(
-              domain, t_ext, featConfidence, Confidence.get(newVal));
+              domain, t_ext, featConfidence, Confidentiality.get(newVal));
           cmd.setLabel("set confidence on " + t_ext.getName());
           cmdList.add(cmd);
           

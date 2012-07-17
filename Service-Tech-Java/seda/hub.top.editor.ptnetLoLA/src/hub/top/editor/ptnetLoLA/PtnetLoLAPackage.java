@@ -695,13 +695,13 @@ public interface PtnetLoLAPackage extends EPackage {
 	int TRANSITION_EXT__MAX_TIME = TRANSITION_FEATURE_COUNT + 3;
 
 		/**
-   * The feature id for the '<em><b>Confidence</b></em>' attribute.
+   * The feature id for the '<em><b>Confidentiality</b></em>' attribute.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int TRANSITION_EXT__CONFIDENCE = TRANSITION_FEATURE_COUNT + 4;
+  int TRANSITION_EXT__CONFIDENTIALITY = TRANSITION_FEATURE_COUNT + 4;
 
     /**
    * The number of structural features of the '<em>Transition Ext</em>' class.
@@ -934,15 +934,14 @@ public interface PtnetLoLAPackage extends EPackage {
 
 
 	/**
-   * The meta object id for the '{@link hub.top.editor.ptnetLoLA.Confidence <em>Confidence</em>}' enum.
+   * The meta object id for the '{@link hub.top.editor.ptnetLoLA.Confidentiality <em>Confidentiality</em>}' enum.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see hub.top.editor.ptnetLoLA.Confidence
-   * @see hub.top.editor.ptnetLoLA.impl.PtnetLoLAPackageImpl#getConfidence()
+   * @see hub.top.editor.ptnetLoLA.Confidentiality
+   * @see hub.top.editor.ptnetLoLA.impl.PtnetLoLAPackageImpl#getConfidentiality()
    * @generated
    */
-  int CONFIDENCE = 16;
-
+  int CONFIDENTIALITY = 16;
 
   /**
    * Returns the meta object for class '{@link hub.top.editor.ptnetLoLA.Place <em>Place</em>}'.
@@ -1329,15 +1328,15 @@ public interface PtnetLoLAPackage extends EPackage {
 	EAttribute getTransitionExt_MaxTime();
 
 		/**
-   * Returns the meta object for the attribute '{@link hub.top.editor.ptnetLoLA.TransitionExt#getConfidence <em>Confidence</em>}'.
+   * Returns the meta object for the attribute '{@link hub.top.editor.ptnetLoLA.TransitionExt#getConfidentiality <em>Confidentiality</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for the attribute '<em>Confidence</em>'.
-   * @see hub.top.editor.ptnetLoLA.TransitionExt#getConfidence()
+   * @return the meta object for the attribute '<em>Confidentiality</em>'.
+   * @see hub.top.editor.ptnetLoLA.TransitionExt#getConfidentiality()
    * @see #getTransitionExt()
    * @generated
    */
-  EAttribute getTransitionExt_Confidence();
+  EAttribute getTransitionExt_Confidentiality();
 
     /**
    * Returns the meta object for class '{@link hub.top.editor.ptnetLoLA.PlaceExt <em>Place Ext</em>}'.
@@ -1424,14 +1423,14 @@ public interface PtnetLoLAPackage extends EPackage {
 	EEnum getNodeType();
 
 	/**
-   * Returns the meta object for enum '{@link hub.top.editor.ptnetLoLA.Confidence <em>Confidence</em>}'.
+   * Returns the meta object for enum '{@link hub.top.editor.ptnetLoLA.Confidentiality <em>Confidentiality</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for enum '<em>Confidence</em>'.
-   * @see hub.top.editor.ptnetLoLA.Confidence
+   * @return the meta object for enum '<em>Confidentiality</em>'.
+   * @see hub.top.editor.ptnetLoLA.Confidentiality
    * @generated
    */
-  EEnum getConfidence();
+  EEnum getConfidentiality();
 
   /**
    * Returns the factory that creates the instances of the model.
@@ -1768,12 +1767,12 @@ public interface PtnetLoLAPackage extends EPackage {
 		EAttribute TRANSITION_EXT__MAX_TIME = eINSTANCE.getTransitionExt_MaxTime();
 
 				/**
-     * The meta object literal for the '<em><b>Confidence</b></em>' attribute feature.
+     * The meta object literal for the '<em><b>Confidentiality</b></em>' attribute feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
-    EAttribute TRANSITION_EXT__CONFIDENCE = eINSTANCE.getTransitionExt_Confidence();
+    EAttribute TRANSITION_EXT__CONFIDENTIALITY = eINSTANCE.getTransitionExt_Confidentiality();
 
         /**
      * The meta object literal for the '{@link hub.top.editor.ptnetLoLA.impl.PlaceExtImpl <em>Place Ext</em>}' class.
@@ -1848,14 +1847,14 @@ public interface PtnetLoLAPackage extends EPackage {
 		EEnum NODE_TYPE = eINSTANCE.getNodeType();
 
     /**
-     * The meta object literal for the '{@link hub.top.editor.ptnetLoLA.Confidence <em>Confidence</em>}' enum.
+     * The meta object literal for the '{@link hub.top.editor.ptnetLoLA.Confidentiality <em>Confidentiality</em>}' enum.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see hub.top.editor.ptnetLoLA.Confidence
-     * @see hub.top.editor.ptnetLoLA.impl.PtnetLoLAPackageImpl#getConfidence()
+     * @see hub.top.editor.ptnetLoLA.Confidentiality
+     * @see hub.top.editor.ptnetLoLA.impl.PtnetLoLAPackageImpl#getConfidentiality()
      * @generated
      */
-    EEnum CONFIDENCE = eINSTANCE.getConfidence();
+    EEnum CONFIDENTIALITY = eINSTANCE.getConfidentiality();
 
 	}
 

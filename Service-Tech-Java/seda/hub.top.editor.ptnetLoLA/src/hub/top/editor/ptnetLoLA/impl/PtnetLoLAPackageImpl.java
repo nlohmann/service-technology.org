@@ -12,7 +12,7 @@ import hub.top.editor.ptnetLoLA.ArcToPlace;
 import hub.top.editor.ptnetLoLA.ArcToPlaceExt;
 import hub.top.editor.ptnetLoLA.ArcToTransition;
 import hub.top.editor.ptnetLoLA.ArcToTransitionExt;
-import hub.top.editor.ptnetLoLA.Confidence;
+import hub.top.editor.ptnetLoLA.Confidentiality;
 import hub.top.editor.ptnetLoLA.Marking;
 import hub.top.editor.ptnetLoLA.Node;
 import hub.top.editor.ptnetLoLA.NodeType;
@@ -158,7 +158,7 @@ public class PtnetLoLAPackageImpl extends EPackageImpl implements PtnetLoLAPacka
    * <!-- end-user-doc -->
    * @generated
    */
-  private EEnum confidenceEEnum = null;
+  private EEnum confidentialityEEnum = null;
 
   /**
    * Creates an instance of the model <b>Package</b>, registered with
@@ -550,7 +550,7 @@ public class PtnetLoLAPackageImpl extends EPackageImpl implements PtnetLoLAPacka
    * <!-- end-user-doc -->
    * @generated
    */
-  public EAttribute getTransitionExt_Confidence() {
+  public EAttribute getTransitionExt_Confidentiality() {
     return (EAttribute)transitionExtEClass.getEStructuralFeatures().get(4);
   }
 
@@ -631,8 +631,8 @@ public class PtnetLoLAPackageImpl extends EPackageImpl implements PtnetLoLAPacka
    * <!-- end-user-doc -->
    * @generated
    */
-  public EEnum getConfidence() {
-    return confidenceEEnum;
+  public EEnum getConfidentiality() {
+    return confidentialityEEnum;
   }
 
   /**
@@ -710,7 +710,7 @@ public class PtnetLoLAPackageImpl extends EPackageImpl implements PtnetLoLAPacka
     createEAttribute(transitionExtEClass, TRANSITION_EXT__MIN_TIME);
     createEAttribute(transitionExtEClass, TRANSITION_EXT__COST);
     createEAttribute(transitionExtEClass, TRANSITION_EXT__MAX_TIME);
-    createEAttribute(transitionExtEClass, TRANSITION_EXT__CONFIDENCE);
+    createEAttribute(transitionExtEClass, TRANSITION_EXT__CONFIDENTIALITY);
 
     placeExtEClass = createEClass(PLACE_EXT);
     createEAttribute(placeExtEClass, PLACE_EXT__PROBABILITY);
@@ -724,7 +724,7 @@ public class PtnetLoLAPackageImpl extends EPackageImpl implements PtnetLoLAPacka
 
     // Create enums
     nodeTypeEEnum = createEEnum(NODE_TYPE);
-    confidenceEEnum = createEEnum(CONFIDENCE);
+    confidentialityEEnum = createEEnum(CONFIDENTIALITY);
   }
 
 	/**
@@ -813,7 +813,7 @@ public class PtnetLoLAPackageImpl extends EPackageImpl implements PtnetLoLAPacka
     initEAttribute(getTransitionExt_MinTime(), ecorePackage.getEInt(), "minTime", "0", 0, 1, TransitionExt.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getTransitionExt_Cost(), ecorePackage.getEDouble(), "cost", "0", 0, 1, TransitionExt.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getTransitionExt_MaxTime(), ecorePackage.getEInt(), "maxTime", "0", 0, 1, TransitionExt.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEAttribute(getTransitionExt_Confidence(), this.getConfidence(), "confidence", null, 0, 1, TransitionExt.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getTransitionExt_Confidentiality(), this.getConfidentiality(), "confidentiality", null, 0, 1, TransitionExt.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(placeExtEClass, PlaceExt.class, "PlaceExt", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEAttribute(getPlaceExt_Probability(), ecorePackage.getEDouble(), "probability", "1.0", 0, 1, PlaceExt.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -832,10 +832,10 @@ public class PtnetLoLAPackageImpl extends EPackageImpl implements PtnetLoLAPacka
     addEEnumLiteral(nodeTypeEEnum, NodeType.OUTPUT);
     addEEnumLiteral(nodeTypeEEnum, NodeType.INOUT);
 
-    initEEnum(confidenceEEnum, Confidence.class, "Confidence");
-    addEEnumLiteral(confidenceEEnum, Confidence.UNKNOWN);
-    addEEnumLiteral(confidenceEEnum, Confidence.LOW);
-    addEEnumLiteral(confidenceEEnum, Confidence.HIGH);
+    initEEnum(confidentialityEEnum, Confidentiality.class, "Confidentiality");
+    addEEnumLiteral(confidentialityEEnum, Confidentiality.UNKNOWN);
+    addEEnumLiteral(confidentialityEEnum, Confidentiality.LOW);
+    addEEnumLiteral(confidentialityEEnum, Confidentiality.HIGH);
 
     // Create resource
     createResource(eNS_URI);

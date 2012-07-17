@@ -37,14 +37,11 @@
 package hub.top.editor.lola.text.modelcreating;
 
 import hub.sam.tef.modelcreating.IModelCreatingContext;
-import hub.top.editor.ptnetLoLA.Confidence;
 import hub.top.editor.ptnetLoLA.Node;
 import hub.top.editor.ptnetLoLA.NodeType;
 import hub.top.editor.ptnetLoLA.Place;
-import hub.top.editor.ptnetLoLA.PlaceExt;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.editor.ptnetLoLA.Transition;
-import hub.top.editor.ptnetLoLA.TransitionExt;
 
 public class LolaStatementEvaluation {
 

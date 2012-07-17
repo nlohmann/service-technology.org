@@ -38,7 +38,7 @@ package hub.top.editor.ptnetLoLA.diagram.edit.parts;
 
 import hub.top.editor.petrinets.diagram.tool.FireTool;
 import hub.top.editor.ptnetLoLA.Arc;
-import hub.top.editor.ptnetLoLA.Confidence;
+import hub.top.editor.ptnetLoLA.Confidentiality;
 import hub.top.editor.ptnetLoLA.NodeType;
 import hub.top.editor.ptnetLoLA.Place;
 import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
@@ -413,9 +413,9 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
           .getModel()).getElement();
       if (t instanceof TransitionExt) {
         TransitionExt t_ext = (TransitionExt)t;
-        if (t_ext.getConfidence() == Confidence.HIGH) {
+        if (t_ext.getConfidentiality() == Confidentiality.HIGH) {
           setBackgroundColor(THIS_BACK_RED);
-        } else if (t_ext.getConfidence() == Confidence.LOW) {
+        } else if (t_ext.getConfidentiality() == Confidentiality.LOW) {
           setBackgroundColor(THIS_BACK_GREEN);
         } else {
           setBackgroundColor(THIS_BACK);
@@ -550,7 +550,7 @@ public class TransitionEditPart extends AbstractBorderedShapeEditPart {
         System.out.println("is EAttribute, " + attribute.getName()
             + " ?= "
             + PtnetLoLAPackage.eINSTANCE.getNode_Type().getName());
-        if (attribute == PtnetLoLAPackage.eINSTANCE.getTransitionExt_Confidence()) {
+        if (attribute == PtnetLoLAPackage.eINSTANCE.getTransitionExt_Confidentiality()) {
           this.getPrimaryShape().recolorFigure();
         }
       }

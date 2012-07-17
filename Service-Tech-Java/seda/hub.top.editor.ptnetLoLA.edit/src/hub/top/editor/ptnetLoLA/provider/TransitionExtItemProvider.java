@@ -96,7 +96,7 @@ public class TransitionExtItemProvider
       addMinTimePropertyDescriptor(object);
       addCostPropertyDescriptor(object);
       addMaxTimePropertyDescriptor(object);
-      addConfidencePropertyDescriptor(object);
+      addConfidentialityPropertyDescriptor(object);
     }
     return itemPropertyDescriptors;
   }
@@ -190,19 +190,19 @@ public class TransitionExtItemProvider
   }
 
 		/**
-   * This adds a property descriptor for the Confidence feature.
+   * This adds a property descriptor for the Confidentiality feature.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    */
-  protected void addConfidencePropertyDescriptor(Object object) {
+  protected void addConfidentialityPropertyDescriptor(Object object) {
     itemPropertyDescriptors.add
       (createItemPropertyDescriptor
         (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
          getResourceLocator(),
-         getString("_UI_TransitionExt_confidence_feature"),
-         getString("_UI_PropertyDescriptor_description", "_UI_TransitionExt_confidence_feature", "_UI_TransitionExt_type"),
-         PtnetLoLAPackage.Literals.TRANSITION_EXT__CONFIDENCE,
+         getString("_UI_TransitionExt_confidentiality_feature"),
+         getString("_UI_PropertyDescriptor_description", "_UI_TransitionExt_confidentiality_feature", "_UI_TransitionExt_type"),
+         PtnetLoLAPackage.Literals.TRANSITION_EXT__CONFIDENTIALITY,
          true,
          false,
          false,
@@ -252,7 +252,7 @@ public class TransitionExtItemProvider
       case PtnetLoLAPackage.TRANSITION_EXT__MIN_TIME:
       case PtnetLoLAPackage.TRANSITION_EXT__COST:
       case PtnetLoLAPackage.TRANSITION_EXT__MAX_TIME:
-      case PtnetLoLAPackage.TRANSITION_EXT__CONFIDENCE:
+      case PtnetLoLAPackage.TRANSITION_EXT__CONFIDENTIALITY:
         fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
         return;
     }

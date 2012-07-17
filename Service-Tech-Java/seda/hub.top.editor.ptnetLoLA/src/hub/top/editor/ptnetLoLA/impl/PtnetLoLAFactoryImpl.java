@@ -122,8 +122,8 @@ public class PtnetLoLAFactoryImpl extends EFactoryImpl implements PtnetLoLAFacto
     switch (eDataType.getClassifierID()) {
       case PtnetLoLAPackage.NODE_TYPE:
         return createNodeTypeFromString(eDataType, initialValue);
-      case PtnetLoLAPackage.CONFIDENCE:
-        return createConfidenceFromString(eDataType, initialValue);
+      case PtnetLoLAPackage.CONFIDENTIALITY:
+        return createConfidentialityFromString(eDataType, initialValue);
       default:
         throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
     }
@@ -139,8 +139,8 @@ public class PtnetLoLAFactoryImpl extends EFactoryImpl implements PtnetLoLAFacto
     switch (eDataType.getClassifierID()) {
       case PtnetLoLAPackage.NODE_TYPE:
         return convertNodeTypeToString(eDataType, instanceValue);
-      case PtnetLoLAPackage.CONFIDENCE:
-        return convertConfidenceToString(eDataType, instanceValue);
+      case PtnetLoLAPackage.CONFIDENTIALITY:
+        return convertConfidentialityToString(eDataType, instanceValue);
       default:
         throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
     }
@@ -324,8 +324,8 @@ public class PtnetLoLAFactoryImpl extends EFactoryImpl implements PtnetLoLAFacto
    * <!-- end-user-doc -->
    * @generated
    */
-  public Confidence createConfidenceFromString(EDataType eDataType, String initialValue) {
-    Confidence result = Confidence.get(initialValue);
+  public Confidentiality createConfidentialityFromString(EDataType eDataType, String initialValue) {
+    Confidentiality result = Confidentiality.get(initialValue);
     if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
     return result;
   }
@@ -335,7 +335,7 @@ public class PtnetLoLAFactoryImpl extends EFactoryImpl implements PtnetLoLAFacto
    * <!-- end-user-doc -->
    * @generated
    */
-  public String convertConfidenceToString(EDataType eDataType, Object instanceValue) {
+  public String convertConfidentialityToString(EDataType eDataType, Object instanceValue) {
     return instanceValue == null ? null : instanceValue.toString();
   }
 

@@ -14,10 +14,10 @@
       <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//NodeType/output"/>
       <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//NodeType/inout"/>
     </genEnums>
-    <genEnums typeSafeEnumCompatible="false" ecoreEnum="ptnetLoLA.ecore#//Confidence">
-      <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//Confidence/UNKNOWN"/>
-      <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//Confidence/LOW"/>
-      <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//Confidence/HIGH"/>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="ptnetLoLA.ecore#//Confidentiality">
+      <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//Confidentiality/UNKNOWN"/>
+      <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//Confidentiality/LOW"/>
+      <genEnumLiterals ecoreEnumLiteral="ptnetLoLA.ecore#//Confidentiality/HIGH"/>
     </genEnums>
     <genClasses ecoreClass="ptnetLoLA.ecore#//Place">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//Place/token"/>
@@ -63,7 +63,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//TransitionExt/minTime"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//TransitionExt/cost"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//TransitionExt/maxTime"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//TransitionExt/confidence"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//TransitionExt/confidentiality"/>
     </genClasses>
     <genClasses ecoreClass="ptnetLoLA.ecore#//PlaceExt">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//PlaceExt/probability"/>

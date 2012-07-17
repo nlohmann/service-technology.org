@@ -52,7 +52,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link hub.top.editor.ptnetLoLA.TransitionExt#getMinTime <em>Min Time</em>}</li>
  *   <li>{@link hub.top.editor.ptnetLoLA.TransitionExt#getCost <em>Cost</em>}</li>
  *   <li>{@link hub.top.editor.ptnetLoLA.TransitionExt#getMaxTime <em>Max Time</em>}</li>
- *   <li>{@link hub.top.editor.ptnetLoLA.TransitionExt#getConfidence <em>Confidence</em>}</li>
+ *   <li>{@link hub.top.editor.ptnetLoLA.TransitionExt#getConfidentiality <em>Confidentiality</em>}</li>
  * </ul>
  * </p>
  *
@@ -170,32 +170,32 @@ public interface TransitionExt extends Transition {
 	void setMaxTime(int value);
 
     /**
-   * Returns the value of the '<em><b>Confidence</b></em>' attribute.
-   * The literals are from the enumeration {@link hub.top.editor.ptnetLoLA.Confidence}.
+   * Returns the value of the '<em><b>Confidentiality</b></em>' attribute.
+   * The literals are from the enumeration {@link hub.top.editor.ptnetLoLA.Confidentiality}.
    * <!-- begin-user-doc -->
    * <p>
-   * If the meaning of the '<em>Confidence</em>' attribute isn't clear,
+   * If the meaning of the '<em>Confidentiality</em>' attribute isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Confidence</em>' attribute.
-   * @see hub.top.editor.ptnetLoLA.Confidence
-   * @see #setConfidence(Confidence)
-   * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getTransitionExt_Confidence()
+   * @return the value of the '<em>Confidentiality</em>' attribute.
+   * @see hub.top.editor.ptnetLoLA.Confidentiality
+   * @see #setConfidentiality(Confidentiality)
+   * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getTransitionExt_Confidentiality()
    * @model
    * @generated
    */
-  Confidence getConfidence();
+  Confidentiality getConfidentiality();
 
     /**
-   * Sets the value of the '{@link hub.top.editor.ptnetLoLA.TransitionExt#getConfidence <em>Confidence</em>}' attribute.
+   * Sets the value of the '{@link hub.top.editor.ptnetLoLA.TransitionExt#getConfidentiality <em>Confidentiality</em>}' attribute.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Confidence</em>' attribute.
-   * @see hub.top.editor.ptnetLoLA.Confidence
-   * @see #getConfidence()
+   * @param value the new value of the '<em>Confidentiality</em>' attribute.
+   * @see hub.top.editor.ptnetLoLA.Confidentiality
+   * @see #getConfidentiality()
    * @generated
    */
-  void setConfidence(Confidence value);
+  void setConfidentiality(Confidentiality value);
 
 } // TransitionExt

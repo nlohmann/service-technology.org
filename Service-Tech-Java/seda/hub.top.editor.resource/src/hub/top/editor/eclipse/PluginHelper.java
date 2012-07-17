@@ -37,6 +37,8 @@ package hub.top.editor.eclipse;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 public class PluginHelper {
@@ -84,8 +86,54 @@ public class PluginHelper {
    * @param warning message to be logged
    */
   public void logWarning(String warning) {
-    fHostPlugin.getLog().log(new Status(
-        IStatus.WARNING, fHostPluginID, IStatus.OK, warning, null)
-      );
+    logWarning(warning, null);
+  }
+  
+  /**
+  * log a warning within the host plugin of this helper
+  * @param warning message to be logged
+  * @param throwable exception causing the warning
+  */
+ public void logWarning(String warning, Throwable throwable) {
+   fHostPlugin.getLog().log(new Status(
+       IStatus.WARNING, fHostPluginID, IStatus.OK, warning, throwable)
+     );
+ }
+  
+  /**
+   * Show error dialog with the given title and the error message and log the error
+   * in the error view.
+   * 
+   * @param title
+   * @param error
+   * @param cause
+   */
+  public void showErrorToUser(final String title, final String error, final Throwable cause) {
+    Display.getDefault().syncExec( new ErrorRunnable(this, title, error, cause) );
+  }
+  
+  /**
+   * Runnable class that displays an error dialog and logs the error to the Eclipse error log.
+   * 
+   * @author dfahland
+   */
+  public static class ErrorRunnable implements Runnable {
+    
+    private final String title;
+    private final String error;
+    private final Throwable cause;
+    private final PluginHelper helper;
+    
+    public ErrorRunnable(final PluginHelper helper, final String title, final String error, final Throwable cause) {
+      this.title = title;
+      this.error = error;
+      this.cause = cause;
+      this.helper = helper;
+    }
+    
+    public void run() {
+      MessageDialog.openError(null, title, error+"\nSee error log for details.");
+      if (cause != null) helper.logError(error, cause);  
+    };
   }
 }

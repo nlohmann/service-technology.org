@@ -37,7 +37,7 @@
  */
 package hub.top.editor.ptnetLoLA.impl;
 
-import hub.top.editor.ptnetLoLA.Confidence;
+import hub.top.editor.ptnetLoLA.Confidentiality;
 import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.TransitionExt;
 
@@ -61,7 +61,7 @@ import org.eclipse.emf.ecore.util.EDataTypeEList;
  *   <li>{@link hub.top.editor.ptnetLoLA.impl.TransitionExtImpl#getMinTime <em>Min Time</em>}</li>
  *   <li>{@link hub.top.editor.ptnetLoLA.impl.TransitionExtImpl#getCost <em>Cost</em>}</li>
  *   <li>{@link hub.top.editor.ptnetLoLA.impl.TransitionExtImpl#getMaxTime <em>Max Time</em>}</li>
- *   <li>{@link hub.top.editor.ptnetLoLA.impl.TransitionExtImpl#getConfidence <em>Confidence</em>}</li>
+ *   <li>{@link hub.top.editor.ptnetLoLA.impl.TransitionExtImpl#getConfidentiality <em>Confidentiality</em>}</li>
  * </ul>
  * </p>
  *
@@ -149,24 +149,24 @@ public class TransitionExtImpl extends TransitionImpl implements TransitionExt {
 	protected int maxTime = MAX_TIME_EDEFAULT;
 
 		/**
-   * The default value of the '{@link #getConfidence() <em>Confidence</em>}' attribute.
+   * The default value of the '{@link #getConfidentiality() <em>Confidentiality</em>}' attribute.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getConfidence()
+   * @see #getConfidentiality()
    * @generated
    * @ordered
    */
-  protected static final Confidence CONFIDENCE_EDEFAULT = Confidence.UNKNOWN;
+  protected static final Confidentiality CONFIDENTIALITY_EDEFAULT = Confidentiality.UNKNOWN;
 
     /**
-   * The cached value of the '{@link #getConfidence() <em>Confidence</em>}' attribute.
+   * The cached value of the '{@link #getConfidentiality() <em>Confidentiality</em>}' attribute.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getConfidence()
+   * @see #getConfidentiality()
    * @generated
    * @ordered
    */
-  protected Confidence confidence = CONFIDENCE_EDEFAULT;
+  protected Confidentiality confidentiality = CONFIDENTIALITY_EDEFAULT;
 
     /**
    * <!-- begin-user-doc -->
@@ -276,8 +276,8 @@ public class TransitionExtImpl extends TransitionImpl implements TransitionExt {
    * <!-- end-user-doc -->
    * @generated
    */
-  public Confidence getConfidence() {
-    return confidence;
+  public Confidentiality getConfidentiality() {
+    return confidentiality;
   }
 
     /**
@@ -285,11 +285,11 @@ public class TransitionExtImpl extends TransitionImpl implements TransitionExt {
    * <!-- end-user-doc -->
    * @generated
    */
-  public void setConfidence(Confidence newConfidence) {
-    Confidence oldConfidence = confidence;
-    confidence = newConfidence == null ? CONFIDENCE_EDEFAULT : newConfidence;
+  public void setConfidentiality(Confidentiality newConfidentiality) {
+    Confidentiality oldConfidentiality = confidentiality;
+    confidentiality = newConfidentiality == null ? CONFIDENTIALITY_EDEFAULT : newConfidentiality;
     if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, PtnetLoLAPackage.TRANSITION_EXT__CONFIDENCE, oldConfidence, confidence));
+      eNotify(new ENotificationImpl(this, Notification.SET, PtnetLoLAPackage.TRANSITION_EXT__CONFIDENTIALITY, oldConfidentiality, confidentiality));
   }
 
     /**
@@ -308,8 +308,8 @@ public class TransitionExtImpl extends TransitionImpl implements TransitionExt {
         return getCost();
       case PtnetLoLAPackage.TRANSITION_EXT__MAX_TIME:
         return getMaxTime();
-      case PtnetLoLAPackage.TRANSITION_EXT__CONFIDENCE:
-        return getConfidence();
+      case PtnetLoLAPackage.TRANSITION_EXT__CONFIDENTIALITY:
+        return getConfidentiality();
     }
     return super.eGet(featureID, resolve, coreType);
   }
@@ -335,8 +335,8 @@ public class TransitionExtImpl extends TransitionImpl implements TransitionExt {
       case PtnetLoLAPackage.TRANSITION_EXT__MAX_TIME:
         setMaxTime((Integer)newValue);
         return;
-      case PtnetLoLAPackage.TRANSITION_EXT__CONFIDENCE:
-        setConfidence((Confidence)newValue);
+      case PtnetLoLAPackage.TRANSITION_EXT__CONFIDENTIALITY:
+        setConfidentiality((Confidentiality)newValue);
         return;
     }
     super.eSet(featureID, newValue);
@@ -362,8 +362,8 @@ public class TransitionExtImpl extends TransitionImpl implements TransitionExt {
       case PtnetLoLAPackage.TRANSITION_EXT__MAX_TIME:
         setMaxTime(MAX_TIME_EDEFAULT);
         return;
-      case PtnetLoLAPackage.TRANSITION_EXT__CONFIDENCE:
-        setConfidence(CONFIDENCE_EDEFAULT);
+      case PtnetLoLAPackage.TRANSITION_EXT__CONFIDENTIALITY:
+        setConfidentiality(CONFIDENTIALITY_EDEFAULT);
         return;
     }
     super.eUnset(featureID);
@@ -385,8 +385,8 @@ public class TransitionExtImpl extends TransitionImpl implements TransitionExt {
         return cost != COST_EDEFAULT;
       case PtnetLoLAPackage.TRANSITION_EXT__MAX_TIME:
         return maxTime != MAX_TIME_EDEFAULT;
-      case PtnetLoLAPackage.TRANSITION_EXT__CONFIDENCE:
-        return confidence != CONFIDENCE_EDEFAULT;
+      case PtnetLoLAPackage.TRANSITION_EXT__CONFIDENTIALITY:
+        return confidentiality != CONFIDENTIALITY_EDEFAULT;
     }
     return super.eIsSet(featureID);
   }
@@ -409,8 +409,8 @@ public class TransitionExtImpl extends TransitionImpl implements TransitionExt {
     result.append(cost);
     result.append(", maxTime: ");
     result.append(maxTime);
-    result.append(", confidence: ");
-    result.append(confidence);
+    result.append(", confidentiality: ");
+    result.append(confidentiality);
     result.append(')');
     return result.toString();
   }

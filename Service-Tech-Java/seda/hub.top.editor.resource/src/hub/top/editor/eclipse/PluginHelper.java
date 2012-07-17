@@ -113,6 +113,18 @@ public class PluginHelper {
   }
   
   /**
+   * Show error dialog with the given title and the error message and log the error
+   * in the error view.
+   * 
+   * @param title
+   * @param error
+   * @param cause
+   */
+  public void showInfoToUser(final String title, final String info) {
+    Display.getDefault().syncExec( new InfoRunnable(this, title, info) );
+  }
+  
+  /**
    * Runnable class that displays an error dialog and logs the error to the Eclipse error log.
    * 
    * @author dfahland
@@ -134,6 +146,26 @@ public class PluginHelper {
     public void run() {
       MessageDialog.openError(null, title, error+"\nSee error log for details.");
       if (cause != null) helper.logError(error, cause);  
+    };
+  }
+  
+  /**
+   * Runnable class that displays an error dialog and logs the error to the Eclipse error log.
+   * 
+   * @author dfahland
+   */
+  public static class InfoRunnable implements Runnable {
+    
+    private final String title;
+    private final String info;
+    
+    public InfoRunnable(final PluginHelper helper, final String title, final String info) {
+      this.title = title;
+      this.info = info;
+    }
+    
+    public void run() {
+      MessageDialog.openInformation(null, title, info);
     };
   }
 }

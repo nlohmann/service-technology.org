@@ -152,7 +152,9 @@ public class CheckConfidentiality_Job extends Job {
             JSONObject j_values = j_reply.getJSONObject("assignment");
             
             // update confidence values of transitions by the new assignment
-            updateConfidentialityInNet(net, j_values, domain);
+            if (!updateConfidentialityInNet(net, j_values, domain)) {
+              Activator.getPluginHelper().showInfoToUser("Message from Anica", "The current assignment is secure.");
+            }
           } else if (j_reply.has("error")) {
             Activator.getPluginHelper().showErrorToUser("Message from Anica", "Anica found a problem in your net:\n"+j_reply.getString("error"), null);            
           }
@@ -190,8 +192,13 @@ public class CheckConfidentiality_Job extends Job {
    * 
    * @param net
    * @param assignment
+   * 
+   * @return {@code true} iff the confidentiality values were updated and {@code false} iff there was
+   * a change in at least one confidentiality value
    */
-  private void updateConfidentialityInNet(PtNet net, JSONObject assignment, EditingDomain domain) {
+  private boolean updateConfidentialityInNet(PtNet net, JSONObject assignment, EditingDomain domain) {
+    
+    boolean updated = false;
     
     // to update transition attributes, we need to execute commands
     // list of all commands, each command sets one transition attribute
@@ -207,10 +214,12 @@ public class CheckConfidentiality_Job extends Job {
         try {
           String newVal = assignment.getString(t_ext.getName());
           
+          updated = updated || (Confidentiality.get(newVal) != t_ext.getConfidentiality());
+          
           // and create a command to set the value
           org.eclipse.emf.edit.command.SetCommand cmd = new org.eclipse.emf.edit.command.SetCommand(
               domain, t_ext, featConfidence, Confidentiality.get(newVal));
-          cmd.setLabel("set confidence on " + t_ext.getName());
+          cmd.setLabel("set confidentiality on " + t_ext.getName());
           cmdList.add(cmd);
           
         } catch (JSONException e) {
@@ -224,6 +233,8 @@ public class CheckConfidentiality_Job extends Job {
         cmdList);
     fireCmd.setLabel("update confidentialities");
     domain.getCommandStack().execute(fireCmd);
+    
+    return updated;
   }
 
 }

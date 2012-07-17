@@ -37,6 +37,7 @@ std::map<std::string, anica::confidence_e> assignment;
 #define IDENT(n) for (int i = 0; i < n; ++i) printf("    ")
 
 void print_json(json_value* value, int ident = 0) {
+return;
     IDENT(ident);
     if (value->name) {
         printf("\"%s\" = ", value->name);
@@ -366,14 +367,24 @@ int main(int argc, char** argv) {
     // initialize ports
     rep->status("listening to socket %d", inputPort);
     inputSocket = new Socket(inputPort);
-    rep->status("talking to socket %d", outputPort);
-    outputSocket = new Socket(outputPort, "localhost");
+    
+    if (UNLIKELY(argc == 2))
+    {
+        outputSocket = new Socket(outputPort, argv[1]);
+        rep->status("talking to socket %d (%s)", outputPort, argv[1]);
+    }
+    else
+    {
+        outputSocket = new Socket(outputPort, "localhost");
+        rep->status("talking to socket %d (localhost)", outputPort);
+    }
 
     // state machine
     while (true) {
         rep->status("waiting for messages");
 
         json_value* json = receiveJson();
+        
         const char* command = getCommand(json);
 
         if (!strcmp(command, "net")) {

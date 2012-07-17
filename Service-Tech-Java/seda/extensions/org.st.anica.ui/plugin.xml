@@ -6,15 +6,15 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="hub.top.editor.commands.category"
-            id="hub.top.editor.commands.checkConfidence"
-            name="Check Confidence of Transitions">
+            id="hub.top.editor.commands.checkConfidentiality"
+            name="Check Confidentiality of Transitions">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.st.anica.ui.CheckConfidence"
-            commandId="hub.top.editor.commands.checkConfidence">
+            class="org.st.anica.ui.CheckConfidentiality"
+            commandId="hub.top.editor.commands.checkConfidentiality">
       </handler>
    </extension>
    <extension
@@ -26,8 +26,8 @@
                label="Petri Nets"
                mnemonic="M">
             <command
-                  commandId="hub.top.editor.commands.checkConfidence"
-                  id="hub.top.editor.menus.checkConfidence"
+                  commandId="hub.top.editor.commands.checkConfidentiality"
+                  id="hub.top.editor.menus.checkConfidentiality"
                   mnemonic="C">
             </command>
          </menu>
@@ -37,9 +37,9 @@
          <toolbar
                id="hub.top.editor.toolbars.petrinetsToolbar">
             <command
-                  commandId="hub.top.editor.commands.checkConfidence"
-                  id="hub.top.editor.toolbars.convertToDiagram"
-                  tooltip="check confidence">
+                  commandId="hub.top.editor.commands.checkConfidentiality"
+                  id="hub.top.editor.toolbars.checkConfidentiality"
+                  tooltip="check confidentiality">
             </command>
          </toolbar>
       </menuContribution>

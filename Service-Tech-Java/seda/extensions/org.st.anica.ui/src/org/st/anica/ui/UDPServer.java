@@ -16,6 +16,8 @@ public class UDPServer {
     
     public String receive() throws IOException {
         byte[] receiveData = new byte[1024];
+        
+        socket.setSoTimeout(5000);
 
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length); 
 
@@ -29,7 +31,7 @@ public class UDPServer {
         socket.close();
     }
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SocketException {
         UDPServer e = new UDPServer(5556);
         
         while (true) {

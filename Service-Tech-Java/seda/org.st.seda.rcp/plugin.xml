@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="org.st.seda.rcp.application"
+         name="RCPSeda"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.st.seda.rcp.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="product_e4"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.st.seda.rcp.application"
+            name="Seda">
+         <property
+               name="appName"
+               value="Seda">
+         </property>
+         <property
+               name="applicationXMI"
+               value="org.st.seda.rcp/Application.e4xmi">
+         </property>
+         <property
+               name="applicationCSS"
+               value="org.st.seda.rcp/css/default.css">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/document.net.bw_2.16.png,icons/document.net.bw3.32.png,icons/document.net.bw.64.png">
+         </property>
+      </product>
+   </extension>
+  <extension point="org.eclipse.ui.navigator.viewer">
+       <viewerActionBinding
+            viewerId="org.st.seda.rcp.view.explorer">
+         <includes>
+             <actionExtension pattern="org.eclipse.ui.navigator.resources.*" />
+         </includes>
+       </viewerActionBinding>
+       <viewerContentBinding 
+            viewerId="org.st.seda.rcp.view.explorer">
+          <includes>
+             <contentExtension pattern="org.eclipse.ui.navigator.resourceContent" />                  
+       <contentExtension pattern="org.eclipse.ui.navigator.resources.filters.*"/>
+             <contentExtension pattern="org.eclipse.ui.navigator.resources.linkHelper"/>
+             <contentExtension pattern="org.eclipse.ui.navigator.resources.workingSets"/>
+          </includes>
+       </viewerContentBinding>
+   </extension>
+  <extension
+        point="org.eclipse.ui.perspectives">
+     <perspective
+           class="org.st.seda.rcp.Perspective"
+           icon="icons/document.net.bw_2.16.png"
+           id="org.st.seda.rcp.perspective"
+           name="Petri Nets">
+     </perspective>
+  </extension>
+</plugin>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.st.seda.rcp.feature_2.0.0.qualifier.jar" id="org.st.seda.rcp.feature" version="2.0.0.qualifier">
+      <category name="Seda"/>
+   </feature>
+   <category-def name="Seda" label="Seda"/>
+</site>

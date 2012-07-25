@@ -195,7 +195,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     	if (introAction != null)
     		helpMenu.add(introAction);
     	helpMenu.add(getAction(ActionFactory.HELP_CONTENTS.getId()));
-    	helpMenu.add(new Separator("update"));
+        helpMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     	helpMenu.add(new GroupMarker(IWorkbenchActionConstants.HELP_END));
     	helpMenu.add(getAction(ActionFactory.ABOUT.getId()));
     }

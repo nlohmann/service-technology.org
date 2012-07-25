@@ -36,6 +36,7 @@
          </property>
       </product>
    </extension>
+   <!--
   <extension point="org.eclipse.ui.navigator.viewer">
        <viewerActionBinding
             viewerId="org.st.seda.rcp.view.explorer">
@@ -53,6 +54,7 @@
           </includes>
        </viewerContentBinding>
    </extension>
+   -->
   <extension
         point="org.eclipse.ui.perspectives">
      <perspective

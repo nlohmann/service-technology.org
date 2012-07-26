@@ -3,12 +3,18 @@
 
 <product name="Seda" id="org.st.seda.rcp.product_e4" application="org.st.seda.rcp.application" version="2.0.0.qualifier" useFeatures="true" includeLaunchers="true">
 
+   <aboutInfo>
+      <image path="/org.st.seda.rcp/icons/document.net.bw.64.png"/>
+      <text>
+         Seda - Service-Technology Editor Application
+      </text>
+   </aboutInfo>
 
    <configIni use="default">
    </configIni>
 
    <launcherArgs>
-      <programArgs>-clearPersistedState</programArgs>
+      <programArgs>-data @noDefault</programArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
@@ -16,7 +22,7 @@
 
    <splash
       location="org.st.seda.rcp" />
-   <launcher>
+   <launcher name="seda">
       <solaris/>
       <win useIco="false">
          <bmp/>
@@ -26,6 +32,7 @@
 
    <vm>
    </vm>
+
 
    <plugins>
    </plugins>
@@ -44,6 +51,23 @@
       <feature id="org.eclipse.platform"/>
       <feature id="org.eclipse.equinox.executable"/>
       <feature id="org.eclipse.help"/>
+      <feature id="hub.top.editor.ptnetLoLA.feature"/>
+      <feature id="hub.top.seda.tef"/>
+      <feature id="hub.top.pnapi"/>
+      <feature id="org.eclipse.ocl"/>
+      <feature id="org.eclipse.gef"/>
+      <feature id="org.st.seda.rcp.feature.emf"/>
+      <feature id="org.eclipse.gmf"/>
+      <feature id="org.eclipse.gmf.runtime.thirdparty"/>
+      <feature id="org.eclipse.emf.workspace"/>
+      <feature id="org.eclipse.emf.transaction"/>
+      <feature id="org.eclipse.gmf.runtime.notation"/>
+      <feature id="org.eclipse.emf.edit"/>
+      <feature id="org.eclipse.draw2d"/>
+      <feature id="org.eclipse.emf.edit.ui"/>
+      <feature id="org.eclipse.emf.validation"/>
+      <feature id="org.eclipse.emf.common.ui"/>
+      <feature id="org.eclipse.emf.ecore.edit"/>
    </features>
 
    <configurations>

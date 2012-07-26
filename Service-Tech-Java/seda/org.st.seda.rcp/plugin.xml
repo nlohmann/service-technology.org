@@ -34,6 +34,14 @@
                name="windowImages"
                value="icons/document.net.bw_2.16.png,icons/document.net.bw3.32.png,icons/document.net.bw.64.png">
          </property>
+         <property
+               name="aboutImage"
+               value="icons/document.net.bw.64.png">
+         </property>
+         <property
+               name="aboutText"
+               value="Seda - Service-Technology Editor Application">
+         </property>
       </product>
    </extension>
    <!--

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/hub.top.editor.ptnetLoLA.feature_1.2.0.qualifier.jar" id="hub.top.editor.ptnetLoLA.feature" version="1.2.0.qualifier">
+      <category name="Petri Nets"/>
+   </feature>
+   <feature url="features/org.eclipse.gef_3.8.0.201206112118.jar" id="org.eclipse.gef" version="3.8.0.201206112118">
+      <category name="Petri Nets Required Libraries"/>
+   </feature>
+   <feature url="features/org.eclipse.gmf_1.6.0.v20120517-1809-7d9X7FFYnmMJUVOKcqPSgIiK281V.jar" id="org.eclipse.gmf" version="1.6.0.v20120517-1809-7d9X7FFYnmMJUVOKcqPSgIiK281V">
+      <category name="Petri Nets Required Libraries"/>
+   </feature>
+   <feature url="features/org.eclipse.ocl_3.2.0.v20120611-1210.jar" id="org.eclipse.ocl" version="3.2.0.v20120611-1210">
+      <category name="Petri Nets Required Libraries"/>
+   </feature>
+   <feature url="features/org.st.seda.rcp.feature.emf_2.0.0.qualifier.jar" id="org.st.seda.rcp.feature.emf" version="2.0.0.qualifier">
+      <category name="Petri Nets Required Libraries"/>
+   </feature>
+   <category-def name="Petri Nets" label="Petri Nets"/>
+   <category-def name="Petri Nets Required Libraries" label="Petri Nets Required Libraries"/>
+</site>

@@ -4,7 +4,8 @@ Bundle-Name: Petri Net API
 Bundle-SymbolicName: hub.top.pnapi
 Bundle-Version: 1.0.2
 Bundle-ClassPath: pnapi.jar,
- libs-external/antlr-runtime-3.2.jar
+ libs-external/antlr-runtime-3.2.jar,
+ libs-external/lpsolve55j.jar
 Export-Package: hub.top.petrinet,
  hub.top.petrinet.util,
  org.antlr.runtime,

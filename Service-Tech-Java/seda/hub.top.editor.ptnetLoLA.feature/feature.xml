@@ -57,7 +57,7 @@ of any one of the EPL, the GPL or the LGPL.
    </license>
 
    <url>
-      <update label="Service-Technology.org Seda Update Site" url="http://download.gna.org/service-tech/seda/updatesite/"/>
+      <update label="Service-Technology.org Seda Update Site" url="http://download.gna.org/service-tech/seda/updates/"/>
    </url>
 
    <requires>

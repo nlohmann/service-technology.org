@@ -29,16 +29,16 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
    </plugins>
 
    <features>
       <feature id="org.st.seda.rcp.feature"/>
+      <feature id="org.st.seda.rcp.feature.emf"/>
+      <feature id="org.st.seda.rcp.petrinets.feature"/>
       <feature id="org.eclipse.e4.rcp"/>
       <feature id="org.eclipse.emf.ecore"/>
       <feature id="org.eclipse.emf.common"/>
@@ -51,12 +51,8 @@
       <feature id="org.eclipse.platform"/>
       <feature id="org.eclipse.equinox.executable"/>
       <feature id="org.eclipse.help"/>
-      <feature id="hub.top.editor.ptnetLoLA.feature"/>
-      <feature id="hub.top.seda.tef"/>
-      <feature id="hub.top.pnapi"/>
       <feature id="org.eclipse.ocl"/>
       <feature id="org.eclipse.gef"/>
-      <feature id="org.st.seda.rcp.feature.emf"/>
       <feature id="org.eclipse.gmf"/>
       <feature id="org.eclipse.gmf.runtime.thirdparty"/>
       <feature id="org.eclipse.emf.workspace"/>

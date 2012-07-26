@@ -5,17 +5,21 @@
       version="2.0.0.qualifier"
       provider-name="service-technology.org">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description url="http://service-technology.org/seda">
+      Seda, Service-Technology Editor Application.
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright url="http://service-technology.org/">
+      Copyright (C) 2008-2012. Dirk Fahland
    </copyright>
 
-   <license url="http://www.example.com/license">
-      [Enter License Description here.]
+   <license url="http://www.eclipse.org/legal/epl-v10.html">
+      http://www.eclipse.org/legal/epl-v10.html
    </license>
+
+   <url>
+      <update url="http://download.gna.org/service-tech/seda/updates/"/>
+   </url>
 
    <plugin
          id="org.st.seda.rcp"

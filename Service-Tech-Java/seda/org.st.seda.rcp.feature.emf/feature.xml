@@ -16,6 +16,10 @@
       http://www.eclipse.org/legal/epl-v10.html
    </license>
 
+   <url>
+      <update url="http://download.gna.org/service-tech/seda/updates/"/>
+   </url>
+
    <plugin
          id="org.eclipse.emf"
          download-size="0"

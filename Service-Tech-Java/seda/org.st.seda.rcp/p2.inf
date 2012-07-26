@@ -1,3 +1,23 @@
 instructions.configure=\
-  addRepository(type:0,location:http${#58}//www.eclipse.org/equinox/p2/testing/updateSite);\
-  addRepository(type:1,location:http${#58}//www.eclipse.org/equinox/p2/testing/updateSite);
+  addRepository(type:0,location:http${#58}//download.gna.org/service-tech/seda/updates/);\
+  addRepository(type:1,location:http${#58}//download.gna.org/service-tech/seda/updates/);\
+  addRepository(type:0,location:http${#58}//download.eclipse.org/eclipse/updates/4.2);\
+  addRepository(type:1,location:http${#58}//download.eclipse.org/eclipse/updates/4.2);\
+  addRepository(type:0,location:http${#58}//download.eclipse.org/releases/juno);\
+  addRepository(type:1,location:http${#58}//download.eclipse.org/releases/juno);\
+  addRepository(type:0,location:http${#58}//download.eclipse.org/modeling/gmp/gmf-tooling/updates/releases/);\
+  addRepository(type:1,location:http${#58}//download.eclipse.org/modeling/gmp/gmf-tooling/updates/releases/);\
+  addRepository(type:0,location:http${#58}//download.eclipse.org/tools/orbit/downloads/drops/R20120526062928/repository/);\
+  addRepository(type:1,location:http${#58}//download.eclipse.org/tools/orbit/downloads/drops/R20120526062928/repository/);
+
+requires.0.namespace = org.eclipse.equinox.p2.iu
+requires.0.name = org.st.seda.rcp.petrinets.feature.feature.group
+requires.0.range = [2.0.0, 3.0.0)
+
+requires.1.namespace = org.eclipse.equinox.p2.iu
+requires.1.name = org.st.seda.rcp.feature.emf.feature.group
+requires.1.range = [2.0.0, 3.0.0)
+
+requires.2.namespace = org.eclipse.equinox.p2.iu
+requires.2.name = org.st.seda.rcp.feature.feature.group
+requires.2.range = [2.0.0, 3.0.0)

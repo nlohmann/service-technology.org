@@ -693,7 +693,7 @@ Public License instead of this License.  But first, please read
    </license>
 
    <url>
-      <update label="Service-Technology.org Seda Update Site" url="http://download.gna.org/service-tech/seda/updatesite/"/>
+      <update label="Service-Technology.org Seda Update Site" url="http://download.gna.org/service-tech/seda/updates/"/>
       <discovery label="Textual Editing Framework Update Site" url="http://tef.berlios.de/updatesite"/>
    </url>
 

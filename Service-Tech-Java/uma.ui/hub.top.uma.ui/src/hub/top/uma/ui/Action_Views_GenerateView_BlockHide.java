@@ -39,30 +39,25 @@ package hub.top.uma.ui;
 import hub.top.editor.eclipse.ActionHelper;
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
-import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 import hub.top.petrinet.util.Complexity;
 import hub.top.petrinet.util.StructuralReduction;
-import hub.top.scenario.OcletIO;
 import hub.top.uma.DNode;
-import hub.top.uma.DNodeBP;
-import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.DNodeRefold;
+import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
 import hub.top.uma.synthesis.NetSynthesis;
 import hub.top.uma.synthesis.TransitiveDependencies;
-import hub.top.uma.view.DNodeBP_View;
 import hub.top.uma.view.ViewGeneration;
 import hub.top.uma.view.ViewGeneration2;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import com.google.gwt.dev.util.collect.HashSet;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -75,11 +70,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+
+import com.google.gwt.dev.util.collect.HashSet;
 
 public class Action_Views_GenerateView_BlockHide implements IWorkbenchWindowActionDelegate {
 
@@ -275,7 +271,7 @@ public class Action_Views_GenerateView_BlockHide implements IWorkbenchWindowActi
   
             IPath targetPath_lola = new Path(selectedFile_system.getFullPath().toString()+".view_block_hide.lola");
             IPath targetPath_dot = new Path(selectedFile_system.getFullPath().toString()+".view_block_hide.dot");
-            ActionHelper.writeFile(targetPath_lola, PetriNetIO.toLoLA(simplestNet));
+            ActionHelper.writeFile(targetPath_lola, PetriNetIO_Out.toLoLA(simplestNet));
             ActionHelper.writeFile(targetPath_dot, simplestNet.toDot());
           } catch (IOException e) {
             Activator.getPluginHelper().logError("Could not read model file: "+selectedFile_system, e);

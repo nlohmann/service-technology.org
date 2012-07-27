@@ -40,18 +40,15 @@ import hub.top.editor.eclipse.ActionHelper;
 import hub.top.petrinet.Arc;
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
-import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 import hub.top.petrinet.util.Complexity;
 import hub.top.uma.DNode;
-import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeRefold;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
-import hub.top.uma.synthesis.NetSynthesis;
-import hub.top.uma.synthesis.TransitiveDependencies;
 import hub.top.uma.view.MineSimplify;
 import hub.top.uma.view.ViewGeneration;
 import hub.top.uma.view.ViewGeneration2;
@@ -294,7 +291,7 @@ public class Action_Views_UnfoldingView_Block implements IWorkbenchWindowActionD
               ActionHelper.writeFile(targetPath_dot, simplestNet.toDot());
               
               IPath targetPath_lola = new Path(fileName_system_wsPath.toString()+".view_unfold_"+cov+".lola");
-              ActionHelper.writeFile(targetPath_lola, PetriNetIO.toLoLA(simplestNet));
+              ActionHelper.writeFile(targetPath_lola, PetriNetIO_Out.toLoLA(simplestNet));
               
               IPath targetPath_dot2 = new Path(fileName_system_wsPath.toString()+".view_unfold_"+cov+"_S.dot");
               ActionHelper.writeFile(targetPath_dot2, simplestNet_struct.toDot());

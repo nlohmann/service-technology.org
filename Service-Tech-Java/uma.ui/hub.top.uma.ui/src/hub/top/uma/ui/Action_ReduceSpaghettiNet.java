@@ -40,6 +40,7 @@ import hub.top.editor.eclipse.ActionHelper;
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeSet.DNodeSetElement;
@@ -144,7 +145,7 @@ public class Action_ReduceSpaghettiNet implements IWorkbenchWindowActionDelegate
 
           IPath targetPath_lola = new Path(selectedFile_system.getFullPath().toString()+".view_block.lola");
           IPath targetPath_dot = new Path(selectedFile_system.getFullPath().toString()+".view_block.dot");
-          ActionHelper.writeFile(targetPath_lola, PetriNetIO.toLoLA(net));
+          ActionHelper.writeFile(targetPath_lola, PetriNetIO_Out.toLoLA(net));
           ActionHelper.writeFile(targetPath_dot, net.toDot());
 
           monitor.done();

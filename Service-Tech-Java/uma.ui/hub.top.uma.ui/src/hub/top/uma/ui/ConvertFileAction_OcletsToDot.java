@@ -36,10 +36,9 @@
 package hub.top.uma.ui;
 
 import hub.top.editor.eclipse.ActionHelper;
-import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.petrinet.PetriNet;
-import hub.top.petrinet.PetriNetIO;
 import hub.top.scenario.OcletIO;
+import hub.top.scenario.OcletIO_Out;
 import hub.top.scenario.OcletSpecification;
 
 import java.io.IOException;
@@ -48,7 +47,6 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -90,7 +88,7 @@ public class ConvertFileAction_OcletsToDot implements IWorkbenchWindowActionDele
       PetriNet net = OcletIO.readNetFromFile(fileName);
       if (selectedFile_system.getFileExtension().equals("oclets")) {
         OcletSpecification os = new OcletSpecification(net);
-        ActionHelper.writeFile(targetPath, OcletIO.toDot(os));
+        ActionHelper.writeFile(targetPath, OcletIO_Out.toDot(os));
         
       } else {
         ActionHelper.writeFile(targetPath, net.toDot());

@@ -39,9 +39,8 @@ package hub.top.uma.ui;
 import hub.top.editor.eclipse.ActionHelper;
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
-import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.uma.DNode;
-import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeRefold;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
@@ -144,7 +143,7 @@ public class Action_SynthesizeNet implements IWorkbenchWindowActionDelegate {
             else out.print("\ndone ");
           }
 
-          out.println(build.getStatistics());
+          out.println(build.getStatistics(false));
           out.println("finished after "+analysisTime+"ms");
           
           monitor.subTask("generating labeled Petri net");
@@ -156,7 +155,7 @@ public class Action_SynthesizeNet implements IWorkbenchWindowActionDelegate {
           IPath targetPath_lola = new Path(targetPathStr+".syn.lola");
           IPath targetPath_dot = new Path(targetPathStr+".syn_rendered.dot");
 
-          ActionHelper.writeFile(targetPath_lola, PetriNetIO.toLoLA(net));
+          ActionHelper.writeFile(targetPath_lola, PetriNetIO_Out.toLoLA(net));
           ActionHelper.writeFile(targetPath_dot, net.toDot());
 
           monitor.done();

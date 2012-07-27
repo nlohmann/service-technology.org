@@ -39,7 +39,7 @@ package hub.top.uma.ui;
 import hub.top.editor.eclipse.ActionHelper;
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
-import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 import hub.top.petrinet.util.Complexity;
@@ -51,17 +51,13 @@ import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
 import hub.top.uma.synthesis.NetSynthesis;
 import hub.top.uma.synthesis.TransitiveDependencies;
-import hub.top.uma.view.ViewGeneration;
 import hub.top.uma.view.ViewGeneration2;
 import hub.top.uma.view.ViewGeneration3;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import com.google.gwt.dev.util.collect.HashSet;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -71,7 +67,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -81,6 +76,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+
+import com.google.gwt.dev.util.collect.HashSet;
 
 public class Action_Views_UnfoldingView_Modular implements IWorkbenchWindowActionDelegate {
 
@@ -417,7 +414,7 @@ public class Action_Views_UnfoldingView_Modular implements IWorkbenchWindowActio
     ActionHelper.writeFile(targetPath_dot2, net.toDot(colorMap2));
     
     IPath targetPath_lola = new Path(sourceFileName+".view_unfold.lola");
-    ActionHelper.writeFile(targetPath_lola, PetriNetIO.toLoLA(net));
+    ActionHelper.writeFile(targetPath_lola, PetriNetIO_Out.toLoLA(net));
 	}
 	
 	private static int validateNet(PetriNet net, LinkedList<String[]> traces) {

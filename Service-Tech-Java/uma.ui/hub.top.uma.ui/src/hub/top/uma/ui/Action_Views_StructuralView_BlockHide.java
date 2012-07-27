@@ -39,7 +39,7 @@ package hub.top.uma.ui;
 import hub.top.editor.eclipse.ActionHelper;
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
-import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.petrinet.Transition;
 import hub.top.petrinet.util.Complexity;
 import hub.top.petrinet.util.StructuralReduction;
@@ -249,7 +249,7 @@ public class Action_Views_StructuralView_BlockHide implements IWorkbenchWindowAc
             if (simplestNet != null) {
               IPath targetPath_lola = new Path(selectedFile_system.getFullPath().toString()+".view_struct.lola");
               IPath targetPath_dot = new Path(selectedFile_system.getFullPath().toString()+".view_struct.dot");
-              ActionHelper.writeFile(targetPath_lola, PetriNetIO.toLoLA(simplestNet));
+              ActionHelper.writeFile(targetPath_lola, PetriNetIO_Out.toLoLA(simplestNet));
               ActionHelper.writeFile(targetPath_dot, simplestNet.toDot());
             }
           } catch (InvalidModelException e) {

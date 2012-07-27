@@ -49,7 +49,7 @@ import hub.top.uma.Uma;
 import hub.top.uma.synthesis.NetSynthesis;
 import hub.top.uma.view.DNodeBP_View;
 import hub.top.uma.view.Precision;
-import hub.top.uma.view.Precision2;
+import hub.top.uma.view.Precision_ETC;
 import hub.top.uma.view.ViewGeneration;
 import hub.top.uma.view.ViewGeneration2;
 import hub.top.uma.view.ViewGeneration3;
@@ -141,7 +141,7 @@ public class Action_ComputePrecision implements IWorkbenchWindowActionDelegate {
           DNodeBP build = Uma.initBuildPrefix_View(sys, 0);
           
           Precision precision = new Precision(build);
-          Precision2 precision2 = new Precision2(net);
+          Precision_ETC precision2 = new Precision_ETC(net);
           
           int failed = 0;
           int traceNum = 0;

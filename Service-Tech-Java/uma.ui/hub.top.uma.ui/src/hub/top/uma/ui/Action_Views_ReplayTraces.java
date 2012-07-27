@@ -144,14 +144,16 @@ public class Action_Views_ReplayTraces implements IWorkbenchWindowActionDelegate
               failed++;
             }
             traceNum++;
+            monitor.worked(1);
             monitor.subTask("failed for: "+failed);
           }
           
           if (failed > 0) {
             final int failInfo = failed;
+            final int traceNumInfo = traceNum;
             Display.getDefault().syncExec(new Runnable() {
               public void run() {         
-                MessageDialog.openError(null, "Validate traces", "Could not execute "+failInfo+" traces.");
+                MessageDialog.openError(null, "Validate traces", "Could not execute "+failInfo+"/"+traceNumInfo+" traces.");
               }
             });
           } else {

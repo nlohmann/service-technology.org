@@ -37,24 +37,17 @@
 package hub.top.uma.ui;
 
 import hub.top.editor.eclipse.ActionHelper;
-import hub.top.petrinet.Arc;
 import hub.top.petrinet.PetriNet;
-import hub.top.petrinet.PetriNetIO;
-import hub.top.petrinet.Place;
-import hub.top.petrinet.Transition;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.uma.DNode;
-import hub.top.uma.DNodeRefold;
-import hub.top.uma.DotColors;
 import hub.top.uma.InvalidModelException;
+import hub.top.uma.Uma;
 import hub.top.uma.view.MineSimplify;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -111,17 +104,19 @@ public class Action_Views_Simplify implements IWorkbenchWindowActionDelegate {
           simplify.prepareModel();
           simplify.run();
           PetriNet simplifiedNet = simplify.getSimplifiedNet();
+          
+          Uma.out.println(simplify.result.toString());
             
           if (simplifiedNet != null) {
             
             IPath targetPath_dot = new Path(fileName_system_wsPath.toString()+".simplified.dot");
-            ActionHelper.writeFile(targetPath_dot, simplifiedNet.toDot(simplify._debug_weakImpliedPlaces));
+            ActionHelper.writeFile(targetPath_dot, simplifiedNet.toDot(simplify.debug._weakImpliedPlaces));
             
             IPath targetPath_lola = new Path(fileName_system_wsPath.toString()+".simplified.lola");
-            ActionHelper.writeFile(targetPath_lola, PetriNetIO.toLoLA(simplifiedNet));
+            ActionHelper.writeFile(targetPath_lola, PetriNetIO_Out.toLoLA(simplifiedNet));
             
             IPath targetPath_result = new Path(fileName_system_wsPath.toString()+".simplified.result.txt");
-            ActionHelper.writeFile(targetPath_result, simplify.generateResultsFile());
+            ActionHelper.writeFile(targetPath_result, simplify.result.toString());
             
             List<DNode> nodes = new LinkedList<DNode>(simplify.getBuild().getBranchingProcess().allConditions);
             for (DNode b : nodes) {
@@ -134,7 +129,7 @@ public class Action_Views_Simplify implements IWorkbenchWindowActionDelegate {
             
             IPath targetPath_bp_dot = new Path(fileName_system_wsPath.toString()+".simplify_bp.dot");
             //ActionHelper.writeFile(targetPath_bp_dot, simplify.getBuild().toDot(simplify._getColoringImplied()));
-            ActionHelper.writeFile(targetPath_bp_dot, simplify.getBuild().toDot(simplify._debug_weakImpliedConditions));
+            ActionHelper.writeFile(targetPath_bp_dot, simplify.getBuild().toDot(simplify.debug._weakImpliedConditions));
           }
 
         } catch (InvalidModelException e) {

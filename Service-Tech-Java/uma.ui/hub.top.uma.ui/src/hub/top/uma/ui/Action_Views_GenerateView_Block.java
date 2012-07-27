@@ -39,21 +39,15 @@ package hub.top.uma.ui;
 import hub.top.editor.eclipse.ActionHelper;
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
-import hub.top.petrinet.PetriNetIO;
+import hub.top.petrinet.PetriNetIO_Out;
 import hub.top.uma.DNode;
-import hub.top.uma.DNodeBP;
-import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.DNodeRefold;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
-import hub.top.uma.synthesis.NetSynthesis;
-import hub.top.uma.view.DNodeBP_View;
 import hub.top.uma.view.ViewGeneration2;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -143,7 +137,7 @@ public class Action_Views_GenerateView_Block implements IWorkbenchWindowActionDe
 
           IPath targetPath_lola = new Path(selectedFile_system.getFullPath().toString()+".view_block.lola");
           IPath targetPath_dot = new Path(selectedFile_system.getFullPath().toString()+".view_block.dot");
-          ActionHelper.writeFile(targetPath_lola, PetriNetIO.toLoLA(net));
+          ActionHelper.writeFile(targetPath_lola, PetriNetIO_Out.toLoLA(net));
           ActionHelper.writeFile(targetPath_dot, net.toDot());
 
           monitor.done();

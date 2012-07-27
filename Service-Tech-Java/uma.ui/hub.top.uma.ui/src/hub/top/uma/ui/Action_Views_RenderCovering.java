@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
@@ -148,7 +149,7 @@ public class Action_Views_RenderCovering implements IWorkbenchWindowActionDelega
             build.futureEquivalence();
             
             ViewGeneration2 viewGen = new ViewGeneration2(build);
-            HashMap<DNode, Float> cover = viewGen.calculateCovering(traces);
+            Map<DNode, Float> cover = viewGen.calculateCovering(traces);
             
             HashMap<DNode, String> colorMap = new HashMap<DNode, String>();
             for (Entry<DNode, Float> coverVal : cover.entrySet()) {

@@ -170,7 +170,7 @@ public class Action_BuildPrefix implements IWorkbenchWindowActionDelegate {
             else out.print("\ndone ");
           }
 
-          out.println(build.getStatistics());
+          out.println(build.getStatistics(false));
           out.println("finished after "+analysisTime+"ms");
           //build.analyze(monitor, System.out);
           

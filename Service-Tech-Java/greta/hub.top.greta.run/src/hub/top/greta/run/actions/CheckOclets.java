@@ -54,6 +54,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -68,45 +70,32 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
 
-public class CheckOclets extends Action implements
-		IWorkbenchWindowActionDelegate,IObjectActionDelegate {
+public class CheckOclets extends SelectionAwareCommandHandler {
+	
+	public static String ID = "hub.top.GRETA.run.commands.checkOclets";
+	
+	@Override
+	protected String getID() {
+		return ID;
+	}
 
-	protected IWorkbenchWindow workbenchWindow;
 	protected AdaptiveSystemDiagramEditor adaptiveSystemDiagramEditor;
 	protected AdaptiveSystem adaptiveSystem;
 	
 	protected EMap<Node, Boolean> cycleCheckMap = new BasicEMap<Node, Boolean>();
 		
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		//do nothing
-		
-	}
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-	
-	public void dispose() {
-		//do nothing
-	}
-
-	public void init(IWorkbenchWindow window) {
-		workbenchWindow = window;	
-	}
-
-	public void run(IAction action) {
-		if(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor 
-				&& action.getId().equals("hub.top.GRETA.run.checkOclets")) {
+		if(getWorkbenchWindow().getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor) {
 			//System.out.println("Check wellformedness of oclets : START run() ");
-			adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) workbenchWindow.getActivePage().getActiveEditor();
+			adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) getWorkbenchWindow().getActivePage().getActiveEditor();
 			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
 			EList<Oclet> ocletList = adaptiveSystem.getOclets();
 					
@@ -232,55 +221,21 @@ public class CheckOclets extends Action implements
 		  else {
 			action.setEnabled(false);
 		}*/
+		
+		return null;
 	}
 
-	/**
-	 * track selections in editor and reset button proofWellformednessOfOclets if an oclets preNet could be changed
-	 * 
-	 * @author Manja Wolf
-	 */
-	public void selectionChanged(IAction action, ISelection selection) {
-		if(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor 
-				&& action.getId().equals("hub.top.GRETA.run.checkOclets")) {
-			
-		  /*
-			adaptiveSystemDiagramEditor = (AdaptiveSystemDiagramEditor) workbenchWindow.getActivePage().getActiveEditor();
-			adaptiveSystem = (AdaptiveSystem) adaptiveSystemDiagramEditor.getDiagram().getElement();
-			
-			if(adaptiveSystem.isSetWellformednessToOclets() )
-			{
-				//if SetWellformdnessToOclets is true and action is enabled, than was restart of editor and initial values should be set
-				//(action disabled) ==> synchronize setWellformednessToOclets with action.isEnabled()
-				if(action.isEnabled()) {
-					//System.out.println("ap: " + adaptiveSystem.getOclets() + " initial ap.true und action.enabled.");
-					action.setEnabled(false);
-					return;
-				}
-			} //END if isSetWellformedToOClets
-			else
-			     */ 
-			{
-				if(!action.isEnabled()) {
-					//System.out.println("ap: " + adaptiveSystem.getOclets() + "initial ap.false und action.disabled.");
-					action.setEnabled(true);
-				}
-			}
-
-		  
-		} else if ((!(workbenchWindow.getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor)
-				|| !action.getId().equals("hub.top.GRETA.run.checkOclets"))
-				&& action.isEnabled()) {
-			/*
-			Shell shell = new Shell();
-			MessageDialog.openInformation(
-				shell,
-				"AdaptiveSystem - check wellformedness of oclets selctionChanged()",
-				"This button is only enabled for *.adaptiveSystem_diagram files.");
-			*/
-			action.setEnabled(false);
+	
+	@Override
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+		if(getWorkbenchWindow().getActivePage().getActiveEditor() instanceof AdaptiveSystemDiagramEditor
+				&& !this.isEnabled())
+		{
+			this.setBaseEnabled(true);
+		} else {
+			this.setBaseEnabled(false);
 		}
 	}
-	
 	
 	
 	
@@ -522,5 +477,6 @@ public class CheckOclets extends Action implements
 		
 		return false;
 	}
+
 	
 }

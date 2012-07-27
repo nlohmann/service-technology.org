@@ -35,34 +35,25 @@
 
 package hub.top.greta.simulation;
 
-import java.util.HashMap;
-import java.util.List;
-
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
-import hub.top.editor.ptnetLoLA.util.PtnetLoLAValidator;
 import hub.top.greta.cpn.AdaptiveSystemToCPN;
 import hub.top.greta.run.Activator;
 import hub.top.greta.run.actions.ActionHelper;
+import hub.top.greta.run.actions.SelectionAwareCommandHandler;
 import hub.top.greta.validation.ModelError;
 
-import org.cpntools.accesscpn.engine.Simulator;
-import org.cpntools.accesscpn.engine.SimulatorService;
-import org.cpntools.accesscpn.engine.highlevel.HighLevelSimulator;
-import org.cpntools.accesscpn.model.util.BuildCPNUtil;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.emf.ecore.xmi.XMLResource;
-import org.eclipse.gmf.runtime.common.ui.resources.IBookmark;
-import org.eclipse.gmf.runtime.notation.Diagram;
-import org.eclipse.gmf.runtime.notation.View;
-import org.eclipse.jface.action.IAction;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.menus.UIElement;
 
 /**
  * Action that controls the simulation mode of the {@link AdaptiveSystemDiagramEditor}.
@@ -73,34 +64,38 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
  * @author Dirk Fahland
  *
  */
-public class StartAction implements
-		IWorkbenchWindowActionDelegate {
+public class StartAction extends SelectionAwareCommandHandler {
 
-	public static final String ID = "hub.top.GRETA.run.simulation";
+	public static final String ID = "hub.top.GRETA.run.commands.simulation";
 	
-	private IWorkbenchWindow window;
+	@Override
+	protected String getID() {
+		return ID;
+	}
+	
 	private AdaptiveProcessSimulationView simView = new AdaptiveProcessSimulationView();
 
 	private boolean startSim;
+	
+	public StartAction() {
+		super();
+		this.startSim = true;
+		setBaseEnabled(false);
+	}
 
 	public void dispose() {
 		// do nothing
 	}
 
-	public void init(IWorkbenchWindow window) {
-		this.window = window;
-		this.startSim = true;
-	}
 
-	public void run(IAction action) {
-		if (!action.getId().equals(StartAction.ID))
-			return;
-		
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+
 		if (startSim) {
 			
 			startSimulation();
-			switchToStop(action);
-			return;
+			switchToStop();
+			return null;
 
 			/*
 			InitProcessSimulationView.initializeProcessViewDiagram(
@@ -113,87 +108,93 @@ public class StartAction implements
 		} else if (isValidConfigOf(simView.adaptiveSystem)) {
 			
 			stopSimulation(/*doReset*/ true);
-			switchToPlay(action);
+			switchToPlay();
 			
 		} else if (isSimuluationRunning()) {
-			MessageBox m = new MessageBox(window.getShell(), (SWT.YES|SWT.NO));
+			MessageBox m = new MessageBox(getWorkbenchWindow().getShell(), (SWT.YES|SWT.NO));
 			m.setText("Abort current simulation?");
 			m.setMessage("There is currently an active simulation. Stop " +
 					"this simulation?");
 			if (m.open() == SWT.NO) {
-				return;
+				return null;
 			} else {
 				
 				stopSimulation(/*doReset*/ false);
-				switchToPlay(action);
-				return;
+				switchToPlay();
+				return null;
 			}
 		}
+		return null;
 	}
 
-	public void selectionChanged(IAction action, ISelection selection) {
-		if (!action.getId().equals(StartAction.ID))
-			return;
-		
-		simView.setProcessViewEditor_andFields(window.getActivePage().getActiveEditor());
+	@Override
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+
+		simView.setProcessViewEditor_andFields(getWorkbenchWindow().getActivePage().getActiveEditor());
 		if (simView.processViewEditor == null) {
-			if (startSim && action.isEnabled())
+			if (startSim && isEnabled())
 				// cannot start simulation on an invalid view,
-				// but stopping is possible 
-				action.setEnabled(false);
+				// but stopping is possible
+				setBaseEnabled(false);
 		} else {
-		  
-		  if (simView.adaptiveSystem.isSetWellformednessToOclets()) {
-	      if (!action.isEnabled())
-	        action.setEnabled(true);
-		  } else if (startSim && action.isEnabled()) {
-        // cannot start simulation on invalid model
-        action.setEnabled(false);
-		  }
+			
+			if (simView.adaptiveSystem.isSetWellformednessToOclets()) {
+				if (!isEnabled())
+					setBaseEnabled(true);
+			} else if (startSim && isEnabled()) {
+				// cannot start simulation on invalid model
+				setBaseEnabled(false);
+			}
 		}
+		
+		//requestRefresh();
+	}
+	
+	private String ui_text = "start simulation";
+	private String ui_toolTip = "start simulation";
+	private ImageDescriptor ui_img_enabled = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/full/etool16/run_exc.gif");
+	private ImageDescriptor ui_img_disabled = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/full/dtool16/run_exc.gif");
+	
+	@Override
+	public void updateElement(UIElement element, @SuppressWarnings("rawtypes") Map parameters) {
+		element.setIcon(ui_img_enabled);
+		element.setDisabledIcon(ui_img_disabled);
+		element.setText(null);
+		element.setTooltip(ui_toolTip);
+		System.out.println("set");
 	}
 
 	/**
 	 * Switch action to "start simulation" by changing icons, texts, ...
 	 * @param action
 	 */
-	private void switchToPlay (IAction action) {
-		ImageDescriptor img = Activator.imageDescriptorFromPlugin(
-				Activator.PLUGIN_ID, "icons/full/etool16/run_exc.gif");
-		action.setImageDescriptor(img);
-		
-		img = Activator.imageDescriptorFromPlugin(
-				Activator.PLUGIN_ID, "icons/full/dtool16/run_exc.gif");
-		action.setDisabledImageDescriptor(img);
-
-		action.setText("start simulation");
-		action.setToolTipText("start simulation of adaptive process");
+	private void switchToPlay () {
+		ui_img_enabled = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/full/etool16/run_exc.gif");
+		ui_img_disabled = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/full/dtool16/run_exc.gif");
+		ui_text = "start simulation";
+		ui_toolTip = "start simulation";
 		
 		startSim = true;
 		
 		if (simView.processViewEditor == null) {
 			// disable action if not in the right context
-			action.setEnabled(false);
+			setBaseEnabled(false);
 		}
+		requestRefresh();
 	}
 
 	/**
 	 * Switch action to "stop simulation" by changing icons, texts, ...
 	 * @param action
 	 */
-	private void switchToStop (IAction action) {
-		ImageDescriptor img = Activator.imageDescriptorFromPlugin(
-				Activator.PLUGIN_ID, "icons/full/elcl16/terminate_co.gif");
-		action.setImageDescriptor(img);
-		
-		img = Activator.imageDescriptorFromPlugin(
-				Activator.PLUGIN_ID, "icons/full/dlcl16/terminate_co.gif");
-		action.setDisabledImageDescriptor(img);
-		
-		action.setText("stop simulation");
-		action.setToolTipText("stop simulation of adaptive process");
+	private void switchToStop () {
+		ui_img_enabled = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/full/elcl16/terminate_co.gif");
+		ui_img_disabled = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/full/dlcl16/terminate_co.gif");
+		ui_text = "stop simulation";
+		ui_toolTip = "stop simulation";
 		
 		startSim = false;
+		requestRefresh();
 	}
 	
 	/**
@@ -225,7 +226,7 @@ public class StartAction implements
 	private void stopSimulation (boolean doReset) {
 		
 		if (doReset)
-			ResetAction.resetSimulation(window.getShell(), simView);
+			ResetAction.resetSimulation(getWorkbenchWindow().getShell(), simView);
 		
 		cancelCurrentRun();
 		
@@ -300,5 +301,7 @@ public class StartAction implements
 		
 		return simulationConfiguration;
 	}
+
+
 
 }

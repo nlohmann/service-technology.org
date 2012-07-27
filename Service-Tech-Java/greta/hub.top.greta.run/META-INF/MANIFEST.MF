@@ -23,7 +23,8 @@ Require-Bundle: org.eclipse.ui,
  org.cpntools.accesscpn.engine.highlevel;bundle-version="2.0.2",
  org.cpntools.accesscpn.model;bundle-version="2.0.2",
  org.cpntools.accesscpn.model.exporter;bundle-version="2.0.2",
- org.cpntools.accesscpn.model.importer;bundle-version="2.0.2"
+ org.cpntools.accesscpn.model.importer;bundle-version="2.0.2",
+ org.eclipse.core.expressions;bundle-version="3.4.400"
 Bundle-ActivationPolicy: lazy
 Import-Package: hub.top.adaptiveSystem,
  hub.top.adaptiveSystem.diagram.edit.commands,

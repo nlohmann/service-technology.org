@@ -2,7 +2,7 @@
 <feature
       id="hub.top.pnapi"
       label="Petri Net API/Java"
-      version="1.0.2"
+      version="1.0.3"
       provider-name="service-technology.org">
 
    <description url="http://www.service-technology.org/">

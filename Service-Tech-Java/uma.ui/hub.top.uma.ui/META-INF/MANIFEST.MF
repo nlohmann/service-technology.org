@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Uma Eclipse UI
 Bundle-SymbolicName: hub.top.uma.ui;singleton:=true
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 1.3.1.qualifier
 Bundle-Activator: hub.top.uma.ui.Activator
 Bundle-Vendor: service-technology.org
 Require-Bundle: org.eclipse.ui,

@@ -21,3 +21,7 @@ requires.1.range = [2.0.0, 3.0.0)
 requires.2.namespace = org.eclipse.equinox.p2.iu
 requires.2.name = org.st.seda.rcp.feature.feature.group
 requires.2.range = [2.0.0, 3.0.0)
+
+requires.2.namespace = org.eclipse.equinox.p2.iu
+requires.2.name = org.st.seda.extensions.feature.feature.group
+requires.2.range = [2.0.0, 3.0.0)

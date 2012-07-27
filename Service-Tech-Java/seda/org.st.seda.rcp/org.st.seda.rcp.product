@@ -39,6 +39,7 @@
       <feature id="org.st.seda.rcp.feature"/>
       <feature id="org.st.seda.rcp.feature.emf"/>
       <feature id="org.st.seda.rcp.petrinets.feature"/>
+      <feature id="org.st.seda.rcp.extensions.feature"/>
       <feature id="org.eclipse.e4.rcp"/>
       <feature id="org.eclipse.emf.ecore"/>
       <feature id="org.eclipse.emf.common"/>

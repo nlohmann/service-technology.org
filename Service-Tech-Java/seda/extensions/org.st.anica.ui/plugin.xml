@@ -28,6 +28,7 @@
             <command
                   commandId="hub.top.editor.commands.checkConfidentiality"
                   id="hub.top.editor.menus.checkConfidentiality"
+                  label="Check Confidentiality"
                   mnemonic="C">
             </command>
          </menu>
@@ -39,6 +40,7 @@
             <command
                   commandId="hub.top.editor.commands.checkConfidentiality"
                   id="hub.top.editor.toolbars.checkConfidentiality"
+                  label="Check Confidentiality"
                   tooltip="check confidentiality">
             </command>
          </toolbar>

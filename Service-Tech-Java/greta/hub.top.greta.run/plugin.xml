@@ -24,6 +24,22 @@
                   style="push"
                   tooltip="start simulation">
             </command>
+            <command
+                  commandId="hub.top.GRETA.run.commands.simulationStep"
+                  disabledIcon="icons/full/dlcl16/resume_co.gif"
+                  icon="icons/full/elcl16/resume_co.gif"
+                  label="step in simulation"
+                  style="push"
+                  tooltip="execute one step in simulation">
+            </command>
+            <command
+                  commandId="hub.top.GRETA.run.commands.simulationReset"
+                  disabledIcon="icons/full/dlcl16/refresh.gif"
+                  icon="icons/full/elcl16/refresh.gif"
+                  label="reset current run"
+                  style="push"
+                  tooltip="reset current run to initial state">
+            </command>
             <separator
                   name="analysis"
                   visible="true">
@@ -61,6 +77,20 @@
                   style="push"
                   tooltip="start simulation">
             </command>
+            <command
+                  commandId="hub.top.GRETA.run.commands.simulationStep"
+                  disabledIcon="icons/full/dlcl16/resume_co.gif"
+                  icon="icons/full/elcl16/resume_co.gif"
+                  style="push"
+                  tooltip="execute one step in simulation">
+            </command>
+            <command
+                  commandId="hub.top.GRETA.run.commands.simulationReset"
+                  disabledIcon="icons/full/dlcl16/refresh.gif"
+                  icon="icons/full/elcl16/refresh.gif"
+                  style="push"
+                  tooltip="reset current run to initial state">
+            </command>
             <separator
                   name="analysis"
                   visible="true">
@@ -79,22 +109,6 @@
    <extension
          point="org.eclipse.ui.actionSets">
 
-      <!-- actions for controlling the simulation in the graphical interface -->
-      <actionSet
-            id="hub.top.GRETA.simulation.SimulationControlActions"
-            label="Simulation Control Actions"
-            visible="true">
-         <action
-               class="hub.top.greta.simulation.StartAction"
-               disabledIcon="icons/full/dtool16/run_exc.gif"
-               icon="icons/full/etool16/run_exc.gif"
-               id="hub.top.GRETA.run.simulation"
-               label="start simulation"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/simulation"
-               style="push"
-               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
-               tooltip="start simulation of adaptive process">
-         </action>
          <!-- feature currently broken TODO: repair simulation code
          <action
                class="hub.top.greta.simulation.SimulationInt_OcletAction"
@@ -108,18 +122,6 @@
                tooltip="extend by all enabled oclets">
          </action>
           -->
-         <action
-               class="hub.top.greta.simulation.SimulationInt_EventAction2"
-               disabledIcon="icons/full/dlcl16/resume_co.gif"
-               icon="icons/full/elcl16/resume_co.gif"
-               id="hub.top.GRETA.run.processD"
-               label="fire single event"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/simulation"
-               state="false"
-               style="push"
-               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
-               tooltip="fire single event">
-         </action>
          <!--
          <action
                class="hub.top.greta.simulation.SimulationInt_EventAction"
@@ -134,30 +136,6 @@
                tooltip="fire single event">
          </action>
            -->
-         <action
-               class="hub.top.greta.simulation.ResetAction"
-               disabledIcon="icons/full/dlcl16/refresh.gif"
-               icon="icons/full/elcl16/refresh.gif"
-               id="hub.top.GRETA.run.reset"
-               label="reset current run"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/simulation"
-               state="false"
-               style="push"
-               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
-               tooltip="reset current run">
-         </action>
-         <action
-               class="hub.top.greta.run.actions.CheckOclets"
-               disabledIcon="icons/wellformedOcletsOK4.png"
-               icon="icons/wellformedOcletsFrage1.png"
-               id="hub.top.GRETA.run.checkOclets"
-               label="check wellformedness of oclets"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/simulation"
-               style="push"
-               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
-               tooltip="check wellformedness of oclets">
-         </action>
-      </actionSet>
       
       <!-- actions for analyzing an adaptive system -->
       <actionSet
@@ -428,10 +406,20 @@
             id="hub.top.GRETA.run.commands.checkOclets"
             name="check oclets">
       </command>
-            <command
+      <command
       		categoryId="hub.top.GRETA.run.commands.category"
             id="hub.top.GRETA.run.commands.simulation"
             name="start simulation">
+      </command>
+      <command
+      		categoryId="hub.top.GRETA.run.commands.category"
+            id="hub.top.GRETA.run.commands.simulationStep"
+            name="execute one step in simulation">
+      </command>
+      <command
+      		categoryId="hub.top.GRETA.run.commands.category"
+            id="hub.top.GRETA.run.commands.simulationReset"
+            name="reset current run">
       </command>
    </extension>
    <extension
@@ -440,11 +428,20 @@
             class="hub.top.greta.run.actions.CheckOclets"
             commandId="hub.top.GRETA.run.commands.checkOclets">
       </handler>
-            <handler
+      <handler
             class="hub.top.greta.simulation.StartAction"
             commandId="hub.top.GRETA.run.commands.simulation">
       </handler>
+      <handler
+            class="hub.top.greta.simulation.SimulationInt_EventAction2"
+            commandId="hub.top.GRETA.run.commands.simulationStep">
+      </handler>
+      <handler
+            class="hub.top.greta.simulation.ResetAction"
+            commandId="hub.top.GRETA.run.commands.simulationReset">
+      </handler>
    </extension>
+   <!--
    <extension
          point="org.eclipse.ui.bindings">
       <key
@@ -454,6 +451,7 @@
             sequence="M1+6">
       </key>
    </extension>
+   -->
    <extension
          point="org.eclipse.ui.startup">
       <startup

@@ -38,68 +38,66 @@ package hub.top.greta.simulation;
 
 
 import hub.top.greta.cpn.AdaptiveSystemToCPN;
+import hub.top.greta.run.actions.SelectionAwareCommandHandler;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-public class ResetAction implements IWorkbenchWindowActionDelegate {
+public class ResetAction extends SelectionAwareCommandHandler {
 
 	public static final String ID = "hub.top.GRETA.run.reset";
-	protected IWorkbenchWindow workbenchWindow;
+	
+	@Override
+	protected String getID() {
+	  return ID;
+	}
 	
 	private AdaptiveProcessSimulationView simView = new AdaptiveProcessSimulationView();
-	
-	public void dispose() {
-		// do nothing
-	}
 
-	public void init(IWorkbenchWindow window) {
-		workbenchWindow = window;
-	}
-
-	public void run(IAction action) {
-		if (!action.getId().equals(ResetAction.ID))
-			return;
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if (simView.processViewEditor == null)
-			return;
+			return null;
 		
-		resetSimulation(workbenchWindow.getShell(), simView);
+		resetSimulation(getWorkbenchWindow().getShell(), simView);
+		return null;
 	}
 
-	public void selectionChanged(IAction action, ISelection selection) {
+	@Override
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		boolean validContext = true;
 
-		if (!action.getId().equals(ResetAction.ID))
-			validContext = false;
-		
 		// set and check whether the current editor can handle this action
-		simView.setProcessViewEditor_andFields(workbenchWindow.getActivePage().getActiveEditor());
+		simView.setProcessViewEditor_andFields(getWorkbenchWindow().getActivePage().getActiveEditor());
 		if (simView.processViewEditor == null)
 			validContext = false;
 		
 		if (validContext)
 		{
 			if (StartAction.isValidConfigOf(simView.adaptiveSystem)) {
-				if (!action.isEnabled()) {
+				if (!isEnabled()) {
 					// we have a running simulation,
 					// looking at the right simulation view
-					action.setEnabled(true);
+					setBaseEnabled(true);
 					return;
 				}
 			} else {
 				// no simulation running
-				if (action.isEnabled()) {
-					action.setEnabled(false);
+				if (isEnabled()) {
+					setBaseEnabled(false);
 				}
 			}
 		} else {
 			// invalid context
-			if (action.isEnabled()) {
-				action.setEnabled(false);
+			if (isEnabled()) {
+				setBaseEnabled(false);
 			}
 		}
 	}

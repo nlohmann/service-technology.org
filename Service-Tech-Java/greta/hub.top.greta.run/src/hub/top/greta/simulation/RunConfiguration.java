@@ -42,6 +42,7 @@ import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.greta.cpn.AdaptiveSystemToCPN;
+import hub.top.greta.validation.ModelError;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -53,6 +54,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.CanonicalConnectionEditPolicy;
 import org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts.DiagramDocumentEditor;
+import org.eclipse.ui.internal.Model;
 
 /**
  * Stores and handles the states of the {@link AdaptiveProcess} during simulation.
@@ -203,25 +205,21 @@ public class RunConfiguration {
 			return false;
 	}
 	
-  public void createNewBridgeToCPN(AdaptiveSystem adaptiveSystem) {
-    try {
-      if (a2c != null) a2c.destroy();
-      
-      a2c = new AdaptiveSystemToCPN(adaptiveSystem);
-      // now read from the underlying .cpn file
-      //a2c.loadFunctionDefinitions(adaptiveSystem);
-      a2c.loadPlaceTypes(adaptiveSystem);
-      a2c.declareVariables(adaptiveSystem);
-      a2c.buildDependencies(adaptiveSystem);
-      
-      a2c.convertInitialRunToMarking(adaptiveSystem);
-      a2c.convertEventsToTransitions(adaptiveSystem);
-      a2c.check();
-      a2c.exportNet();
-    } catch (Exception e) {
-      System.err.println(e);
-      e.printStackTrace();
-    }
+  public void createNewBridgeToCPN(AdaptiveSystem adaptiveSystem) throws Exception {
+    if (a2c != null) a2c.destroy();
+    
+    a2c = new AdaptiveSystemToCPN(adaptiveSystem);
+    // now read from the underlying .cpn file
+    //a2c.loadFunctionDefinitions(adaptiveSystem);
+    a2c.loadPlaceTypes(adaptiveSystem);
+    a2c.declareVariables(adaptiveSystem);
+    a2c.buildDependencies(adaptiveSystem);
+    
+    a2c.convertInitialRunToMarking(adaptiveSystem);
+    a2c.convertEventsToTransitions(adaptiveSystem);
+    a2c.check();
+    
+    a2c.exportNet();
   }
   
   public void terminateBridgeToCPN() {

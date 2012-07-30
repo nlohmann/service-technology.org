@@ -52,7 +52,10 @@ import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Oclet;
 import hub.top.adaptiveSystem.Temp;
 import hub.top.adaptiveSystem.diagram.edit.parts.EventAPEditPart;
+import hub.top.greta.run.actions.SelectionAwareCommandHandler;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CommandStack;
 import org.eclipse.emf.common.command.CompoundCommand;
@@ -68,16 +71,15 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-public abstract class SimulationInteractiveAction implements IWorkbenchWindowActionDelegate {
+public abstract class SimulationInteractiveAction extends SelectionAwareCommandHandler {
   
   public static boolean option_checkCapacity = false;  // enable to set capacity of places to "1"
   public static boolean option_matchExactPrecondition = false;
   
-  protected IWorkbenchWindow workbenchWindow;
-
   // data structure collecting all information about the current simulation view in
   // the shown editor
   protected AdaptiveProcessSimulationView simView = new AdaptiveProcessSimulationView();
@@ -87,46 +89,33 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
   // all activated events of the AdaptiveProcess in the current step
   protected EList<Event> activatedEvents = new BasicEList<Event>();
 
-  // internal flag of the action that signals whether the action now
-  // waits for the user to select an enabled event for firing
-  //private boolean inWaitForUser = false;
-  
-  public void init(IWorkbenchWindow window) {
-    workbenchWindow = window;
-  }
-  
-  public void dispose() {
-    // do nothing
-
-  }
-  
-  public void run(IAction action) {
+  @Override
+  public Object execute(ExecutionEvent event) throws ExecutionException {
     
     if (simView.processViewEditor == null)
-      return;
+      return null;
     // adaptiveSystem, adaptiveProcess and processViewEditor are set
 
     if (!simView.apEditPart.isActive()) {
-      return;
+      return null;
     }
     
     RunConfiguration rc = StartAction.getActiveRunConfiguration(simView.adaptiveSystem);
-    if (rc == null) return;
+    if (rc == null) return null;
     
     extendAdaptiveProcess(rc);
     rc.inWaitForUser = true;
-    action.setEnabled(false);
+    setBaseEnabled(false);
+    return null;
   }
 
-  public void selectionChanged(IAction action, ISelection selection) {
+  @Override
+  public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 
     boolean validContext = true;
 
-    if (!action.getId().equals(getID()))
-      validContext = false;
-    
     // set and check whether the current editor can handle this action
-    simView.setProcessViewEditor_andFields(workbenchWindow.getActivePage().getActiveEditor());
+    simView.setProcessViewEditor_andFields(getWorkbenchWindow().getActivePage().getActiveEditor());
     if (simView.processViewEditor == null)
       validContext = false;
     
@@ -134,8 +123,8 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
     {
       if (!StartAction.isValidConfigOf(simView.adaptiveSystem)) {
         // no simulation running or this view is not the current simulation
-        if (action.isEnabled()) {
-          action.setEnabled(false);
+        if (isEnabled()) {
+          setBaseEnabled(false);
         }
 
         if (!StartAction.isSimuluationRunning()) {
@@ -182,23 +171,23 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
           return;
         }
         
-        if(!rc.inWaitForUser && !action.isEnabled()) {
-          action.setEnabled(true);
+        if(!rc.inWaitForUser && !isEnabled()) {
+          setBaseEnabled(true);
         }
         
       } else {  // well-formedness of oclets not checked yet 
-        if(action.isEnabled()) {
+        if(isEnabled()) {
           rc.inWaitForUser = false;
-          action.setEnabled(false);
+          setBaseEnabled(false);
           return;
         }
       }
     } else {  // invalid context
 
-      if (action.isEnabled()) {
+      if (isEnabled()) {
         RunConfiguration rc = StartAction.getActiveRunConfiguration(simView.adaptiveSystem);
         if (rc != null) rc.inWaitForUser = false;
-        action.setEnabled(false);
+        setBaseEnabled(false);
       }
     }
   }
@@ -406,7 +395,7 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
       return;
 
     } else if (depth < -20) {
-      if (!MessageDialog.openQuestion(workbenchWindow.getShell(), "Possibly unsafe process?",
+      if (!MessageDialog.openQuestion(getWorkbenchWindow().getShell(), "Possibly unsafe process?",
           "It might be that you are executing an unsafe process. Continue " +
           "with the operation or cancel?"))
       {

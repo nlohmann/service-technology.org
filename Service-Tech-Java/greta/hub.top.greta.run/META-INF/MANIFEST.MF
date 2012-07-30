@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Greta Adaptive System Runtime Environment
 Bundle-SymbolicName: hub.top.GRETA.run;singleton:=true
-Bundle-Version: 1.1.7.qualifier
+Bundle-Version: 1.3.1.qualifier
 Bundle-Activator: hub.top.greta.run.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

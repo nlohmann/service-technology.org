@@ -69,7 +69,7 @@ version of this file under the terms of any one of the EPL or the AGPL.
    </license>
 
    <url>
-      <update label="Greta Updates" url="http://download.gna.org/service-tech/greta/updatesite/"/>
+      <update label="Service-Technology.org Seda Update Site" url="http://download.gna.org/service-tech/seda/updates/"/>
       <discovery label="Service-Technology.org Greta Update Site" url="http://download.gna.org/service-tech/greta/updatesite/"/>
       <discovery label="Service-Technology.org Seda Update Site" url="http://download.gna.org/service-tech/seda/updatesite/"/>
    </url>

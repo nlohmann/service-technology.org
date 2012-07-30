@@ -48,6 +48,7 @@ import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -93,9 +94,15 @@ public class StartAction extends SelectionAwareCommandHandler {
 
 		if (startSim) {
 			
-			startSimulation();
-			switchToStop();
-			return null;
+		  try {
+  			startSimulation();
+  			switchToStop();
+  			return null;
+		  } catch (Exception e) {
+        MessageDialog.openError(getWorkbenchWindow().getShell(), "Start Simulation", "Failed to start simulation:\n"+e.getMessage());
+        Activator.getPluginHelper().logError("Failed to start simulation.", e);
+        return null;
+      }
 
 			/*
 			InitProcessSimulationView.initializeProcessViewDiagram(
@@ -200,7 +207,7 @@ public class StartAction extends SelectionAwareCommandHandler {
 	/**
 	 * Initiate simulation and notify other actions about this change
 	 */
-	private void startSimulation () {
+	private void startSimulation () throws Exception {
 		createNewRunConfiguration(simView.adaptiveSystem);
 		
 		if (AdaptiveSystemToCPN.isHighLevelSpecification(simView.adaptiveSystem)) {

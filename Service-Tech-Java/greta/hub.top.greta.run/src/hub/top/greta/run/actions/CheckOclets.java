@@ -47,6 +47,7 @@ import hub.top.adaptiveSystem.Oclet;
 import hub.top.adaptiveSystem.PreNet;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
 import hub.top.greta.cpn.AdaptiveSystemToCPN;
+import hub.top.greta.run.Activator;
 import hub.top.greta.validation.ModelError;
 
 import java.util.HashSet;
@@ -72,6 +73,7 @@ import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPart;
 
@@ -131,6 +133,7 @@ public class CheckOclets extends SelectionAwareCommandHandler {
 				    
 				    final AdaptiveSystemDiagramEditor ed = adaptiveSystemDiagramEditor;
 				    
+				    //final Shell jobShell = new Shell(getWorkbenchWindow().getShell());
 				    Job checkJob = new Job("Checking Data in Scenarios") {
 				      @Override
 				      protected IStatus run(IProgressMonitor monitor) {
@@ -185,7 +188,7 @@ public class CheckOclets extends SelectionAwareCommandHandler {
 		              ((CommandStack) ((EditingDomain) adaptiveSystemDiagramEditor.getEditingDomain()).getCommandStack()).execute(fireCmd);
 		              
 		            } catch (Exception e) {
-		              e.printStackTrace();
+		              Activator.getPluginHelper().showErrorToUser("Checking Data in Scenarios", "Failed to check data in scenarios:\n"+e.getMessage(), e);
 		            }
 		            return Status.OK_STATUS;
 				      }

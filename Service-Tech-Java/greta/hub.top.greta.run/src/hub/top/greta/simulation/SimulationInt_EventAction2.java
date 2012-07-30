@@ -72,7 +72,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 
 public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
 
-	public static final String ID = "hub.top.GRETA.run.processD";
+	public static final String ID = "hub.top.GRETA.run.commands.simulationStep";
 
   // all events that were visited during nodeMatch()
   //protected HashSet<Event> checkedEvents = new HashSet<Event>();
@@ -128,7 +128,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
       boolean coloredSpec = (rc.a2c != null) ? true : false; 
       system = new DNodeSys_AdaptiveSystem(simView.adaptiveSystem, INameProcessor.HLtoLL, coloredSpec);
     } catch (InvalidModelException e) {
-      MessageDialog.openError(this.workbenchWindow.getShell(), "Animated one step.", "Failed to animate. "+e.getMessage());
+      MessageDialog.openError(getWorkbenchWindow().getShell(), "Animated one step.", "Failed to animate. "+e.getMessage());
       return;
     }
     

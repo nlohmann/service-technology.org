@@ -41,6 +41,7 @@ import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Oclet;
+import hub.top.greta.run.Activator;
 import hub.top.greta.validation.ModelError;
 
 import java.io.File;
@@ -61,9 +62,13 @@ import java.util.Set;
 
 import org.cpntools.accesscpn.engine.Simulator;
 import org.cpntools.accesscpn.engine.SimulatorService;
+import org.cpntools.accesscpn.engine.highlevel.CheckerException;
+import org.cpntools.accesscpn.engine.highlevel.DeclarationCheckerException;
 import org.cpntools.accesscpn.engine.highlevel.HighLevelSimulator;
+import org.cpntools.accesscpn.engine.highlevel.LocalCheckFailed;
 import org.cpntools.accesscpn.engine.highlevel.SyntaxCheckerException;
 import org.cpntools.accesscpn.engine.highlevel.checker.Checker;
+import org.cpntools.accesscpn.engine.highlevel.checker.ErrorInitializingSMLInterface;
 import org.cpntools.accesscpn.engine.highlevel.instance.Binding;
 import org.cpntools.accesscpn.engine.highlevel.instance.Instance;
 import org.cpntools.accesscpn.engine.highlevel.instance.cpnvalues.CPNValue;
@@ -127,7 +132,7 @@ public class AdaptiveSystemToCPN {
             getPlaceName(c.getName());
             getToken(c.getName());
           } catch (Exception ex) {
-            System.err.println("No HL-oclet specification: "+n.getName()+" in "+o.getName()+" (precondition) has invalid format");
+            System.err.println("No HL-oclet specification: condition '"+n.getName()+"' in "+o.getName()+" (precondition) has invalid format");
             ex.printStackTrace();
             return false;
           }
@@ -140,7 +145,7 @@ public class AdaptiveSystemToCPN {
             getPlaceName(c.getName());
             getToken(c.getName());
           } catch (Exception ex) {
-            System.err.println("No HL-oclet specification: "+n.getName()+" in "+o.getName()+" (contribution) has invalid format");
+            System.err.println("No HL-oclet specification: condition '"+n.getName()+"' in "+o.getName()+" (contribution) has invalid format");
             ex.printStackTrace();
             return false;
           }
@@ -838,7 +843,7 @@ public class AdaptiveSystemToCPN {
     }
   }
 
-  public void exportNet() {
+  public void exportNet() throws Exception {
     try {
       String cpn_model_file_name = sourceURI.trimFileExtension().lastSegment();
       org.eclipse.emf.common.util.URI ml = sourceURI.trimFileExtension().trimSegments(1).appendSegment(cpn_model_file_name+"_run").appendFileExtension("cpn");
@@ -851,8 +856,7 @@ public class AdaptiveSystemToCPN {
       DOMGenerator.export(net, out);
       System.out.println("done");
     } catch (Exception e) {
-      System.err.println("could not write debug file");
-      e.printStackTrace();
+      throw new Exception("Could not write CPN Tools base file for model.", e);
     }
   }
 
@@ -917,6 +921,8 @@ public class AdaptiveSystemToCPN {
    */
   private String findExpressionsForMissingIDs(HighLevelSimulator sim_local, Set<String> missingIDs, String expression, Map<String, Set<String>> definedExpressions, Set<String> requiredExpressions) {
     
+    //System.out.println("find "+missingIDs+" in "+definedExpressions);
+    
     if (missingIDs.isEmpty()) return null;
     
     // check for each missing ID whether there is a defined expression
@@ -962,7 +968,11 @@ public class AdaptiveSystemToCPN {
   private String[] getDeclaringIDs(String exp, HighLevelSimulator sim) {
     try {
       
+      // escape quote signs in the expression so that SML does not stumble
+      exp = exp.replaceAll("\"", "\\\\\"");
+      
       String _ml_def_expression = "CPN'Dep.find_use \"fun () = "+exp+"\"";
+      System.out.println(_ml_def_expression);
       String result = sim.evaluate(_ml_def_expression);
 
       List<String> ids = new LinkedList<String>();
@@ -997,7 +1007,8 @@ public class AdaptiveSystemToCPN {
               char c = arguments[j].charAt(i);
               if (   !Character.isJavaIdentifierPart(c)
                   && !Character.isLetterOrDigit(c)
-                  && !Character.isWhitespace(c)) {
+                  && !Character.isWhitespace(c)
+                  && !(c == '\"')) {
                 return new String[] { exp };
               }
             }
@@ -1322,9 +1333,32 @@ public class AdaptiveSystemToCPN {
     } catch (SyntaxCheckerException e) {
 
       ModelError error = new ModelError(null, "CPN model", "The generated CPN model contains errors; see console.");
+      errors.add(error);
+      
+      e.printStackTrace();
+      
+    } catch (DeclarationCheckerException e) {
+      
+      ModelError error = new ModelError(null, "CPN model", "The generated CPN model contains errors; see console.");
+      errors.add(error);
+      
+    } catch (LocalCheckFailed e) {
+      
+      ModelError error = new ModelError(null, "CPN model", "The generated CPN model contains errors; see console.");
+      errors.add(error);
+      
+    } catch (CheckerException e) {
+      
+      ModelError error = new ModelError(null, "CPN model", "The generated CPN model contains errors; see console.");
+      errors.add(error);
+      
+    } catch (ErrorInitializingSMLInterface e) {
+      // ignore this one: unclear why it is raised
       
     } catch (Exception e) {
-      e.printStackTrace();
+      
+      Activator.getPluginHelper().logWarning("An exception occurred while checking.", e);
+
     }
     
     sim.setTarget((org.cpntools.accesscpn.model.impl.PetriNetImpl)net);

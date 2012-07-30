@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_VnmacNSzEeGBn6dQ9VPexA" elementId="org.eclipse.e4.ide.application" bindingContexts="_VnmacdSzEeGBn6dQ9VPexA">
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_Vnmah9SzEeGBn6dQ9VPexA" label="Seda" iconURI="platform:/plugin/org.st.seda.rcp/icons/document.net.bw_2.16.png" width="800" height="600">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_Vnmah9SzEeGBn6dQ9VPexA" label="Seda" iconURI="platform:/plugin/org.st.seda.rcp/icons/document.net.bw_2.16.png" width="1000" height="800">
     <children xsi:type="advanced:PerspectiveStack" xmi:id="_Vnmaj9SzEeGBn6dQ9VPexA" selectedElement="_VnmakNSzEeGBn6dQ9VPexA">
       <children xsi:type="advanced:Perspective" xmi:id="_VnmakNSzEeGBn6dQ9VPexA" elementId="org.st.seda.rcp.perspective" selectedElement="_VnnBgNSzEeGBn6dQ9VPexA" label="Petri Nets" iconURI="platform:/plugin/org.st.seda.rcp/icons/document.net.bw_2.16.png">
         <tags>Perspective</tags>
@@ -103,6 +103,10 @@
     <tags>categoryTag:General</tags>
   </descriptors>
   <descriptors xmi:id="_W63zcdSjEeGgKvWHVYtRxQ" elementId="org.eclipse.ui.views.PropertySheet" label="Properties" iconURI="platform:/plugin/org.eclipse.ui.views//icons/full/eview16/prop_ps.gif" allowMultiple="true" category="org.eclipse.e4.secondaryDataStack" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <tags>View</tags>
+    <tags>categoryTag:General</tags>
+  </descriptors>
+  <descriptors xmi:id="_HiNSANoiEeGP9OhoGIghTA" elementId="org.eclipse.pde.runtime.LogView" label="Error Log" iconURI="platform:/plugin/org.eclipse.ui.views.log//icons/eview16/error_log.gif" category="org.eclipse.e4.secondaryDataStack" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
     <tags>View</tags>
     <tags>categoryTag:General</tags>
   </descriptors>

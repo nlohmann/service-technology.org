@@ -75,6 +75,9 @@ version of this file under the terms of any one of the EPL or the AGPL.
    </url>
 
    <requires>
+      <import feature="hub.top.uma" version="1.3.1"/>
+      <import feature="org.cpntools.accesscpn.engine.feature" version="2.2.0.qualifier"/>
+      <import feature="org.cpntools.accesscpn.feature" version="2.2.0.qualifier"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.emf.ecore"/>
       <import plugin="org.eclipse.emf.ecore.xmi"/>
@@ -108,12 +111,24 @@ version of this file under the terms of any one of the EPL or the AGPL.
       <import plugin="org.eclipse.emf.edit" version="2.4.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.4.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.gmf.runtime.diagram.ui" version="1.1.2" match="greaterOrEqual"/>
+      <import plugin="hub.top.GRETA.diagram" version="1.1.2" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.ui.editors"/>
-      <import plugin="hub.top.uma" version="1.2.0" match="greaterOrEqual"/>
-      <import plugin="hub.top.GRETA.diagram" version="1.1.4" match="greaterOrEqual"/>
-      <import plugin="hub.top.editor.resource" version="1.0.6" match="greaterOrEqual"/>
+      <import plugin="hub.top.editor.resource" version="1.0.5" match="greaterOrEqual"/>
       <import plugin="hub.top.editor.ptnetLoLA" version="1.0.5" match="greaterOrEqual"/>
+      <import plugin="hub.top.uma" version="1.2.1" match="greaterOrEqual"/>
+      <import plugin="hub.top.pnapi" version="1.0.2" match="greaterOrEqual"/>
+      <import plugin="org.cpntools.accesscpn.engine" version="2.0.2" match="greaterOrEqual"/>
+      <import plugin="org.cpntools.accesscpn.engine.highlevel" version="2.0.2" match="greaterOrEqual"/>
+      <import plugin="org.cpntools.accesscpn.model" version="2.0.2" match="greaterOrEqual"/>
+      <import plugin="org.cpntools.accesscpn.model.exporter" version="2.0.2" match="greaterOrEqual"/>
+      <import plugin="org.cpntools.accesscpn.model.importer" version="2.0.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.expressions" version="3.4.400" match="greaterOrEqual"/>
+      <import plugin="org.cpntools.accesscpn.engine" version="2.2.0" match="greaterOrEqual"/>
+      <import plugin="org.cpntools.accesscpn.model" version="2.2.0" match="greaterOrEqual"/>
+      <import plugin="org.cpntools.accesscpn.model.importer" version="2.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.common"/>
+      <import plugin="org.cpntools.accesscpn.engine.highlevel" version="2.2.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

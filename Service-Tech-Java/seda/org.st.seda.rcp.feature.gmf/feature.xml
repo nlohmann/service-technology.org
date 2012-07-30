@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.st.seda.rcp.feature.gmf"
+      label="org.eclipse.gmf.* and related plugins used in Seda"
+      version="2.0.0.qualifier">
+
+   <description>
+      3rd party plugins used in Seda.
+   </description>
+
+   <copyright url="http://www.eclipse.org/legal/epl-v10.html">
+      http://www.eclipse.org/legal/epl-v10.html
+   </copyright>
+
+   <license url="http://www.eclipse.org/legal/epl-v10.html">
+      http://www.eclipse.org/legal/epl-v10.html
+   </license>
+
+   <includes
+         id="org.eclipse.gmf"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.gmf.runtime.thirdparty"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.draw2d"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.gef"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.ocl"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.gmf.runtime.notation"
+         version="0.0.0"/>
+
+</feature>

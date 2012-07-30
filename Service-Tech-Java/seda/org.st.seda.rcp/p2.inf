@@ -19,9 +19,13 @@ requires.1.name = org.st.seda.rcp.feature.emf.feature.group
 requires.1.range = [2.0.0, 3.0.0)
 
 requires.2.namespace = org.eclipse.equinox.p2.iu
-requires.2.name = org.st.seda.rcp.feature.feature.group
+requires.2.name = org.st.seda.rcp.feature.gmf.feature.group
 requires.2.range = [2.0.0, 3.0.0)
 
-requires.2.namespace = org.eclipse.equinox.p2.iu
-requires.2.name = org.st.seda.extensions.feature.feature.group
-requires.2.range = [2.0.0, 3.0.0)
+requires.3.namespace = org.eclipse.equinox.p2.iu
+requires.3.name = org.st.seda.rcp.feature.feature.group
+requires.3.range = [2.0.0, 3.0.0)
+
+requires.4.namespace = org.eclipse.equinox.p2.iu
+requires.4.name = org.st.seda.rcp.extensions.feature.feature.group
+requires.4.range = [2.0.0, 3.0.0)

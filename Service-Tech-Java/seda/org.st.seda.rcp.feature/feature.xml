@@ -21,6 +21,54 @@
       <update url="http://download.gna.org/service-tech/seda/updates/"/>
    </url>
 
+   <includes
+         id="org.eclipse.e4.rcp"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.emf.common"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.emf.ecore"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.equinox.p2.rcp.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.equinox.p2.user.ui"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.equinox.p2.core.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.equinox.p2.discovery.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.equinox.p2.extras.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.rcp"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.platform"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.equinox.executable"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.help"
+         version="0.0.0"/>
+
    <plugin
          id="org.st.seda.rcp"
          download-size="0"

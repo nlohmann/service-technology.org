@@ -38,33 +38,9 @@
    <features>
       <feature id="org.st.seda.rcp.feature"/>
       <feature id="org.st.seda.rcp.feature.emf"/>
+      <feature id="org.st.seda.rcp.feature.gmf"/>
       <feature id="org.st.seda.rcp.petrinets.feature"/>
       <feature id="org.st.seda.rcp.extensions.feature"/>
-      <feature id="org.eclipse.e4.rcp"/>
-      <feature id="org.eclipse.emf.ecore"/>
-      <feature id="org.eclipse.emf.common"/>
-      <feature id="org.eclipse.equinox.p2.rcp.feature"/>
-      <feature id="org.eclipse.equinox.p2.user.ui"/>
-      <feature id="org.eclipse.equinox.p2.core.feature"/>
-      <feature id="org.eclipse.equinox.p2.extras.feature"/>
-      <feature id="org.eclipse.equinox.p2.discovery.feature"/>
-      <feature id="org.eclipse.rcp"/>
-      <feature id="org.eclipse.platform"/>
-      <feature id="org.eclipse.equinox.executable"/>
-      <feature id="org.eclipse.help"/>
-      <feature id="org.eclipse.ocl"/>
-      <feature id="org.eclipse.gef"/>
-      <feature id="org.eclipse.gmf"/>
-      <feature id="org.eclipse.gmf.runtime.thirdparty"/>
-      <feature id="org.eclipse.emf.workspace"/>
-      <feature id="org.eclipse.emf.transaction"/>
-      <feature id="org.eclipse.gmf.runtime.notation"/>
-      <feature id="org.eclipse.emf.edit"/>
-      <feature id="org.eclipse.draw2d"/>
-      <feature id="org.eclipse.emf.edit.ui"/>
-      <feature id="org.eclipse.emf.validation"/>
-      <feature id="org.eclipse.emf.common.ui"/>
-      <feature id="org.eclipse.emf.ecore.edit"/>
    </features>
 
    <configurations>

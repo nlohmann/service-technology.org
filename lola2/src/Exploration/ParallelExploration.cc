@@ -64,7 +64,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 	SimpleProperty* sp = resultProperty->copy();
 	Firelist* myFirelist = fireListCreator.createFireList(sp);
 	/// the search stack
-	SearchStack stack;
+	SearchStack<SimpleStackEntry> stack;
 
 	// prepare property
 	bool localValue = sp->initProperty(ns);
@@ -132,7 +132,8 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 					// push put current transition on stack
 					// this way, the stack contains ALL transitions
 					// of witness path
-					stack.push(currentEntry, currentFirelist);
+					SimpleStackEntry * s = stack.push();
+					s = new (s) SimpleStackEntry(currentFirelist, currentEntry);
 					// end the DFS
 					// inform all threads that we have finished
 					finished = true;
@@ -151,7 +152,8 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 					return &ns;
 				}
 				// push the transition onto the stack
-				stack.push(currentEntry, currentFirelist);
+				SimpleStackEntry * s = stack.push();
+				s = new (s) SimpleStackEntry(currentFirelist, currentEntry);
 
 				// first try the dirty read to make the program more efficient
 				// but do it only if there are at least two transitions in the firelist left (one for us, and one for the other thread)
@@ -179,7 +181,10 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 						sem_wait(transfer_finished_semaphore);
 
 						// backfire the current transition to return to original state
-						stack.pop(&currentEntry, &currentFirelist);
+						SimpleStackEntry & s = stack.top();
+						currentEntry = s.current;
+						currentFirelist = s.fl;
+						stack.pop();
 						assert(currentEntry < Net::Card[TR]);
 						Transition::backfire(ns, currentFirelist[currentEntry]);
 						Transition::revertEnabled(ns,
@@ -254,7 +259,10 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 				continue;
 
 			}
-			stack.pop(&currentEntry, &currentFirelist);
+			SimpleStackEntry & s = stack.top();
+			currentEntry = s.current;
+			currentFirelist = s.fl;	
+			stack.pop();
 			assert(currentEntry < Net::Card[TR]);
 			Transition::backfire(ns, currentFirelist[currentEntry]);
 			Transition::revertEnabled(ns, currentFirelist[currentEntry]);

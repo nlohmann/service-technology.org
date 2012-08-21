@@ -402,9 +402,9 @@ void Task::printWitness()
     index_t* f;
     while (p->stack.StackPointer > 0)
     {
-        index_t t = p->stack.topTransition();
-        rep->message("%s", Net::Name[TR][t]);
-        p->stack.pop(& c, & f);
+	SimpleStackEntry & s = p->stack.top();
+        rep->message("%s", Net::Name[TR][s.fl[s.current]]);
+        p->stack.pop();
     }
 }
 
@@ -446,9 +446,9 @@ void Task::printDot()
     index_t* f;
     while (p->stack.StackPointer > 0)
     {
-        index_t i = p->stack.topTransition();
-        path.push_front(i);
-        p->stack.pop(& c, & f);
+	SimpleStackEntry & s = p->stack.top();
+        path.push_front(s.fl[s.current]);
+        p->stack.pop();
     }
 
     // add all events (with surrounding conditions)

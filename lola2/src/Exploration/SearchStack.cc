@@ -11,75 +11,89 @@
 #include <Core/Dimensions.h>
 #include <Exploration/SearchStack.h>
 
-
+template<class T>
 Chunk::Chunk()
 {
     prev = NULL;
-    for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
-        list[i] = NULL;
+    content = calloc(sizeof(T),SIZEOF_STACKCHUNK);
 }
 
+template<class T>
 Chunk::~Chunk(){
-	for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
-		if (list[i])
-			delete[] list[i];
+delete content;
 }
 
+
+template<class T>
 void Chunk::delete_all_prev_chunks(){
 	if (!prev)
 		return;
 	prev->delete_all_prev_chunks();
 	// if we want to delete all the prev chunks, we have to delete all its lists,
 	// as no one will pop them in the future
+	for(unsigned int i = 0; i < SIZEOF_STACKCHUNK;i++)
+	{
+		prev -> content[i].~T();
+	}
 	delete prev;
+
 }
 
-Chunk &Chunk::operator=(const Chunk &chunk)
-{
-    // copy the current values
-    memcpy(current, chunk.current, SIZEOF_STACKCHUNK * SIZEOF_INDEX_T);
-    for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
-    {
-    	if (list[i])
-    		delete[] list[i];
+//template<class T>
+//Chunk &Chunk::operator=(const Chunk &chunk)
+//{
+//    // copy the current values
+//    memcpy(current, chunk.current, SIZEOF_STACKCHUNK * SIZEOF_INDEX_T);
+//    for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
+//    {
+//    	if (list[i])
+//    		delete[] list[i];
+//
+//    	if (chunk.list[i])
+//        {
+//            list[i] = new index_t[current[i] + 1];
+//            for (int j = 0; j <= current[i]; j++)
+//                list[i][j] = chunk.list[i][j];
+//        } else
+//        	list[i] = 0;
+//    }
+//
+//    if (chunk.prev != NULL)
+//    {
+//    	// if there is not next element to copy onto create one
+//    	if (!prev)
+//    		prev = new Chunk();
+//        *prev = *(chunk.prev);
+//    }
+//    else{
+//    	if (prev)
+//    		delete_all_prev_chunks();
+//        prev = NULL;
+//    }
+//}
 
-    	if (chunk.list[i])
-        {
-            list[i] = new index_t[current[i] + 1];
-            for (int j = 0; j <= current[i]; j++)
-                list[i][j] = chunk.list[i][j];
-        } else
-        	list[i] = 0;
-    }
-
-    if (chunk.prev != NULL)
-    {
-    	// if there is not next element to copy onto create one
-    	if (!prev)
-    		prev = new Chunk();
-        *prev = *(chunk.prev);
-    }
-    else{
-    	if (prev)
-    		delete_all_prev_chunks();
-        prev = NULL;
-    }
-}
-
+template<class T>
 SearchStack::SearchStack() :
     StackPointer(0), currentchunk(NULL)
 {
 }
 
+template<class T>
 SearchStack::~SearchStack()
 {
 	if (!currentchunk)
 		return;
    currentchunk->delete_all_prev_chunks();
+   do
+   {
+	content[StackPointer % SIZEOF_STACKCHUNK].~T();
+   }
+   while((--StackPointer % SIZEOF_STACKCHUNK) != 0)
    delete currentchunk;
 }
 
-void SearchStack::push(index_t c, index_t* f)
+template<class t>
+T* SearchStack::push()
 {
     if ((StackPointer % SIZEOF_STACKCHUNK) == 0)
     {
@@ -88,20 +102,13 @@ void SearchStack::push(index_t c, index_t* f)
         newchunk->prev = currentchunk;
         currentchunk = newchunk;
     }
-    currentchunk->current[StackPointer % SIZEOF_STACKCHUNK] = c;
-    currentchunk->list[StackPointer++ % SIZEOF_STACKCHUNK] = f;
+    return(currentchunk->content + (StackPointer++ % SIZEOF_STACKCHUNK));
 }
 
-/*!
- \param[in,out] c  index within firelist
- \param[in,out] f  firelist
- */
-void SearchStack::pop(index_t* c, index_t** f)
+template<class T>
+void SearchStack::pop()
 {
-    *c = currentchunk->current[(--StackPointer) % SIZEOF_STACKCHUNK];
-    currentchunk->current[(StackPointer) % SIZEOF_STACKCHUNK] = 0;
-    *f = currentchunk->list[StackPointer % SIZEOF_STACKCHUNK];
-    currentchunk->list[StackPointer % SIZEOF_STACKCHUNK] = 0;
+    content[--StackPointer % SIZEOF_STACKCHUNK].~T();
     if ((StackPointer % SIZEOF_STACKCHUNK) == 0)
     {
         // need to jump to previous chunk
@@ -111,34 +118,85 @@ void SearchStack::pop(index_t* c, index_t** f)
     }
 }
 
-index_t SearchStack::topTransition() const
+template<class T>
+T& SearchStack::top() const
 {
-    return currentchunk->list[(StackPointer - 1) % SIZEOF_STACKCHUNK][currentchunk->current[(StackPointer
-                                                                      - 1) % SIZEOF_STACKCHUNK]];
+    return currentchunk->content[(StackPointer - 1)% SIZEOF_STACKCHUNK];
 }
 
 
-SearchStack &SearchStack::operator=(const SearchStack &stack)
+template<class T>
+SearchStack<T> &SearchStack::operator=(const SearchStack<T> &stack)
 {
-	// first copy the stack pointer, they must be the same
-    StackPointer = stack.StackPointer;
+	// 1. copy top chunk
+	if(currentchunk)
+	{
+		do
+		{
+			currentchunk->content[(--StackPointer)%SIZEOF_STACKCHUNK].~T();
+		}
+		while((StackPointer % SIZEOF_STACKCHUNK) != 0);
+	}
+	if(stack.currentchunk)
+	{
+		if(!currentchunk) currentchunk = new Chunk<T>();
+		for(unsigned int i = 0; i <(StackPointer % SIZEOF_STACKCHUNK); i++)
+		{
+			new (currentchunk.content+i) T(stack.currentchunk.content[i]);
+		}
+	}
+	else
+	{
+		if(currentchunk) delete currentchunk;
+	}
+	StackPointer = stack.StackPointer;
+	
+	// 2. copy previous chunks
 
-    if (stack.currentchunk != NULL)
-    {
-    	// should happen rarely
-    	if (!currentchunk)
-    		currentchunk = new Chunk();
-    	// this almost in all cases
-        *currentchunk = *(stack.currentchunk);
-    }
-    else
-    {
-    	if (currentchunk){
-    		currentchunk->delete_all_prev_chunks();
-    		// delete all the lists (see Chunk::delete_all_prev_chunks for explanation)
-    		delete currentchunk;
-    	}
-        currentchunk = NULL;
-    }
+	// 2a. copy as long as both source and target stacks have chunks
+
+	Chunk<T> ** target = &prev;
+	Chunk<T> ** source = &stack.prev;
+	while(*target && *source)
+
+	{
+		for(unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
+		{
+			(*target) -> content[i].~T();
+			new ((*target)->content + i) T((*source)->content[i]);
+		}
+		target = &((*target) -> prev);
+		source = &((*source) -> prev);
+	}
+
+	// 2b. create new chunks at target if source has spare chunks
+	while(*source)
+	{
+		*target = new Chunk<T>();
+		(*target) -> prev = NULL;
+		for(unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
+		{
+			new ((*target)->content + i) T((*source)->content[i]);
+		}
+		target = &((*target) -> prev);
+		source = &((*source) -> prev);
+	}
+	// 2c. release spare chunks at target
+	Chunk<T> * targ = * target;
+	while(*target)
+	{
+		for(unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
+		{
+			(*target) -> content[i].~T();
+		}
+		target = &((*target) -> prev);
+	}
+	while(targ)
+	{
+		Chunk<T> tmp = targ;
+		targ = targ -> prev;
+		delete tmp;
+	}
+	
     return *this;
 }

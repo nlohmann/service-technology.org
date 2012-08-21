@@ -41,7 +41,7 @@ class ParallelExploration : public DFSExploration
         int num_suspended;
 
         pthread_mutex_t send_mutex;
-        SearchStack transfer_stack;
+        SearchStack<SimpleStackEntry> transfer_stack;
         NetState* transfer_netstate;
         SimpleProperty* transfer_property;
 

@@ -42,7 +42,7 @@ lola_SOURCES = \
                 Exploration/ParallelExploration.cc Exploration/ParallelExploration.h \
                 Exploration/Firelist.cc Exploration/Firelist.h \
                 Exploration/RandomWalk.cc Exploration/RandomWalk.h \
-                Exploration/SearchStack.cc Exploration/SearchStack.h \
+                Exploration/SearchStack.h \
                 Exploration/SimpleProperty.h \
                 Exploration/Deadlock.cc Exploration/Deadlock.h \
                 Exploration/ChooseTransition.h \

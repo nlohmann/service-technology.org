@@ -75,14 +75,16 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store &
                     // push put current transition on stack
                     // this way, the stack contains ALL transitions
                     // of witness path
-                    property.stack.push(currentEntry, currentFirelist);
+                    SimpleStackEntry *stack = property.stack.push();
+		    stack = new ((void *) stack) SimpleStackEntry(currentFirelist,currentEntry);
                     myStore.finalize();
                     delete(&myFirelist);
                     return true;
                 }
 
                 // Here: current marking does not satisfy property --> continue search
-                property.stack.push(currentEntry, currentFirelist);
+                    SimpleStackEntry *stack = property.stack.push();
+		    stack = new (stack) SimpleStackEntry(currentFirelist,currentEntry);
                 currentEntry = myFirelist.getFirelist(ns, &currentFirelist);
             } // end else branch for "if state exists"
         }
@@ -97,7 +99,11 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store &
                 delete(&myFirelist);
                 return false;
             }
-            property.stack.pop(&currentEntry, &currentFirelist);
+	    SimpleStackEntry & stack = property.stack.top();
+            currentEntry = stack.current;
+	    currentFirelist = stack.fl;
+	    stack.fl = NULL;
+            property.stack.pop();
             assert(currentEntry < Net::Card[TR]);
             Transition::backfire(ns, currentFirelist[currentEntry]);
             Transition::revertEnabled(ns, currentFirelist[currentEntry]);

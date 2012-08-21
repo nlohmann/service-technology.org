@@ -19,6 +19,16 @@ class Firelist;
 class Store;
 class EmptyStore;
 
+/// one element on the stack for simple properties
+class SimpleStackEntry
+{
+public:
+	SimpleStackEntry(index_t * f,index_t c){fl = f; current = c;} //firelist, first processed in firelist
+	SimpleStackEntry(SimpleStackEntry& src){current = src.current;fl = (index_t *) calloc(SIZEOF_INDEX_T,current+1);memcpy(fl,src.fl,(current+1)*SIZEOF_INDEX_T);}
+	index_t * fl; // array to take a firelist
+	index_t current; // index of first processed element of fl
+};
+
 class SimpleProperty
 {
     public:
@@ -26,7 +36,7 @@ class SimpleProperty
         virtual ~SimpleProperty() {}
 
         /// the witness path
-        SearchStack stack;
+        SearchStack<SimpleStackEntry> stack;
 
         /// value of property in current state
         bool value;

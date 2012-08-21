@@ -175,6 +175,7 @@ template<class T>
 SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
 {
 	// 1. copy top chunk
+
 	if(currentchunk)
 	{
 		do
@@ -186,7 +187,7 @@ SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
 	if(stack.currentchunk)
 	{
 		if(!currentchunk) currentchunk = new Chunk<T>();
-		for(unsigned int i = 0; i <(StackPointer % SIZEOF_STACKCHUNK); i++)
+		for(unsigned int i = 0; i <(stack.StackPointer % SIZEOF_STACKCHUNK); i++)
 		{
 			new (currentchunk->content+i) T(stack.currentchunk->content[i]);
 		}

@@ -108,9 +108,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 			delete sp;
 			return NULL;
 		}
-		//printf("GOON %x NS %x\n", container, ns);
 		if (currentEntry-- > 0) {
-			// printf("%d ANA %d\n",threadNumber, currentEntry);
 			// there is a next transition that needs to be explored in current marking
 
 			// fire this transition to produce new Marking::Current
@@ -165,12 +163,15 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 						pthread_mutex_unlock(&num_suspend_mutex);
 						pthread_mutex_lock(&num_suspend_mutex);
 						// if the end is reached abort this thread
+						// exclude this from code coverage, as I can not provoke it, but is necessary in very rare occasions
+						// LCOV_EXCL_START
 						if (finished) {
-							// delete the sp&firelist
+							// delete the firelist
 							delete myFirelist;
 							delete sp;
 							return NULL;
 						}
+						// LCOV_EXCL_STOP
 
 						// copy the data for the other thread
 						transfer_stack = stack;
@@ -198,7 +199,6 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 					pthread_mutex_unlock(&num_suspend_mutex);
 				}
 
-				//printf("%d DOWN\n", threadNumber);
 				// Here: current marking does not satisfy property --> continue search
 				currentEntry = myFirelist->getFirelist(ns, &currentFirelist);
 			} // end else branch for "if state exists"
@@ -319,8 +319,10 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 	// create the threads
 	for (int i = 0; i < number_of_threads; i++)
 		if (UNLIKELY(pthread_create(runner_thread + i, NULL, threadPrivateDFS, args + i))) {
+			// LCOV_EXCL_START
 			rep->status("threads could not be created");
 			rep->abort(ERROR_THREADING);
+			// LCOV_EXCL_STOP
 		}
 
 	//// THREADS ARE RUNNING AND SEARCHING
@@ -330,8 +332,10 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 	for (int i = 0; i < number_of_threads; i++) {
 		void* return_value;
 		if (UNLIKELY(pthread_join(runner_thread[i], &return_value))) {
+			// LCOV_EXCL_START
 			rep->status("threads could not be joined");
 			rep->abort(ERROR_THREADING);
+			// LCOV_EXCL_STOP
 		}
 		if (return_value) {
 			property.value = true;

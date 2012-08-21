@@ -1,8 +1,8 @@
 # the main program
 bin_PROGRAMS = lola
 
-lola_CFLAGS = -g -ggdb
-lola_CXXFLAGS = -g -ggdb
+lola_CFLAGS = -g -ggdb -pedantic
+lola_CXXFLAGS = -g -ggdb -pedantic
 
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \

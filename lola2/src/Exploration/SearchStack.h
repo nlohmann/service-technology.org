@@ -237,6 +237,11 @@ SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
 	}
 	// 2c. release spare chunks at target
 	if (*target){
+		(*target) -> delete_all_prev_chunks();
+		for(unsigned int i = 0; i < SIZEOF_STACKCHUNK;i++)
+			{
+				(*target) -> content[i].~T();
+			}
 		delete *target;
 		*target = NULL;
 	}

@@ -67,7 +67,7 @@ Chunk<T>::Chunk()
 
 template<class T>
 Chunk<T>::~Chunk(){
-delete content;
+	free(content);
 }
 
 
@@ -133,9 +133,9 @@ SearchStack<T>::~SearchStack()
    currentchunk->delete_all_prev_chunks();
    do
    {
-	currentchunk->content[StackPointer % SIZEOF_STACKCHUNK].~T();
+	   currentchunk->content[--StackPointer % SIZEOF_STACKCHUNK].~T();
    }
-   while((--StackPointer % SIZEOF_STACKCHUNK) != 0);
+   while((StackPointer % SIZEOF_STACKCHUNK) != 0);
    delete currentchunk;
 }
 
@@ -155,7 +155,7 @@ T* SearchStack<T>::push()
 template<class T>
 void SearchStack<T>::pop()
 {
-    currentchunk->content[--StackPointer % SIZEOF_STACKCHUNK].~T();
+	StackPointer--;
     if ((StackPointer % SIZEOF_STACKCHUNK) == 0)
     {
         // need to jump to previous chunk
@@ -194,10 +194,17 @@ SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
 	}
 	else
 	{
-		if(currentchunk) delete currentchunk;
+		if(currentchunk){
+			delete currentchunk;
+			currentchunk = 0;
+		}
 	}
 	StackPointer = stack.StackPointer;
 	
+	// for safety
+	if (!currentchunk)
+		return *this;
+
 	// 2. copy previous chunks
 
 	// 2a. copy as long as both source and target stacks have chunks
@@ -229,20 +236,9 @@ SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
 		source = &((*source) -> prev);
 	}
 	// 2c. release spare chunks at target
-	Chunk<T> * targ = * target;
-	while(*target)
-	{
-		for(unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
-		{
-			(*target) -> content[i].~T();
-		}
-		target = &((*target) -> prev);
-	}
-	while(targ)
-	{
-		Chunk<T> * tmp = targ;
-		targ = targ -> prev;
-		delete tmp;
+	if (*target){
+		delete *target;
+		*target = NULL;
 	}
 	
     return *this;

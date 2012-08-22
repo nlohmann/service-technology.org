@@ -47,6 +47,8 @@ class ParallelExploration : public DFSExploration
 
         // mutex to control writing back to current marking
         pthread_mutex_t write_current_back_mutex;
+
+        virtual ~ParallelExploration() {}
     protected:
 
 

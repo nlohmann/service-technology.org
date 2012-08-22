@@ -1176,7 +1176,7 @@ void Net::preprocess_organizeConflictingTransitions() {
     free(tmp_array);
     for(index_t i = 0; i <= cardTR; i++)
         delete conflictcache[i];
-    delete conflictcache;
+    delete[] conflictcache;
     for(index_t i = 0; i <= cardPL; i++)
         if(stack_conflictset[i])
             free(stack_conflictset[i]);

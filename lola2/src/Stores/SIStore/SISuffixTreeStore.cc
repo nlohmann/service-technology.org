@@ -69,12 +69,12 @@ SISuffixTreeStore::Decision::~Decision()
 
 }
 
-bool SISuffixTreeStore::search(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex){
-	return searchAndInsert(in,bitlen,hash,threadIndex,false);
+bool SISuffixTreeStore::search(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex) {
+    return searchAndInsert(in,bitlen,hash,threadIndex,false);
 }
 
-bool SISuffixTreeStore::insert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex){
-	return searchAndInsert(in,bitlen,hash,threadIndex,true);
+bool SISuffixTreeStore::insert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex) {
+    return searchAndInsert(in,bitlen,hash,threadIndex,true);
 }
 
 /// search for an input vector in the suffix tree and insert it, if it is not present
@@ -257,9 +257,9 @@ bool SISuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitle
             }
         }
 
-        if (!doinsert){
-        	pthread_rwlock_unlock(rwlocks + hash);
-        	return false;
+        if (!doinsert) {
+            pthread_rwlock_unlock(rwlocks + hash);
+            return false;
         }
 
         // state not found --> prepare for insertion
@@ -283,9 +283,9 @@ bool SISuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitle
         }
     }
 
-    if (!doinsert){
-    	pthread_rwlock_unlock(rwlocks + hash);
-    	return false;
+    if (!doinsert) {
+        pthread_rwlock_unlock(rwlocks + hash);
+        return false;
     }
 
     assert(bitlen > position);
@@ -308,7 +308,7 @@ bool SISuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitle
             *pVector |= vectordata_t(*pInput << (VECTOR_WIDTH - input_bitstogo));
             pInput++;
             if(++input_index > max_input_index)
-            	break;
+                break;
             *pVector |= vectordata_t(*pInput >> input_bitstogo);
             pVector++;
         }

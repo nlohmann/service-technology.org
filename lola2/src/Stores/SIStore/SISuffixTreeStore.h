@@ -14,7 +14,7 @@ This Version has been transformed into an search and insert store.
 class SISuffixTreeStore : public SIStore
 {
 public:
-	SISuffixTreeStore(int numberOfThreads);
+    SISuffixTreeStore(int numberOfThreads);
     virtual ~SISuffixTreeStore();
 
     // inserts input vector into suffix tree
@@ -37,7 +37,7 @@ private:
 
 
     // the internal state of an search operation, which can be used to make the corresponding insert
-    struct Search_State{
+    struct Search_State {
         /// If a new decision record is inserted, * anchor must point to it
         Decision** anchor;
 

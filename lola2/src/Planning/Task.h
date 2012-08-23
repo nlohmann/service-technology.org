@@ -14,36 +14,36 @@ class NetState;
 
 class Task
 {
-    private:
-        StatePredicate* sp;
-        NetState* ns;
-        ChooseTransition* choose;
-        enum_search search;
-        FireListCreator* flc;
-        SimpleProperty* p;
-        DFSExploration* exploration;
-        int number_of_threads;
-        formula_t formulaType;
-        void setNet();
-        void setFormula();
+private:
+    StatePredicate* sp;
+    NetState* ns;
+    ChooseTransition* choose;
+    enum_search search;
+    FireListCreator* flc;
+    SimpleProperty* p;
+    DFSExploration* exploration;
+    int number_of_threads;
+    formula_t formulaType;
+    void setNet();
+    void setFormula();
 
-    public:
-        Store* s;
+public:
+    Store* s;
 
-        Task();
-        ~Task();
+    Task();
+    ~Task();
 
-        bool getResult();
-        void interpreteResult(bool);
+    bool getResult();
+    void interpreteResult(bool);
 
-        void setStore();
-        void setProperty();
+    void setStore();
+    void setProperty();
 
-        void printWitness();
-        void printMarking();
+    void printWitness();
+    void printMarking();
 
-        void printDot();
+    void printDot();
 
-        // this function is needed to allow the random walk in the main function
-        NetState* getNetState();
+    // this function is needed to allow the random walk in the main function
+    NetState* getNetState();
 };

@@ -7,17 +7,17 @@
 
 class Event
 {
-    private:
-        static std::map<index_t, Event*> current;
-        static std::vector<Event*> events;
+private:
+    static std::map<index_t, Event*> current;
+    static std::vector<Event*> events;
 
-        index_t transition;
+    index_t transition;
 
-    public:
-        bool target;
+public:
+    bool target;
 
-        Event(index_t);
+    Event(index_t);
 
-        static void dot(FILE * = stdout);
+    static void dot(FILE * = stdout);
 };
 

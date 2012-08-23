@@ -27,35 +27,35 @@ class EmptyStore;
 
 class ParallelExploration : public DFSExploration
 {
-    public:
-        /// evaluate property by dfs. Result true = state found, false = state not found
-        virtual bool depth_first(SimpleProperty &property, NetState &ns, Store &, FireListCreator &firelistcreator, int threadNumber);
+public:
+    /// evaluate property by dfs. Result true = state found, false = state not found
+    virtual bool depth_first(SimpleProperty &property, NetState &ns, Store &, FireListCreator &firelistcreator, int threadNumber);
 
 
-        sem_t* restartSemaphore;
-        // needs to be a semaphore to be able to simply delete it
-        sem_t* transfer_finished_semaphore;
-        bool finished;
-        // mutex for access to num_suspended AND the two transfer variables
-        pthread_mutex_t num_suspend_mutex;
-        int num_suspended;
+    sem_t* restartSemaphore;
+    // needs to be a semaphore to be able to simply delete it
+    sem_t* transfer_finished_semaphore;
+    bool finished;
+    // mutex for access to num_suspended AND the two transfer variables
+    pthread_mutex_t num_suspend_mutex;
+    int num_suspended;
 
-        pthread_mutex_t send_mutex;
-        SearchStack<SimpleStackEntry> transfer_stack;
-        NetState* transfer_netstate;
-        SimpleProperty* transfer_property;
+    pthread_mutex_t send_mutex;
+    SearchStack<SimpleStackEntry> transfer_stack;
+    NetState* transfer_netstate;
+    SimpleProperty* transfer_property;
 
-        // mutex to control writing back to current marking
-        pthread_mutex_t write_current_back_mutex;
+    // mutex to control writing back to current marking
+    pthread_mutex_t write_current_back_mutex;
 
-        virtual ~ParallelExploration() {}
-    protected:
+    virtual ~ParallelExploration() {}
+protected:
 
 
-    private:
-        pthread_t* runner_thread;
-        static void* threadPrivateDFS(void* container);
+private:
+    pthread_t* runner_thread;
+    static void* threadPrivateDFS(void* container);
 
-        // this will either return NULL (no state fullfilling the property has been found) or the witness state itself
-        NetState* threadedExploration(NetState &ns, Store &myStore, FireListCreator &fireListCreator, SimpleProperty* resultProperty, int threadNumber, int number_of_threads);
+    // this will either return NULL (no state fullfilling the property has been found) or the witness state itself
+    NetState* threadedExploration(NetState &ns, Store &myStore, FireListCreator &fireListCreator, SimpleProperty* resultProperty, int threadNumber, int number_of_threads);
 };

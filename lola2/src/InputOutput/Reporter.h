@@ -39,24 +39,24 @@ typedef enum
 */
 class Reporter
 {
-    protected:
-        /// error messages (indexed by errorcode_t)
-        static const char* error_messages[];
+protected:
+    /// error messages (indexed by errorcode_t)
+    static const char* error_messages[];
 
-    public:
-        virtual ~Reporter() {}
+public:
+    virtual ~Reporter() {}
 
-        /// markup a string
-        virtual String markup(markup_t, const char*, ...) const = 0;
+    /// markup a string
+    virtual String markup(markup_t, const char*, ...) const = 0;
 
-        /// always report
-        virtual void message(const char*, ...) const = 0;
+    /// always report
+    virtual void message(const char*, ...) const = 0;
 
-        /// only report in verbose mode
-        virtual void status(const char*, ...) const = 0;
+    /// only report in verbose mode
+    virtual void status(const char*, ...) const = 0;
 
-        /// display error message and abort program
-        __attribute__((noreturn)) virtual void abort(errorcode_t) const = 0;
+    /// display error message and abort program
+    __attribute__((noreturn)) virtual void abort(errorcode_t) const = 0;
 };
 
 /*!
@@ -64,28 +64,28 @@ class Reporter
 */
 class ReporterSocket : public Reporter
 {
-    private:
-        /// whether verbose reports are desired
-        const unsigned verbose : 1;
+private:
+    /// whether verbose reports are desired
+    const unsigned verbose : 1;
 
-        /// socket for this reporter
-        Socket mySocket;
+    /// socket for this reporter
+    Socket mySocket;
 
-    public:
-        ReporterSocket(u_short port, const char*, bool = true);
-        ~ReporterSocket();
+public:
+    ReporterSocket(u_short port, const char*, bool = true);
+    ~ReporterSocket();
 
-        /// always report
-        void message(const char*, ...) const;
+    /// always report
+    void message(const char*, ...) const;
 
-        /// only report in verbose mode
-        void status(const char*, ...) const;
+    /// only report in verbose mode
+    void status(const char*, ...) const;
 
-        /// display error message and abort program
-        __attribute__((noreturn)) void abort(errorcode_t) const;
+    /// display error message and abort program
+    __attribute__((noreturn)) void abort(errorcode_t) const;
 
-        /// markup a string
-        String markup(markup_t, const char*, ...) const;
+    /// markup a string
+    String markup(markup_t, const char*, ...) const;
 };
 
 /*!
@@ -93,79 +93,79 @@ class ReporterSocket : public Reporter
 */
 class ReporterStream : public Reporter
 {
-    private:
-        /// whether verbose reports are desired
-        const unsigned verbose : 1;
+private:
+    /// whether verbose reports are desired
+    const unsigned verbose : 1;
 
-        /// whether to use colored output
-        const unsigned useColor : 1;
+    /// whether to use colored output
+    const unsigned useColor : 1;
 
-        /// set foreground color to red
-        const char* _cr_;
-        /// set foreground color to green
-        const char* _cg_;
-        /// set foreground color to yellow
-        const char* _cy_;
-        /// set foreground color to blue
-        const char* _cb_;
-        /// set foreground color to magenta
-        const char* _cm_;
-        /// set foreground color to cyan
-        const char* _cc_;
-        /// set foreground color to light grey
-        const char* _cl_;
+    /// set foreground color to red
+    const char* _cr_;
+    /// set foreground color to green
+    const char* _cg_;
+    /// set foreground color to yellow
+    const char* _cy_;
+    /// set foreground color to blue
+    const char* _cb_;
+    /// set foreground color to magenta
+    const char* _cm_;
+    /// set foreground color to cyan
+    const char* _cc_;
+    /// set foreground color to light grey
+    const char* _cl_;
 
-        /// set foreground color to red (underlined)
-        const char* _cr__;
-        /// set foreground color to green (underlined)
-        const char* _cg__;
-        /// set foreground color to yellow (underlined)
-        const char* _cy__;
-        /// set foreground color to blue (underlined)
-        const char* _cb__;
-        /// set foreground color to magenta (underlined)
-        const char* _cm__;
-        /// set foreground color to cyan (underlined)
-        const char* _cc__;
-        /// set foreground color to light grey (underlined)
-        const char* _cl__;
+    /// set foreground color to red (underlined)
+    const char* _cr__;
+    /// set foreground color to green (underlined)
+    const char* _cg__;
+    /// set foreground color to yellow (underlined)
+    const char* _cy__;
+    /// set foreground color to blue (underlined)
+    const char* _cb__;
+    /// set foreground color to magenta (underlined)
+    const char* _cm__;
+    /// set foreground color to cyan (underlined)
+    const char* _cc__;
+    /// set foreground color to light grey (underlined)
+    const char* _cl__;
 
-        /// set foreground color to red (bold)
-        const char* _cR_;
-        /// set foreground color to green (bold)
-        const char* _cG_;
-        /// set foreground color to yellow (bold)
-        const char* _cY_;
-        /// set foreground color to blue (bold)
-        const char* _cB_;
-        /// set foreground color to magenta (bold)
-        const char* _cM_;
-        /// set foreground color to cyan (bold)
-        const char* _cC_;
-        /// set foreground color to light grey (bold)
-        const char* _cL_;
+    /// set foreground color to red (bold)
+    const char* _cR_;
+    /// set foreground color to green (bold)
+    const char* _cG_;
+    /// set foreground color to yellow (bold)
+    const char* _cY_;
+    /// set foreground color to blue (bold)
+    const char* _cB_;
+    /// set foreground color to magenta (bold)
+    const char* _cM_;
+    /// set foreground color to cyan (bold)
+    const char* _cC_;
+    /// set foreground color to light grey (bold)
+    const char* _cL_;
 
-        /// reset foreground color
-        const char* _c_;
-        /// make text bold
-        const char* _bold_;
-        /// unterline text
-        const char* _underline_;
+    /// reset foreground color
+    const char* _c_;
+    /// make text bold
+    const char* _bold_;
+    /// unterline text
+    const char* _underline_;
 
-    public:
-        ReporterStream(bool = true);
+public:
+    ReporterStream(bool = true);
 
-        /// always report
-        void message(const char*, ...) const;
+    /// always report
+    void message(const char*, ...) const;
 
-        /// only report in verbose mode
-        void status(const char*, ...) const;
+    /// only report in verbose mode
+    void status(const char*, ...) const;
 
-        /// display error message and abort program
-        __attribute__((noreturn)) void abort(errorcode_t) const;
+    /// display error message and abort program
+    __attribute__((noreturn)) void abort(errorcode_t) const;
 
-        /// markup a string
-        String markup(markup_t, const char*, ...) const;
+    /// markup a string
+    String markup(markup_t, const char*, ...) const;
 };
 
 // the reporter thread should be declared globally, so that each class can write messages without declaring it itself

@@ -21,26 +21,26 @@ from/to the same transtion.
 */
 class ArcList
 {
-    public:
-        /// Getter for place
-        PlaceSymbol* getPlace() const;
-        /// Getter for multiplicity
-        mult_t getMultiplicity() const;
-        /// Getter for next
-        ArcList* getNext() const;
-        /// Setter for next
-        void setNext(Symbol*);
-        /// Adding some tokens to multplicity
-        void addMultiplicity(mult_t);
+public:
+    /// Getter for place
+    PlaceSymbol* getPlace() const;
+    /// Getter for multiplicity
+    mult_t getMultiplicity() const;
+    /// Getter for next
+    ArcList* getNext() const;
+    /// Setter for next
+    void setNext(Symbol*);
+    /// Adding some tokens to multplicity
+    void addMultiplicity(mult_t);
 
-        /// Generate and initialize a list element
-        ArcList(PlaceSymbol*, mult_t);
+    /// Generate and initialize a list element
+    ArcList(PlaceSymbol*, mult_t);
 
-    private:
-        ///The place at the other end of arc (transition implicilty given)
-        PlaceSymbol* place;
-        /// Arcs are organized as lists.
-        ArcList* next;
-        /// Multiplicity
-        mult_t multiplicity;
+private:
+    ///The place at the other end of arc (transition implicilty given)
+    PlaceSymbol* place;
+    /// Arcs are organized as lists.
+    ArcList* next;
+    /// Multiplicity
+    mult_t multiplicity;
 };

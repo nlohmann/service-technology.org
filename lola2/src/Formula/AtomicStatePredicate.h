@@ -17,77 +17,77 @@ constant The general shape is: \f$ k_1 \cdot p_1 + \cdots + k_n \cdot p_n \leq k
 */
 class AtomicStatePredicate : public StatePredicate
 {
-    public:
-        virtual ~AtomicStatePredicate();
+public:
+    virtual ~AtomicStatePredicate();
 
-        /// creates a state predicate
-        AtomicStatePredicate(index_t, index_t, int);
+    /// creates a state predicate
+    AtomicStatePredicate(index_t, index_t, int);
 
-        /// adds a place (arg2) with positive factor (arg3) at position arg1
-        void addPos(index_t, index_t, capacity_t);
+    /// adds a place (arg2) with positive factor (arg3) at position arg1
+    void addPos(index_t, index_t, capacity_t);
 
-        /// adds a place (arg2) with negative factor (arg3) at position arg1
-        void addNeg(index_t, index_t, capacity_t);
+    /// adds a place (arg2) with negative factor (arg3) at position arg1
+    void addNeg(index_t, index_t, capacity_t);
 
-        virtual index_t getUpSet(index_t* stack, bool* onstack);
+    virtual index_t getUpSet(index_t* stack, bool* onstack);
 
-        /// These will only be called for non-atomic formulas.
-        // LCOV_EXCL_START
-        virtual void updateTF(index_t) {}
-        virtual void updateFT(index_t) {}
-        // LCOV_EXCL_STOP
+    /// These will only be called for non-atomic formulas.
+    // LCOV_EXCL_START
+    virtual void updateTF(index_t) {}
+    virtual void updateFT(index_t) {}
+    // LCOV_EXCL_STOP
 
 
-        /// updates the value of this sub formula. If value of this changes, it needs to be propagated to its parent
-        /// The parameter is the change in the formal sum
-        /// k_1 p_1 + ... + k_n p_n between the previously considered marking and the current marking.
-        /// Having a precomputed value for this change, evaluation of the formula is accelerated
-        void update(NetState &ns, int);
+    /// updates the value of this sub formula. If value of this changes, it needs to be propagated to its parent
+    /// The parameter is the change in the formal sum
+    /// k_1 p_1 + ... + k_n p_n between the previously considered marking and the current marking.
+    /// Having a precomputed value for this change, evaluation of the formula is accelerated
+    void update(NetState &ns, int);
 
-        /// evaluates a formula, e.g. upon initialization. Evaluation starts top/down, so the whole formula is
-        /// examined. Evaluation is done w.r.t. Marking::Current
-        virtual void evaluate(NetState &ns);
+    /// evaluates a formula, e.g. upon initialization. Evaluation starts top/down, so the whole formula is
+    /// examined. Evaluation is done w.r.t. Marking::Current
+    virtual void evaluate(NetState &ns);
 
-        void setUpSet();
+    void setUpSet();
 
-        /// lists place p_i indices that occur with positive multiplicity k_i
-        index_t* posPlaces;
+    /// lists place p_i indices that occur with positive multiplicity k_i
+    index_t* posPlaces;
 
-        /// lists place p_i indices that occur with negative multiplicity k_i
-        index_t* negPlaces;
+    /// lists place p_i indices that occur with negative multiplicity k_i
+    index_t* negPlaces;
 
-        /// lists multiplicities  k_i of places in posPlaces
-        capacity_t* posMult;
+    /// lists multiplicities  k_i of places in posPlaces
+    capacity_t* posMult;
 
-        /// lists multiplicities  k_i of places in negPlaces
-        capacity_t* negMult;
+    /// lists multiplicities  k_i of places in negPlaces
+    capacity_t* negMult;
 
-        /// the number of pos entries
-        index_t cardPos;
+    /// the number of pos entries
+    index_t cardPos;
 
-        /// the number of negative entries
-        index_t cardNeg;
+    /// the number of negative entries
+    index_t cardNeg;
 
-        /// the threshold k
-        int threshold;
+    /// the threshold k
+    int threshold;
 
-        /// The current value of the formal sum k_1 p_1 + ... + k_n p_n
-        int sum;
+    /// The current value of the formal sum k_1 p_1 + ... + k_n p_n
+    int sum;
 
-        /// The up set of this formula
-        index_t* up;
+    /// The up set of this formula
+    index_t* up;
 
-        /// The size of the up set
-        index_t cardUp;
+    /// The size of the up set
+    index_t cardUp;
 
-        /// counts atomic subformulas
-        virtual index_t countAtomic();
+    /// counts atomic subformulas
+    virtual index_t countAtomic();
 
-        /// collects atomic subformulas; array must be malloced beforehand
-        /// result is number of inserted elements
-        virtual index_t collectAtomic(AtomicStatePredicate**);
-        virtual bool DEBUG__consistency(NetState &ns);
+    /// collects atomic subformulas; array must be malloced beforehand
+    /// result is number of inserted elements
+    virtual index_t collectAtomic(AtomicStatePredicate**);
+    virtual bool DEBUG__consistency(NetState &ns);
 
-        // copy function
-        virtual StatePredicate* copy(StatePredicate* parent);
+    // copy function
+    virtual StatePredicate* copy(StatePredicate* parent);
 };

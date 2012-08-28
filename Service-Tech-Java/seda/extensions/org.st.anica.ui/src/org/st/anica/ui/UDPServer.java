@@ -5,19 +5,26 @@ import java.net.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.st.anica.ui.preferences.PreferenceConstants;
 
 public class UDPServer {
     
     private DatagramSocket socket;
+    
+    private final int fPacketSize;
+    private final int fTimeout;
 
     public UDPServer(int port) throws IOException {
         socket = new DatagramSocket(port);
+        
+        fPacketSize = Integer.parseInt(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_ANICA_PACKETSIZE))*1024;
+        fTimeout = Integer.parseInt(Activator.getDefault().getPreferenceStore().getString(PreferenceConstants.P_ANICA_TIMEOUT));
     }
     
     public String receive() throws IOException {
-        byte[] receiveData = new byte[1024];
+        byte[] receiveData = new byte[fPacketSize];
         
-        socket.setSoTimeout(5000);
+        socket.setSoTimeout(fTimeout);
 
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length); 
 

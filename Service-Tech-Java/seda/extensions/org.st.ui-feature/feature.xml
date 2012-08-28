@@ -2,7 +2,7 @@
 <feature
       id="org.st.ui"
       label="Service-Technology.org UI"
-      version="1.0.1.qualifier"
+      version="1.0.2.qualifier"
       provider-name="service-technology.org">
 
    <description url="http://www.service-technology.org/">

@@ -28,6 +28,8 @@ public class AnicaUI_PreferencePage
 		addField(new StringFieldEditor(PreferenceConstants.P_ANICA_SERVER_URL, "Anica Server URL", getFieldEditorParent()));
     addField(new IntegerFieldEditor(PreferenceConstants.P_ANICA_SERVER_PORT, "Server Port", getFieldEditorParent()));
     addField(new IntegerFieldEditor(PreferenceConstants.P_ANICA_LOCAL_PORT, "Local Port", getFieldEditorParent()));
+    addField(new IntegerFieldEditor(PreferenceConstants.P_ANICA_PACKETSIZE, "Maximum Packet Size (KB)", getFieldEditorParent()));
+    addField(new IntegerFieldEditor(PreferenceConstants.P_ANICA_TIMEOUT, "Timeout for Reply from Anica (ms)", getFieldEditorParent()));
 	}
 
 	/* (non-Javadoc)

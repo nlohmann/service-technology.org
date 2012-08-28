@@ -3,7 +3,7 @@ import java.io.*;
 import java.net.*;
 
 public class UDPClient {
-    private int port = 5556;
+    private int port;
     private InetAddress ipaddress;
     private DatagramSocket socket;
     

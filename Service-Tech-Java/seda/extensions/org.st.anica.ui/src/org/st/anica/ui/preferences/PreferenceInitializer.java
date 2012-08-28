@@ -19,5 +19,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(PreferenceConstants.P_ANICA_SERVER_URL, "localhost");
 		store.setDefault(PreferenceConstants.P_ANICA_SERVER_PORT, "5556");
 		store.setDefault(PreferenceConstants.P_ANICA_LOCAL_PORT, "5555");
+		
+		store.setDefault(PreferenceConstants.P_ANICA_PACKETSIZE, 64);
+		store.setDefault(PreferenceConstants.P_ANICA_TIMEOUT, 5000);
 	}
 }

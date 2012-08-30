@@ -17,13 +17,17 @@ public:
 
     vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex);
 private:
-    /// input vector filled in getinput method
+    /// vector of input vectors that are returned from encodeNetState. Each thread has its own vector to avoid conflicts.
     vectordata_t** inputs;
 
-    /// number of words in input vector
+    /// number of words in input vector (fixed for all threads)
     index_t insize;
 
-    /// number of leading words that can be copied using memcpy.
+    /// memcpy can be used only if
+    /// - input and suffix tree vectors use the same data type
+    /// - the alignment right (offset is 0 bits)
+    /// - all bits are significant for the used places
+    /// to simplify, memcpy ist used only for the first couple of places where all conditions are met. memcpylen states the number of such leading places
     index_t memcpylen;
 };
 

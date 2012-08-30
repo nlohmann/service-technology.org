@@ -19,10 +19,12 @@ extern Reporter* rep;
 
 CopyEncoder::CopyEncoder(int numThreads) : PluginStore::NetStateEncoder(numThreads)
 {
+	// compute number of input words necessary to store all significant places.
     insize = ((SIZEOF_CAPACITY_T*Place::CardSignificant+SIZEOF_VECTORDATA_T-1)/SIZEOF_VECTORDATA_T);
 
     rep->status("using %d bytes per marking, including %d wasted bytes", insize * SIZEOF_VECTORDATA_T, insize * SIZEOF_VECTORDATA_T - SIZEOF_CAPACITY_T * Place::CardSignificant);
 
+    // test if memcpy is actually required. See declaration of nocopy for detailed information.
 #if SIZEOF_CAPACITY_T % SIZEOF_VECTORDATA_T != 0
     if(insize * SIZEOF_VECTORDATA_T <= Net::Card[PL] * SIZEOF_CAPACITY_T)
         nocopy = true;
@@ -39,6 +41,7 @@ CopyEncoder::CopyEncoder(int numThreads) : PluginStore::NetStateEncoder(numThrea
 
 CopyEncoder::~CopyEncoder()
 {
+	// free input vectors (if at all used)
 #if SIZEOF_CAPACITY_T % SIZEOF_VECTORDATA_T != 0
     if(!nocopy) {
         for(int i=0; i<numThreads; i++)
@@ -53,11 +56,15 @@ CopyEncoder::~CopyEncoder()
 vectordata_t* CopyEncoder::encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex)
 {
     bitlen = insize * VECTOR_WIDTH;
+
+    // test if memcpy is required
 #if SIZEOF_CAPACITY_T % SIZEOF_VECTORDATA_T == 0
+    // it isn't (case a), cast the input vector
     return reinterpret_cast<vectordata_t*>(ns.Current);
 #else
-    if(nocopy)
+    if(nocopy) // it isn't (case b), cast the input vector
         return reinterpret_cast<vectordata_t*>(ns.Current);
+    // it is, memcpy into preallocated input vector
     memcpy(inputs[threadIndex],ns.Current,Place::CardSignificant * SIZEOF_CAPACITY_T);
     return inputs[threadIndex];
 #endif

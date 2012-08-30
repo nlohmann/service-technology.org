@@ -18,18 +18,20 @@ extern Reporter* rep;
 
 BitEncoder::BitEncoder(int numThreads) : PluginStore::NetStateEncoder(numThreads)
 {
+	// compute number of input words necessary to store all significant bits.
     insize = ((Place::SizeOfBitVector+VECTOR_WIDTH-1)/VECTOR_WIDTH);
 
     rep->status("using %d bytes per marking, with %d unused bits", insize * SIZEOF_VECTORDATA_T, insize * VECTOR_WIDTH - Place::SizeOfBitVector);
 
+    // allocate input vectors
     inputs = (vectordata_t**) malloc(numThreads * SIZEOF_VOIDP);
     for(int i=0; i<numThreads; i++)
     {
         inputs[i] = (vectordata_t*) malloc(insize * sizeof(vectordata_t));
     }
 
+    // determine the number of leading places suitable for memcpying
     memcpylen = 0;
-    // memcpy can be used only if input and suffix tree vectors use the same data type
 #if VECTOR_WIDTH == PLACE_WIDTH
     while(memcpylen<insize && Place::CardBits[memcpylen] == PLACE_WIDTH)
         memcpylen++;
@@ -38,6 +40,7 @@ BitEncoder::BitEncoder(int numThreads) : PluginStore::NetStateEncoder(numThreads
 
 BitEncoder::~BitEncoder()
 {
+	// free all imput vectors
     for(int i=0; i<numThreads; i++)
     {
         free(inputs[i]);
@@ -71,17 +74,20 @@ vectordata_t* BitEncoder::encodeNetState(NetState& ns, bitindex_t& bitlen, index
     /// the bits of the current input word we have NOT dealt with so far
     bitindex_t input_bitstogo = VECTOR_WIDTH;
 
-    /// clear input vector
+    /// clear input vector (we are going to use bitwise or later on, so all bits have to be zero initially)
     memset(pInput,0,(insize - memcpylen)*sizeof(vectordata_t));
 
     while (true)
     {
+    	// fill all bits into the input vector that are in the current word of both the input vector and the current place.
 #if PLACE_WIDTH >= VECTOR_WIDTH
         *pInput |= vectordata_t((capacity_t(*pPlace << (PLACE_WIDTH - place_bitstogo)) >> (PLACE_WIDTH - input_bitstogo)));
 #else
         *pInput |= vectordata_t(vectordata_t(*pPlace) << (VECTOR_WIDTH - place_bitstogo)) >> (VECTOR_WIDTH - input_bitstogo);
 #endif
-        if(place_bitstogo < input_bitstogo) {
+
+        // update position variables
+        if(place_bitstogo < input_bitstogo) { // all place bits inserted, go to next place
             place_index++, pPlace++;
             if (place_index >= Place::CardSignificant)
             {
@@ -89,11 +95,11 @@ vectordata_t* BitEncoder::encodeNetState(NetState& ns, bitindex_t& bitlen, index
             }
             input_bitstogo -= place_bitstogo;
             place_bitstogo = Place::CardBits[place_index];
-        } else if(place_bitstogo > input_bitstogo) {
+        } else if(place_bitstogo > input_bitstogo) { // current input word full, go to next word
             place_bitstogo -= input_bitstogo;
             input_bitstogo = VECTOR_WIDTH;
             ++pInput;
-        } else {
+        } else { // both current input word and current place are done, go to next ones.
             place_index++, pPlace++;
             if (place_index >= Place::CardSignificant)
             {

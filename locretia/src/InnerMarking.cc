@@ -197,6 +197,7 @@ void InnerMarking::deleteCounterPlace() {
  \brief Creates a XES log with traces of the given net and writes it to the given output stream.
 
  \param[in,out]	file 				the output stream to write the log to
+ \param[in,out]	filename			the filename
  \param[in]		trace_count  		the total number of traces to be created
  \param[in]		trace_min_length	the minimal length of a trace
  \param[in]		trace_max_length	the maximal length of a trace
@@ -306,7 +307,7 @@ void InnerMarking::create_trace(std::ostream& file, const int trace_number, cons
 		//create log entry for event
 		tempstring << "\t\t<event>\n"
 				   << "\t\t\t<string key=\"org:resource\" value=\"UNDEFINED\"/>\n"
-				   << "\t\t\t<date key=\"time:timestamp\" value=\"" << timestring.str() << /*".000+00:00*/"\"/>\n"
+				   << "\t\t\t<date key=\"time:timestamp\" value=\"" << timestring.str() << ".000+00:00\"/>\n"
 				   << "\t\t\t<string key=\"" << EVENT_KEY_LABEL << "\" value=\"" << Label::id2name[inner_markings[id]->labels[choose]] << "\"/>\n"
 				   //<< "\t\t\t<int key=\"" << EVENT_KEY_NUMBER << "\" value=\"" << counter << "\"/>\n"
 				   << "\t\t\t<string key=\"lifecycle:transition\" value=\"complete\"/>\n"

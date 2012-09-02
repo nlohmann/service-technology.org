@@ -195,7 +195,7 @@ std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, st
 	   << "  net size:    " << pnapi::io::stat << net << pnapi::io::pnml
 	   << "\n-->\n\n"
 
-	   << "<pnml>\n";
+	   << "<pnml>\n"
 
 	   << "  <module>\n";
 

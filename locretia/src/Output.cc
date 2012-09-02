@@ -197,7 +197,7 @@ std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, st
 
 	   << "<pnml>\n";
 
-//	   << "  <module>\n";
+	   << "  <module>\n";
 
 //	output(os, net.getInterface());
 
@@ -223,7 +223,7 @@ std::ostream & Output::output(std::ostream & os, const pnapi::PetriNet & net, st
 	os << "      </marking>\n"
 	   << "    </finalmarkings>\n"
 
-//	   << "  </module>\n"
+	   << "  </module>\n"
 
 	   << "</pnml>\n";
 

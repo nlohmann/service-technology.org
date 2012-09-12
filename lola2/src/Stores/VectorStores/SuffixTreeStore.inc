@@ -15,7 +15,8 @@
 
 
 
-SuffixTreeStore::SuffixTreeStore()
+template <typename T>
+SuffixTreeStore<T>::SuffixTreeStore()
 {
     branch = (Decision**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
     firstvector = (vectordata_t**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
@@ -25,7 +26,8 @@ SuffixTreeStore::SuffixTreeStore()
         pthread_rwlock_init(rwlocks+i, NULL);
 }
 
-SuffixTreeStore::~SuffixTreeStore()
+template <typename T>
+SuffixTreeStore<T>::~SuffixTreeStore()
 {
     for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
     {
@@ -48,11 +50,13 @@ SuffixTreeStore::~SuffixTreeStore()
 }
 
 /// create a new branch in the decision tree at depth b.
-SuffixTreeStore::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL)
+template <typename T>
+SuffixTreeStore<T>::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL)
 {
 }
 
-SuffixTreeStore::Decision::~Decision()
+template <typename T>
+SuffixTreeStore<T>::Decision::~Decision()
 {
     free(vector);
     if (nextnew)
@@ -67,7 +71,8 @@ SuffixTreeStore::Decision::~Decision()
 }
 
 /// search for an input vector in the suffix tree and insert it, if it is not present
-bool SuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex)
+template <typename T>
+bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex)
 {
     /// If a new decision record is inserted, * anchor must point to it
     Decision** anchor;
@@ -267,7 +272,7 @@ bool SuffixTreeStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen,
         }
     }
 
-    assert(bitlen > position);
+    assert(bitlen >= position);
     // vector_bitstogo is always VECTOR_WIDTH here
     int newvectorlen = ((bitlen - position) + (VECTOR_WIDTH - 1)) / VECTOR_WIDTH;
     *newvector = (vectordata_t*) calloc(newvectorlen, sizeof(vectordata_t));

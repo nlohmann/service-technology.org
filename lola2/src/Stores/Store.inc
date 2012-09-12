@@ -10,14 +10,15 @@
 #include <unistd.h>
 #include <csignal>
 #include <Core/Dimensions.h>
-#include <Stores/Store.h>
+//#include <Stores/Store.h>
 #include <Stores/EmptyStore.h>
 #include <InputOutput/Reporter.h>
 #include <cmdline.h>
 
 extern gengetopt_args_info args_info;
 
-void* Store::reporter_internal(void)
+template <typename T>
+void* Store<T>::reporter_internal(void)
 {
     static unsigned int intervals = 0;
     uint64_t last_markings = 0;
@@ -34,7 +35,7 @@ void* Store::reporter_internal(void)
 
         if (args_info.search_arg == search_arg_findpath)
         {
-            rep->status("%10llu tries, %10llu fired transitions, %5d secs", ((EmptyStore*)this)->tries, get_number_of_calls() - 1, time_elapsed);
+            rep->status("%10llu tries, %10llu fired transitions, %5d secs", ((EmptyStore<T>*) this)->tries, get_number_of_calls() - 1, time_elapsed);
         }
         else
         {
@@ -56,13 +57,15 @@ void* Store::reporter_internal(void)
     }
 }
 
-void* Store::reporter_helper(void* context)
+template <typename T>
+void* Store<T>::reporter_helper(void* context)
 {
     // required indirection to mix C/C++ - see http://stackoverflow.com/questions/1151582/pthread-function-from-a-class for more information
     return ((Store*)context)->reporter_internal();
 }
 
-Store::Store(uint32_t _number_of_threads) : markings(0), calls(0), number_of_threads(_number_of_threads)
+template <typename T>
+Store<T>::Store(uint32_t _number_of_threads) : markings(0), calls(0), number_of_threads(_number_of_threads)
 {
     calls = (uint64_t*) calloc(number_of_threads, sizeof(uint64_t));
     markings = (uint64_t*) calloc(number_of_threads, sizeof(uint64_t));
@@ -74,7 +77,8 @@ Store::Store(uint32_t _number_of_threads) : markings(0), calls(0), number_of_thr
     }
 }
 
-Store::~Store()
+template <typename T>
+Store<T>::~Store()
 {
     void* void_pointer;
     int ret = pthread_cancel(reporter_thread);
@@ -87,27 +91,23 @@ Store::~Store()
     free(markings);
 }
 
-uint64_t Store::get_number_of_markings() {
+template <typename T>
+uint64_t Store<T>::get_number_of_markings() {
     uint64_t result = 0;
     for (uint32_t thread_number = 0; thread_number < number_of_threads; thread_number++)
         result += markings[thread_number];
     return result;
 }
 
-uint64_t Store::get_number_of_calls() {
+template <typename T>
+uint64_t Store<T>::get_number_of_calls() {
     uint64_t result = 0;
     for (uint32_t thread_number = 0; thread_number < number_of_threads; thread_number++)
         result += calls[thread_number];
     return result;
 }
 
-
-bool Store::searchAndInsert(NetState &ns, uint32_t thread)
+template <typename T>
+void Store<T>::finalize()
 {
-    return searchAndInsert(ns);
-}
-
-void Store::finalize()
-{
-
 }

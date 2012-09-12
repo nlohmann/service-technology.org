@@ -11,15 +11,11 @@
 #include <Net/Marking.h>
 #include <Net/Net.h>
 #include <Net/Place.h>
-#include <Stores/PluginStore.h>
 
-
-PluginStore::NetStateEncoder::NetStateEncoder(int _numThreads) : numThreads(_numThreads)
-{
-}
 
 /// creates new Store using the specified components. The given components are assumed to be used exclusively and are freed once the PluggableStore gets destructed.
-PluginStore::PluginStore(NetStateEncoder* _netStateEncoder, VectorStore* _vectorStore, uint32_t _number_of_threads) : Store(_number_of_threads)
+template<typename T>
+PluginStore<T>::PluginStore(NetStateEncoder* _netStateEncoder, VectorStore<T>* _vectorStore, uint32_t _number_of_threads) : Store<T>(_number_of_threads)
 {
     pthread_mutex_init(&inc_mutex, NULL);
     netStateEncoder = _netStateEncoder;
@@ -27,7 +23,8 @@ PluginStore::PluginStore(NetStateEncoder* _netStateEncoder, VectorStore* _vector
 }
 
 /// frees both components
-PluginStore::~PluginStore()
+template<typename T>
+PluginStore<T>::~PluginStore()
 {
     pthread_mutex_destroy(&inc_mutex);
     delete netStateEncoder;
@@ -35,23 +32,20 @@ PluginStore::~PluginStore()
 }
 
 /// search for a state and insert it, if it is not present
-bool PluginStore::searchAndInsert(NetState &ns, void** s)
+template<typename T>
+bool PluginStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex)
 {
-    return searchAndInsert(ns, (index_t) 0);
-}
-
-/// search for a state and insert it, if it is not present
-bool PluginStore::searchAndInsert(NetState &ns, index_t threadIndex)
-{
-    ++calls[threadIndex];
+    ++(this->calls[threadIndex]);
 
     // fetch input vector
     bitindex_t bitlen;
     vectordata_t* input = netStateEncoder->encodeNetState(ns, bitlen, threadIndex);
 
     // check input vector in vector store
-    bool ret = vectorStore->searchAndInsert(input, bitlen, ns.HashCurrent, threadIndex);
-    if (!ret)
-        ++markings[threadIndex];
+    bool ret = vectorStore->searchAndInsert(input, bitlen, ns.HashCurrent, payload, threadIndex);
+    if (!ret) {
+        ++(this->markings[threadIndex]);
+//        printf("markings[%u]: %llu\n",threadIndex,this->markings[threadIndex]);
+    }
     return ret;
 }

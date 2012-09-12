@@ -581,14 +581,6 @@ AT_CLEANUP
 AT_BANNER([Stores])
 ############################################################################
 
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bin],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bin2],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[lgbin],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[lgwbbin],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],1,3,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[stl],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bit],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbbin],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbstl],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbbloom],1,2,[no],242,805)
@@ -599,14 +591,6 @@ AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssbin],1,2,[no],242,805
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssstl],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssbloom],1,2,[no],242,805)
 
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bin],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bin2],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[lgbin],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[lgwbbin],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],1,3,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[stl],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bit],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psbbin],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psbstl],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psbbloom],1,2,[no],2048,23040)
@@ -617,14 +601,6 @@ AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssbin],1,2
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssstl],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssbloom],1,2,[no],2048,23040)
 
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bin],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bin2],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[lgbin],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[lgwbbin],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],1,3,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[stl],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bit],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psbbin],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psbstl],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pscbin],1,2,[no],47905,137280)
@@ -634,10 +610,6 @@ AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssbin],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssstl],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssbloom],1,2,[no],47905,137280)
 
-AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bin],1,2,[no],2546432,24460016)
-AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bin2],1,2,[no],2546432,24460016)
-AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[lgbin],1,2,[no],2546432,24460016)
-AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[lgwbbin],1,2,[no],2546432,24460016)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[psbbin],1,2,[no],2546432,24460016)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pscbin],1,2,[no],2546432,24460016)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pssbin],1,2,[no],2546432,24460016)
@@ -650,9 +622,6 @@ AT_BANNER([Parallel Stores])
 ############################################################################
 
 
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bin2],4,2,[no],242,)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[lgbin],4,2,[no],242,)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[lgwbbin],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbbin],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbstl],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbbloom],4,2,[no],242,)
@@ -663,9 +632,6 @@ AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssbin],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssstl],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssbloom],4,2,[no],242,)
 
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bin2],4,2,[no],2048,)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[lgbin],4,2,[no],2048,)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[lgwbbin],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psbbin],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psbstl],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psbbloom],4,2,[no],2048,)
@@ -676,9 +642,6 @@ AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssbin],4,2
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssstl],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssbloom],4,2,[no],2048,)
 
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bin2],4,2,[no],47905,)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[lgbin],4,2,[no],47905,)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[lgwbbin],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psbbin],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psbstl],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pscbin],4,2,[no],47905,)
@@ -688,9 +651,6 @@ AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssbin],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssstl],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssbloom],4,2,[no],47905,)
 
-AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bin2],4,2,[no],2546432,)
-AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[lgbin],4,2,[no],2546432,)
-AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[lgwbbin],4,2,[no],2546432,)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[psbbin],4,2,[no],2546432,)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pscbin],4,2,[no],2546432,)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pssbin],4,2,[no],2546432,)
@@ -704,7 +664,7 @@ AT_BANNER([Deadlock])
 
 AT_SETUP([Phils 10])
 AT_CHECK([cp TESTFILES/phils10.lola .])
-AT_CHECK([LOLA phils10.lola --check=deadlock --store=bin2 -v --state --path],0,stdout,stderr)
+AT_CHECK([LOLA phils10.lola --check=deadlock --store=psbbin -v --state --path],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_CHECK([GREP -q "lola: witness state:" stderr])
 AT_CHECK([GREP -q "lola: hl.1 : 1" stderr])
@@ -727,7 +687,7 @@ AT_CLEANUP
 
 AT_SETUP([Phils 10 (parallel)])
 AT_CHECK([cp TESTFILES/phils10.lola .])
-AT_CHECK([LOLA phils10.lola --check=deadlock --store=bin2 -v --state --path --threads=4 ],0,stdout,stderr)
+AT_CHECK([LOLA phils10.lola --check=deadlock --store=psbbin -v --state --path --threads=4 ],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_CHECK([GREP -q "lola: witness state:" stderr])
 AT_CHECK([GREP -q "lola: hl.1 : 1" stderr])
@@ -738,7 +698,7 @@ AT_CLEANUP
 
 AT_SETUP([Kanban 5 (parallel)])
 AT_CHECK([cp TESTFILES/Kanban5.pnml.lola .])
-AT_CHECK([LOLA Kanban5.pnml.lola --store=bin2 --check=deadlock -v --state --path --threads=4],0,stdout,stderr)
+AT_CHECK([LOLA Kanban5.pnml.lola --store=psbbin --check=deadlock -v --state --path --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: witness state:" stderr], 1)
 AT_CHECK([GREP -q "lola: witness path:" stderr], 1)
@@ -768,14 +728,14 @@ AT_CLEANUP
 
 AT_SETUP([Garavel (parallel)])
 AT_CHECK([cp TESTFILES/garavel.lola TESTFILES/garavel.task .])
-AT_CHECK([LOLA garavel.lola --formula=garavel.task --check=statepredicate -v --store=bin2 --threads=4],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --formula=garavel.task --check=statepredicate -v --store=psbbin --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
 
 AT_SETUP([positive formula (parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola TESTFILES/philpos.task .])
-AT_CHECK([LOLA phils5.lola --formula=philpos.task --check=statepredicate -v --store=bin2 --threads=4],0,stdout,stderr)
+AT_CHECK([LOLA phils5.lola --formula=philpos.task --check=statepredicate -v --store=psbbin --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -794,7 +754,7 @@ AT_CLEANUP
 
 AT_SETUP([Garavel (parallel)])
 AT_CHECK([cp TESTFILES/garavel.lola TESTFILES/garavel.task .])
-AT_CHECK([LOLA garavel.lola --formula=garavel.task --search=findpath --check=statepredicate -v --store=bin2 --threads=4],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --formula=garavel.task --search=findpath --check=statepredicate -v --store=psbbin --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(findpath)
 AT_CLEANUP
@@ -814,7 +774,7 @@ AT_CLEANUP
 
 AT_SETUP([Phils 10 (parallel)])
 AT_CHECK([cp TESTFILES/phils10.lola .])
-AT_CHECK([LOLA phils10.lola --check=full -v --threads=4 --store=bin2],0,stdout,stderr)
+AT_CHECK([LOLA phils10.lola --check=full -v --threads=4 --store=psbbin],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 59048 markings" stderr])
 AT_KEYWORDS(deadlock)
@@ -822,7 +782,7 @@ AT_CLEANUP
 
 AT_SETUP([Kanban 5 (parallel)])
 AT_CHECK([cp TESTFILES/Kanban5.pnml.lola .])
-AT_CHECK([LOLA Kanban5.pnml.lola --check=full  -v --threads=4 --store=bin2],0,stdout,stderr)
+AT_CHECK([LOLA Kanban5.pnml.lola --check=full  -v --threads=4 --store=psbbin],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 2546432 markings" stderr])
 AT_KEYWORDS(deadlock)
@@ -861,7 +821,7 @@ AT_CLEANUP
 AT_SETUP([State predicate initially satisfied (parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsinitial.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsinitial.task phils5.lola -v --threads=4 --store=bin2],0,ignore,stderr)
+AT_CHECK([LOLA --check=statepredicate --formula=philsinitial.task phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
 AT_CHECK([GREP -q -E "0 markings, 0 edges" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -869,7 +829,7 @@ AT_CLEANUP
 AT_SETUP([Findpath initially satisfied (parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsinitial.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsinitial.task --search=findpath phils5.lola -v --threads=4 --store=bin2],0,ignore,stderr)
+AT_CHECK([LOLA --check=statepredicate --formula=philsinitial.task --search=findpath phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: yes" stderr])
 AT_KEYWORDS(findpath)
 AT_CLEANUP
@@ -878,7 +838,7 @@ AT_SETUP([TRUE (parallel)])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_DATA(formula.task,[FORMULA TRUE;
 ])
-AT_CHECK([LOLA garavel.lola --check=statepredicate --formula=formula.task --verbose --threads=4 --store=bin2],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --check=statepredicate --formula=formula.task --verbose --threads=4 --store=psbbin],0,stdout,stderr)
 AT_CHECK([GREP -q -E "result: yes" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -917,7 +877,7 @@ AT_CLEANUP
 AT_SETUP([State predicate unsatisfiable (parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsunsat.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task phils5.lola -v --threads=4 --store=bin2],0,ignore,stderr)
+AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -925,7 +885,7 @@ AT_CLEANUP
 AT_SETUP([Findpath unsatisfiable (parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsunsat.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task --search=findpath --retrylimit=100 --depthlimit=1000 phils5.lola -v --threads=4 --store=bin2],0,ignore,stderr)
+AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task --search=findpath --retrylimit=100 --depthlimit=1000 phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
 AT_KEYWORDS(findpath)
 AT_CLEANUP
@@ -934,7 +894,7 @@ AT_SETUP([FALSE (parallel)])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_DATA(formula.task,[FORMULA FALSE;
 ])
-AT_CHECK([LOLA garavel.lola --check=statepredicate --formula=formula.task --verbose --threads=4 --store=bin2],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --check=statepredicate --formula=formula.task --verbose --threads=4 --store=psbbin],0,stdout,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -953,7 +913,7 @@ AT_CLEANUP
 
 AT_SETUP(disabled tscc in deadlock stubborn sets (parallel))
 AT_CHECK([cp TESTFILES/m.lola .])
-AT_CHECK([LOLA --check=deadlock m.lola -v --threads=4 --store=bin2],0,ignore,stderr)
+AT_CHECK([LOLA --check=deadlock m.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: yes" stderr])
 AT_KEYWORDS(stubborn)
 AT_CLEANUP
@@ -965,22 +925,6 @@ AT_BANNER([Memory Management])
 # AT_ST_CHECK_MEMORY([Net Name], [Filename], [--check=], [--store=], [--threads=])
 # E.G.: AT_ST_CHECK_MEMORY([Garavel], [garavel.lola], [none], [bin], 1)
 
-AT_ST_CHECK_MEMORY([Garavel], [garavel.lola], [none], [bin], 1)
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [none], [bin], 1)
-
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [bin], 1)
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [stl], 1)
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [bit], 1)
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [bloom], 1)
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [bin], 1)
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [stl], 1)
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [bit], 1)
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [bloom], 1)
-
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [bin2], 4)
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [bin2], 4)
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [lgbin], 4)
-AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [deadlock], [lgbin], 4)
 AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [pscbin], 4)
 AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [pssbin], 4)
 AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [psbbin], 4)

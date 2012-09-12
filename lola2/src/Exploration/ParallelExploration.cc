@@ -36,7 +36,7 @@ extern Reporter* rep;
 
 struct tpDFSArguments {
     NetState* ns;
-    Store* myStore;
+    Store<void>* myStore;
     FireListCreator* fireListCreator;
     SimpleProperty* resultProperty;
     int threadNumber;
@@ -47,7 +47,7 @@ struct tpDFSArguments {
 void* ParallelExploration::threadPrivateDFS(void* container) {
     tpDFSArguments* arguments = (tpDFSArguments*) container;
     NetState &ns = *arguments->ns;
-    Store &myStore = *arguments->myStore;
+    Store<void> &myStore = *arguments->myStore;
     FireListCreator &fireListCreator = *arguments->fireListCreator;
     int threadNumber = arguments->threadNumber;
     int number_of_threads = arguments->number_of_threads;
@@ -58,7 +58,7 @@ void* ParallelExploration::threadPrivateDFS(void* container) {
             number_of_threads);
 }
 
-NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
+NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &myStore,
         FireListCreator &fireListCreator, SimpleProperty* resultProperty,
         int threadNumber, int number_of_threads) {
     SimpleProperty* sp = resultProperty->copy();
@@ -91,7 +91,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
     // add initial marking to store
     // we do not care about return value since we know that store is empty
 
-    myStore.searchAndInsert(ns, threadNumber);
+    myStore.searchAndInsert(ns,0,threadNumber);
 
     // get first firelist
     index_t* currentFirelist;
@@ -114,7 +114,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
             // fire this transition to produce new Marking::Current
             Transition::fire(ns, currentFirelist[currentEntry]);
 
-            if (myStore.searchAndInsert(ns, threadNumber)) {
+            if (myStore.searchAndInsert(ns,0,threadNumber)) {
                 // State exists! -->backtracking to previous state
                 Transition::backfire(ns, currentFirelist[currentEntry]);
             } else {
@@ -272,7 +272,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store &myStore,
 }
 
 bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
-                                      Store &myStore, FireListCreator &firelistcreator,
+                                      Store<void> &myStore, FireListCreator &firelistcreator,
                                       int number_of_threads) {
     // copy initial marking into current marking
     //Marking::init();

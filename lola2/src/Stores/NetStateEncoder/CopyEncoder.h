@@ -9,7 +9,7 @@
 #include <Core/Dimensions.h>
 #include <Stores/PluginStore.h>
 
-class CopyEncoder : public PluginStore::NetStateEncoder
+class CopyEncoder : public NetStateEncoder
 {
 public:
     CopyEncoder(int numThreads);

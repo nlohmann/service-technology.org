@@ -8,43 +8,26 @@
 #pragma once
 #include <Core/Dimensions.h>
 #include <Stores/Store.h>
+#include <Stores/VectorStores/VectorStore.h>
+#include <Stores/NetStateEncoder/NetStateEncoder.h>
 
-class PluginStore : public Store
+template <typename T> class PluginStore : public Store<T>
 {
 public:
-    class NetStateEncoder
-    {
-    protected:
-        int numThreads;
-    public:
-        NetStateEncoder(int _numThreads);
-        virtual ~NetStateEncoder() {}
-        virtual vectordata_t* encodeNetState(NetState &ns, bitindex_t &bitlen, index_t threadIndex) = 0;
-    };
-
-    class VectorStore
-    {
-    public:
-        virtual ~VectorStore() {}
-        virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex) = 0;
-    };
-
     /// creates new Store using the specified components. The given components are assumed to be used exclusively and are freed once the PluggableStore gets destructed.
-    PluginStore(NetStateEncoder* _netStateEncoder, VectorStore* _vectorStore, uint32_t _number_of_threads);
+    PluginStore(NetStateEncoder* _netStateEncoder, VectorStore<T>* _vectorStore, uint32_t _number_of_threads);
 
     /// frees both components
     ~PluginStore();
 
     /// check whether current marking is stored
-    bool searchAndInsert(NetState &ns, uint32_t threadIndex);
-
-    /// check whether current marking is stored
-    bool searchAndInsert(NetState &ns, void** s = NULL);
+    bool searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex);
 
 private:
     // a mutex for incrementing
     pthread_mutex_t inc_mutex;
     NetStateEncoder* netStateEncoder;
-    VectorStore* vectorStore;
+    VectorStore<T>* vectorStore;
 };
 
+#include <Stores/PluginStore.inc>

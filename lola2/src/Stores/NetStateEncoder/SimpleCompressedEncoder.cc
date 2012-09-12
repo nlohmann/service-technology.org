@@ -14,7 +14,7 @@
 #include <Stores/NetStateEncoder/SimpleCompressedEncoder.h>
 
 
-SimpleCompressedEncoder::SimpleCompressedEncoder(int numThreads) : PluginStore::NetStateEncoder(numThreads)
+SimpleCompressedEncoder::SimpleCompressedEncoder(int numThreads) : NetStateEncoder(numThreads)
 {
     insize = ((2*Place::CardSignificant*PLACE_WIDTH+VECTOR_WIDTH-1)/VECTOR_WIDTH) * sizeof(vectordata_t);
 

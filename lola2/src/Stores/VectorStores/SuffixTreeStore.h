@@ -7,16 +7,18 @@
 
 #pragma once
 #include <Core/Dimensions.h>
-#include <Stores/PluginStore.h>
+#include <Stores/VectorStores/VectorStore.h>
+#include <pthread.h>
 
-class SuffixTreeStore : public PluginStore::VectorStore
+template <typename T>
+class SuffixTreeStore : public VectorStore<T>
 {
 public:
     SuffixTreeStore();
     virtual ~SuffixTreeStore();
 
     // inserts input vector into suffix tree
-    virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex);
+    virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex);
 private:
     /// a binary decision node
     class Decision
@@ -40,3 +42,4 @@ private:
     vectordata_t** firstvector;
 };
 
+#include <Stores/VectorStores/SuffixTreeStore.inc>

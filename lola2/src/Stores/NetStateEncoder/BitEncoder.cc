@@ -16,7 +16,7 @@
 
 extern Reporter* rep;
 
-BitEncoder::BitEncoder(int numThreads) : PluginStore::NetStateEncoder(numThreads)
+BitEncoder::BitEncoder(int numThreads) : NetStateEncoder(numThreads)
 {
 	// compute number of input words necessary to store all significant bits.
     insize = ((Place::SizeOfBitVector+VECTOR_WIDTH-1)/VECTOR_WIDTH);

@@ -9,9 +9,10 @@
 #pragma once
 
 #include <Exploration/SimpleProperty.h>
+#include <Stores/Store.h>
 
 class Firelist;
-class Store;
+//class Store;
 
 /// derives deadlock checking from SimpleProperty
 class Deadlock : public SimpleProperty

@@ -11,9 +11,11 @@
 
 #include <Formula/AtomicStatePredicate.h>
 #include <Exploration/SimpleProperty.h>
+#include <Stores/Store.h>
+
 
 class Firelist;
-class Store;
+//class Store;
 
 class StatePredicateProperty: public SimpleProperty
 {

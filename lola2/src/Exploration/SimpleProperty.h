@@ -14,10 +14,12 @@
 #include <Exploration/ChooseTransition.h>
 #include <Net/NetState.h>
 #include <Exploration/Firelist.h>
+#include <Stores/Store.h>
+#include <Stores/EmptyStore.h>
 
 class Firelist;
-class Store;
-class EmptyStore;
+//class Store;
+//class EmptyStore;
 
 /// one element on the stack for simple properties
 class SimpleStackEntry

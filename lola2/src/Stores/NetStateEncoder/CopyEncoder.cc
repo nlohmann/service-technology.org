@@ -17,7 +17,7 @@
 extern Reporter* rep;
 
 
-CopyEncoder::CopyEncoder(int numThreads) : PluginStore::NetStateEncoder(numThreads)
+CopyEncoder::CopyEncoder(int numThreads) : NetStateEncoder(numThreads)
 {
 	// compute number of input words necessary to store all significant places.
     insize = ((SIZEOF_CAPACITY_T*Place::CardSignificant+SIZEOF_VECTORDATA_T-1)/SIZEOF_VECTORDATA_T);

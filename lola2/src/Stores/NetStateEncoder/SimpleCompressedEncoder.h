@@ -9,7 +9,7 @@
 #include <Core/Dimensions.h>
 #include <Stores/PluginStore.h>
 
-class SimpleCompressedEncoder : public PluginStore::NetStateEncoder
+class SimpleCompressedEncoder : public NetStateEncoder
 {
 public:
     SimpleCompressedEncoder(int numThreads);

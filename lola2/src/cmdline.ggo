@@ -13,7 +13,7 @@ option "store" -
   "Store"
   values="bin","stl","bit","bloom","bin2","lgbin","lgwbbin", "rwbin2", "obin2","psbstl","pscstl","pssstl","psbbin","pscbin","pssbin","psbbloom","pscbloom","pssbloom" enum
   typestr="STORE"
-  default="bin"
+  default="psbbin"
   optional
 
 option "hashfunctions" -

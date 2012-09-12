@@ -9,7 +9,7 @@
 #include <Core/Dimensions.h>
 #include <Stores/PluginStore.h>
 
-class BitEncoder : public PluginStore::NetStateEncoder
+class BitEncoder : public NetStateEncoder
 {
 public:
     BitEncoder(int numThreads);

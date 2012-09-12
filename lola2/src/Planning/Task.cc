@@ -33,8 +33,6 @@
 
 #include <Formula/StatePredicate.h>
 
-#include <Stores/BinStore.h>
-#include <Stores/BinStore2.h>
 #include <Stores/NetStateEncoder/BitEncoder.h>
 #include <Stores/NetStateEncoder/CopyEncoder.h>
 #include <Stores/NetStateEncoder/SimpleCompressedEncoder.h>
@@ -42,13 +40,9 @@
 #include <Stores/VectorStores/VSTLStore.h>
 #include <Stores/VectorStores/VBloomStore.h>
 #include <Stores/PluginStore.h>
-#include <Stores/BitStore.h>
-#include <Stores/BloomStore.h>
 #include <Stores/EmptyStore.h>
 #include <Stores/SIStore/SISuffixTreeStore.h>
-#include <Stores/STLStore.h>
 #include <Stores/Store.h>
-#include <Stores/LocalGlobalStore.h>
 
 #include <Witness/Condition.h>
 #include <Witness/Event.h>
@@ -214,60 +208,39 @@ void Task::setStore()
 {
     if (args_info.search_arg == search_arg_findpath)
     {
-        s = new EmptyStore();
+        s = new EmptyStore<void>();
     }
     else
     {
         // choose a store
         switch (args_info.store_arg)
         {
-        case store_arg_bin:
-            s = new BinStore();
-            break;
-        case store_arg_bloom:
-            s = new BloomStore(args_info.hashfunctions_arg);
-            break;
-        case store_arg_stl:
-            s = new STLStore();
-            break;
-        case store_arg_bit:
-            s = new BitStore();
-            break;
-        case store_arg_bin2:
-            s = new BinStore2(number_of_threads);
-            break;
         case store_arg_psbbin:
-            s = new PluginStore(new BitEncoder(number_of_threads), new SuffixTreeStore(), number_of_threads);
+            s = new PluginStore<void>(new BitEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
             break;
         case store_arg_pscbin:
-            s = new PluginStore(new CopyEncoder(number_of_threads), new SuffixTreeStore(), number_of_threads);
+            s = new PluginStore<void>(new CopyEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
             break;
         case store_arg_pssbin:
-            s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore(), number_of_threads);
+            s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
             break;
         case store_arg_psbstl:
-            s = new PluginStore(new BitEncoder(number_of_threads), new VSTLStore(number_of_threads), number_of_threads);
+            s = new PluginStore<void>(new BitEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
             break;
         case store_arg_pscstl:
-            s = new PluginStore(new CopyEncoder(number_of_threads), new VSTLStore(number_of_threads), number_of_threads);
+            s = new PluginStore<void>(new CopyEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
             break;
         case store_arg_pssstl:
-            s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VSTLStore(number_of_threads), number_of_threads);
+            s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
             break;
         case store_arg_psbbloom:
-            s = new PluginStore(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+            s = new PluginStore<void>(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
             break;
         case store_arg_pscbloom:
-            s = new PluginStore(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+            s = new PluginStore<void>(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
             break;
         case store_arg_pssbloom:
-            s = new PluginStore(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
-            break;
-        case store_arg_lgbin:
-            s = new LocalGlobalStore(new SISuffixTreeStore(number_of_threads), number_of_threads, new CopyEncoder(number_of_threads));
-            break;
-        case store_arg_lgwbbin:
-            s = new LocalGlobalStore(new SuffixTreeStore(), number_of_threads, new CopyEncoder(number_of_threads));
+            s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
             break;
         }
     }
@@ -343,7 +316,7 @@ bool Task::getResult()
         }
 
         choose = new ChooseTransitionHashDriven();
-        result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(p), *((EmptyStore*)s), *choose);
+        result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(p), *((EmptyStore<void>*)s), *choose);
         delete choose;
         break;
 

@@ -49,7 +49,7 @@ inline uint32_t VBloomStore::hash_fnv(const vectordata_t* in, size_t len) const
     return hash;
 }
 
-bool VBloomStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex)
+bool VBloomStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex)
 {
     uint32_t* cur_hashes = hash_values + (threadIndex * hash_functions);
     size_t len = (bitlen+VECTOR_WIDTH-1) / VECTOR_WIDTH;

@@ -24,7 +24,7 @@ extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
 
-bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store &myStore, FireListCreator &firelistcreator, int threadNumber)
+bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<void> &myStore, FireListCreator &firelistcreator, int threadNumber)
 {
     Firelist &myFirelist = *firelistcreator.createFireList(&property);
     //// copy initial marking into current marking
@@ -43,7 +43,7 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store &
     // add initial marking to store
     // we do not care about return value since we know that store is empty
 
-    myStore.searchAndInsert(ns);
+    myStore.searchAndInsert(ns,0,0);
 
     // get first firelist
     index_t* currentFirelist;
@@ -58,7 +58,7 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store &
             // fire this transition to produce new Marking::Current
             Transition::fire(ns, currentFirelist[currentEntry]);
 
-            if (myStore.searchAndInsert(ns))
+            if (myStore.searchAndInsert(ns,0,0))
             {
                 // State exists! -->backtracking to previous state
                 Transition::backfire(ns, currentFirelist[currentEntry]);
@@ -112,7 +112,7 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store &
     }
 }
 
-bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore &s, ChooseTransition &c)
+bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore<void> &s, ChooseTransition &c)
 {
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.
@@ -180,7 +180,7 @@ bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned 
         for (index_t depth = 0; depth < maxdepth; ++depth)
         {
             // register this transition's firing
-            s.searchAndInsert(ns);
+            s.searchAndInsert(ns,0,0);
 
             // get firelist
             index_t* currentFirelist;

@@ -10,20 +10,20 @@
 #include <Net/Marking.h>
 #include <Stores/VectorStores/VSTLStore.h>
 
-VSTLStore::VSTLStore(index_t num_threads)
+VSTLStore<void>::VSTLStore(index_t num_threads)
 {
     singleThreaded = (num_threads == 1);
     intermediate = new std::vector<vectordata_t>[num_threads];
     pthread_rwlock_init(&rwlock, NULL);
 }
 
-VSTLStore::~VSTLStore()
+VSTLStore<void>::~VSTLStore()
 {
     pthread_rwlock_destroy(&rwlock);
     delete[] intermediate;
 }
 
-bool VSTLStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, index_t threadIndex)
+bool VSTLStore<void>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex)
 {
     index_t vectorLength = (bitlen+(VECTOR_WIDTH-1))/VECTOR_WIDTH;
 

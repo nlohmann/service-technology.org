@@ -2,10 +2,11 @@
 
 #include <cmdline.h>
 #include <Core/Dimensions.h>
+#include <Stores/Store.h>
+
 
 class StatePredicate;
 class SimpleProperty;
-class Store;
 class FireListCreator;
 class ChooseTransition;
 class DFSExploration;
@@ -28,7 +29,7 @@ private:
     void setFormula();
 
 public:
-    Store* s;
+    Store<void>* s;
 
     Task();
     ~Task();

@@ -290,10 +290,10 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
         args[i].resultProperty = &property;
     }
     // init the restart semaphore
-    sem_unlink("ParallelExploration_restartSem");
-    restartSemaphore = sem_open("ParallelExploration_restartSem", O_CREAT, 0600,
+    sem_unlink("PErestart");
+    restartSemaphore = sem_open("PErestart", O_CREAT, 0600,
                                 0);
-    transfer_finished_semaphore = sem_open("ParallelExploration_transfer_finished_semaphore", O_CREAT, 0600,
+    transfer_finished_semaphore = sem_open("PEtranscom", O_CREAT, 0600,
                                            0);
     // LCOV_EXCL_START
     if (UNLIKELY(!(long int)restartSemaphore)) {
@@ -357,9 +357,9 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     // LCOV_EXCL_STOP
     int semaphore_destruction_status = 0;
     semaphore_destruction_status |= sem_close(transfer_finished_semaphore);
-    semaphore_destruction_status |= sem_unlink("ParallelExploration_transfer_finished_semaphore");
+    semaphore_destruction_status |= sem_unlink("PEtranscom");
     semaphore_destruction_status |= sem_close(restartSemaphore);
-    semaphore_destruction_status |= sem_unlink("ParallelExploration_restartSem");
+    semaphore_destruction_status |= sem_unlink("PErestart");
     // LCOV_EXCL_START
     if (UNLIKELY(semaphore_destruction_status)) {
         rep->status("named semaphore could not be closed and/or unlinked");

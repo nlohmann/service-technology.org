@@ -75,8 +75,9 @@ def buildReqDict():
 
 toolname = json.loads(open(sys.argv[1]).read())["shortname"]
 
-result = { "url" : getURL(),  "email" : getEMail() , "officialVersion" : getOfficialVersion(toolname) , "lastVersion" : getLastVersion() ,  "commits" : json.loads(getCommitters()) }
+result = { "url" : getURL(),  "email" : getEMail() , "officialVersion" : getOfficialVersion(toolname) , "lastVersion" : getLastVersion() }
 result.update(buildReqDict())
+result.update(json.loads(getCommitters()))
 
 
 oldVals = dict()

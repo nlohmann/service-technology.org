@@ -31,9 +31,6 @@ svn co svn+ssh://${USERNAME}@svn.gna.org/svn/service-tech/trunk/${SVNNAME}
 echo "Checking out geninfo tool from svn.gna.org/svn/service-tech/trunk/meta/geninfo with username ${USERNAME}"
 svn co svn://svn.gna.org/svn/service-tech/trunk/meta/geninfo
 
-echo "Temporarily adding ${WORKSPACE}/geninfo to PATH" 
-PATH=${PATH}:${WORKSPACE}/geninfo
-
 echo "Changing to ${WORKSPACE}/${SVNNAME}"
 cd ${WORKSPACE}/${SVNNAME}
 
@@ -44,8 +41,8 @@ autoreconf -i
 echo "Changing to ${WORKSPACE}/${SVNNAME}/doc"
 cd ${WORKSPACE}/${SVNNAME}/doc
 
-echo "Calling ${WORKSPACE}/geninfo/update_json.sh to create/update ${WORKSPACE}/${SVNNAME}/doc/${TOOL}.json" 
-${WORKSPACE}/geninfo/update_json.sh ${WORKSPACE}/${SVNNAME}/doc/${TOOL}.json
+echo "Calling ${WORKSPACE}/geninfo/update_json.py to create/update ${WORKSPACE}/${SVNNAME}/doc/generic.json" 
+${WORKSPACE}/geninfo/update_json.py ${WORKSPACE}/${SVNNAME}/doc/${TOOL}.json
 
 echo "Changing to ${WORKSPACE}"
 cd ${WORKSPACE}
@@ -54,11 +51,11 @@ echo "Checking out the mockup directory from svn.gna.org/svn/service-tech/meta/w
 svn co svn+ssh://${USERNAME}@svn.gna.org/svn/service-tech/trunk/meta/wsmockup
 
 echo "Calling page creation script"
-${CURDIR}/utils/createToolPages.sh $SVNNAME ${WORKSPACE}/${SVNNAME}/doc ${CURDIR}/template/tool/ ${WORKSPACE}/wsmockup/${TOOL}/ ${CURDIR}/utils/ ${CURDIR}/data/
+${CURDIR}/utils/createToolPages.sh $SVNNAME ${WORKSPACE}/${SVNNAME}/doc ${CURDIR}/template/tool/ ${WORKSPACE}/wsmockup/website/${TOOL}/ ${CURDIR}/utils/ ${CURDIR}/data/
 
 if [ $? -eq 0 ]
 then
-    echo "Created tool web pages in '${WORKSPACE}/wsmockup/${TOOL}'"
+    echo "Created tool web pages in '${WORKSPACE}/wsmockup/website/${TOOL}'"
     exit 0
 else
     echo "There was an error creating the pages. Exit."

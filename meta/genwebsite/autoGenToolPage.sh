@@ -31,8 +31,6 @@ svn co svn+ssh://${USERNAME}@svn.gna.org/svn/service-tech/trunk/${SVNNAME}
 echo "Checking out geninfo tool from svn.gna.org/svn/service-tech/trunk/meta/geninfo with username ${USERNAME}"
 svn co svn://svn.gna.org/svn/service-tech/trunk/meta/geninfo
 
-echo "Temporarily adding ${WORKSPACE}/geninfo to PATH" 
-PATH=${PATH}:${WORKSPACE}/geninfo
 
 echo "Changing to ${WORKSPACE}/${SVNNAME}"
 cd ${WORKSPACE}/${SVNNAME}
@@ -44,8 +42,8 @@ autoreconf -i
 echo "Changing to ${WORKSPACE}/${SVNNAME}/doc"
 cd ${WORKSPACE}/${SVNNAME}/doc
 
-echo "Calling ${WORKSPACE}/geninfo/update_json.sh to create/update ${WORKSPACE}/${SVNNAME}/doc/${TOOL}.json" 
-${WORKSPACE}/geninfo/update_json.sh ${WORKSPACE}/${SVNNAME}/doc/${TOOL}.json
+echo "Calling ${WORKSPACE}/geninfo/update_json.py to create/update ${WORKSPACE}/${SVNNAME}/doc/generic.json" 
+${WORKSPACE}/geninfo/update_json.py ${WORKSPACE}/${SVNNAME}/doc/${TOOL}.json
 
 echo "Changing to ${WORKSPACE}"
 cd ${WORKSPACE}

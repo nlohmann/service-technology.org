@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+   
+    <link href="../main.css" rel="stylesheet" type="text/css">
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <title>
+      service-technology.org/rachel - get involved
+    </title>
+  </head>
+  <body>
+    <div id="mainframe">
+      <div id="topspacer"></div>
+      <div id="shadowbox">
+        <div id="navigation">
+          <div id="titlenav">
+            <div id="pagetitle">
+              <h1>
+                <a href="../index.html">service-technology.org</a>/<a href="index.html">rachel</a>
+              </h1>
+            </div>
+            <div id="nav">
+              <ul>
+                <li>
+                  <a href="../people/index.html" id="people" class="ncurrent" name="people">People</a>
+                </li>
+                <li style="list-style: none">
+                  <div class="seperator"></div>
+                </li>
+                <li>
+                  <a href="../pub/index.html" id="pub" class="ncurrent" name="pub">Publications</a>
+                </li>
+                <li style="list-style: none">
+                  <div class="seperator"></div>
+                </li>
+                <li>
+                  <a href="../tools/index.html" id="tools" class="current" name="tools">Tools</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div id="tabs">
+            <ul>
+              <li>
+                <a href="index.html" class="ncurrent">About</a>
+              </li>
+              <li>
+                <a href="help.html" class="ncurrent">Help</a>
+              </li>
+              <li style="display: none;">
+                <a href="science.html" class="ncurrent">Science</a>
+              </li>
+              <li>
+                <a href="download.html" class="ncurrent">Download</a>
+              </li>
+              <li>
+                <a href="getInvolved.html" class="current">Get involved</a>
+              </li>
+              <li>
+                <a href="support.html" class="ncurrent">Support</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div id="content">
+          <h2>
+            Join the team ...
+          </h2>
+          <div>
+            <img src="../people/g/niels.jpg" alt="Niels Lohmann" title="Niels Lohmann" class="portrait" width="75"><img src="../people/g/gierds.jpg" alt="Christian Gierds" title="Christian Gierds" class="portrait" width="75"><img src="../people/g/rimueller.jpg" alt="Richard Müller" title="Richard Müller" class="portrait" width="75"><img src="../people/g/marvintriebel.jpg" alt="Marvin Triebel" title="Marvin Triebel" class="portrait" width="75"><img src="../people/g/suermeli.jpg" alt="Jan Sürmeli" title="Jan Sürmeli" class="portrait" width="75"><img src="../people/g/al020.jpg" alt="Andreas Lehmann" title="Andreas Lehmann" class="portrait" width="75"> <img width="75" src="../icons/plus.png" class="plus-sign"> <img width="75" src="../icons/dummy-devel.png" class="portrait">
+          </div>
+          <h2>
+            ... become a contributor
+          </h2>
+          <div class="number-list">
+            <ol>
+              <li>Check out the Rachel directory from the source repository:<br>
+                <code>svn co svn://svn.gna.org/svn/service-tech/trunk/rachel</code>
+              </li>
+              <li>Compile Rachel:<br>
+                <code>autoreconf -i &amp;&amp; ./configure &amp;&amp; make</code>
+              </li>
+              <li>Add/change code. Consult the <a href="http://jenkins.service-technology.org/job/rachel/doclinks/2/">Doxygen documentation</a> to get a better understanding of the code.
+              </li>
+              <li>Review your changes:<br>
+                <code>make &amp;&amp; make check &amp;&amp; make distcheck</code>
+              </li>
+              <li>Compile your changes in a patch:<br>
+                <code>svn diff &gt; /path/to/patch.diff</code>
+              </li>
+              <li>
+                <a href="" title="Peter Pan">Send the patch to Rachel's maintainer Peter Pan.</a>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

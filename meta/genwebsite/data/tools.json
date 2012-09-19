@@ -1,0 +1,58 @@
+{
+  "tools" : [
+    {
+      "toolname" : "bpel2owfn",
+      "svnname" : "bpel2owfn"
+    },
+
+    {
+      "toolname" : "wendy",
+      "svnname" : "wendy"
+    },
+
+    {
+      "toolname" : "fiona",
+      "svnname" : "fiona"
+    },
+
+    {
+      "toolname" : "candy",
+      "svnname" : "candy"
+    },
+
+    {
+      "toolname" : "rachel",
+      "svnname" : "rachel"
+    },
+
+    {
+      "toolname" : "marlene",
+      "svnname" : "marlene"
+    },
+
+    {
+      "toolname" : "mia",
+      "svnname" : "mia"
+    },
+
+    {
+      "toolname" : "cosme",
+      "svnname" : "cosme"
+    },
+
+    {
+      "toolname" : "linda",
+      "svnname" : "linda"
+    },
+
+    {
+      "toolname" : "yasmina",
+       "svnname" : "yasmina"
+    },
+
+    {
+      "toolname" : "lola",
+      "svnname" : "lola"
+    }
+  ]
+}

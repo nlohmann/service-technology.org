@@ -26,6 +26,11 @@ option "asyncEnv" -
   "OWFN -> asynchronous environment."
   details="Using this option, a PNML file will be generated containing the asynchronous environment of the given OWFN."
   flag off
+  
+option "evaluate" -
+  "PNML + XES log -> evaluation."
+  details="Using this option, the given PNML file and XES log are evaluated for conformance checking. Use the 'pnmlFile' and 'logFile' options to set the input."
+  flag off
 
 section "TPN to OWFN"
 sectiondesc="Options which are used if the 'tpn'-flag is set....\n"
@@ -70,6 +75,16 @@ option "partnerView" p
   details="Using this option, the log will be generated using the asynchronous environment of the given net."
   flag off
 
+section "evaluation"
+sectiondesc="Options which are used if the 'evaluate'-flag is set...\n"
+
+option "algorithm" a
+  "Choose the algorithm which should be used."
+  details="The algorithm can be set to 'SSD' or 'noILP'. The default is set to 'SSD'\n"
+  string
+  typestr="ALGORITHM"
+  default="SSD"
+  optional
 
 section "Input/Output"
 sectiondesc="When called without an input file, Locretia reads from the standard input stream. When called without an output parameter, Locretia creates a log file and/or an OWFN file based on the chosen options. If no filename is given for one of the options below, the input filename's suffix (`.owfn'/`.tpn') is replaced by the name of the respective option (e.g., `.xes'). If the filename `-' is given, Locretia will pipe the respective output to the standard output stream.\n"
@@ -155,6 +170,15 @@ option "tmpfile" -
   string
   typestr="FILENAME"
   default="/tmp/locretia-XXXXXX"
+  optional
+  hidden
+  
+option "java" -
+  "Set the path to the java-classes needed for the evaluation."
+  details="The path to the various java-classes needed by the algorithm of the Petri net and log replayer in ProM.\n"
+  string
+  typestr="PATH"
+  default="./java"
   optional
   hidden
 

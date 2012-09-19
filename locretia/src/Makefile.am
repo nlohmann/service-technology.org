@@ -11,7 +11,9 @@ locretia_SOURCES = cmdline.c cmdline.h \
                 syntax_graph.yy lexic_graph.ll \
                 types.h \
                 util.h \
-                verbose.cc verbose.h
+                verbose.cc verbose.h \
+		  PromBridge.cc PromBridge.h \
+		  jni.h jni_md.h
 
 # the configuration files
 sysconf_DATA = locretia.conf
@@ -24,6 +26,10 @@ if COMPILE_PNAPI
 locretia_CPPFLAGS += -I$(top_srcdir)/libs -I$(top_srcdir)/libs/pnapi
 locretia_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
+
+# add the java virtual machine library
+AM_LDFLAGS = -L$(top_srcdir)/libs -ljvm
+# LIBS += -ljvm
 
 
 #############################################################################

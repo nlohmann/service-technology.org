@@ -19,17 +19,19 @@ done
 
 cd ..
 
+SYSTEM=`uname -a`
 MACHINE=`uname -m`
 IS32=`echo $MACHINE | grep 86 | wc -w`
 IS64=`echo $MACHINE | grep 64 | wc -w`
 
+AC_MSG_NOTICE([Running System: $SYSTEM])
 AC_MSG_NOTICE([Machine: $MACHINE])
 
-TESTVAR1=`ls -1 jre*/ | grep lib | wc -w`
+TESTVAR1=`ls -1 jre*/ 2> /dev/null | grep lib | wc -w`
 if test "${TESTVAR1}" = "0" 
 then
  AC_MSG_NOTICE([Java JRE not found.])
- TESTVAR2=`ls -1 *.tar.gz | grep jre | wc -w`
+ TESTVAR2=`ls -1 *.tar.gz 2> /dev/null | grep jre | wc -w`
  if test "${TESTVAR2}" = "0" 
  then
   AC_MSG_NOTICE([Downloading JRE...])
@@ -67,6 +69,8 @@ then
  JDKLIBDIR=/libs/libjvm/amd64
 fi
 
+AC_MSG_NOTICE([Java JRE library dir: $JRELIBDIR])
+AC_MSG_NOTICE([Java JDK library dir: $JDKLIBDIR])
 AC_SUBST(JRELIB, $JRELIBDIR)
 AC_SUBST(JDKLIB, $JDKLIBDIR)
 

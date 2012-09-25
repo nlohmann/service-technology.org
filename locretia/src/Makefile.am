@@ -28,7 +28,7 @@ locretia_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
 # add the java virtual machine library
-AM_LDFLAGS = -L$(top_srcdir)/libs/libjvm/amd64 -ljvm
+AM_LDFLAGS = -Wl,-rpath=@JRELIB@ -L$(top_srcdir)@JDKLIB@ -ljvm
 # LIBS += -ljvm
 
 

@@ -57,6 +57,8 @@ def buildReqList(key):
     return result
 
 def setRequirements(key):
+    print "heerrree"
+    print key
     if key in j:
         replDict[key] = buildReqList(key)
         setFlag(key)

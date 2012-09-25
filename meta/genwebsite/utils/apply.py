@@ -56,7 +56,10 @@ def buildReqList(key):
 def setRequirements(key):
     if key in j:
         replDict[key] = buildReqList(key)
-        setFlag(key)
+        if replDict[key] != '' :
+            setFlag(key)
+        else:
+            remFlag(key)
     else:
         replDict['key'] = 'none'
         remFlag(key)

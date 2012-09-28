@@ -12,7 +12,11 @@
 class BitEncoder : public NetStateEncoder
 {
 public:
+    /// constructor; initialize auxiliary data structure (namely "inputs").
+    /// @param numThreads maximum number of threads that may work with this NetStateEncoder concurrently.
     BitEncoder(int numThreads);
+
+    /// destructor; frees all memory used for auxiliary data structure (namely "inputs").
     ~BitEncoder();
 
     vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex);
@@ -25,8 +29,9 @@ private:
 
     /// memcpy can be used only if
     /// - input and suffix tree vectors use the same data type
-    /// - the alignment right (offset is 0 bits)
+    /// - the alignment is right (offset is 0 bits)
     /// - all bits are significant for the used places
+    ///
     /// to simplify, memcpy ist used only for the first couple of places where all conditions are met. memcpylen states the number of such leading places
     index_t memcpylen;
 };

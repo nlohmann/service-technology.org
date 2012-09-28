@@ -25,8 +25,11 @@ private:
     /// a) the marking bit width is divisble by the input vector data width
     ///    or
     /// b) the marking vector has at least as many bytes as the needed input vector
-    /// a) will be checked at compile time whereas b) will be checked at runtime. Only if both tests fail memcpy is actually used.
+    /// (a) will be checked at compile time whereas (b) will be checked at runtime. Only if both tests fail memcpy is actually used.
+
+    /// test codition (a). If the condition is met, these variables are not necessary.
 #if SIZEOF_CAPACITY_T % SIZEOF_VECTORDATA_T != 0
+    /// states whether condition (b) is met. Will be determined once in the constructor.
     bool nocopy;
 
     /// vector of input vectors that are returned from encodeNetState. Each thread has its own vector to avoid conflicts. Only needed if memcpy is actually used.

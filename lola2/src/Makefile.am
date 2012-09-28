@@ -59,19 +59,16 @@ lola_SOURCES = \
                 Formula/FalsePredicate.cc Formula/FalsePredicate.h \
                 \
                 Stores/Store.h Stores/Store.inc \
-                Stores/SIStore/SIStore.h \
-                Stores/SIStore/SISuffixTreeStore.cc Stores/SIStore/SISuffixTreeStore.h \
-                Stores/LoadedBinStore.h \
-                Stores/EmptyStore.cc Stores/EmptyStore.h \
+                Stores/EmptyStore.h \
+                Stores/PluginStore.h Stores/PluginStore.inc \
+                Stores/NetStateEncoder/NetStateEncoder.h \
                 Stores/NetStateEncoder/BitEncoder.cc Stores/NetStateEncoder/BitEncoder.h \
                 Stores/NetStateEncoder/CopyEncoder.cc Stores/NetStateEncoder/CopyEncoder.h \
                 Stores/NetStateEncoder/SimpleCompressedEncoder.cc Stores/NetStateEncoder/SimpleCompressedEncoder.h \
-                Stores/NetStateEncoder/NetStateEncoder.h \
+                Stores/VectorStores/VectorStore.h \
                 Stores/VectorStores/VSTLStore.cc Stores/VectorStores/VSTLStore.h Stores/VectorStores/VSTLStore.inc \
                 Stores/VectorStores/VBloomStore.cc Stores/VectorStores/VBloomStore.h \
                 Stores/VectorStores/SuffixTreeStore.h Stores/VectorStores/SuffixTreeStore.inc \
-                Stores/VectorStores/VectorStore.h \
-                Stores/PluginStore.h Stores/PluginStore.inc \
                 \
                 Witness/Event.h Witness/Event.cc Witness/Condition.h Witness/Condition.cc
 

@@ -35,7 +35,6 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<v
 
     if (property.value)
     {
-        myStore.finalize();
         // initial marking satisfies property
         return true;
     }
@@ -77,7 +76,6 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<v
                     // of witness path
                     SimpleStackEntry *stack = property.stack.push();
                     stack = new ((void *) stack) SimpleStackEntry(currentFirelist,currentEntry);
-                    myStore.finalize();
                     delete(&myFirelist);
                     return true;
                 }
@@ -95,7 +93,6 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<v
             if (property.stack.StackPointer == 0)
             {
                 // have completely processed initial marking --> state not found
-                myStore.finalize();
                 delete(&myFirelist);
                 return false;
             }

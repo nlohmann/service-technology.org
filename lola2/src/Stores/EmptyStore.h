@@ -1,11 +1,16 @@
 /*!
-\author Niels and Max Görner
+\author Niels
+\author Max Görner
+\author Christian Koch
 \file EmptyStore.h
 \status new
+
+\brief Store implementation that is always empty. All calls to searchAndInsert() will return false.
 */
 
 #pragma once
 #include <Stores/Store.h>
+#include <cmath>
 
 template <typename T>
 class EmptyStore : public Store<T>
@@ -13,28 +18,18 @@ class EmptyStore : public Store<T>
 public:
     int tries;
 
-    EmptyStore();
+    EmptyStore(uint32_t number_of_threads);
     bool searchAndInsert(NetState &ns, T** payload, index_t thread);
 };
 
-
-//////////////////////////////////////////////
-/// implementation of EmptyStore.h follows ///
-/// for now, just copied + pasted cc-File  ///
-//////////////////////////////////////////////
-
-#include <cmath>
-//#include <Stores/EmptyStore.h>
-
-
 template <typename T>
-EmptyStore<T>::EmptyStore() : Store<T>(1), tries(0)
+EmptyStore<T>::EmptyStore(uint32_t number_of_threads) : Store<T>(number_of_threads), tries(0)
 {
 }
 
 template <typename T>
 inline bool EmptyStore<T>::searchAndInsert(NetState &ns, T** payload, index_t thread){
 	if(payload) *payload = NULL;
-	++this->calls[0]; //We're using "this" since access to protected attributes is harder when using templates than when not.
-	return true;
+	++this->calls[thread]; //We're using "this" since access to protected attributes is harder when using templates than when not.
+	return false;
 }

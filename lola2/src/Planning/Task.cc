@@ -41,7 +41,6 @@
 #include <Stores/VectorStores/VBloomStore.h>
 #include <Stores/PluginStore.h>
 #include <Stores/EmptyStore.h>
-#include <Stores/SIStore/SISuffixTreeStore.h>
 #include <Stores/Store.h>
 
 #include <Witness/Condition.h>
@@ -208,7 +207,7 @@ void Task::setStore()
 {
     if (args_info.search_arg == search_arg_findpath)
     {
-        s = new EmptyStore<void>();
+        s = new EmptyStore<void>(number_of_threads);
     }
     else
     {

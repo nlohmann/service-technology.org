@@ -24,9 +24,9 @@ public:
     bool searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex);
 
 private:
-    /// used NetStateEncoder (given in costructor)
+    /// used NetStateEncoder (given in constructor)
     NetStateEncoder* netStateEncoder;
-    /// used VectorStore (given in costructor)
+    /// used VectorStore (given in constructor)
     VectorStore<T>* vectorStore;
 };
 

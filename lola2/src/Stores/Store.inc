@@ -1,6 +1,6 @@
 /*!
 \author Niels
-\author Max GÃ¶rner
+\author Max Görner
 \author Christian Koch
 \file Store.inc
 \status new
@@ -107,4 +107,10 @@ uint64_t Store<T>::get_number_of_calls() {
     for (uint32_t thread_number = 0; thread_number < number_of_threads; thread_number++)
         result += calls[thread_number];
     return result;
+}
+
+template <typename T>
+bool Store<T>::popState(NetState &) {
+    rep->status("popState method not yet implemented for this store");
+    rep->abort(ERROR_COMMANDLINE);
 }

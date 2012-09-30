@@ -47,4 +47,7 @@ public:
 
     // this function is needed to allow the random walk in the main function
     NetState* getNetState();
+
+    // this method is only to test Store::popState() until its use case is implemented
+    void testPopState();
 };

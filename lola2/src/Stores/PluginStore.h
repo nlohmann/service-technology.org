@@ -23,6 +23,10 @@ public:
 
     bool searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex);
 
+    /// sets ns to a state from the store; removes this state from the store
+    /// returns false if store was already empty
+    virtual bool popState(NetState &ns);
+
 private:
     /// used NetStateEncoder (given in constructor)
     NetStateEncoder* netStateEncoder;

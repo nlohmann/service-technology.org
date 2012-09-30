@@ -16,7 +16,7 @@
 
 
 template <typename T>
-SuffixTreeStore<T>::SuffixTreeStore()
+SuffixTreeStore<T>::SuffixTreeStore() : popVectorCache(NULL), currentBucket(0)
 {
     branch = (Decision**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
     firstvector = (vectordata_t**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
@@ -43,6 +43,7 @@ SuffixTreeStore<T>::~SuffixTreeStore()
     }
     free(branch);
     free(firstvector);
+    delete popVectorCache;
 
     for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
         pthread_rwlock_destroy(rwlocks+i);
@@ -299,4 +300,111 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
         pthread_rwlock_unlock(rwlocks + hash);
         return false;
     }
+}
+
+/*!
+ * \brief  gets and removes a vector from the store
+ */
+template <typename T>
+bool SuffixTreeStore<T>::popVector(vectordata_t * & out)
+{
+  // create intermediate vector
+  if(!popVectorCache)
+  {
+    popVectorCache = (vectordata_t *) calloc(SIZEOF_CAPACITY_T, Net::Card[PL]);
+  }
+  
+  // vector currently viewed
+  vectordata_t * pVector = NULL;
+  // anchor to a decision node
+  Decision * anchor = NULL;
+  
+  // iterate over all buckets
+  while(currentBucket < SIZEOF_MARKINGTABLE)
+  {
+    if(!(pVector = firstvector[currentBucket]))
+    {
+      // no vectors in this bucket
+      ++currentBucket;
+      continue;
+    }
+    
+    // copy "first" vector to return it later
+    memcpy(popVectorCache, pVector, Net::Card[PL] * SIZEOF_CAPACITY_T);
+    out = popVectorCache;
+    
+    if(!(anchor = branch[currentBucket]))
+    {
+      // no further markings in this bucket
+      free(pVector);
+      firstvector[currentBucket++] = NULL;
+      return true;
+    }
+    
+    // alignment of both vectors (i.e. relative position of first bit of anchor->vector)
+    bitindex_t shift = (anchor->bit + 1) % VECTOR_WIDTH;
+    // remaining words to copy
+    bitindex_t remaining = (Net::Card[PL] * SIZEOF_CAPACITY_T - anchor->bit - 1) / VECTOR_WIDTH;
+    
+    // go to position of first differing bit
+    pVector += (anchor->bit / VECTOR_WIDTH);
+    // toggle bit 
+    *pVector ^= 1 << (VECTOR_WIDTH - (anchor->bit % VECTOR_WIDTH) - 1);
+    
+    // vector to be copied from
+    vectordata_t * source = anchor->vector;
+    
+    // test for good alignment
+    if(shift == 0)
+    {
+      // good alignment, use memcpy
+      memcpy(++pVector, source, remaining);
+    }
+    else
+    {
+      // bad alignment, copy manually
+      // initially clear recent word
+      *pVector = ((*pVector >> shift) << shift);
+      
+      while(true)
+      {
+        // copy lower half
+        *(pVector++) |= *source >> shift;
+        if(remaining-- == 0)
+        {
+          // finished copying
+          break;
+        }
+        // copy upper half
+        *pVector = *(source++) << shift;
+      }
+    }
+    
+    // remove node
+    Decision * anchor2 = anchor->nextnew;
+    if(anchor2)
+    {
+      // "next new" becomes new root of this tree
+      branch[currentBucket] = anchor2;
+      // go to oldest node in this subtree
+      while(anchor2->nextold)
+      {
+        anchor2 = anchor2->nextold;
+      }
+      
+      // each node older than anchor is also older than the new root
+      anchor2->nextold = anchor->nextold;
+    }
+    else
+    {
+      branch[currentBucket] = anchor->nextold;
+    }
+    delete anchor;
+    
+    // return result
+    return true;
+  }
+  
+  // when reaching this line, no more vectors are stored
+  return false;
 }

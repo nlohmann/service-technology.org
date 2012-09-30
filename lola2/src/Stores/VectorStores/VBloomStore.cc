@@ -99,3 +99,11 @@ bool VBloomStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, has
     // all bits were 1 -> vector was probably stored already
     return true;
 }
+
+// gets and removes a vector from the store
+bool VBloomStore::popVector(vectordata_t * &)
+{
+  rep->status("this store can not return states");
+  rep->abort(ERROR_COMMANDLINE);
+  return false;
+}

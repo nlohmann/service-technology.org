@@ -279,6 +279,13 @@ int main(int argc, char** argv)
         {
             Handlers::statistics();
         }
+
+        // test popState()
+        // TODO: remove this when actual use case is implemented
+        if (args_info.testStateForeach_flag)
+        {
+          task.testPopState();
+        }
     }
 
     return EXIT_SUCCESS;

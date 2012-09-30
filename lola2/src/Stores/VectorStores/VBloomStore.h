@@ -20,4 +20,7 @@ public:
     ~VBloomStore();
 
     bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex);
+
+    // gets and removes a vector from the store
+    virtual bool popVector(vectordata_t * & out);
 };

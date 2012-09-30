@@ -30,4 +30,7 @@ public:
     /// @param threadIndex input: the index of the thread that requests this call. Values will range from 0 to (numThreads - 1). Used to allow using thread-local auxiliary data structures without locking any variables.
 	/// @return the final input vector.
 	virtual vectordata_t* encodeNetState(NetState &ns, bitindex_t &bitlen, index_t threadIndex) = 0;
+
+	// decodes a given encoded state and sets the netstate appropriately
+	virtual void decodeNetState(NetState& ns, vectordata_t* data);
 };

@@ -35,6 +35,7 @@
 
 #include <Stores/NetStateEncoder/BitEncoder.h>
 #include <Stores/NetStateEncoder/CopyEncoder.h>
+#include <Stores/NetStateEncoder/FullCopyEncoder.h>
 #include <Stores/NetStateEncoder/SimpleCompressedEncoder.h>
 #include <Stores/VectorStores/SuffixTreeStore.h>
 #include <Stores/VectorStores/VSTLStore.h>
@@ -220,6 +221,9 @@ void Task::setStore()
         case store_arg_pscbin:
             s = new PluginStore<void>(new CopyEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
             break;
+        case store_arg_psfbin:
+            s = new PluginStore<void>(new FullCopyEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
+            break;
         case store_arg_pssbin:
             s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
             break;
@@ -228,6 +232,9 @@ void Task::setStore()
             break;
         case store_arg_pscstl:
             s = new PluginStore<void>(new CopyEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
+            break;
+        case store_arg_psfstl:
+            s = new PluginStore<void>(new FullCopyEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
             break;
         case store_arg_pssstl:
             s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
@@ -443,4 +450,33 @@ void Task::printDot()
     Event::dot(o);
     Condition::dot(o);
     fprintf(o, "}\n");
+}
+
+
+#include <sstream>
+/*!
+ * \brief this method is only to test Store::popState() until its use case is implemented
+ * \todo  remove me!
+ */
+void Task::testPopState()
+{
+  rep->message("%s", rep->markup(MARKUP_IMPORTANT, "iterating over all stored states:").str());
+  unsigned long long counter = 0;
+
+  while(s->popState(*ns))
+  {
+    // increment counter
+    ++counter;
+    std::stringstream msg;
+    for (index_t p = 0; p < Net::Card[PL]; ++p)
+    {
+        if (ns->Current[p] > 0)
+        {
+            msg << Net::Name[PL][p] << ": " << ns->Current[p] << ", ";
+        }
+    }
+    rep->message("[State] %s", msg.str().c_str());
+  }
+
+  rep->message("%s", rep->markup(MARKUP_IMPORTANT, "states collected: %u", counter).str());
 }

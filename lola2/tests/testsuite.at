@@ -587,6 +587,8 @@ AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbbloom],1,2,[no],242,8
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pscbin],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pscstl],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pscbloom],1,2,[no],242,805)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psfbin],1,2,[no],242,805)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psfstl],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssbin],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssstl],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssbloom],1,2,[no],242,805)
@@ -597,6 +599,8 @@ AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psbbloom],1
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pscbin],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pscstl],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pscbloom],1,2,[no],2048,23040)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psfbin],1,2,[no],2048,23040)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psfstl],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssbin],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssstl],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssbloom],1,2,[no],2048,23040)
@@ -606,12 +610,15 @@ AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psbstl],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pscbin],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pscstl],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pscbloom],1,2,[no],47905,137280)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psfbin],1,2,[no],47905,137280)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psfstl],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssbin],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssstl],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssbloom],1,2,[no],47905,137280)
 
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[psbbin],1,2,[no],2546432,24460016)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pscbin],1,2,[no],2546432,24460016)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[psfbin],1,2,[no],2546432,24460016)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pssbin],1,2,[no],2546432,24460016)
 
 
@@ -628,6 +635,8 @@ AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbbloom],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pscbin],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pscstl],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pscbloom],4,2,[no],242,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psfbin],4,2,[no],242,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psfstl],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssbin],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssstl],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[pssbloom],4,2,[no],242,)
@@ -638,6 +647,8 @@ AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psbbloom],4
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pscbin],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pscstl],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pscbloom],4,2,[no],2048,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psfbin],4,2,[no],2048,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[psfstl],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssbin],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssstl],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[pssbloom],4,2,[no],2048,)
@@ -647,14 +658,55 @@ AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psbstl],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pscbin],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pscstl],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pscbloom],4,2,[no],47905,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psfbin],4,2,[no],47905,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[psfstl],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssbin],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssstl],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[pssbloom],4,2,[no],47905,)
 
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[psbbin],4,2,[no],2546432,)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pscbin],4,2,[no],2546432,)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[psfbin],4,2,[no],2546432,)
 AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pssbin],4,2,[no],2546432,)
 
+
+
+
+############################################################################
+AT_BANNER([Collect Stored States])
+############################################################################
+
+AT_SETUP([STL Store])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=psfstl -v --testStateForeach],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_CHECK([GREP -q "lola: states collected: 242" stderr])
+AT_CHECK([GREP "lola: \[[State\]]" stderr | sort -u | wc -l | GREP -q "242"])
+AT_KEYWORDS(collectStates)
+AT_CLEANUP
+
+AT_SETUP([Suffix Tree Store])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=psfbin -v --testStateForeach],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: 242 markings, 805 edges" stderr])
+AT_CHECK([GREP -q "lola: states collected: 242" stderr])
+AT_CHECK([GREP "lola: \[[State\]]" stderr | sort -u | wc -l | GREP -q "242"])
+AT_KEYWORDS(collectStates)
+AT_CLEANUP
+
+AT_SETUP([STL vs. Suffix Tree Store])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --check=full --store=psfstl -v --testStateForeach],0,stdout,stderr)
+AT_CHECK([mv stdout lola.out])
+AT_CHECK([GREP "lola: \[[State\]]" stderr | sort],0,stdout)
+AT_CHECK([mv stdout states.stl])
+AT_CHECK([mv stderr lola.err.stl])
+AT_CHECK([LOLA phils5.lola --check=full --store=psfbin -v --testStateForeach],0,stdout,stderr)
+AT_CHECK([mv stdout lola.out2])
+AT_CHECK([GREP "lola: \[[State\]]" stderr | sort],0,stdout)
+AT_CHECK([diff stdout states.stl])
+AT_KEYWORDS(collectStates)
+AT_CLEANUP
 
 
 

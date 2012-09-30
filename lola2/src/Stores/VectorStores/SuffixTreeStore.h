@@ -19,6 +19,9 @@ public:
 
     // inserts input vector into suffix tree
     virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex);
+
+    // gets and removes a vector from the store
+    virtual bool popVector(vectordata_t * & out);
 private:
     /// a binary decision node
     class Decision
@@ -40,6 +43,11 @@ private:
 
     // first vector in bucket; null as long as bucket empty
     vectordata_t** firstvector;
+
+    // full vector will be reconstructed here when popping vectors
+    vectordata_t * popVectorCache;
+    // index cache, so we don't have to search the whole store on each pop
+    hash_t currentBucket;
 };
 
 #include <Stores/VectorStores/SuffixTreeStore.inc>

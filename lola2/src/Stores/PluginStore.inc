@@ -45,3 +45,16 @@ bool PluginStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadI
     }
     return ret;
 }
+
+/// sets ns to a state from the store; removes this state from the store
+/// returns false if store was already empty
+template<typename T>
+bool PluginStore<T>::popState(NetState &ns) {
+  vectordata_t * vec = NULL;
+  bool result = vectorStore->popVector(vec);
+  if(result)
+  {
+    netStateEncoder->decodeNetState(ns, vec);
+  }
+  return result;
+}

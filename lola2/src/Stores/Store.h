@@ -80,6 +80,10 @@ public:
     /// @param thread the index of the thread that requests this call. Values will range from 0 to (number_of_threads - 1). Used to allow using thread-local auxiliary data structures without locking any variables.
 	/// @return true, if the marking was found in the store, otherwise false.
     virtual bool searchAndInsert(NetState &ns, T** payload, index_t thread) = 0;
+
+    /// sets ns to a state from the store; removes this state from the store
+    /// returns false if store was already empty
+    virtual bool popState(NetState &ns);
 };
 
 #include <Stores/Store.inc>

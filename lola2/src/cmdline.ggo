@@ -11,7 +11,7 @@ option "check" -
 
 option "store" -
   "Store"
-  values="bin","stl","bit","bloom","bin2","lgbin","lgwbbin", "rwbin2", "obin2","psbstl","pscstl","pssstl","psbbin","pscbin","pssbin","psbbloom","pscbloom","pssbloom" enum
+  values="bin","stl","bit","bloom","bin2","lgbin","lgwbbin", "rwbin2", "obin2","psbstl","pscstl","psfstl","pssstl","psbbin","pscbin","psfbin","pssbin","psbbloom","pscbloom","pssbloom" enum
   typestr="STORE"
   default="psbbin"
   optional
@@ -149,6 +149,11 @@ option "printNet" -
 
 option "stats" -
   "Print memory statistics"
+  flag off
+  hidden
+
+option "testStateForeach" -
+  "Selftest for stores capable of returning stored states"
   flag off
   hidden
 

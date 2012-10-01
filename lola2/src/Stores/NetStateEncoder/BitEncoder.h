@@ -32,7 +32,7 @@ private:
     /// - the alignment is right (offset is 0 bits)
     /// - all bits are significant for the used places
     ///
-    /// to simplify, memcpy ist used only for the first couple of places where all conditions are met. memcpylen states the number of such leading places
+    /// to simplify, memcpy is used only for the first couple of places where all conditions are met. memcpylen states the number of such leading places
     index_t memcpylen;
 };
 

@@ -3,7 +3,7 @@
 \author Karsten
 \status approved 18.04.2012
 
-\brief Evaluates deadlocks
+\brief property to find deadlocks
 */
 
 #include <cstring>

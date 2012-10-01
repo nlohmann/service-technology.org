@@ -1,18 +1,9 @@
 /*!
- \file ParallelExploration.cc
- \author Gregor
- \status new
-
- \brief Evaluates simple property (only SET of states needs to be computed).
- 		The actual property is an parameter.
- 		The evaluation of the property will be done by a parallel exploration of the state space.
- 		Therefore n threads will be started with the initial marking. The given store has to be thread-safe. If it is not this search may crash.
-		It would be preferable if the store would give the absolute correct answer, but this is not necessary.
-		If the search of an thread has ended (because there are no successor-markings, that have not been visited by none of the threads[Meaning: other threads can cut parts of the search-space of other threads]), the search will be restarted.
-		If so, an other thread will spare one of its transitions currently in the current firelist, but only if this would lead to a new state, and the spearing-thread will have one other transition left. (Assuming there is not always only one transition to fire, but then parallelization is useless)
-		The state resulting in firering this transition will be transfered to the other thread, which will continue the search at this position.
-		All threads will poll a variable to be able to abort if one of the threads has found a solution.
- */
+\file ParallelExploration.cc
+\author Gregor
+\status new
+\brief Evaluates simple property (only SET of states needs to be computed) in parallel.
+*/
 
 #include <cstring>
 #include <cstdlib>
@@ -34,13 +25,21 @@
 extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
+/// transfer struct for the start of a parallel search thread
 struct tpDFSArguments {
+	/// the initial net state
     NetState* ns;
+    /// the store to use (this will be the same of all threads)
     Store<void>* myStore;
+    /// initial firelist, all used firelists will be created from this one.
     Firelist* baseFireList;
+    /// the property to be checked, each thread will create its own copy
     SimpleProperty* resultProperty;
+    /// the number of the current thread
     int threadNumber;
+    /// the total number of threads
     int number_of_threads;
+    /// the exploration object
     ParallelExploration* pexploration;
 };
 
@@ -304,7 +303,6 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 
     int mutex_creation_status = 0;
     mutex_creation_status |= pthread_mutex_init(&num_suspend_mutex, NULL);
-    mutex_creation_status |= pthread_mutex_init(&send_mutex, NULL);
     mutex_creation_status |= pthread_mutex_init(&write_current_back_mutex,
                              NULL);
     // LCOV_EXCL_START
@@ -347,7 +345,6 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     // clean up all variables needed to make the parallel DFS
     int mutex_destruction_status = 0;
     mutex_destruction_status |= pthread_mutex_destroy(&num_suspend_mutex);
-    mutex_destruction_status |= pthread_mutex_destroy(&send_mutex);
     mutex_destruction_status |= pthread_mutex_destroy(&write_current_back_mutex);
     // LCOV_EXCL_START
     if (UNLIKELY(mutex_destruction_status)) {

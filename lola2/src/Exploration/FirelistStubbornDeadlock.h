@@ -13,6 +13,7 @@ enabled transitions.
 #include <pthread.h>
 
 
+/// a stubborn firelist for the search for deadlocks
 class FirelistStubbornDeadlock : public Firelist
 {
 public:

@@ -3,8 +3,7 @@
  \author Karsten
  \status new
 
- \brief Evaluates simple property (only SET of states needs to be computed).
- Actual property is virtual, default (base class) is full exploration
+ \brief represents a property to be represented by a predicate
  */
 
 #pragma once
@@ -17,12 +16,20 @@
 class Firelist;
 //class Store;
 
+
+/*!
+\brief represents a property to be represented by a predicate
+
+This is a property based on a state-predicate, which makes statements about a marking.
+Incremental update of the property is possible.
+*/
 class StatePredicateProperty: public SimpleProperty
 {
 
 public:
     StatePredicateProperty(StatePredicate*);
     virtual ~StatePredicateProperty();
+    /// return the predicate used to evaluate the property
     StatePredicate* getPredicate()
     {
         return predicate;
@@ -38,21 +45,18 @@ private:
     /// check property in Marking::Current, use after backfire. Argument is transition just backfired.
     virtual bool updateProperty(NetState &ns, index_t);
 
-    // the actual formula to be verified;
+    /// the actual formula to be verified;
     StatePredicate* predicate;
 
-    // for each transition t, number of state predicates that need to be checked
-    // when t is fired
+    /// for each transition t, number of state predicates that need to be checked when t is fired
     index_t* cardChanged;
 
-    // for each transition t, an array with all state predicates that
-    // need to be checked
-    // when t is fired
+    /// for each transition t, an array with all state predicates that need to be checked when t is fired
     AtomicStatePredicate*** changedPredicate;
 
-    // changedSum[t][i] is the difference that t causes in the formal sum of
-    // state predicate changedPredicate[t][i]
+    /// changedSum[t][i] is the difference that t causes in the formal sum of state predicate changedPredicate[t][i]
     int** changedSum;
 
+    /// create a copy of the property, needed in parallel exploration
     virtual SimpleProperty* copy();
 };

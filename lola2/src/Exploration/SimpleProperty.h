@@ -1,11 +1,10 @@
 /*!
- \file SimpleProperty.h
- \author Karsten
- \status new
+\file SimpleProperty.h
+\author Karsten
+\status new
 
- \brief Evaluates simple property (only SET of states needs to be computed).
- Actual property is virtual, default (base class) is full exploration
- */
+\brief simple property (only SET of states needs to be computed to check it).
+*/
 
 #pragma once
 
@@ -21,15 +20,23 @@ class Firelist;
 //class Store;
 //class EmptyStore;
 
-/// one element on the stack for simple properties
+/*!
+\brief one element on the stack for simple properties
+
+A simple stack entry contains two elements
+- a firelist (as an array of numbers)
+- the current index on the firelist
+ */
 class SimpleStackEntry
 {
 public:
+	/// ordinary constructor for entry
     SimpleStackEntry(index_t * f,index_t c) {
         assert(f);    //firelist, first processed in firelist
         fl = f;
         current = c;
     }
+    /// copy constructor used by the search stack
     SimpleStackEntry(SimpleStackEntry& src) {
         current = src.current;
         fl = new index_t[current+1];
@@ -45,6 +52,13 @@ public:
     index_t current; // index of first processed element of fl
 };
 
+
+/*!
+\brief simple property, beeing always false
+
+This property is one of the simplest possible properties, beeing false for every marking.
+Also this class is the base class for all property, that only need to be evaluated on one single marking.
+*/
 class SimpleProperty
 {
 public:
@@ -75,6 +89,7 @@ public:
         return false;
     }
 
+    /// create a new simple property exactly as the current one
     virtual SimpleProperty* copy()
     {
         return new SimpleProperty();

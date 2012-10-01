@@ -12,11 +12,12 @@
 class SimpleProperty;
 
 /*!
-\author Karsten
-\brief class for firelist generation. Default is firelist consisting of all enabled transitions.
+\brief Class for firelist generation. Default is firelist consisting of all enabled transitions.
 
 Base class for all firelists. By default a firelist contains all enabled transition.
 A firelist may contain not all enabled transtitions, but must not contain transition, which are not enabled.
+
+\author Karsten
 */
 class Firelist
 {

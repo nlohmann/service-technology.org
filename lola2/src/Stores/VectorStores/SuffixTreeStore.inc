@@ -308,16 +308,18 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
 template <typename T>
 bool SuffixTreeStore<T>::popVector(vectordata_t * & out)
 {
+  index_t vectorlen = SIZEOF_CAPACITY_T * Net::Card[PL];
   // create intermediate vector
   if(!popVectorCache)
   {
-    popVectorCache = (vectordata_t *) calloc(SIZEOF_CAPACITY_T, Net::Card[PL]);
+    popVectorCache = (vectordata_t *) malloc(vectorlen);
   }
   
   // vector currently viewed
   vectordata_t * pVector = NULL;
   // anchor to a decision node
   Decision * anchor = NULL;
+  Decision ** pAnchor = NULL;
   
   // iterate over all buckets
   while(currentBucket < SIZEOF_MARKINGTABLE)
@@ -330,7 +332,7 @@ bool SuffixTreeStore<T>::popVector(vectordata_t * & out)
     }
     
     // copy "first" vector to return it later
-    memcpy(popVectorCache, pVector, Net::Card[PL] * SIZEOF_CAPACITY_T);
+    memcpy(popVectorCache, pVector, vectorlen);
     out = popVectorCache;
     
     if(!(anchor = branch[currentBucket]))
@@ -341,10 +343,14 @@ bool SuffixTreeStore<T>::popVector(vectordata_t * & out)
       return true;
     }
     
+    pAnchor = &branch[currentBucket];
+    while(anchor->nextold)
+      pAnchor = &(anchor->nextold), anchor = anchor-> nextold;
+    
     // alignment of both vectors (i.e. relative position of first bit of anchor->vector)
     bitindex_t shift = (anchor->bit + 1) % VECTOR_WIDTH;
     // remaining words to copy
-    bitindex_t remaining = (Net::Card[PL] * SIZEOF_CAPACITY_T - anchor->bit - 1) / VECTOR_WIDTH;
+    bitindex_t remaining = (vectorlen*8 - anchor->bit - 1) / VECTOR_WIDTH;
     
     // go to position of first differing bit
     pVector += (anchor->bit / VECTOR_WIDTH);
@@ -358,13 +364,13 @@ bool SuffixTreeStore<T>::popVector(vectordata_t * & out)
     if(shift == 0)
     {
       // good alignment, use memcpy
-      memcpy(++pVector, source, remaining);
+      memcpy(++pVector, source, remaining * SIZEOF_VECTORDATA_T);
     }
     else
     {
       // bad alignment, copy manually
       // initially clear recent word
-      *pVector = ((*pVector >> shift) << shift);
+      *pVector = ((*pVector >> (VECTOR_WIDTH-shift)) << (VECTOR_WIDTH-shift));
       
       while(true)
       {
@@ -376,29 +382,13 @@ bool SuffixTreeStore<T>::popVector(vectordata_t * & out)
           break;
         }
         // copy upper half
-        *pVector = *(source++) << shift;
+        *pVector = *(source++) << (VECTOR_WIDTH-shift);
       }
     }
     
     // remove node
-    Decision * anchor2 = anchor->nextnew;
-    if(anchor2)
-    {
-      // "next new" becomes new root of this tree
-      branch[currentBucket] = anchor2;
-      // go to oldest node in this subtree
-      while(anchor2->nextold)
-      {
-        anchor2 = anchor2->nextold;
-      }
-      
-      // each node older than anchor is also older than the new root
-      anchor2->nextold = anchor->nextold;
-    }
-    else
-    {
-      branch[currentBucket] = anchor->nextold;
-    }
+    *pAnchor = anchor->nextnew;
+    anchor->nextnew = NULL; // prevent it from being deleted when calling the destructor
     delete anchor;
     
     // return result

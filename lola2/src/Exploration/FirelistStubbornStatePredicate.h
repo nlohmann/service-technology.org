@@ -21,14 +21,11 @@ public:
     /// parameter for actual list
     virtual index_t getFirelist(NetState &, index_t**);
 
+    /// create a new StubbornStatePredicate-Firelist form the current one
+    virtual Firelist* createNewFireList(SimpleProperty *property);
+
 private:
     StatePredicate* predicate;
     index_t* dfsStack;
     bool* onStack;
-};
-
-class FirelistStubbornStatePredicateCreator : public FireListCreator
-{
-public:
-    virtual Firelist* createFireList(SimpleProperty*);
 };

@@ -7,7 +7,7 @@
 
 class StatePredicate;
 class SimpleProperty;
-class FireListCreator;
+class Firelist;
 class ChooseTransition;
 class DFSExploration;
 class NetState;
@@ -20,7 +20,7 @@ private:
     NetState* ns;
     ChooseTransition* choose;
     enum_search search;
-    FireListCreator* flc;
+    Firelist* fl;
     SimpleProperty* p;
     DFSExploration* exploration;
     int number_of_threads;

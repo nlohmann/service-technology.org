@@ -83,7 +83,7 @@ index_t FirelistStubbornStatePredicate::getFirelist(NetState &ns, index_t** resu
     return size;
 }
 
-Firelist* FirelistStubbornStatePredicateCreator::createFireList(SimpleProperty* property)
+Firelist* FirelistStubbornStatePredicate::createNewFireList(SimpleProperty *property)
 {
     return new FirelistStubbornStatePredicate(((StatePredicateProperty*)property)->getPredicate());
 }

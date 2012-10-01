@@ -73,7 +73,7 @@ void myprinter(const char* s, kc::uview v)
 
 extern kc::tFormula TheFormula;
 
-Task::Task() : sp(NULL), ns(NULL), p(NULL), s(NULL), flc(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
+Task::Task() : sp(NULL), ns(NULL), p(NULL), s(NULL), fl(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
 {
     setFormula();
     setNet();
@@ -85,7 +85,7 @@ Task::~Task()
     delete s;
     delete p;
     delete sp;
-    delete flc;
+    delete fl;
     delete exploration;
 }
 
@@ -262,17 +262,17 @@ void Task::setProperty()
 
     case check_arg_full:
         p = new SimpleProperty();
-        flc = new FireListCreator();
+        fl = new Firelist();
         break;
 
     case check_arg_deadlock:
         p = new Deadlock();
-        flc = new FireListStubbornDeadlockCreator();
+        fl = new FirelistStubbornDeadlock();
         break;
 
     case check_arg_statepredicate:
         p = new StatePredicateProperty(sp);
-        flc = new FirelistStubbornStatePredicateCreator();
+        fl = new FirelistStubbornStatePredicate(sp);
         break;
     }
 
@@ -302,13 +302,13 @@ bool Task::getResult()
     assert(s);
     assert(p);
     assert(exploration);
-    assert(flc);
+    assert(fl);
 
     bool result;
     switch (args_info.search_arg)
     {
     case search_arg_depth:
-        result = exploration->depth_first(*p, *ns, *s, * flc, number_of_threads);
+        result = exploration->depth_first(*p, *ns, *s, *fl, number_of_threads);
         break;
 
     case search_arg_findpath:
@@ -322,7 +322,7 @@ bool Task::getResult()
         }
 
         choose = new ChooseTransitionHashDriven();
-        result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *flc->createFireList(p), *((EmptyStore<void>*)s), *choose);
+        result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore<void>*)s), *choose);
         delete choose;
         break;
 

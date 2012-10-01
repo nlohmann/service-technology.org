@@ -24,9 +24,8 @@ extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
 
-bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<void> &myStore, FireListCreator &firelistcreator, int threadNumber)
+bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<void> &myStore, Firelist &myFirelist, int threadNumber)
 {
-    Firelist &myFirelist = *firelistcreator.createFireList(&property);
     //// copy initial marking into current marking
     //Marking::init();
 
@@ -76,7 +75,6 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<v
                     // of witness path
                     SimpleStackEntry *stack = property.stack.push();
                     stack = new ((void *) stack) SimpleStackEntry(currentFirelist,currentEntry);
-                    delete(&myFirelist);
                     return true;
                 }
 
@@ -93,7 +91,6 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<v
             if (property.stack.StackPointer == 0)
             {
                 // have completely processed initial marking --> state not found
-                delete(&myFirelist);
                 return false;
             }
             SimpleStackEntry & stack = property.stack.top();

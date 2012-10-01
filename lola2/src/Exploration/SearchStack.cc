@@ -1,11 +1,3 @@
-/*!
- \file SearchStack.cc
- \author Karsten
- \status new
-
- \brief Organizes the search stack for dfs or bfs.
- */
-
 #include <cstdlib>
 #include <cstring>
 #include <Core/Dimensions.h>

@@ -30,7 +30,7 @@ class ParallelExploration : public DFSExploration
 {
 public:
     /// evaluate property by dfs. Result true = state found, false = state not found
-    virtual bool depth_first(SimpleProperty &property, NetState &ns, Store<void> &, FireListCreator &firelistcreator, int threadNumber);
+    virtual bool depth_first(SimpleProperty &property, NetState &ns, Store<void> &, Firelist &firelist, int threadNumber);
 
 
     sem_t* restartSemaphore;
@@ -58,5 +58,5 @@ private:
     static void* threadPrivateDFS(void* container);
 
     // this will either return NULL (no state fullfilling the property has been found) or the witness state itself
-    NetState* threadedExploration(NetState &ns, Store<void> &myStore, FireListCreator &fireListCreator, SimpleProperty* resultProperty, int threadNumber, int number_of_threads);
+    NetState* threadedExploration(NetState &ns, Store<void> &myStore, Firelist &baseFireList, SimpleProperty* resultProperty, int threadNumber, int number_of_threads);
 };

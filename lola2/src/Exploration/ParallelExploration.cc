@@ -37,7 +37,7 @@ extern Reporter* rep;
 struct tpDFSArguments {
     NetState* ns;
     Store<void>* myStore;
-    FireListCreator* fireListCreator;
+    Firelist* baseFireList;
     SimpleProperty* resultProperty;
     int threadNumber;
     int number_of_threads;
@@ -48,21 +48,21 @@ void* ParallelExploration::threadPrivateDFS(void* container) {
     tpDFSArguments* arguments = (tpDFSArguments*) container;
     NetState &ns = *arguments->ns;
     Store<void> &myStore = *arguments->myStore;
-    FireListCreator &fireListCreator = *arguments->fireListCreator;
+    Firelist &baseFireList = *arguments->baseFireList;
     int threadNumber = arguments->threadNumber;
     int number_of_threads = arguments->number_of_threads;
     SimpleProperty* resultProperty = arguments->resultProperty;
 
     return arguments->pexploration->threadedExploration(ns,
-            myStore, fireListCreator, resultProperty, threadNumber,
+            myStore, baseFireList, resultProperty, threadNumber,
             number_of_threads);
 }
 
 NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &myStore,
-        FireListCreator &fireListCreator, SimpleProperty* resultProperty,
+        Firelist &baseFireList, SimpleProperty* resultProperty,
         int threadNumber, int number_of_threads) {
     SimpleProperty* sp = resultProperty->copy();
-    Firelist* myFirelist = fireListCreator.createFireList(sp);
+    Firelist* myFirelist = baseFireList.createNewFireList(sp);
     /// the search stack
     SearchStack<SimpleStackEntry> stack;
 
@@ -249,7 +249,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                 delete transfer_netstate;
                 // rebuild
                 sp->initProperty(ns);
-                myFirelist = fireListCreator.createFireList(sp);
+                myFirelist = baseFireList.createNewFireList(sp);
                 // my sender holds the lock that authorizes me to decrease the variable
                 sem_post(transfer_finished_semaphore);
 
@@ -272,7 +272,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
 }
 
 bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
-                                      Store<void> &myStore, FireListCreator &firelistcreator,
+                                      Store<void> &myStore, Firelist &firelist,
                                       int number_of_threads) {
     // copy initial marking into current marking
     //Marking::init();
@@ -281,7 +281,7 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     tpDFSArguments* args = (tpDFSArguments*) calloc(number_of_threads,
                            sizeof(tpDFSArguments));
     for (int i = 0; i < number_of_threads; i++) {
-        args[i].fireListCreator = &firelistcreator;
+        args[i].baseFireList = &firelist;
         args[i].myStore = &myStore;
         args[i].ns = new NetState(ns);
         args[i].threadNumber = i;

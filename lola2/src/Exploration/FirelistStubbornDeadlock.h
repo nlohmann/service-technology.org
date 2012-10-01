@@ -22,6 +22,8 @@ public:
     /// parameter for actual list
     virtual index_t getFirelist(NetState &ns, index_t**);
 
+    virtual Firelist* createNewFireList(SimpleProperty *property);
+
 private:
     index_t* dfsStack;
     index_t* dfs;
@@ -33,10 +35,4 @@ private:
     uint32_t* onTarjanStack;
     uint32_t stamp;
     void newStamp();
-};
-
-class FireListStubbornDeadlockCreator : public FireListCreator
-{
-public:
-    virtual Firelist* createFireList(SimpleProperty*);
 };

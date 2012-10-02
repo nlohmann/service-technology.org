@@ -52,7 +52,9 @@ option "state" s
   "Print witness state"
   flag off
 
-
+option "symmetry" y
+  "Use symmetry reduction"
+  flag off
 
 section "Input/Output"
 

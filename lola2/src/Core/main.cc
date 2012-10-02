@@ -40,6 +40,8 @@
 
 #include <Stores/Store.h>
 
+#include <Symmetry/GeneratingSystem.h>
+
 
 extern ParserPTNet* ParserPTNetLoLA();
 
@@ -248,7 +250,13 @@ int main(int argc, char** argv)
     {
         task.setStore();
         task.setProperty();
-
+        
+        if (args_info.symmetry_given)
+        {
+            // TODO: Move this to a more appropriate place.
+            GeneratingSystem::create();
+        }
+        
         bool result = task.getResult();
         task.interpreteResult(result);
 

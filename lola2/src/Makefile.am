@@ -2,7 +2,7 @@
 bin_PROGRAMS = lola
 
 lola_CFLAGS = -g -ggdb -pedantic
-lola_CXXFLAGS = -g -ggdb -pedantic
+lola_CXXFLAGS = -g -ggdb -pedantic -fopenmp -pg
 
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
@@ -70,6 +70,10 @@ lola_SOURCES = \
                 Stores/VectorStores/VSTLStore.cc Stores/VectorStores/VSTLStore.h Stores/VectorStores/VSTLStore.inc \
                 Stores/VectorStores/VBloomStore.cc Stores/VectorStores/VBloomStore.h \
                 Stores/VectorStores/SuffixTreeStore.h Stores/VectorStores/SuffixTreeStore.inc \
+                \
+                Symmetry/GeneratingSystem.cc Symmetry/Permutation.cc \
+                Symmetry/PartitionRefinement.cc Symmetry/Refiners.cc \
+		Symmetry/SCC.cc Symmetry/LinkedList.cc \
                 \
                 Witness/Event.h Witness/Event.cc Witness/Condition.h Witness/Condition.cc
 

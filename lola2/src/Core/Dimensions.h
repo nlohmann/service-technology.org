@@ -143,3 +143,17 @@ typedef uint32_t vectordata_t;
 // maximum size (in bits) of a vector item
 #define VECTOR_WIDTH (SIZEOF_VECTORDATA_T * 8)
 
+
+/////////////
+// types used for symmetry reduction
+
+// bucket size for bucketized counting sort
+#define BUCKET_SIZE 3000
+
+// Comparison
+typedef enum
+{
+    CMP_LT = 0,
+    CMP_EQ = 1,
+    CMP_GT = 2
+} cmp_t;

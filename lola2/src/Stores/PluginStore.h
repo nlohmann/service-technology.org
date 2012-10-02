@@ -23,8 +23,9 @@ public:
 
     bool searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex);
 
-    /// sets ns to a state from the store; removes this state from the store
-    /// returns false if store was already empty
+    /// gets and removes a state from the store
+    /// @param ns NetState where the removed state will be written to
+    /// @return false, if store was already empty
     virtual bool popState(NetState &ns);
 
 private:

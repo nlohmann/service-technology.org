@@ -308,6 +308,7 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
 template <typename T>
 bool SuffixTreeStore<T>::popVector(vectordata_t * & out)
 {
+  /// size of resulting vector
   index_t vectorlen = SIZEOF_CAPACITY_T * Net::Card[PL];
   // create intermediate vector
   if(!popVectorCache)
@@ -343,9 +344,14 @@ bool SuffixTreeStore<T>::popVector(vectordata_t * & out)
       return true;
     }
     
+    // we start with the root of the decision tree
     pAnchor = &branch[currentBucket];
+    // and search for the decision node differing as last from the "first" vector
     while(anchor->nextold)
-      pAnchor = &(anchor->nextold), anchor = anchor-> nextold;
+    {
+      pAnchor = &(anchor->nextold);
+      anchor = anchor-> nextold;
+    }
     
     // alignment of both vectors (i.e. relative position of first bit of anchor->vector)
     bitindex_t shift = (anchor->bit + 1) % VECTOR_WIDTH;

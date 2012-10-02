@@ -46,14 +46,21 @@ bool PluginStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadI
     return ret;
 }
 
-/// sets ns to a state from the store; removes this state from the store
-/// returns false if store was already empty
+/*!
+ * \brief gets and removes a state from the store
+ * \param ns NetState where the removed state will be written to
+ * \return false, if store was already empty
+ */  
 template<typename T>
 bool PluginStore<T>::popState(NetState &ns) {
+  // pointer to be set to popped vector
   vectordata_t * vec = NULL;
+  
+  // try to get a vector from the store
   bool result = vectorStore->popVector(vec);
   if(result)
   {
+    // decode vector to state and write to ns
     netStateEncoder->decodeNetState(ns, vec);
   }
   return result;

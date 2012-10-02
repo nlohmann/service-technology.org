@@ -31,6 +31,8 @@ public:
 	/// @return the final input vector.
 	virtual vectordata_t* encodeNetState(NetState &ns, bitindex_t &bitlen, index_t threadIndex) = 0;
 
-	// decodes a given encoded state and sets the netstate appropriately
+	/// decodes a given encoded state and sets the netstate appropriately
+	/// @param ns NetState the decoded state will be written to
+	/// @param data vector to be decoded
 	virtual void decodeNetState(NetState& ns, vectordata_t* data);
 };

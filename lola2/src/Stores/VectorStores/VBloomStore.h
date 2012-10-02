@@ -16,11 +16,22 @@ private:
     const size_t hash_functions;
 
 public:
+    /// constructor
     explicit VBloomStore(index_t num_threads, size_t = 2);
+    /// destructor
     ~VBloomStore();
 
+    /// searches for a vector and inserts if not found
+    /// @param in vector to be seached for or inserted
+    /// @param bitlen length of vector
+    /// @param hash of current NetState
+    /// @param payload pointer to be set to the place where the payload of this state will be held
+    /// @param threadIndex the index of the thread that requests this call. Values will range from 0 to (number_of_threads - 1). Used to allow using thread-local auxiliary data structures without locking any variables.
+    /// @return true, if the marking was found in the store, otherwise false.
     bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex);
 
-    // gets and removes a vector from the store
+    /// gets and removes a vector from the store
+    /// @param out place where the returned vector will be written to
+    /// @return false, if the store was already empty, otherwise true
     virtual bool popVector(vectordata_t * & out);
 };

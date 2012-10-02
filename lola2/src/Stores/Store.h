@@ -81,8 +81,9 @@ public:
 	/// @return true, if the marking was found in the store, otherwise false.
     virtual bool searchAndInsert(NetState &ns, T** payload, index_t thread) = 0;
 
-    /// sets ns to a state from the store; removes this state from the store
-    /// returns false if store was already empty
+    /// gets and removes a state from the store
+    /// @param ns NetState where the removed state will be written to
+    /// @return false, if store was already empty
     virtual bool popState(NetState &ns);
 };
 

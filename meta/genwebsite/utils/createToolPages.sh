@@ -7,7 +7,7 @@ TARGET=$4
 UTILDIR=$5
 DATADIR=$6
 
-FILES="download getInvolved help index science support"
+FILES="download getInvolved index science support"
 ADDITIONALS="style.css"
 
 if [ ! -d $JSONDIR ]

@@ -24,5 +24,5 @@ def mineAll(jsonfile, genericfile, peoplefile, reqfile):
 utils.update_website.mineAll(jsonfile, path+"generic.json", "data/people.json", "data/requirements.json")
 
 # write each single file
-for file in ["download", "getInvolved", "help", "index",  "science", "support"]:
+for file in ["download", "getInvolved", "index",  "science", "support"]:
   utils.update_website.writeFile("template/" + file + ".html", targetDir + file +".html")

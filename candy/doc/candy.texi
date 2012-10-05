@@ -11,7 +11,7 @@
 
 @b{About this document:}
 
-This manual is for Candy, version @value{VERSION}, a tool to synthesize cost efficient partners for services, last updated @value{UPDATED}.
+This manual is for Candy, version @value{VERSION}, a tool to synthesize cost-efficient partners for services, last updated @value{UPDATED}.
 
 Copyright @copyright{} 2010 Richard Mueller
 
@@ -24,7 +24,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @dircategory service-technology.org
 @direntry
-* Candy: (candy).       synthesizing cost efficient partners for services.
+* Candy: (candy).       synthesizing cost-efficient partners for services.
 @end direntry
 
 
@@ -34,7 +34,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @title Candy
 
-@subtitle Synthesizing cost efficient partners for services
+@subtitle Synthesizing cost-efficient partners for services
 @subtitle @url{http://service-technology.org/candy}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
@@ -246,7 +246,7 @@ Parameters given via command-line will overwrite parameters given via configurat
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 Candy implements an algorithm published in volume 380 of CEUR Workshop Proceedings.
 
-@section Cost efficient operating guidelines for adapter synthesis
+@section Cost-efficient operating guidelines for adapter synthesis
 
 @subsubheading General Algorithm
 

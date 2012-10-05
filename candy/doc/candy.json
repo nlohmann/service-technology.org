@@ -2,13 +2,15 @@
 "toolname": "Candy", 
 "shortname": "candy", 
 "svnname": "candy", 
+"status": "inactive",
+"tagline": "synthesizing cost-efficient partners for services",
+"purpose": "Candy is a tool to synthesize cost-efficient partners for services.",
+"copyright": "2010 Richard Mueller",
 "authors": [
-    "Peter Pan implemented ...",
-    "Donald Duck implemented ...",
-    "Daisy Duck implemented ..."
-], 
-"maintainer": "Peter Pan", 
-"tagline": "Making life easier", 
-"purpose": "Life is *hard*. Let's make life *easier*...", 
+    "Richard Mueller implemented Candy"
+],
+"maintainer": "Richard Mueller", 
 "license": "AGPL3+"
+"bugtracker": "https://gna.org/bugs/?group=service-tech",
+"tasktracker": "https://gna.org/task/?group=service-tech"
 }

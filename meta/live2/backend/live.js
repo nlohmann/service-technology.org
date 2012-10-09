@@ -8,11 +8,13 @@ var TIMELIMIT = 120;
 
 // enforce constrained path
 process.env.PATH = require('path').resolve('tools/bin');
+WORKDIR = require('path').resolve('workdir');
 
 // includes
 var spawn = require('child_process').spawn;
 var exec = require('child_process').exec;
 var express = require('express');
+var fs = require('fs');
 
 // configure the express app
 var app = express();
@@ -52,6 +54,19 @@ app.post('/', function(req, res){
 
     //console.log(req.headers)
     //console.log(req.body);
+    //console.log(req.files);
+
+    // create working dir
+    var currentDate = new Date();
+    workdir = WORKDIR + '/' + require('dateformat')(currentDate, "yyyy-mm/dd-HHMMss-L");
+    require('mkdirp')(workdir, function (err) {
+        // move transmitted files to working dir
+        for (var i = 0; i < req.files.file.length; i++) {
+            if (req.files.file[i].size > 0) {
+                fs.renameSync(req.files.file[i].path, workdir + '/' + req.files.file[i].filename);
+            }
+        }
+    });
 
     // shameless advertisement
     res.setHeader("X-Powered-By", "service-technology.org");
@@ -87,7 +102,7 @@ app.post('/', function(req, res){
     resp.meta.processes = processcount
 
     try {
-        child = spawn(user_data.tool, user_data.parameters, {'cwd': '/tmp'});
+        child = spawn(user_data.tool, user_data.parameters, {'cwd': workdir});
         resp.result.time.begin = (new Date()).getTime();
         processcount++;
     } catch(e) {

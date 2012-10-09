@@ -20,7 +20,8 @@ uninstall:
 	rm -fr $(LOCAL)
 
 nodejs:
-	cd backend ; npm install express forever
+	cd backend ; npm install express forever dateformat mkdirp
+	mkdir -p backend/workdir
 
 tools: tool-lola tool-pnapi tool-wendy tool-mia
 

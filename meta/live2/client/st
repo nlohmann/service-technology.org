@@ -3,11 +3,19 @@
 import requests
 import json
 import sys
+import os
 
-url     = "http://tools.service-technology.org"
-data    = {'data': json.dumps({'tool': sys.argv[1], 'parameters': sys.argv[2:]})}
-headers = {'Content-type': 'application/json'}
-r = requests.post(url, data=json.dumps(data), headers=headers)
+url = 'http://tools.service-technology.org'
+# url = 'http://localhost:1337'
+
+payload = {'data': json.dumps({'tool': sys.argv[1], 'parameters': sys.argv[2:]})}
+
+files = {}
+for p in sys.argv[2:]:
+    if os.path.exists(p):
+        files[p] = open(p, 'rb')
+
+r = requests.post(url, data=payload, files=files)
 
 res = json.loads(r.text)
 

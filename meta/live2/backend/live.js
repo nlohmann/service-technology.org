@@ -47,23 +47,38 @@ setInterval(function() {
 }, 2000);
 
 
-
 app.post('/', function(req, res){
     // increase timelimit
     req.connection.setTimeout((TIMELIMIT + 30) * 1000);
 
-    //console.log(req.headers)
-    //console.log(req.body);
-    //console.log(req.files);
+//    console.log(req.headers)
+//    console.log(req.body);
+//    console.log(req.files);
 
-    // create working dir
+    // create working dir and copy all files into it
     var currentDate = new Date();
     workdir = WORKDIR + '/' + require('dateformat')(currentDate, "yyyy-mm/dd-HHMMss-L");
     require('mkdirp')(workdir, function (err) {
-        // move transmitted files to working dir
-        for (var i = 0; i < req.files.file.length; i++) {
-            if (req.files.file[i].size > 0) {
-                fs.renameSync(req.files.file[i].path, workdir + '/' + req.files.file[i].filename);
+        if (req.files == undefined) {
+            return;
+        }
+
+        files = new Array();
+
+        for (i in req.files) {
+            if (req.files[i] instanceof Array) {
+                for (var j = 0; j < req.files[i].length; ++j) {
+                    files.push(req.files[i][j]);
+                }
+            } else {
+                files.push(req.files[i]);
+            }
+        }
+        
+        // iterate the array
+        for (var i = 0; i < files.length; i++) {
+            if (files[i].size > 0) {
+                fs.renameSync(files[i].path, workdir + '/' + files[i].filename);
             }
         }
     });
@@ -84,6 +99,9 @@ app.post('/', function(req, res){
         res.end('{"error": {"name": "' + e.name + '", "message": "' + e.message + '"}}');
         return;
     }
+
+    // archive the request
+    fs.writeFile(workdir + '/request.json', JSON.stringify(user_data), function(err) {});
 
     // start tool
     var child;
@@ -152,6 +170,9 @@ app.post('/', function(req, res){
         // prepare response
         var r = JSON.stringify(resp);
         
+        // archive a copy
+        fs.writeFile(workdir + '/response.json', r, function(err) {});
+        
         res.header('Content-Type', 'application/json');
         res.end(r);
     });
@@ -161,8 +182,6 @@ app.post('/', function(req, res){
         resp.result.exit.comment = "Terminated due to time limit";
         child.kill('SIGINT');
     }, TIMELIMIT * 1000);
-
-
 });
 
 app.listen(1337);

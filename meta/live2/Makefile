@@ -23,7 +23,7 @@ nodejs:
 	cd backend ; npm install express forever dateformat mkdirp
 	mkdir -p backend/workdir
 
-tools: tool-lola tool-pnapi tool-wendy tool-mia
+tools: tool-lola tool-pnapi tool-wendy tool-mia tool-sara
 
 tool-wendy: tool-pnapi tool-lola
 	wget http://download.gna.org/service-tech/wendy/wendy.tar.gz
@@ -56,3 +56,11 @@ tool-lola:
 	cd lola-* ; PATH=${LOCAL}/bin:$$PATH ./configure --prefix=${LOCAL}
 	cd lola-* ; make lola-statespace lola-statespace1 install
 	rm -fr lola-*
+
+tool-sara: tool-pnapi
+	wget http://download.gna.org/service-tech/sara/sara.tar.gz
+	tar xfz sara.tar.gz
+	rm -fr sara.tar.gz
+	cd sara-* ; PATH=${LOCAL}/bin:$$PATH ./configure --prefix=${LOCAL}
+	cd sara-* ; make all install
+	rm -fr sara-*

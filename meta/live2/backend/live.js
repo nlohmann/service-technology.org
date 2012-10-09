@@ -55,6 +55,8 @@ app.post('/', function(req, res){
 //    console.log(req.body);
 //    console.log(req.files);
 
+    var inputFiles = Array();
+
     // create working dir and copy all files into it
     var currentDate = new Date();
     workdir = WORKDIR + '/' + require('dateformat')(currentDate, "yyyy-mm/dd-HHMMss-L");
@@ -79,6 +81,7 @@ app.post('/', function(req, res){
         for (var i = 0; i < files.length; i++) {
             if (files[i].size > 0) {
                 fs.renameSync(files[i].path, workdir + '/' + files[i].filename);
+                inputFiles.push(files[i].filename);
             }
         }
     });
@@ -155,11 +158,29 @@ app.post('/', function(req, res){
         // store exit code and kill signal
         resp.result.exit.signal = signal;
         resp.result.exit.code = code;
-        
+
+        // transform output to arrays of string
         resp.result.output.stdout = resp.result.output.stdout.split("\n")
         resp.result.output.stderr = resp.result.output.stderr.split("\n")
         resp.result.output.stdout.pop();
         resp.result.output.stderr.pop();
+
+        // handle files
+        resp.result.output.files = new Array();
+        filenames = fs.readdirSync(workdir);
+
+        // send back all generated files
+        for (i in filenames) {
+            // skip the request or the input files
+            if (filenames[i] == "request.json" || inputFiles.indexOf(filenames[i]) != -1) {
+                continue;
+            }
+
+            // add file content as base64
+            c = fs.readFileSync(workdir + '/' + filenames[i], 'utf-8');
+            entry = {'filename': filenames[i], 'content': new Buffer(c).toString('base64')};
+            resp.result.output.files.push(entry);
+        }
         
         // remove tool from process pool and switch of timout
         processpool.splice(processpool.indexOf(pid), 1);

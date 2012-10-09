@@ -4,10 +4,27 @@ import requests
 import json
 import sys
 import os
+import base64
 
 url = 'http://tools.service-technology.org'
-# url = 'http://localhost:1337'
+#url = 'http://localhost:1337'
 
+# install mode
+if sys.argv[1] == "--install":
+    tool = sys.argv[2]
+    
+    os.system('curl -O http://download.gna.org/service-tech/' + tool + '/' + tool + '.tar.gz')
+    os.system('tar xfz ' + tool + '.tar.gz')
+    os.system('cd ' + tool + '* ; ./configure --prefix=`pwd`/../build')
+    os.system('cd ' + tool + '* ; make all install')
+    os.system('rm -fr ' + tool + '*')
+    
+    print "Installed " + tool + " in folder 'build/bin'."
+
+    sys.exit()
+
+
+# normal mode
 payload = {'data': json.dumps({'tool': sys.argv[1], 'parameters': sys.argv[2:]})}
 
 files = {}
@@ -24,5 +41,11 @@ for line in res['result']['output']['stdout']:
 
 for line in res['result']['output']['stderr']:
     print >> sys.stderr, line
+
+for f in res['result']['output']['files']:
+    if not os.path.exists(f['filename']):
+        of = open(f['filename'], "w")
+        of.write(base64.b64decode(f['content']))
+        of.close()
 
 sys.exit(res['result']['exit']['code'])

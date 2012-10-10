@@ -3,8 +3,8 @@
 "shortname": "marlene",
 "svnname": "marlene", 
 "authors": [
-    "Christian Gierds implemented ...",
-    "Richard Müller implemented ..."
+    "Christian Gierds implemented the main functionality including diagnosis of unadaptability.",
+    "Richard Müller implemented the cost-optimization in connection with Candy."
 ], 
 "maintainer": "Christian Gierds", 
 "tagline": "Making adapters behave well.", 

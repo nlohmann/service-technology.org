@@ -14,7 +14,7 @@ start:
 stop:
 	@cd backend ; node_modules/forever/bin/forever stop live.js
 
-install: nodejs nodejs-modules tools
+install: nodejs-modules tools
 
 uninstall:
 	rm -fr backend/node_modules
@@ -29,7 +29,7 @@ nodejs:
 	rm -fr node-*
 
 nodejs-modules:
-	cd backend ; ${NODEJS}/bin/npm install express forever dateformat mkdirp
+	cd backend ; npm install express forever dateformat mkdirp
 	mkdir -p backend/workdir
 
 tools: tool-lola tool-pnapi tool-wendy tool-mia tool-sara

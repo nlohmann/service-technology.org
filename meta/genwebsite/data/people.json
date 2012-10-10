@@ -11,21 +11,21 @@
     "ad001": 
         { 
           "name": "Andreas Daehn",
-          "url": "", 
+          "url": "http://wwwiuk.informatik.uni-rostock.de/wer_sind_wir/mitarbeiter/andreas_daehn/?L=0", 
           "affiliation": "Universität Rostock"
         } , 
     
     "al020": 
         { 
           "name": "Andreas Lehmann",
-          "url": "", 
+          "url": "http://www.informatik.uni-rostock.de/tpp/staff/al.htm", 
           "affiliation": "Universität Rostock"
         } , 
 
     "amooij": 
         { 
           "name": "Arjan Mooij",
-          "url": "", 
+          "url": "http://www.win.tue.nl/~amooij/", 
           "affiliation": "Technische Universiteit Eindhoven"
         } , 
 
@@ -67,7 +67,7 @@
     "fahland": 
         { 
           "name": "Dirk Fahland",
-          "url": "", 
+          "url": "http://www.win.tue.nl/~dfahland/", 
           "affiliation": "Technische Universiteit Eindhoven"
         } , 
 
@@ -81,7 +81,7 @@
     "gierds": 
         { 
           "name": "Christian Gierds",
-          "url": "", 
+          "url": "https://www2.informatik.hu-berlin.de/top/en/www/mitarbeiter/christian_gierds", 
           "affiliation": "Humboldt-Universität zu Berlin"
          } , 
 
@@ -95,7 +95,7 @@
     "hw138": 
         { 
           "name": "Harro Wimmel",
-          "url": "", 
+          "url": "http://www.informatik.uni-rostock.de/tpp/staff/hw.htm", 
           "affiliation": "Universität Rostock"
         } , 
 
@@ -116,7 +116,7 @@
     "karstenwolf": 
         { 
           "name": "Karsten Wolf",
-          "url": "", 
+          "url": "http://www.informatik.uni-rostock.de/tpp/staff/kw.htm", 
           "affiliation": "Universität Rostock"
         } , 
 
@@ -130,7 +130,7 @@
     "marvintriebel":
         { 
           "name": "Marvin Triebel",
-          "url": "", 
+          "url": "https://www2.informatik.hu-berlin.de/top/en/www/mitarbeiter/marvin_triebel", 
           "affiliation": "Humboldt-Universität zu Berlin"
          } , 
 
@@ -173,7 +173,7 @@
     "rimueller": 
         { 
           "name": "Richard Müller",
-          "url": "", 
+          "url": "https://www2.informatik.hu-berlin.de/top/en/www/mitarbeiter/richard_mueller", 
           "affiliation": "Humboldt-Universität zu Berlin"
          } , 
 
@@ -194,7 +194,7 @@
     "suermeli": 
         { 
           "name": "Jan Sürmeli",
-          "url": "", 
+          "url": "about.me/suermeli", 
           "affiliation": "Humboldt-Universität zu Berlin"
          } , 
 
@@ -202,7 +202,7 @@
       "weinberg":
         { 
           "name": "Daniela Weinberg",
-          "url": "", 
+          "url": "http://www.informatik.uni-rostock.de/tpp/staff/dw.htm", 
           "affiliation": "Universität Rostock"
          } 
 

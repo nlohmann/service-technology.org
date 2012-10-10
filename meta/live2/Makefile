@@ -1,4 +1,5 @@
 LOCAL := $(shell pwd)/backend/tools
+NODEJS := $(shell pwd)/backend/nodejs
 
 all:
 	@echo "valid targets:"
@@ -13,22 +14,22 @@ start:
 stop:
 	@cd backend ; node_modules/forever/bin/forever stop live.js
 
-install: nodejs-modules tools
+install: nodejs nodejs-modules tools
 
 uninstall:
 	rm -fr backend/node_modules
-	rm -fr $(LOCAL)
+	rm -fr $(LOCAL) $(NODEJS)
 
 nodejs:
 	wget http://nodejs.org/dist/v0.8.11/node-v0.8.11.tar.gz
 	tar xfz node-v0.8.11.tar.gz
 	rm -fr node-v0.8.11.tar.gz
-	cd node-* ; PATH=${LOCAL}/bin:$$PATH ./configure --prefix=${LOCAL}
+	cd node-* ; ./configure --prefix=${NODEJS}
 	cd node-* ; make all install
 	rm -fr node-*
 
 nodejs-modules:
-	cd backend ; npm install express forever dateformat mkdirp
+	cd backend ; ${NODEJS}/bin/npm install express forever dateformat mkdirp
 	mkdir -p backend/workdir
 
 tools: tool-lola tool-pnapi tool-wendy tool-mia tool-sara

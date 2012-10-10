@@ -13,13 +13,21 @@ start:
 stop:
 	@cd backend ; node_modules/forever/bin/forever stop live.js
 
-install: nodejs tools
+install: nodejs-modules tools
 
 uninstall:
 	rm -fr backend/node_modules
 	rm -fr $(LOCAL)
 
-nodejs:
+nodesjs:
+	wget http://nodejs.org/dist/v0.8.11/node-v0.8.11.tar.gz
+	tar xfz node-v0.8.11.tar.gz
+	rm -fr node-v0.8.11.tar.gz
+	cd node-* ; PATH=${LOCAL}/bin:$$PATH ./configure --prefix=${LOCAL}
+	cd node-* ; make all install
+	rm -fr node-*
+
+nodejs-modules:
 	cd backend ; npm install express forever dateformat mkdirp
 	mkdir -p backend/workdir
 

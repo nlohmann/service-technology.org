@@ -19,7 +19,7 @@ uninstall:
 	rm -fr backend/node_modules
 	rm -fr $(LOCAL)
 
-nodesjs:
+nodejs:
 	wget http://nodejs.org/dist/v0.8.11/node-v0.8.11.tar.gz
 	tar xfz node-v0.8.11.tar.gz
 	rm -fr node-v0.8.11.tar.gz
@@ -62,7 +62,7 @@ tool-lola:
 	tar xfz lola.tar.gz
 	rm -fr lola.tar.gz
 	cd lola-* ; PATH=${LOCAL}/bin:$$PATH ./configure --prefix=${LOCAL}
-	cd lola-* ; make lola-statespace lola-statespace1 install
+	cd lola-* ; make lola-statespace lola-statespace1 lola-full lola-full1 install
 	rm -fr lola-*
 
 tool-sara: tool-pnapi

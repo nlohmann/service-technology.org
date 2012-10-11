@@ -46,7 +46,6 @@ setInterval(function() {
     }
 }, 2000);
 
-
 app.post('/', function(req, res){
     // increase timelimit
     req.connection.setTimeout((TIMELIMIT + 30) * 1000);
@@ -203,6 +202,12 @@ app.post('/', function(req, res){
         resp.result.exit.comment = "Terminated due to time limit";
         child.kill('SIGINT');
     }, TIMELIMIT * 1000);
+});
+
+app.get('/list', function(req, res) {
+    res.setHeader("X-Powered-By", "service-technology.org");
+    res.header('Content-Type', 'application/json');
+    res.sendfile('tools.json');
 });
 
 app.listen(1337);

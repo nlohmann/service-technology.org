@@ -461,7 +461,7 @@ void Task::printDot()
 void Task::testPopState()
 {
   rep->message("%s", rep->markup(MARKUP_IMPORTANT, "iterating over all stored states:").str());
-  unsigned long long counter = 0;
+  uint64_t counter = 0;
 
   while(s->popState(*ns))
   {

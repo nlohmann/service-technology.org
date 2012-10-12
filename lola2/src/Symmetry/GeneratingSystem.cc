@@ -35,7 +35,7 @@ void GeneratingSystem::create() {
     Partition partition = Partition(Net::Card[PL] + Net::Card[TR]);
     
     // separate places and transitions
-    bool types[Net::Card[PL] + Net::Card[TR]];
+    bool *types = new bool[Net::Card[PL] + Net::Card[TR]];
     memset(types, false, sizeof(bool) * Net::Card[PL]);
     memset(&types[Net::Card[PL]], true, sizeof(bool) * Net::Card[TR]);
     refineAll<BoolArrayRefinement>(BoolArrayRefinement(&partition, types));
@@ -100,7 +100,7 @@ void GeneratingSystem::create() {
     gettimeofday(&start, NULL);
     
     // build partitions stabilizing [0,i-1]
-    Partition *partitions[partition.order];
+    Partition **partitions = new Partition*[partition.order];
     memset(partitions, 0, sizeof(Partition*) * partition.order);
     index_t last = -1;
     for(index_t i = 0; !partition.complete(); i++, last++) {
@@ -152,7 +152,11 @@ std::cout << end.tv_sec-start.tv_sec + (end.tv_usec-start.tv_usec)*1e-6 << " " <
 
     int generators = 0; for(index_t i = 0; i < partition.order; i++) if(sigma[i] != NULL) generators++;
     rep->status("Symmetry group has %d non-trivial generators", generators);
+    
     exit(0);
+    
+    delete[] types;
+    delete[] partitions;
   
     return;
 }

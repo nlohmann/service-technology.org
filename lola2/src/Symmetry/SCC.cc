@@ -64,9 +64,9 @@ SCC::SCC() {
   for(index_t i = 0; i < sccs; i++) {
     #pragma omp parallel for
     for(int dir = PRE; dir <= POST; dir++) {
-      index_t tempArcs[Net::Card[PL] + Net::Card[TR]];
-      mult_t tempMult[Net::Card[PL] + Net::Card[TR]];
-      
+      index_t *tempArcs = new index_t[Net::Card[PL] + Net::Card[TR]];
+      mult_t *tempMult = new mult_t[Net::Card[PL] + Net::Card[TR]];
+
       for(index_t j = ranges[i].from; j <= ranges[i].to; j++) {
 	for(index_t k = 0; k < Net::CardArcs[elems[j].node][dir][elems[j].ix]; k++) {
 	  node_t complement = (elems[j].node == PL ? TR : PL);
@@ -86,6 +86,8 @@ SCC::SCC() {
       
       mult[dir][i] = new mult_t[card[dir][i]];
       memcpy(mult[dir][i], tempMult, sizeof(mult_t) * card[dir][i]);
+      
+      delete[] tempArcs; delete[] tempMult;
     }
   }
 }

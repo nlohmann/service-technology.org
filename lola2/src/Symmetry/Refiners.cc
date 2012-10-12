@@ -156,8 +156,9 @@ bool NeighbourhoodRefinement::refineMultiplicity(index_t i) {
 
 void refineFix(Partition *partition) {
     NeighbourhoodRefinement *neighbourhood[2];
-    bool suspects[2][partition->order];
+    bool **suspects = new bool*[2];
     for(int dir = PRE; dir <= POST; dir++) {
+        suspects[dir] = new bool[partition->order];
 	neighbourhood[dir] = new NeighbourhoodRefinement(partition, (direction_t)dir);
 	neighbourhood[dir]->start();
 
@@ -189,6 +190,7 @@ void refineFix(Partition *partition) {
     } while(partition->change);
     
     delete neighbourhood[PRE]; delete neighbourhood[POST];
+    delete[] suspects[PRE]; delete[] suspects[POST];
 }
 
 bool refineFix2(Partition *p1, Partition *p2) {
@@ -196,9 +198,11 @@ bool refineFix2(Partition *p1, Partition *p2) {
     index_t order = p1->order;
     Partition *p[2] = {p1, p2};
     NeighbourhoodRefinement *neighbourhood[2][2];
-    bool suspects[2][2][order];
+    bool ***suspects = new bool**[2];
     for(int i = 0; i < 2; i++) {
+        suspects[i] = new bool*[2];
 	for(int dir = PRE; dir <= POST; dir++) {
+            suspects[i][dir] = new bool[order];
 	    neighbourhood[i][dir] = new NeighbourhoodRefinement(p[i], (direction_t)dir);
 	    neighbourhood[i][dir]->start();
 	    

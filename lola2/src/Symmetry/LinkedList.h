@@ -19,6 +19,7 @@ class Cons {
  public:
   Cons();
   Cons<T>* next;
+  void deallocate();
   void discard();
   T getContent();
   bool isLast();
@@ -33,6 +34,9 @@ T Cons<T>::getContent() { return content; }
 
 template <typename T>
 void Cons<T>::discard() { discarded = true; }
+
+template <typename T>
+void Cons<T>::deallocate() { if(!isLast()) { next->deallocate(); delete next; } }
 
 template <typename T>
 Cons<T>* Cons<T>::insert(T t) {
@@ -106,16 +110,11 @@ LinkedList<T> LinkedList<T>::copy() {
 
 template <typename T>
 void LinkedList<T>::deallocate() {
-  if(isEmpty()) return;
-  
-  Cons<T> *current, *next;
-  reset(); current = getCons();
-  while(!current->isLast()) {
-    next = current->next;
-    delete current;
-    current = next;
+  if(!isEmpty()) {
+    head->deallocate();
+    head->next = last;
+    last->next = head;
   }
-  delete current;
 }
 
 template <typename T>

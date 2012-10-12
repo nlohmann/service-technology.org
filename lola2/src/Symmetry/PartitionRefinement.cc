@@ -190,13 +190,13 @@ void CountingRefinement::dispatch(index_t left, index_t right) {
     if(num == 1) { counting(left, right, 0, Net::Card[PL] + Net::Card[TR]); return; }
     
     // count hits for each bin
-    int hits[num]; memset(hits, 0, sizeof(index_t) * num);
+    int *hits = new int[num]; memset(hits, 0, sizeof(index_t) * num);
     for(index_t i = left; i <= right; i++) hits[value(a[i])/BUCKET_SIZE]++;
     
     // calculate prefix sum
     int used = hits[0] > 0 ? 1 : 0;
-    int reprs[num]; memset(reprs, 0, sizeof(index_t) * num);
-    int bins[num]; memset(bins, 0, sizeof(index_t) * num);
+    int *reprs = new int[num]; memset(reprs, 0, sizeof(index_t) * num);
+    int *bins = new int[num]; memset(bins, 0, sizeof(index_t) * num);
     bins[0] = left + hits[0];
     for(index_t i = 1; i < num; i++) {
 	if(hits[i] > 0) used++;
@@ -218,6 +218,8 @@ void CountingRefinement::dispatch(index_t left, index_t right) {
     for(index_t i = 0, j = left; i < num; j += hits[i], i++) {
 	counting(j, j+hits[i]-1, BUCKET_SIZE*i, BUCKET_SIZE*(i+1)-1);
     }
+    
+    delete[] bins; delete[] reprs; delete[] hits;
 }
 
 

@@ -38,7 +38,8 @@ index_t Bijection::stabilizes() {
 }
 
 void Bijection::show() {
-    bool touched[size]; memset(touched, false, sizeof(bool) * size);
+    bool *touched = new bool[size]; memset(touched, false, sizeof(bool) * size);
+    
     for(index_t i = 0; i < size; i++) {
 	if(touched[i]) continue;
 	touched[i] = true; 
@@ -56,4 +57,6 @@ void Bijection::show() {
 	}
 	std::cout << ")\n";
     }
+    
+    delete[] touched;
 }

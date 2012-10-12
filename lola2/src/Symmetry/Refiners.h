@@ -264,9 +264,12 @@ class NeighbourhoodRefinement : public DirectionalRefiner, public NeighbourhoodR
 
 template <typename T>
 bool isomorphic(T* a1, T* a2, unsigned int length) {
-    T b1[length]; memcpy(b1, a1, sizeof(T) * length); std::sort(b1, &b1[length]);
-    T b2[length]; memcpy(b2, a2, sizeof(T) * length); std::sort(b2, &b2[length]);
-    return (memcmp(b1, b2, sizeof(T) * length) == 0);
+    T *b1 = new T[length]; memcpy(b1, a1, sizeof(T) * length); std::sort(b1, &b1[length]);
+    T *b2 = new T[length]; memcpy(b2, a2, sizeof(T) * length); std::sort(b2, &b2[length]);
+    bool result = (memcmp(b1, b2, sizeof(T) * length) == 0);
+    
+    delete[] b1; delete[] b2;
+    return result;
 }
 
 void refineFix(Partition *partition);

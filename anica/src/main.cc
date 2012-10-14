@@ -363,7 +363,7 @@ int main(int argc, char** argv) {
             message(_cgood_("net is secure"));
         }
         else {
-            message(_cbad_("net is unsecure"));
+            message(_cbad_("net is insecure"));
         }
     }
     else if (args_info.task_arg == task_arg_characterization) {

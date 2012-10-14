@@ -263,6 +263,8 @@ void updateNonInterference() {
             
             rep->status("characterization calculated");
             
+            myBDD->DumpDot(std::vector<BDD>(1, *cuddOutput), cuddVariableNames);
+            
             // check if valid
             if (cuddOutput->IsZero()) {
                 sendError("assignment is not secure");

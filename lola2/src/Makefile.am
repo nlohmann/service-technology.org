@@ -26,7 +26,7 @@ lola_SOURCES = \
                 Net/LinearAlgebra.cc Net/LinearAlgebra.h \
                 Net/Marking.cc Net/Marking.h \
                 Net/Net.cc Net/Net.h \
-               	Net/NetState.cc Net/NetState.h \
+                Net/NetState.cc Net/NetState.h \
                 Net/Place.cc Net/Place.h \
                 Net/Transition.cc Net/Transition.h \
                 \
@@ -70,10 +70,6 @@ lola_SOURCES = \
                 Stores/VectorStores/VSTLStore.cc Stores/VectorStores/VSTLStore.h Stores/VectorStores/VSTLStore.inc \
                 Stores/VectorStores/VBloomStore.cc Stores/VectorStores/VBloomStore.h \
                 Stores/VectorStores/SuffixTreeStore.h Stores/VectorStores/SuffixTreeStore.inc \
-                \
-                Symmetry/GeneratingSystem.cc Symmetry/Permutation.cc \
-                Symmetry/PartitionRefinement.cc Symmetry/Refiners.cc \
-		Symmetry/SCC.cc Symmetry/LinkedList.cc \
                 \
                 Witness/Event.h Witness/Event.cc Witness/Condition.h Witness/Condition.cc
 

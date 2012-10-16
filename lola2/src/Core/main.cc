@@ -40,7 +40,7 @@
 
 #include <Stores/Store.h>
 
-#include <Symmetry/GeneratingSystem.h>
+//#include <Symmetry/GeneratingSystem.h>
 
 
 extern ParserPTNet* ParserPTNetLoLA();

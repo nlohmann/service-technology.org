@@ -21,9 +21,6 @@ AC_PROG_AWK
 AC_DEFINE_UNQUOTED(TOOL_AWK, "\"${AWK}\"", [awk])
 AC_DEFINE_UNQUOTED(TOOL_GREP, "\"${GREP}\"", [grep])
 
-# check for OpenMP
-AC_OPENMP
-
 # check for additional programs needed to compile
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)

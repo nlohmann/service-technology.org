@@ -2,7 +2,7 @@
 bin_PROGRAMS = lola
 
 lola_CFLAGS = -g -ggdb -pedantic
-lola_CXXFLAGS = -g -ggdb -pedantic -fopenmp -pg
+lola_CXXFLAGS = -g -ggdb -pedantic -pg
 
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \

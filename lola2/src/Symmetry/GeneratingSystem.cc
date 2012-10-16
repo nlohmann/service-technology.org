@@ -117,7 +117,7 @@ void GeneratingSystem::create() {
     memset(sigma, 0, sizeof(Perm<Bijection>*) * partition.order);
     
     if(last != (index_t)-1) {
-        #pragma omp parallel for schedule(dynamic)
+        //#pragma omp parallel for schedule(dynamic)
 	for(index_t i = 1; i < partition.order; i++) {
 	    for(index_t j = std::min(i-1, last); j >= 0 && j != (index_t)-1; j--) {
           	if(partitions[j]->representative[j] != partitions[j]->representative[i]) continue;

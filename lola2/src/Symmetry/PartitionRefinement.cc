@@ -21,7 +21,7 @@ Partition::Partition(index_t o) : order(o), elements(NULL), representative(NULL)
     if(order == 0) return;
   
     elements = new index_t[order];
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for(index_t i = 0; i < order; i++) elements[i] = i;
     
     representative = new index_t[order]();

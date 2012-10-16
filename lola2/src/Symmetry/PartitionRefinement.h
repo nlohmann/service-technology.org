@@ -108,8 +108,8 @@ bool refineWhen(T prototype, bool *cond) {
     bool emergence = false;
     Partition *partition = prototype.getPartition();
     partition->round++;
-//    #pragma omp parallel for schedule(dynamic)
-    #pragma omp parallel for schedule(dynamic, 32)
+//    //#pragma omp parallel for schedule(dynamic)
+    //#pragma omp parallel for schedule(dynamic, 32)
     for(index_t i = 0; i < partition->order; i++) {
         if(partition->ranges[i] == 0 || partition->rounds[i] == partition->round) continue;
 	if(!cond[i] || !prototype.perform(i, i + partition->ranges[i] - 1)) continue;
@@ -132,8 +132,7 @@ bool refineRange(T prototype, index_t from, index_t to) {
     
     Partition *partition = prototype.getPartition();
     partition->round++;
-//    #pragma omp parallel for schedule(dynamic)
-    #pragma omp parallel for schedule(dynamic, 32)
+    //#pragma omp parallel for schedule(dynamic, 32)
     for(index_t i = from; i < to; i++) {
         index_t last = i + partition->ranges[i] - 1;
 	if(partition->ranges[i] == 0 || partition->rounds[i] == partition->round || last > to) continue;

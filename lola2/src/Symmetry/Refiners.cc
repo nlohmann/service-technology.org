@@ -38,7 +38,7 @@ NeighbourhoodRefiner::~NeighbourhoodRefiner() {
 }
 
 void NeighbourhoodRefiner::start() {
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for(index_t i = 0; i < partition->order; i++) {
 	neighbours[i] = new Partition(getCardinality(i));
 	cells[i] = LinkedList<split_cell_t>();
@@ -68,7 +68,7 @@ bool NeighbourhoodRefiner::publish(index_t i) {
 bool NeighbourhoodRefiner::next() {
     bool nonEmpty = false;
     
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for(index_t i = 0; i < partition->order; i++) {
 	if(cells[i].isValid()) cells[i].next();
 	if(publish(i)) nonEmpty = true;
@@ -80,7 +80,7 @@ bool NeighbourhoodRefiner::next() {
 bool NeighbourhoodRefiner::progress(bool *suspects) {
     bool emergence = false;
     
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for(index_t i = 0; i < partition->order; i++) {
 	// refine neighbours
 	neighbours[i]->reset();

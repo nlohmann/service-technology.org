@@ -13,11 +13,11 @@ SCC::SCC() {
   elems = new scc_vertex_t[Net::Card[PL] + Net::Card[TR]]; nextElem = 0;
   tarjan = new scc_vertex_t[Net::Card[PL] + Net::Card[TR]]; nextTarjan = 0;
   
-  #pragma omp parallel for
+  //#pragma omp parallel for
   for(int n = PL; n <= TR; n++) {
     scc[n] = new index_t[Net::Card[n]];
     nodes[n] = new scc_node_t[Net::Card[n]];
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for(index_t i = 0; i < Net::Card[n]; i++) {
       nodes[n][i].lowlink = -1;
       nodes[n][i].dfs = -1;
@@ -42,7 +42,7 @@ SCC::SCC() {
   for(index_t i = 0; list.isValid(); list.next(), i++) {
     ranges[i] = list.getCons()->getContent();
     
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for(index_t j = ranges[i].from; j <= ranges[i].to; j++) {
       scc[elems[j].node][elems[j].ix] = i;
     }
@@ -60,9 +60,9 @@ SCC::SCC() {
   card[PRE] = new index_t[sccs](); card[POST] = new index_t[sccs]();
   intra[PRE] = new index_t[sccs](); intra[POST] = new index_t[sccs]();
   
-  #pragma omp parallel for
+  //#pragma omp parallel for
   for(index_t i = 0; i < sccs; i++) {
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for(int dir = PRE; dir <= POST; dir++) {
       index_t *tempArcs = new index_t[Net::Card[PL] + Net::Card[TR]];
       mult_t *tempMult = new mult_t[Net::Card[PL] + Net::Card[TR]];

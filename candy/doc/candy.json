@@ -10,7 +10,7 @@
     "Richard Mueller implemented Candy"
 ],
 "maintainer": "Richard Mueller", 
-"license": "AGPL3+"
+"license": "AGPL3+",
 "bugtracker": "https://gna.org/bugs/?group=service-tech",
 "tasktracker": "https://gna.org/task/?group=service-tech"
 }

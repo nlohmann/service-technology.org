@@ -2,6 +2,7 @@
 
 import sys
 import json
+import os
 
 import utils.update_json
 import utils.update_website
@@ -13,16 +14,16 @@ targetDir = sys.argv[2] + "/"
 path = os.path.dirname(jsonfile) + "/"
 
 # find the shortname from the json
-shortname = json.loads(open(jsonfile, "r").read())[shortname]
+shortname = json.loads(open(jsonfile, "r").read())["shortname"]
+
+print(path)
 
 # generate the generic.json
 utils.update_json.generate(shortname, path)
 
-def mineAll(jsonfile, genericfile, peoplefile, reqfile):
-
 # mine everything
-utils.update_website.mineAll(jsonfile, path+"generic.json", "data/people.json", "data/requirements.json")
+utils.update_website.mineAll(jsonfile, path+"generic.json", "data/people.json", "data/requirements.json", "data/variables.json")
 
 # write each single file
 for file in ["download", "getInvolved", "index",  "science", "support"]:
-  utils.update_website.writeFile("template/" + file + ".html", targetDir + file +".html")
+  utils.update_website.writeFile("template/tool/" + file + ".html", targetDir + file +".html")

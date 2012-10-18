@@ -1,0 +1,38 @@
+{
+  "singles" : [
+  
+    {"name" : "toolname"}, 
+    {"name" : "shortname", "type" : "cond" , "default-ref" : "toolname"},
+    {"name" : "svnname", "type" : "cond", "default-ref" : "shortname"},
+    {"name" : "tagline"},
+    {"name" : "purpose", "format" : "markdown"},
+    {"name" : "features", "type" : "cond", "format" : "markdown"},
+    {"name" : "faq", "type" : "cond", "format" : "markdown"},
+    {"name" : "screencast", "type" : "cond"}, 
+    {"name" : "quickstart", "type" : "cond", "format" : "markdown"},
+    {"name" : "science", "type" : "cond", "format" : "markdown"},
+    {"name" : "maintainer"},
+    {"name" : "bugtracker", "type" : "cond", "default-val" : "http://gna.org/task/?group=service-tech"}, 
+    {"name" : "tasktracker", "type" : "cond", "default-val" : "http://gna.org/bugs/?group=service-tech"}, 
+    {"name" : "officialVersion", "type" : "auto"},
+    {"name" : "license"}, 
+    {"name" : "livelink", "type" : "cond", "default-complex" : [{"val" : "http://esla.informatik.uni-rostock.de/service-tech/live/#"}, { "ref" : "shortname" }]}, 
+    {"name" : "contributors", "type" : "result"},
+    {"name" : "contributorimages", "type" : "result"},
+    {"name" : "maintainerusername", "type" : "result"},
+    {"name" : "maintainermail" , "type" : "result"},
+    {"name" : "maintainerurl", "type" : "result"}
+  ],
+
+  "multis" : [
+
+    {"name" : "authors", "format" : "string-enum"}, 
+    {"name" : "thanks", "type" : "cond", "format" : "string-list"}, 
+    {"name" : "commits", "type" : "auto", "format" : "commit-list", "prefix" : "contributor"}, 
+    {"name" : "req_runtime", "type" : "auto", "format" : "tool-list"}, 
+    {"name" : "req_compile", "type" : "auto", "format" : "tool-list"}, 
+    {"name" : "req_tests", "type" : "auto", "format" : "tool-list"},
+    {"name" : "req_edit", "type" : "auto", "format" : "tool-list"}
+  ]
+
+}

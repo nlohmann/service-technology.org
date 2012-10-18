@@ -8,43 +8,43 @@ import os
 
 # Do the grep-work
 
-def grepExpr(expr):
-  f=os.popen("DIR='..' && grep -Rh \"" + expr + "\" ${DIR}/m4/* ${DIR}/*.am ${DIR}/*.ac | sort | uniq")
+def grepExpr(expr,path):
+  f=os.popen("DIR='" + path + "..' && grep -Rh \"" + expr + "\" ${DIR}/m4/* ${DIR}/*.am ${DIR}/*.ac | sort | uniq")
   return f.read() 
 
-def grepEmAll():
+def grepEmAll(path):
   expressions =["AM_MISSING_PROG(", "AC_PATH_PROG(", "AC_PROG_CC", "AC_PROG_CXX", "AC_PROG_LEX", "AC_PROG_YACC", "AC_PROG_LIBTOOL" ]
   result = ""
   for expr in expressions:
-    result += grepExpr(expr)
+    result += grepExpr(expr, path)
   return result
 
-def getOfficialVersion(toolname):
+def getOfficialVersion(toolname, path):
   f=os.popen("curl -s http://download.gna.org/service-tech/" + toolname + "/ | grep -oh \"" + toolname + "-[0-9.]*\" | sort | uniq | sed \"s/" + toolname + "-//g\" | sed 's/.$//g' | tail -n1")       
   return f.read().strip()
 
-def getFromConfigStatus(variable):
-  f=os.popen("echo @" + variable + "@ | ../config.status --file=-")
+def getFromConfigStatus(variable, path):
+  f=os.popen("echo @" + variable + "@ | " + path + "../config.status --file=-")
   return f.read().strip()
 
 
-def getLastVersion():
-  return getFromConfigStatus("PACKAGE_VERSION")
+def getLastVersion(path):
+  return getFromConfigStatus("PACKAGE_VERSION", path)
 
-def getURL():
-  return getFromConfigStatus("PACKAGE_URL")
+def getURL(path):
+  return getFromConfigStatus("PACKAGE_URL", path)
 
-def getEMail():
-  return getFromConfigStatus("PACKAGE_BUGREPORT")
+def getEMail(path):
+  return getFromConfigStatus("PACKAGE_BUGREPORT", path)
   
 
-def getCommitters(): 
-  f=os.popen("svn log .. --quiet | grep '^r' | awk '{print $3}' | sort | uniq -c | sort -r | awk ' { print \"{ \\\"user\\\": \\\"\" $2 \"\\\", \\\"commits\\\": \" $1 \" }\"  } ' | tr '\n' ',' | sed 's/.$//'")
+def getCommitters(path): 
+  f=os.popen("svn log " + path + "../ --quiet | grep '^r' | awk '{print $3}' | sort | uniq -c | sort -r | awk ' { print \"{ \\\"user\\\": \\\"\" $2 \"\\\", \\\"commits\\\": \" $1 \" }\"  } ' | tr '\n' ',' | sed 's/.$//'")
   return "{ \"commits\" : [" + f.read().strip() + "]}"
 
 
-def buildReqDict():
-  l = grepEmAll()
+def buildReqDict(path):
+  l = grepEmAll(path)
   
   d_compile = { "AC_PROG_CC" : "gcc", "AC_PROG_CXX" : "g++" , "AC_PROG_LIBTOOL" : "libtool"}
   d_tests = { "autom4te" : "autotest" , "lcov" : "lcov" , "valgrind" : "valgrind" }
@@ -71,9 +71,9 @@ def buildReqDict():
 
 def generate(toolname, path):
 
-  result = { "url" : getURL(),  "email" : getEMail() , "officialVersion" : getOfficialVersion(toolname) , "lastVersion" : getLastVersion() }
-  result.update(buildReqDict())
-  result.update(json.loads(getCommitters()))
+  result = { "url" : getURL(path),  "email" : getEMail(path) , "officialVersion" : getOfficialVersion(toolname,path) , "lastVersion" : getLastVersion(path) }
+  result.update(buildReqDict(path))
+  result.update(json.loads(getCommitters(path)))
 
   oldVals = dict()
 

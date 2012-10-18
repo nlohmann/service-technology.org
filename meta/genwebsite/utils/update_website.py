@@ -56,9 +56,7 @@ def buildReqList(key):
         result += listThis(curReq)    
     return result
 
-def setRequirements(key):
-    print "heerrree"
-    print key
+def insertToolList(key):
     if key in j:
         replDict[key] = buildReqList(key)
         setFlag(key)
@@ -66,61 +64,61 @@ def setRequirements(key):
         replDict['key'] = 'none'
         remFlag(key)
 
-def setAuthors(): 
+def insertStringEnum(vName): 
     global j
     global replDict
-    if (len(j['authors'])) == 1:
-        replDict['authors'] = j['authors'][0]
+    if (len(j[vName])) == 1:
+        replDict[vName] = j[vName][0]
 
-    if (len(j['authors'])) == 2:
-        replDict['authors'] = j['authors'][0] + ' and ' + j['authors'][1]
+    if (len(j[vName])) == 2:
+        replDict[vName] = j[vName][0] + ' and ' + j[vName][1]
 
-    if (len(j['authors'])) > 2:
-        replDict['authors']  = ''
-        for i in range(0, len(j['authors'])-1):
-            replDict['authors']  = replDict['authors'] + j['authors'][i] + ", "
-        replDict['authors']  = replDict['authors'] + 'and ' + j['authors'][len(j['authors'])-1]
+    if (len(j[vName])) > 2:
+        replDict[vName]  = ''
+        for i in range(0, len(j[vName])-1):
+            replDict[vName]  = replDict[vName] + j[vName][i] + ", "
+        replDict[vName]  = replDict[vName] + 'and ' + j[vName][len(j[vName])-1]
 
-def setThanks():
+def insertStringList(vName):
     global j
     global replDict
-    replDict['thanks']  = ''
-    if 'thanks' in j:
-        for thank in j['thanks']:
-            replDict['thanks'] = replDict['thanks'] + listThis(thank)
-        setFlag('thanks')
+    replDict[vName]  = ''
+    if vName in j:
+        for thank in j[vName]:
+            replDict[vName] = replDict[vName] + listThis(thank)
+        setFlag(vName)
     else:
-        remFlag('thanks')
+        remFlag(vName)
 
-def setContributors():
+def insertCommitList(vName, prefix):
     global j
     global p
     global replDict
     contribDict = dict()
 
-    for cont in j['commits']:
+    for cont in j[vName]:
         curuser = cont['user']
         if cont['user'] in p['refs']:
             curuser = p['refs'][curuser]
 
         if curuser in contribDict: 
-           contribDict[curuser] = contribDict[curuser] + cont['commits']
+           contribDict[curuser] = contribDict[curuser] + cont[vName]
         else:
-           contribDict[curuser] = cont['commits']
+           contribDict[curuser] = cont[vName]
 
     contribList = sorted(contribDict, key = contribDict.get, reverse=True)
 
-    replDict['contributors'] = ''
-    replDict['contributorimages'] = '' 
+    replDict[prefix + 's'] = ''
+    replDict[prefix + 'images'] = '' 
     for cont in contribList:
         actname = cont 
         if cont in p['data']:
             actname = p['data'][cont]['name']
         if cont in p['people']:
-            replDict['contributorimages'] = replDict['contributorimages'] + getImageTag('../people/g/' + cont + '.jpg', actname, actname, 'class="portrait" width="75"')
+            replDict[prefix + 'images'] = replDict[prefix + 'images'] + getImageTag('../people/g/' + cont + '.jpg', actname, actname, 'class="portrait" width="75"')
         else:
-                replDict['contributorimages'] = replDict['contributorimages'] + getImageTag('../people/g/dummy.jpg', actname, actname, 'class="portrait" width="75"')
-        replDict['contributors'] = replDict['contributors'] + listThis( actname + " (" + getCommitString(contribDict[cont]) + ")")
+                replDict[prefix + 'images'] = replDict[prefix + 'images'] + getImageTag('../people/g/dummy.jpg', actname, actname, 'class="portrait" width="75"')
+        replDict[prefix + 's'] = replDict[prefix + 's'] + listThis( actname + " (" + getCommitString(contribDict[cont]) + ")")
 
 
 def getImageTag(filename, alt, title, additional = ''):
@@ -130,71 +128,111 @@ def listThis(someString):
     return '<li>' + someString + '</li>' + "\n"
 
     
-def mineAll(jsonfile, genericfile, peoplefile, reqfile):
+def mineAll(jsonfile, genericfile, peoplefile, reqfile, varfile):
   
   global replDict
   global j
+  global p
+  global r
   
   j1 = json.loads(open(jsonfile, 'r').read())
   j2 = json.loads(open(genericfile, 'r').read())
   j = dict(list(j1.items()) + list(j2.items()))
   p = json.loads(open(peoplefile, 'r').read())
   r = json.loads(open(reqfile, 'r').read())
+  variables = json.loads(open(varfile, 'r').read())
 
   # BUILDING THE REPLACEMENT DICTIONARY
 
-  # Tool names
-  simpleInsert('toolname')
-  condInsert('shortname', simpleInsert, replDict['toolname'])
-  condInsert('svnname', simpleInsert, replDict['shortname'])
+  # GO THROUGH ALL THE SINGLE VARIABLES
+  
+  for v in variables["singles"]:
+    # GET THE TYPE OF THE VARIABLES
+    vName = v["name"]
+    vType = ""
+    if "type" in v:
+      vType = v["type"]
+    else:
+      vType = "required"
+      
+    print(vType)
 
-  # Tagline, purpose, features
-
-  simpleInsert('tagline')
-  htmlInsert('purpose')
-  condInsert('features', htmlInsert)
-
-  # Help
-
-  condInsert('faq', htmlInsert)
-  condInsert('screencast', simpleInsert)
-  condInsert('quickstart', htmlInsert)
-
-  # Science
-
-  condInsert('science', htmlInsert)
-
-  # Maintainer and support 
-
-  simpleInsert('maintainer')
-  condInsert('bugtracker', simpleInsert, "http://gna.org/task/?group=service-tech")
-  condInsert('tasktracker', simpleInsert, "http://gna.org/bugs/?group=service-tech")
+    # IF IT IS OF TYPE RESULT, SKIP THIS VARIABLE
+    if vType == "result":
+      continue
+    
+    # GET THE FORMAT OF THE VARIABLE AND SET THE INSERT FUNCTION
+    
+    insertF = simpleInsert
+    if "format" in v:
+      if v["format"] == "markdown":
+        insertF = htmlInsert
+   
+    
+    # IF IT IS OF TYPE COND, SET THE VALUE ACCORDINGLY
+    if vType == "cond":
+      defaultString = ""
+      if "default-ref" in v:
+        defaultString = replDict[v["default-ref"]]
+      if "default-val" in v:
+        defaultString = v["default-val"]
+      if "default-complex" in v:
+        compl = v["default-complex"]
+        for x in compl:
+          if "ref" in "x":
+            defaultString += replDict[x["ref"]]
+          if "val" in "x":
+            defaultString += x["val"]
+      condInsert(vName, insertF, defaultString)
+      continue
+      
+    # IT IS NEITHER OF TYPE COND NOR RESULT, SO IT'S EITHER AUTO OR REQUIRED. JUST INSERT IT ACCORDINGLY
+    print(vName)
+    insertF(vName)
+  
+  # RETRIEVE THE MAINTAINER STUFF
+  
   replDict['maintainerusername'] = ''
   replDict['maintainermail'] = ''
   replDict['maintainerurl'] = ''
   for username in p['data']:
-      if p['data'][username]['name'] == j['maintainer']:
-	replDict['maintainerusername'] = username
-	replDict['maintainermail'] = p['data'][username]['url']
-	replDict['maintainerurl'] = p['data'][username]['url']
+    if p['data'][username]['name'] == j['maintainer']:
+      replDict['maintainerusername'] = username
+      replDict['maintainermail'] = p['data'][username]['url']
+      replDict['maintainerurl'] = p['data'][username]['url']
 
+  # NOW THE MULTI VARIABLES
+  
+  for v in variables["multis"]:
+    vName = v["name"]
+    
+    # GET THE TYPE OF THE VARIABLES
+    vType = ""
+    if "type" in v:
+      vType = v["type"]
+      
+    # IF IT IS OF TYPE RESULT, SKIP THIS VARIABLE
+    if vType == "result":
+      continue    
 
-  # Download / Live 
+    vFormat = v["format"]
+      
+    # IF IT IS A STRING ENUMERATION, MAKE AN COMMA-SEPARATED LIST AND INSERT
+    if vFormat == "string-enum":
+      insertStringEnum(vName)
 
-  simpleInsert('officialVersion')
-  simpleInsert('license')
-  condInsert('livelink', simpleInsert, "http://esla.informatik.uni-rostock.de/service-tech/live/#" + replDict['shortname'])
-  setRequirements('req_compile')
-  setRequirements('req_tests')
-  setRequirements('req_edit')
-  setRequirements('runtime')
-
-
-
-  # Authors, Contributors, Ackknowledgements
-  setAuthors()
-  setThanks()
-  setContributors()
+    # IF IT IS A STRING LIST, INSERT IT AS HTML LIST
+    if vFormat == "string-list":
+      insertStringList(vName)
+      
+    # IF IT IS A COMMIT LIST, COLLECT ALL INFORMATION AND INSERT THE HTML LIST
+    if vFormat == "commit-list":
+      insertCommitList(vName, v["prefix"])
+    
+    # IF IT IS A TOOL LIST, COLLECT ALL INFORMATION AND INSERT THE HTML LIST
+    if vFormat == "tool-list":
+      insertToolList(vName)
+ 
 
 
   

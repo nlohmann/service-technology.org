@@ -2,7 +2,8 @@
 
 import sys
 import json
-import misaka
+import markdown
+import utils.stella_out
 
 replDict = dict()
 j = dict()
@@ -27,11 +28,13 @@ def getCommitString(nrOfCommits):
         return str(nrOfCommits) + " commits"
 
 def getHTML(md):
-    return misaka.html(md)
+    return markdown.markdown(md)
 
 def simpleInsert(key):
     global replDict
     global j
+    if key not in j:
+      utils.stella_out.error("Required key >" + key + "< not found.")
     replDict[key] = j[key]
 
 def htmlInsert(key):

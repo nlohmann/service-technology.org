@@ -1,0 +1,8 @@
+1. Check out your tool <tool> from gna svn to <tooldir>
+2. Check out service-tech/trunk/meta/genwebsite to <genwebsite>
+3. Check out service-tech/website to <website>
+4. Decide a folder name <name> for your tool, usually the name of your tool
+5. Invoke stella.py prepare <name> <website>
+6. Invoke stella.py check <tooldir>/doc/<tool>.json
+7. Invoke stella.py update <tooldir>/doc/<tool>.json <website>/<name>
+8. Add the directory <website>/<name> with all its contents to SVN and commit

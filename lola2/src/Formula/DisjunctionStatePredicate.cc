@@ -214,6 +214,7 @@ StatePredicate* DisjunctionStatePredicate::copy(StatePredicate* parent)
     dsp->value = value;
     dsp->position = position;
     dsp->parent = parent;
+    // copy all sub-predicates, and give them the _new_ disjunction as parent
     for (index_t i = 0; i < cardSub; i++)
     {
         dsp->sub[i] = sub[i]->copy(dsp);

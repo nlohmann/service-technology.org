@@ -2,8 +2,6 @@
  \file NetState.cc
  \author Christian K and Gregor B
  \status unknown
- \brief
-
  */
 
 #include "Core/Dimensions.h"
@@ -284,6 +282,7 @@ NetState &NetState::operator=(NetState &ns)
     Enabled = ns.Enabled;
     CardEnabled = ns.CardEnabled;
     PositionScapegoat = ns.PositionScapegoat;
+    // must be copied seperately as the arry itself is statically allocated in each object
     Arc[0][0] = ns.Arc[0][0];
     Arc[0][1] = ns.Arc[0][1];
     Arc[1][0] = ns.Arc[1][0];
@@ -292,6 +291,7 @@ NetState &NetState::operator=(NetState &ns)
     Mult[0][1] = ns.Mult[0][1];
     Mult[1][0] = ns.Mult[1][0];
     Mult[1][1] = ns.Mult[1][1];
+
     CardDisabled = ns.CardDisabled;
     Disabled = ns.Disabled;
     // now the old netstate does not need to delete its members on deletions as they are now the members of this netstate;

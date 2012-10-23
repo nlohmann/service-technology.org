@@ -56,7 +56,9 @@ public:
     virtual index_t collectAtomic(AtomicStatePredicate**) = 0;
     virtual bool DEBUG__consistency(NetState &ns) = 0;
 
-    // copy function
+    /// create a new state predicate by copy this object.
+    ///@param parent the parent predicate for the new, copied, object
     virtual StatePredicate* copy(StatePredicate* parent) = 0;
+    /// create a new state predicate by copy this object.
     virtual StatePredicate* copy();
 };

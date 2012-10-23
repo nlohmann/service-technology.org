@@ -205,6 +205,8 @@ StatePredicate* ConjunctionStatePredicate::copy(StatePredicate* parent)
     csp->value = value;
     csp->position = position;
     csp->parent = parent;
+
+    // copy all sub-predicates, and give them the _new_ konjunction as parent
     for (index_t i = 0; i < cardSub; i++)
     {
         csp->sub[i] = sub[i]->copy(csp);

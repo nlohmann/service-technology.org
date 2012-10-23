@@ -68,15 +68,16 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
     // prepare property
     bool localValue = sp->initProperty(ns);
 
+
     if (localValue) {
         // initial marking satisfies property
-        // inform all threads that we have finished
+        // inform all threads that a satisfying has been found
         finished = true;
         // release all semaphores
         for (int i = 0; i < number_of_threads; i++)
             sem_post(restartSemaphore);
         sem_post(transfer_finished_semaphore);
-        // return success
+        // return success and the current stack and property
         pthread_mutex_lock(&write_current_back_mutex);
         resultProperty->stack = stack;
         resultProperty->initProperty(ns);
@@ -89,7 +90,6 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
 
     // add initial marking to store
     // we do not care about return value since we know that store is empty
-
     myStore.searchAndInsert(ns,0,threadNumber);
 
     // get first firelist
@@ -98,9 +98,9 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
 
     while (true) // exit when trying to pop from empty stack
     {
-        // if one of the threads sends the finished signal this thread is useless and has to abort
+        // if one of the threads sets the finished signal this thread is useless and has to abort
         if (finished) {
-            // the current firelist it at the moment not on the stack, so will not be deleted by the stack
+            // the current firelist it at the moment not on the stack, so will it not be deleted by the stack-delete
             delete[] currentFirelist;
             // delete the sp&firelist
             delete myFirelist;
@@ -108,9 +108,9 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
             return NULL;
         }
         if (currentEntry-- > 0) {
-            // there is a next transition that needs to be explored in current marking
+        	// there is a next transition that needs to be explored in current marking
 
-            // fire this transition to produce new Marking::Current
+            // fire this transition to produce new marking in ns
             Transition::fire(ns, currentFirelist[currentEntry]);
 
             if (myStore.searchAndInsert(ns,0,threadNumber)) {
@@ -132,13 +132,13 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                     SimpleStackEntry * s = stack.push();
                     s = new (s) SimpleStackEntry(currentFirelist, currentEntry);
                     // end the DFS
-                    // inform all threads that we have finished
+                    // inform all threads that a satisfying state has been found
                     finished = true;
                     // release all semaphores
                     for (int i = 0; i < number_of_threads; i++)
                         sem_post(restartSemaphore);
                     sem_post(transfer_finished_semaphore);
-                    // return success
+                    // return success and the current stack and property
                     pthread_mutex_lock(&write_current_back_mutex);
                     resultProperty->stack = stack;
                     resultProperty->initProperty(ns);
@@ -152,12 +152,15 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                 SimpleStackEntry * s = stack.push();
                 s = new (s) SimpleStackEntry(currentFirelist, currentEntry);
 
-                // first try the dirty read to make the program more efficient
-                // but do it only if there are at least two transitions in the firelist left (one for us, and one for the other thread)
+                // if possible spare the current transition to give it to an other thread, having explored it's part of the search space completely
+                // try the dirty read to make the program more efficient
+                // most of the time this will already fail and we have saved the time needed to lock the mutex
+                // ... do it only if there are at least two transitions in the firelist left (one for us, and one for the other thread)
                 if (currentEntry >= 2 && num_suspended > 0) {
+                	// try to lock
                     pthread_mutex_lock(&num_suspend_mutex);
                     if (num_suspended > 0) {
-                        //  i know that there is an other thread waiting for my data
+                        // i know that there is an other thread waiting for my data
                         num_suspended--;
                         pthread_mutex_unlock(&num_suspend_mutex);
                         pthread_mutex_lock(&num_suspend_mutex);
@@ -165,7 +168,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                         // exclude this from code coverage, as I can not provoke it, but is necessary in very rare occasions
                         // LCOV_EXCL_START
                         if (finished) {
-                            // delete the firelist
+                            // delete the sp&firelist
                             delete myFirelist;
                             delete sp;
                             return NULL;
@@ -177,7 +180,9 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                         transfer_netstate = new NetState(ns);
                         transfer_property = sp->copy();
 
+                        // inform the other thread that the data is ready
                         sem_post(restartSemaphore);
+                        // wait until the transfer has been completed
                         sem_wait(transfer_finished_semaphore);
 
                         // backfire the current transition to return to original state
@@ -191,7 +196,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                                                   currentFirelist[currentEntry]);
                         localValue = sp->updateProperty(ns,
                                                         currentFirelist[currentEntry]);
-                        // go on as nothing happened
+                        // go on as nothing happened (i.e. do as if the new marking has been in the store)
                         pthread_mutex_unlock(&num_suspend_mutex);
                         continue;
                     }
@@ -200,7 +205,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
 
                 // Here: current marking does not satisfy property --> continue search
                 currentEntry = myFirelist->getFirelist(ns, &currentFirelist);
-            } // end else branch for "if state exists"
+            } // end else branch for "if state is already in store"
         } else {
             // firing list completed -->close state and return to previous state
             delete[] currentFirelist;
@@ -242,6 +247,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                 // now we have been signaled because one of the threads is able to give us an part of search space
                 delete sp;
                 delete myFirelist;
+                // copy the data given by the other thread into the local variables
                 stack = transfer_stack;
                 sp = transfer_property;
                 ns = *transfer_netstate;
@@ -258,6 +264,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                 continue;
 
             }
+            // if there is still a firelist, which can be popped, do it!
             SimpleStackEntry & s = stack.top();
             currentEntry = s.current;
             currentFirelist = s.fl;

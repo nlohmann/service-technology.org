@@ -67,7 +67,7 @@ public:
     NetState &operator=(NetState &ns);
 
 private:
-    /// marker varialbe, whether we have to delete some of the arrays ourself
+    /// marker variable, whether we have to delete some of the arrays ourself
     bool need_to_delete_members_on_delete;
     /// delete all members
     void deleteAllMembers();

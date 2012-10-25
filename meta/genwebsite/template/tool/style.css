@@ -289,4 +289,22 @@ td.immediate {
   border-bottom: 0px;
 }
 
+/* the download ul */
+/* no binaries, no table at the moment */
+ul#versions
+{
+  list-style-type: none;
+  padding: 0px;
+  margin: 0px;
+}
+ul#versions li {
+  margin-top: 12px;
+}
+ul#versions li a
+{
+  background-image: url(../icons/dl-icon-small.png);
+  background-repeat: no-repeat;
+  background-position: 0px 8px;
+  padding: 4 4 4 22;
+}
 

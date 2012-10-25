@@ -66,51 +66,11 @@
             Download @TOOLNAME@
           </h2>
 
-          <table width="90%" id="stable-versions">
-            <tr>
-              <th class="theader" width="*">
-                Version
-              </th>
-              <th class="linux-header">
-                Source Code
-              </th>
-              <th class="apple-header">
-                MacOS X
-              </th>
-              <th class="windows-header">
-                Windows
-              </th>
-            </tr>
+          <ul id="versions">
+              <li style="display:@OFFICIALVERSIONGIVEN@"><a href="http://download.gna.org/service-tech/@SHORTNAME@/@SHORTNAME@-@OFFICIALVERSION@.tar.gz">Version @OFFICIALVERSION@ (Source Code)</a></li>
+              <li><a href="http://jenkins.service-technology.org/job/@SHORTNAME@/lastSuccessfulBuild/artifact/artifacts/@SHORTNAME@.tar.gz">Latest Build (Source Code)</a></li>
+          </ul>
 
-            <tr>
-              <td class="text">
-                @TOOLNAME@ @OFFICIALVERSION@
-              </td>
-              <td>
-                <a href="http://download.gna.org/service-tech/@SHORTNAME@/@SHORTNAME@-@OFFICIALVERSION@.tar.gz" title="Source Code">Download</a>
-              </td>
-              <td>
-                <a href="test" title="MacOS X Binary">Download</a>
-              </td>
-              <td>
-                <a href="test" title="Windows Binary">Download</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="text">
-                Nightly Build
-              </td>
-              <td>
-                <a href="test" title="Source Code">Download</a>
-              </td>
-              <td>
-                <a href="test" title="MacOS X Binary">Download</a>
-              </td>
-              <td>
-                <a href="test" title="Windows Binary">Download</a>
-              </td>
-            </tr>
-          </table>
           <h3>
             Version history
           </h3>

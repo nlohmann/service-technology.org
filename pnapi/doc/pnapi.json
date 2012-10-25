@@ -3,12 +3,12 @@
 "shortname": "pnapi", 
 "svnname": "pnapi", 
 "authors": [
-    "Peter Pan implemented ...",
-    "Donald Duck implemented ...",
-    "Daisy Duck implemented ..."
+    "Christian Sura",
+    "Niels Lohmann",
+    "Stephan Mennicke"
 ], 
-"maintainer": "Peter Pan", 
-"tagline": "Making life easier", 
-"purpose": "Life is *hard*. Let's make life *easier*...", 
+"maintainer": "Niels Lohmann", 
+"tagline": "The Petri Net Library", 
+"purpose": "The Petri Net API (PNAPI) is a C++ library encapsulating Petri net-related functions.", 
 "license": "AGPL3+"
 }

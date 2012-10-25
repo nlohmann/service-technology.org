@@ -50,8 +50,8 @@ if mode == "update":
 if mode == "prepare":
   toolname = sys.argv[2]
   targetDir = sys.argv[3]
-  shutil.copytree(templateDir,targetDir + "/" + toolname)
-
+  shutil.copytree(templateDir,targetDir + "/" + toolname, ignore=ignore_patterns('.svn'))
+# copytree(source, destination, )
 if mode == "help": 
   if len(sys.argv) == 2:
     print("Call syntax: \n\tstella.py <mode> <args> \n\twhere \n\t\t<mode> is in " + str(modes)+ "\n\t\t<args> is a sequence of arguments for the given mode.")

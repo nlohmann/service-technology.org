@@ -1,77 +1,77 @@
 {
     "tools": [
         {
-            "toolname": "bpel2owfn",
+            "toolname": "BPEL2oWFN",
             "svnname": "bpel2owfn"
         },
         {
-            "toolname": "wendy",
+            "toolname": "Wendy",
             "svnname": "wendy"
         },
         {
-            "toolname": "candy",
+            "toolname": "Candy",
             "svnname": "candy"
         },
         {
-            "toolname": "cosme",
+            "toolname": "Cosme",
             "svnname": "cosme"
         },
         {
-            "toolname": "diane",
+            "toolname": "Diane",
             "svnname": "diane"
         },
         {
-            "toolname": "pnapi",
+            "toolname": "PNAPI",
             "svnname": "pnapi"
         },
         {
-            "toolname": "marlene",
+            "toolname": "Marlene",
             "svnname": "marlene"
         },
         {
-            "toolname": "sara",
+            "toolname": "Sara",
             "svnname": "sara"
         },
         {
-            "toolname": "locretia",
+            "toolname": "Locretia",
             "svnname": "locretia"
         },
         {
-            "toolname": "ondine",
+            "toolname": "Ondine",
             "svnname": "ondine"
         },
         {
-            "toolname": "anastasia",
+            "toolname": "Anastasia",
             "svnname": "anastasia"
         }
     ],
     "legacy-tools": [
         {
-            "toolname": "anica",
+            "toolname": "Anica",
             "svnname": "anica"
         },
         {
-            "toolname": "fiona",
+            "toolname": "Fiona",
             "svnname": "fiona"
         },
         {
-            "toolname": "greta",
+            "toolname": "Greta",
             "svnname": "greta"
         },
         {
-            "toolname": "lola",
+            "toolname": "LoLA",
             "svnname": "lola"
         },
         {
-            "toolname": "mia",
+            "toolname": "Mia",
             "svnname": "mia"
         },
         {
-            "toolname": "rachel",
+            "toolname": "Rachel",
             "svnname": "rachel"
         },
         {
-            "toolname": "uml2owfn",
+            "toolname": "UML2oWFN",
             "svnname": "uml2owfn"
         }
     ],

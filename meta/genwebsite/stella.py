@@ -50,7 +50,7 @@ if mode == "update":
 if mode == "prepare":
   toolname = sys.argv[2]
   targetDir = sys.argv[3]
-  shutil.copytree(templateDir,targetDir + "/" + toolname, ignore=ignore_patterns('.svn'))
+  shutil.copytree(templateDir,targetDir + "/" + toolname, ignore=shutil.ignore_patterns('.svn', '*~'))
 # copytree(source, destination, )
 if mode == "help": 
   if len(sys.argv) == 2:

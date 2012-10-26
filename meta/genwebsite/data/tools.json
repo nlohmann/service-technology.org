@@ -39,10 +39,6 @@
         {
             "toolname": "Ondine",
             "svnname": "ondine"
-        },
-        {
-            "toolname": "Anastasia",
-            "svnname": "anastasia"
         }
     ],
     "legacy-tools": [
@@ -91,7 +87,8 @@
         "petia",
         "safira",
         "stanca",
-        "tess"
+        "tess", 
+        "anastasia"
     ],
     "lost-tools": [
         "rebecca",

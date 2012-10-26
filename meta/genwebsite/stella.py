@@ -101,7 +101,7 @@ if mode == "help":
 if mode == "update-all":
 
   # set the working directory
-  workingdir = sys.argv[3]
+  workingdir = sys.argv[3] + "/"
   
   # parse tools.json
   toolsJSON = json.loads(open(homeDir+"/data/tools.json", "r").read())  
@@ -117,7 +117,7 @@ if mode == "update-all":
     os.system("cd " + workingdir + "/" + tool["svnname"] + " && autoreconf -i && ./configure")
 
   # Checkout the website repository
-  websitedir = sys.argv[2]
+  websitedir = sys.argv[2] + "/"
     
   for tool in toollist:
     jsonfile = workingdir + "/" + tool["svnname"] + "/doc/" + tool["toolname"].lower() +  ".json"

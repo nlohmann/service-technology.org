@@ -1,25 +1,101 @@
 {
-  "tools" : [
-    {
-      "toolname" : "bpel2owfn",
-      "svnname" : "bpel2owfn"
-    },
-
-    {
-      "toolname" : "wendy",
-      "svnname" : "wendy"
-    },
-    
-    {
-      "toolname" : "candy",
-      "svnname" : "candy"
-    },
-
-    {
-      "toolname" : "marlene",
-      "svnname" : "marlene"
-    }
-
- 
-  ]
+    "tools": [
+        {
+            "toolname": "bpel2owfn",
+            "svnname": "bpel2owfn"
+        },
+        {
+            "toolname": "wendy",
+            "svnname": "wendy"
+        },
+        {
+            "toolname": "candy",
+            "svnname": "candy"
+        },
+        {
+            "toolname": "cosme",
+            "svnname": "cosme"
+        },
+        {
+            "toolname": "diane",
+            "svnname": "diane"
+        },
+        {
+            "toolname": "pnapi",
+            "svnname": "pnapi"
+        },
+        {
+            "toolname": "marlene",
+            "svnname": "marlene"
+        },
+        {
+            "toolname": "sara",
+            "svnname": "sara"
+        },
+        {
+            "toolname": "locretia",
+            "svnname": "locretia"
+        },
+        {
+            "toolname": "ondine",
+            "svnname": "ondine"
+        },
+        {
+            "toolname": "anastasia",
+            "svnname": "anastasia"
+        }
+    ],
+    "legacy-tools": [
+        {
+            "toolname": "anica",
+            "svnname": "anica"
+        },
+        {
+            "toolname": "fiona",
+            "svnname": "fiona"
+        },
+        {
+            "toolname": "greta",
+            "svnname": "greta"
+        },
+        {
+            "toolname": "lola",
+            "svnname": "lola"
+        },
+        {
+            "toolname": "mia",
+            "svnname": "mia"
+        },
+        {
+            "toolname": "rachel",
+            "svnname": "rachel"
+        },
+        {
+            "toolname": "uml2owfn",
+            "svnname": "uml2owfn"
+        }
+    ],
+    "missing-tools": [
+        "linda",
+        "yasmina",
+        "tara",
+        "sam",
+        "uma",
+        "chie",
+        "cora",
+        "domino",
+        "evans",
+        "lisa",
+        "maxis",
+        "patricia",
+        "petia",
+        "safira",
+        "stanca",
+        "tess"
+    ],
+    "lost-tools": [
+        "rebecca",
+        "owfn2bpel",
+        "sayo"
+    ]
 }

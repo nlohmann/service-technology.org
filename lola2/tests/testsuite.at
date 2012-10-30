@@ -581,6 +581,8 @@ AT_CLEANUP
 AT_BANNER([Stores])
 ############################################################################
 
+# AT_CHECK_RUNLOLA([Net Name], [Filename], [--check=], [--store=], [--threads=], [--hashfunctions=], expected answer, expected number of markings, expected number of edges)
+
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbbin],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbstl],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbbloom],1,2,[no],242,805)
@@ -628,6 +630,8 @@ AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[pssbin],1,
 AT_BANNER([Parallel Stores])
 ############################################################################
 
+# AT_CHECK_RUNLOLA([Net Name], [Filename], [--check=], [--store=], [--threads=], [--hashfunctions=], expected answer, expected number of markings, leave empty!)
+# The last field has to be left empty because parallel exploration can't guarante to visit any specific number of edges.
 
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbbin],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[psbstl],4,2,[no],242,)

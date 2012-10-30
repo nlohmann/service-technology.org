@@ -3,15 +3,15 @@
 	font-family:'Open Sans Condensed', 'helvetica neue', 'arial narrow', helvetica, arial;
   background: 
     url(../osicons/sidebyside.png) no-repeat right bottom, 
-    url(../icons/dl-icon.png) no-repeat center left, 
+    url(../g/icons/dl-icon.png) no-repeat center left, 
     rgb(179,220,237); /* Old browsers */
   background: 
     url(../osicons/sidebyside.png) no-repeat right bottom, 
-    url(../icons/dl-icon.png) no-repeat center left, 
+    url(../g/icons/dl-icon.png) no-repeat center left, 
     -moz-linear-gradient(top, rgba(179,220,237,1) 0%, rgba(41,184,229,1) 87%, rgba(2,174,237,1) 100%); /* FF3.6+ */
   background: 
     url(../osicons/sidebyside.png) no-repeat right bottom, 
-    url(../icons/dl-icon.png) no-repeat center left, 
+    url(../g/icons/dl-icon.png) no-repeat center left, 
     -webkit-linear-gradient(top, rgba(179,220,237,1) 0%,rgba(41,184,229,1) 87%,rgba(2,174,237,1) 100%); /* Chrome10+,Safari5.1+ */
   border: 2px solid #02aeed;
   text-align: left;
@@ -40,16 +40,16 @@
 {
 	font-family:'Open Sans Condensed', 'helvetica neue', 'arial narrow', helvetica, arial;
   background: 
-    url(../icons/browser-side-by-side.png) no-repeat right bottom, 
-    url(../icons/live-icon.png) no-repeat center left, 
+    url(../g/icons/browser-side-by-side.png) no-repeat right bottom, 
+    url(../g/icons/live-icon.png) no-repeat center left, 
     rgb(179,220,237); /* Old browsers */
   background: 
-    url(../icons/browser-side-by-side.png) no-repeat right bottom, 
-    url(../icons/live-icon.png) no-repeat center left, 
+    url(../g/icons/browser-side-by-side.png) no-repeat right bottom, 
+    url(../g/icons/live-icon.png) no-repeat center left, 
     -moz-linear-gradient(top, rgba(179,220,237,1) 0%, rgba(41,184,229,1) 87%, rgba(2,174,237,1) 100%); /* FF3.6+ */
   background: 
-    url(../icons/browser-side-by-side.png) no-repeat right bottom, 
-    url(../icons/live-icon.png) no-repeat center left, 
+    url(../g/icons/browser-side-by-side.png) no-repeat right bottom, 
+    url(../g/icons/live-icon.png) no-repeat center left, 
     -webkit-linear-gradient(top, rgba(179,220,237,1) 0%,rgba(41,184,229,1) 87%,rgba(2,174,237,1) 100%); /* Chrome10+,Safari5.1+ */
   border: 2px solid #02aeed;
   text-align: left;
@@ -280,12 +280,12 @@ td.immediate {
 #stable-versions a:link, #stable-versions a:visited {
   display: block;
   font-size: 0px;
-  background: url(../icons/dl-icon-small.png) no-repeat center center;
+  background: url(../g/icons/dl-icon-small.png) no-repeat center center;
   border-bottom: 0px;
 }
 
 #stable-versions a:hover {
-  background: url(../icons/dl-icon-small.png) no-repeat center center, #02aeed;
+  background: url(../g/icons/dl-icon-small.png) no-repeat center center, #02aeed;
   border-bottom: 0px;
 }
 
@@ -302,7 +302,7 @@ ul#versions li {
 }
 ul#versions li a
 {
-  background-image: url(../icons/dl-icon-small.png);
+  background-image: url(../g/icons/dl-icon-small.png);
   background-repeat: no-repeat;
   background-position: 0px 8px;
   padding: 4px 4px 4px 22px;

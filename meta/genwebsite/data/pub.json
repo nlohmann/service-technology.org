@@ -1,0 +1,101 @@
+{
+  "publications" = [
+  
+    {
+      "title" = "Analyzing Interacting WS-BPEL Processes Using Flexible Model Generation", 
+      "authors" = "Niels Lohmann, Peter Massuthe, Christian Stahl, and Daniela Weinberg",
+      "book" = "Data Knowl. Eng.", 
+      "additional" = "64(1):38–54, January 2008"
+    }, 
+
+    {
+      "title" = "Does my service have partners?", 
+      "authors" = "Karsten Wolf",
+      "book" = "LNCS ToPNoC", 
+      "additional" = "5460(II):152-171, March 2009. Special Issue on Concurrency in Process-Aware Information Systems"
+    }, 
+    
+    {
+      "title" = "Challenges in a Service-Oriented World", 
+      "authors" = "Wolfgang Reisig, Karsten Wolf, Jan Bretschneider, Kathrin Kaschner, Niels Lohmann, Peter Massuthe, and Christian Stahl",
+      "book" = "ERCIM News", 
+      "additional" = "70:28-29, July 2007"
+    }, 
+
+    {
+      "title" = "Operating Guidelines for Finite-State Services",
+      "authors" = "Niels Lohmann, Peter Massuthe, and Karsten Wolf", 
+      "book" = "28th International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25-29, 2007, Proceedings, volume 4546 of Lecture Notes in Computer Science", 
+      "additional" = "pages 321-341, June 2007. Springer-Verlag"
+    }, 
+    
+    {
+      "title" = "A Feature-Complete Petri Net Semantics for WS-BPEL 2.0", 
+      "authors" = "Niels Lohmann",
+      "book" = "Web Services and Formal Methods, Forth International Workshop, WS-FM 2007, Brisbane, Australia, September 28-29, 2007, Proceedings, volume 4937 of Lecture Notes in Computer Science", 
+      "additional" = "pages 77-91, April 2008. Springer-Verlag"
+    }, 
+    
+    {
+      "title" = ">Wendy: A tool to synthesize partners for services", 
+      "authors" = "Niels Lohmann and Daniela Weinberg",
+      "book" = "31st International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, PETRI NETS 2010, Braga, Portugal, June 21-25, 2010, Proceedings, volume 6128 of Lecture Notes in Computer Science", 
+      "additional" = "pages 297-307, June 2010. Springer-Verlag"
+    }, 
+    
+    {
+      "title" = "Reducing adapter synthesis to controller synthesis", 
+      "authors" = "Christian Gierds, Arjan J. Mooij, and Karsten Wolf",
+      "book" = "IEEE T. Services Computing", 
+      "additional" = "2010"
+    }, 
+    
+    
+    {
+      "title" = "Conformance testing for asynchronously communicating services", 
+      "authors" = "Kathrin Kaschner",
+      "book" = "9th International Conference on Service Oriented Computing, ICSOC 2011, December 5-8, 2011, Paphos, Cyprus, Proceedings, volume 7084 of Lecture Notes in Computer Science", 
+      "additional" = "Springer-Verlag, December 2011"
+    }, 
+    
+    
+    {
+      "title" = "Another Approach to Service Instance Migration", 
+      "authors" = "Nannette Liske, Niels Lohmann, Christian Stahl, and Karsten Wolf",
+      "book" = "Service-Oriented Computing - ICSOC 2009, 7th International Conference, Stockholm, Sweden, November 24-27, 2009. Proceedings, volume 5900 of Lecture Notes in Computer Science", 
+      "additional" = "pages 607-621, November 2009. Springer-Verlag"
+    }, 
+    
+    
+    {
+      "title" = "Multiparty Contracts: Agreeing and Implementing Interorganizational Processes", 
+      "authors" = "Wil M. P. van der Aalst, Niels Lohmann, Peter Massuthe, Christian Stahl, and Karsten Wolf",
+      "book" = "Comput. J.", 
+      "additional" = "53(1):90-106, January 2010"
+    }, 
+    
+    
+    {
+      "title" = "Extending the Compatibility Notion for Abstract WS-BPEL Processes", 
+      "authors" = "Dieter König, Niels Lohmann, Simon Moser, Christian Stahl, and Karsten Wolf",
+      "book" = "Proceedings of the 17th International Conference on World Wide Web, WWW 2008, Beijing, China, April 21-25, 2008", 
+      "additional" = "pages 785-794, April 2008. ACM"
+    }, 
+    
+    
+    {
+      "title" = "Artifact-Centric Choreographies", 
+      "authors" = "Niels Lohmann and Karsten Wolf",
+      "book" = "8th International Conference on Service Oriented Computing, ICSOC 2010, December 7-10, 2010, San Francisco, California, USA, Proceedings, volume 6470 of Lecture Notes in Computer Science", 
+      "additional" = "pages 32-46, December 2010. Springer-Verlag"
+    }, 
+    
+  
+  
+  
+  ]
+
+
+
+
+}

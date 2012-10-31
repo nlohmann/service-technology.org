@@ -11,7 +11,7 @@ option "check" -
 
 option "store" -
   "Store"
-  values="bin","stl","bit","bloom","bin2","lgbin","lgwbbin", "rwbin2", "obin2","psbstl","pscstl","psfstl","pssstl","psbbin","pscbin","psfbin","pssbin","psbbloom","pscbloom","pssbloom" enum
+  values="comp","bin","stl","bit","bloom","bin2","lgbin","lgwbbin", "rwbin2", "obin2","psbstl","pscstl","psfstl","pssstl","psbbin","pscbin","psfbin","pssbin","psbbloom","pscbloom","pssbloom" enum
   typestr="STORE"
   default="psbbin"
   optional

@@ -60,6 +60,7 @@ lola_SOURCES = \
                 \
                 Stores/Store.h Stores/Store.inc \
                 Stores/EmptyStore.h \
+                Stores/CompareStore.h Stores/CompareStore.inc \
                 Stores/PluginStore.h Stores/PluginStore.inc \
                 Stores/NetStateEncoder/NetStateEncoder.h Stores/NetStateEncoder/NetStateEncoder.cc \
                 Stores/NetStateEncoder/BitEncoder.cc Stores/NetStateEncoder/BitEncoder.h \

@@ -42,6 +42,7 @@
 #include <Stores/VectorStores/VBloomStore.h>
 #include <Stores/PluginStore.h>
 #include <Stores/EmptyStore.h>
+#include <Stores/CompareStore.h>
 #include <Stores/Store.h>
 
 #include <Witness/Condition.h>
@@ -215,6 +216,13 @@ void Task::setStore()
         // choose a store
         switch (args_info.store_arg)
         {
+        case store_arg_comp:
+            s = new CompareStore<void>(
+            		new PluginStore<void>(new BitEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads),
+            		new PluginStore<void>(new BitEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads),
+            		number_of_threads
+            		);
+            break;
         case store_arg_psbbin:
             s = new PluginStore<void>(new BitEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
             break;

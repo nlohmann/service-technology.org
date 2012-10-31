@@ -71,7 +71,10 @@ def buildReqDict(path):
 
 def generate(toolname, path):
 
-  result = { "url" : getURL(path),  "email" : getEMail(path) , "officialVersion" : getOfficialVersion(toolname,path) , "lastVersion" : getLastVersion(path) }
+  result = { "url" : getURL(path),  "email" : getEMail(path) , "lastVersion" : getLastVersion(path) }
+  offVersion = getOfficialVersion(toolname,path)
+  if offVersion != "":
+    result["officialVersion"] = offVersion 
   result.update(buildReqDict(path))
   result.update(json.loads(getCommitters(path)))
 

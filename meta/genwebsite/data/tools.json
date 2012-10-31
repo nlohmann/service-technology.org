@@ -67,6 +67,10 @@
             "svnname": "rachel"
         },
         {
+            "toolname": "Seda",
+            "svnname": "seda"
+        },
+        {
             "toolname": "UML2oWFN",
             "svnname": "uml2owfn"
         }

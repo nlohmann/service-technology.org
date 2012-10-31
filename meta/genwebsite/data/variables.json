@@ -14,7 +14,7 @@
     {"name" : "maintainer"},
     {"name" : "bugtracker", "type" : "cond", "default-val" : "http://gna.org/task/?group=service-tech"}, 
     {"name" : "tasktracker", "type" : "cond", "default-val" : "http://gna.org/bugs/?group=service-tech"}, 
-    {"name" : "officialVersion", "type" : "auto"},
+    {"name" : "officialVersion", "type" : "cond"},
     {"name" : "license"}, 
     {"name" : "livelink", "type" : "cond", "default-complex" : [{"val" : "http://esla.informatik.uni-rostock.de/service-tech/live/#"}, { "ref" : "shortname" }]}, 
     {"name" : "contributors", "type" : "result"},

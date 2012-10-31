@@ -41,11 +41,12 @@ replDict = dict();
 
 replDict['paper-list-unstructured'] = ''
 replDict['paper-modals'] = ''
+replDict['paper-modals-noscript'] = ''
 
 
 for paper in p['publications']:
   replDict['paper-modals'] = replDict['paper-modals'] + makeModal(paper,m)
-  replDict['paper-modals-noscript'] = replDict['paper-modals'] + makeModal(paper,mns)
+  replDict['paper-modals-noscript'] = replDict['paper-modals-noscript'] + makeModal(paper,mns)
   replDict['paper-list-unstructured'] = replDict['paper-list-unstructured'] + listThis(paper['authors'] + ". " + linkThis("<strong>" + paper['title'] + "</strong>",paper['key']))
   
 

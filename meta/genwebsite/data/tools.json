@@ -37,6 +37,18 @@
             "svnname": "locretia"
         },
         {
+            "toolname": "Linda",
+            "svnname": "linda"
+        },
+        {
+            "toolname": "Yasmina",
+            "svnname": "yasmina2"
+        },
+        {
+            "toolname": "Tara",
+            "svnname": "tara"
+        },
+        {
             "toolname": "Ondine",
             "svnname": "ondine"
         }
@@ -76,9 +88,6 @@
         }
     ],
     "missing-tools": [
-        "linda",
-        "yasmina",
-        "tara",
         "sam",
         "uma",
         "chie",

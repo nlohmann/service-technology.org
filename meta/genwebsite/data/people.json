@@ -3,7 +3,8 @@
 
   "refs" : {
     "nlohmann": "niels", 
-    "nielslohmann": "niels"
+    "nielslohmann": "niels",
+    "Richard Mueller" : "rimueller"
   },
 
   "data" : {

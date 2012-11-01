@@ -198,11 +198,23 @@ def mineAll(jsonfile, genericfile, peoplefile, reqfile, varfile):
   replDict['maintainerusername'] = ''
   replDict['maintainermail'] = ''
   replDict['maintainerurl'] = ''
-  for username in p['data']:
-    if p['data'][username]['name'] == j['maintainer']:
-      replDict['maintainerusername'] = username
-      replDict['maintainermail'] = p['data'][username]['url']
-      replDict['maintainerurl'] = p['data'][username]['url']
+  
+  # Check if it is a reference
+  
+  entry = dict()
+  musername = ''
+  if j['maintainer'] in p['refs']:
+    musername = p['refs'][j['maintainer']]
+    
+  elif j['maintainer'] in p['data']:
+    musername = j['maintainer']
+  else:
+    for username in p['data']:
+      if p['data'][username]['name'] == j['maintainer']:
+        musername = username
+  replDict['maintainerusername'] = musername
+  replDict['maintainermail'] = p['data'][musername]['url']
+  replDict['maintainerurl'] = p['data'][musername]['url']
 
   # NOW THE MULTI VARIABLES
   

@@ -19,6 +19,8 @@ def makeModal(entry, template):
   result = result.replace('@AUTHORS@', entry['authors'])
   result = result.replace('@ADDITIONAL@', entry['additional'])
   result = result.replace('@TITLE@', entry['title'])
+  result = result.replace('@URL@', entry['url'])
+
   result = result.replace('@MODALNAME@', "paper-modal-" + entry['key'])
   return result
     

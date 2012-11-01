@@ -3,12 +3,12 @@
 "shortname": "linda", 
 "svnname": "linda", 
 "authors": [
-    "Peter Pan implemented ...",
-    "Donald Duck implemented ...",
-    "Daisy Duck implemented ..."
+    "Jan Sürmeli implemented Linda."
 ], 
-"maintainer": "Peter Pan", 
-"tagline": "Making life easier", 
-"purpose": "Life is *hard*. Let's make life *easier*...", 
-"license": "AGPL3+"
+"maintainer": "Jan Sürmeli", 
+"tagline": "Computing communication fingerprints of services", 
+"purpose": "Linda computes a *fingerprint* of a service. A fingerprint abstracts away from any control flow, and merely describes the linear dependencies of the number of certain event occurrences. This abstract representation of a service may be used for compatibility quick checks to boost performance during service discovery. You can find more information in the [science section](science.html). Linda provides the input for [Yasmina](../yasmina)", 
+"license": "AGPL3+", 
+"science" : "You may read more about the theory behind Linda, and find a case study [in this paper (Oanea, Sürmeli, Wolf, *ICSOC 2010*)](../yasmina/experiments)."
+
 }

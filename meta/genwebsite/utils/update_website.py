@@ -158,8 +158,6 @@ def mineAll(jsonfile, genericfile, peoplefile, reqfile, varfile):
     else:
       vType = "required"
       
-    print(vType)
-
     # IF IT IS OF TYPE RESULT, SKIP THIS VARIABLE
     if vType == "result":
       continue
@@ -182,15 +180,15 @@ def mineAll(jsonfile, genericfile, peoplefile, reqfile, varfile):
       if "default-complex" in v:
         compl = v["default-complex"]
         for x in compl:
-          if "ref" in "x":
+          if "ref" in x:
             defaultString += replDict[x["ref"]]
-          if "val" in "x":
+          if "val" in x:
             defaultString += x["val"]
+      
       condInsert(vName, insertF, defaultString)
       continue
       
     # IT IS NEITHER OF TYPE COND NOR RESULT, SO IT'S EITHER AUTO OR REQUIRED. JUST INSERT IT ACCORDINGLY
-    print(vName)
     insertF(vName)
   
   # RETRIEVE THE MAINTAINER STUFF

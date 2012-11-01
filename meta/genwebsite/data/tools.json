@@ -97,7 +97,15 @@
         {
             "toolname": "Seda",
             "svnname": "seda",
-            "tags" : ["ed"]
+            "tags" : ["edsim"]
+        },
+        {
+            "toolname": "Uma",
+            "svnname": "uma"
+        },
+        {
+            "toolname": "Safira",
+            "svnname": "safira"
         },
         {
             "toolname": "UML2oWFN",
@@ -107,7 +115,6 @@
     ],
     "missing-tools": [
         "sam",
-        "uma",
         "chie",
         "cora",
         "domino",
@@ -116,7 +123,6 @@
         "maxis",
         "patricia",
         "petia",
-        "safira",
         "stanca",
         "tess", 
         "anastasia"
@@ -126,14 +132,14 @@
         "owfn2bpel",
         "sayo"
     ], 
-    "tags" : [
-      {"mc" : "Model Checking"}, 
-      {"sec" : "Security"},
-      {"psog" : "Partner Synthesis and Operating Guidelines"},
-      {"memi" : "Service Mediation and Migration"},
-      {"fp" : "Service Fingerprints"},
-      {"chor" : "Service Choreographies"}, 
-      {"mt" : "Model Transformation"}, 
-      {"ed" : "Editors and Simulators"}
-    ]
+    "tags" : {
+      "mc" : "Model Checking", 
+      "sec" : "Security",
+      "psog" : "Partner Synthesis and Operating Guidelines",
+      "memi" : "Service Mediation and Migration",
+      "fp" : "Service Fingerprints",
+      "chor" : "Service Choreographies", 
+      "mt" : "Model Transformation", 
+      "edsim" : "Editors and Simulators"
+    }
 }

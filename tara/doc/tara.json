@@ -3,12 +3,12 @@
 "shortname": "tara", 
 "svnname": "tara", 
 "authors": [
-    "Peter Pan implemented ...",
-    "Donald Duck implemented ...",
-    "Daisy Duck implemented ..."
-], 
-"maintainer": "Peter Pan", 
-"tagline": "Making life easier", 
-"purpose": "Life is *hard*. Let's make life *easier*...", 
-"license": "AGPL3+"
+    "Jan Sürmeli developed the core algorithms in Tara.",
+    "Marvin Triebel implemented Tara and provided optimizations for the core algorithms."
+    ], 
+"maintainer": "Jan Sürmeli", 
+"tagline": "Synthesizing cost-minimal partners for services", 
+"purpose": "Given a service and a cost specification, Tara computes the cost-minimal partners of this service. Thereby, Tara cooperates with [Wendy](../wendy) and [LoLA](../lola). For more information, have a look at the [science section](science.html)", 
+"license": "AGPL3+", 
+"science": "The science behind Tara has been accepted for publication at the [WS-FM 2012 workshop](http://www.informatik.uni-rostock.de/ws-fm2012/). The according LNCS proceedings are scheduled for the beginning of 2013. Meanwhile, have a look at [this paper (Sürmeli, ZEUS 2012)](http://www.informatik.uni-trier.de/~ley/db/conf/zeus/zeus2012.html#Surmeli12) which presents Tara in the setting of adapter synthesis."
 }

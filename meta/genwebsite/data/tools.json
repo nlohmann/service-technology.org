@@ -67,50 +67,60 @@
         {
             "toolname": "Anica",
             "svnname": "anica",
-            "tags" : ["sec"]
+            "tags" : ["sec"],
+            "tagline" : "checking non-interference for safe Petri nets"
         },
         {
             "toolname": "Fiona",
             "svnname": "fiona",
-            "tags" : ["psog"]
+            "tags" : ["psog"],
+            "tagline": "checking behavioral correctness of a service"
         },
         {
             "toolname": "Greta",
             "svnname": "greta",
-            "tags" : ["edsim"]
+            "tags" : ["edsim"],
+            "tagline" : "Graphical Runtime Environment for Adaptive Processes"
         },
         {
             "toolname": "LoLA",
             "svnname": "lola",
-            "tags" : ["mc"]
+            "tags" : ["mc"],
+            "tagline": "A Low Level Petri Net Analyzer"
         },
         {
             "toolname": "Mia",
             "svnname": "mia",
-            "tags" : ["memi"]
+            "tags" : ["memi"],
+            "tagline": "calculating migration information"
         },
         {
             "toolname": "Rachel",
             "svnname": "rachel",
-            "tags" : ["chor"]
+            "tags" : ["chor"],
+            "tagline" : "repairing deadlocking service choreographies"
         },
         {
             "toolname": "Seda",
             "svnname": "seda",
-            "tags" : ["edsim"]
+            "tags" : ["edsim"],
+            "tageline" : "Service-Technology.org Editor Application"
         },
         {
             "toolname": "Uma",
-            "svnname": "uma"
+            "svnname": "uma",
+            "tagline": "an Unfolding-based Model Analyzer"
         },
         {
             "toolname": "Safira",
-            "svnname": "safira"
+            "svnname": "safira",
+            "tagline" : "performing basic set operations for sets of services"
         },
         {
             "toolname": "UML2oWFN",
             "svnname": "uml2owfn",
-            "tags" : ["mt"]
+            "tags" : ["mt"],
+            "tagline": "translating UML2 Activity Diagrams to Petri nets"
         }
     ],
     "missing-tools": [

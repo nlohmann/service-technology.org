@@ -47,7 +47,8 @@
 
 <?php
 
-$out = file_get_contents($argv[1]);
+$p = "http://www.service-technology.org/" . $argv[1];
+$out = file_get_contents($p);
 
 $begin_hash = "<div class=\"dokuwiki\">";
 $end_hash = "<div id=\"body_bottom\">";
@@ -58,9 +59,12 @@ $arr = explode($end_hash, $out);
 $out = $arr[0];
 $out = $begin_hash . $out;
 
+$mediaDir = preg_replace("/\/.+/", "", $argv[1]);
+
 // remove detail links
 $out = preg_replace( "/href=\\\"\/_detail[^\\\"]*\\\"/", "", $out);
-$out = preg_replace( "/src=\\\"\/_media\/publications([^\\\"\\?]*)\\??[^\\\"]*\\\"/", "src=\"/publications/files$1\"", $out);
+$out = preg_replace( "/src=\\\"\/_media\/".$mediaDir."([^\\\"\\?]*)\\??[^\\\"]*\\\"/", "src=\"/".$mediaDir."/files$1\"", $out);
+$out = preg_replace( "/href=\\\"\/_media\/".$mediaDir."([^\\\"\\?]*)\\??[^\\\"]*\\\"/", "href=\"/".$mediaDir."/files$1\"", $out);
 echo $out;
 
 ?>

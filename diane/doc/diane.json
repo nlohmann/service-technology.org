@@ -3,12 +3,10 @@
 "shortname": "diane", 
 "svnname": "diane", 
 "authors": [
-    "Peter Pan implemented ...",
-    "Donald Duck implemented ...",
-    "Daisy Duck implemented ..."
+    "Stephan Mennicke"
 ], 
-"maintainer": "Peter Pan", 
-"tagline": "Making life easier", 
-"purpose": "Life is *hard*. Let's make life *easier*...", 
+"maintainer": "Stephan Mennicke", 
+"tagline": "", 
+"purpose": "Diane is a tool to decompose Petri nets.", 
 "license": "AGPL3+"
 }

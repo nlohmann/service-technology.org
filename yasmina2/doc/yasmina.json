@@ -3,12 +3,12 @@
 "shortname": "yasmina", 
 "svnname": "yasmina2", 
 "authors": [
-    "Peter Pan implemented ...",
-    "Donald Duck implemented ...",
-    "Daisy Duck implemented ..."
+    "Olivia Oanea implemented the first version of Yasmina.",
+    "Jan Sürmeli re-implemented Yasmina from the scratch."
 ], 
-"maintainer": "Peter Pan", 
-"tagline": "Making life easier", 
-"purpose": "Life is *hard*. Let's make life *easier*...", 
-"license": "AGPL3+"
+"maintainer": "Jan Sürmeli", 
+"tagline": "Checking service compatibility with ILP", 
+"purpose": "Yasmina performs a variety of quick checks to semi-decide compatibility of services. The results may be used during service discovery to narrow down the search for a compatible partner service. Please find more information in the [science section](science.html). One possible input for Yasmina are fingerprints, as provided by [Linda](../linda)", 
+"license": "AGPL3+",
+"science" : "You may read more about the theory behind Yasmina, and find a case study [in this paper (Oanea, Sürmeli, Wolf, *ICSOC 2010*)](experiments)."
 }

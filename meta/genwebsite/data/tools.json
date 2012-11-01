@@ -104,7 +104,7 @@
             "toolname": "Seda",
             "svnname": "seda",
             "tags" : ["edsim"],
-            "tageline" : "Service-Technology.org Editor Application"
+            "tagline" : "Service-Technology.org Editor Application"
         },
         {
             "toolname": "Uma",

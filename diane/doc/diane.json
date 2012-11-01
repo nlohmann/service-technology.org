@@ -6,7 +6,7 @@
     "Stephan Mennicke"
 ], 
 "maintainer": "Stephan Mennicke", 
-"tagline": "", 
+"tagline": "Decomposing Petri nets", 
 "purpose": "Diane is a tool to decompose Petri nets.", 
 "license": "AGPL3+"
 }

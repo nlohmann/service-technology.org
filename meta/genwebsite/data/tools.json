@@ -2,31 +2,38 @@
     "tools": [
         {
             "toolname": "BPEL2oWFN",
-            "svnname": "bpel2owfn"
+            "svnname": "bpel2owfn", 
+            "tags" : ["mt"]
         },
         {
             "toolname": "Wendy",
-            "svnname": "wendy"
+            "svnname": "wendy",
+            "tags" : ["psog"]
         },
         {
             "toolname": "Candy",
             "svnname": "candy"
+
         },
         {
             "toolname": "Cosme",
-            "svnname": "cosme"
+            "svnname": "cosme",
+            "tags" : ["psog"]
         },
         {
             "toolname": "Diane",
-            "svnname": "diane"
+            "svnname": "diane",
+            "tags" : ["mt"]
         },
         {
             "toolname": "PNAPI",
-            "svnname": "pnapi"
+            "svnname": "pnapi",
+            "tags" : ["mt"]
         },
         {
             "toolname": "Marlene",
-            "svnname": "marlene"
+            "svnname": "marlene",
+            "tags" : ["memi"]
         },
         {
             "toolname": "Sara",
@@ -38,15 +45,18 @@
         },
         {
             "toolname": "Linda",
-            "svnname": "linda"
+            "svnname": "linda",
+            "tags" : ["fp"]
         },
         {
             "toolname": "Yasmina",
-            "svnname": "yasmina2"
+            "svnname": "yasmina2",
+            "tags" : ["fp"]
         },
         {
             "toolname": "Tara",
-            "svnname": "tara"
+            "svnname": "tara",
+            "tags" : ["psog"]
         },
         {
             "toolname": "Ondine",
@@ -56,35 +66,43 @@
     "legacy-tools": [
         {
             "toolname": "Anica",
-            "svnname": "anica"
+            "svnname": "anica",
+            "tags" : ["sec"]
         },
         {
             "toolname": "Fiona",
-            "svnname": "fiona"
+            "svnname": "fiona",
+            "tags" : ["psog"]
         },
         {
             "toolname": "Greta",
-            "svnname": "greta"
+            "svnname": "greta",
+            "tags" : ["edsim"]
         },
         {
             "toolname": "LoLA",
-            "svnname": "lola"
+            "svnname": "lola",
+            "tags" : ["mc"]
         },
         {
             "toolname": "Mia",
-            "svnname": "mia"
+            "svnname": "mia",
+            "tags" : ["memi"]
         },
         {
             "toolname": "Rachel",
-            "svnname": "rachel"
+            "svnname": "rachel",
+            "tags" : ["chor"]
         },
         {
             "toolname": "Seda",
-            "svnname": "seda"
+            "svnname": "seda",
+            "tags" : ["ed"]
         },
         {
             "toolname": "UML2oWFN",
-            "svnname": "uml2owfn"
+            "svnname": "uml2owfn",
+            "tags" : ["mt"]
         }
     ],
     "missing-tools": [
@@ -107,5 +125,15 @@
         "rebecca",
         "owfn2bpel",
         "sayo"
+    ], 
+    "tags" : [
+      {"mc" : "Model Checking"}, 
+      {"sec" : "Security"},
+      {"psog" : "Partner Synthesis and Operating Guidelines"},
+      {"memi" : "Service Mediation and Migration"},
+      {"fp" : "Service Fingerprints"},
+      {"chor" : "Service Choreographies"}, 
+      {"mt" : "Model Transformation"}, 
+      {"ed" : "Editors and Simulators"}
     ]
 }

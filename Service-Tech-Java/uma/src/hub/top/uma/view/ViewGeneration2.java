@@ -133,8 +133,8 @@ public class ViewGeneration2 {
   public boolean extendByTrace(String[] trace, Map<String, String> e2t) {
     Set<DNode> run = new HashSet<DNode>();
     
-    //System.out.println("extend by "+toString(trace));
-    //System.out.println("available transitions "+toString(build.getSystem().properNames));
+    System.out.println("extend by "+toString(trace));
+    System.out.println("available transitions "+toString(build.getSystem().properNames));
     
     for (DNode b : bp.initialCut) {
       run.add(b);
@@ -241,7 +241,7 @@ public class ViewGeneration2 {
             }
           } else {
             
-            System.out.println("could not fire "+eventName+" ("+trace[i]+")");
+            System.out.println("could not fire "+eventName+" ("+trace[i]+", "+i+")");
             return false;
           }
         } // fireEvent == null

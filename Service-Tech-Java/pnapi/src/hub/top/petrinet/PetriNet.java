@@ -516,6 +516,9 @@ public class PetriNet implements ISystemModel {
    * @return the new place pMerge
    */
   public Place mergePlaces(Place p1, Place p2) {
+    
+    if (p1 == p2) return p1;
+    
     Place pMerged = addPlace(p1.getName()+"_"+p2.getName());
     setTokens(pMerged, p1.getTokens() + p2.getTokens());
 

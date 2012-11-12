@@ -19,12 +19,13 @@ class BuechiAutomata
 {
 public:
 
-	/// the number of the current state
-	uint32_t currentState;
-
-	/// returns an array with all successor-states of the current netstate
+	/// returns an array with all successor-states(as diffenrence to the given State) of the current netstate in the parameter
 	/// this function will also call automatically updateProperty
-	int* getSuccessors(NetState &ns, index_t transition);
+	/// @return number of successors
+	int getSuccessors(NetState &ns, index_t** list, index_t currentState);
+
+	/// updates all properties
+	void updateProperties(NetState &ns, index_t transition);
 
 	/// reverts all Properties
 	void revertProperties(NetState &ns, index_t transition);

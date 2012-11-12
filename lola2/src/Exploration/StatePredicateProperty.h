@@ -29,12 +29,6 @@ class StatePredicateProperty: public SimpleProperty
 public:
     StatePredicateProperty(StatePredicate*);
     virtual ~StatePredicateProperty();
-    /// return the predicate used to evaluate the property
-    StatePredicate* getPredicate()
-    {
-        return predicate;
-    }
-private:
     StatePredicateProperty() {}
     /// prepare for search
     virtual bool initProperty(NetState &ns);
@@ -44,6 +38,11 @@ private:
 
     /// check property in Marking::Current, use after backfire. Argument is transition just backfired.
     virtual bool updateProperty(NetState &ns, index_t);
+
+    /// return the predicate used to evaluate the property
+    StatePredicate* getPredicate(){return predicate;}
+
+private:
 
     /// the actual formula to be verified;
     StatePredicate* predicate;

@@ -38,6 +38,7 @@ lola_SOURCES = \
                 \
                 Planning/Task.cc Planning/Task.h \
                 \
+                Exploration/LTLExploration.cc Exploration/LTLExploration.h \
                 Exploration/DFSExploration.cc Exploration/DFSExploration.h \
                 Exploration/ParallelExploration.cc Exploration/ParallelExploration.h \
                 Exploration/Firelist.cc Exploration/Firelist.h \
@@ -57,6 +58,7 @@ lola_SOURCES = \
                 Formula/DisjunctionStatePredicate.cc Formula/DisjunctionStatePredicate.h \
                 Formula/TruePredicate.cc Formula/TruePredicate.h \
                 Formula/FalsePredicate.cc Formula/FalsePredicate.h \
+                Formula/BuechiAutomata.h Formula/BuechiAutomata.cc \
                 \
                 Stores/Store.h Stores/Store.inc \
                 Stores/EmptyStore.h \

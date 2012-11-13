@@ -90,18 +90,18 @@ public class DNodeSys_PetriNet extends DNodeSys {
 		
 		// collect all names and assign each new name a new ID
 		for (Node n : net.getTransitions()) {
-			if (nameToID.get(n.getName()) == null)
-				nameToID.put(n.getName(), currentNameID++);
+			if (nameToID.get(n.getUniqueIdentifier()) == null)
+				nameToID.put(n.getUniqueIdentifier(), currentNameID++);
 			nodeNum++;
 		}
 		for (Node n : net.getPlaces()) {
-			if (nameToID.get(n.getName()) == null)
-				nameToID.put(n.getName(), currentNameID++);
+			if (nameToID.get(n.getUniqueIdentifier()) == null)
+				nameToID.put(n.getUniqueIdentifier(), currentNameID++);
 			nodeNum++;
 			
 			if (n.getOutgoing().size() == 0)
 				// remember ID of this terminal node
-				terminalNodes.add(nameToID.get(n.getName()));
+				terminalNodes.add(nameToID.get(n.getUniqueIdentifier()));
 		}
 		
 		// build the translation table from IDs to names
@@ -234,7 +234,7 @@ public class DNodeSys_PetriNet extends DNodeSys {
 				pre = new DNode[n.getIncoming().size()];
 				int i = 0;
 				for (Arc a : n.getIncoming()) {
-				  DNode b = new DNode(nameToID.get(a.getSource().getName()), (DNode[])null);
+				  DNode b = new DNode(nameToID.get(a.getSource().getUniqueIdentifier()), (DNode[])null);
 					pre[i++] = b;
 			    nodeEncoding.put(a.getSource(), b);   // store new pair
 			    nodeOrigin.put(b, a.getSource());     // and its reverse mapping
@@ -242,11 +242,11 @@ public class DNodeSys_PetriNet extends DNodeSys {
 				DNode.sortIDs(pre);
 			} else {
 			  throw new InvalidModelException(InvalidModelException.EMPTY_PRESET,
-			      n, "Node "+n.getName()+" has an empty pre-set.");
+			      n, "Node "+n.getUniqueIdentifier()+" has an empty pre-set.");
 			}
 			
 			// create new DNode d for Node n
-			DNode d = new DNode(nameToID.get(n.getName()), pre);
+			DNode d = new DNode(nameToID.get(n.getUniqueIdentifier()), pre);
 			d.isEvent = true;
 			fireableEvents.add(d);
 			
@@ -265,7 +265,7 @@ public class DNodeSys_PetriNet extends DNodeSys {
 
 				int i = 0;
 				for (Arc a : n.getOutgoing()) {
-				  DNode b = new DNode(nameToID.get(a.getTarget().getName()), dPostPre); 
+				  DNode b = new DNode(nameToID.get(a.getTarget().getUniqueIdentifier()), dPostPre); 
 					d.post[i++] = b;
 	        nodeEncoding.put(a.getTarget(), b);   // store new pair
 	        nodeOrigin.put(b, a.getTarget());     // and its reverse mapping
@@ -296,7 +296,7 @@ public class DNodeSys_PetriNet extends DNodeSys {
 		// create a new DNode for every token on every place in the net
 		for (Place p : net.getPlaces()) {
 			for (int i=0; i<p.getTokens(); i++) {
-			  DNode d = new DNode(nameToID.get(p.getName()), new DNode[0]);
+			  DNode d = new DNode(nameToID.get(p.getUniqueIdentifier()), new DNode[0]);
 				ds.add(d);
 				
 	      nodeEncoding.put(p, d);   // store new pair

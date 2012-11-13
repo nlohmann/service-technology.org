@@ -255,6 +255,10 @@ public class ModelRepair_SubProcess {
       List<DNode> produced = null;
       if (!existingEvents.isEmpty()) {
         
+        for (DNode e : existingEvents) {
+          System.out.println("existing "+e+" "+DNode.toString(e.pre)+" "+DNode.toString(e.post));
+        }
+        
         // get one enabled event and fire it
         fireEvent = existingEvents.iterator().next();
         for (int s = 0; s < state.action.size(); s++) {
@@ -264,7 +268,10 @@ public class ModelRepair_SubProcess {
           }
         }
         
-        System.out.println("reuse "+getOriginalTransitions(fireEvent)+" @ "+getOriginalTransitions(fireEvent).get(0).getPreSet());
+        System.out.println("reuse "+getOriginalTransitions(fireEvent)+" @ "+getOriginalTransitions(fireEvent).get(0).getPreSet()+" "+getOriginalTransitions(fireEvent).get(0).getPostSet());
+        if (succState != null) {
+          System.out.println(succState.marking);
+        }
         
         if (isSkipStep) {
           // model move
@@ -609,10 +616,14 @@ public class ModelRepair_SubProcess {
     bp.removeAll(noiseNodes);
   }
   
-  private void extendByTraces(Collection<Move[]> traces, Map<String, String> e2t) {
-    for (Move[] trace : traces) {
-      extendByTrace(trace, e2t); 
+  private List<Integer> extendByTraces(List<Move[]> traces, Map<String, String> e2t) {
+    List<Integer> unreplayable = new LinkedList<Integer>();
+    for (int i=0; i<traces.size(); i++) {
+      if (!extendByTrace(traces.get(i), e2t)) {
+        unreplayable.add(i);
+      }
     }
+    return unreplayable;
   }
   
   private HashMap<DNode, Float> calculateCovering(LinkedList<String[]> traces) {
@@ -1969,19 +1980,22 @@ public class ModelRepair_SubProcess {
    }
 
    
-   public void replayAlignment(String systemFile, Collection<Move[]> traces, Map<String, String> e2t) throws InvalidModelException, IOException {
+   public List<Integer> replayAlignment(String systemFile, List<Move[]> traces, Map<String, String> e2t) throws InvalidModelException, IOException {
 
+     List<Integer> unreplayable;
      for (DNode b : build.getBranchingProcess().allConditions) {
        conditionOrigin.put(b, new DNode[] { b });
      }
      
-     extendByTraces(traces, e2t);
+     unreplayable = extendByTraces(traces, e2t);
      computeNodeOccurrences();
      
      OcletIO_Out.writeFile(build.toDot(), systemFile+".unfolding.dot");
+     
+     return unreplayable;
    }
    
-   public void repair(String systemFile, Collection<Move[]> traces, Map<String, String> e2t) throws InvalidModelException, IOException {
+   public void repair(String systemFile, List<Move[]> traces, Map<String, String> e2t) throws InvalidModelException, IOException {
      replayAlignment(systemFile, traces, e2t);
      
      extendModelWithMoveOnModel();

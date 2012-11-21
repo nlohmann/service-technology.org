@@ -25,7 +25,7 @@ import java.util.Set;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
-public class EventStructureReplay_Trace2 {
+public class EventStructureMiner_Direct {
   
   private PetriNet net;
   private EventStructure es;
@@ -33,7 +33,7 @@ public class EventStructureReplay_Trace2 {
   private Event artificialStart;
   private Place move_on_log;
   
-  public EventStructureReplay_Trace2(PetriNet net) {
+  public EventStructureMiner_Direct(PetriNet net) {
     this.net = net;
     
     net.makeNormalNet();
@@ -415,6 +415,7 @@ public class EventStructureReplay_Trace2 {
       int level = getEventLevel(e);
       if (level > maxLevel) maxLevel = level;
     }
+    maxLevel++;
     
     boolean precedes[][][] = new boolean[maxLevel][properNames.length][properNames.length];
     for (Event e : es.getAllEvents()) {
@@ -1157,7 +1158,7 @@ System.out.println("add transitive "+e_pred+" --> "+e);
     
     System.out.println("replaying "+allTraces.size()+" traces");
     
-    EventStructureReplay_Trace2 replay = this;
+    EventStructureMiner_Direct replay = this;
     
     move_on_log = net.addPlace("move_on_log");
     
@@ -1309,10 +1310,11 @@ System.out.println("add transitive "+e_pred+" --> "+e);
     //String fileName_system_sysPath = "./examples/model_correction2/wabo1.lola";
     //String fileName_trace  = "./examples/model_correction2/wabo1.log.txt";
     
-    String fileName_system_sysPath = "./examples/model_correction2/a22f0n00.lola";
-    String fileName_trace  = "./examples/model_correction2/a22f0n00.log_20.txt";
+    //String fileName_system_sysPath = "./examples/model_correction2/a22f0n00.lola";
+    //String fileName_trace  = "./examples/model_correction2/a22f0n00.log_20.txt";
 
-    
+    String fileName_system_sysPath = "./examples/discovery_from_log/a22f0n00_20.lola";
+    String fileName_trace  = "./examples/discovery_from_log/a22f0n00_20.log.txt";
 
     List<String[]> allTraces = ViewGeneration2.readTraces(fileName_trace);
     
@@ -1324,7 +1326,7 @@ System.out.println("add transitive "+e_pred+" --> "+e);
     
     PetriNet sysModel;
     
-    boolean doMining = false;
+    boolean doMining = true;
     if (doMining) {
       // mining: create a flower model and do generalization from there
       sysModel = new PetriNet();
@@ -1336,18 +1338,18 @@ System.out.println("add transitive "+e_pred+" --> "+e);
         sysModel.addArc(t, p);
       }
     } else {
-      // repair: read given net and go generalization from there
+      // repair: read given net and do generalization from there
       sysModel = PetriNetIO.readNetFromFile(fileName_system_sysPath);
     }
     
     
-    EventStructureReplay_Trace2 replay = new EventStructureReplay_Trace2(sysModel);
+    EventStructureMiner_Direct replay = new EventStructureMiner_Direct(sysModel);
     PetriNet net = replay.replay(allTraces, fileName_system_sysPath);
     
     //ImplicitPlaces.findImplicitPlaces(net);
     
-    PetriNetIO_Out.writeToFile(net, fileName_system_sysPath+"_refold", PetriNetIO_Out.FORMAT_DOT, 0);
-    PetriNetIO_Out.writeToFile(net, fileName_system_sysPath+"_refold", PetriNetIO_Out.FORMAT_LOLA, 0);
+    PetriNetIO_Out.writeToFile(net, fileName_system_sysPath+"_mine_direct", PetriNetIO_Out.FORMAT_DOT, 0);
+    PetriNetIO_Out.writeToFile(net, fileName_system_sysPath+"_mine_direct", PetriNetIO_Out.FORMAT_LOLA, 0);
   }
 
   public static void writeFile(String s, String fileName) throws IOException {

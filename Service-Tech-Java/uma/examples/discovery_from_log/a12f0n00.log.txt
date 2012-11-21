@@ -1,0 +1,5 @@
+1x case0 S+complete b+complete c+complete e+complete j+complete E+complete
+1x case1 S+complete f+complete g+complete i+complete h+complete k+complete E+complete
+1x case2 S+complete b+complete d+complete j+complete E+complete
+1x case3 S+complete f+complete h+complete g+complete i+complete k+complete E+complete
+1x case4 S+complete f+complete g+complete h+complete i+complete k+complete E+complete

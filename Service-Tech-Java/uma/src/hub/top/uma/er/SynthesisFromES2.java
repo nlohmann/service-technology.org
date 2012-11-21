@@ -584,7 +584,7 @@ public class SynthesisFromES2 {
     }
     
     try {
-      EventStructureReplay_Trace.writeFile(pnet.toDot(), path+"_bp.dot");
+      EventStructureMiner_BP.writeFile(pnet.toDot(), path+"_bp.dot");
     } catch (IOException e1) {
       // TODO Auto-generated catch block
       e1.printStackTrace();
@@ -787,7 +787,7 @@ public class SynthesisFromES2 {
     PetriNet net = synth.synthesize(es);
     
     //PetriNetIO.writeToFile(net, fileName_system_sysPath+"_refold", PetriNetIO.FORMAT_DOT, 0);
-    EventStructureReplay_Trace.writeFile(net.toDot(), fileName_system_sysPath+"_refold.dot");
+    EventStructureMiner_BP.writeFile(net.toDot(), fileName_system_sysPath+"_refold.dot");
   }
   
 }

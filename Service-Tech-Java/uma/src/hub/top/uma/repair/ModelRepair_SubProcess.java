@@ -255,9 +255,9 @@ public class ModelRepair_SubProcess {
       List<DNode> produced = null;
       if (!existingEvents.isEmpty()) {
         
-        for (DNode e : existingEvents) {
-          System.out.println("existing "+e+" "+DNode.toString(e.pre)+" "+DNode.toString(e.post));
-        }
+//        for (DNode e : existingEvents) {
+//          System.out.println("existing "+e+" "+DNode.toString(e.pre)+" "+DNode.toString(e.post));
+//        }
         
         // get one enabled event and fire it
         fireEvent = existingEvents.iterator().next();
@@ -268,10 +268,10 @@ public class ModelRepair_SubProcess {
           }
         }
         
-        System.out.println("reuse "+getOriginalTransitions(fireEvent)+" @ "+getOriginalTransitions(fireEvent).get(0).getPreSet()+" "+getOriginalTransitions(fireEvent).get(0).getPostSet());
-        if (succState != null) {
-          System.out.println(succState.marking);
-        }
+//        System.out.println("reuse "+getOriginalTransitions(fireEvent)+" @ "+getOriginalTransitions(fireEvent).get(0).getPreSet()+" "+getOriginalTransitions(fireEvent).get(0).getPostSet());
+//        if (succState != null) {
+//          System.out.println(succState.marking);
+//        }
         
         if (isSkipStep) {
           // model move
@@ -310,21 +310,21 @@ public class ModelRepair_SubProcess {
             if (m.t == null) {
               // no mapped transition, find a matching one by tranistion name
               if (build.getSystem().properNames[e.id].equals(transitionName)) {
-                System.out.println("add "+e+" because of name "+transitionName);
+                //System.out.println("add "+e+" because of name "+transitionName);
                 matchingEvents.add(e);
               }
             } else {
               DNodeSys_PetriNet sysModel = (DNodeSys_PetriNet)this.build.getSystem();
               if (sysModel.getOriginalNode(e) == m.t) {
-                System.out.println("add "+e+" @ "+sysModel.getOriginalNode(e).getPreSet()+" because of transition "+m.t+" "+m.t.getPreSet());
+                //System.out.println("add "+e+" @ "+sysModel.getOriginalNode(e).getPreSet()+" because of transition "+m.t+" "+m.t.getPreSet());
                 matchingEvents.add(e);
               } else if (sysModel.getOriginalNode(e).getName().equals(m.t.getName())) {
-                System.out.println("not taking "+e+" @ "+sysModel.getOriginalNode(e).getPreSet()+" for "+m.t+" "+m.t.getPreSet());
+                //System.out.println("not taking "+e+" @ "+sysModel.getOriginalNode(e).getPreSet()+" for "+m.t+" "+m.t.getPreSet());
               }
             }
           }
           
-          System.out.println("matching events: "+matchingEvents);
+          //System.out.println("matching events: "+matchingEvents);
           EnablingInfo enablingInfo = getAllEnabledEvents(state.marking, matchingEvents);
           
           if (enablingInfo.locations.size() == 0 && m.t != null) {
@@ -335,12 +335,12 @@ public class ModelRepair_SubProcess {
             for (DNode e : build.getSystem().fireableEvents) {
               DNodeSys_PetriNet sysModel = (DNodeSys_PetriNet)this.build.getSystem();
               if (sysModel.getOriginalNode(e).getName().equals(m.t.getName())) {
-                System.out.println("taking "+e+" @ "+sysModel.getOriginalNode(e).getPreSet()+" for "+m.t+" "+m.t.getPreSet());
+                //System.out.println("taking "+e+" @ "+sysModel.getOriginalNode(e).getPreSet()+" for "+m.t+" "+m.t.getPreSet());
                 matchingEvents.add(e);
               }
             }
 
-            System.out.println("matching events: "+matchingEvents);
+            //System.out.println("matching events: "+matchingEvents);
             enablingInfo = getAllEnabledEvents(state.marking, matchingEvents);
           }
   
@@ -364,7 +364,7 @@ public class ModelRepair_SubProcess {
             DNode[] events = enablingInfo.locations.get(eventId)[0].events;
             DNode[] loc = enablingInfo.locations.get(eventId)[0].loc;
             
-            System.out.println("firing enabled transition "+build.getSystem().properNames[events[0].id]+" @ "+DNode.toString(loc));
+            //System.out.println("firing enabled transition "+build.getSystem().properNames[events[0].id]+" @ "+DNode.toString(loc));
             
             DNode[] postConditions = bp.fire(events, loc, false);
             if (postConditions != null && postConditions.length > 0) {
@@ -421,11 +421,6 @@ public class ModelRepair_SubProcess {
             for (DNode d : state.marking) {
               List<Place> orig = getOriginalPlaces(d);
               for (Place p : orig) {
-                if (p == null) {
-                  System.out.println("oh");
-                  System.out.println("no original places for "+d);
-                  getOriginalPlaces(d);
-                }
                 mark.add(p);
               }              
             }
@@ -434,7 +429,7 @@ public class ModelRepair_SubProcess {
               currentMoveOnLogTokens = mark;
             }
 
-            System.out.println("could not fire "+transitionName+" ("+trace[i]+") in "+mark);
+            //System.out.println("could not fire "+transitionName+" ("+trace[i]+") in "+mark);
             if (m.t != null) {
               System.err.println("ERROR: log move on model move or synchronous move");
               for (int ra = 0; ra<=i; ra++) {
@@ -504,7 +499,7 @@ public class ModelRepair_SubProcess {
     
     if (currentMoveOnLog.size() > 0) {
       this.moveOnLogSequences.add(currentMoveOnLog);
-      System.out.println("adding final "+currentMoveOnLog+" @ "+currentMoveOnLogTokens);
+      //System.out.println("adding final "+currentMoveOnLog+" @ "+currentMoveOnLogTokens);
         
       this.visitedMarkings.add(currentMoveOnLogTokens);
       currentMoveOnLog = new LinkedList<MoveOnLog>();
@@ -544,13 +539,13 @@ public class ModelRepair_SubProcess {
       
       // store move on log sequence
       this.moveOnLogSequences.add(currentMoveOnLog);
-      System.out.println("adding1 "+currentMoveOnLog+" @ "+currentMoveOnLogTokens);
+      //System.out.println("adding1 "+currentMoveOnLog+" @ "+currentMoveOnLogTokens);
       this.visitedMarkings.add(currentMoveOnLogTokens);
       
       return true;
       
     } else {
-      System.out.println(currentMoveOnLogTokens+" --"+transitionName+"--> "+remaining+" "+(DNode.toString(loc)));
+      //System.out.println(currentMoveOnLogTokens+" --"+transitionName+"--> "+remaining+" "+(DNode.toString(loc)));
       currentMoveOnLogTokens.removeAll(consuming);
       if (currentMoveOnLog.size() > 0 && currentMoveOnLog.getLast().tokensConsumedAfter == null) {
         currentMoveOnLog.getLast().tokensConsumedAfter = new HashSet<Place>();
@@ -643,7 +638,7 @@ public class ModelRepair_SubProcess {
       for (int i = 0; i<trace.length; i++) {
         HashSet<DNode> enabledEvents = getEnabledTransitions_equiv(marking);
         if (enabledEvents.isEmpty()) {
-          System.out.println("no more enabled events at "+DNode.toString(marking));
+          //System.out.println("no more enabled events at "+DNode.toString(marking));
           break;
         }
 
@@ -656,7 +651,7 @@ public class ModelRepair_SubProcess {
         }
         
         if (fireEvent == null) {
-          System.out.println("action "+trace[i]+" not enabled at "+DNode.toString(marking));
+          //System.out.println("action "+trace[i]+" not enabled at "+DNode.toString(marking));
           break;
         }
         
@@ -893,7 +888,7 @@ public class ModelRepair_SubProcess {
        markingClasses.add(thisIDs);
      }
      
-     System.out.println("locations: "+ markingClasses);
+     //System.out.println("locations: "+ markingClasses);
      
 
      // cluster the found log sequences on their location, put a trace to an
@@ -904,7 +899,7 @@ public class ModelRepair_SubProcess {
        List<MoveOnLog> seq = moveOnLogSequences.get(i);
        Set<Place> marking = visitedMarkings.get(i);
        
-       System.out.println("found "+ moveOnLogSequences.get(i) +" @ "+visitedMarkings.get(i));
+       //System.out.println("found "+ moveOnLogSequences.get(i) +" @ "+visitedMarkings.get(i));
 
        // scan all marking classes for the class with the largest overlap
        // in the worst case, this is the very marking the log sequence occurred at
@@ -968,7 +963,7 @@ public class ModelRepair_SubProcess {
          HashSet<Place> m1_intersect_m2 = new HashSet<Place>(merge1);
          m1_intersect_m2.retainAll(merge2);
          
-         System.out.println(merge1+" + "+merge2+" -> "+m1_intersect_m2);
+         //System.out.println(merge1+" + "+merge2+" -> "+m1_intersect_m2);
 
          // add all traces to the overlap
          if (!sublogClasses.containsKey(m1_intersect_m2)) sublogClasses.put(m1_intersect_m2, new LinkedList<List<MoveOnLog>>());
@@ -1183,7 +1178,7 @@ public class ModelRepair_SubProcess {
                // if so also return the prefix and the suffix
                List<List<MoveOnLog>> splitted = splitTrace(long_trace, short_trace);
                if (splitted != null) {
-                 System.out.println(splitted);
+                 //System.out.println(splitted);
                  
                  // if long_trace could be split, sort them based on their lengths 
                  separateTracesByLength(splitted, separated);
@@ -1195,8 +1190,7 @@ public class ModelRepair_SubProcess {
              }
              // add all new separated traces to the set of all traces
              for (Integer new_len : separated.keySet()) {
-               if (new_len >= len)
-                 System.out.println("error!");
+               //if (new_len >= len) System.out.println("error!");
                if (!traces_by_length.containsKey(new_len)) traces_by_length.put(new_len, new LinkedList<List<MoveOnLog>>());
                traces_by_length.get(new_len).addAll(separated.get(new_len));
              }
@@ -1692,10 +1686,6 @@ public class ModelRepair_SubProcess {
          if (t_parallel == t) continue;
          if (!t_parallel.isTau()) continue;
          
-         if (t.getName().equals("01_HOOFD_065_2")) {
-           System.out.println(t);
-         }
-        
          if (t_parallel.getIncoming().size() != t.getIncoming().size()) continue;
          if (t_parallel.getOutgoing().size() != t.getOutgoing().size()) continue;
          

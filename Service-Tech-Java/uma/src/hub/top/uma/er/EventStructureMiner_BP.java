@@ -25,7 +25,7 @@ import java.util.Set;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
-public class EventStructureReplay_Trace {
+public class EventStructureMiner_BP {
   
   private PetriNet net;
   private EventStructure es;
@@ -33,7 +33,7 @@ public class EventStructureReplay_Trace {
   private Event artificialStart;
   private Place move_on_log;
   
-  public EventStructureReplay_Trace(PetriNet net) {
+  public EventStructureMiner_BP(PetriNet net) {
     this.net = net;
     
     net.makeNormalNet();
@@ -1263,7 +1263,7 @@ System.out.println("add transitive "+e_pred+" --> "+e);
   
   public PetriNet replay(List<String[]> allTraces, String tempOutputFile) throws IOException {
     
-    EventStructureReplay_Trace replay = this;
+    EventStructureMiner_BP replay = this;
     
     move_on_log = net.addPlace("move_on_log");
     
@@ -1417,14 +1417,14 @@ System.out.println("add transitive "+e_pred+" --> "+e);
     //String fileName_system_sysPath = args[0];
     //String fileName_trace = args[1];
     
-    //String fileName_system_sysPath = "./examples/model_correction/a12f0n00_alpha.lola";
-    //String fileName_trace  = "./examples/model_correction/a12f0n00.log.txt";
+    String fileName_system_sysPath = "./examples/discovery_from_log/a22f0n00_20.lola";
+    String fileName_trace  = "./examples/discovery_from_log/a22f0n00_20.log.txt";
 
     //String fileName_system_sysPath = "./examples/model_correction/a12f0n00_alpha.lola";
     //String fileName_trace  = "./examples/model_correction/a12f0n05_aligned_to_00.log.txt";
     
-    String fileName_system_sysPath = "./examples/model_correction/a12f0n05_alpha.lola";
-    String fileName_trace  = "./examples/model_correction/a12f0n05_aligned.log_20.txt";
+    //String fileName_system_sysPath = "./examples/model_correction/a12f0n05_alpha.lola";
+    //String fileName_trace  = "./examples/model_correction/a12f0n05_aligned.log_20.txt";
     //String fileName_trace  = "./examples/model_correction/a12f0n05_aligned.log.txt";
     
     //String fileName_system_sysPath = "./examples/model_correction/a22f0n00.lola";
@@ -1445,7 +1445,7 @@ System.out.println("add transitive "+e_pred+" --> "+e);
     
     PetriNet sysModel;
     
-    boolean doMining = false;
+    boolean doMining = true;
     if (doMining) {
       // mining: create a flower model and do generalization from there
       sysModel = new PetriNet();
@@ -1457,18 +1457,18 @@ System.out.println("add transitive "+e_pred+" --> "+e);
         sysModel.addArc(t, p);
       }
     } else {
-      // repair: read given net and go generalization from there
+      // repair: read given net and do generalization from there
       sysModel = PetriNetIO.readNetFromFile(fileName_system_sysPath);
     }
     
     
-    EventStructureReplay_Trace replay = new EventStructureReplay_Trace(sysModel);
+    EventStructureMiner_BP replay = new EventStructureMiner_BP(sysModel);
     PetriNet net = replay.replay(allTraces, fileName_system_sysPath);
     
     //ImplicitPlaces.findImplicitPlaces(net);
     
-    PetriNetIO_Out.writeToFile(net, fileName_system_sysPath+"_refold", PetriNetIO_Out.FORMAT_DOT, 0);
-    PetriNetIO_Out.writeToFile(net, fileName_system_sysPath+"_refold", PetriNetIO_Out.FORMAT_LOLA, 0);
+    PetriNetIO_Out.writeToFile(net, fileName_system_sysPath+"_mine_bp", PetriNetIO_Out.FORMAT_DOT, 0);
+    PetriNetIO_Out.writeToFile(net, fileName_system_sysPath+"_mine_bp", PetriNetIO_Out.FORMAT_LOLA, 0);
   }
 
   public static void writeFile(String s, String fileName) throws IOException {

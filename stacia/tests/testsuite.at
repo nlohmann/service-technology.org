@@ -1,0 +1,53 @@
+AT_INIT
+AT_COLOR_TESTS
+
+# <<-- CHANGE START (tests) -->>
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([STACIA --help],0,ignore)
+AT_CHECK([STACIA --detailed-help],0,ignore)
+AT_CHECK([STACIA --full-help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([STACIA --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Parameters])
+############################################################################
+
+AT_SETUP([Piping from stdin])
+AT_CHECK([cp TESTFILES/expsiphon32.owfn .])
+AT_CHECK([cat expsiphon32.owfn | STACIA],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Reading from file])
+AT_CHECK([cp TESTFILES/expsiphon32.owfn .])
+AT_CHECK([STACIA expsiphon32.owfn],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Output to stderr])
+AT_CHECK([cp TESTFILES/expsiphon32.owfn .])
+AT_CHECK([STACIA expsiphon32.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "All siphons" stdout], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Output to given file])
+AT_CHECK([cp TESTFILES/expsiphon32.owfn .])
+AT_CHECK([STACIA expsiphon32.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "All siphons" stdout], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+# <<-- CHANGE END -->>

@@ -1,0 +1,12 @@
+@c <<-- CHANGE START (version information) -->>
+
+@heading Version 1.0-unreleased (21 November 2012)
+@itemize
+@item first release of Stacia
+
+@item Checks the Siphon-Trap property using divide-and-conquer
+
+@end itemize
+
+@heading Version 0.0 (21 November 2012)
+@c <<-- CHANGE END -->>

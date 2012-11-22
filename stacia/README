@@ -1,0 +1,42 @@
+                        ____  _             _           
+                       / ___|| |_ __ _  ___(_) __ _ 
+                       \___ \| __/ _` |/ __| |/ _` |
+                        ___) | || (_| | (__| | (_| |
+                       |____/ \__\__,_|\___|_|\__,_|
+			      Siphon Trap Analysis -- Conquer In Action
+			        http://service-technology.org/stacia
+
+
+PURPOSE
+    Stacia checks the siphon-trap property (Commoner-Hack) using a divide-and-conquer approach
+
+
+COPYRIGHT
+    Copyright (c) 2012 Harro Wimmel
+
+
+AUTHORS
+    See file "AUTHORS" for details.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    Stacia is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of Stacia.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+    Stacia can be easily compiled and installed. See file "INSTALL" for
+    instructions. Please also have a look at the file "REQUIREMENTS" for
+    information on the tools required to run, compile, and develop Stacia.
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of Stacia. It can also be
+    downloaded at <http://service-technology.org/files/stacia/stacia.pdf>.

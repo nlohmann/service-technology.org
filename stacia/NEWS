@@ -1,0 +1,19 @@
+                        ____  _             _           
+                       / ___|| |_ __ _  ___(_) __ _ 
+                       \___ \| __/ _` |/ __| |/ _` |
+                        ___) | || (_| | (__| | (_| |
+                       |____/ \__\__,_|\___|_|\__,_|
+			      Siphon Trap Analysis -- Conquer In Action
+			        http://service-technology.org/stacia
+
+
+PURPOSE
+Version 1.0-unreleased (21 November 2012)
+=========================================
+
+* first release of Stacia
+
+* Checks the Siphon-Trap property using divide-and-conquer
+
+
+\nSee file ChangeLog <http://service-technology.org/files/stacia/ChangeLog> for\ncomplete version history.\n

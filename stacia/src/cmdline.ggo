@@ -1,0 +1,156 @@
+# This is the only input file for gengetopt.
+
+# arguments for gengetopt ... what do they do?
+# --long-help: long usage line in help
+# --include-getopt: adds code for getopt_long in generated C file
+# --show-required: output of help will specify which options are mandatory
+# --unamed-opts=FILE: accept options without names
+# --no-handle-error: TODO
+# --conf-parser: TODO
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+description "About Stacia:"
+purpose "Siphon Trap Analysis -- Conquer in Action.\n This program checks the Commoner-Hack property using divide-and-conquer\n\n  Report bugs to stacia@service-technology.org.\n  Visit Stacia's home page at http://service-technology.org/stacia"
+
+# <<-- CHANGE START (parameters) -->>
+section "Input/Output"
+sectiondesc="When called without an input file, Stacia reads from the standard input stream.\n"
+
+defgroup "Input Format" groupdesc="Choose an option according to the format of the input Petri net:"
+groupoption "lola" -
+  "Assume the input net to be in LoLA format."
+  group="Input Format"
+
+groupoption "owfn" -
+  "Assume the input net to be in open net format oWFN (default)."
+  group="Input Format"
+
+groupoption "pnml" -
+  "Assume the input net to be in PNML format."
+  group="Input Format"
+
+option "shownet" n
+  "Print the possibly modified net."
+  details="The net may obtain a loop transition via option -l or places may be split when using -p. This option will print the modified net.\n"
+  flag off
+
+section "Algorithm"
+sectiondesc="These options determine when and how siphons and traps are determined.\n"
+
+option "algorithm" a
+  "Five algorithms for divide-and-conquer (0-4), default is 2, choosing components to combine by maximising over the number of common interface places."
+  details="0=worst component first (linear try), 1=minimize outer interface, 2=maximize common interface, 3=worst component first, 4=3+2."
+  int
+  typestr="0..4"
+  optional
+
+option "bruteforce" b
+  "Applies the SAT-Solver directly to the problem, no divide-and-conquer is done."
+  flag off
+
+option "dac" d
+  "Default divide-and-conquer strategy, short for -s1 -p3 -g7. Overrides those switches."
+  flag off
+
+option "combined" c
+  "Default divide-and-conquer strategy, but reverts back to brute force if the number of siphons in an intermediate component grows above 25, short for -s1 -p3 -g7 -S25. Overrides those switches."
+  flag off
+
+option "threads" t
+  "The number of threads used in the conquer phase of the divide-and-conquer algorithm."
+  int
+  typestr="unsigned int"
+  optional  
+
+option "componentsize" s
+  "How large a component should grow before siphons and traps are determined the first time."
+  details="The given number of transitions roughly determines the size of subnets upto which siphons and traps are determined by direct computation. An explicit value of zero means no divide-and-conquer at all.\n"
+  int
+  typestr="unsigned int"
+  optional
+
+option "placesplit" p
+  "How small the neighborhood of a place must be for the place to be allowed as an internal place inside a single component."
+  details="A place with larger neighborhood is replaced by an equivalent set of places that can be distributed to different components. For maximal splitting use a value of 1, a value of zero means no splitting at all.\n"
+  int
+  typestr="unsigned int"
+  optional
+
+option "goaloriented" g
+  "How large an interface of a component must be such that the algorithm goes to a goal-oriented mode specifically trying to minimize this components' interface."
+  details="Default value is 8. Do not vary much. If all components have a smaller interface, the best match is selected (leading to an even smaller interface).\n"
+  int
+  typestr="unsigned int"
+  optional
+
+option "maxinterfacesize" m
+  "How large an interface of a (temporary) component must be such that the divide-and-conquer algorithm is shut down and the program resorts to brute force SAT-solving."
+  details="Default value is MAX_INT. To use no divide-and-conquer at all, use the --bruteforce option.\n"
+  int
+  typestr="unsigned int"
+  optional
+
+option "siphonthreshold" S
+  "At how many open siphons in a component the divide-and-conquer algorithm is shut down and the program resorts to brute force SAT-solving."
+  details="Default value is 25. To use no divide-and-conquer at all, use the --bruteforce option.\n"
+  int
+  typestr="unsigned int"
+  optional
+
+option "noearlyquit" e
+  "Do not quit the computation if some component contains a counterexample."
+  flag off
+
+option "loopnet" l
+  "Add a transition from all places with empty postset to all places with empty preset."
+  flag off
+
+section "Configuration"
+
+option "config" -
+  "Read configuration from file."
+  details="If no file is given, Stacia first tries to parse file `stacia.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Stacia was installed) and then from the current working directory. If neither file was found, the standard values are assumed.\n"
+  string
+  typestr="FILE"
+  optional
+
+option "tmpfile" -
+  "Set the path and name of temporary files."
+  details="The filename Stacia should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string. Option has no effect at this time.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/stacia-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created will be kept after Stacia terminates.\n"
+  flag off
+
+
+section "Debugging"
+sectiondesc="These options control how much debug output Stacia creates.\n"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+
+option "debug" D
+  "Show debug messages."
+  details="Show debug information reporting intermediate steps.\n"
+  flag off
+
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine Stacia was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden
+
+option "stats" -
+  "Display time and memory consumption on termination."
+  details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
+  flag off
+  hidden
+# <<-- CHANGE END -->>

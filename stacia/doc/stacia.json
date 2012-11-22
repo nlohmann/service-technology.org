@@ -1,0 +1,12 @@
+{
+"toolname": "Stacia", 
+"shortname": "stacia", 
+"svnname": "stacia", 
+"authors": [
+    "Harro Wimmel"
+], 
+"maintainer": "Harro Wimmel", 
+"tagline": "Siphon-Trap Analysis", 
+"purpose": "Check Commoner-Hack by divide-and-conquer", 
+"license": "AGPL3+"
+}

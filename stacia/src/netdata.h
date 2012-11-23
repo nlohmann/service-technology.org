@@ -113,6 +113,9 @@ public:
 	/// Get a siphon by its ID
 	set<PlaceID> getSiphon(SiphonID ID) const;
 
+	/// Get a siphon by its matching
+	set<PlaceID> getSiphon(const Matching& matching) const;
+
 	/// Print all open siphons represented by the meta info in this component
 	void printSiphonMatchings() const;
 

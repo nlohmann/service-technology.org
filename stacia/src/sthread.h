@@ -62,7 +62,15 @@ struct SThread {
 	/// pointer to the resulting structure
 	SubNetInfo* result;
 	SubNet* sn;
-	Siphon s;
+
+	/// Witness siphon
+	set<PlaceID> s;
+	/// Witness matching
+	Matching wmat;
+	/// Constructed matchings object
+	Matchings* m;
+	/// Constructed SiphonTrap object
+	SiphonTrap* st;
 
 	const Matchings* ms;
 	InterfaceID id;

@@ -20,6 +20,7 @@
 #include "verbose.h"
 
 using pnapi::Arc;
+using std::cout;
 using std::cerr;
 using std::endl;
 using std::stringstream;
@@ -735,5 +736,20 @@ vector<PlaceID> IMatrix::getMarked() const {
 	for(PlaceID p=0; p<numplaces; ++p)
 		if (tokens.at(p)>0) res.push_back(p);
 	return res;
+}
+
+/** Print a siphon.
+	@param s The siphon.
+*/
+void IMatrix::printSiphon(set<PlaceID> s) const {
+	cout << "{";
+	bool comma(false);
+	set<PlaceID>::const_iterator sit;
+	for(sit=s.begin(); sit!=s.end(); ++sit)
+	{
+		if (comma) cout << ","; else comma=true;
+		cout << pName(*sit);
+	}
+	cout << "}" << endl;
 }
 

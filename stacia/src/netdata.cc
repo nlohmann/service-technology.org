@@ -216,6 +216,26 @@ set<PlaceID> NetData::getSiphon(SiphonID ID) const {
 	return result;
 }
 
+/** Get a siphon by matching.
+	@param matching The matching forming the siphon.
+	@return The set of places contained in the siphon.
+*/
+set<PlaceID> NetData::getSiphon(const Matching& matching) const {
+	set<PlaceID> result;
+	if (!m) return result;
+	for(unsigned int j=0; j<matching.first.size(); ++j)
+	{
+		set<PlaceID> tmp(child1->getSiphon(matching.first[j]));
+		result.insert(tmp.begin(),tmp.end());
+	}
+	for(unsigned int j=0; j<matching.second.size(); ++j)
+	{
+		set<PlaceID> tmp(child2->getSiphon(matching.second[j]));
+		result.insert(tmp.begin(),tmp.end());
+	}
+	return result;
+}
+
 /*
 set<PlaceID> NetData::getITrap(TrapID ID) const {
 	set<PlaceID> result;

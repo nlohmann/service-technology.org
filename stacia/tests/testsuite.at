@@ -36,17 +36,22 @@ AT_CHECK([STACIA expsiphon32.owfn],0,ignore, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Output to stderr])
+############################################################################
+AT_BANNER([Output])
+############################################################################
+
+AT_SETUP([Output to stdout])
 AT_CHECK([cp TESTFILES/expsiphon32.owfn .])
 AT_CHECK([STACIA expsiphon32.owfn], 0, stdout, ignore)
 AT_CHECK([GREP -q "All siphons" stdout], 0, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Output to given file])
-AT_CHECK([cp TESTFILES/expsiphon32.owfn .])
-AT_CHECK([STACIA expsiphon32.owfn], 0, stdout, ignore)
-AT_CHECK([GREP -q "All siphons" stdout], 0, ignore)
+AT_SETUP([Witness output])
+AT_CHECK([cp TESTFILES/expsiphon8a.owfn .])
+AT_CHECK([STACIA expsiphon8a.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "q1" stdout], 0, ignore)
+AT_CHECK([GREP -q "{..,..,..,..,..,..,..,..}" stdout], 0, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 

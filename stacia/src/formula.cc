@@ -442,19 +442,34 @@ void Formula::printResult() const {
 }
 
 /** Get the siphon belonging to a solution.
-	@param base If the formula was create for a full check.
 	@return The siphon (empty if non-existent).
 */
-Siphon Formula::getSiphon(bool base) {
-	Siphon result;
+set<PlaceID> Formula::getSiphon() {
+	set<PlaceID> result;
 	if (!satisfied) return result;
-	if (base) {
-		map<ExtSiphonID,Literal>::iterator sit;
-		for(sit=svarnum.begin(); sit!=svarnum.end(); ++sit) 
-			if (mssolution[sit->second-1])
-				result.push_back(sit->first);
-	} else {
-	}
+	map<ExtSiphonID,Literal>::iterator sit;
+	for(sit=svarnum.begin(); sit!=svarnum.end(); ++sit) 
+		if (mssolution[sit->second-1])
+			result.insert(sit->first);
 	return result;
+}
+
+/** Get the matching belonging to a solution.
+	@return The matching (representing a closed siphon).
+*/
+Matching Formula::getMatching() {
+	Matching m;
+	if (!satisfied) return m;
+	map<ExtSiphonID,Literal>::const_iterator sit;
+	for(sit=svarnum.begin(); sit!=svarnum.end(); ++sit)
+	{
+		ExtSiphonID eid(sit->first);
+		Literal vid(sit->second);
+		if (mssolution[vid-1]) {
+			if (eid<0) m.first.push_back(-eid-1);
+			else m.second.push_back(eid);
+		}
+	}
+	return m;
 }
 

@@ -149,6 +149,9 @@ public:
 	/// Get all places marked initially
 	vector<PlaceID> getMarked() const;
 
+	/// Print a siphon (set of places)
+	void printSiphon(set<PlaceID> s) const;
+
 	/// Verbosity level.
 	int verbose;
 

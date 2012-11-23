@@ -248,16 +248,35 @@ Parameters given via command-line will overwrite parameters given via configurat
 @chapter Theory
 
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
-Stacia implements several algorithms and result published in several scientific articles.
+Stacia implements several algorithms and results published in several scientific articles.
 
 @c <<-- CHANGE START (theory) -->>
 
-@section <<-- THEORY -->>
+@section Petri net properties in general
 
-@subsubheading <<-- THEORY -->>
+A good overview over Petri nets including siphons, traps, liveness, and deadlocks can be found
+in Murata's often cited work:
 
 @quotation
-<<-- THEORY -->>
+T. Murata. @b{Petri nets: Properties, analysis and applications}. @i{Proc. IEEE} @b{77}:4, pp.201--221, 1989.
+@end quotation
+
+@section Free Choice nets
+
+The most complete overview of Free Choice nets including a proof of the equivalence of liveness and
+the Commoner-Hack property for this class of nets can be found in the work of Desel and Esparza:
+
+@quotation
+J. Desel, J. Esparza. @b{Free Choice Petri Nets}. Cambridge University Press, ISBN 0-521-46519-2, 1995.
+@end quotation
+
+@section Using SAT solvers and Divide-and-Conquer to compute siphons and traps
+
+How to build formulae that allow for a divide-and-conquer startegy using SAT solvers to determine siphons, traps, and even counterexamples
+to the Commoner-Hack property is shown in the following paper.
+
+@quotation
+O. Oanea, H. Wimmel, K. Wolf. @b{New Algorithms for Deciding the Siphon-Trap Property}. @i{Lecture Notes in Computer Science} @b{6128}, pp.267--286, 2010.
 @end quotation
 
 @c <<-- CHANGE END -->>
@@ -286,11 +305,93 @@ In case any error occurs, Stacia aborts with exit code @samp{1} and prints a mes
 @c <<-- CHANGE START (exit/error codes) -->>
 
 @item #01
-<<-- ERROR DESCRIPTION -->>
+The Petri net file given as parameter is inaccessible and could not be opened.
 
 @smallexample
 @cartouche
-stacia: <<-- ERROR MESSAGE -->> -- aborting [#01]
+stacia: could not open file -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@item #02
+The Petri Net API was unable to read the given Petri net file. Most likely reason is a wrong format (--lola, --owfn, and --pnml are possible).
+
+@smallexample
+@cartouche
+stacia: << error message may vary >> -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #04
+The command line parameter list contains more than one input file. Use a script to call Stacia with several Petri nets, one at a time.
+
+@smallexample
+@cartouche
+stacia: at most one input file must be given -- aborting [#04]
+@end cartouche
+@end smallexample
+
+@item #07
+The command line contains a parameter Stacia cannot interpret. Use --help to check available parameters.
+
+@smallexample
+@cartouche
+stacia: invalid command line parameters -- aborting [#07]
+@end cartouche
+@end smallexample
+
+@item #11
+An error occurred when writing to a temporary file. At the moment, Stacia does not need to write to temporary files, so this error should not occur.
+
+@smallexample
+@cartouche
+stacia: could not write to file -- aborting [#11]
+@end cartouche
+@end smallexample
+
+@item #13
+An error occurred when creating a temporary file. At the moment, Stacia does not need to write to temporary files, so this error should not occur.
+
+
+@smallexample
+@cartouche
+stacia: could not create temporary file -- aborting [#13]
+@end cartouche
+@end smallexample
+
+@item #14
+A configuration file given as parameter was not accessible.
+
+@smallexample
+@cartouche
+stacia: error reading configuration file -- aborting [#14]
+@end cartouche
+@end smallexample
+
+@item #41
+The divide-and-conquer algorithm tried to build a union of subnets that are not contained in the same original net. An internal error that should never happen.
+
+@smallexample
+@cartouche
+stacia: union of subnets stemming from different nets -- aborting [#41]
+@end cartouche
+@end smallexample
+
+@item #81
+A transition has not been supplied with an internal ID. This should not happen.
+
+@smallexample
+@cartouche
+stacia: no transitionID for transition pointer -- aborting [#81]
+@end cartouche
+@end smallexample
+
+@item #82
+A place has not been supplied with an internal ID. This should not happen.
+
+@smallexample
+@cartouche
+stacia: no placeID for place pointer -- aborting [#82]
 @end cartouche
 @end smallexample
 

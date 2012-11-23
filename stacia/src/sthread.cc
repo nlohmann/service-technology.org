@@ -236,18 +236,24 @@ void* threadManagement(void* arg) {
 				thread.ms = NULL;
 			} else if (thread.sn) {
 				Formula fo(*(thread.sn));
-				if (!texit && fo.check(false)) { thread.solved = true; thread.s = fo.getSiphon(true); }
+				if (!texit && fo.check(false)) { thread.solved = true; thread.s = fo.getSiphon(); }
 				if (!thread.solved || !forcequit) {
-					SiphonTrap st(*(thread.sn));
-					if (!texit) st.computeBruteForce();
-					if (!texit) texit = thread.result->computeComponentInfo(st);
+					thread.st = new SiphonTrap(*(thread.sn));
+					if (!texit) thread.st->computeBruteForce();
+					if (!texit) texit = thread.result->computeComponentInfo(*thread.st);
 				} else texit = true;
 				thread.sn = NULL;
 			} else {
+				thread.m = new Matchings(*(thread.inf1),*(thread.inf2));
+				Formula f(*thread.m);
+				if (!texit && f.check(false)) { thread.solved = true; thread.wmat = f.getMatching(); }
+				if (!texit && (!thread.solved || !forcequit)) texit = thread.result->computeComponentInfo(*thread.m);
+/*
 				Matchings m(*(thread.inf1),*(thread.inf2));
 				Formula f(m);
-				if (!texit && f.check(false)) { thread.solved = true; }
+				if (!texit && f.check(false)) { thread.solved = true; thread.wmat = f.getMatching(); }
 				if (!texit && (!thread.solved || !forcequit)) texit = thread.result->computeComponentInfo(m);
+*/
 			}
 		}
 
@@ -401,7 +407,7 @@ void stopThreads() {
 		if (debug) { cerr << i+1; cerr.flush(); }
 		pthread_join(threads[i],(void **)x);
 	}
-	cerr << endl;
+	if (debug) cerr << endl;
 }
 
 /** Destroy all thread related data.

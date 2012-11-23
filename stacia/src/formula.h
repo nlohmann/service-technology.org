@@ -49,7 +49,10 @@ public:
 	bool check(bool dummy);
 
 	/// Get the corresponding siphon for a solution
-	Siphon getSiphon(bool base);
+	set<PlaceID> getSiphon();
+
+	/// Get the siphon matching for a solution
+	Matching getMatching();
 
 private:
 	// Create the formula for closed siphons

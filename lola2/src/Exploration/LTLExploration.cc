@@ -36,6 +36,8 @@ bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
 
 	// the stack for the search
 	SearchStack<LTLStackEntry> stack;
+	// pseudo tarjan stack, for being able to mark states as "not on tarjan-stack"
+	SearchStack<AutomataTree*> tarjanStack;
 
 	// initialize the properties
 	automata.initProperties(ns);
@@ -44,7 +46,10 @@ bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
 	index_t currentAutomataState = 42;
 
 	/// current global dfs number
-	index_t currentDFSNumber = 0;
+	index_t currentNextDFSNumber = 0;
+
+	/// found counterexample
+	bool foundcounterexample = false;
 
 	// get first firelist
 	index_t* currentFirelist;
@@ -53,12 +58,17 @@ bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
 	index_t currentStateListEntry = automata.getSuccessors(ns,
 			&currentStateList, currentAutomataState);
 	index_t currentStateListLength = currentStateListEntry;
+	index_t currentLowlink = 0;
 	AutomataTree* currentStateEntry;
 
 	// insert the initial transition and initial state of the buechi automata into the store
 	store.searchAndInsert(ns, &currentStateEntry, 0);
+	currentStateList = 0;
 	searchAndInsertAutomataState(currentAutomataState, &currentStateEntry,
 			&currentStateEntry);
+
+	// set dfs and lowlink number
+	currentStateEntry->dfs = currentNextDFSNumber;
 
 	while (true) // exit when trying to pop from empty stack
 	{
@@ -76,22 +86,23 @@ bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
 			Transition::fire(ns, currentFirelist[currentFirelistEntry]);
 
 			AutomataTree* searchResult;
-			store.searchAndInsert(ns, &searchResult, 0);
-
+			if (!store.searchAndInsert(ns, &searchResult, 0))
+				searchResult = 0;
 			AutomataTree* nextStateEntry;
-			// TODO handle Buechi-Automata states correctly
+
 			if (searchAndInsertAutomataState(currentAutomataState,
 					&searchResult, &nextStateEntry)) {
-				// TODO if on tarjan-stack
-				if (true)
-					if (nextStateEntry->lowlink < currentStateEntry->lowlink)
-						currentStateEntry->lowlink = nextStateEntry->dfs;
+				// if on tarjan-stack(indicated by lowlink == -1)
+				// this is not necessary
+				// if (nextStateEntry->dfs != -1)
+				if (currentLowlink > nextStateEntry->dfs)
+					currentLowlink = nextStateEntry->dfs;
 
 				// State exists! -->backtracking to previous state
 				Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
 			} else {
 				// switch to next state
-				currentAutomataState += currentStateList[currentStateListEntry];
+				currentAutomataState = currentStateList[currentStateListEntry];
 				// State does not exist!
 				Transition::updateEnabled(ns,
 						currentFirelist[currentFirelistEntry]);
@@ -103,7 +114,7 @@ bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
 				stackEntry = new (stackEntry) LTLStackEntry(currentFirelist,
 						currentFirelistEntry, currentStateList,
 						currentStateListEntry, currentStateListLength,
-						currentStateEntry);
+						currentLowlink, currentStateEntry);
 
 				// get Firelist and successor states
 				currentFirelistEntry = firelist.getFirelist(ns,
@@ -111,19 +122,41 @@ bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
 				currentStateListEntry = automata.getSuccessors(ns,
 						&currentStateList, currentAutomataState);
 				currentStateListLength = currentStateListEntry;
+				// set initial low-link number and local dfs
+				currentLowlink = currentNextDFSNumber;
 				// create a new automata state
 				currentStateEntry = nextStateEntry;
-				currentStateEntry->dfs = currentDFSNumber++;
-				currentStateEntry->lowlink = currentStateEntry->dfs;
+				currentStateEntry->dfs = currentNextDFSNumber++;
 			} // end else branch for "if state exists"
 		} else {
-			// if dfs == lowlink, we have found an scc, and have to analyse it
-			if (currentStateEntry->dfs == currentStateEntry->lowlink){
-				// detected SCC
+			// make check for a possible counter example
+			foundcounterexample |= automata.isAcceptingState(
+					currentAutomataState);
+
+			// check for the end of the SCC
+			if (currentLowlink == currentStateEntry->dfs) {
+				if (foundcounterexample) {
+					// check for fairness via a new DFS!
+					return true;
+				}
+				// not found the counter example, so discard the component
+				while (tarjanStack.StackPointer){
+					// mark all states as visited
+					tarjanStack.top()->dfs = -1;
+					tarjanStack.pop();
+				}
 			}
+			// push state onto tarjan stack
+			// this stack contains all elements, which are on the "real" tarjan but not on the dfs stack
+			AutomataTree** tarjanEntry = tarjanStack.push();
+			*tarjanEntry = currentStateEntry;
 
 
 
+			// switch back to the previous state
+
+			// save current lowlink number
+			index_t oldstateLowLink = currentLowlink;
 
 			// firing list completed -->close state and return to previous state
 			delete[] currentFirelist;
@@ -132,21 +165,21 @@ bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
 				// have completely processed initial marking --> state not found
 				return false;
 			}
-			// save current lowlink number
-			index_t nextStateLowlinkNumber = currentStateEntry->lowlink;
 
+			// load the own predecessor
 			LTLStackEntry & stackEntry = stack.top();
 			currentFirelistEntry = stackEntry.current_on_firelist;
 			currentFirelist = stackEntry.fl;
 			currentStateListEntry = stackEntry.current_on_statelist;
 			currentStateList = stackEntry.states;
 			currentStateListLength = stackEntry.length_of_statelists;
-			currentStateEntry = stackEntry.dfs_lowlink;
+			currentLowlink = stackEntry.lowlink;
+			currentStateEntry = stackEntry.dfs;
 			stack.pop();
 
 			// adjust own lowlink
-			if (nextStateLowlinkNumber < currentStateEntry->lowlink)
-				currentStateEntry->lowlink = nextStateLowlinkNumber;
+			if (oldstateLowLink < currentLowlink)
+				currentLowlink = oldstateLowLink;
 
 			assert(currentFirelistEntry < Net::Card[TR]);
 			// revert the petrinet
@@ -154,7 +187,7 @@ bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
 			Transition::revertEnabled(ns,
 					currentFirelist[currentStateListEntry]);
 			// revert the buechi automata
-			currentAutomataState -= currentStateList[currentStateListEntry];
+			currentAutomataState = currentStateList[currentStateListEntry];
 		}
 	}
 }

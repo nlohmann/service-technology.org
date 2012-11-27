@@ -19,7 +19,7 @@ class BuechiAutomata
 {
 public:
 
-	/// returns an array with all successor-states(as diffenrence to the given State) of the current netstate in the parameter
+	/// returns an array with all successor-states of the current netstate in the parameter
 	/// this function will also call automatically updateProperty
 	/// @return number of successors
 	int getSuccessors(NetState &ns, index_t** list, index_t currentState);
@@ -32,6 +32,9 @@ public:
 
 	/// initialize all atomic properties
 	void initProperties(NetState &ns);
+
+	/// returns true if the given state is accepting
+	bool isAcceptingState(index_t state);
 
 private:
 	/// number of atomic propositions

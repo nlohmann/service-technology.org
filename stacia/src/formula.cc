@@ -34,19 +34,21 @@ extern bool texit;
 /** Constructor for incremental checks of the siphon-trap property. Only siphons that become
 	closed in the current component are checked.
 	@param m The matchings for the current component.
+	@param mt If a check is made for siphons without marked traps (true) or siphons containing no traps at all (false).
 */
-Formula::Formula(const Matchings& m) : maxvarnum(0) {
+Formula::Formula(const Matchings& m, bool mt) : maxvarnum(0) {
 	createSiphonFormula(m);
-	createMatchingFormula(m);
+	createMatchingFormula(m,mt);
 }
 
 /** Constructor for full checks of the siphon-trap property.
 	@param sn The (sub)net to check for siphons without a marked trap.
+	@param mt If a check is made for siphons without marked traps (true) or siphons containing no traps at all (false).
 */ 
-Formula::Formula(const SubNet& sn) : maxvarnum(0) {
+Formula::Formula(const SubNet& sn, bool mt) : maxvarnum(0) {
 	createSiphonFormula(sn);
 	createNonEmptyFormula();
-	createMaxTrapFormula(sn);
+	createMaxTrapFormula(sn,mt);
 }
 
 /** Create a subformula that is satisfied by siphons.
@@ -93,8 +95,9 @@ void Formula::createNonEmptyFormula() {
 
 /** Create a subformula that is satisfied by an unmarked maximal trap inside a siphon.
 	@param sn The (sub)net to check for siphons without a marked trap.
+	@param mt If a contained maximal trap is allowed at all (true=unmarked allowed, false=should not exist).
 */ 
-void Formula::createMaxTrapFormula(const SubNet& sn) {
+void Formula::createMaxTrapFormula(const SubNet& sn, bool mt) {
 //	if (texit) return;
 	const vector<PlaceID>& places(sn.getInnerPlaces());
 	if (places.empty()) return;
@@ -119,7 +122,7 @@ void Formula::createMaxTrapFormula(const SubNet& sn) {
 	// Unmarked Max Trap:
 	vector<Literal> clause;
 	for(unsigned int i=0; i<places.size(); ++i)
-		if (sn.isMarked(places[i])) {
+		if (!mt || sn.isMarked(places[i])) {
 			clause.clear();
 			clause.push_back(-ptvar[places[i]].back());
 			clause.push_back(0);
@@ -278,35 +281,39 @@ void Formula::createSiphonFormula(const Matchings& m) {
 	}
 }
 
-/** Create a formula satisfied by a siphon not covering any token trap matching.
+/** Create a formula satisfied by a siphon not covering any trap matching.
 	@param m The matchings of the current component.
+	@param mt True=check for token trap matchings, false=check for interface trap matchings.
 */
-void Formula::createMatchingFormula(const Matchings& m) {
+void Formula::createMatchingFormula(const Matchings& m, bool mt) {
 	if (texit) return;
-	unsigned int num(m.numMatchings(Matchings::TTRAP));
+	unsigned int num(m.numMatchings(mt ? Matchings::TTRAP : Matchings::ITRAP));
 	nametoiif.clear();
 	nametotif.clear();
 	map<string,Literal> mlit;
 	for(unsigned int i=0; i<num; ++i)
 	{
 		// obtain the matching
-		const Matching& match(m.getMatching(i,Matchings::TTRAP));
-		unsigned int ttrap(m.getTokenTrap(i));
-		bool ttside(m.getTokenTrapSide(i));
-
-		// create a name for the token trap interface
-		stringstream sstr1;
-		sstr1 << "TT" << (ttside?"R":"L") << ttrap;
-		string name1;
-		sstr1 >> name1;
-		nametotif[name1] = (ttside? ttrap : -ttrap-1);
-		if (mlit.find(name1)==mlit.end()) { mlit[name1]= ++maxvarnum; names[maxvarnum]=name1; }
+		const Matching& match(m.getMatching(i,mt ? Matchings::TTRAP : Matchings::ITRAP));
 
 		// start creating the clause for this matching
 		vector<Literal> cs1;
-		cs1.push_back(mlit[name1]);
 
-		// walk the elements and construct a name for each interface
+		if (mt) {
+			unsigned int ttrap(m.getTokenTrap(i));
+			bool ttside(m.getTokenTrapSide(i));
+
+			// create a name for the token trap interface
+			stringstream sstr1;
+			sstr1 << "TT" << (ttside?"R":"L") << ttrap;
+			string name1;
+			sstr1 >> name1;
+			nametotif[name1] = (ttside? ttrap : -ttrap-1);
+			if (mlit.find(name1)==mlit.end()) { mlit[name1]= ++maxvarnum; names[maxvarnum]=name1; }
+			cs1.push_back(mlit[name1]);
+		}
+
+		// walk the elementary interface traps and construct a name for each interface
 		for(unsigned int j=0; j<match.first.size(); ++j)
 		{
 			stringstream sstr2;
@@ -360,6 +367,7 @@ void Formula::createMatchingFormula(const Matchings& m) {
 			}
 		}		
 	}
+	// for each interface trap interface that appears in a matching ...
 	for(mit=nametoiif.begin(); mit!=nametoiif.end(); ++mit)
 	{
 		vector<Literal> cs1;

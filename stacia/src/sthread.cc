@@ -76,6 +76,9 @@ bool multithreaded;
 /// quit on solved formula
 bool forcequit(true);
 
+/// if checks are made for siphons with unmarked or no traps contained
+extern bool unmarkedtraps;
+
 	/*****************************************
 	* Implementation for the thread handling *
 	*****************************************/
@@ -235,19 +238,19 @@ void* threadManagement(void* arg) {
 				}
 				thread.ms = NULL;
 			} else if (thread.sn) {
-				Formula fo(*(thread.sn));
+				Formula fo(*(thread.sn),unmarkedtraps);
 				if (!texit && fo.check(false)) { thread.solved = true; thread.s = fo.getSiphon(); }
 				if (!thread.solved || !forcequit) {
 					thread.st = new SiphonTrap(*(thread.sn));
-					if (!texit) thread.st->computeBruteForce();
+					if (!texit) thread.st->computeBruteForce(unmarkedtraps);
 					if (!texit) texit = thread.result->computeComponentInfo(*thread.st);
 				} else texit = true;
 				thread.sn = NULL;
 			} else {
-				thread.m = new Matchings(*(thread.inf1),*(thread.inf2));
-				Formula f(*thread.m);
+				thread.m = new Matchings(*(thread.inf1),*(thread.inf2),unmarkedtraps);
+				Formula f(*thread.m,unmarkedtraps);
 				if (!texit && f.check(false)) { thread.solved = true; thread.wmat = f.getMatching(); }
-				if (!texit && (!thread.solved || !forcequit)) texit = thread.result->computeComponentInfo(*thread.m);
+				if (!texit && (!thread.solved || !forcequit)) texit = thread.result->computeComponentInfo(*thread.m,unmarkedtraps);
 /*
 				Matchings m(*(thread.inf1),*(thread.inf2));
 				Formula f(m);

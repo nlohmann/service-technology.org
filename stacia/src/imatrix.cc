@@ -747,8 +747,23 @@ void IMatrix::printSiphon(set<PlaceID> s) const {
 	set<PlaceID>::const_iterator sit;
 	for(sit=s.begin(); sit!=s.end(); ++sit)
 	{
+		if (pID(pPTR(*sit))!=*sit) continue;
 		if (comma) cout << ","; else comma=true;
-		cout << pName(*sit);
+		cout << pPTR(*sit)->getName();
+	}
+	cout << "}" << endl;
+}
+
+/** Print a trap.
+	@param tr The trap.
+*/
+void IMatrix::printTrap(Trap tr) const {
+	cout << "{";
+	bool comma(false);
+	for(unsigned int i=0; i<tr.size(); ++i)
+	{
+		if (comma) cout << ","; else comma=true;
+		cout << pName(tr[i]);
 	}
 	cout << "}" << endl;
 }

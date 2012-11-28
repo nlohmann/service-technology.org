@@ -27,13 +27,32 @@ AT_BANNER([Parameters])
 AT_SETUP([Piping from stdin])
 AT_CHECK([cp TESTFILES/expsiphon32.owfn .])
 AT_CHECK([cat expsiphon32.owfn | STACIA],0,ignore, ignore)
-AT_KEYWORDS(infrastructure)
+AT_KEYWORDS(parameters)
 AT_CLEANUP
 
 AT_SETUP([Reading from file])
 AT_CHECK([cp TESTFILES/expsiphon32.owfn .])
-AT_CHECK([STACIA expsiphon32.owfn],0,ignore, ignore)
-AT_KEYWORDS(infrastructure)
+AT_CHECK([STACIA --owfn expsiphon32.owfn],0,ignore, ignore)
+AT_KEYWORDS(parameters)
+AT_CLEANUP
+
+AT_SETUP([Reading PNML file])
+AT_CHECK([cp TESTFILES/test.pnml .])
+AT_CHECK([STACIA --pnml test.pnml],0,ignore, ignore)
+AT_KEYWORDS(parameters)
+AT_CLEANUP
+
+AT_SETUP([Reading LOLA file])
+AT_CHECK([cp TESTFILES/fms.spec.lola .])
+AT_CHECK([STACIA --lola fms.spec.lola],0,ignore, ignore)
+AT_KEYWORDS(parameters)
+AT_CLEANUP
+
+AT_SETUP([Add a loop])
+AT_CHECK([cp TESTFILES/test12.owfn .])
+AT_CHECK([STACIA --owfn test12.owfn -l],0,stdout, ignore)
+AT_CHECK([GREP -q "All siphons" stdout], 0, ignore)
+AT_KEYWORDS(parameters)
 AT_CLEANUP
 
 ############################################################################
@@ -53,6 +72,88 @@ AT_CHECK([STACIA expsiphon8a.owfn], 0, stdout, ignore)
 AT_CHECK([GREP -q "q1" stdout], 0, ignore)
 AT_CHECK([GREP -q "{..,..,..,..,..,..,..,..}" stdout], 0, ignore)
 AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Print net])
+AT_CHECK([cp TESTFILES/test.pnml .])
+AT_CHECK([STACIA --pnml test.pnml -n], 0, stdout, ignore)
+AT_CHECK([GREP -q "{p.,p.,p.}" stdout], 0, ignore)
+AT_CHECK([GREP -q "(p8)--t5->(p.,p.)" stdout], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Algorithm])
+############################################################################
+
+AT_SETUP([Every siphon has a trap])
+AT_CHECK([cp TESTFILES/expsiphon8a.owfn .])
+AT_CHECK([STACIA -c -N expsiphon8a.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "All siphons" stdout], 0, ignore)
+AT_KEYWORDS(algorithm)
+AT_CLEANUP
+
+AT_SETUP([A siphon has no marked trap])
+AT_CHECK([cp TESTFILES/expsiphon8a.owfn .])
+AT_CHECK([STACIA -c expsiphon8a.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "q1" stdout], 0, ignore)
+AT_CHECK([GREP -q "{..,..,..,..,..,..,..,..}" stdout], 0, ignore)
+AT_KEYWORDS(algorithm)
+AT_CLEANUP
+
+AT_SETUP([A siphon has no trap])
+AT_CHECK([cp TESTFILES/test4.owfn .])
+AT_CHECK([STACIA -c test4.owfn -N -p8], 0, stdout, ignore)
+AT_CHECK([GREP -q "{.2,.2}" stdout], 0, ignore)
+AT_KEYWORDS(algorithm)
+AT_CLEANUP
+
+AT_SETUP([Brute Force])
+AT_CHECK([cp TESTFILES/expsiphon8a.owfn .])
+AT_CHECK([STACIA -b expsiphon8a.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "q1" stdout], 0, ignore)
+AT_CHECK([GREP -q "{..,..,..,..,..,..,..,..}" stdout], 0, ignore)
+AT_KEYWORDS(algorithm)
+AT_CLEANUP
+
+AT_SETUP([Pure Divide-and-Conquer])
+AT_CHECK([cp TESTFILES/expsiphon8a.owfn .])
+AT_CHECK([STACIA -d expsiphon8a.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "q1" stdout], 0, ignore)
+AT_CHECK([GREP -q "{..,..,..,..,..,..,..,..}" stdout], 0, ignore)
+AT_KEYWORDS(algorithm)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Errors])
+############################################################################
+
+AT_SETUP([Missing file])
+AT_CHECK([cp TESTFILES/expsiphon8a.owfn .])
+AT_CHECK([STACIA expsiphon8.owfn], 1, ignore, stderr)
+AT_CHECK([GREP -q "aborting ..01." stderr], 0, ignore)
+AT_KEYWORDS(errors)
+AT_CLEANUP
+
+AT_SETUP([Wrong file format])
+AT_CHECK([cp TESTFILES/expsiphon8a.owfn .])
+AT_CHECK([STACIA --lola expsiphon8a.owfn], 1, ignore, stderr)
+AT_CHECK([GREP -q "aborting ..02." stderr], 0, ignore)
+AT_KEYWORDS(errors)
+AT_CLEANUP
+
+AT_SETUP([Too many files])
+AT_CHECK([cp TESTFILES/expsiphon8a.owfn TESTFILES/expsiphon32.owfn .])
+AT_CHECK([STACIA expsiphon8a.owfn expsiphon32.owfn], 1, ignore, stderr)
+AT_CHECK([GREP -q "aborting ..04." stderr], 0, ignore)
+AT_KEYWORDS(errors)
+AT_CLEANUP
+
+AT_SETUP([Invalid command line])
+AT_CHECK([cp TESTFILES/expsiphon8a.owfn .])
+AT_CHECK([STACIA expsiphon8a.owfn -X], 1, ignore, stderr)
+AT_CHECK([GREP -q "aborting ..07." stderr], 0, ignore)
+AT_KEYWORDS(errors)
 AT_CLEANUP
 
 # <<-- CHANGE END -->>

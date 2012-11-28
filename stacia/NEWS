@@ -8,12 +8,16 @@
 
 
 PURPOSE
-Version 1.0-unreleased (21 November 2012)
-=========================================
+Version 1.0 (28 November 2012)
+==============================
 
-* first release of Stacia
+* Added check for siphons without any contained trap
 
-* Checks the Siphon-Trap property using divide-and-conquer
+* Explicitly constructed a witness siphon
+
+* Added theory section and error codes to documentation
+
+* Added test cases
 
 
 \nSee file ChangeLog <http://service-technology.org/files/stacia/ChangeLog> for\ncomplete version history.\n

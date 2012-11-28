@@ -1,8 +1,20 @@
 @c <<-- CHANGE START (version information) -->>
 
+@heading Version 1.0 (28 November 2012)
+@itemize
+@item Added check for siphons without any contained trap 
+
+@item Explicitly constructed a witness siphon
+
+@item Added theory section and error codes to documentation
+
+@item Added test cases
+
+@end itemize
+
 @heading Version 1.0-unreleased (21 November 2012)
 @itemize
-@item first release of Stacia
+@item First version of Stacia
 
 @item Checks the Siphon-Trap property using divide-and-conquer
 

@@ -27,18 +27,20 @@ extern bool texit;
 	about siphons and traps.
 	@param i1 The info for the first child.
 	@param i2 The info for the second child.
+	@param mt True if closed interface-trap matchings can be omitted.
 */
-Matchings::Matchings(const SubNetInfo& i1, const SubNetInfo& i2) : inf1(i1),inf2(i2) {
-	computeMatchings(SIPHON);
-	computeMatchings(ITRAP);
-	computeMatchings(TTRAP);
+Matchings::Matchings(const SubNetInfo& i1, const SubNetInfo& i2, bool mt) : inf1(i1),inf2(i2) {
+	computeMatchings(SIPHON,true);
+	computeMatchings(ITRAP,mt);
+	computeMatchings(TTRAP,true);
 	computeMatchingLists();
 }
 
 /** Compute the matchings of a certain type.
 	@param type Possible types are SIPHON, ITRAP, and TTRAP.
+	@param mt True if closed interface-trap matchings can be omitted (ITRAP only).
 */
-void Matchings::computeMatchings(STType type) {
+void Matchings::computeMatchings(STType type, bool mt) {
 	// the common interface set of the two subnets
 	Interface common(getCommonInterface());
 
@@ -97,7 +99,7 @@ void Matchings::computeMatchings(STType type) {
 		case ITRAP:		for(unsigned int i=0; i<inf1.getLQ().size(); ++i)
 						{
 							int ue(inf1.getUniqueElement(inf1.getLQ(i),false));
-							if ((ue>=0 && common.find(ue)==common.end())
+							if (!mt || (ue>=0 && common.find(ue)==common.end())
 								|| (ue<0 && common.find(*(inf1.getLQ(i).begin()))==common.end()))
 							{
 								uinit.push_back(-i-1);
@@ -107,7 +109,7 @@ void Matchings::computeMatchings(STType type) {
 						for(unsigned int i=0; i<inf2.getLQ().size(); ++i)
 						{
 							int ue(inf2.getUniqueElement(inf2.getLQ(i),false));
-							if ((ue>=0 && common.find(ue)==common.end())
+							if (!mt || (ue>=0 && common.find(ue)==common.end())
 								|| (ue<0 && common.find(*(inf2.getLQ(i).begin()))==common.end()))
 							{
 								uinit.push_back(i);
@@ -115,13 +117,13 @@ void Matchings::computeMatchings(STType type) {
 							}
 						}
 						break;
-		case TTRAP:		for(unsigned int i=0; i<inf1.getLM().size(); ++i)
+		case TTRAP:		if (mt) for(unsigned int i=0; i<inf1.getLM().size(); ++i)
 						{
 							int ue(inf1.getUniqueElement(inf1.getLM(i),false));
 							uinit.push_back(-i-1);
 							ufirst.push_back(ue);
 						}
-						for(unsigned int i=0; i<inf2.getLM().size(); ++i)
+						if (mt) for(unsigned int i=0; i<inf2.getLM().size(); ++i)
 						{
 							int ue(inf2.getUniqueElement(inf2.getLM(i),false));
 							uinit.push_back(i);

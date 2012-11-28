@@ -591,7 +591,7 @@ void SubNetInfo::removeRedundant(SiphonID sid) {
 	@param m The matchings of this subnet.
 	@return True on premature exit forced by another thread.
 */
-bool SubNetInfo::computeComponentInfo(const Matchings& m) {
+bool SubNetInfo::computeComponentInfo(const Matchings& m, bool mt) {
 	// get the siphon matchings and their interfaces
 	intmap.clear();
 	for(MatchingID ID=0; ID<m.numMatchings(Matchings::SIPHON); ++ID)
@@ -608,7 +608,7 @@ bool SubNetInfo::computeComponentInfo(const Matchings& m) {
 	for(MatchingID ID=0; ID<m.numMatchings(Matchings::ITRAP); ++ID)
 	{
 		Interface interface(m.getMatchingInterface(ID,Matchings::ITRAP));
-		if (!interface.empty()) {
+		if (!mt || !interface.empty()) {
 			LQtmp.insert(interface);
 			itom[interface].push_back(ID);
 		}
@@ -619,14 +619,16 @@ bool SubNetInfo::computeComponentInfo(const Matchings& m) {
 	set<Interface> LMtmp;
 	LM.clear();
 	map<Interface,vector<MatchingID> > itomm;
-	for(MatchingID ID=0; ID<m.numMatchings(Matchings::TTRAP); ++ID)
-	{
-		Interface interface(m.getMatchingInterface(ID,Matchings::TTRAP));
-		const Matching& ttmatching(m.getMatching(ID,Matchings::TTRAP));
-		LMtmp.insert(interface);
-		itomm[interface].push_back(ID);
+	if (mt) {
+		for(MatchingID ID=0; ID<m.numMatchings(Matchings::TTRAP); ++ID)
+		{
+			Interface interface(m.getMatchingInterface(ID,Matchings::TTRAP));
+			const Matching& ttmatching(m.getMatching(ID,Matchings::TTRAP));
+			LMtmp.insert(interface);
+			itomm[interface].push_back(ID);
+		}
+		LM.assign(LMtmp.begin(),LMtmp.end());
 	}
-	LM.assign(LMtmp.begin(),LMtmp.end());
 
 	if (false) { //(multithreaded) {
 		// construct the structure of wQ/wM, so it will not be changed later when the threads access it
@@ -725,7 +727,7 @@ int SubNetInfo::getUniqueElement(const Interface& interface, bool siphon) const 
 */
 void SubNetInfo::computeWrappingSets(const Matchings& m, InterfaceID iID, const Matching& matching, InterfaceID tti, int side) {
 	// map from siphons (in each subnet) to index of selected matching containing it in lsmlist/rsmlist
-	if (m.getSNI(false).intmap.empty() || m.getSNI(true).intmap.empty()) return; // no siphons == now wrapping sets
+	if (m.getSNI(false).intmap.empty() || m.getSNI(true).intmap.empty()) return; // no siphons == no wrapping sets
 	vector<int> select1(m.getSNI(false).intmap.rbegin()->first+1,-1),select2(m.getSNI(true).intmap.rbegin()->first+1,-1); // [SiphonID]
 	vector<unsigned int> selcnt1(select1.size(),0), selcnt2(select2.size(),0); // [SiphonID]
 	// how often each new siphon matching is selected

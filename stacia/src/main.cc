@@ -71,6 +71,9 @@ set<unsigned int> tindex;
 /// how many (open) siphons a component must have such that divide-and-conquer is stopped
 unsigned int siphonthreshold;
 
+/// if we should check for siphons without marked traps or without traps at all
+bool unmarkedtraps(true);
+
 /// check if a file exists and can be opened for reading
 inline bool fileExists(const std::string& filename) {
     std::ifstream tmp(filename.c_str(), std::ios_base::in);
@@ -246,6 +249,8 @@ int main(int argc, char** argv) {
 	bool verbose(args_info.verbose_flag);
 	bool debug(args_info.debug_flag);
 
+	if (args_info.notraps_flag) unmarkedtraps=false;
+
 	// check flag for full computation even in the case of a found siphon without marked trap
 	if (args_info.noearlyquit_flag) forcequit=false;
 
@@ -312,13 +317,13 @@ int main(int argc, char** argv) {
 	{
 			status("using brute force SAT-solving");
 			clock_t startc = clock();
-			Formula fo3(sn);
+			Formula fo3(sn,unmarkedtraps);
 //cout << "Formula:" << endl; fo3.print(); cout << endl;
 			// if we find such a siphon, we might quit the program
 //if (!fo3.check(false)) cout << args_info.inputs[0] << endl;
-			if (fo3.check(false)) { cout << "The net contains a siphon without marked trap:" << endl;
+			if (fo3.check(false)) { cout << "The net contains a siphon without " << (unmarkedtraps ? "marked" : "any") << " trap:" << endl;
 									im.printSiphon(fo3.getSiphon());
-			} else cout << "All siphons contain an initially marked trap." << endl;
+			} else cout << "All siphons contain a" << (unmarkedtraps?"n initially marked":"") << " trap." << endl;
 			clock_t endc = clock();
 			cout << "Time: " << ((double)(endc-startc))/CLOCKS_PER_SEC << " secs." << endl;
 			return EXIT_SUCCESS;
@@ -525,11 +530,11 @@ int main(int argc, char** argv) {
 
 	if (bruteforce) {
 			status("selected algorithm: brute force SAT-solving");
-			Formula fo(sn);
+			Formula fo(sn,unmarkedtraps);
 			// if we find such a siphon, we might quit the program
-			if (fo.check(false)) { cout << "The net contains a siphon without marked trap." << endl;
+			if (fo.check(false)) { cout << "The net contains a siphon without " << (unmarkedtraps ? "marked" : "any") << " trap." << endl;
 									im.printSiphon(fo.getSiphon());
-			} else cout << "All siphons contain an initially marked trap." << endl;
+			} else cout << "All siphons contain a" << (unmarkedtraps?"n initially marked":"") << " trap." << endl;
 			clock_t endc = clock();
 			cout << "Time: " << ((double)(endc-startc))/CLOCKS_PER_SEC << " secs." << endl;
 			for(unsigned int i=0; i<netdata.size(); ++i)
@@ -565,7 +570,7 @@ int main(int argc, char** argv) {
 			// compute siphons/traps for this component brute force, if there is no info yet
 			if (netdata[pos]->getChild(true)==NULL) {
 				// but first check if there is an internal siphon without marked trap first
-				Formula fo(netdata[pos]->getSubNet());
+				Formula fo(netdata[pos]->getSubNet(),unmarkedtraps);
 				// if we find such a siphon, we might quit the program
 				if (fo.check(false)) { 
 					witness = fo.getSiphon();
@@ -580,7 +585,7 @@ int main(int argc, char** argv) {
 				// otherwise compute the siphons/traps explicitly
 				SiphonTrap* st(new SiphonTrap(netdata[pos]->getSubNet()));
 				netdata[pos]->setSiphonTrap(st);
-				st->computeBruteForce();
+				st->computeBruteForce(unmarkedtraps);
 				// then obtain the necessary info about the subnet from its siphons and traps
 				if (netdata[pos]->getSubNetInfo()->computeComponentInfo(*st)) break;
 				if (debug) netdata[pos]->getSubNetInfo()->printInfo();
@@ -590,7 +595,7 @@ int main(int argc, char** argv) {
 
 			// this component should be derived from two subcomponents
 			// first, compute the matchings of the subcomponents
-			Matchings* m(new Matchings(*(netdata[pos]->getChild(false)->getSubNetInfo()),*(netdata[pos]->getChild(true)->getSubNetInfo())));
+			Matchings* m(new Matchings(*(netdata[pos]->getChild(false)->getSubNetInfo()),*(netdata[pos]->getChild(true)->getSubNetInfo()),unmarkedtraps));
 			netdata[pos]->setMatchings(m);
 
 			if (debug) {
@@ -604,9 +609,10 @@ int main(int argc, char** argv) {
 			}
 
 			// compute the siphon/trap formula from the matchings
-			Formula f(*m);
+			Formula f(*m,unmarkedtraps);
 			// and check it. If true, we have a siphon without marked trap and may quit
 			if (f.check(false)) { 
+//f.print();
 				witness = netdata[pos]->getSiphon(f.getMatching());
 				fsolved=true; 
 				if (debug) {
@@ -618,7 +624,7 @@ int main(int argc, char** argv) {
 
 			// otherwise we must compute the new info for the combined subnets
 			// from the info of the selected subnets (conquer part!)
-			if (netdata[pos]->getSubNetInfo()->computeComponentInfo(*m)) break;
+			if (netdata[pos]->getSubNetInfo()->computeComponentInfo(*m,unmarkedtraps)) break;
 			if (debug) netdata[pos]->getSubNetInfo()->printInfo();
 			netdata[pos]->setComputed();
 		}
@@ -627,10 +633,10 @@ int main(int argc, char** argv) {
 		// after a break due to too many siphons, we revert to brute force
 		if (!fsolved && pos<netdata.size()) {
 			status("reverting to brute force SAT-solving");
-			Formula fo2(sn);
-			if (fo2.check(false)) { cout << "The net contains a siphon without marked trap:" << endl;
+			Formula fo2(sn,unmarkedtraps);
+			if (fo2.check(false)) { cout << "The net contains a siphon without " << (unmarkedtraps ? "marked" : "any") << " trap:" << endl;
 									witness = fo2.getSiphon();
-			} else cout << "All siphons contain an initially marked trap." << endl;
+			} else cout << "All siphons contain a" << (unmarkedtraps?"n initially marked":"") << " trap." << endl;
 			bruteforce = true;
 		}
 
@@ -737,10 +743,10 @@ int main(int argc, char** argv) {
 		// after a break due to too many siphons, we revert to brute force
 		if (texit && !fsolved) {
 			status("reverting to brute force SAT-solving");
-			Formula fo(sn);
-			if (fo.check(false)) { cout << "The net contains a siphon without marked trap:" << endl;
+			Formula fo(sn,unmarkedtraps);
+			if (fo.check(false)) { cout << "The net contains a siphon without " << (unmarkedtraps ? "marked" : "any") << " trap:" << endl;
 									im.printSiphon(fo.getSiphon());
-			} else cout << "All siphons contain an initially marked trap." << endl;
+			} else cout << "All siphons contain a" << (unmarkedtraps?"n initially marked":"") << " trap." << endl;
 			bruteforce = true;
 		}
 
@@ -760,9 +766,9 @@ int main(int argc, char** argv) {
     `------------------------------*/
 
 	if (!bruteforce) {
-		if (fsolved) { cout << "The net contains a siphon without marked trap:" << endl;
+		if (fsolved) { cout << "The net contains a siphon without " << (unmarkedtraps ? "marked" : "any") << " trap:" << endl;
 						im.printSiphon(witness);
-		} else cout << "All siphons contain an initially marked trap." << endl;
+		} else cout << "All siphons contain a" << (unmarkedtraps?"n initially marked":"") << " trap." << endl;
 	}
 	clock_t endc = clock();
 	cout << "Time: " << ((double)(endc-startc))/CLOCKS_PER_SEC << " secs." << endl;

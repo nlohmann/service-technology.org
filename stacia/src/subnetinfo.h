@@ -43,7 +43,7 @@ public:
 	bool computeComponentInfo(const SiphonTrap& stobj);
 
 	/// Compute the subnet info from incremental siphon and trap information
-	bool computeComponentInfo(const Matchings& m);
+	bool computeComponentInfo(const Matchings& m, bool mt);
 
 	/// Print the siphon IDs and interfaces
 	void printIntmap() const;

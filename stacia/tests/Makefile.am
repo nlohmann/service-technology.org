@@ -21,7 +21,8 @@
 # 4. Add the file to the SVN repository.
 
 # <<-- CHANGE START (testfiles) -->>
-TESTFILES = expsiphon32.owfn expsiphon8a.owfn
+TESTFILES = expsiphon32.owfn expsiphon8a.owfn test.pnml fms.spec.lola \
+			test12.owfn test4.owfn
 # <<-- CHANGE END -->>
 
 

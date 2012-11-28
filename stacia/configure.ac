@@ -1,4 +1,4 @@
-AC_INIT([Stacia], 1.0-unreleased, stacia@service-technology.org, stacia, http://service-technology.org/stacia)
+AC_INIT([Stacia], 1.0, stacia@service-technology.org, stacia, http://service-technology.org/stacia)
 
 AC_MSG_NOTICE([ ____  _             _       ])
 AC_MSG_NOTICE([/ ___|| |_ __ _  ___(_) __ _ ])

@@ -152,6 +152,9 @@ public:
 	/// Print a siphon (set of places)
 	void printSiphon(set<PlaceID> s) const;
 
+	/// Print a trap
+	void printTrap(Trap tr) const;
+
 	/// Verbosity level.
 	int verbose;
 

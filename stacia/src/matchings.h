@@ -34,7 +34,7 @@ class Matchings {
 
 public:
 	/// Constructor
-	Matchings(const SubNetInfo& info1, const SubNetInfo& info2);
+	Matchings(const SubNetInfo& info1, const SubNetInfo& info2, bool mt);
 
 	/// Types of matchings
 	enum STType {
@@ -78,7 +78,7 @@ public:
 
 private:
 	/// Compute all matchings of one type
-	void computeMatchings(STType type);
+	void computeMatchings(STType type, bool mt);
 
 	/// Compute a mapping from siphons to containing matchings
 	void computeMatchingLists();

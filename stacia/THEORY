@@ -8,16 +8,37 @@
 
 
 PURPOSE
-Stacia implements several algorithms and result published in several
+Stacia implements several algorithms and results published in several
 scientific articles.
 
-<<- THEORY ->>
-==============
+Petri net properties in general
+===============================
 
-<<- THEORY ->>
-..............
+A good overview over Petri nets including siphons, traps, liveness, and
+deadlocks can be found in Murata's often cited work:
 
-     <<- THEORY ->>
+     T. Murata. Petri nets: Properties, analysis and applications. Proc. IEEE
+     77:4, pp.201-221, 1989.
+
+Free Choice nets
+================
+
+The most complete overview of Free Choice nets including a proof of the
+equivalence of liveness and the Commoner-Hack property for this class of nets
+can be found in the work of Desel and Esparza:
+
+     J. Desel, J. Esparza. Free Choice Petri Nets. Cambridge University Press,
+     ISBN 0-521-46519-2, 1995.
+
+Using SAT solvers and Divide-and-Conquer to compute siphons and traps
+=====================================================================
+
+How to build formulae that allow for a divide-and-conquer startegy using SAT
+solvers to determine siphons, traps, and even counterexamples to the
+Commoner-Hack property is shown in the following paper.
+
+     O. Oanea, H. Wimmel, K. Wolf. New Algorithms for Deciding the Siphon-Trap
+     Property. Lecture Notes in Computer Science 6128, pp.267-286, 2010.
 
 
 

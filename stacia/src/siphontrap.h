@@ -36,7 +36,7 @@ public:
 	SiphonTrap(const SubNet& net);
 
 	/// Compute siphons and traps by brute force
-	void computeBruteForce();
+	void computeBruteForce(bool mt);
 
 	/// Compute all elementary siphons starting at a given place
 	void elementarySiphons(PlaceID p);
@@ -94,7 +94,7 @@ private:
 	void elementarySiphons();
 
 	/// Compute all elementary traps
-	void elementaryTraps();
+	void elementaryTraps(bool mt);
 
 	/// Compute elementary siphons/traps recursively, starting at a given place
 	void elemRec(PlaceID fixp, bool siphon);

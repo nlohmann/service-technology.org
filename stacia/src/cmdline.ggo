@@ -37,6 +37,10 @@ option "shownet" n
 section "Algorithm"
 sectiondesc="These options determine when and how siphons and traps are determined.\n"
 
+option "notraps" N
+  "Look for siphons without any contained traps (instead of unmarked traps)."
+  flag off
+
 option "algorithm" a
   "Five algorithms for divide-and-conquer (0-4), default is 2, choosing components to combine by maximising over the number of common interface places."
   details="0=worst component first (linear try), 1=minimize outer interface, 2=maximize common interface, 3=worst component first, 4=3+2."

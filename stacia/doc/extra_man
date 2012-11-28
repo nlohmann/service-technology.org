@@ -2,7 +2,11 @@
 Stacia exits with 0 on success, and with 1 if an error occurs. See Texinfo manual for detailed information. Note that the exit code is not correlated to the result.
 
 [EXAMPLES]
-<<-- example call here -->>
+To check the siphon-trap property of a net `test4.owfn', execute
+.IP
+stacia -c test4.owfn
+.PP
+The result and a potential witness will be written to stdout.
 
 [FILES]
 Unless a configuration file is explicitly given using the
@@ -25,4 +29,5 @@ At https://gna.org/bugs/?group=service-tech you can see a list of open bugs.
 [COPYRIGHT]
 Copyright (c) 2012 Harro Wimmel
 
-
+[SEE ALSO]
+anastasia(1), stanca(1)

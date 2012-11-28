@@ -32,9 +32,10 @@ extern bool texit;
 SiphonTrap::SiphonTrap(const SubNet& subnet) : net(subnet),im(subnet.getMatrix()) {}
 
 /** Function to compute all elementary siphons ans traps.
+	@param mt If marked traps are of interest.
 */
-void SiphonTrap::computeBruteForce() {
-	elementaryTraps();
+void SiphonTrap::computeBruteForce(bool mt) {
+	elementaryTraps(mt);
 	if (texit) return;
 	elementarySiphons();
 }
@@ -321,11 +322,13 @@ void SiphonTrap::elementarySiphons() {
 }
 
 /** Compute all interface-elementary and token-elementary traps.
+	@param mt If marked traps are of interest.
 */
-void SiphonTrap::elementaryTraps() {
+void SiphonTrap::elementaryTraps(bool mt) {
 	vector<PlaceID> places(net.getMarked());
 	places.insert(places.end(), net.getInput().begin(), net.getInput().end());
 	places.insert(places.end(), net.getOutput().begin(), net.getOutput().end());
+	if (!mt) places.insert(places.end(), net.getInnerPlaces().begin(), net.getInnerPlaces().end());
 	vector<bool> done(im.numPlaces(),false);
 	for(unsigned int i=0; i<places.size(); ++i)
 	{
@@ -354,7 +357,7 @@ void SiphonTrap::elementaryTraps() {
 		{
 			pet[*xit].push_back(id);
 			if (net.isMarked(*xit)) me=true;
-			if (net.interface(*xit)) ie=true;
+			if (net.interface(*xit) || !mt) ie=true;
 		}
 		if (ie) titoid[interface].push_back(id);
 		if (me) mtitoid[interface].push_back(id);

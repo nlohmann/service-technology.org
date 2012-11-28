@@ -34,10 +34,10 @@ class Formula {
 public:
 
 	/// Constructor via matchings for incremental checks
-	Formula(const Matchings& m);
+	Formula(const Matchings& m, bool mt);
 
 	/// Constructor via net components for full checks
-	Formula(const SubNet& sn);
+	Formula(const SubNet& sn, bool mt);
 
 	/// Print the formula
 	void print() const;
@@ -59,7 +59,7 @@ private:
 	void createSiphonFormula(const Matchings& m);
 
 	/// Create the formula for checking for token traps inside siphons
-	void createMatchingFormula(const Matchings& m);
+	void createMatchingFormula(const Matchings& m, bool mt);
 
 	/// Create the formula for all siphons
 	void createSiphonFormula(const SubNet& sn);
@@ -68,7 +68,7 @@ private:
 	void createNonEmptyFormula();
 
 	/// Create the formula for unmarked maximal traps in siphons
-	void createMaxTrapFormula(const SubNet& sn);
+	void createMaxTrapFormula(const SubNet& sn, bool mt);
 
 	/// The formula in CNF
 	vector<vector<Literal> > f;

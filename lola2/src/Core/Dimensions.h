@@ -57,6 +57,9 @@ typedef enum
 typedef uint32_t index_t;
 #endif
 
+/// type for numbering/counting the states of the petri net while processing
+typedef uint32_t statenumber_t;
+
 /// Type for bitvector indices, should be large enough for card(places) * log maxcapacity
 
 typedef uint32_t bitindex_t;

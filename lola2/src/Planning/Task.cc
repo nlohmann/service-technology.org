@@ -345,10 +345,11 @@ bool Task::getResult()
 void Task::interpreteResult(bool result)
 {
     // in case AG is used, the result needs to be negated
-    if (formulaType == FORMULA_INVARIANT or formulaType == FORMULA_IMPOSSIBLE)
-    {
-        result = not result;
-    }
+    if (args_info.formula_given)
+		if (formulaType == FORMULA_INVARIANT or formulaType == FORMULA_IMPOSSIBLE)
+		{
+			result = not result;
+		}
 
     // make result three-valued
     trinary_t final_result = result ? TRINARY_TRUE : TRINARY_FALSE;

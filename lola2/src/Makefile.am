@@ -2,7 +2,7 @@
 bin_PROGRAMS = lola
 
 lola_CFLAGS = -g -ggdb -pedantic
-lola_CXXFLAGS = -g -ggdb -pedantic -pg
+lola_CXXFLAGS = -g -ggdb -pedantic
 
 # the plain sources you need to compile (no generated code)
 lola_SOURCES = \
@@ -59,6 +59,23 @@ lola_SOURCES = \
                 Formula/TruePredicate.cc Formula/TruePredicate.h \
                 Formula/FalsePredicate.cc Formula/FalsePredicate.h \
                 Formula/BuechiAutomata.h Formula/BuechiAutomata.cc \
+                Formula/CTL/CTLFormula.h \
+                Formula/CTL/DFSFormula.h \
+                Formula/CTL/ConjunctionFormula.h \
+                Formula/CTL/DisjunctionFormula.h \
+                Formula/CTL/NotFormula.h \
+                Formula/CTL/TrueFormula.h \
+                Formula/CTL/AtomicFormula.h \
+                Formula/CTL/AFFormula.h \
+                Formula/CTL/AGFormula.h \
+                Formula/CTL/ARFormula.h \
+                Formula/CTL/AXFormula.h \
+                Formula/CTL/EFFormula.h \
+                Formula/CTL/EGFormula.h \
+                Formula/CTL/ERFormula.h \
+                Formula/CTL/EXFormula.h \
+                Formula/CTL/AUFormula.h Formula/CTL/AUFormula.cc \
+                Formula/CTL/EUFormula.h Formula/CTL/EUFormula.cc \
                 \
                 Stores/Store.h Stores/Store.inc \
                 Stores/EmptyStore.h \

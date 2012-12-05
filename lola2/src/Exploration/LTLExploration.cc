@@ -140,7 +140,7 @@ bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
 					return true;
 				}
 				// not found the counter example, so discard the component
-				while (tarjanStack.StackPointer){
+				while (tarjanStack.StackPointer && tarjanStack.top()->dfs > currentStateEntry->dfs){
 					// mark all states as visited
 					tarjanStack.top()->dfs = -1;
 					tarjanStack.pop();

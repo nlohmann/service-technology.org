@@ -30,7 +30,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist) {
 	SearchStack<DFSStackEntry> dfsStack;
 
 	// tarjan stack will contain all _black_ nodes the SCC of which is not yet finished
-	// this implies that at every time all elements on the tarjan stack belong to the same SCC
+	// see doc/Tarjan for an explanation on how and why this works
 	SearchStack<void*> tarjanStack;
 
 	statenumber_t currentDFSNumber = 0; // starting with 1 to leave 0 for recognizing uninitialized values
@@ -112,8 +112,8 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist) {
 			// check if SCC is finished
 			statenumber_t dfs = getDFS(payload);
 			if(dfs == currentLowlink) {
-				// all elements that are on tarjan stack belong to the finished SCC -> formula true
-				while(tarjanStack.StackPointer) {
+				// all elements on tarjan stack that have a higher dfs number then ours belong to the finished SCC -> formula true
+				while(tarjanStack.StackPointer && getDFS(tarjanStack.top()) > dfs) {
 					setCachedResult(tarjanStack.top(),KNOWN_TRUE);
 					tarjanStack.pop();
 				}

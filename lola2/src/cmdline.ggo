@@ -4,7 +4,7 @@ section "Check a property"
 
 option "check" -
   "Check a property"
-  values="none","full","deadlock","statepredicate" enum
+  values="none","full","deadlock","statepredicate","ltl","ctl" enum
   typestr="PROPERTY"
   default="none"
   optional
@@ -76,6 +76,11 @@ option "formula" f
   "A formula to check, read from file or a string"
   string
   typestr="FORMULA"
+  optional
+
+option "buechi" b
+  "A buechi-automata to check against, read from file"
+  string
   optional
 
 option "nolog" -

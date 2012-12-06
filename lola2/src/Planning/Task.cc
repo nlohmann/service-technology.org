@@ -76,7 +76,10 @@ extern kc::tFormula TheFormula;
 
 Task::Task() : sp(NULL), ns(NULL), p(NULL), s(NULL), fl(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
 {
-    setFormula();
+	if (args_info.formula_given)
+		setFormula();
+	if(args_info.buechi_given)
+		setBuechiAutomata();
     setNet();
 }
 
@@ -205,6 +208,12 @@ void Task::setFormula()
     sp = result;
 }
 
+void Task::setBuechiAutomata()
+{
+	// reading the buechi automata
+	bauto = NULL;
+}
+
 void Task::setStore()
 {
     if (args_info.search_arg == search_arg_findpath)
@@ -217,44 +226,87 @@ void Task::setStore()
         switch (args_info.store_arg)
         {
         case store_arg_comp:
-            s = new CompareStore<void>(
+        	if (args_info.check_arg == check_arg_ltl)
+        		sltl= new CompareStore<AutomataTree>(
+                		new PluginStore<AutomataTree>(new BitEncoder(number_of_threads), new SuffixTreeStore<AutomataTree>(), number_of_threads),
+                		new PluginStore<AutomataTree>(new BitEncoder(number_of_threads), new VSTLStore<AutomataTree>(number_of_threads), number_of_threads),
+                		number_of_threads
+                		);
+        	else
+        		s = new CompareStore<void>(
             		new PluginStore<void>(new BitEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads),
             		new PluginStore<void>(new BitEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads),
             		number_of_threads
             		);
             break;
         case store_arg_psbbin:
-            s = new PluginStore<void>(new BitEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
+        	if (args_info.check_arg == check_arg_ltl)
+                sltl = new PluginStore<AutomataTree>(new BitEncoder(number_of_threads), new SuffixTreeStore<AutomataTree>(), number_of_threads);
+            else
+            	s = new PluginStore<void>(new BitEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
             break;
         case store_arg_pscbin:
-            s = new PluginStore<void>(new CopyEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
+        	if (args_info.check_arg == check_arg_ltl)
+                sltl = new PluginStore<AutomataTree>(new CopyEncoder(number_of_threads), new SuffixTreeStore<AutomataTree>(), number_of_threads);
+            else
+            	s = new PluginStore<void>(new CopyEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
             break;
         case store_arg_psfbin:
-            s = new PluginStore<void>(new FullCopyEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
+        	if (args_info.check_arg == check_arg_ltl)
+        		sltl= new PluginStore<AutomataTree>(new FullCopyEncoder(number_of_threads), new SuffixTreeStore<AutomataTree>(), number_of_threads);
+            else
+            	s = new PluginStore<void>(new FullCopyEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
             break;
         case store_arg_pssbin:
-            s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
+        	if (args_info.check_arg == check_arg_ltl)
+        		sltl = new PluginStore<AutomataTree>(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore<AutomataTree>(), number_of_threads);
+            else
+            	s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
             break;
         case store_arg_psbstl:
-            s = new PluginStore<void>(new BitEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
+        	if (args_info.check_arg == check_arg_ltl)
+        		sltl  = new PluginStore<AutomataTree>(new BitEncoder(number_of_threads), new VSTLStore<AutomataTree>(number_of_threads), number_of_threads);
+            else
+            	s = new PluginStore<void>(new BitEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
             break;
         case store_arg_pscstl:
-            s = new PluginStore<void>(new CopyEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
+        	if (args_info.check_arg == check_arg_ltl)
+        		sltl  = new PluginStore<AutomataTree>(new CopyEncoder(number_of_threads), new VSTLStore<AutomataTree>(number_of_threads), number_of_threads);
+            else
+            	s = new PluginStore<void>(new CopyEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
             break;
         case store_arg_psfstl:
-            s = new PluginStore<void>(new FullCopyEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
+        	if (args_info.check_arg == check_arg_ltl)
+        		sltl  = new PluginStore<AutomataTree>(new FullCopyEncoder(number_of_threads), new VSTLStore<AutomataTree>(number_of_threads), number_of_threads);
+            else
+            	s = new PluginStore<void>(new FullCopyEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
             break;
         case store_arg_pssstl:
-            s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
+        	if (args_info.check_arg == check_arg_ltl)
+        		sltl  = new PluginStore<AutomataTree>(new SimpleCompressedEncoder(number_of_threads), new VSTLStore<AutomataTree>(number_of_threads), number_of_threads);
+            else
+            	s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
             break;
         case store_arg_psbbloom:
-            s = new PluginStore<void>(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+        	if (args_info.check_arg == check_arg_ltl)
+        		assert(false);
+        		//sltl  = new PluginStore<AutomataTree>(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+            else
+            	s = new PluginStore<void>(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
             break;
         case store_arg_pscbloom:
-            s = new PluginStore<void>(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+        	if (args_info.check_arg == check_arg_ltl)
+        		assert(false);
+        		//sltl  = new PluginStore<AutomataTree>(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+        	else
+        		s = new PluginStore<void>(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
             break;
         case store_arg_pssbloom:
-            s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+        	if (args_info.check_arg == check_arg_ltl)
+        		assert(false);
+        		//sltl = new PluginStore<AutomataTree>(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+            else
+            	s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
             break;
         }
     }
@@ -300,6 +352,9 @@ void Task::setProperty()
             exploration = new ParallelExploration();
         }
         break;
+    case check_arg_ltl:
+    	ltlexploration = new LTLExploration();
+    	break;
         // now there is only one, but who knows...
     }
 }
@@ -330,7 +385,10 @@ bool Task::getResult()
         }
 
         choose = new ChooseTransitionHashDriven();
-        result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore<void>*)s), *choose);
+        if (args_info.check_arg == check_arg_ltl)
+        	result = ltlexploration->checkProperty(*bauto,*sltl, *fl,*ns);
+        else
+        	result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore<void>*)s), *choose);
         delete choose;
         break;
 

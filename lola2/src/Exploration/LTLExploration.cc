@@ -31,7 +31,7 @@ inline bool searchAndInsertAutomataState(uint32_t automataState,
 	}
 }
 
-bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
+bool LTLExploration::checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
 		Firelist &firelist, NetState &ns) {
 
 	// the stack for the search

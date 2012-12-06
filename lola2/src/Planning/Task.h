@@ -3,6 +3,7 @@
 #include <cmdline.h>
 #include <Core/Dimensions.h>
 #include <Stores/Store.h>
+#include <Exploration/LTLExploration.h>
 
 
 class StatePredicate;
@@ -22,14 +23,18 @@ private:
     enum_search search;
     Firelist* fl;
     SimpleProperty* p;
+    BuechiAutomata* bauto;
     DFSExploration* exploration;
+    LTLExploration* ltlexploration;
     int number_of_threads;
     formula_t formulaType;
     void setNet();
     void setFormula();
+    void setBuechiAutomata();
 
 public:
     Store<void>* s;
+    Store<AutomataTree>* sltl;
 
     Task();
     ~Task();

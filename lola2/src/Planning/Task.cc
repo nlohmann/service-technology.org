@@ -54,15 +54,24 @@ extern Reporter* rep;
 // the parsers
 extern int ptformula_parse();
 extern int ptformula_lex_destroy();
+// the parsers II
+extern int ptbuechi_parse();
+extern int ptbuechi_lex_destroy();
 
 // input file
 extern FILE* ptformula_in;
+// input file
+extern FILE* ptbuechi_in;
 
 // code to parse from a string
 struct yy_buffer_state;
 typedef yy_buffer_state* YY_BUFFER_STATE;
 extern YY_BUFFER_STATE ptformula__scan_string(const char* yy_str);
 extern void ptformula__delete_buffer(YY_BUFFER_STATE);
+
+// code to parse from a string
+extern YY_BUFFER_STATE ptbuechi__scan_string(const char* yy_str);
+extern void ptbuechi__delete_buffer(YY_BUFFER_STATE);
 
 /// printer-function for Kimiwtu's output on stdout
 // LCOV_EXCL_START
@@ -73,6 +82,7 @@ void myprinter(const char* s, kc::uview v)
 // LCOV_EXCL_STOP
 
 extern kc::tFormula TheFormula;
+extern kc::tBuechiAutomata TheBuechi;
 
 Task::Task() : sp(NULL), ns(NULL), p(NULL), s(NULL), fl(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
 {
@@ -210,8 +220,65 @@ void Task::setFormula()
 
 void Task::setBuechiAutomata()
 {
+    if (not args_info.buechi_given)
+    {
+        return;
+    }
+
+    BuechiAutomata* result = NULL;
+    Input* buechiFile = NULL;
+
+    // Check if the paramter of --buechi is a file that we can open: if that
+    // works, parse the file. If not, parse the string.
+    FILE* file;
+    if ((file = fopen(args_info.buechi_arg, "r")) == NULL and errno == ENOENT)
+    {
+        YY_BUFFER_STATE my_string_buffer = ptbuechi__scan_string(args_info.buechi_arg);
+    }
+    else
+    {
+        fclose(file);
+        buechiFile = new Input("Beuchi", args_info.buechi_arg);
+        ptbuechi_in = *buechiFile;
+    }
+
+    // parse the formula
+    ptbuechi_parse();
+
+    // restructure the formula: remove arrows and handle negations and tautologies
+    TheBuechi = TheBuechi->rewrite(kc::arrows);
+    TheBuechi = TheBuechi->rewrite(kc::neg);
+
+    // check temporal status
+    TheBuechi->unparse(myprinter, kc::temporal);
+
+    rep->status("checking LTL");
+
+
+    // restructure the formula: again tautoglies and simplification
+    TheBuechi = TheBuechi->rewrite(kc::neg);
+    TheBuechi = TheBuechi->rewrite(kc::leq);
+    TheBuechi = TheBuechi->rewrite(kc::sides);
+    TheBuechi = TheBuechi->rewrite(kc::lists);
+
+    // copy restructured formula into internal data structures
+    TheBuechi->unparse(myprinter, kc::internal);
+    result = TheBuechi->automata;
+
+    rep->status("processed buechi automata");
+
+    // tidy parser
+    ptformula_lex_destroy();
+    //delete TheFormula;
+
+    if (args_info.buechi_given)
+    {
+        delete buechiFile;
+    }
+
+
 	// reading the buechi automata
-	bauto = NULL;
+    bauto = result;
 }
 
 void Task::setStore()

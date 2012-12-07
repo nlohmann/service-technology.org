@@ -18,6 +18,7 @@ lola_SOURCES = \
                 Parser/ParserPTNet.h Parser/ParserPTNet.cc \
                 Parser/ParserPTNetLoLA.yy Parser/Lexic.ll \
                 Parser/ParserPTFormula.yy Parser/LexicFormula.ll \
+                Parser/ParserPTBuechi.yy Parser/LexicBuechi.ll \
                 Parser/PlaceSymbol.cc Parser/PlaceSymbol.h \
                 Parser/Symbol.cc Parser/Symbol.h \
                 Parser/SymbolTable.cc Parser/SymbolTable.h \

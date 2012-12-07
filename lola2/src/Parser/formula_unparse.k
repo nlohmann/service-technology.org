@@ -275,3 +275,8 @@ Initial() -> [internal:
 Product(x, Node(p)) -> [internal: { current[p->value] += x->value; } ];
 Node(p) -> [internal: { assert(false /* sollte nicht mehr vorkommen */); current[p->value] += 1; } ];
 Number(x) -> [internal: /* do not print values */ ];
+
+
+
+
+b=BuechiNull -> [internal: { b->automata = 0; } ];

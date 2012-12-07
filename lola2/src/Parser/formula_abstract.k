@@ -4,9 +4,11 @@
 #include <string>
 #include <Core/Dimensions.h>
 #include <Formula/StatePredicate.h>
+#include <Formula/BuechiAutomata.h>
 
 // required, because the abstract grammar does not allow pointer types
 typedef StatePredicate* StatePredicate_p;
+typedef BuechiAutomata* BuechiAutomata_p;
 %}
 
 tFormula:
@@ -62,4 +64,11 @@ tTerm:
 
 tProduct_list:
   list tTerm
+;
+
+tBuechiAutomata:
+ BuechiNull(tAtomicProposition)
+{
+	BuechiAutomata_p automata;
+}
 ;

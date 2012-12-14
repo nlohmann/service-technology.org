@@ -9,6 +9,7 @@
 #pragma once
 
 #include <set>
+#include <map>
 #include <Core/Dimensions.h>
 #include <Net/NetState.h>
 #include <Exploration/StatePredicateProperty.h>
@@ -43,6 +44,10 @@ private:
 	/// an array containing the atomic propositions used by this buechi automata
 	StatePredicateProperty* atomicPropositions;
 
+public: //TODO make private + add constructors
+  /// transition rules - maps a state + an atomic formula to another state
+  std::map<std::pair<uint32_t,StatePredicate*>,uint32_t>* transitions;
+
 	/// accepting set
-	std::set<uint32_t>* acceptingsets;
+	std::set<uint32_t>* acceptingset;
 };

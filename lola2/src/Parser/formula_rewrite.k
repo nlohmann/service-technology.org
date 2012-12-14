@@ -255,3 +255,11 @@ StatePredicateFormula(AllPath(Always(Negation(y)))) -> <reachability: StatePredi
 
 // collect sums of products in a product list
 Sum(x,y) -> <lists: ProductList(ConstProduct_list(x, ConstProduct_list(y, NiltProduct_list())))>;
+
+
+%rview rbuechi;
+
+// expands all transition rules to triples (from,formula,to)
+BuechiRule(from,TransitionRules(lrules,rrules)) -> <rbuechi: BuechiRules(BuechiRule(from,lrules),BuechiRule(from,rrules))>;
+BuechiRule(from,TransitionRule(formula,to)) -> <rbuechi: ExpandedBuechiRule(from,formula,to)>;
+BuechiRule(from,EmptyTransitionRules()) -> <rbuechi: EmptyBuechiRules()>;

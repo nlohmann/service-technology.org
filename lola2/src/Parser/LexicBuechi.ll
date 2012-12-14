@@ -59,7 +59,8 @@ FIREABLE                                 { ptbuechi_setcol(); return _FIREABLE_;
 DEADLOCK                                 { ptbuechi_setcol(); return _DEADLOCK_; }
 INITIAL                                  { ptbuechi_setcol(); return _INITIAL_; }
 
-BUECHI                                   { ptbuechi_setcol(); return _BUECHI_; }
+buechi                                   { ptbuechi_setcol(); return _buechi_; }
+accept                                   { ptbuechi_setcol(); return _accept_; }
 AND                                      { ptbuechi_setcol(); return _AND_; }
 NOT                                      { ptbuechi_setcol(); return _NOT_; }
 OR                                       { ptbuechi_setcol(); return _OR_; }
@@ -67,19 +68,9 @@ XOR                                      { ptbuechi_setcol(); return _XOR_; }
 TRUE                                     { ptbuechi_setcol(); return _TRUE_; }
 FALSE                                    { ptbuechi_setcol(); return _FALSE_; }
 
-ALLPATH                                  { ptbuechi_setcol(); return _ALLPATH_; }
-EXPATH                                   { ptbuechi_setcol(); return _EXPATH_; }
-
-ALWAYS                                   { ptbuechi_setcol(); return _ALWAYS_; }
-EVENTUALLY                               { ptbuechi_setcol(); return _EVENTUALLY_; }
-UNTIL                                    { ptbuechi_setcol(); return _UNTIL_; }
-NEXTSTATE                                { ptbuechi_setcol(); return _NEXTSTATE_; }
-RELEASE                                  { ptbuechi_setcol(); return _RELEASE_; }
-
-REACHABLE                                { ptbuechi_setcol(); return _REACHABLE_; }
-INVARIANT                                { ptbuechi_setcol(); return _INVARIANT_; }
-IMPOSSIBLE                               { ptbuechi_setcol(); return _IMPOSSIBLE_; }
-
+\:                                       { ptbuechi_setcol(); return _colon_; }
+\,                                       { ptbuechi_setcol(); return _comma_; }
+=\>                                      { ptbuechi_setcol(); return _then_; }
 \;                                       { ptbuechi_setcol(); return _semicolon_; }
 \<\-\>                                   { ptbuechi_setcol(); return _iff_; }
 !=                                       { ptbuechi_setcol(); return _notequal_; }
@@ -91,6 +82,8 @@ IMPOSSIBLE                               { ptbuechi_setcol(); return _IMPOSSIBLE
 \*                                       { ptbuechi_setcol(); return _times_; }
 \(                                       { ptbuechi_setcol(); return _leftparenthesis_; }
 \)                                       { ptbuechi_setcol(); return _rightparenthesis_; }
+\{                                       { ptbuechi_setcol(); return _braceleft_; }
+\}                                       { ptbuechi_setcol(); return _braceright_; }
 [>]                                      { ptbuechi_setcol(); return _greaterthan_; }
 [<]                                      { ptbuechi_setcol(); return _lessthan_; }
 [#]                                      { ptbuechi_setcol(); return _notequal_; }
@@ -102,8 +95,6 @@ IMPOSSIBLE                               { ptbuechi_setcol(); return _IMPOSSIBLE
 [\t ]                                    { ptbuechi_setcol();  /* whitespace */ }
 
 [0-9]+                                   { ptbuechi_setcol(); ptbuechi_lval.yt_integer = kc::mkinteger(atoi(ptbuechi_text)); return NUMBER; }
-
-"{"[^\n\r]*"}"                           { ptbuechi_setcol(); /* comments */ }
 
 
 [^,;:()\t \n\r\{\}]+                     { ptbuechi_setcol(); ptbuechi_lval.yt_casestring = kc::mkcasestring(ptbuechi_text); return IDENTIFIER; }

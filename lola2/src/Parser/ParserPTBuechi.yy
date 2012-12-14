@@ -42,12 +42,17 @@ void ptbuechi_yyerrors(char* token, const char* format, ...);
 %type <yt_casestring> IDENTIFIER
 
 %type <yt_tBuechiAutomata> buechiAutomata
+%type <yt_tBuechiRules> buechiRule
+%type <yt_tBuechiRules> buechiRules
+%type <yt_tTransitionRules> transitionRules
+%type <yt_tAcceptingSet> acceptingsets
 %type <yt_tStatePredicate> statepredicate
 %type <yt_tAtomicProposition> atomic_proposition
 %type <yt_tTerm> term
 
 %token IDENTIFIER NUMBER
-%token _RELEASE_ _NEXTSTATE_ _INITIAL_ _BUECHI_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _ALLPATH_ _ALWAYS_ _EVENTUALLY_ _EXPATH_ _UNTIL_ _REACHABLE_ _INVARIANT_ _IMPOSSIBLE_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_ _FIREABLE_ _DEADLOCK_
+%token _accept_ _buechi_ _braceleft_ _braceright_ _comma_ _then_ _colon_
+%token _INITIAL_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_ _FIREABLE_ _DEADLOCK_
 
 // precedences (lowest written first, e.g. PLUS/MINUS) and precedences
 %left _OR_ _XOR_
@@ -79,14 +84,64 @@ extern int ptbuechi_colno;
 %{
 /* globals */
 tBuechiAutomata TheBuechi;
+uint32_t currentState;
 %}
 
 %%
 
 buechiAutomata:
-  _BUECHI_ atomic_proposition _semicolon_
-    { TheBuechi = $$ = BuechiNull($2); }
+  _buechi_ _braceleft_ buechiRules _braceright_ _accept_ _braceleft_ acceptingsets _braceright_ _semicolon_
+    { TheBuechi = $$ = BuechiNull(); }
 ;
+
+buechiRules:
+  buechiRule              { $$ = $1; }
+| buechiRule buechiRules  { $$ = BuechiRules($1,$2); }
+
+buechiRule:
+  IDENTIFIER _colon_ transitionRules
+    {
+        Symbol *t = symbolTables->TransitionTable->lookup($1->name);
+        if (t == NULL)
+        {
+            ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $1->name);
+        }
+        $$ = BuechiRule((mkinteger(t->getIndex())),$3);
+    }
+
+transitionRules:
+  /* empty */   { $$ = EmptyTransitionRules(); }
+| statepredicate _then_ IDENTIFIER transitionRules
+    {
+        Symbol *t = symbolTables->TransitionTable->lookup($3->name);
+        if (t == NULL)
+        {
+            ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $3->name);
+        }
+        $$ = TransitionRules(TransitionRule(StatePredicateFormula($1),mkinteger(t->getIndex())),$4);
+    }
+
+
+acceptingsets:
+  /* empty */     { $$ = EmptyAcceptingSet(); }
+| IDENTIFIER
+    {
+        Symbol *t = symbolTables->TransitionTable->lookup($1->name);
+        if (t == NULL)
+        {
+            ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $1->name);
+        }
+        $$ = AcceptingState(mkinteger(t->getIndex()));
+    }
+| IDENTIFIER _comma_ acceptingsets
+    {
+        Symbol *t = symbolTables->TransitionTable->lookup($1->name);
+        if (t == NULL)
+        {
+            ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $1->name);
+        }
+        $$ = AcceptingSet(AcceptingState(mkinteger(t->getIndex())),$3);
+    }
 
 statepredicate:
   _leftparenthesis_ statepredicate _rightparenthesis_

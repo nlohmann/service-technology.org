@@ -67,8 +67,28 @@ tProduct_list:
 ;
 
 tBuechiAutomata:
- BuechiNull(tAtomicProposition)
+  BuechiAutomaton(tBuechiRules tAcceptingSet)
+| BuechiNull()
 {
 	BuechiAutomata_p automata;
 }
+;
+
+tBuechiRules:
+  EmptyBuechiRules()
+| BuechiRule(integer tTransitionRules)
+| ExpandedBuechiRule(integer tFormula integer)
+| BuechiRules(tBuechiRules tBuechiRules)
+;
+
+tTransitionRules:
+  EmptyTransitionRules()
+| TransitionRule(tFormula integer)
+| TransitionRules(tTransitionRules tTransitionRules)
+;
+
+tAcceptingSet:
+  EmptyAcceptingSet()
+| AcceptingState(integer)
+| AcceptingSet(tAcceptingSet tAcceptingSet)
 ;

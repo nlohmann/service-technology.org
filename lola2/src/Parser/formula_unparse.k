@@ -278,5 +278,46 @@ Number(x) -> [internal: /* do not print values */ ];
 
 
 
+%uview buechi;
+%{ KC_UNPARSE
+std::map<std::pair<uint32_t,StatePredicate*>,uint32_t>* transitions = new std::map<std::pair<uint32_t,StatePredicate*>,uint32_t>;
+std::set<uint32_t>* acceptingset = new std::set<uint32_t>;
+%}
 
-b=BuechiNull -> [internal: { b->automata = 0; } ];
+
+b=BuechiNull -> [buechi: { b->automata = 0; } ];
+b=BuechiAutomaton -> [buechi:
+    {
+        b->automata = new BuechiAutomata();
+        b->automata->transitions = transitions;
+        b->automata->acceptingset = acceptingset;
+    }
+];
+
+
+ExpandedBuechiRule(from, formula, to) -> [buechi:
+    formula
+    {
+        (*transitions)[std::make_pair(from->value,formula->formula)] = to->value;
+    } 
+];
+
+EmptyBuechiRules() -> [buechi: ];
+
+BuechiRules(lrules, rrules) -> [buechi:
+    lrules
+    rrules
+];
+
+AcceptingState(state) -> [buechi:
+    {
+        acceptingset->insert(state->value);
+    }
+];
+
+AcceptingSet(set1, set2) -> [buechi:
+  set1
+  set2
+];
+
+EmptyAcceptingSet() -> [buechi: ];

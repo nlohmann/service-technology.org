@@ -95,8 +95,9 @@ buechiAutomata:
 ;
 
 buechiRules:
-  buechiRule              { $$ = $1; }
-| buechiRule buechiRules  { $$ = BuechiRules($1,$2); }
+  /* empty */                     { $$ = EmptyBuechiRules(); }
+| buechiRule                      { $$ = $1; }
+| buechiRule _comma_ buechiRules  { $$ = BuechiRules($1,$3); }
 
 buechiRule:
   IDENTIFIER _colon_ transitionRules

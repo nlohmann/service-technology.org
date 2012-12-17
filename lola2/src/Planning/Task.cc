@@ -144,6 +144,7 @@ void Task::setFormula()
     TheFormula->unparse(myprinter, kc::temporal);
     formulaType = TheFormula->type;
 
+    //printf("FormulaType: %d\n",formulaType);
     switch (formulaType)
     {
     case (FORMULA_REACHABLE):
@@ -188,14 +189,21 @@ void Task::setFormula()
     // TheFormula->print();
     // TheFormula->unparse(myprinter, kc::out);
 
-    if (formulaType == FORMULA_REACHABLE or
+    if ((formulaType == FORMULA_REACHABLE or
             formulaType == FORMULA_INVARIANT or
             formulaType == FORMULA_IMPOSSIBLE or
-            formulaType == FORMULA_INITIAL)
+            formulaType == FORMULA_INITIAL))
     {
         // copy restructured formula into internal data structures
         TheFormula->unparse(myprinter, kc::internal);
         result = TheFormula->formula;
+    }
+    else if(formulaType == FORMULA_MODELCHECKING){
+    	 TheFormula->unparse(myprinter, kc::out);
+    	 TheFormula->unparse(myprinter, kc::ctl);
+    	 result = TheFormula->formula;
+    	 rep->message("implementation in progress");
+    	 //rep->abort(ERROR_COMMANDLINE);
     }
     else
     {

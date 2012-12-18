@@ -1,6 +1,7 @@
 /*
 \file Net.cc
 \author Karsten
+		cast progress measure to int32 on 18.12.2012
 \status approved 27.01.2012
 
 \brief basic routines for handling nodes
@@ -642,7 +643,7 @@ void Net::setProgressMeasure()
     assert(m.getRowCount() == cardTR);
 
     // calculate progress measure
-    Transition::ProgressMeasure = (int64_t*) calloc(cardTR, SIZEOF_INT64_T);
+    int64_t* progressMeasure = (int64_t*) calloc(cardTR, SIZEOF_INT64_T);
     int64_t* denominatorValue = (int64_t*) calloc(cardTR, SIZEOF_INT64_T);
 
     for (index_t t = 0; t < cardNO; ++t)
@@ -658,7 +659,7 @@ void Net::setProgressMeasure()
             if (curRow->variables[0] < cardPL)
             {
                 // entry is linear independent
-                Transition::ProgressMeasure[curReference] = 1;
+                progressMeasure[curReference] = 1;
                 denominatorValue[curReference] = 1;
             }
             else
@@ -675,19 +676,19 @@ void Net::setProgressMeasure()
                     else
                     {
                         // current variable is any other transition
-                        Transition::ProgressMeasure[curReference] -= curRow->coefficients[v];
+                        progressMeasure[curReference] -= curRow->coefficients[v];
                     }
                 }
                 // normalize current progress measure
-                if (Transition::ProgressMeasure[curReference] != 0)
+                if (progressMeasure[curReference] != 0)
                 {
                     assert(denominatorValue[curReference] != 0);
-                    Transition::ProgressMeasure[curReference] /= denominatorValue[curReference];
-                    denominatorValue[curReference] /= ggt(Transition::ProgressMeasure[curReference], denominatorValue[curReference]);
+                    progressMeasure[curReference] /= denominatorValue[curReference];
+                    denominatorValue[curReference] /= ggt(progressMeasure[curReference], denominatorValue[curReference]);
                     if (denominatorValue[curReference] < 0)
                     {
                         denominatorValue[curReference] *= -1;
-                        Transition::ProgressMeasure[curReference] *= -1;
+                        progressMeasure[curReference] *= -1;
                     }
                 }
             }
@@ -708,11 +709,19 @@ void Net::setProgressMeasure()
         if (m.isSignificant(p))
         {
             const index_t curReference = m.getReference(p);
-            Transition::ProgressMeasure[curReference] *= (gcd / denominatorValue[curReference]);
+            progressMeasure[curReference] *= (gcd / denominatorValue[curReference]);
         }
     }
 
+    // cast progress measures to 32bit
+    Transition::ProgressMeasure = (int32_t*) calloc(cardTR, SIZEOF_INT);
+    for (index_t t = 0; t < cardTR; ++t)
+    {
+        Transition::ProgressMeasure[t] = (int32_t) progressMeasure[t];
+    }
+
     // free memory
+    free(progressMeasure);
     free(denominatorValue);
 }
 

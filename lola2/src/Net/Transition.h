@@ -1,7 +1,8 @@
 /*!
  \file Transition.h
  \author Karsten
- \status approved 27.01.2012
+ \status approved 27.01.2012,
+         changed progress measure to int32 on 18.12.2012
  \brief Global data for transition specific information
 
  All data that describe attributes of transitions can be found here. General
@@ -60,7 +61,7 @@ public:
     static index_t* PositionScapegoat;
 
     /// The progress measure for the sweep line method
-    static int64_t* ProgressMeasure;
+    static int32_t* ProgressMeasure;
 
     /// Check transition for activation
     static void checkEnabled(NetState &ns, index_t t);

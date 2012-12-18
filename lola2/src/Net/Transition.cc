@@ -1,7 +1,8 @@
 /*!
 \file Transition.cc
 \author Karsten
-\status approved 27.01.2012
+\status approved 27.01.2012,
+		changed progress measure to int32 on 18.12.2012
 \brief Useful routines for transition specific information
 
 All data that describe attributes of transitions can be found here. General
@@ -30,7 +31,7 @@ index_t** Transition::Conflicting = NULL;
 index_t* Transition::CardBackConflicting = NULL;
 index_t** Transition::BackConflicting = NULL;
 bool* Transition::BackConflictingIsOriginal = NULL;
-int64_t* Transition::ProgressMeasure = NULL;
+int32_t* Transition::ProgressMeasure = NULL;
 
 /*!
 Whenever t gets disabled, we sort its Pre list such that the scapegoat is the

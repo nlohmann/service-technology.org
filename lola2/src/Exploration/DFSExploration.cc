@@ -17,6 +17,8 @@ Actual property is a parameter of the constructor
 #include <Exploration/DFSExploration.h>
 #include <Stores/Store.h>
 #include <Stores/EmptyStore.h>
+#include <SweepLine/SweepEmptyStore.h>
+#include <SweepLine/Sweep.h>
 #include <InputOutput/Reporter.h>
 #include <cmdline.h>
 
@@ -204,3 +206,10 @@ bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned 
     // initial marking satisfies property
     return false;
 }
+
+bool DFSExploration::sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore, Firelist &myFirelist, int threadNumber)
+{
+	Sweep<void> s(property, ns, myStore, myFirelist, threadNumber);
+	return s.run();
+}
+

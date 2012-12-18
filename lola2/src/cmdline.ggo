@@ -25,7 +25,7 @@ option "hashfunctions" -
 
 option "search" -
   "Search strategy"
-  values="depth","breadth","findpath" enum
+  values="depth","breadth","findpath","sweepline" enum
   typestr="STRATEGY"
   default="depth"
   optional

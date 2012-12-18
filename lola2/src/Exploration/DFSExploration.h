@@ -17,6 +17,7 @@ Actual property is a parameter of the constructor
 #include <Exploration/Firelist.h>
 #include <Stores/Store.h>
 #include <Stores/EmptyStore.h>
+#include <SweepLine/SweepEmptyStore.h>
 
 
 class Firelist;
@@ -88,6 +89,18 @@ public:
     \param c ChooseTransition object to determine which enabled transition to fire.
     */
     bool find_path(SimpleProperty &property, NetState &ns, unsigned int attempts, unsigned int maxdepth, Firelist &, EmptyStore<void> &e, ChooseTransition &c);
+
+    /*!
+    \brief evaluate property by sweepline method.
+    \param property the property for which a witness state should be found
+    \param ns the net state of the initial marking
+    \param myStore A dummy store for counting markings
+    \param myFirelist the object used to generate the actual firelists, this must correspond with given property
+    \param number_of_threads will be ignored by the standard search.
+           In the parallel execution mode this number indicates the number of threads to be used for the search
+    \return if the state was found
+    */
+    bool sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore, Firelist &firelist, int number_of_threads);
 
     virtual ~DFSExploration() {}
 };

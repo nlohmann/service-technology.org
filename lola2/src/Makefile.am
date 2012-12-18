@@ -92,6 +92,12 @@ lola_SOURCES = \
                 Stores/VectorStores/VBloomStore.cc Stores/VectorStores/VBloomStore.h \
                 Stores/VectorStores/SuffixTreeStore.h Stores/VectorStores/SuffixTreeStore.inc \
                 \
+                SweepLine/Sweep.h SweepLine/Sweep.inc \
+                SweepLine/SweepStore.h SweepLine/SweepStore.inc \
+                SweepLine/SweepRingStore.h SweepLine/SweepRingStore.inc \
+                SweepLine/SweepListStore.h SweepLine/SweepListStore.inc \
+                SweepLine/SweepEmptyStore.h SweepLine/SweepEmptyStore.cc \
+                \
                 Witness/Event.h Witness/Event.cc Witness/Condition.h Witness/Condition.cc
 
 ###

@@ -45,6 +45,8 @@
 #include <Stores/CompareStore.h>
 #include <Stores/Store.h>
 
+#include <SweepLine/SweepEmptyStore.h>
+
 #include <Witness/Condition.h>
 #include <Witness/Event.h>
 
@@ -301,6 +303,11 @@ void Task::setStore()
     {
         s = new EmptyStore<void>(number_of_threads);
     }
+    else if (args_info.search_arg == search_arg_sweepline)
+    {
+	// dummy store for the sweepline method, only counts markings and calls
+        s = new SweepEmptyStore();
+    }
     else
     {
         // choose a store
@@ -471,6 +478,11 @@ bool Task::getResult()
         else
         	result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore<void>*)s), *choose);
         delete choose;
+        break;
+
+    case search_arg_sweepline:
+	// no choice of stores for sweepline method here
+        result = exploration->sweepline(*p, *ns, *(SweepEmptyStore*)(s), *fl, number_of_threads);
         break;
 
     default:

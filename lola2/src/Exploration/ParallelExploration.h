@@ -14,6 +14,7 @@
 #include <Net/NetState.h>
 #include <Stores/Store.h>
 #include <Stores/EmptyStore.h>
+#include <SweepLine/SweepEmptyStore.h>
 
 
 class Firelist;
@@ -70,6 +71,16 @@ public:
      */
     virtual bool depth_first(SimpleProperty &property, NetState &ns, Store<void> &store, Firelist &firelist, int threadNumber);
 
+    /*!
+    \brief distributed evaluation of the property by the sweepline method.
+    \param property the property for which a witness state should be found
+    \param ns the net state of the initial marking
+    \param myStore A dummy store for counting markings
+    \param myFirelist the object used to generate the actual firelists, this must correspond with given property
+    \param number_of_threads indicates the number of threads to be used for the search
+    \return if a witness state was found
+    */
+    bool sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore, Firelist &firelist, int number_of_threads);
 
     virtual ~ParallelExploration() {}
 protected:

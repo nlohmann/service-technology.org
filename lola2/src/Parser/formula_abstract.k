@@ -36,6 +36,9 @@ tStatePredicate:
 | Release(tStatePredicate tStatePredicate)
 {
     bool containsTemporal = false;
+    bool validCTLPathFormula = false;
+    bool validCTLStateFormula = false;
+    bool validLTLFormula = false;
 }
 ;
 

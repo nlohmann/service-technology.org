@@ -55,20 +55,91 @@ f=StatePredicateFormula(x) -> [temporal: x
             { f->type = FORMULA_EVENTUALLY; }
         default provided (not x->containsTemporal) :
             { f->type = FORMULA_INITIAL; }
+        default provided (x->containsTemporal && x->validLTLFormula) :
+            { f->type = FORMULA_LTL; }
+        default provided (x->containsTemporal && x->validCTLStateFormula) :
+            { f->type = FORMULA_CTL; }
         default :
             { f->type = FORMULA_MODELCHECKING; }
     }
 }
 ];
 
-f=AtomicProposition(x) -> [temporal:     { f->containsTemporal = false; } ];
-f=Negation(x)          -> [temporal: x   { f->containsTemporal = x->containsTemporal; } ];
-f=Conjunction(x,y)     -> [temporal: x y { f->containsTemporal = (x->containsTemporal || y->containsTemporal); } ];
-f=Disjunction(x,y)     -> [temporal: x y { f->containsTemporal = (x->containsTemporal || y->containsTemporal); } ];
-f=AllPath(x)           -> [temporal: x   { f->containsTemporal = true; assert(x->containsTemporal); } ];
-f=ExPath(x)            -> [temporal: x   { f->containsTemporal = true; assert(x->containsTemporal); } ];
-f=Always(x)            -> [temporal: x   { f->containsTemporal = true; } ];
-f=Eventually(x)        -> [temporal: x   { f->containsTemporal = true; } ];
+f=AtomicProposition(x) -> [temporal:     
+    {
+        f->containsTemporal = false;
+        f->validCTLPathFormula = false;
+        f->validCTLStateFormula = true;
+        f->validLTLFormula = true;
+    } ];
+f=Conjunction(x,y)     -> [temporal: x y
+    {
+        f->containsTemporal = (x->containsTemporal || y->containsTemporal);
+        f->validCTLStateFormula = (x->validCTLStateFormula && y->validCTLStateFormula);
+        f->validCTLPathFormula = false;
+        f->validLTLFormula = (x->validLTLFormula && y->validLTLFormula);
+    } ];
+f=Disjunction(x,y)     -> [temporal: x y
+    {
+        f->containsTemporal = (x->containsTemporal || y->containsTemporal);
+        f->validCTLStateFormula = (x->validCTLStateFormula && y->validCTLStateFormula);
+        f->validCTLPathFormula = false;
+        f->validLTLFormula = (x->validLTLFormula && y->validLTLFormula);
+    } ];
+f=AllPath(x)           -> [temporal: x
+    {
+        assert(x->containsTemporal);
+
+        f->containsTemporal = true;
+        f->validCTLStateFormula = x->validCTLPathFormula;
+        f->validCTLPathFormula = false;
+        f->validLTLFormula = false;
+    } ];
+f=ExPath(x)            -> [temporal: x
+    {
+        assert(x->containsTemporal);
+        
+        f->containsTemporal = true;
+        f->validCTLStateFormula = x->validCTLPathFormula;
+        f->validCTLPathFormula = false;
+        f->validLTLFormula = false;
+    } ];
+f=Always(x)            -> [temporal: x
+    {
+        f->containsTemporal = true;
+        f->validCTLStateFormula = false;
+        f->validCTLPathFormula = x->validCTLStateFormula;
+        f->validLTLFormula = x->validLTLFormula;
+    } ];
+f=Eventually(x)        -> [temporal: x
+    {
+        f->containsTemporal = true;
+        f->validCTLStateFormula = false;
+        f->validCTLPathFormula = x->validCTLStateFormula;
+        f->validLTLFormula = x->validLTLFormula;
+    } ];
+f=NextState(x)         -> [temporal: x
+    {
+        f->containsTemporal = true;
+        f->validCTLStateFormula = false;
+        f->validCTLPathFormula = x->validCTLStateFormula;
+        f->validLTLFormula = x->validLTLFormula;
+    } ];
+f=Until(x,y)           -> [temporal: x y
+    {
+        f->containsTemporal = true;
+        f->validCTLStateFormula = false;
+        f->validCTLPathFormula = (x->validCTLStateFormula && y->validCTLStateFormula);
+        f->validLTLFormula = (x->validLTLFormula && y->validLTLFormula);
+    } ];
+f=Release(x,y)         -> [temporal: x y
+    {
+        f->containsTemporal = true;
+        f->validCTLStateFormula = false;
+        f->validCTLPathFormula = (x->validCTLStateFormula && y->validCTLStateFormula);
+        f->validLTLFormula = (x->validLTLFormula && y->validLTLFormula);
+    } ];
+
 
 //////////////////////////////////////////////////////////////////////////
 %uview internal;

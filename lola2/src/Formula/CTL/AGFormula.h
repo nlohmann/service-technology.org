@@ -22,13 +22,13 @@ public:
 	}
 
 	// AG phi = !EF(!phi) = !E (T U !phi)
-	bool check(Store<void*>& s, NetState& ns, Firelist& firelist) {
+	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
 		notFormula.inner = &inner;
 		euFormula.phi = &trueFormula;
 		euFormula.psi = &notFormula;
 		euFormula.index = index;
 		euFormula.dfsindex = dfsindex;
 		euFormula.payloadsize = payloadsize;
-		return !euFormula.check(s,ns,firelist);
+		return !euFormula.check(s,ns,firelist,witness);
 	}
 };

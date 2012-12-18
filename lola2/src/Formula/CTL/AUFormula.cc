@@ -3,7 +3,7 @@
 #include <Exploration/SearchStack.h>
 #include <Net/Transition.h>
 
-bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist) {
+bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
 	void** pInitialPayload;
 	if(!s.searchAndInsert(ns, &pInitialPayload, 0))
 		*pInitialPayload = calloc(payloadsize,1); // all-zeros is starting state for all values
@@ -15,13 +15,14 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist) {
 	assert(cachedResult != IN_PROGRESS); // impossible for first state
 
 	// psi -> A phi U psi
-	if(psi->check(s,ns,firelist)) {
+	if(psi->check(s,ns,firelist,witness)) {
 		setCachedResult(payload,KNOWN_TRUE);
 		return true;
 	}
 
+	witness->clear();
 	// !phi and !psi -> !E phi U psi
-	if(!phi->check(s,ns,firelist)) {
+	if(!phi->check(s,ns,firelist,witness)) {
 		setCachedResult(payload,KNOWN_FALSE);
 		return false;
 	}
@@ -58,7 +59,8 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist) {
 			CTLFormulaResult newCachedResult = getCachedResult(newpayload);
 			if(newCachedResult == UNKNOWN) {
 
-				if(psi->check(s,ns,firelist)) {
+				witness->clear();
+				if(psi->check(s,ns,firelist,witness)) {
 					setCachedResult(newpayload,KNOWN_TRUE);
 					// continue;
 					Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
@@ -66,7 +68,8 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist) {
 					continue;
 				}
 
-				if(!phi->check(s,ns,firelist)) {
+				witness->clear();
+				if(!phi->check(s,ns,firelist,witness)) {
 					setCachedResult(newpayload,KNOWN_FALSE);
 					// break; set all nodes to false
 					break;
@@ -139,6 +142,9 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist) {
 				assert(!tarjanStack.StackPointer); // tarjan stack empty
 				assert(dfs == currentLowlink); // first node is always start of SCC
 				assert(*pInitialPayload == payload); // returned to initial state
+
+				// no (negative) witness path found
+				witness->clear();
 				return true;
 			}
 		}
@@ -146,6 +152,9 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist) {
 	// revert transition that brought us to the counterexample state
 	Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
 	revertAtomics(ns,currentFirelist[currentFirelistIndex]);
+
+	// add transition to witness path
+	witness->push_back(currentFirelist[currentFirelistIndex]);
 
 	// current state can reach counterexample state -> formula false
 	setCachedResult(payload,KNOWN_FALSE);
@@ -163,6 +172,9 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist) {
 		setCachedResult(dfsStack.top().payload,KNOWN_FALSE);
 		Transition::backfire(ns,dfsStack.top().fl[dfsStack.top().flIndex]);
 		revertAtomics(ns,dfsStack.top().fl[dfsStack.top().flIndex]);
+
+		witness->push_back(dfsStack.top().fl[dfsStack.top().flIndex]);
+
 		dfsStack.pop();
 	}
 	return true;

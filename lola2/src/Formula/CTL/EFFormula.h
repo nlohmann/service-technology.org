@@ -20,12 +20,12 @@ public:
 	}
 
 	// EF phi  = E (T U phi)
-	bool check(Store<void*>& s, NetState& ns, Firelist& firelist) {
+	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
 		euFormula.phi = &trueFormula;
 		euFormula.psi = inner;
 		euFormula.index = index;
 		euFormula.dfsindex = dfsindex;
 		euFormula.payloadsize = payloadsize;
-		return euFormula.check(s,ns,firelist);
+		return euFormula.check(s,ns,firelist,witness);
 	}
 };

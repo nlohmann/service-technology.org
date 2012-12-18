@@ -14,7 +14,7 @@ struct NotFormula : public CTLFormula {
 		inner->revertAtomics(ns,t);
 	}
 
-	bool check(Store<void*>& s, NetState& ns, Firelist& firelist) {
-		return !inner.check(s,ns,firelist);
+	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
+		return !inner.check(s,ns,firelist, witness);
 	}
 };

@@ -24,7 +24,7 @@ public:
 	}
 
 	// E (phi R psi) = !A (!phi U !psi)
-	bool check(Store<void*>& s, NetState& ns, Firelist& firelist) {
+	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
 		notPhi.inner = phi;
 		notPsi.inner = psi;
 		auFormula.phi = &notPhi;
@@ -32,6 +32,6 @@ public:
 		auFormula.index = index;
 		auFormula.dfsindex = dfsindex;
 		auFormula.payloadsize = payloadsize;
-		return !auFormula.check(s,ns,firelist);
+		return !auFormula.check(s,ns,firelist,witness);
 	}
 };

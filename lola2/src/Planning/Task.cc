@@ -174,8 +174,14 @@ void Task::setFormula()
     case (FORMULA_INITIAL):
         rep->status("checking initial satisfiability");
         break;
-    case (FORMULA_MODELCHECKING):
+    case (FORMULA_LTL):
+        rep->status("checking LTL");
+        break;
+    case (FORMULA_CTL):
         rep->status("checking CTL");
+        break;
+    case (FORMULA_MODELCHECKING):
+        rep->status("checking CTL*");
         break;
     }
 
@@ -198,7 +204,7 @@ void Task::setFormula()
         TheFormula->unparse(myprinter, kc::internal);
         result = TheFormula->formula;
     }
-    else if(formulaType == FORMULA_MODELCHECKING){
+    else if(formulaType == FORMULA_CTL){
     	 TheFormula->unparse(myprinter, kc::out);
     	 TheFormula->unparse(myprinter, kc::ctl);
     	 result = TheFormula->formula;

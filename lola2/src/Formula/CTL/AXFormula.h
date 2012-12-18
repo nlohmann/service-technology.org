@@ -15,7 +15,7 @@ struct AXFormula : public CTLFormula {
 		inner->revertAtomics(ns,t);
 	}
 
-	bool check(Store<void*>& s, NetState& ns, Firelist& firelist) {
+	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
 		index_t* fl;
 		index_t cardfl = firelist.getFirelist(ns,&fl);
 		bool result;
@@ -23,13 +23,17 @@ struct AXFormula : public CTLFormula {
 			Transition::fire(ns,fl[cardfl]);
 			updateAtomics(ns,fl[cardfl]);
 
-			result = inner->check(s,ns,firelist);
+			result = inner->check(s,ns,firelist,null,witness);
 
 			Transition::backfire(ns,fl[cardfl]);
 			revertAtomics(ns,fl[cardfl]);
 
-			if(!result)
+			if(!result) {
+				witness->push_back(fl[cardfl]);
 				return false;
+			}
+			else
+				witness->clear();
 		}
 		return true;
 	}

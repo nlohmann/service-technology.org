@@ -20,12 +20,12 @@ public:
 	}
 
 	// AF phi A (T U phi)
-	bool check(Store<void*>& s, NetState& ns, Firelist& firelist) {
+	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
 		auFormula.phi = &trueFormula;
 		auFormula.psi = inner;
 		auFormula.index = index;
 		auFormula.dfsindex = dfsindex;
 		auFormula.payloadsize = payloadsize;
-		return auFormula.check(s,ns,firelist);
+		return auFormula.check(s,ns,firelist,witness);
 	}
 };

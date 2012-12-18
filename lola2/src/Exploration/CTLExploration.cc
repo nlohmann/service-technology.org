@@ -3,7 +3,11 @@
 
 bool CTLExploration::checkProperty(CTLFormula* formula, Store<void*> &store,
 			Firelist &firelist, NetState &ns) {
-	// TODO: initialize formula meta information, then call formula.check()
+
+	// TODO: initialize formula meta information, ideally while unparsing
+
+	witness.clear();
+	return formula->check(store,ns,firelist,&witness);
 }
 
 

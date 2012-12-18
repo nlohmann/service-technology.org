@@ -20,5 +20,5 @@ struct AUFormula : public DFSFormula {
 		psi->revertAtomics(ns,t);
 	}
 
-	bool check(Store<void*>& s, NetState& ns, Firelist& firelist);
+	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness);
 };

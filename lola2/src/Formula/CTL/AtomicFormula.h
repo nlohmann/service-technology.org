@@ -14,7 +14,7 @@ struct AtomicFormula : public CTLFormula {
 	void revertAtomics(NetState& ns, index_t t) {
 		inner->updateProperty(ns,t);
 	}
-	bool check(Store<void*>& s, NetState& ns, Firelist& firelist) {
+	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
 		return inner->value;
 	}
 };

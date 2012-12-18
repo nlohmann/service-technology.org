@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <Net/NetState.h>
 #include <Exploration/Firelist.h>
 #include <Stores/Store.h>
@@ -36,5 +38,5 @@ struct CTLFormula {
 
 	virtual void updateAtomics(NetState& ns, index_t t) = 0;
 	virtual void revertAtomics(NetState& ns, index_t t) = 0;
-	virtual bool check(Store<void*>& s, NetState& ns, Firelist& firelist) = 0;
+	virtual bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) = 0;
 };

@@ -115,7 +115,9 @@ typedef enum
     FORMULA_STABILIZATION = 5, ///< FG
     FORMULA_EVENTUALLY    = 6, ///< F
     FORMULA_INITIAL       = 7, ///< no temporal operator
-    FORMULA_MODELCHECKING = 8  ///< CTL formulae
+    FORMULA_LTL           = 8, ///< LTL formulae
+    FORMULA_CTL           = 9, ///< CTL formulae
+    FORMULA_MODELCHECKING = 10 ///< CTL* formulae
 } formula_t;
 
 /// three-valued logic

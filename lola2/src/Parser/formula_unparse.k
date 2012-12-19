@@ -395,6 +395,7 @@ EmptyAcceptingSet() -> [buechi: ];
 
 %uview ctl;
 %{ KC_UNPARSE
+
 #include <map>
 #include <vector>
 #include <stack>
@@ -406,6 +407,8 @@ EmptyAcceptingSet() -> [buechi: ];
 #include <Formula/DisjunctionStatePredicate.h>
 #include <Formula/TruePredicate.h>
 #include <Formula/FalsePredicate.h>
+
+#include <Exploration/StatePredicateProperty.h>
 
 #include <Formula/CTL/CTLFormula.h>
 #include <Formula/CTL/DFSFormula.h>
@@ -425,7 +428,6 @@ EmptyAcceptingSet() -> [buechi: ];
 #include <Formula/CTL/ConjunctionFormula.h>
 #include <Formula/CTL/AtomicFormula.h>
 
-
 // mapping from node ids to factors
 std::map<int, int> ctl_current;
 
@@ -437,6 +439,9 @@ std::stack<size_t> ctl_id_stack;
 
 // next free id
 size_t ctl_nextId = 0;
+
+//temporal storage to be able to include the LessEqualStatePredicate into an AtomicFormula
+StatePredicateProperty* spp; 
 %}
 
 //EINSTIEG
@@ -469,7 +474,7 @@ Conjunction(a,b) -> [ctl:
         const index_t myId = ctl_id_stack.top();
         ctl_id_stack.pop();
 
-        ConjunctionFormula *cf;
+        ConjunctionFormula *cf = new ConjunctionFormula();
         CTLFormula_p subs = ((CTLFormula*) malloc(sizeof(CTLFormula)*ctl_formulas[myId].size()));
         cf->subs = &subs;
         for (size_t i = 0; i < ctl_formulas[myId].size(); ++i)
@@ -495,20 +500,23 @@ Disjunction(a,b) -> [ctl:
     b
     {
         // after returning from my childs, I am the top of the stack
-        const index_t  myId = ctl_id_stack.top();
+        const index_t myId = ctl_id_stack.top();
         ctl_id_stack.pop();
-		/*
-        StatePredicate *f = new DisjunctionStatePredicate(ctl_formulas[myId].size());
+
+        DisjunctionFormula *df = new DisjunctionFormula();
+        CTLFormula_p subs = ((CTLFormula*) malloc(sizeof(CTLFormula)*ctl_formulas[myId].size()));
+        df->subs = &subs;
         for (size_t i = 0; i < ctl_formulas[myId].size(); ++i)
         {
             //printf("disjunction %d: added a subformula to index %d\n", myId, i);
             assert(ctl_formulas[myId][i]);
-            ((DisjunctionStatePredicate*)f)->addSub(i, ctl_formulas[myId][i]);
+            subs[i] = *ctl_formulas[myId][i];
+            //((ConjunctionStatePredicate*)f)->addSub(i, ctl_formulas[myId][i]);
         }
+        df->cardSubs = ctl_formulas[myId].size();
 
         printf("told my parent %d about me %d\n", ctl_id_stack.top(), myId);
-        ctl_formulas[ctl_id_stack.top()].push_back(f);
-        */
+        ctl_formulas[ctl_id_stack.top()].push_back(df);
     }
 ];
 
@@ -516,7 +524,7 @@ True() -> [ctl:
 {
     StatePredicate *f = new TruePredicate();
     // register formula at parent
-    AtomicFormula *atomic_ctl;
+    AtomicFormula *atomic_ctl = new AtomicFormula();
     atomic_ctl->inner = new StatePredicateProperty(f);
     ctl_formulas[ctl_id_stack.top()].push_back(new TrueFormula());
 }
@@ -526,7 +534,7 @@ False() -> [ctl:
 {
     StatePredicate *f = new FalsePredicate();
     // register formula at parent
-    AtomicFormula *atomic_ctl;
+    AtomicFormula *atomic_ctl = new AtomicFormula();
     atomic_ctl->inner = new StatePredicateProperty(f);
     ctl_formulas[ctl_id_stack.top()].push_back(atomic_ctl);    
 }
@@ -535,14 +543,17 @@ False() -> [ctl:
 //CTL-Operatoren
 //AG(x)
 AllPath(Always(x)) -> [ctl:
-	{printf("CTL-AllPath_Always\n");}
+	{
+		printf("CTL-AllPath_Always\n");
+		ctl_id_stack.push(ctl_nextId++);
+	}
 		x
 	{
 	    // after returning from my childs, I am the top of the stack
 	    const index_t myId = ctl_id_stack.top();
 	    ctl_id_stack.pop();
 		
-		AGFormula* agf;
+		AGFormula* agf = new AGFormula();
 		assert(ctl_formulas[myId].size() == 1);
 		agf->inner = ctl_formulas[myId][0];
 		
@@ -552,14 +563,17 @@ AllPath(Always(x)) -> [ctl:
 
 //AF(x)
 AllPath(Eventually(x)) -> [ctl:
-	{printf("CTL-AllPath_Eventually\n");}
+	{
+		printf("CTL-AllPath_Eventually\n");
+        ctl_id_stack.push(ctl_nextId++);
+	}
 	x
 	{
 		// after returning from my childs, I am the top of the stack
 		const index_t myId = ctl_id_stack.top();
 		ctl_id_stack.pop();
 
-		AFFormula* aff;
+		AFFormula* aff = new AFFormula();
 		assert(ctl_formulas[myId].size() == 1);
 		aff->inner = ctl_formulas[myId][0];
 
@@ -569,14 +583,17 @@ AllPath(Eventually(x)) -> [ctl:
 
 //AX(x)
 AllPath(NextState(x)) -> [ctl:
-	{printf("CTL-AllPath_NextState\n");}
+	{
+		printf("CTL-AllPath_NextState\n");
+        ctl_id_stack.push(ctl_nextId++);
+    }
 	x
 	{
 		// after returning from my childs, I am the top of the stack
 		const index_t myId = ctl_id_stack.top();
 		ctl_id_stack.pop();
 
-		AXFormula* axf;
+		AXFormula* axf = new AXFormula();
 		assert(ctl_formulas[myId].size() == 1);
 		axf->inner = ctl_formulas[myId][0];
 		
@@ -586,21 +603,39 @@ AllPath(NextState(x)) -> [ctl:
 
 //AU(a,b) -- wirklich so?
 AllPath(Until(a,b)) -> [ctl:
-	{printf("CTL-AllPath_Until\n");}
+	{
+		printf("CTL-AllPath_Until\n");
+        ctl_id_stack.push(ctl_nextId++);
+    }
 	a
 	b
+	{
+	    // after returning from my childs, I am the top of the stack
+	    const index_t myId = ctl_id_stack.top();
+	    ctl_id_stack.pop();
+		assert(ctl_formulas[myId].size() == 2);
+
+		AUFormula* auf = new AUFormula();
+		auf->phi = ctl_formulas[myId][0];
+		auf->psi = ctl_formulas[myId][1];
+		
+		ctl_formulas[ctl_id_stack.top()].push_back(auf);
+	}
 ];
 
 //EG(x)
 ExPath(Always(x)) -> [ctl:
-	{printf("CTL-ExPath_Always\n");}
+	{
+		printf("CTL-ExPath_Always\n");
+        ctl_id_stack.push(ctl_nextId++);
+    }
 	x
 	{
 		// after returning from my childs, I am the top of the stack
 		const index_t myId = ctl_id_stack.top();
 		ctl_id_stack.pop();
 
-		EGFormula* egf;
+		EGFormula* egf = new EGFormula();
 		assert(ctl_formulas[myId].size() == 1);
 		egf->inner = ctl_formulas[myId][0];
 
@@ -610,14 +645,17 @@ ExPath(Always(x)) -> [ctl:
 
 //EF(x)
 ExPath(Eventually(x)) -> [ctl:
-	{printf("CTL-ExPath_Eventually\n");}
+	{
+		printf("CTL-ExPath_Eventually\n");
+        ctl_id_stack.push(ctl_nextId++);
+    }
 	x
 	{
 		// after returning from my childs, I am the top of the stack
 		const index_t myId = ctl_id_stack.top();
 		ctl_id_stack.pop();
 
-		EFFormula* eff;
+		EFFormula* eff = new EFFormula();
 		assert(ctl_formulas[myId].size() == 1);
 		eff->inner = ctl_formulas[myId][0];
 
@@ -627,14 +665,17 @@ ExPath(Eventually(x)) -> [ctl:
 
 //EX(x)
 ExPath(NextState(x)) -> [ctl:
-	{printf("CTL-ExPath_Next\n");}
+	{
+		printf("CTL-ExPath_Next\n");
+        ctl_id_stack.push(ctl_nextId++);
+    }
 	x
 	{
 		// after returning from my childs, I am the top of the stack
 		const index_t myId = ctl_id_stack.top();
 		ctl_id_stack.pop();
 
-		EXFormula* exf;
+		EXFormula* exf = new EXFormula();
 		assert(ctl_formulas[myId].size() == 1);
 		exf->inner = ctl_formulas[myId][0];
 
@@ -644,19 +685,46 @@ ExPath(NextState(x)) -> [ctl:
 
 //EU(x) -- wirklich so?
 ExPath(Until(a,b)) -> [ctl:
-	{printf("CTL-ExPath_Until\n");}
+	{
+		printf("CTL-ExPath_Until\n");
+        ctl_id_stack.push(ctl_nextId++);
+    }
 	a
 	b
+	{
+	    // after returning from my childs, I am the top of the stack
+	    const index_t myId = ctl_id_stack.top();
+	    ctl_id_stack.pop();
+		assert(ctl_formulas[myId].size() == 2);
+
+		EUFormula* euf = new EUFormula();
+		euf->phi = ctl_formulas[myId][0];
+		euf->psi = ctl_formulas[myId][1];
+		
+		ctl_formulas[ctl_id_stack.top()].push_back(euf);
+	}
 ];
 
 AtomicProposition(a) -> [ctl:
-	{printf("CTL-AtomicProposition\n");}
+	{
+		printf("CTL-AtomicProposition\n");
+        ctl_id_stack.push(ctl_nextId++);
+	}
 	a
+	{
+		const index_t myId = ctl_id_stack.top();
+		ctl_id_stack.pop();
+		assert(ctl_formulas[myId].size() == 0);
+		AtomicFormula *af = new AtomicFormula();
+		af->inner = spp;
+
+		ctl_formulas[ctl_id_stack.top()].push_back(af);
+	}
 ];
 
 LessEqualAtomicProposition(x, Number(y)) -> [ctl:
 {
-	/*printf("I am an atomic (<=) CTL-proposition. My parent is %d\n", ctl_id_stack.top());
+	printf("I am an atomic (<=) CTL-proposition. My parent is %d\n", ctl_id_stack.top());
 
     index_t factors_positive = 0;
     index_t factors_negative = 0;
@@ -697,8 +765,7 @@ LessEqualAtomicProposition(x, Number(y)) -> [ctl:
 
     // register formula at parent
     printf("told my parent %d about me; %p\n", ctl_id_stack.top(), f);
-    ctl_formulas[ctl_id_stack.top()].push_back(f);
-    */
+    spp = new StatePredicateProperty (f);
 }
 ];
 
@@ -708,7 +775,7 @@ LessEqualAtomicProposition(x, Number(y)) -> [ctl:
 //Bis jetzt nur kopiert und Datenstrukturen um ctl-Präfix erweitert
 Fireable(x) -> [ctl:
 {
-    /*// create a conjunction with #preset elements
+    // create a conjunction with #preset elements
     StatePredicate *f = new ConjunctionStatePredicate(Net::CardArcs[TR][PRE][x->value]);
     //printf("%p=ConjunctionStatePredicate(Net::CardArcs[TR][PRE][x->value]=%d)\n", f, Net::CardArcs[TR][PRE][x->value]);
 
@@ -728,8 +795,9 @@ Fireable(x) -> [ctl:
         //printf("%p->addSub(p=%d, a=%p)\n", f, p, a);
     }
 
-    ctl_formulas[ctl_id_stack.top()].push_back(f);
-    */
+	AtomicFormula *af = new AtomicFormula();
+	af->inner = (new StatePredicateProperty (f));
+    ctl_formulas[ctl_id_stack.top()].push_back(af);
 }
 ];
 

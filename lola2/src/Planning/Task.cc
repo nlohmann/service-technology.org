@@ -196,7 +196,7 @@ void Task::setFormula()
     // TheFormula->print();
     // TheFormula->unparse(myprinter, kc::out);
 
-    if (false and (formulaType == FORMULA_REACHABLE or
+    if ((formulaType == FORMULA_REACHABLE or
             formulaType == FORMULA_INVARIANT or
             formulaType == FORMULA_IMPOSSIBLE or
             formulaType == FORMULA_INITIAL))
@@ -210,7 +210,7 @@ void Task::setFormula()
 
         sp = result;
     }
-    else if(true or formulaType == FORMULA_CTL){
+    else if(formulaType == FORMULA_CTL){
     	 rep->message("implementation in progress");
     	 TheFormula->unparse(myprinter, kc::out);
     	 TheFormula->unparse(myprinter, kc::ctl);

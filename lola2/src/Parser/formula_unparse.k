@@ -407,6 +407,25 @@ EmptyAcceptingSet() -> [buechi: ];
 #include <Formula/TruePredicate.h>
 #include <Formula/FalsePredicate.h>
 
+#include <Formula/CTL/CTLFormula.h>
+#include <Formula/CTL/DFSFormula.h>
+#include <Formula/CTL/AFFormula.h>
+#include <Formula/CTL/AGFormula.h>
+#include <Formula/CTL/ARFormula.h>
+#include <Formula/CTL/AUFormula.h>
+#include <Formula/CTL/AXFormula.h>
+#include <Formula/CTL/EFFormula.h>
+#include <Formula/CTL/EGFormula.h>
+#include <Formula/CTL/ERFormula.h>
+#include <Formula/CTL/EUFormula.h>
+#include <Formula/CTL/EXFormula.h>
+#include <Formula/CTL/NotFormula.h>
+#include <Formula/CTL/TrueFormula.h>
+#include <Formula/CTL/DisjunctionFormula.h>
+#include <Formula/CTL/ConjunctionFormula.h>
+#include <Formula/CTL/AtomicFormula.h>
+
+
 // mapping from node ids to factors
 std::map<int, int> ctl_current;
 

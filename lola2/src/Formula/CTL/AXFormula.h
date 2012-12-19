@@ -23,7 +23,7 @@ struct AXFormula : public CTLFormula {
 			Transition::fire(ns,fl[cardfl]);
 			updateAtomics(ns,fl[cardfl]);
 
-			result = inner->check(s,ns,firelist,null,witness);
+			result = inner->check(s,ns,firelist,witness);
 
 			Transition::backfire(ns,fl[cardfl]);
 			revertAtomics(ns,fl[cardfl]);

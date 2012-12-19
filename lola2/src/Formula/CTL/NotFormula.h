@@ -15,6 +15,6 @@ struct NotFormula : public CTLFormula {
 	}
 
 	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
-		return !inner.check(s,ns,firelist, witness);
+		return !inner->check(s,ns,firelist, witness);
 	}
 };

@@ -23,7 +23,7 @@ public:
 
 	// EG phi = !AF(!phi) = !A (T U !phi)
 	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
-		notFormula.inner = &inner;
+		notFormula.inner = inner;
 		auFormula.phi = &trueFormula;
 		auFormula.psi = &notFormula;
 		auFormula.index = index;

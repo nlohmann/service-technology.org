@@ -430,7 +430,7 @@ EmptyAcceptingSet() -> [buechi: ];
 std::map<int, int> ctl_current;
 
 // mapping from tree node ids to list of intermediate formulas
-std::map<int, std::vector<StatePredicate *> > ctl_formulas;
+std::map<int, std::vector<CTLFormula_p> > ctl_formulas;
 
 // invariant: top is always my parent
 std::stack<size_t> ctl_id_stack;
@@ -451,9 +451,8 @@ f=StatePredicateFormula(x) -> [ctl:
         ctl_id_stack.pop();
         // return the only entry for the root
         assert(ctl_nextId == 0);
-        printf("Anz. Formeln: %d\n", ctl_formulas[0].size());
-        f->formula = ctl_formulas[0][0];
-        printf("I am a state predicate. Done!\n");
+        f->ctl_formula = ctl_formulas[0][0];
+        printf("I am a CTL state predicate. Done!\n");
     }
 ];
 
@@ -470,16 +469,20 @@ Conjunction(a,b) -> [ctl:
         const index_t myId = ctl_id_stack.top();
         ctl_id_stack.pop();
 
-        StatePredicate *f = new ConjunctionStatePredicate(ctl_formulas[myId].size());
+        ConjunctionFormula *cf;
+        CTLFormula_p subs = ((CTLFormula*) malloc(sizeof(CTLFormula)*ctl_formulas[myId].size()));
+        cf->subs = &subs;
         for (size_t i = 0; i < ctl_formulas[myId].size(); ++i)
         {
             //printf("conjunction %d: added a subformula to index %d\n", myId, i);
             assert(ctl_formulas[myId][i]);
-            ((ConjunctionStatePredicate*)f)->addSub(i, ctl_formulas[myId][i]);
+            subs[i] = *ctl_formulas[myId][i];
+            //((ConjunctionStatePredicate*)f)->addSub(i, ctl_formulas[myId][i]);
         }
+        cf->cardSubs = ctl_formulas[myId].size();
 
         printf("told my parent %d about me %d\n", ctl_id_stack.top(), myId);
-        ctl_formulas[ctl_id_stack.top()].push_back(f);
+        ctl_formulas[ctl_id_stack.top()].push_back(cf);
     }
 ];
 
@@ -494,7 +497,7 @@ Disjunction(a,b) -> [ctl:
         // after returning from my childs, I am the top of the stack
         const index_t  myId = ctl_id_stack.top();
         ctl_id_stack.pop();
-
+		/*
         StatePredicate *f = new DisjunctionStatePredicate(ctl_formulas[myId].size());
         for (size_t i = 0; i < ctl_formulas[myId].size(); ++i)
         {
@@ -505,34 +508,83 @@ Disjunction(a,b) -> [ctl:
 
         printf("told my parent %d about me %d\n", ctl_id_stack.top(), myId);
         ctl_formulas[ctl_id_stack.top()].push_back(f);
+        */
     }
 ];
 
-//CTL-Operatoren
-Always(x) -> [ctl:
-	{printf("CTL-Always\n");}
-	x
+True() -> [ctl:
+{
+    StatePredicate *f = new TruePredicate();
+    // register formula at parent
+    AtomicFormula *atomic_ctl;
+    atomic_ctl->inner = new StatePredicateProperty(f);
+    ctl_formulas[ctl_id_stack.top()].push_back(new TrueFormula());
+}
 ];
 
+False() -> [ctl:
+{
+    StatePredicate *f = new FalsePredicate();
+    // register formula at parent
+    AtomicFormula *atomic_ctl;
+    atomic_ctl->inner = new StatePredicateProperty(f);
+    ctl_formulas[ctl_id_stack.top()].push_back(atomic_ctl);    
+}
+];
+
+//CTL-Operatoren
 //AG(x)
 AllPath(Always(x)) -> [ctl:
 	{printf("CTL-AllPath_Always\n");}
-	x
+		x
+	{
+	    // after returning from my childs, I am the top of the stack
+	    const index_t myId = ctl_id_stack.top();
+	    ctl_id_stack.pop();
+		
+		AGFormula* agf;
+		assert(ctl_formulas[myId].size() == 1);
+		agf->inner = ctl_formulas[myId][0];
+		
+		ctl_formulas[ctl_id_stack.top()].push_back(agf);
+	}
 ];
 
 //AF(x)
 AllPath(Eventually(x)) -> [ctl:
 	{printf("CTL-AllPath_Eventually\n");}
 	x
+	{
+		// after returning from my childs, I am the top of the stack
+		const index_t myId = ctl_id_stack.top();
+		ctl_id_stack.pop();
+
+		AFFormula* aff;
+		assert(ctl_formulas[myId].size() == 1);
+		aff->inner = ctl_formulas[myId][0];
+
+		ctl_formulas[ctl_id_stack.top()].push_back(aff);
+	}
 ];
 
 //AX(x)
 AllPath(NextState(x)) -> [ctl:
 	{printf("CTL-AllPath_NextState\n");}
 	x
+	{
+		// after returning from my childs, I am the top of the stack
+		const index_t myId = ctl_id_stack.top();
+		ctl_id_stack.pop();
+
+		AXFormula* axf;
+		assert(ctl_formulas[myId].size() == 1);
+		axf->inner = ctl_formulas[myId][0];
+		
+		ctl_formulas[ctl_id_stack.top()].push_back(axf);
+	}
 ];
 
-//AU(a,b) -- wirklich?
+//AU(a,b) -- wirklich so?
 AllPath(Until(a,b)) -> [ctl:
 	{printf("CTL-AllPath_Until\n");}
 	a
@@ -543,21 +595,54 @@ AllPath(Until(a,b)) -> [ctl:
 ExPath(Always(x)) -> [ctl:
 	{printf("CTL-ExPath_Always\n");}
 	x
+	{
+		// after returning from my childs, I am the top of the stack
+		const index_t myId = ctl_id_stack.top();
+		ctl_id_stack.pop();
+
+		EGFormula* egf;
+		assert(ctl_formulas[myId].size() == 1);
+		egf->inner = ctl_formulas[myId][0];
+
+		ctl_formulas[ctl_id_stack.top()].push_back(egf);
+	}
 ];
 
 //EF(x)
 ExPath(Eventually(x)) -> [ctl:
 	{printf("CTL-ExPath_Eventually\n");}
 	x
+	{
+		// after returning from my childs, I am the top of the stack
+		const index_t myId = ctl_id_stack.top();
+		ctl_id_stack.pop();
+
+		EFFormula* eff;
+		assert(ctl_formulas[myId].size() == 1);
+		eff->inner = ctl_formulas[myId][0];
+
+		ctl_formulas[ctl_id_stack.top()].push_back(eff);
+	}
 ];
 
 //EX(x)
 ExPath(NextState(x)) -> [ctl:
 	{printf("CTL-ExPath_Next\n");}
 	x
+	{
+		// after returning from my childs, I am the top of the stack
+		const index_t myId = ctl_id_stack.top();
+		ctl_id_stack.pop();
+
+		EXFormula* exf;
+		assert(ctl_formulas[myId].size() == 1);
+		exf->inner = ctl_formulas[myId][0];
+
+		ctl_formulas[ctl_id_stack.top()].push_back(exf);
+	}
 ];
 
-//EU(x) -- wirklich?
+//EU(x) -- wirklich so?
 ExPath(Until(a,b)) -> [ctl:
 	{printf("CTL-ExPath_Until\n");}
 	a
@@ -571,7 +656,7 @@ AtomicProposition(a) -> [ctl:
 
 LessEqualAtomicProposition(x, Number(y)) -> [ctl:
 {
-	printf("I am an atomic (<=) CTL-proposition. My parent is %d\n", ctl_id_stack.top());
+	/*printf("I am an atomic (<=) CTL-proposition. My parent is %d\n", ctl_id_stack.top());
 
     index_t factors_positive = 0;
     index_t factors_negative = 0;
@@ -613,5 +698,55 @@ LessEqualAtomicProposition(x, Number(y)) -> [ctl:
     // register formula at parent
     printf("told my parent %d about me; %p\n", ctl_id_stack.top(), f);
     ctl_formulas[ctl_id_stack.top()].push_back(f);
+    */
 }
 ];
+
+
+
+//Werden nachfolgende Konstrukte benötigt?
+//Bis jetzt nur kopiert und Datenstrukturen um ctl-Präfix erweitert
+Fireable(x) -> [ctl:
+{
+    /*// create a conjunction with #preset elements
+    StatePredicate *f = new ConjunctionStatePredicate(Net::CardArcs[TR][PRE][x->value]);
+    //printf("%p=ConjunctionStatePredicate(Net::CardArcs[TR][PRE][x->value]=%d)\n", f, Net::CardArcs[TR][PRE][x->value]);
+
+    // iterate preset
+    for (index_t p = 0; p < Net::CardArcs[TR][PRE][x->value]; ++p)
+    {
+        // create atomic state predicate with 1 positive factor and the arc weight
+        StatePredicate *a = new AtomicStatePredicate(0, 1, - Net::Mult[TR][PRE][x->value][p]);
+        //printf("%p=AtomicStatePredicate(0, 1, - Net::Mult[TR][PRE][x->value][p]=%d)\n", a, - Net::Mult[TR][PRE][x->value][p]);
+
+        // add place p to index 0 with factor 1
+        ((AtomicStatePredicate*)a)->addNeg(0, Net::Arc[TR][PRE][x->value][p], 1);
+        //printf("%p->addNeg(0, Net::Arc[TR][PRE][x->value][p]=%d, 1)\n", a, Net::Arc[TR][PRE][x->value][p]);
+
+        // add atomic state predicate to conjunction
+        ((ConjunctionStatePredicate*)f)->addSub(p, a);
+        //printf("%p->addSub(p=%d, a=%p)\n", f, p, a);
+    }
+
+    ctl_formulas[ctl_id_stack.top()].push_back(f);
+    */
+}
+];
+
+Initial() -> [ctl:
+{
+    /*StatePredicate *f = new ConjunctionStatePredicate(Net::Card[PL]);
+    // iterate places
+    for (index_t p = 0; p < Net::Card[PL]; ++p)
+    {
+        /* TODO */
+    }
+
+    ctl_formulas[ctl_id_stack.top()].push_back(f);
+    */
+}
+];
+
+Product(x, Node(p)) -> [ctl: { ctl_current[p->value] += x->value; } ];
+Node(p) -> [ctl: { assert(false /* sollte nicht mehr vorkommen */); ctl_current[p->value] += 1; } ];
+Number(x) -> [ctl: /* do not print values */ ];

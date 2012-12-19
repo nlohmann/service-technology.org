@@ -7,6 +7,7 @@
 
 
 class StatePredicate;
+class CTLFormula;
 class SimpleProperty;
 class Firelist;
 class ChooseTransition;
@@ -18,6 +19,7 @@ class Task
 {
 private:
     StatePredicate* sp;
+    CTLFormula* ctlFormula;
     NetState* ns;
     ChooseTransition* choose;
     enum_search search;

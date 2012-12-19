@@ -1,1 +1,1 @@
-FORMULA (ea.1 > 0 AND ea.2 > 0) OR (ea.2 > 0 AND ea.3 > 0);
+FORMULA ALLPATH ALWAYS ((ea.1 > 0 AND ea.2 > 0) OR (ea.2 > 0 AND ea.3 > 0));

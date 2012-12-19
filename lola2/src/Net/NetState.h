@@ -63,7 +63,7 @@ public:
     static NetState* createNetStateFromInitial();
     /// copy constructor
     NetState(NetState &ns);
-    // copy operator, be aware that this changes the given ns (this necessary to ensure proper deallocation of memory)
+    // copy operator, be aware that this changes the given ns (this is necessary to ensure proper deallocation of memory)
     NetState &operator=(NetState &ns);
 
 private:

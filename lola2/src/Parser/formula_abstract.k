@@ -5,10 +5,12 @@
 #include <Core/Dimensions.h>
 #include <Formula/StatePredicate.h>
 #include <Formula/BuechiAutomata.h>
+#include <Formula/CTL/CTLFormula.h>
 
 // required, because the abstract grammar does not allow pointer types
 typedef StatePredicate* StatePredicate_p;
 typedef BuechiAutomata* BuechiAutomata_p;
+typedef CTLFormula* CTLFormula_p;
 %}
 
 tFormula:
@@ -16,6 +18,7 @@ tFormula:
 {
     formula_t type;
     StatePredicate_p formula = NULL;
+    CTLFormula_p ctl_formula = NULL;
 }
 ;
 

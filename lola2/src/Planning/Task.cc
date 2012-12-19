@@ -118,7 +118,6 @@ void Task::setFormula()
         return;
     }
 
-    StatePredicate* result = NULL;
     Input* formulaFile = NULL;
 
     // Check if the paramter of --formula is a file that we can open: if that
@@ -197,20 +196,28 @@ void Task::setFormula()
     // TheFormula->print();
     // TheFormula->unparse(myprinter, kc::out);
 
-    if ((formulaType == FORMULA_REACHABLE or
+    if (false and (formulaType == FORMULA_REACHABLE or
             formulaType == FORMULA_INVARIANT or
             formulaType == FORMULA_IMPOSSIBLE or
             formulaType == FORMULA_INITIAL))
     {
         // copy restructured formula into internal data structures
         TheFormula->unparse(myprinter, kc::internal);
-        result = TheFormula->formula;
+        StatePredicate* result = TheFormula->formula;
+
+        assert(result);
+        rep->status("processed formula with %d atomic propositions", result->countAtomic());
+
+        sp = result;
     }
-    else if(formulaType == FORMULA_CTL){
+    else if(true or formulaType == FORMULA_CTL){
+    	 rep->message("implementation in progress");
     	 TheFormula->unparse(myprinter, kc::out);
     	 TheFormula->unparse(myprinter, kc::ctl);
-    	 result = TheFormula->formula;
-    	 rep->message("implementation in progress");
+    	 CTLFormula* ctlFormula = TheFormula->ctl_formula;
+
+    	 assert(ctlFormula);
+
     	 //rep->abort(ERROR_COMMANDLINE);
     }
     else
@@ -219,8 +226,6 @@ void Task::setFormula()
         rep->abort(ERROR_COMMANDLINE);
     }
 
-    assert(result);
-    rep->status("processed formula with %d atomic propositions", result->countAtomic());
 
     // tidy parser
     ptformula_lex_destroy();
@@ -230,8 +235,6 @@ void Task::setFormula()
     {
         delete formulaFile;
     }
-
-    sp = result;
 }
 
 void Task::setBuechiAutomata()

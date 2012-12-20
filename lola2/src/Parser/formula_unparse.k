@@ -739,13 +739,16 @@ AtomicProposition(a) -> [ctl:
 	{
 		const index_t myId = ctl_id_stack.top();
 		ctl_id_stack.pop();
+		assert(ctl_formulas[myId].size() < 2);
 		if(ctl_formulas[myId].size() == 0){
-			;
+			AtomicFormula *af = new AtomicFormula();
+			af->inner = spp;
+	
+			ctl_formulas[ctl_id_stack.top()].push_back(af);
 		}
-		AtomicFormula *af = new AtomicFormula();
-		af->inner = spp;
-
-		ctl_formulas[ctl_id_stack.top()].push_back(af);
+		else{
+			ctl_formulas[ctl_id_stack.top()].push_back(ctl_formulas[myId][0]);
+		}
 	}
 ];
 

@@ -440,8 +440,14 @@ std::stack<size_t> ctl_id_stack;
 // next free id
 size_t ctl_nextId = 0;
 
+//needs dfs-storage;
+size_t ctl_dfs_id = 0;
+
+//needs cached results id
+size_t ctl_result_cache_id = 0;
+
 //temporal storage to be able to include the LessEqualStatePredicate into an AtomicFormula
-StatePredicateProperty* spp; 
+StatePredicateProperty* spp;
 %}
 
 //EINSTIEG
@@ -457,6 +463,7 @@ f=StatePredicateFormula(x) -> [ctl:
         // return the only entry for the root
         assert(ctl_nextId == 0);
         f->ctl_formula = ctl_formulas[0][0];
+        f->ctl_formula->payloadsize = ctl_dfs_id*sizeof(statenumber_t) + (2*ctl_result_cache+7)/8;
         printf("I am a CTL state predicate. Done!\n");
     }
 ];
@@ -521,23 +528,15 @@ Disjunction(a,b) -> [ctl:
 ];
 
 True() -> [ctl:
-{
-    StatePredicate *f = new TruePredicate();
-    // register formula at parent
-    AtomicFormula *atomic_ctl = new AtomicFormula();
-    atomic_ctl->inner = new StatePredicateProperty(f);
-    ctl_formulas[ctl_id_stack.top()].push_back(new TrueFormula());
-}
+	{
+		ctl_formulas[ctl_id_stack.top()].push_back(new TrueFormula());
+	}
 ];
 
 False() -> [ctl:
-{
-    StatePredicate *f = new FalsePredicate();
-    // register formula at parent
-    AtomicFormula *atomic_ctl = new AtomicFormula();
-    atomic_ctl->inner = new StatePredicateProperty(f);
-    ctl_formulas[ctl_id_stack.top()].push_back(atomic_ctl);    
-}
+	{
+		ctl_formulas[ctl_id_stack.top()].push_back(atomic_ctl);    
+	}
 ];
 
 //CTL-Operatoren
@@ -546,6 +545,8 @@ AllPath(Always(x)) -> [ctl:
 	{
 		printf("CTL-AllPath_Always\n");
 		ctl_id_stack.push(ctl_nextId++);
+		size_t myDFSId = ctl_dfs_id++;
+		size_t myCacheId = ctl_result_cache_id++;
 	}
 		x
 	{
@@ -556,6 +557,8 @@ AllPath(Always(x)) -> [ctl:
 		AGFormula* agf = new AGFormula();
 		assert(ctl_formulas[myId].size() == 1);
 		agf->inner = ctl_formulas[myId][0];
+		agf->index = 2*myCacheId;
+		agf->dfsindex = myDFSId*sizeof(statenumber_t);
 		
 		ctl_formulas[ctl_id_stack.top()].push_back(agf);
 	}
@@ -566,6 +569,8 @@ AllPath(Eventually(x)) -> [ctl:
 	{
 		printf("CTL-AllPath_Eventually\n");
         ctl_id_stack.push(ctl_nextId++);
+		size_t myDFSId = ctl_dfs_id++;
+		size_t myCacheId = ctl_result_cache_id++;
 	}
 	x
 	{
@@ -576,6 +581,8 @@ AllPath(Eventually(x)) -> [ctl:
 		AFFormula* aff = new AFFormula();
 		assert(ctl_formulas[myId].size() == 1);
 		aff->inner = ctl_formulas[myId][0];
+		aff->index = 2*myCacheId;
+		aff->dfsindex = myDFSId*sizeof(statenumber_t);
 
 		ctl_formulas[ctl_id_stack.top()].push_back(aff);
 	}
@@ -606,6 +613,8 @@ AllPath(Until(a,b)) -> [ctl:
 	{
 		printf("CTL-AllPath_Until\n");
         ctl_id_stack.push(ctl_nextId++);
+		size_t myDFSId = ctl_dfs_id++;
+		size_t myCacheId = ctl_result_cache_id++;
     }
 	a
 	b
@@ -618,7 +627,9 @@ AllPath(Until(a,b)) -> [ctl:
 		AUFormula* auf = new AUFormula();
 		auf->phi = ctl_formulas[myId][0];
 		auf->psi = ctl_formulas[myId][1];
-		
+		auf->index = 2*myCacheId;
+		auf->dfsindex = myDFSId*sizeof(statenumber_t);
+
 		ctl_formulas[ctl_id_stack.top()].push_back(auf);
 	}
 ];
@@ -628,6 +639,8 @@ ExPath(Always(x)) -> [ctl:
 	{
 		printf("CTL-ExPath_Always\n");
         ctl_id_stack.push(ctl_nextId++);
+		size_t myDFSId = ctl_dfs_id++;
+		size_t myCacheId = ctl_result_cache_id++;
     }
 	x
 	{
@@ -638,6 +651,8 @@ ExPath(Always(x)) -> [ctl:
 		EGFormula* egf = new EGFormula();
 		assert(ctl_formulas[myId].size() == 1);
 		egf->inner = ctl_formulas[myId][0];
+		egf->index = 2*myCacheId;
+		egf->dfsindex = myDFSId*sizeof(statenumber_t);
 
 		ctl_formulas[ctl_id_stack.top()].push_back(egf);
 	}
@@ -648,6 +663,8 @@ ExPath(Eventually(x)) -> [ctl:
 	{
 		printf("CTL-ExPath_Eventually\n");
         ctl_id_stack.push(ctl_nextId++);
+		size_t myDFSId = ctl_dfs_id++;
+		size_t myCacheId = ctl_result_cache_id++;
     }
 	x
 	{
@@ -658,6 +675,8 @@ ExPath(Eventually(x)) -> [ctl:
 		EFFormula* eff = new EFFormula();
 		assert(ctl_formulas[myId].size() == 1);
 		eff->inner = ctl_formulas[myId][0];
+		eff->index = 2*myCacheId;
+		eff->dfsindex = myDFSId*sizeof(statenumber_t);
 
 		ctl_formulas[ctl_id_stack.top()].push_back(eff);
 	}
@@ -688,6 +707,8 @@ ExPath(Until(a,b)) -> [ctl:
 	{
 		printf("CTL-ExPath_Until\n");
         ctl_id_stack.push(ctl_nextId++);
+		size_t myDFSId = ctl_dfs_id++;
+		size_t myCacheId = ctl_result_cache_id++;
     }
 	a
 	b
@@ -700,7 +721,9 @@ ExPath(Until(a,b)) -> [ctl:
 		EUFormula* euf = new EUFormula();
 		euf->phi = ctl_formulas[myId][0];
 		euf->psi = ctl_formulas[myId][1];
-		
+		euf->index = 2*myCacheId;
+		euf->dfsindex = myDFSId*sizeof(statenumber_t);
+
 		ctl_formulas[ctl_id_stack.top()].push_back(euf);
 	}
 ];

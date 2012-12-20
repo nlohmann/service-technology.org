@@ -463,7 +463,7 @@ f=StatePredicateFormula(x) -> [ctl:
         // return the only entry for the root
         assert(ctl_nextId == 0);
         f->ctl_formula = ctl_formulas[0][0];
-        f->ctl_formula->payloadsize = ctl_dfs_id*sizeof(statenumber_t) + (2*ctl_result_cache+7)/8;
+        f->ctl_formula->payloadsize = ctl_dfs_id*sizeof(statenumber_t) + (2*ctl_result_cache_id+7)/8;
         printf("I am a CTL state predicate. Done!\n");
     }
 ];
@@ -535,7 +535,9 @@ True() -> [ctl:
 
 False() -> [ctl:
 	{
-		ctl_formulas[ctl_id_stack.top()].push_back(atomic_ctl);    
+		NotFormula * nf;
+		nf->inner = new TrueFormula();
+		ctl_formulas[ctl_id_stack.top()].push_back(nf);
 	}
 ];
 
@@ -737,7 +739,9 @@ AtomicProposition(a) -> [ctl:
 	{
 		const index_t myId = ctl_id_stack.top();
 		ctl_id_stack.pop();
-		assert(ctl_formulas[myId].size() == 0);
+		if(ctl_formulas[myId].size() == 0){
+			;
+		}
 		AtomicFormula *af = new AtomicFormula();
 		af->inner = spp;
 

@@ -21,4 +21,26 @@ struct AUFormula : public DFSFormula {
 	}
 
 	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness);
+
+
+	void DEBUG_print() {
+		printf("[%u,%u,%lu]A(",index,dfsindex,payloadsize);
+		phi->DEBUG_print();
+		printf(")U(");
+		psi->DEBUG_print();
+		printf(")");
+	}
+
+	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
+		dfsindex = ((*numDFS)++) * sizeof(statenumber_t);
+		index = ((*numCachedResults)++) * 2;
+		phi->gatherPayloadInformation(numDFS,numCachedResults);
+		psi->gatherPayloadInformation(numDFS,numCachedResults);
+	}
+	void setPayloadInformation(index_t cachedResultOffset, size_t payloadSize) {
+		index += cachedResultOffset * 8;
+		payloadsize = payloadSize;
+		phi->setPayloadInformation(cachedResultOffset,payloadSize);
+		psi->setPayloadInformation(cachedResultOffset,payloadSize);
+	}
 };

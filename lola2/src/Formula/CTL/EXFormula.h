@@ -37,4 +37,16 @@ struct EXFormula : public CTLFormula {
 		}
 		return false;
 	}
+
+	void DEBUG_print() {
+		printf("EX(");
+		inner->DEBUG_print();
+		printf(")");
+	}
+	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
+		inner->gatherPayloadInformation(numDFS,numCachedResults);
+	}
+	void setPayloadInformation(index_t cachedResultOffset, size_t payloadSize) {
+		inner->setPayloadInformation(cachedResultOffset,payloadSize);
+	}
 };

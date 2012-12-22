@@ -31,4 +31,21 @@ public:
 		euFormula.payloadsize = payloadsize;
 		return !euFormula.check(s,ns,firelist,witness);
 	}
+
+	void DEBUG_print() {
+		printf("[%u,%u,%lu]AG(",index,dfsindex,payloadsize);
+		inner->DEBUG_print();
+		printf(")");
+	}
+
+	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
+		dfsindex = ((*numDFS)++) * sizeof(statenumber_t);
+		index = ((*numCachedResults)++) * 2;
+		inner->gatherPayloadInformation(numDFS,numCachedResults);
+	}
+	void setPayloadInformation(index_t cachedResultOffset, size_t payloadSize) {
+		index += cachedResultOffset * 8;
+		payloadsize = payloadSize;
+		inner->setPayloadInformation(cachedResultOffset,payloadSize);
+	}
 };

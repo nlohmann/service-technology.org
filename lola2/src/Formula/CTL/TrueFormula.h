@@ -10,4 +10,15 @@ struct TrueFormula : public CTLFormula {
 	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
 		return true;
 	}
+
+	void DEBUG_print() {
+		printf("TRUE");
+	}
+
+	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
+		// do nothing
+	}
+	void setPayloadInformation(index_t cachedResultOffset, size_t payloadSize) {
+		// do nothing
+	}
 };

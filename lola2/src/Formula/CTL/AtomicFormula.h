@@ -17,4 +17,15 @@ struct AtomicFormula : public CTLFormula {
 	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
 		return inner->value;
 	}
+
+	void DEBUG_print() {
+		printf("ATOMIC");
+	}
+
+	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
+		// do nothing
+	}
+	void setPayloadInformation(index_t cachedResultOffset, size_t payloadSize) {
+		// do nothing
+	}
 };

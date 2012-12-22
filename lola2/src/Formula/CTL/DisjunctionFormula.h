@@ -25,4 +25,20 @@ struct DisjunctionFormula : public CTLFormula {
 				witness->clear();
 		return false;
 	}
+
+	void DEBUG_print() {
+		printf("OR(");
+		for(index_t i=0;i<cardSubs;i++)
+			subs[i]->DEBUG_print();
+		printf(")");
+	}
+
+	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
+		for(index_t i = 0; i < cardSubs; i++)
+			subs[i]->gatherPayloadInformation(numDFS,numCachedResults);
+	}
+	void setPayloadInformation(index_t cachedResultOffset, size_t payloadSize) {
+		for(index_t i = 0; i < cardSubs; i++)
+			subs[i]->setPayloadInformation(cachedResultOffset,payloadSize);
+	}
 };

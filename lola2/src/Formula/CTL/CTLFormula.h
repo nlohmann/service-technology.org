@@ -7,6 +7,8 @@
 #include <Exploration/Firelist.h>
 #include <Stores/Store.h>
 
+#include <cstdio>
+
 enum CTLFormulaResult {
 	UNKNOWN = 0,     // implies white/unvisited
 	IN_PROGRESS = 1, // implies gray or on tarjan stack (depending on search method)
@@ -16,7 +18,6 @@ enum CTLFormulaResult {
 
 struct CTLFormula {
 	index_t index; // bit index in state payload. known flag is 2*index, value flag is 2*index+1
-//	CTLFormula* parent;
 	size_t payloadsize;
 
 	CTLFormulaResult getCachedResult(void* payload) {
@@ -39,4 +40,9 @@ struct CTLFormula {
 	virtual void updateAtomics(NetState& ns, index_t t) = 0;
 	virtual void revertAtomics(NetState& ns, index_t t) = 0;
 	virtual bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) = 0;
+
+	virtual void DEBUG_print() = 0;
+
+	virtual void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) = 0;
+	virtual void setPayloadInformation(index_t cachedResultOffset, size_t payloadSize) = 0;
 };

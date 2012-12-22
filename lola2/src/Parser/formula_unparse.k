@@ -411,7 +411,6 @@ EmptyAcceptingSet() -> [buechi: ];
 #include <Exploration/StatePredicateProperty.h>
 
 #include <Formula/CTL/CTLFormula.h>
-#include <Formula/CTL/DFSFormula.h>
 #include <Formula/CTL/AFFormula.h>
 #include <Formula/CTL/AGFormula.h>
 #include <Formula/CTL/ARFormula.h>

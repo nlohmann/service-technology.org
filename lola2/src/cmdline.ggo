@@ -4,7 +4,7 @@ section "Check a property"
 
 option "check" -
   "Check a property"
-  values="none","full","deadlock","statepredicate","ltl","ctl" enum
+  values="none","full","deadlock","formula","ltl" enum
   typestr="PROPERTY"
   default="none"
   optional

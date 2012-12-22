@@ -3,6 +3,10 @@
 #pragma once
 
 #include <vector>
+#include <Formula/CTL/CTLFormula.h>
+#include <Stores/Store.h>
+#include <Exploration/Firelist.h>
+#include <Net/NetState.h>
 
 class CTLExploration {
 public:

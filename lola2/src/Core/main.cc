@@ -279,7 +279,23 @@ int main(int argc, char** argv)
 
         if (args_info.search_arg != search_arg_findpath)
         {
-            rep->message("%llu markings, %llu edges", task.s->get_number_of_markings(), (task.s->get_number_of_calls() > 0) ? task.s->get_number_of_calls() - 1 : 0);
+        	uint64_t numMarkings = 0;
+        	if(task.store)
+        		numMarkings = task.store->get_number_of_markings();
+        	else if(task.ltlStore)
+        		numMarkings = task.ltlStore->get_number_of_markings();
+        	else if(task.ctlStore)
+        		numMarkings = task.ctlStore->get_number_of_markings();
+        	uint64_t numEdges = 0;
+        	if(task.store)
+        		numEdges = task.store->get_number_of_calls();
+        	else if(task.ltlStore)
+        		numEdges = task.ltlStore->get_number_of_calls();
+        	else if(task.ctlStore)
+        		numEdges = task.ctlStore->get_number_of_calls();
+        	if(numEdges)
+        		numEdges--;
+            rep->message("%llu markings, %llu edges", numMarkings, numEdges);
         }
 
         // print statistics

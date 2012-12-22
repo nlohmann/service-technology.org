@@ -4,6 +4,7 @@
 #include <Net/Transition.h>
 
 bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
+
 	void** pInitialPayload;
 	if(!s.searchAndInsert(ns, &pInitialPayload, 0))
 		*pInitialPayload = calloc(payloadsize,1); // all-zeros is starting state for all values
@@ -26,6 +27,8 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 		setCachedResult(payload,KNOWN_FALSE);
 		return false;
 	}
+
+	rep->status("starting AU check");
 
 	// dfs stack will contain all gray nodes
 	SearchStack<DFSStackEntry> dfsStack;

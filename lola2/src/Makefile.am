@@ -39,6 +39,7 @@ lola_SOURCES = \
                 \
                 Planning/Task.cc Planning/Task.h \
                 \
+                Exploration/CTLExploration.cc Exploration/CTLExploration.h \
                 Exploration/LTLExploration.cc Exploration/LTLExploration.h \
                 Exploration/DFSExploration.cc Exploration/DFSExploration.h \
                 Exploration/ParallelExploration.cc Exploration/ParallelExploration.h \

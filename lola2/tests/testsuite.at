@@ -115,7 +115,7 @@ AT_SETUP([Writing and reading compressed files (3/4)])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([cp TESTFILES/garavel.task .])
 AT_CHECK([LOLA --writeCompressed garavel.lola],0,ignore,stderr)
-AT_CHECK([LOLA --compressed compressedOutput.net compressedOutput.names --check=statepredicate --formula=garavel.task -v],0,ignore,stderr)
+AT_CHECK([LOLA --compressed compressedOutput.net compressedOutput.names --check=formula --formula=garavel.task -v],0,ignore,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(frontend)
 AT_CLEANUP
@@ -768,7 +768,7 @@ AT_BANNER([State Predicate])
 
 AT_SETUP([Garavel])
 AT_CHECK([cp TESTFILES/garavel.lola TESTFILES/garavel.task .])
-AT_CHECK([LOLA garavel.lola --formula=garavel.task --check=statepredicate -v],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --formula=garavel.task --check=formula -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_CHECK([GREP -q "lola: 17 markings, 16 edges" stderr])
 AT_KEYWORDS(statepredicate)
@@ -776,7 +776,7 @@ AT_CLEANUP
 
 AT_SETUP([positive formula])
 AT_CHECK([cp TESTFILES/phils5.lola TESTFILES/philpos.task .])
-AT_CHECK([LOLA phils5.lola --formula=philpos.task --check=statepredicate -v],0,stdout,stderr)
+AT_CHECK([LOLA phils5.lola --formula=philpos.task --check=formula -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -784,14 +784,14 @@ AT_CLEANUP
 
 AT_SETUP([Garavel (parallel)])
 AT_CHECK([cp TESTFILES/garavel.lola TESTFILES/garavel.task .])
-AT_CHECK([LOLA garavel.lola --formula=garavel.task --check=statepredicate -v --store=psbbin --threads=4],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --formula=garavel.task --check=formula -v --store=psbbin --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
 
 AT_SETUP([positive formula (parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola TESTFILES/philpos.task .])
-AT_CHECK([LOLA phils5.lola --formula=philpos.task --check=statepredicate -v --store=psbbin --threads=4],0,stdout,stderr)
+AT_CHECK([LOLA phils5.lola --formula=philpos.task --check=formula -v --store=psbbin --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -803,14 +803,14 @@ AT_BANNER([Find Path])
 
 AT_SETUP([Garavel])
 AT_CHECK([cp TESTFILES/garavel.lola TESTFILES/garavel.task .])
-AT_CHECK([LOLA garavel.lola --formula=garavel.task --search=findpath --check=statepredicate -v],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --formula=garavel.task --search=findpath --check=formula -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(findpath)
 AT_CLEANUP
 
 AT_SETUP([Garavel (parallel)])
 AT_CHECK([cp TESTFILES/garavel.lola TESTFILES/garavel.task .])
-AT_CHECK([LOLA garavel.lola --formula=garavel.task --search=findpath --check=statepredicate -v --store=psbbin --threads=4],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --formula=garavel.task --search=findpath --check=formula -v --store=psbbin --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
 AT_KEYWORDS(findpath)
 AT_CLEANUP
@@ -851,7 +851,7 @@ AT_BANNER([Initially Satisfied Predicates])
 AT_SETUP([State predicate initially satisfied])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsinitial.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsinitial.task phils5.lola -v],0,ignore,stderr)
+AT_CHECK([LOLA --check=formula --formula=philsinitial.task phils5.lola -v],0,ignore,stderr)
 AT_CHECK([GREP -q -E "0 markings, 0 edges" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -859,7 +859,7 @@ AT_CLEANUP
 AT_SETUP([Findpath initially satisfied])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsinitial.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsinitial.task --search=findpath phils5.lola -v],0,ignore,stderr)
+AT_CHECK([LOLA --check=formula --formula=philsinitial.task --search=findpath phils5.lola -v],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: yes" stderr])
 AT_KEYWORDS(findpath)
 AT_CLEANUP
@@ -868,7 +868,7 @@ AT_SETUP([TRUE])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_DATA(formula.task,[FORMULA TRUE;
 ])
-AT_CHECK([LOLA garavel.lola --check=statepredicate --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --check=formula --formula=formula.task --verbose],0,stdout,stderr)
 AT_CHECK([GREP -q -E "result: yes" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -877,7 +877,7 @@ AT_CLEANUP
 AT_SETUP([State predicate initially satisfied (parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsinitial.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsinitial.task phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
+AT_CHECK([LOLA --check=formula --formula=philsinitial.task phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
 AT_CHECK([GREP -q -E "0 markings, 0 edges" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -885,7 +885,7 @@ AT_CLEANUP
 AT_SETUP([Findpath initially satisfied (parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsinitial.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsinitial.task --search=findpath phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
+AT_CHECK([LOLA --check=formula --formula=philsinitial.task --search=findpath phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: yes" stderr])
 AT_KEYWORDS(findpath)
 AT_CLEANUP
@@ -894,7 +894,7 @@ AT_SETUP([TRUE (parallel)])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_DATA(formula.task,[FORMULA TRUE;
 ])
-AT_CHECK([LOLA garavel.lola --check=statepredicate --formula=formula.task --verbose --threads=4 --store=psbbin],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --check=formula --formula=formula.task --verbose --threads=4 --store=psbbin],0,stdout,stderr)
 AT_CHECK([GREP -q -E "result: yes" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -907,7 +907,7 @@ AT_BANNER([Unsatisfiable Predicates])
 AT_SETUP([State predicate unsatisfiable])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsunsat.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task phils5.lola -v],0,ignore,stderr)
+AT_CHECK([LOLA --check=formula --formula=philsunsat.task phils5.lola -v],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -915,7 +915,7 @@ AT_CLEANUP
 AT_SETUP([Findpath unsatisfiable])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsunsat.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task --search=findpath --retrylimit=100 --depthlimit=1000 phils5.lola -v],0,ignore,stderr)
+AT_CHECK([LOLA --check=formula --formula=philsunsat.task --search=findpath --retrylimit=100 --depthlimit=1000 phils5.lola -v],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
 AT_KEYWORDS(findpath)
 AT_CLEANUP
@@ -924,7 +924,7 @@ AT_SETUP([FALSE])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_DATA(formula.task,[FORMULA FALSE;
 ])
-AT_CHECK([LOLA garavel.lola --check=statepredicate --formula=formula.task --verbose],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --check=formula --formula=formula.task --verbose],0,stdout,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -933,7 +933,7 @@ AT_CLEANUP
 AT_SETUP([State predicate unsatisfiable (parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsunsat.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
+AT_CHECK([LOLA --check=formula --formula=philsunsat.task phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP
@@ -941,7 +941,7 @@ AT_CLEANUP
 AT_SETUP([Findpath unsatisfiable (parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsunsat.task .])
-AT_CHECK([LOLA --check=statepredicate --formula=philsunsat.task --search=findpath --retrylimit=100 --depthlimit=1000 phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
+AT_CHECK([LOLA --check=formula --formula=philsunsat.task --search=findpath --retrylimit=100 --depthlimit=1000 phils5.lola -v --threads=4 --store=psbbin],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
 AT_KEYWORDS(findpath)
 AT_CLEANUP
@@ -950,7 +950,7 @@ AT_SETUP([FALSE (parallel)])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_DATA(formula.task,[FORMULA FALSE;
 ])
-AT_CHECK([LOLA garavel.lola --check=statepredicate --formula=formula.task --verbose --threads=4 --store=psbbin],0,stdout,stderr)
+AT_CHECK([LOLA garavel.lola --check=formula --formula=formula.task --verbose --threads=4 --store=psbbin],0,stdout,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
 AT_KEYWORDS(statepredicate)
 AT_CLEANUP

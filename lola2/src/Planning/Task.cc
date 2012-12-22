@@ -33,16 +33,6 @@
 
 #include <Formula/StatePredicate.h>
 
-#include <Stores/NetStateEncoder/BitEncoder.h>
-#include <Stores/NetStateEncoder/CopyEncoder.h>
-#include <Stores/NetStateEncoder/FullCopyEncoder.h>
-#include <Stores/NetStateEncoder/SimpleCompressedEncoder.h>
-#include <Stores/VectorStores/SuffixTreeStore.h>
-#include <Stores/VectorStores/VSTLStore.h>
-#include <Stores/VectorStores/VBloomStore.h>
-#include <Stores/PluginStore.h>
-#include <Stores/EmptyStore.h>
-#include <Stores/CompareStore.h>
 #include <Stores/Store.h>
 
 #include <SweepLine/SweepEmptyStore.h>
@@ -83,10 +73,27 @@ void myprinter(const char* s, kc::uview v)
 }
 // LCOV_EXCL_STOP
 
+/// special store creation for stores without payload support (e.g. BloomStore)
+template<>
+Store<void>* StoreCreator<void>::createSpecializedStore(int number_of_threads) {
+    switch (args_info.store_arg)
+    {
+    case store_arg_psbbloom:
+    	return new PluginStore<void>(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+    case store_arg_pscbloom:
+    	return new PluginStore<void>(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+    case store_arg_pssbloom:
+    	return new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+    default:
+    	storeCreationError();
+    }
+    return NULL;
+}
+
 extern kc::tFormula TheFormula;
 extern kc::tBuechiAutomata TheBuechi;
 
-Task::Task() : sp(NULL), ns(NULL), p(NULL), s(NULL), fl(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
+Task::Task() : spFormula(NULL), ctlFormula(NULL), bauto(NULL), ns(NULL), p(NULL), store(NULL), ctlStore(NULL), ltlStore(NULL), fl(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
 {
 	if (args_info.formula_given)
 		setFormula();
@@ -98,9 +105,9 @@ Task::Task() : sp(NULL), ns(NULL), p(NULL), s(NULL), fl(NULL), exploration(NULL)
 Task::~Task()
 {
     delete ns;
-    delete s;
+    delete store;
     delete p;
-    delete sp;
+    delete spFormula;
     delete fl;
     delete exploration;
 }
@@ -208,13 +215,18 @@ void Task::setFormula()
         assert(result);
         rep->status("processed formula with %d atomic propositions", result->countAtomic());
 
-        sp = result;
+        spFormula = result;
     }
     else if(formulaType == FORMULA_CTL){
     	 rep->message("implementation in progress");
     	 TheFormula->unparse(myprinter, kc::out);
     	 TheFormula->unparse(myprinter, kc::ctl);
-    	 CTLFormula* ctlFormula = TheFormula->ctl_formula;
+    	 ctlFormula = TheFormula->ctl_formula;
+
+    	// debug output
+    	printf("Formula: ");
+    	ctlFormula->DEBUG_print();
+    	printf("\n");
 
     	 assert(ctlFormula);
 
@@ -304,102 +316,22 @@ void Task::setStore()
 {
     if (args_info.search_arg == search_arg_findpath)
     {
-        s = new EmptyStore<void>(number_of_threads);
+        store = new EmptyStore<void>(number_of_threads);
     }
     else if (args_info.search_arg == search_arg_sweepline)
     {
 	// dummy store for the sweepline method, only counts markings and calls
-        s = new SweepEmptyStore();
+        store = new SweepEmptyStore();
     }
     else
     {
         // choose a store
-        switch (args_info.store_arg)
-        {
-        case store_arg_comp:
-        	if (args_info.check_arg == check_arg_ltl)
-        		sltl= new CompareStore<AutomataTree>(
-                		new PluginStore<AutomataTree>(new BitEncoder(number_of_threads), new SuffixTreeStore<AutomataTree>(), number_of_threads),
-                		new PluginStore<AutomataTree>(new BitEncoder(number_of_threads), new VSTLStore<AutomataTree>(number_of_threads), number_of_threads),
-                		number_of_threads
-                		);
-        	else
-        		s = new CompareStore<void>(
-            		new PluginStore<void>(new BitEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads),
-            		new PluginStore<void>(new BitEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads),
-            		number_of_threads
-            		);
-            break;
-        case store_arg_psbbin:
-        	if (args_info.check_arg == check_arg_ltl)
-                sltl = new PluginStore<AutomataTree>(new BitEncoder(number_of_threads), new SuffixTreeStore<AutomataTree>(), number_of_threads);
-            else
-            	s = new PluginStore<void>(new BitEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
-            break;
-        case store_arg_pscbin:
-        	if (args_info.check_arg == check_arg_ltl)
-                sltl = new PluginStore<AutomataTree>(new CopyEncoder(number_of_threads), new SuffixTreeStore<AutomataTree>(), number_of_threads);
-            else
-            	s = new PluginStore<void>(new CopyEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
-            break;
-        case store_arg_psfbin:
-        	if (args_info.check_arg == check_arg_ltl)
-        		sltl= new PluginStore<AutomataTree>(new FullCopyEncoder(number_of_threads), new SuffixTreeStore<AutomataTree>(), number_of_threads);
-            else
-            	s = new PluginStore<void>(new FullCopyEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
-            break;
-        case store_arg_pssbin:
-        	if (args_info.check_arg == check_arg_ltl)
-        		sltl = new PluginStore<AutomataTree>(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore<AutomataTree>(), number_of_threads);
-            else
-            	s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore<void>(), number_of_threads);
-            break;
-        case store_arg_psbstl:
-        	if (args_info.check_arg == check_arg_ltl)
-        		sltl  = new PluginStore<AutomataTree>(new BitEncoder(number_of_threads), new VSTLStore<AutomataTree>(number_of_threads), number_of_threads);
-            else
-            	s = new PluginStore<void>(new BitEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
-            break;
-        case store_arg_pscstl:
-        	if (args_info.check_arg == check_arg_ltl)
-        		sltl  = new PluginStore<AutomataTree>(new CopyEncoder(number_of_threads), new VSTLStore<AutomataTree>(number_of_threads), number_of_threads);
-            else
-            	s = new PluginStore<void>(new CopyEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
-            break;
-        case store_arg_psfstl:
-        	if (args_info.check_arg == check_arg_ltl)
-        		sltl  = new PluginStore<AutomataTree>(new FullCopyEncoder(number_of_threads), new VSTLStore<AutomataTree>(number_of_threads), number_of_threads);
-            else
-            	s = new PluginStore<void>(new FullCopyEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
-            break;
-        case store_arg_pssstl:
-        	if (args_info.check_arg == check_arg_ltl)
-        		sltl  = new PluginStore<AutomataTree>(new SimpleCompressedEncoder(number_of_threads), new VSTLStore<AutomataTree>(number_of_threads), number_of_threads);
-            else
-            	s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VSTLStore<void>(number_of_threads), number_of_threads);
-            break;
-        case store_arg_psbbloom:
-        	if (args_info.check_arg == check_arg_ltl)
-        		assert(false);
-        		//sltl  = new PluginStore<AutomataTree>(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
-            else
-            	s = new PluginStore<void>(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
-            break;
-        case store_arg_pscbloom:
-        	if (args_info.check_arg == check_arg_ltl)
-        		assert(false);
-        		//sltl  = new PluginStore<AutomataTree>(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
-        	else
-        		s = new PluginStore<void>(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
-            break;
-        case store_arg_pssbloom:
-        	if (args_info.check_arg == check_arg_ltl)
-        		assert(false);
-        		//sltl = new PluginStore<AutomataTree>(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
-            else
-            	s = new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
-            break;
-        }
+    	if(bauto)
+    		ltlStore = StoreCreator<AutomataTree>::createStore(number_of_threads);
+    	else if(ctlFormula)
+    		ctlStore = StoreCreator<void*>::createStore(number_of_threads);
+    	else
+    		store = StoreCreator<void>::createStore(number_of_threads);
     }
 }
 
@@ -421,9 +353,15 @@ void Task::setProperty()
         fl = new FirelistStubbornDeadlock();
         break;
 
-    case check_arg_statepredicate:
-        p = new StatePredicateProperty(sp);
-        fl = new FirelistStubbornStatePredicate(sp);
+    case check_arg_formula:
+    	if(bauto) {
+    		fl = new Firelist();
+    	} else if(ctlFormula) {
+    		fl = new Firelist();
+    	} else if(spFormula) {
+			p = new StatePredicateProperty(spFormula);
+			fl = new FirelistStubbornStatePredicate(spFormula);
+    	}
         break;
     }
 
@@ -433,18 +371,22 @@ void Task::setProperty()
     {
     case check_arg_full:
     case check_arg_deadlock:
-    case check_arg_statepredicate:
-        if (number_of_threads == 1)
-        {
-            exploration = new DFSExploration();
-        }
-        else
-        {
-            exploration = new ParallelExploration();
-        }
+    case check_arg_formula:
+    	if(ctlFormula) {
+    	    ctlExploration = new CTLExploration();
+    	} else {
+			if (number_of_threads == 1)
+			{
+				exploration = new DFSExploration();
+			}
+			else
+			{
+				exploration = new ParallelExploration();
+			}
+    	}
         break;
     case check_arg_ltl:
-    	ltlexploration = new LTLExploration();
+    	ltlExploration = new LTLExploration();
     	break;
         // now there is only one, but who knows...
     }
@@ -453,44 +395,51 @@ void Task::setProperty()
 bool Task::getResult()
 {
     assert(ns);
-    assert(s);
-    assert(p);
-    assert(exploration);
+    assert(!ctlFormula || ctlStore);
+    assert(!bauto || ltlStore);
+    assert(ctlFormula || bauto || store);
+    assert(!ctlFormula || ctlExploration);
+    assert(!bauto || ltlExploration);
+    assert(ctlFormula || bauto || exploration);
+    assert(ctlFormula || bauto || p);
     assert(fl);
 
     bool result;
-    switch (args_info.search_arg)
-    {
-    case search_arg_depth:
-        result = exploration->depth_first(*p, *ns, *s, *fl, number_of_threads);
-        break;
+    if(ctlFormula) {
+    	result = ctlExploration->checkProperty(ctlFormula,*ctlStore,*fl,*ns);
+    } else if(bauto) {
+		result = ltlExploration->checkProperty(*bauto,*ltlStore, *fl,*ns);
+    } else {
+		switch (args_info.search_arg)
+		{
+		case search_arg_depth:
+			result = exploration->depth_first(*p, *ns, *store, *fl, number_of_threads);
+			break;
 
-    case search_arg_findpath:
-        if (args_info.retrylimit_arg == 0)
-        {
-            rep->status("starting infinite tries of depth %d", args_info.depthlimit_arg);
-        }
-        else
-        {
-            rep->status("starting at most %d tries of depth %d", args_info.retrylimit_arg, args_info.depthlimit_arg);
-        }
+		case search_arg_findpath:
+			if (args_info.retrylimit_arg == 0)
+			{
+				rep->status("starting infinite tries of depth %d", args_info.depthlimit_arg);
+			}
+			else
+			{
+				rep->status("starting at most %d tries of depth %d", args_info.retrylimit_arg, args_info.depthlimit_arg);
+			}
 
-        choose = new ChooseTransitionHashDriven();
-        if (args_info.check_arg == check_arg_ltl)
-        	result = ltlexploration->checkProperty(*bauto,*sltl, *fl,*ns);
-        else
-        	result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore<void>*)s), *choose);
-        delete choose;
-        break;
+			choose = new ChooseTransitionHashDriven();
+			result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore<void>*)store), *choose);
+			delete choose;
+			break;
 
-    case search_arg_sweepline:
-	// no choice of stores for sweepline method here
-        result = exploration->sweepline(*p, *ns, *(SweepEmptyStore*)(s), *fl, number_of_threads);
-        break;
+		case search_arg_sweepline:
+		// no choice of stores for sweepline method here
+			result = exploration->sweepline(*p, *ns, *(SweepEmptyStore*)(store), *fl, number_of_threads);
+			break;
 
-    default:
-        assert(false);
-        break;
+		default:
+			assert(false);
+			break;
+		}
     }
 
     return result;
@@ -514,7 +463,7 @@ void Task::interpreteResult(bool result)
         switch (args_info.check_arg)
         {
         case (check_arg_deadlock):
-        case (check_arg_statepredicate):
+        case (check_arg_formula):
             if (not result)
             {
                 final_result = TRINARY_UNKNOWN;
@@ -540,13 +489,19 @@ void Task::interpreteResult(bool result)
 void Task::printWitness()
 {
     rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness path:").str());
-    index_t c;
-    index_t* f;
-    while (p->stack.StackPointer > 0)
-    {
-        SimpleStackEntry & s = p->stack.top();
-        rep->message("%s", Net::Name[TR][s.fl[s.current]]);
-        p->stack.pop();
+
+    if(ctlFormula) {
+		for(std::vector<int>::iterator it = ctlExploration->witness.begin(); it != ctlExploration->witness.end();it++) {
+			rep->message("%s", Net::Name[TR][*it]);
+		}
+		ctlExploration->witness.clear();
+    } else {
+		while (p->stack.StackPointer > 0)
+		{
+			SimpleStackEntry & s = p->stack.top();
+			rep->message("%s", Net::Name[TR][s.fl[s.current]]);
+			p->stack.pop();
+		}
     }
 }
 
@@ -626,7 +581,7 @@ void Task::testPopState()
   rep->message("%s", rep->markup(MARKUP_IMPORTANT, "iterating over all stored states:").str());
   uint64_t counter = 0;
 
-  while(s->popState(*ns))
+  while(store->popState(*ns))
   {
     // increment counter
     ++counter;

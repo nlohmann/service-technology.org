@@ -1,5 +1,7 @@
 #include <errno.h>
 
+#include <iostream>
+
 #include <map>
 #include <list>
 #include <set>
@@ -86,8 +88,8 @@ Store<void>* StoreCreator<void>::createSpecializedStore(int number_of_threads) {
     	return new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
     default:
     	storeCreationError();
+    	return NULL;
     }
-    return NULL;
 }
 
 extern kc::tFormula TheFormula;
@@ -273,8 +275,10 @@ void Task::setBuechiAutomata()
         ptbuechi_in = *buechiFile;
     }
 
+    rep->message("Parsing Büchi-Automaton");
     // parse the formula
     ptbuechi_parse();
+    rep->message("Finished Parsing");
 
     // restructure the formula: remove arrows and handle negations and tautologies
     TheBuechi = TheBuechi->rewrite(kc::arrows);
@@ -283,7 +287,7 @@ void Task::setBuechiAutomata()
     // check temporal status
     TheBuechi->unparse(myprinter, kc::temporal);
 
-    rep->status("checking LTL");
+    rep->message("checking LTL");
 
 
     // restructure the formula: again tautoglies and simplification
@@ -296,10 +300,10 @@ void Task::setBuechiAutomata()
     TheBuechi->unparse(myprinter, kc::internal);
     result = TheBuechi->automata;
 
-    rep->status("processed buechi automata");
+    rep->message("Processed Büchi-Automaton");
 
     // tidy parser
-    ptformula_lex_destroy();
+    ptbuechi_lex_destroy();
     //delete TheFormula;
 
     if (args_info.buechi_given)

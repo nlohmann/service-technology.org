@@ -1,5 +1,7 @@
 buechi {
- 
+ good :
+ 	TRUE => good
 }
-accept {  } ;
+accept { good }
+;
 

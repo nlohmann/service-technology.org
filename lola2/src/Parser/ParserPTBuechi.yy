@@ -20,6 +20,7 @@
 #include <Parser/ast-system-yystype.h>
 
 extern ParserPTNet* symbolTables;
+extern SymbolTable* buechiStateTable;
 
 extern gengetopt_args_info args_info;
 
@@ -90,7 +91,7 @@ uint32_t currentState;
 %%
 
 buechiAutomata:
-  _buechi_ _braceleft_ buechiRules _braceright_ _accept_ _braceleft_ acceptingsets _braceright_ _semicolon_
+  _buechi_ _braceleft_ buechiRules _braceright_  _accept_ _braceleft_ acceptingsets _braceright_ _semicolon_
     { TheBuechi = $$ = BuechiNull(); }
 ;
 
@@ -98,36 +99,33 @@ buechiRules:
   /* empty */                     { $$ = EmptyBuechiRules(); }
 | buechiRule                      { $$ = $1; }
 | buechiRule _comma_ buechiRules  { $$ = BuechiRules($1,$3); }
+;
 
 buechiRule:
-  IDENTIFIER _colon_ transitionRules
-    {
-        Symbol *t = symbolTables->TransitionTable->lookup($1->name);
-        if (t == NULL)
-        {
-            ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $1->name);
-        }
-        $$ = BuechiRule((mkinteger(t->getIndex())),$3);
-    }
+  IDENTIFIER {
+  	Symbol *t = buechiStateTable->lookup($1->name);
+  	if (t == NULL)
+  		buechiStateTable->insert(new Symbol($1->name));
+  }
+   _colon_ transitionRules { Symbol *t = buechiStateTable->lookup($1->name); $$ = BuechiRule((mkinteger(t->getIndex())),$4); }
+;
 
 transitionRules:
   /* empty */   { $$ = EmptyTransitionRules(); }
 | statepredicate _then_ IDENTIFIER transitionRules
     {
-        Symbol *t = symbolTables->TransitionTable->lookup($3->name);
-        if (t == NULL)
-        {
-            ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $3->name);
-        }
+        Symbol *t = buechiStateTable->lookup($3->name);
+	  	if (t == NULL)
+	  		buechiStateTable->insert(new Symbol($3->name));
         $$ = TransitionRules(TransitionRule(StatePredicateFormula($1),mkinteger(t->getIndex())),$4);
     }
-
+;
 
 acceptingsets:
   /* empty */     { $$ = EmptyAcceptingSet(); }
 | IDENTIFIER
     {
-        Symbol *t = symbolTables->TransitionTable->lookup($1->name);
+        Symbol *t = buechiStateTable->lookup($1->name);
         if (t == NULL)
         {
             ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $1->name);
@@ -136,13 +134,14 @@ acceptingsets:
     }
 | IDENTIFIER _comma_ acceptingsets
     {
-        Symbol *t = symbolTables->TransitionTable->lookup($1->name);
+        Symbol *t = buechiStateTable->lookup($1->name);
         if (t == NULL)
         {
             ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $1->name);
         }
         $$ = AcceptingSet(AcceptingState(mkinteger(t->getIndex())),$3);
     }
+;
 
 statepredicate:
   _leftparenthesis_ statepredicate _rightparenthesis_
@@ -229,11 +228,11 @@ __attribute__((noreturn)) void ptbuechi_yyerrors(char* token, const char* format
     char* errormessage = NULL;
     const int res = vasprintf(&errormessage, format, args);
     assert(res != -1);
-    rep->status(errormessage);
+    rep->message(errormessage);
     free(errormessage);
     va_end(args);
 
-    rep->status("%s:%d:%d - error near '%s'", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str(), ptbuechi_lineno, ptbuechi_colno, token);
+    rep->message("%s:%d:%d - error near '%s'", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str(), ptbuechi_lineno, ptbuechi_colno, token);
 //    rep->status("%d:%d - error near '%s'", ptbuechi_lineno, ptbuechi_colno, token);
 
     rep->abort(ERROR_SYNTAX);

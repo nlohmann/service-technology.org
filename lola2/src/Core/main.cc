@@ -55,6 +55,7 @@ extern FILE* ptnetlola_in;
 Reporter* rep = NULL;
 
 ParserPTNet* symbolTables;
+SymbolTable* buechiStateTable;
 
 /*!
 \brief variable to manage multiple files
@@ -158,6 +159,9 @@ int main(int argc, char** argv)
     {
         callHome(argc, argv);
     }
+
+    if (args_info.buechi_given)
+    	buechiStateTable = new SymbolTable();
 
     // file input
     if (args_info.compressed_given)

@@ -13,11 +13,14 @@ LTLExploration::~LTLExploration() {
 inline bool searchAndInsertAutomataState(uint32_t automataState,
 		AutomataTree** tree, AutomataTree** result) {
 	while (true) {
+		//rep->message("sai %d %d %d", automataState, *tree, (*tree)?(*tree)->state:-1);
 		if (*tree == 0) {
 			*tree = new AutomataTree();
 			(*tree)->state = automataState;
 			(*tree)->bigger = 0;
 			(*tree)->smaller = 0;
+			*result = *tree;
+			//rep->message("create state %d @ %d", automataState, *tree);
 			return false;
 		}
 		if ((*tree)->state == automataState) {
@@ -31,7 +34,7 @@ inline bool searchAndInsertAutomataState(uint32_t automataState,
 	}
 }
 
-bool LTLExploration::checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
+bool LTLExploration::checkProperty(BuechiAutomata &automata, Store<AutomataTree*> &store,
 		Firelist &firelist, NetState &ns) {
 
 	// the stack for the search
@@ -53,45 +56,58 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata, Store<AutomataTree>
 
 	// get first firelist
 	index_t* currentFirelist;
-	index_t currentFirelistEntry = firelist.getFirelist(ns, &currentFirelist);
+	// the size of the list is not a valid index (thus -1)
+	index_t currentFirelistEntry = firelist.getFirelist(ns, &currentFirelist) - 1;
 	index_t* currentStateList;
 	index_t currentStateListEntry = automata.getSuccessors(ns,
 			&currentStateList, currentAutomataState);
 	index_t currentStateListLength = currentStateListEntry;
 	index_t currentLowlink = 0;
-	AutomataTree* currentStateEntry;
+
+//	rep->message("current params: FLL %d SLL %d AS %d", currentFirelistEntry, currentStateListEntry, currentAutomataState);
 
 	// insert the initial transition and initial state of the buechi automata into the store
-	store.searchAndInsert(ns, &currentStateEntry, 0);
-	currentStateList = 0;
-	searchAndInsertAutomataState(currentAutomataState, &currentStateEntry,
+	AutomataTree* currentStateEntry;
+	AutomataTree** __temp_reader;
+	//rep->message("pointer %d",__temp_reader);
+	store.searchAndInsert(ns, &__temp_reader, 0);
+	//rep->message("pointer %d",__temp_reader);
+	searchAndInsertAutomataState(currentAutomataState, __temp_reader,
 			&currentStateEntry);
+	currentStateEntry = *__temp_reader;
+	//rep->message("\t\t\t\t\t\tNEW STATE %d %d %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], currentStateList[currentStateListEntry]);
 
 	// set dfs and lowlink number
 	currentStateEntry->dfs = currentNextDFSNumber;
 
 	while (true) // exit when trying to pop from empty stack
 	{
+		//rep->message("current params: FLL %d SLL %d AS %d", currentFirelistEntry, currentStateListEntry, currentAutomataState);
+		//rep->message("current state %d %d %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], currentAutomataState);
 		// calculate the next transition
 		if (currentStateListEntry == 0) {
-			currentStateListEntry = currentStateListLength;
+			currentStateListEntry = currentStateListLength-1;
 			currentFirelistEntry--;
 		} else
 			currentStateListEntry--;
 
-		if (currentFirelistEntry >= 0 && currentStateListEntry >= 0) {
+		if (currentFirelistEntry != -1 && currentStateListEntry >= 0) {
+			//rep->message("Checking Transition %d(to %d) %d", currentStateListEntry, currentStateList[currentStateListEntry],currentFirelistEntry);
 			// there is a next transition that needs to be explored in current marking
 
 			// fire this transition to produce new Marking::Current
 			Transition::fire(ns, currentFirelist[currentFirelistEntry]);
+			//rep->message(" ==> %d %d %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], currentStateList[currentStateListEntry]);
 
-			AutomataTree* searchResult;
+			AutomataTree** searchResult;
 			if (!store.searchAndInsert(ns, &searchResult, 0))
-				searchResult = 0;
-			AutomataTree* nextStateEntry;
+				*searchResult = 0;
+			AutomataTree* nextStateEntry = 0;
 
-			if (searchAndInsertAutomataState(currentAutomataState,
-					&searchResult, &nextStateEntry)) {
+			//rep->message("store %d",resu);
+			if (searchAndInsertAutomataState(currentStateList[currentStateListEntry],
+					searchResult, &nextStateEntry)) {
+				//rep->message("old one found");
 				// if on tarjan-stack(indicated by lowlink == -1)
 				// this is not necessary
 				// if (nextStateEntry->dfs != -1)
@@ -101,6 +117,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata, Store<AutomataTree>
 				// State exists! -->backtracking to previous state
 				Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
 			} else {
+				//rep->message("\t\t\t\t\t\tNEW STATE %d %d %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], currentStateList[currentStateListEntry]);
 				// switch to next state
 				currentAutomataState = currentStateList[currentStateListEntry];
 				// State does not exist!
@@ -118,7 +135,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata, Store<AutomataTree>
 
 				// get Firelist and successor states
 				currentFirelistEntry = firelist.getFirelist(ns,
-						&currentFirelist);
+						&currentFirelist) - 1;
 				currentStateListEntry = automata.getSuccessors(ns,
 						&currentStateList, currentAutomataState);
 				currentStateListLength = currentStateListEntry;
@@ -135,6 +152,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata, Store<AutomataTree>
 
 			// check for the end of the SCC
 			if (currentLowlink == currentStateEntry->dfs) {
+				//rep->message("found an SCC");
 				if (foundcounterexample) {
 					// check for fairness via a new DFS!
 					return true;
@@ -144,6 +162,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata, Store<AutomataTree>
 					// mark all states as visited
 					tarjanStack.top()->dfs = -1;
 					tarjanStack.pop();
+					//rep->message("+1");
 				}
 			}
 			// push state onto tarjan stack
@@ -183,9 +202,11 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata, Store<AutomataTree>
 
 			assert(currentFirelistEntry < Net::Card[TR]);
 			// revert the petrinet
-			Transition::backfire(ns, currentFirelist[currentStateListEntry]);
+			Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
 			Transition::revertEnabled(ns,
-					currentFirelist[currentStateListEntry]);
+					currentFirelist[currentFirelistEntry]);
+			automata.revertProperties(ns,
+									currentFirelist[currentFirelistEntry]);
 			// revert the buechi automata
 			currentAutomataState = currentStateList[currentStateListEntry];
 		}

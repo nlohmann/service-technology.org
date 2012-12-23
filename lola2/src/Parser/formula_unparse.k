@@ -440,7 +440,7 @@ b=BuechiAutomaton(trans,accept) -> [buechi:
     		for (uint32_t j = 0; j < transitions[i].size(); j++){
     			b->automata->transitions[i][j] = (uint32_t*)calloc(2, sizeof(uint32_t));
     			b->automata->transitions[i][j][0] = transitions[i][j].first;
-    			b->automata->transitions[i][j][0] = transitions[i][j].second;
+    			b->automata->transitions[i][j][1] = transitions[i][j].second;
     		}
     	}
     	

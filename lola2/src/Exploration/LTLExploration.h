@@ -100,6 +100,6 @@ public:
 
 	~LTLExploration();
 
-	bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
+	bool checkProperty(BuechiAutomata &automata, Store<AutomataTree*> &store,
 			Firelist &firelist, NetState &ns);
 };

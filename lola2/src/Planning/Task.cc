@@ -274,10 +274,10 @@ void Task::setBuechiAutomata()
         ptbuechi_in = *buechiFile;
     }
 
-    rep->message("Parsing Büchi-Automaton");
+    //rep->message("Parsing Büchi-Automaton");
     // parse the formula
     ptbuechi_parse();
-    rep->message("Finished Parsing");
+    //rep->message("Finished Parsing");
 
     // restructure the formula: remove arrows and handle negations and tautologies
     TheBuechi = TheBuechi->rewrite(kc::arrows);
@@ -289,7 +289,7 @@ void Task::setBuechiAutomata()
     //rep->message("parsed Buechi");
     //TheBuechi->unparse(myprinter, kc::out);
 
-    rep->message("checking LTL");
+    //rep->message("checking LTL");
 
 
     // restructure the formula: again tautoglies and simplification
@@ -302,7 +302,7 @@ void Task::setBuechiAutomata()
     TheBuechi->unparse(myprinter, kc::buechi);
     bauto = TheBuechi->automata;
 
-    rep->message("Processed Büchi-Automaton");
+    //rep->message("Processed Büchi-Automaton");
 
     // tidy parser
     ptbuechi_lex_destroy();
@@ -332,7 +332,7 @@ void Task::setStore()
     {
         // choose a store
     	if(bauto)
-    		ltlStore = StoreCreator<AutomataTree>::createStore(number_of_threads);
+    		ltlStore = StoreCreator<AutomataTree*>::createStore(number_of_threads);
     	else if(ctlFormula)
     		ctlStore = StoreCreator<void*>::createStore(number_of_threads);
     	else

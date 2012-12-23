@@ -258,7 +258,6 @@ void Task::setBuechiAutomata()
         return;
     }
 
-    BuechiAutomata* result = NULL;
     Input* buechiFile = NULL;
 
     // Check if the paramter of --buechi is a file that we can open: if that
@@ -284,8 +283,11 @@ void Task::setBuechiAutomata()
     TheBuechi = TheBuechi->rewrite(kc::arrows);
     TheBuechi = TheBuechi->rewrite(kc::neg);
 
-    // check temporal status
-    TheBuechi->unparse(myprinter, kc::temporal);
+    // expande the transitions rules
+    TheBuechi = TheBuechi->rewrite(kc::rbuechi);
+
+    //rep->message("parsed Buechi");
+    //TheBuechi->unparse(myprinter, kc::out);
 
     rep->message("checking LTL");
 
@@ -297,8 +299,8 @@ void Task::setBuechiAutomata()
     TheBuechi = TheBuechi->rewrite(kc::lists);
 
     // copy restructured formula into internal data structures
-    TheBuechi->unparse(myprinter, kc::internal);
-    result = TheBuechi->automata;
+    TheBuechi->unparse(myprinter, kc::buechi);
+    bauto = TheBuechi->automata;
 
     rep->message("Processed Büchi-Automaton");
 
@@ -311,9 +313,8 @@ void Task::setBuechiAutomata()
         delete buechiFile;
     }
 
-
 	// reading the buechi automata
-    bauto = result;
+    assert(bauto);
 }
 
 void Task::setStore()
@@ -367,6 +368,9 @@ void Task::setProperty()
 			fl = new FirelistStubbornStatePredicate(spFormula);
     	}
         break;
+    case check_arg_ltl:
+    	fl = new Firelist();
+    	break;
     }
 
 

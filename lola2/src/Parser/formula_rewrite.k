@@ -263,3 +263,5 @@ Sum(x,y) -> <lists: ProductList(ConstProduct_list(x, ConstProduct_list(y, NiltPr
 BuechiRule(from,TransitionRules(lrules,rrules)) -> <rbuechi: BuechiRules(BuechiRule(from,lrules),BuechiRule(from,rrules))>;
 BuechiRule(from,TransitionRule(formula,to)) -> <rbuechi: ExpandedBuechiRule(from,formula,to)>;
 BuechiRule(from,EmptyTransitionRules()) -> <rbuechi: EmptyBuechiRules()>;
+BuechiRules(a,EmptyBuechiRules()) -> <rbuechi: a>;
+BuechiRules(EmptyBuechiRules(),a) -> <rbuechi: a>;

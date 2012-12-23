@@ -92,7 +92,7 @@ uint32_t currentState;
 
 buechiAutomata:
   _buechi_ _braceleft_ buechiRules _braceright_  _accept_ _braceleft_ acceptingsets _braceright_ _semicolon_
-    { TheBuechi = $$ = BuechiNull(); }
+    { TheBuechi = $$ = BuechiAutomaton($3,$7); }
 ;
 
 buechiRules:
@@ -115,8 +115,10 @@ transitionRules:
 | statepredicate _then_ IDENTIFIER transitionRules
     {
         Symbol *t = buechiStateTable->lookup($3->name);
-	  	if (t == NULL)
+	  	if (t == NULL){
 	  		buechiStateTable->insert(new Symbol($3->name));
+	  		t = buechiStateTable->lookup($3->name);
+	  	}
         $$ = TransitionRules(TransitionRule(StatePredicateFormula($1),mkinteger(t->getIndex())),$4);
     }
 ;

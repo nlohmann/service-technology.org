@@ -43,7 +43,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata, Store<AutomataTree>
 	automata.initProperties(ns);
 
 	/// current state of the buechi-automata
-	index_t currentAutomataState = 42;
+	index_t currentAutomataState = 0;
 
 	/// current global dfs number
 	index_t currentNextDFSNumber = 0;

@@ -37,17 +37,18 @@ public:
 	/// returns true if the given state is accepting
 	bool isAcceptingState(index_t state);
 
-private:
+public:
 	/// number of atomic propositions
-	int cardAtomicPropositions;
-
+	uint32_t cardAtomicPropositions;
 	/// an array containing the atomic propositions used by this buechi automata
-	StatePredicateProperty* atomicPropositions;
+	StatePredicateProperty** atomicPropositions;
 
-public: //TODO make private + add constructors
-  /// transition rules - maps a state + an atomic formula to another state
-  std::map<std::pair<uint32_t,StatePredicate*>,uint32_t>* transitions;
-
-	/// accepting set
-	std::set<uint32_t>* acceptingset;
+	/// number of states
+	uint32_t cardStates;
+	/// number of possible transitions per automata state
+	uint32_t* cardTransitions;
+	/// the transition "matrix" -- first index=state, second=number of transition, third= 0->proposition 1->next state
+	uint32_t*** transitions;
+	/// an array, indicating at each position i, whether the state i is an accepting one
+	bool* isStateAccepting;
 };

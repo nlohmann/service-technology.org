@@ -1,7 +1,7 @@
 buechi {
 bad :
-  ea.1 > 0 => good,
-  TRUE => bad
+  ea.1 > 0 => good
+  TRUE => bad,
 good :
   TRUE => good
 }

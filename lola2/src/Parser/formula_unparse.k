@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////
 %uview out;
 
-StatePredicateFormula(x) -> [out: x "\n"];
+StatePredicateFormula(x) -> [out: x "\n" ];
 
 AtomicProposition(x) -> [out: x];
 
@@ -16,6 +16,8 @@ Conjunction(x, y) -> [out: "(" x " && " y ")"];
 Disjunction(x, y) -> [out: "(" x " || " y ")"];
 Implication(x, y) -> [out: "(" x " => " y ")"];
 Equivalence(x, y) -> [out: "(" x " <=> " y ")"];
+True() -> [out: "TRUE"];
+False() -> [out: "TRUE"];
 
 EqualsAtomicProposition(x, y) -> [out: x " = " y];
 NotEqualsAtomicProposition(x, y) -> [out: x " != " y];
@@ -32,6 +34,29 @@ ConstProduct_list(h, NiltProduct_list()) -> [out: h];
 ConstProduct_list(h, l) -> [out: h "+" l];
 
 Node(x) -> [out: "n" x ];
+
+
+BuechiAutomaton(trans,accept) -> [out: trans "\n" accept];
+ExpandedBuechiRule(from, formula, to) -> [out: from "(" formula ") -> " to "\n"];
+BuechiRule(i,t) -> [out: "STATE" i t];
+BuechiRules(a,b) -> [out: a "&" b];
+
+EmptyTransitionRules() -> [out: ];
+TransitionRule(formu,i) -> [out: formu "->" i];
+TransitionRules(a,b) -> [out: a "&" b ];
+
+
+EmptyBuechiRules() -> [out: ];
+
+BuechiRules(lrules, rrules) -> [out:];
+
+AcceptingState(state) -> [out:];
+
+AcceptingSet(set1, set2) -> [out:];
+
+EmptyAcceptingSet() -> [out:];
+
+
 
 //////////////////////////////////////////////////////////////////////////
 %uview temporal;
@@ -172,6 +197,12 @@ size_t nextId = 0;
 
 f=StatePredicateFormula(x) -> [internal:
     {
+    	// clear all data-structures
+    	current.clear();
+    	formulas.clear();
+    	while (!id_stack.empty())
+    		id_stack.pop();
+    	nextId = 0;
         //printf("I am a state predicate. I am %d\n", nextId);
         id_stack.push(nextId++);
     }
@@ -183,6 +214,7 @@ f=StatePredicateFormula(x) -> [internal:
         assert(nextId == 0);
         assert(formulas[0].size() == 1);
         f->formula = formulas[0][0];
+       	//rep->message("Produced a formula %d" , f->formula);
         //printf("I am a state predicate. Done!\n");
     }
 ];
@@ -351,25 +383,94 @@ Number(x) -> [internal: /* do not print values */ ];
 
 %uview buechi;
 %{ KC_UNPARSE
-std::map<std::pair<uint32_t,StatePredicate*>,uint32_t>* transitions = new std::map<std::pair<uint32_t,StatePredicate*>,uint32_t>;
-std::set<uint32_t>* acceptingset = new std::set<uint32_t>;
+std::map<uint32_t,std::vector<std::pair<uint32_t,uint32_t> > > transitions ;
+std::set<uint32_t> acceptingset;
+std::map<uint32_t,StatePredicate*> predicates;
+std::map<uint32_t,uint32_t> states_to_interal;
+
+uint32_t get_state_number(uint32_t state){
+	if (states_to_interal.find(state) == states_to_interal.end()){
+		// get a new state number
+		uint32_t new_state_number = states_to_interal.size();
+		states_to_interal[state] = new_state_number;
+		return new_state_number;
+	}
+	return states_to_interal[state];
+}
+/// printer-function for Kimiwtu's output on stdout
+// LCOV_EXCL_START
+void mylocalprinter(const char* s, kc::uview v)
+{
+    printf("%s", s);
+}
+// LCOV_EXCL_STOP
+
 %}
 
 
-b=BuechiNull -> [buechi: { b->automata = 0; } ];
-b=BuechiAutomaton -> [buechi:
+b=BuechiNull -> [buechi: { rep->message("NULL BUECHI"); b->automata = 0; } ];
+b=BuechiAutomaton(trans,accept) -> [buechi:
+	trans
+	accept
     {
-        b->automata = new BuechiAutomata();
-        b->automata->transitions = transitions;
-        b->automata->acceptingset = acceptingset;
+    	//rep->message("REAL BUECHI");
+    	
+    	// get number of states
+    	uint32_t number_of_states = states_to_interal.size();
+		
+		// construction of the buechi automata
+		b->automata = new BuechiAutomata();
+		b->automata->cardStates = number_of_states;
+
+		//rep->message("transfer predicates");
+    	// transfer all state predicates
+    	b->automata->cardAtomicPropositions = predicates.size();
+    	b->automata->atomicPropositions = (StatePredicateProperty**)calloc(predicates.size(), sizeof(StatePredicateProperty*));
+    	for (uint32_t i = 0; i < predicates.size(); i++)
+    		b->automata->atomicPropositions[i] = new StatePredicateProperty(predicates[i]);	
+    	
+    	
+    	//rep->message("transfer transitions");
+    	// build the transition-data-structure
+    	b->automata->cardTransitions = (uint32_t*)calloc(number_of_states, sizeof(uint32_t));
+    	b->automata->transitions = (uint32_t***)calloc(number_of_states, sizeof(uint32_t**));
+    	for (uint32_t i = 0; i < number_of_states; i++){
+    		b->automata->cardTransitions[i] = transitions[i].size();
+    		b->automata->transitions[i] = (uint32_t**)calloc(transitions[i].size(), sizeof(uint32_t*));
+    		for (uint32_t j = 0; j < transitions[i].size(); j++){
+    			b->automata->transitions[i][j] = (uint32_t*)calloc(2, sizeof(uint32_t));
+    			b->automata->transitions[i][j][0] = transitions[i][j].first;
+    			b->automata->transitions[i][j][0] = transitions[i][j].second;
+    		}
+    	}
+    	
+    	//rep->message("transfer accepting states");
+        // produce a list for the accepting states
+        b->automata->isStateAccepting = (bool*) calloc(number_of_states, sizeof(bool));
+        for (__typeof__(acceptingset.begin()) i = acceptingset.begin(); i != acceptingset.end(); i++)
+        	b->automata->isStateAccepting[*i] = true;
     }
 ];
 
 
 ExpandedBuechiRule(from, formula, to) -> [buechi:
-    formula
     {
-        (*transitions)[std::make_pair(from->value,formula->formula)] = to->value;
+    
+    	formula->unparse(mylocalprinter, kc::internal);
+        StatePredicate* result = formula->formula;
+        
+        
+        
+    	//rep->message("RULE %d -> %d (%d)", from, to,formula->formula);
+    	// get a number for the formula
+    	uint32_t formula_number = (uint32_t)(predicates.size());
+    	//assert();
+    	predicates[formula_number] = result;
+    	// get numbers for the from and to state
+    	uint32_t from_number = get_state_number(from->value);
+    	uint32_t to_number = get_state_number(to->value);
+    	// insert transition
+        transitions[from_number].push_back(std::make_pair(formula_number,to_number));
     } 
 ];
 
@@ -382,7 +483,7 @@ BuechiRules(lrules, rrules) -> [buechi:
 
 AcceptingState(state) -> [buechi:
     {
-        acceptingset->insert(state->value);
+        acceptingset.insert(get_state_number(state->value));
     }
 ];
 

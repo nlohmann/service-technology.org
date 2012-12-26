@@ -34,11 +34,11 @@ void Event::dot(FILE* o)
     {
         if ((*e)->target)
         {
-            fprintf(o, "  e%p [label=\"%s\" shape=box width=.5 fixedsize=true color=green]\n", *e, Net::Name[TR][(*e)->transition]);
+            fprintf(o, "  e%p [label=\"%s\" shape=box width=.5 fixedsize=true color=green]\n", (void*)*e, Net::Name[TR][(*e)->transition]);
         }
         else
         {
-            fprintf(o, "  e%p [label=\"%s\" shape=box width=.5 fixedsize=true]\n", *e, Net::Name[TR][(*e)->transition]);
+            fprintf(o, "  e%p [label=\"%s\" shape=box width=.5 fixedsize=true]\n", (void*)*e, Net::Name[TR][(*e)->transition]);
         }
     }
 }

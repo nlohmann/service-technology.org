@@ -3,10 +3,11 @@
 #include <Core/Dimensions.h>
 #include <Stores/VectorStores/VectorStore.h>
 
+template<size_t SIZE>
 class VBloomStore : public VectorStore<void>
 {
 private:
-    std::bitset<BLOOM_FILTER_SIZE>* filter;
+    std::bitset<SIZE>* filter;
     inline uint32_t hash_sdbm(const vectordata_t* in, size_t len) const;
     inline uint32_t hash_fnv(const vectordata_t* in, size_t len) const;
 
@@ -35,3 +36,7 @@ public:
     /// @return false, if the store was already empty, otherwise true
     virtual bool popVector(vectordata_t * & out);
 };
+
+#include <Stores/VectorStores/VBloomStore.inc>
+
+

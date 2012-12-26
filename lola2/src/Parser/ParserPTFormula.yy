@@ -205,6 +205,7 @@ __attribute__((noreturn)) void ptformula_yyerrors(char* token, const char* forma
 //    rep->status("%d:%d - error near '%s'", ptformula_lineno, ptformula_colno, token);
 
     rep->abort(ERROR_SYNTAX);
+    exit(EXIT_ERROR); // needed to corrently recognize noreturn since rep->abort is virtual
 }
 
 /// display a parser error and exit

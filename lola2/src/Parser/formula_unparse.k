@@ -553,7 +553,7 @@ StatePredicateProperty* spp;
 //EINSTIEG
 f=StatePredicateFormula(x) -> [ctl:
 	{
-        printf("I am a CTL state predicate. I am %d\n", ctl_nextId);
+        printf("I am a CTL state predicate. I am %lu\n", ctl_nextId);
         ctl_id_stack.push(ctl_nextId++);
     }
     x
@@ -571,7 +571,7 @@ f=StatePredicateFormula(x) -> [ctl:
 //Boolsche Operatoren
 Conjunction(a,b) -> [ctl:
 	  {
-       	printf("I am %d (a CTL-conjunction). My parent is %d\n", ctl_nextId, ctl_id_stack.top());
+       	printf("I am %lu (a CTL-conjunction). My parent is %lu\n", ctl_nextId, ctl_id_stack.top());
         ctl_id_stack.push(ctl_nextId++);
     }
     a
@@ -593,14 +593,14 @@ Conjunction(a,b) -> [ctl:
         }
         cf->cardSubs = ctl_formulas[myId].size();
 
-        printf("told my parent %d about me %d\n", ctl_id_stack.top(), myId);
+        printf("told my parent %lu about me %d\n", ctl_id_stack.top(), myId);
         ctl_formulas[ctl_id_stack.top()].push_back(cf);
     }
 ];
 
 Disjunction(a,b) -> [ctl:
 	{
-        printf("I am %d (a CTL-disjunction). My parent is %d\n", ctl_nextId, ctl_id_stack.top());
+        printf("I am %lu (a CTL-disjunction). My parent is %lu\n", ctl_nextId, ctl_id_stack.top());
         ctl_id_stack.push(ctl_nextId++);
     }
     a
@@ -622,7 +622,7 @@ Disjunction(a,b) -> [ctl:
         }
         df->cardSubs = ctl_formulas[myId].size();
 
-        printf("told my parent %d about me %d\n", ctl_id_stack.top(), myId);
+        printf("told my parent %lu about me %d\n", ctl_id_stack.top(), myId);
         ctl_formulas[ctl_id_stack.top()].push_back(df);
     }
 ];
@@ -854,7 +854,7 @@ AtomicProposition(a) -> [ctl:
 
 LessEqualAtomicProposition(x, Number(y)) -> [ctl:
 {
-	printf("I am an atomic (<=) CTL-proposition. My parent is %d\n", ctl_id_stack.top());
+	printf("I am an atomic (<=) CTL-proposition. My parent is %lu\n", ctl_id_stack.top());
 
     index_t factors_positive = 0;
     index_t factors_negative = 0;
@@ -894,7 +894,7 @@ LessEqualAtomicProposition(x, Number(y)) -> [ctl:
     ctl_current.clear();
 
     // register formula at parent
-    printf("told my parent %d about me; %p\n", ctl_id_stack.top(), f);
+    printf("told my parent %lu about me; %p\n", ctl_id_stack.top(), (void*)f);
     spp = new StatePredicateProperty (f);
 }
 ];

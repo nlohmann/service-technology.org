@@ -1,71 +1,56 @@
 /*!
-\file SuffixTreeStore.cc
+\file PrefixTreeStore.inc
 \author Christian Koch
 \status new
-\brief VectorStore implementation using binary suffix trees. Based on BinStore. Relies on the assumption that different input vectors (possibly of different length) are not prefix of another.
+\brief VectorStore implementation using binary prefix trees. Based on BinStore. Relies on the assumption that different input vectors (possibly of different length) are not prefix of another.
 */
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-#include <Net/Marking.h>
-#include <Net/Net.h>
-#include <Net/Place.h>
-#include <Stores/VectorStores/SuffixTreeStore.h>
-
+#include <Stores/VectorStores/PrefixTreeStore.h>
 
 
 template <typename T>
-SuffixTreeStore<T>::SuffixTreeStore() : popVectorCache(NULL), currentBucket(0)
+PrefixTreeStore<T>::PrefixTreeStore() : popVectorCache(NULL)
 {
-    branch = (Decision**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
-    firstvector = (vectordata_t**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
-    rwlocks =(pthread_rwlock_t*) calloc(sizeof(pthread_rwlock_t), SIZEOF_MARKINGTABLE);
+    branch = NULL;
+    firstvector = NULL;
 
-    for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
-        pthread_rwlock_init(rwlocks+i, NULL);
+    pthread_rwlock_init(&rwlock, NULL);
 }
 
 template <typename T>
-inline size_t SuffixTreeStore<T>::getPayloadSize()
+inline size_t PrefixTreeStore<T>::getPayloadSize()
 {
     return sizeof(T);
 }
 
 template <typename T>
-SuffixTreeStore<T>::~SuffixTreeStore()
+PrefixTreeStore<T>::~PrefixTreeStore()
 {
-    for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
+    if (branch)
     {
-        if (branch[i])
-        {
-            delete branch[i];
-        }
-        if (firstvector[i])
-        {
-            free(firstvector[i]);
-        }
-
+        delete branch;
     }
-    free(branch);
-    free(firstvector);
-    delete popVectorCache;
+    if (firstvector)
+    {
+        free(firstvector);
+    }
 
-    for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
-        pthread_rwlock_destroy(rwlocks+i);
-    free(rwlocks);
+	if(popVectorCache)
+        free(popVectorCache);
+
+    pthread_rwlock_destroy(&rwlock);
 }
 
 /// create a new branch in the decision tree at depth b.
 template <typename T>
-SuffixTreeStore<T>::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL)
+PrefixTreeStore<T>::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL)
 {
 }
 
 template <typename T>
-SuffixTreeStore<T>::Decision::~Decision()
+PrefixTreeStore<T>::Decision::~Decision()
 {
-    free(vector);
+    vector = NULL;
     if (nextnew)
     {
         delete nextnew;
@@ -79,7 +64,7 @@ SuffixTreeStore<T>::Decision::~Decision()
 
 /// search for an input vector in the suffix tree and insert it, if it is not present
 template <typename T>
-bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex)
+bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex)
 {
     /// If a new decision record is inserted, * anchor must point to it
     Decision** anchor;
@@ -114,18 +99,18 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
     bitindex_t position = 0;
 
     // lock the current bucket to ensure thread safety
-    pthread_rwlock_wrlock(rwlocks + hash);
+    pthread_rwlock_wrlock(&rwlock);
 
     // Is hash bucket empty? If so, assign to currentvector
-    if (!(pVector = (firstvector[hash])))
+    if (!(pVector = firstvector))
     {
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
-        newvector = firstvector + hash;
+        newvector = &firstvector;
     }
     else
     {
         // Here, hash bucket is not empty.
-        anchor = branch + hash;
+        anchor = &branch;
 
         while (true) // just entered new suffix tree vector
         {
@@ -141,7 +126,7 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
                 // good alignment, can use memcmp
                 if(!memcmp(pInput,pVector,vectorlen*sizeof(vectordata_t))) {
                     // match found, we're done
-                    pthread_rwlock_unlock(rwlocks + hash);
+                    pthread_rwlock_unlock(&rwlock);
                     return true;
                 }
                 // difference found, skip to first differing word.
@@ -172,7 +157,7 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
                                     position += VECTOR_WIDTH, pVector++;
                                 }
                                 else {
-                                    pthread_rwlock_unlock(rwlocks + hash);
+                                    pthread_rwlock_unlock(&rwlock);
                                     return true;
                                 }
                             }
@@ -185,7 +170,7 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
                                 break;
                             }
                         } else {
-                            pthread_rwlock_unlock(rwlocks + hash);
+                            pthread_rwlock_unlock(&rwlock);
                             return true;
                         }
                     }
@@ -243,7 +228,7 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
                 // skip the differing bit. We don't need to store it since its value is determined by the old vector and the branch position.
                 input_bitstogo--;
                 if(input_index == max_input_index && input_bitstogo + max_input_numbits <= VECTOR_WIDTH) {
-                    pthread_rwlock_unlock(rwlocks + hash);
+                    pthread_rwlock_unlock(&rwlock);
                     return true;
                 }
                 if (!input_bitstogo)
@@ -270,7 +255,7 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
 
         input_bitstogo--;
         if(input_index == max_input_index && input_bitstogo + max_input_numbits == VECTOR_WIDTH) {
-            pthread_rwlock_unlock(rwlocks + hash);
+            pthread_rwlock_unlock(&rwlock);
             return false;
         }
         if (!input_bitstogo)
@@ -291,7 +276,7 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
     {
         // good alignment, use memcpy
         memcpy(pVector,pInput,newvectorlen*sizeof(vectordata_t));
-        pthread_rwlock_unlock(rwlocks + hash);
+        pthread_rwlock_unlock(&rwlock);
         return false;
     } else {
         // bad alignment, copy contents manually
@@ -303,7 +288,7 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
             *pVector |= vectordata_t(*pInput >> input_bitstogo);
             pVector++;
         }
-        pthread_rwlock_unlock(rwlocks + hash);
+        pthread_rwlock_unlock(&rwlock);
         return false;
     }
 }
@@ -312,7 +297,7 @@ bool SuffixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
  * \brief  gets and removes a vector from the store
  */
 template <typename T>
-bool SuffixTreeStore<T>::popVector(vectordata_t * & out)
+bool PrefixTreeStore<T>::popVector(vectordata_t * & out)
 {
   /// size of resulting vector
   index_t vectorlen = SIZEOF_CAPACITY_T * Net::Card[PL];
@@ -328,33 +313,28 @@ bool SuffixTreeStore<T>::popVector(vectordata_t * & out)
   Decision * anchor = NULL;
   Decision ** pAnchor = NULL;
   
-  // iterate over all buckets
-  while(currentBucket < SIZEOF_MARKINGTABLE)
+  if(!(pVector = firstvector))
   {
-    if(!(pVector = firstvector[currentBucket]))
-    {
-      // no vectors in this bucket
-      ++currentBucket;
-      continue;
-    }
+      return false;
+  }
     
-    // copy "first" vector to return it later
-    memcpy(popVectorCache, pVector, vectorlen);
-    out = popVectorCache;
+  // copy "first" vector to return it later
+  memcpy(popVectorCache, pVector, vectorlen);
+  out = popVectorCache;
+  
+  if(!(anchor = branch))
+  {
+    // no further markings in this bucket
+    free(pVector);
+    firstvector = NULL;
+    return true;
+  }
     
-    if(!(anchor = branch[currentBucket]))
-    {
-      // no further markings in this bucket
-      free(pVector);
-      firstvector[currentBucket++] = NULL;
-      return true;
-    }
-    
-    // we start with the root of the decision tree
-    pAnchor = &branch[currentBucket];
-    // and search for the decision node differing as last from the "first" vector
-    while(anchor->nextold)
-    {
+  // we start with the root of the decision tree
+  pAnchor = &anchor;
+  // and search for the decision node differing as last from the "first" vector
+  while(anchor->nextold)
+   {
       pAnchor = &(anchor->nextold);
       anchor = anchor-> nextold;
     }
@@ -405,8 +385,4 @@ bool SuffixTreeStore<T>::popVector(vectordata_t * & out)
     
     // return result
     return true;
-  }
-  
-  // when reaching this line, no more vectors are stored
-  return false;
 }

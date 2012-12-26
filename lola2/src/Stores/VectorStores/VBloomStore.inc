@@ -9,21 +9,26 @@
 extern Reporter* rep;
 
 
-VBloomStore::VBloomStore(index_t num_threads, size_t hashes) :hash_functions(hashes), filter(new std::bitset<BLOOM_FILTER_SIZE>())
+template<size_t SIZE>
+VBloomStore<SIZE>::VBloomStore(index_t num_threads, size_t hashes) :hash_functions(hashes), filter(new std::bitset<SIZE>())
 {
     hash_values = new uint32_t[hash_functions*num_threads];
     pthread_mutex_init(&mutex,NULL);
-    rep->status("using Bloom filter of length %lu with %d hash functions", BLOOM_FILTER_SIZE, hash_functions);
+    
+    // debug output causes performance issues when used with HashingWrapperStore
+    //rep->status("using Bloom filter of length %lu with %d hash functions", SIZE, hash_functions);
 }
 
-VBloomStore::~VBloomStore()
+template<size_t SIZE>
+VBloomStore<SIZE>::~VBloomStore()
 {
     delete filter;
     delete[] hash_values;
     pthread_mutex_destroy(&mutex);
 }
 
-inline uint32_t VBloomStore::hash_sdbm(const vectordata_t* in, size_t len) const
+template<size_t SIZE>
+inline uint32_t VBloomStore<SIZE>::hash_sdbm(const vectordata_t* in, size_t len) const
 {
     uint32_t hash = 0;
 
@@ -35,7 +40,8 @@ inline uint32_t VBloomStore::hash_sdbm(const vectordata_t* in, size_t len) const
     return hash;
 }
 
-inline uint32_t VBloomStore::hash_fnv(const vectordata_t* in, size_t len) const
+template<size_t SIZE>
+inline uint32_t VBloomStore<SIZE>::hash_fnv(const vectordata_t* in, size_t len) const
 {
     const unsigned int fnv_prime = 0x811C9DC5;
     uint32_t hash = 0;
@@ -49,7 +55,8 @@ inline uint32_t VBloomStore::hash_fnv(const vectordata_t* in, size_t len) const
     return hash;
 }
 
-bool VBloomStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex)
+template<size_t SIZE>
+bool VBloomStore<SIZE>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex)
 {
     uint32_t* cur_hashes = hash_values + (threadIndex * hash_functions);
     size_t len = (bitlen+VECTOR_WIDTH-1) / VECTOR_WIDTH;
@@ -60,15 +67,15 @@ bool VBloomStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, has
 
     // the first two hash functions are given explicitly
     const uint32_t hash_0 = hash_sdbm(in,len);
-    cur_hashes[0] = hash_0 % BLOOM_FILTER_SIZE;
+    cur_hashes[0] = hash_0 % SIZE;
 
     const uint32_t hash_1 = hash_fnv(in,len);
-    cur_hashes[1] = hash_1 % BLOOM_FILTER_SIZE;
+    cur_hashes[1] = hash_1 % SIZE;
 
     // the other hash functions can be derived: h_i(x) = h_1(x) + i * h_2(x)
     for (size_t h = 2; h < hash_functions; ++h)
     {
-        cur_hashes[h] = (hash_0 + h * hash_1) % BLOOM_FILTER_SIZE;
+        cur_hashes[h] = (hash_0 + h * hash_1) % SIZE;
     }
 
 
@@ -101,7 +108,8 @@ bool VBloomStore::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, has
 }
 
 // gets and removes a vector from the store
-bool VBloomStore::popVector(vectordata_t * &)
+template<size_t SIZE>
+bool VBloomStore<SIZE>::popVector(vectordata_t * &)
 {
   rep->status("this store can not return states");
   rep->abort(ERROR_COMMANDLINE);

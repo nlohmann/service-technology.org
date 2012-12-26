@@ -10,14 +10,56 @@
 #include <Stores/VectorStores/VectorStore.h>
 #include <pthread.h>
 
+template<typename P>
+class VectorStoreCreator {
+public:
+  virtual VectorStore<P>* operator() ( void ) const  = 0;
+};
+
+template<typename P,typename T>
+class NullaryVectorStoreCreator : public VectorStoreCreator<P> {
+public:
+	VectorStore<P>* operator() ( void ) const {
+    return new T();
+  }
+};
+
+template<typename P,typename T,typename A1>
+class UnaryVectorStoreCreator : public VectorStoreCreator<P> {
+  A1 arg1;
+public:
+  UnaryVectorStoreCreator(A1 _arg1) {
+    arg1 = _arg1;
+  }
+  VectorStore<P>* operator() ( void ) const {
+    return new T(arg1);
+  }
+};
+
+template<typename P,typename T,typename A1,typename A2>
+class BinaryVectorStoreCreator : public VectorStoreCreator<P> {
+	  A1 arg1;
+	  A2 arg2;
+public:
+	  BinaryVectorStoreCreator(A1 _arg1,A2 _arg2) {
+    arg1 = _arg1;
+    arg2 = _arg2;
+  }
+  VectorStore<P>* operator() ( void ) const {
+    return new T(arg1,arg2);
+  }
+};
+
+
+
 template <typename T>
-class SuffixTreeStore : public VectorStore<T>
+class HashingWrapperStore : public VectorStore<T>
 {
 public:
     /// constructor
-    SuffixTreeStore();
+	HashingWrapperStore(VectorStoreCreator<T>* _storeCreator);
     /// destructor
-    virtual ~SuffixTreeStore();
+    virtual ~HashingWrapperStore();
 
     /// searches for a vector and inserts if not found
     /// @param in vector to be seached for or inserted
@@ -34,40 +76,15 @@ public:
     virtual bool popVector(vectordata_t * & out);
 private:
 
-    inline size_t getPayloadSize();
+    VectorStoreCreator<T>* storeCreator;
 
-    /// a binary decision node
-    class Decision
-    {
-    public:
-        /// constructor
-        /// @param b index of first bit different from previous vector
-        Decision(bitindex_t b);
-        /// index of first bit different from previous vector
-        bitindex_t bit;
-        /// remaining vector after first differing bit
-        vectordata_t* vector;
-        /// decision nodes differing later than this one
-        Decision* nextold;
-        /// decision nodes differing from the remaining vector of this node
-        Decision* nextnew;
-        /// destructor
-        ~Decision();
-
-    };
-    // first branch in decision tree; NULL as long as less than two elements in bucket
-    Decision** branch;
+        // first branch in decision tree; NULL as long as less than two elements in bucket
+    VectorStore<T>** buckets;
 
     // the read-write mutexes
     pthread_rwlock_t* rwlocks;
 
-    // first vector in bucket; null as long as bucket empty
-    vectordata_t** firstvector;
-
-    // full vector will be reconstructed here when popping vectors
-    vectordata_t * popVectorCache;
-    // index cache, so we don't have to search the whole store on each pop
-    hash_t currentBucket;
+    index_t currentPopBucket;
 };
 
-#include <Stores/VectorStores/SuffixTreeStore.inc>
+#include <Stores/VectorStores/HashingWrapperStore.inc>

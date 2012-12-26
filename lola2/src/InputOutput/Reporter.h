@@ -162,7 +162,7 @@ public:
     void status(const char*, ...) const;
 
     /// display error message and abort program
-    __attribute__((noreturn)) void abort(errorcode_t) const;
+    void abort(errorcode_t) const __attribute__((noreturn));
 
     /// markup a string
     String markup(markup_t, const char*, ...) const;

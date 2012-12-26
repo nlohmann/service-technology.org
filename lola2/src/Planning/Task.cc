@@ -81,11 +81,21 @@ Store<void>* StoreCreator<void>::createSpecializedStore(int number_of_threads) {
     switch (args_info.store_arg)
     {
     case store_arg_psbbloom:
-    	return new PluginStore<void>(new BitEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+    	return new PluginStore<void>(new BitEncoder(number_of_threads), new VBloomStore<BLOOM_FILTER_SIZE>(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
     case store_arg_pscbloom:
-    	return new PluginStore<void>(new CopyEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+    	return new PluginStore<void>(new CopyEncoder(number_of_threads), new VBloomStore<BLOOM_FILTER_SIZE>(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
     case store_arg_pssbloom:
-    	return new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VBloomStore(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+    	return new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new VBloomStore<BLOOM_FILTER_SIZE>(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+    case store_arg_psfbloom:
+    	return new PluginStore<void>(new FullCopyEncoder(number_of_threads), new VBloomStore<BLOOM_FILTER_SIZE>(number_of_threads, args_info.hashfunctions_arg), number_of_threads);
+    case store_arg_psbhbloom:
+    	return new PluginStore<void>(new BitEncoder(number_of_threads), new HashingWrapperStore<void>(new BinaryVectorStoreCreator<void,VBloomStore<BLOOM_FILTER_SIZE/SIZEOF_MARKINGTABLE + 1>,index_t,size_t>(number_of_threads,args_info.hashfunctions_arg)), number_of_threads);
+    case store_arg_pschbloom:
+    	return new PluginStore<void>(new CopyEncoder(number_of_threads), new HashingWrapperStore<void>(new BinaryVectorStoreCreator<void,VBloomStore<BLOOM_FILTER_SIZE/SIZEOF_MARKINGTABLE + 1>,index_t,size_t>(number_of_threads,args_info.hashfunctions_arg)), number_of_threads);
+    case store_arg_psshbloom:
+    	return new PluginStore<void>(new SimpleCompressedEncoder(number_of_threads), new HashingWrapperStore<void>(new BinaryVectorStoreCreator<void,VBloomStore<BLOOM_FILTER_SIZE/SIZEOF_MARKINGTABLE + 1>,index_t,size_t>(number_of_threads,args_info.hashfunctions_arg)), number_of_threads);
+    case store_arg_psfhbloom:
+    	return new PluginStore<void>(new FullCopyEncoder(number_of_threads), new HashingWrapperStore<void>(new BinaryVectorStoreCreator<void,VBloomStore<BLOOM_FILTER_SIZE/SIZEOF_MARKINGTABLE + 1>,index_t,size_t>(number_of_threads,args_info.hashfunctions_arg)), number_of_threads);
     default:
     	storeCreationError();
     	return NULL;
@@ -466,7 +476,14 @@ void Task::interpreteResult(bool result)
     trinary_t final_result = result ? TRINARY_TRUE : TRINARY_FALSE;
 
     // if the Bloom store did not find anything, the result is unknown
-    if (args_info.store_arg == store_arg_bloom)
+    if (args_info.store_arg == store_arg_psbbloom ||
+    		args_info.store_arg == store_arg_pscbloom ||
+    		args_info.store_arg == store_arg_pssbloom ||
+    		args_info.store_arg == store_arg_psfbloom ||
+    		args_info.store_arg == store_arg_psbhbloom ||
+    		args_info.store_arg == store_arg_pschbloom ||
+    		args_info.store_arg == store_arg_psshbloom ||
+    		args_info.store_arg == store_arg_psfhbloom)
     {
         switch (args_info.check_arg)
         {

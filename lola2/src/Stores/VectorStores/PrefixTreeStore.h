@@ -1,8 +1,8 @@
 /*!
-\file SuffixTreeStore.h
+\file PrefixTreeStore.h
 \author Christian Koch
 \status new
-\brief VectorStore implementation using binary suffix trees. Based on BinStore. Relies on the assumption that different input vectors (possibly of different length) are not prefix of another.
+\brief VectorStore implementation using binary prefix trees. Based on BinStore. Relies on the assumption that different input vectors (possibly of different length) are not prefix of another.
 */
 
 #pragma once
@@ -11,13 +11,13 @@
 #include <pthread.h>
 
 template <typename T>
-class SuffixTreeStore : public VectorStore<T>
+class PrefixTreeStore : public VectorStore<T>
 {
 public:
     /// constructor
-    SuffixTreeStore();
+	PrefixTreeStore();
     /// destructor
-    virtual ~SuffixTreeStore();
+    virtual ~PrefixTreeStore();
 
     /// searches for a vector and inserts if not found
     /// @param in vector to be seached for or inserted
@@ -55,19 +55,17 @@ private:
         ~Decision();
 
     };
-    // first branch in decision tree; NULL as long as less than two elements in bucket
-    Decision** branch;
+    // first branch in decision tree; NULL as long as less than two elements
+    Decision* branch;
 
-    // the read-write mutexes
-    pthread_rwlock_t* rwlocks;
+    // the read-write mutex
+    pthread_rwlock_t rwlock;
 
-    // first vector in bucket; null as long as bucket empty
-    vectordata_t** firstvector;
+    // first vector; null as long as empty
+    vectordata_t* firstvector;
 
     // full vector will be reconstructed here when popping vectors
-    vectordata_t * popVectorCache;
-    // index cache, so we don't have to search the whole store on each pop
-    hash_t currentBucket;
+    vectordata_t* popVectorCache;
 };
 
-#include <Stores/VectorStores/SuffixTreeStore.inc>
+#include <Stores/VectorStores/PrefixTreeStore.inc>

@@ -4,6 +4,7 @@
 #include <libgen.h>
 #include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
 #include <set>
 #include <cmdline.h>
 #include <Core/Dimensions.h>
@@ -238,6 +239,7 @@ __attribute__((noreturn)) void ptbuechi_yyerrors(char* token, const char* format
 //    rep->status("%d:%d - error near '%s'", ptbuechi_lineno, ptbuechi_colno, token);
 
     rep->abort(ERROR_SYNTAX);
+    exit(EXIT_ERROR); // needed to corrently recognize noreturn since rep->abort is virtual
 }
 
 /// display a parser error and exit

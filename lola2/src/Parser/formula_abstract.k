@@ -11,6 +11,10 @@
 typedef StatePredicate* StatePredicate_p;
 typedef BuechiAutomata* BuechiAutomata_p;
 typedef CTLFormula* CTLFormula_p;
+
+// don't use hash sets, since they are deprecated and unordered sets are not yet supported by Kimwitu++
+#define DONT_USE_HASHSET
+
 %}
 
 tFormula:

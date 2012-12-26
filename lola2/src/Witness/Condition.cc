@@ -26,7 +26,7 @@ void Condition::dot(FILE* o)
         {
             if ((*b)->in != NULL)
             {
-                fprintf(o, "  e%p -> e%p\n", (*b)->in, (*b)->out);
+                fprintf(o, "  e%p -> e%p\n", (void*)(*b)->in, (void*)(*b)->out);
             }
             continue;
         }
@@ -54,28 +54,28 @@ void Condition::dot(FILE* o)
 
         if (target)
         {
-            fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true color=green]\n", *b, Net::Name[PL][(*b)->place]);
+            fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true color=green]\n", (void*)*b, Net::Name[PL][(*b)->place]);
         }
         else
         {
             if (initial)
             {
-                fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true color=blue]\n", *b, Net::Name[PL][(*b)->place]);
+                fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true color=blue]\n", (void*)*b, Net::Name[PL][(*b)->place]);
             }
             else
             {
-                fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true]\n", *b, Net::Name[PL][(*b)->place]);
+                fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true]\n", (void*)*b, Net::Name[PL][(*b)->place]);
             }
         }
 
         if ((*b)->in != NULL)
         {
-            fprintf(o, "  e%p -> c%p\n", (*b)->in, *b);
+            fprintf(o, "  e%p -> c%p\n", (void*)(*b)->in, (void*)*b);
         }
 
         if ((*b)->out != NULL)
         {
-            fprintf(o, "  c%p -> e%p\n", *b, (*b)->out);
+            fprintf(o, "  c%p -> e%p\n", (void*)*b, (void*)(*b)->out);
         }
     }
 }

@@ -89,9 +89,11 @@ lola_SOURCES = \
                 Stores/NetStateEncoder/FullCopyEncoder.cc Stores/NetStateEncoder/FullCopyEncoder.h \
                 Stores/NetStateEncoder/SimpleCompressedEncoder.cc Stores/NetStateEncoder/SimpleCompressedEncoder.h \
                 Stores/VectorStores/VectorStore.h \
+                Stores/VectorStores/HashingWrapperStore.h Stores/VectorStores/HashingWrapperStore.inc \
                 Stores/VectorStores/VSTLStore.cc Stores/VectorStores/VSTLStore.h Stores/VectorStores/VSTLStore.inc \
-                Stores/VectorStores/VBloomStore.cc Stores/VectorStores/VBloomStore.h \
-                Stores/VectorStores/SuffixTreeStore.h Stores/VectorStores/SuffixTreeStore.inc \
+                Stores/VectorStores/VBloomStore.h Stores/VectorStores/VBloomStore.inc \
+                Stores/VectorStores/SuffixTreeStore.cc Stores/VectorStores/SuffixTreeStore.h Stores/VectorStores/SuffixTreeStore.inc \
+                Stores/VectorStores/PrefixTreeStore.h Stores/VectorStores/PrefixTreeStore.inc \
                 \
                 SweepLine/Sweep.h SweepLine/Sweep.inc \
                 SweepLine/SweepStore.h SweepLine/SweepStore.inc \
@@ -163,7 +165,8 @@ KCSOURCES = Parser/ast-system-k.cc Parser/ast-system-k.h \
 $(KCDUMMY): $(KCFILES_NECESSARY) $(KCFILES_TEMP)
 	$(AM_V_at)touch $@
 	$(AM_V_GEN)$(KC) $(KCFLAGS) $^
-	$(AM_V_at)$(SED) -i 's/reinterpret_cast<int>/reinterpret_cast<size_t>/g' ast-system-k.cc
+	$(AM_V_at)$(SED) -i 's/%x", reinterpret_cast<int>/%lx", reinterpret_cast<unsigned long int>/g' ast-system-k.cc
+	$(AM_V_at)$(SED) -i 's/%x_%d", reinterpret_cast<int>/%lx_%d", reinterpret_cast<unsigned long int>/g' ast-system-k.cc
 	$(AM_V_at)mv $(KCSOURCES:Parser/%=%) Parser
 
 MAINTAINERCLEANFILES += $(KCSOURCES) $(KCDUMMY)

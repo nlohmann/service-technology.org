@@ -289,6 +289,7 @@ __attribute__((noreturn)) void yyerrors(char* token, const char* format, ...) {
     rep->status("%s:%d:%d - error near '%s'", rep->markup(MARKUP_FILE, basename((char*)netFile->getFilename())).str(), ptnetlola_lineno, ptnetlola_colno, token);
 
     rep->abort(ERROR_SYNTAX);
+    exit(EXIT_ERROR); // needed to corrently recognize noreturn since rep->abort is virtual
 }
 
 /// display a parser error and exit

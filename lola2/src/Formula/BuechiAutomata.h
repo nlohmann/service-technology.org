@@ -37,6 +37,9 @@ public:
 	/// returns true if the given state is accepting
 	bool isAcceptingState(index_t state);
 
+	/// default destructor
+	~BuechiAutomata();
+
 public:
 	/// number of atomic propositions
 	uint32_t cardAtomicPropositions;

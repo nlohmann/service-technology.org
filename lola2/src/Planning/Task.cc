@@ -14,6 +14,7 @@
 #include <Parser/ast-system-k.h>
 #include <Parser/ast-system-rk.h>
 #include <Parser/ast-system-unpk.h>
+#include <Parser/SymbolTable.h>
 
 #include <Net/Net.h>
 #include <Net/Marking.h>
@@ -67,6 +68,8 @@ extern void ptformula__delete_buffer(YY_BUFFER_STATE);
 extern YY_BUFFER_STATE ptbuechi__scan_string(const char* yy_str);
 extern void ptbuechi__delete_buffer(YY_BUFFER_STATE);
 
+extern SymbolTable* buechiStateTable;
+
 /// printer-function for Kimiwtu's output on stdout
 // LCOV_EXCL_START
 void myprinter(const char* s, kc::uview v)
@@ -105,7 +108,7 @@ Store<void>* StoreCreator<void>::createSpecializedStore(int number_of_threads) {
 extern kc::tFormula TheFormula;
 extern kc::tBuechiAutomata TheBuechi;
 
-Task::Task() : spFormula(NULL), ctlFormula(NULL), bauto(NULL), ns(NULL), p(NULL), store(NULL), ctlStore(NULL), ltlStore(NULL), fl(NULL), exploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
+Task::Task() : spFormula(NULL), ctlFormula(NULL), bauto(NULL), ns(NULL), p(NULL), store(NULL), ctlStore(NULL), ltlStore(NULL), fl(NULL), exploration(NULL), ctlExploration(NULL), ltlExploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
 {
 	if (args_info.formula_given)
 		setFormula();
@@ -117,11 +120,16 @@ Task::Task() : spFormula(NULL), ctlFormula(NULL), bauto(NULL), ns(NULL), p(NULL)
 Task::~Task()
 {
     delete ns;
-    delete store;
+    if (store) delete store;
+    if (ltlStore) delete ltlStore;
+    if (ctlStore) delete ctlStore;
     delete p;
     delete spFormula;
     delete fl;
-    delete exploration;
+    if (exploration) delete exploration;
+    if (ltlExploration) delete ltlExploration;
+    if (ctlExploration) delete ctlExploration;
+    delete bauto;
 }
 
 void Task::setNet()
@@ -261,6 +269,8 @@ void Task::setFormula()
     }
 }
 
+
+
 void Task::setBuechiAutomata()
 {
     if (not args_info.buechi_given)
@@ -280,20 +290,26 @@ void Task::setBuechiAutomata()
     else
     {
         fclose(file);
-        buechiFile = new Input("Beuchi", args_info.buechi_arg);
+        buechiFile = new Input("Buechi", args_info.buechi_arg);
         ptbuechi_in = *buechiFile;
     }
 
     //rep->message("Parsing Büchi-Automaton");
     // parse the formula
     ptbuechi_parse();
+
     //rep->message("Finished Parsing");
 
     // restructure the formula: remove arrows and handle negations and tautologies
     TheBuechi = TheBuechi->rewrite(kc::arrows);
     TheBuechi = TheBuechi->rewrite(kc::neg);
+    // restructure the formula: again tautoglies and simplification
+    TheBuechi = TheBuechi->rewrite(kc::neg);
+    TheBuechi = TheBuechi->rewrite(kc::leq);
+    TheBuechi = TheBuechi->rewrite(kc::sides);
+    TheBuechi = TheBuechi->rewrite(kc::lists);
 
-    // expande the transitions rules
+    // expand the transitions rules
     TheBuechi = TheBuechi->rewrite(kc::rbuechi);
 
     //rep->message("parsed Buechi");
@@ -301,16 +317,12 @@ void Task::setBuechiAutomata()
 
     //rep->message("checking LTL");
 
-
-    // restructure the formula: again tautoglies and simplification
-    TheBuechi = TheBuechi->rewrite(kc::neg);
-    TheBuechi = TheBuechi->rewrite(kc::leq);
-    TheBuechi = TheBuechi->rewrite(kc::sides);
-    TheBuechi = TheBuechi->rewrite(kc::lists);
-
     // copy restructured formula into internal data structures
     TheBuechi->unparse(myprinter, kc::buechi);
     bauto = TheBuechi->automata;
+    TheBuechi->free(true); // XXX: this _must_ work according to the kimwitu docu, but it does not, kimwitu produces memory leaks!
+    //delete TheBuechi;
+    delete buechiStateTable;
 
     //rep->message("Processed Büchi-Automaton");
 
@@ -342,7 +354,7 @@ void Task::setStore()
     {
         // choose a store
     	if(bauto)
-    		ltlStore = StoreCreator<AutomataTree*>::createStore(number_of_threads);
+    		ltlStore = StoreCreator<AutomataTree>::createStore(number_of_threads);
     	else if(ctlFormula)
     		ctlStore = StoreCreator<void*>::createStore(number_of_threads);
     	else

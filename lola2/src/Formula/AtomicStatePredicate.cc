@@ -45,6 +45,7 @@ AtomicStatePredicate::~AtomicStatePredicate()
     free(negPlaces);
     free(posMult);
     free(negMult);
+    //free(up);
 }
 
 void AtomicStatePredicate::addPos(index_t i, index_t p, capacity_t m)

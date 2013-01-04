@@ -12,7 +12,6 @@
 #include <Core/Dimensions.h>
 #include <Formula/StatePredicate.h>
 
-
 /// A state predicate is a formula that assigns a Boolean value to Marking::Current
 class TruePredicate: public StatePredicate
 {

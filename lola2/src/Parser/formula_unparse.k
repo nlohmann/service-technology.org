@@ -458,6 +458,7 @@ ExpandedBuechiRule(from, formula, to) -> [buechi:
     
     	formula->unparse(mylocalprinter, kc::internal);
         StatePredicate* result = formula->formula;
+        //formula->free(true);
         
         
         

@@ -1105,7 +1105,7 @@ AT_CHECK([cp TESTFILES/cycle.lola .])
 AT_CHECK([cp TESTFILES/simple.buechi .])
 AT_CHECK([LOLA cycle.lola --buechi simple.buechi --check=ltl --store=psbstl -v],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_CHECK([GREP -q "lola: 3 markings, 6 edges" stderr])
+AT_CHECK([GREP -q "lola: 3 markings" stderr])
 AT_KEYWORDS(ltl)
 AT_CLEANUP
 
@@ -1121,3 +1121,4 @@ AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [pscbin], 4)
 AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [pssbin], 4)
 AT_ST_CHECK_MEMORY([Phils 10], [phils10.lola], [full], [psbbin], 4)
 
+# AT_LTL_CHECK_MEMORY([Phils 10], [cycle.lola], [simple.buechi], [psbstl])

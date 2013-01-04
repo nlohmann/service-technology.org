@@ -96,6 +96,17 @@ m4_define([AT_ST_CHECK_MEMORY], [
   AT_CLEANUP
 ])
 
+# AT_LTL_CHECK_MEMORY(label, file, buechi, store)
+m4_define([AT_LTL_CHECK_MEMORY], [
+  AT_SETUP([Checking for memory leaks: $1 (check: $3, store: $4)])
+  AT_CHECK([cp TESTFILES/$2 .])
+  AT_CHECK([cp TESTFILES/$3 .])
+  AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW --check=ltl --store=$4 --buechi=$3 $2],0,ignore,stderr)
+  AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
+  AT_KEYWORDS(valgrind)
+  AT_CLEANUP
+])
+
 # AT_CHECK_RUNLOLA(label, file, check, store, threads, hashfunctions, result, markings, edges)
 m4_define([AT_CHECK_RUNLOLA], [
   AT_SETUP([$1 (store $4, $5 threads)])

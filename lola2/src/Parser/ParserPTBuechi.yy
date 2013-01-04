@@ -93,7 +93,7 @@ uint32_t currentState;
 
 buechiAutomata:
   _buechi_ _braceleft_ buechiRules _braceright_  _accept_ _braceleft_ acceptingsets _braceright_ _semicolon_
-    { TheBuechi = $$ = BuechiAutomaton($3,$7); }
+    { TheBuechi = BuechiAutomaton($3,$7); }
 ;
 
 buechiRules:
@@ -108,7 +108,7 @@ buechiRule:
   	if (t == NULL)
   		buechiStateTable->insert(new Symbol($1->name));
   }
-   _colon_ transitionRules { Symbol *t = buechiStateTable->lookup($1->name); $$ = BuechiRule((mkinteger(t->getIndex())),$4); }
+   _colon_ transitionRules { Symbol *t = buechiStateTable->lookup($1->name); $$ = BuechiRule((mkinteger(t->getIndex())),$4); $1->free(true);}
 ;
 
 transitionRules:
@@ -120,6 +120,7 @@ transitionRules:
 	  		buechiStateTable->insert(new Symbol($3->name));
 	  		t = buechiStateTable->lookup($3->name);
 	  	}
+	  	$3->free(true);
         $$ = TransitionRules(TransitionRule(StatePredicateFormula($1),mkinteger(t->getIndex())),$4);
     }
 ;
@@ -133,6 +134,7 @@ acceptingsets:
         {
             ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $1->name);
         }
+        $1->free(free);
         $$ = AcceptingState(mkinteger(t->getIndex()));
     }
 | IDENTIFIER _comma_ acceptingsets
@@ -142,6 +144,7 @@ acceptingsets:
         {
             ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $1->name);
         }
+        $1->free(true);
         $$ = AcceptingSet(AcceptingState(mkinteger(t->getIndex())),$3);
     }
 ;
@@ -189,6 +192,7 @@ atomic_proposition:
         {
             ptbuechi_yyerrors(ptbuechi_text, "transition %s unknown", $3->name);
         }
+        $3->free(true);
         $$ = Fireable(mkinteger(t->getIndex()));
         //target_transition.insert(t->getIndex());
     }
@@ -208,6 +212,7 @@ term:
         {
             ptbuechi_yyerrors(ptbuechi_text, "place %s unknown", $1->name);
         }
+        $1->free(true);
         $$ = Node(mkinteger(p->getIndex()));
       	//target_place.insert(p->getIndex());
     }

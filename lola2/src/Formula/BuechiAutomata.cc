@@ -13,7 +13,7 @@ int BuechiAutomata::getSuccessors(NetState &ns, index_t** list,
 		if (atomicPropositions[transitionsList[i][0]]->getPredicate()->value)
 			succ.push_back(transitionsList[i][1]);
 	}
-	*list = (index_t*)calloc(succ.size(),SIZEOF_INDEX_T);
+	*list = new index_t[succ.size()];
 	for (int i = 0; i < succ.size(); i++)
 		(*list)[i] = succ[i];
 	return succ.size();
@@ -37,4 +37,22 @@ void BuechiAutomata::revertProperties(NetState &ns, index_t transition) {
 
 bool BuechiAutomata::isAcceptingState(index_t state){
 	return isStateAccepting[state];
+}
+
+BuechiAutomata::~BuechiAutomata(){
+	for (index_t i = 0; i < cardAtomicPropositions; i++){
+		delete atomicPropositions[i]->getPredicate();
+		delete atomicPropositions[i];
+	}
+	free(atomicPropositions);
+
+	for (index_t i = 0; i < cardStates; i++){
+		for (index_t j = 0; j < cardTransitions[i]; j++)
+			free(transitions[i][j]);
+		free(transitions[i]);
+	}
+	free(transitions);
+
+	free(cardTransitions);
+	free(isStateAccepting);
 }

@@ -27,7 +27,7 @@ struct ConjunctionFormula : public CTLFormula {
 	}
 
 	void DEBUG_print() {
-		printf("OR(");
+		printf("AND(");
 		for(index_t i=0;i<cardSubs;i++)
 			subs[i]->DEBUG_print();
 		printf(")");

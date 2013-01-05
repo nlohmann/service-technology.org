@@ -248,9 +248,9 @@ void Task::setFormula()
     	ctlFormula->DEBUG_print();
     	printf("\n");
 
-    	 assert(ctlFormula);
+    	assert(ctlFormula);
 
-    	 //rep->abort(ERROR_COMMANDLINE);
+    	//rep->abort(ERROR_COMMANDLINE);
     }
     else
     {

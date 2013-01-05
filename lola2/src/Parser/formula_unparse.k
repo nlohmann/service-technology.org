@@ -554,7 +554,7 @@ StatePredicateProperty* spp;
 //EINSTIEG
 f=StatePredicateFormula(x) -> [ctl:
 	{
-        printf("I am a CTL state predicate. I am %lu\n", ctl_nextId);
+		//printf("I am a CTL state predicate. I am %lu\n", ctl_nextId);
         ctl_id_stack.push(ctl_nextId++);
     }
     x
@@ -565,14 +565,14 @@ f=StatePredicateFormula(x) -> [ctl:
         assert(ctl_nextId == 0);
         f->ctl_formula = ctl_formulas[0][0];
         f->ctl_formula->payloadsize = ctl_dfs_id*sizeof(statenumber_t) + (2*ctl_result_cache_id+7)/8;
-        printf("I am a CTL state predicate. Done!\n");
+		//printf("I am a CTL state predicate. Done!\n");
     }
 ];
 
 //Boolsche Operatoren
 Conjunction(a,b) -> [ctl:
 	  {
-       	printf("I am %lu (a CTL-conjunction). My parent is %lu\n", ctl_nextId, ctl_id_stack.top());
+       	//printf("I am %lu (a CTL-conjunction). My parent is %lu\n", ctl_nextId, ctl_id_stack.top());
         ctl_id_stack.push(ctl_nextId++);
     }
     a
@@ -583,25 +583,24 @@ Conjunction(a,b) -> [ctl:
         ctl_id_stack.pop();
 
         ConjunctionFormula *cf = new ConjunctionFormula();
-        CTLFormula_p subs = ((CTLFormula*) malloc(sizeof(CTLFormula)*ctl_formulas[myId].size()));
-        cf->subs = &subs;
+        cf->subs = ((CTLFormula**) malloc(sizeof(CTLFormula_p)*ctl_formulas[myId].size()));
         for (size_t i = 0; i < ctl_formulas[myId].size(); ++i)
         {
             //printf("conjunction %d: added a subformula to index %d\n", myId, i);
             assert(ctl_formulas[myId][i]);
-            subs[i] = *ctl_formulas[myId][i];
+            cf->subs[i] = ctl_formulas[myId][i];
             //((ConjunctionStatePredicate*)f)->addSub(i, ctl_formulas[myId][i]);
         }
         cf->cardSubs = ctl_formulas[myId].size();
 
-        printf("told my parent %lu about me %d\n", ctl_id_stack.top(), myId);
+		//printf("told my parent %lu about me %d\n", ctl_id_stack.top(), myId);
         ctl_formulas[ctl_id_stack.top()].push_back(cf);
     }
 ];
 
 Disjunction(a,b) -> [ctl:
 	{
-        printf("I am %lu (a CTL-disjunction). My parent is %lu\n", ctl_nextId, ctl_id_stack.top());
+		//printf("I am %lu (a CTL-disjunction). My parent is %lu\n", ctl_nextId, ctl_id_stack.top());
         ctl_id_stack.push(ctl_nextId++);
     }
     a
@@ -612,18 +611,17 @@ Disjunction(a,b) -> [ctl:
         ctl_id_stack.pop();
 
         DisjunctionFormula *df = new DisjunctionFormula();
-        CTLFormula_p subs = ((CTLFormula*) malloc(sizeof(CTLFormula)*ctl_formulas[myId].size()));
-        df->subs = &subs;
+        df->subs = ((CTLFormula**) malloc(sizeof(CTLFormula_p)*ctl_formulas[myId].size()));
         for (size_t i = 0; i < ctl_formulas[myId].size(); ++i)
         {
             //printf("disjunction %d: added a subformula to index %d\n", myId, i);
             assert(ctl_formulas[myId][i]);
-            subs[i] = *ctl_formulas[myId][i];
+            df->subs[i] = ctl_formulas[myId][i];
             //((ConjunctionStatePredicate*)f)->addSub(i, ctl_formulas[myId][i]);
         }
         df->cardSubs = ctl_formulas[myId].size();
 
-        printf("told my parent %lu about me %d\n", ctl_id_stack.top(), myId);
+		//printf("told my parent %lu about me %d\n", ctl_id_stack.top(), myId);
         ctl_formulas[ctl_id_stack.top()].push_back(df);
     }
 ];
@@ -646,7 +644,7 @@ False() -> [ctl:
 //AG(x)
 AllPath(Always(x)) -> [ctl:
 	{
-		printf("CTL-AllPath_Always\n");
+		//printf("CTL-AllPath_Always\n");
 		ctl_id_stack.push(ctl_nextId++);
 		size_t myDFSId = ctl_dfs_id++;
 		size_t myCacheId = ctl_result_cache_id++;
@@ -670,7 +668,7 @@ AllPath(Always(x)) -> [ctl:
 //AF(x)
 AllPath(Eventually(x)) -> [ctl:
 	{
-		printf("CTL-AllPath_Eventually\n");
+		//printf("CTL-AllPath_Eventually\n");
         ctl_id_stack.push(ctl_nextId++);
 		size_t myDFSId = ctl_dfs_id++;
 		size_t myCacheId = ctl_result_cache_id++;
@@ -694,7 +692,7 @@ AllPath(Eventually(x)) -> [ctl:
 //AX(x)
 AllPath(NextState(x)) -> [ctl:
 	{
-		printf("CTL-AllPath_NextState\n");
+		//printf("CTL-AllPath_NextState\n");
         ctl_id_stack.push(ctl_nextId++);
     }
 	x
@@ -714,7 +712,7 @@ AllPath(NextState(x)) -> [ctl:
 //AU(a,b) -- wirklich so?
 AllPath(Until(a,b)) -> [ctl:
 	{
-		printf("CTL-AllPath_Until\n");
+		//printf("CTL-AllPath_Until\n");
         ctl_id_stack.push(ctl_nextId++);
 		size_t myDFSId = ctl_dfs_id++;
 		size_t myCacheId = ctl_result_cache_id++;
@@ -740,7 +738,7 @@ AllPath(Until(a,b)) -> [ctl:
 //EG(x)
 ExPath(Always(x)) -> [ctl:
 	{
-		printf("CTL-ExPath_Always\n");
+		//printf("CTL-ExPath_Always\n");
         ctl_id_stack.push(ctl_nextId++);
 		size_t myDFSId = ctl_dfs_id++;
 		size_t myCacheId = ctl_result_cache_id++;
@@ -764,7 +762,7 @@ ExPath(Always(x)) -> [ctl:
 //EF(x)
 ExPath(Eventually(x)) -> [ctl:
 	{
-		printf("CTL-ExPath_Eventually\n");
+		//printf("CTL-ExPath_Eventually\n");
         ctl_id_stack.push(ctl_nextId++);
 		size_t myDFSId = ctl_dfs_id++;
 		size_t myCacheId = ctl_result_cache_id++;
@@ -788,7 +786,7 @@ ExPath(Eventually(x)) -> [ctl:
 //EX(x)
 ExPath(NextState(x)) -> [ctl:
 	{
-		printf("CTL-ExPath_Next\n");
+		//printf("CTL-ExPath_Next\n");
         ctl_id_stack.push(ctl_nextId++);
     }
 	x
@@ -808,7 +806,7 @@ ExPath(NextState(x)) -> [ctl:
 //EU(x) -- wirklich so?
 ExPath(Until(a,b)) -> [ctl:
 	{
-		printf("CTL-ExPath_Until\n");
+		//printf("CTL-ExPath_Until\n");
         ctl_id_stack.push(ctl_nextId++);
 		size_t myDFSId = ctl_dfs_id++;
 		size_t myCacheId = ctl_result_cache_id++;
@@ -833,7 +831,7 @@ ExPath(Until(a,b)) -> [ctl:
 
 AtomicProposition(a) -> [ctl:
 	{
-		printf("CTL-AtomicProposition\n");
+		//printf("CTL-AtomicProposition\n");
         ctl_id_stack.push(ctl_nextId++);
 	}
 	a
@@ -855,7 +853,7 @@ AtomicProposition(a) -> [ctl:
 
 LessEqualAtomicProposition(x, Number(y)) -> [ctl:
 {
-	printf("I am an atomic (<=) CTL-proposition. My parent is %lu\n", ctl_id_stack.top());
+	//printf("I am an atomic (<=) CTL-proposition. My parent is %lu\n", ctl_id_stack.top());
 
     index_t factors_positive = 0;
     index_t factors_negative = 0;
@@ -895,7 +893,7 @@ LessEqualAtomicProposition(x, Number(y)) -> [ctl:
     ctl_current.clear();
 
     // register formula at parent
-    printf("told my parent %lu about me; %p\n", ctl_id_stack.top(), (void*)f);
+		//printf("told my parent %lu about me; %p\n", ctl_id_stack.top(), (void*)f);
     spp = new StatePredicateProperty (f);
 }
 ];

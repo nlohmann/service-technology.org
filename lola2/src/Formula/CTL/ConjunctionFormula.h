@@ -5,7 +5,7 @@
 #include <Formula/CTL/CTLFormula.h>
 
 struct ConjunctionFormula : public CTLFormula {
-	CTLFormula** subs;
+	CTLFormula** subs; //array of pointer
 	index_t cardSubs;
 
 	void updateAtomics(NetState& ns, index_t t) {

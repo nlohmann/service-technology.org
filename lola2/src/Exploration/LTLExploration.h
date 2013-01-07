@@ -24,12 +24,12 @@ public:
 	index_t state;
 	// lowlink can be maintained locally
 //	uint64_t lowlink;
-	uint64_t dfs;
+	dfsnum_t dfs;
 	AutomataTree* smaller;
 	AutomataTree* bigger;
 
-	AutomataTree(){smaller = 0; bigger = 0;};
-	AutomataTree(index_t _state) { smaller = 0; bigger = 0; state = _state;};
+	AutomataTree(){smaller = 0; bigger = 0; dfs = -1;};
+	AutomataTree(index_t _state) { smaller = 0; bigger = 0; state = _state; dfs = -1;};
 
 	~AutomataTree(){
 		if (smaller) delete smaller;
@@ -61,9 +61,9 @@ private:
 	fairness_assumptions assumptions;
 	bool* forbidden_transtitions;
 
-	bool isFair(BuechiAutomata &automata, Store<AutomataTree> &store,
+	bool searchFair(BuechiAutomata &automata, Store<AutomataTree> &store,
 			Firelist &firelist, NetState &ns, index_t currentAutomataState, AutomataTree* currentEntry,
-			index_t depth, index_t currentNextDFS);
+			dfsnum_t depth, index_t currentNextDFS);
 	index_t checkFairness(BuechiAutomata &automata, Store<AutomataTree> &store,
 			Firelist &firelist, NetState &ns, index_t currentAutomataState,
 			index_t depth);

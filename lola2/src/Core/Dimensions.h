@@ -150,6 +150,10 @@ typedef uint32_t vectordata_t;
 
 
 /////////////
+// types for Tarjan
+typedef uint64_t dfsnum_t;
+
+/////////////
 // types used for symmetry reduction
 
 // bucket size for bucketized counting sort

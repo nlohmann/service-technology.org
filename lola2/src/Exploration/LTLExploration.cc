@@ -363,31 +363,31 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 						&& tarjanStack.top()->dfs > currentStateEntry->dfs;
 
 				// make preparations if this is not the counter example
-				SearchStack<AutomataTree*> __back_stack;
-				AutomataTree** __back_entry = __back_stack.push();
-				*__back_entry = currentStateEntry;
+				//SearchStack<AutomataTree*> __back_stack;
+				//AutomataTree** __back_entry = __back_stack.push();
+				//*__back_entry = currentStateEntry;
 
 				// not found the counter example, so discard the component
 				while (tarjanStack.StackPointer
 						&& tarjanStack.top()->dfs > currentStateEntry->dfs) {
 					// mark all states as visited
-					tarjanStack.top()->dfs = -depth - 3;
+					tarjanStack.top()->dfs = -currentNextDepth;
 					// check whether is state is an accepting one
 					foundcounterexample |= automata.isAcceptingState(
 							tarjanStack.top()->state);
 
-					__back_entry = __back_stack.push();
-					*__back_entry = tarjanStack.top();
+					//__back_entry = __back_stack.push();
+					//*__back_entry = tarjanStack.top();
 
 					tarjanStack.pop();
 				}
 				// remove current node from tarjan stack and mark it as already visited (once) for the fairness check
-				currentStateEntry->dfs = -depth - 4;
+				currentStateEntry->dfs = -currentNextDepth - 1;
 				// if a counter example if found it must be inside a non trivial SCC, else it is none
 				if (foundcounterexample && nonTrivial) {
 					// first we need to check all fairness assumptions via DFS
 					index_t checkResult = checkFairness(automata, store, firelist, ns,
-							currentAutomataState, depth);
+							currentAutomataState, currentNextDepth);
 					if (checkResult == -1)
 						return true;
 					if (checkResult == -2)
@@ -396,9 +396,10 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 					// if a strong fairness assumption is not fulfilled -> search smaller components
 					forbidden_transtitions[checkResult] = true;
 
+					currentNextDepth += 3;
 					// check for fairness via lichtenstein-pnueli
 					if (searchFair(automata, store, firelist, ns,
-							currentAutomataState, currentStateEntry, depth + 3,
+							currentAutomataState, currentStateEntry, currentNextDepth - 3,
 							currentNextDFSNumber)) {
 						delete[] currentFirelist;
 						delete[] currentStateList;
@@ -413,10 +414,10 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 					forbidden_transtitions[checkResult] = false;
 				}
 				// mark all elements as fully processed
-				while (__back_stack.StackPointer) {
-					__back_stack.top()->dfs = -depth - 2;
-					__back_stack.pop();
-				}
+				//while (__back_stack.StackPointer) {
+				//	__back_stack.top()->dfs = -depth - 2;
+				//	__back_stack.pop();
+				//}
 			} else {
 				// push state onto tarjan stack
 				// this stack contains all elements, which are on the "real" tarjan but not on the dfs stack
@@ -522,6 +523,8 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	/// current global dfs number
 	index_t currentNextDFSNumber = 1;
 
+	currentNextDepth = 3;
+
 	// get first firelist
 	//index_t* currentFirelist;
 	// the size of the list is not a valid index (thus -1)
@@ -546,7 +549,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	// set dfs and lowlink number
 	currentStateEntry->dfs = currentNextDFSNumber;
 
-	return searchFair(automata, store,firelist,ns,currentAutomataState,currentStateEntry,0,currentNextDFSNumber);
+	return searchFair(automata, store,firelist,ns,currentAutomataState,currentStateEntry,currentNextDepth-3,currentNextDFSNumber);
 }
 
 

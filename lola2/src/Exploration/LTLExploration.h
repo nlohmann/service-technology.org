@@ -60,6 +60,7 @@ private:
 
 	fairness_assumptions assumptions;
 	bool* forbidden_transtitions;
+	dfsnum_t currentNextDepth;
 
 	bool searchFair(BuechiAutomata &automata, Store<AutomataTree> &store,
 			Firelist &firelist, NetState &ns, index_t currentAutomataState, AutomataTree* currentEntry,

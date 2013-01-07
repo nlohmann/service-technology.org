@@ -9,6 +9,9 @@
 #include <Core/Dimensions.h>
 #include <Stores/VectorStores/VectorStore.h>
 #include <pthread.h>
+#include <cstdlib>
+#include <cstring>
+#include <Net/Net.h>
 
 template <typename T>
 class PrefixTreeStore : public VectorStore<T>
@@ -34,7 +37,7 @@ public:
     virtual bool popVector(vectordata_t * & out);
 private:
 
-    inline size_t getPayloadSize();
+    size_t getPayloadSize();
 
     /// a binary decision node
     class Decision
@@ -67,5 +70,10 @@ private:
     // full vector will be reconstructed here when popping vectors
     vectordata_t* popVectorCache;
 };
+
+// forward declaration to register function specialization
+template<>
+size_t PrefixTreeStore<void>::getPayloadSize();
+
 
 #include <Stores/VectorStores/PrefixTreeStore.inc>

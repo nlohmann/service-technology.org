@@ -92,8 +92,8 @@ lola_SOURCES = \
                 Stores/VectorStores/HashingWrapperStore.h Stores/VectorStores/HashingWrapperStore.inc \
                 Stores/VectorStores/VSTLStore.cc Stores/VectorStores/VSTLStore.h Stores/VectorStores/VSTLStore.inc \
                 Stores/VectorStores/VBloomStore.h Stores/VectorStores/VBloomStore.inc \
-                Stores/VectorStores/SuffixTreeStore.cc Stores/VectorStores/SuffixTreeStore.h Stores/VectorStores/SuffixTreeStore.inc \
-                Stores/VectorStores/PrefixTreeStore.h Stores/VectorStores/PrefixTreeStore.inc \
+                Stores/VectorStores/SuffixTreeStore.h Stores/VectorStores/SuffixTreeStore.inc \
+                Stores/VectorStores/PrefixTreeStore.cc Stores/VectorStores/PrefixTreeStore.h Stores/VectorStores/PrefixTreeStore.inc \
                 \
                 SweepLine/Sweep.h SweepLine/Sweep.inc \
                 SweepLine/SweepStore.h SweepLine/SweepStore.inc \

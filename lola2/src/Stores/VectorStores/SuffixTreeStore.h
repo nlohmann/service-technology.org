@@ -34,8 +34,6 @@ public:
     virtual bool popVector(vectordata_t * & out);
 private:
 
-    inline size_t getPayloadSize();
-
     /// a binary decision node
     class Decision
     {

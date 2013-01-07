@@ -89,6 +89,9 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
     const vectordata_t* pInput = in;
 
 
+    /// the starting address of the current vector. In each vector, the payload is loacted before the marking data.
+    vectordata_t* pPayload;
+
     /// the vector word we are currently investigating
     vectordata_t* pVector;
 
@@ -97,18 +100,23 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
 
     /// the number of bits processed since reaching the current branch
     bitindex_t position = 0;
+    
+    size_t payloadSize = getPayloadSize();
 
     // lock the current bucket to ensure thread safety
     pthread_rwlock_wrlock(&rwlock);
-
+    
     // Is hash bucket empty? If so, assign to currentvector
-    if (!(pVector = firstvector))
+    if (!(pPayload = firstvector))
     {
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
         newvector = &firstvector;
     }
     else
     {
+    	// skip payload. Cast to char* is done to ensure skipping exaclty the right amount of bytes.
+    	pVector = (vectordata_t*)(((char*)pPayload) + payloadSize);
+    
         // Here, hash bucket is not empty.
         anchor = &branch;
 
@@ -127,6 +135,9 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
                 if(!memcmp(pInput,pVector,vectorlen*sizeof(vectordata_t))) {
                     // match found, we're done
                     pthread_rwlock_unlock(&rwlock);
+                    
+                    if(payload)
+                        *payload = (T*) pPayload;
                     return true;
                 }
                 // difference found, skip to first differing word.
@@ -158,6 +169,8 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
                                 }
                                 else {
                                     pthread_rwlock_unlock(&rwlock);
+                                    if(payload)
+                                        *payload = (T*) pPayload;
                                     return true;
                                 }
                             }
@@ -171,6 +184,8 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
                             }
                         } else {
                             pthread_rwlock_unlock(&rwlock);
+                            if(payload)
+                                *payload = (T*) pPayload;
                             return true;
                         }
                     }
@@ -219,7 +234,8 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
             if ((*anchor) && (*anchor)->bit == (position + (VECTOR_WIDTH - vector_bitstogo)))
             {
                 // Indeed, there is. Switch to that branch and repeat with new suffix tree vector
-                pVector = (* anchor) -> vector;
+                pPayload = (* anchor) -> vector;
+    	        pVector = (vectordata_t*)(((char*)pPayload) + payloadSize);
                 anchor = &((* anchor) -> nextnew);
 
                 position += (VECTOR_WIDTH - vector_bitstogo) + 1;
@@ -229,6 +245,8 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
                 input_bitstogo--;
                 if(input_index == max_input_index && input_bitstogo + max_input_numbits <= VECTOR_WIDTH) {
                     pthread_rwlock_unlock(&rwlock);
+                    if(payload)
+                        *payload = (T*) pPayload;
                     return true;
                 }
                 if (!input_bitstogo)
@@ -256,6 +274,8 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
         input_bitstogo--;
         if(input_index == max_input_index && input_bitstogo + max_input_numbits == VECTOR_WIDTH) {
             pthread_rwlock_unlock(&rwlock);
+            if(payload)
+                *payload = (T*) pPayload;
             return false;
         }
         if (!input_bitstogo)
@@ -267,8 +287,9 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
     assert(bitlen >= position);
     // vector_bitstogo is always VECTOR_WIDTH here
     int newvectorlen = ((bitlen - position) + (VECTOR_WIDTH - 1)) / VECTOR_WIDTH;
-    *newvector = (vectordata_t*) calloc(newvectorlen, sizeof(vectordata_t));
-    pVector = *newvector;
+    *newvector = (vectordata_t*) calloc(payloadSize + newvectorlen*sizeof(vectordata_t), 1);
+    pPayload = *newvector;
+    pVector = (vectordata_t*)(((char*)pPayload) + payloadSize);
 
 
     // test for good alignment
@@ -277,6 +298,8 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
         // good alignment, use memcpy
         memcpy(pVector,pInput,newvectorlen*sizeof(vectordata_t));
         pthread_rwlock_unlock(&rwlock);
+        if(payload)
+            *payload = (T*) pPayload;
         return false;
     } else {
         // bad alignment, copy contents manually
@@ -289,6 +312,8 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
             pVector++;
         }
         pthread_rwlock_unlock(&rwlock);
+        if(payload)
+            *payload = (T*) pPayload;
         return false;
     }
 }
@@ -308,16 +333,19 @@ bool PrefixTreeStore<T>::popVector(vectordata_t * & out)
   }
   
   // vector currently viewed
+  vectordata_t * pPayload = NULL;
   vectordata_t * pVector = NULL;
   // anchor to a decision node
   Decision * anchor = NULL;
   Decision ** pAnchor = NULL;
   
-  if(!(pVector = firstvector))
+  if(!(pPayload = firstvector))
   {
       return false;
   }
-    
+  // skip payload data
+  pVector = (vectordata_t*)(((char*)pPayload) + getPayloadSize());
+
   // copy "first" vector to return it later
   memcpy(popVectorCache, pVector, vectorlen);
   out = popVectorCache;
@@ -325,7 +353,7 @@ bool PrefixTreeStore<T>::popVector(vectordata_t * & out)
   if(!(anchor = branch))
   {
     // no further markings in this bucket
-    free(pVector);
+    free(pPayload);
     firstvector = NULL;
     return true;
   }

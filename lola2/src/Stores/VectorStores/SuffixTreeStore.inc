@@ -27,12 +27,6 @@ SuffixTreeStore<T>::SuffixTreeStore() : popVectorCache(NULL), currentBucket(0)
 }
 
 template <typename T>
-inline size_t SuffixTreeStore<T>::getPayloadSize()
-{
-    return sizeof(T);
-}
-
-template <typename T>
 SuffixTreeStore<T>::~SuffixTreeStore()
 {
     for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)

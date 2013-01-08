@@ -27,7 +27,7 @@ AT_BANNER([Parameters])
 AT_SETUP([Piping from stdin])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([cat myCoffee.owfn | LOCRETIA --verbose --log],0,ignore,ignore)
+AT_CHECK([cat myCoffee.owfn | LOCRETIA --owfn --verbose --log],0,ignore,ignore)
 AT_CHECK([test -f locretia_output.xes])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -35,7 +35,7 @@ AT_CLEANUP
 AT_SETUP([Piping to stdout])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([LOCRETIA myCoffee.owfn --log --verbose --logFile=-],0,stdout,ignore)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn  --log --verbose --logFile=-],0,stdout,ignore)
 AT_CHECK([GREP -q "</log>" stdout])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -43,7 +43,7 @@ AT_CLEANUP
 AT_SETUP([Piping from stdin to stdout])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([cat myCoffee.owfn | LOCRETIA --verbose --log --logFile=-],0,stdout,ignore)
+AT_CHECK([cat myCoffee.owfn | LOCRETIA --owfn  --verbose --log --logFile=-],0,stdout,ignore)
 AT_CHECK([GREP -q "</log>" stdout])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -59,7 +59,7 @@ AT_CLEANUP
 AT_SETUP([XES log output])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([LOCRETIA myCoffee.owfn --log --count=5 --maxLength=8 --minLength=3 --partnerView --verbose],0,ignore,ignore)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn  --log --count=5 --maxLength=8 --minLength=3 --partnerView --verbose],0,ignore,ignore)
 AT_CHECK([test -f myCoffee.xes])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -67,7 +67,7 @@ AT_CLEANUP
 AT_SETUP([synchronous environment output])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([LOCRETIA myCoffee.owfn --syncEnv --verbose],0,ignore,ignore)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn  --syncEnv --verbose],0,ignore,ignore)
 AT_CHECK([test -f myCoffee.sync.pnml])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -75,7 +75,7 @@ AT_CLEANUP
 AT_SETUP([asynchronous environment output])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([LOCRETIA myCoffee.owfn --asyncEnv --verbose],0,ignore,ignore)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn --asyncEnv --verbose],0,ignore,ignore)
 AT_CHECK([test -f myCoffee.async.pnml])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -85,11 +85,11 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.* .])
 AT_CHECK([LOCRETIA myCoffee.tpn --tpn --owfnFile=test.owfn --verbose],0,ignore,ignore)
 AT_CHECK([test -f test.owfn])
-AT_CHECK([LOCRETIA myCoffee.owfn --log --logFile=test.xes --verbose],0,ignore,ignore)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn  --log --logFile=test.xes --verbose],0,ignore,ignore)
 AT_CHECK([test -f test.xes])
-AT_CHECK([LOCRETIA myCoffee.owfn --syncEnv --pnmlFile=test.sync.pnml --verbose],0,ignore,ignore)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn  --syncEnv --pnmlFile=test.sync.pnml --verbose],0,ignore,ignore)
 AT_CHECK([test -f test.sync.pnml])
-AT_CHECK([LOCRETIA myCoffee.owfn --asyncEnv --pnmlFile=test.async.pnml --verbose],0,ignore,ignore)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn  --asyncEnv --pnmlFile=test.async.pnml --verbose],0,ignore,ignore)
 AT_CHECK([test -f test.async.pnml])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -104,9 +104,9 @@ AT_CLEANUP
 AT_SETUP([Cleaning vs. no cleaning of temporary files])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([LOCRETIA myCoffee.owfn --log --tmpfile=locretia-XXXXXX -v],0,ignore,ignore)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn  --log --tmpfile=locretia-XXXXXX -v],0,ignore,ignore)
 AT_CHECK([test -f locretia-*],1)
-AT_CHECK([LOCRETIA myCoffee.owfn --log --tmpfile=locretia-XXXXXX --noClean -v],0,ignore,ignore)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn  --log --tmpfile=locretia-XXXXXX --noClean -v],0,ignore,ignore)
 AT_CHECK([test -f locretia-*],0)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -115,7 +115,7 @@ AT_CLEANUP
 #AT_CHECK_LOLA
 #AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 #AT_DATA([my_locretia.conf], [verbose])
-#AT_CHECK([LOCRETIA --config=my_locretia.conf --log myCoffee.owfn],0,ignore,stderr)
+#AT_CHECK([LOCRETIA --config=my_locretia.conf --owfn --log myCoffee.owfn],0,ignore,stderr)
 #AT_CHECK([GREP -q "using configuration file 'my_locretia.conf'" stderr])
 #AT_KEYWORDS(infrastructure)
 #AT_CLEANUP
@@ -124,7 +124,7 @@ AT_CLEANUP
 #AT_CHECK_LOLA
 #AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 #AT_DATA([locretia.conf], [verbose])
-#AT_CHECK([LOCRETIA --log myCoffee.owfn],0,ignore,stderr)
+#AT_CHECK([LOCRETIA --owfn --log myCoffee.owfn],0,ignore,stderr)
 #AT_CHECK([GREP -q "using configuration file 'locretia.conf'" stderr])
 #AT_KEYWORDS(infrastructure)
 #AT_CLEANUP
@@ -132,7 +132,7 @@ AT_CLEANUP
 AT_SETUP([Results output])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([LOCRETIA myCoffee.owfn --resultFile],0,ignore,ignore)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn --resultFile],0,ignore,ignore)
 AT_CHECK([test -f myCoffee.results])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -165,35 +165,35 @@ AT_BANNER([Errors])
 ############################################################################
 
 AT_SETUP([Input file not found])
-AT_CHECK([LOCRETIA foo.owfn --lola=],1,ignore,stderr)
+AT_CHECK([LOCRETIA foo.owfn --owfn --lola=],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#01\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
 AT_SETUP([Syntax error])
 AT_CHECK([cp TESTFILES/error02.* .])
-AT_CHECK([LOCRETIA error02.owfn --lola=],1,ignore,stderr)
+AT_CHECK([LOCRETIA error02.owfn --owfn --lola=],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#02\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
 AT_SETUP([Un-normal input net])
 AT_CHECK([cp TESTFILES/error03.* .])
-AT_CHECK([LOCRETIA error03.owfn --lola=],1,ignore,stderr)
+AT_CHECK([LOCRETIA error03.owfn --owfn --lola=],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#03\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
 AT_SETUP([Multiple file input])
 AT_CHECK([cp TESTFILES/error04* .])
-AT_CHECK([LOCRETIA error04-1.owfn error04-2.owfn --lola=],1,ignore,stderr)
+AT_CHECK([LOCRETIA error04-1.owfn error04-2.owfn --owfn --lola=],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#04\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
 AT_SETUP([Error building the reachability graph])
 AT_CHECK([cp TESTFILES/error06.* .])
-AT_CHECK([LOCRETIA error06.owfn --log --lola=foo],1,ignore,stderr)
+AT_CHECK([LOCRETIA error06.owfn --owfn --log --lola=foo],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#06\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
@@ -211,11 +211,11 @@ AT_CHECK([touch myCoffee.xes myCoffee.sync.pnml myCoffee.async.pnml])
 AT_CHECK([chmod a-w myCoffee.xes myCoffee.sync.pnml myCoffee.async.pnml myCoffee.owfn])
 AT_CHECK([LOCRETIA myCoffee.tpn --tpn --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
-AT_CHECK([LOCRETIA myCoffee.owfn --log --verbose],1,ignore,stderr)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn --log --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
-AT_CHECK([LOCRETIA myCoffee.owfn --syncEnv --verbose],1,ignore,stderr)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn --syncEnv --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
-AT_CHECK([LOCRETIA myCoffee.owfn --asyncEnv --verbose],1,ignore,stderr)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn --asyncEnv --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
@@ -225,7 +225,7 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([touch foo])
 AT_CHECK([chmod a-w foo])
-AT_CHECK([LOCRETIA myCoffee.owfn --log --verbose --tmpfile=foo],1,ignore,stderr)
+AT_CHECK([LOCRETIA myCoffee.owfn --owfn --log --verbose --tmpfile=foo],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#13\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP

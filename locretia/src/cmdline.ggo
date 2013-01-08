@@ -47,7 +47,7 @@ option "log" -
   flag off
   
 section "OWFN to ..."
-sectiondesc="Options which are used if the 'owfn'-flag is set...\n"
+sectiondesc="Options which are used if the 'owfn'-flag or the 'sa'-flag is set...\n"
 
 option "syncEnv" -
   "OWFN -> synchronous environment."

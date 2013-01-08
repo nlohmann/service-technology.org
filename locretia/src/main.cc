@@ -235,6 +235,7 @@ int main(int argc, char** argv) {
     // There is no need to parse a net when evaluating a PNML file and a XES log -> skip everything unnecessary
     if (!args_info.evaluate_flag) {
 
+    	pnapi::Automaton* servAuto = new pnapi::Automaton();
     	/*----------------------.
     	| 2. parse the open net |
     	`----------------------*/
@@ -246,8 +247,10 @@ int main(int argc, char** argv) {
     				std::cin >> pnapi::io::woflan >> *InnerMarking::net;
     			else if (args_info.owfn_flag)
     				std::cin >> pnapi::io::owfn >> *InnerMarking::net;
-    			else if (args_info.sa_flag)
-    			    std::cin >> pnapi::io::sa >> *InnerMarking::net;
+    			else if (args_info.sa_flag) {
+    			    std::cin >> pnapi::io::sa >> *servAuto;
+    			    *InnerMarking::net = servAuto->toStateMachine();
+    			}
     		} else {
     			// strip suffix from input filename
     			filename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
@@ -262,9 +265,11 @@ int main(int argc, char** argv) {
     			else if (args_info.owfn_flag)
     				inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
     				    >> pnapi::io::owfn >> *InnerMarking::net;
-    			else if (args_info.sa_flag)
+    			else if (args_info.sa_flag) {
     				inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-    				    >> pnapi::io::sa >> *InnerMarking::net;
+    				    >> pnapi::io::sa >> *servAuto;
+    				*InnerMarking::net = servAuto->toStateMachine();
+    			}
     		}
     		if (args_info.verbose_flag) {
     			std::ostringstream s;

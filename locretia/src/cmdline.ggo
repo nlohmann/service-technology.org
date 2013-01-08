@@ -11,20 +11,15 @@ option "tpn" -
   "TPN -> OWFN."
   details="Using this option, the input file is expected to be in a (special) TPN file format. An output file (.owfn) is generated which is the given net plus a random generated interface."
   flag off
-  
-option "log" -
-  "OWFN -> XES log."
-  details="Using this option, a XES log is generated from the underlying OWFN which was either just generated from a TPN or given as an input file."
+
+option "owfn" -
+  "OWFN -> XES log or synchronous or asynchronous environment (PNML) ."
+  details="Using this option, the input file is expected to be in OWFN file format."
   flag off
-  
-option "syncEnv" -
-  "OWFN -> synchronous environment."
-  details="Using this option, a PNML file will be generated containing the synchronous environment of the given OWFN."
-  flag off
-  
-option "asyncEnv" -
-  "OWFN -> asynchronous environment."
-  details="Using this option, a PNML file will be generated containing the asynchronous environment of the given OWFN."
+
+option "sa" -
+  "SA -> XES log."
+  details="Using this option, the input file is expected to be in SA file format."
   flag off
   
 option "evaluate" -
@@ -43,6 +38,27 @@ option "icount" -
   default="-1"
   optional
 
+section "OWFN or SA to XES log"
+sectiondesc="Options which are used if the 'owfn'-flag is set...\n"
+
+option "log" -
+  "OWFN or SA -> XES log."
+  details="Using this option, a XES log is generated from the underlying SA or an OWFN which was either just generated from a TPN or given as an input file."
+  flag off
+  
+section "OWFN to ..."
+sectiondesc="Options which are used if the 'owfn'-flag is set...\n"
+
+option "syncEnv" -
+  "OWFN -> synchronous environment."
+  details="Using this option, a PNML file will be generated containing the synchronous environment of the given OWFN."
+  flag off
+  
+option "asyncEnv" -
+  "OWFN -> asynchronous environment."
+  details="Using this option, a PNML file will be generated containing the asynchronous environment of the given OWFN."
+  flag off
+  
 section "OWFN to XES (XES log generation)"
 sectiondesc="Options which are used if the 'log'-flag is set...\n"
 

@@ -105,14 +105,10 @@ statepredicate:
     { $$ = Implication($1, $3); }
 | statepredicate _iff_ statepredicate
     { $$ = Equivalence($1, $3); }
-| _ALLPATH_ _ALWAYS_ statepredicate
-    { $$ = AllPath(Always($3)); }
-| _ALLPATH_ _EVENTUALLY_ statepredicate
-    { $$ = AllPath(Eventually($3)); }
-| _EXPATH_ _ALWAYS_ statepredicate
-    { $$ = ExPath(Always($3)); }
-| _EXPATH_ _EVENTUALLY_ statepredicate
-    { $$ = ExPath(Eventually($3)); }
+| _ALLPATH_ statepredicate
+    { $$ = AllPath($2); }
+| _EXPATH_ statepredicate
+    { $$ = ExPath($2); }
 | _ALWAYS_ statepredicate
     { $$ = Always($2); }
 | _EVENTUALLY_ statepredicate

@@ -189,6 +189,8 @@ void Task::setFormula()
         break;
     case (FORMULA_LIVENESS):
         rep->status("checking liveness");
+        rep->status("liveness not yet implemented, converting to CTL...");
+        formulaType = FORMULA_CTL;
         break;
     case (FORMULA_FAIRNESS):
         rep->status("checking fairness");

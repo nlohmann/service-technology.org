@@ -96,6 +96,18 @@ Conjunction(NextState(x), NextState(y)) -> <neg: NextState(Conjunction(x,y))>;
 // X (a OR b) <->  (Xa OR Xb)
 Disjunction(NextState(x), NextState(y)) -> <neg: NextState(Disjunction(x,y))>;
 
+// AA x       <->  A x
+AllPath(a=AllPath(x)) -> <neg: a>;
+
+// AE x       <->  E x
+AllPath(a=ExPath(x)) -> <neg: a>;
+
+// EA x       <->  A x
+ExPath(a=AllPath(x)) -> <neg: a>;
+
+// EE x       <->  E x
+ExPath(a=ExPath(x)) -> <neg: a>;
+
 // FGF x       <->  GF x
 Eventually(a=Always(Eventually(x))) -> <neg: a>;
 
@@ -112,7 +124,7 @@ AllPath(Eventually(a=AllPath(Eventually(x)))) -> <neg: a>;
 ExPath(Eventually(a=ExPath(Eventually(x)))) -> <neg: a>;
 
 // AGEFAGEF x <-> AGEF x
-AllPath(AllPath(Always(ExPath(Eventually(a=AllPath(Always(ExPath(Eventually(x))))))))) -> <neg: a>;
+AllPath(Always(ExPath(Eventually(a=AllPath(Always(ExPath(Eventually(x)))))))) -> <neg: a>;
 
 // EFAGEFAG x <-> EFAG x
 ExPath(Eventually(AllPath(Always(a=ExPath(Eventually(AllPath(Always(x)))))))) -> <neg: a>;

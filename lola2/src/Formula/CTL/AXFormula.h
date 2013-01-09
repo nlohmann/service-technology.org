@@ -8,6 +8,9 @@
 struct AXFormula : public CTLFormula {
 	CTLFormula* inner;
 
+	void initAtomics(NetState& ns) {
+		inner->initAtomics(ns);
+	}
 	void updateAtomics(NetState& ns, index_t t) {
 		inner->updateAtomics(ns,t);
 	}

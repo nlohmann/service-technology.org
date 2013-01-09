@@ -11,6 +11,10 @@ struct AUFormula : public DFSFormula {
 	CTLFormula* phi;
 	CTLFormula* psi; //phi until psi
 
+	void initAtomics(NetState& ns) {
+		phi->initAtomics(ns);
+		psi->initAtomics(ns);
+	}
 	void updateAtomics(NetState& ns, index_t t) {
 		phi->updateAtomics(ns,t);
 		psi->updateAtomics(ns,t);

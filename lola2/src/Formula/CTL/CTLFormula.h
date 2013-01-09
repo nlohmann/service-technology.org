@@ -37,6 +37,7 @@ struct CTLFormula {
 		*(reinterpret_cast<uint8_t*>(payload)+(index>>3)) = cachedValue;
 	}
 
+	virtual void initAtomics(NetState& ns) = 0;
 	virtual void updateAtomics(NetState& ns, index_t t) = 0;
 	virtual void revertAtomics(NetState& ns, index_t t) = 0;
 	virtual bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) = 0;

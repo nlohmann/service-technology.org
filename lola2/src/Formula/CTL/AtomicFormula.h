@@ -8,6 +8,9 @@
 struct AtomicFormula : public CTLFormula {
 	StatePredicateProperty* inner;
 
+	void initAtomics(NetState& ns) {
+		inner->initProperty(ns);
+	}
 	void updateAtomics(NetState& ns, index_t t) {
 		inner->checkProperty(ns,t);
 	}

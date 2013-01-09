@@ -15,6 +15,9 @@ struct TrueFormula : public CTLFormula {
 		printf("TRUE");
 	}
 
+	void initAtomics(NetState& ns) {
+		// do nothing
+	}
 	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
 		// do nothing
 	}

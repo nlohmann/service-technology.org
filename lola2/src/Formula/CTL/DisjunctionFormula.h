@@ -8,6 +8,10 @@ struct DisjunctionFormula : public CTLFormula {
 	CTLFormula** subs; //array of pointer
 	index_t cardSubs;
 
+	void initAtomics(NetState& ns) {
+		for(index_t i = 0; i<cardSubs; i++)
+			subs[i]->initAtomics(ns);
+	}
 	void updateAtomics(NetState& ns, index_t t) {
 		for(index_t i = 0; i<cardSubs; i++)
 			subs[i]->updateAtomics(ns,t);

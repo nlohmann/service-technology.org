@@ -21,6 +21,8 @@ bool CTLExploration::checkProperty(CTLFormula* formula, Store<void*> &store,
 	formula->DEBUG_print();
 	printf("\n");
 
+	formula->initAtomics(ns);
+
 	witness.clear();
 	return formula->check(store,ns,firelist,&witness);
 }

@@ -79,9 +79,14 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				}
 
 				// recursive descent
-				DFSStackEntry* entry = dfsStack.push();
+
+	            DFSStackEntry* entry = dfsStack.push();
 				new (entry) DFSStackEntry(currentFirelist,currentFirelistIndex,payload,currentLowlink);
 
+				// update enabledness for current state
+	            Transition::updateEnabled(ns, currentFirelist[currentFirelistIndex]);
+
+	            // get new firelist
 				payload = newpayload;
 				currentFirelistIndex = firelist.getFirelist(ns,&currentFirelist);
 
@@ -140,6 +145,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				dfsStack.pop();
 
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
+	            Transition::revertEnabled(ns, currentFirelist[currentFirelistIndex]);
 				revertAtomics(ns,currentFirelist[currentFirelistIndex]);
 			} else {
 				assert(!tarjanStack.StackPointer); // tarjan stack empty
@@ -174,11 +180,13 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	while(dfsStack.StackPointer) {
 		setCachedResult(dfsStack.top().payload,KNOWN_FALSE);
 		Transition::backfire(ns,dfsStack.top().fl[dfsStack.top().flIndex]);
+        Transition::revertEnabled(ns, dfsStack.top().fl[dfsStack.top().flIndex]);
 		revertAtomics(ns,dfsStack.top().fl[dfsStack.top().flIndex]);
 
 		witness->push_back(dfsStack.top().fl[dfsStack.top().flIndex]);
 
 		dfsStack.pop();
 	}
-	return true;
+	// (negative) witness found
+	return false;
 }

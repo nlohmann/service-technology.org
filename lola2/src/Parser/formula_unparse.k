@@ -634,7 +634,7 @@ True() -> [ctl:
 
 False() -> [ctl:
 	{
-		NotFormula * nf;
+		NotFormula* nf = new NotFormula();
 		nf->inner = new TrueFormula();
 		ctl_formulas[ctl_id_stack.top()].push_back(nf);
 	}

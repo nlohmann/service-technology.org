@@ -29,7 +29,8 @@ using std::endl;
  * \param _front_offset Maximal progress of a single transition
  */
 template <class T>
-SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset) : size(_size), front_offset(_front_offset), active(size-front_offset-1), offset(0)
+SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset)
+: size(_size), front_offset(_front_offset), active(size-front_offset-1), offset(0), transient_offset(_transient_offset)
 {
 	assert(size>front_offset);
 	// get encoders
@@ -188,7 +189,6 @@ bool SweepRingStore<T>::advanceProgress()
 	// find our foremost and rearmost store
 	index_t front(active+front_offset);
 	if (front>=size) front -= size;
-	index_t back(front+1<size ? front+1 : 0);
 
 	// check if all transient stores in front of the active are empty
 	index_t pos(active);
@@ -203,22 +203,20 @@ bool SweepRingStore<T>::advanceProgress()
 	if (store_empty && !oldpersistent[front]->checkNext()) return false;
 
 	// delete the transients at the back and swap in the transients at the active position
-	delete store[back];
+	index_t back(transient_offset>active ? active+size-transient_offset : active-transient_offset);
+	if (transient_offset>0) {
+		delete store[back];
+		store[back] = store[active]; // empty store at this point
+		store[active] = samevalue;
+	} else delete samevalue;
 	deleted_store_size = count[back];
-	store[back] = store[active]; // empty store at this point
 	count[back] = 0;
-	store[active] = samevalue;
 	samevalue = new SweepStore<T>();
-/*
-	// version 2: just delete the transients at the active position, no swapping
-	delete samevalue;
-	deleted_store_size = count[active];
-	samevalue = new SweepStore<T>();
-	count[active] = 0;
-*/
+
 	// link in next persistent stores at the back (= the new front)
-	newpersistent[back] = newpersistent[front]->getNext();
-	oldpersistent[back] = oldpersistent[front]->getNext();
+	index_t newfront(front+1<size ? front+1 : 0);
+	newpersistent[newfront] = newpersistent[front]->getNext();
+	oldpersistent[newfront] = oldpersistent[front]->getNext();
 
 	// advance on the ring
 	if (++active>=size) active=0;

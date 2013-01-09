@@ -10,12 +10,15 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
+#include <map>
+#include <cmdline.h>
 #include <pthread.h>
 #include <SweepLine/Sweep.h>
 #include <Net/Net.h>
 #include <Net/Transition.h>
 #include <InputOutput/Reporter.h>
 
+extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
 /*!
@@ -32,22 +35,39 @@ Sweep<T>::Sweep(SimpleProperty& property, NetState& ns, SweepEmptyStore& st, Fir
 : nr_of_fronts(number_of_fronts), prop(property), start(ns), fl(firelist), count_store(st), max_transient_count(0), exit(false)
 {
 	// determine the necessary store sizes from min and max progress measure
-	int32_t foff(0), boff(0);
+	int32_t foff(0), boff(0), negcount(0);
+	std::map<int32_t,int32_t> negmap;
 	for(index_t i=0; i<Net::Card[TR]; ++i)
 	{
 		if (Transition::ProgressMeasure[i]>foff)
 			foff = Transition::ProgressMeasure[i];
 		if (Transition::ProgressMeasure[i]<boff)
 			boff = Transition::ProgressMeasure[i];
-
+		// count the transitions with negative progress and bucket-sort the progress values
+		if (Transition::ProgressMeasure[i]<0) {
+			++negcount;
+			++negmap[Transition::ProgressMeasure[i]];
+		}
 	}
 	front_offset = (index_t) foff;
 	store_size = (index_t) (foff-boff+1);
+
+	// find the negative progress offset at which transient states are forgotten
+	int32_t negtcount(args_info.sweeplinedelay_arg*negcount/100);
+	transient_offset = 0;
+	for(std::map<int32_t,int32_t>::reverse_iterator it=negmap.rbegin(); it!=negmap.rend() && negtcount>0; ++it)
+	{
+		negtcount -= it->second;
+		transient_offset = (index_t)(-it->first);
+	}
+
+	rep->status("transition progress range [%d,%d], transients in [%d,%d]",boff,foff,-(int32_t)(transient_offset),foff);
 
 	// obtain initial (empty) lists of stores for persistent states
 	start_new_persistent = new SweepListStore<T>(store_size);
 	start_old_persistent = new SweepListStore<T>(store_size);
 
+	// reserve memory for counting states and edges for all threads/fronts
 	persistent_count = (int64_t***) calloc(SIZEOF_INT64_T,nr_of_fronts);
 	transient_count = (int64_t***) calloc(SIZEOF_INT64_T,nr_of_fronts);
 	call_count = (int64_t***) calloc(SIZEOF_INT64_T,nr_of_fronts);
@@ -237,7 +257,7 @@ void* Sweep<T>::threadSweep(void* container) {
     Firelist* myFirelist = sweep->fl.createNewFireList(sp);
 
     // Create the Store for this thread
-    SweepRingStore<T> store(sweep->store_size,sweep->front_offset);
+    SweepRingStore<T> store(sweep->store_size,sweep->front_offset,sweep->transient_offset);
     if (arguments->ns) {
         store.init(sweep->start_old_persistent,sweep->start_new_persistent);
         store.searchAndInsert(*arguments->ns,NULL,0);
@@ -278,6 +298,8 @@ void* Sweep<T>::threadSweep(void* container) {
         pthread_mutex_unlock(arguments->backMutex);
     }
 
+    if (!arguments->threadNumber) sweep->forwardStateCount();
+
     delete myFirelist;
     delete sp;
     return solution;
@@ -295,13 +317,13 @@ template <class T>
 bool Sweep<T>::initFront(tpSweepArguments& args, SweepRingStore<T>& store, int32_t& back_progress, int32_t& sem_countdown)
 {
 	// if we are not the most advanced front, wait until our predecessor is far enough away
-    if (args.number_of_threads>1) {
-        pthread_mutex_lock(args.frontMutex);
-        while (!args.frontrunner[args.threadNumber] && !*args.frontSemaphore) 
-            pthread_cond_wait(args.frontCond,args.frontMutex);
-        if (!args.frontrunner[args.threadNumber]) --*args.frontSemaphore;
-        pthread_mutex_unlock(args.frontMutex);
-    }
+	if (args.number_of_threads>1) {
+		pthread_mutex_lock(args.frontMutex);
+		while (!args.frontrunner[args.threadNumber] && !*args.frontSemaphore) 
+			pthread_cond_wait(args.frontCond,args.frontMutex);
+		if (!args.frontrunner[args.threadNumber]) --*args.frontSemaphore;
+		pthread_mutex_unlock(args.frontMutex);
+	}
 
 	if (exit) return false;
 
@@ -348,7 +370,7 @@ NetState* Sweep<T>::runFront(SweepRingStore<T>& store, Firelist& fl, SimplePrope
 		}
 
         // compute and forward the state count
-        if (args.frontrunner[args.threadNumber]) forwardStateCount();
+        if (args.frontrunner[args.threadNumber] && !exit) forwardStateCount();
 
         // advance the front to the next progress measure
         if (!store.advanceProgress()) break;
@@ -499,6 +521,7 @@ void Sweep<T>::forwardStateCount()
 	else max_transient_count=trcnt;
 
     // save the counter values, no distinguishing transient and persistent states possible
+	if (exit) rep->status("%lld persistent markings, %lld transient markings (max)",pscnt,trcnt);
 	count_store.setMarkings(trcnt+pscnt);
 	count_store.setCalls(ccnt);
 }

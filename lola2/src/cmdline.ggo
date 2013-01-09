@@ -63,6 +63,15 @@ option "symmetry" y
   "Use symmetry reduction"
   flag off
 
+option "sweeplinedelay" -
+  "Parameter for the SweepLine search strategy"
+  details="Percentage of transitions with negative progress values for which non-persistent states are remembered."
+  int
+  typestr="PERCENTAGE"
+  default="100"
+  optional
+  hidden
+
 section "Input/Output"
 
 option "compressed" -

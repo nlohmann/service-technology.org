@@ -48,15 +48,15 @@ struct tpSweepArguments {
 	/// mutex for the frontrunner flag (for the predecessor thread)
 	pthread_mutex_t* frontMutex;
 	/// mutex for the frontrunner flag (for the successor thread)
-    pthread_mutex_t* backMutex;
+        pthread_mutex_t* backMutex;
 	/// mutex condition (for the predecessor thread)
 	pthread_cond_t* frontCond;
 	/// mutex condition (for the successor thread)
 	pthread_cond_t* backCond;
 	/// semaphore value (for the predecessor thread)
-    index_t* frontSemaphore;
+        index_t* frontSemaphore;
 	/// semaphore value (for the successor thread)
-    index_t* backSemaphore;
+        index_t* backSemaphore;
 	/// the ID number of the current thread
 	int threadNumber;
 	/// the total number of threads
@@ -118,13 +118,13 @@ struct tpSweepArguments {
 	/// the list of old persistent states (starting point, minimal progress measure)
 	SweepListStore<T>* start_old_persistent;
 
-	/// counter for persistent states
+	/// counters for persistent states
 	int64_t*** persistent_count;
 
-	/// counter for transient states
+	/// counters for transient states
 	int64_t*** transient_count;
 
-	/// counter for edges (calls)
+	/// counters for edges (calls)
 	int64_t*** call_count;
 
 	/// maximal number of transient states
@@ -135,6 +135,9 @@ struct tpSweepArguments {
 
 	/// the maximal progress measure of a single transition
 	index_t front_offset;
+
+	/// the negative progress measure offset at which transient states are forgotten
+	index_t transient_offset;
 
 	/// a flag telling all threads to terminate
 	bool exit;

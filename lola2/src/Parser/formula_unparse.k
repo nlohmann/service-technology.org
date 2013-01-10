@@ -399,7 +399,7 @@ uint32_t get_state_number(uint32_t state){
 // LCOV_EXCL_START
 void mylocalprinter(const char* s, kc::uview v)
 {
-    printf("%s", s);
+    //printf("%s", s);
 }
 // LCOV_EXCL_STOP
 
@@ -550,8 +550,29 @@ StatePredicateProperty* spp;
 %}
 
 //EINSTIEG
+
+f=Conjunction provided (!f->containsTemporal) , 
+f=Disjunction provided (!f->containsTemporal) , 
+f=Negation provided (!f->containsTemporal) , 
+f=AtomicProposition provided (!f->containsTemporal) -> [ctl:
+    {
+        with(StatePredicateFormula(f))
+        {
+            x=StatePredicateFormula(*) :
+            {
+                x->unparse(mylocalprinter,kc::internal);
+                AtomicFormula* af = new AtomicFormula();
+                af->inner = new StatePredicateProperty(x->formula);
+		        ctl_formulas[ctl_id_stack.top()].push_back(af);
+		    }
+		}
+    }
+];
+
 f=StatePredicateFormula(x) -> [ctl:
 	{
+	    f->unparse(mylocalprinter, kc::temporal);
+        //printf("CONTAINS_TEMPORAL: %d\n",x->containsTemporal);
 		//printf("I am a CTL state predicate. I am %lu\n", ctl_nextId);
         ctl_id_stack.push(ctl_nextId++);
     }
@@ -568,7 +589,7 @@ f=StatePredicateFormula(x) -> [ctl:
 ];
 
 //Boolsche Operatoren
-Conjunction(a,b) -> [ctl:
+f=Conjunction(a,b) provided (f->containsTemporal) -> [ctl:
 	  {
        	//printf("I am %lu (a CTL-conjunction). My parent is %lu\n", ctl_nextId, ctl_id_stack.top());
         ctl_id_stack.push(ctl_nextId++);
@@ -596,7 +617,7 @@ Conjunction(a,b) -> [ctl:
     }
 ];
 
-Disjunction(a,b) -> [ctl:
+f=Disjunction(a,b) provided (f->containsTemporal) -> [ctl:
 	{
 		//printf("I am %lu (a CTL-disjunction). My parent is %lu\n", ctl_nextId, ctl_id_stack.top());
         ctl_id_stack.push(ctl_nextId++);
@@ -827,7 +848,7 @@ ExPath(Until(a,b)) -> [ctl:
 	}
 ];
 
-AtomicProposition(a) -> [ctl:
+f=AtomicProposition(a) provided (f->containsTemporal) -> [ctl:
 	{
 		//printf("CTL-AtomicProposition\n");
         ctl_id_stack.push(ctl_nextId++);

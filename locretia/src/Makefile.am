@@ -4,8 +4,8 @@ bin_PROGRAMS = locretia
 # the plain sources you need to compile (no generated code)
 locretia_SOURCES = cmdline.c cmdline.h \
                 InnerMarking.h InnerMarking.cc \
-		  generateLog.cc generateLog.h \
-		  serviceAutomaton.cc serviceAutomaton.h \
+		generateLog.cc generateLog.h \
+		serviceAutomaton.cc serviceAutomaton.h \
                 Label.h Label.cc \
                 main.cc \
                 Output.cc Output.h \
@@ -13,9 +13,7 @@ locretia_SOURCES = cmdline.c cmdline.h \
                 syntax_graph.yy lexic_graph.ll \
                 types.h \
                 util.h \
-                verbose.cc verbose.h \
-		  PromBridge.cc PromBridge.h \
-		  jni.h jni_md.h
+                verbose.cc verbose.h
 
 # the configuration files
 sysconf_DATA = locretia.conf
@@ -29,9 +27,6 @@ locretia_CPPFLAGS += -I$(top_srcdir)/libs -I$(top_srcdir)/libs/pnapi
 locretia_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
-# add the java virtual machine library
-AM_LDFLAGS = -Wl,-rpath=@JRELIB@ -L$(top_srcdir)@JDKLIB@ -ljvm
-# LIBS += -ljvm
 
 
 #############################################################################

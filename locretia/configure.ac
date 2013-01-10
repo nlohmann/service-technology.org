@@ -21,9 +21,6 @@ AC_ST_AUTOTEST
 AC_ST_PNAPI([4.02])
 AC_ST_VERBOSE
 
-# use the macro to find the path to the java-classes needed by Locretia
-AC_JAVAPATH
-
 # needed to integrate "silence" utility
 AC_DEFINE_UNQUOTED([UTIL_FOLDER], ["`pwd`/utils"], [The path to the utils folder.])
 

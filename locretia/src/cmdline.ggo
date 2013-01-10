@@ -201,15 +201,6 @@ option "tmpfile" -
   default="/tmp/locretia-XXXXXX"
   optional
   hidden
-  
-option "java" -
-  "Set the path to the java-classes needed for the evaluation."
-  details="The path to the various java-classes needed by the algorithm of the Petri net and log replayer in ProM.\n"
-  string
-  typestr="PATH"
-  default="./java"
-  optional
-  hidden
 
 option "noClean" -
   "Do not delete temporary files."

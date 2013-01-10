@@ -99,8 +99,6 @@ FALSE                                    { ptbuechi_setcol(); return _FALSE_; }
 
 [^,;:()\t \n\r\{\}]+                     { ptbuechi_setcol(); ptbuechi_lval.yt_casestring = kc::mkcasestring(ptbuechi_text); return IDENTIFIER; }
 
-.                                        { ptbuechi_setcol(); ptbuechi_error("lexical error"); }
-
 %%
 
 inline void ptbuechi_setcol()

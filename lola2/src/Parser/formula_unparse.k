@@ -48,8 +48,6 @@ TransitionRules(a,b) -> [out: a "&" b ];
 
 EmptyBuechiRules() -> [out: ];
 
-BuechiRules(lrules, rrules) -> [out:];
-
 AcceptingState(state) -> [out:];
 
 AcceptingSet(set1, set2) -> [out:];

@@ -37,17 +37,9 @@ option "icount" -
   typestr="COUNT"
   default="-1"
   optional
-
-section "OWFN or SA to XES log"
-sectiondesc="Options which are used if the 'owfn'-flag is set...\n"
-
-option "log" -
-  "OWFN or SA -> XES log."
-  details="Using this option, a XES log is generated from the underlying SA or an OWFN which was either just generated from a TPN or given as an input file."
-  flag off
   
-section "OWFN to ..."
-sectiondesc="Options which are used if the 'owfn'-flag or the 'sa'-flag is set...\n"
+section "OWFN input"
+sectiondesc="Options which are used if the 'owfn'-flag is set...\n"
 
 option "syncEnv" -
   "OWFN -> synchronous environment."
@@ -59,8 +51,16 @@ option "asyncEnv" -
   details="Using this option, a PNML file will be generated containing the asynchronous environment of the given OWFN."
   flag off
   
-section "OWFN to XES (XES log generation)"
-sectiondesc="Options which are used if the 'log'-flag is set...\n"
+section "OWFN or SA input"
+sectiondesc="Options which are used if the 'owfn'-flag or the 'sa'-flag is set...\n"
+
+option "log" -
+  "OWFN or SA -> XES log."
+  details="Using this option, a XES log is generated from the underlying SA or an OWFN which was either just generated from a TPN or given as an input file."
+  flag off
+  
+section "XES log generation (OWFN or SA input)"
+sectiondesc="Options which are used if the 'log'-flag is set and the input is either an OWFN or a SA...\n"
 
 option "count" n
   "Number of traces to appear in the log-file."
@@ -85,11 +85,24 @@ option "minLength" l
   typestr="MINLENGTH"
   default="0"
   optional
+  
+option "final" f
+  "Only generate traces that end in a final state."
+  details="Using this option, only traces are generated that end in a final state. (Every other trace will just be discarded.)"
+  flag off
+
+section "XES log generation (OWFN only)"
+sectiondesc="Options which are used if the 'log'-flag is set and the input is an OWFN...\n"
 
 option "partnerView" p
   "Change to the environment's point of view."
   details="Using this option, the log will be generated using the asynchronous environment of the given net."
   flag off
+  
+section "XES log generation (SA only)"
+sectiondesc="Options which are used if the 'log'-flag is set and the input is a SA...\n"
+
+
 
 section "evaluation"
 sectiondesc="Options which are used if the 'evaluate'-flag is set...\n"

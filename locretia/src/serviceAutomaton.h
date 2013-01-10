@@ -19,39 +19,28 @@
 
 #pragma once
 
-#include "jni.h"
-#include <cstdarg>
-#include <cstdio>
-#include <cstdlib>
-#include <string>
+#include <pnapi/pnapi.h>
+
 
 /*!
- \brief Prom bridge
-
- A class that uses Prom and specifically The PNAlignment plugin
+ \brief ...
 */
-class PromBridge {
+class serviceAutomaton {
 
     public: /* static functions */
-
-		static JNIEnv* create_vm(std::string & javaPath, JavaVM* & jvm);
-
-		/// invokes the Prom-classes
-		static void invoke_class(JNIEnv* env, std::string & pnmlPath, std::string & logPath);
-
-		/// calls Prom with given log and petri net
-		static int callProm(std::string & pnmlPath, std::string & logPath, std::string & javaPath);
+		static int isFinalStateReachable(const int trace_max_length);
 
     public: /* static attributes */
+        /// the open net that created these inner markings
+        static pnapi::Automaton* sa;
 
     private: /* static attributes */
-
-    private: /* static functions */
 
     public: /* member functions */
 
     private: /* member functions */
+        static int traverse(const pnapi::State& state, int depth, int counter);
 
     public: /* member attributes */
-
 };
+

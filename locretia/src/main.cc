@@ -1,20 +1,20 @@
 /*****************************************************************************\
- Wendy -- Synthesizing Partners for Services
+ Locretia -- generating logs...
 
- Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
+ Copyright (c) 2012 Simon Heiden
 
- Wendy is free software: you can redistribute it and/or modify it under the
+ Locretia is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
  Software Foundation, either version 3 of the License, or (at your option)
  any later version.
 
- Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ Locretia is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
+ along with Locretia.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -29,6 +29,8 @@
 #include <string>
 #include "config-log.h"
 #include "InnerMarking.h"
+#include "serviceAutomaton.h"
+#include "generateLog.h"
 #include "Label.h"
 #include "cmdline.h"
 #include "Results.h"
@@ -235,7 +237,6 @@ int main(int argc, char** argv) {
     // There is no need to parse a net when evaluating a PNML file and a XES log -> skip everything unnecessary
     if (!args_info.evaluate_flag) {
 
-    	pnapi::Automaton* servAuto = new pnapi::Automaton();
     	/*----------------------.
     	| 2. parse the open net |
     	`----------------------*/
@@ -248,8 +249,7 @@ int main(int argc, char** argv) {
     			else if (args_info.owfn_flag)
     				std::cin >> pnapi::io::owfn >> *InnerMarking::net;
     			else if (args_info.sa_flag) {
-    			    std::cin >> pnapi::io::sa >> *servAuto;
-    			    *InnerMarking::net = servAuto->toStateMachine();
+    			    std::cin >> pnapi::io::sa >> *serviceAutomaton::sa;
     			}
     		} else {
     			// strip suffix from input filename
@@ -267,13 +267,15 @@ int main(int argc, char** argv) {
     				    >> pnapi::io::owfn >> *InnerMarking::net;
     			else if (args_info.sa_flag) {
     				inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-    				    >> pnapi::io::sa >> *servAuto;
-    				*InnerMarking::net = servAuto->toStateMachine();
+    				    >> pnapi::io::sa >> *serviceAutomaton::sa;
     			}
     		}
     		if (args_info.verbose_flag) {
     			std::ostringstream s;
-    			s << pnapi::io::stat << *InnerMarking::net;
+    			if (args_info.sa_flag)
+    				s << pnapi::io::stat << *serviceAutomaton::sa;
+    			else
+    				s << pnapi::io::stat << *InnerMarking::net;
     			status("read net: %s", s.str().c_str());
     		}
     	} catch (const pnapi::exception::InputError& error) {
@@ -282,15 +284,17 @@ int main(int argc, char** argv) {
     		abort(2, "\b%s", s.str().c_str());
     	}
 
-    	// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
-    	if (InnerMarking::net->getTransitions().empty()) {
-    		status("net has no transitions -- adding dead dummy transition");
-    		InnerMarking::net->createArc(InnerMarking::net->createPlace(), InnerMarking::net->createTransition());
-    	}
+    	if (!args_info.sa_flag) {
+    		// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
+    		if (InnerMarking::net->getTransitions().empty()) {
+    			status("net has no transitions -- adding dead dummy transition");
+    			InnerMarking::net->createArc(InnerMarking::net->createPlace(), InnerMarking::net->createTransition());
+    		}
 
-    	// only normal nets are supported so far
-    	if (not InnerMarking::net->isNormal()) {
-    		abort(3, "the input open net must be normal");
+    		// only normal nets are supported so far
+    		if (not InnerMarking::net->isNormal()) {
+    			abort(3, "the input open net must be normal");
+    		}
     	}
 
 
@@ -359,67 +363,75 @@ int main(int argc, char** argv) {
     	if (args_info.owfn_flag || args_info.sa_flag) {
 
     		/*===================================..
-    		|| SA or OWFN -> XES log                   ||
+    		|| SA or OWFN -> XES log             ||
     		``===================================*/
 
     		if (args_info.log_flag) {
     			status("Generating XES Log...");
 
-    			if (args_info.partnerView_flag) {
-    				InnerMarking::changeView(InnerMarking::net, args_info.maxLength_arg);
-    			}
+    			if (args_info.owfn_flag) {
+    				if (args_info.partnerView_flag) {
+    					InnerMarking::changeView(InnerMarking::net, args_info.maxLength_arg);
+    				}
 
-    			/*--------------------------------------------.
-    			| 1. initialize labels and interface markings |
-    			`--------------------------------------------*/
-    			Label::initialize();
-
-
-    			/*--------------------------------------------.
-    			| 2. write inner of the open net to LoLA file |
-    			`--------------------------------------------*/
-    			Output* temp = new Output();
-    			std::stringstream ss;
-    			ss << pnapi::io::lola << *InnerMarking::net;
-    			std::string lola_net = ss.str();
-
-    			//    	//test output!!
-    			//    	std::string lola_filename = filename + ".lola";
-    			//    	Output outputLola(lola_filename, "LoLa Net");
-    			//    	outputLola << lola_net << std::endl;
-
-    			temp->stream() << lola_net << std::endl;
+    				/*--------------------------------------------.
+    				| 1. initialize labels and interface markings |
+    				`--------------------------------------------*/
+    				Label::initialize();
 
 
-    			/*------------------------------------------.
-    			| 3. call LoLA and parse reachability graph |
-    			`------------------------------------------*/
-    			// select LoLA binary and build LoLA command
+    				/*--------------------------------------------.
+    				| 2. write inner of the open net to LoLA file |
+    				`--------------------------------------------*/
+    				Output* temp = new Output();
+    				std::stringstream ss;
+    				ss << pnapi::io::lola << *InnerMarking::net;
+    				std::string lola_net = ss.str();
+
+    				//    	//test output!!
+    				//    	std::string lola_filename = filename + ".lola";
+    				//    	Output outputLola(lola_filename, "LoLa Net");
+    				//    	outputLola << lola_net << std::endl;
+
+    				temp->stream() << lola_net << std::endl;
+
+
+    				/*------------------------------------------.
+    				| 3. call LoLA and parse reachability graph |
+    				`------------------------------------------*/
+    				// select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
-    			//    // MinGW does not understand pathnames with "/", so we use the basename
-    			const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
+    				//    // MinGW does not understand pathnames with "/", so we use the basename
+    				const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
 #else
-    			const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
+    				const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
 #endif
 
-    			// call LoLA
-    			status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
-    			time(&start_time);
-    			graph_in = popen(command_line.c_str(), "r");
+    				// call LoLA
+    				status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
+    				time(&start_time);
+    				graph_in = popen(command_line.c_str(), "r");
 
-    			graph_parse();
-    			pclose(graph_in);
-    			graph_lex_destroy();
-    			time(&end_time);
-    			status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
-    			delete temp;
+    				graph_parse();
+    				pclose(graph_in);
+    				graph_lex_destroy();
+    				time(&end_time);
+    				status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
+    				delete temp;
 
 
-    			/*-------------------------------.
-    			| 4. organize reachability graph |
-    			`-------------------------------*/
-    			InnerMarking::initialize();
+    				/*-------------------------------.
+    				| 4. organize reachability graph |
+    				`-------------------------------*/
+    				InnerMarking::initialize();
 
+    			}
+
+    			if (args_info.sa_flag && args_info.final_flag) {
+    				int result = serviceAutomaton::isFinalStateReachable(args_info.maxLength_arg);
+    				if (result == -1)
+    					abort(8877, "No final state reachable in given SA with Trace length of %i.", args_info.maxLength_arg);
+    			}
 
     			/*-------------------------------.
     			| 5. create the XES log          |
@@ -427,12 +439,9 @@ int main(int argc, char** argv) {
     			std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename + ".xes";
     			Output output(log_filename, "XES Log");
 
-    			InnerMarking::createLog(output, filename, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg);
+    			generateLog::createLog(output, filename, !args_info.sa_flag, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg, args_info.final_flag);
 
-    			//    	// delete the "counter place" if it was formerly created
-    			//    	if (args_info.partnerView_flag) {
-    			//    		InnerMarking::deleteCounterPlace();
-    			//    	}
+
     		}
 
     	}

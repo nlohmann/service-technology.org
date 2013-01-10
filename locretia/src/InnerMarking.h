@@ -1,20 +1,20 @@
 /*****************************************************************************\
- Wendy -- Synthesizing Partners for Services
+ Locretia -- generating logs...
 
- Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
+ Copyright (c) 2012 Simon Heiden
 
- Wendy is free software: you can redistribute it and/or modify it under the
+ Locretia is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
  Software Foundation, either version 3 of the License, or (at your option)
  any later version.
 
- Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ Locretia is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
+ along with Locretia.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 #pragma once
@@ -53,14 +53,6 @@ class InnerMarking {
 
         static void deleteCounterPlace();
 
-//        static void createLabeledEnvironment();
-
-        /// print the knowledges as OG
-        static void createLog(std::ostream& file, std::string & filename,
-        										   const int trace_count ,
-				  	  	  	  	  	  	  	  	   const int trace_min_length,
-				  	  	  	  	  	  	  	  	   const int trace_max_length);
-
         /// destroy all objects of this class
         static void finalize();
 
@@ -98,6 +90,9 @@ class InnerMarking {
         /// the open net that created these inner markings
         static pnapi::PetriNet* net;
 
+        /// the open net that created these inner markings
+        static pnapi::Automaton* sa;
+
         /// remember if the reachability graph of the inner is acyclic
         static bool is_acyclic;
 
@@ -118,16 +113,6 @@ class InnerMarking {
             /// the number of final markings
             unsigned int final_markings;
         } stats;
-
-    private: /* static functions */
-            /// creates the header for the output file
-            static void fileHeader(std::ostream&, std::string& filename);
-
-            /// creates the footer for the output file
-            static void fileFooter(std::ostream&);
-
-            /// creates a trace and writes it to the output file
-            static void create_trace(std::ostream& file, const int trace_number, const int trace_maxlength);
 
     public: /* member functions */
         /// constructor
@@ -161,11 +146,5 @@ class InnerMarking {
         Label_ID* labels;
 };
 
-#define TRACE_CLASSIFIER "Trace Name"
-#define TRACE_KEY_NAME "concept:name"
-#define TRACE_KEY_LENGTH "length"
-#define EVENT_CLASSIFIER "Event Name"
-#define EVENT_KEY_LABEL "concept:name"
-#define EVENT_KEY_NUMBER "number"
 
 #define PORT_NAME "port"

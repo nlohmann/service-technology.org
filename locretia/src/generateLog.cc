@@ -62,7 +62,8 @@ void generateLog::createLog(std::ostream& file, std::string& filename, const boo
 												  const int trace_count ,
 												  const int trace_min_length,
 												  const int trace_max_length,
-												  const bool finalEnd) {
+												  const bool finalEnd,
+												  const bool enforceTraceCount) {
 	status("creating log-file with %i traces, each with lengths %i to %i",
 			trace_count, trace_min_length, trace_max_length);
 
@@ -71,12 +72,22 @@ void generateLog::createLog(std::ostream& file, std::string& filename, const boo
     // initialize the random number generator
     std::srand(time(NULL));
 
-    int length, counter = 0;
+    int length, counter = 1;
+    bool finishedTrace = false;
     // create 'trace_count' traces
     for (int i = 0; i < trace_count; ++i) {
     	// randomize the (maximal) length of the next trace
     	length = (std::rand() % (trace_max_length + 1 - trace_min_length)) + trace_min_length;
-    	create_trace(file, isOWFN, ++counter, length, finalEnd);
+    	finishedTrace = false;
+
+    	if (enforceTraceCount)
+    		while(!finishedTrace)
+    			finishedTrace = create_trace(file, isOWFN, counter, length, finalEnd);
+    	else
+    		finishedTrace = create_trace(file, isOWFN, counter, length, finalEnd);
+
+    	if (finishedTrace)
+    		++counter;
     }
 
     fileFooter(file);
@@ -129,8 +140,10 @@ void generateLog::fileFooter(std::ostream& file) {
  \param[in]		trace_number  	the number of the trace
  \param[in]		trace_maxlength	the maximal length of the trace
  \param[in]		finalEnd		only generate traces that end in a final state?
+
+ \return bool if the trace has been written to the output
  */
-void generateLog::create_trace(std::ostream& file, const bool isOWFN, const int trace_number,
+bool generateLog::create_trace(std::ostream& file, const bool isOWFN, const int trace_number,
 											const int trace_max_length, const bool finalEnd) {
 	status("creating trace %i with maximal length %i", trace_number, trace_max_length);
 
@@ -206,6 +219,8 @@ void generateLog::create_trace(std::ostream& file, const bool isOWFN, const int 
 			trace_is_final = true;
 	}
 
+	bool finishedTrace = false;
+
 	if (finalEnd && !trace_is_final) {
 		status("ignored trace %i, length: %i, because it didn't end in a final state", trace_number, counter);
 	} else {
@@ -216,7 +231,10 @@ void generateLog::create_trace(std::ostream& file, const bool isOWFN, const int 
 				<< tempstring.str()
 				<< "\t</trace>\n";
 		status("done with trace %i, length: %i", trace_number, counter);
+		finishedTrace = true;
 	}
 	tempstring.clear();
+
+	return finishedTrace;
 }
 

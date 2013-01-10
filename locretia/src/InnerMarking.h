@@ -59,8 +59,7 @@ class InnerMarking {
         /// print results
         static void outputResults(Results&);
 
-//        /// traverse reachability graph
-//        static void traverse(const InnerMarking_ID& markingID);
+        static int isFinalStateReachable(const int trace_max_length);
 
         /// add a (more or less) random interface to the net
         static void addInterface(const int count);
@@ -125,6 +124,9 @@ class InnerMarking {
     private: /* member functions */
         /// determine the type of this marking
         inline void determineType(const InnerMarking_ID&);
+
+        /// traverse reachability graph
+        static int traverse(const InnerMarking_ID& markingID, int depth, int counter);
 
     public: /* member attributes */
         /// whether this marking is final

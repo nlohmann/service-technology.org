@@ -278,15 +278,50 @@ void InnerMarking::addInterface(const int count) {
 }
 
 
-///*
-// * traverses the reachability graph of the net (just for test purposes...)
-// */
-//void InnerMarking::traverse(const InnerMarking_ID& markingID) {
-//	for (InnerMarking_ID i = 0; i < inner_markings[markingID]->out_degree; ++i) {
-//		status("edge from node %i to node %i with label %s", markingID, inner_markings[markingID]->successors[i], Label::id2name[inner_markings[markingID]->labels[i]].c_str());
-//		traverse(inner_markings[markingID]->successors[i]);
-//	}
-//}
+/*!
+ \brief Checks if a final state is reachable with the given maximal trace length
+
+ \param[in]		trace_max_length	the given maximal length of a trace
+
+ \return minimal trace length to be able to reach a final state or '-1' if no final state is reachable
+ */
+int InnerMarking::isFinalStateReachable(const int trace_max_length) {
+	status("checking if a final state is reachable in %i steps...", trace_max_length);
+
+	int result = -1;
+
+	for (int depth = 1; depth <= trace_max_length; ++depth) {
+		int counter = 0;
+		result = traverse(0, depth, counter);
+
+		if (result != -1)
+			break;
+	}
+
+	if (result == -1) {
+		status("no final state is reachable!");
+	} else {
+		status("at least one final state is reachable in %i steps!", result);
+	}
+
+	return result;
+}
+
+int InnerMarking::traverse(const InnerMarking_ID& markingID, int depth, int counter) {
+	if (inner_markings[markingID]->is_final)
+		return counter;
+	if (--depth < 0)
+		return -1;
+
+	++counter;
+	for (InnerMarking_ID i = 0; i < inner_markings[markingID]->out_degree; ++i) {
+		int result = traverse(inner_markings[markingID]->successors[i], depth, counter);
+		if (result != -1)
+			return result;
+	}
+
+	return -1;
+}
 
 /*!
  \brief Adds the final condition to the OWFN built from the TPN

@@ -30,8 +30,3 @@ lola = @LOLA@
 # MinGW, path names are ignored and the basename is used instead.
 
 tmpfile = /tmp/locretia-XXXXXX
-
-# Locretia needs to know the path to the java-classes used for evaluation.
-# These classes are located in '.../locretia/java'.
-
-java = @JAVA@

@@ -38,7 +38,6 @@
 #include "verbose.h"
 #include "util.h"
 #include <pnapi/pnapi.h>
-#include "PromBridge.h"
 
 
 // input files
@@ -169,10 +168,9 @@ void evaluateParameters(int argc, char** argv) {
     }
 
     // allow only one of the basic functionalities
-    if ((args_info.tpn_flag && (args_info.owfn_flag || args_info.sa_flag || args_info.evaluate_flag))
-    	|| (args_info.owfn_flag && (args_info.tpn_flag || args_info.sa_flag || args_info.evaluate_flag))
-    	|| (args_info.sa_flag && (args_info.tpn_flag || args_info.owfn_flag || args_info.evaluate_flag))
-    	|| (args_info.evaluate_flag && (args_info.tpn_flag || args_info.sa_flag || args_info.owfn_flag)))
+    if ((args_info.tpn_flag && (args_info.owfn_flag || args_info.sa_flag))
+    	|| (args_info.owfn_flag && (args_info.tpn_flag || args_info.sa_flag))
+    	|| (args_info.sa_flag && (args_info.tpn_flag || args_info.owfn_flag)))
     {
     	abort(1337, "select only one of the basic functionalities");
     }
@@ -234,258 +232,239 @@ int main(int argc, char** argv) {
     Output::setKeepTempfiles(args_info.noClean_flag);
 
 
-    // There is no need to parse a net when evaluating a PNML file and a XES log -> skip everything unnecessary
-    if (!args_info.evaluate_flag) {
 
-    	/*----------------------.
+    /*----------------------.
     	| 2. parse the open net |
     	`----------------------*/
-    	try {
-    		// parse either from standard input or from a given file
-    		if (args_info.inputs_num == 0) {
-    			status("reading from stdin...");
-    			if (args_info.tpn_flag)
-    				std::cin >> pnapi::io::woflan >> *InnerMarking::net;
-    			else if (args_info.owfn_flag)
-    				std::cin >> pnapi::io::owfn >> *InnerMarking::net;
-    			else if (args_info.sa_flag) {
-    			    std::cin >> pnapi::io::sa >> *serviceAutomaton::sa;
-    			}
-    		} else {
-    			// strip suffix from input filename
-    			filename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
+    try {
+    	// parse either from standard input or from a given file
+    	if (args_info.inputs_num == 0) {
+    		status("reading from stdin...");
+    		if (args_info.tpn_flag)
+    			std::cin >> pnapi::io::woflan >> *InnerMarking::net;
+    		else if (args_info.owfn_flag)
+    			std::cin >> pnapi::io::owfn >> *InnerMarking::net;
+    		else if (args_info.sa_flag) {
+    			std::cin >> pnapi::io::sa >> *serviceAutomaton::sa;
+    		}
+    	} else {
+    		// strip suffix from input filename
+    		filename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
 
-    			std::ifstream inputStream(args_info.inputs[0]);
-    			if (!inputStream) {
-    				abort(1, "could not open file '%s'", args_info.inputs[0]);
-    			}
-    			if (args_info.tpn_flag)
-    				inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-    					>> pnapi::io::woflan >> *InnerMarking::net;
-    			else if (args_info.owfn_flag)
-    				inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-    				    >> pnapi::io::owfn >> *InnerMarking::net;
-    			else if (args_info.sa_flag) {
-    				inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-    				    >> pnapi::io::sa >> *serviceAutomaton::sa;
-    			}
+    		std::ifstream inputStream(args_info.inputs[0]);
+    		if (!inputStream) {
+    			abort(1, "could not open file '%s'", args_info.inputs[0]);
     		}
-    		if (args_info.verbose_flag) {
-    			std::ostringstream s;
-    			if (args_info.sa_flag)
-    				s << pnapi::io::stat << *serviceAutomaton::sa;
-    			else
-    				s << pnapi::io::stat << *InnerMarking::net;
-    			status("read net: %s", s.str().c_str());
+    		if (args_info.tpn_flag)
+    			inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
+    			>> pnapi::io::woflan >> *InnerMarking::net;
+    		else if (args_info.owfn_flag)
+    			inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
+    			>> pnapi::io::owfn >> *InnerMarking::net;
+    		else if (args_info.sa_flag) {
+    			inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
+    				    		>> pnapi::io::sa >> *serviceAutomaton::sa;
     		}
-    	} catch (const pnapi::exception::InputError& error) {
+    	}
+    	if (args_info.verbose_flag) {
     		std::ostringstream s;
-    		s << error;
-    		abort(2, "\b%s", s.str().c_str());
+    		if (args_info.sa_flag)
+    			s << pnapi::io::stat << *serviceAutomaton::sa;
+    		else
+    			s << pnapi::io::stat << *InnerMarking::net;
+    		status("read net: %s", s.str().c_str());
+    	}
+    } catch (const pnapi::exception::InputError& error) {
+    	std::ostringstream s;
+    	s << error;
+    	abort(2, "\b%s", s.str().c_str());
+    }
+
+    if (!args_info.sa_flag) {
+    	// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
+    	if (InnerMarking::net->getTransitions().empty()) {
+    		status("net has no transitions -- adding dead dummy transition");
+    		InnerMarking::net->createArc(InnerMarking::net->createPlace(), InnerMarking::net->createTransition());
     	}
 
-    	if (!args_info.sa_flag) {
-    		// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
-    		if (InnerMarking::net->getTransitions().empty()) {
-    			status("net has no transitions -- adding dead dummy transition");
-    			InnerMarking::net->createArc(InnerMarking::net->createPlace(), InnerMarking::net->createTransition());
-    		}
-
-    		// only normal nets are supported so far
-    		if (not InnerMarking::net->isNormal()) {
-    			abort(3, "the input open net must be normal");
-    		}
+    	// only normal nets are supported so far
+    	if (not InnerMarking::net->isNormal()) {
+    		abort(3, "the input open net must be normal");
     	}
-
-
-    	/*===================================..
-    	|| TPN -> OWFN with random interface ||
-    	``===================================*/
-
-    	if (args_info.tpn_flag) {
-    		status("Generating OWFN from TPN...");
-
-    		// add a random interface
-    		InnerMarking::addInterface(args_info.icount_arg);
-
-    		std::string owfn_filename = args_info.owfnFile_arg ? args_info.owfnFile_arg : filename + ".owfn";
-    		Output output(owfn_filename, "OWFN");
-
-    		// write the net to the stream with an added final condition
-    		output.stream() << InnerMarking::addFinalCondition();
-
-    	}
-
-
-    	if (args_info.owfn_flag) {
-
-    		/*===================================..
-    		|| OWFN -> synchronous environment   ||
-    		``===================================*/
-
-    		if (args_info.syncEnv_flag) {
-    			status("Generating synchronous environment...");
-
-    			//InnerMarking::createLabeledEnvironment();
-
-    			std::string pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename + ".sync.pnml";
-    			Output output(pnml_filename, "synchronous environment");
-    			output.stream() << pnapi::io::pnml;
-    			Output::output(output.stream(), *InnerMarking::net, filename);
-    		}
-
-
-    		/*===================================..
-    		|| OWFN -> asynchronous environment  ||
-    		``===================================*/
-
-    		if (args_info.asyncEnv_flag) {
-    			status("Generating asynchronous environment...");
-
-    			//    	pnapi::PetriNet tempNet = pnapi::PetriNet(*InnerMarking::net);
-    			//    	InnerMarking::changeView(&tempNet, args_info.maxLength_arg);
-
-    			InnerMarking::changeView(InnerMarking::net, args_info.maxLength_arg);
-    			InnerMarking::deleteCounterPlace();
-
-    			//InnerMarking::createLabeledEnvironment();
-
-    			std::string pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename + ".async.pnml";
-    			Output output(pnml_filename, "asynchronous environment");
-    			output.stream() << pnapi::io::pnml;
-    			//Output::output(output.stream(), tempNet, filename);
-    			Output::output(output.stream(), *InnerMarking::net, filename);
-    		}
-
-    	}
-
-
-    	if (args_info.owfn_flag || args_info.sa_flag) {
-
-    		/*===================================..
-    		|| SA or OWFN -> XES log             ||
-    		``===================================*/
-
-    		if (args_info.log_flag) {
-    			status("Generating XES Log...");
-
-    			if (args_info.owfn_flag) {
-    				if (args_info.partnerView_flag) {
-    					InnerMarking::changeView(InnerMarking::net, args_info.maxLength_arg);
-    				}
-
-    				/*--------------------------------------------.
-    				| 1. initialize labels and interface markings |
-    				`--------------------------------------------*/
-    				Label::initialize();
-
-
-    				/*--------------------------------------------.
-    				| 2. write inner of the open net to LoLA file |
-    				`--------------------------------------------*/
-    				Output* temp = new Output();
-    				std::stringstream ss;
-    				ss << pnapi::io::lola << *InnerMarking::net;
-    				std::string lola_net = ss.str();
-
-    				//    	//test output!!
-    				//    	std::string lola_filename = filename + ".lola";
-    				//    	Output outputLola(lola_filename, "LoLa Net");
-    				//    	outputLola << lola_net << std::endl;
-
-    				temp->stream() << lola_net << std::endl;
-
-
-    				/*------------------------------------------.
-    				| 3. call LoLA and parse reachability graph |
-    				`------------------------------------------*/
-    				// select LoLA binary and build LoLA command
-#if defined(__MINGW32__)
-    				//    // MinGW does not understand pathnames with "/", so we use the basename
-    				const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
-#else
-    				const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
-#endif
-
-    				// call LoLA
-    				status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
-    				time(&start_time);
-    				graph_in = popen(command_line.c_str(), "r");
-
-    				graph_parse();
-    				pclose(graph_in);
-    				graph_lex_destroy();
-    				time(&end_time);
-    				status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
-    				delete temp;
-
-
-    				/*-------------------------------.
-    				| 4. organize reachability graph |
-    				`-------------------------------*/
-    				InnerMarking::initialize();
-
-    			}
-
-    			if (args_info.sa_flag && args_info.final_flag) {
-    				int result = serviceAutomaton::isFinalStateReachable(args_info.maxLength_arg);
-    				if (result == -1)
-    					abort(8877, "No final state reachable in given SA with Trace length of %i.", args_info.maxLength_arg);
-    			}
-
-    			/*-------------------------------.
-    			| 5. create the XES log          |
-    			`-------------------------------*/
-    			std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename + ".xes";
-    			Output output(log_filename, "XES Log");
-
-    			generateLog::createLog(output, filename, !args_info.sa_flag, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg, args_info.final_flag);
-
-
-    		}
-
-    	}
-
-    	/*===================================..
-    	|| results output                    ||
-    	``===================================*/
-
-    	if (args_info.resultFile_given) {
-    		std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";
-    		Results results(results_filename);
-    		InnerMarking::outputResults(results);
-    		Label::output_results(results);
-
-    		results.add("meta.package_name", (const char*)PACKAGE_NAME);
-    		results.add("meta.package_version", (const char*)PACKAGE_VERSION);
-    		results.add("meta.svn_version", (const char*)VERSION_SVN);
-    		results.add("meta.invocation", invocation);
-    	}
-
-    } // endif (!args_info.evaluate_flag)
+    }
 
 
     /*===================================..
-    || PNML + XES log -> evaluation      ||
+    || TPN -> OWFN with random interface ||
     ``===================================*/
 
-    if (args_info.evaluate_flag) {
-    	status("evaluating PNML and XES log...");
+    if (args_info.tpn_flag) {
+    	status("Generating OWFN from TPN...");
 
-    	if (!args_info.pnmlFile_given)
-    		abort(125, "no PNML file given!");
-    	if (!args_info.logFile_given)
-    		abort(126, "no XES log given!");
+    	// add a random interface
+    	InnerMarking::addInterface(args_info.icount_arg);
 
-    	std::string pnmlPath = args_info.pnmlFile_arg;
-    	std::string logPath = args_info.logFile_arg;
+    	std::string owfn_filename = args_info.owfnFile_arg ? args_info.owfnFile_arg : filename + ".owfn";
+    	Output output(owfn_filename, "OWFN");
 
-    	if (!args_info.java_given)
-    	    		abort(125, "no path to java classes given!");
+    	// write the net to the stream with an added final condition
+    	output.stream() << InnerMarking::addFinalCondition();
 
-    	std::string javaPath = args_info.java_arg;
+    }
 
-    	PromBridge::callProm(pnmlPath, logPath, javaPath);
+
+    if (args_info.owfn_flag) {
+
+    	/*===================================..
+    	|| OWFN -> synchronous environment   ||
+    	``===================================*/
+
+    	if (args_info.syncEnv_flag) {
+    		status("Generating synchronous environment...");
+
+    		//InnerMarking::createLabeledEnvironment();
+
+    		std::string pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename + ".sync.pnml";
+    		Output output(pnml_filename, "synchronous environment");
+    		output.stream() << pnapi::io::pnml;
+    		Output::output(output.stream(), *InnerMarking::net, filename);
+    	}
+
+
+    	/*===================================..
+    	|| OWFN -> asynchronous environment  ||
+    	``===================================*/
+
+    	if (args_info.asyncEnv_flag) {
+    		status("Generating asynchronous environment...");
+
+    		//    	pnapi::PetriNet tempNet = pnapi::PetriNet(*InnerMarking::net);
+    		//    	InnerMarking::changeView(&tempNet, args_info.maxLength_arg);
+
+    		InnerMarking::changeView(InnerMarking::net, args_info.maxLength_arg);
+    		InnerMarking::deleteCounterPlace();
+
+    		//InnerMarking::createLabeledEnvironment();
+
+    		std::string pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename + ".async.pnml";
+    		Output output(pnml_filename, "asynchronous environment");
+    		output.stream() << pnapi::io::pnml;
+    		//Output::output(output.stream(), tempNet, filename);
+    		Output::output(output.stream(), *InnerMarking::net, filename);
+    	}
+
+    }
+
+
+    if (args_info.owfn_flag || args_info.sa_flag) {
+
+    	/*===================================..
+    	|| SA or OWFN -> XES log             ||
+    	``===================================*/
+
+    	if (args_info.log_flag) {
+    		status("Generating XES Log...");
+
+    		if (args_info.owfn_flag) {
+    			if (args_info.partnerView_flag) {
+    				InnerMarking::changeView(InnerMarking::net, args_info.maxLength_arg);
+    			}
+
+    			/*--------------------------------------------.
+    			| 1. initialize labels and interface markings |
+    			`--------------------------------------------*/
+    			Label::initialize();
+
+
+    			/*--------------------------------------------.
+    			| 2. write inner of the open net to LoLA file |
+    			`--------------------------------------------*/
+    			Output* temp = new Output();
+    			std::stringstream ss;
+    			ss << pnapi::io::lola << *InnerMarking::net;
+    			std::string lola_net = ss.str();
+
+    			//    	//test output!!
+    			//    	std::string lola_filename = filename + ".lola";
+    			//    	Output outputLola(lola_filename, "LoLa Net");
+    			//    	outputLola << lola_net << std::endl;
+
+    			temp->stream() << lola_net << std::endl;
+
+
+    			/*------------------------------------------.
+    			| 3. call LoLA and parse reachability graph |
+    			`------------------------------------------*/
+    			// select LoLA binary and build LoLA command
+#if defined(__MINGW32__)
+    			//    // MinGW does not understand pathnames with "/", so we use the basename
+    			const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
+#else
+    			const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
+#endif
+
+    			// call LoLA
+    			status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
+    			time(&start_time);
+    			graph_in = popen(command_line.c_str(), "r");
+
+    			graph_parse();
+    			pclose(graph_in);
+    			graph_lex_destroy();
+    			time(&end_time);
+    			status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
+    			delete temp;
+
+
+    			/*-------------------------------.
+    			| 4. organize reachability graph |
+    			`-------------------------------*/
+    			InnerMarking::initialize();
+
+    		}
+
+    		if (args_info.final_flag) {
+    			int result = -1;
+    			if (args_info.sa_flag)
+    				result = serviceAutomaton::isFinalStateReachable(args_info.maxLength_arg);
+    			if (args_info.owfn_flag)
+    				result = InnerMarking::isFinalStateReachable(args_info.maxLength_arg);
+    			if (result == -1)
+    				abort(8877, "No final state reachable in given SA with Trace length of %i.", args_info.maxLength_arg);
+    			if (result > args_info.minLength_arg) {
+    				status("No final state reachable in %i steps! The minimal count of steps is set to %i.", args_info.minLength_arg, result);
+    				args_info.minLength_arg = result;
+    			}
+    		}
+
+
+    		/*-------------------------------.
+    		| 5. create the XES log          |
+    		`-------------------------------*/
+    		std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename + ".xes";
+    		Output output(log_filename, "XES Log");
+
+    		generateLog::createLog(output, filename, !args_info.sa_flag, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg, args_info.final_flag, args_info.enforceTraceCount_flag);
+
+
+    	}
+
+    }
+
+    /*===================================..
+    || results output                    ||
+    ``===================================*/
+
+    if (args_info.resultFile_given) {
+    	std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";
+    	Results results(results_filename);
+    	InnerMarking::outputResults(results);
+    	Label::output_results(results);
+
+    	results.add("meta.package_name", (const char*)PACKAGE_NAME);
+    	results.add("meta.package_version", (const char*)PACKAGE_VERSION);
+    	results.add("meta.svn_version", (const char*)VERSION_SVN);
+    	results.add("meta.invocation", invocation);
     }
 
     return EXIT_SUCCESS;

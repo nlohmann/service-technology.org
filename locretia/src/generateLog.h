@@ -39,7 +39,8 @@ class generateLog {
         										   const int trace_count ,
 				  	  	  	  	  	  	  	  	   const int trace_min_length,
 				  	  	  	  	  	  	  	  	   const int trace_max_length,
-				  	  	  	  	  	  	  	  	   bool finalEnd);
+				  	  	  	  	  	  	  	  	   const bool finalEnd,
+				  	  	  	  	  	  	  	  	   const bool enforceTraceCount);
 
     private: /* static functions */
             /// creates the header for the output file
@@ -49,7 +50,7 @@ class generateLog {
             static void fileFooter(std::ostream&);
 
             /// creates a trace and writes it to the output file
-            static void create_trace(std::ostream& file, bool isOWFN, const int trace_number,
+            static bool create_trace(std::ostream& file, bool isOWFN, const int trace_number,
             								const int trace_max_length, const bool finalEnd);
 
 };

@@ -18,7 +18,7 @@ struct AtomicFormula : public CTLFormula {
 		inner->updateProperty(ns,t);
 	}
 	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
-		return inner->value;
+		return inner->getPredicate()->value;
 	}
 
 	void DEBUG_print() {

@@ -27,6 +27,8 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 		return false;
 	}
 
+	rep->status("starting EU check");
+
 	// dfs stack will contain all gray nodes
 	SearchStack<DFSStackEntry> dfsStack;
 

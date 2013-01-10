@@ -17,7 +17,7 @@ Disjunction(x, y) -> [out: "(" x " || " y ")"];
 Implication(x, y) -> [out: "(" x " => " y ")"];
 Equivalence(x, y) -> [out: "(" x " <=> " y ")"];
 True() -> [out: "TRUE"];
-False() -> [out: "TRUE"];
+False() -> [out: "FALSE"];
 
 EqualsAtomicProposition(x, y) -> [out: x " = " y];
 NotEqualsAtomicProposition(x, y) -> [out: x " != " y];

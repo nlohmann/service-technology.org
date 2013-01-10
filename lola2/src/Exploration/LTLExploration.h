@@ -59,7 +59,9 @@ public:
 private:
 
 	fairness_assumptions assumptions;
-	bool* forbidden_transtitions;
+	index_t* forbidden_transtitions;
+	index_t card_forbidden_transtitions;
+
 	dfsnum_t currentNextDepth;
 
 	bool searchFair(BuechiAutomata &automata, Store<AutomataTree> &store,
@@ -67,5 +69,5 @@ private:
 			dfsnum_t depth, index_t currentNextDFS);
 	index_t checkFairness(BuechiAutomata &automata, Store<AutomataTree> &store,
 			Firelist &firelist, NetState &ns, index_t currentAutomataState,
-			index_t depth);
+			dfsnum_t depth);
 };

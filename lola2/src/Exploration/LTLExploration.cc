@@ -103,22 +103,7 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
 
 			// fire this transition to produce new Marking::Current
 			Transition::fire(ns, currentFirelist[currentFirelistEntry]);
-			Transition::updateEnabled(ns,currentFirelist[currentFirelistEntry]);
 			//rep->message("current aftrF %d %d %d %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState);
-
-			// check forbidden transitions
-			bool forbidden = false;
-			for(index_t i = 0; i < card_forbidden_transtitions; i++)
-				if (ns.Enabled[forbidden_transtitions[i]]){
-					Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
-					Transition::revertEnabled(ns, currentFirelist[currentFirelistEntry]);
-					forbidden = true;
-					break;
-				}
-			if (forbidden){
-				//rep->message("Forbidden");
-				continue;
-			}
 
 			// search in the store
 			AutomataTree* searchResult;
@@ -152,8 +137,25 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
 					}
 				}
 				Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
-				Transition::revertEnabled(ns, currentFirelist[currentFirelistEntry]);
+				//Transition::revertEnabled(ns, currentFirelist[currentFirelistEntry]);
 			} else {
+				Transition::updateEnabled(ns,currentFirelist[currentFirelistEntry]);
+
+				// check forbidden transitions
+				bool forbidden = false;
+				for(index_t i = 0; i < card_forbidden_transtitions; i++)
+					if (ns.Enabled[forbidden_transtitions[i]]){
+						Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
+						Transition::revertEnabled(ns, currentFirelist[currentFirelistEntry]);
+						forbidden = true;
+						break;
+					}
+				if (forbidden){
+					//rep->message("Forbidden");
+					continue;
+				}
+
+
 				//rep->message("NEW");
 				// switch to next state
 				currentAutomataState = currentStateList[currentStateListEntry];
@@ -208,19 +210,30 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
 			delete[] currentStateList;
 			if (stack.StackPointer == 0) {
 
+				//rep->message("====================RES==================");
+				// searched all states, calculate return value
+				if (card_fulfilled_weak != assumptions.card_weak
+						|| !buechi_accepting_state){
+					free(fulfilled_strong);
+					free(fulfilled_weak);
+					free(enabled_strong);
+					free(__enabled_weak);
+					return -2;
+				}
+				for (index_t i = 0; i < assumptions.card_strong; i++){
+					//rep->message("STRONG %d: %d %d", i, fulfilled_strong[i], enabled_strong[i]);
+					if (!fulfilled_strong[i] && enabled_strong[i]){
+						free(fulfilled_strong);
+						free(fulfilled_weak);
+						free(enabled_strong);
+						free(__enabled_weak);
+						return i;
+					}
+				}
 				free(fulfilled_strong);
 				free(fulfilled_weak);
 				free(enabled_strong);
 				free(__enabled_weak);
-
-				//rep->message("====================CF==================");
-				// searched all states, calculate return value
-				if (card_fulfilled_weak != assumptions.card_weak
-						|| !buechi_accepting_state)
-					return -2;
-				for (index_t i = 0; i < assumptions.card_strong; i++)
-					if (!fulfilled_strong[i] && enabled_strong[i])
-						return i;
 				// all fairness assumptions are fulfilled
 				return -1;
 			}
@@ -258,7 +271,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 		Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
 		index_t currentAutomataState, AutomataTree* currentStateEntry,
 		dfsnum_t depth, index_t initialDFS) {
-	//rep->message("=====================CALL===========================");
+	// rep->message("=====================CALL===========================");
 	// at this point we assume, that all states being outside the current SCC
 	// depth and DFS numbers
 	// dfs numbers < initialDFS    -    unprocessed outside
@@ -295,7 +308,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 
 	while (true) // exit when trying to pop from empty stack
 	{
-		//rep->message("current state %d %d %d %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState);
+		//rep->message("current state %d %d %d %d (%d) %d", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState, depth);
 		// calculate the next transition
 		if (currentStateListEntry == 0) {
 			currentStateListEntry = currentStateListLength - 1;
@@ -309,23 +322,6 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 			// fire this transition to produce new Marking::Current
 			Transition::fire(ns, currentFirelist[currentFirelistEntry]);
 			//rep->message("current aftrF %d %d %d %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState);
-			Transition::updateEnabled(ns, currentFirelist[currentFirelistEntry]);
-
-
-			// check forbidden transitions
-			bool forbidden = false;
-			//rep->message("FB %d %d %d %d, %d", ns.Enabled[0], ns.Enabled[1], ns.Enabled[2], ns.Enabled[3], forbidden_transtitions[0]);
-			for(index_t i = 0; i < card_forbidden_transtitions; i++)
-				if (ns.Enabled[forbidden_transtitions[i]]){
-					Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
-					Transition::revertEnabled(ns, currentFirelist[currentFirelistEntry]);
-					forbidden = true;
-					break;
-				}
-			if (forbidden){
-				//rep->message("Forbidden");
-				continue;
-			}
 
 			// search in the store
 			AutomataTree* searchResult;
@@ -345,6 +341,25 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 
 			// unseen state
 			if (nextStateEntry->dfs == -depth - 1) {
+
+				Transition::updateEnabled(ns, currentFirelist[currentFirelistEntry]);
+
+
+				// check forbidden transitions
+				bool forbidden = false;
+				//rep->message("FB %d %d %d %d, %d", ns.Enabled[0], ns.Enabled[1], ns.Enabled[2], ns.Enabled[3], forbidden_transtitions[0]);
+				for(index_t i = 0; i < card_forbidden_transtitions; i++)
+					if (ns.Enabled[forbidden_transtitions[i]]){
+						Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
+						Transition::revertEnabled(ns, currentFirelist[currentFirelistEntry]);
+						forbidden = true;
+						break;
+					}
+				if (forbidden){
+					//rep->message("Forbidden");
+					continue;
+				}
+
 				//rep->message("NEW");
 				// switch to next state
 				currentAutomataState = currentStateList[currentStateListEntry];
@@ -380,7 +395,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 						&& currentLowlink > nextStateEntry->dfs)
 					currentLowlink = nextStateEntry->dfs;
 				Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
-				Transition::revertEnabled(ns, currentFirelist[currentFirelistEntry]);
+				// Transition::revertEnabled(ns, currentFirelist[currentFirelistEntry]);
 			}
 		} else {
 			// current marking has been completely processed
@@ -398,12 +413,12 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 				//AutomataTree** __back_entry = __back_stack.push();
 				//*__back_entry = currentStateEntry;
 
-				//rep->message("SCC FOUND %d",currentLowlink);
+				// rep->message("SCC FOUND %d",currentLowlink);
 				//rep->message("current aftrF %d %d %d %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState);
 				// not found the counter example, so discard the component
 				while (tarjanStack.StackPointer
 						&& tarjanStack.top()->dfs > currentStateEntry->dfs) {
-					//rep->message("+1");
+					// rep->message("+1");
 					// mark all states as visited
 					tarjanStack.top()->dfs = -currentNextDepth;
 					// check whether is state is an accepting one
@@ -423,9 +438,9 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 					// first we need to check all fairness assumptions via DFS
 					index_t checkResult = checkFairness(automata, store, firelist, ns,
 							currentAutomataState, currentNextDepth-3);
-					//rep->message("CF %d",checkResult);
+					// rep->message("CF %d",checkResult);
 					if (checkResult == -1){
-						//rep->message("=============RET T==============");
+						// rep->message("=============RET T==============");
 						return true;
 					}
 					if (checkResult != -2){

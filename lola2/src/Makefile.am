@@ -40,7 +40,7 @@ lola_SOURCES = \
                 Planning/Task.cc Planning/Task.h \
                 \
                 Exploration/CTLExploration.cc Exploration/CTLExploration.h \
-                Exploration/LTLExploration.cc Exploration/LTLExploration.h \
+                Exploration/LTLExploration.cc Exploration/LTLExploration.h Exploration/LTLStack.h \
                 Exploration/DFSExploration.cc Exploration/DFSExploration.h \
                 Exploration/ParallelExploration.cc Exploration/ParallelExploration.h \
                 Exploration/Firelist.cc Exploration/Firelist.h \

@@ -42,7 +42,7 @@ Simple stack based on chunks of size `SIZEOF_STACKCHUNK.`
 If the current top object is accessed and the pop method is called the destructor will _not_ be called, thus the user of the top object has to delete itself.
 In case the copy-operator `=` will be used the destructor will be called on all elements currently contained in the chunk.
 Be aware that a `pop`-call might result in a free of the memory chunk the pop-result resides in.
-So all values stored the stack _should_ be moved befor a call to pop.
+So all values stored the stack _should_ be moved before a call to pop.
  */
 template<class T>
 class SearchStack

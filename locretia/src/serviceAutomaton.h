@@ -23,7 +23,9 @@
 
 
 /*!
- \brief ...
+ \brief service automaton
+
+ All service automaton related functions and attributes.
 */
 class serviceAutomaton {
 

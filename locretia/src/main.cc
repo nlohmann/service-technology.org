@@ -365,7 +365,10 @@ int main(int argc, char** argv) {
     	if (args_info.log_flag) {
     		status("Generating XES Log...");
 
+    		// if the input is an OWFN build the reachability graph and use that...
     		if (args_info.owfn_flag) {
+
+    			// if needed, change the view
     			if (args_info.partnerView_flag) {
     				InnerMarking::changeView(InnerMarking::net, args_info.maxLength_arg);
     			}
@@ -423,12 +426,17 @@ int main(int argc, char** argv) {
 
     		}
 
+    		// find out if a final state is reachable in the given steps
     		if (args_info.final_flag) {
     			int result = -1;
+
+    			// use the appropriate function
     			if (args_info.sa_flag)
     				result = serviceAutomaton::isFinalStateReachable(args_info.maxLength_arg);
     			if (args_info.owfn_flag)
     				result = InnerMarking::isFinalStateReachable(args_info.maxLength_arg);
+
+    			// no final state reachable?
     			if (result == -1)
     				abort(8877, "No final state reachable in given SA with Trace length of %i.", args_info.maxLength_arg);
     			if (result > args_info.minLength_arg) {

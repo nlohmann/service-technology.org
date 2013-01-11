@@ -279,7 +279,7 @@ void InnerMarking::addInterface(const int count) {
 
 
 /*!
- \brief Checks if a final state is reachable with the given maximal trace length
+ \brief Checks if a final state is reachable with the given maximal trace length. Iterative depth search is used.
 
  \param[in]		trace_max_length	the given maximal length of a trace
 
@@ -307,6 +307,15 @@ int InnerMarking::isFinalStateReachable(const int trace_max_length) {
 	return result;
 }
 
+/*!
+ \brief Help funtion for the 'isFinalStateReachable'-function
+
+ \param[in]		markingID		the ID of the current node
+ \param[in]		depth			the current depth of the iterative depth search
+ \param[in]		counter			the amount of steps taken from the initial node to the current node
+
+ \return amount of steps to reach a final state or '-1' if no final state reachable
+ */
 int InnerMarking::traverse(const InnerMarking_ID& markingID, int depth, int counter) {
 	if (inner_markings[markingID]->is_final)
 		return counter;

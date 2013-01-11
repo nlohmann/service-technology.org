@@ -427,11 +427,11 @@ void Task::setProperty()
 bool Task::getResult()
 {
     assert(ns);
-    assert(!ctlFormula || ctlStore);
-    assert(!bauto || ltlStore);
+    assert(!ctlFormula || ctlStore); //ctlFormula ==> ctlStore
+    assert(!bauto || ltlStore); //bauto ==> ltlStore
     assert(ctlFormula || bauto || store);
     assert(!ctlFormula || ctlExploration);
-    assert(!bauto || ltlExploration);
+    assert(!bauto || ltlExploration); //bauto ==> ltlExploration
     assert(ctlFormula || bauto || exploration);
     assert(ctlFormula || bauto || p);
     assert(fl);

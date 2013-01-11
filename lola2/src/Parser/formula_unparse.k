@@ -556,11 +556,14 @@ f=Disjunction provided (!f->containsTemporal) ,
 f=Negation provided (!f->containsTemporal) , 
 f=AtomicProposition provided (!f->containsTemporal) -> [ctl:
     {
-        with(StatePredicateFormula(f))
+    	//We call the unparse process again to avoid unneccessary code replication.
+    	//Furthermore this may decrease evaluation time, since now some parts of some formula can be checked without taking care of temporal operators.
+        with(StatePredicateFormula(f))	//Here a little memory leak may occurs. A new object "StatePredicateFormula" is created but never deconstructed.
+        								//Since kimwitu++ has memory leaks nonetheless and this one is very small, we considered it to be acceptable.
         {
             x=StatePredicateFormula(*) :
             {
-                x->unparse(mylocalprinter,kc::internal);
+                x->unparse(mylocalprinter,kc::internal); //unparse using code of different goal to reuse existing code
                 AtomicFormula* af = new AtomicFormula();
                 af->inner = new StatePredicateProperty(x->formula);
 		        ctl_formulas[ctl_id_stack.top()].push_back(af);
@@ -571,7 +574,8 @@ f=AtomicProposition provided (!f->containsTemporal) -> [ctl:
 
 f=StatePredicateFormula(x) -> [ctl:
 	{
-	    f->unparse(mylocalprinter, kc::temporal);
+	    f->unparse(mylocalprinter, kc::temporal);	//making sure that correct information about contained temporal operators is available at every node
+        											//Note that this information is _inevietable_ in order to unparse CTL-Formulas correctly!
         //printf("CONTAINS_TEMPORAL: %d\n",x->containsTemporal);
 		//printf("I am a CTL state predicate. I am %lu\n", ctl_nextId);
         ctl_id_stack.push(ctl_nextId++);
@@ -848,121 +852,12 @@ ExPath(Until(a,b)) -> [ctl:
 	}
 ];
 
-f=AtomicProposition(a) provided (f->containsTemporal) -> [ctl:
-	{
-		//printf("CTL-AtomicProposition\n");
-        ctl_id_stack.push(ctl_nextId++);
-	}
-	a
-	{
-		const index_t myId = ctl_id_stack.top();
-		ctl_id_stack.pop();
-		assert(ctl_formulas[myId].size() < 2);
-		if(ctl_formulas[myId].size() == 0){
-			AtomicFormula *af = new AtomicFormula();
-			af->inner = spp;
-	
-			ctl_formulas[ctl_id_stack.top()].push_back(af);
-		}
-		else{
-			ctl_formulas[ctl_id_stack.top()].push_back(ctl_formulas[myId][0]);
-		}
-	}
-];
-
-LessEqualAtomicProposition(x, Number(y)) -> [ctl:
-{
-	//printf("I am an atomic (<=) CTL-proposition. My parent is %lu\n", ctl_id_stack.top());
-
-    index_t factors_positive = 0;
-    index_t factors_negative = 0;
-
-    // count positive and negative entries
-    for (std::map<int, int>::const_iterator it = ctl_current.begin(); it != ctl_current.end(); ++it)
-    {
-        if (it->second > 0)
-        {
-            factors_positive++;
-        }
-        else if (it->second < 0)
-        {
-            factors_negative++;
-        }
-    }
-
-    // create formula object
-    StatePredicate *f = new AtomicStatePredicate(factors_positive, factors_negative, y->value);
-    index_t position_pos = 0;
-    index_t position_neg = 0;
-
-    // add positive and negative entries
-    for (std::map<int, int>::const_iterator it = ctl_current.begin(); it != ctl_current.end(); ++it)
-    {
-        if (it->second > 0)
-        {
-            ((AtomicStatePredicate*)f)->addPos(position_pos++, it->first, it->second);
-        }
-        else if (it->second < 0)
-        {
-            ((AtomicStatePredicate*)f)->addNeg(position_neg++, it->first, -it->second);
-        }
-    }
-
-    // reset current
-    ctl_current.clear();
-
-    // register formula at parent
-		//printf("told my parent %lu about me; %p\n", ctl_id_stack.top(), (void*)f);
-    spp = new StatePredicateProperty (f);
-}
-];
-
-
-
-//Werden nachfolgende Konstrukte benötigt?
-//Bis jetzt nur kopiert und Datenstrukturen um ctl-Präfix erweitert
-Fireable(x) -> [ctl:
-{
-    // create a conjunction with #preset elements
-    StatePredicate *f = new ConjunctionStatePredicate(Net::CardArcs[TR][PRE][x->value]);
-    //printf("%p=ConjunctionStatePredicate(Net::CardArcs[TR][PRE][x->value]=%d)\n", f, Net::CardArcs[TR][PRE][x->value]);
-
-    // iterate preset
-    for (index_t p = 0; p < Net::CardArcs[TR][PRE][x->value]; ++p)
-    {
-        // create atomic state predicate with 1 positive factor and the arc weight
-        StatePredicate *a = new AtomicStatePredicate(0, 1, - Net::Mult[TR][PRE][x->value][p]);
-        //printf("%p=AtomicStatePredicate(0, 1, - Net::Mult[TR][PRE][x->value][p]=%d)\n", a, - Net::Mult[TR][PRE][x->value][p]);
-
-        // add place p to index 0 with factor 1
-        ((AtomicStatePredicate*)a)->addNeg(0, Net::Arc[TR][PRE][x->value][p], 1);
-        //printf("%p->addNeg(0, Net::Arc[TR][PRE][x->value][p]=%d, 1)\n", a, Net::Arc[TR][PRE][x->value][p]);
-
-        // add atomic state predicate to conjunction
-        ((ConjunctionStatePredicate*)f)->addSub(p, a);
-        //printf("%p->addSub(p=%d, a=%p)\n", f, p, a);
-    }
-
-	AtomicFormula *af = new AtomicFormula();
-	af->inner = (new StatePredicateProperty (f));
-    ctl_formulas[ctl_id_stack.top()].push_back(af);
-}
-];
-
-Initial() -> [ctl:
-{
-    /*StatePredicate *f = new ConjunctionStatePredicate(Net::Card[PL]);
-    // iterate places
-    for (index_t p = 0; p < Net::Card[PL]; ++p)
-    {
-        /* TODO */
-    }
-
-    ctl_formulas[ctl_id_stack.top()].push_back(f);
-    */
-}
-];
-
-Product(x, Node(p)) -> [ctl: { ctl_current[p->value] += x->value; } ];
-Node(p) -> [ctl: { assert(false /* sollte nicht mehr vorkommen */); ctl_current[p->value] += 1; } ];
-Number(x) -> [ctl: /* do not print values */ ];
+//All following Rules should be covered by the internal parsing with goal "internal"
+//Hence, all rules assert false to make it more easy to detect errors if I was mistaken.   
+Product(x, Node(p)) -> [ctl: { assert(false);} ];
+Node(p) -> [ctl: { assert(false); } ];
+Number(x) -> [ctl: { assert(false); } ];
+AtomicProposition(a) -> [ctl: { assert(false); } ];
+LessEqualAtomicProposition(x, Number(y)) -> [ctl: { assert(false); } ];
+Fireable(x) -> [ctl: { assert(false); } ];
+Initial() -> [ctl: { assert(false); } ];

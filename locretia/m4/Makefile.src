@@ -18,8 +18,8 @@ EXTRA_DIST += $(BISON_FILES:.yy=.hh)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
 
 # fix for Automake 1.12
-$(BISON_FILES:.yy=.hh):
-	$(AM_V_GEN) mv $(@:.hh=.h) $@
+#$(BISON_FILES:.yy=.hh):
+#	$(AM_V_GEN) mv $(@:.hh=.h) $@
 
 
 #----------------------------------------------------------------#

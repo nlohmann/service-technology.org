@@ -18,8 +18,8 @@ EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
 
 # fix for Automake 1.12
-$(BISON_FILES:.yy=.hh):
-	$(AM_V_GEN) mv $(@:.hh=.h) $@
+$(BISON_FILES:.yy=.h):
+	$(AM_V_GEN) mv $(@:.h=.hh) $@
 
 #-------------------------------------------------------------#
 # GENERIC: organize distribution and cleaning of Flex sources #

@@ -37,59 +37,42 @@ class StoreCreator
 public:
 	/// creates a new store based on the specified template and the command line arguments
 	static Store<T>* createStore(int number_of_threads) {
+	      NetStateEncoder* enc = 0;
+	      switch (args_info.encoder_arg) {
+	      case encoder_arg_bit:
+	          enc = new BitEncoder(number_of_threads);
+	          break;
+	      case encoder_arg_copy:
+	          enc = new CopyEncoder(number_of_threads);
+	          break;
+	      case encoder_arg_simplecompressed:
+	          enc = new SimpleCompressedEncoder(number_of_threads);
+	          break;
+	      case encoder_arg_fullcopy:
+	          enc = new FullCopyEncoder(number_of_threads);
+	          break;
+	      }
+  	
         switch (args_info.store_arg)
         {
         case store_arg_comp:
        		return new CompareStore<T>(
-           		new PluginStore<T>(new BitEncoder(number_of_threads), new SuffixTreeStore<T>(), number_of_threads),
-           		new PluginStore<T>(new BitEncoder(number_of_threads), new VSTLStore<T>(number_of_threads), number_of_threads),
+           		new PluginStore<T>(enc, new SuffixTreeStore<T>(), number_of_threads),
+           		new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads),
            		number_of_threads
            		);
-        case store_arg_psbprefix:
-           	return new PluginStore<T>(new BitEncoder(number_of_threads), new PrefixTreeStore<T>(), number_of_threads);
-        case store_arg_pscprefix:
-           	return new PluginStore<T>(new CopyEncoder(number_of_threads), new PrefixTreeStore<T>(), number_of_threads);
-        case store_arg_pssprefix:
-           	return new PluginStore<T>(new SimpleCompressedEncoder(number_of_threads), new PrefixTreeStore<T>(), number_of_threads);
-        case store_arg_psfprefix:
-           	return new PluginStore<T>(new FullCopyEncoder(number_of_threads), new PrefixTreeStore<T>(), number_of_threads);
-
-        case store_arg_psbhprefix:
-           	return new PluginStore<T>(new BitEncoder(number_of_threads), new HashingWrapperStore<T>(new NullaryVectorStoreCreator<T,PrefixTreeStore<T> >()), number_of_threads);
-        case store_arg_pschprefix:
-           	return new PluginStore<T>(new CopyEncoder(number_of_threads), new HashingWrapperStore<T>(new NullaryVectorStoreCreator<T,PrefixTreeStore<T> >()), number_of_threads);
-        case store_arg_psshprefix:
-           	return new PluginStore<T>(new SimpleCompressedEncoder(number_of_threads), new HashingWrapperStore<T>(new NullaryVectorStoreCreator<T,PrefixTreeStore<T> >()), number_of_threads);
-        case store_arg_psfhprefix:
-           	return new PluginStore<T>(new FullCopyEncoder(number_of_threads), new HashingWrapperStore<T>(new NullaryVectorStoreCreator<T,PrefixTreeStore<T> >()), number_of_threads);
-
-        case store_arg_psbstl:
-        	return new PluginStore<T>(new BitEncoder(number_of_threads), new VSTLStore<T>(number_of_threads), number_of_threads);
-        case store_arg_pscstl:
-        	return new PluginStore<T>(new CopyEncoder(number_of_threads), new VSTLStore<T>(number_of_threads), number_of_threads);
-        case store_arg_pssstl:
-        	return new PluginStore<T>(new SimpleCompressedEncoder(number_of_threads), new VSTLStore<T>(number_of_threads), number_of_threads);
-        case store_arg_psfstl:
-        	return new PluginStore<T>(new FullCopyEncoder(number_of_threads), new VSTLStore<T>(number_of_threads), number_of_threads);
-
-        case store_arg_psbhstl:
-        	return new PluginStore<T>(new BitEncoder(number_of_threads), new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
-        case store_arg_pschstl:
-        	return new PluginStore<T>(new CopyEncoder(number_of_threads), new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
-        case store_arg_psshstl:
-        	return new PluginStore<T>(new SimpleCompressedEncoder(number_of_threads), new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
-        case store_arg_psfhstl:
-        	return new PluginStore<T>(new FullCopyEncoder(number_of_threads), new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
-
-        case store_arg_psbbin:
-           	return new PluginStore<T>(new BitEncoder(number_of_threads), new SuffixTreeStore<T>(), number_of_threads);
-        case store_arg_pscbin:
-           	return new PluginStore<T>(new CopyEncoder(number_of_threads), new SuffixTreeStore<T>(), number_of_threads);
-        case store_arg_pssbin:
-        	return new PluginStore<T>(new SimpleCompressedEncoder(number_of_threads), new SuffixTreeStore<T>(), number_of_threads);
-        case store_arg_psfbin:
-           	return new PluginStore<T>(new FullCopyEncoder(number_of_threads), new SuffixTreeStore<T>(), number_of_threads);
-
+        case store_arg_prefix:
+            if(args_info.hashing_given)
+              return new PluginStore<T>(enc, new HashingWrapperStore<T>(new NullaryVectorStoreCreator<T,PrefixTreeStore<T> >()), number_of_threads);
+            else
+           	  return new PluginStore<T>(enc, new PrefixTreeStore<T>(), number_of_threads);
+        case store_arg_stl:
+            if(args_info.hashing_given)
+              return new PluginStore<T>(enc, new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
+            else
+           	  return new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads);
+        case store_arg_bin:
+           	return new PluginStore<T>(enc, new SuffixTreeStore<T>(), number_of_threads);
         default:
         	return createSpecializedStore(number_of_threads);
         }

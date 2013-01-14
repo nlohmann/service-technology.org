@@ -12,16 +12,21 @@ option "check" -
 option "store" -
   "Store"
   values="comp",
-         "psbprefix", "pscprefix", "pssprefix", "psfprefix",
-         "psbhprefix","pschprefix","psshprefix","psfhprefix",
-         "psbstl",    "pscstl",    "pssstl",    "psfstl",
-         "psbhstl",   "pschstl",   "psshstl",   "psfhstl",
-         "psbbin",    "pscbin",    "pssbin",    "psfbin",
-         "psbbloom",  "pscbloom",  "pssbloom",  "psfbloom",
-         "psbhbloom", "pschbloom", "psshbloom", "psfhbloom" enum
+         "prefix", "stl", "bin", "bloom" enum
   typestr="STORE"
-  default="psbbin"
+  default="bin"
   optional
+
+option "encoder" -
+  "Encoder"
+  values="bit", "copy", "simplecompressed", "fullcopy" enum
+  typestr="ENCODER"
+  default="bit"
+  optional
+
+option "hashing" -
+  "Activate hashing, if the selected store supports it."
+  flag off
 
 option "hashfunctions" -
   "Hash functions for the Bloom filter"

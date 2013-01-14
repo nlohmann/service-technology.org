@@ -33,7 +33,7 @@
 #include <string>
 #include <list>
 
-#include "parser_marking_information.h"            // list of all tokens used
+#include "parser_marking_information.hh"            // list of all tokens used
 
 using std::string;
 

@@ -28,6 +28,7 @@
 
 #include "libconfig.h++"
 #include "pnapi/pnapi.h"
+#include "adapter.h"
 #include "verbose.h"
 #include "helper.h"
 #include "macros.h"
@@ -696,6 +697,72 @@ std::string Diagnosis::DiagnosisInformation::getLive() const {
     return result;
 
 }
+
+bool Diagnosis::isSuitableForRepair(const RuleSet::AdapterRule::AdapterRule_ptr rule, RuleSet & rs) const {
+
+    FUNCIN
+
+    if (rule->getSyncList().size() != 0) {
+        return false;
+    }
+    bool atLeastFor1DI = false;
+    // iterate over all diagnosis information and return true, if rule is suitable
+    for (std::set<DiagnosisInformation>::const_iterator di =
+            diagnosisInformation.begin(); di != diagnosisInformation.end(); ++di) {
+
+        {
+            bool foundAll = true;
+            // check left-hand side of rule
+            std::list< unsigned int > messageList = rule->getRule().first;
+            std::list< unsigned int >::iterator messageIter = messageList.begin();
+            bool first = true;
+            while ( messageIter != messageList.end() ) {
+
+                bool found = false;
+                for (std::vector<std::string>::const_iterator message =
+                        di->pendingMessages.begin(); message != di->pendingMessages.end(); ++message) {
+                    if ( message->compare(rs.getMessageForId(*messageIter)) == 0) {
+                        found = true;
+                    }
+                }
+                if  (not found) {
+                    foundAll = false;
+                    break;
+                }
+
+                first = false;
+                ++messageIter;
+            }
+            if (foundAll) {
+                atLeastFor1DI = true;
+            }
+
+        }
+
+        // check right-hand side of rule
+        for (std::vector<std::string>::const_iterator message =
+                di->requiredMessages.begin(); message != di->requiredMessages.end(); ++message) {
+        }
+
+        // check previously applied rules for further input
+        for (std::set<std::string>::iterator rule =
+                di->previouslyAppliedRules.begin(); rule
+                != di->previouslyAppliedRules.end(); ++rule) {
+        }
+
+    }
+
+    // rule is not suitable for any diagnosis information, so return false
+    FUNCOUT
+    return atLeastFor1DI;
+
+}
+
+
+/*
+ * Implementation of DGraph
+ */
+
 
 DGraph::DGraph() :
     nodeId(0), labelId(0) {

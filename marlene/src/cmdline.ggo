@@ -78,6 +78,14 @@ option "diagnosis" -
   "Output diagnostic information in case adapter is not controllable"
   flag off
 
+option "repair" -
+  "Suggest additional rules from FILE to add to SEA based on diagnosis information."
+  string
+  typestr="FILE"
+  dependon="diagnosis"
+  optional
+  hidden
+
 option "withprefix" -
   "Adds a unique prefix to each read net."
   details="In order to read one net multiple time, a prefix to the net's nodes

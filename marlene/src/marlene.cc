@@ -39,6 +39,9 @@
 // include PN API headers
 #include "pnapi/pnapi.h"
 
+// include json library
+#include "json/json.h"
+
 /// a variable holding the time of the call
 clock_t start_clock = clock();
 
@@ -234,7 +237,7 @@ int main(int argc, char* argv[]) {
         time(&start_time);
         pnapi::PetriNet composition(*adapter.composeEngine());
         time(&end_time);
-        status("engine built [%.0f sec]", difftime(end_time, start_time));
+        status("engine composed [%.0f sec]", difftime(end_time, start_time));
 
         if (args_info.composedonly_flag) {
             std::string filename = (args_info.output_given ? std::string(

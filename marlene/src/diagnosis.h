@@ -24,6 +24,7 @@
 #include <set>
 #include "config.h"
 #include "markings.h"
+#include "adapter.h"
 
 // forward declarations
 class DGraph;
@@ -161,5 +162,8 @@ class Diagnosis {
         void evaluateAlternatives(std::vector<PetriNet_ptr> & nets,
                 pnapi::PetriNet & engine);
         void outputLive() const;
+
+        bool isSuitableForRepair(const RuleSet::AdapterRule::AdapterRule_ptr, RuleSet &) const;
+
 };
 

@@ -198,8 +198,13 @@ class Adapter {
     void
     findConflictFreeTransitions();
 
+#if defined(HAVE_LIBCONFIG__) and HAVE_LIBCONFIG__ == 1
+    void
+    diagnose(std::string filename);
+
     static std::string
     computeMPP( const std::string & );
+#endif
 
     /*!
      * \brief Returns the name for the rule with index i.
@@ -208,7 +213,7 @@ class Adapter {
      *
      * \return string representing the rule's for using as transition name
      */
-    static inline std::string
+    static std::string
     getRuleName( unsigned int i );
 
     std::string cost_file_content;
@@ -223,6 +228,13 @@ class Adapter {
  */
 class RuleSet {
   public:
+
+#ifdef USE_SHARED_PTR
+    typedef std::tr1::shared_ptr<RuleSet> RuleSet_ptr;
+#else
+    typedef RuleSet * RuleSet_ptr;
+#endif
+
 
     /*!
      * \brief Represents exactly one rule.
@@ -281,15 +293,14 @@ class RuleSet {
          *
          * \return the associated #rulepair
          */
-        inline const rulepair &
-        getRule() const;
+        const rulepair & getRule() const;
 
         /*!
          * \brief Returns the #syncList associated with the object.
          *
          * \return the associated #syncList
          */
-        inline const syncList &
+        const syncList &
         getSyncList() const;
 
         /*!
@@ -297,7 +308,7 @@ class RuleSet {
          *
          * \return the transformation rule's modus
          */
-        inline const cfMode &
+        const cfMode &
         getMode() const;
 
         /*!
@@ -305,8 +316,13 @@ class RuleSet {
          *
          * \return the transformation rule's costs
          */
-        inline const int &
+        const int &
         getCosts() const;
+
+        /*!
+         * \brief Prints the rule as used in file format
+         */
+        std::string print(const RuleSet &) const;
 
       private:
 
@@ -334,12 +350,6 @@ class RuleSet {
 
     };
 
-#ifdef USE_SHARED_PTR
-    typedef std::tr1::shared_ptr<RuleSet> RuleSet_ptr;
-#else
-    typedef RuleSet * RuleSet_ptr;
-#endif
-
     //! basic constructor
     RuleSet();
 
@@ -360,7 +370,7 @@ class RuleSet {
      * \return list of transformation rules
      * \todo Warum keine Referenzen?
      */
-    inline const std::list< AdapterRule::AdapterRule_ptr >
+    const std::list< AdapterRule::AdapterRule_ptr > &
     getRules() const;
 
     /*!
@@ -370,8 +380,7 @@ class RuleSet {
      *
      * \return the message name connected to an ID
      */
-    inline const std::string
-    getMessageForId( const unsigned int id ) const;
+    const std::string getMessageForId( unsigned int id ) const;
 
   private:
     //! a mapping from IDs to message names (contrary of #_messageId)

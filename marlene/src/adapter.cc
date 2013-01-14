@@ -372,51 +372,15 @@ Adapter::buildController() {
         message(
                 "Controller could not be built! No adapter was created, exiting." );
         exit( EXIT_FAILURE );
-    }
-
-    // bool diagnosis_superfluous = false;
+    } else
     if ( args_info.diagnosis_flag ) {
-        /********* *\
-        * diagnosis *
-         \***********/
-        status( "Going into diagnosis mode ..." );
-
-        // TODO: debug
-        //std::string png_command = "dot -Tpng -odiag.png < " + diag_filename
-        //        + ".dot";
-        //status("Executing png command: %s", png_command.c_str());
-        //system(png_command.c_str());
-
 #if defined(HAVE_LIBCONFIG__) and HAVE_LIBCONFIG__ == 1
-
-        // open MPPs for each net or create them if necessary
-        std::vector< std::string > mpp_files;
-        for ( unsigned i = 0; i < args_info.inputs_num; ++i ) {
-            std::string filename = std::string( args_info.inputs[i] );
-
-            mpp_files.push_back( Adapter::computeMPP( filename ) );
-        }
-
-        MarkingInformation mi( mi_filename );
-        Diagnosis diag( diag_filename, mi );
-        if ( not diag.superfluous ) {
-            diag.readMPPs( mpp_files );
-            diag.evaluateDeadlocks( _nets, *_engine );
-            if ( args_info.property_arg == property_arg_livelock ) {
-                diag.evaluateLivelocks( _nets, *_engine );
-            }
-            diag.evaluateAlternatives( _nets, *_engine );
-
-            diag.outputLive();
-        }
-        // diagnosis_superfluous = diag.superfluous;
-        if ( diag.superfluous ) {
-// args_info.diagnosis_flag = 0;
-        }
+        diagnose(owfn_filename);
+#else
+        message("Diagnosis not possible, because a required library was not present during compilation.")
 #endif
-
-    }
-    if ( not args_info.diagnosis_flag ) {
+    } else
+    {
         /*******************************\
         * parse most-permissive partner *
          \*******************************/
@@ -962,12 +926,107 @@ Adapter::findConflictFreeTransitions() {
 }
 
 //! returns the name for the rule with index i
-inline std::string
+std::string
 Adapter::getRuleName( unsigned int i ) {
     FUNCIN
     FUNCOUT
     return "rule_" + toString( i );
 }
+
+#if defined(HAVE_LIBCONFIG__) and HAVE_LIBCONFIG__ == 1
+void
+Adapter::diagnose(std::string filename) {
+    std::string diag_filename = filename + ".diag";
+    std::string mi_filename = filename + ".mi";
+
+    Output repairedFile("repaired.ar", "additional rules");
+
+    /********* *\
+    * diagnosis *
+     \***********/
+    status( "Going into diagnosis mode ..." );
+
+    // TODO: debug
+    //std::string png_command = "dot -Tpng -odiag.png < " + diag_filename
+    //        + ".dot";
+    //status("Executing png command: %s", png_command.c_str());
+    //system(png_command.c_str());
+
+
+    // open MPPs for each net or create them if necessary
+    std::vector< std::string > mpp_files;
+    for ( unsigned i = 0; i < args_info.inputs_num; ++i ) {
+        std::string filename = std::string( args_info.inputs[i] );
+
+        mpp_files.push_back( Adapter::computeMPP( filename ) );
+    }
+
+    MarkingInformation mi( mi_filename );
+    Diagnosis diag( diag_filename, mi );
+    if ( not diag.superfluous ) {
+        diag.readMPPs( mpp_files );
+        diag.evaluateDeadlocks( _nets, *_engine );
+        if ( args_info.property_arg == property_arg_livelock ) {
+            diag.evaluateLivelocks( _nets, *_engine );
+        }
+        diag.evaluateAlternatives( _nets, *_engine );
+
+        diag.outputLive();
+
+        if (args_info.repair_given != 0) {
+            //! #repairset contains the RuleSet that is the base for additional rules
+            RuleSet repairset;
+            time_t start_time, end_time;
+
+            status("Providing repair information using file %s", args_info.repair_arg);
+
+            // reading second rule file for source in repair
+            if (args_info.repair_given) {
+                    time(&start_time);
+                    status("reading additional transformation rules for repair from file \"%s\"",
+                            args_info.repair_arg);
+        #ifdef USE_SHARED_PTR
+                    std::tr1::shared_ptr<FILE> repairfile(fopen(
+                            args_info.repair_arg, "r"), fclose);
+                    if (repairfile.get() != NULL) {
+        #else
+                        FILE * repairfile = fopen(args_info.repair_arg, "r");
+                        if (repairfile != NULL) {
+        #endif
+                        repairset.addRules(repairfile);
+                    } else {
+                        abort(2, "Repair set of rules %s could not be opened for reading",
+                                args_info.repair_arg);
+                    }
+                    time(&end_time);
+                    status("reading all repair rules done [%.0f sec]", difftime(
+                            end_time, start_time));
+        #ifndef USE_SHARED_PTR
+                    fclose(repairfile);
+        #endif
+                }
+
+            time(&start_time);
+            std::list< RuleSet::AdapterRule::AdapterRule_ptr > ruleSet = repairset.getRules();
+            for(std::list< RuleSet::AdapterRule::AdapterRule_ptr >::const_iterator rule = ruleSet.begin(); rule != ruleSet.end(); ++rule) {
+                status("Rule: %s", (*rule)->print(repairset).c_str());
+                if (diag.isSuitableForRepair(*rule, repairset)) {
+                    status("Rule is suitable for repair.");
+                    repairedFile.stream() << (*rule)->print(repairset) << std::endl;
+                }
+            }
+            time(&end_time);
+            status("checking for suitable rules done [%.0f sec]", difftime(
+                    end_time, start_time));
+        }
+    }
+    // diagnosis_superfluous = diag.superfluous;
+    if ( diag.superfluous ) {
+// args_info.diagnosis_flag = 0;
+    }
+}
+
+
 
 std::string
 Adapter::computeMPP( const std::string & filename ) {
@@ -1029,6 +1088,8 @@ Adapter::computeMPP( const std::string & filename ) {
     return results_filename;
 
 }
+#endif
+
 
 RuleSet::RuleSet() :
         _maxId( 0 ) {
@@ -1078,15 +1139,15 @@ RuleSet::addRules( FILE_ptr inputStream ) {
     FUNCOUT
 }
 
-inline const std::list< RuleSet::AdapterRule::AdapterRule_ptr >
+const std::list< RuleSet::AdapterRule::AdapterRule_ptr > &
 RuleSet::getRules() const {
     FUNCIN
     FUNCOUT
     return _adapterRules;
 }
 
-inline const std::string
-RuleSet::getMessageForId( const unsigned int id ) const {
+const std::string
+RuleSet::getMessageForId( unsigned int id ) const {
     FUNCIN
     std::map< unsigned int, std::string >::const_iterator iter =
             _messageIndex.find( id );
@@ -1126,31 +1187,88 @@ RuleSet::AdapterRule::~AdapterRule() {
     FUNCOUT
 }
 
-inline const RuleSet::AdapterRule::rulepair &
+const RuleSet::AdapterRule::rulepair &
 RuleSet::AdapterRule::getRule() const {
     FUNCIN
     FUNCOUT
     return _rule;
 }
 
-inline const RuleSet::AdapterRule::syncList &
+const RuleSet::AdapterRule::syncList &
 RuleSet::AdapterRule::getSyncList() const {
     FUNCIN
     FUNCOUT
     return _syncList;
 }
 
-inline const RuleSet::AdapterRule::cfMode &
+const RuleSet::AdapterRule::cfMode &
 RuleSet::AdapterRule::getMode() const {
     FUNCIN
     FUNCOUT
     return _modus;
 }
 
-inline const int &
+const int &
 RuleSet::AdapterRule::getCosts() const {
     FUNCIN
     FUNCOUT
     return _costs;
 }
 
+std::string RuleSet::AdapterRule::print(const RuleSet & rs) const {
+
+    std::string prettyrule;
+
+    switch (getMode()) {
+    case AR_NORMAL : break;
+    case AR_HIDDEN : prettyrule += "HIDDEN "; break;
+    case AR_OBSERVABLE : prettyrule += "OBSERVABLE "; break;
+    case AR_CONTROLLABLE : prettyrule += "CONTROLLABLE "; break;
+    default:
+        assert(false); break;
+    }
+    {
+        std::list< unsigned int > messageList = getRule().first;
+        std::list< unsigned int >::iterator messageIter = messageList.begin();
+        bool first = true;
+        while ( messageIter != messageList.end() ) {
+            prettyrule += (first?"":", ") + rs.getMessageForId(*messageIter);
+            first = false;
+            ++messageIter;
+        }
+        prettyrule += " ";
+    }
+
+    if (not getSyncList().empty()) {
+        prettyrule += "-- ";
+        std::list< unsigned int > messageList = getSyncList();
+        std::list< unsigned int >::iterator messageIter = messageList.begin();
+        bool first = true;
+        while ( messageIter != messageList.end() ) {
+            prettyrule += (first?"":", ") + rs.getMessageForId(*messageIter);
+            first = false;
+            ++messageIter;
+        }
+        prettyrule += " ";
+    }
+    prettyrule += "-> ";
+
+    {
+        std::list< unsigned int > messageList = getRule().second;
+        std::list< unsigned int >::iterator messageIter = messageList.begin();
+        bool first = true;
+        while ( messageIter != messageList.end() ) {
+            prettyrule += (first?"":", ") + rs.getMessageForId(*messageIter);
+            first = false;
+            ++messageIter;
+        }
+        prettyrule += " ";
+    }
+
+    if (getCosts() != 0) {
+        prettyrule += "(" + toString(getCosts()) + ")";
+    }
+
+    prettyrule += ";";
+    return prettyrule;
+}

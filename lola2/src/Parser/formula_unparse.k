@@ -606,7 +606,7 @@ f=Conjunction(a,b) provided (f->containsTemporal) -> [ctl:
         ctl_id_stack.pop();
 
         ConjunctionFormula *cf = new ConjunctionFormula();
-        cf->subs = ((CTLFormula**) malloc(sizeof(CTLFormula_p)*ctl_formulas[myId].size()));
+        cf->subs = ((CTLFormula**) calloc(ctl_formulas[myId].size(), sizeof(CTLFormula_p)));
         for (size_t i = 0; i < ctl_formulas[myId].size(); ++i)
         {
             //printf("conjunction %d: added a subformula to index %d\n", myId, i);
@@ -634,7 +634,7 @@ f=Disjunction(a,b) provided (f->containsTemporal) -> [ctl:
         ctl_id_stack.pop();
 
         DisjunctionFormula *df = new DisjunctionFormula();
-        df->subs = ((CTLFormula**) malloc(sizeof(CTLFormula_p)*ctl_formulas[myId].size()));
+        df->subs = ((CTLFormula**) calloc(ctl_formulas[myId].size(), sizeof(CTLFormula_p)));
         for (size_t i = 0; i < ctl_formulas[myId].size(); ++i)
         {
             //printf("disjunction %d: added a subformula to index %d\n", myId, i);

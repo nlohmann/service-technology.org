@@ -88,9 +88,9 @@ m4_define([VALGRIND],             [wrap.sh @VALGRIND@])
 
 # AT_ST_CHECK_MEMORY(label, file, check, store, threads)
 m4_define([AT_ST_CHECK_MEMORY], [
-  AT_SETUP([Checking for memory leaks: $1 (check: $3, store: $4, threads: $5)])
+  AT_SETUP([Checking for memory leaks: $1 (check: $3, store: $4, encoder: $5, threads: $6)])
   AT_CHECK([cp TESTFILES/$2 .])
-  AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW --check=$3 --store=$4 --threads=$5 $2],0,ignore,stderr)
+  AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes LOLA_RAW --check=$3 --store=$4 --encoder=$5 --threads=$6 $2],0,ignore,stderr)
   AT_CHECK([GREP -q -E "definitely lost: 0 bytes in 0 blocks|All heap blocks were freed -- no leaks are possible" stderr])
   AT_KEYWORDS(valgrind)
   AT_CLEANUP
@@ -109,12 +109,12 @@ m4_define([AT_LTL_CHECK_MEMORY], [
 
 # AT_CHECK_RUNLOLA(label, file, check, store, threads, hashfunctions, result, markings, edges)
 m4_define([AT_CHECK_RUNLOLA], [
-  AT_SETUP([$1 (store $4, $5 threads)])
+  AT_SETUP([$1 (store $4, encoder $5, $7 threads)])
   AT_CHECK([cp TESTFILES/$2 .])
-  AT_CHECK([LOLA --check=$3 --store=$4 --threads=$5 --hashfunctions=$6 $2],0,ignore,stderr)
-  AT_CHECK([GREP -q "lola: result: $7" stderr])
-  AT_CHECK([GREP -q "$8 markings" stderr])
-  AT_CHECK([GREP -q "$9 edges" stderr])
+  AT_CHECK([LOLA --check=$3 --store=$4 --encoder=$5 $6 --threads=$7 --hashfunctions=$8 $2],0,ignore,stderr)
+  AT_CHECK([GREP -q "lola: result: $9" stderr])
+  AT_CHECK([GREP -q "$10 markings" stderr])
+  AT_CHECK([GREP -q "$11 edges" stderr])
   AT_KEYWORDS(stores)
   AT_CLEANUP
 ])

@@ -273,14 +273,14 @@ int main(int argc, char** argv) {
         if(Tara::args_info.sa_given) {
             message("Synthesized a cost-minimal partner. (Costs = %d)", minBudget);
             std::string s = "writing partner to ";
-            if (std::string(Tara::args_info.og_arg).compare("-") == 0) {
+            if (std::string(Tara::args_info.sa_arg).compare("-") == 0) {
                 s += "standard out";             
             } else {
-                s += "file '" + std::string(Tara::args_info.og_arg) + "'";
+                s += "file '" + std::string(Tara::args_info.sa_arg) + "'";
             }
             message("Computing cost-minimal partner, %s.", s.c_str());
             iMod.setToValue(minBudget);
-            computeMP(*Tara::net, Tara::args_info.og_arg);
+            computeMP(*Tara::net, Tara::args_info.sa_arg);
     	}
         if (Tara::args_info.og_given) {
             std::string s = "writing operating guidelines to ";

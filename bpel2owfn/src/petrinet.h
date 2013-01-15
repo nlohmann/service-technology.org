@@ -37,7 +37,7 @@
  * \date    \$Date: 2008/03/05 10:33:24 $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
- *          the project Tools4BPEL at the Humboldt-Universit‰t zu Berlin. See
+ *          the project Tools4BPEL at the Humboldt-Universit√§t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \version \$Revision: 1.160 $

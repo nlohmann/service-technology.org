@@ -37,7 +37,7 @@
  * \date    \$Date: 2007/09/12 11:42:04 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universit‰t zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-Universit√§t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.

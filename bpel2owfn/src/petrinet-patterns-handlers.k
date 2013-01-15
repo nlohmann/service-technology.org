@@ -36,7 +36,7 @@
  * \date    \$Date: 2007/07/13 12:50:47 $
  * 
  * \note    This file is part of the tool BPEL2oWFN and was created during the
- *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
+ *          project "Tools4BPEL" at the Humboldt-UniversitÃ¤t zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
  *
  * \note    This file was created using Kimwitu++ reading file petrinet-patterns-scopes.k.
@@ -214,7 +214,7 @@ void PFaultHandlers(impl_tFaultHandlers* abstract_phylum, uview current_view)
   }
   else
   {
-    /* für das Prozesspattern hier andere Plätze verschmelzen */
+    /* fÃ¼r das Prozesspattern hier andere PlÃ¤tze verschmelzen */
     PN.mergePlaces((toString(globals::ASTEmap[phylum->id]->parentScopeId) + ".internal.inner_stop"),  (prefix + "stop"));
     PN.mergePlaces((toString(globals::ASTEmap[phylum->id]->parentScopeId) + ".internal.final"),       (prefix + "stopped"));
   }

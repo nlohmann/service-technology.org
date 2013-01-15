@@ -62,12 +62,12 @@ public:
            		number_of_threads
            		);
         case store_arg_prefix:
-            if(args_info.hashing_given)
+            if(args_info.bucketing_given)
               return new PluginStore<T>(enc, new HashingWrapperStore<T>(new NullaryVectorStoreCreator<T,PrefixTreeStore<T> >()), number_of_threads);
             else
            	  return new PluginStore<T>(enc, new PrefixTreeStore<T>(), number_of_threads);
         case store_arg_stl:
-            if(args_info.hashing_given)
+            if(args_info.bucketing_given)
               return new PluginStore<T>(enc, new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
             else
            	  return new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads);

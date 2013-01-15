@@ -100,7 +100,7 @@ Store<void>* StoreCreator<void>::createSpecializedStore(int number_of_threads) {
     switch (args_info.store_arg)
     {
     case store_arg_bloom:
-      if(args_info.hashing_given)
+      if(args_info.bucketing_given)
         return new PluginStore<void>(enc, new HashingWrapperStore<void>(new BinaryVectorStoreCreator<void,VBloomStore<BLOOM_FILTER_SIZE/SIZEOF_MARKINGTABLE + 1>,index_t,size_t>(number_of_threads,args_info.hashfunctions_arg)), number_of_threads);
       else
         return new PluginStore<void>(enc, new VBloomStore<BLOOM_FILTER_SIZE>(number_of_threads, args_info.hashfunctions_arg), number_of_threads);

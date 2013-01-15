@@ -24,8 +24,8 @@ option "encoder" -
   default="bit"
   optional
 
-option "hashing" -
-  "Activate hashing, if the selected store supports it."
+option "bucketing" -
+  "Activate bucketing, if the selected store supports it."
   flag off
 
 option "hashfunctions" -

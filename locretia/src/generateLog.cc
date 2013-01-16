@@ -22,6 +22,8 @@
 #include <climits>
 #include <algorithm>
 #include <time.h>
+#include <string>
+#include <sstream>
 #include "generateLog.h"
 #include "InnerMarking.h"
 #include "serviceAutomaton.h"

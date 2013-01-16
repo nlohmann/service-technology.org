@@ -33,7 +33,6 @@
 #include "generateLog.h"
 #include "Label.h"
 #include "cmdline.h"
-#include "Results.h"
 #include "Output.h"
 #include "verbose.h"
 #include "util.h"
@@ -98,7 +97,7 @@ void evaluateParameters(int argc, char** argv) {
 
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0) {
-        abort(7, "invalid command-line parameter(s)");
+        abort(10, "invalid command-line parameter(s)");
     }
 
     // debug option
@@ -119,7 +118,7 @@ void evaluateParameters(int argc, char** argv) {
 
         // call the config file parser
         if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
-            abort(14, "error reading configuration file '%s'", args_info.config_arg);
+            abort(15, "error reading configuration file '%s'", args_info.config_arg);
         } else {
             status("using configuration file '%s'", _cfilename_(args_info.config_arg));
         }
@@ -135,7 +134,7 @@ void evaluateParameters(int argc, char** argv) {
             params->initialize = 0;
             params->override = 0;
             if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
-                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
+                abort(15, "error reading configuration file '%s'", conf_filename.c_str());
             } else {
                 status("using configuration file '%s'", _cfilename_(conf_filename));
             }
@@ -157,14 +156,10 @@ void evaluateParameters(int argc, char** argv) {
         abort(4, "at most one input file must be given");
     }
 
-    // \TODO: error codes
-    if (args_info.count_arg < 0) {
-    	abort(123, "Trace count has to be a positive integer.");
-    }
-
-    // \TODO: error codes
-    if (args_info.icount_arg < -1) {
-    	abort(124, "Interface count has to be a positive integer or '-1'.");
+    // one of the basic functionalities has to be selected
+    if (!args_info.tpn_flag && !args_info.owfn_flag && !args_info.sa_flag && !args_info.sa_flag)
+    {
+    	abort(5, "either the `--tpn', `--owfn' or `--sa' parameter has to be selected");
     }
 
     // allow only one of the basic functionalities
@@ -172,16 +167,37 @@ void evaluateParameters(int argc, char** argv) {
     	|| (args_info.owfn_flag && (args_info.tpn_flag || args_info.sa_flag))
     	|| (args_info.sa_flag && (args_info.tpn_flag || args_info.owfn_flag)))
     {
-    	abort(1337, "select only one of the basic functionalities");
+    	abort(6, "`--tpn', `--owfn' and `--sa' parameter are mutually exclusive");
     }
 
     if (args_info.owfn_flag) {
-    	if ((args_info.log_flag && (args_info.syncEnv_flag || args_info.asyncEnv_flag))
-    			|| (args_info.syncEnv_flag && (args_info.log_flag || args_info.asyncEnv_flag))
-    			|| (args_info.asyncEnv_flag && (args_info.syncEnv_flag || args_info.log_flag)))
+    	// one of the owfn functionalities has to be selected
+    	if (!args_info.log_flag && !args_info.syncEnv_flag && !args_info.asyncEnv_flag)
     	{
-    		abort(1338, "select only one of the owfn functionalities");
+    		abort(7, "either the `--log', `--syncEnv' and `--asyncEnv' parameter has to be selected");
     	}
+    	// allow only one of the owfn functionalities
+    	if ((args_info.log_flag && (args_info.syncEnv_flag || args_info.asyncEnv_flag))
+    		|| (args_info.syncEnv_flag && (args_info.log_flag || args_info.asyncEnv_flag))
+    		|| (args_info.asyncEnv_flag && (args_info.syncEnv_flag || args_info.log_flag)))
+    	{
+    		abort(8, "`--log', `--syncEnv' and `--asyncEnv' parameter are mutually exclusive");
+    	}
+    }
+
+    // the trace count parameter's argument has to be a positive integer
+    if (args_info.count_arg < 0) {
+    	abort(11, "argument of `--count' parameter has to be a positive integer");
+    }
+
+    // the interface place count parameter's argument has to be a positive integer or '-1' for a full interface
+    if (args_info.icount_arg < -1) {
+    	abort(12, "argument of `--icount' parameter has to be a positive integer or '-1'");
+    }
+
+    // the log count parameter's argument has to be a positive integer
+    if (args_info.logCount_arg < 0) {
+    	abort(17, "argument of `--logCount' parameter has to be a positive integer");
     }
 
     free(params);
@@ -233,7 +249,7 @@ int main(int argc, char** argv) {
 
 
 
-    /*----------------------.
+    	/*----------------------.
     	| 2. parse the open net |
     	`----------------------*/
     try {
@@ -438,7 +454,7 @@ int main(int argc, char** argv) {
 
     			// no final state reachable?
     			if (result == -1)
-    				abort(8877, "No final state reachable in given SA with Trace length of %i.", args_info.maxLength_arg);
+    				abort(16, "no final state reachable in given SA with Trace length of %i", args_info.maxLength_arg);
     			if (result > args_info.minLength_arg) {
     				status("No final state reachable in %i steps! The minimal count of steps is set to %i.", args_info.minLength_arg, result);
     				args_info.minLength_arg = result;
@@ -449,30 +465,20 @@ int main(int argc, char** argv) {
     		/*-------------------------------.
     		| 5. create the XES log          |
     		`-------------------------------*/
-    		std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename + ".xes";
-    		Output output(log_filename, "XES Log");
+    		for (int i = 1; i <= args_info.logCount_arg; ++i)
+    		{
+    			std::stringstream number;
+    			number << i;
+    			std::string log_filename = args_info.logFile_arg ? args_info.logFile_arg : filename
+    					+ (args_info.logCount_arg == 1 ? "" : "_"+number.str()) + ".xes";
+    			Output output(log_filename, "XES Log");
+    			number.clear();
 
-    		generateLog::createLog(output, filename, !args_info.sa_flag, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg, args_info.final_flag, args_info.enforceTraceCount_flag);
-
+    			generateLog::createLog(output, filename, !args_info.sa_flag, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg, args_info.final_flag, args_info.enforceTraceCount_flag);
+    		}
 
     	}
 
-    }
-
-    /*===================================..
-    || results output                    ||
-    ``===================================*/
-
-    if (args_info.resultFile_given) {
-    	std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";
-    	Results results(results_filename);
-    	InnerMarking::outputResults(results);
-    	Label::output_results(results);
-
-    	results.add("meta.package_name", (const char*)PACKAGE_NAME);
-    	results.add("meta.package_version", (const char*)PACKAGE_VERSION);
-    	results.add("meta.svn_version", (const char*)VERSION_SVN);
-    	results.add("meta.invocation", invocation);
     }
 
     return EXIT_SUCCESS;

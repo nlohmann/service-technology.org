@@ -9,7 +9,6 @@ locretia_SOURCES = cmdline.c cmdline.h \
                 Label.h Label.cc \
                 main.cc \
                 Output.cc Output.h \
-                Results.h Results.cc \
                 syntax_graph.yy lexic_graph.ll \
                 types.h \
                 util.h \

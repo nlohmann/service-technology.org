@@ -101,7 +101,7 @@ make check
 @end smallexample
 @end cartouche
 
-to execute the testcases located in @file{tests}. If everything went fine, you should see something like:@footnote{Some tests use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.}
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
 
 @smallexample
 ## ------------- ##
@@ -291,7 +291,7 @@ See @url{http://service-technology.org/publications} for more information.
 
 @section Exit Codes
 
-Locretia will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input open net could be read, the reachability graph of the inner could be build, the operating guidelines could be calculated, and---if requested---output files could be successfully written. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+Locretia will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input net or service automaton could be read, the other steps of the requested task have been taken successfully, and---if requested---output files could be successfully written. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
 
 
 
@@ -338,114 +338,123 @@ locretia: at most one input file must be given -- aborting [#04]
 @end smallexample
 
 @item #05
-@i{This error code is deprecated since version 1.5.}
-
-@item #06
-This error occurs in case Locretia could not parse the reachability graph from LoLA. This might happen if a wrong version of LoLA (e.g., not using the @samp{STATESPACE} mode, see @ref{Requirements}) is used or LoLA runs out of memory. To get the exact parse error, use the command-line option @samp{--verbose}.
+Locretia's input has to be either a TPN, an open workflow net (OWFN) or a service automaton (SA). One of the options @option{--tpn}, @option{--owfn} or @option{--sa} has to be selected.
 
 @smallexample
 @cartouche
-locretia: error while parsing the reachability graph -- aborting [#06]
+locretia: either the `--tpn', `--owfn' or `--sa' parameter has to be selected -- aborting [#5]
+@end cartouche
+@end smallexample
+
+@item #06
+Locretia's input has to be either a TPN, an open workflow net (OWFN) or a service automaton (SA). The options @option{--tpn}, @option{--owfn} and @option{--sa} are mutually exclusive.
+
+@smallexample
+@cartouche
+locretia: `--tpn', `--owfn' and `--sa' parameter are mutually exclusive -- aborting [#6]
 @end cartouche
 @end smallexample
 
 @item #07
+If the input is an OWFN, Locretia can either build a XES log, build the synchronous environment or build the asynchronous environment. One of the options @option{--log}, @option{--syncEnv} and @option{--asyncEnv} has to be selected.
+
+@smallexample
+@cartouche
+locretia: either the `--log', `--syncEnv' or `--asyncEnv' parameter has to be selected -- aborting [#7]
+@end cartouche
+@end smallexample
+
+@item #08
+If the input is an OWFN, Locretia can either build a XES log, build the synchronous environment or build the asynchronous environment. The options @option{--log}, @option{--syncEnv} and @option{--asyncEnv} are mutually exclusive.
+
+@smallexample
+@cartouche
+locretia: `--log', `--syncEnv' and `--asyncEnv' parameter are mutually exclusive -- aborting [#8]
+@end cartouche
+@end smallexample
+
+@item #09
+This error occurs in case Locretia could not parse the reachability graph from LoLA. This might happen if a wrong version of LoLA (e.g., not using the @samp{STATESPACE} mode, see @ref{Requirements}) is used or LoLA runs out of memory. To get the exact parse error, use the command-line option @samp{--verbose}.
+
+@smallexample
+@cartouche
+locretia: error while parsing the reachability graph -- aborting [#09]
+@end cartouche
+@end smallexample
+
+@item #10
 A wrong command-line parameter was given or there was a problem with the combination of command-line parameters. This message is usually accompanied by another message describing the exact problem. Run @samp{locretia --help} for an overview of the valid command-line parameters.
 
 @smallexample
 @cartouche
 locretia: `--showEmptyNode' option depends on option `dot'
-locretia: invalid command-line parameter(s) -- aborting [#07]
+locretia: invalid command-line parameter(s) -- aborting [#10]
 @end cartouche
 @end smallexample
-
-@item #08
-The report frequency for built knowledges must be a positive number. To switch off reporting at all, use @samp{--reportFrequency=0}.
-
-@smallexample
-@cartouche
-locretia: report frequency must not be negative -- aborting [#08]
-@end cartouche
-@end smallexample
-
-@item #09
-Interface markings are stored in byte vectors, so the marking of each place has to be stored in one byte. Hence, the message bound must not exceed 255.
-
-@smallexample
-@cartouche
-locretia: message bound must be between 1 and 255 -- aborting [#09]
-@end cartouche
-@end smallexample
-
-@item #10
-@i{This parameter is deprecated since version 2.6.}
 
 @item #11
-Error opening a file to write. Usually, this error occurs in case Locretia is called in a directory without writing permissions or the output file is already present, but write protected. Output files can be the target files of the @option{--og} or @option{--dot} parameter as well as the temporary LoLA file @file{tmp.lola} or the generated cover constraint file @file{ogfile.cover}.
+The trace count parameter's argument has to be a positive integer.
 
 @smallexample
 @cartouche
-locretia: could not write to file `foo.og' -- aborting [#11]
+locretia: argument of `--count' parameter has to be a positive integer -- aborting [#11]
 @end cartouche
 @end smallexample
 
 @item #12
-Locretia can either create operating guidelines or a service automaton. The options @option{--og} and @option{--sa} are mutually exclusive.
+The interface place count parameter's argument has to be a positive integer or '-1' for a full interface.
 
 @smallexample
 @cartouche
-locretia: `--og' and `--sa' parameter are mutually exclusive -- aborting [#12]
+locretia: argument of `--icount' parameter has to be a positive integer or '-1' -- aborting [#12]
 @end cartouche
 @end smallexample
 
 @item #13
+Error opening a file to write. Usually, this error occurs in case Locretia is called in a directory without writing permissions or the output file is already present, but write protected. Output files can be the target files of the @option{--og} or @option{--dot} parameter as well as the temporary LoLA file @file{tmp.lola} or the generated cover constraint file @file{ogfile.cover}.
+
+@smallexample
+@cartouche
+locretia: could not write to file `foo.og' -- aborting [#13]
+@end cartouche
+@end smallexample
+
+@item #14
 Locretia cannot create a temporary file @file{/tmp/locretia-XXXXXX}, where @samp{XXXXXX} is replaced by a unique name. If this error occurs, check whether the @file{/tmp} folder exists and you have the rights to write there. One reason for this error can be that you are running Locretia under Windows (outside Cygwin), where UNIX-style path names are not recognized. In that case, try using the @option{--tmpfile} parameter. In case you provide a filename without @samp{XXXXXX} suffix, make sure this file does not already exist.
 
 @smallexample
 @cartouche
-locretia: could not create a temporary file `/tmp/locretia-k4CS4x' -- aborting [#13]
+locretia: could not create a temporary file `/tmp/locretia-k4CS4x' -- aborting [#14]
 @end cartouche
 @end smallexample
 
 The parameter @option{--verbose} can give you additional information on the nature of the error, e.g. `Permission denied' or `File exists'.
 
-@item #14
+@item #15
 Locretia cannot find the configuration file given by @file{--config} parameter or it has syntax errors. For an example configuration file, see the standard configuration file @file{src/locretia.conf} created by the configure script. See @url{http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files} for more information on configuration file.
 
 @smallexample
 @cartouche
 locretia: Error opening configuration file `myconf.conf'
-locretia: error reading configuration file `myconf.conf' -- aborting [#14]
-@end cartouche
-@end smallexample
-
-@item #15
-Locretia cannot find the cover file given by @option{--cover} parameter or it has syntax errors. 
-
-@smallexample
-@cartouche
-locretia: could not open cover file `foo.cov' -- aborting [#15]
-locretia: error while parsing the cover file -- aborting [#15]
+locretia: error reading configuration file `myconf.conf' -- aborting [#15]
 @end cartouche
 @end smallexample
 
 @item #16
-A node that has to be covered (by using the @option{--cover} parameter) does not occur in the given net.
+If the `--final' flag is set then locretia searches for a path from the initial state to a final state before any log is generated. If no final state is reachable in the number of steps given by the `--maxLength' parameter's argument then the execution is aborted due to obvious reasons.
 
 @smallexample
 @cartouche
-locretia: unknown place `p' in file `foo.cov' -- aborting [#16]
-locretia: unknown transition `t' in file `foo.cov' -- aborting [#16]
+locretia: no final state reachable in given SA with Trace length of @samp{xy} -- aborting [#16]
 @end cartouche
 @end smallexample
 
 @item #17
-A marking activates two transitions with the same synchronous label. This is not an error of the input net, but a situation Locretia cannot handle due to design decisions. It might be resolved in later versions. See @url{https://gna.org/bugs/?14719} for more information.
+The log count parameter's argument has to be a positive integer.
 
 @smallexample
 @cartouche
-locretia: synchronous label `a' of transition `t' already used in this
-       marking -- aborting [#17]
+locretia: argument of `--logCount' parameter has to be a positive integer -- aborting [#17]
 @end cartouche
 @end smallexample
 

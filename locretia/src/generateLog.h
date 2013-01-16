@@ -27,7 +27,9 @@
 
 
 /*!
- \brief ...
+ \brief XES log
+
+ ...
 */
 class generateLog {
 

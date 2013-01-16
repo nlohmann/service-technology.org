@@ -21,6 +21,8 @@
 #include <climits>
 #include <algorithm>
 #include <time.h>
+#include <string>
+#include <sstream>
 #include "InnerMarking.h"
 #include "Label.h"
 
@@ -189,11 +191,11 @@ void InnerMarking::deleteCounterPlace() {
 
 
 /*!
- \brief Adds a random Interface to the net. Every transition gets either an input or an output label.
+ \brief Adds a random Interface to the net. Every (visible) transition gets either an input or an output label.
 
  \param[in]	count	the maximal number of created interface labels
  */
-void InnerMarking::addInterface(const int count) {
+void InnerMarking::addInterface(int count) {
 	status("adding %i random interface transitions...", count);
 	net->createPort(PORT_NAME);
 	// initialize the random number generator
@@ -221,11 +223,15 @@ void InnerMarking::addInterface(const int count) {
 
 	int choose = 0;
 
+	// if the count of requested interface places is higher than the count of
+	// visible transitions then a "full" interface is generated
+	if (count >= visible_trans.size())
+		count = -1;
+
 	// the following is split up for reasons of performance...
 	if (count > visible_trans.size()/2 || count == -1) {
 		// if there are more than half of the visible transitions to be added to the interface
 		// delete randomly transitions until there are only <count> transitions left
-
 		if (count != -1 && count < visible_trans.size()) {
 			int border = visible_trans.size() - count;
 			for (int i=0; i < border; i++) {
@@ -493,9 +499,3 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
     }
 }
 
-void InnerMarking::outputResults(Results& r) {
-    r.add("statistics.inner_markings", InnerMarking::stats.markings);
-    r.add("statistics.inner_markings_final", InnerMarking::stats.final_markings);
-    r.add("statistics.inner_markings_bad", InnerMarking::stats.bad_states);
-    r.add("statistics.inner_markings_inevitable_bad", InnerMarking::stats.inevitable_deadlocks);
-}

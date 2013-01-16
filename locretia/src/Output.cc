@@ -68,7 +68,7 @@ Output::Output(const std::string& str, const std::string& kind) :
       ),
     filename(str), temp(NULL), kind(kind) {
     if (not os.good()) {
-        abort(11, "could not write to file '%s'", _cfilename_(filename));
+        abort(13, "could not write to file '%s'", _cfilename_(filename));
     }
 
     if (str.compare("-")) {
@@ -155,7 +155,7 @@ char* Output::createTmp() {
 #else
     temp = strdup(tempfileTemplate.c_str());
     if (mkstemp(temp) == -1) {
-        abort(13, "could not create temporary file '%s'", _cfilename_(temp));
+        abort(14, "could not create temporary file '%s'", _cfilename_(temp));
     };
 #endif
     return temp;

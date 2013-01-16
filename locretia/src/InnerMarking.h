@@ -23,7 +23,6 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "Results.h"
 #include "types.h"
 
 
@@ -56,13 +55,10 @@ class InnerMarking {
         /// destroy all objects of this class
         static void finalize();
 
-        /// print results
-        static void outputResults(Results&);
-
         static int isFinalStateReachable(const int trace_max_length);
 
         /// add a (more or less) random interface to the net
-        static void addInterface(const int count);
+        static void addInterface(int count);
 
         /// add the final condition to the OWFN built from the TPN
         static std::string addFinalCondition();

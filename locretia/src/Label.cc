@@ -121,10 +121,3 @@ void Label::initialize() {
     sync_events = last_sync - send_events - receive_events;
 }
 
-
-void Label::output_results(Results& r) {
-    r.add("statistics.events", events);
-    r.add("statistics.events_send", send_events);
-    r.add("statistics.events_receive", receive_events);
-    r.add("statistics.events_synchronous", sync_events);
-}

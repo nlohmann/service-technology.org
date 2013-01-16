@@ -57,9 +57,17 @@ option "log" -
 section "XES log generation (OWFN or SA input)"
 sectiondesc="Options which are used if the 'log'-flag is set and the input is either an OWFN or a SA...\n"
 
+option "logCount" -
+  "Number of logs to be created."
+  details="Sets the number of logs which are generated. The default is set to 1. if a number greater than 1 is chosen, a counter '_xyz' is appended to the filename.\n"
+  int
+  typestr="COUNT"
+  default="1"
+  optional
+  
 option "count" n
   "Number of traces to appear in the log-file."
-  details="The trace-count sets the number of traces which is generated. The default is set to 10 traces.\n"
+  details="The trace-count sets the number of traces which are generated. The default is set to 10 traces.\n"
   int
   typestr="COUNT"
   default="10"
@@ -125,14 +133,6 @@ option "pnmlFile" -
   typestr="FILENAME"
   argoptional
   optional
-  
-option "resultFile" r
-  "Results output."
-  string
-  typestr="FILENAME"
-  argoptional
-  optional
-
 
 section "Debugging"
 sectiondesc="These options control how much debug output Locretia creates.\n"

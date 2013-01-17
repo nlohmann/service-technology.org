@@ -61,7 +61,6 @@ Permission is granted to copy, distribute and/or modify this document under the 
 * First Steps::How to set up and install Locretia.
 * Command Line Options::How to run Locretia.
 * Theory::The theory behind Locretia.
-* Results::What information is written to the results files.
 * Exit and Error Codes::What the error and exit codes of Locretia mean.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
@@ -108,7 +107,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 23 tests were successful.
+All 36 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{locretia@@service-technology.org}.
@@ -248,11 +247,6 @@ When Locretia is executed, it evaluates parameters as follows:
 Parameters given via command-line will overwrite parameters given via configuration files.
 
 
-@section Compatibility to Fiona
-
-Since Locretia Version 2.6, direct support of Fiona's file format has been discontinued. Instead, a compiler @code{locretia2fiona} can translate Locretia's OG output into Fiona's file format.
-
-
 
 @c --------------------------------------------------------------------------
 
@@ -263,22 +257,36 @@ Since Locretia Version 2.6, direct support of Fiona's file format has been disco
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 Locretia implements several algorithms and result published in several scientific articles.
 
+@section XES log
 
+Locretia's main function is to generate logs in the XES format. See @url{http://www.xes-standard.org/} for more information about the XES standard.
+
+The logs consist of traces which themselves consist of events. The number of traces in a log can be specified by the user as well as the number of events in a trace which also can be randomized.
+
+An event contains the label of a fired transition. A trace is a sequence of transitions which can be fired in the net or the service automaton from the initial state.
+The user may choose if a trace has to end in a final state or not.
+
+@subsection OWFN input
+
+If the input file is an open workflow net then the reachability graph of the inner is created (thanks to Niels Lohmann for providing the underlying source code) and is then used to generate the traces of the log.
+
+@subsection SA input
+
+In case of a service automaton the traces are built by just making steps in the automaton.
+
+@section synchronous and asynchronous environment of an OWFN
+
+Locretia can build PNML files containing the synchronous or asynchronous environment of the given OWFN.
+
+@section generating an OWFN with random interface from a TPN
+
+If a TPN is given as an input file then Locretia can generate an OWFN and add a random interface to it. The number of interface places can be specified by the user. At most one interface place per visible transition can be added and it is randomly chosen between input and output place.
 
 
 @sp 3
 
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 See @url{http://service-technology.org/publications} for more information.
-
-
-
-@c --------------------------------------------------------------------------
-
-
-@node Results
-@chapter Results
-
 
 
 
@@ -342,7 +350,8 @@ Locretia's input has to be either a TPN, an open workflow net (OWFN) or a servic
 
 @smallexample
 @cartouche
-locretia: either the `--tpn', `--owfn' or `--sa' parameter has to be selected -- aborting [#5]
+locretia: either the `--tpn', `--owfn' or `--sa' parameter has 
+          to be selected -- aborting [#5]
 @end cartouche
 @end smallexample
 
@@ -351,7 +360,8 @@ Locretia's input has to be either a TPN, an open workflow net (OWFN) or a servic
 
 @smallexample
 @cartouche
-locretia: `--tpn', `--owfn' and `--sa' parameter are mutually exclusive -- aborting [#6]
+locretia: `--tpn', `--owfn' and `--sa' parameter are mutually
+          exclusive -- aborting [#6]
 @end cartouche
 @end smallexample
 
@@ -360,7 +370,8 @@ If the input is an OWFN, Locretia can either build a XES log, build the synchron
 
 @smallexample
 @cartouche
-locretia: either the `--log', `--syncEnv' or `--asyncEnv' parameter has to be selected -- aborting [#7]
+locretia: either the `--log', `--syncEnv' or `--asyncEnv' parameter
+          has to be selected -- aborting [#7]
 @end cartouche
 @end smallexample
 
@@ -369,7 +380,8 @@ If the input is an OWFN, Locretia can either build a XES log, build the synchron
 
 @smallexample
 @cartouche
-locretia: `--log', `--syncEnv' and `--asyncEnv' parameter are mutually exclusive -- aborting [#8]
+locretia: `--log', `--syncEnv' and `--asyncEnv' parameter are mutually
+          exclusive -- aborting [#8]
 @end cartouche
 @end smallexample
 
@@ -397,7 +409,8 @@ The trace count parameter's argument has to be a positive integer.
 
 @smallexample
 @cartouche
-locretia: argument of `--count' parameter has to be a positive integer -- aborting [#11]
+locretia: argument of `--count' parameter has to be a positive
+          integer -- aborting [#11]
 @end cartouche
 @end smallexample
 
@@ -406,7 +419,8 @@ The interface place count parameter's argument has to be a positive integer or '
 
 @smallexample
 @cartouche
-locretia: argument of `--icount' parameter has to be a positive integer or '-1' -- aborting [#12]
+locretia: argument of `--icount' parameter has to be a positive
+          integer or '-1' -- aborting [#12]
 @end cartouche
 @end smallexample
 
@@ -424,7 +438,8 @@ Locretia cannot create a temporary file @file{/tmp/locretia-XXXXXX}, where @samp
 
 @smallexample
 @cartouche
-locretia: could not create a temporary file `/tmp/locretia-k4CS4x' -- aborting [#14]
+locretia: could not create a temporary file `/tmp/locretia-k4CS4x'
+          -- aborting [#14]
 @end cartouche
 @end smallexample
 
@@ -445,16 +460,8 @@ If the `--final' flag is set then locretia searches for a path from the initial 
 
 @smallexample
 @cartouche
-locretia: no final state reachable in given SA with Trace length of @samp{xy} -- aborting [#16]
-@end cartouche
-@end smallexample
-
-@item #17
-The log count parameter's argument has to be a positive integer.
-
-@smallexample
-@cartouche
-locretia: argument of `--logCount' parameter has to be a positive integer -- aborting [#17]
+locretia: no final state reachable in given SA with Trace length of @samp{xy}
+          -- aborting [#16]
 @end cartouche
 @end smallexample
 
@@ -478,11 +485,6 @@ Locretia is developed under the ``Release Early, Release Often'' maxime (see @ur
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 The most recent change log is available at Locretia's website at @url{http://service-technology.org/files/locretia/ChangeLog}.
 
-
-@c --------------------------------------------------------------------------
-
-@unnumbered Results Index
-@printindex fn
 
 @c --------------------------------------------------------------------------
 

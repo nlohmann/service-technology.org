@@ -6,6 +6,7 @@
 */
 
 #include <Stores/VectorStores/PrefixTreeStore.h>
+#include <InputOutput/Reporter.h>
 
 
 template <typename T>
@@ -272,7 +273,14 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
         vector_bitstogo = VECTOR_WIDTH;
 
         input_bitstogo--;
+        // difference occurred in the very last bit of the input string
         if(input_index == max_input_index && input_bitstogo + max_input_numbits == VECTOR_WIDTH) {
+            // allocate space for payload if necessary
+            if(payloadSize) {
+	            *newvector = (vectordata_t*) calloc(payloadSize, 1);
+	            pPayload = *newvector;
+	        }
+            
             pthread_rwlock_unlock(&rwlock);
             if(payload)
                 *payload = (T*) pPayload;

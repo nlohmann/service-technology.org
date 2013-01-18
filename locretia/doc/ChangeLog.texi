@@ -5,7 +5,7 @@
 
 
 
-@heading Version 1.0 (dec 2012)
+@heading Version 1.0 (December 2012)
 @itemize
 @item generate logs in the XES format from OWFN input
 

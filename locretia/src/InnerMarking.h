@@ -20,9 +20,6 @@
 #pragma once
 
 #include <pnapi/pnapi.h>
-#include <vector>
-#include <map>
-#include <set>
 #include "types.h"
 
 
@@ -48,20 +45,12 @@ class InnerMarking {
         /// copy markings from temporary storage to array
         static void initialize();
 
-        static void changeView(pnapi::PetriNet* net, const int c);
-
-        static void deleteCounterPlace();
-
         /// destroy all objects of this class
         static void finalize();
 
+        /// Checks if a final state is reachable using the reachability graph of
+        /// the inner with the given maximal trace length.
         static int isFinalStateReachable(const int trace_max_length);
-
-        /// add a (more or less) random interface to the net
-        static void addInterface(int count);
-
-        /// add the final condition to the OWFN built from the TPN
-        static std::string addFinalCondition();
 
     public: /* static attributes */
         /// a temporary storage used during parsing of the reachability graph
@@ -82,16 +71,8 @@ class InnerMarking {
         /// a mapping from labels to inner markings that can synchronize with this label
         static std::map<Label_ID, std::set<InnerMarking_ID> > synchs;
 
-        /// the open net that created these inner markings
-        static pnapi::PetriNet* net;
-
-        /// the open net that created these inner markings
-        static pnapi::Automaton* sa;
-
         /// remember if the reachability graph of the inner is acyclic
         static bool is_acyclic;
-
-        static pnapi::Place* counterPlace;
 
     private: /* static attributes */
         /// struct combining the statistics on the class InnerMarking
@@ -121,7 +102,7 @@ class InnerMarking {
         /// determine the type of this marking
         inline void determineType(const InnerMarking_ID&);
 
-        /// traverse reachability graph
+        /// help function for the 'isFinalStateReachable'-function
         static int traverse(const InnerMarking_ID& markingID, int depth, int counter);
 
     public: /* member attributes */
@@ -143,6 +124,3 @@ class InnerMarking {
         /// the successor label ids
         Label_ID* labels;
 };
-
-
-#define PORT_NAME "port"

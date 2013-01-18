@@ -19,9 +19,6 @@
 
 
 #include <config.h>
-#include <climits>
-#include <algorithm>
-#include <time.h>
 #include <string>
 #include <sstream>
 #include "generateLog.h"
@@ -30,7 +27,6 @@
 #include "Label.h"
 
 #include "verbose.h"
-#include "util.h"
 
 using std::set;
 using std::vector;
@@ -82,6 +78,10 @@ void generateLog::createLog(std::ostream& file, std::string& filename, const boo
     	length = (std::rand() % (trace_max_length + 1 - trace_min_length)) + trace_min_length;
     	finishedTrace = false;
 
+    	// If the log has to contain a defined number of traces then repeat the procedure of creating
+    	// a trace until it is written to the output. This may not be the case if the trace doesn't end
+    	// in a final state and the user requested only to create those traces.
+    	// Else just discard the current trace and start with a new one.
     	if (enforceTraceCount)
     		while(!finishedTrace)
     			finishedTrace = create_trace(file, isOWFN, counter, length, finalEnd);
@@ -176,6 +176,7 @@ bool generateLog::create_trace(std::ostream& file, const bool isOWFN, const int 
 	std::stringstream tempstring (std::stringstream::in | std::stringstream::out);
 	// create events until the maximal length is reached or no transitions can fire
 	if (isOWFN) {
+		// if the input an OWFN then create the trace based on the reachability graph of the inner:
 		InnerMarking_ID id = 0;
 		while (counter < trace_max_length && InnerMarking::inner_markings[id]->out_degree > 0) {
 			++counter;
@@ -196,6 +197,7 @@ bool generateLog::create_trace(std::ostream& file, const bool isOWFN, const int 
 		if (InnerMarking::inner_markings[id]->is_final)
 			trace_is_final = true;
 	} else {
+		// if the input is a SA then build the trace by using the structure of the automaton:
 		pnapi::State* state = *(serviceAutomaton::sa->getInitialStates().begin());
 		while (counter < trace_max_length && state->getPostset().size() > 0) {
 			++counter;
@@ -223,6 +225,8 @@ bool generateLog::create_trace(std::ostream& file, const bool isOWFN, const int 
 
 	bool finishedTrace = false;
 
+	// if the traces have to end in a final state but this trace doesn't then ignore the trace
+	// else write the trace to the output
 	if (finalEnd && !trace_is_final) {
 		status("ignored trace %i, length: %i, because it didn't end in a final state", trace_number, counter);
 	} else {

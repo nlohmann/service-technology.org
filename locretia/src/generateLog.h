@@ -29,7 +29,13 @@
 /*!
  \brief XES log
 
- ...
+ Contains all functions needed to generate logs in the XES format. (See @url{http://www.xes-standard.org/}.)
+ The logs consist of traces which themselves consist of events. The number of traces in a log can be
+ specified by the user as well as the number of events in a trace which also can be randomized.
+ An event contains the label of a fired transition. A trace is a sequence of transitions which can be
+ fired in the net or the service automaton from the initial state.
+ The user may choose if a trace has to end in a final state or not.
+
 */
 class generateLog {
 
@@ -45,14 +51,14 @@ class generateLog {
 				  	  	  	  	  	  	  	  	   const bool enforceTraceCount);
 
     private: /* static functions */
-            /// creates the header for the output file
-            static void fileHeader(std::ostream&, std::string& filename);
+        /// creates the header for the output file
+        static void fileHeader(std::ostream&, std::string& filename);
 
-            /// creates the footer for the output file
-            static void fileFooter(std::ostream&);
+        /// creates the footer for the output file
+        static void fileFooter(std::ostream&);
 
-            /// creates a trace and writes it to the output file
-            static bool create_trace(std::ostream& file, bool isOWFN, const int trace_number,
+        /// creates a trace and writes it to the output file
+        static bool create_trace(std::ostream& file, bool isOWFN, const int trace_number,
             								const int trace_max_length, const bool finalEnd);
 
 };

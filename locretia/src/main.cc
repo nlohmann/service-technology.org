@@ -29,6 +29,7 @@
 #include <string>
 #include "config-log.h"
 #include "InnerMarking.h"
+#include "openNet.h"
 #include "serviceAutomaton.h"
 #include "generateLog.h"
 #include "Label.h"
@@ -257,9 +258,9 @@ int main(int argc, char** argv) {
     	if (args_info.inputs_num == 0) {
     		status("reading from stdin...");
     		if (args_info.tpn_flag)
-    			std::cin >> pnapi::io::woflan >> *InnerMarking::net;
+    			std::cin >> pnapi::io::woflan >> *openNet::net;
     		else if (args_info.owfn_flag)
-    			std::cin >> pnapi::io::owfn >> *InnerMarking::net;
+    			std::cin >> pnapi::io::owfn >> *openNet::net;
     		else if (args_info.sa_flag) {
     			std::cin >> pnapi::io::sa >> *serviceAutomaton::sa;
     		}
@@ -273,10 +274,10 @@ int main(int argc, char** argv) {
     		}
     		if (args_info.tpn_flag)
     			inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-    			>> pnapi::io::woflan >> *InnerMarking::net;
+    			>> pnapi::io::woflan >> *openNet::net;
     		else if (args_info.owfn_flag)
     			inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-    			>> pnapi::io::owfn >> *InnerMarking::net;
+    			>> pnapi::io::owfn >> *openNet::net;
     		else if (args_info.sa_flag) {
     			inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
     				    		>> pnapi::io::sa >> *serviceAutomaton::sa;
@@ -287,7 +288,7 @@ int main(int argc, char** argv) {
     		if (args_info.sa_flag)
     			s << pnapi::io::stat << *serviceAutomaton::sa;
     		else
-    			s << pnapi::io::stat << *InnerMarking::net;
+    			s << pnapi::io::stat << *openNet::net;
     		status("read net: %s", s.str().c_str());
     	}
     } catch (const pnapi::exception::InputError& error) {
@@ -298,13 +299,13 @@ int main(int argc, char** argv) {
 
     if (!args_info.sa_flag) {
     	// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
-    	if (InnerMarking::net->getTransitions().empty()) {
+    	if (openNet::net->getTransitions().empty()) {
     		status("net has no transitions -- adding dead dummy transition");
-    		InnerMarking::net->createArc(InnerMarking::net->createPlace(), InnerMarking::net->createTransition());
+    		openNet::net->createArc(openNet::net->createPlace(), openNet::net->createTransition());
     	}
 
     	// only normal nets are supported so far
-    	if (not InnerMarking::net->isNormal()) {
+    	if (not openNet::net->isNormal()) {
     		abort(3, "the input open net must be normal");
     	}
     }
@@ -318,13 +319,13 @@ int main(int argc, char** argv) {
     	status("Generating OWFN from TPN...");
 
     	// add a random interface
-    	InnerMarking::addInterface(args_info.icount_arg);
+    	openNet::addInterface(args_info.icount_arg);
 
     	std::string owfn_filename = args_info.owfnFile_arg ? args_info.owfnFile_arg : filename + ".owfn";
     	Output output(owfn_filename, "OWFN");
 
     	// write the net to the stream with an added final condition
-    	output.stream() << InnerMarking::addFinalCondition();
+    	output.stream() << openNet::addFinalCondition();
 
     }
 
@@ -343,7 +344,7 @@ int main(int argc, char** argv) {
     		std::string pnml_filename = args_info.pnmlFile_arg ? args_info.pnmlFile_arg : filename + ".sync.pnml";
     		Output output(pnml_filename, "synchronous environment");
     		output.stream() << pnapi::io::pnml;
-    		Output::output(output.stream(), *InnerMarking::net, filename);
+    		Output::output(output.stream(), *openNet::net, filename);
     	}
 
 
@@ -354,11 +355,11 @@ int main(int argc, char** argv) {
     	if (args_info.asyncEnv_flag) {
     		status("Generating asynchronous environment...");
 
-    		//    	pnapi::PetriNet tempNet = pnapi::PetriNet(*InnerMarking::net);
+    		//    	pnapi::PetriNet tempNet = pnapi::PetriNet(*openNet::net);
     		//    	InnerMarking::changeView(&tempNet, args_info.maxLength_arg);
 
-    		InnerMarking::changeView(InnerMarking::net, args_info.maxLength_arg);
-    		InnerMarking::deleteCounterPlace();
+    		openNet::changeView(openNet::net, args_info.maxLength_arg);
+    		openNet::deleteCounterPlace();
 
     		//InnerMarking::createLabeledEnvironment();
 
@@ -366,7 +367,7 @@ int main(int argc, char** argv) {
     		Output output(pnml_filename, "asynchronous environment");
     		output.stream() << pnapi::io::pnml;
     		//Output::output(output.stream(), tempNet, filename);
-    		Output::output(output.stream(), *InnerMarking::net, filename);
+    		Output::output(output.stream(), *openNet::net, filename);
     	}
 
     }
@@ -386,7 +387,7 @@ int main(int argc, char** argv) {
 
     			// if needed, change the view
     			if (args_info.partnerView_flag) {
-    				InnerMarking::changeView(InnerMarking::net, args_info.maxLength_arg);
+    				openNet::changeView(openNet::net, args_info.maxLength_arg);
     			}
 
     			/*--------------------------------------------.
@@ -400,7 +401,7 @@ int main(int argc, char** argv) {
     			`--------------------------------------------*/
     			Output* temp = new Output();
     			std::stringstream ss;
-    			ss << pnapi::io::lola << *InnerMarking::net;
+    			ss << pnapi::io::lola << *openNet::net;
     			std::string lola_net = ss.str();
 
     			//    	//test output!!

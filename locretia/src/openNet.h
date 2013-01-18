@@ -20,31 +20,37 @@
 #pragma once
 
 #include <pnapi/pnapi.h>
+#include <vector>
+#include <map>
+#include <set>
 
 
 /*!
- \brief service automaton
+ \brief open net
 
- All service automaton related functions and attributes.
+ Contains all open net related stuff... Is used if the input is either an OWFN or a TPN.
 */
-class serviceAutomaton {
+class openNet {
 
     public: /* static functions */
-		/// Checks if a final state is reachable with the given maximal trace length.
-		static int isFinalStateReachable(const int trace_max_length);
+		/// change the viewpoint to the environment
+        static void changeView(pnapi::PetriNet* net, const int c);
+
+        static void deleteCounterPlace();
+
+        /// add a (more or less) random interface to the net
+        static void addInterface(int count);
+
+        /// add the final condition to the OWFN built from the TPN
+        static std::string addFinalCondition();
 
     public: /* static attributes */
-        /// the open net that created these inner markings
-        static pnapi::Automaton* sa;
+        /// the open net
+        static pnapi::PetriNet* net;
 
-    private: /* static attributes */
+        static pnapi::Place* counterPlace;
 
-    public: /* member functions */
-
-    private: /* member functions */
-        /// help function for the 'isFinalStateReachable'-function
-        static int traverse(const pnapi::State& state, int depth, int counter);
-
-    public: /* member attributes */
 };
 
+
+#define PORT_NAME "port"

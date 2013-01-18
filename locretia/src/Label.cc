@@ -19,7 +19,7 @@
 
 #include <set>
 #include "Label.h"
-#include "InnerMarking.h"
+#include "openNet.h"
 #include "cmdline.h"
 #include "verbose.h"
 #include "util.h"
@@ -66,7 +66,7 @@ void Label::initialize() {
 	id2name[0] = "\\tau";
 
     // ASYNCHRONOUS RECEIVE EVENTS (?-step for us)
-    const set<pnapi::Label*> outputLabels(InnerMarking::net->getInterface().getOutputLabels());
+    const set<pnapi::Label*> outputLabels(openNet::net->getInterface().getOutputLabels());
     for (set<pnapi::Label*>::const_iterator l = outputLabels.begin(); l != outputLabels.end(); ++l, ++receive_events) {
         id2name[++events] = (**l).getName();
 
@@ -84,7 +84,7 @@ void Label::initialize() {
     // ASYNCHRONOUS RECEIVE SEND (!-step for us)
     first_send = events + 1;
 
-    const set<pnapi::Label*> inputLabels(InnerMarking::net->getInterface().getInputLabels());
+    const set<pnapi::Label*> inputLabels(openNet::net->getInterface().getInputLabels());
 
     for (set<pnapi::Label*>::const_iterator l = inputLabels.begin(); l != inputLabels.end(); ++l, ++send_events) {
         id2name[++events] = (**l).getName();
@@ -105,7 +105,7 @@ void Label::initialize() {
 
     // collect the labels
     std::map<string, Label_ID> sync_labels;
-    const set<pnapi::Label*> sync_label_names(InnerMarking::net->getInterface().getSynchronousLabels());
+    const set<pnapi::Label*> sync_label_names(openNet::net->getInterface().getSynchronousLabels());
     FOREACH(l, sync_label_names) {
         sync_labels[(**l).getName()] = ++events;
         id2name[events] = (**l).getName();

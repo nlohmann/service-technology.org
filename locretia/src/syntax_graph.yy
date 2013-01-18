@@ -30,6 +30,7 @@
 #include <string>
 #include <map>
 #include "InnerMarking.h"
+#include "openNet.h"
 #include "Label.h"
 #include "Output.h"
 #include "cmdline.h"
@@ -84,7 +85,7 @@ state:
   KW_STATE NUMBER lowlink scc markings_or_transitions
     {
         InnerMarking::markingMap[$2] = new InnerMarking($2, currentLabels, currentSuccessors,
-                                           InnerMarking::net->getFinalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
+                                           openNet::net->getFinalCondition().isSatisfied(pnapi::Marking(marking, openNet::net)));
                                            
         /* ================================================================================= */
         /* calculate strongly connected components and do some evaluation on its members     */
@@ -147,7 +148,7 @@ markings:
 
 marking:
   NAME COLON NUMBER
-    { marking[InnerMarking::net->findPlace($1)] = $3; free($1); }
+    { marking[openNet::net->findPlace($1)] = $3; free($1); }
 ;
 
 transitions:

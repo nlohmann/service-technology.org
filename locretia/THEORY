@@ -31,13 +31,21 @@ OWFN input
 
 If the input file is an open workflow net then the reachability graph of the
 inner is created (thanks to Niels Lohmann for providing the underlying source
-code) and is then used to generate the traces of the log.
+code) and is then used to generate the traces of the log. This allows for very
+fast trace creation but has the downside that Locretia won't work for OWFNs
+with an infinite reachability graph. Future versions of Locretia should fix
+that problem!
+
+The net has to be a normal net to be parsed by LoLa. Locretia assumes
+asynchronous labels. Working with synchronous labels has not been tested and
+may lead to unexpected behaviour and output results.
 
 SA input
 --------
 
 In case of a service automaton the traces are built by just making steps in
-the automaton.
+the automaton. There are no restrictions to the service automaton other than
+having only one initial state.
 
 synchronous and asynchronous environment of an OWFN
 ===================================================
@@ -52,6 +60,12 @@ If a TPN is given as an input file then Locretia can generate an OWFN and add
 a random interface to it. The number of interface places can be specified by
 the user. At most one interface place per visible transition can be added and
 it is randomly chosen between input and output places.
+
+The TPN is assumed to have a special form. The initial place is labeled "A\\n"
+and the final place is labeled "B\\n". Only in this case the generated OWFN
+will get a final state.  Transitions are tagged as invisible by adding the
+suffix "$invisible$". (theoretically the suffix "$" would be sufficient
+because the tool only looks at the last character of the label.)
 
 
 

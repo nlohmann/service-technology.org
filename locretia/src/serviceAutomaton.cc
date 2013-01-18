@@ -64,7 +64,7 @@ int serviceAutomaton::isFinalStateReachable(const int trace_max_length) {
 }
 
 /*!
- \brief Help funtion for the 'isFinalStateReachable'-function
+ \brief help function for the 'isFinalStateReachable'-function
 
  \param[in]		markingID		the ID of the current node
  \param[in]		depth			the current depth of the iterative depth search

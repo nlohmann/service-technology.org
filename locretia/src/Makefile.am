@@ -4,8 +4,9 @@ bin_PROGRAMS = locretia
 # the plain sources you need to compile (no generated code)
 locretia_SOURCES = cmdline.c cmdline.h \
                 InnerMarking.h InnerMarking.cc \
-		generateLog.cc generateLog.h \
-		serviceAutomaton.cc serviceAutomaton.h \
+                generateLog.cc generateLog.h \
+                serviceAutomaton.cc serviceAutomaton.h \
+                openNet.cc openNet.h \
                 Label.h Label.cc \
                 main.cc \
                 Output.cc Output.h \

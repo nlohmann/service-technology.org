@@ -7,16 +7,15 @@
                       http://service-technology.org/locretia
 
 
+
 PURPOSE
-    Locretia is a tool to synthesize partners for services. This includes a
-    finite characterization of all partners (called "operating guidelines").
-    Locretia uses a vast set of reduction rules to synthesize (small) 
-    partners. These rules may, however, not preserve all partners of the
-    service under consideration, but will synthesize a partner if one exists.
+    Locretia is a tool to generate XES logs from OWFN or SA input. 
+    It also can build the synchronous or asynchronous environment of an
+    OWFN and generate an OWFN with a random interface from TPN input.
 
 
 COPYRIGHT
-    Copyright (c) 2009, 2010 Niels Lohmann, Christian Sura, and Daniela Weinberg
+    Copyright (c) 2012, 2013 Simon Heiden
 
 
 AUTHORS

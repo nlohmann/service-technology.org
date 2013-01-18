@@ -7,14 +7,14 @@
                       http://service-technology.org/locretia
 
 
-Locretia implements several algorithms and result published in several scientific
-articles.
 
-Tool Paper
-==========
+PURPOSE
+Locretia implements several algorithms and result published in several
+scientific articles.
 
-No paper...
+XES log
+=======
 
-
-See `http://service-technology.org/publications' for more information.
+Locretia's main function is to generate logs in the XES format. See
+`http://www.xes-standard.org/' for more information about the XES standard.
 

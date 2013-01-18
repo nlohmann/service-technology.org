@@ -7,6 +7,8 @@
                       http://service-technology.org/locretia
 
 
+
+PURPOSE
 In order to run, compile, and develop Locretia, several tools are required.
 
 Runtime
@@ -24,12 +26,12 @@ Runtime
        4. copy the binary `src/lola-statespace' to a directory of your path
           (e.g., `/usr/local/bin') or call `make install'
 
-     If LoLA is not installed before Locretia is configured, a source release of
-     LoLA is automatically downloaded and compiled.
+     If LoLA is not installed before Locretia is configured, a source release
+     of LoLA is automatically downloaded and compiled.
 
-Locretia's configure script checks whether LoLA (with binary `lola-statespace')
-is found in the path and adjusts the configuration file `src/locretia.conf'
-accordingly.
+Locretia's configure script checks whether LoLA (with binary
+`lola-statespace') is found in the path and adjusts the configuration file
+`src/locretia.conf' accordingly.
 
 Compilation
 -----------

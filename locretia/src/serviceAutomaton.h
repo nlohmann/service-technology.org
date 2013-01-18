@@ -25,7 +25,8 @@
 /*!
  \brief service automaton
 
- All service automaton related functions and attributes.
+ Contains all service automaton related functions and attributes.
+ Is used if the input is a service automaton.
 */
 class serviceAutomaton {
 

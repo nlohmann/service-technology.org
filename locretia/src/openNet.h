@@ -28,7 +28,8 @@
 /*!
  \brief open net
 
- Contains all open net related stuff... Is used if the input is either an OWFN or a TPN.
+ Contains all open net related functions and attributes.
+ Is used if the input is either an OWFN or a TPN.
 */
 class openNet {
 

@@ -7,10 +7,20 @@
                       http://service-technology.org/locretia
 
 
-Version 1.0-unreleased
+
+Version 1.1-unreleased
 ======================
 
-* generates a XES log file containing traces of an OWFN
+* generate logs in the XES format from SA input
+
+Version 1.0 (December 2012)
+===========================
+
+* generate logs in the XES format from OWFN input
+
+* generate OWFNs with random interface from TPN input
+
+* generate synchronous and asynchronous environment from OWFN input
 
 
 

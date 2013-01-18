@@ -8,13 +8,53 @@
 
 
 
-PURPOSE
 Locretia implements several algorithms and result published in several
 scientific articles.
 
 XES log
 =======
 
-Locretia's main function is to generate logs in the XES format. See
-`http://www.xes-standard.org/' for more information about the XES standard.
+Locretia's main function is to generate logs in the XES format. (See
+`http://www.xes-standard.org/'.)
+
+The logs consist of traces which themselves consist of events. The number of
+traces in a log can be specified by the user as well as the number of events
+in a trace which also can be randomized.
+
+An event contains the label of a fired transition. A trace is a sequence of
+transitions which can be fired in the net or the service automaton from the
+initial state.  The user may choose if a trace has to end in a final state or
+not.
+
+OWFN input
+----------
+
+If the input file is an open workflow net then the reachability graph of the
+inner is created (thanks to Niels Lohmann for providing the underlying source
+code) and is then used to generate the traces of the log.
+
+SA input
+--------
+
+In case of a service automaton the traces are built by just making steps in
+the automaton.
+
+synchronous and asynchronous environment of an OWFN
+===================================================
+
+Locretia can build PNML files containing the synchronous or asynchronous
+environment of the given OWFN.
+
+generating an OWFN with random interface from a TPN
+===================================================
+
+If a TPN is given as an input file then Locretia can generate an OWFN and add
+a random interface to it. The number of interface places can be specified by
+the user. At most one interface place per visible transition can be added and
+it is randomly chosen between input and output places.
+
+
+
+
+See `http://service-technology.org/publications' for more information.
 

@@ -46,7 +46,9 @@ $(top_srcdir)/ChangeLog: ChangeLog.texi
 	$(AM_V_at)cat ChangeLog.txt >> $(top_srcdir)/ChangeLog
 	$(AM_V_at)head -n$(BANNERHEIGHT) $(top_srcdir)/README > $(top_srcdir)/NEWS
 	$(AM_V_at)head -n `($(GREP) -n -m2 "^Version " ChangeLog.txt | $(SED) -n '2p' | $(SED) -e 's/:/ /' | $(AWK) '{print $$1-1}')` ChangeLog.txt >> $(top_srcdir)/NEWS
-	$(AM_V_at)echo "\nSee file ChangeLog <http://service-technology.org/files/$(PACKAGE)/ChangeLog> for\ncomplete version history.\n" >> $(top_srcdir)/NEWS
+	$(AM_V_at)echo "" >> $(top_srcdir)/NEWS
+	$(AM_V_at)echo "See file ChangeLog <http://service-technology.org/files/$(PACKAGE)/ChangeLog> for" >> $(top_srcdir)/NEWS
+	$(AM_V_at)echo "complete version history." >> $(top_srcdir)/NEWS
 	$(AM_V_at)rm ChangeLog.txt
 
 $(top_srcdir)/REQUIREMENTS: $(PACKAGE).texi

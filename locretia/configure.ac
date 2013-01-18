@@ -1,4 +1,4 @@
-AC_INIT([Locretia], 1.0-unreleased, locretia@service-technology.org, locretia, http://service-technology.org/locretia)
+AC_INIT([Locretia], 1.1-unreleased, locretia@service-technology.org, locretia, http://service-technology.org/locretia)
 
 AC_MSG_NOTICE([ _                    _   _        ])
 AC_MSG_NOTICE([| | ___  ____ _ _ ___| |_|_| __ _  ])

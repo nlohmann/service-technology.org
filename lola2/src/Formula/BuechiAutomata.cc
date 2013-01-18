@@ -6,33 +6,38 @@ int BuechiAutomata::getSuccessors(NetState &ns, index_t** list,
 		index_t currentState) {
 	index_t cardTransitionList = cardTransitions[currentState];
 	uint32_t** transitionsList = transitions[currentState];
-	// TODO this is only temporarily, will be changed to an efficient version later
-	std::vector<index_t> succ;
+
+	*list = new index_t[cardEnabled[currentState]];
+	int curCard = 0;
+
 	for (int i = 0; i < cardTransitionList; i++){
 		//rep->message("checking %d (%d) -> %d",currentState, atomicPropositions[transitionsList[i][0]]->getPredicate()->value,transitionsList[i][1]);
 		if (atomicPropositions[transitionsList[i][0]]->getPredicate()->value)
-			succ.push_back(transitionsList[i][1]);
+			*list[curCard++] = transitionsList[i][1];
 	}
-	*list = new index_t[succ.size()];
-	for (int i = 0; i < succ.size(); i++)
-		(*list)[i] = succ[i];
-	return succ.size();
+	return curCard;
 }
 
 void BuechiAutomata::updateProperties(NetState &ns, index_t transition) {
-	for (int i = 0; i < cardAtomicPropositions; i++)
-		atomicPropositions[i]->checkProperty(ns, transition);
-}
-
-void BuechiAutomata::initProperties(NetState &ns) {
 	for (int i = 0; i < cardAtomicPropositions; i++){
-		atomicPropositions[i]->initProperty(ns);
+		int value_before = (atomicPropositions[i]->value)?1:0;
+		int value_after = (atomicPropositions[i]->checkProperty(ns, transition))?1:
+		cardEnabled[atomicPropotions_backlist[i]] += value_after - value_before;
 	}
 }
 
-void BuechiAutomata::revertProperties(NetState &ns, index_t transition) {
+void BuechiAutomata::initProperties(NetState &ns) {
 	for (int i = 0; i < cardAtomicPropositions; i++)
-		atomicPropositions[i]->updateProperty(ns, transition);
+		if (atomicPropositions[i]->initProperty(ns))
+			cardEnabled[atomicPropotions_backlist[i]]++;
+}
+
+void BuechiAutomata::revertProperties(NetState &ns, index_t transition) {
+	for (int i = 0; i < cardAtomicPropositions; i++){
+		int value_before = (atomicPropositions[i]->value)?1:0;
+		int value_after = (atomicPropositions[i]->updateProperty(ns, transition))?1:
+		cardEnabled[atomicPropotions_backlist[i]] += value_after - value_before;
+	}
 }
 
 bool BuechiAutomata::isAcceptingState(index_t state){

@@ -45,6 +45,8 @@ public:
 	uint32_t cardAtomicPropositions;
 	/// an array containing the atomic propositions used by this buechi automata
 	StatePredicateProperty** atomicPropositions;
+	/// contains for each atomic proposition the
+	index_t* atomicPropotions_backlist;
 
 	/// number of states
 	uint32_t cardStates;
@@ -52,6 +54,8 @@ public:
 	uint32_t* cardTransitions;
 	/// the transition "matrix" -- first index=state, second=number of transition, third= 0->proposition 1->next state
 	uint32_t*** transitions;
+	/// current number of successor states
+	index_t* cardEnabled;
 	/// an array, indicating at each position i, whether the state i is an accepting one
 	bool* isStateAccepting;
 };

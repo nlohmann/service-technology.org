@@ -2,6 +2,6 @@ buechi {
  good :
  	TRUE => good
 }
-accept { good }
+accept { }
 ;
 

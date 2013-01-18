@@ -533,6 +533,14 @@ void Task::printWitness()
 			rep->message("%s", Net::Name[TR][*it]);
 		}
 		ctlExploration->witness.clear();
+    } else if (bauto){
+    	while (ltlExploration->witness.StackPointer > 0)
+    			{
+    				index_t & s = ltlExploration->witness.top();
+    				if (s == -1) rep->message("===begin of circle===");
+    				else rep->message("%s", Net::Name[TR][s]);
+    				ltlExploration->witness.pop();
+    			}
     } else {
 		while (p->stack.StackPointer > 0)
 		{

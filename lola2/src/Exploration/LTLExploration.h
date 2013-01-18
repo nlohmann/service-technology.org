@@ -56,6 +56,8 @@ public:
 	bool checkProperty(BuechiAutomata &automata, Store<AutomataTree> &store,
 			Firelist &firelist, NetState &ns);
 
+	SearchStack<index_t> witness;
+
 private:
 
 	fairness_assumptions assumptions;
@@ -70,4 +72,11 @@ private:
 	index_t checkFairness(BuechiAutomata &automata, Store<AutomataTree> &store,
 			Firelist &firelist, NetState &ns, index_t currentAutomataState,
 			dfsnum_t depth);
+	void produceWitness(BuechiAutomata &automata,
+			Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
+			index_t currentAutomataState, AutomataTree* currentStateEntry,  dfsnum_t depth);
+
+	void completeWitness(BuechiAutomata &automata,
+			Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
+			index_t currentAutomataState, dfsnum_t depth);
 };

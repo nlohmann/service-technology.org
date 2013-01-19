@@ -40,10 +40,10 @@ public:
 
 struct fairness_assumptions {
 	index_t card_strong;
-	index_t* strong_fairness;
+	//index_t* strong_fairness;
 	index_t* strong_backlist;
 	index_t card_weak;
-	index_t* weak_fairness;
+	//index_t* weak_fairness;
 	index_t* weak_backlist;
 };
 

@@ -469,8 +469,8 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 					if (checkResult == -1){
 						produceWitness(automata, store, firelist, ns,
 								currentAutomataState, currentStateEntry, currentNextDepth-3);
-						//delete[] currentFirelist;
-						//delete[] currentStateList;
+						delete[] currentFirelist;
+						delete[] currentStateList;
 						*(witness.push()) = -1;
 						while (stack.StackPointer) {
 							*(witness.push()) = stack.top().fl[stack.top().current_on_firelist];
@@ -488,8 +488,8 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 						if (searchFair(automata, store, firelist, ns,
 								currentAutomataState, currentStateEntry, currentNextDepth - 3,
 								currentNextDFSNumber)) {
-							//delete[] currentFirelist;
-							//delete[] currentStateList;
+							delete[] currentFirelist;
+							delete[] currentStateList;
 							while (stack.StackPointer) {
 								*(witness.push()) = stack.top().fl[stack.top().current_on_firelist];
 								stack.top().~LTLStackEntry();
@@ -565,8 +565,8 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	for (index_t i = 0; i < Net::Card[TR]; i++)
 		if (Transition::Fairness[i] == STRONG_FAIRNESS)
 			assumptions.card_strong++;
-	assumptions.strong_fairness = (index_t*) calloc(assumptions.card_strong,
-			SIZEOF_INDEX_T);
+	//assumptions.strong_fairness = (index_t*) calloc(assumptions.card_strong,
+	//		SIZEOF_INDEX_T);
 	assumptions.strong_backlist = (index_t*) calloc(Net::Card[TR],
 			SIZEOF_INDEX_T);
 	// put all strong fair transitions into an array
@@ -574,7 +574,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	for (index_t i = 0; i < Net::Card[TR]; i++){
 		//rep->message("Transition %d: Fairness %d", i, Transition::Fairness[i]);
 		if (Transition::Fairness[i] == STRONG_FAIRNESS) {
-			assumptions.strong_fairness[__card_on_sf] = i;
+	//		assumptions.strong_fairness[__card_on_sf] = i;
 			assumptions.strong_backlist[i] = __card_on_sf++;
 		} else
 			assumptions.strong_backlist[i] = -1;
@@ -585,14 +585,14 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	for (index_t i = 0; i < Net::Card[TR]; i++)
 		if (Transition::Fairness[i] == WEAK_FAIRNESS)
 			assumptions.card_weak++;
-	assumptions.weak_fairness = (index_t*) calloc(assumptions.card_weak,
-			SIZEOF_INDEX_T);
+	//assumptions.weak_fairness = (index_t*) calloc(assumptions.card_weak,
+	//		SIZEOF_INDEX_T);
 	assumptions.weak_backlist = (index_t*) calloc(Net::Card[TR],
 			SIZEOF_INDEX_T);
 	index_t __card_on_wf = 0;
 	for (index_t i = 0; i < Net::Card[TR]; i++)
 		if (Transition::Fairness[i] == WEAK_FAIRNESS) {
-			assumptions.weak_fairness[__card_on_wf] = i;
+	//		assumptions.weak_fairness[__card_on_wf] = i;
 			assumptions.weak_backlist[i] = __card_on_wf++;
 		} else
 			assumptions.weak_backlist[i] = -1;
@@ -636,7 +636,16 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	// set dfs and lowlink number
 	currentStateEntry->dfs = currentNextDFSNumber;
 
-	return searchFair(automata, store,firelist,ns,currentAutomataState,currentStateEntry,currentNextDepth-3,currentNextDFSNumber);
+	bool result  =searchFair(automata, store,firelist,ns,currentAutomataState,currentStateEntry,currentNextDepth-3,currentNextDFSNumber);
+
+	// cleanup
+	free(assumptions.strong_backlist);
+	//free(assumptions.strong_fairness);
+	free(assumptions.weak_backlist);
+	//free(assumptions.weak_fairness);
+	free(forbidden_transtitions);
+
+	return result;
 }
 
 
@@ -902,6 +911,8 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 	if (automata.isAcceptingState(
 			currentAutomataState)){
 		completeWitness(automata,store,firelist, ns,currentAutomataState,depth);
+		delete[] currentFirelist;
+		delete[] currentStateList;
 		return;
 	}
 
@@ -963,13 +974,13 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 					// search cycle
 					nextStateEntry->dfs = -depth - 3;
 					completeWitness(automata,store,firelist, ns,currentAutomataState,depth);
-					//delete[] currentFirelist;
-					//delete[] currentStateList;
 					while (stack.StackPointer) {
 						*(witness.push()) = stack.top().fl[stack.top().current_on_firelist];
 						stack.top().~LTLStackEntry();
 						stack.pop();
 					}
+					delete[] currentFirelist;
+					delete[] currentStateList;
 					return;
 				}
 				nextStateEntry->dfs = -depth - 2;
@@ -993,9 +1004,9 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 			// firing list completed -->close state and return to previous state
 			delete[] currentFirelist;
 			delete[] currentStateList;
-			if (stack.StackPointer == 0) {
-				return;
-			}
+			// this will not happen
+			assert(stack.StackPointer);
+			//if (stack.StackPointer == 0) {
 
 			// mark current marking as "removed from stack"
 			currentStateEntry->dfs = -depth - 3;
@@ -1118,14 +1129,15 @@ void LTLExploration::completeWitness(BuechiAutomata &automata,
 				currentStateListLength = currentStateListEntry;
 			} else if (nextStateEntry->dfs == - depth - 2){
 				// found the counter example
-				//delete[] currentFirelist;
-				//delete[] currentStateList;
 				*(witness.push()) = currentFirelist[currentFirelistEntry];
 				while (stack.StackPointer) {
 					*(witness.push()) = stack.top().fl[stack.top().current_on_firelist];
 					stack.top().~LTLFairnessStackEntry();
 					stack.pop();
 				}
+				delete[] currentFirelist;
+				delete[] currentStateList;
+
 				return;
 			} else
 				Transition::backfire(ns, currentFirelist[currentFirelistEntry]);

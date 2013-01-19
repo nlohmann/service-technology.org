@@ -6,7 +6,6 @@
 */
 
 #include <Stores/VectorStores/PrefixTreeStore.h>
-#include <InputOutput/Reporter.h>
 
 
 template <typename T>

@@ -4,6 +4,9 @@
 #include <Net/Transition.h>
 
 bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
+
+	//rep->status("init EU check in %x",ns.HashCurrent);
+
 	void** pInitialPayload;
 	if(!s.searchAndInsert(ns, &pInitialPayload, 0))
 		*pInitialPayload = calloc(payloadsize,1); // all-zeros is starting state for all values
@@ -27,7 +30,7 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 		return false;
 	}
 
-	rep->status("starting EU check");
+	//rep->status("starting EU check in %x",ns.HashCurrent);
 
 	// dfs stack will contain all gray nodes
 	SearchStack<DFSStackEntry> dfsStack;
@@ -48,10 +51,12 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	currentLowlink = currentDFSNumber;
 	setCachedResult(payload,IN_PROGRESS);
 
+	bool revertEnabledNeeded = false;
+
 	while(true) {
 		if(currentFirelistIndex--) {
+			//rep->status("fire %d (%x %d) from %x",currentFirelist[currentFirelistIndex],currentFirelist,currentFirelistIndex,ns.HashCurrent);
 			Transition::fire(ns, currentFirelist[currentFirelistIndex]);
-			updateAtomics(ns, currentFirelist[currentFirelistIndex]);
 
 			void** pNewPayload;
 			if(!s.searchAndInsert(ns,&pNewPayload,0))
@@ -61,9 +66,15 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 			CTLFormulaResult newCachedResult = getCachedResult(newpayload);
 			if(newCachedResult == UNKNOWN) {
 
+				// update enabledness and atomic propositions for current state (needed for further checking)
+	            Transition::updateEnabled(ns, currentFirelist[currentFirelistIndex]);
+				updateAtomics(ns, currentFirelist[currentFirelistIndex]);
+
 				witness->clear();
 				if(psi->check(s,ns,firelist,witness)) {
 					setCachedResult(newpayload,KNOWN_TRUE);
+					// we updated the enabledness, so it needs to be reverted
+					revertEnabledNeeded = true;
 					// break; set all nodes to true
 					break;
 				}
@@ -73,6 +84,8 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 					setCachedResult(newpayload,KNOWN_FALSE);
 					// continue;
 					Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
+					//rep->status("backfire %d (%x %d) to %x",currentFirelist[currentFirelistIndex],currentFirelist,currentFirelistIndex,ns.HashCurrent);
+		            Transition::revertEnabled(ns, currentFirelist[currentFirelistIndex]);
 					revertAtomics(ns,currentFirelist[currentFirelistIndex]);
 
 					continue;
@@ -81,9 +94,6 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				// recursive descent
 				DFSStackEntry* entry = dfsStack.push();
 				new (entry) DFSStackEntry(currentFirelist,currentFirelistIndex,payload,currentLowlink);
-
-				// update enabledness for current state
-	            Transition::updateEnabled(ns, currentFirelist[currentFirelistIndex]);
 
 				payload = newpayload;
 				currentFirelistIndex = firelist.getFirelist(ns,&currentFirelist);
@@ -101,12 +111,14 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				if(newdfs < currentLowlink)
 					currentLowlink = newdfs;
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
-				revertAtomics(ns,currentFirelist[currentFirelistIndex]);
+				//rep->status("backfire %d (%x %d) to %x",currentFirelist[currentFirelistIndex],currentFirelist,currentFirelistIndex,ns.HashCurrent);
+				// enabledness and atomics weren't updated, so no revert needed
 				continue;
 			} else { // KNOWN_FALSE
 				// continue;
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
-				revertAtomics(ns,currentFirelist[currentFirelistIndex]);
+				//rep->status("backfire %d (%x %d) to %x",currentFirelist[currentFirelistIndex],currentFirelist,currentFirelistIndex,ns.HashCurrent);
+				// enabledness and atomics weren't updated, so no revert needed
 				continue;
 			}
 		} else { // if(currentFirelistIndex--)
@@ -138,6 +150,7 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				dfsStack.pop();
 
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
+				//rep->status("backfire %d (%x %d) to %x",currentFirelist[currentFirelistIndex],currentFirelist,currentFirelistIndex,ns.HashCurrent);
 	            Transition::revertEnabled(ns, currentFirelist[currentFirelistIndex]);
 				revertAtomics(ns,currentFirelist[currentFirelistIndex]);
 			} else {
@@ -152,9 +165,14 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	}
 	// revert transition that brought us to the witness state
 	Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
-	revertAtomics(ns,currentFirelist[currentFirelistIndex]);
+	//rep->status("backfire %d (%x %d) to %x",currentFirelist[currentFirelistIndex],currentFirelist,currentFirelistIndex,ns.HashCurrent);
+	if(revertEnabledNeeded) {
+        Transition::revertEnabled(ns, currentFirelist[currentFirelistIndex]);
+        revertAtomics(ns,currentFirelist[currentFirelistIndex]);
+	}
 
 	// add transition to witness path
+	//rep->status("push_back %d to %lu",currentFirelist[currentFirelistIndex],witness->size());
 	witness->push_back(currentFirelist[currentFirelistIndex]);
 
 	// current state can reach witness state -> formula true
@@ -172,6 +190,7 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	while(dfsStack.StackPointer) {
 		setCachedResult(dfsStack.top().payload,KNOWN_TRUE);
 		Transition::backfire(ns,dfsStack.top().fl[dfsStack.top().flIndex]);
+		//rep->status("backfire %d (%x %d) to %x",dfsStack.top().fl[dfsStack.top().flIndex],dfsStack.top().fl,dfsStack.top().flIndex,ns.HashCurrent);
         Transition::revertEnabled(ns, dfsStack.top().fl[dfsStack.top().flIndex]);
 		revertAtomics(ns,dfsStack.top().fl[dfsStack.top().flIndex]);
 

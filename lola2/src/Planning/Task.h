@@ -127,11 +127,12 @@ public:
     ~Task();
 
     bool getResult();
-    void interpreteResult(bool);
+    void interpreteResult(bool*);
 
     void setStore();
     void setProperty();
 
+    bool hasWitness(bool result);
     void printWitness();
     void printMarking();
 

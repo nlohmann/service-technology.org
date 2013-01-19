@@ -10,6 +10,7 @@ ExPath(x)  -> [out: "E" x ];
 
 Eventually(x) -> [out: "F (" x ")" ];
 Always(x)     -> [out: "G (" x ")" ];
+Until(phi,psi) -> [out: "(" phi " U " psi ")"];
 
 Negation(x) -> [out: "! (" x ")"];
 Conjunction(x, y) -> [out: "(" x " && " y ")"];
@@ -399,7 +400,7 @@ uint32_t get_state_number(uint32_t state){
 // LCOV_EXCL_START
 void mylocalprinter(const char* s, kc::uview v)
 {
-    //printf("%s", s);
+    printf("%s", s);
 }
 // LCOV_EXCL_STOP
 
@@ -424,6 +425,7 @@ b=BuechiAutomaton(trans,accept) -> [buechi:
     	// transfer all state predicates
     	b->automata->cardAtomicPropositions = predicates.size();
     	b->automata->atomicPropositions = (StatePredicateProperty**)calloc(predicates.size(), sizeof(StatePredicateProperty*));
+    	b->automata->atomicPropotions_backlist = (index_t*)calloc(predicates.size(), SIZEOF_INDEX_T);
     	for (uint32_t i = 0; i < predicates.size(); i++)
     		b->automata->atomicPropositions[i] = new StatePredicateProperty(predicates[i]);	
     	
@@ -432,13 +434,16 @@ b=BuechiAutomaton(trans,accept) -> [buechi:
     	// build the transition-data-structure
     	b->automata->cardTransitions = (uint32_t*)calloc(number_of_states, sizeof(uint32_t));
     	b->automata->transitions = (uint32_t***)calloc(number_of_states, sizeof(uint32_t**));
+    	b->automata->cardEnabled = (index_t*)calloc(number_of_states, SIZEOF_INDEX_T);
     	for (uint32_t i = 0; i < number_of_states; i++){
     		b->automata->cardTransitions[i] = transitions[i].size();
     		b->automata->transitions[i] = (uint32_t**)calloc(transitions[i].size(), sizeof(uint32_t*));
     		for (uint32_t j = 0; j < transitions[i].size(); j++){
+    			//rep->message("TRANSITION %d %d %d", i,j,transitions[i][j].second);
     			b->automata->transitions[i][j] = (uint32_t*)calloc(2, sizeof(uint32_t));
     			b->automata->transitions[i][j][0] = transitions[i][j].first;
     			b->automata->transitions[i][j][1] = transitions[i][j].second;
+    			b->automata->atomicPropotions_backlist[transitions[i][j].second] = i;
     		}
     	}
     	
@@ -861,3 +866,140 @@ AtomicProposition(a) -> [ctl: { assert(false); } ];
 LessEqualAtomicProposition(x, Number(y)) -> [ctl: { assert(false); } ];
 Fireable(x) -> [ctl: { assert(false); } ];
 Initial() -> [ctl: { assert(false); } ];
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+%uview ltl;
+%{ KC_UNPARSE
+//#include <Formula/LTL/BuechiFromLTL.h>
+#include <Parser/ast-system-rk.h>
+
+#include <vector>
+
+std::vector<LTLTree_p> ltlstack;
+
+%}
+
+
+f=StatePredicateFormula(x) -> [ltl:
+	x
+	{
+		// put top of stack into memoy
+		f->ltl_tree = bin_simpler(push_negation(tl_nn(NOT,ltlstack.back(),NULL)));
+		//f->ltl_tree = ltlstack.back();
+	} ];
+
+AtomicProposition(x) -> [ltl:
+	{
+		// parse atomic propostion with internal
+		kc::tFormula internalFormula = StatePredicateFormula(AtomicProposition(x));
+		internalFormula->unparse(mylocalprinter, kc::internal);
+        StatePredicate* result = internalFormula->formula;
+        // negation
+        internalFormula = StatePredicateFormula(Negation(AtomicProposition(x)));
+        internalFormula = internalFormula->rewrite(kc::neg);
+	    internalFormula = internalFormula->rewrite(kc::leq);
+    	internalFormula = internalFormula->rewrite(kc::sides);
+    	internalFormula = internalFormula->rewrite(kc::lists);
+        
+        //internalFormula->unparse(mylocalprinter, kc::out);
+        internalFormula->unparse(mylocalprinter, kc::internal);
+        StatePredicate* negresult = internalFormula->formula;
+        
+        // produce a new string
+        int num;
+        char_p sym = produce_next_string(&num);
+        predicateMap[num] = result;
+        negpredicateMap[num] = negresult;
+        LTLTree_p newTree = tl_nn(PREDICATE,NULL,NULL);
+        newTree->sym = tl_lookup(sym);
+        newTree = bin_simpler(newTree);
+        //rep->message("SYM %x %x",newTree,newTree->sym);
+        assert(newTree->sym);
+        ltlstack.push_back(newTree);
+	}
+];
+
+Eventually(x) -> [ltl: 
+	x
+	{
+		LTLTree_p a = ltlstack.back();
+		ltlstack.pop_back();
+		ltlstack.push_back(bin_simpler(tl_nn(U_OPER,tl_nn(TRUE,NULL,NULL),a)));
+	}
+ ];
+Always(x)     -> [ltl:
+	x
+	{
+		LTLTree_p a = ltlstack.back();
+		ltlstack.pop_back();
+		ltlstack.push_back(bin_simpler(tl_nn(V_OPER,tl_nn(FALSE,NULL,NULL),a)));
+	}
+];
+Until(phi,psi) -> [ltl: 
+	phi
+	psi
+	{
+		LTLTree_p a = ltlstack.back();
+		ltlstack.pop_back();
+		LTLTree_p b = ltlstack.back();
+		ltlstack.pop_back();
+		ltlstack.push_back(bin_simpler(tl_nn(U_OPER,a,b)));
+	}
+];
+
+Negation(x) -> [ltl:
+	x
+	{
+		LTLTree_p a = ltlstack.back();
+		ltlstack.pop_back();
+		ltlstack.push_back(bin_simpler(tl_nn(NOT,a,NULL)));
+	}
+];
+Conjunction(x, y) -> [ltl: 
+	x
+	y
+	{
+		LTLTree_p a = ltlstack.back();
+		ltlstack.pop_back();
+		LTLTree_p b = ltlstack.back();
+		ltlstack.pop_back();
+		ltlstack.push_back(bin_simpler(tl_nn(AND,a,b)));
+	}
+];
+Disjunction(x, y) -> [ltl:
+	x
+	y
+	{
+		LTLTree_p a = ltlstack.back();
+		ltlstack.pop_back();
+		LTLTree_p b = ltlstack.back();
+		ltlstack.pop_back();
+		ltlstack.push_back(bin_simpler(tl_nn(OR,a,b)));
+	}
+];
+Implication(x, y) -> [ltl:
+ 	x
+	y
+	{
+		LTLTree_p a = ltlstack.back();
+		ltlstack.pop_back();
+		LTLTree_p b = ltlstack.back();
+		ltlstack.pop_back();
+		ltlstack.push_back(bin_simpler(tl_nn(IMPLIES,a,b)));
+	}
+];
+Equivalence(x, y) -> [ltl:
+	x
+	y
+	{
+		LTLTree_p a = ltlstack.back();
+		ltlstack.pop_back();
+		LTLTree_p b = ltlstack.back();
+		ltlstack.pop_back();
+		ltlstack.push_back(bin_simpler(tl_nn(EQUIV,a,b)));
+	}
+];

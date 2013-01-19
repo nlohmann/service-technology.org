@@ -17,6 +17,9 @@ information for a transition in its role as a node, ar contained in Node.*
 #include <Net/Place.h>
 #include <Net/Transition.h>
 #include <Net/Marking.h>
+#include <InputOutput/Reporter.h>
+
+extern Reporter* rep;
 
 fairnessAssumption_t* Transition::Fairness = NULL;
 bool* Transition::Enabled = NULL;
@@ -230,6 +233,7 @@ void Transition::checkEnabled_Initial(index_t t)
 /// fire a transition and
 void Transition::fire(NetState &ns, index_t t)
 {
+	//rep->message("F %d",t);
     //  Don't even think about firing a disabled transition!
     assert(ns.Enabled[t]);
 
@@ -290,6 +294,7 @@ void Transition::updateEnabled(NetState &ns, index_t t)
 /// fire a transition in reverse direction (for backtracking) and update enabledness of all transitions
 void Transition::backfire(NetState &ns, index_t t)
 {
+	//rep->message("B %d",t);
     // 1. Update current marking
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {

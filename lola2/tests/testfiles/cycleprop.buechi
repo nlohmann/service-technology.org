@@ -1,0 +1,15 @@
+buechi {
+a :
+	TRUE => b
+	s4 = 0 => c
+	s1 = 1 => d,
+b :
+	TRUE => b
+	s1 = 1 => d,
+c: 
+	s4 = 0 => c,
+d: 
+	TRUE => d,
+}
+
+accept { c,d } ;

@@ -4,13 +4,16 @@
 #include <string>
 #include <Core/Dimensions.h>
 #include <Formula/StatePredicate.h>
-#include <Formula/BuechiAutomata.h>
+#include <Formula/LTL/BuechiAutomata.h>
+#include <Formula/LTL/BuechiFromLTL.h>
 #include <Formula/CTL/CTLFormula.h>
 
 // required, because the abstract grammar does not allow pointer types
 typedef StatePredicate* StatePredicate_p;
 typedef BuechiAutomata* BuechiAutomata_p;
 typedef CTLFormula* CTLFormula_p;
+typedef tl_Node* LTLTree_p;
+typedef char* char_p;
 
 // don't use hash sets, since they are deprecated and unordered sets are not yet supported by Kimwitu++
 #define DONT_USE_HASHSET
@@ -23,6 +26,7 @@ tFormula:
     formula_t type;
     StatePredicate_p formula = NULL;
     CTLFormula_p ctl_formula = NULL;
+    LTLTree_p ltl_tree = NULL;
 }
 ;
 

@@ -16,7 +16,7 @@
 #include <Net/NetState.h>
 #include <Exploration/Firelist.h>
 #include <Stores/Store.h>
-#include <Formula/BuechiAutomata.h>
+#include <Formula/LTL/BuechiAutomata.h>
 
 /// a simpe struct for a tree used as payload of the store
 class AutomataTree {

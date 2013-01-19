@@ -14,6 +14,11 @@
 #include <Net/NetState.h>
 #include <Exploration/StatePredicateProperty.h>
 
+// datastructure for parsing buechi automatons from LTL formulae
+extern std::map<int,StatePredicate*> predicateMap;
+extern std::map<int,StatePredicate*> negpredicateMap;
+
+char* produce_next_string(int* );
 
 /// A Büchi-Automata
 class BuechiAutomata

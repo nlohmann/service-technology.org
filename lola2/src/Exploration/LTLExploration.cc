@@ -220,11 +220,20 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
 				}
 				for (index_t i = 0; i < assumptions.card_strong; i++){
 					//rep->message("STRONG %d: %d %d", i, fulfilled_strong[i], enabled_strong[i]);
-					if (!fulfilled_strong[i] && enabled_strong[i]){
+					bool bad = false;
+					for(index_t j = 0; j < card_forbidden_transtitions; j++)
+						if (forbidden_transtitions[j] == i){
+							bad = true;
+							break;
+						}
+					if (enabled_strong[i] && (!fulfilled_strong[i] || bad )){
 						free(fulfilled_strong);
 						free(fulfilled_weak);
 						free(enabled_strong);
 						free(__enabled_weak);
+						//rep->message("Forbid %d %s",i, Net::Name[TR][i]);
+						if (bad)
+							return -2;
 						return i;
 					}
 				}
@@ -269,6 +278,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 		Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
 		index_t currentAutomataState, AutomataTree* currentStateEntry,
 		dfsnum_t depth, index_t initialDFS) {
+
 	// rep->message("=====================CALL===========================");
 	// at this point we assume, that all states being outside the current SCC
 	// depth and DFS numbers
@@ -341,7 +351,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 		} else
 			currentStateListEntry--;
 
-		if (currentFirelistEntry != -1 && currentStateListEntry >= 0) {
+		if (currentFirelistEntry != -1 && currentStateListEntry != -1) {
 			// there is a next transition that needs to be explored in current marking
 
 			// fire this transition to produce new Marking::Current
@@ -410,7 +420,19 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 					// check current marking for property
 					automata.updateProperties(ns,
 							currentFirelist[currentFirelistEntry]);
-
+				} else {
+					// firelist is empty, this node forms its own SCC, and is thus not important
+					delete[] currentFirelist;
+					delete[] currentStateList;
+					LTLStackEntry & stackEntry = stack.top();
+					currentFirelistEntry = stackEntry.current_on_firelist;
+					currentFirelist = stackEntry.fl;
+					currentStateListEntry = stackEntry.current_on_statelist;
+					currentStateList = stackEntry.states;
+					currentStateListLength = stackEntry.length_of_statelists;
+					currentLowlink = stackEntry.lowlink;
+					currentStateEntry = stackEntry.dfs;
+					stack.pop();
 				}
 			} else {
 				// State exists! -->backtracking to previous state
@@ -440,12 +462,12 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 				//AutomataTree** __back_entry = __back_stack.push();
 				//*__back_entry = currentStateEntry;
 
-				// rep->message("SCC FOUND %d",currentLowlink);
+				//rep->message("SCC FOUND %d",currentLowlink);
 				//rep->message("current aftrF %d %d %d %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState);
 				// not found the counter example, so discard the component
 				while (tarjanStack.StackPointer
 						&& tarjanStack.top()->dfs > currentStateEntry->dfs) {
-					// rep->message("+1");
+					//rep->message("+1");
 					// mark all states as visited
 					tarjanStack.top()->dfs = -currentNextDepth;
 					// check whether is state is an accepting one
@@ -481,7 +503,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 					}
 					if (checkResult != -2){
 						// if a strong fairness assumption is not fulfilled -> search smaller components
-						//rep->message("FORBID %d",assumptions.strong_backlist[checkResult]);
+						//rep->message("FORBID %d %d",card_forbidden_transtitions, assumptions.strong_backlist[checkResult]);
 						forbidden_transtitions[card_forbidden_transtitions++] = assumptions.strong_backlist[checkResult];
 
 						// check for fairness via lichtenstein-pnueli
@@ -495,7 +517,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 								stack.top().~LTLStackEntry();
 								stack.pop();
 							}
-							//rep->message("=============RET T==============");
+							// rep->message("=============RET T==============");
 							return true;
 						}
 						// the transition is not any more forbidden
@@ -560,6 +582,8 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 bool LTLExploration::checkProperty(BuechiAutomata &automata,
 		Store<AutomataTree> &store, Firelist &firelist, NetState &ns) {
 
+	// rep->message("Names %s %s %s %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3]);
+
 	// prepare strong fairness assumptions
 	assumptions.card_strong = 0;
 	for (index_t i = 0; i < Net::Card[TR]; i++)
@@ -599,6 +623,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 
 	// prepare forbidden transtitions
 	forbidden_transtitions = (index_t*) calloc(assumptions.card_strong, SIZEOF_BOOL);
+	//rep->message("FORB %x",forbidden_transtitions);
 	card_forbidden_transtitions = 0;
 
 	// initialize the properties
@@ -643,6 +668,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	//free(assumptions.strong_fairness);
 	free(assumptions.weak_backlist);
 	//free(assumptions.weak_fairness);
+	//rep->message("FORB %x",forbidden_transtitions);
 	free(forbidden_transtitions);
 
 	return result;

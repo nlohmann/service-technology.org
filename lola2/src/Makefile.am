@@ -60,7 +60,11 @@ lola_SOURCES = \
                 Formula/DisjunctionStatePredicate.cc Formula/DisjunctionStatePredicate.h \
                 Formula/TruePredicate.cc Formula/TruePredicate.h \
                 Formula/FalsePredicate.cc Formula/FalsePredicate.h \
-                Formula/BuechiAutomata.h Formula/BuechiAutomata.cc \
+                Formula/LTL/BuechiAutomata.h Formula/LTL/BuechiAutomata.cc \
+                Formula/LTL/trans.c Formula/LTL/buchi.c Formula/LTL/main.c \
+                Formula/LTL/alternating.c Formula/LTL/mem.c Formula/LTL/set.c \
+                Formula/LTL/generalized.c Formula/LTL/cache.c Formula/LTL/lex.c \
+                Formula/LTL/rewrt.c Formula/LTL/parse.c \
                 Formula/CTL/CTLFormula.h \
                 Formula/CTL/DFSFormula.h \
                 Formula/CTL/ConjunctionFormula.h \

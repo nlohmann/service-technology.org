@@ -3,6 +3,75 @@ AT_COLOR_TESTS
 
 
 ############################################################################
+AT_BANNER([LTL])
+############################################################################
+
+AT_SETUP([3-Cycle])
+AT_CHECK([cp TESTFILES/cycle.lola .])
+AT_CHECK([cp TESTFILES/simple.buechi .])
+AT_CHECK([LOLA cycle.lola --buechi simple.buechi --check=ltl --store=stl --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 3 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+AT_SETUP([3-Cycle + 1 strong fair])
+AT_CHECK([cp TESTFILES/cycle2.lola .])
+AT_CHECK([cp TESTFILES/simple.buechi .])
+AT_CHECK([LOLA cycle2.lola --buechi simple.buechi --check=ltl --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 4 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+AT_SETUP([3-Cycle + 1 not strong fair])
+AT_CHECK([cp TESTFILES/cycle3.lola .])
+AT_CHECK([cp TESTFILES/simple.buechi .])
+AT_CHECK([LOLA cycle3.lola --buechi simple.buechi --check=ltl --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 4 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+AT_SETUP([3-Cycle + 1 strong fair (cmplx)])
+AT_CHECK([cp TESTFILES/cycle2.lola .])
+AT_CHECK([cp TESTFILES/cycleprop.buechi .])
+AT_CHECK([LOLA cycle2.lola --buechi cycleprop.buechi --check=ltl --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 4 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+AT_SETUP([3-Cycle + 1 not strong fair (cmplx)])
+AT_CHECK([cp TESTFILES/cycle3.lola .])
+AT_CHECK([cp TESTFILES/cycleprop.buechi .])
+AT_CHECK([LOLA cycle3.lola --buechi cycleprop.buechi --check=ltl --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 4 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
+AT_SETUP([3-Cycle + 1 not strong fair (formula)])
+AT_CHECK([cp TESTFILES/cycle3.lola .])
+AT_CHECK([LOLA cycle3.lola --formula='"FORMULA ALWAYS s4 = 0 OR EVENTUALLY s1 = 1;"' --check=ltl --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 4 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
+AT_SETUP([3-Cycle + 1 not strong fair (formula)])
+AT_CHECK([cp TESTFILES/cycle.lola .])
+AT_CHECK([LOLA cycle.lola --formula='"FORMULA ALWAYS s1 = 0 AND EVENTUALLY s1 = 1;"' --check=ltl --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 3 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
+
+############################################################################
 AT_BANNER([Command-line parameters])
 ############################################################################
 
@@ -1159,37 +1228,6 @@ AT_CHECK([cp TESTFILES/m.lola .])
 AT_CHECK([LOLA --check=deadlock m.lola -v --threads=4 --store=bin --encoder=bit],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: yes" stderr])
 AT_KEYWORDS(stubborn)
-AT_CLEANUP
-
-############################################################################
-AT_BANNER([LTL])
-############################################################################
-
-AT_SETUP([3-Cycle])
-AT_CHECK([cp TESTFILES/cycle.lola .])
-AT_CHECK([cp TESTFILES/simple.buechi .])
-AT_CHECK([LOLA cycle.lola --buechi simple.buechi --check=ltl --store=stl --encoder=bit -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_CHECK([GREP -q "lola: 3 markings" stderr])
-AT_KEYWORDS(ltl)
-AT_CLEANUP
-
-AT_SETUP([3-Cycle + 1 strong fair])
-AT_CHECK([cp TESTFILES/cycle2.lola .])
-AT_CHECK([cp TESTFILES/simple.buechi .])
-AT_CHECK([LOLA cycle2.lola --buechi simple.buechi --check=ltl --store=stl --encoder=bit -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_CHECK([GREP -q "lola: 4 markings" stderr])
-AT_KEYWORDS(ltl)
-AT_CLEANUP
-
-AT_SETUP([3-Cycle + 1 not strong fair])
-AT_CHECK([cp TESTFILES/cycle3.lola .])
-AT_CHECK([cp TESTFILES/simple.buechi .])
-AT_CHECK([LOLA cycle3.lola --buechi simple.buechi --check=ltl --store=stl --encoder=bit -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: no" stderr])
-AT_CHECK([GREP -q "lola: 4 markings" stderr])
-AT_KEYWORDS(ltl)
 AT_CLEANUP
 
 

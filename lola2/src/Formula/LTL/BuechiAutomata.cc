@@ -1,6 +1,7 @@
-#include <Formula/BuechiAutomata.h>
+#include <Formula/LTL/BuechiAutomata.h>
 #include <cstdlib>
 #include <vector>
+#include <math.h>
 
 int BuechiAutomata::getSuccessors(NetState &ns, index_t** list,
 		index_t currentState) {
@@ -10,11 +11,15 @@ int BuechiAutomata::getSuccessors(NetState &ns, index_t** list,
 	*list = new index_t[cardEnabled[currentState]];
 	int curCard = 0;
 
+	//rep->message("BEGIN");
 	for (int i = 0; i < cardTransitionList; i++){
 		//rep->message("checking %d (%d) -> %d",currentState, atomicPropositions[transitionsList[i][0]]->getPredicate()->value,transitionsList[i][1]);
-		if (atomicPropositions[transitionsList[i][0]]->getPredicate()->value)
+		if (atomicPropositions[transitionsList[i][0]]->getPredicate()->value){
+			//rep->message("List %d",transitionsList[i][1]);
 			(*list)[curCard++] = transitionsList[i][1];
+		}
 	}
+	//rep->message("END");
 	return curCard;
 }
 
@@ -60,4 +65,16 @@ BuechiAutomata::~BuechiAutomata(){
 
 	free(cardTransitions);
 	free(isStateAccepting);
+}
+
+
+int current_next_string_index_number = 1;
+
+char* produce_next_string(int* val){
+	current_next_string_index_number++;
+	int length = log10(current_next_string_index_number) + 2;
+	char* buf = (char*) calloc(length, sizeof(char));
+	sprintf(buf,"%d",current_next_string_index_number);
+	*val = current_next_string_index_number;
+	return buf;
 }

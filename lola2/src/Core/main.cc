@@ -262,7 +262,7 @@ int main(int argc, char** argv)
 	}*/
         
         bool result = task.getResult();
-        task.interpreteResult(result);
+        task.interpreteResult(& result);
 
         // print current marking
         if (result and args_info.state_given)
@@ -271,7 +271,7 @@ int main(int argc, char** argv)
         }
 
         // print witness path
-        if (result and args_info.path_given)
+        if (task.hasWitness(result) and args_info.path_given)
         {
             task.printWitness();
         }

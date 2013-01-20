@@ -29,10 +29,10 @@ struct DFSFormula : public CTLFormula {
 	index_t dfsindex; // byte index to dfs number
 
 	statenumber_t getDFS(void* payload) {
-		return *(reinterpret_cast<statenumber_t*>(payload)+dfsindex);
+		return *reinterpret_cast<statenumber_t*>(reinterpret_cast<char*>(payload)+dfsindex);
 	}
 
 	void setDFS(void* payload, statenumber_t dfs) {
-		*(reinterpret_cast<statenumber_t*>(payload)+dfsindex) = dfs;
+		*reinterpret_cast<statenumber_t*>(reinterpret_cast<char*>(payload)+dfsindex) = dfs;
 	}
 };

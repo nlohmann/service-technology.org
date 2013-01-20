@@ -28,7 +28,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 		return false;
 	}
 
-	rep->status("starting AU check");
+	//rep->status("starting AU check");
 
 	// dfs stack will contain all gray nodes
 	SearchStack<DFSStackEntry> dfsStack;
@@ -49,10 +49,12 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	currentLowlink = currentDFSNumber;
 	setCachedResult(payload,IN_PROGRESS);
 
+	bool revertEnabledNeeded = false;
+
 	while(true) {
 		if(currentFirelistIndex--) {
 			Transition::fire(ns, currentFirelist[currentFirelistIndex]);
-			updateAtomics(ns, currentFirelist[currentFirelistIndex]);
+			// don't update enabledness and atomics yet, since it'll maybe not be needed at all.
 
 			void** pNewPayload;
 			if(!s.searchAndInsert(ns,&pNewPayload,0))
@@ -62,11 +64,16 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 			CTLFormulaResult newCachedResult = getCachedResult(newpayload);
 			if(newCachedResult == UNKNOWN) {
 
+				// update enabledness and atomic propositions for current state (needed for further checking)
+	            Transition::updateEnabled(ns, currentFirelist[currentFirelistIndex]);
+				updateAtomics(ns, currentFirelist[currentFirelistIndex]);
+
 				witness->clear();
 				if(psi->check(s,ns,firelist,witness)) {
 					setCachedResult(newpayload,KNOWN_TRUE);
 					// continue;
 					Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
+		            Transition::revertEnabled(ns, currentFirelist[currentFirelistIndex]);
 					revertAtomics(ns,currentFirelist[currentFirelistIndex]);
 					continue;
 				}
@@ -74,17 +81,15 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				witness->clear();
 				if(!phi->check(s,ns,firelist,witness)) {
 					setCachedResult(newpayload,KNOWN_FALSE);
+					// we updated the enabledness, so it needs to be reverted
+					revertEnabledNeeded = true;
 					// break; set all nodes to false
 					break;
 				}
 
 				// recursive descent
-
 	            DFSStackEntry* entry = dfsStack.push();
 				new (entry) DFSStackEntry(currentFirelist,currentFirelistIndex,payload,currentLowlink);
-
-				// update enabledness for current state
-	            Transition::updateEnabled(ns, currentFirelist[currentFirelistIndex]);
 
 	            // get new firelist
 				payload = newpayload;
@@ -108,12 +113,12 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				if(newdfs < currentLowlink)
 					currentLowlink = newdfs;
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
-				revertAtomics(ns,currentFirelist[currentFirelistIndex]);
+				// enabledness and atomics weren't updated, so no revert needed
 				continue;
 			} else { // KNOWN_TRUE
 				// continue;
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
-				revertAtomics(ns,currentFirelist[currentFirelistIndex]);
+				// enabledness and atomics weren't updated, so no revert needed
 				continue;
 			}
 		} else { // if(currentFirelistIndex--)
@@ -160,7 +165,10 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	}
 	// revert transition that brought us to the counterexample state
 	Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
-	revertAtomics(ns,currentFirelist[currentFirelistIndex]);
+	if(revertEnabledNeeded) {
+        Transition::revertEnabled(ns, currentFirelist[currentFirelistIndex]);
+        revertAtomics(ns,currentFirelist[currentFirelistIndex]);
+	}
 
 	// add transition to witness path
 	witness->push_back(currentFirelist[currentFirelistIndex]);

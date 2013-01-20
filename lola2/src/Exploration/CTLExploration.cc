@@ -17,9 +17,9 @@ bool CTLExploration::checkProperty(CTLFormula* formula, Store<void*> &store,
 	formula->setPayloadInformation(cachedResultOffset,payloadSize);
 
 	// debug output
-	printf("Formula: ");
-	formula->DEBUG_print();
-	printf("\n");
+	//printf("Formula: ");
+	//formula->DEBUG_print();
+	//printf("\n");
 
 	formula->initAtomics(ns);
 

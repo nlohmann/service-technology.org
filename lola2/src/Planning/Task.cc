@@ -285,9 +285,9 @@ void Task::setFormula()
     	 ctlFormula = TheFormula->ctl_formula;
 
     	// debug output
-    	printf("Formula: ");
-    	ctlFormula->DEBUG_print();
-    	printf("\n");
+    	//printf("Formula: ");
+    	//ctlFormula->DEBUG_print();
+    	//printf("\n");
 
     	assert(ctlFormula);
 

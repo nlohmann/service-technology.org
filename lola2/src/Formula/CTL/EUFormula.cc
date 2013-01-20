@@ -57,12 +57,14 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 		if(currentFirelistIndex--) {
 			//rep->status("fire %d (%x %d) from %x",currentFirelist[currentFirelistIndex],currentFirelist,currentFirelistIndex,ns.HashCurrent);
 			Transition::fire(ns, currentFirelist[currentFirelistIndex]);
+			// don't update enabledness and atomics yet, since it'll maybe not be needed at all.
 
 			void** pNewPayload;
 			if(!s.searchAndInsert(ns,&pNewPayload,0))
 				*pNewPayload = calloc(payloadsize,1); // all-zeros is starting state for all values
 			void* newpayload = *pNewPayload;
 
+			//rep->status("pPayload=%x, payload=%x",pNewPayload,newpayload);
 			CTLFormulaResult newCachedResult = getCachedResult(newpayload);
 			if(newCachedResult == UNKNOWN) {
 

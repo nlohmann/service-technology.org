@@ -233,12 +233,18 @@ void Task::setFormula()
         break;
     case (FORMULA_FAIRNESS):
         rep->status("checking fairness");
+        rep->status("fairness not yet implemented, converting to LTL...");
+        formulaType = FORMULA_LTL;
         break;
     case (FORMULA_STABILIZATION):
         rep->status("checking stabilization");
+        rep->status("stabilization not yet implemented, converting to LTL...");
+        formulaType = FORMULA_LTL;
         break;
     case (FORMULA_EVENTUALLY):
         rep->status("checking eventual occurrence");
+        rep->status("stabilization not yet implemented, converting to LTL...");
+        formulaType = FORMULA_LTL;
         break;
     case (FORMULA_INITIAL):
         rep->status("checking initial satisfiability");
@@ -521,7 +527,7 @@ void Task::setProperty()
         fl = new FirelistStubbornDeadlock();
         break;
 
-    case check_arg_formula:
+    case check_arg_modelchecking:
     	if(bauto) {
     		fl = new Firelist();
     	} else if(ctlFormula) {
@@ -531,9 +537,6 @@ void Task::setProperty()
 			fl = new FirelistStubbornStatePredicate(spFormula);
     	}
         break;
-    case check_arg_ltl:
-    	fl = new Firelist();
-    	break;
     }
 
 
@@ -542,10 +545,12 @@ void Task::setProperty()
     {
     case check_arg_full:
     case check_arg_deadlock:
-    case check_arg_formula:
+    case check_arg_modelchecking:
     	if(ctlFormula) {
     	    ctlExploration = new CTLExploration();
-    	} else {
+    	} else if(bauto) {
+        	ltlExploration = new LTLExploration();
+    	} else { // state predicate checking
 			if (number_of_threads == 1)
 			{
 				exploration = new DFSExploration();
@@ -556,10 +561,6 @@ void Task::setProperty()
 			}
     	}
         break;
-    case check_arg_ltl:
-    	ltlExploration = new LTLExploration();
-    	break;
-        // now there is only one, but who knows...
     }
 }
 
@@ -634,7 +635,7 @@ void Task::interpreteResult(bool* result)
         switch (args_info.check_arg)
         {
         case (check_arg_deadlock):
-        case (check_arg_formula):
+        case (check_arg_modelchecking):
             if (not *result)
             {
                 final_result = TRINARY_UNKNOWN;

@@ -4,7 +4,7 @@ section "Check a property"
 
 option "check" -
   "Check a property"
-  values="none","full","deadlock","formula","ltl" enum
+  values="none","full","deadlock","modelchecking" enum
   typestr="PROPERTY"
   default="none"
   optional
@@ -14,7 +14,7 @@ option "store" -
   values="comp",
          "prefix", "stl", "bin", "bloom" enum
   typestr="STORE"
-  default="bin"
+  default="prefix"
   optional
 
 option "encoder" -

@@ -214,6 +214,9 @@ void terminationHandler() {
         cmdline_parser_free(&args_info);
         InnerMarking::finalize();
 
+        delete openNet::net;
+        delete serviceAutomaton::sa;
+
         time(&end_time);
         status("released memory [%.0f sec]", difftime(end_time, start_time));
     }

@@ -124,8 +124,8 @@ void openNet::changeView(pnapi::PetriNet* net, const int c) {
 	//\TODO: what about synchronous labels?...
 }
 
+// delete the counter place (for output)
 void openNet::deleteCounterPlace() {
-	// delete the counter place (for output)
 	net->deletePlace(*counterPlace);
 }
 

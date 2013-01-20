@@ -37,6 +37,7 @@ class openNet {
 		/// change the viewpoint to the environment
         static void changeView(pnapi::PetriNet* net, const int c);
 
+        /// delete the counter place (for output)
         static void deleteCounterPlace();
 
         /// add a (more or less) random interface to the net
@@ -49,6 +50,7 @@ class openNet {
         /// the open net
         static pnapi::PetriNet* net;
 
+        /// the counter place
         static pnapi::Place* counterPlace;
 
 };

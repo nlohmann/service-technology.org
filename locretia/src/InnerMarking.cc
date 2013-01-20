@@ -147,7 +147,6 @@ int InnerMarking::traverse(const InnerMarking_ID& markingID, int depth, int coun
 }
 
 void InnerMarking::finalize() {
-    delete openNet::net;
     for (InnerMarking_ID i = 0; i < stats.markings; ++i) {
         delete inner_markings[i];
     }

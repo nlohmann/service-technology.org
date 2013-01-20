@@ -296,7 +296,7 @@ void Task::setFormula()
     else if (formulaType == FORMULA_LTL){
     	rep->message("transforming LTL-Formula into an Büchi-Automaton");
     	// print the formula
-    	//TheFormula->unparse(myprinter, kc::out);
+    	TheFormula->unparse(myprinter, kc::out);
     	// extract the Node*
     	TheFormula->unparse(myprinter, kc::ltl);
 

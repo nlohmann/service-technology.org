@@ -643,5 +643,5 @@ void mk_buchi()
     }
   }
 
-  /*print_spin_buchi();*/
+  print_spin_buchi();
 }

@@ -2,7 +2,7 @@
 info_TEXINFOS = locretia.texi
 
 # any other files you need to add (images)
-EXTRA_DIST = toolpaper.pdf extra_man
+EXTRA_DIST = extra_man
 
 # the height of the README's ASCII art + URL + 3 spaces
 BANNERHEIGHT = 10

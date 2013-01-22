@@ -31,7 +31,7 @@
 #include <iostream>
 #include <string>
 #include "formula.h"
-#include "syntax-og.h"
+#include "syntax-og.hh"
 
 
 int yyerror(char const *msg);

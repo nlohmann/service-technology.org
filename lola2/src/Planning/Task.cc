@@ -37,6 +37,7 @@
 #include <Formula/StatePredicate.h>
 #include <Formula/TruePredicate.h>
 #include <Formula/ConjunctionStatePredicate.h>
+#include <Formula/DisjunctionStatePredicate.h>
 
 #include <Stores/Store.h>
 
@@ -350,6 +351,7 @@ void Task::setFormula()
 
     	// read out the datastructure
 		int curState = -1;
+		int curProperty = 0;
     	for(s = bstates->prv; s != bstates; s = s->prv){
     		curState++;
     		if (s->id == 0){
@@ -365,23 +367,50 @@ void Task::setFormula()
     		}
     		if (s->final == accepting_state)
     			bauto->isStateAccepting[curState] = true;
+
+
+
+
+
+
     		// build the successor list
     		bauto->cardTransitions[curState] = 0;
-    		for(t = s->trans->nxt; t != s->trans; t = t->nxt)
+    		for(t = s->trans->nxt; t != s->trans; t = t->nxt){
+    			// now build the property
+    			std::vector<StatePredicate*> disjunctionproperty;
+    			disjunctionproperty.push_back(buildPropertyFromList(t->pos,t->neg));
+    			BTrans *t1;
+    			for(t1 = t; t1->nxt != s->trans; )
+    				if (t1->nxt->to->id == t->to->id && t1->nxt->to->final == t->to->final) {
+    					disjunctionproperty.push_back(buildPropertyFromList(t1->nxt->pos,t1->nxt->neg));
+    					t1->nxt = t1->nxt->nxt;
+    				}
+    				else  t1 = t1->nxt;
+
+    			if (disjunctionproperty.size() == 1)
+    				neededProperties.push_back(disjunctionproperty[0]);
+    			else{
+    				DisjunctionStatePredicate* disjucntion = new DisjunctionStatePredicate(disjunctionproperty.size());
+    				for (int i = 0; i < disjunctionproperty.size(); i++)
+    					disjucntion->addSub(i,disjunctionproperty[i]);
+    				neededProperties.push_back(disjucntion);
+    			}
+    			neededProperties_backmap[neededProperties.back()] =curState;
+
+    			// increment number of transitions
     			bauto->cardTransitions[curState]++;
+    		}
 
     		bauto->transitions[curState] = (uint32_t**)calloc(bauto->cardTransitions[curState], SIZEOF_VOIDP);
     		int current_on_trans = -1;
     		for(t = s->trans->nxt; t != s->trans; t = t->nxt){
+    			// bauto data structures
     			current_on_trans++;
     			bauto->transitions[curState][current_on_trans] = (uint32_t*)calloc(2, sizeof(uint32_t));
     			//rep->message("Transition %d -> %d", curState, state_id[t->to->final][t->to->id]);
-    			bauto->transitions[curState][current_on_trans][0] = neededProperties.size();
+    			bauto->transitions[curState][current_on_trans][0] = curProperty++;
     			bauto->transitions[curState][current_on_trans][1] = state_id[t->to->final][t->to->id];
     			//bauto->atomicPropotions_backlist[neededProperties.size()] = curState;
-    			// now build the property
-    			neededProperties.push_back(buildPropertyFromList(t->pos,t->neg));
-    			neededProperties_backmap[neededProperties.back()] =curState;
     		}
     	}
 

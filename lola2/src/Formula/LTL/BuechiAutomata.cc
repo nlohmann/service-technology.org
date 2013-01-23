@@ -32,9 +32,15 @@ void BuechiAutomata::updateProperties(NetState &ns, index_t transition) {
 }
 
 void BuechiAutomata::initProperties(NetState &ns) {
-	for (int i = 0; i < cardAtomicPropositions; i++)
-		if (atomicPropositions[i]->initProperty(ns))
+	for (int i = 0; i < cardAtomicPropositions; i++){
+		//rep->message("INIT %d",i);
+		if (atomicPropositions[i]->initProperty(ns)){
+
 			cardEnabled[atomicPropotions_backlist[i]]++;
+			//rep->message("TRUE %d",cardEnabled[atomicPropotions_backlist[i]]);
+		} //else
+		//	rep->message("FALSE");
+	}
 }
 
 void BuechiAutomata::revertProperties(NetState &ns, index_t transition) {

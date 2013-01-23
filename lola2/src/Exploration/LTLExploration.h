@@ -40,10 +40,10 @@ public:
 
 struct fairness_assumptions {
 	index_t card_strong;
-	//index_t* strong_fairness;
+	index_t* strong_fairness;
 	index_t* strong_backlist;
 	index_t card_weak;
-	//index_t* weak_fairness;
+	index_t* weak_fairness;
 	index_t* weak_backlist;
 };
 
@@ -75,6 +75,10 @@ private:
 	void produceWitness(BuechiAutomata &automata,
 			Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
 			index_t currentAutomataState, AutomataTree* currentStateEntry,  dfsnum_t depth);
+
+	bool iterateSCC(BuechiAutomata &automata,
+			Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
+			index_t currentAutomataState, AutomataTree* currentStateEntry, dfsnum_t depth, index_t currentNextDF);
 
 	void completeWitness(BuechiAutomata &automata,
 			Store<AutomataTree> &store, Firelist &firelist, NetState &ns,

@@ -1,4 +1,10 @@
 @c <<-- CHANGE START (version information) -->>
+@heading Version 0.2
+@itemize
+@item adding different output modes for arbitrary cost-optimal partner, most-permissive cost-optimal partner, and representation of all cost-optimal partners
+@item implemented better search algorithm for minimal cost bound
+@end itemize
+
 @heading Version 0.1
 @itemize
 @item some first functionality

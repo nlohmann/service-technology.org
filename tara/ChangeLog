@@ -8,6 +8,15 @@ Tackling non-functional properties for stateful services
           http://service-technology.org/tara
 
 
+Version 0.2
+===========
+
+* adding different output modes for arbitrary cost-optimal partner,
+  most-permissive cost-optimal partner, and representation of all
+  cost-optimal partners
+
+* implemented better search algorithm for minimal cost bound
+
 Version 0.1
 ===========
 

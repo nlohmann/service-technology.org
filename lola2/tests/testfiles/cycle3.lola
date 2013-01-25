@@ -26,4 +26,9 @@ TRANSITION f STRONG FAIR
 		s3 : 1;
 	PRODUCE
 		s4 : 1;
+TRANSITION b
+	CONSUME
+		s4 : 1;
+	PRODUCE
+		s1 : 1;
 

@@ -88,4 +88,6 @@ public:
 
 
     static void checkTransitions(NetState &);
+
+    static bool isCycle(NetState &ns, index_t t);
 };

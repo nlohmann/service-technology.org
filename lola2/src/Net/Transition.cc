@@ -233,7 +233,6 @@ void Transition::checkEnabled_Initial(index_t t)
 /// fire a transition and
 void Transition::fire(NetState &ns, index_t t)
 {
-	//rep->message("F %d",t);
     //  Don't even think about firing a disabled transition!
     assert(ns.Enabled[t]);
 
@@ -259,6 +258,37 @@ void Transition::fire(NetState &ns, index_t t)
         ns.HashCurrent += SIZEOF_MARKINGTABLE;
         // LCOV_EXCL_STOP
     }
+}
+
+
+bool Transition::isCycle(NetState &ns, index_t t){
+    //  Don't even think about firing a disabled transition!
+    assert(ns.Enabled[t]);
+
+    index_t diff = 0;
+    index_t p = -1;
+
+    if (!Transition::CardDeltaT[POST][t] && !Transition::CardDeltaT[PRE][t]) return true;
+
+    // 1. Update current marking
+    for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
+    {
+        // there should be enough tokens to fire this transition
+        assert(ns.Current[Transition::DeltaT[PRE][t][i]] >= Transition::MultDeltaT[PRE][t][i]);
+
+        if (p == -1) p = Transition::DeltaT[PRE][t][i];
+        if (Transition::DeltaT[PRE][t][i] != p)	return false;
+        diff -= Transition::MultDeltaT[PRE][t][i];
+    }
+    if (p == -1) return false;
+    for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
+    {
+    	if (Transition::DeltaT[POST][t][i] != p) return false;
+        diff += Transition::MultDeltaT[POST][t][i];
+    }
+
+    if (diff == 0) return true;
+    return false;
 }
 
 /// update enabledness information after having fired a transition

@@ -28,7 +28,7 @@ public:
 	/// returns an array with all successor-states of the current netstate in the parameter
 	/// this function will also call automatically updateProperty
 	/// @return number of successors
-	int getSuccessors(NetState &ns, index_t** list, index_t currentState);
+	int getSuccessors(index_t** list, index_t currentState);
 
 	/// updates all properties
 	void updateProperties(NetState &ns, index_t transition);

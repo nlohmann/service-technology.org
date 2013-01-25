@@ -3,7 +3,7 @@
 #include <vector>
 #include <math.h>
 
-int BuechiAutomata::getSuccessors(NetState &ns, index_t** list,
+int BuechiAutomata::getSuccessors(index_t** list,
 		index_t currentState) {
 	index_t cardTransitionList = cardTransitions[currentState];
 	uint32_t** transitionsList = transitions[currentState];

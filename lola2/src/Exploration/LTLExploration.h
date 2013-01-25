@@ -82,5 +82,7 @@ private:
 
 	void completeWitness(BuechiAutomata &automata,
 			Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
-			index_t currentAutomataState, dfsnum_t depth);
+			index_t currentAutomataState,  index_t stateToFind, dfsnum_t depth);
+
+	bool isAcceptingStateReachable(BuechiAutomata &automata,index_t currentAutomataState);
 };

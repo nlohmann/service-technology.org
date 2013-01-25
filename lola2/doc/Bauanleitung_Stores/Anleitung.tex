@@ -112,6 +112,7 @@ Ein leicht verständliches Beispiel für eine solche Datenstruktur ist eine List
 Folgende VectorStores existieren bisher:
 \begin{description}
 \item[BloomStore] Dieser VectorStore basiert auf Hashfunktionen. Dadurch verbraucht er sehr wenig Speicher, kann aber falsche Antworten geben.
+\item[CompareStore] Dieser VectorStore vergleicht die Ergebnisse zweier Stores. Damit können neue Stores einfach auf Korrektheit getestet werden. Auf diesen Store wird in Kapitel \ref{kap:CompareStore} näher eingegangen.
 \item[PrefixTreeStore:] Dieser VectorStore kann Vektoren ohne Verschnitt speichern. Er ist sehr schnell und speichereffizient. Er verwendet Präfixbäume als Datenstruktur.
 \item[SuffixTreeStore:] Dieser VectorStore kann Vektoren ohne Verschnitt speichern. Er ist sehr schnell und speichereffizient. Er verwendet Präfixbäume als Datenstruktur.
 \item[VSTLStore:] Dieser VectorStore verdeutlicht das Prinzip von Stores. Sein didaktischer Nutzen ist größer als der für den produktiven Einsatz. Er verwendet als Datenstruktur STL-Sets, in denen STL-Vektoren gespeichert werden.
@@ -121,7 +122,7 @@ Weiterführende Details können den Kommentaren des Quellcodes oder der daraus a
 
 Damit ein neu geschriebener VectorStore kompiliert wird, müssen seine Quellcodedateien in die Liste \frqq lola\_SOURCES\Flqq in der Datei \frqq src/Makefile.am\Flqq eingetragen werden.
 
-\subsection{Verwendung}
+\subsection{Verwendung von PluginStores}
 Wenn der gewünschte NetStateEncoder und VectorStore vorhanden sind, müssen für die Erstellung eines neuen PluginStores keine neuen Dateien angelegt werden. Es reicht, eine neue Klasse zu erstellen und einer entsprechenden Variablen zuzuweisen. Beispiele finden sich in Listing \ref{lst:PluginStore} und in der Datei \frqq src/Planning/Tasks.h\Flqq.
 
 \section{Templates und Payload}
@@ -130,7 +131,7 @@ Diverse Algorithmen von \lola erfordern es, NetStates nicht nur zu speichern, so
 Die Verwendung von Templates beschränkt sich momentan darauf, die Signaturen der betroffenen Funktionen, sowie die Art gewisser Variablen und Rückgabetypen variabel zu halten. Bis auf eine Ausnahme,
 \frqq Store$<$void$>$\Flqq verändern Templates momentan nicht die Arbeitsweise der Stores.
 
-Damit im Falle des Verzichts auf Payload kein Speicherplatz verschwendet wird, wurde \frqq void\Flqq als Schlüsselwort dafür definiert, dass kein Payload hinterlegt werden wird. Dementsprechend wird mit
+Damit im Falle des Verzichts auf Payload kein Speicherplatz verschwendet wird, wurde \frqq void\Flqq als Schlüsselwort dafür definiert, dass kein Payload hinterlegt werden wird. Dementsprechend wird im Listing \ref{lst:PluginStore}
 
 \begin{center}
 \begin{minipage}{0.7\textwidth}
@@ -141,12 +142,49 @@ s = new PluginStore<void>(
    new SuffixTreeStore<void>(), number_of_threads);\end{lstlisting}
 \end{minipage}
 \end{center}
-
+%
 der Variablen s ein PluginStore, der intern einen SuffixTreeStore verwendet, aber keinerlei Speicherplatz für Payload verbraucht, zugewiesen. Es wird nicht einmal Speicherplatz für Variablen verbraucht, die nur für die Verwaltung des Payload interessant wären.
 
 Durch die Verwendung von Templates ist es in den betroffenen Klassen nicht möglich, die übliche Aufteilung in einen Definitionsteil (.h-Datei) und einen Implementierungsteil (.cc-Datei), wobei die .h-Datei in der .cc-Datei inkludiert wird, beizubehalten. Eine ausführliche Erklärung dazu findet sich im Buch \frqq C++ Templates: The Complete Guide\Flqq von Josuttis und Vandevoorde. Um trotzdem eine ähnliche Struktur beibehalten zu können, gibt es eine kurze und übersichtliche Datei mit Definitionen (.h-Datei), sowie einer Datei mit den Implementierungen (.inc-Datei), wobei am Ende der ersten die zweite inkludiert wird. Dies entspricht dem \frqq Inclusion Model\Flqq aus dem genannten Buch.
 
+\subsection{Bucketing}
+Ein weiterer, besonderer VectorStore ist der \frqq HashingWrapperStore\flqq\footnote{Der HashingWrapperStore ist in der Datei \frqq src/Stores/VectorStores/HashingWrapperStore.h\Flqq definiert.}. Dieser verwaltet intern sehr viele VectorStores und versucht die zu speichernden NetStates auf diesen möglichst gleichmäßig zu verteilen. In diesem Abschnitt werden zunächst die Vor- und Nachteile dieser Technik erläutert. Im Anschluss wird erläutert, wie Bucketing bei der Erstellung neuer Stores genutzt werden kann.
+
+\subsubsection{Vor- und Nachteile}
+Bei allen Stores außer dem BloomStore hängt die Zeit für einen Aufruf der Funktion \frqq searchAndInsert\Flqq logarithmisch von der Anzahl der gespeicherten NetStates ab. Diese Anzahl wird oft sehr groß. Eine Beschleunigung\footnote{Diese Beschleunigung ändert nicht die asymptotische Komplexität sondern beschleunigt um einen konstanten Faktor.} mit nur konstantem Speichermehrverbrauch kann daher erreicht werden, wenn die Markierungen durch geeignete Hashfunktionen sehr schnell auf viele verschiedene Stores aufgeteilt werden können, da die Anzahl der gespeicherten Netzzustände pro Store damit stark reduziert wird. Diese Aufteilung übernimmt der HashingWrapperStore.
+
+Zusätzlich zur direkten Beschleunigung ist der HashingWrapperStore auch eine einfache Variante, mit beliebigen VectorStores eine Parallelisierung zu erreichen, da die einzelnen Stores voneinander unabhängig sind.
+
+Allerdings wird bei der Verwendung des HashingWrapperStores mehr Arbeitsspeicher verbraucht. Schon die Erstellung und Vorhaltung sehr vieler Stores verbraucht etwas Speicherplatz. Dieser nur konstante Mehrverbrauch dürfte jedoch in den meisten Fällen vernachlässigbar sein. Viel gewichtiger ist, dass einige Stores, momentan der PrefixTreeStore und SuffixTreeStore, die Netzzustände speicherschonend abspeichern. Bei den beiden genannten Stores werden beispielsweise gleiche Anfänge in der Bitdarstellung zweier Vektoren nur genau ein Mal gespeichert. Diese Einsparung ist nicht mehr möglich, wenn Vektoren mit gleichen Anfangsstücken in unterschiedlichen Buckets landen.
+
+\subsubsection{Verwendung des Bucketing}
+Bucketing wird durch den Parameter \frqq --bucketing\Flqq angestellt. Wie selbstgeschriebene Stores in \lola integriert werden, wird im Kapitel \ref{kap:Etablierung} erläutert. Hier wird erläutert, wie die Erstellung von HashingWrapperStores funktioniert.
+
+Ein HashingWrapperStore ist ein auf Templates basierender Store, dessen Konstruktor einen VectorStoreCreator\footnote{Die Definition findet sich in der Datei des HashingWrapperStores.} (VSC) entgegennimmnt. Ein VSC wird benötigt, da eine variable Anzahl Stores erstellt werden muss. Es genügt daher nicht, den gewünschten Store zu übergeben; vielmehr wird eine beliebig oft aufrufbare Funktion benötigt, die den gewünschten Store übergibt. VSC übernehmen genau diese Aufgabe.
+
+Da die Konstruktoren verschiedener Stores eine unterschiedliche Anzahl von Parametern erwarten, gibt es verschiedene VSC, namentlich den \frqq NullaryVectorStoreCreator\frqq, den \frqq UnaryVectorStoreCreator\Frqq sowie den \frqq BinaryVectorStoreCreator\flqq\footnote{Alle definiert in der Datei des HashingWrapperStores.}, die VectorStores mit keinem bis zwei Parametern erstellen. Eine Unterstützung weiterer Parameteranzahlen ist denkbar, aber bis jetzt nicht notwendig gewesen. Mit dem schon vorhandenen Quellcode sollten weitere VSC einfach implementiert werden können.
+
+Ein konkretes Beispiel zur Erstellung eines PluginStores mit Bucketing ist in Listing \ref{lst:HashingWrapperStore} zu sehen.
+
+\begin{center}
+\begin{minipage}{0.7\textwidth}
+\lstset{language=C++}
+\begin{lstlisting}[label=lst:HashingWrapperStore,caption={Erstellung eines PluginStores mit Bucketing. Dem HashingWrapperStore wird ein UnaryVectorStoreCreator übergeben, welcher einen VSTLStore erstellt. Das Argument des VSC-Konstruktors wird an jeden erstellten VSTL-Store weitergereicht.}]
+s = new PluginStore<T>(
+	new BitEncoder(number_of_threads),
+	new HashingWrapperStore<T>(
+		new UnaryVectorStoreCreator
+			<T,VSTLStore<T>,index_t>
+			(number_of_threads)
+		),
+	number_of_threads);
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+
 \section{Etablierung eines neuen Stores}
+\label{kap:Etablierung}
 Um einen neu geschriebenen Store verwenden zu können, müssen für diesen neue Kommandozeilenparameter eingeführt werden. Außerdem muss der Store in den Kompilierungsprozess und die Korrektheitstest integriert werden.
 
 \subsection{Kommandozeilenparameter einführen}
@@ -165,7 +203,16 @@ Um neue Stores mit Payload-Informationen verwenden zu können, muss der entsprec
 \subsection{Kompilierungsprozess erweitern}
 Damit ein neu geschriebener Store oder NetStateEncoder kompiliert wird, müssen die entsprechenden Quellcodedateien in die Liste \frqq lola\_SOURCES\Flqq in der Datei \frqq src/Makefile.am\Flqq eingetragen werden.
 
-\subsection{Automatisierte Korrektheitstest}
+\subsection{Korrektheitstest}
+Gerade bei der Entwicklung neuer Funktionen können Fehler gemacht oder entdeckt werden. Daher bietet \lola eine Reihe von Maßnahmen, diese z finden. In diesem Abschnitt werden die auf Stores bezogenen Qualitätssicherungsmaßnahmen behandelt.
+
+\subsubsection{Der CompareStore}
+\label{kap:CompareStore}
+Gerade bei der Entwicklung neuer Stores ist nicht immer ganz klar, ob diese Stores alle Netzzustände zuverlässig speichern und wiederfinden. Dies überprüft der CompareStore, indem er die Rückgaben zweier Stores vergleicht. Sind diese unterschiedlich, beendet sich das Programm.
+
+Um einen zu überprüfenden Store anzugeben, muss dieser in der Task.h anstelle eines der momentan dort als Parameter des CompareStores eingetragenen Stores angegeben werden.
+
+\subsubsection{Automatisierte Korrektheitstests}
 In \lola wurden einige Korrektheitstest automatisiert. Es gibt Tests, die prüfen, ob \lola unter Verwendung der zu testenden Stores das erwartete Ergebnis berechnet. Es gibt ähnliche Tests, die dafür jedoch mehrere Threads verwenden und somit Fehler im Threading feststellen können. Abschließend gibt es noch Tests, die überprüfen, ob die Speicherverwaltung der Stores allen angeforderten Speicher wieder frei gibt.
 
 Um einen Store in einen der oben genannten Tests einzubinden, muss in der Datei

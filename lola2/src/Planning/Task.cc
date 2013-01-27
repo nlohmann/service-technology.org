@@ -708,7 +708,7 @@ void Task::printWitness()
     	while (ltlExploration->witness.StackPointer > 0)
     			{
     				index_t & s = ltlExploration->witness.top();
-    				if (s == -1) rep->message("===begin of circle===");
+    				if (s == -1) rep->message("===begin of cycle===");
     				else rep->message("%s", Net::Name[TR][s]);
     				ltlExploration->witness.pop();
     			}

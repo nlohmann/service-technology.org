@@ -1,8 +1,8 @@
 buechi {
 a :
-	TRUE => b
+	s1 = 1 => d
 	s4 = 0 => c
-	s1 = 1 => d,
+	TRUE => b,
 b :
 	TRUE => b
 	s1 = 1 => d,

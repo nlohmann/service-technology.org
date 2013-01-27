@@ -30,5 +30,4 @@ TRANSITION b
 	CONSUME
 		s4 : 1;
 	PRODUCE
-		s1 : 1;
-
+		s4 : 1;

@@ -62,6 +62,7 @@ private:
 
 	fairness_assumptions assumptions;
 	index_t* forbidden_transtitions;
+	bool* is_forbidden;
 	index_t card_forbidden_transtitions;
 
 	dfsnum_t currentNextDepth;
@@ -71,10 +72,12 @@ private:
 			dfsnum_t depth, index_t currentNextDFS);
 	index_t checkFairness(BuechiAutomata &automata, Store<AutomataTree> &store,
 			Firelist &firelist, NetState &ns, index_t currentAutomataState,
-			dfsnum_t depth);
+			dfsnum_t depth, bool** enabledStrongTransitions);
 	void produceWitness(BuechiAutomata &automata,
 			Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
-			index_t currentAutomataState, AutomataTree* currentStateEntry,  dfsnum_t depth);
+			index_t currentAutomataState, AutomataTree* currentStateEntry,
+			dfsnum_t depth, dfsnum_t witness_depth, bool* fulfilledWeak, bool* fulfilledStrong,
+			index_t fulfilled_conditions, bool acceptingStateFound, AutomataTree* targetPointer);
 
 	bool iterateSCC(BuechiAutomata &automata,
 			Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
@@ -82,7 +85,13 @@ private:
 
 	void completeWitness(BuechiAutomata &automata,
 			Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
-			index_t currentAutomataState,  index_t stateToFind, dfsnum_t depth);
+			index_t currentAutomataState,  AutomataTree* targetPointer, dfsnum_t depth, dfsnum_t witness_depth);
 
+	// helper functions
 	bool isAcceptingStateReachable(BuechiAutomata &automata,index_t currentAutomataState);
+	inline void get_next_transition(BuechiAutomata &automata, NetState &ns,
+			index_t* currentStateListEntry, index_t* currentFirelistEntry, index_t* currentFirelist,
+			index_t** currentStateList, index_t currentAutomataState);
+	inline void get_first_transition(NetState &ns,
+			index_t* currentFirelistEntry, index_t* currentFirelist);
 };

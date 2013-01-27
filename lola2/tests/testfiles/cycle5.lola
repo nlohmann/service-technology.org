@@ -39,6 +39,11 @@ TRANSITION t31m
 		s3m : 1;
 	PRODUCE
 		s1m : 1;
+TRANSITION t21m STRONG FAIR
+	CONSUME
+		s2m : 1;
+	PRODUCE
+		s1m : 1;
 		
 TRANSITION toMirror
 	CONSUME

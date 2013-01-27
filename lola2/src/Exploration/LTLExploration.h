@@ -88,10 +88,12 @@ private:
 			index_t currentAutomataState,  AutomataTree* targetPointer, dfsnum_t depth, dfsnum_t witness_depth);
 
 	// helper functions
-	bool isAcceptingStateReachable(BuechiAutomata &automata,index_t currentAutomataState);
+	bool isAcceptingLoopReachable(BuechiAutomata &automata,index_t currentAutomataState);
+	bool isStateReachable(BuechiAutomata &automata,index_t currentAutomataState, index_t targetState);
 	inline void get_next_transition(BuechiAutomata &automata, NetState &ns,
 			index_t* currentStateListEntry, index_t* currentFirelistEntry, index_t* currentFirelist,
-			index_t** currentStateList, index_t currentAutomataState);
-	inline void get_first_transition(NetState &ns,
-			index_t* currentFirelistEntry, index_t* currentFirelist);
+			index_t stateListLength,index_t currentAutomataState);
+	inline bool get_first_transition(NetState &ns, Firelist &firelist,BuechiAutomata &automata, index_t currentAutomataState,
+			index_t* currentFirelistEntry, index_t** currentFirelist,index_t* currentStateListEntry,
+			index_t* currentStateListLength, index_t** currentStateList);
 };

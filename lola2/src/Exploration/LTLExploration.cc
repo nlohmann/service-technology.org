@@ -679,6 +679,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 							if (!__enabled_weak[i])
 								fulfilled_conditions++,fulfilledWeak[i] = true;
 						// produce the witness path inside the SCC
+						//rep->message("%d = %d + %d + 1",fulfilled_conditions,assumptions.card_strong,assumptions.card_weak);
 						if (fulfilled_conditions == assumptions.card_strong + assumptions.card_weak + 1)
 							completeWitness(automata,store,firelist,ns,currentAutomataState,currentStateEntry,currentNextDepth-4, currentNextDepth);
 						else
@@ -776,7 +777,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 		Store<AutomataTree> &store, Firelist &firelist, NetState &ns) {
 	// XXX
 	//rep->message("Names %s %s %s, %s %s %s, %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3],Net::Name[PL][4],Net::Name[PL][5],Net::Name[PL][6]);
-	rep->message("Names %s %s %s %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3]);
+	//rep->message("Names %s %s %s %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3]);
 
 	// prepare strong fairness assumptions
 	assumptions.card_strong = 0;
@@ -1057,7 +1058,6 @@ void LTLExploration::completeWitness(BuechiAutomata &automata,
 	// XXX
 	//rep->message("==================== CW ===================");
 	//rep->message("ENTER: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
-	return;
 	// the stack for the search
 	SearchStack<LTLFairnessStackEntry> stack;
 	// get first firelist

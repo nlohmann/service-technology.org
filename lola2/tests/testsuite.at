@@ -53,6 +53,16 @@ AT_KEYWORDS(ltl)
 AT_CLEANUP
 
 
+AT_SETUP([2x3-Cycle + 1 strong fair (multiple SCC)])
+AT_CHECK([cp TESTFILES/cycle6.lola .])
+AT_CHECK([cp TESTFILES/simple.buechi .])
+AT_CHECK([LOLA cycle6.lola --formula='"FORMULA EVENTUALLY s4 = 1 ;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 7 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
 
 AT_SETUP([3-Cycle + 1 strong fair (formula)])
 AT_CHECK([cp TESTFILES/cycle3.lola .])

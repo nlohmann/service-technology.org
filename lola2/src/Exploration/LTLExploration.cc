@@ -58,8 +58,8 @@ inline bool LTLExploration::get_first_transition(NetState &ns, Firelist &firelis
 		// check whether this transition goes into an non forbidden state
 		//rep->message("current F(%s): %d %d %d, %d %d %d, %d",Net::Name[TR][(*currentFirelist)[*currentFirelistEntry]], ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6]);
 		bool forbidden = false;
-		for(index_t i = 0; i < card_forbidden_transtitions; i++)
-			if (ns.Enabled[forbidden_transtitions[i]]){
+		for(index_t i = 0; i < card_forbidden_transitions; i++)
+			if (ns.Enabled[forbidden_transitions[i]]){
 				//rep->message("FORBI %d %s", forbidden_transtitions[i], Net::Name[TR][forbidden_transtitions[i]]);
 				forbidden = true; break;
 			}
@@ -100,8 +100,8 @@ inline void LTLExploration::get_next_transition(BuechiAutomata &automata, NetSta
 			automata.updateProperties(ns, currentFirelist[*currentFirelistEntry]);
 			// check for forbidden transition
 			bool forbidden = false;
-			for(index_t i = 0; i < card_forbidden_transtitions; i++)
-				if (ns.Enabled[forbidden_transtitions[i]]){
+			for(index_t i = 0; i < card_forbidden_transitions; i++)
+				if (ns.Enabled[forbidden_transitions[i]]){
 					forbidden = true;
 					break;
 				}
@@ -245,8 +245,8 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
 				}
 				for (index_t i = 0; i < assumptions.card_strong; i++){
 					bool bad = false;
-					for(index_t j = 0; j < card_forbidden_transtitions; j++)
-						if (forbidden_transtitions[j] == i){
+					for(index_t j = 0; j < card_forbidden_transitions; j++)
+						if (forbidden_transitions[j] == i){
 							bad = true;
 							break;
 						}
@@ -309,8 +309,8 @@ bool LTLExploration::iterateSCC(BuechiAutomata &automata,
 	// current markings belongs to a new SCC
 	bool forbidden = false;
 	//rep->message("FB %d %d %d %d, %d", ns.Enabled[0], ns.Enabled[1], ns.Enabled[2], ns.Enabled[3], forbidden_transtitions[0]);
-	for(index_t i = 0; i < card_forbidden_transtitions; i++)
-		if (ns.Enabled[forbidden_transtitions[i]]){
+	for(index_t i = 0; i < card_forbidden_transitions; i++)
+		if (ns.Enabled[forbidden_transitions[i]]){
 			//Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
 			//Transition::revertEnabled(ns, currentFirelist[currentFirelistEntry]);
 			forbidden = true;
@@ -336,18 +336,18 @@ bool LTLExploration::iterateSCC(BuechiAutomata &automata,
 	index_t* currentStateList;
 	index_t currentStateListEntry, currentStateListLength;
 	// ignore forbidden ones
-	card_forbidden_transtitions--;
+	card_forbidden_transitions--;
 	get_first_transition(ns,firelist, automata, currentAutomataState,&currentFirelistEntry,&currentFirelist,&currentStateListEntry,&currentStateListLength, &currentStateList);
-	card_forbidden_transtitions++;
+	card_forbidden_transitions++;
 	// XXX
 
 
 	while (true) // exit when trying to pop from empty stack
 	{
 		// calculate the next transition
-		card_forbidden_transtitions--;
+		card_forbidden_transitions--;
 		get_next_transition(automata,ns,&currentStateListEntry,&currentFirelistEntry,currentFirelist,currentStateListLength,currentAutomataState);
-		card_forbidden_transtitions++;
+		card_forbidden_transitions++;
 
 		if (currentFirelistEntry != -1 && currentStateListEntry >= 0) {
 			// there is a next transition that needs to be explored in current marking
@@ -374,8 +374,8 @@ bool LTLExploration::iterateSCC(BuechiAutomata &automata,
 				if (nextStateEntry->dfs == -depth - 1){
 					// check forbidden transitions
 					forbidden = false;
-					for(index_t i = 0; i < card_forbidden_transtitions; i++)
-						if (ns.Enabled[forbidden_transtitions[i]]){
+					for(index_t i = 0; i < card_forbidden_transitions; i++)
+						if (ns.Enabled[forbidden_transitions[i]]){
 							forbidden = true;
 							break;
 						}
@@ -414,9 +414,9 @@ bool LTLExploration::iterateSCC(BuechiAutomata &automata,
 
 					currentStateEntry = nextStateEntry;
 
-					card_forbidden_transtitions--;
+					card_forbidden_transitions--;
 					get_first_transition(ns,firelist, automata, currentAutomataState,&currentFirelistEntry,&currentFirelist,&currentStateListEntry,&currentStateListLength, &currentStateList);
-					card_forbidden_transtitions++;
+					card_forbidden_transitions++;
 
 					if (currentFirelistEntry == -1) {
 						// firelist is empty, this node forms its own SCC, and is thus not important
@@ -703,7 +703,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 					if (checkResult != -2){
 						// if a strong fairness assumption is not fulfilled -> search smaller components
 						//rep->message("FORBID %d %d %s",card_forbidden_transtitions, assumptions.strong_fairness[checkResult], Net::Name[TR][assumptions.strong_fairness[checkResult]]);
-						forbidden_transtitions[card_forbidden_transtitions++] = assumptions.strong_fairness[checkResult];
+						forbidden_transitions[card_forbidden_transitions++] = assumptions.strong_fairness[checkResult];
 
 						// check for fairness via lichtenstein-pnueli
 						if (iterateSCC(automata, store, firelist, ns,
@@ -720,7 +720,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 							return true;
 						}
 						// the transition is not any more forbidden
-						--card_forbidden_transtitions;
+						--card_forbidden_transitions;
 					}
 				}
 			} else {
@@ -813,9 +813,9 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	}
 
 	// prepare forbidden transtitions
-	forbidden_transtitions = (index_t*) calloc(assumptions.card_strong, SIZEOF_BOOL);
+	forbidden_transitions = (index_t*) calloc(assumptions.card_strong, SIZEOF_INDEX_T);
 	//rep->message("FORB %x",forbidden_transtitions);
-	card_forbidden_transtitions = 0;
+	card_forbidden_transitions = 0;
 
 	// initialize the properties
 	automata.initProperties(ns);
@@ -871,7 +871,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	free(assumptions.weak_backlist);
 	free(assumptions.weak_fairness);
 	//rep->message("FORB %x",forbidden_transtitions);
-	free(forbidden_transtitions);
+	free(forbidden_transitions);
 
 	return result;
 }

@@ -61,9 +61,9 @@ public:
 private:
 
 	fairness_assumptions assumptions;
-	index_t* forbidden_transtitions;
+	index_t* forbidden_transitions;
 	bool* is_forbidden;
-	index_t card_forbidden_transtitions;
+	index_t card_forbidden_transitions;
 
 	dfsnum_t currentNextDepth;
 

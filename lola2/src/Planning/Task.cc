@@ -689,7 +689,9 @@ void Task::interpreteResult(bool* result)
 
 bool Task::hasWitness(bool result)
 {
-	if (formulaType == FORMULA_LTL)
+	if(ctlFormula)
+		return ctlExploration->witness.size();
+	if (bauto)
 		return !result;
 	return result;
 }

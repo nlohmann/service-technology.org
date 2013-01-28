@@ -21,9 +21,6 @@ Actual property is a parameter of the constructor
 
 
 class Firelist;
-//class Store;
-//class EmptyStore;
-
 
 /*!
 \author Karsten

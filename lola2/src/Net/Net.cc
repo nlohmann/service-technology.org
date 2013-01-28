@@ -70,29 +70,41 @@ bool Net::DEBUG__checkArcOrdering()
     index_t curElem;
     for (index_t t = 0; t < Net::Card[TR]; ++t)
     {
-        curElem = Net::Arc[TR][PRE][t][0];
-        for (index_t p = 1; p < Net::CardArcs[TR][PRE][t]; ++p)
-        {
-            assert(curElem < Net::Arc[TR][PRE][t][p]);
-        }
-        curElem = Net::Arc[TR][POST][t][0];
-        for (index_t p = 1; p < Net::CardArcs[TR][POST][t]; ++p)
-        {
-            assert(curElem < Net::Arc[TR][POST][t][p]);
-        }
+    	if(Net::CardArcs[TR][PRE][t])
+    	{
+			curElem = Net::Arc[TR][PRE][t][0];
+			for (index_t p = 1; p < Net::CardArcs[TR][PRE][t]; ++p)
+			{
+				assert(curElem < Net::Arc[TR][PRE][t][p]);
+			}
+    	}
+    	if(Net::CardArcs[TR][POST][t])
+    	{
+			curElem = Net::Arc[TR][POST][t][0];
+			for (index_t p = 1; p < Net::CardArcs[TR][POST][t]; ++p)
+			{
+				assert(curElem < Net::Arc[TR][POST][t][p]);
+			}
+    	}
     }
     for (index_t p = 0; p < Net::Card[PL]; ++p)
     {
-        curElem = Net::Arc[PL][PRE][p][0];
-        for (index_t t = 1; t < Net::CardArcs[PL][PRE][p]; ++t)
-        {
-            assert(curElem < Net::Arc[PL][PRE][p][t]);
-        }
-        curElem = Net::Arc[PL][POST][p][0];
-        for (index_t t = 1; t < Net::CardArcs[PL][POST][p]; ++t)
-        {
-            assert(curElem < Net::Arc[PL][POST][p][t]);
-        }
+    	if(Net::CardArcs[PL][PRE][p])
+    	{
+            curElem = Net::Arc[PL][PRE][p][0];
+            for (index_t t = 1; t < Net::CardArcs[PL][PRE][p]; ++t)
+            {
+                assert(curElem < Net::Arc[PL][PRE][p][t]);
+            }
+    	}
+    	if(Net::CardArcs[PL][POST][p])
+    	{
+			curElem = Net::Arc[PL][POST][p][0];
+			for (index_t t = 1; t < Net::CardArcs[PL][POST][p]; ++t)
+			{
+				assert(curElem < Net::Arc[PL][POST][p][t]);
+			}
+    	}
     }
     return true;
 }

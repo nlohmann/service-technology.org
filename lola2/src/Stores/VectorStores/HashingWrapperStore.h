@@ -10,12 +10,15 @@
 #include <Stores/VectorStores/VectorStore.h>
 #include <pthread.h>
 
+/// A VectorStoreCreator encapsulates a method that, when invoked, creates a new VectorStore.
+/// It is used by the HashingWrapperStore to create VectorStores for new hash buckets on demand.
 template<typename P>
 class VectorStoreCreator {
 public:
   virtual VectorStore<P>* operator() ( void ) const  = 0;
 };
 
+/// VectorStoreCreator implementation template for VectorStores with zero constructor arguments
 template<typename P,typename T>
 class NullaryVectorStoreCreator : public VectorStoreCreator<P> {
 public:
@@ -24,6 +27,7 @@ public:
   }
 };
 
+/// VectorStoreCreator implementation template for VectorStores with one constructor argument
 template<typename P,typename T,typename A1>
 class UnaryVectorStoreCreator : public VectorStoreCreator<P> {
   A1 arg1;
@@ -36,6 +40,7 @@ public:
   }
 };
 
+/// VectorStoreCreator implementation template for VectorStores with two constructor arguments
 template<typename P,typename T,typename A1,typename A2>
 class BinaryVectorStoreCreator : public VectorStoreCreator<P> {
 	  A1 arg1;
@@ -51,7 +56,8 @@ public:
 };
 
 
-
+/// A HashingWrapperStore provides a hash based bucketing mechanism and can be combined with any underlying VectorStore.
+/// It creates a fixed number of buckets, each with its own VectorStore, and redirects the incoming searchAndInsert calls to one of them depending on the hash value of the given NetState.
 template <typename T>
 class HashingWrapperStore : public VectorStore<T>
 {
@@ -78,7 +84,6 @@ private:
 
     VectorStoreCreator<T>* storeCreator;
 
-        // first branch in decision tree; NULL as long as less than two elements in bucket
     VectorStore<T>** buckets;
 
     // the read-write mutexes

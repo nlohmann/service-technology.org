@@ -774,9 +774,9 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 ///////////////////////////////////////////////////////////////////////////////
 bool LTLExploration::checkProperty(BuechiAutomata &automata,
 		Store<AutomataTree> &store, Firelist &firelist, NetState &ns) {
-
+	// XXX
 	//rep->message("Names %s %s %s, %s %s %s, %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3],Net::Name[PL][4],Net::Name[PL][5],Net::Name[PL][6]);
-	//rep->message("Names %s %s %s %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3]);
+	rep->message("Names %s %s %s %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3]);
 
 	// prepare strong fairness assumptions
 	assumptions.card_strong = 0;

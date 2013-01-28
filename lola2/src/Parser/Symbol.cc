@@ -34,6 +34,8 @@ void Symbol::setNext(Symbol* sym)
     next = sym;
 }
 
+#include <cstdio>
+
 /// Setter for index
 void Symbol::setIndex(index_t i)
 {

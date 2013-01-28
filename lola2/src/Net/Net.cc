@@ -18,7 +18,9 @@
 #include <Net/Place.h>
 #include <Net/Transition.h>
 #include <Parser/FairnessAssumptions.h>
+#include <Parser/ParserPTNet.h>
 #include <InputOutput/Reporter.h>
+#include <Parser/Symbol.h>
 
 
 extern Reporter* rep;
@@ -261,6 +263,8 @@ void Net::print()
     printf("done\n");
 }
 
+extern ParserPTNet* symbolTables;
+
 /*!
 \todo remove TargetMarking ?
 */
@@ -268,9 +272,17 @@ void Net::swapPlaces(index_t left, index_t right)
 {
     // 1. Net data structures
 
-    char* tempname = Net::Name[PL][left];
+	int ixdLeft = symbolTables->PlaceTable->lookup(Net::Name[PL][left])->getIndex();
+	symbolTables->PlaceTable->lookup(Net::Name[PL][left])->setIndex(symbolTables->PlaceTable->lookup(Net::Name[PL][right])->getIndex());
+	symbolTables->PlaceTable->lookup(Net::Name[PL][right])->setIndex(ixdLeft);
+
+
+	char* tempname = Net::Name[PL][left];
     Net::Name[PL][left] = Net::Name[PL][right];
     Net::Name[PL][right] = tempname;
+
+
+
     assert(DEBUG__checkConsistency());
 
     for (int direction = PRE; direction <= POST; ++direction)
@@ -1205,7 +1217,6 @@ void Net::preprocess_organizeConflictingTransitions() {
 
 /// assumes that raw net is read and places, transitions and the edges in-between are set properly. Computes additional net information used to speed up the simulation.
 void Net::preprocess() {
-
     const index_t cardPL = Net::Card[PL];
     const index_t cardTR = Net::Card[TR];
 
@@ -1297,5 +1308,3 @@ void Net::preprocess() {
         Transition::checkEnabled_Initial(t);
     }
 }
-
-

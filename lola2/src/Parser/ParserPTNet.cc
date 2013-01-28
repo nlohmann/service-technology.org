@@ -177,6 +177,7 @@ void ParserPTNet::symboltable2net()
         }
     }
 
+    //rep->message("Names %s %s %s %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3]);
     free(current_arc_pre);
     free(current_arc_post);
 

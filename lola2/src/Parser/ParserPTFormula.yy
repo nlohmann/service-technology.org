@@ -15,6 +15,7 @@
 #include <Parser/ArcList.h>
 #include <InputOutput/Reporter.h>
 #include <InputOutput/InputOutput.h>
+#include <Net/Net.h>
 
 #include <Parser/ast-system-k.h>
 #include <Parser/ast-system-yystype.h>

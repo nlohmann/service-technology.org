@@ -1,6 +1,93 @@
 AT_INIT
 AT_COLOR_TESTS
 
+
+
+############################################################################
+AT_BANNER([LTL])
+############################################################################
+
+AT_SETUP([3-Cycle])
+AT_CHECK([cp TESTFILES/cycle.lola .])
+AT_CHECK([cp TESTFILES/simple.buechi .])
+AT_CHECK([LOLA cycle.lola --buechi simple.buechi --check=modelchecking --store=stl --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 3 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+AT_SETUP([3-Cycle + 1 strong fair])
+AT_CHECK([cp TESTFILES/cycle2.lola .])
+AT_CHECK([cp TESTFILES/simple.buechi .])
+AT_CHECK([LOLA cycle2.lola --buechi simple.buechi --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 4 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+AT_SETUP([3-Cycle + 1 not strong fair])
+AT_CHECK([cp TESTFILES/cycle3.lola .])
+AT_CHECK([cp TESTFILES/simple.buechi .])
+AT_CHECK([LOLA cycle3.lola --buechi simple.buechi --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 4 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+AT_SETUP([3-Cycle + 1 strong fair (cmplx)])
+AT_CHECK([cp TESTFILES/cycle2.lola .])
+AT_CHECK([cp TESTFILES/cycleprop.buechi .])
+AT_CHECK([LOLA cycle2.lola --buechi cycleprop.buechi --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 4 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+AT_SETUP([2x3-Cycle + 1 strong fair (iterate SCC)])
+AT_CHECK([cp TESTFILES/cycle4.lola .])
+AT_CHECK([cp TESTFILES/simple.buechi .])
+AT_CHECK([LOLA cycle4.lola --formula='"FORMULA EVENTUALLY s4 = 1 ;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 7 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
+
+AT_SETUP([3-Cycle + 1 strong fair (formula)])
+AT_CHECK([cp TESTFILES/cycle3.lola .])
+AT_CHECK([LOLA cycle3.lola --formula='"FORMULA ALWAYS s4 = 0 OR EVENTUALLY s1 = 1;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 4 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
+AT_SETUP([3-Cycle (wrong formula)])
+AT_CHECK([cp TESTFILES/cycle.lola .])
+AT_CHECK([LOLA cycle.lola --formula='"FORMULA ALWAYS s1 = 0 AND EVENTUALLY s1 = 1;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 3 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
+AT_SETUP([2x3-Cycle + 1 strong fair (witness path)])
+AT_CHECK([cp TESTFILES/cycle5.lola .])
+AT_CHECK([cp TESTFILES/simple.buechi .])
+AT_CHECK([LOLA cycle5.lola --formula='"FORMULA EVENTUALLY s4 = 1 ;"' --check=modelchecking --store=prefix --encoder=bit --path -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 7 markings" stderr])
+AT_CHECK([GREP -q "lola: t23" stderr])
+AT_CHECK([GREP -q "lola: t31" stderr])
+AT_CHECK([GREP -q "lola: toMirror" stderr])
+AT_CHECK([GREP -q "lola: ===begin of cycle===" stderr])
+AT_CHECK([GREP -q "lola: t12m" stderr])
+AT_CHECK([GREP -q "lola: t21m" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
 ############################################################################
 AT_BANNER([Command-line parameters])
 ############################################################################
@@ -1160,90 +1247,6 @@ AT_CHECK([GREP -q -E "result: yes" stderr])
 AT_KEYWORDS(stubborn)
 AT_CLEANUP
 
-
-############################################################################
-AT_BANNER([LTL])
-############################################################################
-
-AT_SETUP([3-Cycle])
-AT_CHECK([cp TESTFILES/cycle.lola .])
-AT_CHECK([cp TESTFILES/simple.buechi .])
-AT_CHECK([LOLA cycle.lola --buechi simple.buechi --check=modelchecking --store=stl --encoder=bit -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_CHECK([GREP -q "lola: 3 markings" stderr])
-AT_KEYWORDS(ltl)
-AT_CLEANUP
-
-AT_SETUP([3-Cycle + 1 strong fair])
-AT_CHECK([cp TESTFILES/cycle2.lola .])
-AT_CHECK([cp TESTFILES/simple.buechi .])
-AT_CHECK([LOLA cycle2.lola --buechi simple.buechi --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_CHECK([GREP -q "lola: 4 markings" stderr])
-AT_KEYWORDS(ltl)
-AT_CLEANUP
-
-AT_SETUP([3-Cycle + 1 not strong fair])
-AT_CHECK([cp TESTFILES/cycle3.lola .])
-AT_CHECK([cp TESTFILES/simple.buechi .])
-AT_CHECK([LOLA cycle3.lola --buechi simple.buechi --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: no" stderr])
-AT_CHECK([GREP -q "lola: 4 markings" stderr])
-AT_KEYWORDS(ltl)
-AT_CLEANUP
-
-AT_SETUP([3-Cycle + 1 strong fair (cmplx)])
-AT_CHECK([cp TESTFILES/cycle2.lola .])
-AT_CHECK([cp TESTFILES/cycleprop.buechi .])
-AT_CHECK([LOLA cycle2.lola --buechi cycleprop.buechi --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_CHECK([GREP -q "lola: 4 markings" stderr])
-AT_KEYWORDS(ltl)
-AT_CLEANUP
-
-AT_SETUP([2x3-Cycle + 1 strong fair (iterate SCC)])
-AT_CHECK([cp TESTFILES/cycle4.lola .])
-AT_CHECK([cp TESTFILES/simple.buechi .])
-AT_CHECK([LOLA cycle4.lola --formula='"FORMULA EVENTUALLY s4 = 1 ;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: no" stderr])
-AT_CHECK([GREP -q "lola: 7 markings" stderr])
-AT_KEYWORDS(ltl)
-AT_CLEANUP
-
-
-
-AT_SETUP([3-Cycle + 1 strong fair (formula)])
-AT_CHECK([cp TESTFILES/cycle3.lola .])
-AT_CHECK([LOLA cycle3.lola --formula='"FORMULA ALWAYS s4 = 0 OR EVENTUALLY s1 = 1;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: no" stderr])
-AT_CHECK([GREP -q "lola: 4 markings" stderr])
-AT_KEYWORDS(ltl)
-AT_CLEANUP
-
-
-AT_SETUP([3-Cycle (wrong formula)])
-AT_CHECK([cp TESTFILES/cycle.lola .])
-AT_CHECK([LOLA cycle.lola --formula='"FORMULA ALWAYS s1 = 0 AND EVENTUALLY s1 = 1;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: no" stderr])
-AT_CHECK([GREP -q "lola: 3 markings" stderr])
-AT_KEYWORDS(ltl)
-AT_CLEANUP
-
-
-AT_SETUP([2x3-Cycle + 1 strong fair (witness path)])
-AT_CHECK([cp TESTFILES/cycle5.lola .])
-AT_CHECK([cp TESTFILES/simple.buechi .])
-AT_CHECK([LOLA cycle5.lola --formula='"FORMULA EVENTUALLY s4 = 1 ;"' --check=modelchecking --store=prefix --encoder=bit --path -v],0,stdout,stderr)
-AT_CHECK([GREP -q "lola: result: no" stderr])
-AT_CHECK([GREP -q "lola: 7 markings" stderr])
-AT_CHECK([GREP -q "lola: t23" stderr])
-AT_CHECK([GREP -q "lola: t31" stderr])
-AT_CHECK([GREP -q "lola: toMirror" stderr])
-AT_CHECK([GREP -q "lola: ===begin of cycle===" stderr])
-AT_CHECK([GREP -q "lola: t12m" stderr])
-AT_CHECK([GREP -q "lola: t21m" stderr])
-AT_KEYWORDS(ltl)
-AT_CLEANUP
 
 
 ############################################################################

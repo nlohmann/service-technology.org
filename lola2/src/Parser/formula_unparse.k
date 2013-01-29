@@ -12,6 +12,8 @@ Eventually(x) -> [out: "F (" x ")" ];
 Always(x)     -> [out: "G (" x ")" ];
 Until(phi,psi) -> [out: "(" phi " U " psi ")"];
 
+NextState(x) -> [out: "X (" x ")"];
+
 Negation(x) -> [out: "! (" x ")"];
 Conjunction(x, y) -> [out: "(" x " && " y ")"];
 Disjunction(x, y) -> [out: "(" x " || " y ")"];
@@ -814,7 +816,7 @@ ExPath(Eventually(x)) -> [ctl:
 //EX(x)
 ExPath(NextState(x)) -> [ctl:
 	{
-		//printf("CTL-ExPath_Next\n");
+		//printf("CTL-ExPath_NextState\n");
         ctl_id_stack.push(ctl_nextId++);
     }
 	x

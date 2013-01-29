@@ -134,7 +134,6 @@ AT_CHECK([GREP -q "lola: 7 markings" stderr])
 AT_KEYWORDS(ctl)
 AT_CLEANUP
 
-
 AT_SETUP([2x3-Cycle + 1 strong fair (witness path)])
 AT_CHECK([cp TESTFILES/LTL/cycle5.lola .])
 AT_CHECK([LOLA cycle5.lola --formula='"FORMULA EXPATH ALWAYS s4 = 0;"' --check=modelchecking --store=prefix --encoder=bit --path -v],0,stdout,stderr)
@@ -145,6 +144,42 @@ AT_CHECK([GREP -q "lola: t31" stderr])
 AT_CHECK([GREP -q "lola: toMirror" stderr])
 AT_CHECK([GREP -q "lola: t12m" stderr])
 AT_CHECK([GREP -q "lola: t21m" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([AU and AX on phils5])
+AT_CHECK([cp TESTFILES/CTL/phils-AX.task .])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula=phils-AX.task --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([AU and EX on phils5])
+AT_CHECK([cp TESTFILES/CTL/phils-EX.task .])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula=phils-EX.task --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 242 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([EU + Conjunction on phils5])
+AT_CHECK([cp TESTFILES/CTL/phils-TemporalConjunction.task .])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula=phils-TemporalConjunction.task --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 78 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([EU + Disjunction on phils5])
+AT_CHECK([cp TESTFILES/CTL/phils-TemporalDisjunction.task .])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula=phils-TemporalDisjunction.task --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 39 markings" stderr])
 AT_KEYWORDS(ctl)
 AT_CLEANUP
 

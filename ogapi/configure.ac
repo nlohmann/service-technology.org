@@ -27,7 +27,7 @@ AC_PATH_PROG(WENDY2FIONA, [wendy2fiona], not found)
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_ERROR([cannot use required functions]))
 
 AC_CONFIG_FILES([Makefile
-                 src/productOG/Makefile src/minimize/Makefile
+                 src/productOG/Makefile src/minimize/Makefile src/validSubGraphs/Makefile
                  tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

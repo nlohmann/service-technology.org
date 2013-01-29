@@ -1,0 +1,53 @@
+PLACE SAFE 1:
+	s1,
+	s1m,
+	s2,
+	s2m,
+	s3,
+	s3m,
+	s4;
+MARKING
+	s2 : 1;
+TRANSITION t12
+	CONSUME
+		s1 : 1;
+	PRODUCE
+		s2 : 1;
+TRANSITION t23
+	CONSUME
+		s2 : 1;
+	PRODUCE
+		s3 : 1;
+TRANSITION t31
+	CONSUME
+		s3 : 1;
+	PRODUCE
+		s1 : 1;
+
+TRANSITION t12m
+	CONSUME
+		s1m : 1;
+	PRODUCE
+		s2m : 1;
+TRANSITION t23m
+	CONSUME
+		s2m : 1;
+	PRODUCE
+		s3m : 1;
+TRANSITION t31m
+	CONSUME
+		s3m : 1;
+	PRODUCE
+		s1m : 1;
+
+TRANSITION toMirror
+	CONSUME
+		s1 : 1;
+	PRODUCE
+		s1m : 1;
+
+TRANSITION f STRONG FAIR
+	CONSUME
+		s3m : 1;
+	PRODUCE
+		s4 : 1;

@@ -69,7 +69,7 @@ inline bool LTLExploration::get_first_transition(NetState &ns, Firelist &firelis
 		Transition::revertEnabled(ns,(*currentFirelist)[*currentFirelistEntry]);
 		if (--(*currentFirelistEntry) == -1) break;
 	}
-	if (!deadlock && *currentFirelistEntry != -1){
+	if (*currentFirelistEntry != -1){
 		//rep->message("UPDATE");
 		automata.updateProperties(ns, (*currentFirelist)[*currentFirelistEntry]);
 	}
@@ -353,7 +353,6 @@ bool LTLExploration::iterateSCC(BuechiAutomata &automata,
 			// there is a next transition that needs to be explored in current marking
 
 			// fire this transition to produce new Marking::Current
-			//Transition::fire(ns, currentFirelist[currentFirelistEntry]);
 
 			// search in the store
 			AutomataTree* searchResult;
@@ -452,13 +451,6 @@ bool LTLExploration::iterateSCC(BuechiAutomata &automata,
 			stack.pop();
 
 			assert(currentFirelistEntry < Net::Card[TR]);
-			// revert the petrinet
-			//Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
-			//Transition::revertEnabled(ns,
-			//		currentFirelist[currentFirelistEntry]);
-			//automata.revertProperties(ns,
-			//		currentFirelist[currentFirelistEntry]);
-			// revert the buechi automata
 			currentAutomataState = currentStateList[currentStateListEntry];
 		}
 	}
@@ -830,8 +822,8 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	currentNextDepth = 4;
 
 	// iterate over all possible initial states
-	index_t* currentStateList;
-	index_t stateListLenght = automata.getSuccessors(&currentStateList, currentAutomataState);
+	//index_t* currentStateList;
+	//index_t stateListLenght = automata.getSuccessors(&currentStateList, currentAutomataState);
 
 	bool result = false;
 	/*for (index_t i = 0 ; i < stateListLenght; i++){
@@ -1148,12 +1140,17 @@ bool LTLExploration::isAcceptingLoopReachable(BuechiAutomata &automata,index_t c
 		for (index_t i = 0; i < cardNext; i++)
 			if (!visitedStates[nextStates[i]]){
 				if (automata.isStateAccepting[nextStates[i]])
-					if (isStateReachable(automata,currentAutomataState,nextStates[i]))
+					if (isStateReachable(automata,currentAutomataState,nextStates[i])){
+						delete[] visitedStates;
+						delete[] stateQueue;
 						return true;
+					}
 				visitedStates[nextStates[i]] = true;
 				stateQueue[currentNext++] = nextStates[i];
 			}
 	}
+	delete[] visitedStates;
+	delete[] stateQueue;
 	return false;
 }
 
@@ -1172,10 +1169,16 @@ bool LTLExploration::isStateReachable(BuechiAutomata &automata,index_t currentAu
 		index_t cardNext = automata.getSuccessors(&nextStates, stateQueue[currentBegin++]);
 		for (index_t i = 0; i < cardNext; i++)
 			if (!visitedStates[nextStates[i]]){
-				if (nextStates[i] == targetState) return true;
+				if (nextStates[i] == targetState){
+					delete[] visitedStates;
+					delete[] stateQueue;
+					return true;
+				}
 				visitedStates[nextStates[i]] = true;
 				stateQueue[currentNext++] = nextStates[i];
 			}
 	}
+	delete[] visitedStates;
+	delete[] stateQueue;
 	return false;
 }

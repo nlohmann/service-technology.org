@@ -37,10 +37,12 @@ AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k)
     cardPos = p;
     cardNeg = n;
     threshold = k;
+    original = true;
 }
 
 AtomicStatePredicate::~AtomicStatePredicate()
 {
+	if (!original) return;
     free(posPlaces);
     free(negPlaces);
     free(posMult);
@@ -266,5 +268,6 @@ StatePredicate* AtomicStatePredicate::copy(StatePredicate* parent)
     af->sum = sum;
     af->up = up;
     af->cardUp = cardUp;
+    af->original = false;
     return af;
 }

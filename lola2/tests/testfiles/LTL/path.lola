@@ -1,0 +1,17 @@
+PLACE SAFE 1:
+	s1,
+	s2,
+	s3,
+	s4;
+MARKING
+	s2 : 1;
+TRANSITION t23
+	CONSUME
+		s2 : 1;
+	PRODUCE
+		s3 : 1;
+TRANSITION t34
+	CONSUME
+		s3 : 1;
+	PRODUCE
+		s4 : 1;

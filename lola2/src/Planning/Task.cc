@@ -362,7 +362,9 @@ void Task::setFormula()
     			bauto->transitions[curState][0] = (uint32_t*)calloc(2, sizeof(uint32_t));
     			bauto->transitions[curState][0][0] = neededProperties.size();
     			bauto->transitions[curState][0][1] = curState;
+    			curProperty++;
     			neededProperties.push_back(new TruePredicate());
+    			neededProperties_backmap[neededProperties.back()] =curState;
     			continue;
     		}
     		if (s->final == accepting_state)
@@ -395,6 +397,7 @@ void Task::setFormula()
     					disjucntion->addSub(i,disjunctionproperty[i]);
     				neededProperties.push_back(disjucntion);
     			}
+    			//rep->message("CREATE %d -> %d", neededProperties.size(), curState);
     			neededProperties_backmap[neededProperties.back()] =curState;
 
     			// increment number of transitions
@@ -410,7 +413,7 @@ void Task::setFormula()
     			//rep->message("Transition %d -> %d", curState, state_id[t->to->final][t->to->id]);
     			bauto->transitions[curState][current_on_trans][0] = curProperty++;
     			bauto->transitions[curState][current_on_trans][1] = state_id[t->to->final][t->to->id];
-    			//bauto->atomicPropotions_backlist[neededProperties.size()] = curState;
+    			//rep->message("FROM TO %d %d", curState, state_id[t->to->final][t->to->id]);
     		}
     	}
 
@@ -424,6 +427,7 @@ void Task::setFormula()
     	bauto->atomicPropotions_backlist = (index_t*)calloc(bauto->cardAtomicPropositions, SIZEOF_INDEX_T);
     	for (int i = 0; i < neededProperties.size(); i++){
     		bauto->atomicPropositions[i] = new StatePredicateProperty(neededProperties[i]);
+    		//rep->message("BL %d %d", i, neededProperties_backmap[neededProperties[i]]);
     		bauto->atomicPropotions_backlist[i] = neededProperties_backmap[neededProperties[i]];
     	}
 

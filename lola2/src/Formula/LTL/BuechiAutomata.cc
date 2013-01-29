@@ -11,31 +11,37 @@ int BuechiAutomata::getSuccessors(index_t** list,
 	*list = new index_t[cardEnabled[currentState]];
 	int curCard = 0;
 
-	//rep->message("BEGIN");
+	//rep->message("SIZE %d (curState %d)",cardEnabled[currentState], currentState);
 	for (int i = 0; i < cardTransitionList; i++){
 		//rep->message("checking %d (%d) -> %d",currentState, atomicPropositions[transitionsList[i][0]]->getPredicate()->value,transitionsList[i][1]);
 		if (atomicPropositions[transitionsList[i][0]]->getPredicate()->value){
-			//rep->message("List %d",transitionsList[i][1]);
+			//rep->message("NOW PROP %d (p:%d)--> TRUE",i,atomicPropositions[transitionsList[i][0]]);
+			//rep->message("List %d = %d",curCard,transitionsList[i][1]);
 			(*list)[curCard++] = transitionsList[i][1];
-		}
+		} //else
+		//	rep->message("NOW PROP %d --> FALSE",i);
 	}
 	//rep->message("END");
 	return curCard;
 }
 
 void BuechiAutomata::updateProperties(NetState &ns, index_t transition) {
+	//rep->message("UPDATE");
 	for (int i = 0; i < cardStates; i++)
 		cardEnabled[i] = 0;
 	for (int i = 0; i < cardAtomicPropositions; i++)
-		if(atomicPropositions[i]->checkProperty(ns, transition))
+		if(atomicPropositions[i]->checkProperty(ns, transition)){
+			//rep->message("CHECK PROP %d (s = %d, p:%d) --> TRUE",i,atomicPropotions_backlist[i],atomicPropositions[i]);
 			cardEnabled[atomicPropotions_backlist[i]] ++;
+		} //else
+			//rep->message("CHECK PROP %d (s = %d, p:%d)--> FALSE",i,atomicPropotions_backlist[i],atomicPropositions[i]);
 }
 
 void BuechiAutomata::initProperties(NetState &ns) {
+	//rep->message("INIT");
 	for (int i = 0; i < cardAtomicPropositions; i++){
 		//rep->message("INIT %d",i);
 		if (atomicPropositions[i]->initProperty(ns)){
-
 			cardEnabled[atomicPropotions_backlist[i]]++;
 			//rep->message("TRUE %d",cardEnabled[atomicPropotions_backlist[i]]);
 		} //else
@@ -44,6 +50,7 @@ void BuechiAutomata::initProperties(NetState &ns) {
 }
 
 void BuechiAutomata::revertProperties(NetState &ns, index_t transition) {
+	//rep->message("REVERT");
 	for (int i = 0; i < cardStates; i++)
 		cardEnabled[i] = 0;
 	for (int i = 0; i < cardAtomicPropositions; i++)
@@ -71,6 +78,7 @@ BuechiAutomata::~BuechiAutomata(){
 
 	free(cardTransitions);
 	free(isStateAccepting);
+	free(atomicPropotions_backlist);
 }
 
 

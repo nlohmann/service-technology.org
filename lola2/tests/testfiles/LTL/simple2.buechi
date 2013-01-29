@@ -1,0 +1,8 @@
+buechi {
+bad :
+  s1 > 0 => good
+  s4 = 0 => bad,
+good :
+  s4 = 0 => good
+}
+accept { good } ;

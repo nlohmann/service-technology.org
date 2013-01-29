@@ -24,8 +24,8 @@ TESTFILES = Kanban5.pnml.lola Kanban5.5safe.pnml.lola 4state.lola \
             phils5.lola phils10.lola phils1000.lola phils10000.lola \
             syntax_min.lola syntax_full.lola syntax_utf8.lola \
             test_significant.lola philsinitial.task philsunsat.task \
-	    	m.lola philpos.task planner.lola cycle.lola cycle2.lola cycle3.lola\
-	    	cycle4.lola cycle5.lola cycle6.lola simple.buechi cycleprop.buechi
+	    	m.lola philpos.task planner.lola LTL/cycle.lola LTL/cycle2.lola LTL/cycle3.lola\
+	    	LTL/cycle4.lola LTL/cycle5.lola LTL/cycle6.lola LTL/simple.buechi LTL/cycleprop.buechi
 	    
 
 

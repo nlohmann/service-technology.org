@@ -80,6 +80,9 @@ public:
     /// The size of the up set
     index_t cardUp;
 
+    /// if true, this is an original property an not a copy, thus it has to free the arrays on the free command
+    bool original;
+
     /// counts atomic subformulas
     virtual index_t countAtomic();
 

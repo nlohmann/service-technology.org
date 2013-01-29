@@ -1,4 +1,4 @@
-SUBDIRS = src/productOG src/minimize tests
+SUBDIRS = src/productOG src/minimize src/validSubGraphs tests
 
 # tell aclocal about the macros in the "m4" folder
 ACLOCAL_AMFLAGS = -I m4 --install

@@ -1,0 +1,22 @@
+buechi { /* whenever fork1 is taken it should eventually be released */
+start:
+  fo.1 = 0 => taken
+  fo.1 = 1 => released
+  fo.1 = 1 => nevertaken,
+
+nevertaken:
+  fo.1 = 1 => nevertaken
+  fo.1 = 0 => refuse,
+  
+refuse:
+  TRUE => refuse,
+
+taken:
+  fo.1 = 1 => released
+  fo.1 = 0 => taken,
+
+released:
+  fo.1 = 0 => taken
+  fo.1 = 1 => released
+}
+accept { nevertaken, released };

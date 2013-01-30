@@ -1,0 +1,10 @@
+buechi {
+hungry:
+  ea.1 = 1 => eating
+  ea.1 = 0 => hungry,
+
+eating:
+  ea.1 = 1 => eating
+  ea.1 = 0 => hungry,
+}
+accept { eating };

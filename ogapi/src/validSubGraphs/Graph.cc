@@ -63,18 +63,17 @@ AssignCount Graph::countFromNode(Node *node) {//, Node *from) {
 	if (node->isActive) {
 		// the last edge would lead to a cycle, return 1
 		result.multiply = 1;
+//	} else if (node->subgraphcount != -1) {// && node->visitedBy.node == from) {
+////		++(node->visitedBy.count);
+//		result.multiply = node->subgraphcount;
 
-//	} else if (node->visitedBy.node != NULL && node->visitedBy.node != from) {
+//	} else if (node->visitedBy.node != NULL) {
 //		if (node->formula->hasFinal()) {
 //			result.add = (node->subgraphcount-1) * wasVisitedByNode(node, from);
 //		} else {
 //			result.add = (node->subgraphcount) * wasVisitedByNode(node, from);
 //		}
-//		return result;
 
-	} else if (node->subgraphcount != -1) {// && node->visitedBy.node == from) {
-//		++(node->visitedBy.count);
-		result.multiply = node->subgraphcount;
 	} else {
 		// this is a new node for the current search path
 		node->isActive = true;

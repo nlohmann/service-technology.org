@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
   status("counting valid subgraphs...");
   int count = G.countValidSubgraphs();
-  message("upper bound: %i valid subgraphs.", count);
+  message("overapproximation: %i valid subgraphs.", count);
 
 //  // dot output
 //  if (args_info.output_given) {

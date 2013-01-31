@@ -695,8 +695,11 @@ bool Task::hasWitness(bool result)
 {
 	if(ctlFormula)
 		return ctlExploration->witness.size();
-	if (bauto)
-		return !result;
+	if (bauto){
+		if (args_info.formula_given)
+			return !result;
+		return result;
+	}
 	return result;
 }
 

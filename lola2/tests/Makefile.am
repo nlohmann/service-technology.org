@@ -22,10 +22,12 @@
 TESTFILES = Kanban5.pnml.lola Kanban5.5safe.pnml.lola 4state.lola \
             eratosthenes-020.pnml.lola garavel.lola garavel.task process.lola \
             phils5.lola phils10.lola phils1000.lola phils10000.lola \
+            phils5dld.lola \
             syntax_min.lola syntax_full.lola syntax_utf8.lola \
             test_significant.lola philsinitial.task philsunsat.task \
 	    	m.lola philpos.task planner.lola LTL/cycle.lola LTL/cycle2.lola LTL/cycle3.lola\
 	    	LTL/cycle4.lola LTL/cycle5.lola LTL/cycle6.lola LTL/simple.buechi LTL/cycleprop.buechi\
+	    	LTL/phils5dld.buechi \
 	    	CTL/phils-AX.task CTL/phils-EX.task CTL/phils-TemporalConjunction.task\
 	    	CTL/phils-TemporalDisjunction.task
 	    

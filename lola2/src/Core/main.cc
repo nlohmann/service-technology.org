@@ -271,7 +271,7 @@ int main(int argc, char** argv)
         }
 
         // print witness path
-        if (task.hasWitness(result) and args_info.path_given)
+        if (args_info.path_given and task.hasWitness(result))
         {
             task.printWitness();
         }

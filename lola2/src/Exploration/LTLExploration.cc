@@ -635,8 +635,8 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 					// mark all states as visited
 					tarjanStack.top()->dfs = -currentNextDepth;
 					// check whether is state is an accepting one
-					foundcounterexample |= automata.isAcceptingState(
-							tarjanStack.top()->state);
+					foundcounterexample |= automata.isAcceptingState(tarjanStack.top()->state);
+					//if (automata.isAcceptingState(tarjanStack.top()->state)) rep->message("FOUND STATE @ %x %d",tarjanStack.top(),tarjanStack.top()->state);
 					tarjanStack.pop();
 				}
 
@@ -902,7 +902,7 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 		dfsnum_t depth, dfsnum_t witness_depth, bool* fulfilled_weak, bool* fulfilled_strong,
 		index_t fulfilled_conditions, bool acceptingStateFound, AutomataTree* targetPointer) {
 	// XXX
-	//rep->message("==================== PW =================== %d", fulfilled_conditions);
+	//rep->message("==================== PW =================== %d (%d)", fulfilled_conditions,acceptingStateFound);
 	// the stack for the search
 	SearchStack<LTLStackEntry> stack;
 	// get first firelist
@@ -912,7 +912,6 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 	index_t* currentStateList;
 	index_t currentStateListEntry,currentStateListLength;
 	get_first_transition(ns,firelist,automata, currentAutomataState,&currentFirelistEntry,&currentFirelist,&currentStateListEntry,&currentStateListLength, &currentStateList);
-
 
 	while (true) // exit when trying to pop from empty stack
 	{
@@ -952,14 +951,13 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 				}
 
 				// new to this search
-				if (nextStateEntry->dfs == - depth - 1 || nextStateEntry->dfs != - witness_depth - 1){
+				if (nextStateEntry->dfs != - witness_depth){
 					// check for possible new assumptions to be fulfilled
 					bool* __enabled_weak = (bool*) calloc(assumptions.card_weak,SIZEOF_BOOL);
 					for (index_t i = 0; i <= currentFirelistEntry; i++)
 						if (assumptions.weak_backlist[currentFirelist[i]] != -1)
 							__enabled_weak[assumptions.weak_backlist[currentFirelist[i]]] = true;
 					// check for newly fulfilled conditions
-					bool newly_fulfilled = false;
 					for (index_t i = 0; i < assumptions.card_weak; i++)
 						if (!__enabled_weak[i] && !fulfilled_weak[i]) {
 								fulfilled_weak[i] = true;
@@ -971,7 +969,6 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 						acceptingStateFound = true; fulfilled_conditions++; newly_fulfilled = true;
 					}
 				}
-
 				// more fairness assumptions are fulfilled
 				if (newly_fulfilled){
 					// if everything is fulfilled search for the begin of the SCC and finish
@@ -994,7 +991,7 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 					return;
 				}
 				// nothing newly fulfilled
-				if (nextStateEntry->dfs == - depth - 1 || nextStateEntry->dfs != - witness_depth){
+				if (nextStateEntry->dfs != - witness_depth){
 					// switch to next state
 					currentAutomataState = currentStateList[currentStateListEntry];
 					// mark new state as visited

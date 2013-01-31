@@ -64,6 +64,7 @@ AssignCount Graph::countFromNode(Node *node, Node *from) {
 		// the last edge would lead to a cycle, return 1
 		result.multiply = 1;
 	} else if (node->visitedBy.find(from) != node->visitedBy.end()) {
+		// we have already calculated the result from here!
 		++(node->visitedBy[from].count);
 		result.multiply = node->visitedBy[from].subgraphcount;
 

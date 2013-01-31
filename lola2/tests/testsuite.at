@@ -193,6 +193,15 @@ AT_CHECK([GREP -q "lola: 78 markings" stderr])
 AT_KEYWORDS(ctl)
 AT_CLEANUP
 
+AT_SETUP([EU + Conjunction on phils5dld])
+AT_CHECK([cp TESTFILES/CTL/phils-TemporalConjunction.task .])
+AT_CHECK([cp TESTFILES/phils5dld.lola .])
+AT_CHECK([LOLA phils5dld.lola --formula=phils-TemporalConjunction.task --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 78 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
 AT_SETUP([EU + Disjunction on phils5])
 AT_CHECK([cp TESTFILES/CTL/phils-TemporalDisjunction.task .])
 AT_CHECK([cp TESTFILES/phils5.lola .])

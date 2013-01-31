@@ -107,6 +107,15 @@ AT_CHECK([GREP -q "lola: 242 markings" stderr])
 AT_KEYWORDS(ltl)
 AT_CLEANUP
 
+AT_SETUP([Phils5 Deadlock-free (fork 1 will be used)])
+AT_CHECK([cp TESTFILES/phils5dld.lola .])
+AT_CHECK([cp TESTFILES/LTL/fork1.buechi .])
+AT_CHECK([LOLA --check=modelchecking --buechi fork1.buechi phils5dld.lola -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 242 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([CTL])

@@ -59,19 +59,6 @@ Output* markingoutput = NULL;
 /// a variable holding the time of the call
 clock_t start_clock = clock();
 
-
-///// replace one occurrence of a substring in a string
-//std::string replaceOnce(std::string result, const std::string& replaceWhat,
-//                        const std::string& replaceWithWhat) {
-//    const size_t pos = result.find(replaceWhat);
-//    if (pos == std::string::npos) {
-//        return result;
-//    }
-//    result.replace(pos, replaceWhat.size(), replaceWithWhat);
-//    return result;
-//}
-
-
 /// check if a file exists and can be opened for reading
 inline bool fileExists(const std::string& filename) {
     std::ifstream tmp(filename.c_str(), std::ios_base::in);

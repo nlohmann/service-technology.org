@@ -48,9 +48,9 @@ class Graph {
         int countValidSubgraphs();
 
         /// help function
-        AssignCount countFromNode(Node *node);//, Node *from);
+        AssignCount countFromNode(Node *node, Node *from);
 
-//        int wasVisitedByNode(Node *node, Node *from);
+        int wasVisitedByNode(Node *node, Node *from);
 
     private:
         /// input check

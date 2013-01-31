@@ -9,10 +9,12 @@
 
 class Node;
 
-typedef struct nodecount {
-	Node* node;
+typedef struct {
 	int count;
-} NodeAndCount;
+	int subgraphcount;
+} Sub;
+
+typedef std::map<Node*, Sub> VisitedByNodes;
 
 class Node {
     private:        
@@ -32,10 +34,10 @@ class Node {
         /// is the node in the current search path?
         bool isActive;
 
-        int subgraphcount;
+//        int subgraphcount;
 
         ///
-        NodeAndCount visitedBy;
+        VisitedByNodes visitedBy;
 
         std::map<std::string, int > labelmap;
 

@@ -13,9 +13,7 @@ using std::vector;
 
 /// constructors
 Node::Node(unsigned int _id, Formula *_formula) :
-    sat(NULL), id(_id), formula(_formula), isActive(false), subgraphcount(-1) {
-		visitedBy.node = NULL;
-		visitedBy.count = 0;
+    sat(NULL), id(_id), formula(_formula), isActive(false) {
         outEdges.clear();
     }
 

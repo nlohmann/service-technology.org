@@ -36,7 +36,7 @@ void Graph::addNode(Node *n) {
 }
 
 int Graph::countValidSubgraphs() {
-	AssignCount result = countFromNode(root);//, NULL);
+	AssignCount result = countFromNode(root, NULL);
 	return result.multiply;
 }
 
@@ -57,15 +57,15 @@ int Graph::countValidSubgraphs() {
 //	return -1;
 //}
 
-AssignCount Graph::countFromNode(Node *node) {//, Node *from) {
+AssignCount Graph::countFromNode(Node *node, Node *from) {
 
 	AssignCount result = {0,0};
 	if (node->isActive) {
 		// the last edge would lead to a cycle, return 1
 		result.multiply = 1;
-//	} else if (node->subgraphcount != -1) {// && node->visitedBy.node == from) {
-////		++(node->visitedBy.count);
-//		result.multiply = node->subgraphcount;
+	} else if (node->visitedBy.find(from) != node->visitedBy.end()) {
+		++(node->visitedBy[from].count);
+		result.multiply = node->visitedBy[from].subgraphcount;
 
 //	} else if (node->visitedBy.node != NULL) {
 //		if (node->formula->hasFinal()) {
@@ -77,8 +77,7 @@ AssignCount Graph::countFromNode(Node *node) {//, Node *from) {
 	} else {
 		// this is a new node for the current search path
 		node->isActive = true;
-//		node->visitedBy.node = from;
-//		node->visitedBy.count = 1;
+		node->visitedBy[from].count = 1;
 
 		Assignments *assigns = node->Sat();
 
@@ -100,7 +99,7 @@ AssignCount Graph::countFromNode(Node *node) {//, Node *from) {
 					// \todo: only one successor per output label!!!!
 					status("node id: %i, assignment: %i, label: %s, starting...", node->id, counter, itLabel->c_str());
 					// if the function returns '0' (no possible subgraphs) then temp gets the value '0'
-					temp2 = countFromNode(*(node->outEdges[*itLabel].begin()));//, node);
+					temp2 = countFromNode(*(node->outEdges[*itLabel].begin()), node);
 
 					temp.multiply *= temp2.multiply;
 //					temp.add += temp2.add;
@@ -124,7 +123,7 @@ AssignCount Graph::countFromNode(Node *node) {//, Node *from) {
 			result.multiply *= 2;
 		}
 
-		node->subgraphcount = result.multiply;
+		node->visitedBy[from].subgraphcount = result.multiply;
 		node->isActive = false;
 	}
 

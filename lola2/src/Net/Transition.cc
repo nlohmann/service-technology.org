@@ -295,6 +295,7 @@ bool Transition::isCycle(NetState &ns, index_t t){
 /// update enabledness information after having fired a transition
 void Transition::updateEnabled(NetState &ns, index_t t)
 {
+	//rep->message("UE %d",t);
     // 1. check conflicting enabled transitions (tt) for enabledness
     for (index_t i = 0; i < Transition::CardConflicting[t]; i++)
     {
@@ -351,6 +352,7 @@ void Transition::backfire(NetState &ns, index_t t)
 /// update enabledness after having backfired a transition
 void Transition::revertEnabled(NetState &ns, index_t t)
 {
+	//rep->message("RE %d",t);
     // 1. check backward conflicting enabled transitions for enabledness
     for (index_t i = 0; i < Transition::CardBackConflicting[t]; i++)
     {

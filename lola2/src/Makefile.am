@@ -67,7 +67,7 @@ lola_SOURCES = \
                 Formula/LTL/generalized.c Formula/LTL/cache.c Formula/LTL/lex.c \
                 Formula/LTL/rewrt.c Formula/LTL/parse.c \
                 Formula/CTL/CTLFormula.h \
-                Formula/CTL/DFSFormula.h Formula/CTL/DFSFormula.cpp \
+                Formula/CTL/DFSFormula.h \
                 Formula/CTL/ConjunctionFormula.h \
                 Formula/CTL/DisjunctionFormula.h \
                 Formula/CTL/NotFormula.h \

@@ -45,7 +45,7 @@ class Graph {
         void addNode(Node *n);
 
         /// count the valid subgraphs of the given OG
-        int countValidSubgraphs();
+        unsigned int countValidSubgraphs();
 
         /// help function
         AssignCount countFromNode(Node *node, Node *from);

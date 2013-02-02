@@ -35,7 +35,7 @@ void Graph::addNode(Node *n) {
     nodes[n->id] = n;
 }
 
-int Graph::countValidSubgraphs() {
+unsigned int Graph::countValidSubgraphs() {
 	AssignCount result = countFromNode(root, NULL);
 	return result.multiply;
 }
@@ -59,7 +59,8 @@ int Graph::countValidSubgraphs() {
 
 AssignCount Graph::countFromNode(Node *node, Node *from) {
 
-	AssignCount result = {0,0};
+	AssignCount result;
+	result.multiply = 0;
 	if (node->isActive) {
 		// the last edge would lead to a cycle, return 1
 		result.multiply = 1;
@@ -67,6 +68,9 @@ AssignCount Graph::countFromNode(Node *node, Node *from) {
 		// we have already calculated the result from here!
 		++(node->visitedBy[from].count);
 		result.multiply = node->visitedBy[from].subgraphcount;
+//	} else if (!node->visitedBy.empty()) {
+		// \todo: further requirements...
+
 
 //	} else if (node->visitedBy.node != NULL) {
 //		if (node->formula->hasFinal()) {
@@ -89,38 +93,38 @@ AssignCount Graph::countFromNode(Node *node, Node *from) {
 
 			if (it->empty()) {
 				// formula contains final or true
-				status("node id: %i, assignment: %i, final or true, done!", node->id, counter);
-				status("...added 1 to %i possibilities.", result.multiply);
+				status("node id: %u, assignment: %u, final or true, done!", node->id, counter);
+				status("...added 1 to %u possibilities.", result.multiply);
 				++result.multiply;
 			} else {
-				AssignCount temp = {1,0};
+				AssignCount temp;
+				temp.multiply = 1;
 				// iterate through the labels in the current assignment
 				for (std::vector<std::string>::const_iterator itLabel = it->begin(); itLabel != it->end(); ++itLabel) {
-					AssignCount temp2 = {1,0};
 					// \todo: only one successor per output label!!!!
-					status("node id: %i, assignment: %i, label: %s, starting...", node->id, counter, itLabel->c_str());
+					status("node id: %u, assignment: %u, label: %s, starting...", node->id, counter, itLabel->c_str());
 					// if the function returns '0' (no possible subgraphs) then temp gets the value '0'
-					temp2 = countFromNode(*(node->outEdges[*itLabel].begin()), node);
+					AssignCount temp2 = countFromNode(*(node->outEdges[*itLabel].begin()), node);
 
 					temp.multiply *= temp2.multiply;
-//					temp.add += temp2.add;
+//					temp.add += temp2.add; // \todo
 
-					status("node id: %i, assignment: %i, label: %s, done!", node->id, counter, itLabel->c_str());
+					status("node id: %u, assignment: %u, label: %s, done!", node->id, counter, itLabel->c_str());
 					if (temp.multiply == 0) {
-						status("node id: %i, assignment: %i, no valid subgraph possible. aborting loop...", node->id, counter);
+						status("node id: %u, assignment: %u, no valid subgraph possible. aborting loop...", node->id, counter);
 						break;
 					}
 				}
-				status("node id: %i, last label of assignment %i. added %i to %i possibilities.", node->id, counter, temp.multiply, result.multiply);
+				status("node id: %u, last label of assignment %u. added %u to %u possibilities.", node->id, counter, temp.multiply, result.multiply);
 				result.multiply += temp.multiply;
 			}
 			++counter;
 		}
 
 		if (node->formula->hasFinal()) {
-			status("node %i contains final", node->id);
+			status("node %u contains final", node->id);
 		} else {
-			status("node %i doesn't contain final, multiplying possible subgraphs by 2...", node->id);
+			status("node %u doesn't contain final, multiplying possible subgraphs by 2...", node->id);
 			result.multiply *= 2;
 		}
 
@@ -128,7 +132,7 @@ AssignCount Graph::countFromNode(Node *node, Node *from) {
 		node->isActive = false;
 	}
 
-	status("leaving node id: %i with %i possibilities...", node->id, result.multiply);
+	status("leaving node id: %u with %u possibilities...", node->id, result.multiply);
 	return result;
 }
 

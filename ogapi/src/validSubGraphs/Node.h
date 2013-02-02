@@ -7,14 +7,6 @@
 #include "types.h"
 #include "Formula.h"
 
-class Node;
-
-typedef struct {
-	int count;
-	int subgraphcount;
-} Sub;
-
-typedef std::map<Node*, Sub> VisitedByNodes;
 
 class Node {
     private:        

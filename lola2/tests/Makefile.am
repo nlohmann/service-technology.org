@@ -29,7 +29,7 @@ TESTFILES = Kanban5.pnml.lola Kanban5.5safe.pnml.lola 4state.lola \
 	    	LTL/cycle4.lola LTL/cycle5.lola LTL/cycle6.lola LTL/simple.buechi LTL/cycleprop.buechi\
 	    	LTL/phils5dld.buechi LTL/fork1.buechi \
 	    	CTL/phils-AX.task CTL/phils-EX.task CTL/phils-TemporalConjunction.task\
-	    	CTL/phils-TemporalDisjunction.task
+	    	CTL/phils-TemporalDisjunction.task CTL/phils-complex.task
 	    
 
 

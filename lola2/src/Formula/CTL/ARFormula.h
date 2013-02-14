@@ -39,6 +39,7 @@ public:
 		return !euFormula.check(s,ns,firelist,witness);
 	}
 
+	// LCOV_EXCL_START
 	void DEBUG_print() {
 		printf("[%u,%u,%lu]A(",index,dfsindex,payloadsize);
 		phi->DEBUG_print();
@@ -46,6 +47,7 @@ public:
 		psi->DEBUG_print();
 		printf(")");
 	}
+	// LCOV_EXCL_STOP
 
 	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
 		dfsindex = ((*numDFS)++) * sizeof(statenumber_t);

@@ -186,6 +186,9 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 		tarjanStack.pop();
 	}
 
+	// free memory for current firelist
+	delete[] currentFirelist;
+
 	// all elements that are still on dfs stack (and hence on tarjan stack)
 	// can reach this state -> formula true
 	// revert all the transitions to restore original NetState
@@ -197,6 +200,9 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 		revertAtomics(ns,dfsStack.top().fl[dfsStack.top().flIndex]);
 
 		witness->push_back(dfsStack.top().fl[dfsStack.top().flIndex]);
+
+		// free memory for stacked firelist
+		delete[] dfsStack.top().fl;
 
 		dfsStack.pop();
 	}

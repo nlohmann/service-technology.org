@@ -30,12 +30,14 @@ struct ConjunctionFormula : public CTLFormula {
 		return true;
 	}
 
+	// LCOV_EXCL_START
 	void DEBUG_print() {
 		printf("AND(");
 		for(index_t i=0;i<cardSubs;i++)
 			subs[i]->DEBUG_print();
 		printf(")");
 	}
+	// LCOV_EXCL_STOP
 
 	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
 		for(index_t i = 0; i < cardSubs; i++)

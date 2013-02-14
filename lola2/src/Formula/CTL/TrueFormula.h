@@ -11,9 +11,11 @@ struct TrueFormula : public CTLFormula {
 		return true;
 	}
 
+	// LCOV_EXCL_START
 	void DEBUG_print() {
 		printf("TRUE");
 	}
+	// LCOV_EXCL_STOP
 
 	void initAtomics(NetState& ns) {
 		// do nothing

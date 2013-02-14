@@ -41,11 +41,14 @@ struct AXFormula : public CTLFormula {
 		return true;
 	}
 
+	// LCOV_EXCL_START
 	void DEBUG_print() {
 		printf("AX(");
 		inner->DEBUG_print();
 		printf(")");
 	}
+	// LCOV_EXCL_STOP
+
 	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
 		inner->gatherPayloadInformation(numDFS,numCachedResults);
 	}

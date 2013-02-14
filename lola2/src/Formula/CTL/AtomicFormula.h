@@ -21,9 +21,11 @@ struct AtomicFormula : public CTLFormula {
 		return inner->getPredicate()->value;
 	}
 
+	// LCOV_EXCL_START
 	void DEBUG_print() {
 		printf("ATOMIC");
 	}
+	// LCOV_EXCL_STOP
 
 	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
 		// do nothing

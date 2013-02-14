@@ -11,12 +11,12 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 		*pInitialPayload = calloc(payloadsize,1); // all-zeros is starting state for all values
 	void* payload = *pInitialPayload;
 
-	rep->status("init AU check at %x (payload: %lx)",ns.HashCurrent,payload);
+	//rep->status("init AU check at %x (payload: %lx)",ns.HashCurrent,payload);
 
 	CTLFormulaResult cachedResult = getCachedResult(payload);
 	if(cachedResult & 2) { // value known
 
-		rep->status("AU cached %d at %x",cachedResult,ns.HashCurrent);
+		//rep->status("AU cached %d at %x",cachedResult,ns.HashCurrent);
 
 		return cachedResult & 1; // return result
 	}
@@ -26,7 +26,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	if(psi->check(s,ns,firelist,witness)) {
 		setCachedResult(payload,KNOWN_TRUE);
 
-		rep->status("AU initial TRUE at %x",ns.HashCurrent);
+		//rep->status("AU initial TRUE at %x",ns.HashCurrent);
 
 		return true;
 	}
@@ -36,12 +36,12 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	if(!phi->check(s,ns,firelist,witness)) {
 		setCachedResult(payload,KNOWN_FALSE);
 
-		rep->status("AU initial FALSE at %x",ns.HashCurrent);
+		//rep->status("AU initial FALSE at %x",ns.HashCurrent);
 
 		return false;
 	}
 
-	rep->status("starting AU check at %x (payload: %lx)",ns.HashCurrent,payload);
+	//rep->status("starting AU check at %x (payload: %lx)",ns.HashCurrent,payload);
 
 	// initialize fairness data
 	fairness_data fairness;
@@ -115,7 +115,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				*pNewPayload = calloc(payloadsize,1); // all-zeros is starting state for all values
 			void* newpayload = *pNewPayload;
 
-			rep->status("AU check fire %s to %x (payload: %lx)",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent,newpayload);
+			//rep->status("AU check fire %s to %x (payload: %lx)",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent,newpayload);
 
 			CTLFormulaResult newCachedResult = getCachedResult(newpayload);
 			if(newCachedResult == UNKNOWN) {
@@ -130,7 +130,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 					// continue;
 
 
-					rep->status("AU check backfire (psi) %s",Net::Name[TR][currentFirelist[currentFirelistIndex]]);
+					//rep->status("AU check backfire (psi) %s",Net::Name[TR][currentFirelist[currentFirelistIndex]]);
 
 					Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
 		            Transition::revertEnabled(ns, currentFirelist[currentFirelistIndex]);
@@ -173,7 +173,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				if(newdfs < currentLowlink)
 					currentLowlink = newdfs;
 
-				rep->status("AU check backfire (IN_PROGRESS) %s",Net::Name[TR][currentFirelist[currentFirelistIndex]]);
+				//rep->status("AU check backfire (IN_PROGRESS) %s",Net::Name[TR][currentFirelist[currentFirelistIndex]]);
 
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
 				// enabledness and atomics weren't updated, so no revert needed
@@ -181,7 +181,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 			} else { // KNOWN_TRUE
 				// continue;
 
-				rep->status("AU check backfire (KNOWN_TRUE) %s",Net::Name[TR][currentFirelist[currentFirelistIndex]]);
+				//rep->status("AU check backfire (KNOWN_TRUE) %s",Net::Name[TR][currentFirelist[currentFirelistIndex]]);
 
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
 				// enabledness and atomics weren't updated, so no revert needed
@@ -195,17 +195,17 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 			statenumber_t dfs = getDFS(payload);
 			if(dfs == currentLowlink) {
 
-				rep->status("AU found SCC at %x",ns.HashCurrent);
+				//rep->status("AU found SCC at %x",ns.HashCurrent);
 
 				// SCC finished, test if fair witness can be found
 				fairness.card_forbidden_transitions = 0; // reset fairness data
 				if(getFairWitness(s,ns,firelist,witness,fairness)) {
-					rep->status("AU found fair SCC at %x",ns.HashCurrent);
+					//rep->status("AU found fair SCC at %x",ns.HashCurrent);
 					// no need to pop elements from Tarjan stack to set them to KNOWN_FALSE, this is done later anyway
 					backfireNeeded = false;
 					break;
 				}
-				rep->status("AU found unfair SCC at %x",ns.HashCurrent);
+				//rep->status("AU found unfair SCC at %x",ns.HashCurrent);
 
 				// all elements on tarjan stack that have a higher dfs number then ours belong to the finished SCC -> formula true
 				while(tarjanStack.StackPointer && getDFS(tarjanStack.top()) >= dfs) {
@@ -228,7 +228,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 					currentLowlink = dfsStack.top().lowlink;
 				dfsStack.pop();
 
-				rep->status("AU check backfire (fl) %s",Net::Name[TR][currentFirelist[currentFirelistIndex]]);
+				//rep->status("AU check backfire (fl) %s",Net::Name[TR][currentFirelist[currentFirelistIndex]]);
 
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
 	            Transition::revertEnabled(ns, currentFirelist[currentFirelistIndex]);
@@ -248,7 +248,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				free(fairness.forbidden_transitions);
 
 
-				rep->status("AU proven TRUE at %x",ns.HashCurrent);
+				//rep->status("AU proven TRUE at %x",ns.HashCurrent);
 
 				return true;
 			}
@@ -257,7 +257,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	// revert transition that brought us to the counterexample state
 	if(backfireNeeded) {
 
-		rep->status("AU check backfire (backfireNeeded) %s",Net::Name[TR][currentFirelist[currentFirelistIndex]]);
+		//rep->status("AU check backfire (backfireNeeded) %s",Net::Name[TR][currentFirelist[currentFirelistIndex]]);
 
 		Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
 
@@ -268,6 +268,9 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 			Transition::revertEnabled(ns, currentFirelist[currentFirelistIndex]);
 			revertAtomics(ns,currentFirelist[currentFirelistIndex]);
 		}
+
+		// free memory for current firelist
+		delete[] currentFirelist;
 	}
 
 	// current state can reach counterexample state -> formula false
@@ -285,13 +288,16 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	while(dfsStack.StackPointer) {
 		setCachedResult(dfsStack.top().payload,KNOWN_FALSE);
 
-		rep->status("AU check backfire (dfsStack) %s",Net::Name[TR][dfsStack.top().fl[dfsStack.top().flIndex]]);
+		//rep->status("AU check backfire (dfsStack) %s",Net::Name[TR][dfsStack.top().fl[dfsStack.top().flIndex]]);
 
 		Transition::backfire(ns,dfsStack.top().fl[dfsStack.top().flIndex]);
         Transition::revertEnabled(ns, dfsStack.top().fl[dfsStack.top().flIndex]);
 		revertAtomics(ns,dfsStack.top().fl[dfsStack.top().flIndex]);
 
 		witness->push_back(dfsStack.top().fl[dfsStack.top().flIndex]);
+
+		// free memory for stacked firelist
+		delete[] dfsStack.top().fl;
 
 		dfsStack.pop();
 	}
@@ -303,7 +309,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	free(fairness.weak_fairness);
 	free(fairness.forbidden_transitions);
 
-	rep->status("AU proven FALSE at %x",ns.HashCurrent);
+	//rep->status("AU proven FALSE at %x",ns.HashCurrent);
 
 	return false;
 }
@@ -327,7 +333,7 @@ bool AUFormula::getFairWitness(Store<void*>& s, NetState& ns,
 	s.searchAndInsert(ns,&pPayload,0);
 	statenumber_t initialDFS = getDFS(*pPayload); // all states in the SCC will be set to this DFS number to mark the area for later steps
 
-	rep->status("getFairWitness init at %x initialDFS %ld (pPayload: %lx, payload: %lx)",ns.HashCurrent, initialDFS, pPayload, *pPayload);
+	//rep->status("getFairWitness init at %x initialDFS %ld (pPayload: %lx, payload: %lx)",ns.HashCurrent, initialDFS, pPayload, *pPayload);
 
 	SearchStack<DFSStackEntry> dfsStack;
 	bool nonTrivial = false; // states whether current SCC contains any cycles
@@ -346,7 +352,7 @@ bool AUFormula::getFairWitness(Store<void*>& s, NetState& ns,
 	// check for weak fairness enabledness (not enabled -> fulfilled)
 	for(int t = 0; t < fairness.card_weak; t++)
 		if(!ns.Enabled[fairness.weak_fairness[t]])
-			fulfilled_weak[fairness.weak_fairness[t]] = true;
+			fulfilled_weak[t] = true;
 
 	// check for strong fairness enabledness
 	for(int t = 0; t < currentFirelistIndex; t++)
@@ -366,9 +372,9 @@ bool AUFormula::getFairWitness(Store<void*>& s, NetState& ns,
 			statenumber_t curDFS = getDFS(*pNewPayload);
 			// test if new state belongs to this SCC
 
-			rep->status("getFairWitness fire %s to %x (pPayload: %lx, payload: %lx)",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent,pNewPayload,*pNewPayload);
+			//rep->status("getFairWitness fire %s to %x (pPayload: %lx, payload: %lx)",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent,pNewPayload,*pNewPayload);
 
-			rep->status("getFairWitness dfs %ld result %d",curDFS,getCachedResult(*pNewPayload));
+			//rep->status("getFairWitness dfs %ld result %d",curDFS,getCachedResult(*pNewPayload));
 
 			CTLFormulaResult result = getCachedResult(*pNewPayload);
 			if(result & 2 || (curDFS != initialDFS && (result != IN_PROGRESS || curDFS < initialDFS))) {
@@ -393,7 +399,7 @@ bool AUFormula::getFairWitness(Store<void*>& s, NetState& ns,
 				continue;
 			}
 
-			rep->status("getFairWitness new state");
+			//rep->status("getFairWitness new state");
 
 			// update maximum DFS number seen
 			//if(curDFS > maxDFS)
@@ -415,7 +421,7 @@ bool AUFormula::getFairWitness(Store<void*>& s, NetState& ns,
 			// check for weak fairness enabledness (not enabled -> fulfilled)
 			for(int t = 0; t < fairness.card_weak; t++)
 				if(!ns.Enabled[fairness.weak_fairness[t]])
-					fulfilled_weak[fairness.weak_fairness[t]] = true;
+					fulfilled_weak[t] = true;
 
 			// check for strong fairness enabledness
 			for(int t = 0; t < currentFirelistIndex; t++)
@@ -424,7 +430,7 @@ bool AUFormula::getFairWitness(Store<void*>& s, NetState& ns,
 		} else {
 			delete[] currentFirelist;
 
-			rep->status("getFairWitness backtrack from %x",ns.HashCurrent);
+			//rep->status("getFairWitness backtrack from %x",ns.HashCurrent);
 
 			// check if there are any states to backtrack to
 			if(dfsStack.StackPointer) {
@@ -433,7 +439,7 @@ bool AUFormula::getFairWitness(Store<void*>& s, NetState& ns,
 				dfsStack.pop();
 
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
-				rep->status("backfire %s (%x %d) to %x",Net::Name[TR][currentFirelist[currentFirelistIndex]],currentFirelist,currentFirelistIndex,ns.HashCurrent);
+				//rep->status("backfire %s (%x %d) to %x",Net::Name[TR][currentFirelist[currentFirelistIndex]],currentFirelist,currentFirelistIndex,ns.HashCurrent);
 	            Transition::revertEnabled(ns, currentFirelist[currentFirelistIndex]);
 			} else
 				break;
@@ -486,7 +492,7 @@ void AUFormula::constructWitness(Store<void*>& s, NetState& ns,
 	void** pPayload;
 	s.searchAndInsert(ns,&pPayload,0);
 
-	rep->status("constructWitness init at %x (pPayload: %lx, payload: %lx)",ns.HashCurrent,pPayload,*pPayload);
+	//rep->status("constructWitness init at %x (pPayload: %lx, payload: %lx)",ns.HashCurrent,pPayload,*pPayload);
 
 	bool* fulfilled_weak = (bool*) calloc(fairness.card_weak,SIZEOF_BOOL);
 	bool* fulfilled_strong = (bool*) calloc(fairness.card_strong,SIZEOF_BOOL);
@@ -502,8 +508,8 @@ void AUFormula::constructWitness(Store<void*>& s, NetState& ns,
 
 	// check for weak fairness enabledness (not enabled -> fulfilled)
 	for(int t = 0; t < fairness.card_weak; t++)
-		if(!fulfilled_weak[fairness.weak_fairness[t]] && !ns.Enabled[fairness.weak_fairness[t]]) {
-			fulfilled_weak[fairness.weak_fairness[t]] = true;
+		if(!fulfilled_weak[t] && !ns.Enabled[fairness.weak_fairness[t]]) {
+			fulfilled_weak[t] = true;
 			fulfilled_conditions++;
 		}
 
@@ -523,7 +529,7 @@ void AUFormula::produceWitness(Store<void*>& s, NetState& ns,
 	void** pPayload;
 	s.searchAndInsert(ns,&pPayload,0);
 
-	rep->status("produceWitness init at %x (payload: %lx, myDFS: %ld, fc: %d)",ns.HashCurrent,*pPayload,myDFS,initial_fulfilled_conditions);
+	//rep->status("produceWitness init at %x (payload: %lx, myDFS: %ld, fc: %d)",ns.HashCurrent,*pPayload,myDFS,initial_fulfilled_conditions);
 
 	SearchStack<DFSStackEntry> dfsStack;
 
@@ -540,13 +546,13 @@ void AUFormula::produceWitness(Store<void*>& s, NetState& ns,
 			s.searchAndInsert(ns,&pNewPayload,0);
 			statenumber_t curDFS = getDFS(*pNewPayload);
 
-			rep->status("produceWitness fire %s to %x (payload: %lx)",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent,*pPayload);
+			//rep->status("produceWitness fire %s to %x (payload: %lx)",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent,*pPayload);
 
-			rep->status("produceWitness dfs %ld result %d",curDFS,getCachedResult(*pNewPayload));
+			//rep->status("produceWitness dfs %ld result %d",curDFS,getCachedResult(*pNewPayload));
 
 			// test if new state belongs to this SCC
 			if(getCachedResult(*pNewPayload) != UNKNOWN || curDFS < initialDFS || curDFS > myDFS) {
-				rep->status("produceWitness backfire");
+				//rep->status("produceWitness backfire");
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
 				continue;
 			}
@@ -568,8 +574,8 @@ void AUFormula::produceWitness(Store<void*>& s, NetState& ns,
 
 			// check for weak fairness enabledness (not enabled -> fulfilled)
 			for(int t = 0; t < fairness.card_weak; t++)
-				if(!fulfilled_weak[fairness.weak_fairness[t]] && !ns.Enabled[fairness.weak_fairness[t]]) {
-					fulfilled_weak[fairness.weak_fairness[t]] = true;
+				if(!fulfilled_weak[t] && !ns.Enabled[fairness.weak_fairness[t]]) {
+					fulfilled_weak[t] = true;
 					current_fulfilled_conditions++;
 				}
 
@@ -577,7 +583,7 @@ void AUFormula::produceWitness(Store<void*>& s, NetState& ns,
 			// note that initial_fulfilled_conditions can be fairness.card_strong + fairness.card_weak as well if all fairness assumptions were met in the initial state. Still, a cycle needs to be found.
 			if(current_fulfilled_conditions == fairness.card_strong + fairness.card_weak || current_fulfilled_conditions > initial_fulfilled_conditions) {
 
-				rep->status("produceWitness fc: %d, cs: %d, cw: %d",current_fulfilled_conditions,fairness.card_strong,fairness.card_weak);
+				//rep->status("produceWitness fc: %d, cs: %d, cw: %d",current_fulfilled_conditions,fairness.card_strong,fairness.card_weak);
 
 				if(current_fulfilled_conditions == fairness.card_strong + fairness.card_weak) {
 					// all assumptions are met now, find a path back to the initial node
@@ -610,7 +616,7 @@ void AUFormula::produceWitness(Store<void*>& s, NetState& ns,
 
 			// test if new state belongs to this SCC and is unvisited
 			if(curDFS == myDFS) {
-				rep->status("produceWitness backfire2");
+				//rep->status("produceWitness backfire2");
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
 				Transition::revertEnabled(ns,currentFirelist[currentFirelistIndex]);
 				continue;
@@ -626,7 +632,7 @@ void AUFormula::produceWitness(Store<void*>& s, NetState& ns,
 		} else {
 			delete[] currentFirelist;
 
-			rep->status("produceWitness backtrack from %x",ns.HashCurrent);
+			//rep->status("produceWitness backtrack from %x",ns.HashCurrent);
 
 			// we can't run out of stack frames since a valid witness path is guaranteed to exist
 			assert(dfsStack.StackPointer);
@@ -655,9 +661,9 @@ void AUFormula::findWitnessPathTo(Store<void*>& s, NetState& ns,
 
 	witness->clear();
 
-	rep->status("findWitnessPathTo init at %x (payload: %lx)",ns.HashCurrent, destinationPayload);
+	//rep->status("findWitnessPathTo init at %x (payload: %lx)",ns.HashCurrent, destinationPayload);
 
-	rep->status("findWitnessPathTo start %lx", *pPayload);
+	//rep->status("findWitnessPathTo start %lx", *pPayload);
 
 	// starting state is the destination, witness path is empty
 	if(*pPayload == destinationPayload)
@@ -674,9 +680,9 @@ void AUFormula::findWitnessPathTo(Store<void*>& s, NetState& ns,
 			s.searchAndInsert(ns,&pNewPayload,0);
 			statenumber_t curDFS = getDFS(*pNewPayload);
 
-			rep->status("findWitnessPathTo fire %s to %x (payload: %lx)",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent,*pNewPayload);
+			//rep->status("findWitnessPathTo fire %s to %x (payload: %lx)",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent,*pNewPayload);
 
-			rep->status("findWitnessPathTo dfs %ld result %d",curDFS,getCachedResult(*pNewPayload));
+			//rep->status("findWitnessPathTo dfs %ld result %d",curDFS,getCachedResult(*pNewPayload));
 
 			// test if new state belongs to this SCC and is unvisited
 			if(getCachedResult(*pNewPayload) != UNKNOWN || curDFS < initialDFS || curDFS >= myDFS) {
@@ -746,6 +752,8 @@ bool AUFormula::subdivideFairnessCheck(Store<void*>& s, NetState& ns,
 	index_t* currentFirelist;
 	index_t currentFirelistIndex = firelist.getFirelist(ns,&currentFirelist);
 
+	//rep->status("subdivideFairnessCheck init at %x",ns.HashCurrent);
+
 	// start SCC search from this state
 	if(fairSCC(s,ns,firelist,witness,fairness))
 		return true;
@@ -758,9 +766,13 @@ bool AUFormula::subdivideFairnessCheck(Store<void*>& s, NetState& ns,
 			void** pNewPayload;
 			s.searchAndInsert(ns,&pNewPayload,0);
 			statenumber_t curDFS = getDFS(*pNewPayload);
+
+			//rep->status("subdivideFairnessCheck fire %s to %x (pPayload: %lx, payload: %lx)",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent,pNewPayload,*pNewPayload);
+
 			// test if new state belongs to this SCC
 			if(curDFS != initialDFS) {
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
+				//rep->status("subdivideFairnessCheck backfire (initialDFS) %s to %x",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent);
 				continue;
 			}
 
@@ -769,6 +781,7 @@ bool AUFormula::subdivideFairnessCheck(Store<void*>& s, NetState& ns,
 			// test if state was already visited by this DFS (or some previous search that happened to use the same DFS number)
 			if(newResult == KNOWN_TRUE) {
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
+				//rep->status("subdivideFairnessCheck backfire (KNOWN_TRUE) %s to %x",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent);
 				continue;
 			}
 
@@ -778,7 +791,9 @@ bool AUFormula::subdivideFairnessCheck(Store<void*>& s, NetState& ns,
 			// test if node not already visited by a previous SCC search
 			if(newResult == UNKNOWN) {
 				// start SCC search from this state
+				//rep->status("subdivideFairnessCheck testing SCC at %x",ns.HashCurrent);
 				if(fairSCC(s,ns,firelist,witness,fairness)) {
+					//rep->status("subdivideFairnessCheck SCC at %x is fair",ns.HashCurrent);
 					// extend witness path with all transitions that were fired to get here; revert ns to initial state; cleanup
 
 					// add transition that was used to get here to witness
@@ -803,6 +818,7 @@ bool AUFormula::subdivideFairnessCheck(Store<void*>& s, NetState& ns,
 
 					return true;
 				}
+				//rep->status("subdivideFairnessCheck SCC at %x is not fair",ns.HashCurrent);
 			}
 			// getCachedResult(*pNewPayload) is set to KNOWN_FALSE by one of the fairSCC searches at this point
 			assert(getCachedResult(*pNewPayload) == KNOWN_FALSE);
@@ -824,8 +840,9 @@ bool AUFormula::subdivideFairnessCheck(Store<void*>& s, NetState& ns,
 				dfsStack.pop();
 
 				Transition::backfire(ns,currentFirelist[currentFirelistIndex]);
-				rep->status("backfire %s (%x %d) to %x",Net::Name[TR][currentFirelist[currentFirelistIndex]],currentFirelist,currentFirelistIndex,ns.HashCurrent);
+				//rep->status("backfire %s (%x %d) to %x",Net::Name[TR][currentFirelist[currentFirelistIndex]],currentFirelist,currentFirelistIndex,ns.HashCurrent);
 	            Transition::revertEnabled(ns, currentFirelist[currentFirelistIndex]);
+				//rep->status("subdivideFairnessCheck backfire (StackPointer) %s to %x",Net::Name[TR][currentFirelist[currentFirelistIndex]],ns.HashCurrent);
 			} else {
 				// SCC fully explored and no fair path was found
 				return false;
@@ -846,6 +863,13 @@ bool AUFormula::fairSCC(Store<void*>& s, NetState& ns,
 	s.searchAndInsert(ns,&pInitialPayload,0);
 	void* payload = *pInitialPayload;
 	statenumber_t initialDFS = getDFS(payload); // all states in the considered area are assumed to have this DFS number
+
+	// test if any forbidden transition is enabled in the initial state
+	for(index_t i = 0; i < fairness.card_forbidden_transitions; i++)
+		if (ns.Enabled[fairness.forbidden_transitions[i]]) {
+			setCachedResult(payload,KNOWN_FALSE);
+			return false;
+		}
 
 	// dfs stack will contain all gray nodes
 	SearchStack<DFSStackEntry> dfsStack;

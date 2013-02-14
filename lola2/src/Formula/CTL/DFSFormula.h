@@ -31,10 +31,6 @@ struct DFSStackEntry
         payload = _payload;
         lowlink = _lowlink;
     }
-    ~DFSStackEntry() {
-        if (fl) delete[] fl;
-        fl = NULL;
-    }
 };
 
 struct DFSFormula : public CTLFormula {

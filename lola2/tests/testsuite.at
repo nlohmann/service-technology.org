@@ -224,6 +224,92 @@ AT_CHECK([GREP -q "lola: t21m" stderr])
 AT_KEYWORDS(ctl)
 AT_CLEANUP
 
+AT_SETUP([E(TRUE R FALSE)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula='"FORMULA EXPATH (TRUE RELEASE FALSE);"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 1 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([E(TRUE R TRUE)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula='"FORMULA EXPATH (TRUE RELEASE TRUE);"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 1 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([A(TRUE R FALSE)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula='"FORMULA ALLPATH (TRUE RELEASE FALSE);"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 1 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([A(TRUE R TRUE)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula='"FORMULA ALLPATH (TRUE RELEASE TRUE);"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 1 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([E(FALSE U FALSE)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula='"FORMULA EXPATH (FALSE UNTIL FALSE);"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 1 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([E(FALSE U TRUE)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula='"FORMULA EXPATH (FALSE UNTIL TRUE);"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 1 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([A(FALSE U FALSE)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula='"FORMULA ALLPATH (FALSE UNTIL FALSE);"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 1 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([A(FALSE U TRUE)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula='"FORMULA ALLPATH (FALSE UNTIL TRUE);"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 1 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([A(th.1 = 1 UNTIL FALSE)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula='"FORMULA ALLPATH (th.1 = 1 UNTIL FALSE);"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([E(th.1 = 1 UNTIL FALSE)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula='"FORMULA EXPATH (th.1 = 1 UNTIL FALSE);"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([AG(FALSE) || AG(TRUE)])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola --formula='"FORMULA ALLPATH ALWAYS FALSE OR ALLPATH ALWAYS TRUE;"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 242 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
 AT_SETUP([AU and AX on phils5])
 AT_CHECK([cp TESTFILES/CTL/phils-AX.task .])
 AT_CHECK([cp TESTFILES/phils5.lola .])

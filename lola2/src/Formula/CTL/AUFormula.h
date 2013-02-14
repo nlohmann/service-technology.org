@@ -27,6 +27,7 @@ struct AUFormula : public DFSFormula {
 	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness);
 
 
+	// LCOV_EXCL_START
 	void DEBUG_print() {
 		printf("[%u,%u,%lu]A(",index,dfsindex,payloadsize);
 		phi->DEBUG_print();
@@ -34,6 +35,7 @@ struct AUFormula : public DFSFormula {
 		psi->DEBUG_print();
 		printf(")");
 	}
+	// LCOV_EXCL_STOP
 
 	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
 		dfsindex = ((*numDFS)++) * sizeof(statenumber_t);

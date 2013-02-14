@@ -11,6 +11,7 @@ ExPath(x)  -> [out: "E" x ];
 Eventually(x) -> [out: "F (" x ")" ];
 Always(x)     -> [out: "G (" x ")" ];
 Until(phi,psi) -> [out: "(" phi " U " psi ")"];
+Release(phi,psi) -> [out: "(" phi " R " psi ")"];
 
 NextState(x) -> [out: "X (" x ")"];
 
@@ -739,7 +740,7 @@ AllPath(NextState(x)) -> [ctl:
 	}
 ];
 
-//AU(a,b) -- wirklich so?
+//AU(a,b)
 AllPath(Until(a,b)) -> [ctl:
 	{
 		//printf("CTL-AllPath_Until\n");
@@ -762,6 +763,32 @@ AllPath(Until(a,b)) -> [ctl:
 		auf->dfsindex = myDFSId*sizeof(statenumber_t);
 
 		ctl_formulas[ctl_id_stack.top()].push_back(auf);
+	}
+];
+
+//AR(a,b)
+AllPath(Release(a,b)) -> [ctl:
+	{
+		//printf("CTL-AllPath_Release\n");
+        ctl_id_stack.push(ctl_nextId++);
+		size_t myDFSId = ctl_dfs_id++;
+		size_t myCacheId = ctl_result_cache_id++;
+    }
+	a
+	b
+	{
+	    // after returning from my childs, I am the top of the stack
+	    const index_t myId = ctl_id_stack.top();
+	    ctl_id_stack.pop();
+		assert(ctl_formulas[myId].size() == 2);
+
+		ARFormula* arf = new ARFormula();
+		arf->phi = ctl_formulas[myId][0];
+		arf->psi = ctl_formulas[myId][1];
+		arf->index = 2*myCacheId;
+		arf->dfsindex = myDFSId*sizeof(statenumber_t);
+
+		ctl_formulas[ctl_id_stack.top()].push_back(arf);
 	}
 ];
 
@@ -833,7 +860,7 @@ ExPath(NextState(x)) -> [ctl:
 	}
 ];
 
-//EU(x) -- wirklich so?
+//EU(x)
 ExPath(Until(a,b)) -> [ctl:
 	{
 		//printf("CTL-ExPath_Until\n");
@@ -856,6 +883,32 @@ ExPath(Until(a,b)) -> [ctl:
 		euf->dfsindex = myDFSId*sizeof(statenumber_t);
 
 		ctl_formulas[ctl_id_stack.top()].push_back(euf);
+	}
+];
+
+//ER(x)
+ExPath(Release(a,b)) -> [ctl:
+	{
+		//printf("CTL-ExPath_Release\n");
+        ctl_id_stack.push(ctl_nextId++);
+		size_t myDFSId = ctl_dfs_id++;
+		size_t myCacheId = ctl_result_cache_id++;
+    }
+	a
+	b
+	{
+	    // after returning from my childs, I am the top of the stack
+	    const index_t myId = ctl_id_stack.top();
+	    ctl_id_stack.pop();
+		assert(ctl_formulas[myId].size() == 2);
+
+		ERFormula* erf = new ERFormula();
+		erf->phi = ctl_formulas[myId][0];
+		erf->psi = ctl_formulas[myId][1];
+		erf->index = 2*myCacheId;
+		erf->dfsindex = myDFSId*sizeof(statenumber_t);
+
+		ctl_formulas[ctl_id_stack.top()].push_back(erf);
 	}
 ];
 

@@ -59,6 +59,7 @@ lola_SOURCES = \
                 Formula/AtomicStatePredicate.cc Formula/AtomicStatePredicate.h \
                 Formula/ConjunctionStatePredicate.cc Formula/ConjunctionStatePredicate.h \
                 Formula/DisjunctionStatePredicate.cc Formula/DisjunctionStatePredicate.h \
+                Formula/NegationStatePredicate.cc Formula/NegationStatePredicate.h \
                 Formula/TruePredicate.cc Formula/TruePredicate.h \
                 Formula/FalsePredicate.cc Formula/FalsePredicate.h \
                 Formula/LTL/BuechiAutomata.h Formula/LTL/BuechiAutomata.cc \

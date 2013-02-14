@@ -1,0 +1,33 @@
+PLACE SAFE 1:
+	a,b,c,token;
+MARKING
+	a : 1, token;
+TRANSITION ab
+	CONSUME
+		a : 1,
+		token : 1;
+	PRODUCE
+		b : 1,
+		token : 1;
+
+TRANSITION bc
+	CONSUME
+		b : 1,
+		token : 1;
+	PRODUCE
+		c : 1,
+		token : 1;
+
+TRANSITION ca
+	CONSUME
+		c : 1,
+		token : 1;
+	PRODUCE
+		a : 1,
+		token : 1;
+
+TRANSITION deltoken WEAK FAIR
+	CONSUME
+		token : 1;
+	PRODUCE
+		;

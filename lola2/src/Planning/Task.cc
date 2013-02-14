@@ -38,6 +38,7 @@
 #include <Formula/StatePredicate.h>
 #include <Formula/TruePredicate.h>
 #include <Formula/ConjunctionStatePredicate.h>
+#include <Formula/NegationStatePredicate.h>
 #include <Formula/DisjunctionStatePredicate.h>
 
 #include <Stores/Store.h>
@@ -77,7 +78,6 @@ extern void ptbuechi__delete_buffer(YY_BUFFER_STATE);
 extern SymbolTable* buechiStateTable;
 
 std::map<int,StatePredicate*> predicateMap;
-std::map<int,StatePredicate*> negpredicateMap;
 extern FILE	*tl_out;
 
 /// printer-function for Kimiwtu's output on stdout
@@ -169,7 +169,7 @@ StatePredicate* buildPropertyFromList(int *pos, int *neg) /* prints the content 
     		  subForms.push_back(predicateMap[atoi(sym_table[mod * i + j])]->copy());
       if(neg[i] & (1 << j))
     	  if (atoi(sym_table[mod * i + j]) > 1)
-    		  subForms.push_back(negpredicateMap[atoi(sym_table[mod * i + j])]->copy());
+    		  subForms.push_back(new NegationStatePredicate(predicateMap[atoi(sym_table[mod * i + j])]->copy()));
     }
   if (subForms.size() == 0) return new TruePredicate();
   ConjunctionStatePredicate* result = new ConjunctionStatePredicate(subForms.size());

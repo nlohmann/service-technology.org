@@ -28,8 +28,8 @@ public:
 	AutomataTree* smaller;
 	AutomataTree* bigger;
 
-	AutomataTree(){smaller = 0; bigger = 0; dfs = -1;};
-	AutomataTree(index_t _state) { smaller = 0; bigger = 0; state = _state; dfs = -1;};
+	AutomataTree(){smaller = 0; bigger = 0; dfs = -2;};
+	AutomataTree(index_t _state) { smaller = 0; bigger = 0; state = _state; dfs = -2;};
 
 	~AutomataTree(){
 		if (smaller) delete smaller;

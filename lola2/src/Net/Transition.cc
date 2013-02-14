@@ -234,6 +234,15 @@ void Transition::checkEnabled_Initial(index_t t)
 void Transition::fire(NetState &ns, index_t t)
 {
 	//rep->message("F %d",t);
+
+	if (!ns.Enabled[t]){
+		for (int i = 0; i < 5; i++){
+			rep->message("MARKING %s %s %s %s %s",Net::Name[PL][5*i],Net::Name[PL][5*i+1],Net::Name[PL][5*i+2],Net::Name[PL][5*i+3],Net::Name[PL][5*i+4]);
+			rep->message("MARKING %d %d %d %d %d",ns.Current[5*i],ns.Current[5*i+1],ns.Current[5*i+2],ns.Current[5*i+3],ns.Current[5*i+4]);
+		}
+		rep->message("Try to fire %d %s", t, Net::Name[TR][t]);
+	}
+
     //  Don't even think about firing a disabled transition!
     assert(ns.Enabled[t]);
 

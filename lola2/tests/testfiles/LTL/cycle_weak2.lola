@@ -1,0 +1,15 @@
+PLACE SAFE 1:
+	a,b,c;
+MARKING
+	a : 1, c : 1;
+TRANSITION cycle
+	CONSUME
+		c : 1;
+	PRODUCE
+		c : 1;
+
+TRANSITION f WEAK FAIR
+	CONSUME
+		a : 1;
+	PRODUCE
+		b : 1;

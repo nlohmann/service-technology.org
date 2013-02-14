@@ -1,0 +1,27 @@
+PLACE SAFE 1:
+	a,b,c;
+MARKING
+	a : 1;
+TRANSITION ab
+	CONSUME
+		a : 1;
+	PRODUCE
+		b : 1;
+
+TRANSITION ba
+	CONSUME
+		b : 1;
+	PRODUCE
+		a : 1;
+
+TRANSITION cc
+	CONSUME
+		c : 1;
+	PRODUCE
+		c : 1;
+
+TRANSITION move_token WEAK FAIR
+	CONSUME
+		a : 1;
+	PRODUCE
+		c : 1;

@@ -117,6 +117,53 @@ AT_KEYWORDS(ltl)
 AT_CLEANUP
 
 
+
+AT_SETUP([Phils5 Deadlock-free (formula 1)])
+AT_CHECK([cp TESTFILES/phils5dld.lola .])
+AT_CHECK([LOLA --check=modelchecking --formula='"FORMULA ALWAYS (EVENTUALLY (ea.1 = 0));"' phils5dld.lola -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 75 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
+AT_SETUP([Phils5 Deadlock-free (formula 2)])
+AT_CHECK([cp TESTFILES/phils5dld.lola .])
+AT_CHECK([LOLA --check=modelchecking --formula='"FORMULA ALWAYS (EVENTUALLY (fo.1 = 0 OR fo.3 = 0 OR fo.5 = 0));"' phils5dld.lola -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 242 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+AT_SETUP([Weak Fairness (no weak)])
+AT_CHECK([cp TESTFILES/LTL/cycle_weak1.lola .])
+AT_CHECK([LOLA cycle_weak1.lola --formula='"FORMULA EVENTUALLY b = 1;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+AT_SETUP([Weak Fairness (fulfill weak)])
+AT_CHECK([cp TESTFILES/LTL/cycle_weak2.lola .])
+AT_CHECK([LOLA cycle_weak2.lola --formula='"FORMULA EVENTUALLY b = 1;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 2 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
+AT_SETUP([Weak Fairness (force weak)])
+AT_CHECK([cp TESTFILES/LTL/cycle_weak3.lola .])
+AT_CHECK([LOLA cycle_weak3.lola --formula='"FORMULA ALWAYS a + b + c + token = 2 ;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
+
+
+
 ############################################################################
 AT_BANNER([CTL])
 ############################################################################
@@ -219,6 +266,32 @@ AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 40354 markings" stderr])
 AT_KEYWORDS(ctl)
 AT_CLEANUP
+
+AT_SETUP([Weak Fairness (no weak)])
+AT_CHECK([cp TESTFILES/LTL/cycle_weak1.lola .])
+AT_CHECK([LOLA cycle_weak1.lola --formula='"FORMULA EVENTUALLY b = 1;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([Weak Fairness (fulfill weak)])
+AT_CHECK([cp TESTFILES/LTL/cycle_weak2.lola .])
+AT_CHECK([LOLA cycle_weak2.lola --formula='"FORMULA EVENTUALLY b = 1;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: yes" stderr])
+AT_CHECK([GREP -q "lola: 2 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
+AT_SETUP([Weak Fairness (force weak)])
+AT_CHECK([cp TESTFILES/LTL/cycle_weak3.lola .])
+AT_CHECK([LOLA cycle_weak3.lola --formula='"FORMULA TRUE AND ALLPATH ALWAYS a + b + c + token = 2 ;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
 
 
 ############################################################################

@@ -900,22 +900,11 @@ AtomicProposition(x) -> [ltl:
 		kc::tFormula internalFormula = StatePredicateFormula(AtomicProposition(x));
 		internalFormula->unparse(mylocalprinter, kc::internal);
         StatePredicate* result = internalFormula->formula;
-        // negation
-        internalFormula = StatePredicateFormula(Negation(AtomicProposition(x)));
-        internalFormula = internalFormula->rewrite(kc::neg);
-	    internalFormula = internalFormula->rewrite(kc::leq);
-    	internalFormula = internalFormula->rewrite(kc::sides);
-    	internalFormula = internalFormula->rewrite(kc::lists);
-        
-        //internalFormula->unparse(mylocalprinter, kc::out);
-        internalFormula->unparse(mylocalprinter, kc::internal);
-        StatePredicate* negresult = internalFormula->formula;
         
         // produce a new string
         int num;
         char_p sym = produce_next_string(&num);
         predicateMap[num] = result;
-        negpredicateMap[num] = negresult;
         LTLTree_p newTree = tl_nn(PREDICATE,NULL,NULL);
         newTree->sym = tl_lookup(sym);
         newTree = bin_simpler(newTree);

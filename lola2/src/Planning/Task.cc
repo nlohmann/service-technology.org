@@ -29,6 +29,7 @@
 #include <Exploration/SimpleProperty.h>
 #include <Exploration/Deadlock.h>
 #include <Exploration/FirelistStubbornDeadlock.h>
+#include <Exploration/FirelistStubbornDeletion.h>
 #include <Exploration/FirelistStubbornStatePredicate.h>
 #include <Exploration/StatePredicateProperty.h>
 #include <Exploration/ChooseTransition.h>
@@ -557,7 +558,10 @@ void Task::setProperty()
 
     case check_arg_deadlock:
         p = new Deadlock();
-        fl = new FirelistStubbornDeadlock();
+        if (args_info.stubborn_arg == stubborn_arg_deletion)
+			fl = new FirelistStubbornDeletion();
+		else
+			fl = new FirelistStubbornDeadlock();
         break;
 
     case check_arg_modelchecking:
@@ -567,7 +571,10 @@ void Task::setProperty()
     		fl = new Firelist();
     	} else if(spFormula) {
 			p = new StatePredicateProperty(spFormula);
-			fl = new FirelistStubbornStatePredicate(spFormula);
+	        if (args_info.stubborn_arg == stubborn_arg_deletion)
+				fl = new FirelistStubbornDeletion(spFormula);
+			else
+				fl = new FirelistStubbornStatePredicate(spFormula);
     	}
         break;
     }

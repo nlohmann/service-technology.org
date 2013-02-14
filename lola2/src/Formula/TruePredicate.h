@@ -39,7 +39,7 @@ public:
     virtual void evaluate(NetState &ns) {}
 
     /// counts atomic subformulas
-    virtual index_t countAtomic();
+    virtual index_t countAtomic() const;
 
     /// collects atomic subformulas; array must be malloced beforehand
     /// result is number of inserted elements
@@ -51,4 +51,7 @@ public:
 
     // copy function
     virtual StatePredicate* copy(StatePredicate* parent);
+
+	/// for direct read access for the deletion algorithm
+	virtual index_t getSubs(const StatePredicate* const** subs) const;
 };

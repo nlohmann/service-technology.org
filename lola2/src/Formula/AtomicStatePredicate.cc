@@ -122,7 +122,7 @@ void AtomicStatePredicate::evaluate(NetState &ns)
     value = (sum <= threshold);
 }
 
-index_t AtomicStatePredicate::countAtomic()
+index_t AtomicStatePredicate::countAtomic() const
 {
     return 1;
 }
@@ -271,3 +271,9 @@ StatePredicate* AtomicStatePredicate::copy(StatePredicate* parent)
     af->original = false;
     return af;
 }
+
+index_t AtomicStatePredicate::getSubs(const StatePredicate* const** subs) const
+{
+	return 0;
+}
+

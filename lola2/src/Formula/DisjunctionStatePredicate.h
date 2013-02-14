@@ -39,6 +39,10 @@ public:
 
     virtual bool DEBUG__consistency(NetState &ns);
 
+	// direct read access for the deletion algorithm
+	virtual index_t getSubs(const StatePredicate* const** subs) const;
+	bool isOrNode() const;
+
 private:
     /// the list of subformulas
     StatePredicate** sub;
@@ -50,7 +54,7 @@ private:
     index_t cardSat;
 
     /// counts atomic subformulas
-    virtual index_t countAtomic();
+    virtual index_t countAtomic() const;
 
     /// collects atomic subformulas; array must be malloced beforehand
     /// result is number of inserted elements

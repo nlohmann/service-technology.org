@@ -141,7 +141,7 @@ void DisjunctionStatePredicate::evaluate(NetState &ns)
     }
 }
 
-index_t DisjunctionStatePredicate::countAtomic()
+index_t DisjunctionStatePredicate::countAtomic() const
 {
     index_t result = 0;
 
@@ -221,3 +221,15 @@ StatePredicate* DisjunctionStatePredicate::copy(StatePredicate* parent)
     }
     return dsp;
 }
+
+index_t DisjunctionStatePredicate::getSubs(const StatePredicate* const** subs) const
+{
+	*subs = sub;
+	return cardSub;
+}
+
+bool DisjunctionStatePredicate::isOrNode() const
+{
+	return true;
+}
+

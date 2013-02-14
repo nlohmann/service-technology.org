@@ -49,7 +49,7 @@ public:
     index_t position;
 
     /// counts atomic subformulas
-    virtual index_t countAtomic() = 0;
+    virtual index_t countAtomic() const = 0;
 
     /// collects atomic subformulas; array must be malloced beforehand
     /// result is number of inserted elements
@@ -61,4 +61,11 @@ public:
     virtual StatePredicate* copy(StatePredicate* parent) = 0;
     /// create a new state predicate by copy this object.
     virtual StatePredicate* copy();
+
+	/// the following functions are added for the deletion algorithm
+	/// the deletion algorithm will only read the state predicates - no changes
+	virtual index_t getSubs(const StatePredicate* const** subs) const = 0;
+	virtual bool isOrNode() const;
+	virtual index_t countUnsatisfied() const; // for and-nodes only!
+
 };

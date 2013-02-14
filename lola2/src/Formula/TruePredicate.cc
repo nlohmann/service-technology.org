@@ -19,7 +19,7 @@ index_t TruePredicate::getUpSet(index_t* stack, bool* onstack)
     return 0;
 }
 
-index_t TruePredicate::countAtomic()
+index_t TruePredicate::countAtomic() const
 {
     return 0;
 }
@@ -36,3 +36,9 @@ StatePredicate* TruePredicate::copy(StatePredicate* parent)
     p->position = position;
     return p;
 }
+
+index_t TruePredicate::getSubs(const StatePredicate* const** subs) const
+{
+	return 0;
+}
+

@@ -64,6 +64,13 @@ option "state" s
   "Print witness state"
   flag off
 
+option "stubborn" -
+  "Which algorithm to use to construct stubborn sets"
+  values="tarjan","deletion" enum
+  typestr="STUBBORN"
+  default="tarjan"
+  optional
+
 option "symmetry" y
   "Use symmetry reduction"
   flag off

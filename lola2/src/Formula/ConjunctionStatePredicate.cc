@@ -133,7 +133,7 @@ void ConjunctionStatePredicate::evaluate(NetState &ns)
     }
 }
 
-index_t ConjunctionStatePredicate::countAtomic()
+index_t ConjunctionStatePredicate::countAtomic() const
 {
     index_t result = 0;
 
@@ -213,3 +213,15 @@ StatePredicate* ConjunctionStatePredicate::copy(StatePredicate* parent)
     }
     return csp;
 }
+
+index_t ConjunctionStatePredicate::getSubs(StatePredicate const *const **subs) const
+{
+	*subs = sub;
+	return cardSub;
+}
+
+index_t ConjunctionStatePredicate::countUnsatisfied() const
+{
+	return cardSub - cardSat;
+}
+

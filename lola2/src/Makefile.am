@@ -52,6 +52,7 @@ lola_SOURCES = \
                 Exploration/ChooseTransitionHashDriven.cc Exploration/ChooseTransitionHashDriven.h \
                 Exploration/StatePredicateProperty.cc Exploration/StatePredicateProperty.h \
                 Exploration/FirelistStubbornDeadlock.cc Exploration/FirelistStubbornDeadlock.h \
+                Exploration/FirelistStubbornDeletion.cc Exploration/FirelistStubbornDeletion.h \
                 Exploration/FirelistStubbornStatePredicate.cc Exploration/FirelistStubbornStatePredicate.h \
                 \
                 Formula/StatePredicate.h Formula/StatePredicate.cc\

@@ -446,7 +446,7 @@ b=BuechiAutomaton(trans,accept) -> [buechi:
     			b->automata->transitions[i][j] = (uint32_t*)calloc(2, sizeof(uint32_t));
     			b->automata->transitions[i][j][0] = transitions[i][j].first;
     			b->automata->transitions[i][j][1] = transitions[i][j].second;
-    			b->automata->atomicPropotions_backlist[transitions[i][j].second] = i;
+    			b->automata->atomicPropotions_backlist[transitions[i][j].first] = i;
     		}
     	}
     	

@@ -16,12 +16,12 @@ LTLExploration::~LTLExploration() {
 inline bool searchAndInsertAutomataState(uint32_t automataState,
 		AutomataTree** tree, AutomataTree** result) {
 	while (true) {
-		//rep->message("S %d %d", automataState, (*tree)?(*tree)->state:-1);
-		//rep->message("sai %d %d %d", automataState, *tree, (*tree)?(*tree)->state:-1);
+		////rep->message("S %d %d", automataState, (*tree)?(*tree)->state:-1);
+		////rep->message("sai %d %d %d", automataState, *tree, (*tree)?(*tree)->state:-1);
 		if (*tree == 0) {
 			*tree = new AutomataTree(automataState);
 			*result = *tree;
-			//rep->message("create state %d @ %d", automataState, *tree);
+			////rep->message("create state %d @ %d", automataState, *tree);
 			return false;
 		}
 		if ((*tree)->state == automataState) {
@@ -39,51 +39,53 @@ inline bool LTLExploration::get_first_transition(NetState &ns, Firelist &firelis
 		index_t* currentFirelistEntry, index_t** currentFirelist,index_t* currentStateListEntry,
 		index_t* currentStateListLength, index_t** currentStateList){
 	//XXX
-	//rep->message("GFT");
-	//rep->message("=========================");
+	////rep->message("GFT");
+	////rep->message("=========================");
 	// produce new firelist
 	// the size of the list is not a valid index (thus -1)
 	bool deadlock = (*currentFirelistEntry = (firelist.getFirelist(ns, currentFirelist) - 1)) == -1;
 	if (*currentFirelistEntry == 2 && (*currentFirelist)[0] == 1 && (*currentFirelist)[1] == 2 && (*currentFirelist)[2] == 11 ){ //&& (*currentFirelist)[0] == 1 && (*currentFirelist)[1] == 2
-		/*rep->message("CONT %d %d %d @ %x", (*currentFirelist)[0] == 1, (*currentFirelist)[1], *currentFirelistEntry, *currentFirelist);
+		/*//rep->message("CONT %d %d %d @ %x", (*currentFirelist)[0] == 1, (*currentFirelist)[1], *currentFirelistEntry, *currentFirelist);
 		for (int i = 0; i < 5; i++){
-			rep->message("MARKING %s %s %s %s %s",Net::Name[PL][5*i],Net::Name[PL][5*i+1],Net::Name[PL][5*i+2],Net::Name[PL][5*i+3],Net::Name[PL][5*i+4]);
-			rep->message("MARKING %d %d %d %d %d",ns.Current[5*i],ns.Current[5*i+1],ns.Current[5*i+2],ns.Current[5*i+3],ns.Current[5*i+4]);
+			//rep->message("MARKING %s %s %s %s %s",Net::Name[PL][5*i],Net::Name[PL][5*i+1],Net::Name[PL][5*i+2],Net::Name[PL][5*i+3],Net::Name[PL][5*i+4]);
+			//rep->message("MARKING %d %d %d %d %d",ns.Current[5*i],ns.Current[5*i+1],ns.Current[5*i+2],ns.Current[5*i+3],ns.Current[5*i+4]);
 		}*/
 	}
 	if (deadlock) return true;
 
+	//rep->message("NET %s %s %s %s", Net::Name[PL][0], Net::Name[PL][1], Net::Name[PL][2], Net::Name[PL][3]);
+	//rep->message("MAR %d %d %d %d", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3]);
 	// create automata states
 	*currentStateListEntry = automata.getSuccessors(currentStateList, currentAutomataState);
 	*currentStateListLength = *currentStateListEntry;
 
-	//rep->message("SLL %d", *currentStateListLength);
+	////rep->message("SLL %d", *currentStateListLength);
 	if (*currentStateListLength == 0){
 		*currentFirelistEntry = -1;
-		//rep->message("DEADLOCK %x", currentFirelistEntry);
+		////rep->message("DEADLOCK %x", currentFirelistEntry);
 		return false;
 	}
 	while (true){
 		// fire this transition to produce new Marking::Current
-		//rep->message("current B(%s): %d %d %d, %d %d %d, %d",Net::Name[TR][(*currentFirelist)[*currentFirelistEntry]], ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6]);
+		////rep->message("current B(%s): %d %d %d, %d %d %d, %d",Net::Name[TR][(*currentFirelist)[*currentFirelistEntry]], ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6]);
 		Transition::fire(ns, (*currentFirelist)[*currentFirelistEntry]);
 		Transition::updateEnabled(ns, (*currentFirelist)[*currentFirelistEntry]);
 		// check whether this transition goes into an non forbidden state
-		//rep->message("current F(%s): %d %d %d, %d %d %d, %d",Net::Name[TR][(*currentFirelist)[*currentFirelistEntry]], ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6]);
+		////rep->message("current F(%s): %d %d %d, %d %d %d, %d",Net::Name[TR][(*currentFirelist)[*currentFirelistEntry]], ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6]);
 		bool forbidden = false;
 		for(index_t i = 0; i < card_forbidden_transitions; i++)
 			if (ns.Enabled[forbidden_transitions[i]]){
-				//rep->message("FORBI %d %s", forbidden_transtitions[i], Net::Name[TR][forbidden_transtitions[i]]);
+				////rep->message("FORBI %d %s", forbidden_transtitions[i], Net::Name[TR][forbidden_transtitions[i]]);
 				forbidden = true; break;
 			}
 		if (!forbidden) break;
-		//rep->message("FORB");
+		////rep->message("FORB");
 		Transition::backfire(ns, (*currentFirelist)[*currentFirelistEntry]);
 		Transition::revertEnabled(ns,(*currentFirelist)[*currentFirelistEntry]);
 		if (--(*currentFirelistEntry) == -1) break;
 	}
 	if (*currentFirelistEntry != -1){
-		//rep->message("UPDATE");
+		////rep->message("UPDATE");
 		automata.updateProperties(ns, (*currentFirelist)[*currentFirelistEntry]);
 	}
 	return false;
@@ -94,16 +96,16 @@ inline void LTLExploration::get_next_transition(BuechiAutomata &automata, NetSta
 		index_t* currentStateListEntry, index_t* currentFirelistEntry, index_t* currentFirelist, index_t stateListLength,
 		index_t currentAutomataState){
 	// calculate the next transition
-	//rep->message("GNT: %x",currentFirelist);
+	////rep->message("GNT: %x",currentFirelist);
 	if (*currentStateListEntry == 0) {
 		// revert currently fired transitions
-		//rep->message("GNT-->");
+		////rep->message("GNT-->");
 		while (true){
 			// revert the petrinet
 			Transition::backfire(ns, currentFirelist[*currentFirelistEntry]);
 			Transition::revertEnabled(ns,currentFirelist[*currentFirelistEntry]);
 			automata.revertProperties(ns,currentFirelist[*currentFirelistEntry]);
-			//rep->message("current N: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
+			////rep->message("current N: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
 			(*currentFirelistEntry)--;
 			// if there is no next transition ext
 			if (*currentFirelistEntry == -1) break;
@@ -112,7 +114,7 @@ inline void LTLExploration::get_next_transition(BuechiAutomata &automata, NetSta
 			Transition::updateEnabled(ns, currentFirelist[*currentFirelistEntry]);
 			// check current marking for property
 			automata.updateProperties(ns, currentFirelist[*currentFirelistEntry]);
-			//rep->message("current F: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
+			////rep->message("current F: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
 			// check for forbidden transition
 			bool forbidden = false;
 			for(index_t i = 0; i < card_forbidden_transitions; i++)
@@ -122,13 +124,13 @@ inline void LTLExploration::get_next_transition(BuechiAutomata &automata, NetSta
 				}
 			if (!forbidden)
 				break;
-			//rep->message("FORB");
+			////rep->message("FORB");
 			// set available transitions in Buechi-Automata
 		}
 		*currentStateListEntry = stateListLength - 1;
 	} else
 		(*currentStateListEntry)--;
-	//rep->message("--> %d %d",*currentStateListEntry,*currentFirelistEntry);
+	////rep->message("--> %d %d",*currentStateListEntry,*currentFirelistEntry);
 }
 
 
@@ -145,7 +147,7 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
 		Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
 		index_t currentAutomataState, dfsnum_t depth, bool** enabledStrongTransitions) {
 
-	//rep->message("====================CF==================");
+	////rep->message("====================CF==================");
 	// the stack for the search
 	SearchStack<LTLFairnessStackEntry> stack;
 	// prepare the search
@@ -190,7 +192,7 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
 
 		// there is a next transition that needs to be explored in current marking
 		if (currentFirelistEntry != -1 && currentStateListEntry >= 0) {
-			//rep->message("current state %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3],ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
+			////rep->message("current state %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3],ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
 			// search in the store
 			AutomataTree* searchResult;
 			store.searchAndInsert(ns, &searchResult, 0);
@@ -198,7 +200,7 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
 			// search state in state-tree
 			searchAndInsertAutomataState(currentStateList[currentStateListEntry], &searchResult,&nextStateEntry);
 
-			//rep->message("nSE %d",nextStateEntry->dfs, -depth);
+			////rep->message("nSE %d",nextStateEntry->dfs, -depth);
 
 			if (nextStateEntry->dfs == -depth || nextStateEntry->dfs == -depth-1){
 				// maybe the transition itself does fulfill something
@@ -249,7 +251,7 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
 			delete[] currentFirelist;
 			if (stack.StackPointer == 0) {
 
-				//rep->message("====================RES==================");
+				////rep->message("====================RES==================");
 				// searched all states, calculate return value
 				if (card_fulfilled_weak != assumptions.card_weak
 						|| !buechi_accepting_state){
@@ -266,13 +268,13 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
 							bad = true;
 							break;
 						}
-					//rep->message("STRONG %d (%s): %d %d %d", i, Net::Name[TR][assumptions.strong_fairness[i]], enabled_strong[i], fulfilled_strong[i], bad);
+					////rep->message("STRONG %d (%s): %d %d %d", i, Net::Name[TR][assumptions.strong_fairness[i]], enabled_strong[i], fulfilled_strong[i], bad);
 					if (enabled_strong[i] && (!fulfilled_strong[i] || bad )){
 						free(fulfilled_strong);
 						free(fulfilled_weak);
 						free(enabled_strong);
 						free(__enabled_weak);
-						//rep->message("Forbid %d %s",assumptions.strong_fairness[i], Net::Name[TR][assumptions.strong_fairness[i]]);
+						////rep->message("Forbid %d %s",assumptions.strong_fairness[i], Net::Name[TR][assumptions.strong_fairness[i]]);
 						if (bad)
 							return -2;
 						return i;
@@ -320,11 +322,11 @@ bool LTLExploration::iterateSCC(BuechiAutomata &automata,
 	// will set on all visited markings DFS = -depth -3
 
 
-	//rep->message("===========================SS======================");
-	//rep->message("START SEARCH %d %d %d %d (%d) %d", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState, depth);
+	////rep->message("===========================SS======================");
+	////rep->message("START SEARCH %d %d %d %d (%d) %d", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState, depth);
 	// current markings belongs to a new SCC
 	bool forbidden = false;
-	//rep->message("FB %d %d %d %d, %d", ns.Enabled[0], ns.Enabled[1], ns.Enabled[2], ns.Enabled[3], forbidden_transtitions[0]);
+	////rep->message("FB %d %d %d %d, %d", ns.Enabled[0], ns.Enabled[1], ns.Enabled[2], ns.Enabled[3], forbidden_transtitions[0]);
 	for(index_t i = 0; i < card_forbidden_transitions; i++)
 		if (ns.Enabled[forbidden_transitions[i]]){
 			//Transition::backfire(ns, currentFirelist[currentFirelistEntry]);
@@ -333,13 +335,13 @@ bool LTLExploration::iterateSCC(BuechiAutomata &automata,
 			break;
 		}
 	if (!forbidden){
-		//rep->message("===> @ BEGIN");
+		////rep->message("===> @ BEGIN");
 		if (searchFair(automata, store, firelist, ns, currentAutomataState, currentStateEntry,depth,currentNextDF)){
-			//rep->message("========== SCC =========");
+			////rep->message("========== SCC =========");
 			return true;
 		}
 	}
-	//rep->message("===========================NF======================");
+	////rep->message("===========================NF======================");
 	// if this SCC does not fulfill the property and the fairness assumption, search for non-fain-connected SCC's
 
 
@@ -395,8 +397,8 @@ bool LTLExploration::iterateSCC(BuechiAutomata &automata,
 							break;
 						}
 					if (!forbidden){
-						//rep->message("===========================SS======================");
-						//rep->message("START SEARCH %d %d %d %d (%d) %d", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState, depth);
+						////rep->message("===========================SS======================");
+						////rep->message("START SEARCH %d %d %d %d (%d) %d", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState, depth);
 						// found a fair example
 						if (searchFair(automata, store, firelist, ns, currentAutomataState, nextStateEntry,depth,currentNextDF)){
 							// produce witness path
@@ -408,12 +410,12 @@ bool LTLExploration::iterateSCC(BuechiAutomata &automata,
 							}
 							delete[] currentFirelist;
 							delete[] currentStateList;
-							//rep->message("========== SCC =========");
+							////rep->message("========== SCC =========");
 							return true;
 						}
 					} //else {
-					//	rep->message("SCC forb");
-					//	rep->message("FB %d %d %d %d, %d", ns.Enabled[0], ns.Enabled[1], ns.Enabled[2], ns.Enabled[3], forbidden_transtitions[0]);
+					//	//rep->message("SCC forb");
+					//	//rep->message("FB %d %d %d %d, %d", ns.Enabled[0], ns.Enabled[1], ns.Enabled[2], ns.Enabled[3], forbidden_transtitions[0]);
 					//}
 
 					// mark this state as visited
@@ -452,7 +454,7 @@ bool LTLExploration::iterateSCC(BuechiAutomata &automata,
 			delete[] currentFirelist;
 			// no example has been found
 			if (stack.StackPointer == 0){
-				//rep->message("========== NO SCC =========");
+				////rep->message("========== NO SCC =========");
 				return false;
 			}
 
@@ -485,8 +487,8 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 		index_t currentAutomataState, AutomataTree* currentStateEntry,
 		dfsnum_t depth, index_t initialDFS) {
 
-	// rep->message("=====================CALL===========================");
-	//rep->message("current BEGIN: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
+	// //rep->message("=====================CALL===========================");
+	////rep->message("current BEGIN: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
 	// at this point we assume, that all states being outside the current SCC
 	// depth and DFS numbers
 	// dfs numbers < initialDFS    -    unprocessed outside
@@ -522,7 +524,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 	// if there is a deadlock
 	if (get_first_transition(ns,firelist,automata, currentAutomataState,&currentFirelistEntry,&currentFirelist,&currentStateListEntry,&currentStateListLength, &currentStateList)){
 		if (isAcceptingLoopReachable(automata,currentAutomataState)){
-			//rep->message("LOOP");
+			////rep->message("LOOP");
 			delete[] currentStateList;
 			delete[] currentFirelist;
 			return true;
@@ -553,7 +555,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 			// unseen state
 			if (nextStateEntry->dfs == -depth - 1) {
 
-				//rep->message("NEW");
+				////rep->message("NEW");
 				// switch to next state
 				currentAutomataState = currentStateList[currentStateListEntry];
 				// State does not exist!
@@ -574,7 +576,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 						stack.top().~LTLStackEntry();
 						stack.pop();
 					}
-					//rep->message("=============== RET T ==============");
+					////rep->message("=============== RET T ==============");
 					return true;
 				}
 
@@ -609,7 +611,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 				// if on tarjan-stack(indicated by lowlink == -depth - 2)
 				// this is not necessary
 				// if (nextStateEntry->dfs != -1)
-				//rep->message("Adjust DFS from %d %d %d %d (%d) %d [%d,%d]", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState, depth,nextStateEntry->dfs,currentLowlink);
+				////rep->message("Adjust DFS from %d %d %d %d (%d) %d [%d,%d]", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], currentAutomataState, depth,nextStateEntry->dfs,currentLowlink);
 
 				if (nextStateEntry->dfs >= initialDFS
 						&& currentLowlink > nextStateEntry->dfs)
@@ -644,24 +646,24 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 				//AutomataTree** __back_entry = __back_stack.push();
 				//*__back_entry = currentStateEntry;
 
-				//rep->message("SCC FOUND %d",currentLowlink);
+				////rep->message("SCC FOUND %d",currentLowlink);
 				//for (int i = 0; i < 5; i++){
-				//	rep->message("MARKING %s %s %s %s %s",Net::Name[PL][5*i],Net::Name[PL][5*i+1],Net::Name[PL][5*i+2],Net::Name[PL][5*i+3],Net::Name[PL][5*i+4]);
-				//	rep->message("MARKING %d %d %d %d %d",ns.Current[5*i],ns.Current[5*i+1],ns.Current[5*i+2],ns.Current[5*i+3],ns.Current[5*i+4]);
+				//	//rep->message("MARKING %s %s %s %s %s",Net::Name[PL][5*i],Net::Name[PL][5*i+1],Net::Name[PL][5*i+2],Net::Name[PL][5*i+3],Net::Name[PL][5*i+4]);
+				//	//rep->message("MARKING %d %d %d %d %d",ns.Current[5*i],ns.Current[5*i+1],ns.Current[5*i+2],ns.Current[5*i+3],ns.Current[5*i+4]);
 				//}
-				//rep->message("current aftrF: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
+				////rep->message("current aftrF: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
 				// not found the counter example, so discard the component
-				// rep->message("BEGIN SCC");
-				//rep->message("%x",currentStateEntry);
+				// //rep->message("BEGIN SCC");
+				////rep->message("%x",currentStateEntry);
 				while (tarjanStack.StackPointer
 						&& tarjanStack.top()->dfs > currentStateEntry->dfs) {
-					//rep->message("+1");
+					////rep->message("+1");
 					// mark all states as visited
-					//rep->message("%x, %d > %d", tarjanStack.top(), tarjanStack.top()->dfs, currentStateEntry->dfs);
+					////rep->message("%x, %d > %d", tarjanStack.top(), tarjanStack.top()->dfs, currentStateEntry->dfs);
 					tarjanStack.top()->dfs = -currentNextDepth;
 					// check whether is state is an accepting one
 					foundcounterexample |= automata.isAcceptingState(tarjanStack.top()->state);
-					//if (automata.isAcceptingState(tarjanStack.top()->state)) rep->message("FOUND STATE @ %x %d",tarjanStack.top(),tarjanStack.top()->state);
+					//if (automata.isAcceptingState(tarjanStack.top()->state)) //rep->message("FOUND STATE @ %x %d",tarjanStack.top(),tarjanStack.top()->state);
 					tarjanStack.pop();
 				}
 
@@ -671,12 +673,12 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 				currentStateEntry->dfs = -currentNextDepth - 1;
 				// if a counter example if found it must be inside a non trivial SCC, else it is none
 				currentNextDepth += 4;
-				//rep->message("SCC STATUS %d %d", foundcounterexample, nonTrivial);
+				////rep->message("SCC STATUS %d %d", foundcounterexample, nonTrivial);
 				if (foundcounterexample && nonTrivial) {
 					// first we need to check all fairness assumptions via DFS
 					bool* enabled_strong_fair;
 					index_t checkResult = checkFairness(automata, store, firelist, ns, currentAutomataState, currentNextDepth-4, &enabled_strong_fair);
-					//rep->message("CF %d", checkResult);
+					////rep->message("CF %d", checkResult);
 
 					// now all markings current SCC have DFS = -(currentNextDepth-3) - 1;
 					if (checkResult == -1){
@@ -697,7 +699,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 							if (!__enabled_weak[i])
 								fulfilled_conditions++,fulfilledWeak[i] = true;
 						// produce the witness path inside the SCC
-						//rep->message("%d = %d + %d + 1",fulfilled_conditions,assumptions.card_strong,assumptions.card_weak);
+						////rep->message("%d = %d + %d + 1",fulfilled_conditions,assumptions.card_strong,assumptions.card_weak);
 						if (fulfilled_conditions == assumptions.card_strong + assumptions.card_weak + 1)
 							completeWitness(automata,store,firelist,ns,currentAutomataState,currentStateEntry,currentNextDepth-4, currentNextDepth);
 						else
@@ -716,12 +718,12 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 							stack.top().~LTLStackEntry();
 							stack.pop();
 						}
-						//rep->message("=============== RET T ==============");
+						////rep->message("=============== RET T ==============");
 						return true;
 					}
 					if (checkResult != -2){
 						// if a strong fairness assumption is not fulfilled -> search smaller components
-						//rep->message("FORBID %d %d %s",card_forbidden_transtitions, assumptions.strong_fairness[checkResult], Net::Name[TR][assumptions.strong_fairness[checkResult]]);
+						////rep->message("FORBID %d %d %s",card_forbidden_transtitions, assumptions.strong_fairness[checkResult], Net::Name[TR][assumptions.strong_fairness[checkResult]]);
 						forbidden_transitions[card_forbidden_transitions++] = assumptions.strong_fairness[checkResult];
 
 						// check for fairness via lichtenstein-pnueli
@@ -735,7 +737,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 								stack.top().~LTLStackEntry();
 								stack.pop();
 							}
-							//rep->message("============= RET T ==============");
+							////rep->message("============= RET T ==============");
 							return true;
 						}
 						// the transition is not any more forbidden
@@ -763,7 +765,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 			delete[] currentStateList;
 			if (stack.StackPointer == 0) {
 				// have completely processed initial marking --> SCC not found
-				// rep->message("=============RET F==============");
+				// //rep->message("=============RET F==============");
 				return false;
 			}
 
@@ -800,8 +802,8 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 bool LTLExploration::checkProperty(BuechiAutomata &automata,
 		Store<AutomataTree> &store, Firelist &firelist, NetState &ns) {
 	// XXX
-	//rep->message("Names %s %s %s, %s %s %s, %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3],Net::Name[PL][4],Net::Name[PL][5],Net::Name[PL][6]);
-	//rep->message("Names %s %s %s %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3]);
+	////rep->message("Names %s %s %s, %s %s %s, %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3],Net::Name[PL][4],Net::Name[PL][5],Net::Name[PL][6]);
+	////rep->message("Names %s %s %s %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3]);
 
 	// prepare strong fairness assumptions
 	assumptions.card_strong = 0;
@@ -813,7 +815,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	// put all strong fair transitions into an array
 	index_t __card_on_sf = 0;
 	for (index_t i = 0; i < Net::Card[TR]; i++){
-		//rep->message("Transition (%s) %d: Fairness %d", Net::Name[TR][i], i, Transition::Fairness[i]);
+		////rep->message("Transition (%s) %d: Fairness %d", Net::Name[TR][i], i, Transition::Fairness[i]);
 		if (Transition::Fairness[i] == STRONG_FAIRNESS) {
 			assumptions.strong_fairness[__card_on_sf] = i;
 			assumptions.strong_backlist[i] = __card_on_sf++;
@@ -839,7 +841,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 
 	// prepare forbidden transtitions
 	forbidden_transitions = (index_t*) calloc(assumptions.card_strong, SIZEOF_INDEX_T);
-	//rep->message("FORB %x",forbidden_transtitions);
+	////rep->message("FORB %x",forbidden_transtitions);
 	card_forbidden_transitions = 0;
 
 	// initialize the properties
@@ -896,7 +898,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	free(assumptions.strong_fairness);
 	free(assumptions.weak_backlist);
 	free(assumptions.weak_fairness);
-	//rep->message("FORB %x",forbidden_transtitions);
+	////rep->message("FORB %x",forbidden_transtitions);
 	free(forbidden_transitions);
 
 	return result;
@@ -935,7 +937,7 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 		dfsnum_t depth, dfsnum_t witness_depth, bool* fulfilled_weak, bool* fulfilled_strong,
 		index_t fulfilled_conditions, bool acceptingStateFound, AutomataTree* targetPointer) {
 	// XXX
-	//rep->message("==================== PW =================== %d (%d)", fulfilled_conditions,acceptingStateFound);
+	////rep->message("==================== PW =================== %d (%d)", fulfilled_conditions,acceptingStateFound);
 	// the stack for the search
 	SearchStack<LTLStackEntry> stack;
 	// get first firelist
@@ -944,7 +946,7 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 	index_t currentFirelistEntry;
 	index_t* currentStateList;
 	index_t currentStateListEntry,currentStateListLength;
-	//rep->message("GO INTI PW %x  @ %x", &currentFirelistEntry, currentStateEntry);
+	////rep->message("GO INTI PW %x  @ %x", &currentFirelistEntry, currentStateEntry);
 	get_first_transition(ns,firelist,automata, currentAutomataState,&currentFirelistEntry,&currentFirelist,&currentStateListEntry,&currentStateListLength, &currentStateList);
 
 	while (true) // exit when trying to pop from empty stack
@@ -961,12 +963,12 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 			// search state in state-tree
 			searchAndInsertAutomataState(currentStateList[currentStateListEntry], &searchResult,&nextStateEntry);
 
-			//rep->message("Store: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
-			//rep->message("Store: %d %d", nextStateEntry->dfs, -depth - 1);
+			////rep->message("Store: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
+			////rep->message("Store: %d %d", nextStateEntry->dfs, -depth - 1);
 
 			// if state belongs to the current SCC
 			if (nextStateEntry->dfs <= - depth - 1 && nextStateEntry->dfs >= -witness_depth){
-				//rep->message("@ %x %d", nextStateEntry, nextStateEntry->dfs);
+				////rep->message("@ %x %d", nextStateEntry, nextStateEntry->dfs);
 
 				bool newly_fulfilled = false;
 				// maybe the transition itself has made us fair
@@ -974,13 +976,13 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 					// found a successor
 					if (!fulfilled_weak[assumptions.weak_backlist[currentFirelist[currentFirelistEntry]]]) {
 						fulfilled_conditions++; newly_fulfilled = true;
-						//rep->message("FC Weak %d",currentFirelist[currentFirelistEntry]);
+						////rep->message("FC Weak %d",currentFirelist[currentFirelistEntry]);
 						fulfilled_weak[assumptions.weak_backlist[currentFirelist[currentFirelistEntry]]] = true;
 					}
 				} else if (assumptions.strong_backlist[currentFirelist[currentFirelistEntry]] != -1) {
 					// strong, found a successor in set
-					//rep->message("FC Strong %d %s",currentFirelist[currentFirelistEntry], Net::Name[TR][currentFirelist[currentFirelistEntry]]);
-					//rep->message("FC Strong: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
+					////rep->message("FC Strong %d %s",currentFirelist[currentFirelistEntry], Net::Name[TR][currentFirelist[currentFirelistEntry]]);
+					////rep->message("FC Strong: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
 					fulfilled_strong[assumptions.strong_backlist[currentFirelist[currentFirelistEntry]]] = true;
 					fulfilled_conditions++; newly_fulfilled = true;
 				}
@@ -1076,8 +1078,8 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
 void LTLExploration::completeWitness(BuechiAutomata &automata, Store<AutomataTree> &store, Firelist &firelist, NetState &ns,
 		index_t currentAutomataState,  AutomataTree* targetPointer, dfsnum_t depth, dfsnum_t witness_depth) {
 	// XXX
-	//rep->message("==================== CW ===================");
-	//rep->message("ENTER: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
+	////rep->message("==================== CW ===================");
+	////rep->message("ENTER: %d %d %d, %d %d %d, %d (%d)", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState);
 	// the stack for the search
 	SearchStack<LTLFairnessStackEntry> stack;
 	// get first firelist
@@ -1087,10 +1089,10 @@ void LTLExploration::completeWitness(BuechiAutomata &automata, Store<AutomataTre
 	index_t* currentStateList;
 	index_t currentStateListEntry,currentStateListLength;
 	get_first_transition(ns,firelist,automata, currentAutomataState,&currentFirelistEntry,&currentFirelist,&currentStateListEntry,&currentStateListLength, &currentStateList);
-	//rep->message("GO INTI CW %x = %d to %x", &currentFirelistEntry, currentFirelistEntry, targetPointer);
+	////rep->message("GO INTI CW %x = %d to %x", &currentFirelistEntry, currentFirelistEntry, targetPointer);
 //	for (int i = 0; i < 5; i++){
-//		rep->message("MARKING %s %s %s %s %s",Net::Name[PL][5*i],Net::Name[PL][5*i+1],Net::Name[PL][5*i+2],Net::Name[PL][5*i+3],Net::Name[PL][5*i+4]);
-//		rep->message("MARKING %d %d %d %d %d",ns.Current[5*i],ns.Current[5*i+1],ns.Current[5*i+2],ns.Current[5*i+3],ns.Current[5*i+4]);
+//		//rep->message("MARKING %s %s %s %s %s",Net::Name[PL][5*i],Net::Name[PL][5*i+1],Net::Name[PL][5*i+2],Net::Name[PL][5*i+3],Net::Name[PL][5*i+4]);
+//		//rep->message("MARKING %d %d %d %d %d",ns.Current[5*i],ns.Current[5*i+1],ns.Current[5*i+2],ns.Current[5*i+3],ns.Current[5*i+4]);
 //	}
 
 	while (true) // exit when trying to pop from empty stack
@@ -1105,7 +1107,7 @@ void LTLExploration::completeWitness(BuechiAutomata &automata, Store<AutomataTre
 			AutomataTree* nextStateEntry = 0;
 			// search state in state-tree
 			searchAndInsertAutomataState(currentStateList[currentStateListEntry], &searchResult, &nextStateEntry);
-			//rep->message("GOTO @ %x -> %d (%ud,%ud)", nextStateEntry, nextStateEntry->dfs, -depth-1 - 4294967200, -witness_depth-4294967200);
+			////rep->message("GOTO @ %x -> %d (%ud,%ud)", nextStateEntry, nextStateEntry->dfs, -depth-1 - 4294967200, -witness_depth-4294967200);
 
 			if (nextStateEntry == targetPointer){
 				// found the state we are looking for
@@ -1121,7 +1123,7 @@ void LTLExploration::completeWitness(BuechiAutomata &automata, Store<AutomataTre
 			}
 
 			if (nextStateEntry->dfs <= - depth - 1 && nextStateEntry->dfs > -witness_depth){
-				//rep->message("ENTER: %d %d %d, %d %d %d, %d (%d) %d", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState, nextStateEntry->dfs);
+				////rep->message("ENTER: %d %d %d, %d %d %d, %d (%d) %d", ns.Current[0], ns.Current[1], ns.Current[2], ns.Current[3], ns.Current[4], ns.Current[5], ns.Current[6], currentAutomataState, nextStateEntry->dfs);
 				// switch to next state
 				currentAutomataState = currentStateList[currentStateListEntry];
 				// mark new state as visited
@@ -1132,7 +1134,7 @@ void LTLExploration::completeWitness(BuechiAutomata &automata, Store<AutomataTre
 						currentFirelistEntry, currentStateList,
 						currentStateListEntry,currentStateListLength);
 				bool dead = get_first_transition(ns,firelist,automata, currentAutomataState,&currentFirelistEntry,&currentFirelist,&currentStateListEntry,&currentStateListLength, &currentStateList);
-				//rep->message("OUTPUT %d %d", dead, currentFirelistEntry);
+				////rep->message("OUTPUT %d %d", dead, currentFirelistEntry);
 			}
 		} else {
 			// firing list completed -->close state and return to previous state

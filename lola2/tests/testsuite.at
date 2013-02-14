@@ -163,6 +163,17 @@ AT_CLEANUP
 
 
 
+AT_SETUP([Weak Fairness (force weak)])
+AT_CHECK([cp TESTFILES/LTL/cycle_weak3.lola .])
+AT_CHECK([LOLA cycle_weak3.lola --formula='"FORMULA ALWAYS a + b + c + token = 2 ;"' --check=modelchecking --store=prefix --encoder=bit -v],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 2 markings" stderr])
+AT_KEYWORDS(ltl)
+AT_CLEANUP
+
+
+
+
 
 ############################################################################
 AT_BANNER([CTL])

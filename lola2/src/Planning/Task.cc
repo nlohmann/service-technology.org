@@ -717,7 +717,10 @@ void Task::printWitness()
 
     if(ctlFormula) {
 		for(std::vector<int>::iterator it = ctlExploration->witness.begin(); it != ctlExploration->witness.end();it++) {
-			rep->message("%s", Net::Name[TR][*it]);
+			if(*it == -1)
+				rep->message("===begin of cycle===");
+			else
+				rep->message("%s", Net::Name[TR][*it]);
 		}
 		ctlExploration->witness.clear();
     } else if (bauto){

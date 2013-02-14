@@ -97,6 +97,15 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	index_t* currentFirelist;
 	index_t currentFirelistIndex = firelist.getFirelist(ns,&currentFirelist);
 
+	// test if initial state is deadlock
+	if(!currentFirelistIndex) {
+		setCachedResult(payload,KNOWN_FALSE);
+
+		//rep->status("AU initial FALSE (deadlock) at %x",ns.HashCurrent);
+
+		return false;
+	}
+
 	// initialize dfs number, lowlink; mark state to be on tarjan stack
 	setDFS(payload, ++currentDFSNumber);
 	currentLowlink = currentDFSNumber;
@@ -154,6 +163,13 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	            // get new firelist
 				payload = newpayload;
 				currentFirelistIndex = firelist.getFirelist(ns,&currentFirelist);
+
+				// test if new state is deadlock
+				if(!currentFirelistIndex) {
+					delete[] currentFirelist;
+					backfireNeeded = false;
+					break;
+				}
 
 				setDFS(newpayload, ++currentDFSNumber);
 				currentLowlink = currentDFSNumber;
@@ -514,6 +530,8 @@ void AUFormula::constructWitness(Store<void*>& s, NetState& ns,
 		}
 
 	produceWitness(s,ns,firelist,witness,fairness,*pPayload,getDFS(*pPayload),fulfilled_weak,fulfilled_strong,fulfilled_conditions);
+
+	witness->push_back(-1); // mark begin of cycle
 
 	free(fulfilled_weak);
 	free(fulfilled_strong);

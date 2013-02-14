@@ -310,6 +310,14 @@ AT_CHECK([GREP -q "lola: 242 markings" stderr])
 AT_KEYWORDS(ctl)
 AT_CLEANUP
 
+AT_SETUP([AF(FALSE) with deadlock])
+AT_CHECK([cp TESTFILES/4state.lola .])
+AT_CHECK([LOLA 4state.lola --formula='"FORMULA ALLPATH EVENTUALLY FALSE;"' --check=modelchecking],0,stdout,stderr)
+AT_CHECK([GREP -q "lola: result: no" stderr])
+AT_CHECK([GREP -q "lola: 193 markings" stderr])
+AT_KEYWORDS(ctl)
+AT_CLEANUP
+
 AT_SETUP([AU and AX on phils5])
 AT_CHECK([cp TESTFILES/CTL/phils-AX.task .])
 AT_CHECK([cp TESTFILES/phils5.lola .])
@@ -324,7 +332,6 @@ AT_CHECK([cp TESTFILES/CTL/phils-EX.task .])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --formula=phils-EX.task --check=modelchecking --store=prefix --encoder=bit],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
-AT_CHECK([GREP -q "lola: 242 markings" stderr])
 AT_KEYWORDS(ctl)
 AT_CLEANUP
 
@@ -351,7 +358,6 @@ AT_CHECK([cp TESTFILES/CTL/phils-TemporalDisjunction.task .])
 AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([LOLA phils5.lola --formula=phils-TemporalDisjunction.task --check=modelchecking --store=prefix --encoder=bit],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_CHECK([GREP -q "lola: 39 markings" stderr])
 AT_KEYWORDS(ctl)
 AT_CLEANUP
 

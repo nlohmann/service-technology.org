@@ -101,6 +101,8 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 	if(!currentFirelistIndex) {
 		setCachedResult(payload,KNOWN_FALSE);
 
+		delete[] currentFirelist;
+
 		//rep->status("AU initial FALSE (deadlock) at %x",ns.HashCurrent);
 
 		return false;
@@ -157,8 +159,7 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				}
 
 				// recursive descent
-	            DFSStackEntry* entry = dfsStack.push();
-				new (entry) DFSStackEntry(currentFirelist,currentFirelistIndex,payload,currentLowlink);
+				new (dfsStack.push()) DFSStackEntry(currentFirelist,currentFirelistIndex,payload,currentLowlink);
 
 	            // get new firelist
 				payload = newpayload;
@@ -179,11 +180,6 @@ bool AUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				// break; set all nodes to false
 				break;
 			} else if(newCachedResult == IN_PROGRESS) {
-				//if(true) { // TODO: fairness check
-					// break; set all nodes to false
-				//	break;
-				//}
-
 				// update lowlink and continue
 				statenumber_t newdfs = getDFS(newpayload);
 				if(newdfs < currentLowlink)
@@ -467,7 +463,7 @@ bool AUFormula::getFairWitness(Store<void*>& s, NetState& ns,
 
 	// if area is trivial, there is no witness
 	if(!nonTrivial)
-		return weakFair = false;
+		weakFair = false;
 
 	// test if weak fairness assumption is violated
 	for(int t = 0; t < fairness.card_weak; t++)

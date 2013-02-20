@@ -17,7 +17,7 @@ enum CTLFormulaResult {
 };
 
 struct CTLFormula {
-	index_t index; // bit index in state payload. known flag is 2*index, value flag is 2*index+1
+	index_t index; // bit index in state payload. known flag is index, value flag is index+1
 	size_t payloadsize;
 
 	CTLFormulaResult getCachedResult(void* payload) {

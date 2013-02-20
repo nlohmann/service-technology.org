@@ -94,8 +94,7 @@ bool EUFormula::check(Store<void*>& s, NetState& ns, Firelist& firelist, std::ve
 				}
 
 				// recursive descent
-				DFSStackEntry* entry = dfsStack.push();
-				new (entry) DFSStackEntry(currentFirelist,currentFirelistIndex,payload,currentLowlink);
+				new (dfsStack.push()) DFSStackEntry(currentFirelist,currentFirelistIndex,payload,currentLowlink);
 
 				payload = newpayload;
 				currentFirelistIndex = firelist.getFirelist(ns,&currentFirelist);

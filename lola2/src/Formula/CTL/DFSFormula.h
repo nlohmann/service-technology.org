@@ -37,10 +37,10 @@ struct DFSFormula : public CTLFormula {
 	index_t dfsindex; // byte index to dfs number
 
 	statenumber_t getDFS(void* payload) {
-		return *reinterpret_cast<statenumber_t*>(reinterpret_cast<char*>(payload)+dfsindex);
+		return *reinterpret_cast<statenumber_t*>(reinterpret_cast<uint8_t*>(payload)+dfsindex);
 	}
 
 	void setDFS(void* payload, statenumber_t dfs) {
-		*reinterpret_cast<statenumber_t*>(reinterpret_cast<char*>(payload)+dfsindex) = dfs;
+		*reinterpret_cast<statenumber_t*>(reinterpret_cast<uint8_t*>(payload)+dfsindex) = dfs;
 	}
 };

@@ -366,7 +366,7 @@ bool PrefixTreeStore<T>::popVector(vectordata_t * & out)
   }
     
   // we start with the root of the decision tree
-  pAnchor = &anchor;
+  pAnchor = &branch;
   // and search for the decision node differing as last from the "first" vector
   while(anchor->nextold)
    {

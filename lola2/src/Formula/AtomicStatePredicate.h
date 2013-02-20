@@ -96,4 +96,7 @@ public:
 
 	/// direct read access for the deletion algorithm
 	virtual index_t getSubs(const StatePredicate* const** subs) const;
+
+	/// returns the negated version of this property, but leaves the current one untouched
+	StatePredicate* negate();
 };

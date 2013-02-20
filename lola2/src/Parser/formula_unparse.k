@@ -957,7 +957,8 @@ AtomicProposition(x) -> [ltl:
         // produce a new string
         int num;
         char_p sym = produce_next_string(&num);
-        predicateMap[num] = result;
+        // I know what i am doing, the current sub-tree is an atomic propositon
+        predicateMap[num] = (AtomicStatePredicate*)result;
         LTLTree_p newTree = tl_nn(PREDICATE,NULL,NULL);
         newTree->sym = tl_lookup(sym);
         newTree = bin_simpler(newTree);

@@ -60,7 +60,7 @@ public:
     ///@param parent the parent predicate for the new, copied, object
     virtual StatePredicate* copy(StatePredicate* parent) = 0;
     /// create a new state predicate by copy this object.
-    virtual StatePredicate* copy();
+    StatePredicate* copy(void);
 
 	/// the following functions are added for the deletion algorithm
 	/// the deletion algorithm will only read the state predicates - no changes

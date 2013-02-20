@@ -13,6 +13,9 @@
 #include <Net/Marking.h>
 #include <cstdlib>
 #include <cstdio>
+#include <InputOutput/Reporter.h>
+
+extern Reporter* rep;
 
 /*!
 \brief creates a state predicate with a formal sum of #p places with positive factor,
@@ -275,5 +278,15 @@ StatePredicate* AtomicStatePredicate::copy(StatePredicate* parent)
 index_t AtomicStatePredicate::getSubs(const StatePredicate* const** subs) const
 {
 	return 0;
+}
+
+
+StatePredicate* AtomicStatePredicate::negate(){
+	AtomicStatePredicate* af = new AtomicStatePredicate(cardNeg, cardPos, - threshold - 1);
+	for (index_t i = 0; i < cardPos; i++)
+		af->addNeg(i,posPlaces[i],posMult[i]);
+	for (index_t i = 0; i < cardNeg; i++)
+		af->addPos(i,negPlaces[i],negMult[i]);
+	return af;
 }
 

@@ -13,9 +13,10 @@
 #include <Core/Dimensions.h>
 #include <Net/NetState.h>
 #include <Exploration/StatePredicateProperty.h>
+#include <Formula/AtomicStatePredicate.h>
 
 // datastructure for parsing buechi automatons from LTL formulae
-extern std::map<int,StatePredicate*> predicateMap;
+extern std::map<int,AtomicStatePredicate*> predicateMap;
 
 char* produce_next_string(int* );
 

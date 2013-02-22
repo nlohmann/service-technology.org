@@ -29,23 +29,24 @@ using std::endl;
  * \param _front_offset Maximal progress of a single transition
  */
 template <class T>
-SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset)
-: size(_size), front_offset(_front_offset), active(size-front_offset-1), offset(0), transient_offset(_transient_offset)
+SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, index_t threads_per_front)
+: size(_size), front_offset(_front_offset), active(size-front_offset-1), transient_offset(_transient_offset), threadsPerFront(threads_per_front)
 {
 	assert(size>front_offset);
 	// get encoders
-	fullencoder = new FullCopyEncoder(1);
-	sigpencoder = new CopyEncoder(1);
+	fullencoder = new FullCopyEncoder(threadsPerFront);
+	sigpencoder = new CopyEncoder(threadsPerFront);
 	// obtain space for counters
 	count = (int64_t*) calloc(SIZEOF_INT64_T,size);
 	// obtain store ring for transient states
 	store = (SweepStore<T>**) malloc(sizeof(SweepStore<T>**)*size);
-	for(index_t i=0; i<size; ++i) store[i] = new SweepStore<T>();
+	for(index_t i=0; i<size; ++i) store[i] = new SweepStore<T>(threadsPerFront);
 	// obtain swap space for current progress measure
-	samevalue = new SweepStore<T>();
+	samevalue = new SweepStore<T>(threadsPerFront);
 	// obtain space for pointers to old and new persistent states
 	newpersistent = (SweepListStore<T>**) calloc(sizeof(SweepListStore<T>**),size);
 	oldpersistent = (SweepListStore<T>**) calloc(sizeof(SweepListStore<T>**),size);
+	inserted_persistent = (bool*) malloc(SIZEOF_BOOL * threadsPerFront);
 	deleted_store_size = 0;
 }
 
@@ -63,51 +64,43 @@ SweepRingStore<T>::~SweepRingStore()
 	delete samevalue;
 	free(newpersistent);
 	free(oldpersistent);
-}
-
-/*!
- * \brief Set the current progress offset for a subsequent call to searchAndInsert
- * \param _offset The offset with respect to the current progress measure
- */
-template <class T>
-void SweepRingStore<T>::setOffset(int32_t _offset)
-{
-	offset = _offset;
+	free(inserted_persistent);
 }
 
 /*!
  * \brief Search for a given state with a given progress measure, insert it if not stored yet
  * \param ns The state to search for
  * \param offset The progress offset of the state ns in relation to the current progress measure in this store
- * \param payload Dummy at this time; additional information for this state could be stores
- * \param thread Dummy; SweepRingStore is single-threaded
+ * \param payload Dummy at this time; additional information for this state could be stored
+ * \param thread The active thread number
  * \return If the state was found in the store (and thus not inserted)
  */
 template <class T>
-bool SweepRingStore<T>::searchAndInsert(NetState &ns, T** payload, index_t thread)
+bool SweepRingStore<T>::searchAndInsert(NetState &ns, int32_t offset, T** payload, index_t thread)
 {
 	// calculate the index on our store ring where the state could be
 //cout << "size=" << size << " active=" << active << endl;
 	index_t pos((active+size+offset)%size);
 	// check old persistent markings first, use CopyEncoder
 	bitindex_t bitlen;
-	vectordata_t* data(sigpencoder->encodeNetState(ns, bitlen, 0));
+	vectordata_t* data(sigpencoder->encodeNetState(ns, bitlen, thread));
+	hash_t hash(0);
 //cout << "inserting at offset " << offset << ", pos " << pos << ": ";
 //printState(ns);
 
-	if (oldpersistent[pos]->store.searchAndInsert(data,bitlen,payload,false)) return true;
+	if (oldpersistent[pos]->store.searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
 	// now check other stores with FullCopyEncoder
-	data = fullencoder->encodeNetState(ns, bitlen, 0);
+	data = fullencoder->encodeNetState(ns, bitlen, thread);
 	bool ret(true);
 	if (offset>0)
 	{
 		// future states are made transient, we will see them shortly
 		// so check first if they are persistent already
-		if (newpersistent[pos]->store.searchAndInsert(data,bitlen,payload,false)) return true;
+		if (newpersistent[pos]->store.searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
 		// then possibly insert them into a transient store
-		if (!(ret = store[pos]->searchAndInsert(data,bitlen,payload)))
+		if (!(ret = store[pos]->searchAndInsert(data,bitlen,hash,payload,thread)))
 		{
-			inserted_persistent = false;
+			inserted_persistent[thread] = false;
 			++(count[pos]);
 		}
 	}
@@ -115,12 +108,12 @@ bool SweepRingStore<T>::searchAndInsert(NetState &ns, T** payload, index_t threa
 	{
 		// past states must be made persistent, the next front will visit them
 		// but check first if we have already seen them ourselves
-		if (store[pos]->searchAndInsert(data,bitlen,payload,false)) return true;
+		if (store[pos]->searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
 		// and only if not, make the new persistent
-		if (!(ret = newpersistent[pos]->store.searchAndInsert(data,bitlen,payload)))
+		if (!(ret = newpersistent[pos]->store.searchAndInsert(data,bitlen,hash,payload,thread)))
 		{
 			new_persistent_empty = false;
-			inserted_persistent = true;
+			inserted_persistent[thread] = true;
 		}
 	}
 	else
@@ -128,11 +121,11 @@ bool SweepRingStore<T>::searchAndInsert(NetState &ns, T** payload, index_t threa
 		// successor states with the same progress value must additionally check
 		// the swap space before being inserted as transient states like
 		// in the future case
-		if (newpersistent[pos]->store.searchAndInsert(data,bitlen,payload,false)) return true;
-		if (samevalue->searchAndInsert(data,bitlen,payload,false)) return true;
-		if (!(ret = store[pos]->searchAndInsert(data,bitlen,payload)))
+		if (newpersistent[pos]->store.searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
+		if (samevalue->searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
+		if (!(ret = store[pos]->searchAndInsert(data,bitlen,hash,payload,thread)))
 		{
-			inserted_persistent = false;
+			inserted_persistent[thread] = false;
 			++(count[pos]);
 		}
 	}
@@ -147,34 +140,37 @@ bool SweepRingStore<T>::searchAndInsert(NetState &ns, T** payload, index_t threa
  * \return If a state with current progress value has been found at all
  */
 template <class T>
-bool SweepRingStore<T>::popState(NetState& ns)
+bool SweepRingStore<T>::popState(NetState& ns, index_t thread)
 {
 	// get either a transient or new persistent state
 	// and transfer it to the samevalue resp. old persistent store
 	bitindex_t bitlen;
 	vectordata_t* data(NULL);
+	hash_t hash(0);
 	// check for a transient state first
-	if (store[active]->popVector(data))
+	if (store[active]->popVector(data,thread))
 	{
 		// decode, reencode, and insert into swap space
 //cout << "transient popped " << data << " " << &ns << endl;
 		fullencoder->decodeNetState(ns, data);
 //printState(ns);
-		data = fullencoder->encodeNetState(ns, bitlen, 0);
-		samevalue->searchAndInsert(data,bitlen,NULL); // need to get payload from store!!!
+		data = fullencoder->encodeNetState(ns, bitlen, thread);
+		samevalue->searchAndInsert(data,bitlen,hash,NULL,thread); // need to get payload from store!!!
 		return true;
 	}
+
 	// if no transient state is found, check for the persistent ones
-	if (newpersistent[active]->store.popVector(data))
+	if (newpersistent[active]->store.popVector(data,thread))
 	{
 		// decode, reencode, and insert into old persistent store
 //cout << "persistent popped " << data << endl;
 		fullencoder->decodeNetState(ns, data);
 //printState(ns);
-		data = sigpencoder->encodeNetState(ns, bitlen, 0);
-		oldpersistent[active]->store.searchAndInsert(data,bitlen,NULL); // need to get payload from store!!!
+		data = sigpencoder->encodeNetState(ns, bitlen, thread);
+		oldpersistent[active]->store.searchAndInsert(data,bitlen,hash,NULL,thread); // need to get payload from store!!!
 		return true;
 	}
+
 	// no state with current progress measure found
 	return false;
 }
@@ -211,7 +207,7 @@ bool SweepRingStore<T>::advanceProgress()
 	} else delete samevalue;
 	deleted_store_size = count[back];
 	count[back] = 0;
-	samevalue = new SweepStore<T>();
+	samevalue = new SweepStore<T>(threadsPerFront);
 
 	// link in next persistent stores at the back (= the new front)
 	index_t newfront(front+1<size ? front+1 : 0);
@@ -241,11 +237,9 @@ void SweepRingStore<T>::init(SweepListStore<T>* oldp, SweepListStore<T>* newp)
 		}
 		oldpersistent[i] = oldp;
 		newpersistent[i] = newp;
-//cout << "old=" << oldp << " new=" << newp << " tr=" << store[i] << endl;
 	}
 	// set the current progress measure, i.e. select the correct store on the ring
 	active = size-front_offset-1;
-//cout << "swap=" << samevalue << endl;
 	new_persistent_empty = true;
 }
 
@@ -258,21 +252,19 @@ bool SweepRingStore<T>::clear()
 {
 	// clear all non-empty stores on the ring
 	for(index_t i=0; i<size; ++i)
-	{
 		if (!store[i]->empty())
 		{
 			delete store[i];
-			store[i] = new SweepStore<T>();
+			store[i] = new SweepStore<T>(threadsPerFront);
 		}
-//		oldpersistent[i] = NULL;
-//		newpersistent[i] = NULL;
-	}
+
 	// clear the swap space (usually necessary)
 	if (!samevalue->empty())
 	{
 		delete samevalue;
-		samevalue = new SweepStore<T>();
+		samevalue = new SweepStore<T>(threadsPerFront);
 	}
+
 	return new_persistent_empty;
 }
 
@@ -293,9 +285,9 @@ bool SweepRingStore<T>::checkNewPersistent()
  * \return True if it is new persistent state
  */
 template <class T>
-bool SweepRingStore<T>::insertedIsNewPersistent()
+bool SweepRingStore<T>::insertedIsNewPersistent(index_t thread)
 {
-	return inserted_persistent;
+	return inserted_persistent[thread];
 }
 
 /*!
@@ -305,7 +297,6 @@ bool SweepRingStore<T>::insertedIsNewPersistent()
 template <class T>
 int64_t SweepRingStore<T>::getNumberOfDeletedStates()
 {
-//cout << "deleted: " << deleted_store_size << endl;
 	return deleted_store_size;
 }
 

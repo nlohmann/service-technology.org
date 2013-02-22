@@ -31,16 +31,14 @@ class SweepRingStore
 {
 public:
 	/// constructor with size of the store and maximal positive progress
-	SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset);
+	SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, index_t threadsPerFront = 1);
 	/// destructor
 	~SweepRingStore();
 
-	/// set the progress offset for consecutive searchAndInsert
-	void setOffset(int32_t _offset);
 	/// check if a state is in the store at progress offset, insert it if not
-	bool searchAndInsert(NetState& ns, T** payload, index_t thread);
+	bool searchAndInsert(NetState& ns, int32_t offset, T** payload, index_t thread);
 	/// get a state at active progress and relocate it to swap or permanent storage
-	bool popState(NetState& ns);
+	bool popState(NetState& ns, index_t thread);
 	/// advance the active progress by one
 	bool advanceProgress();
 	/// initialise the store with the persistent states
@@ -50,7 +48,7 @@ public:
 	/// check for a new persistent state in the bucket with the lowest progress value
 	bool checkNewPersistent();
 	/// check if the last inserted state was made persistent
-	bool insertedIsNewPersistent();
+	bool insertedIsNewPersistent(index_t thread);
 	/// get the number of deleted transient states during the last progress advance
 	int64_t getNumberOfDeletedStates();
 
@@ -62,10 +60,10 @@ private:
 	index_t front_offset;
 	/// store element for the current progress value
 	index_t active;
-	/// the element in the ring store in which to search and insert
-	int32_t offset;
 	/// progress offset at which transient state are forgotten
 	index_t transient_offset;
+	/// maximal number of threads to access this store simultaneously
+	index_t threadsPerFront;
 	/// size of the last deleted store bucket
 	int64_t deleted_store_size;
 	/// encoder for all transient and new persistent states
@@ -85,7 +83,7 @@ private:
 	/// flag indicating if the list of new persistent states is empty
 	bool new_persistent_empty;
 	/// flag indicating whether the last inserted state is persistent or transient
-	bool inserted_persistent;
+	bool* inserted_persistent;
 };
 
 #include <SweepLine/SweepRingStore.inc>

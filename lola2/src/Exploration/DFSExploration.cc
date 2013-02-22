@@ -207,9 +207,9 @@ bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned 
     return false;
 }
 
-bool DFSExploration::sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore, Firelist &myFirelist, int threadNumber)
+bool DFSExploration::sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore, Firelist &myFirelist, int frontNumber, int threadNumber)
 {
-	Sweep<void> s(property, ns, myStore, myFirelist, threadNumber);
+	Sweep<void> s(property, ns, myStore, myFirelist, frontNumber, threadNumber);
 	return s.run();
 }
 

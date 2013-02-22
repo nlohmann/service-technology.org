@@ -27,7 +27,7 @@ class Sweep
 {
 public:
 	/// Constructor
-	Sweep(SimpleProperty& property, NetState& ns, SweepEmptyStore& st, Firelist& firelist, index_t number_of_fronts);
+	Sweep(SimpleProperty& property, NetState& ns, SweepEmptyStore& st, Firelist& firelist, index_t number_of_fronts, index_t number_of_threads);
 
 	/// Destructor
 	~Sweep();
@@ -48,19 +48,21 @@ struct tpSweepArguments {
 	/// mutex for the frontrunner flag (for the predecessor thread)
 	pthread_mutex_t* frontMutex;
 	/// mutex for the frontrunner flag (for the successor thread)
-        pthread_mutex_t* backMutex;
+	pthread_mutex_t* backMutex;
 	/// mutex condition (for the predecessor thread)
 	pthread_cond_t* frontCond;
 	/// mutex condition (for the successor thread)
 	pthread_cond_t* backCond;
 	/// semaphore value (for the predecessor thread)
-        index_t* frontSemaphore;
+    index_t* frontSemaphore;
 	/// semaphore value (for the successor thread)
-        index_t* backSemaphore;
-	/// the ID number of the current thread
-	int threadNumber;
-	/// the total number of threads
-	int number_of_threads;
+    index_t* backSemaphore;
+	/// the ID number of the front the current thread belongs to
+	int frontID;
+	/// the ID number of the current thread in its front
+	int threadID;
+	/// the global ID of the current thread
+	int globalThreadID; 
 	/// number of transient states in the local store
 	int64_t* transient_count;
 	/// number of persistent states added by the local store
@@ -99,6 +101,12 @@ struct tpSweepArguments {
 
 	/// the number of fronts running over the search space
 	index_t nr_of_fronts;
+
+	/// the total number of threads running over the search space
+	index_t nr_of_threads;
+
+	/// the number of threads per front
+	index_t threads_per_front;
 
 	/// the property to check for
 	SimpleProperty& prop;

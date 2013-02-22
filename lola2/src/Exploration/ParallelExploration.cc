@@ -380,9 +380,9 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     return property.value;
 }
 
-bool ParallelExploration::sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore, Firelist &myFirelist, int threadNumber)
+bool ParallelExploration::sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore, Firelist &myFirelist, int frontNumber, int threadNumber)
 {
-	Sweep<void> s(property, ns, myStore, myFirelist, threadNumber);
+	Sweep<void> s(property, ns, myStore, myFirelist, frontNumber, threadNumber);
 	return s.runThreads();
 }
 

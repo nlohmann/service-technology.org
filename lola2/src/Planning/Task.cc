@@ -645,7 +645,7 @@ bool Task::getResult()
 
 		case search_arg_sweepline:
 		// no choice of stores for sweepline method here
-			result = exploration->sweepline(*p, *ns, *(SweepEmptyStore*)(store), *fl, number_of_threads);
+			result = exploration->sweepline(*p, *ns, *(SweepEmptyStore*)(store), *fl, args_info.sweepfronts_arg, number_of_threads);
 			break;
 
 		default:

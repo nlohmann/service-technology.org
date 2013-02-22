@@ -75,6 +75,15 @@ option "symmetry" y
   "Use symmetry reduction"
   flag off
 
+option "sweepfronts" -
+  "Number of fronts that may run simultaneously in the SweepLine method."
+  details="In addition, a higher number of threads can be selected to sweep through states inside any single front concurrently."
+  int
+  typestr="FRONTS"
+  default="1"
+  optional
+  hidden
+
 option "sweeplinedelay" -
   "Parameter for the SweepLine search strategy"
   details="Percentage of transitions with negative progress values for which non-persistent states are remembered."

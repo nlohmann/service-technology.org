@@ -1,64 +1,77 @@
 /*!
-\file SweepStore.cc
+\file SweepStore.inc
 \author Christian Koch, Harro Wimmel
 \status new
-\brief VectorStore implementation using binary suffix trees. Based on BinStore. Relies on the assumption that different input vectors (possibly of different length) are not prefix of another.
-
-	Note: not VectorStore compatible at the moment due to missing parameter (hash_t)
-	in the searchAndInsert function.
+\brief VectorStore implementation using binary prefix trees. Based on BinStore. Relies on the assumption that different input vectors (possibly of different length) are not prefix of another.
 */
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-#include <Net/Marking.h>
-#include <Net/Net.h>
-#include <Net/Place.h>
-//#include <SweepLine/SweepStore.h>
+#include <SweepLine/SweepStore.h>
+#include <iostream>
 
+using std::cout;
+using std::endl;
 
-/*!
- * \brief Constructor
- */
-template <class T>
-SweepStore<T>::SweepStore() : popVectorCache(NULL), branch(NULL), firstvector(NULL)
+template <typename T>
+SweepStore<T>::SweepStore(index_t threadsPerFront)
 {
+    branch = NULL;
+    firstvector = NULL;
+	popVectorCache = (vectordata_t**) calloc(SIZEOF_VOIDP, threadsPerFront);
+	this->threadsPerFront = threadsPerFront;
+
+    pthread_rwlock_init(&rwlock, NULL);
 }
 
-/*!
- * \brief Destructor
- */
-template <class T>
+template <typename T>
+inline size_t SweepStore<T>::getPayloadSize()
+{
+    return sizeof(T);
+}
+
+template <typename T>
 SweepStore<T>::~SweepStore()
 {
-        if (branch)
-            delete branch;
-        if (firstvector)
-            free(firstvector);
-	if (popVectorCache)
-	    free(popVectorCache);
+    if (branch)
+    {
+        delete branch;
+    }
+    if (firstvector)
+    {
+        free(firstvector);
+    }
+
+	for(index_t i=0; i<threadsPerFront; ++i)
+		if(popVectorCache[i])
+	        free(popVectorCache[i]);
+	free(popVectorCache);
+
+    pthread_rwlock_destroy(&rwlock);
 }
 
 /// create a new branch in the decision tree at depth b.
-template <class T>
+template <typename T>
 SweepStore<T>::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL)
 {
 }
 
-/// Destructor for the internal decision tree
-template <class T>
+template <typename T>
 SweepStore<T>::Decision::~Decision()
 {
-    free(vector);
+    vector = NULL;
     if (nextnew)
+    {
         delete nextnew;
+    }
     if (nextold)
+    {
         delete nextold;
+    }
+
 }
 
 /// search for an input vector in the suffix tree and insert it, if it is not present
-template <class T>
-bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T** payload, bool insert)
+template <typename T>
+bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex, bool noinsert)
 {
     /// If a new decision record is inserted, * anchor must point to it
     Decision** anchor;
@@ -82,6 +95,10 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
     // pointer to the current input word
     const vectordata_t* pInput = in;
 
+
+    /// the starting address of the current vector. In each vector, the payload is loacted before the marking data.
+    vectordata_t* pPayload;
+
     /// the vector word we are currently investigating
     vectordata_t* pVector;
 
@@ -90,18 +107,29 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
 
     /// the number of bits processed since reaching the current branch
     bitindex_t position = 0;
+    
+    size_t payloadSize = getPayloadSize();
 
+    // lock the current bucket to ensure thread safety
+    if (noinsert) pthread_rwlock_rdlock(&rwlock);
+	else pthread_rwlock_wrlock(&rwlock);
+    
     // Is hash bucket empty? If so, assign to currentvector
-    if (!(pVector = firstvector))
+    if (!(pPayload = firstvector))
     {
-	// in case we don't want to insert the new state
-	if (!insert) return false;
+		if (noinsert) {
+			pthread_rwlock_unlock(&rwlock);
+			return false;
+		}
 
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
         newvector = &firstvector;
     }
     else
     {
+    	// skip payload. Cast to char* is done to ensure skipping exaclty the right amount of bytes.
+    	pVector = (vectordata_t*)(((char*)pPayload) + payloadSize);
+    
         // Here, hash bucket is not empty.
         anchor = &branch;
 
@@ -119,6 +147,10 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
                 // good alignment, can use memcmp
                 if(!memcmp(pInput,pVector,vectorlen*sizeof(vectordata_t))) {
                     // match found, we're done
+                    pthread_rwlock_unlock(&rwlock);
+                    
+                    if(payload)
+                        *payload = (T*) pPayload;
                     return true;
                 }
                 // difference found, skip to first differing word.
@@ -149,6 +181,9 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
                                     position += VECTOR_WIDTH, pVector++;
                                 }
                                 else {
+                                    pthread_rwlock_unlock(&rwlock);
+                                    if(payload)
+                                        *payload = (T*) pPayload;
                                     return true;
                                 }
                             }
@@ -161,6 +196,9 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
                                 break;
                             }
                         } else {
+                            pthread_rwlock_unlock(&rwlock);
+                            if(payload)
+                                *payload = (T*) pPayload;
                             return true;
                         }
                     }
@@ -209,7 +247,8 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
             if ((*anchor) && (*anchor)->bit == (position + (VECTOR_WIDTH - vector_bitstogo)))
             {
                 // Indeed, there is. Switch to that branch and repeat with new suffix tree vector
-                pVector = (* anchor) -> vector;
+                pPayload = (* anchor) -> vector;
+    	        pVector = (vectordata_t*)(((char*)pPayload) + payloadSize);
                 anchor = &((* anchor) -> nextnew);
 
                 position += (VECTOR_WIDTH - vector_bitstogo) + 1;
@@ -218,6 +257,9 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
                 // skip the differing bit. We don't need to store it since its value is determined by the old vector and the branch position.
                 input_bitstogo--;
                 if(input_index == max_input_index && input_bitstogo + max_input_numbits <= VECTOR_WIDTH) {
+                    pthread_rwlock_unlock(&rwlock);
+                    if(payload)
+                        *payload = (T*) pPayload;
                     return true;
                 }
                 if (!input_bitstogo)
@@ -232,8 +274,11 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
             }
         }
 
-	// in case we don't want to insert the state (just searching)
-	if (!insert) return false;
+		// in case we do not want to insert the state, stop right now
+		if (noinsert) {
+			pthread_rwlock_unlock(&rwlock);
+			return false;
+		}
 
         // state not found --> prepare for insertion
         Decision* newdecision = new Decision(position + (VECTOR_WIDTH - vector_bitstogo));
@@ -246,7 +291,17 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
         vector_bitstogo = VECTOR_WIDTH;
 
         input_bitstogo--;
+        // difference occurred in the very last bit of the input string
         if(input_index == max_input_index && input_bitstogo + max_input_numbits == VECTOR_WIDTH) {
+            // allocate space for payload if necessary
+            if(payloadSize) {
+	            *newvector = (vectordata_t*) calloc(payloadSize, 1);
+	            pPayload = *newvector;
+	        }
+            
+            pthread_rwlock_unlock(&rwlock);
+            if(payload)
+                *payload = (T*) pPayload;
             return false;
         }
         if (!input_bitstogo)
@@ -258,8 +313,9 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
     assert(bitlen >= position);
     // vector_bitstogo is always VECTOR_WIDTH here
     int newvectorlen = ((bitlen - position) + (VECTOR_WIDTH - 1)) / VECTOR_WIDTH;
-    *newvector = (vectordata_t*) calloc(newvectorlen, sizeof(vectordata_t));
-    pVector = *newvector;
+    *newvector = (vectordata_t*) calloc(payloadSize + newvectorlen*sizeof(vectordata_t), 1);
+    pPayload = *newvector;
+    pVector = (vectordata_t*)(((char*)pPayload) + payloadSize);
 
 
     // test for good alignment
@@ -267,6 +323,9 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
     {
         // good alignment, use memcpy
         memcpy(pVector,pInput,newvectorlen*sizeof(vectordata_t));
+        pthread_rwlock_unlock(&rwlock);
+        if(payload)
+            *payload = (T*) pPayload;
         return false;
     } else {
         // bad alignment, copy contents manually
@@ -278,59 +337,68 @@ bool SweepStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, T
             *pVector |= vectordata_t(*pInput >> input_bitstogo);
             pVector++;
         }
+        pthread_rwlock_unlock(&rwlock);
+        if(payload)
+            *payload = (T*) pPayload;
         return false;
     }
 }
 
 /*!
  * \brief  gets and removes a vector from the store
- * \param out Points to the raw state data afterwards
- * \return If there was a state in the store
  */
-template <class T>
-bool SweepStore<T>::popVector(vectordata_t * & out)
+template <typename T>
+bool SweepStore<T>::popVector(vectordata_t * & out, index_t threadIndex)
 {
   /// size of resulting vector
   index_t vectorlen = SIZEOF_CAPACITY_T * Net::Card[PL];
+
+  // lock the current bucket to ensure thread safety
+  pthread_rwlock_wrlock(&rwlock);
+
   // create intermediate vector
-  if(!popVectorCache)
+  if(!(popVectorCache[threadIndex]))
   {
-    popVectorCache = (vectordata_t *) malloc(vectorlen);
+    popVectorCache[threadIndex] = (vectordata_t *) malloc(vectorlen);
   }
   
   // vector currently viewed
+  vectordata_t * pPayload = NULL;
   vectordata_t * pVector = NULL;
   // anchor to a decision node
   Decision * anchor = NULL;
   Decision ** pAnchor = NULL;
   
-    if(!(pVector = firstvector))
-    {
-      // no vectors in this bucket
+  if(!(pPayload = firstvector))
+  {
+      pthread_rwlock_unlock(&rwlock);
       return false;
-    }
+  }
+  // skip payload data
+  pVector = (vectordata_t*)(((char*)pPayload) + getPayloadSize());
+
+  // copy "first" vector to return it later
+  memcpy(popVectorCache[threadIndex], pVector, vectorlen);
+  out = popVectorCache[threadIndex];
+  
+  if(!(anchor = branch))
+  {
+    // no further markings in this bucket
+    free(pPayload);
+    firstvector = NULL;
+    pthread_rwlock_unlock(&rwlock);
+    return true;
+  }
     
-    // copy "first" vector to return it later
-    memcpy(popVectorCache, pVector, vectorlen);
-    out = popVectorCache;
-    
-    if(!(anchor = branch))
-    {
-      // no further markings in this bucket
-      free(pVector);
-      firstvector = NULL;
-      return true;
-    }
-    
-    // we start with the root of the decision tree
-    pAnchor = &branch;
-    // and search for the decision node differing as last from the "first" vector
-    while(anchor->nextold)
-    {
-      pAnchor = &(anchor->nextold);
-      anchor = anchor-> nextold;
-    }
-    
+  // we start with the root of the decision tree
+  pAnchor = &branch;
+  // and search for the decision node differing as last from the "first" vector
+  while(anchor->nextold)
+  {
+    pAnchor = &(anchor->nextold);
+    anchor = anchor-> nextold;
+  }
+
     // alignment of both vectors (i.e. relative position of first bit of anchor->vector)
     bitindex_t shift = (anchor->bit + 1) % VECTOR_WIDTH;
     // remaining words to copy
@@ -376,17 +444,25 @@ bool SweepStore<T>::popVector(vectordata_t * & out)
     delete anchor;
     
     // return result
+    pthread_rwlock_unlock(&rwlock);
     return true;
-  
 }
 
 /*!
  * \brief Check if the store is empty
  * \return If the store is empty
  */
-template <class T>
+template <typename T>
 bool SweepStore<T>::empty()
 {
-	return (!firstvector);
+	// lock the current bucket to ensure thread safety
+	pthread_rwlock_rdlock(&rwlock);
+	if (firstvector) {
+		pthread_rwlock_unlock(&rwlock);
+		return false;
+	} else {
+		pthread_rwlock_unlock(&rwlock);
+		return true;
+	}
 }
 

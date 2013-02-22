@@ -80,7 +80,7 @@ public:
     \param number_of_threads indicates the number of threads to be used for the search
     \return if a witness state was found
     */
-    bool sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore, Firelist &firelist, int number_of_threads);
+    bool sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore, Firelist &firelist, int number_of_fronts, int number_of_threads);
 
     virtual ~ParallelExploration() {}
 protected:

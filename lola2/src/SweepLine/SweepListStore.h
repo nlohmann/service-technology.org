@@ -23,10 +23,10 @@ class SweepListStore
 {
 public:
 	/// constructor for a single element of a list
-	SweepListStore();
+	SweepListStore(index_t threadsPerFront = 1);
 
 	/// constructor for a list of stores of given length
-	SweepListStore(index_t size);
+	SweepListStore(index_t threadsPerFront, index_t size);
 
 	/// destructor
 	~SweepListStore();
@@ -46,6 +46,9 @@ public:
 private:
 	/// the next store in the list
 	SweepListStore<T>* next;
+
+	/// maximal number of threads to access this store simultaneously
+	index_t threadsPerFront;
 };
 
 #include <SweepLine/SweepListStore.inc>

@@ -11,16 +11,14 @@ measure and containing known persistent markings, either old or new ones.
 
 #include <cstdlib>
 #include <SweepLine/SweepListStore.h>
-#include <iostream>
-using std::cout;
-using std::endl;
 
 /*! 
  * \brief Constructor for one store in a list of stores
  */
 template <class T>
-SweepListStore<T>::SweepListStore() : next(NULL) {
-//cout << "list elt=" << this << endl;
+SweepListStore<T>::SweepListStore(index_t threads_per_front) 
+: next(NULL), store(threads_per_front), threadsPerFront(threads_per_front)
+{
 }
 
 /*! 
@@ -28,8 +26,9 @@ SweepListStore<T>::SweepListStore() : next(NULL) {
  * \param size The number of stores in the list
  */
 template <class T>
-SweepListStore<T>::SweepListStore(index_t size) : next(size>0 ? new SweepListStore(size-1) : NULL) {
-//cout << "list elt=" << this << endl;
+SweepListStore<T>::SweepListStore(index_t threads_per_front, index_t size) 
+: next(size>0 ? new SweepListStore(size-1) : NULL), store(threads_per_front), threadsPerFront(threads_per_front)
+{
 }
 
 /*!
@@ -38,7 +37,6 @@ SweepListStore<T>::SweepListStore(index_t size) : next(size>0 ? new SweepListSto
 template <class T>
 SweepListStore<T>::~SweepListStore()
 {
-//cout << "list free=" << this << endl;
 	delete next;
 }
 
@@ -54,13 +52,13 @@ SweepListStore<T>* SweepListStore<T>::checkNext()
 
 /*!
  * \brief Check if there exists a store after this one in the list
- *        and create one if it does not exists
+ *        and create one if it does not exist
  * \return The next store in the list, possibly just created
  */
 template <class T>
 SweepListStore<T>* SweepListStore<T>::getNext()
 {
-	if (!next) next = new SweepListStore<T>(); 
+	if (!next) next = new SweepListStore<T>(threadsPerFront);
 	return next;
 }
 

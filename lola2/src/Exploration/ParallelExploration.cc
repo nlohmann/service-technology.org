@@ -230,7 +230,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                     delete myFirelist;
                     delete sp;
                     // there is no such state
-                    return false;
+                    return NULL;
                 }
                 pthread_mutex_unlock(&num_suspend_mutex);
                 sem_wait(restartSemaphore);

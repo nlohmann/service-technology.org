@@ -1,4 +1,4 @@
-bin_PROGRAMS = petri cdnf generator cphils configurator artifact
+bin_PROGRAMS = petri cdnf generator cphils configurator artifact pathify
 dist_noinst_SCRIPTS = process.sh make_customer.sh
 
 noinst_PROGRAMS = sound
@@ -23,6 +23,8 @@ configurator_SOURCES = configurator.cc \
 
 sound_SOURCES = sound.cc
 
+pathify_SOURCES = pathify.cc
+
 artifact_SOURCES = artifact.cc \
                    artifact-cmdline.c artifact-cmdline.h \
                    Output.h Output.cc \
@@ -41,6 +43,7 @@ cdnf_LDADD =  $(top_builddir)/src/libpnapi.la
 configurator_LDADD =  $(top_builddir)/src/libpnapi.la
 sound_LDADD =  $(top_builddir)/src/libpnapi.la
 artifact_LDADD =  $(top_builddir)/src/libpnapi.la
+pathify_LDADD =  $(top_builddir)/src/libpnapi.la
 
 AM_CPPFLAGS = -I$(top_srcdir)/src
 

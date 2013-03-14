@@ -1572,7 +1572,7 @@ AT_CHECK([LOLA Kanban5.pnml.lola --check=deadlock -v --state --path --stubborn=d
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: witness state:" stderr], 1)
 AT_CHECK([GREP -q "lola: witness path:" stderr], 1)
-AT_CHECK([GREP -q "lola: 17 markings, 21 edges" stderr])
+AT_CHECK([GREP -q "lola: 110 markings, 148 edges" stderr])
 AT_KEYWORDS(stubborn)
 AT_CLEANUP
 

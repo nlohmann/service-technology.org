@@ -29,24 +29,24 @@ using std::endl;
  * \param _front_offset Maximal progress of a single transition
  */
 template <class T>
-SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, index_t threads_per_front)
-: size(_size), front_offset(_front_offset), active(size-front_offset-1), transient_offset(_transient_offset), threadsPerFront(threads_per_front)
+SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, index_t _nr_of_threads)
+: size(_size), front_offset(_front_offset), active(size-front_offset-1), transient_offset(_transient_offset), nr_of_threads(_nr_of_threads)
 {
 	assert(size>front_offset);
 	// get encoders
-	fullencoder = new FullCopyEncoder(threadsPerFront);
-	sigpencoder = new CopyEncoder(threadsPerFront);
+	fullencoder = new FullCopyEncoder(nr_of_threads);
+	sigpencoder = new CopyEncoder(nr_of_threads);
 	// obtain space for counters
 	count = (int64_t*) calloc(SIZEOF_INT64_T,size);
 	// obtain store ring for transient states
 	store = (SweepStore<T>**) malloc(sizeof(SweepStore<T>**)*size);
-	for(index_t i=0; i<size; ++i) store[i] = new SweepStore<T>(threadsPerFront);
+	for(index_t i=0; i<size; ++i) store[i] = new SweepStore<T>(nr_of_threads);
 	// obtain swap space for current progress measure
-	samevalue = new SweepStore<T>(threadsPerFront);
+	samevalue = new SweepStore<T>(nr_of_threads);
 	// obtain space for pointers to old and new persistent states
 	newpersistent = (SweepListStore<T>**) calloc(sizeof(SweepListStore<T>**),size);
 	oldpersistent = (SweepListStore<T>**) calloc(sizeof(SweepListStore<T>**),size);
-	inserted_persistent = (bool*) malloc(SIZEOF_BOOL * threadsPerFront);
+	inserted_persistent = (bool*) malloc(SIZEOF_BOOL * nr_of_threads);
 	deleted_store_size = 0;
 }
 
@@ -207,7 +207,7 @@ bool SweepRingStore<T>::advanceProgress()
 	} else delete samevalue;
 	deleted_store_size = count[back];
 	count[back] = 0;
-	samevalue = new SweepStore<T>(threadsPerFront);
+	samevalue = new SweepStore<T>(nr_of_threads);
 
 	// link in next persistent stores at the back (= the new front)
 	index_t newfront(front+1<size ? front+1 : 0);
@@ -255,14 +255,14 @@ bool SweepRingStore<T>::clear()
 		if (!store[i]->empty())
 		{
 			delete store[i];
-			store[i] = new SweepStore<T>(threadsPerFront);
+			store[i] = new SweepStore<T>(nr_of_threads);
 		}
 
 	// clear the swap space (usually necessary)
 	if (!samevalue->empty())
 	{
 		delete samevalue;
-		samevalue = new SweepStore<T>(threadsPerFront);
+		samevalue = new SweepStore<T>(nr_of_threads);
 	}
 
 	return new_persistent_empty;

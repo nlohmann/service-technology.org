@@ -8,6 +8,10 @@
 #include <Core/Dimensions.h>
 #include <Net/Net.h>
 
+#ifndef INDEX_T_MAX
+#define INDEX_T_MAX 0xFFFFFFFF
+#endif
+
 /// computes the ggt of two unsigned integers
 inline int64_t ggt(int64_t a, int64_t b)
 {
@@ -62,7 +66,7 @@ public:
         ~Row();
 
         /// Eleminate current first variable of a row in its successor row (same first variable)
-        void apply(Matrix &);
+        void apply(Matrix &, index_t rowToChange = INDEX_T_MAX);
 
         /// Write row to cout
         void DEBUG__printRow() const;
@@ -110,6 +114,9 @@ public:
 
     /// Generate the triangular form of the matrix (original one gets lost)
     void reduce();
+
+    /// Approach the diagonal form of the matrix (with a remainder in linear dependent columns)
+    void diagonalise();
 
     /// Returns true iff a column with given index is significant
     bool isSignificant(index_t) const;

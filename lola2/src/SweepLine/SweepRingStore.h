@@ -31,7 +31,7 @@ class SweepRingStore
 {
 public:
 	/// constructor with size of the store and maximal positive progress
-	SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, index_t threadsPerFront = 1);
+	SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, index_t _nr_of_threads = 1);
 	/// destructor
 	~SweepRingStore();
 
@@ -63,7 +63,7 @@ private:
 	/// progress offset at which transient state are forgotten
 	index_t transient_offset;
 	/// maximal number of threads to access this store simultaneously
-	index_t threadsPerFront;
+	index_t nr_of_threads;
 	/// size of the last deleted store bucket
 	int64_t deleted_store_size;
 	/// encoder for all transient and new persistent states

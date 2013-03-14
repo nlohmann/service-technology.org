@@ -17,6 +17,10 @@
 #include <Net/Net.h>
 #include <Net/Transition.h>
 #include <InputOutput/Reporter.h>
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 extern gengetopt_args_info args_info;
 extern Reporter* rep;
@@ -39,6 +43,7 @@ Sweep<T>::Sweep(SimpleProperty& property, NetState& ns, SweepEmptyStore& st, Fir
 	std::map<int32_t,int32_t> negmap;
 	for(index_t i=0; i<Net::Card[TR]; ++i)
 	{
+//cout << "progress(" << Net::Name[TR][i] << ")= " << Transition::ProgressMeasure[i] << endl;
 		if (Transition::ProgressMeasure[i]>foff)
 			foff = Transition::ProgressMeasure[i];
 		if (Transition::ProgressMeasure[i]<boff)
@@ -63,24 +68,34 @@ Sweep<T>::Sweep(SimpleProperty& property, NetState& ns, SweepEmptyStore& st, Fir
 
 	rep->status("transition progress range [%d,%d], transients in [%d,%d]",boff,foff,-(int32_t)(transient_offset),foff);
 
-	// compute the true number of threads (multiple of number_of_fronts)
-	threads_per_front = number_of_threads / nr_of_fronts;
-	nr_of_threads = threads_per_front * nr_of_fronts;
-	if (nr_of_threads < number_of_threads) 
-	{
-		nr_of_threads += nr_of_fronts;
-		++threads_per_front;
-		rep->status("total number of threads changed to %d (%d threads per front)", nr_of_threads, threads_per_front);
+	// compute the true number of threads (as given unless lower than number_of_fronts)
+	if ((threads_per_front = number_of_threads / nr_of_fronts)) {
+		nr_of_threads = number_of_threads;
+	} else {
+		nr_of_threads = nr_of_fronts;
+		rep->status("total number of threads changed to %d", nr_of_threads);
 	}
+	if (nr_of_threads % nr_of_fronts > 0) ++threads_per_front;
 
 	// obtain initial (empty) lists of stores for persistent states
-	start_new_persistent = new SweepListStore<T>(threads_per_front, store_size);
-	start_old_persistent = new SweepListStore<T>(threads_per_front, store_size);
+	start_new_persistent = new SweepListStore<T>(nr_of_threads, store_size);
+	start_old_persistent = new SweepListStore<T>(nr_of_threads, store_size);
 
 	// reserve memory for counting states and edges for all threads/fronts
 	persistent_count = (int64_t***) calloc(SIZEOF_INT64_T,nr_of_threads);
 	transient_count = (int64_t***) calloc(SIZEOF_INT64_T,nr_of_threads);
 	call_count = (int64_t***) calloc(SIZEOF_INT64_T,nr_of_threads);
+
+	// reserve memory for thread-local mutexes for the idle state / front change
+    idleMutex = (pthread_mutex_t**) malloc(nr_of_threads * SIZEOF_VOIDP);
+    idleCond = (pthread_cond_t**) malloc(nr_of_threads * SIZEOF_VOIDP);
+	idle = (bool**) calloc(SIZEOF_VOIDP, nr_of_threads);
+	frontptr = (index_t**) malloc(nr_of_threads * SIZEOF_VOIDP);
+	call = (bool**) malloc(nr_of_threads * SIZEOF_VOIDP);
+	helpers = (index_t**) malloc(nr_of_fronts * SIZEOF_VOIDP);
+
+	// reserve memory for pointers to the stores
+	store = (SweepRingStore<T>**) malloc(nr_of_fronts * SIZEOF_VOIDP);
 }
 
 /*!
@@ -89,6 +104,13 @@ Sweep<T>::Sweep(SimpleProperty& property, NetState& ns, SweepEmptyStore& st, Fir
 template <class T>
 Sweep<T>::~Sweep()
 {
+	free(store);
+	free(idleMutex);
+	free(idleCond);
+	free(idle);
+	free(frontptr);
+	free(call);
+	free(helpers);
 	free(call_count);
 	free(transient_count);
 	free(persistent_count);
@@ -107,12 +129,24 @@ bool Sweep<T>::run()
 	// check if we need a multithreaded run
 	if (threads_per_front>1 || nr_of_fronts>1) return runThreads();
 
-	// gather the arguments for the run
+	// get a mutex and condition for thread synchronisation on termination
+	terminating = running = nr_of_threads;
+    // LCOV_EXCL_START
+    if (UNLIKELY(pthread_mutex_init(&runMutex, NULL))) {
+        rep->status("mutexes could not be created");
+        rep->abort(ERROR_THREADING);
+    }
+    if (UNLIKELY(pthread_cond_init(&runCond, NULL))) {
+        rep->status("mutex conditions could not be created");
+        rep->abort(ERROR_THREADING);
+    }
+    // LCOV_EXCL_STOP
+
+	// gather the arguments for the run using the main thread only
 	bool frontrunner(true);
 	tpSweepArguments args;
 	args.frontrunner = &frontrunner;
 	args.frontID = 0;
-	args.threadID = 0;
 	args.globalThreadID = 0;
 	args.sweep = this;
 	args.ns = &start;
@@ -122,9 +156,30 @@ bool Sweep<T>::run()
 	call_count[0] = &args.call_count;
 
 	// run the sweepline method and get the result
-	void* return_value(threadSweep((void*) &args));
-	if (return_value) start = *(NetState*) return_value;
+	void* return_value(frontSweep((void*) &args));
+	prop.value = false;
+	if (return_value) {
+		prop.value = true;
+		start = *(NetState*) return_value;
+	}
 
+    // destroy mutexes
+    int mutex_destruction_status = 0;
+    mutex_destruction_status |= pthread_cond_destroy(&runCond);
+    mutex_destruction_status |= pthread_mutex_destroy(&runMutex);
+    // LCOV_EXCL_START
+    if (UNLIKELY(mutex_destruction_status)) {
+        rep->status("mutexes could not be destroyed");
+        rep->abort(ERROR_THREADING);
+    }
+    // LCOV_EXCL_STOP
+
+	// make a final calculation of states and edges
+    forwardStateCount();
+
+    free(args.persistent_count);
+    free(args.transient_count);
+    free(args.call_count);
 	return prop.value;
 }
 
@@ -136,57 +191,82 @@ bool Sweep<T>::run()
 template <class T>
 bool Sweep<T>::runThreads()
 {
+	// get a mutex and condition for thread synchronisation on termination
+	terminating = running = nr_of_threads;
+    // LCOV_EXCL_START
+    if (UNLIKELY(pthread_mutex_init(&runMutex, NULL))) {
+        rep->status("mutexes could not be created");
+        rep->abort(ERROR_THREADING);
+    }
+    if (UNLIKELY(pthread_cond_init(&runCond, NULL))) {
+        rep->status("mutex conditions could not be created");
+        rep->abort(ERROR_THREADING);
+    }
+    // LCOV_EXCL_STOP
+
     // flag for the most advanced front
-    bool* frontrunner = (bool*) calloc(nr_of_fronts, sizeof(bool));
+    bool* frontrunner = (bool*) calloc(sizeof(bool), nr_of_fronts);
     // semaphore values controlled by the following mutex
-    index_t* semval = (index_t*) calloc(nr_of_fronts, sizeof(index_t));
+    index_t* semval = (index_t*) calloc(sizeof(index_t), nr_of_fronts);
     // mutex controlling false->true change for frontrunner flag and semaphore values
-    pthread_mutex_t* mutex = (pthread_mutex_t*) calloc(nr_of_fronts, sizeof(pthread_mutex_t));
-    pthread_cond_t* cond = (pthread_cond_t*) calloc(nr_of_fronts, sizeof(pthread_cond_t));
+    pthread_mutex_t* mutex = (pthread_mutex_t*) calloc(sizeof(pthread_mutex_t), nr_of_fronts);
+    pthread_cond_t* cond = (pthread_cond_t*) calloc(sizeof(pthread_cond_t), nr_of_fronts);
     // a thread for each front
-    pthread_t* runner_thread = (pthread_t*) calloc(nr_of_fronts, sizeof(pthread_t));
+    pthread_t* runner_thread = (pthread_t*) calloc(sizeof(pthread_t), nr_of_threads);
     // arguments for each front/thread
-    tpSweepArguments* args = (tpSweepArguments*) calloc(nr_of_fronts,
-                           sizeof(tpSweepArguments));
+    tpSweepArguments* args = (tpSweepArguments*) calloc(sizeof(tpSweepArguments), nr_of_threads);
     // the first front gets the start state and is also the most advanced front
     args[0].ns = &start;
     frontrunner[0] = true;
-    // set the arguments for all fronts and obtain the semaphores
-    for (index_t i = 0; i < nr_of_fronts; i++) {
-        // initialise mutexes and conditions
-        // LCOV_EXCL_START
-        if (UNLIKELY(pthread_mutex_init(&mutex[i], NULL))) {
-            rep->status("mutexes could not be created");
-            rep->abort(ERROR_THREADING);
-        }
-        if (UNLIKELY(pthread_cond_init(&cond[i], NULL))) {
-            rep->status("mutex conditions could not be created");
-            rep->abort(ERROR_THREADING);
-        }
-        // LCOV_EXCL_STOP
 
-        // initialise data structure for threads
-        args[i].frontMutex = (i>0 ? &mutex[i-1] : &mutex[nr_of_fronts-1]);
-        args[i].backMutex = &mutex[i];
-        args[i].frontCond = (i>0 ? &cond[i-1] : &cond[nr_of_fronts-1]);
-        args[i].backCond = &cond[i];
-        args[i].frontSemaphore = (i>0 ? &semval[i-1] : &semval[nr_of_fronts-1]);
-        args[i].backSemaphore = &semval[i];
-        args[i].frontrunner = frontrunner;
-        args[i].frontID = i;
-        args[i].threadID = i;
-        args[i].globalThreadID = i;
-        args[i].call_count = NULL;
-        args[i].sweep = this;
+    // set the arguments for all fronts/threads and obtain the semaphores
+    for (index_t i = 0; i < nr_of_threads; i++) {
 
-        persistent_count[i] = &args[i].persistent_count;
-        transient_count[i] = &args[i].transient_count;
-        call_count[i] = &args[i].call_count;
+		if (i < nr_of_fronts) {
+	        // initialise mutexes and conditions
+	        // LCOV_EXCL_START
+	        if (UNLIKELY(pthread_mutex_init(&mutex[i], NULL))) {
+	            rep->status("mutexes could not be created");
+	            rep->abort(ERROR_THREADING);
+	        }
+	        if (UNLIKELY(pthread_cond_init(&cond[i], NULL))) {
+	            rep->status("mutex conditions could not be created");
+	            rep->abort(ERROR_THREADING);
+	        }
+	        // LCOV_EXCL_STOP
+
+	        // initialise data structure for fronts
+	        args[i].frontMutex = (i>0 ? &mutex[i-1] : &mutex[nr_of_fronts-1]);
+	        args[i].backMutex = &mutex[i];
+	        args[i].frontCond = (i>0 ? &cond[i-1] : &cond[nr_of_fronts-1]);
+	        args[i].backCond = &cond[i];
+	        args[i].frontSemaphore = (i>0 ? &semval[i-1] : &semval[nr_of_fronts-1]);
+	        args[i].backSemaphore = &semval[i];
+	        args[i].frontrunner = frontrunner;
+	        args[i].frontID = i;
+	        args[i].globalThreadID = i;
+	        args[i].call_count = NULL;
+	        args[i].sweep = this;
+
+	        persistent_count[i] = &args[i].persistent_count;
+	        transient_count[i] = &args[i].transient_count;
+	        call_count[i] = &args[i].call_count;
+		} else {
+			// initialise data structure for helper threads
+			args[i].frontID = i % nr_of_fronts;
+			args[i].globalThreadID = i;
+			args[i].call_count = NULL;
+			args[i].sweep = this;
+
+	        persistent_count[i] = &args[i].persistent_count;
+	        transient_count[i] = &args[i].transient_count;
+	        call_count[i] = &args[i].call_count;
+		}
     }
 
     // create the threads
-    for (index_t i = 0; i < nr_of_fronts; i++)
-        if (UNLIKELY(pthread_create(runner_thread + i, NULL, threadSweep, args + i))) {
+    for (index_t i = 0; i < nr_of_threads; i++)
+        if (UNLIKELY(pthread_create(runner_thread + i, NULL, (i<nr_of_fronts ? frontSweep : threadSweep), args + i))) {
             // LCOV_EXCL_START
             rep->status("threads could not be created");
             rep->abort(ERROR_THREADING);
@@ -196,9 +276,10 @@ bool Sweep<T>::runThreads()
 
     //// THREADS ARE RUNNING AND SEARCHING
 
+
     // wait for all threads to finish
     prop.value = false;
-    for (index_t i = 0; i < nr_of_fronts; i++) {
+    for (index_t i = 0; i < nr_of_threads; i++) {
         void* return_value;
         if (UNLIKELY(pthread_join(runner_thread[i], &return_value))) {
             // LCOV_EXCL_START
@@ -219,6 +300,9 @@ bool Sweep<T>::runThreads()
         mutex_destruction_status |= pthread_cond_destroy(&cond[i]);
         mutex_destruction_status |= pthread_mutex_destroy(&mutex[i]);
     }
+    mutex_destruction_status |= pthread_cond_destroy(&runCond);
+    mutex_destruction_status |= pthread_mutex_destroy(&runMutex);
+
     // LCOV_EXCL_START
     if (UNLIKELY(mutex_destruction_status)) {
         rep->status("mutexes could not be destroyed");
@@ -226,10 +310,13 @@ bool Sweep<T>::runThreads()
     }
     // LCOV_EXCL_STOP
 
+	// make a final calculation of states and edges
+    forwardStateCount();
+
     // free the allocated memory
     free(runner_thread);
     free(frontrunner);
-    for(index_t i=0; i<nr_of_fronts; ++i) 
+    for(index_t i=0; i<nr_of_threads; ++i) 
     {
         free(args[i].persistent_count);
         free(args[i].transient_count);
@@ -250,32 +337,37 @@ bool Sweep<T>::runThreads()
  * \return Pointer to a state fulfilling the property or NULL if none exists
  */
 template <class T>
-void* Sweep<T>::threadSweep(void* container) {
+void* Sweep<T>::frontSweep(void* container) {
     tpSweepArguments* arguments = (tpSweepArguments*) container;
     Sweep<T>* sweep(arguments->sweep);
+	index_t threadID(arguments->globalThreadID);
 
-    // allocate memory for state and edge counters
+    // allocate memory for state and edge counters and such
     arguments->persistent_count = (int64_t*) calloc(SIZEOF_INT64_T,1);
     arguments->transient_count = (int64_t*) calloc(SIZEOF_INT64_T,1);
     arguments->call_count = (int64_t*) calloc(SIZEOF_INT64_T,1);
 
-    // first thread polls here until all threads have initialised
-    if (!arguments->globalThreadID)
-        for(index_t i = 0; i < sweep->nr_of_threads; ++i)
-            while (!*(sweep->call_count[i])) ;
+    // for idle checks by helpers and the front itself
+	index_t helpers(0);
+	sweep->helpers[threadID] = &helpers;
+	bool idle(true);
+	sweep->idle[threadID] = &idle;
+	bool call(false);
+	sweep->call[threadID] = &call;
 
     // Make copies of SimpleProperty and FireList
     SimpleProperty* sp = sweep->prop.copy();
     Firelist* myFirelist = sweep->fl.createNewFireList(sp);
 
     // Create the Store for this thread
-// !! not for threads with ID>0 !!
-		SweepRingStore<T> store(sweep->store_size,sweep->front_offset,sweep->transient_offset);
-		if (arguments->ns) {
-			store.init(sweep->start_old_persistent,sweep->start_new_persistent);
-			store.searchAndInsert(*arguments->ns,0,NULL,0);
-			++(*arguments->transient_count);
-		}
+	SweepRingStore<T> store(sweep->store_size,sweep->front_offset,sweep->transient_offset,sweep->nr_of_threads);
+	sweep->store[arguments->frontID] = &store;
+
+	if (arguments->ns) {
+		store.init(sweep->start_old_persistent,sweep->start_new_persistent);
+		store.searchAndInsert(*arguments->ns,0,NULL,0);
+		++(*arguments->transient_count);
+	}
 
     // state variable for the current state, deleted on thread termination
     arguments->ns = NetState::createNetStateFromInitial();
@@ -286,6 +378,12 @@ void* Sweep<T>::threadSweep(void* container) {
 
     // how often the front must advance before the next thread can start
     int32_t sem_countdown(sweep->store_size-1);
+
+	// allocate mutex and wait for init of all threads
+    pthread_mutex_t mutex;
+	pthread_cond_t cond;
+	sweep->initThreadMutex(&mutex,&cond,threadID);
+	idle = true;
 
     NetState* solution(NULL);
     // run until termination notice is given
@@ -303,7 +401,7 @@ void* Sweep<T>::threadSweep(void* container) {
         sweep->deinitFront(store,*arguments);
     }
 
-    // signal the next thread to terminate
+    // signal the next front to terminate
     if (sweep->nr_of_fronts>1) {
         pthread_mutex_lock(arguments->backMutex);
         *arguments->backSemaphore = 1;
@@ -311,7 +409,104 @@ void* Sweep<T>::threadSweep(void* container) {
         pthread_mutex_unlock(arguments->backMutex);
     }
 
-    if (!arguments->globalThreadID) sweep->forwardStateCount();
+	// signal all helper threads of this front to terminate
+	if (sweep->threads_per_front>1)
+		for(index_t i = arguments->frontID + sweep->nr_of_fronts; i < sweep->nr_of_threads; i+=sweep->nr_of_fronts) {
+			pthread_mutex_lock(sweep->idleMutex[i]);
+			pthread_cond_signal(sweep->idleCond[i]);
+			pthread_mutex_unlock(sweep->idleMutex[i]);		
+		}
+
+	sweep->terminateThreadMutex(&mutex, &cond);
+
+    delete myFirelist;
+    delete sp;
+    return solution;
+}
+
+/*!
+ * \brief main function for a thread (also used for single-threaded runs)
+ * \param container Arguments needed by the thread
+ * \return Pointer to a state fulfilling the property or NULL if none exists
+ */
+template <class T>
+void* Sweep<T>::threadSweep(void* container) {
+    tpSweepArguments* arguments = (tpSweepArguments*) container;
+    Sweep<T>* sweep(arguments->sweep);
+
+    // allocate memory for state and edge counters
+    arguments->persistent_count = (int64_t*) calloc(SIZEOF_INT64_T,1);
+    arguments->transient_count = (int64_t*) calloc(SIZEOF_INT64_T,1);
+    arguments->call_count = (int64_t*) calloc(SIZEOF_INT64_T,1);
+
+	index_t threadID(arguments->globalThreadID);
+	index_t frontptr(arguments->frontID);
+	sweep->frontptr[threadID] = &frontptr;
+	bool call(false);
+	sweep->call[threadID] = &call;
+	bool idle(true);
+	sweep->idle[threadID] = &idle;
+
+    // Make copies of SimpleProperty and FireList
+    SimpleProperty* sp = sweep->prop.copy();
+    Firelist* myFirelist = sweep->fl.createNewFireList(sp);
+
+    // state variable for the current state, deleted on thread termination
+    arguments->ns = NetState::createNetStateFromInitial();
+
+	// allocate local mutex
+    pthread_mutex_t mutex;
+	pthread_cond_t cond;
+	sweep->initThreadMutex(&mutex,&cond,threadID);
+
+    NetState* solution(NULL);
+    // run until termination notice is given
+    while (!sweep->exit)
+    {
+		bool idleresult(true);
+		while (!sweep->exit) {
+			bool* idletest(sweep->idle[frontptr]);
+			if (!(idleresult = *idletest)) {
+				pthread_mutex_lock(sweep->idleMutex[frontptr]);
+				if (!(idleresult = *idletest))
+					++*sweep->helpers[frontptr];
+				pthread_mutex_unlock(sweep->idleMutex[frontptr]);
+			}	
+			if (idleresult) {
+				if (++frontptr == sweep->nr_of_fronts) frontptr=0;
+				if (frontptr != arguments->frontID) continue;
+				pthread_mutex_lock(&mutex);
+				idle = *sweep->idle[frontptr];
+				while (idle && !sweep->exit)
+					pthread_cond_wait(&cond, &mutex);
+				call = false;
+				pthread_mutex_unlock(&mutex);
+				continue;
+			} else break;
+		}
+
+		if (!sweep->exit) {
+	        // check states at current progress measure and compute successors
+	        if (sweep->checkStates(*sweep->store[frontptr],*myFirelist,*sp,*arguments)) {
+				solution = arguments->ns;
+				sweep->exit = true;
+			}
+		}
+
+		if (!idleresult) {
+			pthread_mutex_lock(sweep->idleMutex[frontptr]);
+			--*sweep->helpers[frontptr];
+			pthread_cond_signal(sweep->idleCond[frontptr]);
+			pthread_mutex_unlock(sweep->idleMutex[frontptr]);
+		}
+		if (call) {
+			call = false;
+			frontptr = arguments->frontID;
+		}
+    }
+
+	// wait until request for termination is accepted
+	sweep->terminateThreadMutex(&mutex, &cond);
 
     delete myFirelist;
     delete sp;
@@ -332,8 +527,10 @@ bool Sweep<T>::initFront(tpSweepArguments& args, SweepRingStore<T>& store, int32
 	// if we are not the most advanced front, wait until our predecessor is far enough away
 	if (nr_of_fronts>1) {
 		pthread_mutex_lock(args.frontMutex);
-		while (!args.frontrunner[args.frontID] && !*args.frontSemaphore) 
+		while (!args.frontrunner[args.frontID] && !*args.frontSemaphore) {
 			pthread_cond_wait(args.frontCond,args.frontMutex);
+//			checkCall(args);
+		}
 		if (!args.frontrunner[args.frontID]) --*args.frontSemaphore;
 		pthread_mutex_unlock(args.frontMutex);
 	}
@@ -364,10 +561,53 @@ bool Sweep<T>::initFront(tpSweepArguments& args, SweepRingStore<T>& store, int32
 template <class T>
 NetState* Sweep<T>::runFront(SweepRingStore<T>& store, Firelist& fl, SimpleProperty& sp, tpSweepArguments& args, int32_t& bp, int32_t& semcnt)
 {
+	index_t pval(0);
+
+	index_t frontID(args.frontID);
+	bool& frontIdle(*idle[frontID]);
+	pthread_mutex_t* mutex(idleMutex[frontID]);
+	pthread_cond_t* cond(idleCond[frontID]);
+	index_t& frontHelpers(*helpers[frontID]);
     // run until termination notice is given
     while (!exit) {
+		// tell dependent threads that we have work to do
+		if (threads_per_front>1) {
+			frontIdle = false;
+			checkCall(args,true);
+			for(index_t i=nr_of_fronts; i<nr_of_threads; ++i)
+				if (*idle[i]) {
+					pthread_mutex_lock(idleMutex[i]);
+					*idle[i] = false;
+					pthread_cond_signal(idleCond[i]);
+					pthread_mutex_unlock(idleMutex[i]);
+				}
+/*
+			index_t tocall((frontID+1) % nr_of_fronts);
+			*call[tocall] = true;
+			pthread_cond_signal(idleCond[tocall]);
+			pthread_cond_signal(args.backCond);
+*/
+		}
+
         // check states at current progress measure and compute successors
-        if (checkStates(store,fl,sp,*(args.ns),args)) return args.ns;
+		bool solved;
+        if ((solved = checkStates(store,fl,sp,args))) exit = true;
+
+		// tell dependent threads to look for work elsewhere
+		// and wait for all threads still working here to clear the area before we advance
+		if (threads_per_front>1) {
+			pthread_mutex_lock(mutex);
+			frontIdle = true;
+			while (frontHelpers>0) {
+				pthread_cond_wait(cond,mutex);
+//				checkCall(args);
+			}
+			pthread_mutex_unlock(mutex);
+		}
+
+		// if a solution was found (by any thread), quit
+		if (solved) return args.ns;
+		if (exit) return NULL;
 
         // check if we need to precede the persistent store lists
         // with new, empty stores
@@ -376,14 +616,19 @@ NetState* Sweep<T>::runFront(SweepRingStore<T>& store, Firelist& fl, SimplePrope
 		// if we're not the foremost front, check if we may advance
 		if (nr_of_fronts>1) {
 			pthread_mutex_lock(args.frontMutex);
-			while (!args.frontrunner[args.frontID] && !*args.frontSemaphore)
-			pthread_cond_wait(args.frontCond,args.frontMutex);
-		    if (!args.frontrunner[args.frontID]) --*args.frontSemaphore;
+			while (!args.frontrunner[frontID] && !*args.frontSemaphore) {
+				pthread_cond_wait(args.frontCond,args.frontMutex);
+//				checkCall(args);
+			}
+		    if (!args.frontrunner[frontID]) --*args.frontSemaphore;
 			pthread_mutex_unlock(args.frontMutex);
 		}
 
         // compute and forward the state count
-        if (args.frontrunner[args.frontID] && !exit) forwardStateCount();
+        if (args.frontrunner[frontID] && !exit) {
+			forwardStateCount();
+//			if (++pval % 100000 == 0) { rep->status("progress at %d",pval); forwardStateCount(true); }
+		}
 
         // advance the front to the next progress measure
         if (!store.advanceProgress()) break;
@@ -412,6 +657,8 @@ NetState* Sweep<T>::runFront(SweepRingStore<T>& store, Firelist& fl, SimplePrope
 template <class T>
 void Sweep<T>::deinitFront(SweepRingStore<T>& store, tpSweepArguments& args)
 {
+//	forwardStateCount(true);
+
 	// clear the transient states and check if there were new persistent states at all
 	if (store.clear()) exit=true;
 
@@ -429,6 +676,7 @@ void Sweep<T>::deinitFront(SweepRingStore<T>& store, tpSweepArguments& args)
     }
 }
 
+
 /*!
  * \brief Check all states with the current progress measure and compute their successors
  * \param store The store for this thread/front
@@ -438,12 +686,17 @@ void Sweep<T>::deinitFront(SweepRingStore<T>& store, tpSweepArguments& args)
  * \return If a witness state fulfilling the property has been found
  */
 template <class T>
-bool Sweep<T>::checkStates(SweepRingStore<T>& store, Firelist& fl, SimpleProperty& sp, NetState& ns, tpSweepArguments& args)
+bool Sweep<T>::checkStates(SweepRingStore<T>& store, Firelist& fl, SimpleProperty& sp, tpSweepArguments& args)
 {
-	index_t threadID(args.threadID);
+	NetState& ns(*args.ns);
+	index_t threadID(args.globalThreadID);
+	int64_t* persistents(args.persistent_count);
+	int64_t* transients(args.transient_count);
+	int64_t* calls(args.call_count);
+
 	// get a state from the store (transient or new persistent)
     // note: the state will not be deleted from the store but transferred to the seen / old persistent list
-    while (store.popState(ns,threadID))
+    while (!exit && store.popState(ns,threadID))
     {
         // adapt the enabledness information
         Sweep::updateState(ns);
@@ -454,17 +707,18 @@ bool Sweep<T>::checkStates(SweepRingStore<T>& store, Firelist& fl, SimplePropert
         // get the firelist, i.e. all transition that need to fire
         index_t* currentFirelist;
         index_t currentEntry = fl.getFirelist(ns, &currentFirelist);
+
         while (currentEntry-- > 0)
         {
 			index_t t(currentFirelist[currentEntry]);
             // fire one transition, calculate the successor state
             Transition::fire(ns, t);
             // add the state to the store
-            ++(*args.call_count);
+            ++*calls;
             if (!store.searchAndInsert(ns,Transition::ProgressMeasure[t],NULL,threadID)) 
 			{
-                if (store.insertedIsNewPersistent(threadID)) ++(*args.persistent_count);
-                else ++(*args.transient_count);
+                if (store.insertedIsNewPersistent(threadID)) ++*persistents;
+                else ++*transients;
             }
 		    // return to the original state
             Transition::backfire(ns, t);
@@ -476,6 +730,7 @@ bool Sweep<T>::checkStates(SweepRingStore<T>& store, Firelist& fl, SimplePropert
     return false;
 }
 
+
 /*!
  * \brief Preceed the persistent store lists with new, empty stores
  * \param bp The number of stores to insert
@@ -486,11 +741,11 @@ void Sweep<T>::extendLeft(int32_t& bp)
 	SweepListStore<T>* sls;
 	while (bp-->0)
 	{
-		sls = new SweepListStore<T>(threads_per_front);
+		sls = new SweepListStore<T>(nr_of_threads);
 		sls->setNext(start_new_persistent);
 		start_new_persistent = sls;
 
-		sls = new SweepListStore<T>(threads_per_front);
+		sls = new SweepListStore<T>(nr_of_threads);
 		sls->setNext(start_old_persistent);
 		start_old_persistent = sls;
 	}	
@@ -518,7 +773,7 @@ void Sweep<T>::updateState(NetState& ns)
  * \brief Update the counter for markings and calls in the dummy store
  */
 template <class T>
-void Sweep<T>::forwardStateCount()
+void Sweep<T>::forwardStateCount(bool show)
 {
 	int64_t trcnt(0),pscnt(0),ccnt(0);
 
@@ -536,8 +791,88 @@ void Sweep<T>::forwardStateCount()
 	else max_transient_count=trcnt;
 
     // save the counter values, no distinguishing transient and persistent states possible
-	if (exit) rep->status("%lld persistent markings, %lld transient markings (max)",pscnt,trcnt);
+	if (exit || show) rep->status("%lld persistent markings, %lld transient markings (max)",pscnt,trcnt);
 	count_store.setMarkings(trcnt+pscnt);
 	count_store.setCalls(ccnt);
+}
+
+template <class T>
+void Sweep<T>::initThreadMutex(pthread_mutex_t* mutex, pthread_cond_t* cond, index_t threadID)
+{
+	idleMutex[threadID] = mutex;
+    idleCond[threadID] = cond;
+	// LCOV_EXCL_START
+	if (UNLIKELY(pthread_mutex_init(mutex, NULL))) {
+		exit = true;
+		rep->status("mutexes could not be created");
+		rep->abort(ERROR_THREADING);
+	}
+    if (UNLIKELY(pthread_cond_init(cond, NULL))) {
+		exit = true;
+        rep->status("mutex conditions could not be created");
+        rep->abort(ERROR_THREADING);
+    }
+	// LCOV_EXCL_STOP
+
+	// wait until all threads have initialised
+	pthread_mutex_lock(&runMutex);
+	if (!--running) {
+		pthread_mutex_unlock(&runMutex);
+		pthread_mutex_lock(idleMutex[0]);
+		*idle[0] = false;
+		pthread_cond_signal(idleCond[0]);
+		pthread_mutex_unlock(idleMutex[0]);
+	} else pthread_mutex_unlock(&runMutex);
+	pthread_mutex_lock(mutex);
+	while (*idle[threadID] && !exit)
+		pthread_cond_wait(cond, mutex);
+	pthread_mutex_unlock(mutex);
+	if (!threadID)
+		for(index_t i=1; i<nr_of_fronts; ++i) {
+			pthread_mutex_lock(idleMutex[i]);
+			*idle[i] = false;
+			pthread_cond_signal(idleCond[i]);
+			pthread_mutex_unlock(idleMutex[i]);
+		}
+}
+
+template <class T>
+void Sweep<T>::terminateThreadMutex(pthread_mutex_t* mutex, pthread_cond_t* cond)
+{
+	// wait until request for termination is accepted
+	pthread_mutex_lock(&runMutex);
+	if (!--terminating)
+		pthread_cond_broadcast(&runCond);
+	else while (terminating)
+		pthread_cond_wait(&runCond, &runMutex);
+	pthread_mutex_unlock(&runMutex);
+
+    int mutex_destruction_status = pthread_cond_destroy(cond);
+    mutex_destruction_status |= pthread_mutex_destroy(mutex);
+    // LCOV_EXCL_START
+    if (UNLIKELY(mutex_destruction_status)) {
+        rep->status("mutexes could not be destroyed");
+        rep->abort(ERROR_THREADING);
+    }
+    // LCOV_EXCL_STOP
+}
+
+template <class T>
+void Sweep<T>::checkCall(tpSweepArguments& args, bool draw)
+{
+	if (draw || *call[args.frontID]) {
+        for(index_t i = args.frontID + nr_of_fronts; i < nr_of_threads; i += nr_of_fronts)
+		{
+			*call[i] = draw;
+			if (*idle[i]) {
+				pthread_mutex_lock(idleMutex[i]);
+				*idle[i] = false;
+				pthread_cond_signal(idleCond[i]);
+				pthread_mutex_unlock(idleMutex[i]);
+			}
+		}
+		if (!draw) *call[(args.frontID+1) % nr_of_fronts] = true;
+		*call[args.frontID] = false;
+	}
 }
 

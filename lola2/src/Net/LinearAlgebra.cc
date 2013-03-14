@@ -21,9 +21,10 @@ void Matrix::Row::DEBUG__printRow() const
     for (index_t i = 0; i < varCount; ++i)
     {
         std::cout << coefficients[i] << "*" << variables[i] << " ";
-        //std::cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
+//        if (variables[i]<Net::Card[PL]) std::cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
+//		std::cout << coefficients[i] << "*" << Net::Name[TR][variables[i]] << " ";
     }
-    std::cout << "[" << reference << "]";
+    std::cout << "[" << Net::Name[PL][reference] << "]";
     std::cout << std::endl;
     /*
     for (index_t i = 0; i < varCount; ++i) {
@@ -103,33 +104,59 @@ Matrix::Row::Row(index_t length, const index_t* var, const int64_t* coef, index_
 }
 
 /// eleminates the first variable on the second row of the first variable
-void Matrix::Row::apply(Matrix &matrix)
+void Matrix::Row::apply(Matrix &matrix, index_t rowToChange)
 {
-    // the variable to be eliminated should be the same
-    assert(variables[0] == next->variables[0]);
-    assert(this != next);
+	if (rowToChange == INDEX_T_MAX)
+	{
+	    // the variable to be eliminated should be the same
+	    assert(variables[0] == next->variables[0]);
+	    assert(this != next);
+	} else {
+        // the second row must exist and be singular and start with a lower variable
+        assert(matrix.matrix[rowToChange]);
+        assert(matrix.matrix[rowToChange]->next == NULL);
+        assert(variables[0] > matrix.matrix[rowToChange]->variables[0]);
+    }
 
-    // calculate correctur factors
-    int64_t ggtFactor = ggt(coefficients[0], next->coefficients[0]);
-    const int64_t firstRowFactor = next->coefficients[0] / ggtFactor;
+	const Row* realNext(rowToChange==INDEX_T_MAX ? next : matrix.matrix[rowToChange]);
+//DEBUG__printRow();
+//realNext->DEBUG__printRow();
+    // determine the index of the variable to eliminate in the second row
+	int64_t ggtFactor; 
+	index_t useVar(INDEX_T_MAX);
+	for(index_t i=0; i<realNext->varCount; ++i)
+        if (variables[0]==realNext->variables[i])
+	    {
+            useVar = i;
+//std::cout << "v0=" << variables[0] << " c0=" << coefficients[0] << " 2v0=" << realNext->variables[i] << " 2c0=" << realNext->coefficients[i] << std::endl;
+            ggtFactor = ggt(coefficients[0], realNext->coefficients[i]);
+//std::cout << "ggt=" << ggtFactor << std::endl;
+            break;
+	    }
+//std::cout << "endvar" << std::endl;
+    // do nothing if the variable does not exist in this row
+	if (useVar==INDEX_T_MAX) return;
+//std::cout << "ggt=" << ggtFactor << std::endl;
+    // calculate corrective factors
+    const int64_t firstRowFactor = realNext->coefficients[useVar] / ggtFactor;
     const int64_t secondRowFactor = coefficients[0] / ggtFactor;
 
     // get some space for the new row (secondRow - firstRow)
     // at most |firstRow| + |secondRow| elements are neccessary
     // one less is also suitable
-    index_t* newVar = (index_t*) calloc((varCount + next->varCount), SIZEOF_INDEX_T);
-    int64_t* newCoef = (int64_t*) calloc((varCount + next->varCount), SIZEOF_INT64_T);
+    index_t* newVar = (index_t*) calloc((varCount + realNext->varCount), SIZEOF_INDEX_T);
+    int64_t* newCoef = (int64_t*) calloc((varCount + realNext->varCount), SIZEOF_INT64_T);
     index_t newSize = 0;
 
-    // start with the second element, because the first one is to be ruled out
-    index_t firstRow = 1;
-    index_t secondRow = 1;
+    // start with the first element, because the first one is not necessarily ruled out
+    index_t firstRow = 0;
+    index_t secondRow = 0;
 
     // as long as there are some "common" variables left
-    while ((firstRow < varCount) && (secondRow < next->varCount))
+    while ((firstRow < varCount) && (secondRow < realNext->varCount))
     {
         // at least one element in both rows is left
-        if (variables[firstRow] < next->variables[secondRow])
+        if (variables[firstRow] < realNext->variables[secondRow])
         {
             // the one in the first row has the smaller index
             newVar[newSize] = variables[firstRow];
@@ -138,12 +165,12 @@ void Matrix::Row::apply(Matrix &matrix)
             // goto next element
             firstRow++;
         }
-        else if (variables[firstRow] > next->variables[secondRow])
+        else if (variables[firstRow] > realNext->variables[secondRow])
         {
             // the one in the second row has the smaller index
-            newVar[newSize] = next->variables[secondRow];
+            newVar[newSize] = realNext->variables[secondRow];
             // new coefficient is rowTwo * FactorTwo
-            newCoef[newSize] = safeMult(secondRowFactor, next->coefficients[secondRow]);
+            newCoef[newSize] = safeMult(secondRowFactor, realNext->coefficients[secondRow]);
             // goto next element
             secondRow++;
         }
@@ -152,7 +179,7 @@ void Matrix::Row::apply(Matrix &matrix)
             // it's the same index, so calculate new coefficient
             newVar[newSize] = variables[firstRow];
             // new coefficient is (rowTwo * factorTwo) - (rowOne * factorOne)
-            newCoef[newSize] = safeMult(secondRowFactor, next->coefficients[secondRow]);
+            newCoef[newSize] = safeMult(secondRowFactor, realNext->coefficients[secondRow]);
             newCoef[newSize] -= safeMult(firstRowFactor, coefficients[firstRow]);
             // new coefficient may be 0
             if (newCoef[newSize] == 0)
@@ -183,12 +210,12 @@ void Matrix::Row::apply(Matrix &matrix)
         firstRow++;
     }
 
-    while (secondRow < next->varCount)
+    while (secondRow < realNext->varCount)
     {
         // second row has more elements as first row
-        newVar[newSize] = next->variables[secondRow];
+        newVar[newSize] = realNext->variables[secondRow];
         // new coefficient is rowTwo * FactorTwo
-        newCoef[newSize] = safeMult(secondRowFactor, next->coefficients[secondRow]);
+        newCoef[newSize] = safeMult(secondRowFactor, realNext->coefficients[secondRow]);
 
         // goto next elements
         newSize++;
@@ -211,14 +238,20 @@ void Matrix::Row::apply(Matrix &matrix)
     }
 
     // save current reference of second row
-    const index_t curReference = this->next->reference;
+    const index_t curReference = realNext->reference;
     // delete second row
-    matrix.deleteRow(this);
+    if (rowToChange == INDEX_T_MAX)
+	    matrix.deleteRow(this);
+	else {
+        delete matrix.matrix[rowToChange];
+        --matrix.rowCount;
+        matrix.matrix[rowToChange] = NULL;
+	}
 
     // create new row based on new arrays
     if (newSize != 0)
     {
-        assert(newVar[0] > variables[0]);
+        if (rowToChange == INDEX_T_MAX) assert(newVar[0] > variables[0]);
         matrix.addRow(newSize, newVar, newCoef, curReference);
     }
     // free memory of the new row (data is already processed)
@@ -325,6 +358,32 @@ void Matrix::reduce()
         }
     }
     assert(DEBUG__checkReduced());
+}
+
+/// reduce the current matrix approaching diagonal form
+void Matrix::diagonalise()
+{
+
+    // if there are no rows, do nothing
+    if (rowCount == 0)
+    {
+        return;
+    }
+
+    reduce();
+
+    // eliminate entries in upper rows (i) using lower rows (j)
+    for (index_t i = 0; i < colCount; ++i)
+        if (matrix[i] != NULL)
+        {
+            for(index_t j = i+1; j < colCount; ++j)
+                if (matrix[j] != NULL)
+                    matrix[j]->apply(*this, i);
+            // make diagonal entry positive (by multiplying row with -1)
+            if (matrix[i]->coefficients[0]<0)
+                for(index_t v=0; v<matrix[i]->varCount; ++v)
+                    matrix[i]->coefficients[v] *= -1;
+        }
 }
 
 /// Returns number of rows

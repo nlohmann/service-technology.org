@@ -16,8 +16,8 @@ measure and containing known persistent markings, either old or new ones.
  * \brief Constructor for one store in a list of stores
  */
 template <class T>
-SweepListStore<T>::SweepListStore(index_t threads_per_front) 
-: next(NULL), store(threads_per_front), threadsPerFront(threads_per_front)
+SweepListStore<T>::SweepListStore(index_t _nr_of_threads) 
+: next(NULL), store(_nr_of_threads), nr_of_threads(_nr_of_threads)
 {
 }
 
@@ -26,8 +26,8 @@ SweepListStore<T>::SweepListStore(index_t threads_per_front)
  * \param size The number of stores in the list
  */
 template <class T>
-SweepListStore<T>::SweepListStore(index_t threads_per_front, index_t size) 
-: next(size>0 ? new SweepListStore(size-1) : NULL), store(threads_per_front), threadsPerFront(threads_per_front)
+SweepListStore<T>::SweepListStore(index_t _nr_of_threads, index_t size) 
+: next(size>0 ? new SweepListStore(_nr_of_threads,size-1) : NULL), store(_nr_of_threads), nr_of_threads(_nr_of_threads)
 {
 }
 
@@ -58,7 +58,7 @@ SweepListStore<T>* SweepListStore<T>::checkNext()
 template <class T>
 SweepListStore<T>* SweepListStore<T>::getNext()
 {
-	if (!next) next = new SweepListStore<T>(threadsPerFront);
+	if (!next) next = new SweepListStore<T>(nr_of_threads);
 	return next;
 }
 

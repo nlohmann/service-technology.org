@@ -12,12 +12,12 @@ using std::cout;
 using std::endl;
 
 template <typename T>
-SweepStore<T>::SweepStore(index_t threadsPerFront)
+SweepStore<T>::SweepStore(index_t nr_of_threads)
 {
     branch = NULL;
     firstvector = NULL;
-	popVectorCache = (vectordata_t**) calloc(SIZEOF_VOIDP, threadsPerFront);
-	this->threadsPerFront = threadsPerFront;
+	popVectorCache = (vectordata_t**) calloc(SIZEOF_VOIDP, nr_of_threads);
+	this->nr_of_threads = nr_of_threads;
 
     pthread_rwlock_init(&rwlock, NULL);
 }
@@ -40,7 +40,7 @@ SweepStore<T>::~SweepStore()
         free(firstvector);
     }
 
-	for(index_t i=0; i<threadsPerFront; ++i)
+	for(index_t i=0; i<nr_of_threads; ++i)
 		if(popVectorCache[i])
 	        free(popVectorCache[i]);
 	free(popVectorCache);
@@ -353,9 +353,6 @@ bool SweepStore<T>::popVector(vectordata_t * & out, index_t threadIndex)
   /// size of resulting vector
   index_t vectorlen = SIZEOF_CAPACITY_T * Net::Card[PL];
 
-  // lock the current bucket to ensure thread safety
-  pthread_rwlock_wrlock(&rwlock);
-
   // create intermediate vector
   if(!(popVectorCache[threadIndex]))
   {
@@ -368,6 +365,9 @@ bool SweepStore<T>::popVector(vectordata_t * & out, index_t threadIndex)
   // anchor to a decision node
   Decision * anchor = NULL;
   Decision ** pAnchor = NULL;
+
+  // lock the current bucket to ensure thread safety
+  pthread_rwlock_wrlock(&rwlock);
   
   if(!(pPayload = firstvector))
   {

@@ -18,7 +18,7 @@ class SweepStore //: public VectorStore<T>
 {
 public:
     /// constructor for multithreading
-	SweepStore(index_t threadsPerFront = 1);
+	SweepStore(index_t nr_of_threads = 1);
     /// destructor
     virtual ~SweepStore();
 
@@ -76,7 +76,7 @@ private:
     vectordata_t** popVectorCache;
 
 	// number of threads that can access this store simultaneously
-	index_t threadsPerFront;
+	index_t nr_of_threads;
 };
 
 // forward declaration to register function specialization

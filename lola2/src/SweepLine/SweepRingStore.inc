@@ -29,13 +29,13 @@ using std::endl;
  * \param _front_offset Maximal progress of a single transition
  */
 template <class T>
-SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, index_t _nr_of_threads)
+SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, FullCopyEncoder* fce, NetStateEncoder* nse, index_t _nr_of_threads)
 : size(_size), front_offset(_front_offset), active(size-front_offset-1), transient_offset(_transient_offset), nr_of_threads(_nr_of_threads)
 {
 	assert(size>front_offset);
 	// get encoders
-	fullencoder = new FullCopyEncoder(nr_of_threads);
-	sigpencoder = new CopyEncoder(nr_of_threads);
+	fullencoder = fce;
+	sigpencoder = nse;
 	// obtain space for counters
 	count = (int64_t*) calloc(SIZEOF_INT64_T,size);
 	// obtain store ring for transient states
@@ -56,8 +56,6 @@ SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t 
 template <class T>
 SweepRingStore<T>::~SweepRingStore()
 {
-	delete fullencoder;
-	delete sigpencoder;
 	for(index_t i=0; i<size; ++i) delete store[i]; 
 	free(store);
 	free(count);

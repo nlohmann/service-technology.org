@@ -31,7 +31,7 @@ class SweepRingStore
 {
 public:
 	/// constructor with size of the store and maximal positive progress
-	SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, index_t _nr_of_threads = 1);
+	SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, FullCopyEncoder* fce, NetStateEncoder* nse, index_t _nr_of_threads = 1);
 	/// destructor
 	~SweepRingStore();
 
@@ -69,7 +69,7 @@ private:
 	/// encoder for all transient and new persistent states
 	FullCopyEncoder* fullencoder;
 	/// encoder for old persistent states
-	CopyEncoder* sigpencoder;
+	NetStateEncoder* sigpencoder;
 	/// state counter for transient store
 	int64_t* count;
 	/// ring of stores for transient states

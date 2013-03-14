@@ -18,6 +18,10 @@
 #include <Net/Transition.h>
 #include <InputOutput/Reporter.h>
 #include <iostream>
+#include <Stores/NetStateEncoder/BitEncoder.h>
+#include <Stores/NetStateEncoder/CopyEncoder.h>
+#include <Stores/NetStateEncoder/FullCopyEncoder.h>
+#include <Stores/NetStateEncoder/SimpleCompressedEncoder.h>
 
 using std::cout;
 using std::endl;
@@ -96,6 +100,24 @@ Sweep<T>::Sweep(SimpleProperty& property, NetState& ns, SweepEmptyStore& st, Fir
 
 	// reserve memory for pointers to the stores
 	store = (SweepRingStore<T>**) malloc(nr_of_fronts * SIZEOF_VOIDP);
+
+	// get encoders
+	fullencoder = new FullCopyEncoder(nr_of_threads);
+    switch (args_info.encoder_arg) {
+    case encoder_arg_bit:
+        sigpencoder = new BitEncoder(nr_of_threads);
+        break;
+    case encoder_arg_copy:
+        sigpencoder = new CopyEncoder(nr_of_threads);
+        break;
+    case encoder_arg_simplecompressed:
+        sigpencoder = new SimpleCompressedEncoder(nr_of_threads);
+        break;
+    case encoder_arg_fullcopy:
+        sigpencoder = new FullCopyEncoder(nr_of_threads);
+        break;
+    }
+//	sigpencoder = new CopyEncoder(nr_of_threads);
 }
 
 /*!
@@ -116,6 +138,8 @@ Sweep<T>::~Sweep()
 	free(persistent_count);
 	delete start_new_persistent;
 	delete start_old_persistent;
+    delete fullencoder;
+    delete sigpencoder;
 }
 
 /*!
@@ -360,7 +384,8 @@ void* Sweep<T>::frontSweep(void* container) {
     Firelist* myFirelist = sweep->fl.createNewFireList(sp);
 
     // Create the Store for this thread
-	SweepRingStore<T> store(sweep->store_size,sweep->front_offset,sweep->transient_offset,sweep->nr_of_threads);
+	SweepRingStore<T> store(sweep->store_size,sweep->front_offset,sweep->transient_offset,
+        sweep->fullencoder,sweep->sigpencoder,sweep->nr_of_threads);
 	sweep->store[arguments->frontID] = &store;
 
 	if (arguments->ns) {

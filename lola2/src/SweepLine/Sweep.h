@@ -177,6 +177,11 @@ struct tpSweepArguments {
 	pthread_mutex_t runMutex;
 	pthread_cond_t runCond;
 
+	/// encoder for all transient and new persistent states
+	FullCopyEncoder* fullencoder;
+	/// encoder for old persistent states
+	NetStateEncoder* sigpencoder;
+
 	/// a flag telling all threads to terminate
 	bool exit;
 };

@@ -47,12 +47,15 @@ void dotPO(std::vector<const Transition*> path, std::vector<std::set<const Trans
 
     // traverse path
     for (int i = 0; i < path.size(); ++i) {
+        assert(path[i]);
+
         // create event
         PO_Event *e = new PO_Event(path[i]);
         events.push_back(e);
 
         // connect preset
         PNAPI_FOREACH(p, path[i]->getPreset()) {
+            assert(marked[*p]);
             marked[*p]->post = e;
         }
 
@@ -65,7 +68,6 @@ void dotPO(std::vector<const Transition*> path, std::vector<std::set<const Trans
             marked[*p]->pre = e;
         }
     }
-
 
     // dot
     std::cout << "digraph PO {\n";
@@ -103,12 +105,17 @@ void printPath(std::vector<const Transition*> path, std::vector<std::set<const T
     assert(path.size() == clusters.size());
 
     for (int i = 0; i < path.size(); ++i) {
+        assert(clusters[i].size() > 0);
+        if (reduce_conflicts && clusters[i].size() == 1) {
+            continue;
+        }
+
         std::cerr << i+1 << ". fired " << path[i]->getName();
         
         if (show_branches) {
-            std::cerr << " - alternatives: " << clusters[i].size();
+            std::cerr << " - alternatives: " << clusters[i].size()-1;
         }
-        
+
         std::cerr << "\n";
     }
 }
@@ -140,7 +147,7 @@ int main(int argc, char** argv) {
         i.open(argv[1], std::ios_base::in);
         i >> io::lola >> net;
 
-        std::cerr << "net is " << (net.isFreeChoice() ? "" : "not ") << "free choice\n";
+        // std::cerr << "net is " << (net.isFreeChoice() ? "" : "not ") << "free choice\n";
     }
 
     // read path
@@ -159,7 +166,7 @@ int main(int argc, char** argv) {
             path.push_back(t);
         }
 
-        std::cerr << "parsed path of length " << path.size() << "\n\n";
+       //  std::cerr << "parsed path of length " << path.size() << "\n\n";
     }
 
     // process path
@@ -184,15 +191,17 @@ int main(int argc, char** argv) {
         m = m.getSuccessor(**t);
 
         // skip singleton clusters
-        if (reduce_conflicts && cluster_transitions.size() == 1) {
-            continue;
-        }
+        //if (reduce_conflicts && cluster_transitions.size() == 1) {
+        //    continue;
+        //}
 
         filtered_path.push_back(*t);
         filtered_markings.push_back(m);
         filtered_clusters.push_back(cluster_transitions);
     }
-    
+
+    std::cerr << "STATS: " << path.size() << "," << filtered_path.size() << "\n";
+
     printPath(filtered_path, filtered_clusters);
     //dotPath(filtered_path, filtered_clusters);
     dotPO(filtered_path, filtered_clusters, filtered_markings);

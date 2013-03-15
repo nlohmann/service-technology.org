@@ -6,6 +6,7 @@
 #include <iostream>
 #include "Node.h"
 #include "types.h"
+#include "helpers.h"
 
 class Graph {
     public:
@@ -27,8 +28,13 @@ class Graph {
         Type type;
 
     public:
+
+        Cycles cycles;
+
         /// constructor
         Graph();
+
+        GraphFormula graphformula;
 
 //        int testAllAssignments(std::map<unsigned int, Labels> AssignmentMap, std::vector<Node*> nodes);
 
@@ -44,11 +50,41 @@ class Graph {
         /// add a node to the graph
         void addNode(Node *n);
 
+        ClauseList* calculateGraphFormula(int noCycle_flag);
+
+        ClauseList* addFormulaNotReachable(Node *node);
+
+        ClauseList* addFormulaReachable(Node *node);
+
+        ClauseList* addFormulaCycleReachable(Cycle *cycle, std::vector<int> cycleSeen);
+
+        ClauseList* addFormulaCycleNotReachable(ClauseList* input);
+
+        ClauseList* ClauseIntoNegClauseList(Clause clause);
+
+        std::vector<int> edgeBelongsToCycles(NodeAndInEdge edge);
+
+        ClauseList* combineClauses(ClauseList *list1, ClauseList *list2);
+
+        void printFormulas();
+
+        void printFormulasCNF();
+
+        void printFormulasDNF();
+
+        void findCycles(Node *node, std::vector<NodeAndOutEdge> pathToNode);
+
+        std::vector<NodeAndOutEdge> restVector(Node *node, std::vector<NodeAndOutEdge> nodeVector);
+
+        void insertCycleWithoutDuplicates(std::vector<NodeAndOutEdge> nodeVector);
+
+        void computeIncomingEdgesForCycles();
+
         /// count the valid subgraphs of the given OG
         unsigned int countValidSubgraphs();
 
         /// help function
-        AssignCount countFromNode(Node *node, Node *from);
+        AssignCount countFromNode(Node *node, std::vector<Node*> path);
 
         int wasVisitedByNode(Node *node, Node *from);
 

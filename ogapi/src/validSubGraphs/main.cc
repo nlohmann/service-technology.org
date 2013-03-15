@@ -6,6 +6,7 @@
 #include "Graph.h"
 #include "verbose.h"
 #include "Output.h"
+#include "helpers.h"
 
 // lexer and parser
 extern int og_yyparse();
@@ -55,18 +56,28 @@ int main(int argc, char **argv)
     fclose(og_yyin);
   status("parsing input done");
 
-  status("counting valid subgraphs...");
-  int count = G.countValidSubgraphs();
-  message("overapproximation: %u valid subgraphs.", count);
+//  status("counting valid subgraphs...");
+//  int count = G.countValidSubgraphs();
+//  message("overapproximation: %u valid subgraphs.", count);
 
-//  // dot output
-//  if (args_info.output_given) {
-//    std::string filename = (args_info.inputs_num) ? args_info.inputs[0] : "minimize_output";
-//
-//    std::string og_filename = args_info.output_arg ? args_info.output_arg : filename + ".reduced.og";
-//    Output output(og_filename, "reduced operating guideline");
-//    G.ogOut(output);
-//  }
+//  G.printFormulas();
+//  G.printFormulasCNF();
+//  G.printFormulasDNF();
+
+  G.graphformula.cnfClauses = G.calculateGraphFormula(args_info.noCycles_flag);
+//  G.graphformula.printClauseList(G.graphformula.cnfClauses);
+  G.graphformula.printClauseListExpr(G.graphformula.cnfClauses);
+
+//  delete graphclauses;
+
+  // dot output
+  if (args_info.output_given) {
+    std::string filename = (args_info.inputs_num) ? args_info.inputs[0] : "validateSubGraph_output";
+
+    std::string cnf_filename = args_info.output_arg ? args_info.output_arg : filename + ".cnf";
+    Output output(cnf_filename, "conjunctive normal form");
+    G.graphformula.cnfOut(output, args_info.inputs[0]);
+  }
 
   return EXIT_SUCCESS;
 }

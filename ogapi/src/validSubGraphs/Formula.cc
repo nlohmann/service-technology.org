@@ -3,15 +3,17 @@
 #include <set>
 #include <string>
 
+#include "Graph.h"
 #include "Formula.h"
 #include "types.h"
+#include "helpers.h"
 
 
 /****************************************************************************
  * constructors
  ***************************************************************************/
 
-FormulaBinary::FormulaBinary(const Formula *_left, const Formula *_right) : 
+FormulaBinary::FormulaBinary(const Formula *_left, const Formula *_right) :
     left(_left), right(_right)
 {
     assert(_left);
@@ -24,14 +26,17 @@ FormulaAND::FormulaAND(const Formula *_left, const Formula *_right) :
 FormulaOR::FormulaOR(const Formula *_left, const Formula *_right) :
     FormulaBinary(_left, _right) {}
 
-FormulaNeg::FormulaNeg(const Formula *_f) :
-    f(_f)
+FormulaNeg::FormulaNeg(const Formula *_f, Graph *_graph) :
+    f(_f), graph(_graph)
 {
     assert(_f);
 }
 
-FormulaLit::FormulaLit(const std::string& _literal) :
-    literal(_literal) {}
+FormulaLit::FormulaLit(const std::string& _literal, Graph *_graph, Node *_node) :
+    literal(_literal), graph(_graph), node(_node) {}
+
+FormulaFinal::FormulaFinal(Graph *_graph, Node *_node) :
+    graph(_graph), node(_node) {}
 
 
 /****************************************************************************
@@ -208,21 +213,268 @@ const Formula *FormulaFinal::dnf() const { return this; }
  * conjunctive normal form
  ***************************************************************************/
 
-// todo
-const Formula *FormulaOR::cnf() const { return this; }
+/*!
+ * both children are conjunctions
+ * OR(AND(a,b), AND(c,d)) == AND( AND(OR(a,c),OR(a,d)), AND(OR(b,c),OR(b,d)) )
+ *
+ * one child is a disjunction, the other a conjunction
+ * OR(AND(a,b), OR(c,d)) == AND( OR(a,c,d), OR(b,c,d) )
+ * OR(OR(c,d), AND(a,b)) == AND( OR(a,c,d), OR(b,c,d) )
+ *
+ * one child is a conjunction, the other a uniary formula
+ * OR(a,AND(b,c)) == AND( OR(a,b), OR(a,c) )
+ * OR(AND(b,c),a) == AND( OR(a,b), OR(a,c) )
+ */
+std::vector<std::vector<std::string> > *FormulaOR::cnf() const {
+	std::vector<std::vector<std::string> > *l_cnf = left->cnf();
+	std::vector<std::vector<std::string> > *r_cnf = right->cnf();
+	std::vector<std::vector<std::string> > *result = new std::vector<std::vector<std::string> >();
+
+	for (std::vector<std::vector<std::string> >::const_iterator it_left = l_cnf->begin(); it_left != l_cnf->end(); ++it_left) {
+		for (std::vector<std::vector<std::string> >::const_iterator it_right = r_cnf->begin(); it_right != r_cnf->end(); ++it_right) {
+			std::vector<std::string> temp;
+			temp.insert(temp.end(), it_left->begin(), it_left->end());
+			temp.insert(temp.end(), it_right->begin(), it_right->end());
+			result->push_back(temp);
+		}
+	}
+
+	delete l_cnf;
+	delete r_cnf;
+//
+//	// both children are conjunctions
+//	if (l_cnf->getType() == FORMULA_AND && r_cnf->getType() == FORMULA_AND) {
+//		const FormulaBinary *templ = static_cast<const FormulaBinary*>(l_cnf);
+//		const FormulaBinary *tempr = static_cast<const FormulaBinary*>(r_cnf);
+//		result = new FormulaAND(
+//					new FormulaAND(
+//						new FormulaOR(templ->left, tempr->left),
+//						new FormulaOR(templ->left, tempr->right)),
+//					new FormulaAND(
+//						new FormulaOR(templ->right,tempr->left),
+//						new FormulaOR(templ->right,tempr->right)));
+//	}
+//
+//	// left child is disjunction, right child conjunction
+//	if (l_cnf->getType() == FORMULA_OR && r_cnf->getType() == FORMULA_AND) {
+//		const FormulaBinary *templ = static_cast<const FormulaBinary*>(r_cnf);
+//		result = new FormulaAND(new FormulaOR(templ->left, l_cnf),
+//							    new FormulaOR(templ->right, l_cnf));
+//	}
+//
+//	// right child is disjunction, left child conjunction
+//	if (l_cnf->getType() == FORMULA_AND && r_cnf->getType() == FORMULA_OR) {
+//		const FormulaBinary *tempr = static_cast<const FormulaBinary*>(l_cnf);
+//		result = new FormulaAND(new FormulaOR(tempr->left, r_cnf),
+//							    new FormulaOR(tempr->right, r_cnf));
+//	}
+//
+//	// left child is disjunction, right child unary
+//	if (l_cnf->getType() == FORMULA_OR && r_cnf->getType() == FORMULA_GEN) {
+//		const FormulaBinary *templ = static_cast<const FormulaBinary*>(l_cnf);
+//		result = new FormulaOR(new FormulaAND(templ->left, r_cnf),
+//				new FormulaAND(templ->right, r_cnf));
+//	}
+//
+//	// right child is disjunction, left child unary
+//	if (l_cnf->getType() == FORMULA_GEN && r_cnf->getType() == FORMULA_OR) {
+//		const FormulaBinary *tempr = static_cast<const FormulaBinary*>(r_cnf);
+//		result = new FormulaAND(
+//					new FormulaOR(tempr->left, l_cnf),
+//					new FormulaOR(tempr->right, l_cnf));
+//	}
+//
+//	assert(result);
+	return result;
+}
 
 
 /// we don't support negations at this point
-const Formula *FormulaNeg::cnf() const {
+std::vector<std::vector<std::string> > *FormulaNeg::cnf() const {
     assert(false);
-    return this;
+    std::vector<std::vector<std::string> > *result = new std::vector<std::vector<std::string> >();
+    return result; // \todo:
 }
 
-const Formula *FormulaAND::cnf() const { return this; }
-const Formula *FormulaLit::cnf() const { return this; }
-const Formula *FormulaTrue::cnf() const { return this; }
-const Formula *FormulaFalse::cnf() const { return this; }
-const Formula *FormulaFinal::cnf() const { return this; }
+std::vector<std::vector<std::string> > *FormulaAND::cnf() const {
+	std::vector<std::vector<std::string> > *l_cnf = left->cnf();
+	std::vector<std::vector<std::string> > *r_cnf = right->cnf();
+	std::vector<std::vector<std::string> > *result = new std::vector<std::vector<std::string> >();
+
+	result->insert(result->end(), l_cnf->begin(), l_cnf->end());
+	result->insert(result->end(), r_cnf->begin(), r_cnf->end());
+
+	delete l_cnf;
+	delete r_cnf;
+
+	return result;
+}
+
+std::vector<std::vector<std::string> > *FormulaLit::cnf() const {
+	std::vector<std::string> temp;
+	temp.push_back(literal);
+	std::vector<std::vector<std::string> > *result = new std::vector<std::vector<std::string> >();
+	result->push_back(temp);
+
+	return result;
+}
+
+std::vector<std::vector<std::string> > *FormulaTrue::cnf() const {
+	std::vector<std::string> temp;
+	temp.push_back("true");
+	std::vector<std::vector<std::string> > *result = new std::vector<std::vector<std::string> >();
+	result->push_back(temp);
+
+	return result;
+}
+
+std::vector<std::vector<std::string> > *FormulaFalse::cnf() const {
+	std::vector<std::string> temp;
+	temp.push_back("false");
+	std::vector<std::vector<std::string> > *result = new std::vector<std::vector<std::string> >();
+	result->push_back(temp);
+
+	return result;
+}
+
+std::vector<std::vector<std::string> > *FormulaFinal::cnf() const {
+	std::vector<std::string> temp;
+	temp.push_back("final");
+	std::vector<std::vector<std::string> > *result = new std::vector<std::vector<std::string> >();
+	result->push_back(temp);
+
+	return result;
+}
+
+
+/****************************************************************************
+ * conjunctive normal form (ClauseList)
+ ***************************************************************************/
+
+/*!
+ * both children are conjunctions
+ * OR(AND(a,b), AND(c,d)) == AND( AND(OR(a,c),OR(a,d)), AND(OR(b,c),OR(b,d)) )
+ *
+ * one child is a disjunction, the other a conjunction
+ * OR(AND(a,b), OR(c,d)) == AND( OR(a,c,d), OR(b,c,d) )
+ * OR(OR(c,d), AND(a,b)) == AND( OR(a,c,d), OR(b,c,d) )
+ *
+ * one child is a conjunction, the other a uniary formula
+ * OR(a,AND(b,c)) == AND( OR(a,b), OR(a,c) )
+ * OR(AND(b,c),a) == AND( OR(a,b), OR(a,c) )
+ */
+ClauseList *FormulaOR::toClauseList() const {
+	ClauseList *l_cnf = left->toClauseList();
+	ClauseList *r_cnf = right->toClauseList();
+	ClauseList *result = new ClauseList();
+
+	for (ClauseList::const_iterator it_left = l_cnf->begin(); it_left != l_cnf->end(); ++it_left) {
+		for (ClauseList::const_iterator it_right = r_cnf->begin(); it_right != r_cnf->end(); ++it_right) {
+			Clause temp;
+			temp.insert(temp.end(), it_left->begin(), it_left->end());
+			temp.insert(temp.end(), it_right->begin(), it_right->end());
+			result->push_back(temp);
+		}
+	}
+
+	delete l_cnf;
+	delete r_cnf;
+
+	return result;
+}
+
+
+/// we don't support negations at this point
+ClauseList *FormulaNeg::toClauseList() const {
+	// sub-formula in cnf: subf = (a v b v ...) & (x v y v ...) & ...
+	// => clause list: { {a,b,...}, {x,y,...}, ... }
+	ClauseList *subf = f->toClauseList();
+
+    ClauseList *result = new ClauseList();
+
+    if(subf->empty()) { // sub formula is true!
+    	Clause empty;
+    	result->push_back(empty);
+    	return result;
+    } else if (subf->begin()->empty()) { // sub formula is false!
+    	return result;
+    }
+
+    Clause empty;
+    result->push_back(empty);
+
+    // sub-formula negated: (-a & -b & ...) v (-x & -y & ...) v ...
+    // => convert to clause lists: {{-a},{-b},...}, {{-x},{-y},...}, ...
+    for (ClauseList::const_iterator it_clause = subf->begin(); it_clause != subf->end(); ++it_clause) {
+    	ClauseList *clauses = new ClauseList();
+    	for (Clause::const_iterator it_id = it_clause->begin(); it_id != it_clause->end(); ++it_id) {
+    		Clause tempclause;
+    		tempclause.push_back(-(*it_id));
+    		clauses->push_back(tempclause);
+    	}
+
+    	// => combine all clause lists
+    	result = graph->combineClauses(clauses, result);
+    }
+
+    return result;
+}
+
+ClauseList *FormulaAND::toClauseList() const {
+	ClauseList *l_cnf = left->toClauseList();
+	ClauseList *r_cnf = right->toClauseList();
+	ClauseList *result = new ClauseList();
+
+	if (!l_cnf->begin()->empty() && !r_cnf->end()->empty()) {
+		result->insert(result->end(), l_cnf->begin(), l_cnf->end());
+		result->insert(result->end(), r_cnf->begin(), r_cnf->end());
+	}
+
+	delete l_cnf;
+	delete r_cnf;
+
+	return result;
+}
+
+ClauseList *FormulaLit::toClauseList() const {
+	Clause temp;
+	int literalID = graph->graphformula.getLabelVarId(literal, node);
+	temp.push_back(literalID);
+	ClauseList *result = new ClauseList();
+	result->push_back(temp);
+
+	return result;
+}
+
+ClauseList *FormulaTrue::toClauseList() const {
+	//Clause temp;
+	//temp.push_back("true");
+	ClauseList *result = new ClauseList();
+	//result->push_back(temp);
+
+	return result;
+}
+
+ClauseList *FormulaFalse::toClauseList() const {
+	Clause temp;
+	//temp.push_back("false");
+	ClauseList *result = new ClauseList();
+	result->push_back(temp);
+
+	return result;
+}
+
+ClauseList *FormulaFinal::toClauseList() const {
+	Clause temp;
+	int literalID = graph->graphformula.getLabelVarId("final", node);
+	temp.push_back(literalID);
+	ClauseList *result = new ClauseList();
+	result->push_back(temp);
+
+	return result;
+}
+
+
 
 
 /****************************************************************************

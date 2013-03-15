@@ -7,9 +7,13 @@
 #include "types.h"
 
 
+class Graph;
+
+
 /// a formula to be attached to an OG node
 class Formula {
     public:
+
         /// returns type of the formula
         virtual formulaType getType() const = 0;
         
@@ -26,8 +30,11 @@ class Formula {
         virtual const Formula *dnf() const = 0;
 
         /// return a conjunctive normal form of the formula
-        virtual const Formula *cnf() const = 0;
+        virtual std::vector<std::vector<std::string> > *cnf() const = 0;
         
+        /// return a conjunctive normal form of the formula based on clauses
+        virtual ClauseList *toClauseList() const = 0;
+
         /// returns a string representation of the formula
         virtual std::string toString() const = 0;
         
@@ -51,7 +58,8 @@ class FormulaAND : public FormulaBinary {
         bool sat(const Labels *l) const;
         bool hasFinal() const;
         const Formula *dnf() const;
-        const Formula *cnf() const;
+        std::vector<std::vector<std::string> > *cnf() const;
+        ClauseList *toClauseList() const;
         std::string toString() const;
         formulaType getType() const;
         void rep(std::set<std::set<std::string> > &a, std::set<std::string> &b) const;
@@ -64,7 +72,8 @@ class FormulaOR : public FormulaBinary {
         bool sat(const Labels *l) const;
         bool hasFinal() const;
         const Formula *dnf() const;
-        const Formula *cnf() const;
+        std::vector<std::vector<std::string> > *cnf() const;
+        ClauseList *toClauseList() const;
         std::string toString() const;
         formulaType getType() const;
         void rep(std::set<std::set<std::string> > &a, std::set<std::string> &b) const;
@@ -74,13 +83,15 @@ class FormulaOR : public FormulaBinary {
 class FormulaNeg : public Formula {
     private:
         const Formula *f; ///< sub-formula
+        Graph *graph;
     
     public:
-        FormulaNeg(const Formula *f);
+        FormulaNeg(const Formula *f, Graph *graph);
         bool sat(const Labels *l) const;
         bool hasFinal() const;
         const Formula *dnf() const;
-        const Formula *cnf() const;
+        std::vector<std::vector<std::string> > *cnf() const;
+        ClauseList *toClauseList() const;
         std::string toString() const;
         formulaType getType() const;
         void rep(std::set<std::set<std::string> > &a, std::set<std::string> &b) const;
@@ -89,14 +100,17 @@ class FormulaNeg : public Formula {
 /// a formula to express a literal
 class FormulaLit : public Formula {
     private:
-        std::string literal; ///< the lable the litaral consists
+        std::string literal; ///< the label the litaral consists
+        Graph *graph;
+        Node *node;
 
     public:    
-        FormulaLit(const std::string& literal);
+        FormulaLit(const std::string& literal, Graph *graph, Node *node);
         bool sat(const Labels *l) const;
         bool hasFinal() const;
         const Formula *dnf() const;
-        const Formula *cnf() const;
+        std::vector<std::vector<std::string> > *cnf() const;
+        ClauseList *toClauseList() const;
         std::string toString() const;
         formulaType getType() const;
         void rep(std::set<std::set<std::string> > &a, std::set<std::string> &b) const;
@@ -108,7 +122,8 @@ class FormulaTrue : public Formula {
         bool sat(const Labels *l) const;
         bool hasFinal() const;
         const Formula *dnf() const;
-        const Formula *cnf() const;
+        std::vector<std::vector<std::string> > *cnf() const;
+        ClauseList *toClauseList() const;
         std::string toString() const;
         formulaType getType() const;
         void rep(std::set<std::set<std::string> > &a, std::set<std::string> &b) const;
@@ -120,7 +135,8 @@ class FormulaFalse : public Formula {
         bool sat(const Labels *l) const;
         bool hasFinal() const;
         const Formula *dnf() const;
-        const Formula *cnf() const;
+        std::vector<std::vector<std::string> > *cnf() const;
+        ClauseList *toClauseList() const;
         std::string toString() const;
         formulaType getType() const;
         void rep(std::set<std::set<std::string> > &a, std::set<std::string> &b) const;
@@ -128,11 +144,16 @@ class FormulaFalse : public Formula {
 
 /// a formula to express the final predicate
 class FormulaFinal : public Formula {
+	private:
+		Graph *graph;
+		Node *node;
     public:
+		FormulaFinal(Graph *graph, Node *node);
         bool sat(const Labels *l) const;
         bool hasFinal() const;
         const Formula *dnf() const;
-        const Formula *cnf() const;
+        std::vector<std::vector<std::string> > *cnf() const;
+        ClauseList *toClauseList() const;
         std::string toString() const;
         formulaType getType() const;
         void rep(std::set<std::set<std::string> > &a, std::set<std::string> &b) const;

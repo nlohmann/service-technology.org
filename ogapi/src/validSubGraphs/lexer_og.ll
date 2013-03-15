@@ -18,7 +18,7 @@
 class Node;
 class Formula;
 
-#include "syntax_og.hh"
+#include "syntax_og.h"
 
 extern int og_yyerror(char const *msg);
 %}

@@ -108,12 +108,10 @@ nodes:
   {
     G.addNode($1);
     G.setRoot($1);
-    tempMap[$1->id] = $1;
   }
 | nodes node
   { 
     G.addNode($2);
-    tempMap[$2->id] = $2;
   }
 ;
 
@@ -123,8 +121,10 @@ node:
   { 
     if (tempMap.count($1) > 0) 
       temp = tempMap[$1]; 
-    else 
+    else {
       temp = new Node($1); 
+      tempMap[temp->id] = temp;
+    }
   } 
   annotation successors
   { $$ = temp; }
@@ -164,15 +164,15 @@ formula:
 | formula OP_OR formula
   { $$ = new FormulaOR($1, $3); }
 | OP_NOT formula
-  { $$ = new FormulaNeg($2); }
+  { $$ = new FormulaNeg($2, &G); }
 | KEY_FINAL
-  { $$ = new FormulaFinal(); }
+  { $$ = new FormulaFinal(&G, temp); }
 | KEY_TRUE
   { $$ = new FormulaTrue(); }
 | KEY_FALSE
   { $$ = new FormulaFalse(); }
 | IDENT
-  { $$ = new FormulaLit($1); }
+  { $$ = new FormulaLit($1, &G, temp); }
 ;
 
 
@@ -180,7 +180,7 @@ successors:
   /* empty */
 | successors IDENT ARROW NUMBER
   {
-    if (!tempMap.count($4))
+    if (!(tempMap.count($4) > 0))
     {
       Node *h = new Node($4);
       tempMap[h->id] = h;

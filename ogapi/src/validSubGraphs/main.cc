@@ -68,8 +68,6 @@ int main(int argc, char **argv)
 //  G.graphformula.printClauseList(G.graphformula.cnfClauses);
   G.graphformula.printClauseListExpr(G.graphformula.cnfClauses);
 
-//  delete graphclauses;
-
   // dot output
   if (args_info.output_given) {
     std::string filename = (args_info.inputs_num) ? args_info.inputs[0] : "validateSubGraph_output";

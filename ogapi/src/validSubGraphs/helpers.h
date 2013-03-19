@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <ctime>
 #include "types.h"
 #include "Node.h"
 
@@ -12,6 +13,7 @@ void next_index(std::vector<unsigned int> &current_index,
                 const std::vector<unsigned int> &max_index);
 
 std::string printvector(std::vector<std::string> v);
+
 
 void printCycles(Cycles *cycles);
 
@@ -38,6 +40,14 @@ public:
 	/// the logical graph variables connected to an id
 	std::map<int, int> CycleVarId;
 
+	clock_t start_time;
+
+	int timebound;
+
+	void settime(int timebound);
+
+	void checktime();
+
 	int getNodeVarId(unsigned int nodeId);
 
 	int getLabelVarId(std::string label, Node *node);
@@ -50,8 +60,10 @@ public:
 
 	void printClauseListExpr(ClauseList *clauses);
 
+	void booleanOut(std::ostream &o, std::string filename, ClauseList *clauses, Cycles *cycles);
+
 	/// CNF output
-	void cnfOut(std::ostream &, std::string filename) const;
+	void cnfOut(std::ostream &, std::string filename, double time, int noCycle_flag, Cycles *cycles) const;
 };
 
 #endif

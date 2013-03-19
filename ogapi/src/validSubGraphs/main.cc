@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <ctime>
 #include "cmdline.h"
 #include "Graph.h"
 #include "verbose.h"
@@ -64,17 +65,34 @@ int main(int argc, char **argv)
 //  G.printFormulasCNF();
 //  G.printFormulasDNF();
 
-  G.graphformula.cnfClauses = G.calculateGraphFormula(args_info.noCycles_flag);
-//  G.graphformula.printClauseList(G.graphformula.cnfClauses);
-  G.graphformula.printClauseListExpr(G.graphformula.cnfClauses);
+  G.graphformula.settime(args_info.timebound_arg);
 
-  // dot output
+  /// a variable holding the time of the call
+  clock_t start_clock = clock();
+
+  G.graphformula.cnfClauses = G.calculateGraphFormula(args_info.noCycles_flag);
+
+  double duration = (double)(clock()-start_clock) / CLOCKS_PER_SEC;
+
+//  G.graphformula.printClauseList(G.graphformula.cnfClauses);
+//  G.graphformula.printClauseListExpr(G.graphformula.cnfClauses);
+
+  // CNF output
+  if (args_info.formulaoutput_given) {
+	  std::string filename = (args_info.inputs_num) ? args_info.inputs[0] : "validateSubGraph_formulaoutput";
+
+	  std::string bool_filename = args_info.output_arg ? args_info.output_arg : filename + ".bool";
+	  Output output(bool_filename, "boolean formula");
+	  G.graphformula.booleanOut(output, args_info.inputs[0], G.graphformula.cnfClauses, &(G.cycles));
+  }
+
+  // CNF output
   if (args_info.output_given) {
     std::string filename = (args_info.inputs_num) ? args_info.inputs[0] : "validateSubGraph_output";
 
     std::string cnf_filename = args_info.output_arg ? args_info.output_arg : filename + ".cnf";
     Output output(cnf_filename, "conjunctive normal form");
-    G.graphformula.cnfOut(output, args_info.inputs[0]);
+    G.graphformula.cnfOut(output, args_info.inputs[0], duration, args_info.noCycles_flag, &(G.cycles));
   }
 
   return EXIT_SUCCESS;

@@ -9,11 +9,26 @@ option "noCycles" c
   "Ignore cycles other than self-loops. May deliver false results."
   details="Don't search for cycles other than self-loops. May deliver false results but enhances performance. Searching cycles is done by a complete depth search which will take time depending on the underlying graph."
   flag off
+  
+option "timebound" -
+  "Set a time bound for the execution of the tool in seconds."
+  details="Set a time bound for the execution of the tool in seconds. A value of '-1' sets the bound to unlimited."
+  int
+  typestr="TIMEBOUND"
+  default="-1"
+  optional
 
 section "Input/Output"
 
 option "output" o
-  "Specifying output filename."
+  "Specifying output filename for cnf-file."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+  
+option "formulaoutput" f
+  "Specifying output filename for boolean formula (for better readability by the user)."
   string
   typestr="FILENAME"
   argoptional

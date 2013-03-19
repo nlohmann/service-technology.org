@@ -13,7 +13,7 @@ using std::vector;
 
 /// constructors
 Node::Node(unsigned int _id, Formula *_formula) :
-    sat(NULL), id(_id), formula(_formula), isActive(false) {
+    sat(NULL), id(_id), formula(_formula), isActive(false), hasCycles(true) {
         outEdges.clear();
     }
 

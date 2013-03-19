@@ -7,6 +7,7 @@
 #include <sstream>
 #include "Graph.h"
 #include "verbose.h"
+#include "helpers.h"
 
 
 using std::map;
@@ -51,9 +52,10 @@ ClauseList* Graph::calculateGraphFormula(int noCycle_flag) {
 
 		computeIncomingEdgesForCycles();
 
-		//std::unique(circles.begin(), circles.end());
-		printCycles(&cycles);
+//		printCycles(&cycles);
 	}
+
+	graphformula.checktime();
 
 	status("computing formula...");
 	// root node ID (the root is always reachable!)
@@ -87,13 +89,15 @@ ClauseList* Graph::calculateGraphFormula(int noCycle_flag) {
 		ClauseList *f1 = addFormulaNotReachable(node_it->second);
 		result->insert(result->end(), f1->begin(), f1->end());
 		delete f1;
+
+		graphformula.checktime();
 	}
 
 	std::vector<int> cycleSeen;
 
 	for (Cycles::iterator it_cycles = cycles.begin(); it_cycles != cycles.end(); ++it_cycles) {
 		int cycleVarId = graphformula.getCycleVarId(it_cycles->id);
-		status("cycle id: %i", it_cycles->id);
+//		status("cycle id: %i", it_cycles->id);
 		ClauseList *f4 = addFormulaCycleReachable(&(*it_cycles), cycleSeen);
 		ClauseList *f5 = new ClauseList(*f4);
 
@@ -111,6 +115,8 @@ ClauseList* Graph::calculateGraphFormula(int noCycle_flag) {
 
 		result->insert(result->end(), f5->begin(), f5->end());
 		delete f5;
+
+		graphformula.checktime();
 	}
 
 	return result;
@@ -248,14 +254,14 @@ ClauseList* Graph::addFormulaCycleReachable(Cycle *cycle, std::vector<int> cycle
 		int labelVarId = graphformula.getLabelVarId(it_edges->inEdge.first, it_edges->inEdge.second);
 		// if the edge doesn't belong to another cycle then return the label's variable
 		if (c.empty()) {
-			status("edge doesn't belong to a cycle");
+//			status("edge doesn't belong to a cycle");
 			Clause temp;
 			temp.push_back(-labelVarId);
 			result->push_back(temp);
 		} else {
-			status("iterate over cycles");
+//			status("iterate over cycles");
 			for (std::vector<int>::const_iterator it_cycles = c.begin(); it_cycles != c.end(); ++it_cycles) {
-				status("now in cycle %i", *it_cycles);
+//				status("now in cycle %i", *it_cycles);
 				// if the cycle was already seen then discard the current part of the formula
 				bool found = false;
 				for (std::vector<int>::const_iterator it_f = cycleSeen.begin(); it_f != cycleSeen.end(); ++it_f) {
@@ -266,7 +272,7 @@ ClauseList* Graph::addFormulaCycleReachable(Cycle *cycle, std::vector<int> cycle
 				}
 
 				if (!found) {
-					status("cycle not seen");
+//					status("cycle not seen");
 					ClauseList * tempclauses = addFormulaCycleReachable(&cycles[*it_cycles], cycleSeen);
 
 					for (ClauseList::iterator it = tempclauses->begin(); it != tempclauses->end(); ++it) {
@@ -314,52 +320,8 @@ ClauseList* Graph::ClauseIntoNegClauseList(Clause clause) {
 	return result;
 }
 
-//ClauseList* Graph::addFormulaCycleNotReachable(Cycle *cycle) {
-//	ClauseList *result = new ClauseList();
-//
-//	// 		(...) v (...) v ... => Cycle_reach
-//	// <=>	( not(...) & not(...) & ... ) v Cycle_reach
-//
-//	// 		&&(not(incoming edges)) => not(Cycle_reach)
-//	// <=>	||(incoming edges) v not(Cycle_reach)
-//
-//	Clause temp;
-//	for (std::vector<NodeAndInEdge>::const_iterator it_edges = cycle->incomingEdges.begin(); it_edges != cycle->incomingEdges.end(); ++it_edges) {
-//		int labelVarId = graphformula.getLabelVarId(it_edges->inEdge.first, it_edges->inEdge.second);
-//		temp.push_back(labelVarId);
-//	}
-//
-//	int cycleVarId = graphformula.getCycleVarId(cycle->id);
-//	temp.push_back(-cycleVarId);
-//	result->push_back(temp);
-//
-//	return result;
-//}
-
 std::vector<int> Graph::edgeBelongsToCycles(NodeAndInEdge edge) {
-//	std::vector<int> result;
 //	status("edge (%i, %s, %i) belongs to which cycles?", edge.inEdge.second->id, edge.inEdge.first.c_str(), edge.node->id);
-//	// iterate over all cycles that the node is in
-//	for (std::map<std::string, vector<int> >::iterator it_cycles_l = edge.node->cycleList.begin(); it_cycles_l != edge.node->cycleList.end(); ++it_cycles_l) {
-//		for (std::vector<int>::iterator it_cycles = edge.node->cycleList[edge.inEdge.first].begin(); it_cycles != edge.node->cycleList[edge.inEdge.first].end(); ++it_cycles) {
-//			status("now in cycle: %i", *it_cycles);
-//			// iterate over the cycle's edges to find the one
-//			for (std::vector<NodeAndOutEdge>::iterator it_cycle_edges = cycles[*it_cycles].cycleEdges.begin(); it_cycle_edges != cycles[*it_cycles].cycleEdges.end(); ++it_cycle_edges) {
-//				status("current cycle edge: (%i, %s, %i)", it_cycle_edges->node->id, it_cycle_edges->outEdge.first.c_str(), it_cycle_edges->outEdge.second->id);
-//				// if edge is found then return the cycle
-//				if (edge.node == it_cycle_edges->outEdge.second
-//						&& edge.inEdge.first == it_cycle_edges->outEdge.first) {
-//					status("edge belongs to cycle: %i", *it_cycles);
-//					result.push_back(*it_cycles);
-//					break;
-//				}
-//
-//			}
-//		}
-//	}
-//
-//	return result;
-	status("edge (%i, %s, %i) belongs to which cycles?", edge.inEdge.second->id, edge.inEdge.first.c_str(), edge.node->id);
 	return edge.inEdge.second->cycleList[edge.inEdge.first];
 }
 
@@ -386,17 +348,24 @@ ClauseList* Graph::combineClauses(ClauseList *list1, ClauseList *list2) {
 	return result;
 }
 
-void Graph::findCycles(Node *node, std::vector<NodeAndOutEdge> pathToNode) {
+bool Graph::findCycles(Node *node, std::vector<NodeAndOutEdge> pathToNode) {
+	graphformula.checktime();
+
 	if (node->isActive) {
-		//status("found cycle");
+//		status("found cycle");
 		//printCycles(&cycles);
-		insertCycleWithoutDuplicates(restVector(node, pathToNode));
+		bool temp = insertCycleWithoutDuplicates(restVector(node, pathToNode));
+		return temp;
+	} else if (!node->hasCycles) {
+		return false;
 	} else {
 		node->isActive = true;
 		NodeAndOutEdge temp;
 		temp.node = node;
 		pathToNode.push_back(temp);
-		//status("next node: %u", node->id);
+
+		node->hasCycles = false;
+//		status("next node: %u", node->id);
 		for (std::map<std::string, std::vector<Node*> >::const_iterator it = node->outEdges.begin(); it != node->outEdges.end(); ++it) {
 			//status("node: %i, label: %s, dest node: %i", node->id, it->first.c_str(), (*it->second.begin())->id);
 			// the graph is considered to be deterministic! \todo
@@ -404,9 +373,14 @@ void Graph::findCycles(Node *node, std::vector<NodeAndOutEdge> pathToNode) {
 			edge.first = it->first;
 			edge.second = *it->second.begin();
 			pathToNode.back().outEdge = edge;
-			findCycles(*it->second.begin(), pathToNode);
+			bool tempbool = findCycles(*it->second.begin(), pathToNode);
+			if(tempbool) {
+				node->hasCycles = true;
+			}
 		}
 		node->isActive = false;
+
+		return node->hasCycles;
 	}
 }
 
@@ -420,11 +394,11 @@ std::vector<NodeAndOutEdge> Graph::restVector(Node *node, std::vector<NodeAndOut
 	return nodeVector;
 }
 
-void Graph::insertCycleWithoutDuplicates(std::vector<NodeAndOutEdge> nodeVector) {
+bool Graph::insertCycleWithoutDuplicates(std::vector<NodeAndOutEdge> nodeVector) {
 	int length = nodeVector.size();
 	// ignore loops
 	if (length == 1)
-		return;
+		return false;
 	// iterate over all cycles
 	for (Cycles::const_iterator it_cycles = cycles.begin(); it_cycles != cycles.end(); ++it_cycles) {
 		// only makes sense if vectors are of even length!
@@ -445,7 +419,7 @@ void Graph::insertCycleWithoutDuplicates(std::vector<NodeAndOutEdge> nodeVector)
 			}
 			// if all elements have been found then temp is empty and the cycle is already in the list
 			if (temp.size() == 0) {
-				return;
+				return true;
 			}
 		}
 	}
@@ -454,6 +428,7 @@ void Graph::insertCycleWithoutDuplicates(std::vector<NodeAndOutEdge> nodeVector)
 
 	cycles.push_back(cycle);
 	++graphformula.lastLabelIndex;
+	return true;
 }
 
 void Graph::computeIncomingEdgesForCycles() {
@@ -464,7 +439,7 @@ void Graph::computeIncomingEdgesForCycles() {
 		// iterate over all edges of the current cycle
 		for (std::vector<NodeAndOutEdge>::iterator it_inner = it_cycles->cycleEdges.begin(); it_inner != it_cycles->cycleEdges.end(); ++it_inner) {
 			// add id to list of cycle-ids that the node is in
-			status("node: %i, push back cycle id: %i", it_inner->node->id, cycleID);
+//			status("node: %i, push back cycle id: %i", it_inner->node->id, cycleID);
 			it_inner->node->cycleList[it_inner->outEdge.first].push_back(cycleID);
 			// iterate over all incoming edges of destination node of the current edge
 			for (std::map<std::string, std::vector<Node*> >::iterator it_edges = it_inner->outEdge.second->inEdges.begin(); it_edges != it_inner->outEdge.second->inEdges.end(); ++it_edges) {

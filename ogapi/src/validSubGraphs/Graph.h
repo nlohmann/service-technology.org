@@ -72,11 +72,11 @@ class Graph {
 
         void printFormulasDNF();
 
-        void findCycles(Node *node, std::vector<NodeAndOutEdge> pathToNode);
+        bool findCycles(Node *node, std::vector<NodeAndOutEdge> pathToNode);
 
         std::vector<NodeAndOutEdge> restVector(Node *node, std::vector<NodeAndOutEdge> nodeVector);
 
-        void insertCycleWithoutDuplicates(std::vector<NodeAndOutEdge> nodeVector);
+        bool insertCycleWithoutDuplicates(std::vector<NodeAndOutEdge> nodeVector);
 
         void computeIncomingEdgesForCycles();
 

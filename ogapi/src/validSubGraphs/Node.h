@@ -26,6 +26,8 @@ class Node {
         /// is the node in the current search path?
         bool isActive;
 
+        bool hasCycles;
+
         /// list of cycle-ids that the node is in
         std::map<std::string, std::vector<int> > cycleList;
 

@@ -1,0 +1,30 @@
+args "--include-getopt --show-required --no-handle-error"
+
+package "pathify"
+purpose "A tool that reduces witness paths and counterexamples."
+
+option "net" n
+  "Petri net"
+  string
+  typestr="FILENAME"
+
+option "path" p
+  "path"
+  string
+  typestr="FILENAME"
+
+option "no_reduce_conflicts" -
+  "don't reduce conflicts"
+  flag off
+
+option "run" -
+  "output a distributed run"
+  flag off
+
+option "printpath" -
+  "output the path"
+  flag off
+
+option "branches" -
+  "show branches"
+  flag off

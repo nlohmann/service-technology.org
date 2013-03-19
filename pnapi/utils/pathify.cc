@@ -5,12 +5,42 @@
 #include <string>
 #include <set>
 #include <map>
+#include <libgen.h>
 #include "pnapi.h"
+#include "verbose.h"
+#include "Output.h"
+#include "pathify-cmdline.h"
 
 using namespace pnapi;
 
-bool reduce_conflicts = true;
-bool show_branches = true;
+/// the command line parameters
+gengetopt_args_info args_info;
+
+/// the invocation string
+std::string invocation;
+
+/// evaluate the command line parameters
+void evaluateParameters(int argc, char** argv) {
+    // overwrite invocation for consistent error messages
+    argv[0] = basename(argv[0]);
+
+    // store invocation in a std::string for meta information in file output
+    for (int i = 0; i < argc; ++i) {
+        invocation += std::string(argv[i]) + " ";
+    }
+
+    // initialize the parameters structure
+    struct cmdline_parser_params* params = cmdline_parser_params_create();
+
+    // call the cmdline parser
+    if (cmdline_parser(argc, argv, &args_info) != 0) {
+        abort(1, "invalid command-line parameter(s)");
+    }
+
+    free(params);
+}
+
+
 
 /* data structures for partial orders */
 
@@ -43,7 +73,7 @@ struct PO_Condition : public PO_Node {
 PO_Condition::PO_Condition(const Place *p) : PO_Node(CONDITION), p(p), pre(NULL), post(NULL) {}
 
 
-void dotPO(std::vector<const Transition*> path, std::vector<std::set<const Transition*> > clusters, std::vector<Marking> markings) {
+void dotPO(PetriNet &net, std::vector<const Transition*> path, std::vector<std::set<const Transition*> > clusters, std::vector<Marking> markings) {
     assert(path.size() == clusters.size());
     assert(path.size()+1 == markings.size());
 
@@ -133,10 +163,23 @@ void dotPO(std::vector<const Transition*> path, std::vector<std::set<const Trans
         }
     }
 
+    /*
+    const Place *target_p = net.findPlace("c1");
+    assert(target_p);
+    PO_Condition *target_b = marked[target_p];
+    assert(target_b);
+    */
+
     // dot
     std::cout << "digraph PO {\n";
 
     for (int i = 0; i < conditions.size(); ++i) {
+        /*
+        if (adjacency[conditions[i]][target_b] != 1 and conditions[i] != target_b) {
+            continue;
+        }
+        */
+        
         std::cout << (size_t)conditions[i] << " [shape=circle label=\"" << conditions[i]->p->getName() << "\"]\n";
         if (conditions[i]->pre)
             std::cout << (size_t)conditions[i]->pre << " -> " << (size_t)conditions[i] << ";\n";
@@ -145,6 +188,12 @@ void dotPO(std::vector<const Transition*> path, std::vector<std::set<const Trans
     }
 
     for (int i = 0; i < events.size(); ++i) {
+        /*
+        if (adjacency[events[i]][target_b] != 1) {
+            continue;
+        }
+        */
+
         std::cout << (size_t)events[i] << " [shape=box label=\"" << events[i]->t->getName() << "\"";
         
         if (clusters[i].size() > 1) {
@@ -170,13 +219,13 @@ void printPath(std::vector<const Transition*> path, std::vector<std::set<const T
 
     for (int i = 0; i < path.size(); ++i) {
         assert(clusters[i].size() > 0);
-        if (reduce_conflicts && clusters[i].size() == 1) {
+        if (!args_info.no_reduce_conflicts_given and clusters[i].size() == 1) {
             continue;
         }
 
         std::cerr << i+1 << ". fired " << path[i]->getName();
         
-        if (show_branches) {
+        if (args_info.branches_given) {
             std::cerr << " - alternatives: " << clusters[i].size()-1;
         }
 
@@ -198,6 +247,8 @@ void dotPath(std::vector<const Transition*> path, std::vector<std::set<const Tra
 
 
 int main(int argc, char** argv) {
+    evaluateParameters(argc, argv);
+
     // global variables
     PetriNet net;
     std::vector<const Transition*> path;
@@ -208,7 +259,7 @@ int main(int argc, char** argv) {
     // read net
     {
         std::ifstream i;
-        i.open(argv[1], std::ios_base::in);
+        i.open(args_info.net_arg, std::ios_base::in);
         i >> io::lola >> net;
 
         // std::cerr << "net is " << (net.isFreeChoice() ? "" : "not ") << "free choice\n";
@@ -219,7 +270,7 @@ int main(int argc, char** argv) {
         std::ifstream i;
         std::string line;
         bool first = true;
-        i.open(argv[2], std::ios_base::in);
+        i.open(args_info.path_arg, std::ios_base::in);
         while(std::getline(i, line)) {
             if (first) {
                 first = false;
@@ -266,9 +317,15 @@ int main(int argc, char** argv) {
 
     std::cerr << "STATS: " << path.size() << "," << filtered_path.size() << "\n";
 
-    printPath(filtered_path, filtered_clusters);
+    if (args_info.printpath_given) {
+        printPath(filtered_path, filtered_clusters);
+    }
+
+    if (args_info.run_given) {
+        dotPO(net, filtered_path, filtered_clusters, filtered_markings);
+    }
+
     //dotPath(filtered_path, filtered_clusters);
-    dotPO(filtered_path, filtered_clusters, filtered_markings);
 
     return EXIT_SUCCESS;
 }

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Service Technology - live</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="bootstrap/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="bootstrap/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <body>
+
+
+    <div class="container">
+    <h1 style="text-transform:uppercase;">service-technology.org/live<br><small>solutions that make services behave well</small></h1>
+      <div class="row">
+        <div class="span6">
+          <div class="well">
+          <a href="#" class="toggleEdit" style="display:none;" onclick="return toggleEdit('gui')"><i class="icon-lock"></i>unlock editing</a>
+         <span id="form_container">
+          loading ... </span>
+      </div>
+        </div>
+
+        <div id="command-container" class="span6">
+          <div class="well">
+            <h3>Command <small>for CLI</small></h3>
+            <input type="text" style="width:90%;font-family:monospace;" class="btn selAllOnFocus uneditable-input" id="command-output" 
+            title="Click right and select copy">
+          </div>
+          <div class="well">
+          <a href="" class="toggleEdit" onclick="return toggleEdit('json')"><i class="icon-lock"></i>unlock editing</a>
+            <h3><!-- data-toggle="collapse" style="cursor:pointer" data-target="#json-output-container" -->
+                 JSON for Server
+            </h3>
+            <div id="json-output-container">
+            <form action="http://localhost:1337" enctype="multipart/form-data" id="outForm" method="POST">
+                <textarea name="data" disabled="disabled" class="monospace" style="font-family:monospace;width:90%;height:200px;" id="json-output">...</textarea>
+            </form>
+            </div>
+          </div>
+        </div>
+      </div> <!-- "row" -->
+      <span class="btn btn-large btn-primary submitButton" style="width:97%;">Submit</span>
+      <hr />
+      <div id="output_container" class="well" style="display:none;">
+          <h2>stdout</h2>
+          <pre id="stdout"></pre>
+          <h2>stderr</h2>
+          <pre id="stderr"></pre>
+          <h2>Infos</h2>
+          <pre id="meta"></pre>
+          <div id="files_output_container"></div>
+      </div>
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- extern libraries -->
+    <script src="bootstrap/js/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+// TODO: put this hack somewhere else
+$('input.inputFileHack').change(function() {
+$('#'+this.id+'_').val($(this).val());
+});
+
+(function(){
+  $('.selAllOnFocus').click(function() { // select text on focus
+  $(this).select(); 
+});
+$('.selAllOnFocus').mouseup(function(e){ // fix for chrome and safari
+  e.preventDefault();
+ });
+})(); //​
+
+</script>
+
+<script src="inputs.js"></script>
+<script src="inputList.js"></script>
+<script src="form2command.js"></script>
+<script src="jquery.base64.min.js"></script>
+<script src="formatOutput.js"></script>
+<script src="peg-0.7.0.min.js"></script>
+<script src="ggoConversion.js"></script>
+<script type="text/javascript">
+// read the input hash
+var tool = window.location.search;
+// no XSS:
+tool = tool.replace(/[^a-z0-9_\-]/gi,'');
+
+// and now build the form
+buildForm = function(inputs) {
+    var im = new InputSetManager();
+    im.SetInputs(inputs);
+    var b = $('#form_container');
+    var dom=b.get(0);
+    console.log(dom);
+    b.fadeOut().empty();
+    im.Create(dom);
+    b.fadeIn();
+    // start listening to the formular
+    Form2Command.toolName = tool;
+    Form2Command.listen();
+}
+// TOOL AS JSON
+// $.getJSON('tools/'+tool+'.json', buildForm).error(function(){alert('loading ' + tool + ' failed.');});
+
+// PARSE FROM GGO
+initParse(tool, buildForm);
+
+// toggle editing between gui und json
+function toggleEdit(t) {
+    if(t=='gui') {
+        $('span#form_container *:disabled:not(.forceDisabled)').removeAttr('disabled');
+        $('span#form_container *').fadeTo('slow', 1);
+        $('#json-output').attr('disabled', 'disabled');
+        $('#json-output').parent().find('input[type=file]').fadeOut();
+        $('#json-output').fadeTo('slow', 0.7);
+        Form2Command.update();
+    } else if(t=='json') {
+        $('span#form_container *:enabled').attr('disabled','disabled');
+        $('span#form_container * * *:not(:header)').fadeTo('slow', 0.6);
+        //$('span#form_container h1').fadeTo('slow', 1);
+        $('#json-output').removeAttr('disabled');
+        $('#json-output').fadeTo('slow', 1);
+        $('#json-output').parent().find('input[type=file]').fadeIn();
+    }
+    $('a.toggleEdit').toggle();
+    return false;
+}
+
+$('.submitButton').click(function(){
+        // before and after submit reenable... ugly
+        var jsonOut = $('#json-output');
+        if(jsonOut.attr('disabled')) {
+            jsonOut.removeAttr('disabled');
+            $('form#outForm').submit();
+            jsonOut.attr('disabled', 'disabled');
+        } else {
+            $('form#outForm').submit();
+        }
+});
+
+</script>
+  </body>
+</html>
+

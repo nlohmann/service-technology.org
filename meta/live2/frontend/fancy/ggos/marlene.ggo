@@ -1,0 +1,198 @@
+args "--long-help --include-getopt --show-required --unamed-opts=FILE --conf-parser"
+
+purpose "Synthesizing behavioral adapters."
+description "About Marlene:"
+
+section "Core parameters"
+
+option "type" t
+  "Chose between a most-permissive and an arbitrary adapter."
+  string
+  typestr="TYPE"
+  values="mp","arbitrary" enum
+  default="mp"
+  optional
+
+option "rulefile" r
+  "File containing rules for building the rewriter part of the adapter"
+  string
+  typestr="FILE"
+  optional
+
+section "Output"
+
+section "Options"
+
+option "messagebound" m
+  "Sets the message bound (i.e., the maximal number of messages per channel). Values from the range 1..255 are allowed."
+  int
+  typestr="BOUND"
+  default="1"
+  optional
+
+option "property" p
+  "Sets the property for the controller synthesis algoritm, s.t. PROPERTY freedom is guaranteed."
+  string
+  typestr="PROPERTY"
+  values="deadlock","livelock" enum
+  default="deadlock"
+  optional
+
+option "asyncif" a
+  "Creates an asynchronous interface between adapter engine and controller. (Default is synchronous.)"
+  flag off
+
+option "nocomplementplaces" n
+  "Do not create complementary places in the engine part of the adapter (only in an intermediate state), in order to avoid unbounded places. Capacity of the places is influenced by the message bound."
+  flag off
+
+
+option "chatty" -
+  "Adapter should send messages as early as possible."
+  dependon="asyncif"
+  flag off
+
+option "arrogant" -
+  "Adapter should send messages as late as possible."
+  dependon="asyncif"
+  flag off
+
+option "costoptimized" -
+  "Adapter is optimized for costs. If no cost information are provided, the most liberal adapter is calculated."
+  flag off
+
+option "controlleronly" -
+  "Only return the controller, not the whole adapter"
+  flag off
+
+option "engineonly" -
+  "Only return the engine part of the adapter"
+  flag off
+
+option "composedonly" -
+  "Only return the composition of engine and input services (as passed to Wendy)"
+  flag off
+  hidden
+
+option "diagnosis" -
+  "Output diagnostic information in case adapter is not controllable"
+  flag off
+
+option "withprefix" -
+  "Adds a unique prefix to each read net."
+  details="In order to read one net multiple time, a prefix to the net's nodes
+  is needed. This options adds this prefix."
+  flag off
+
+option "useasif" -
+  "Uses net with index <n> as interface specification for characterization of all adaptable nets."
+  int
+  typestr="<n>"
+  default="1"
+  optional
+
+
+section "Debug"
+
+option "verbose" v
+  "Verbose output."
+  flag off
+
+option "veryverbose" w
+  "Prints a lot of code information. Has only an effect on debug builds!"
+  dependon="verbose"
+  flag off
+
+option "stats" -
+  "Print some statistical information about runtime and memory consumption"
+  flag off
+
+option "bug" -
+  "Creates a file called 'bug.log' that can be sent to the developer. Program will exit immediately after creating this file."
+  flag off
+
+section "Configuration"
+sectiondesc="Marlene relies on some other tools. These options configure Marlene to find these tools.\n"
+
+option "output" o
+  "Write output to FILE"
+  string
+  typestr="FILE"
+  default="result.owfn"
+  optional
+
+option "sa2on" -
+  "Sets the kind of converter from a state automaton to an open net. (State machine conversion is always the fall back)."
+  string
+  typestr="TYPE"
+  values="genet","petrify","statemachine" enum
+  default="genet"
+  optional
+  hidden
+  
+option "wendy" -
+  "Set the name of the Wendy binary used to build most-permissive partners."
+  string
+  typestr="FILE"
+  default="wendy"
+  optional
+  hidden
+
+option "candy" -
+  "Set the name of the Candy binary used to cost-optimize controller parts of the adapter."
+  string
+  typestr="FILE"
+  default="candy"
+  optional
+  hidden
+
+option "genet" -
+  "Set the name of the Genet binary for transformation of service automata to open nets."
+  string
+  typestr="FILE"
+  default="genet"
+  optional
+  hidden
+
+option "petrify" -
+  "Set the name of the Petrify binary for transformation of service automata to open nets."
+  string
+  typestr="FILE"
+  default="petrify"
+  optional
+  hidden
+
+option "pruner" -
+  "Set the name of the pruner binary needed for deciding adaptability."
+  string
+  typestr="FILE"
+  default="pruner"
+  optional
+  hidden
+
+option "tmpfile" -
+  "Set the name of the standard temp file."
+  string
+  typestr="FILE"
+  default="/tmp/marlene-XXXXXX"
+  optional
+  hidden
+
+option "live" -
+  "Output file for live."
+  string
+  typestr="FILE"
+  default="live.txt"
+  optional
+  hidden
+
+option "config" c
+  "Read configuration from file. If no file is given, Marlene first tries to parse file 'marlene.conf' from the sysconf directory (usually '/usr/local/etc'; written in case Marlene was installed) and then from the current working directory. If neither file was found, the standard value for 'wendy' is assumed."
+  string
+  typestr="FILE"
+  optional  
+
+option "noClean" -
+  "Do not remove temporary files after computation."
+  flag off
+  hidden

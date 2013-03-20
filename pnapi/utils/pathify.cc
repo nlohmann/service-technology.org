@@ -50,11 +50,12 @@ typedef enum {
 
 class PO_Node {
     public:
+        bool skip;
         PO_Type type;
         PO_Node(PO_Type);
 };
 
-PO_Node::PO_Node(PO_Type type) : type(type) {}
+PO_Node::PO_Node(PO_Type type) : type(type), skip(false) {}
 
 struct PO_Event : public PO_Node {
     const Transition *t;
@@ -67,10 +68,23 @@ struct PO_Condition : public PO_Node {
     const Place *p;
     PO_Event *pre;
     PO_Event *post;
+    bool initial;
+    bool final;
+    bool goal;
     explicit PO_Condition(const Place *p);
 };
 
-PO_Condition::PO_Condition(const Place *p) : PO_Node(CONDITION), p(p), pre(NULL), post(NULL) {}
+PO_Condition::PO_Condition(const Place *p) : PO_Node(CONDITION), p(p), pre(NULL), post(NULL), initial(false), final(false), goal(false) {}
+
+
+
+std::string shortenName(std::string s) {
+    if (s.size() <= 5 or not args_info.shorten_given) {
+        return s;
+    } else {
+        return "..." + s.substr(s.size()-4, 4);
+    }
+}
 
 
 void dotPO(PetriNet &net, std::vector<const Transition*> path, std::vector<std::set<const Transition*> > clusters, std::vector<Marking> markings) {
@@ -82,17 +96,18 @@ void dotPO(PetriNet &net, std::vector<const Transition*> path, std::vector<std::
     std::map<const Node*, PO_Condition*> marked;
     std::map<PO_Node*, std::map<PO_Node*, int > > adjacency;
 
-    // initial marking
+    // initial marking -> initial cut
     PNAPI_FOREACH(p, markings[0]) {
         if (p->second > 0) {
             // create condition
             PO_Condition *b = new PO_Condition(p->first);
+            b->initial = true;
             conditions.push_back(b);
             marked[p->first] = b;
         }
     }
 
-    // traverse path
+    // traverse path and create run
     for (int i = 0; i < path.size(); ++i) {
         assert(path[i]);
 
@@ -118,7 +133,14 @@ void dotPO(PetriNet &net, std::vector<const Transition*> path, std::vector<std::
             adjacency[e][marked[*p]] = 1;
         }
     }
-    
+
+    // mark final cut
+    for (int i = 0; i < conditions.size(); ++i) {
+        if (conditions[i]->post == NULL) {
+            conditions[i]->final = true;
+        }
+    }
+
     // Floyd-Warshall
     {
         // prepare a list of all nodes
@@ -163,46 +185,277 @@ void dotPO(PetriNet &net, std::vector<const Transition*> path, std::vector<std::
         }
     }
 
-    /*
-    const Place *target_p = net.findPlace("c1");
-    assert(target_p);
-    PO_Condition *target_b = marked[target_p];
-    assert(target_b);
-    */
+
+
+    if (args_info.reachability_given) {
+        for (int i = 0; i < conditions.size(); ++i) {
+            if (conditions[i]->post == NULL) {
+                conditions[i]->goal = true;
+            }
+        }
+    }
+
+
+    if (args_info.safety_given) {
+        std::set<PO_Node*> goal;
+        std::map<const Place*, int> token_count;
+
+        for (int i = 0; i < conditions.size(); ++i) {
+            if (conditions[i]->post == NULL) {
+                token_count[conditions[i]->p]++;
+            }
+        }
+
+        PNAPI_FOREACH(t, token_count) {
+            if (t->second > 1) {
+                for (int i = 0; i < conditions.size(); ++i) {
+                    if (conditions[i]->post == NULL and conditions[i]->p == t->first) {
+                        conditions[i]->goal = true;
+                        goal.insert(conditions[i]);
+                    }
+                }
+            }
+        }
+
+
+        for (int i = 0; i < conditions.size(); ++i) {
+            bool skip_this = true;
+            PNAPI_FOREACH(b, goal) {
+                if (adjacency[conditions[i]][*b] == 1) {
+                    skip_this = false;
+                }
+            }
+            if (skip_this and goal.find(conditions[i]) == goal.end()) {
+                conditions[i]->skip = true;
+            }
+        }
+
+        for (int i = 0; i < events.size(); ++i) {
+            bool skip_this = true;
+            PNAPI_FOREACH(b, goal) {
+                if (adjacency[events[i]][*b] == 1) {
+                    skip_this = false;
+                }
+            }
+            if (skip_this) {
+                events[i]->skip = true;
+            }
+        }
+    }
+
+
+
+    if (args_info.reducerun_given) {
+        std::set<PO_Event*> important;
+        
+        for (int i = 0; i < events.size(); ++i) {
+            if (clusters[i].size() > 1) {
+                important.insert(events[i]);
+            }
+        }
+
+        for (int i = 0; i < conditions.size(); ++i) {
+            if (conditions[i]->goal and conditions[i]->pre) {
+                important.insert((PO_Event*)(conditions[i]->pre));
+            }
+        }
+
+        // dot
+        std::cout << "digraph PO {\n";
+        std::cout << "rankdir=LR;\n";
+        std::cout << "node [fontname=\"Helvetica Neue\"; fontsize=10; fixedsize=true;]\n";
+
+        PNAPI_FOREACH(e1, important) {
+            std::cout << (size_t)(*e1) << " [shape=square label=\"" << shortenName((*e1)->t->getName()) << "\"";
+
+            for (int i = 0; i < events.size(); ++i) {
+                if (events[i] == *e1 and clusters[i].size() > 1) {
+                    std::cout << " penwidth=4; ";
+                }
+            }
+
+            std::cout << "];\n";
+
+            PNAPI_FOREACH(e2, important) {
+                if (*e1 == *e2) {
+                    continue;
+                }
+                if (adjacency[*e1][*e2] == 1) {
+                    std::cout << (size_t)(*e1) << " -> " << (size_t)(*e2) << " [style=dashed;]\n";
+                }
+            }
+        }
+
+        // initial cut
+        std::cout << "subgraph cluster_0 {\n";
+        std::cout << "color=invis;\n";
+        for (int i = 0; i < conditions.size(); ++i) {
+            if (conditions[i]->skip) {
+                continue;
+            }
+
+            if (conditions[i]->initial and !conditions[i]->final) {
+                std::cout << (size_t)conditions[i] << "\n";
+            }
+        }
+        std::cout << "}\n\n";
+
+
+        // final cut
+        std::cout << "subgraph cluster_1 {\n";
+        std::cout << "color=invis;\n";
+        for (int i = 0; i < conditions.size(); ++i) {
+            if (conditions[i]->skip and not args_info.grayskip_given) {
+                continue;
+            }
+
+            if (conditions[i]->goal and !conditions[i]->initial) {
+                std::cout << (size_t)conditions[i] << "\n";
+            }
+        }
+        std::cout << "}\n\n";
+
+
+
+        // conditions
+        for (int i = 0; i < conditions.size(); ++i) {
+            if (conditions[i]->skip) {
+                continue;
+            }
+
+            if (conditions[i]->initial or conditions[i]->goal) {
+
+                std::cout << (size_t)conditions[i] << " [shape=circle label=\"" << shortenName(conditions[i]->p->getName()) << "\"";
+
+                if (conditions[i]->goal) {
+                    std::cout << " color=black; penwidth=4; ";
+                }
+                if (conditions[i]->skip and args_info.grayskip_given) {
+                    std::cout << " color=gray; fontcolor=gray; ";
+                }
+
+                std::cout << "]\n";
+
+                if (conditions[i]->post) {
+                    std::set<PO_Event*>::iterator it = important.find(conditions[i]->post);
+                    if (it != important.end()) {
+                        std::cout << (size_t)conditions[i] << " -> " << (size_t)(*it) << ";\n";
+                    } else {
+                        PNAPI_FOREACH(e, important) {
+                            if (adjacency[conditions[i]][*e] == 1) {
+                                std::cout << (size_t)(conditions[i]) << " -> " << (size_t)(*e) << " [style=dashed;]\n";
+                            }
+                        }
+                    }
+                }
+
+                if (conditions[i]->pre) {
+                    std::set<PO_Event*>::iterator it = important.find(conditions[i]->pre);
+                    if (it != important.end() and not conditions[i]->pre->skip) {
+                        std::cout << (size_t)(*it) << " -> " << (size_t)conditions[i] << ";\n";
+                    }
+                }
+            }
+        }
+
+
+        std::cout << "}\n";
+
+        return;
+    }
+
 
     // dot
     std::cout << "digraph PO {\n";
+    std::cout << "rankdir=LR;\n";
+    std::cout << "node [fontname=\"Helvetica Neue\"; fontsize=10; fixedsize=true;]\n";
+    //std::cout << "splines=false;\n";
 
+
+    // initial cut
+    std::cout << "subgraph cluster_0 {\n";
+    std::cout << "color=invis;\n";
     for (int i = 0; i < conditions.size(); ++i) {
-        /*
-        if (adjacency[conditions[i]][target_b] != 1 and conditions[i] != target_b) {
+        if (conditions[i]->skip) {
             continue;
         }
-        */
+
+        if (conditions[i]->initial and !conditions[i]->final) {
+            std::cout << (size_t)conditions[i] << "\n";
+        }
+    }
+    std::cout << "}\n\n";
+
+
+    // final cut
+    std::cout << "subgraph cluster_1 {\n";
+    std::cout << "color=invis;\n";
+    for (int i = 0; i < conditions.size(); ++i) {
+        if (conditions[i]->skip and not args_info.grayskip_given) {
+            continue;
+        }
+
+        if (conditions[i]->final and !conditions[i]->initial) {
+            std::cout << (size_t)conditions[i] << "\n";
+        }
+    }
+    std::cout << "}\n\n";
+
+
+    // conditions
+    for (int i = 0; i < conditions.size(); ++i) {
+        if (conditions[i]->skip and not args_info.grayskip_given) {
+            continue;
+        }
         
-        std::cout << (size_t)conditions[i] << " [shape=circle label=\"" << conditions[i]->p->getName() << "\"]\n";
-        if (conditions[i]->pre)
-            std::cout << (size_t)conditions[i]->pre << " -> " << (size_t)conditions[i] << ";\n";
-        if (conditions[i]->post)
-            std::cout << (size_t)conditions[i] << " -> " << (size_t)conditions[i]->post << ";\n";
+        std::cout << (size_t)conditions[i] << " [shape=circle label=\"" << shortenName(conditions[i]->p->getName()) << "\"";
+
+        if (conditions[i]->goal) {
+            std::cout << " color=black; penwidth=4; ";
+        }
+        if (conditions[i]->skip and args_info.grayskip_given) {
+            std::cout << " color=gray; fontcolor=gray; ";
+        }
+
+        std::cout << "]\n";
+
+        if (conditions[i]->pre) {
+            std::cout << (size_t)conditions[i]->pre << " -> " << (size_t)conditions[i];
+            if ((conditions[i]->pre->skip or conditions[i]->skip) and args_info.grayskip_given) {
+                std::cout << " [color=gray;]";
+            }
+            std::cout << ";\n";
+        }
+
+        if (conditions[i]->post) {
+            std::cout << (size_t)conditions[i] << " -> " << (size_t)conditions[i]->post;
+            if ((conditions[i]->post->skip or conditions[i]->skip) and args_info.grayskip_given) {
+                std::cout << " [color=gray;]";
+            }
+            std::cout << ";\n";
+        }
     }
 
+
+    // events
     for (int i = 0; i < events.size(); ++i) {
-        /*
-        if (adjacency[events[i]][target_b] != 1) {
+        if (events[i]->skip and not args_info.grayskip_given) {
             continue;
         }
-        */
 
-        std::cout << (size_t)events[i] << " [shape=box label=\"" << events[i]->t->getName() << "\"";
+        std::cout << (size_t)events[i] << " [shape=square label=\"" << shortenName(events[i]->t->getName()) << "\"";
         
         if (clusters[i].size() > 1) {
-            std::cout << " penwidth=5";
+            std::cout << " penwidth=4; ";
+        }
+        if (events[i]->skip and args_info.grayskip_given) {
+            std::cout << " color=gray; fontcolor=gray; ";
         }
         
         std::cout << "]\n";
     }
-    
+
+
     std::cout << "}\n";
 }
 
@@ -261,8 +514,6 @@ int main(int argc, char** argv) {
         std::ifstream i;
         i.open(args_info.net_arg, std::ios_base::in);
         i >> io::lola >> net;
-
-        // std::cerr << "net is " << (net.isFreeChoice() ? "" : "not ") << "free choice\n";
     }
 
     // read path
@@ -280,8 +531,6 @@ int main(int argc, char** argv) {
             Transition *t = net.findTransition(line);
             path.push_back(t);
         }
-
-       //  std::cerr << "parsed path of length " << path.size() << "\n\n";
     }
 
     // process path
@@ -305,12 +554,9 @@ int main(int argc, char** argv) {
         // fire t
         m = m.getSuccessor(**t);
 
-        // skip singleton clusters
-        //if (reduce_conflicts && cluster_transitions.size() == 1) {
-        //    continue;
-        //}
-
-        filtered_path.push_back(*t);
+        // collect intermediate results
+        if (cluster_transitions.size() > 1)
+            filtered_path.push_back(*t);
         filtered_markings.push_back(m);
         filtered_clusters.push_back(cluster_transitions);
     }
@@ -322,10 +568,8 @@ int main(int argc, char** argv) {
     }
 
     if (args_info.run_given) {
-        dotPO(net, filtered_path, filtered_clusters, filtered_markings);
+        dotPO(net, path, filtered_clusters, filtered_markings);
     }
-
-    //dotPath(filtered_path, filtered_clusters);
 
     return EXIT_SUCCESS;
 }

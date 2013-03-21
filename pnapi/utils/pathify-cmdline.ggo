@@ -54,3 +54,7 @@ option "shorten" -
 option "reducerun" -
   "reduce distributed run"
   flag off
+
+option "redaf" -
+  "reduce by further modelchecking runs"
+  flag off

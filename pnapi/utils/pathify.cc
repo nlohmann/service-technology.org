@@ -11,6 +11,8 @@
 #include "Output.h"
 #include "pathify-cmdline.h"
 
+#define __WEXITSTATUS(status)   (((status) & 0xff00) >> 8)	
+
 using namespace pnapi;
 
 /// the command line parameters
@@ -40,6 +42,9 @@ void evaluateParameters(int argc, char** argv) {
     free(params);
 }
 
+
+// fake conflicts
+std::set<int> fakeConflicts;
 
 
 /* data structures for partial orders */
@@ -85,6 +90,72 @@ std::string shortenName(std::string s) {
         return "..." + s.substr(s.size()-4, 4);
     }
 }
+
+
+std::set<int> redAF(PetriNet net, std::vector<const Transition*> path, std::vector<std::set<const Transition*> > clusters, std::vector<Marking> markings) {
+    std::set<int> result;
+
+    for (int i = 0; i < path.size(); ++i) {
+        if (clusters[i].size() > 1) {
+            bool fake_conflict = true;
+            
+            PNAPI_FOREACH(t, clusters[i]) {
+                std::string filename = std::string(args_info.net_arg) + "-af.lola";
+                std::ofstream nn(filename.c_str());
+
+                if (*t != path[i]) {
+                    // firing t yields the new initial marking
+                    Marking m0 = markings[i].getSuccessor(**t);
+
+                    // mark the new net accordingly
+                    PNAPI_FOREACH(p, m0) {
+                        Place *thePlace = (Place *)p->first;
+                        thePlace->setTokenCount(p->second);
+                    }
+
+                    nn << io::lola << net;
+
+                    // find the marking to look for
+                    int j;
+                    for (j = i; j < path.size(); ++j) {
+                        if (clusters[j].size() > 1) {
+                            break;
+                        }
+                    }
+
+                    // j is either the next conflict marking or the target marking
+                    bool first = true;
+                    nn << "\n\nFORMULA ALLPATH EVENTUALLY (";
+                    PNAPI_FOREACH(p, markings[j]) {
+                        if (!first) {
+                            nn << " AND ";
+                        }
+                        first = false;
+                        nn << p->first->getName() << " = " << p->second;
+                    }
+                    nn << ")" << std::endl;
+                    
+                    std::string call = "lola-modelchecking " + filename + " > /dev/null 2> /dev/null";
+                    int res = system(call.c_str());
+                    remove(filename.c_str());
+                    //std::cerr << "result: " << __WEXITSTATUS(res) << "\n";
+                    
+                    if (res != 0) {
+                        fake_conflict = false;
+                        break;
+                    }
+                }
+            }
+            if (fake_conflict) {
+                result.insert(i);
+            }
+        }
+    }
+    
+    return result;
+}
+
+
 
 
 void dotPO(PetriNet &net, std::vector<const Transition*> path, std::vector<std::set<const Transition*> > clusters, std::vector<Marking> markings) {
@@ -249,7 +320,7 @@ void dotPO(PetriNet &net, std::vector<const Transition*> path, std::vector<std::
         std::set<PO_Event*> important;
         
         for (int i = 0; i < events.size(); ++i) {
-            if (clusters[i].size() > 1) {
+            if (clusters[i].size() > 1 and fakeConflicts.find(i) == fakeConflicts.end()) {
                 important.insert(events[i]);
             }
         }
@@ -445,7 +516,7 @@ void dotPO(PetriNet &net, std::vector<const Transition*> path, std::vector<std::
 
         std::cout << (size_t)events[i] << " [shape=square label=\"" << shortenName(events[i]->t->getName()) << "\"";
         
-        if (clusters[i].size() > 1) {
+        if (clusters[i].size() > 1 and fakeConflicts.find(i) == fakeConflicts.end()) {
             std::cout << " penwidth=4; ";
         }
         if (events[i]->skip and args_info.grayskip_given) {
@@ -562,6 +633,11 @@ int main(int argc, char** argv) {
     }
 
     std::cerr << "STATS: " << path.size() << "," << filtered_path.size() << "\n";
+
+    if (args_info.redaf_given) {
+        fakeConflicts = redAF(net, path, filtered_clusters, filtered_markings);
+        std::cerr << fakeConflicts.size() << " fake conflicts\n";
+    }
 
     if (args_info.printpath_given) {
         printPath(filtered_path, filtered_clusters);

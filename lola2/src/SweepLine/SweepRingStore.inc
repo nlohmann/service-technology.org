@@ -279,6 +279,21 @@ bool SweepRingStore<T>::checkNewPersistent()
 }
 
 /*!
+ * \brief check if there are new persistent states in the bp oldest stores with respect to the ring store
+ * \return The relative "age" of the store with a new persistent state (0 if none)
+ */
+template <class T>
+int32_t SweepRingStore<T>::checkNewPersistent(int32_t bp)
+{
+    // the oldest store has already been checked, thus "i+2" in the following formula
+    // test the second oldest one first, and then stores with increasing progress
+    for(index_t i=0; i<bp; ++i)
+        if (!(newpersistent[(active+front_offset+i+2)%size]->store.empty()))
+            return bp-i;
+    return 0;
+}
+
+/*!
  * \brief check if the last inserted state has been new persistent. Only valid directly after a successfull insert by searchAndInsert()
  * \return True if it is new persistent state
  */

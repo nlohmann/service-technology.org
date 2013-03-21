@@ -22,6 +22,7 @@
 #include <Stores/NetStateEncoder/CopyEncoder.h>
 #include <Stores/NetStateEncoder/FullCopyEncoder.h>
 #include <Stores/NetStateEncoder/SimpleCompressedEncoder.h>
+#include <Net/Marking.h>
 
 using std::cout;
 using std::endl;
@@ -637,6 +638,7 @@ NetState* Sweep<T>::runFront(SweepRingStore<T>& store, Firelist& fl, SimplePrope
         // check if we need to precede the persistent store lists
         // with new, empty stores
         if (bp && store.checkNewPersistent()) extendLeft(bp);
+        else if (bp) --bp;
 
 		// if we're not the foremost front, check if we may advance
 		if (nr_of_fronts>1) {
@@ -650,13 +652,15 @@ NetState* Sweep<T>::runFront(SweepRingStore<T>& store, Firelist& fl, SimplePrope
 		}
 
         // compute and forward the state count
-        if (args.frontrunner[frontID] && !exit) {
+        if (args.frontrunner[frontID] && !exit)
 			forwardStateCount();
-//			if (++pval % 100000 == 0) { rep->status("progress at %d",pval); forwardStateCount(true); }
-		}
 
         // advance the front to the next progress measure
-        if (!store.advanceProgress()) break;
+        if (!store.advanceProgress()) {
+            bp = store.checkNewPersistent(bp);
+            extendLeft(bp);
+            break;
+        }
 
         // correct the number of transient states due to progress advance
         *args.transient_count -= store.getNumberOfDeletedStates();
@@ -732,12 +736,12 @@ bool Sweep<T>::checkStates(SweepRingStore<T>& store, Firelist& fl, SimplePropert
         // get the firelist, i.e. all transition that need to fire
         index_t* currentFirelist;
         index_t currentEntry = fl.getFirelist(ns, &currentFirelist);
-
         while (currentEntry-- > 0)
         {
 			index_t t(currentFirelist[currentEntry]);
             // fire one transition, calculate the successor state
             Transition::fire(ns, t);
+
             // add the state to the store
             ++*calls;
             if (!store.searchAndInsert(ns,Transition::ProgressMeasure[t],NULL,threadID)) 
@@ -745,6 +749,7 @@ bool Sweep<T>::checkStates(SweepRingStore<T>& store, Firelist& fl, SimplePropert
                 if (store.insertedIsNewPersistent(threadID)) ++*persistents;
                 else ++*transients;
             }
+
 		    // return to the original state
             Transition::backfire(ns, t);
         }

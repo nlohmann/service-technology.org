@@ -47,6 +47,8 @@ public:
 	bool clear();
 	/// check for a new persistent state in the bucket with the lowest progress value
 	bool checkNewPersistent();
+	/// check for a new persistent state in buckets with the lowest progress values
+	int32_t checkNewPersistent(int32_t);
 	/// check if the last inserted state was made persistent
 	bool insertedIsNewPersistent(index_t thread);
 	/// get the number of deleted transient states during the last progress advance

@@ -249,7 +249,7 @@ void dotPO(PetriNet &net, std::vector<const Transition*> path, std::vector<std::
             for (int j = 0; j < conflict_events.size(); ++j) {
                 if (i != j) {
                     if (adjacency[conflict_events[i]][conflict_events[j]] == 1) {
-                        std::cerr << i << " -> " << j << "\n";
+                        //std::cerr << i << " -> " << j << "\n";
                     }
                 }
             }
@@ -636,7 +636,7 @@ int main(int argc, char** argv) {
 
     if (args_info.redaf_given) {
         fakeConflicts = redAF(net, path, filtered_clusters, filtered_markings);
-        std::cerr << fakeConflicts.size() << " fake conflicts\n";
+        std::cerr <<  "REDUCTION: " << fakeConflicts.size() << ", " << filtered_path.size() << "\n";
     }
 
     if (args_info.printpath_given) {

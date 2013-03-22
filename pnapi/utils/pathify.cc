@@ -289,6 +289,7 @@ void dotPO(PetriNet &net, std::vector<const Transition*> path, std::vector<std::
         }
 
 
+        // backwards reachability
         for (int i = 0; i < conditions.size(); ++i) {
             bool skip_this = true;
             PNAPI_FOREACH(b, goal) {
@@ -314,6 +315,56 @@ void dotPO(PetriNet &net, std::vector<const Transition*> path, std::vector<std::
         }
     }
 
+
+    if (args_info.formula_given) {
+        std::set<PO_Node*> goal;
+
+        std::string filename = std::string(args_info.formula_arg) + ".tmp";
+        std::string cmd = "sed 's/[()=]/ /g' " + std::string(args_info.formula_arg) + " | tr ' ' '\\n' > " + filename;
+        system(cmd.c_str());
+
+        std::ifstream i;
+        std::string line;
+        i.open(filename.c_str(), std::ios_base::in);
+        while(std::getline(i, line)) {
+            Place *p = net.findPlace(line);
+            if (p) {
+                for (int i = 0; i < conditions.size(); ++i) {
+                    if (conditions[i]->post == NULL and conditions[i]->p == p) {
+                        conditions[i]->goal = true;
+                        goal.insert(conditions[i]);
+                    }
+                }
+            }
+        }
+        remove(filename.c_str());
+
+        // backwards reachability
+        for (int i = 0; i < conditions.size(); ++i) {
+            bool skip_this = true;
+            PNAPI_FOREACH(b, goal) {
+                if (adjacency[conditions[i]][*b] == 1) {
+                    skip_this = false;
+                }
+            }
+            if (skip_this and goal.find(conditions[i]) == goal.end()) {
+                conditions[i]->skip = true;
+            }
+        }
+
+        for (int i = 0; i < events.size(); ++i) {
+            bool skip_this = true;
+            PNAPI_FOREACH(b, goal) {
+                if (adjacency[events[i]][*b] == 1) {
+                    skip_this = false;
+                }
+            }
+            if (skip_this) {
+                events[i]->skip = true;
+            }
+        }
+
+    }
 
 
     if (args_info.reducerun_given) {

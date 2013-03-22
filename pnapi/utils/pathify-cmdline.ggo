@@ -15,6 +15,12 @@ option "path" p
   string
   typestr="FILENAME"
 
+option "formula" f
+  "formula"
+  string
+  typestr="FILENAME"
+  optional
+
 section "Output"
 
 option "run" -

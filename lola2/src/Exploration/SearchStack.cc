@@ -3,6 +3,8 @@
 #include <Core/Dimensions.h>
 #include <Exploration/SearchStack.h>
 
+
+
 template<class T>
 Chunk::Chunk()
 {

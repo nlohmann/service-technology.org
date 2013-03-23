@@ -63,7 +63,6 @@ public:
 	// value of the dfs and lowlink numbers
 	AutomataTree* dfs;
 	index_t lowlink;
-
 };
 
 

@@ -28,7 +28,7 @@ public:
 	AutomataTree* smaller;
 	AutomataTree* bigger;
 
-	AutomataTree(){smaller = 0; bigger = 0; dfs = -2;};
+	AutomataTree(){smaller = 0; bigger = 0; dfs = -2;}; // -2 unvisited by outermost search
 	AutomataTree(index_t _state) { smaller = 0; bigger = 0; state = _state; dfs = -2;};
 
 	~AutomataTree(){

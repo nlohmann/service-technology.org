@@ -9,6 +9,15 @@
 #pragma once
 
 #include<new>
+// TODO remove
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
+#include <semaphore.h>
+#include <fcntl.h>
+#include <InputOutput/Reporter.h>
+extern Reporter* rep;
+// TODO
 
 /// serves as a chunk of `SIZEOF_STACKCHUNK` elements in a search stack
 template <class T>
@@ -99,7 +108,8 @@ public:
     */
     SearchStack &operator=(const SearchStack &);
 
-private:
+    //TODO revert
+public:
     Chunk<T>* currentchunk;
 };
 
@@ -128,11 +138,12 @@ void Chunk<T>::delete_all_prev_chunks() {
     prev->delete_all_prev_chunks();
     // if we want to delete all the prev chunks, we have to delete all its lists,
     // as no one will pop them in the future
-    for(unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
-    {
-        prev -> content[i].~T();
-    }
+	for(unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
+		prev -> content[i].~T();
+	rep->message("DELETE CHUNK %p",(void*)prev);
     delete prev;
+
+    prev = 0;
 
 }
 
@@ -181,12 +192,14 @@ SearchStack<T>::~SearchStack()
     if (!currentchunk)
         return;
     currentchunk->delete_all_prev_chunks();
-    do
-    {
-        currentchunk->content[--StackPointer % SIZEOF_STACKCHUNK].~T();
-    }
-    while((StackPointer % SIZEOF_STACKCHUNK) != 0);
+    //rep->message("=============DELETE STACK=================  %p",(void*)currentchunk);
+	do
+	{
+		currentchunk->content[--StackPointer % SIZEOF_STACKCHUNK].~T();
+	}
+	while((StackPointer % SIZEOF_STACKCHUNK) != 0);
     delete currentchunk;
+    //rep->message("DELETE CHUNK %p",(void*)currentchunk);
 }
 
 template<class T>
@@ -196,9 +209,12 @@ T* SearchStack<T>::push()
     {
         // need new chunk
         Chunk<T>* newchunk = new Chunk<T>;
+        //rep->message("CHREATE CHUNK %p @2 StackPointer: %d but %p", (void*)newchunk, StackPointer,currentchunk);
+        if (StackPointer == 0) assert(!currentchunk);
         newchunk->prev = currentchunk;
         currentchunk = newchunk;
     }
+    //rep->message("PUDH on %p to %d",(void*)currentchunk,StackPointer+1);
     return(currentchunk->content + (StackPointer++ % SIZEOF_STACKCHUNK));
 }
 
@@ -206,12 +222,15 @@ template<class T>
 void SearchStack<T>::pop()
 {
     StackPointer--;
+    //rep->message("POP on %p to %d",(void*)currentchunk,StackPointer);
     if ((StackPointer % SIZEOF_STACKCHUNK) == 0)
     {
+    	//rep->message("DELETE on %p to %d",(void*)currentchunk,StackPointer);
         // need to jump to previous chunk
         Chunk<T>* tempchunk = currentchunk;
         currentchunk = currentchunk->prev;
         delete tempchunk;
+        //rep->message("DELETE CHUNK %p",(void*)tempchunk);
     }
 }
 
@@ -225,7 +244,6 @@ template<class T>
 SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
 {
     // 1. copy top chunk
-
     if(currentchunk)
     {
         do
@@ -237,6 +255,7 @@ SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
     if(stack.currentchunk)
     {
         if(!currentchunk) currentchunk = new Chunk<T>();
+        //rep->message("CHREATE CHUNK %p @3 from %p (%d) ", (void*)currentchunk, (void*)stack.currentchunk, stack.StackPointer);
         for(unsigned int i = 0; i <(stack.StackPointer % SIZEOF_STACKCHUNK); i++)
         {
             new (currentchunk->content+i) T(stack.currentchunk->content[i]);
@@ -245,11 +264,14 @@ SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
     else
     {
         if(currentchunk) {
+        	//rep->message("DELETE CHUNK %p",(void*)currentchunk);
             delete currentchunk;
             currentchunk = 0;
         }
     }
+    //rep->message("STACKPOINTER %p %d",(void*)currentchunk, stack.StackPointer);
     StackPointer = stack.StackPointer;
+    //rep->message("STACKPOINTER %p %d SET",(void*)currentchunk, stack.StackPointer);
 
     // for safety
     if (!currentchunk)
@@ -262,11 +284,10 @@ SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
     Chunk<T> ** target = &(currentchunk->prev);
     Chunk<T> ** source = &(stack.currentchunk->prev);
     while(*target && *source)
-
     {
         for(unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
         {
-            (*target) -> content[i].~T();
+        	(*target) -> content[i].~T();
             new ((*target)->content + i) T((*source)->content[i]);
         }
         target = &((*target) -> prev);
@@ -277,6 +298,7 @@ SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
     while(*source)
     {
         *target = new Chunk<T>();
+        rep->message("CHREATE CHUNK %p @1", (void*)*target);
         (*target) -> prev = NULL;
         for(unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
         {
@@ -288,10 +310,9 @@ SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
     // 2c. release spare chunks at target
     if (*target) {
         (*target) -> delete_all_prev_chunks();
-        for(unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
-        {
-            (*target) -> content[i].~T();
-        }
+		for(unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
+			(*target) -> content[i].~T();
+		rep->message("DELETE CHUNK %p",(void*)*target);
         delete *target;
         *target = NULL;
     }

@@ -19,7 +19,7 @@
 class Firelist;
 //class Store;
 //class EmptyStore;
-
+extern int foo_bar;
 /*!
 \brief one element on the stack for simple properties
 
@@ -33,18 +33,25 @@ public:
 	/// ordinary constructor for entry
     SimpleStackEntry(index_t * f,index_t c) {
         assert(f);    //firelist, first processed in firelist
-        fl = f;
         current = c;
+        //fl = new index_t[current+1];
+        //memcpy(fl,f,(current+1)*SIZEOF_INDEX_T);
+        fl = f;
+        //rep->message("argu cr: create %p", (void*)fl);
     }
     /// copy constructor used by the search stack
     SimpleStackEntry(SimpleStackEntry& src) {
         current = src.current;
         fl = new index_t[current+1];
+        //rep->message("copy cr: create %p", (void*)fl);
         assert(fl);
         assert(src.fl);
         memcpy(fl,src.fl,(current+1)*SIZEOF_INDEX_T);
     }
     ~SimpleStackEntry() {
+    	int foo = foo_bar++;
+    	//rep->message("Start deletion (%d) on %p",foo,(void*)this);
+    	//rep->message("Delete (%d): %p",foo,(void*)fl);
         if (fl) delete[] fl;
         fl = NULL;
     }

@@ -120,7 +120,7 @@ private:
 
 public:
     Store<void>* store;
-    Store<AutomataTree>* ltlStore;
+    Store<AutomataTree*>* ltlStore;
     Store<void*>* ctlStore;
 
     Task();

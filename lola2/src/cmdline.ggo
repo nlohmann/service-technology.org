@@ -42,6 +42,13 @@ option "search" -
   default="depth"
   optional
 
+option "ltlmode" -
+  "Select LTL-state storage mode"
+  values="tree","flat" enum
+  typestr="LTLMODE"
+  default="tree"
+  optional
+
 option "path" p
   "Print witness path"
   flag off

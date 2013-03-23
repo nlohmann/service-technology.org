@@ -42,6 +42,9 @@ public:
 	/// returns true if the given state is accepting
 	bool isAcceptingState(index_t state);
 
+	/// returns the number of states
+	index_t getNumberOfStates();
+
 	/// default destructor
 	~BuechiAutomata();
 

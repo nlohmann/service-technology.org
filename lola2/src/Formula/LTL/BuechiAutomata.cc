@@ -64,6 +64,10 @@ bool BuechiAutomata::isAcceptingState(index_t state){
 	return isStateAccepting[state];
 }
 
+index_t BuechiAutomata::getNumberOfStates(){
+	return cardStates;
+}
+
 BuechiAutomata::~BuechiAutomata(){
 	for (index_t i = 0; i < cardAtomicPropositions; i++){
 		delete atomicPropositions[i]->getPredicate();

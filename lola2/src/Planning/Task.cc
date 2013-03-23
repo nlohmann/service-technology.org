@@ -535,7 +535,7 @@ void Task::setStore()
     {
         // choose a store
     	if(bauto)
-    		ltlStore = StoreCreator<AutomataTree>::createStore(number_of_threads);
+    		ltlStore = StoreCreator<AutomataTree*>::createStore(number_of_threads);
     	else if(ctlFormula)
     		ctlStore = StoreCreator<void*>::createStore(number_of_threads);
     	else
@@ -589,7 +589,7 @@ void Task::setProperty()
     	if(ctlFormula) {
     	    ctlExploration = new CTLExploration();
     	} else if(bauto) {
-        	ltlExploration = new LTLExploration();
+        	ltlExploration = new LTLExploration(args_info.ltlmode_arg == ltlmode_arg_tree);
     	} else { // state predicate checking
 			if (number_of_threads == 1)
 			{

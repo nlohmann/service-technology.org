@@ -30,7 +30,8 @@ TESTFILES = Kanban5.pnml.lola Kanban5.5safe.pnml.lola 4state.lola \
 	    	LTL/cycle_weak1.lola LTL/cycle_weak2.lola LTL/cycle_weak3.lola LTL/cycle_weak4.lola \
 	    	LTL/phils5dld.buechi LTL/fork1.buechi \
 	    	CTL/phils-AX.task CTL/phils-EX.task CTL/phils-TemporalConjunction.task\
-	    	CTL/phils-TemporalDisjunction.task CTL/phils-complex.task
+	    	CTL/phils-TemporalDisjunction.task CTL/phils-complex.task\
+		echo-d3r3.name.lola
 	    
 
 

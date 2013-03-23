@@ -206,10 +206,12 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                         Transition::revertEnabled(ns,currentFirelist[currentEntry]);
                         localValue = sp->updateProperty(ns,currentFirelist[currentEntry]);
                         // go on as nothing happened (i.e. do as if the new marking has been in the store)
+                        pthread_mutex_unlock(&num_suspend_mutex);
+                        continue;
                     }
                     pthread_mutex_unlock(&num_suspend_mutex);
                     //rep->message("(%d) TRANSFER UNLOCK",threadNumber);
-                    continue;
+                    //continue;
                 }
                 // Here: current marking does not satisfy property --> continue search
                 currentEntry = myFirelist->getFirelist(ns, &currentFirelist);

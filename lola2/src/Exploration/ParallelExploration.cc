@@ -27,8 +27,6 @@ extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
 
-int foo_bar = 1;
-
 /// transfer struct for the start of a parallel search thread
 struct tpDFSArguments {
 	/// the initial net state
@@ -197,9 +195,6 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                         // LCOV_EXCL_STOP
 
                         // backfire the current transition to return to original state
-                        SimpleStackEntry & s = stack.top();
-                        currentEntry = s.current;
-                        currentFirelist = s.fl;
                         stack.pop();
                         assert(currentEntry < Net::Card[TR]);
                         Transition::backfire(ns, currentFirelist[currentEntry]);
@@ -210,8 +205,6 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                         continue;
                     }
                     pthread_mutex_unlock(&num_suspend_mutex);
-                    //rep->message("(%d) TRANSFER UNLOCK",threadNumber);
-                    //continue;
                 }
                 // Here: current marking does not satisfy property --> continue search
                 currentEntry = myFirelist->getFirelist(ns, &currentFirelist);
@@ -311,15 +304,26 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     restartSemaphore = sem_open("PErestart", O_CREAT, 0600,0);
     sem_unlink("PEtranscom");
     transfer_finished_semaphore = sem_open("PEtranscom", O_CREAT, 0600,0);
-    //int foo_baz;
-    //	sem_getvalue(transfer_finished_semaphore,&foo_baz);
-    //	rep->message("!============================================================ %d",foo_baz);
     // LCOV_EXCL_START
-    if (UNLIKELY(!(long int)restartSemaphore)) {
+    if (UNLIKELY(!(long int)restartSemaphore) || UNLIKELY(!(long int)transfer_finished_semaphore)) {
         rep->status("named semaphore could not be created");
         rep->abort(ERROR_THREADING);
     }
     // LCOV_EXCL_STOP
+    int value_prober;
+    sem_getvalue(transfer_finished_semaphore,&value_prober);
+    // LCOV_EXCL_START
+    if (value_prober != 0){
+    	rep->status("named semaphore (PEtranscom) has not been created as defined");
+    	rep->abort(ERROR_THREADING);
+    }
+    sem_getvalue(restartSemaphore,&value_prober);
+    if (value_prober != 0){
+    	rep->status("named semaphore (PErestart) has not been created as defined");
+    	rep->abort(ERROR_THREADING);
+    }
+    // LCOV_EXCL_STOP
+
 
     int mutex_creation_status = 0;
     mutex_creation_status |= pthread_mutex_init(&num_suspend_mutex, NULL);

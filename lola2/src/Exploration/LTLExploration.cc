@@ -290,7 +290,6 @@ bool LTLExploration::start_restricted_searches(BuechiAutomata &automata,
 	// all elements in current SCC have DFS = -depth - 1 (those, which have not been visited by a SCC-search)
 	// will set on all visited markings DFS = -depth - 3
 
-
 	// current markings belongs to a new SCC
 	bool forbidden = false;
 	for(index_t i = 0; i < card_forbidden_transitions; i++)
@@ -392,7 +391,15 @@ bool LTLExploration::start_restricted_searches(BuechiAutomata &automata,
 			}
 		} else {
 			// firing list completed -->close state and return to previous state
-			//delete[] currentFirelist;
+			forbidden = false;
+			for(index_t i = 0; i < card_forbidden_transitions; i++)
+				if (ns.Enabled[forbidden_transitions[i]]){
+					forbidden = true;
+					break;
+				}
+			// if the state is forbidden, we need to delete the current firelist
+			if (forbidden)
+				delete[] currentFirelist;
 			// no example has been found
 			if (stack.StackPointer == 0)
 				return false;
@@ -639,6 +646,11 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 							stack.top().~LTLStackEntry();
 							stack.pop();
 						}
+						// free all firelists on the current stack
+						while (stack.StackPointer){
+							delete[] stack.top().dfs->firelist;
+							stack.pop();
+						}
 						return true;
 					}
 					if (checkResult != -2){
@@ -660,19 +672,25 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 						}
 						// the transition is not any more forbidden
 						--card_forbidden_transitions;
-					}
+					} else
+						// weak fairness assumption is not fulfilled, so delete all firelists
+						while (firelist_stack.StackPointer){
+							delete[] firelist_stack.top();
+							firelist_stack.pop();
+						}
+
 				} else{
+					// these firelists will be used never again
+					while (firelist_stack.StackPointer){
+						delete[] firelist_stack.top();
+						firelist_stack.pop();
+					}
 					// delete firelists, they will not be needed any more
 					if (!nonTrivial){
 						currentStateEntry->dfs = TRIVIAL_SCC_MARKER_DFS;
 						// if a counter example if found it must be inside a non trivial SCC, else it is none
 						currentNextDepth -= DFS_NUMBERS_PER_PNUELI;
 					}
-				}
-				// either the current SCC is the counter example, then return will be called, or else we will never touch it again so delete the firelists
-				while (firelist_stack.StackPointer){
-					delete[] firelist_stack.top();
-					firelist_stack.pop();
 				}
 			} else {
 				// push state onto tarjan stack

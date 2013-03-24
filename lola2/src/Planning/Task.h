@@ -10,7 +10,6 @@
 #include <Stores/NetStateEncoder/FullCopyEncoder.h>
 #include <Stores/NetStateEncoder/SimpleCompressedEncoder.h>
 #include <Stores/VectorStores/HashingWrapperStore.h>
-#include <Stores/VectorStores/SuffixTreeStore.h>
 #include <Stores/VectorStores/PrefixTreeStore.h>
 #include <Stores/VectorStores/VSTLStore.h>
 #include <Stores/VectorStores/VBloomStore.h>
@@ -57,7 +56,7 @@ public:
         {
         case store_arg_comp:
        		return new CompareStore<T>(
-           		new PluginStore<T>(enc, new SuffixTreeStore<T>(), number_of_threads),
+           		new PluginStore<T>(enc, new PrefixTreeStore<T>(), number_of_threads),
            		new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads),
            		number_of_threads
            		);
@@ -71,8 +70,6 @@ public:
               return new PluginStore<T>(enc, new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
             else
            	  return new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads);
-        case store_arg_bin:
-           	return new PluginStore<T>(enc, new SuffixTreeStore<T>(), number_of_threads);
         default:
         	return createSpecializedStore(number_of_threads);
         }

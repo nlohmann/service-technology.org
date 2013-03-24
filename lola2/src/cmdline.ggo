@@ -12,7 +12,7 @@ option "check" -
 option "store" -
   "Store"
   values="comp",
-         "prefix", "stl", "bin", "bloom" enum
+         "prefix", "stl", "bloom" enum
   typestr="STORE"
   default="prefix"
   optional

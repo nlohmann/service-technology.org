@@ -245,7 +245,7 @@ void Task::setFormula()
         break;
     case (FORMULA_EVENTUALLY):
         rep->status("checking eventual occurrence");
-        rep->status("stabilization not yet implemented, converting to LTL...");
+        rep->status("eventual occurrence not yet implemented, converting to LTL...");
         formulaType = FORMULA_LTL;
         break;
     case (FORMULA_INITIAL):
@@ -287,8 +287,7 @@ void Task::setFormula()
         spFormula = result;
     }
     else if(formulaType == FORMULA_CTL){
-    	 rep->message("implementation in progress");
-    	 TheFormula->unparse(myprinter, kc::out);
+    	 //TheFormula->unparse(myprinter, kc::out);
     	 TheFormula->unparse(myprinter, kc::ctl);
     	 ctlFormula = TheFormula->ctl_formula;
 
@@ -298,8 +297,6 @@ void Task::setFormula()
     	//printf("\n");
 
     	assert(ctlFormula);
-
-    	//rep->abort(ERROR_COMMANDLINE);
     }
     else if (formulaType == FORMULA_LTL){
     	rep->message("transforming LTL-Formula into an Büchi-Automaton");
@@ -622,36 +619,40 @@ bool Task::getResult()
     } else if(bauto) {
 		result = ltlExploration->checkProperty(*bauto,*ltlStore, *fl,*ns);
     } else {
-		switch (args_info.search_arg)
-		{
-		case search_arg_depth:
-			result = exploration->depth_first(*p, *ns, *store, *fl, number_of_threads);
-			break;
-
-		case search_arg_findpath:
-			if (args_info.retrylimit_arg == 0)
+    	if(formulaType == FORMULA_INITIAL) {
+    		result = p->initProperty(*ns);
+    	} else {
+			switch (args_info.search_arg)
 			{
-				rep->status("starting infinite tries of depth %d", args_info.depthlimit_arg);
+			case search_arg_depth:
+				result = exploration->depth_first(*p, *ns, *store, *fl, number_of_threads);
+				break;
+
+			case search_arg_findpath:
+				if (args_info.retrylimit_arg == 0)
+				{
+					rep->status("starting infinite tries of depth %d", args_info.depthlimit_arg);
+				}
+				else
+				{
+					rep->status("starting at most %d tries of depth %d", args_info.retrylimit_arg, args_info.depthlimit_arg);
+				}
+
+				choose = new ChooseTransitionHashDriven();
+				result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore<void>*)store), *choose);
+				delete choose;
+				break;
+
+			case search_arg_sweepline:
+			// no choice of stores for sweepline method here
+				result = exploration->sweepline(*p, *ns, *(SweepEmptyStore*)(store), *fl, args_info.sweepfronts_arg, number_of_threads);
+				break;
+
+			default:
+				assert(false);
+				break;
 			}
-			else
-			{
-				rep->status("starting at most %d tries of depth %d", args_info.retrylimit_arg, args_info.depthlimit_arg);
-			}
-
-			choose = new ChooseTransitionHashDriven();
-			result = exploration->find_path(*p, *ns, args_info.retrylimit_arg, args_info.depthlimit_arg, *fl, *((EmptyStore<void>*)store), *choose);
-			delete choose;
-			break;
-
-		case search_arg_sweepline:
-		// no choice of stores for sweepline method here
-			result = exploration->sweepline(*p, *ns, *(SweepEmptyStore*)(store), *fl, args_info.sweepfronts_arg, number_of_threads);
-			break;
-
-		default:
-			assert(false);
-			break;
-		}
+    	}
     }
 
     return result;

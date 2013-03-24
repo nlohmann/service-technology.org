@@ -236,11 +236,9 @@ void Transition::fire(NetState &ns, index_t t)
 	//rep->message("F %d",t);
 
 	if (!ns.Enabled[t]){
-		for (int i = 0; i < 5; i++){
-			rep->message("MARKING %s %s %s %s %s",Net::Name[PL][5*i],Net::Name[PL][5*i+1],Net::Name[PL][5*i+2],Net::Name[PL][5*i+3],Net::Name[PL][5*i+4]);
-			rep->message("MARKING %d %d %d %d %d",ns.Current[5*i],ns.Current[5*i+1],ns.Current[5*i+2],ns.Current[5*i+3],ns.Current[5*i+4]);
-		}
-		rep->message("Try to fire %d %s", t, Net::Name[TR][t]);
+		rep->message("=================ERRROR==================");
+		rep->message("TRY TO FIRE %s",Net::Name[TR][t]);
+		rep->message("current marking %s:%d %s:%d %s:%d %s:%d",Net::Name[PL][0],ns.Current[0],Net::Name[PL][1],ns.Current[1],Net::Name[PL][2],ns.Current[2],Net::Name[PL][3],ns.Current[3]);
 	}
 
     //  Don't even think about firing a disabled transition!

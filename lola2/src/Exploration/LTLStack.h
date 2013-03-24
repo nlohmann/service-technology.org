@@ -47,8 +47,8 @@ public:
 
 	}
 	~LTLStackEntry() {
-		if (fl)
-			delete[] fl;
+		//if (fl)
+		//	delete[] fl;
 		if (states)
 			delete[] states;
 		fl = NULL;
@@ -103,8 +103,8 @@ public:
 		memcpy(fl, src.fl, (current_on_firelist + 1) * SIZEOF_INDEX_T);
 	}
 	~LTLFairnessStackEntry() {
-		if (fl)
-			delete[] fl;
+		//if (fl)
+		//	delete[] fl;
 		if (states)
 			delete[] states;
 		fl = NULL;

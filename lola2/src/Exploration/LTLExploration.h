@@ -31,11 +31,13 @@ public:
 	// lowlink can be maintained locally
 	// uint64_t lowlink;
 	dfsnum_t dfs;
+	index_t* firelist; // store the firelist in every node seems to be necessary, as the partial order reduction can differ between states with same petri but different buechi configuration
+	index_t cardFirelist; // TODO really???
 	AutomataTree* smaller;
 	AutomataTree* bigger;
 
-	AutomataTree(){smaller = 0; bigger = 0; dfs = DFS_INITIAL_INVALID_NUMBER;}; // -2 unvisited by outermost search
-	AutomataTree(index_t _state) { smaller = 0; bigger = 0; state = _state; dfs = -2;};
+	AutomataTree(){smaller = bigger = 0; firelist = NULL; dfs = DFS_INITIAL_INVALID_NUMBER;}; // -2 unvisited by outermost search
+	AutomataTree(index_t _state) { smaller = bigger = 0; firelist = NULL; state = _state; dfs = -2;};
 
 	~AutomataTree(){
 		if (smaller) delete smaller;
@@ -81,7 +83,7 @@ private:
 			dfsnum_t depth, index_t currentNextDFS);
 	index_t checkFairness(BuechiAutomata &automata, Store<AutomataTree*> &store,
 			Firelist &firelist, NetState &ns, index_t currentAutomataState,
-			dfsnum_t depth, bool** enabledStrongTransitions);
+			dfsnum_t depth, bool** enabledStrongTransitions,AutomataTree* currentStateEntry);
 	void produceWitness(BuechiAutomata &automata,
 			Store<AutomataTree*> &store, Firelist &firelist, NetState &ns,
 			index_t currentAutomataState, AutomataTree* currentStateEntry,
@@ -94,7 +96,7 @@ private:
 
 	void completeWitness(BuechiAutomata &automata,
 			Store<AutomataTree*> &store, Firelist &firelist, NetState &ns,
-			index_t currentAutomataState,  AutomataTree* targetPointer, dfsnum_t depth, dfsnum_t witness_depth);
+			index_t currentAutomataState,  AutomataTree* targetPointer, dfsnum_t depth, dfsnum_t witness_depth,AutomataTree* currentStateEntry);
 
 	// helper functions
 	bool is_next_state_accepting(BuechiAutomata &automata,index_t currentAutomataState);
@@ -103,5 +105,5 @@ private:
 			index_t stateListLength,index_t currentAutomataState);
 	inline bool initialize_transition(NetState &ns, Firelist &firelist,BuechiAutomata &automata, index_t currentAutomataState,
 			index_t* currentFirelistEntry, index_t** currentFirelist,index_t* currentStateListEntry,
-			index_t* currentStateListLength, index_t** currentStateList);
+			index_t* currentStateListLength, index_t** currentStateList, AutomataTree* currentStateEntry);
 };

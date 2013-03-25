@@ -1,3 +1,6 @@
+// wrapper for hiding scope
+var INPUTS = (function(){
+
 // Input abstract class
 function Input(params,id) {
     this.params = params;
@@ -54,11 +57,11 @@ Input.prototype.toLabelledElement = function(element) {
 }
 Input.prototype.toElementSimple = function() {
     var out = this.buildHtmlString('out');
+    console.log(out);
     return make(out);
 }
 
 Input.prototype.buildHtmlString = function(pName) {
-    
     //console.log('buildHTML STring for: ' + this.params[pName] + ' (' + pName + ')');
 
     // templater regex
@@ -94,7 +97,7 @@ Input.prototype.buildHtmlString = function(pName) {
     while(re.test(html)) {
         var p = RegExp.$1;
         var val = '';
-        
+
         // no recursion, just replace if
         // looking for current param
         if(p == pName) {
@@ -186,3 +189,12 @@ InputSetManager.prototype.Create = function(dom) {
     }
     dom.appendChild(form);
 }
+
+// public interface
+return {
+    registerInput: registerInput,
+    InputSetManager: InputSetManager
+}
+
+// wrapper for hiding scope
+})();

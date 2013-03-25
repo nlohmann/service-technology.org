@@ -18,7 +18,7 @@ Form2Command.listen = function() {
            $(this).find('input[type=text], button.btn.active, input[type=file], select').each(
                function() {
                     if (!this.value) return;
-                    
+
                     var argname = this.getAttribute('data-stlive-argname');
                     var def = this.getAttribute('data-stlive-default');
                     var val = this.value;
@@ -73,13 +73,14 @@ Form2Command.update = function() {
    $('#command-output').val(c);
 
    //create json
-   var j = '{\n    "tool": "'+Form2Command.toolName+'",\n    "parameters": [\n        "';
+   var j = '{\n    "tool": "'+Form2Command.toolName+'",\n    "parameters": [';
    for(var i = 0, c = null; c = Form2Command.args[i]; ++i) {
-       if(i>0) {
-           j += '",\n        "';
+       if(i > 0) {
+           j += ",";
        }
-       j += c.replace(/\"/g, '\\"');
+       j += "\n       ";
+       j += '"' + c.replace(/\"/g, '\\"') + '"';
    }
-   j += '"\n    ] \n}';
+   j += '\n    ] \n}';
    $('#json-output').val(j);
 }

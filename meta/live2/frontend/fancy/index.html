@@ -108,13 +108,14 @@ $('.selAllOnFocus').mouseup(function(e){ // fix for chrome and safari
 <script src="ggoConversion.js"></script>
 <script type="text/javascript">
 // read the input hash
+// put to global scope
 var tool = window.location.search;
 // no XSS:
 tool = tool.replace(/[^a-z0-9_\-]/gi,'');
 
 // and now build the form
 buildForm = function(inputs) {
-    var im = new InputSetManager();
+    var im = new INPUTS.InputSetManager();
     im.SetInputs(inputs);
     var b = $('#form_container');
     var dom=b.get(0);
@@ -126,24 +127,25 @@ buildForm = function(inputs) {
     Form2Command.toolName = tool;
     Form2Command.listen();
 }
+
 // TOOL AS JSON
 // $.getJSON('tools/'+tool+'.json', buildForm).error(function(){alert('loading ' + tool + ' failed.');});
 
 // PARSE FROM GGO
-initParse(tool, buildForm);
+GGO_CONVERSION.initParse(tool, buildForm);
 
 // toggle editing between gui und json
 function toggleEdit(t) {
     if(t=='gui') {
         $('span#form_container *:disabled:not(.forceDisabled)').removeAttr('disabled');
-        $('span#form_container *').fadeTo('slow', 1);
+        $('span#form_container *:visible').fadeTo('slow', 1);
         $('#json-output').attr('disabled', 'disabled');
         $('#json-output').parent().find('input[type=file]').fadeOut();
         $('#json-output').fadeTo('slow', 0.7);
         Form2Command.update();
     } else if(t=='json') {
         $('span#form_container *:enabled').attr('disabled','disabled');
-        $('span#form_container * * *:not(:header)').fadeTo('slow', 0.6);
+        $('span#form_container * * *:not(:header):visible').fadeTo('slow', 0.6);
         //$('span#form_container h1').fadeTo('slow', 1);
         $('#json-output').removeAttr('disabled');
         $('#json-output').fadeTo('slow', 1);
@@ -161,6 +163,8 @@ $('.submitButton').click(function(){
             $('form#outForm').submit();
             jsonOut.attr('disabled', 'disabled');
         } else {
+        // here just submit the form
+        // further handling can be done be watching this event
             $('form#outForm').submit();
         }
 });

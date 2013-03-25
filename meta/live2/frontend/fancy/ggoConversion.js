@@ -1,12 +1,18 @@
+// wrap scope
+var GGO_CONVERSION = (function(){
 
+// the parser object
 var PARSER; 
+// overwrite funcion later
+function parser_ready(){}
 function buildParser(input) {
     PARSER = PEG.buildParser(input, {trackLineAndColumn: true});
+    parser_ready();
 }
 $.get('ggoGrammar.pegjs', buildParser, "text");
 
 
-function parse(ggoString) {
+function parse(ggoString, toolName) {
     var ggo = ggoString;
     var inputList = [];
     try {
@@ -15,17 +21,46 @@ function parse(ggoString) {
         alert('Could not parse the ggo file: \n' + e);
         return [];
     }
+    
+    // create the title
+    // search the purpose
+    var purpose = '';
+    for(var j = 0; j < 4; j++) {
+        var p = parsed[j].purpose;
+        if(p) {
+            purpose = p.replace(/(\\n)+/gi, "<br />");
+            break;
+        }
+    } 
+    inputList.push({
+        type: "title",
+        name: toolName.toUpperCase(),
+        shortDesc: purpose
+    });
+
     for(var i = 0, c = null; c = parsed[i]; ++i) {
-        var conv = convertItem(c);
+        var conv = convertItem(c, toolName);
+    if(conv && conv.type == "section") {
+        var l = inputList.length;
+        if (l > 0) {
+        var t = inputList[l-1];
+        // if we have two section,
+        // forget the empty section
+        if (t.type == 'section'){
+            inputList[l-1] = conv;
+            continue;
+        }
+        }
+    }
         if(conv)
-            inputList.push(convertItem(c));
+            inputList.push(conv);
     }
     console.log(inputList);
     return inputList;
 }
 
 
-function convertItem(item) {
+function convertItem(item, toolName) {
     // no hidden items
 
     if(item.unamed_opts_file) {
@@ -37,6 +72,7 @@ function convertItem(item) {
     }
 
     if(item.hidden) return null
+
     
     // convert text to html
     function convText(t) {
@@ -44,12 +80,18 @@ function convertItem(item) {
         return t.replace(/\\n/gi, '<br />');
     }
 
+    // purpose to title
+    if(item.purpose) return false;
+
     // filter section
     if(item.section) {
+    var sd = convText(item.sectiondesc);
+    // escape html entities
+    sd = $("<div/>").text(sd).html();
         return {
             type:'section',
             name: convText(item.section),
-            sectiondescription: convText(item.sectiondesc)
+            sectiondescription: sd
         };
     }
 
@@ -101,7 +143,7 @@ function convertItem(item) {
         if(!input.default) {
             input.default = '<i class="icon-minus-sign"></i>';
         }
-        
+
     }
 
     // FILES
@@ -131,16 +173,22 @@ function convertItem(item) {
 }
 
 function initParse(toolName, callback) {
-    // polling for PARSER.. ugly coding style..
     if(!PARSER) {
-        //global function for timeout
-        TO = function() { window.initParse(toolName, callback); };
-        setTimeout('TO', 100);
+        // if parser is not yet loaded,
+        // overwrite the parser_ready function
+        parser_ready = function() { initParse(toolName, callback); };
     }
 
     var req = 'ggos/' + toolName + '.ggo';
     $.get(req,
-            function(i) {var t=parse(i); callback(t);},
+            function(i) {var t=parse(i, toolName); callback(t);},
             'text').fail(function() { alert("Tool could not be loaded, try index.html?<toolname> (e.g. wendy)"); });
 }
 
+// public interface
+return {
+    initParse: initParse
+};
+
+// wrap scope
+})();

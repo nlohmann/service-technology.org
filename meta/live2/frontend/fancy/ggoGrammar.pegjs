@@ -16,15 +16,17 @@ if(typeof c != 'undefined') cleanList.push(c);
 return cleanList;
 }
 
-ITEM "ITEM" = SP* i:(IGNORE / SECTION / OPTION / COMMENT / ARGS) { return i; }
+ITEM "ITEM" = SP* i:(PURPOSE / IGNORE / SECTION / OPTION / COMMENT / ARGS) { return i; }
 
 ARGS = "args" SP+ "\"" [\"]* s:[^\"]* "\"" { return { unamed_opts_file : (s.join('').indexOf('--unamed-opts=FILE')>-1) }; }
+
+PURPOSE = "purpose" (SP* "\"" s:([^\"]*)  "\"") { return {purpose: s.join("")}; }
 
 IGNORE = IGNORE_WORD ([ ]* "\"" [^\"]*  "\"")? { return; }
 
 COMMENT = "#" [^\n]* {return;}
 
-IGNORE_WORD = "purpose" / "description"
+IGNORE_WORD = "description"
 
 SECTION = "section" SP+ s:STRING SP+
          secdesc:("sectiondesc" SP* "=" SP* ds:STRING {return ds;})?

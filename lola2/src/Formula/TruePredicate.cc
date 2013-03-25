@@ -8,6 +8,7 @@
 
 #include <Core/Dimensions.h>
 #include <Formula/TruePredicate.h>
+#include <Formula/FalsePredicate.h>
 
 TruePredicate::TruePredicate()
 {
@@ -40,5 +41,9 @@ StatePredicate* TruePredicate::copy(StatePredicate* parent)
 index_t TruePredicate::getSubs(const StatePredicate* const** subs) const
 {
 	return 0;
+}
+
+StatePredicate* TruePredicate::negate(){
+	return new FalsePredicate();
 }
 

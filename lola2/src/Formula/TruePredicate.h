@@ -11,9 +11,10 @@
 
 #include <Core/Dimensions.h>
 #include <Formula/StatePredicate.h>
+#include <Formula/AtomicStatePredicate.h>
 
 /// A state predicate is a formula that assigns a Boolean value to Marking::Current
-class TruePredicate: public StatePredicate
+class TruePredicate: public AtomicStatePredicate
 {
 public:
     TruePredicate();
@@ -54,4 +55,6 @@ public:
 
 	/// for direct read access for the deletion algorithm
 	virtual index_t getSubs(const StatePredicate* const** subs) const;
+
+	virtual StatePredicate* negate();
 };

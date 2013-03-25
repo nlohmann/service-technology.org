@@ -63,7 +63,6 @@ AT_KEYWORDS(ltl)
 AT_CLEANUP
 
 
-
 AT_SETUP([3-Cycle + 1 strong fair (formula)])
 AT_CHECK([cp TESTFILES/LTL/cycle3.lola .])
 AT_CHECK([LOLA cycle3.lola --formula='"FORMULA ALWAYS s4 = 0 OR EVENTUALLY s1 = 1;"' --check=modelchecking --store=prefix --encoder=bit --ltlmode=tree -v],0,stdout,stderr)

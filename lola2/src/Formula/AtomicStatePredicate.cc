@@ -122,6 +122,7 @@ void AtomicStatePredicate::evaluate(NetState &ns)
     {
         sum -= ns.Current[negPlaces[i]] * negMult[i];
     }
+    rep->message("SUM THR %d %d", sum, threshold);
     value = (sum <= threshold);
 }
 
@@ -289,4 +290,3 @@ StatePredicate* AtomicStatePredicate::negate(){
 		af->addPos(i,negPlaces[i],negMult[i]);
 	return af;
 }
-

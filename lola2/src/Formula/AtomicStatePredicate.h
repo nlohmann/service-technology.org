@@ -98,5 +98,8 @@ public:
 	virtual index_t getSubs(const StatePredicate* const** subs) const;
 
 	/// returns the negated version of this property, but leaves the current one untouched
-	StatePredicate* negate();
+	virtual StatePredicate* negate();
+
+protected:
+	AtomicStatePredicate(){};
 };

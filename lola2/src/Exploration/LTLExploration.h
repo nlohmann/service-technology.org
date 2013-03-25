@@ -37,7 +37,7 @@ public:
 	AutomataTree* bigger;
 
 	AutomataTree(){smaller = bigger = 0; firelist = NULL; dfs = DFS_INITIAL_INVALID_NUMBER;}; // -2 unvisited by outermost search
-	AutomataTree(index_t _state) { smaller = bigger = 0; firelist = NULL; state = _state; dfs = -2;};
+	AutomataTree(index_t _state,bool tree) {if (tree) smaller = bigger = 0; firelist = NULL; state = _state; dfs = -2;};
 
 	~AutomataTree(){
 		if (smaller) delete smaller;

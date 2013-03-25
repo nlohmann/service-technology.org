@@ -5,7 +5,7 @@
 
 #define TRIVIAL_SCC_MARKER_DFS -1
 #define FLAT_ENTRY_SIZE sizeof(AutomataTree)
-//(SIZEOF_INDEX_T + sizeof(dfsnum_t))
+//#define FLAT_ENTRY_SIZE (12*SIZEOF_INDEX_T + sizeof(dfsnum_t) + SIZEOF_VOIDP)
 
 LTLExploration::LTLExploration(bool mode) {
 	stateStorageMode = mode;
@@ -21,7 +21,7 @@ inline void searchAndInsertAutomataState(uint32_t automataState,
 	if (mode)
 		while (true) {
 			if (*tree == 0) {
-				*tree = new AutomataTree(automataState);
+				*tree = new AutomataTree(automataState,mode);
 				*result = *tree;
 				return;
 			}
@@ -63,7 +63,7 @@ inline bool LTLExploration::initialize_transition(NetState &ns, Firelist &fireli
 	if (*currentStateListLength == 0){
 		// mark this is a "real" deadlock in the product system
 		*currentFirelistEntry = -1;
-		return false;
+		return true;
 	}
 	while (true){
 		// fire this transition to produce new Marking::Current
@@ -82,6 +82,7 @@ inline bool LTLExploration::initialize_transition(NetState &ns, Firelist &fireli
 	}
 	if (*currentFirelistEntry != -1)
 		automata.updateProperties(ns, (*currentFirelist)[*currentFirelistEntry]);
+
 	return false;
 }
 
@@ -463,6 +464,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 
 	// if there is a deadlock
 	if (initialize_transition(ns,firelist,automata, currentAutomataState,&currentFirelistEntry,&currentFirelist,&currentStateListEntry,&currentStateListLength, &currentStateList,currentStateEntry)){
+		rep->message("ACC %d",is_next_state_accepting(automata,currentAutomataState));
 		if (is_next_state_accepting(automata,currentAutomataState)){
 			delete[] currentStateList;
 			//delete[] currentFirelist;
@@ -487,7 +489,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 			//bool newStateFound;
 			if (!store.searchAndInsert(ns, &searchResult, 0)){
 				if (stateStorageMode){
-					*searchResult = new AutomataTree(currentStateList[currentStateListEntry]);
+					*searchResult = new AutomataTree(currentStateList[currentStateListEntry],stateStorageMode);
 					// set next pointer of a state entry
 					nextStateEntry = *searchResult;
 				}
@@ -801,7 +803,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
 	AutomataTree** currentStateEntry;
 	store.searchAndInsert(ns, &currentStateEntry, 0);
 	if (stateStorageMode)
-		*currentStateEntry = new AutomataTree(currentAutomataState);
+		*currentStateEntry = new AutomataTree(currentAutomataState,stateStorageMode);
 	else {
 		*currentStateEntry = (AutomataTree*)malloc(automata.getNumberOfStates() * FLAT_ENTRY_SIZE);
 		for (index_t i = 0; i < automata.getNumberOfStates();i++){
@@ -1064,9 +1066,9 @@ void LTLExploration::completeWitness(BuechiAutomata &automata, Store<AutomataTre
 
 
 bool LTLExploration::is_next_state_accepting(BuechiAutomata &automata,index_t currentAutomataState){
-
 	index_t* nextStates;
 	index_t cardNext = automata.getSuccessors(&nextStates, currentAutomataState);
+	rep->message("CN %d",cardNext);
 	for (index_t i = 0; i < cardNext; i++)
 		if (automata.isAcceptingState(nextStates[i]))
 			return true;

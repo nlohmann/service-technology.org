@@ -1,7 +1,33 @@
 
 function errorHandler() {
-    alert("error in Request... Failed");
+    var e = 'An error occured when the Request was sent to server.';
+    var h = 'Error in Request';
+
+    $('#myAlert h3').text(h);
+    $('#myAlert p').text(e);
+    $('#myAlert').modal();
 }
+
+
+/*function myAlert(headLine, text) {
+    var modal =$('<div />');
+    var modheader = $('<div/>').addClass('modal-header');
+    var close = $('<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>');
+    var header = $('<h3>' + headLine + '</h3>');
+    var msg = $('<div>' + text + '</div>').addClass('modal-body');
+    var footer =$('<div />').addClass('modal-footer');
+
+    close.appendTo(modheader);
+    header.appendTo(modheader);
+    modheader.appendTo(modal);
+    msg.appendTo(modal);
+
+    close.clone().removeClass('close').addClass('btn').text('close').appendTo(footer);
+    footer.appendTo(modal);
+
+    modal.addClass('modal').modal();
+    modal.appendTo('body');
+} */ 
 
 
 function completeHandler(r) {

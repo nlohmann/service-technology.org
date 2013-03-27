@@ -4,21 +4,30 @@ var GGO_CONVERSION = (function(){
 // the parser object
 var PARSER; 
 // overwrite funcion later
-function parser_ready(){}
+var parser_ready_events = [];
 function buildParser(input) {
     PARSER = PEG.buildParser(input, {trackLineAndColumn: true});
-    parser_ready();
+    for(var i = 0, c = null; c = parser_ready_events[i]; ++i) {
+        if (typeof c == 'function') {
+            c();
+        } else {
+            console.log('unknown ggo-parser-ready-event');
+        }
+    }
 }
 $.get('ggoGrammar.pegjs', buildParser, "text");
 
 
 function parse(ggoString, toolName) {
     var ggo = ggoString;
+    var inputTopList = [];
     var inputList = [];
     try {
         var parsed = PARSER.parse(ggo);
     } catch(e) {
-        alert('Could not parse the ggo file: \n' + e);
+        $('#myAlert h3').text('Error');
+        $('#myAlert p').text('Could not parse the ggo file: \n' + e);
+        $('#myAlert').modal();
         return [];
     }
     
@@ -32,12 +41,11 @@ function parse(ggoString, toolName) {
             break;
         }
     } 
-    inputList.push({
+    inputTopList.push({
         type: "title",
         name: toolName.toUpperCase(),
         shortDesc: purpose
     });
-
     for(var i = 0, c = null; c = parsed[i]; ++i) {
         var conv = convertItem(c, toolName);
     if(conv && conv.type == "section") {
@@ -52,11 +60,16 @@ function parse(ggoString, toolName) {
         }
         }
     }
-        if(conv)
+        if(conv && conv.top)
+            inputTopList.push(conv);
+        else if(conv)
             inputList.push(conv);
     }
-    console.log(inputList);
-    return inputList;
+    iLen = inputList.length;
+    if(iLen && inputList[iLen-1].type == 'section') {
+        inputList.pop();
+    }
+    return inputTopList.concat(inputList);
 }
 
 
@@ -67,7 +80,8 @@ function convertItem(item, toolName) {
         return {
             type: 'file',
             argname : '',
-            name : 'Standard File Input'
+            name : 'Standard File Input',
+            top: true
         };
     }
 
@@ -105,7 +119,8 @@ function convertItem(item, toolName) {
         type: 'text',
         argname: '--' + item.long,
         name: item.long,
-        desc: convText(item.desc)
+        desc: convText(item.desc),
+        top: item.top
     };
     input['default'] = '';
     if(typeof item['default'] != 'undefined') {
@@ -152,13 +167,11 @@ function convertItem(item, toolName) {
         // assume:
         // (1)  if we find the word 'out' or 'output', we have an output file
         // (2)  an output file cannot be uploaded
-        // (3)  an optional output file doesnt have to be selected
+        // (3)  an argoptional output file behaves like a flag
         //
-        //
-        // // TODO: wrong assume
 
         re = /out(\.| |put)/gi;
-        if(!input.desc.match(re)) {
+        if(!input.desc.match(re) && !item.output && !item.out) {
             input.type='file';
         } else if (item.optional) {
             if(item.argoptional) {
@@ -176,13 +189,18 @@ function initParse(toolName, callback) {
     if(!PARSER) {
         // if parser is not yet loaded,
         // overwrite the parser_ready function
-        parser_ready = function() { initParse(toolName, callback); };
+        parser_ready_events.push(function() { initParse(toolName, callback); });
+        return;
     }
 
     var req = 'ggos/' + toolName + '.ggo';
     $.get(req,
             function(i) {var t=parse(i, toolName); callback(t);},
-            'text').fail(function() { alert("Tool could not be loaded, try index.html?<toolname> (e.g. wendy)"); });
+            'text').fail(function() {
+                $('#myAlert h3').text('Error');
+                $('#myAlert p').text("Tool could not be loaded, try index.html?<toolname> (e.g. wendy)");
+                $('#myAlert').modal();
+            });
 }
 
 // public interface

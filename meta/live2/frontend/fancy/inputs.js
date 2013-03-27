@@ -41,7 +41,7 @@ Input.prototype.toLabelledElement = function(element) {
     ctrl.className = 'controls';
     ctrl.appendChild(this.toElementSimple());
     if(this.params.desc) {
-        var desc = make('<div><small><em>'+this.params.desc+'</em></small></div>');
+        var desc = make('<div class="help-block"><small><em>'+this.params.desc+'</em></small></div>');
         ctrl.appendChild(desc);
     }
 
@@ -56,7 +56,7 @@ Input.prototype.toLabelledElement = function(element) {
     return lEl;
 }
 Input.prototype.toElementSimple = function() {
-    var out = this.buildHtmlString('out');
+    var out = '<span>' + this.buildHtmlString('out') + '</span>';
     console.log(out);
     return make(out);
 }
@@ -111,12 +111,17 @@ Input.prototype.buildHtmlString = function(pName) {
     return html;
 }
 
-Input.prototype.toElement = function() {
+Input.prototype.toElement = function(section) {
     var el;
     if(this.useLabel) {
         el = this.toLabelledElement();
     } else {
         el = this.toElementSimple();
+    }
+    if(section != 'topSec') {
+        var c = el.className;
+        c += ' tab-pane '+section;
+        el.className = c;
     }
     return el;
 }
@@ -138,7 +143,7 @@ function registerInput(name, expParams, html, useLabel) {
 function make(html) {
     var d = document.createElement('span');
     d.innerHTML = html;
-    return d;
+    return d.firstChild;
 }
 
 ///// Input Set Manager
@@ -176,6 +181,11 @@ InputSetManager.prototype.SetInputs = function(inputs) {
 InputSetManager.prototype.Create = function(dom) {
     var form = document.createElement('form');
     form.className = 'form-horizontal toolForm';
+    var curWell = form;
+
+    var tabLinks = make('<ul class="nav nav-pills" />');
+
+    this.curSec = 'topSec';
     for(var i = 0, c = null; c = this.inputData[i]; ++i) {
         if(typeof Input[c.type] != 'function') {
             console.log('unknown input: '+c.type + ' type is ' + typeof Input[c.type]);
@@ -185,7 +195,22 @@ InputSetManager.prototype.Create = function(dom) {
         if(!this.inputs[i].checkParams()) {
             continue;
         }
-        form.appendChild(this.inputs[i].toElement());
+        if(c.type == 'section') {
+            var firstSec = this.curSec == 'topSec';
+            this.curSec = 'sec'+i;
+            if(firstSec) {
+                // this.curSec += ' active';
+                var well = make('<div class="tab-content stBox"><h5>more Options:</h5></div>');
+                well.appendChild(tabLinks);
+                well.appendChild(make('<hr />'));
+                form.appendChild(well);
+                curWell = well;
+            }
+            var tLink = make('<li ' + (firstSec&&false?'class="active"':'') + '><a href=".sec' + i + '" data-toggle="tab">' + c.name + '</a></li>');
+            tabLinks.appendChild(tLink);
+
+        }
+        curWell.appendChild(this.inputs[i].toElement(this.curSec));
     }
     dom.appendChild(form);
 }

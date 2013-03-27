@@ -18,13 +18,15 @@ return cleanList;
 
 ITEM "ITEM" = SP* i:(PURPOSE / IGNORE / SECTION / OPTION / COMMENT / ARGS) { return i; }
 
-ARGS = "args" SP+ "\"" [\"]* s:[^\"]* "\"" { return { unamed_opts_file : (s.join('').indexOf('--unamed-opts=FILE')>-1) }; }
+ARGS = "args" SP+ "\"" [\"]* s:[^\"]* "\"" { return { top:true, unamed_opts_file : (s.join('').indexOf('--unamed-opts=FILE')>-1) }; }
 
 PURPOSE = "purpose" (SP* "\"" s:([^\"]*)  "\"") { return {purpose: s.join("")}; }
 
 IGNORE = IGNORE_WORD ([ ]* "\"" [^\"]*  "\"")? { return; }
 
-COMMENT = "#" [^\n]* {return;}
+//lowest prio
+COMMENT = SP* "#" [^\n]* {return;}
+
 
 IGNORE_WORD = "description"
 
@@ -41,8 +43,11 @@ OPTION = "option" SP+
          properties:OPTION_PROPERTIES?
 { 
 var obj = { long:long, short:short, desc:desc};
-for(var i=0, c=null;c=properties[i];++i) {
-obj[c[0]]=c[1];
+var pLen = properties.length;
+for(var i=0; i<pLen; ++i) {
+    var c = properties[i];
+    if(c)
+        obj[c[0]]=c[1];
 }
 return obj;
 }
@@ -55,9 +60,10 @@ OPTION_PROPERTIES =
 op:OPTION_PROPERTY SP+ oplist:OPTION_PROPERTIES
 { return [op].concat(oplist);} / op:OPTION_PROPERTY { return [op]; }
 
-OPTION_PROPERTY = p:(SINGLE_PROPERTY / KEY_VAL_PROPERTY / VALUES_PROPERTY / FLAG / ARGTYPE) { return p; }
-// TODO: allow comments here
+OPTION_PROPERTY = p:(SINGLE_PROPERTY / KEY_VAL_PROPERTY / VALUES_PROPERTY / FLAG / ARGTYPE / LIVE_COMMENT) { return p; }
 
+LIVE_COMMENT = SP* "#" l:LIVE_COMMENT_OPT  { if(typeof l=='string' && l) return [l,true]; else return; }
+LIVE_COMMENT_OPT = "live"i SP+ id:IDENTIFIER { return id; } / [^\n]* { return false;}
 
 SINGLE_PROPERTY = s:("required" / "argoptional" / "multiple" / "hidden" / "optional") { return [s,true]; }
 
@@ -84,3 +90,4 @@ IDENTIFIER = "\"" id:[_a-zA-z0-9\-]+ "\"" { return id.join('');; } /
 id:[_a-zA-z0-9\-]+ { return id.join('');; }
 
 STRING = "\"" s:[^\"]+ "\"" {return s.join('');}
+

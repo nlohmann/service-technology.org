@@ -24,7 +24,7 @@ var inputs = [
     type: 'section',
     required: ['name'],
     html: {
-        out: '<legend><span id="${id}" title="${name}" data-content="${sectiondescription}">${name}</span></legend>' +
+ /*       out: '<legend><span id="${id}" title="${name}" data-content="${sectiondescription}">${name}</span></legend>' +
          // the img-tag is a hack to include javascript
          // loading the icons, because they are loaded anyway
          '<img src="bootstrap/img/glyphicons-halflings.png" style="display:none;" onload="'+
@@ -32,6 +32,8 @@ var inputs = [
          'var e=$(\'#${id}\');' +
          'if(e.attr(\'data-content\'))e.popover().addClass(\'btn-link\');' + 
          '" />'
+*/
+         out: ' ' // <p class="well-small well"><small><em>${sectiondescription}</small></em></p>'
     },
     useLabel: false
   },

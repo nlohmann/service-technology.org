@@ -13,6 +13,13 @@
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
+      .stBox {
+        border: 2px solid rgb(221, 221, 221);
+        margin:25px 0px;
+        padding:25px;
+        border-radius: 8px 8px 8px 8px; 
+        background-color: #fff;
+      }
     </style>
     <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -29,27 +36,39 @@
     <link rel="apple-touch-icon-precomposed" href="bootstrap/ico/apple-touch-icon-57-precomposed.png">
   </head>
 
-  <body>
+  <body style="background-color:#ddd;">
 
+    <div id="myAlert" class="modal hide fade" role="dialog">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3></h3>
+        </div>
+        <div class="modal-body">
+            <p></p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" data-dismiss="modal" class="btn">Close</a>
+        </div>
+    </div>
 
     <div class="container">
     <h1 style="text-transform:uppercase;">service-technology.org/live<br><small>solutions that make services behave well</small></h1>
       <div class="row">
         <div class="span6">
-          <div class="well">
-          <a href="#" class="toggleEdit" style="display:none;" onclick="return toggleEdit('gui')"><i class="icon-lock"></i>unlock editing</a>
-         <span id="form_container">
-          loading ... </span>
-      </div>
+          <div class="stBox">
+              <a href="#" class="toggleEdit" style="display:none;" onclick="return toggleEdit('gui')"><i class="icon-lock"></i>unlock editing</a>
+             <span id="form_container">
+              loading ... </span>
+          </div>
         </div>
 
         <div id="command-container" class="span6">
-          <div class="well">
+          <div class="stBox" >
             <h3>Command <small>for CLI</small></h3>
             <input type="text" style="width:90%;font-family:monospace;" class="btn selAllOnFocus uneditable-input" id="command-output" 
             title="Click right and select copy">
           </div>
-          <div class="well">
+          <div class="stBox">
           <a href="" class="toggleEdit" onclick="return toggleEdit('json')"><i class="icon-lock"></i>unlock editing</a>
             <h3><!-- data-toggle="collapse" style="cursor:pointer" data-target="#json-output-container" -->
                  JSON for Server
@@ -64,7 +83,7 @@
       </div> <!-- "row" -->
       <span class="btn btn-large btn-primary submitButton" style="width:97%;">Submit</span>
       <hr />
-      <div id="output_container" class="well" style="display:none;">
+      <div id="output_container" class="stBox" style="display:none;">
           <h2>stdout</h2>
           <pre id="stdout"></pre>
           <h2>stderr</h2>
@@ -113,14 +132,14 @@ var tool = window.location.search;
 // no XSS:
 tool = tool.replace(/[^a-z0-9_\-]/gi,'');
 
-// and now build the form
+// and now build the form, will be callback function for ggo-parser
 buildForm = function(inputs) {
     var im = new INPUTS.InputSetManager();
     im.SetInputs(inputs);
     var b = $('#form_container');
     var dom=b.get(0);
     console.log(dom);
-    b.fadeOut().empty();
+    b.hide().empty();
     im.Create(dom);
     b.fadeIn();
     // start listening to the formular

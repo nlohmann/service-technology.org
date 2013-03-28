@@ -100,6 +100,14 @@ option "sweeplinedelay" -
   optional
   hidden
 
+option "sweeplinespread" -
+  "Allow spreading of progress values over a larger range."
+  int
+  typestr="MULTIPLIER"
+  default="1"
+  optional
+  hidden
+
 section "Input/Output"
 
 option "compressed" -

@@ -7,10 +7,14 @@
 \brief basic routines for handling nodes
 */
 
+#include <cmdline.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <set>
+#include <map>
+#include <vector>
 #include <algorithm>
 #include <Net/LinearAlgebra.h>
 #include <Net/Net.h>
@@ -22,9 +26,14 @@
 #include <InputOutput/Reporter.h>
 #include <Parser/Symbol.h>
 
+using std::set;
+using std::map;
+using std::vector;
+using std::cout;
+using std::endl;
 
 extern Reporter* rep;
-
+extern gengetopt_args_info args_info;
 
 index_t Net::Card[2] = {0, 0};
 index_t* Net::CardArcs[2][2] = {{NULL, NULL}, {NULL, NULL}};
@@ -702,6 +711,99 @@ void Net::setProgressMeasure()
         }
     }
 
+if (args_info.sweeplinespread_arg>1) {
+    // try for another local optimisation (spread progress values better)
+	// first, save the progress measures so far
+    int64_t* progressCopy = (int64_t*) malloc(cardTR * SIZEOF_INT64_T);
+	memcpy(progressCopy, progressMeasure, cardTR * SIZEOF_INT64_T);
+
+	index_t threads(args_info.threads_arg), tries(cardTR), fullbucket(cardTR/threads+1), maxbucket(cardTR);
+	std::set<index_t> done;
+	while (--tries>0) {
+		std::map<int64_t,index_t> pbuckets;
+		index_t highbucket(1);
+		for(index_t t=0; t<cardTR; ++t)
+			if (++pbuckets[progressMeasure[t]] > highbucket) ++highbucket;
+		if (fullbucket * fullbucket > cardTR) --fullbucket;
+		if (highbucket <= maxbucket) maxbucket = highbucket-1;
+		if (maxbucket <= fullbucket) break;
+		std::set<int64_t> tryvalues;
+		for(std::map<int64_t,index_t>::iterator it=pbuckets.begin(); it!=pbuckets.end(); ++it)
+			if (it->second > maxbucket)
+				tryvalues.insert(it->first);
+/*
+		cout << "progress values with too many transitions(" << maxbucket << "," << fullbucket << "): ";
+		for(std::set<int64_t>::iterator it=tryvalues.begin(); it!=tryvalues.end(); ++it)
+			cout << *it << "(" << pbuckets[*it] << ") ";
+		cout << endl;
+*/
+		index_t t;
+        for(t=0; t<cardTR; ++t)
+            if (m.isSignificant(t))
+            {
+				if (done.find(t)!=done.end()) continue;
+                const Matrix::Row* curRow = m.getRow(t);
+				if (tryvalues.find(curRow->coefficients[0]) == tryvalues.end()) continue;
+
+				int64_t mult;
+				for(mult=2; mult<=args_info.sweeplinespread_arg; ++mult)
+				{
+	                int32_t ctmp = 0;
+	                for(index_t v=0; v<curRow->varCount; ++v)
+	                    if (curRow->coefficients[v] > 0 && progressMeasure[curRow->variables[v]] < 0) {
+	                        if (progressMeasure[curRow->variables[v]] + (mult-1)*curRow->coefficients[v] >= 0) ++ctmp;
+	                    } else if (curRow->coefficients[v] < 0 && progressMeasure[curRow->variables[v]] > 0)
+	                        if (progressMeasure[curRow->variables[v]] + (mult-1)*curRow->coefficients[v] < 0) --ctmp;
+					if (ctmp<0) continue;
+
+					int64_t toofull(0);
+					for(index_t v=0; v<curRow->varCount; ++v)
+					{
+						if (pbuckets[progressMeasure[curRow->variables[v]]] > fullbucket) --toofull;
+						if (pbuckets[progressMeasure[curRow->variables[v]]+(mult-1)*curRow->coefficients[v]] > fullbucket) ++toofull;
+					}
+					if (toofull >= 0) continue;
+
+//					cout << "row t=" << Net::Name[TR][t] << " mult=" << mult << endl;
+					done.insert(t);
+
+			        for(index_t v=0; v<curRow->varCount; ++v)
+			        {
+        			    progressMeasure[curRow->variables[v]] += (mult-1)*curRow->coefficients[v];
+        			    curRow->coefficients[v] *= mult;
+        			}
+
+					break;
+				}
+				if (mult <= args_info.sweeplinespread_arg) break;
+            }
+        if (t == cardTR) ++fullbucket;
+	}
+
+	// check if the optimisation uses the buckets in a better way (especially more buckets)
+	std::set<int64_t> oldcnt, newcnt;
+	for(index_t t=0; t<cardTR; ++t)
+	{
+		oldcnt.insert(progressCopy[t]);
+		newcnt.insert(progressMeasure[t]);
+	}
+	if (newcnt.size() <= oldcnt.size())
+		memcpy(progressMeasure, progressCopy, cardTR * SIZEOF_INT64_T);
+	else {
+		float oldrange, newrange, oldsize, newsize;
+		oldrange = (float)(*(oldcnt.rbegin()) - *(oldcnt.begin()) + 1);
+		newrange = (float)(*(newcnt.rbegin()) - *(newcnt.begin()) + 1);
+		oldsize = (float)(oldcnt.size());
+		newsize = (float)(newcnt.size());
+//cout << "oldrange=" << oldrange << " newrange=" << newrange << " oldsize=" << oldsize << " newsize=" << newsize << endl;
+		if (newrange/oldrange >= newsize*newsize/(oldsize*oldsize))
+			memcpy(progressMeasure, progressCopy, cardTR * SIZEOF_INT64_T);
+		else cout << "progress adapted" << endl;
+	}
+
+	free(progressCopy);
+}
+
     // remove gcd from progress values
     int64_t gcd(0);
     for (index_t t = 0; t < cardTR; ++t)
@@ -709,6 +811,7 @@ void Net::setProgressMeasure()
             gcd = progressMeasure[t];
         else if (progressMeasure[t]!=0)
             gcd = ggt(gcd, progressMeasure[t]);
+	if (gcd<0) gcd = -gcd;
     if (gcd!=0)
         for (index_t t = 0; t < cardTR; ++t)
             progressMeasure[t] /= gcd;

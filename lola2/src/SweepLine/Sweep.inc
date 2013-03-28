@@ -769,8 +769,10 @@ template <class T>
 void Sweep<T>::extendLeft(int32_t& bp)
 {
 	SweepListStore<T>* sls;
-	while (bp-->0)
+	while (bp>0)
 	{
+        --bp;
+
 		sls = new SweepListStore<T>(nr_of_threads);
 		sls->setNext(start_new_persistent);
 		start_new_persistent = sls;

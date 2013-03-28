@@ -287,6 +287,7 @@ int32_t SweepRingStore<T>::checkNewPersistent(int32_t bp)
 {
     // the oldest store has already been checked, thus "i+2" in the following formula
     // test the second oldest one first, and then stores with increasing progress
+	assert(bp>=0);
     for(index_t i=0; i<bp; ++i)
         if (!(newpersistent[(active+front_offset+i+2)%size]->store.empty()))
             return bp-i;

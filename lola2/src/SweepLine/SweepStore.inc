@@ -50,23 +50,19 @@ SweepStore<T>::~SweepStore()
 
 /// create a new branch in the decision tree at depth b.
 template <typename T>
-SweepStore<T>::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL)
+SweepStore<T>::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL), vector(NULL)
 {
 }
 
 template <typename T>
 SweepStore<T>::Decision::~Decision()
 {
-    vector = NULL;
+    if (vector)
+        free(vector);
     if (nextnew)
-    {
         delete nextnew;
-    }
     if (nextold)
-    {
         delete nextold;
-    }
-
 }
 
 /// search for an input vector in the suffix tree and insert it, if it is not present

@@ -56,7 +56,7 @@ inline uint32_t VBloomStore<SIZE>::hash_fnv(const vectordata_t* in, size_t len) 
 }
 
 template<size_t SIZE>
-bool VBloomStore<SIZE>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex)
+bool VBloomStore<SIZE>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex, bool noinsert)
 {
     uint32_t* cur_hashes = hash_values + (threadIndex * hash_functions);
     size_t len = (bitlen+VECTOR_WIDTH-1) / VECTOR_WIDTH;
@@ -88,6 +88,8 @@ bool VBloomStore<SIZE>::searchAndInsert(const vectordata_t* in, bitindex_t bitle
         // found an unset bit -> vector is new and must be stored
         if ((*filter)[cur_hashes[h]] == 0)
         {
+			if (noinsert) return false; // check if we want to insert at all
+
             pthread_mutex_lock(&mutex); // some rare occasion where double-checked locking actually works
             if ((*filter)[cur_hashes[h]] == 0)
             {

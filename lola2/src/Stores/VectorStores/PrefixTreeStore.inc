@@ -60,7 +60,7 @@ PrefixTreeStore<T>::Decision::~Decision()
 
 /// search for an input vector in the suffix tree and insert it, if it is not present
 template <typename T>
-bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex)
+bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex, bool noinsert)
 {
     /// If a new decision record is inserted, * anchor must point to it
     Decision** anchor;
@@ -100,11 +100,17 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
     size_t payloadSize = getPayloadSize();
 
     // lock the current bucket to ensure thread safety
-    pthread_rwlock_wrlock(&rwlock);
+    if (noinsert) pthread_rwlock_rdlock(&rwlock);
+	else pthread_rwlock_wrlock(&rwlock);
     
     // Is hash bucket empty? If so, assign to currentvector
     if (!(pPayload = firstvector))
     {
+		if (noinsert) {
+			pthread_rwlock_unlock(&rwlock);
+			return false;
+		}
+
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
         newvector = &firstvector;
     }
@@ -256,6 +262,12 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
                 break;
             }
         }
+
+		// in case we do not want to insert the state, stop right now
+		if (noinsert) {
+			pthread_rwlock_unlock(&rwlock);
+			return false;
+		}
 
         // state not found --> prepare for insertion
         Decision* newdecision = new Decision(position + (VECTOR_WIDTH - vector_bitstogo));

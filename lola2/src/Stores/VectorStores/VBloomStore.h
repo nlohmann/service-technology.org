@@ -28,8 +28,9 @@ public:
     /// @param hash of current NetState
     /// @param payload pointer to be set to the place where the payload of this state will be held
     /// @param threadIndex the index of the thread that requests this call. Values will range from 0 to (number_of_threads - 1). Used to allow using thread-local auxiliary data structures without locking any variables.
+	/// @param noinsert if set to true only a search is done
     /// @return true, if the marking was found in the store, otherwise false.
-    bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex);
+    bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex, bool noinsert = false);
 
     /// gets and removes a vector from the store
     /// @param out place where the returned vector will be written to

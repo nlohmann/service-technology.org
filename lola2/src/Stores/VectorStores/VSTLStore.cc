@@ -23,7 +23,7 @@ VSTLStore<void>::~VSTLStore()
     delete[] intermediate;
 }
 
-bool VSTLStore<void>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex)
+bool VSTLStore<void>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, void** payload, index_t threadIndex, bool noinsert)
 {
     index_t vectorLength = (bitlen+(VECTOR_WIDTH-1))/VECTOR_WIDTH;
 
@@ -39,16 +39,21 @@ bool VSTLStore<void>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen,
         (ci[vectorLength-1] >>= (VECTOR_WIDTH-bitlen)) <<= (VECTOR_WIDTH-bitlen);
 
     // avoid locking overhead if working in single-threaded mode
-    if(singleThreaded)
-        return !store.insert(ci).second;
+    if(singleThreaded) {
+		if (noinsert)
+			return store.count(ci);
+        else
+			return !store.insert(ci).second;
+	}
 
     // test if already inserted
     pthread_rwlock_rdlock(&rwlock);
     int found = store.count(ci);
     pthread_rwlock_unlock(&rwlock);
-    if(found) {
+    if (found)
         return true;
-    }
+    else if (noinsert)
+		return false;
 
     // add vector to marking store
     pthread_rwlock_wrlock(&rwlock);

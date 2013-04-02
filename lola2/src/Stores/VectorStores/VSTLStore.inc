@@ -26,7 +26,7 @@ VSTLStore<T>::~VSTLStore()
 }
 
 template <typename T>
-bool VSTLStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex)
+bool VSTLStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex, bool noinsert)
 {
     index_t vectorLength = (bitlen+(VECTOR_WIDTH-1))/VECTOR_WIDTH;
 
@@ -45,7 +45,8 @@ bool VSTLStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, ha
     // avoid locking overhead if working in single-threaded mode
     if(singleThreaded) {
     	ret = store.count(ci);
-    	*payload = &store[ci];
+		if (!noinsert)
+	    	*payload = &store[ci];
         return ret;
     }
 
@@ -53,9 +54,10 @@ bool VSTLStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, ha
     pthread_rwlock_rdlock(&rwlock);
     ret = store.count(ci);
     pthread_rwlock_unlock(&rwlock);
-    if(ret) {
+    if (ret)
         return true;
-    }
+	else if (noinsert)
+		return false;
 
     // add vector to marking store
     pthread_rwlock_wrlock(&rwlock);

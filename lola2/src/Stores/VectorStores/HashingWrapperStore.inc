@@ -10,14 +10,15 @@
 
 
 template <typename T>
-HashingWrapperStore<T>::HashingWrapperStore(VectorStoreCreator<T>* _storeCreator)
+HashingWrapperStore<T>::HashingWrapperStore(VectorStoreCreator<T>* _storeCreator, index_t _number_of_buckets)
 {
 	storeCreator = _storeCreator;
+	number_of_buckets = _number_of_buckets;
 
-    buckets = (VectorStore<T>**) calloc(SIZEOF_VOIDP, SIZEOF_MARKINGTABLE);
-    rwlocks =(pthread_rwlock_t*) calloc(sizeof(pthread_rwlock_t), SIZEOF_MARKINGTABLE);
+    buckets = (VectorStore<T>**) calloc(SIZEOF_VOIDP, number_of_buckets);
+    rwlocks =(pthread_rwlock_t*) calloc(sizeof(pthread_rwlock_t), number_of_buckets);
 
-    for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
+    for (hash_t i = 0; i < number_of_buckets; i++)
         pthread_rwlock_init(rwlocks+i, NULL);
 
     currentPopBucket = 0;
@@ -26,7 +27,7 @@ HashingWrapperStore<T>::HashingWrapperStore(VectorStoreCreator<T>* _storeCreator
 template <typename T>
 HashingWrapperStore<T>::~HashingWrapperStore()
 {
-    for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
+    for (hash_t i = 0; i < number_of_buckets; i++)
     {
         if (buckets[i])
         {
@@ -35,7 +36,7 @@ HashingWrapperStore<T>::~HashingWrapperStore()
     }
     free(buckets);
 
-    for (hash_t i = 0; i < SIZEOF_MARKINGTABLE; i++)
+    for (hash_t i = 0; i < number_of_buckets; i++)
         pthread_rwlock_destroy(rwlocks+i);
     free(rwlocks);
     
@@ -44,19 +45,19 @@ HashingWrapperStore<T>::~HashingWrapperStore()
 
 /// search for an input vector in the suffix tree and insert it, if it is not present
 template <typename T>
-bool HashingWrapperStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex)
+bool HashingWrapperStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex, bool noinsert)
 {
-    // lock the current bucket to ensure thread safety
-    pthread_rwlock_wrlock(rwlocks + hash);
+	if (!buckets[hash]) {
+	    // lock the current bucket to ensure thread safety
+	    pthread_rwlock_wrlock(rwlocks + hash);
 
-    if(!buckets[hash])
-    	buckets[hash] = (*storeCreator)();
+	    if(!buckets[hash])
+	    	buckets[hash] = (*storeCreator)();
 
-    bool ret = buckets[hash]->searchAndInsert(in,bitlen,hash,payload,threadIndex);
+	    pthread_rwlock_unlock(rwlocks + hash);
+	}
 
-    pthread_rwlock_unlock(rwlocks + hash);
-
-    return ret;
+    return buckets[hash]->searchAndInsert(in,bitlen,hash,payload,threadIndex,noinsert);
 }
 
 /*!
@@ -69,7 +70,7 @@ bool HashingWrapperStore<T>::popVector(vectordata_t * & out)
 	do {
 		if(buckets[currentPopBucket]->popVector(out))
 			return true;
-		currentPopBucket = (currentPopBucket+1)%SIZEOF_MARKINGTABLE;
+		currentPopBucket = (currentPopBucket+1)%number_of_buckets;
 	}
 	while(currentPopBucket != startingPopBucket);
     return false;

@@ -9,10 +9,12 @@
 
 
 template <typename T>
-PrefixTreeStore<T>::PrefixTreeStore() : popVectorCache(NULL)
+PrefixTreeStore<T>::PrefixTreeStore(index_t _number_of_threads)
 {
+	number_of_threads = _number_of_threads;
     branch = NULL;
     firstvector = NULL;
+	popVectorCache = (vectordata_t**) calloc(SIZEOF_VOIDP, number_of_threads);
 
     pthread_rwlock_init(&rwlock, NULL);
 }
@@ -35,8 +37,10 @@ PrefixTreeStore<T>::~PrefixTreeStore()
         free(firstvector);
     }
 
-	if(popVectorCache)
-        free(popVectorCache);
+	for(index_t i=0; i<number_of_threads; ++i)
+		if(popVectorCache[i])
+	        free(popVectorCache[i]);
+	free(popVectorCache);
 
     pthread_rwlock_destroy(&rwlock);
 }
@@ -337,14 +341,14 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
  * \brief  gets and removes a vector from the store
  */
 template <typename T>
-bool PrefixTreeStore<T>::popVector(vectordata_t * & out)
+bool PrefixTreeStore<T>::popVector(vectordata_t * & out, index_t threadIndex)
 {
   /// size of resulting vector
   index_t vectorlen = SIZEOF_CAPACITY_T * Net::Card[PL];
   // create intermediate vector
-  if(!popVectorCache)
+  if(!(popVectorCache[threadIndex]))
   {
-    popVectorCache = (vectordata_t *) malloc(vectorlen);
+    popVectorCache[threadIndex] = (vectordata_t *) malloc(vectorlen);
   }
   
   // vector currently viewed
@@ -353,23 +357,28 @@ bool PrefixTreeStore<T>::popVector(vectordata_t * & out)
   // anchor to a decision node
   Decision * anchor = NULL;
   Decision ** pAnchor = NULL;
+
+  // lock the current bucket to ensure thread safety
+  pthread_rwlock_wrlock(&rwlock);
   
   if(!(pPayload = firstvector))
   {
+      pthread_rwlock_unlock(&rwlock);
       return false;
   }
   // skip payload data
   pVector = (vectordata_t*)(((char*)pPayload) + getPayloadSize());
 
   // copy "first" vector to return it later
-  memcpy(popVectorCache, pVector, vectorlen);
-  out = popVectorCache;
+  memcpy(popVectorCache[threadIndex], pVector, vectorlen);
+  out = popVectorCache[threadIndex];
   
   if(!(anchor = branch))
   {
     // no further markings in this bucket
     free(pPayload);
     firstvector = NULL;
+    pthread_rwlock_unlock(&rwlock);
     return true;
   }
     
@@ -427,5 +436,6 @@ bool PrefixTreeStore<T>::popVector(vectordata_t * & out)
     delete anchor;
     
     // return result
+    pthread_rwlock_unlock(&rwlock);
     return true;
 }

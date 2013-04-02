@@ -10,7 +10,7 @@
 
 
 template <typename T>
-HashingWrapperStore<T>::HashingWrapperStore(VectorStoreCreator<T>* _storeCreator, index_t _number_of_buckets)
+HashingWrapperStore<T>::HashingWrapperStore(VectorStoreCreator<T>* _storeCreator, index_t _number_of_buckets, index_t _number_of_threads)
 {
 	storeCreator = _storeCreator;
 	number_of_buckets = _number_of_buckets;
@@ -21,7 +21,7 @@ HashingWrapperStore<T>::HashingWrapperStore(VectorStoreCreator<T>* _storeCreator
     for (hash_t i = 0; i < number_of_buckets; i++)
         pthread_rwlock_init(rwlocks+i, NULL);
 
-    currentPopBucket = 0;
+    currentPopBucket = (index_t*) calloc(SIZEOF_INDEX_T, _number_of_threads);
 }
 
 template <typename T>
@@ -39,6 +39,8 @@ HashingWrapperStore<T>::~HashingWrapperStore()
     for (hash_t i = 0; i < number_of_buckets; i++)
         pthread_rwlock_destroy(rwlocks+i);
     free(rwlocks);
+
+	free(currentPopBucket);
     
     delete storeCreator;
 }
@@ -64,14 +66,14 @@ bool HashingWrapperStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t 
  * \brief  gets and removes a vector from the store
  */
 template <typename T>
-bool HashingWrapperStore<T>::popVector(vectordata_t * & out)
+bool HashingWrapperStore<T>::popVector(vectordata_t * & out, index_t threadIndex)
 {
-	index_t startingPopBucket = currentPopBucket;
+	index_t startingPopBucket = currentPopBucket[threadIndex];
 	do {
-		if(buckets[currentPopBucket]->popVector(out))
+		if(buckets[currentPopBucket[threadIndex]]->popVector(out))
 			return true;
-		currentPopBucket = (currentPopBucket+1)%number_of_buckets;
+		currentPopBucket[threadIndex] = (currentPopBucket[threadIndex]+1)%number_of_buckets;
 	}
-	while(currentPopBucket != startingPopBucket);
+	while(currentPopBucket[threadIndex] != startingPopBucket);
     return false;
 }

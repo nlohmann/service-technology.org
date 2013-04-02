@@ -111,7 +111,7 @@ bool VBloomStore<SIZE>::searchAndInsert(const vectordata_t* in, bitindex_t bitle
 
 // gets and removes a vector from the store
 template<size_t SIZE>
-bool VBloomStore<SIZE>::popVector(vectordata_t * &)
+bool VBloomStore<SIZE>::popVector(vectordata_t * &, index_t threadIndex)
 {
   rep->status("this store can not return states");
   rep->abort(ERROR_COMMANDLINE);

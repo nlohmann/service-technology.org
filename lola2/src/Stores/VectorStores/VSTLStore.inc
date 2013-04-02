@@ -70,12 +70,12 @@ bool VSTLStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, ha
 
 /*!
  * \brief  gets and removes a vector from the store
- * \note   Assumption: Removing of states is done by a single thread and after inserting states
- *         hence no locking will be done and the internal cache of the first thread will be used.
  */
 template <typename T>
-bool VSTLStore<T>::popVector(vectordata_t * & out)
+bool VSTLStore<T>::popVector(vectordata_t * & out, index_t threadIndex)
 {
+  pthread_rwlock_wrlock(&rwlock);
+
   // get result
   bool result = !store.empty();
 
@@ -83,10 +83,12 @@ bool VSTLStore<T>::popVector(vectordata_t * & out)
   if(result)
   {
     __typeof(store.begin()) it = store.begin(); // get iterator of first element
-    std::vector<vectordata_t> &ci = intermediate[0] = it->first; // get its vector
+    std::vector<vectordata_t> &ci = intermediate[threadIndex] = it->first; // get its vector
     store.erase(it); // remove this iterator from the store
     out = &ci[0]; // return underlying array
   }
+
+  pthread_rwlock_unlock(&rwlock);
 
   // return result
   return result;

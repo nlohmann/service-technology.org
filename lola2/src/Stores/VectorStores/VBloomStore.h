@@ -35,7 +35,7 @@ public:
     /// gets and removes a vector from the store
     /// @param out place where the returned vector will be written to
     /// @return false, if the store was already empty, otherwise true
-    virtual bool popVector(vectordata_t * & out);
+    virtual bool popVector(vectordata_t * & out, index_t threadIndex = 0);
 };
 
 #include <Stores/VectorStores/VBloomStore.inc>

@@ -62,8 +62,8 @@ template <typename T>
 class HashingWrapperStore : public VectorStore<T>
 {
 public:
-    /// constructor
-	HashingWrapperStore(VectorStoreCreator<T>* _storeCreator, index_t _number_of_buckets = SIZEOF_MARKINGTABLE);
+    /// constructor (optional parameter _number_of_threads necessary if elements should be retrievable by popVector())
+	HashingWrapperStore(VectorStoreCreator<T>* _storeCreator, index_t _number_of_buckets = SIZEOF_MARKINGTABLE, index_t _number_of_threads = 1);
     /// destructor
     virtual ~HashingWrapperStore();
 
@@ -80,7 +80,7 @@ public:
     /// gets and removes a vector from the store
     /// @param out place where the returned vector will be written to
     /// @return false, if the store was already empty, otherwise true
-    virtual bool popVector(vectordata_t * & out);
+    virtual bool popVector(vectordata_t * & out, index_t threadIndex = 0);
 private:
 
     VectorStoreCreator<T>* storeCreator;
@@ -90,7 +90,7 @@ private:
     // the read-write mutexes
     pthread_rwlock_t* rwlocks;
 
-    index_t currentPopBucket;
+    index_t* currentPopBucket;
 
 	index_t number_of_buckets;
 };

@@ -17,8 +17,8 @@ template <typename T>
 class PrefixTreeStore : public VectorStore<T>
 {
 public:
-    /// constructor
-	PrefixTreeStore();
+    /// constructor (parameter needed only if elements can be retrieved from the store)
+	PrefixTreeStore(index_t number_of_threads = 1);
     /// destructor
     virtual ~PrefixTreeStore();
 
@@ -35,7 +35,7 @@ public:
     /// gets and removes a vector from the store
     /// @param out place where the returned vector will be written to
     /// @return false, if the store was already empty, otherwise true
-    virtual bool popVector(vectordata_t * & out);
+    virtual bool popVector(vectordata_t * & out, index_t threadIndex = 0);
 private:
 
     size_t getPayloadSize();
@@ -69,7 +69,9 @@ private:
     vectordata_t* firstvector;
 
     // full vector will be reconstructed here when popping vectors
-    vectordata_t* popVectorCache;
+    vectordata_t** popVectorCache;
+
+	index_t number_of_threads;
 };
 
 // forward declaration to register function specialization

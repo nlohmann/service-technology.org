@@ -93,3 +93,15 @@ bool VSTLStore<T>::popVector(vectordata_t * & out, index_t threadIndex)
   // return result
   return result;
 }
+
+/*!
+ * \brief Check if the store is empty
+ * \note This function does not ensure thread safety
+ * \return If the store is empty
+ */
+template <typename T>
+bool VSTLStore<T>::empty()
+{
+	return store.empty();
+}
+

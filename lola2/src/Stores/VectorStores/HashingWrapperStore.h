@@ -81,6 +81,10 @@ public:
     /// @param out place where the returned vector will be written to
     /// @return false, if the store was already empty, otherwise true
     virtual bool popVector(vectordata_t * & out, index_t threadIndex = 0);
+
+	/// check if the store is empty
+	/// @return true, if the store is empty
+	virtual bool empty();
 private:
 
     VectorStoreCreator<T>* storeCreator;

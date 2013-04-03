@@ -77,3 +77,20 @@ bool HashingWrapperStore<T>::popVector(vectordata_t * & out, index_t threadIndex
 	while(currentPopBucket[threadIndex] != startingPopBucket);
     return false;
 }
+
+/*!
+ * \brief Check if the store is empty.
+ * \return If the store is empty
+ */
+template <typename T>
+bool HashingWrapperStore<T>::empty()
+{
+	// A better solution is needed if the number of buckets can be large
+	// At this time, only the SweepLine method uses empty(), and only
+	// with a very small number of buckets (per progress value and mode)
+	for(index_t i=0; i<number_of_buckets; ++i)
+		if(!buckets[currentPopBucket[i]]->empty())
+			return false;
+    return true;
+}
+

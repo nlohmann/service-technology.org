@@ -113,7 +113,20 @@ bool VBloomStore<SIZE>::searchAndInsert(const vectordata_t* in, bitindex_t bitle
 template<size_t SIZE>
 bool VBloomStore<SIZE>::popVector(vectordata_t * &, index_t threadIndex)
 {
-  rep->status("this store can not return states");
+  rep->status("this store cannot return states");
   rep->abort(ERROR_COMMANDLINE);
   return false;
 }
+
+/*!
+ * \brief Check if the store is empty
+ * \return If the store is empty
+ */
+template<size_t SIZE>
+bool VBloomStore<SIZE>::empty()
+{
+  rep->status("this store cannot return states");
+  rep->abort(ERROR_COMMANDLINE);
+  return false;
+}
+

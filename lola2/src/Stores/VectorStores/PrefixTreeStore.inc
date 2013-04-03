@@ -439,3 +439,15 @@ bool PrefixTreeStore<T>::popVector(vectordata_t * & out, index_t threadIndex)
     pthread_rwlock_unlock(&rwlock);
     return true;
 }
+
+/*!
+ * \brief Check if the store is empty
+ * \note This function does not ensure thread safety
+ * \return If the store is empty
+ */
+template <typename T>
+bool PrefixTreeStore<T>::empty()
+{
+	return !firstvector;
+}
+

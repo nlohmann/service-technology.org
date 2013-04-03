@@ -90,3 +90,21 @@ bool VSTLStore<void>::popVector(vectordata_t * & out, index_t threadIndex)
   // return result
   return result;
 }
+
+/*!
+ * \brief Check if the store is empty
+ * \return If the store is empty
+ */
+bool VSTLStore<void>::empty()
+{
+	// lock the store to ensure thread safety
+	pthread_rwlock_rdlock(&rwlock);
+	if (store.empty()) {
+		pthread_rwlock_unlock(&rwlock);
+		return true;
+	} else {
+		pthread_rwlock_unlock(&rwlock);
+		return false;
+	}
+}
+

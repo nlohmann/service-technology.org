@@ -1166,14 +1166,14 @@ AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[stl],[copy],[--bucketing
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[stl],[simplecompressed],[--bucketing],1,2,[no],242,805)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[stl],[fullcopy],[--bucketing],1,2,[no],242,805)
 
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[bit],[],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[copy],[],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[simplecompressed],[],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[fullcopy],[],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[bit],[--bucketing],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[copy],[--bucketing],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[simplecompressed],[--bucketing],1,2,[no],242,805)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[fullcopy],[--bucketing],1,2,[no],242,805)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[bit],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[copy],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[simplecompressed],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[fullcopy],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[bit],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[copy],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[simplecompressed],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[fullcopy],[--bucketing],1,2,[no],,)
 
 
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[prefix],[bit],[],1,2,[no],2048,23040)
@@ -1194,14 +1194,14 @@ AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[stl],[copy]
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[stl],[simplecompressed],[--bucketing],1,2,[no],2048,23040)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[stl],[fullcopy],[--bucketing],1,2,[no],2048,23040)
 
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[bit],[],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[copy],[],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[simplecompressed],[],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[fullcopy],[],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[bit],[--bucketing],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[copy],[--bucketing],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[simplecompressed],[--bucketing],1,2,[no],2048,23040)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[fullcopy],[--bucketing],1,2,[no],2048,23040)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[bit],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[copy],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[simplecompressed],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[fullcopy],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[bit],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[copy],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[simplecompressed],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[fullcopy],[--bucketing],1,2,[no],,)
 
 
 
@@ -1223,14 +1223,14 @@ AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[stl],[copy],[--bucketing],1,2,[n
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[stl],[simplecompressed],[--bucketing],1,2,[no],47905,137280)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[stl],[fullcopy],[--bucketing],1,2,[no],47905,137280)
 
-# AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[bit],[],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[copy],[],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[simplecompressed],[],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[fullcopy],[],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[bit],[--bucketing],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[copy],[--bucketing],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[simplecompressed],[--bucketing],1,2,[no],47905,137280)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[fullcopy],[--bucketing],1,2,[no],47905,137280)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[bit],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[copy],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[simplecompressed],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[fullcopy],[],1,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[bit],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[copy],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[simplecompressed],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[fullcopy],[--bucketing],1,2,[no],,)
 
 
 
@@ -1256,10 +1256,10 @@ AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[stl],[full
 # AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[copy],[],1,2,[no],2546432,24460016)
 # AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[simplecompressed],[],1,2,[no],2546432,24460016)
 # AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[fullcopy],[],1,2,[no],2546432,24460016)
-AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[bit],[--bucketing],1,2,[no],2546432,24460016)
-AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[copy],[--bucketing],1,2,[no],2546432,24460016)
-# AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[simplecompressed],[--bucketing],1,2,[no],2546432,24460016)
-# AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[fullcopy],[--bucketing],1,2,[no],2546432,24460016)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[bit],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[copy],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[simplecompressed],[--bucketing],1,2,[no],,)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[fullcopy],[--bucketing],1,2,[no],,)
 
 
 
@@ -1291,15 +1291,15 @@ AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[stl],[simplecompressed],
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[stl],[fullcopy],[--bucketing],4,2,[no],242,)
 AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[stl],[bit],[--bucketing],64,2,[no],242,)
 
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[bit],[],4,2,[no],242,)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[copy],[],4,2,[no],242,)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[simplecompressed],[],4,2,[no],242,)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[fullcopy],[],4,2,[no],242,)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[bit],[--bucketing],4,2,[no],242,)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[copy],[--bucketing],4,2,[no],242,)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[simplecompressed],[--bucketing],4,2,[no],242,)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[fullcopy],[--bucketing],4,2,[no],242,)
-AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[bit],[--bucketing],64,2,[no],242,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[bit],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[copy],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[simplecompressed],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[fullcopy],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[bit],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[copy],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[simplecompressed],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[fullcopy],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([5 Philosophers],[phils5.lola],[full],[bloom],[bit],[--bucketing],64,2,[no],,)
 
 
 
@@ -1322,14 +1322,14 @@ AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[stl],[copy]
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[stl],[simplecompressed],[--bucketing],4,2,[no],2048,)
 AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[stl],[fullcopy],[--bucketing],4,2,[no],2048,)
 
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[bit],[],4,2,[no],2048,)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[copy],[],4,2,[no],2048,)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[simplecompressed],[],4,2,[no],2048,)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[fullcopy],[],4,2,[no],2048,)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[bit],[--bucketing],4,2,[no],2048,)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[copy],[--bucketing],4,2,[no],2048,)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[simplecompressed],[--bucketing],4,2,[no],2048,)
-AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[fullcopy],[--bucketing],4,2,[no],2048,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[bit],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[copy],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[simplecompressed],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[fullcopy],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[bit],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[copy],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[simplecompressed],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([Eratosthenes],[eratosthenes-020.pnml.lola],[full],[bloom],[fullcopy],[--bucketing],4,2,[no],,)
 
 
 
@@ -1352,14 +1352,14 @@ AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[stl],[copy],[--bucketing],4,2,[n
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[stl],[simplecompressed],[--bucketing],4,2,[no],47905,)
 AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[stl],[fullcopy],[--bucketing],4,2,[no],47905,)
 
-# AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[bit],[],4,2,[no],47905,)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[copy],[],4,2,[no],47905,)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[simplecompressed],[],4,2,[no],47905,)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[fullcopy],[],4,2,[no],47905,)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[bit],[--bucketing],4,2,[no],47905,)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[copy],[--bucketing],4,2,[no],47905,)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[simplecompressed],[--bucketing],4,2,[no],47905,)
-AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[fullcopy],[--bucketing],4,2,[no],47905,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[bit],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[copy],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[simplecompressed],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[fullcopy],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[bit],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[copy],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[simplecompressed],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([4state],[4state.lola],[full],[bloom],[fullcopy],[--bucketing],4,2,[no],,)
 
 
 
@@ -1385,11 +1385,11 @@ AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[stl],[full
 # AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[bit],[],4,2,[no],2546432,)
 # AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[copy],[],4,2,[no],2546432,)
 # AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[simplecompressed],[],4,2,[no],2546432,)
-# AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[fullcopy],[],4,2,[no],2546432,)
-AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[bit],[--bucketing],4,2,[no],2546432,)
-AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[copy],[--bucketing],4,2,[no],2546432,)
-# AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[simplecompressed],[--bucketing],4,2,[no],2546432,)
-# AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[fullcopy],[--bucketing],4,2,[no],2546432,)
+# AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[fullcopy],[],4,2,[no],,)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[bit],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[copy],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[simplecompressed],[--bucketing],4,2,[no],,)
+AT_CHECK_RUNLOLA([Kanban5 (5-safe)],[Kanban5.5safe.pnml.lola],[full],[bloom],[fullcopy],[--bucketing],4,2,[no],,)
 
 
 

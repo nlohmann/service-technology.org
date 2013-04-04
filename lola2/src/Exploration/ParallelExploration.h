@@ -90,7 +90,7 @@ private:
 
 
     /// semaphore used to signal that a transition is able to be spared
-    sem_t* restartSemaphore;
+    sem_t** restartSemaphore;
     /// semaphore indicating that the transfer has been completed an the spearing-thread can restart it's search
     sem_t* transfer_finished_semaphore;
     /// if true one of the threads has found a marking, which satisfies the property
@@ -102,11 +102,13 @@ private:
     /// number of threads currently suspended
     int num_suspended;
     /// search stack used to transfer the current stack to a new (and currently waiting) thread
-    SearchStack<SimpleStackEntry> transfer_stack;
+    SearchStack<SimpleStackEntry>* transfer_stack;
     /// netstate used to transfer the current netstate to a new (and currently waiting) thread
-    NetState* transfer_netstate;
+    NetState** transfer_netstate;
     /// property used to transfer the current evaluated property to a new (and currently waiting) thread
-    SimpleProperty* transfer_property;
+    SimpleProperty** transfer_property;
+    /// array of suspended thread
+    index_t* suspended_threads;
 
     /// mutex to control writing to current marking varible, which contains the result of the parallel search
     pthread_mutex_t write_current_back_mutex;
@@ -142,5 +144,5 @@ private:
 
     \return this will either return NULL (no state fulfilling the property has been found by this thread) or the witness state itself
     */
-    NetState* threadedExploration(NetState &ns, Store<void> &myStore, Firelist &baseFireList, SimpleProperty* resultProperty, int threadNumber, int number_of_threads);
+    NetState* threadedExploration(NetState &ns, Store<void> &myStore, Firelist &baseFireList, SimpleProperty* resultProperty, index_t threadNumber, int number_of_threads);
 };

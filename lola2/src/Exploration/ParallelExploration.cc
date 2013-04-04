@@ -8,6 +8,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <sstream>
 #include <semaphore.h>
 #include <fcntl.h>
 #include <Net/Marking.h>
@@ -22,6 +23,7 @@
 #include <SweepLine/Sweep.h>
 #include <InputOutput/Reporter.h>
 #include <cmdline.h>
+
 
 extern gengetopt_args_info args_info;
 extern Reporter* rep;
@@ -61,7 +63,7 @@ void* ParallelExploration::threadPrivateDFS(void* container) {
 
 NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &myStore,
         Firelist &baseFireList, SimpleProperty* resultProperty,
-        int threadNumber, int number_of_threads) {
+        index_t threadNumber, int number_of_threads) {
 
     SimpleProperty* sp = resultProperty->copy();
     Firelist* myFirelist = baseFireList.createNewFireList(sp);
@@ -79,7 +81,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
         finished = true;
         // release all semaphores
         for (int i = 0; i < number_of_threads; i++)
-            sem_post(restartSemaphore);
+            sem_post(restartSemaphore[i]);
         sem_post(transfer_finished_semaphore);
         // return success and the current stack and property
         pthread_mutex_lock(&write_current_back_mutex);
@@ -135,7 +137,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                     finished = true;
                     // release all semaphores
                     for (int i = 0; i < number_of_threads; i++)
-                        sem_post(restartSemaphore);
+                        sem_post(restartSemaphore[i]);
                     sem_post(transfer_finished_semaphore);
                     // return success and the current stack and property
                     pthread_mutex_lock(&write_current_back_mutex);
@@ -157,8 +159,8 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                     pthread_mutex_lock(&num_suspend_mutex);
                     //rep->message("(%d) TRANSFER LOCK",threadNumber);
                     if (num_suspended > 0) {
-                        // i know that there is an other thread waiting for my data
-                        num_suspended--;
+                    	// i know that there is an other thread waiting for my data
+                    	index_t reader_thread_number = suspended_threads[--num_suspended];
                         pthread_mutex_unlock(&num_suspend_mutex);
 
                         // if the end is reached abort this thread
@@ -175,14 +177,13 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                         // lock transfer mutex
                         pthread_mutex_lock(&transfer_write_access_mutex);
                         // copy the data for the other thread
-                        transfer_stack = stack;
-                        //rep->message("(%d) TRANSFER STARTED %p @ %d",threadNumber, transfer_stack.currentchunk, transfer_stack.StackPointer);
-                        transfer_netstate = new NetState(ns);
-                        transfer_property = sp->copy();
+                        transfer_stack[reader_thread_number] = stack;
+                        transfer_netstate[reader_thread_number] = new NetState(ns);
+                        transfer_property[reader_thread_number] = sp->copy();
 
                         // inform the other thread that the data is ready
                         //rep->message("\t\t\t\t\t\t\t\t\t\t(%d) TRANSFER RESTART W %d",threadNumber,foo_baz);
-                        sem_post(restartSemaphore);
+                        sem_post(restartSemaphore[reader_thread_number]);
                         // wait until the transfer has been completed
                         sem_wait(transfer_finished_semaphore);
                         //rep->message("\t\t\t\t\t\t\t\t\t\t(%d) TRANSFER FINISHED",threadNumber);
@@ -221,8 +222,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                 // maybe we have to go into an other sub-tree of the state-space
                 // first get the counter mutex to be able to count the number of threads currently suspended
                 pthread_mutex_lock(&num_suspend_mutex);
-                //rep->message("(%d) TRANSFER[R] LOCK",threadNumber);
-                num_suspended++;
+                suspended_threads[num_suspended++] = threadNumber;
                 pthread_mutex_unlock(&num_suspend_mutex);
                 //rep->message("(%d) TRANSFER[R] UNLOCK",threadNumber);
                 // then we are the last thread going asleep and so we have to await all the others and tell them that the search is over
@@ -230,7 +230,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                     finished = true;
                     // release all semaphores
                     for (int i = 0; i < number_of_threads; i++)
-                        sem_post(restartSemaphore);
+                        sem_post(restartSemaphore[i]);
                     sem_post(transfer_finished_semaphore);
                     //rep->message("(%d) TRANSFER[R] UNLOCK",threadNumber);
                     // delete the sp&firelist
@@ -239,7 +239,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                     // there is no such state
                     return NULL;
                 }
-                sem_wait(restartSemaphore);
+                sem_wait(restartSemaphore[threadNumber]);
                 //rep->message("\t\t\t\t\t\t\t\t\t\t(%d) TRANSFER[R] RESTART",threadNumber);
                 // if the search has come to an end return without success
                 // exclude this from code coverage, as I can not provoke it, but is necessary in very rare occasions
@@ -251,10 +251,10 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                 // LCOV_EXCL_STOP
                 // now we have been signaled because one of the threads is able to give us an part of search space
                 // copy the data given by the other thread into the local variables
-                stack = transfer_stack;
-                sp = transfer_property;
-                ns = *transfer_netstate;
-                delete transfer_netstate;
+                stack = transfer_stack[threadNumber];
+                sp = transfer_property[threadNumber];
+                ns = *transfer_netstate[threadNumber];
+                delete transfer_netstate[threadNumber];
                 started_stack_at = stack.StackPointer;
                 // rebuild
                 sp->initProperty(ns);
@@ -303,25 +303,32 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     }
     // init the restart semaphore
     sem_unlink("PErestart");
-    restartSemaphore = sem_open("PErestart", O_CREAT, 0600,0);
+    restartSemaphore = new sem_t*[number_of_threads];
+    int sem_fail = 0;
+    int value_prober;
+    for (int i = 0; i < number_of_threads; i++){
+		std::stringstream out;
+		out << "PErestart" << i;
+    	restartSemaphore[i] = sem_open(out.str().c_str(), O_CREAT, 0600,0);
+    	sem_fail |= (!(long int)restartSemaphore[i]);
+        sem_getvalue(restartSemaphore[i],&value_prober);
+        if (value_prober != 0){
+        	rep->status("named semaphore (PErestart) has not been created as defined");
+        	rep->abort(ERROR_THREADING);
+        }
+    }
     sem_unlink("PEtranscom");
     transfer_finished_semaphore = sem_open("PEtranscom", O_CREAT, 0600,0);
     // LCOV_EXCL_START
-    if (UNLIKELY(!(long int)restartSemaphore) || UNLIKELY(!(long int)transfer_finished_semaphore)) {
+    if (UNLIKELY(sem_fail) || UNLIKELY(!(long int)transfer_finished_semaphore)) {
         rep->status("named semaphore could not be created");
         rep->abort(ERROR_THREADING);
     }
     // LCOV_EXCL_STOP
-    int value_prober;
     sem_getvalue(transfer_finished_semaphore,&value_prober);
     // LCOV_EXCL_START
     if (value_prober != 0){
     	rep->status("named semaphore (PEtranscom) has not been created as defined");
-    	rep->abort(ERROR_THREADING);
-    }
-    sem_getvalue(restartSemaphore,&value_prober);
-    if (value_prober != 0){
-    	rep->status("named semaphore (PErestart) has not been created as defined");
     	rep->abort(ERROR_THREADING);
     }
     // LCOV_EXCL_STOP
@@ -338,8 +345,14 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
         rep->abort(ERROR_THREADING);
     }
     // LCOV_EXCL_STOP
+
+    // initialize threading datastructures
     num_suspended = 0;
     finished = false;
+    suspended_threads = new index_t[number_of_threads];
+    transfer_netstate = new NetState*[number_of_threads];
+    transfer_property = new SimpleProperty*[number_of_threads];
+    transfer_stack = new SearchStack<SimpleStackEntry>[number_of_threads];
 
     // create the threads
     for (int i = 0; i < number_of_threads; i++)
@@ -383,8 +396,12 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     int semaphore_destruction_status = 0;
     semaphore_destruction_status |= sem_close(transfer_finished_semaphore);
     semaphore_destruction_status |= sem_unlink("PEtranscom");
-    semaphore_destruction_status |= sem_close(restartSemaphore);
-    semaphore_destruction_status |= sem_unlink("PErestart");
+    for (int i = 0; i < number_of_threads; i++){
+		std::stringstream out;
+		out << "PErestart" << i;
+		semaphore_destruction_status |= sem_close(restartSemaphore[i]);
+		semaphore_destruction_status |= sem_unlink(out.str().c_str());
+    }
     // LCOV_EXCL_START
     if (UNLIKELY(semaphore_destruction_status)) {
         rep->status("named semaphore could not be closed and/or unlinked");

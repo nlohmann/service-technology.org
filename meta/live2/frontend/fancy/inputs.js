@@ -57,7 +57,6 @@ Input.prototype.toLabelledElement = function(element) {
 }
 Input.prototype.toElementSimple = function() {
     var out = '<span>' + this.buildHtmlString('out') + '</span>';
-    console.log(out);
     return make(out);
 }
 
@@ -82,7 +81,6 @@ Input.prototype.buildHtmlString = function(pName) {
     // if this is an array of values
     // recall function with every value
     if(Array.isArray(this.params[pName])) {
-        console.log(pName + " is  arrray ");
         var htmlArr = '';
         var a = this.params[pName].slice() // clone;
         for (var i = 0, c = null; c = a[i]; ++i) {

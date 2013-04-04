@@ -61,7 +61,7 @@ Form2Command.listen = function() {
        // move file inputs to our new form
        $('#form_container .toolForm input[type=file]').each(
            function(){
-               $('#json-output').parent().append(this);
+               $('#json-output').closest('form').append(this);
            }
        );
 

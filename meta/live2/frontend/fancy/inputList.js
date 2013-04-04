@@ -85,7 +85,7 @@ var inputs = [
     // first the hidden field which eventually holds the file
     // (will be copied to json-form later
         out : '<input style="display:none;" type="file" name="${id}_hidden" id="${id}_hidden" ' + 
-              'onchange="$(\'#\\\\${id}\').val(this.value).change();">'+
+              'onchange="if(this.style.display==\'none\')$(\'#\\\\${id}\').val(this.value).change();">'+
           // the visible button just triggers the hidden file input
               '<div class="input-prepend" ' +
           'onclick="if(this.disabled)return false;document.getElementById(\'${id}_hidden\').click()">' + 

@@ -62,8 +62,10 @@ op:OPTION_PROPERTY SP+ oplist:OPTION_PROPERTIES
 
 OPTION_PROPERTY = p:(SINGLE_PROPERTY / KEY_VAL_PROPERTY / VALUES_PROPERTY / FLAG / ARGTYPE / LIVE_COMMENT) { return p; }
 
-LIVE_COMMENT = SP* "#" l:LIVE_COMMENT_OPT  { if(typeof l=='string' && l) return [l,true]; else return; }
-LIVE_COMMENT_OPT = "live"i SP+ id:IDENTIFIER { return id; } / [^\n]* { return false;}
+LIVE_COMMENT = SP* "#" l:LIVE_COMMENT_OPT  { if(l) return l; else return; }
+LIVE_COMMENT_OPT = "live"i SP+ kv:KEY_VAL_PROPERTY { return kv; }
+                 / "live"i SP+ id:IDENTIFIER { return [id,true]; }
+                 / [^\n]* { return false;}
 
 SINGLE_PROPERTY = s:("required" / "argoptional" / "multiple" / "hidden" / "optional") { return [s,true]; }
 

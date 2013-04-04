@@ -63,19 +63,25 @@
         </div>
 
         <div id="command-container" class="span6">
-          <div class="stBox" >
+          <div class="stBox" style="display:none;">
             <h3>Command <small>for CLI</small></h3>
-            <input type="text" style="width:90%;font-family:monospace;" class="btn selAllOnFocus uneditable-input" id="command-output" 
-            title="Click right and select copy">
+                <input type="text" style="width:90%;font-family:monospace;" class="btn selAllOnFocus uneditable-input" id="command-output" 
+                title="Click right and select copy">
           </div>
           <div class="stBox">
           <a href="" class="toggleEdit" onclick="return toggleEdit('json')"><i class="icon-lock"></i>unlock editing</a>
-            <h3><!-- data-toggle="collapse" style="cursor:pointer" data-target="#json-output-container" -->
+            <h1><!-- data-toggle="collapse" style="cursor:pointer" data-target="#json-output-container" -->
                  JSON for Server
-            </h3>
+            </h1>
             <div id="json-output-container">
+            <form class="input-append">
+                <input id="json_typeahead" type="text" class="input-xlarge" data-provide="typeahead" autocomplete="off" disabled="disabled"/>
+                <button type="submit" class="btn" disabled="disabled">Add Param</button>
+            </form>
             <form action="http://localhost:1337" enctype="multipart/form-data" id="outForm" method="POST">
-                <textarea name="data" disabled="disabled" class="monospace" style="font-family:monospace;width:90%;height:200px;" id="json-output">...</textarea>
+<div class="control-group">
+                <textarea name="data" disabled="disabled" class="controls input-block-level monospace" style="font-family:monospace;" id="json-output" rows="20">...</textarea>
+</div>
             </form>
             </div>
           </div>
@@ -125,6 +131,7 @@ $('.selAllOnFocus').mouseup(function(e){ // fix for chrome and safari
 <script src="formatOutput.js"></script>
 <script src="peg-0.7.0.min.js"></script>
 <script src="ggoConversion.js"></script>
+<script src="jsonEdit.js"></script>
 <script type="text/javascript">
 // read the input hash
 // put to global scope
@@ -138,13 +145,15 @@ buildForm = function(inputs) {
     im.SetInputs(inputs);
     var b = $('#form_container');
     var dom=b.get(0);
-    console.log(dom);
     b.hide().empty();
     im.Create(dom);
     b.fadeIn();
     // start listening to the formular
     Form2Command.toolName = tool;
     Form2Command.listen();
+
+    createTypeahead($('#json_typeahead'), inputs);
+    watchJsonBox($('#json-output'));
 }
 
 // TOOL AS JSON
@@ -155,20 +164,22 @@ GGO_CONVERSION.initParse(tool, buildForm);
 
 // toggle editing between gui und json
 function toggleEdit(t) {
+    var jsonEdit = $('#json-output-container');
     if(t=='gui') {
         $('span#form_container *:disabled:not(.forceDisabled)').removeAttr('disabled');
         $('span#form_container *:visible').fadeTo('slow', 1);
-        $('#json-output').attr('disabled', 'disabled');
-        $('#json-output').parent().find('input[type=file]').fadeOut();
-        $('#json-output').fadeTo('slow', 0.7);
+        jsonEdit.find('*:enabled').attr('disabled', 'disabled');
+        jsonEdit.find('input[type=file]').fadeOut();
+        jsonEdit.fadeTo('slow', 0.7);
         Form2Command.update();
     } else if(t=='json') {
         $('span#form_container *:enabled').attr('disabled','disabled');
-        $('span#form_container * * *:not(:header):visible').fadeTo('slow', 0.6);
+        //$('span#form_container * * *:not(:header):visible').fadeTo('slow', 0.6);
+        $('span#form_container * * *:visible').fadeTo('slow', 0.6);
         //$('span#form_container h1').fadeTo('slow', 1);
-        $('#json-output').removeAttr('disabled');
-        $('#json-output').fadeTo('slow', 1);
-        $('#json-output').parent().find('input[type=file]').fadeIn();
+        jsonEdit.find('*:disabled').removeAttr('disabled');
+        jsonEdit.fadeTo('slow', 1);
+        jsonEdit.find('input[type=file]').fadeIn();
     }
     $('a.toggleEdit').toggle();
     return false;

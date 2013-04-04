@@ -73,11 +73,13 @@ option "maxrandomcost" r
    "maximal costs, if random"
    int
    optional
+   #live top
 
 option "minrandomcost" t
    "minimal costs, if random cost function"
    int
    optional
+   #live top
 
 option "randomseed" -
    "set the random seed, used for automated tests"
@@ -118,6 +120,7 @@ option "verbose" v
   "Show verbose messages."
   details="Show verbose information reporting intermediate steps.\n"
   flag off
+  #live hidden
 
 option "bug" -
   "Write configuration information into a file `bug.log'."

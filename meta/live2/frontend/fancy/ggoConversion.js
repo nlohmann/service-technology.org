@@ -16,6 +16,11 @@ function buildParser(input) {
     }
 }
 $.get('ggoGrammar.pegjs', buildParser, "text");
+/*$.ajax({
+    url: 'ggoGrammar.pegjs',
+    success: buildParser,
+    dataType: 'text'
+});*/
 
 
 function parse(ggoString, toolName) {
@@ -109,11 +114,6 @@ function convertItem(item, toolName) {
         };
     }
 
-    // set short, if not set
-    if(item.short == '-') {
-        item.short = '-' + item.long;
-    }
-
     // generate default text input
     var input = {
         type: 'text',
@@ -122,6 +122,12 @@ function convertItem(item, toolName) {
         desc: convText(item.desc),
         top: item.top
     };
+
+    // set short, if not set
+    if(item.short && item.short!= '-') {
+        input.shortArgname = item.short;
+    }
+
     input['default'] = '';
     if(typeof item['default'] != 'undefined') {
         input['default'] = item['default'];
@@ -194,13 +200,17 @@ function initParse(toolName, callback) {
     }
 
     var req = 'ggos/' + toolName + '.ggo';
-    $.get(req,
+    $.get(
+            req,
             function(i) {var t=parse(i, toolName); callback(t);},
-            'text').fail(function() {
+            'text'
+         ).fail(
+             function() {
                 $('#myAlert h3').text('Error');
                 $('#myAlert p').text("Tool could not be loaded, try index.html?<toolname> (e.g. wendy)");
                 $('#myAlert').modal();
-            });
+            }
+         );
 }
 
 // public interface

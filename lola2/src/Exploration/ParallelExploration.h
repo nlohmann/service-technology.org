@@ -97,8 +97,6 @@ private:
     bool finished;
     /// mutex to access the num_suspended variable
     pthread_mutex_t num_suspend_mutex;
-    /// mutex to be allowed to write data onto the transfer stack
-    pthread_mutex_t transfer_write_access_mutex;
     /// number of threads currently suspended
     int num_suspended;
     /// search stack used to transfer the current stack to a new (and currently waiting) thread

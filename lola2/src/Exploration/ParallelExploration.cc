@@ -159,6 +159,8 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                     if (num_suspended > 0) {
                         // i know that there is an other thread waiting for my data
                         num_suspended--;
+                        pthread_mutex_unlock(&num_suspend_mutex);
+
                         // if the end is reached abort this thread
                         // exclude this from code coverage, as I can not provoke it, but is necessary in very rare occasions
                         // LCOV_EXCL_START
@@ -166,12 +168,12 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                             // delete the sp&firelist
                             delete myFirelist;
                             delete sp;
-                            pthread_mutex_unlock(&num_suspend_mutex);
-                            //rep->message("(%d) TRANSFER UNLOCK",threadNumber);
                             return NULL;
                         }
                         // LCOV_EXCL_STOP
 
+                        // lock transfer mutex
+                        pthread_mutex_lock(&transfer_write_access_mutex);
                         // copy the data for the other thread
                         transfer_stack = stack;
                         //rep->message("(%d) TRANSFER STARTED %p @ %d",threadNumber, transfer_stack.currentchunk, transfer_stack.StackPointer);
@@ -201,7 +203,7 @@ NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &my
                         Transition::revertEnabled(ns,currentFirelist[currentEntry]);
                         localValue = sp->updateProperty(ns,currentFirelist[currentEntry]);
                         // go on as nothing happened (i.e. do as if the new marking has been in the store)
-                        pthread_mutex_unlock(&num_suspend_mutex);
+                        pthread_mutex_unlock(&transfer_write_access_mutex);
                         continue;
                     }
                     pthread_mutex_unlock(&num_suspend_mutex);
@@ -327,6 +329,7 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 
     int mutex_creation_status = 0;
     mutex_creation_status |= pthread_mutex_init(&num_suspend_mutex, NULL);
+    mutex_creation_status |= pthread_mutex_init(&transfer_write_access_mutex, NULL);
     mutex_creation_status |= pthread_mutex_init(&write_current_back_mutex,
                              NULL);
     // LCOV_EXCL_START
@@ -369,6 +372,7 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     // clean up all variables needed to make the parallel DFS
     int mutex_destruction_status = 0;
     mutex_destruction_status |= pthread_mutex_destroy(&num_suspend_mutex);
+    mutex_destruction_status |= pthread_mutex_destroy(&transfer_write_access_mutex);
     mutex_destruction_status |= pthread_mutex_destroy(&write_current_back_mutex);
     // LCOV_EXCL_START
     if (UNLIKELY(mutex_destruction_status)) {

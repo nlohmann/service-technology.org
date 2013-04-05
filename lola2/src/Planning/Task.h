@@ -84,7 +84,7 @@ private:
 	}
 	/// auxiliary method that raises an error. Will be called by the different specializations of createSpecializedStore.
 	static void storeCreationError() {
-		rep->markup(MARKUP_BAD,"specified store does not fit the given task");
+		rep->message(rep->markup(MARKUP_BAD,"specified store does not fit the given task").str());
 		rep->abort(ERROR_COMMANDLINE);
 	}
 };

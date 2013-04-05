@@ -16,9 +16,13 @@
 //#include <SweepLine/SweepRingStore.h>
 #include <Stores/NetStateEncoder/FullCopyEncoder.h>
 #include <Stores/NetStateEncoder/CopyEncoder.h>
+#include <Stores/VectorStores/PrefixTreeStore.h>
 #include <SweepLine/SweepListStore.h>
 #include <SweepLine/SweepStore.h>
 #include <Net/NetState.h>
+
+extern gengetopt_args_info args_info;
+extern Reporter* rep;
 
 using std::cout;
 using std::endl;
@@ -39,10 +43,10 @@ SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t 
 	// obtain space for counters
 	count = (int64_t*) calloc(SIZEOF_INT64_T,size);
 	// obtain store ring for transient states
-	store = (SweepStore<T>**) malloc(sizeof(SweepStore<T>**)*size);
-	for(index_t i=0; i<size; ++i) store[i] = new SweepStore<T>(nr_of_threads);
+	store = (VectorStore<T>**) malloc(sizeof(VectorStore<T>**)*size);
+	for(index_t i=0; i<size; ++i) store[i] = createSweepStore();
 	// obtain swap space for current progress measure
-	samevalue = new SweepStore<T>(nr_of_threads);
+	samevalue = createSweepStore();
 	// obtain space for pointers to old and new persistent states
 	newpersistent = (SweepListStore<T>**) calloc(sizeof(SweepListStore<T>**),size);
 	oldpersistent = (SweepListStore<T>**) calloc(sizeof(SweepListStore<T>**),size);
@@ -86,7 +90,7 @@ bool SweepRingStore<T>::searchAndInsert(NetState &ns, int32_t offset, T** payloa
 //cout << "inserting at offset " << offset << ", pos " << pos << ": ";
 //printState(ns);
 
-	if (oldpersistent[pos]->store.searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
+	if (oldpersistent[pos]->store->searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
 	// now check other stores with FullCopyEncoder
 	data = fullencoder->encodeNetState(ns, bitlen, thread);
 	bool ret(true);
@@ -94,7 +98,7 @@ bool SweepRingStore<T>::searchAndInsert(NetState &ns, int32_t offset, T** payloa
 	{
 		// future states are made transient, we will see them shortly
 		// so check first if they are persistent already
-		if (newpersistent[pos]->store.searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
+		if (newpersistent[pos]->store->searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
 		// then possibly insert them into a transient store
 		if (!(ret = store[pos]->searchAndInsert(data,bitlen,hash,payload,thread)))
 		{
@@ -107,8 +111,8 @@ bool SweepRingStore<T>::searchAndInsert(NetState &ns, int32_t offset, T** payloa
 		// past states must be made persistent, the next front will visit them
 		// but check first if we have already seen them ourselves
 		if (store[pos]->searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
-		// and only if not, make the new persistent
-		if (!(ret = newpersistent[pos]->store.searchAndInsert(data,bitlen,hash,payload,thread)))
+		// and only if not, make them new persistent
+		if (!(ret = newpersistent[pos]->store->searchAndInsert(data,bitlen,hash,payload,thread)))
 		{
 			new_persistent_empty = false;
 			inserted_persistent[thread] = true;
@@ -119,7 +123,7 @@ bool SweepRingStore<T>::searchAndInsert(NetState &ns, int32_t offset, T** payloa
 		// successor states with the same progress value must additionally check
 		// the swap space before being inserted as transient states like
 		// in the future case
-		if (newpersistent[pos]->store.searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
+		if (newpersistent[pos]->store->searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
 		if (samevalue->searchAndInsert(data,bitlen,hash,payload,thread,true)) return true;
 		if (!(ret = store[pos]->searchAndInsert(data,bitlen,hash,payload,thread)))
 		{
@@ -158,14 +162,14 @@ bool SweepRingStore<T>::popState(NetState& ns, index_t thread)
 	}
 
 	// if no transient state is found, check for the persistent ones
-	if (newpersistent[active]->store.popVector(data,thread))
+	if (newpersistent[active]->store->popVector(data,thread))
 	{
 		// decode, reencode, and insert into old persistent store
 //cout << "persistent popped " << data << endl;
 		fullencoder->decodeNetState(ns, data);
 //printState(ns);
 		data = sigpencoder->encodeNetState(ns, bitlen, thread);
-		oldpersistent[active]->store.searchAndInsert(data,bitlen,hash,NULL,thread); // need to get payload from store!!!
+		oldpersistent[active]->store->searchAndInsert(data,bitlen,hash,NULL,thread); // need to get payload from store!!!
 		return true;
 	}
 
@@ -205,7 +209,7 @@ bool SweepRingStore<T>::advanceProgress()
 	} else delete samevalue;
 	deleted_store_size = count[back];
 	count[back] = 0;
-	samevalue = new SweepStore<T>(nr_of_threads);
+	samevalue = createSweepStore();
 
 	// link in next persistent stores at the back (= the new front)
 	index_t newfront(front+1<size ? front+1 : 0);
@@ -253,14 +257,14 @@ bool SweepRingStore<T>::clear()
 		if (!store[i]->empty())
 		{
 			delete store[i];
-			store[i] = new SweepStore<T>(nr_of_threads);
+			store[i] = createSweepStore();
 		}
 
 	// clear the swap space (usually necessary)
 	if (!samevalue->empty())
 	{
 		delete samevalue;
-		samevalue = new SweepStore<T>(nr_of_threads);
+		samevalue = createSweepStore();
 	}
 
 	return new_persistent_empty;
@@ -275,7 +279,7 @@ bool SweepRingStore<T>::clear()
 template <class T>
 bool SweepRingStore<T>::checkNewPersistent()
 {
-	return !(newpersistent[(active+front_offset+1)%size]->store.empty()); 
+	return !(newpersistent[(active+front_offset+1)%size]->store->empty()); 
 }
 
 /*!
@@ -289,7 +293,7 @@ int32_t SweepRingStore<T>::checkNewPersistent(int32_t bp)
     // test the second oldest one first, and then stores with increasing progress
 	assert(bp>=0);
     for(index_t i=0; i<bp; ++i)
-        if (!(newpersistent[(active+front_offset+i+2)%size]->store.empty()))
+        if (!(newpersistent[(active+front_offset+i+2)%size]->store->empty()))
             return bp-i;
     return 0;
 }
@@ -312,6 +316,27 @@ template <class T>
 int64_t SweepRingStore<T>::getNumberOfDeletedStates()
 {
 	return deleted_store_size;
+}
+
+template <class T>
+VectorStore<T>* SweepRingStore<T>::createSweepStore()
+{
+    switch (args_info.store_arg)
+    {
+        case store_arg_prefix:
+            if(args_info.bucketing_given)
+				return new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,PrefixTreeStore<T>,index_t>(nr_of_threads),16,nr_of_threads);
+            else
+				return new PrefixTreeStore<T>(nr_of_threads);
+
+        case store_arg_stl:
+				return new VSTLStore<T>(nr_of_threads);
+
+        default:
+			rep->message(rep->markup(MARKUP_BAD,"specified store does not fit the given task").str());
+			rep->abort(ERROR_COMMANDLINE);
+			return NULL;
+    }
 }
 
 template <class T>

@@ -10,15 +10,21 @@ measure and containing known persistent markings, either old or new ones.
 */
 
 #include <cstdlib>
+#include <cmdline.h>
 #include <SweepLine/SweepListStore.h>
+#include <Planning/Task.h>
+
+extern gengetopt_args_info args_info;
+extern Reporter* rep;
 
 /*! 
  * \brief Constructor for one store in a list of stores
  */
 template <class T>
 SweepListStore<T>::SweepListStore(index_t _nr_of_threads) 
-: next(NULL), store(_nr_of_threads), nr_of_threads(_nr_of_threads)
+: next(NULL), nr_of_threads(_nr_of_threads)
 {
+	store = createSweepStore();
 }
 
 /*! 
@@ -27,8 +33,9 @@ SweepListStore<T>::SweepListStore(index_t _nr_of_threads)
  */
 template <class T>
 SweepListStore<T>::SweepListStore(index_t _nr_of_threads, index_t size) 
-: next(size>0 ? new SweepListStore(_nr_of_threads,size-1) : NULL), store(_nr_of_threads), nr_of_threads(_nr_of_threads)
+: next(size>0 ? new SweepListStore(_nr_of_threads,size-1) : NULL), nr_of_threads(_nr_of_threads)
 {
+	store = createSweepStore();
 }
 
 /*!
@@ -37,6 +44,7 @@ SweepListStore<T>::SweepListStore(index_t _nr_of_threads, index_t size)
 template <class T>
 SweepListStore<T>::~SweepListStore()
 {
+	delete store;
 	delete next;
 }
 
@@ -70,5 +78,29 @@ template <class T>
 void SweepListStore<T>::setNext(SweepListStore<T>* sls)
 {
 	next = sls;
+}
+
+template <class T>
+VectorStore<T>* SweepListStore<T>::createSweepStore()
+{
+    switch (args_info.store_arg)
+    {
+        case store_arg_prefix:
+            if(args_info.bucketing_given)
+				return new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,PrefixTreeStore<T>,index_t>(nr_of_threads),16,nr_of_threads);
+            else
+				return new PrefixTreeStore<T>(nr_of_threads);
+        case store_arg_stl:
+/*
+            if(args_info.bucketing_given)
+				return new PluginStore<T>(enc, new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
+            else
+*/
+				return new VSTLStore<T>(nr_of_threads);
+        default:
+			rep->message(rep->markup(MARKUP_BAD,"specified store does not fit the given task").str());
+			rep->abort(ERROR_COMMANDLINE);
+			return NULL;
+    }
 }
 

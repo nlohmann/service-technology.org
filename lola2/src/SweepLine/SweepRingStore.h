@@ -16,6 +16,9 @@ one thread can access one store at any time.
 #include <SweepLine/SweepListStore.h>
 #include <Stores/NetStateEncoder/FullCopyEncoder.h>
 #include <Stores/NetStateEncoder/CopyEncoder.h>
+#include <Stores/VectorStores/PrefixTreeStore.h>
+#include <Stores/VectorStores/VSTLStore.h>
+#include <Stores/VectorStores/HashingWrapperStore.h>
 #include <Net/NetState.h>
 
 /*!
@@ -23,8 +26,7 @@ one thread can access one store at any time.
 
 Each front in the SweepLine method needs one array of stores for transient markings. 
 Since markings need to be retrieved from this array, the only possible encoding
-for this array is the FullCopyEncoder. Multithreading is disregarded as at most
-one thread can access one store at any time.
+for this array is the FullCopyEncoder.
 */
 template <class T>
 class SweepRingStore
@@ -54,6 +56,8 @@ public:
 	/// get the number of deleted transient states during the last progress advance
 	int64_t getNumberOfDeletedStates();
 
+	VectorStore<T>* createSweepStore();
+
 	void printState(NetState& ns);
 private:
 	/// size of the store ring for transient states
@@ -75,9 +79,9 @@ private:
 	/// state counter for transient store
 	int64_t* count;
 	/// ring of stores for transient states
-	SweepStore<T>** store;
+	VectorStore<T>** store;
 	/// swap space for states with computed successors
-	SweepStore<T>* samevalue;
+	VectorStore<T>* samevalue;
 	/// connectors from the store ring to the stores of old persistent states with the same progress values
 	SweepListStore<T>** oldpersistent;
 	/// connectors from the store ring to the stores of new persistent states with the same progress values

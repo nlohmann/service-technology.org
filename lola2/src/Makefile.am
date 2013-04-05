@@ -101,7 +101,6 @@ lola_SOURCES = \
                 Stores/VectorStores/PrefixTreeStore.cc Stores/VectorStores/PrefixTreeStore.h Stores/VectorStores/PrefixTreeStore.inc \
                 \
                 SweepLine/Sweep.h SweepLine/Sweep.inc \
-                SweepLine/SweepStore.cc SweepLine/SweepStore.h SweepLine/SweepStore.inc \
                 SweepLine/SweepRingStore.h SweepLine/SweepRingStore.inc \
                 SweepLine/SweepListStore.h SweepLine/SweepListStore.inc \
                 SweepLine/SweepEmptyStore.h SweepLine/SweepEmptyStore.cc \

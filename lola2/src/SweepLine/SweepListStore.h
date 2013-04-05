@@ -10,7 +10,9 @@ measure and containing known persistent markings, either old or new ones.
 
 #pragma once
 #include <Core/Dimensions.h>
-#include <SweepLine/SweepStore.h>
+#include <Stores/VectorStores/PrefixTreeStore.h>
+#include <Stores/VectorStores/VSTLStore.h>
+#include <Stores/VectorStores/HashingWrapperStore.h>
 
 /*!
 \brief List of Stores for persistent markings in the SweepLine method
@@ -40,8 +42,10 @@ public:
 	/// set the next store in the list
 	void setNext(SweepListStore<T>* sls);
 
+	VectorStore<T>* createSweepStore();
+
 	/// the actual store for this list element
-	SweepStore<T> store;
+	VectorStore<T>* store;
 
 private:
 	/// the next store in the list

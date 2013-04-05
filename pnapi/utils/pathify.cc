@@ -11,6 +11,7 @@
 #include "Output.h"
 #include "pathify-cmdline.h"
 
+/// needed to evaluate exit status of system call
 #define __WEXITSTATUS(status)   (((status) & 0xff00) >> 8)	
 
 using namespace pnapi;

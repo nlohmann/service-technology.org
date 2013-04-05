@@ -18,7 +18,6 @@
 #include <Stores/NetStateEncoder/CopyEncoder.h>
 #include <Stores/VectorStores/PrefixTreeStore.h>
 #include <SweepLine/SweepListStore.h>
-#include <SweepLine/SweepStore.h>
 #include <Net/NetState.h>
 
 extern gengetopt_args_info args_info;

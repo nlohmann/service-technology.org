@@ -11,6 +11,7 @@
 #include "Net/Transition.h"
 #include "Net/Marking.h"
 #include <cstdlib>
+#include <algorithm>
 
 NetState* NetState::createNetStateFromInitial()
 {
@@ -282,7 +283,7 @@ NetState &NetState::operator=(NetState &ns)
     Enabled = ns.Enabled;
     CardEnabled = ns.CardEnabled;
     PositionScapegoat = ns.PositionScapegoat;
-    // must be copied seperately as the arry itself is statically allocated in each object
+    // must be copied separately as the array itself is statically allocated in each object
     Arc[0][0] = ns.Arc[0][0];
     Arc[0][1] = ns.Arc[0][1];
     Arc[1][0] = ns.Arc[1][0];
@@ -294,9 +295,32 @@ NetState &NetState::operator=(NetState &ns)
 
     CardDisabled = ns.CardDisabled;
     Disabled = ns.Disabled;
-    // now the old netstate does not need to delete its members on deletions as they are now the members of this netstate;
+    // now the old NetState does not need to delete its members on deletions as they are now the members of this netstate;
+    need_to_delete_members_on_delete = ns.need_to_delete_members_on_delete;
     ns.need_to_delete_members_on_delete = false;
     return *this;
+}
+
+void NetState::swap(NetState &ns)
+{
+    std::swap(Current, ns.Current);
+    std::swap(HashCurrent, ns.HashCurrent);
+    std::swap(Enabled, ns.Enabled);
+    std::swap(CardEnabled, ns.CardEnabled);
+    std::swap(PositionScapegoat, ns.PositionScapegoat);
+
+    std::swap(Arc[0][0], ns.Arc[0][0]);
+    std::swap(Arc[0][1], ns.Arc[0][1]);
+    std::swap(Arc[1][0], ns.Arc[1][0]);
+    std::swap(Arc[1][1], ns.Arc[1][1]);
+    std::swap(Mult[0][0], ns.Mult[0][0]);
+    std::swap(Mult[0][1], ns.Mult[0][1]);
+    std::swap(Mult[1][0], ns.Mult[1][0]);
+    std::swap(Mult[1][1], ns.Mult[1][1]);
+
+    std::swap(CardDisabled, ns.CardDisabled);
+    std::swap(Disabled, ns.Disabled);
+    std::swap(need_to_delete_members_on_delete, ns.need_to_delete_members_on_delete);
 }
 
 

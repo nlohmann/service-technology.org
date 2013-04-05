@@ -87,34 +87,38 @@ protected:
 
 
 private:
-
-
-    /// semaphore used to signal that a transition is able to be spared
+    /// semaphore used to signal that a transition is able to be spared, one for each thread
     sem_t** restartSemaphore;
-    /// semaphore indicating that the transfer has been completed an the spearing-thread can restart it's search
-    sem_t* transfer_finished_semaphore;
+
     /// if true one of the threads has found a marking, which satisfies the property
     bool finished;
+
     /// mutex to access the num_suspended variable
     pthread_mutex_t num_suspend_mutex;
     /// number of threads currently suspended
     int num_suspended;
-    /// search stack used to transfer the current stack to a new (and currently waiting) thread
-    SearchStack<SimpleStackEntry>* transfer_stack;
-    /// netstate used to transfer the current netstate to a new (and currently waiting) thread
-    NetState** transfer_netstate;
-    /// property used to transfer the current evaluated property to a new (and currently waiting) thread
-    SimpleProperty** transfer_property;
     /// array of suspended thread
     index_t* suspended_threads;
 
+    /// search stacks, one for each thread
+    SearchStack<SimpleStackEntry>* thread_stack;
+    /// NetStates, one for each thread
+    NetState* thread_netstate;
+    /// goal properties, one for each thread
+    SimpleProperty** thread_property;
+
+    SimpleProperty* global_property;
+    /// initial firelist, all used firelists will be created from this one.
+    Firelist* global_baseFireList;
+    Store<void>* global_store;
+
     /// mutex to control writing to current marking varible, which contains the result of the parallel search
-    pthread_mutex_t write_current_back_mutex;
-
-
+    pthread_mutex_t global_property_mutex;
 
     /// array containing the threads actually used for the parallel exploration
-    pthread_t* runner_thread;
+    pthread_t* threads;
+    int number_of_threads;
+
     /*!
      \brief man-in-the-middle function to transform the thread-call into a usable function
 
@@ -142,5 +146,5 @@ private:
 
     \return this will either return NULL (no state fulfilling the property has been found by this thread) or the witness state itself
     */
-    NetState* threadedExploration(NetState &ns, Store<void> &myStore, Firelist &baseFireList, SimpleProperty* resultProperty, index_t threadNumber, int number_of_threads);
+    NetState* threadedExploration(index_t threadNumber);
 };

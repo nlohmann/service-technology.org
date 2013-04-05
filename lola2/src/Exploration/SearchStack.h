@@ -9,6 +9,7 @@
 #pragma once
 
 #include<new>
+#include <algorithm>
 
 /// serves as a chunk of `SIZEOF_STACKCHUNK` elements in a search stack
 template <class T>
@@ -76,13 +77,6 @@ public:
      */
     T& top() const;
 
-    /*!
-     \brief current stack pointer
-     This contains the current stack pointer. The only reason for beeing public is efficiency in testing whether the stack is empty or not.
-     This variable __must not__ be modified form the outside.
-     */
-    unsigned int StackPointer;
-
     SearchStack();
     ~SearchStack();
 
@@ -98,6 +92,14 @@ public:
      For all elements in the old stack this constructor will be called to create the elements in the new stack.
     */
     SearchStack &operator=(const SearchStack &);
+    void swap(SearchStack &);
+
+    /*!
+     \brief current stack pointer
+     This contains the current stack pointer. The only reason for being public is efficiency in testing whether the stack is empty or not.
+     This variable __must not__ be modified form the outside.
+     */
+    unsigned int StackPointer;
 
 private:
     Chunk<T>* currentchunk;
@@ -135,39 +137,6 @@ void Chunk<T>::delete_all_prev_chunks() {
     prev = 0;
 
 }
-
-//template<class T>
-//Chunk<T> &Chunk<T>::operator=(const Chunk<T> &chunk)
-//{
-//    // copy the current values
-//    memcpy(current, chunk.current, SIZEOF_STACKCHUNK * SIZEOF_INDEX_T);
-//    for (int i = 0; i < SIZEOF_STACKCHUNK; i++)
-//    {
-//    	if (list[i])
-//    		delete[] list[i];
-//
-//    	if (chunk.list[i])
-//        {
-//            list[i] = new index_t[current[i] + 1];
-//            for (int j = 0; j <= current[i]; j++)
-//                list[i][j] = chunk.list[i][j];
-//        } else
-//        	list[i] = 0;
-//    }
-//
-//    if (chunk.prev != NULL)
-//    {
-//    	// if there is not next element to copy onto create one
-//    	if (!prev)
-//    		prev = new Chunk();
-//        *prev = *(chunk.prev);
-//    }
-//    else{
-//    	if (prev)
-//    		delete_all_prev_chunks();
-//        prev = NULL;
-//    }
-//}
 
 template<class T>
 SearchStack<T>::SearchStack() :
@@ -223,6 +192,12 @@ T& SearchStack<T>::top() const
 }
 
 template<class T>
+void SearchStack<T>::swap(SearchStack<T> &s) {
+	std::swap(currentchunk, s.currentchunk);
+	std::swap(StackPointer, s.StackPointer);
+}
+
+template<class T>
 SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
 {
     // 1. copy top chunk
@@ -246,7 +221,7 @@ SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
     {
         if(currentchunk) {
             delete currentchunk;
-            currentchunk = 0;
+            currentchunk = NULL;
         }
     }
     StackPointer = stack.StackPointer;

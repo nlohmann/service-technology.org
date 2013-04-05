@@ -12,7 +12,6 @@ one thread can access one store at any time.
 
 #pragma once
 #include <Core/Dimensions.h>
-#include <SweepLine/SweepStore.h>
 #include <SweepLine/SweepListStore.h>
 #include <Stores/NetStateEncoder/FullCopyEncoder.h>
 #include <Stores/NetStateEncoder/CopyEncoder.h>

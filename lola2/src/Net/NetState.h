@@ -9,11 +9,11 @@
 
 
 /*!
-\brief container object which includes all informations about the marking of a preti-net
+\brief container object which includes all informations about the marking of a petri net
 
 Basically this is a struct containing all information available and necessary about a marking.
 This includes the marking itself, its hash, the enabled transitions and several further information,
-to be able to efficiently calculate the netstate of all successor markings.
+to be able to efficiently calculate the NetState of all successor markings.
 
 \author Christian K and Gregor B
  */
@@ -65,6 +65,9 @@ public:
     NetState(NetState &ns);
     // copy operator, be aware that this changes the given ns (this is necessary to ensure proper deallocation of memory)
     NetState &operator=(NetState &ns);
+
+    // swaps all internal members with the given NetState
+    void swap(NetState &ns);
 
 private:
     /// marker variable, whether we have to delete some of the arrays ourself

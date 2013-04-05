@@ -87,12 +87,12 @@ public:
 	virtual bool empty();
 private:
 
-    VectorStoreCreator<T>* storeCreator;
+    //VectorStoreCreator<T>* storeCreator;
 
     VectorStore<T>** buckets;
 
     // the read-write mutexes
-    pthread_rwlock_t* rwlocks;
+    // pthread_rwlock_t* rwlocks;
 
     index_t* currentPopBucket;
 

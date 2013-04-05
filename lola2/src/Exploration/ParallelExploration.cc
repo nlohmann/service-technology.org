@@ -25,317 +25,287 @@
 #include <cmdline.h>
 
 
-extern gengetopt_args_info args_info;
 extern Reporter* rep;
 
 
 /// transfer struct for the start of a parallel search thread
 struct tpDFSArguments {
-	/// the initial net state
-    NetState* ns;
     /// the store to use (this will be the same of all threads)
-    Store<void>* myStore;
-    /// initial firelist, all used firelists will be created from this one.
-    Firelist* baseFireList;
-    /// the property to be checked, each thread will create its own copy
-    SimpleProperty* resultProperty;
     /// the number of the current thread
     int threadNumber;
-    /// the total number of threads
-    int number_of_threads;
     /// the exploration object
     ParallelExploration* pexploration;
 };
 
 void* ParallelExploration::threadPrivateDFS(void* container) {
     tpDFSArguments* arguments = (tpDFSArguments*) container;
-    NetState &ns = *arguments->ns;
-    Store<void> &myStore = *arguments->myStore;
-    Firelist &baseFireList = *arguments->baseFireList;
-    int threadNumber = arguments->threadNumber;
-    int number_of_threads = arguments->number_of_threads;
-    SimpleProperty* resultProperty = arguments->resultProperty;
 
-    return arguments->pexploration->threadedExploration(ns,
-            myStore, baseFireList, resultProperty, threadNumber,
-            number_of_threads);
+    return arguments->pexploration->threadedExploration(arguments->threadNumber);
 }
 
-NetState* ParallelExploration::threadedExploration(NetState &ns, Store<void> &myStore,
-        Firelist &baseFireList, SimpleProperty* resultProperty,
-        index_t threadNumber, int number_of_threads) {
+NetState* ParallelExploration::threadedExploration(index_t threadNumber) {
 
-    SimpleProperty* sp = resultProperty->copy();
-    Firelist* myFirelist = baseFireList.createNewFireList(sp);
-    /// the search stack
-    SearchStack<SimpleStackEntry> stack;
+    SimpleProperty*& local_property = thread_property[threadNumber];
+    Firelist* local_firelist = global_baseFireList->createNewFireList(local_property);
+
+    SearchStack<SimpleStackEntry>& local_stack = thread_stack[threadNumber];
     unsigned int started_stack_at = 0;
 
+    NetState& local_netstate = thread_netstate[threadNumber];
+
     // prepare property
-    bool localValue = sp->initProperty(ns);
+    bool propertyResult = local_property->initProperty(local_netstate);
 
-
-    if (localValue) {
+    if (propertyResult) {
         // initial marking satisfies property
         // inform all threads that a satisfying has been found
         finished = true;
         // release all semaphores
         for (int i = 0; i < number_of_threads; i++)
             sem_post(restartSemaphore[i]);
-        sem_post(transfer_finished_semaphore);
+
         // return success and the current stack and property
-        pthread_mutex_lock(&write_current_back_mutex);
-        resultProperty->stack = stack;
-        resultProperty->initProperty(ns);
-        pthread_mutex_unlock(&write_current_back_mutex);
-        // delete the sp&firelist
-        delete myFirelist;
-        delete sp;
-        return &ns;
+        pthread_mutex_lock(&global_property_mutex);
+        global_property->stack.swap(local_stack);
+        global_property->initProperty(local_netstate);
+        pthread_mutex_unlock(&global_property_mutex);
+
+        delete local_firelist;
+
+        return &local_netstate;
     }
 
     // add initial marking to store
     // we do not care about return value since we know that store is empty
-    myStore.searchAndInsert(ns,0,threadNumber);
+    global_store->searchAndInsert(local_netstate,0,threadNumber);
 
     // get first firelist
     index_t* currentFirelist;
-    index_t currentEntry = myFirelist->getFirelist(ns, &currentFirelist);
-    //rep->message("Thread %d: create %p", threadNumber, (void*)currentFirelist);
+    index_t currentEntry = local_firelist->getFirelist(local_netstate, &currentFirelist);
 
     while (true) // exit when trying to pop from empty stack
     {
         // if one of the threads sets the finished signal this thread is useless and has to abort
         if (finished) {
-            // the current firelist it at the moment not on the stack, so will it not be deleted by the stack-delete
+            // clean up and return
             delete[] currentFirelist;
-            // delete the sp&firelist
-            delete myFirelist;
-            delete sp;
+            delete local_firelist;
+
             return NULL;
         }
         if (currentEntry-- > 0) {
         	// there is a next transition that needs to be explored in current marking
             // fire this transition to produce new marking in ns
-            Transition::fire(ns, currentFirelist[currentEntry]);
+            Transition::fire(local_netstate, currentFirelist[currentEntry]);
 
-            if (myStore.searchAndInsert(ns,0,threadNumber)) {
-                // State exists! -->backtracking to previous state
-                Transition::backfire(ns, currentFirelist[currentEntry]);
-            } else {
-                // State does not exist!
-                // continue with next transition
-                // test whether it is a transition that satisfies the property and if return
-                Transition::updateEnabled(ns, currentFirelist[currentEntry]);
-                // check current marking for property
-                localValue = sp->checkProperty(ns, currentFirelist[currentEntry]);
-                // push the transition onto the stack
-                new (stack.push()) SimpleStackEntry(currentFirelist, currentEntry);
+            if (global_store->searchAndInsert(local_netstate,0,threadNumber)) {
+                // State exists! --> backtrack to previous state and try again
+                Transition::backfire(local_netstate, currentFirelist[currentEntry]);
+                continue;
+            }
+            // State does not exist!
 
-                if (localValue) {
-                	// inform all threads that a satisfying state has been found
-                    finished = true;
-                    // release all semaphores
-                    for (int i = 0; i < number_of_threads; i++)
-                        sem_post(restartSemaphore[i]);
-                    sem_post(transfer_finished_semaphore);
-                    // return success and the current stack and property
-                    pthread_mutex_lock(&write_current_back_mutex);
-                    resultProperty->stack = stack;
-                    resultProperty->initProperty(ns);
-                    pthread_mutex_unlock(&write_current_back_mutex);
-                    // delete the sp&firelist
-                    delete myFirelist;
-                    delete sp;
-                    return &ns;
-                }
+            // check whether the new state fulfills the property
+            Transition::updateEnabled(local_netstate, currentFirelist[currentEntry]);
+            // check current marking for property
+            propertyResult = local_property->checkProperty(local_netstate, currentFirelist[currentEntry]);
 
-                // if possible spare the current transition to give it to an other thread, having explored it's part of the search space completely
-                // try the dirty read to make the program more efficient
-                // most of the time this will already fail and we have saved the time needed to lock the mutex
-                // ... do it only if there are at least two transitions in the firelist left (one for us, and one for the other thread)
-                if (currentEntry >= 2 && num_suspended > 0) {
-                	// try to lock
-                    pthread_mutex_lock(&num_suspend_mutex);
-                    //rep->message("(%d) TRANSFER LOCK",threadNumber);
-                    if (num_suspended > 0) {
-                    	// i know that there is an other thread waiting for my data
-                    	index_t reader_thread_number = suspended_threads[--num_suspended];
-                        pthread_mutex_unlock(&num_suspend_mutex);
+            if (propertyResult) {
+                // inform all threads that a satisfying state has been found
+                finished = true;
+                // release all semaphores
+                for (int i = 0; i < number_of_threads; i++)
+                    sem_post(restartSemaphore[i]);
 
-                        // if the end is reached abort this thread
-                        // exclude this from code coverage, as I can not provoke it, but is necessary in very rare occasions
-                        // LCOV_EXCL_START
-                        if (finished) {
-                            // delete the sp&firelist
-                            delete myFirelist;
-                            delete sp;
-                            return NULL;
-                        }
-                        // LCOV_EXCL_STOP
+                // return success and the current stack and property
+                pthread_mutex_lock(&global_property_mutex);
+                global_property->stack.swap(local_stack);
+                global_property->initProperty(local_netstate);
+                pthread_mutex_unlock(&global_property_mutex);
 
-                        // lock transfer mutex
-                        // copy the data for the other thread
-                        transfer_stack[reader_thread_number] = stack;
-                        transfer_netstate[reader_thread_number] = new NetState(ns);
-                        transfer_property[reader_thread_number] = sp->copy();
+                // clean up and return
+                delete[] currentFirelist;
+                delete local_firelist;
 
-                        // inform the other thread that the data is ready
-                        //rep->message("\t\t\t\t\t\t\t\t\t\t(%d) TRANSFER RESTART W %d",threadNumber,foo_baz);
-                        sem_post(restartSemaphore[reader_thread_number]);
-                        // wait until the transfer has been completed
-                        sem_wait(transfer_finished_semaphore);
-                        //rep->message("\t\t\t\t\t\t\t\t\t\t(%d) TRANSFER FINISHED",threadNumber);
-                        // LCOV_EXCL_START
-                        if (finished) {
-                            // delete the sp&firelist
-                            delete myFirelist;
-                            delete sp;
-                            pthread_mutex_unlock(&num_suspend_mutex);
-                            return NULL;
-                        }
-                        // LCOV_EXCL_STOP
+                return &local_netstate;
+            }
 
-                        // backfire the current transition to return to original state
-                        stack.pop();
-                        assert(currentEntry < Net::Card[TR]);
-                        Transition::backfire(ns, currentFirelist[currentEntry]);
-                        Transition::revertEnabled(ns,currentFirelist[currentEntry]);
-                        localValue = sp->updateProperty(ns,currentFirelist[currentEntry]);
-                        // go on as nothing happened (i.e. do as if the new marking has been in the store)
-                        continue;
-                    }
+            // push the old firelist onto the stack (may be needed to hand over the current state correctly)
+            new (local_stack.push()) SimpleStackEntry(currentFirelist, currentEntry);
+
+            // if possible spare the current transition to give it to an other thread, having explored it's part of the search space completely
+            // try the dirty read to make the program more efficient
+            // most of the time this will already fail and we have saved the time needed to lock the mutex
+            // ... do it only if there are at least two transitions in the firelist left (one for us, and one for the other thread)
+            if (currentEntry >= 2 && num_suspended > 0) {
+            	// try to lock
+                pthread_mutex_lock(&num_suspend_mutex);
+                //rep->message("(%d) TRANSFER LOCK",threadNumber);
+                if (num_suspended > 0) {
+                	// there is another thread waiting for my data, get its thread number
+                	index_t reader_thread_number = suspended_threads[--num_suspended];
                     pthread_mutex_unlock(&num_suspend_mutex);
+
+                    // the destination thread is blocked at this point, waiting our data
+                    // copy the data for the other thread
+                    thread_stack[reader_thread_number] = local_stack;
+                    NetState tmp_netstate(local_netstate);
+                    thread_netstate[reader_thread_number].swap(tmp_netstate);
+                    delete thread_property[reader_thread_number];
+                    thread_property[reader_thread_number] = local_property->copy();
+
+                    // inform the other thread that the data is ready
+                    sem_post(restartSemaphore[reader_thread_number]);
+
+                    // LCOV_EXCL_START
+                    if (finished) {
+                        // clean up and return
+                        delete local_firelist;
+
+                        return NULL;
+                    }
+                    // LCOV_EXCL_STOP
+
+                    // backfire the current transition to return to original state
+                    local_stack.pop();
+                    assert(currentEntry < Net::Card[TR]);
+                    Transition::backfire(local_netstate, currentFirelist[currentEntry]);
+                    Transition::revertEnabled(local_netstate,currentFirelist[currentEntry]);
+                    local_property->updateProperty(local_netstate,currentFirelist[currentEntry]);
+                    // go on as nothing happened (i.e. pretend the new marking has already been in the store)
+                    continue;
                 }
-                // Here: current marking does not satisfy property --> continue search
-                currentEntry = myFirelist->getFirelist(ns, &currentFirelist);
-                //->message("Thread %d: create %p", threadNumber, (void*)currentFirelist);
-            } // end else branch for "if state is already in store"
+                pthread_mutex_unlock(&num_suspend_mutex);
+            }
+            // current marking does not satisfy property --> continue search
+            // grab a new firelist (old one is already on stack)
+            currentEntry = local_firelist->getFirelist(local_netstate, &currentFirelist);
+
         } else {
             // firing list completed -->close state and return to previous state
             delete[] currentFirelist;
-            if (stack.StackPointer == started_stack_at) {
-                // have completely processed local initial marking --> state not found in current sub-tree
 
-                // maybe we have to go into an other sub-tree of the state-space
-                // first get the counter mutex to be able to count the number of threads currently suspended
-                pthread_mutex_lock(&num_suspend_mutex);
-                suspended_threads[num_suspended++] = threadNumber;
-                pthread_mutex_unlock(&num_suspend_mutex);
-                //rep->message("(%d) TRANSFER[R] UNLOCK",threadNumber);
-                // then we are the last thread going asleep and so we have to await all the others and tell them that the search is over
-                if (num_suspended == number_of_threads) {
-                    finished = true;
-                    // release all semaphores
-                    for (int i = 0; i < number_of_threads; i++)
-                        sem_post(restartSemaphore[i]);
-                    sem_post(transfer_finished_semaphore);
-                    //rep->message("(%d) TRANSFER[R] UNLOCK",threadNumber);
-                    // delete the sp&firelist
-                    delete myFirelist;
-                    delete sp;
-                    // there is no such state
-                    return NULL;
-                }
-                sem_wait(restartSemaphore[threadNumber]);
-                //rep->message("\t\t\t\t\t\t\t\t\t\t(%d) TRANSFER[R] RESTART",threadNumber);
-                // if the search has come to an end return without success
-                // exclude this from code coverage, as I can not provoke it, but is necessary in very rare occasions
-                // delete the firelist
-                delete myFirelist;
-                delete sp;
-                // LCOV_EXCL_START
-                if (finished) return NULL;
-                // LCOV_EXCL_STOP
-                // now we have been signaled because one of the threads is able to give us an part of search space
-                // copy the data given by the other thread into the local variables
-                stack = transfer_stack[threadNumber];
-                sp = transfer_property[threadNumber];
-                ns = *transfer_netstate[threadNumber];
-                delete transfer_netstate[threadNumber];
-                started_stack_at = stack.StackPointer;
-                // rebuild
-                sp->initProperty(ns);
-                myFirelist = baseFireList.createNewFireList(sp);
-                // my sender holds the lock that authorizes me to decrease the variable
-                //rep->message("(%d) TRANSFER[R] COMPLETED (SP %d == %d) stack: %p", threadNumber, started_stack_at, stack.StackPointer, stack.currentchunk);
-                //rep->message("\t\t\t\t\t\t\t\t\t\t(%d) TRANSFER[R] FINISHED",threadNumber);
-                sem_post(transfer_finished_semaphore);
-                //rep->message("(%d) TRANSFER[R] TFINI",threadNumber);
-
-                // re-initialize the current search state
-                currentEntry = myFirelist->getFirelist(ns, &currentFirelist);
-                //rep->message("Thread %d: create %p", threadNumber, (void*)currentFirelist);
+            if (local_stack.StackPointer > started_stack_at) {
+                // if there is still a firelist, which can be popped, do it!
+                SimpleStackEntry& s = local_stack.top();
+                currentEntry = s.current;
+                currentFirelist = s.fl;
+                local_stack.pop();
+                assert(currentEntry < Net::Card[TR]);
+                Transition::backfire(local_netstate, currentFirelist[currentEntry]);
+                Transition::revertEnabled(local_netstate, currentFirelist[currentEntry]);
+                propertyResult = local_property->updateProperty(local_netstate, currentFirelist[currentEntry]);
                 continue;
             }
-            // if there is still a firelist, which can be popped, do it!
-            SimpleStackEntry & s = stack.top();
-            currentEntry = s.current;
-            currentFirelist = s.fl;
-            stack.pop();
-            assert(currentEntry < Net::Card[TR]);
-            Transition::backfire(ns, currentFirelist[currentEntry]);
-            Transition::revertEnabled(ns, currentFirelist[currentEntry]);
-            localValue = sp->updateProperty(ns, currentFirelist[currentEntry]);
+
+            // we have completely processed local initial marking --> state not found in current sub-tree
+
+            // delete firelist (we will get new ones if we start again in a different sub-tree)
+            delete local_firelist;
+
+            // maybe we have to go into an other sub-tree of the state-space
+            // first get the counter mutex to be able to count the number of threads currently suspended
+            pthread_mutex_lock(&num_suspend_mutex);
+            suspended_threads[num_suspended++] = threadNumber;
+            int local_num_suspended = num_suspended;
+            pthread_mutex_unlock(&num_suspend_mutex);
+
+            // if we are the last thread going asleep, we have to wake up all the others and tell them that the search is over
+            if (local_num_suspended == number_of_threads) {
+                finished = true;
+                // release all semaphores, wake up all threads
+                for (int i = 0; i < number_of_threads; i++)
+                    sem_post(restartSemaphore[i]);
+                // there is no such state
+                return NULL;
+            }
+            sem_wait(restartSemaphore[threadNumber]);
+
+            // test if result is already known now
+            // LCOV_EXCL_START
+            if (finished)
+            	return NULL;
+            // LCOV_EXCL_STOP
+
+            // mark begin of our sub-tree on the stack (we don't need to backtrack higher than here)
+            started_stack_at = local_stack.StackPointer;
+            // rebuild
+            local_property->initProperty(local_netstate);
+            local_firelist = global_baseFireList->createNewFireList(local_property);
+
+            // re-initialize the current search state
+            currentEntry = local_firelist->getFirelist(local_netstate, &currentFirelist);
         }
     }
 }
 
 bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
                                       Store<void> &myStore, Firelist &firelist,
-                                      int number_of_threads) {
-    // copy initial marking into current marking
-    //Marking::init();
+                                      int _number_of_threads) {
 
-    runner_thread = (pthread_t*) calloc(number_of_threads, sizeof(pthread_t));
+	// allocate space for threads
+    threads = (pthread_t*) calloc(_number_of_threads, sizeof(pthread_t));
+
+    global_property = &property;
+    global_store = &myStore;
+    global_baseFireList = &firelist;
+    number_of_threads = _number_of_threads;
+
+	// allocate space for thread arguments
     tpDFSArguments* args = (tpDFSArguments*) calloc(number_of_threads,
                            sizeof(tpDFSArguments));
     for (int i = 0; i < number_of_threads; i++) {
-        args[i].baseFireList = &firelist;
-        args[i].myStore = &myStore;
-        args[i].ns = new NetState(ns);
         args[i].threadNumber = i;
-        args[i].number_of_threads = number_of_threads;
         args[i].pexploration = this;
-        args[i].resultProperty = &property;
     }
+
+	// allocate and initialize thread local information
+    thread_netstate = new NetState[number_of_threads];
+    thread_property = new SimpleProperty*[number_of_threads];
+    thread_stack = new SearchStack<SimpleStackEntry>[number_of_threads];
+    for (int i = 0; i < number_of_threads; i++) {
+    	NetState tmp_netstate(ns);
+    	thread_netstate[i].swap(tmp_netstate); // copy and swap
+    	thread_property[i] = property.copy();
+    }
+
+    // allocate restart semaphore names (named semaphores used for MacOS compatibility)
+    std::string* restartSemaphoreName = new std::string[number_of_threads];
+    for (int i = 0; i < number_of_threads; i++){
+		std::stringstream out;
+		out << "PErestart" << i;
+		restartSemaphoreName[i] = out.str();
+    }
+
+    // try to clear restart semaphore first
+    for (int i = 0; i < number_of_threads; i++)
+        sem_unlink(restartSemaphoreName[i].c_str());
+
     // init the restart semaphore
-    sem_unlink("PErestart");
     restartSemaphore = new sem_t*[number_of_threads];
     int sem_fail = 0;
     int value_prober;
     for (int i = 0; i < number_of_threads; i++){
-		std::stringstream out;
-		out << "PErestart" << i;
-    	restartSemaphore[i] = sem_open(out.str().c_str(), O_CREAT, 0600,0);
+    	restartSemaphore[i] = sem_open(restartSemaphoreName[i].c_str(), O_CREAT, 0600,0);
     	sem_fail |= (!(long int)restartSemaphore[i]);
         sem_getvalue(restartSemaphore[i],&value_prober);
         if (value_prober != 0){
         	rep->status("named semaphore (PErestart) has not been created as defined");
+        	sem_wait(restartSemaphore[i]); // hack: decrement semaphore in order to eventually eliminate the problem
         	rep->abort(ERROR_THREADING);
         }
     }
-    sem_unlink("PEtranscom");
-    transfer_finished_semaphore = sem_open("PEtranscom", O_CREAT, 0600,0);
     // LCOV_EXCL_START
-    if (UNLIKELY(sem_fail) || UNLIKELY(!(long int)transfer_finished_semaphore)) {
-        rep->status("named semaphore could not be created");
+    if (UNLIKELY(sem_fail)) {
+        rep->status("named semaphores could not be created");
         rep->abort(ERROR_THREADING);
     }
     // LCOV_EXCL_STOP
-    sem_getvalue(transfer_finished_semaphore,&value_prober);
-    // LCOV_EXCL_START
-    if (value_prober != 0){
-    	rep->status("named semaphore (PEtranscom) has not been created as defined");
-    	rep->abort(ERROR_THREADING);
-    }
-    // LCOV_EXCL_STOP
 
-
+    // initialize mutexes
     int mutex_creation_status = 0;
     mutex_creation_status |= pthread_mutex_init(&num_suspend_mutex, NULL);
-    mutex_creation_status |= pthread_mutex_init(&write_current_back_mutex,
-                             NULL);
+    mutex_creation_status |= pthread_mutex_init(&global_property_mutex, NULL);
     // LCOV_EXCL_START
     if (UNLIKELY(mutex_creation_status)) {
         rep->status("mutexes could not be created");
@@ -343,17 +313,14 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     }
     // LCOV_EXCL_STOP
 
-    // initialize threading datastructures
+    // initialize thread intercommunication data structures
     num_suspended = 0;
-    finished = false;
     suspended_threads = new index_t[number_of_threads];
-    transfer_netstate = new NetState*[number_of_threads];
-    transfer_property = new SimpleProperty*[number_of_threads];
-    transfer_stack = new SearchStack<SimpleStackEntry>[number_of_threads];
+    finished = false;
 
-    // create the threads
+    // start the threads
     for (int i = 0; i < number_of_threads; i++)
-        if (UNLIKELY(pthread_create(runner_thread + i, NULL, threadPrivateDFS, args + i))) {
+        if (UNLIKELY(pthread_create(threads + i, NULL, threadPrivateDFS, args + i))) {
             // LCOV_EXCL_START
             rep->status("threads could not be created");
             rep->abort(ERROR_THREADING);
@@ -366,7 +333,7 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     property.value = false;
     for (int i = 0; i < number_of_threads; i++) {
         void* return_value;
-        if (UNLIKELY(pthread_join(runner_thread[i], &return_value))) {
+        if (UNLIKELY(pthread_join(threads[i], &return_value))) {
             // LCOV_EXCL_START
             rep->status("threads could not be joined");
             rep->abort(ERROR_THREADING);
@@ -376,27 +343,24 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
             property.value = true;
             ns = *(NetState*) return_value;
         }
-        delete args[i].ns;
     }
 
-    // clean up all variables needed to make the parallel DFS
+    // clean up mutexes
     int mutex_destruction_status = 0;
     mutex_destruction_status |= pthread_mutex_destroy(&num_suspend_mutex);
-    mutex_destruction_status |= pthread_mutex_destroy(&write_current_back_mutex);
+    mutex_destruction_status |= pthread_mutex_destroy(&global_property_mutex);
     // LCOV_EXCL_START
     if (UNLIKELY(mutex_destruction_status)) {
         rep->status("mutexes could not be destroyed");
         rep->abort(ERROR_THREADING);
     }
     // LCOV_EXCL_STOP
+
+    // clean up semaphores
     int semaphore_destruction_status = 0;
-    semaphore_destruction_status |= sem_close(transfer_finished_semaphore);
-    semaphore_destruction_status |= sem_unlink("PEtranscom");
     for (int i = 0; i < number_of_threads; i++){
-		std::stringstream out;
-		out << "PErestart" << i;
 		semaphore_destruction_status |= sem_close(restartSemaphore[i]);
-		semaphore_destruction_status |= sem_unlink(out.str().c_str());
+		semaphore_destruction_status |= sem_unlink(restartSemaphoreName[i].c_str());
     }
     // LCOV_EXCL_START
     if (UNLIKELY(semaphore_destruction_status)) {
@@ -405,9 +369,21 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     }
     // LCOV_EXCL_STOP
 
-    // free the allocated memory
-    free(runner_thread);
+    // clean up thread intercommunication data structures
+    for (int i = 0; i < number_of_threads; i++)
+    	delete thread_property[i];
+    delete[] suspended_threads;
+    delete[] thread_netstate;
+    delete[] thread_property;
+    delete[] thread_stack;
+
+    // clean up thread arguments
     free(args);
+
+    // free the allocated memory
+    delete[] restartSemaphoreName;
+    delete[] restartSemaphore;
+    free(threads);
 
     return property.value;
 }

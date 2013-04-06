@@ -464,7 +464,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 
 	// if there is a deadlock
 	if (initialize_transition(ns,firelist,automata, currentAutomataState,&currentFirelistEntry,&currentFirelist,&currentStateListEntry,&currentStateListLength, &currentStateList,currentStateEntry)){
-		rep->message("ACC %d",is_next_state_accepting(automata,currentAutomataState));
+		//rep->message("ACC %d",is_next_state_accepting(automata,currentAutomataState));
 		if (is_next_state_accepting(automata,currentAutomataState)){
 			delete[] currentStateList;
 			//delete[] currentFirelist;
@@ -622,7 +622,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
 						if (automata.isAcceptingState(currentAutomataState)) fulfilled_conditions++;
 						// update weak conditions
 						bool* __enabled_weak = (bool*) calloc(assumptions.card_weak, SIZEOF_BOOL);
-						for (index_t i = 0; i <= ns.CardEnabled; i++)
+						for (index_t i = 0; i < ns.CardEnabled; i++)
 							if (assumptions.weak_backlist[ns.Enabled[i]] != -1)
 								__enabled_weak[assumptions.weak_backlist[ns.Enabled[i]]]++;
 						// write not enabled weak back
@@ -1068,7 +1068,7 @@ void LTLExploration::completeWitness(BuechiAutomata &automata, Store<AutomataTre
 bool LTLExploration::is_next_state_accepting(BuechiAutomata &automata,index_t currentAutomataState){
 	index_t* nextStates;
 	index_t cardNext = automata.getSuccessors(&nextStates, currentAutomataState);
-	rep->message("CN %d",cardNext);
+	//rep->message("CN %d",cardNext);
 	for (index_t i = 0; i < cardNext; i++)
 		if (automata.isAcceptingState(nextStates[i]))
 			return true;

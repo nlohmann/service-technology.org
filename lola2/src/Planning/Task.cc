@@ -124,7 +124,7 @@ Store<void>* StoreCreator<void>::createSpecializedStore(int number_of_threads) {
 extern kc::tFormula TheFormula;
 extern kc::tBuechiAutomata TheBuechi;
 
-Task::Task() : spFormula(NULL), ctlFormula(NULL), bauto(NULL), ns(NULL), p(NULL), store(NULL), ctlStore(NULL), ltlStore(NULL), fl(NULL), exploration(NULL), ctlExploration(NULL), ltlExploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg)
+Task::Task() : spFormula(NULL), ctlFormula(NULL), bauto(NULL), ns(NULL), p(NULL), store(NULL), ctlStore(NULL), ltlStore(NULL), fl(NULL), exploration(NULL), ctlExploration(NULL), ltlExploration(NULL), choose(NULL), search(args_info.search_arg), number_of_threads(args_info.threads_arg), formulaType(FORMULA_REACHABLE)
 {
 	if (args_info.formula_given)
 		setFormula();

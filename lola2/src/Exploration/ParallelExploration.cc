@@ -49,7 +49,6 @@ NetState* ParallelExploration::threadedExploration(index_t threadNumber) {
     Firelist* local_firelist = global_baseFireList->createNewFireList(local_property);
 
     SearchStack<SimpleStackEntry>& local_stack = thread_stack[threadNumber];
-    unsigned int started_stack_at = 0;
 
     NetState& local_netstate = thread_netstate[threadNumber];
 
@@ -137,10 +136,10 @@ NetState* ParallelExploration::threadedExploration(index_t threadNumber) {
             // try the dirty read to make the program more efficient
             // most of the time this will already fail and we have saved the time needed to lock the mutex
             // ... do it only if there are at least two transitions in the firelist left (one for us, and one for the other thread)
+
             if (currentEntry >= 2 && num_suspended > 0) {
-            	// try to lock
+                // try to lock
                 pthread_mutex_lock(&num_suspend_mutex);
-                //rep->message("(%d) TRANSFER LOCK",threadNumber);
                 if (num_suspended > 0) {
                 	// there is another thread waiting for my data, get its thread number
                 	index_t reader_thread_number = suspended_threads[--num_suspended];
@@ -185,7 +184,7 @@ NetState* ParallelExploration::threadedExploration(index_t threadNumber) {
             // firing list completed -->close state and return to previous state
             delete[] currentFirelist;
 
-            if (local_stack.StackPointer > started_stack_at) {
+            if (local_stack.StackPointer) {
                 // if there is still a firelist, which can be popped, do it!
                 SimpleStackEntry& s = local_stack.top();
                 currentEntry = s.current;
@@ -227,8 +226,6 @@ NetState* ParallelExploration::threadedExploration(index_t threadNumber) {
             	return NULL;
             // LCOV_EXCL_STOP
 
-            // mark begin of our sub-tree on the stack (we don't need to backtrack higher than here)
-            started_stack_at = local_stack.StackPointer;
             // rebuild
             local_property->initProperty(local_netstate);
             local_firelist = global_baseFireList->createNewFireList(local_property);

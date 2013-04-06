@@ -21,7 +21,7 @@ class NetState
 {
 
 public:
-    NetState(): need_to_delete_members_on_delete(false) {}
+    NetState(): membersInitialized(false) {}
     ~NetState();
 
     //--------- COPIED FOR MARKING.h
@@ -62,16 +62,16 @@ public:
     /// create a NetState object from the global variables set by the parsing process
     static NetState* createNetStateFromInitial();
     /// copy constructor
-    NetState(NetState &ns);
+    NetState(const NetState &ns);
     // copy operator, be aware that this changes the given ns (this is necessary to ensure proper deallocation of memory)
-    NetState &operator=(NetState &ns);
+    NetState &operator=(const NetState &ns);
 
     // swaps all internal members with the given NetState
     void swap(NetState &ns);
 
 private:
     /// marker variable, whether we have to delete some of the arrays ourself
-    bool need_to_delete_members_on_delete;
+    bool membersInitialized;
     /// delete all members
     void deleteAllMembers();
 };

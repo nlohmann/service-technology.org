@@ -54,9 +54,9 @@ public:
 
 
 /*!
-\brief simple property, beeing always false
+\brief simple property, being always false
 
-This property is one of the simplest possible properties, beeing false for every marking.
+This property is one of the simplest possible properties, being false for every marking.
 Also this class is the base class for all property, that only need to be evaluated on one single marking.
 */
 class SimpleProperty

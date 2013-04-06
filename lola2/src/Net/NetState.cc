@@ -16,7 +16,7 @@
 NetState* NetState::createNetStateFromInitial()
 {
     NetState* ns = new NetState();
-    ns->need_to_delete_members_on_delete = true;
+    ns->membersInitialized = true;
     // copy the current marking at its hash
     ns->Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
     for (int i = 0; i < Net::Card[PL]; i++)
@@ -149,9 +149,9 @@ NetState* NetState::createNetStateFromInitial()
 
 
 
-NetState::NetState(NetState &ons)
+NetState::NetState(const NetState &ons)
 {
-    need_to_delete_members_on_delete = true;
+    membersInitialized = true;
     // copy the current marking at its hash
     Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
     for (int i = 0; i < Net::Card[PL]; i++)
@@ -275,29 +275,10 @@ NetState::NetState(NetState &ons)
 
 }
 
-NetState &NetState::operator=(NetState &ns)
+NetState &NetState::operator=(const NetState &ns)
 {
-    deleteAllMembers();
-    Current = ns.Current;
-    HashCurrent = ns.HashCurrent;
-    Enabled = ns.Enabled;
-    CardEnabled = ns.CardEnabled;
-    PositionScapegoat = ns.PositionScapegoat;
-    // must be copied separately as the array itself is statically allocated in each object
-    Arc[0][0] = ns.Arc[0][0];
-    Arc[0][1] = ns.Arc[0][1];
-    Arc[1][0] = ns.Arc[1][0];
-    Arc[1][1] = ns.Arc[1][1];
-    Mult[0][0] = ns.Mult[0][0];
-    Mult[0][1] = ns.Mult[0][1];
-    Mult[1][0] = ns.Mult[1][0];
-    Mult[1][1] = ns.Mult[1][1];
-
-    CardDisabled = ns.CardDisabled;
-    Disabled = ns.Disabled;
-    // now the old NetState does not need to delete its members on deletions as they are now the members of this netstate;
-    need_to_delete_members_on_delete = ns.need_to_delete_members_on_delete;
-    ns.need_to_delete_members_on_delete = false;
+	NetState tmp(ns); // copy and swap
+	swap(tmp);
     return *this;
 }
 
@@ -309,27 +290,26 @@ void NetState::swap(NetState &ns)
     std::swap(CardEnabled, ns.CardEnabled);
     std::swap(PositionScapegoat, ns.PositionScapegoat);
 
-    std::swap(Arc[0][0], ns.Arc[0][0]);
-    std::swap(Arc[0][1], ns.Arc[0][1]);
-    std::swap(Arc[1][0], ns.Arc[1][0]);
-    std::swap(Arc[1][1], ns.Arc[1][1]);
-    std::swap(Mult[0][0], ns.Mult[0][0]);
-    std::swap(Mult[0][1], ns.Mult[0][1]);
-    std::swap(Mult[1][0], ns.Mult[1][0]);
-    std::swap(Mult[1][1], ns.Mult[1][1]);
+    std::swap(Arc[PL][PRE], ns.Arc[PL][PRE]);
+    std::swap(Arc[PL][POST], ns.Arc[PL][POST]);
+    std::swap(Arc[TR][PRE], ns.Arc[TR][PRE]);
+    std::swap(Arc[TR][POST], ns.Arc[TR][POST]);
+    std::swap(Mult[PL][PRE], ns.Mult[PL][PRE]);
+    std::swap(Mult[PL][POST], ns.Mult[PL][POST]);
+    std::swap(Mult[TR][PRE], ns.Mult[TR][PRE]);
+    std::swap(Mult[TR][POST], ns.Mult[TR][POST]);
 
     std::swap(CardDisabled, ns.CardDisabled);
     std::swap(Disabled, ns.Disabled);
-    std::swap(need_to_delete_members_on_delete, ns.need_to_delete_members_on_delete);
+    std::swap(membersInitialized, ns.membersInitialized);
 }
 
 
 void NetState::deleteAllMembers()
 {
-    if (!need_to_delete_members_on_delete)
-    {
+    if (!membersInitialized)
         return;
-    }
+
     free(Current);
     free(Enabled);
     free(PositionScapegoat);

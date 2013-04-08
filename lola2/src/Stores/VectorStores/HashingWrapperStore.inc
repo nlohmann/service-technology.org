@@ -71,7 +71,7 @@ bool HashingWrapperStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t 
 template <typename T>
 bool HashingWrapperStore<T>::popVector(vectordata_t * & out, index_t threadIndex)
 {
-	index_t startingPopBucket = currentPopBucket[threadIndex];
+	hash_t startingPopBucket = currentPopBucket[threadIndex];
 	do {
 		if(buckets[currentPopBucket[threadIndex]]->popVector(out))
 			return true;
@@ -91,8 +91,8 @@ bool HashingWrapperStore<T>::empty()
 	// A better solution is needed if the number of buckets can be large
 	// At this time, only the SweepLine method uses empty(), and only
 	// with a very small number of buckets (per progress value and mode)
-	for(index_t i=0; i<number_of_buckets; ++i)
-		if(!buckets[currentPopBucket[i]]->empty())
+	for(hash_t i=0; i<number_of_buckets; ++i)
+		if(!buckets[i]->empty())
 			return false;
     return true;
 }

@@ -144,12 +144,9 @@ function addParam(p) {
             inObj.parameters.push(p);
         }
         text = JSON.stringify(inObj, null, 4);
-        jqTa.val(text);
     }
     catch(e) { // stuff in textare is no valid json
         text = text + '\n' + p;
-        jqTa.val(text);
-        jqTa.change();
 
         // possible extension:
         // 1st try: regex for argname
@@ -157,10 +154,12 @@ function addParam(p) {
         //          and insert param before
         // 3rd try the latest of the match above
     }
+    jqTa.val(text);
+    jqTa.change();
     return '';
 }
 
-function watchJsonBox(jqObj) {
+function watchJsonBox(jqObj, updateHandler) {
     var alrt = $('<p style="margin-top:1em;margin-bottom:0">');
     alrt.addClass('alert alert-error');
     alrt.html('<h4>No valid JSON</h4><div/>');
@@ -170,7 +169,7 @@ function watchJsonBox(jqObj) {
     jqObj.change(function() {
         var s = jqObj.val();
         try {
-            JSON.parse(s);
+            var jso = JSON.parse(s);
             jqObj.parent('div').removeClass('error');
             alrt.fadeOut();
         } catch(e) {
@@ -178,5 +177,6 @@ function watchJsonBox(jqObj) {
             alrt.find('div').text(e);
             alrt.fadeIn();
         }
+        updateHandler(jso.parameters);
     });
 }

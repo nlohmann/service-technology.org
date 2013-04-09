@@ -56,7 +56,6 @@
       <div class="row">
         <div class="span6">
           <div class="stBox">
-              <a href="#" class="toggleEdit" style="display:none;" onclick="return toggleEdit('gui')"><i class="icon-lock"></i>unlock editing</a>
              <span id="form_container">
               loading ... </span>
           </div>
@@ -69,18 +68,17 @@
                 title="Click right and select copy">
           </div>
           <div class="stBox">
-          <a href="" class="toggleEdit" onclick="return toggleEdit('json')"><i class="icon-lock"></i>unlock editing</a>
             <h1><!-- data-toggle="collapse" style="cursor:pointer" data-target="#json-output-container" -->
                  JSON for Server
             </h1>
             <div id="json-output-container">
             <form class="input-append">
-                <input id="json_typeahead" type="text" class="input-xlarge" data-provide="typeahead" autocomplete="off" disabled="disabled"/>
-                <button type="submit" class="btn" disabled="disabled">Add Param</button>
+                <input id="json_typeahead" type="text" class="input-xlarge" data-provide="typeahead" autocomplete="off" _disabled="disabled"/>
+                <button type="submit" class="btn" _disabled="disabled">Add Param</button>
             </form>
             <form action="http://localhost:1337" enctype="multipart/form-data" id="outForm" method="POST">
 <div class="control-group">
-                <textarea name="data" disabled="disabled" class="controls input-block-level monospace" style="font-family:monospace;" id="json-output" rows="20">...</textarea>
+                <textarea name="data" _disabled="disabled" class="controls input-block-level monospace" style="font-family:monospace;" id="json-output" rows="20">...</textarea>
 </div>
             </form>
             </div>
@@ -153,7 +151,7 @@ buildForm = function(inputs) {
     Form2Command.listen();
 
     createTypeahead($('#json_typeahead'), inputs);
-    watchJsonBox($('#json-output'));
+    watchJsonBox($('#json-output'), function(p){im.update(p);} );
 }
 
 // TOOL AS JSON
@@ -161,29 +159,6 @@ buildForm = function(inputs) {
 
 // PARSE FROM GGO
 GGO_CONVERSION.initParse(tool, buildForm);
-
-// toggle editing between gui und json
-function toggleEdit(t) {
-    var jsonEdit = $('#json-output-container');
-    if(t=='gui') {
-        $('span#form_container *:disabled:not(.forceDisabled)').removeAttr('disabled');
-        $('span#form_container *:visible').fadeTo('slow', 1);
-        jsonEdit.find('*:enabled').attr('disabled', 'disabled');
-        jsonEdit.find('input[type=file]').fadeOut();
-        jsonEdit.fadeTo('slow', 0.7);
-        Form2Command.update();
-    } else if(t=='json') {
-        $('span#form_container *:enabled').attr('disabled','disabled');
-        //$('span#form_container * * *:not(:header):visible').fadeTo('slow', 0.6);
-        $('span#form_container * * *:visible').fadeTo('slow', 0.6);
-        //$('span#form_container h1').fadeTo('slow', 1);
-        jsonEdit.find('*:disabled').removeAttr('disabled');
-        jsonEdit.fadeTo('slow', 1);
-        jsonEdit.find('input[type=file]').fadeIn();
-    }
-    $('a.toggleEdit').toggle();
-    return false;
-}
 
 $('.submitButton').click(function(){
         // before and after submit reenable... ugly

@@ -57,7 +57,9 @@ Input.prototype.toLabelledElement = function(element) {
 }
 Input.prototype.toElementSimple = function() {
     var out = '<span>' + this.buildHtmlString('out') + '</span>';
-    return make(out);
+    var elSmpl = make(out);
+    this.dom = elSmpl;
+    return elSmpl;
 }
 
 Input.prototype.buildHtmlString = function(pName) {
@@ -124,6 +126,25 @@ Input.prototype.toElement = function(section) {
     return el;
 }
 
+Input.prototype.updateValue = function(val) {
+// TODO: update value of element...
+// Problem: how to do this in general
+//
+//
+//  Problem solved for checkboxes...
+if(this.params.type == 'checkbox') {
+    var cb = this.dom.getElementsByTagName("input")[0];
+    if(val === true || val == "on") {
+        cb.checked = "checked";
+    } else {
+        console.log("remove attr");
+        cb.removeAttribute("checked");
+        cb.checked = null;
+    }
+}
+
+}
+
 // add an Input
 function registerInput(name, expParams, html, useLabel) {
     // create new class
@@ -143,6 +164,7 @@ function make(html) {
     d.innerHTML = html;
     return d.firstChild;
 }
+
 
 ///// Input Set Manager
 //InputSetManager = {
@@ -164,6 +186,7 @@ function InputSetManager() {
     this.inputs = [];
 //    this.id = ++(inputSetManager.instanceID);
 //    InputSetManager.instances[this.id]=this;
+    this.inputsByArgname = {};    
 }
 
 InputSetManager.prototype.SetInputs = function(inputs) {
@@ -209,10 +232,40 @@ InputSetManager.prototype.Create = function(dom) {
 
         }
         curWell.appendChild(this.inputs[i].toElement(this.curSec));
+
+        // if we have an argname, put reference to argname list
+        if (typeof this.inputs[i].params.argname != 'undefined' && this.inputs[i].params.argname) {
+            this.inputsByArgname[this.inputs[i].params.argname] = this.inputs[i];
+        }
     }
     dom.appendChild(form);
 }
 
+InputSetManager.prototype.update = function(params) {
+    console.log("called update");
+    var pLen = params.length;
+    var paramsByArgname = {};
+    for(var i=0; i < pLen; ++i) {
+        var c = params[i].replace(/^\-+/, '');
+        var cArr = c.split('=');
+        var argName = cArr[0];
+        console.log(cArr);
+        var val = cArr[1] ? cArr[1] : true;
+        paramsByArgname[argName] = val;
+    }
+    var iLen = this.inputs.length;
+    for(var j=0; j<iLen; ++j) {
+        var c = this.inputs[j];
+        var val = false;
+        if(c && c.params && c.params.name && paramsByArgname[c.params.name]) {
+            val = paramsByArgname[c.params.name];
+        }
+        if(c) {
+            c.updateValue(val);
+        }
+    }
+    
+}
 // public interface
 return {
     registerInput: registerInput,

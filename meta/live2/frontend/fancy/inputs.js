@@ -10,6 +10,7 @@ function Input(params,id) {
     this.expectedParams = [
         'type'
     ];
+
 }
 
 Input.prototype.checkParams = function () {
@@ -31,7 +32,7 @@ Input.prototype.toLabelledElement = function(element) {
     // expecting argname to be the id
     // of the input...
     if(this.params['argname']) {
-        l.setAttribute('for', this.params['argname']);
+        l.setAttribute('for', this.params['id']);
     }
     l.className = 'control-label';
     l.appendChild(d.createTextNode( this.params['name'] ));
@@ -60,6 +61,27 @@ Input.prototype.toElementSimple = function() {
     var elSmpl = make(out);
     this.dom = elSmpl;
     return elSmpl;
+}
+
+Input.prototype.getValue = function() {
+    if(!this.valueOps) {
+        return undefined;
+    }
+    if(!this.valueselector_interpreted) {
+        // value Selector is build
+        if(this.valueOps.selector) {
+            var re = /\$\{(.+)\}/g;
+            var vsi = this.valueOps.selector;
+            while(vsi.match(re)) {
+                var v = this.params[RegExp.$1];
+                vsi = vsi.replace(re,v);
+            }
+            this.valueselector_interpreted = vsi;
+        } else {
+            return false;
+        }
+    }
+    return $(this.dom).find(this.valueselector_interpreted).val();
 }
 
 Input.prototype.buildHtmlString = function(pName) {
@@ -113,7 +135,7 @@ Input.prototype.buildHtmlString = function(pName) {
 
 Input.prototype.toElement = function(section) {
     var el;
-    if(this.useLabel) {
+    if(this.html && this.html.useLabel) {
         el = this.toLabelledElement();
     } else {
         el = this.toElementSimple();
@@ -132,6 +154,36 @@ Input.prototype.updateValue = function(val) {
 //
 //
 //  Problem solved for checkboxes...
+    if(!this.valueOps) {
+        return undefined;
+    }
+
+
+    // TODO
+    if(!this.valueUpdateSelector_interpreted) {
+        // value Selector is build
+        if(this.valueOps.updateSelector) {
+            var re = /\$\{(.+)\}/g;
+            var vsi = this.valueOps.updateSelector;
+            while(vsi.match(re)) {
+                var v;
+                if(RegExp.$1 == 'newValue') {
+                    v = val;
+                } else {
+                    v = this.params[RegExp.$1];
+                }
+                vsi = vsi.replace(re,v);
+            }
+            this.valueUpdateSelector_interpreted = vsi;
+        } else {
+            return false;
+        }
+    }
+    console.log(this.valueOps.updateCall);
+    var el = $(this.dom).find(this.valueUpdateSelector_interpreted);
+    el[this.valueOps.updateCall](val);
+
+    return;
 if(this.params.type == 'checkbox') {
     var cb = this.dom.getElementsByTagName("input")[0];
     if(val === true || val == "on") {
@@ -146,7 +198,7 @@ if(this.params.type == 'checkbox') {
 }
 
 // add an Input
-function registerInput(name, expParams, html, useLabel) {
+function registerInput(name, expParams, html, valueOps) {
     // create new class
     Input[name] = function(p, id) {
         Input.call(this, p, id);
@@ -156,7 +208,7 @@ function registerInput(name, expParams, html, useLabel) {
 
     // set for output creation
     Input[name].prototype.html = html;
-    Input[name].prototype.useLabel = useLabel;
+    Input[name].prototype.valueOps = valueOps;
 }
 
 function make(html) {
@@ -202,20 +254,25 @@ InputSetManager.prototype.SetInputs = function(inputs) {
 InputSetManager.prototype.Create = function(dom) {
     var form = document.createElement('form');
     form.className = 'form-horizontal toolForm';
-    var curWell = form;
+    var curWell = document.createElement('div');
+    curWell.className = 'stBox';
+    form.appendChild(curWell);
 
     var tabLinks = make('<ul class="nav nav-pills" />');
 
     this.curSec = 'topSec';
     for(var i = 0, c = null; c = this.inputData[i]; ++i) {
+        // check if we have an input for that
         if(typeof Input[c.type] != 'function') {
             console.log('unknown input: '+c.type + ' type is ' + typeof Input[c.type]);
             continue;
         }
+        // create input object
         this.inputs[i] = new Input[c.type](c,'input'+i); //overwrite by object
         if(!this.inputs[i].checkParams()) {
             continue;
         }
+        // if we have a section, create a new tab and add to tab
         if(c.type == 'section') {
             var firstSec = this.curSec == 'topSec';
             this.curSec = 'sec'+i;
@@ -239,6 +296,7 @@ InputSetManager.prototype.Create = function(dom) {
         }
     }
     dom.appendChild(form);
+    this.form = form;
 }
 
 InputSetManager.prototype.update = function(params) {
@@ -259,12 +317,45 @@ InputSetManager.prototype.update = function(params) {
         var val = false;
         if(c && c.params && c.params.name && paramsByArgname[c.params.name]) {
             val = paramsByArgname[c.params.name];
+            paramsByArgname[c.params.name] = null;
         }
         if(c) {
             c.updateValue(val);
         }
     }
-    
+}
+
+InputSetManager.prototype.onChange = function(callback) {
+    // this is dirty: cloning this
+    var t = this;
+    $(this.form).change(function(){
+        var p = InputSetManager.prototype.getValues.call(t);
+        callback(p);
+    });
+    // initialize empty
+    callback([]);
+}
+
+InputSetManager.prototype.getValues = function() {
+    var params = [];
+    var iLen = this.inputs.length;
+    for(var j=0; j<iLen; ++j) {
+        var c = this.inputs[j];
+        var v = c.getValue();
+        if(v) {
+            var p = c.params.argname;
+            // flag has no value
+            if(c.params.type != 'checkbox') {
+                // if just standard file
+                if(p !== '') {
+                    p += '=';
+                }
+                p += v;
+            }
+            params.push(p);
+        }
+    }
+    return params;
 }
 // public interface
 return {

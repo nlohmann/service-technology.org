@@ -1,4 +1,6 @@
 
+var JSON_BOX = (function(){
+// wrapper
 
 var values = {};
 
@@ -51,7 +53,7 @@ function createTypeahead(jqObj, inputs) {
     resetTypeahead();
     jqObj.closest('form').submit(
             function(){
-                jqObj.val(addParam(jqObj.val()));
+                jqObj.val(addParam(jqObj.val(),jqObj.parent().parent().find('textarea')));
                 return false;
             }
     );
@@ -119,10 +121,10 @@ function updater(leading_dashes_item) {
     alert('unreachable code ???');
 }
 
-function addParam(p) {
+function addParam(p, jqTa) {
     if(!p) return '';
     if(p.charAt(p.length -1) == '=') return p;
-    var jqTa = jqIn.parent().parent().find('textarea'); // shortcut from global scope
+    //var jqTa = jqIn.parent().parent().find('textarea'); // shortcut from global scope
     var text = jqTa.val();
     var re1 = /^\-+/;
     var re2 = /\=.+$/;
@@ -176,7 +178,39 @@ function watchJsonBox(jqObj, updateHandler) {
             jqObj.parent('div').addClass('error');
             alrt.find('div').text(e);
             alrt.fadeIn();
+            return;
         }
         updateHandler(jso.parameters);
     });
 }
+
+function updateValues(jqObj) {
+    return function(updateParams) {
+        var params = [];
+        try {
+            var jso = JSON.parse(jqObj.val());
+            jso.parameters = updateParams;
+        } catch(e) {
+            jso = {
+                tool: 'tttoooolname',
+                parameters: updateParams
+            };
+            var overwrite = true;
+            // TODO: warning... content will be overwritten..
+        }
+        var json = JSON.stringify(jso, null, 4);
+        jqObj.val(json);
+        if(overwrite) {
+            jqObj.change();
+        }
+   };
+}
+
+return {
+    createTypeahead: createTypeahead,
+    watchJsonBox: watchJsonBox,
+    updateValues: updateValues
+};
+
+// end wrapper
+})();

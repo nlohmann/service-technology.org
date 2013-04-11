@@ -14,11 +14,14 @@
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
       .stBox {
-        border: 2px solid rgb(221, 221, 221);
+        border: 2px solid rgb(153, 153, 153);
         margin:25px 0px;
         padding:25px;
         border-radius: 8px 8px 8px 8px; 
         background-color: #fff;
+      }
+      .stBox .stBox {
+        border: 2px solid rgb(221, 221, 221);
       }
     </style>
     <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
@@ -139,19 +142,20 @@ tool = tool.replace(/[^a-z0-9_\-]/gi,'');
 
 // and now build the form, will be callback function for ggo-parser
 buildForm = function(inputs) {
-    var im = new INPUTS.InputSetManager();
+    im = new INPUTS.InputSetManager();
     im.SetInputs(inputs);
-    var b = $('#form_container');
-    var dom=b.get(0);
-    b.hide().empty();
-    im.Create(dom);
+    var b = $('#form_container').hide().empty();
+    im.Create(b.get(0));
+    im.onChange(JSON_BOX.updateValues($('#json-output')));
     b.fadeIn();
     // start listening to the formular
-    Form2Command.toolName = tool;
-    Form2Command.listen();
+    //Form2Command.toolName = tool;
+    //Form2Command.listen();
 
-    createTypeahead($('#json_typeahead'), inputs);
-    watchJsonBox($('#json-output'), function(p){im.update(p);} );
+    JSON_BOX.createTypeahead($('#json_typeahead'), inputs);
+    // TODO: using a closure here is not the best way...
+    // TODO: maybe this can cause memory leak or bad performance?
+    JSON_BOX.watchJsonBox($('#json-output'), function(p){im.update(p);} );
 }
 
 // TOOL AS JSON

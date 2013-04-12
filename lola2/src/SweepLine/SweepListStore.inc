@@ -21,8 +21,8 @@ extern Reporter* rep;
  * \brief Constructor for one store in a list of stores
  */
 template <class T>
-SweepListStore<T>::SweepListStore(index_t _nr_of_threads) 
-: next(NULL), nr_of_threads(_nr_of_threads)
+SweepListStore<T>::SweepListStore(index_t _nr_of_threads, hash_t _nr_of_buckets) 
+: next(NULL), nr_of_threads(_nr_of_threads), nr_of_buckets(_nr_of_buckets)
 {
 	store = createSweepStore();
 }
@@ -32,8 +32,8 @@ SweepListStore<T>::SweepListStore(index_t _nr_of_threads)
  * \param size The number of stores in the list
  */
 template <class T>
-SweepListStore<T>::SweepListStore(index_t _nr_of_threads, index_t size) 
-: next(size>0 ? new SweepListStore(_nr_of_threads,size-1) : NULL), nr_of_threads(_nr_of_threads)
+SweepListStore<T>::SweepListStore(index_t _nr_of_threads, hash_t _nr_of_buckets, index_t size) 
+: next(size>0 ? new SweepListStore(_nr_of_threads,_nr_of_buckets,size-1) : NULL), nr_of_threads(_nr_of_threads), nr_of_buckets(_nr_of_buckets)
 {
 	store = createSweepStore();
 }
@@ -66,7 +66,7 @@ SweepListStore<T>* SweepListStore<T>::checkNext()
 template <class T>
 SweepListStore<T>* SweepListStore<T>::getNext()
 {
-	if (!next) next = new SweepListStore<T>(nr_of_threads);
+	if (!next) next = new SweepListStore<T>(nr_of_threads, nr_of_buckets);
 	return next;
 }
 
@@ -86,13 +86,13 @@ VectorStore<T>* SweepListStore<T>::createSweepStore()
     switch (args_info.store_arg)
     {
         case store_arg_prefix:
-            if(args_info.bucketing_given)
-				return new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,PrefixTreeStore<T>,index_t>(nr_of_threads),16,nr_of_threads);
+            if (nr_of_buckets>1)
+				return new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,PrefixTreeStore<T>,index_t>(nr_of_threads),nr_of_buckets,nr_of_threads);
             else
 				return new PrefixTreeStore<T>(nr_of_threads);
         case store_arg_stl:
 /*
-            if(args_info.bucketing_given)
+            if (nr_of_buckets>1)
 				return new PluginStore<T>(enc, new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
             else
 */

@@ -25,10 +25,10 @@ class SweepListStore
 {
 public:
 	/// constructor for a single element of a list
-	SweepListStore(index_t nr_of_threads = 1);
+	SweepListStore(index_t nr_of_threads = 1, hash_t nr_of_buckets = 1);
 
 	/// constructor for a list of stores of given length
-	SweepListStore(index_t nr_of_threads, index_t size);
+	SweepListStore(index_t nr_of_threads, hash_t nr_of_buckets, index_t size);
 
 	/// destructor
 	~SweepListStore();
@@ -53,6 +53,9 @@ private:
 
 	/// maximal number of threads to access this store simultaneously
 	index_t nr_of_threads;
+
+	/// number of hash values (buckets per progress value and store mode)
+	hash_t nr_of_buckets;
 };
 
 #include <SweepLine/SweepListStore.inc>

@@ -13,7 +13,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
-//#include <SweepLine/SweepRingStore.h>
 #include <Stores/NetStateEncoder/FullCopyEncoder.h>
 #include <Stores/NetStateEncoder/CopyEncoder.h>
 #include <Stores/VectorStores/PrefixTreeStore.h>
@@ -32,8 +31,9 @@ using std::endl;
  * \param _front_offset Maximal progress of a single transition
  */
 template <class T>
-SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, FullCopyEncoder* fce, NetStateEncoder* nse, index_t _nr_of_threads)
-: size(_size), front_offset(_front_offset), active(size-front_offset-1), transient_offset(_transient_offset), nr_of_threads(_nr_of_threads)
+SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t _transient_offset, FullCopyEncoder* fce, NetStateEncoder* nse, index_t _nr_of_threads, hash_t _nr_of_buckets)
+: size(_size), front_offset(_front_offset), active(size-front_offset-1), 
+  transient_offset(_transient_offset), nr_of_threads(_nr_of_threads), nr_of_buckets(_nr_of_buckets)
 {
 	assert(size>front_offset);
 	// get encoders
@@ -82,10 +82,10 @@ bool SweepRingStore<T>::searchAndInsert(NetState &ns, int32_t offset, T** payloa
 	// calculate the index on our store ring where the state could be
 //cout << "size=" << size << " active=" << active << endl;
 	index_t pos((active+size+offset)%size);
-	// check old persistent markings first, use CopyEncoder
+	// check old persistent markings first, use encoder selected by command line
 	bitindex_t bitlen;
 	vectordata_t* data(sigpencoder->encodeNetState(ns, bitlen, thread));
-	hash_t hash(0);
+	hash_t hash(ns.HashCurrent%nr_of_buckets);
 //cout << "inserting at offset " << offset << ", pos " << pos << ": ";
 //printState(ns);
 
@@ -154,6 +154,10 @@ bool SweepRingStore<T>::popState(NetState& ns, index_t thread)
 		// decode, reencode, and insert into swap space
 //cout << "transient popped " << data << " " << &ns << endl;
 		fullencoder->decodeNetState(ns, data);
+
+		if (nr_of_buckets>1)
+			hash = (ns.HashCurrent = ((HashingWrapperStore<T>*)(store[active]))->getLastHash(thread));
+
 //printState(ns);
 		data = fullencoder->encodeNetState(ns, bitlen, thread);
 		samevalue->searchAndInsert(data,bitlen,hash,NULL,thread); // need to get payload from store!!!
@@ -167,6 +171,10 @@ bool SweepRingStore<T>::popState(NetState& ns, index_t thread)
 //cout << "persistent popped " << data << endl;
 		fullencoder->decodeNetState(ns, data);
 //printState(ns);
+
+		if (nr_of_buckets>1)
+			hash = (ns.HashCurrent = ((HashingWrapperStore<T>*)(newpersistent[active]->store))->getLastHash(thread));
+
 		data = sigpencoder->encodeNetState(ns, bitlen, thread);
 		oldpersistent[active]->store->searchAndInsert(data,bitlen,hash,NULL,thread); // need to get payload from store!!!
 		return true;
@@ -323,8 +331,8 @@ VectorStore<T>* SweepRingStore<T>::createSweepStore()
     switch (args_info.store_arg)
     {
         case store_arg_prefix:
-            if(args_info.bucketing_given)
-				return new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,PrefixTreeStore<T>,index_t>(nr_of_threads),16,nr_of_threads);
+            if (nr_of_buckets>1)
+				return new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,PrefixTreeStore<T>,index_t>(nr_of_threads),nr_of_buckets,nr_of_threads);
             else
 				return new PrefixTreeStore<T>(nr_of_threads);
 

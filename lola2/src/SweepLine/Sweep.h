@@ -111,6 +111,9 @@ struct tpSweepArguments {
 	/// the number of threads per front
 	index_t threads_per_front;
 
+	/// the number of hash values (buckets per progress value and store type)
+	hash_t nr_of_buckets;
+
 	/// the property to check for
 	SimpleProperty& prop;
 

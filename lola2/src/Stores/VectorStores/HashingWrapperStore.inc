@@ -1,8 +1,8 @@
 /*!
-\file SuffixTreeStore.cc
+\file HashingWrapperStore.inc
 \author Christian Koch
 \status new
-\brief VectorStore implementation using binary suffix trees. Based on BinStore. Relies on the assumption that different input vectors (possibly of different length) are not prefix of another.
+\brief VectorStore wrapper for bucketing.
 */
 
 #include <Stores/VectorStores/HashingWrapperStore.h>
@@ -73,7 +73,7 @@ bool HashingWrapperStore<T>::popVector(vectordata_t * & out, index_t threadIndex
 {
 	hash_t startingPopBucket = currentPopBucket[threadIndex];
 	do {
-		if(buckets[currentPopBucket[threadIndex]]->popVector(out))
+		if(buckets[currentPopBucket[threadIndex]]->popVector(out,threadIndex))
 			return true;
 		currentPopBucket[threadIndex] = (currentPopBucket[threadIndex]+1)%number_of_buckets;
 	}

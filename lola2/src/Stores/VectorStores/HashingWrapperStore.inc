@@ -97,3 +97,13 @@ bool HashingWrapperStore<T>::empty()
     return true;
 }
 
+/*!
+ * \brief Get the hash value of the last marking returned by popVector().
+ * \return a hash value
+ */
+template <typename T>
+hash_t HashingWrapperStore<T>::getLastHash(index_t threadIndex)
+{
+    return currentPopBucket[threadIndex];
+}
+

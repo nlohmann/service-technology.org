@@ -85,6 +85,9 @@ public:
 	/// check if the store is empty
 	/// @return true, if the store is empty
 	virtual bool empty();
+
+	/// return the hash value of the last marking returned by popVector()
+	virtual hash_t getLastHash(index_t threadIndex = 0);
 private:
 
     //VectorStoreCreator<T>* storeCreator;

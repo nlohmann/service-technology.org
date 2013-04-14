@@ -16,7 +16,7 @@ using std::vector;
 
 /// constructor
 Graph::Graph() :
-  root(NULL), type(NOTDEFINED)
+  root(NULL), type(NOTDEFINED), lastSearchId(0)
 {
 }
 
@@ -38,7 +38,7 @@ void Graph::addNode(Node *n) {
     nodes[n->id] = n;
 }
 
-ClauseList* Graph::calculateGraphFormula(int noCycle_flag) {
+ClauseList* Graph::calculateGraphFormula(int noCycle_flag, optionType option) {
 	ClauseList *result = new ClauseList();
 
 	graphformula.lastLabelIndex = graphformula.lastCycleIndex;
@@ -49,6 +49,9 @@ ClauseList* Graph::calculateGraphFormula(int noCycle_flag) {
 		status("Searching for cyles...");
 		std::vector<NodeAndOutEdge> dummy;
 		findCycles(root, dummy);
+		if (option == VAR1 || option == VAR1NOFORMULA) {
+			graphformula.lastLabelIndex += cycles.size();
+		}
 
 		computeIncomingEdgesForCycles();
 
@@ -58,6 +61,7 @@ ClauseList* Graph::calculateGraphFormula(int noCycle_flag) {
 	graphformula.checktime();
 
 	status("computing formula...");
+
 	// root node ID (the root is always reachable!)
 	int rootvarId = graphformula.getNodeVarId(root->id);
 	Clause root_reachable;
@@ -65,27 +69,6 @@ ClauseList* Graph::calculateGraphFormula(int noCycle_flag) {
 	result->push_back(root_reachable);
 
 	for (std::map<unsigned int, Node*>::const_iterator node_it = nodes.begin(); node_it != nodes.end(); ++node_it) {
-		ClauseList *f2 = addFormulaReachable(node_it->second);
-		result->insert(result->end(), f2->begin(), f2->end());
-		delete f2;
-
-		// the node's formula
-		ClauseList *f3 = node_it->second->formula->toClauseList();
-		ClauseList *temp;
-
-		// if node K is reachable then the node's formula has to be fulfilled
-		// <=>	K_reach => formula(K)
-		// <=>	not(K_reach) v formula(K)
-		temp = new ClauseList();
-		int varId = graphformula.getNodeVarId(node_it->second->id);
-		Clause tempclause;
-		tempclause.push_back(-varId);
-		temp->push_back(tempclause);
-		f3 = combineClauses(temp, f3);
-
-		result->insert(result->end(), f3->begin(), f3->end());
-		delete f3;
-
 		ClauseList *f1 = addFormulaNotReachable(node_it->second);
 		result->insert(result->end(), f1->begin(), f1->end());
 		delete f1;
@@ -93,30 +76,72 @@ ClauseList* Graph::calculateGraphFormula(int noCycle_flag) {
 		graphformula.checktime();
 	}
 
-	std::vector<int> cycleSeen;
+	if (option == VAR1 || option == VAR1NOFORMULA) {
+		for (std::map<unsigned int, Node*>::const_iterator node_it = nodes.begin(); node_it != nodes.end(); ++node_it) {
+			ClauseList *f2 = addFormulaReachable(node_it->second);
+			result->insert(result->end(), f2->begin(), f2->end());
+			delete f2;
 
-	for (Cycles::iterator it_cycles = cycles.begin(); it_cycles != cycles.end(); ++it_cycles) {
-		int cycleVarId = graphformula.getCycleVarId(it_cycles->id);
-//		status("cycle id: %i", it_cycles->id);
-		ClauseList *f4 = addFormulaCycleReachable(&(*it_cycles), cycleSeen);
-		ClauseList *f5 = new ClauseList(*f4);
-
-		for (ClauseList::iterator it = f4->begin(); it != f4->end(); ++it) {
-			it->push_back(cycleVarId);
+			graphformula.checktime();
 		}
 
-		result->insert(result->end(), f4->begin(), f4->end());
-		delete f4;
+		std::vector<int> cycleSeen;
 
-		f5 = addFormulaCycleNotReachable(f5);
-		for (ClauseList::iterator it = f5->begin(); it != f5->end(); ++it) {
-			it->push_back(-cycleVarId);
+		for (Cycles::iterator it_cycles = cycles.begin(); it_cycles != cycles.end(); ++it_cycles) {
+			int cycleVarId = graphformula.getCycleVarId(it_cycles->id);
+			//		status("cycle id: %i", it_cycles->id);
+			ClauseList *f4 = addFormulaCycleReachable(&(*it_cycles), cycleSeen);
+			ClauseList *f5 = new ClauseList(*f4);
+
+			for (ClauseList::iterator it = f4->begin(); it != f4->end(); ++it) {
+				it->push_back(cycleVarId);
+			}
+
+			result->insert(result->end(), f4->begin(), f4->end());
+			delete f4;
+
+			f5 = addFormulaCycleNotReachable(f5);
+			for (ClauseList::iterator it = f5->begin(); it != f5->end(); ++it) {
+				it->push_back(-cycleVarId);
+			}
+
+			result->insert(result->end(), f5->begin(), f5->end());
+			delete f5;
+
+			graphformula.checktime();
 		}
+	} else if (option == VAR2 || option == VAR2NOFORMULA) {
+		for (std::map<unsigned int, Node*>::const_iterator node_it = nodes.begin(); node_it != nodes.end(); ++node_it) {
+			ClauseList *f2 = addFormulaReachable2(node_it->second);
+			result->insert(result->end(), f2->begin(), f2->end());
+			delete f2;
 
-		result->insert(result->end(), f5->begin(), f5->end());
-		delete f5;
+			graphformula.checktime();
+		}
+	}
 
-		graphformula.checktime();
+	if (option != VAR1NOFORMULA && option != VAR2NOFORMULA) {
+		for (std::map<unsigned int, Node*>::const_iterator node_it = nodes.begin(); node_it != nodes.end(); ++node_it) {
+			// the node's formula
+			ClauseList *f3 = node_it->second->formula->toClauseList();
+			ClauseList *temp;
+			//graphformula.printClauseList(f3);
+
+			// if node K is reachable then the node's formula has to be fulfilled
+			// <=>	K_reach => formula(K)
+			// <=>	not(K_reach) v formula(K)
+			temp = new ClauseList();
+			int varId = graphformula.getNodeVarId(node_it->second->id);
+			Clause tempclause;
+			tempclause.push_back(-varId);
+			temp->push_back(tempclause);
+			f3 = combineClauses(temp, f3);
+
+			result->insert(result->end(), f3->begin(), f3->end());
+			delete f3;
+
+			graphformula.checktime();
+		}
 	}
 
 	return result;
@@ -229,6 +254,170 @@ ClauseList* Graph::addFormulaReachable(Node* node) {
 	return clauses2;
 }
 
+ClauseList* Graph::addFormulaReachable2(Node* node) {
+	// if the current node is the root then just return an empty clause list
+	if (node == root) {
+		return new ClauseList();
+	}
+
+	// node ID (K)
+	int varId = graphformula.getNodeVarId(node->id);
+	int labelVarId;
+
+	ClauseList *clauses = new ClauseList();
+	// <=>	if there exists an edge x from V to K then K is reachable
+	// <=>	||(V -x->* K)( x & ||(x' \in conn(x)\x)( x' ) ) => K_reach
+	// <=>	&&(V -x->* K)( K_reach v not(x) v &&(x' \in conn(x)\x)( not(x') ) )
+
+	// <=>  &&(V -x->* K)( &&(x' \in conn(x)\x)( K_reach v not(x) v not(x') ) )
+
+	ClauseList *clauses2 = new ClauseList();
+	//		if K is reachable then there has to exist a transition x to K and a connection to the 'outside'...
+	// <=>	K_reach => ||(V -x->* K)( x & ||(x' \in conn(x)\x)(x') )
+	// <=>	not(K_reach) v ||(V -x->* K)( x & ||(x' \in conn(x)\x)(x') )
+
+	// add not(K_reach) for part 2
+	Clause tempclause2;
+	tempclause2.push_back(-varId);
+	clauses2->push_back(tempclause2);
+
+	// iterate over incoming edges (labels)
+	for (std::map<std::string, std::vector<Node*> >::const_iterator it_inedges = node->inEdges.begin(); it_inedges != node->inEdges.end(); ++it_inedges) {
+		// iterate over predecessor nodes (V)
+		for (std::vector<Node*>::const_iterator it_prenodes = it_inedges->second.begin(); it_prenodes != it_inedges->second.end(); ++it_prenodes) {
+			// ignore self-loops
+			if (node->id != (*it_prenodes)->id) {
+				// compute conn(x)!
+				// only look at edges V -x-> K where C(V -x-> K) != C(K)
+				//if (!cyclesEqual(&(node->cycleList), it_inedges->first, &((*it_prenodes)->cycleList))) {
+				if ((*it_prenodes)->cycleList.count(it_inedges->first) > 0
+						&& !(node->inEdges.size() == 1 && it_inedges->second.size() == 1)) {
+					++lastSearchId;
+					// remember to delete?
+					//status("start");
+					Clause* conn = computeConnectionSet(node, it_inedges->first, *it_prenodes);
+
+					if (conn->empty()) {
+						delete conn;
+						break;
+					}
+
+					// x
+					int labelVarId = graphformula.getLabelVarId(it_inedges->first, *it_prenodes);
+
+					// K_reach v not(x)
+					// for part 1
+					Clause tempclause;
+					tempclause.push_back(varId);
+					tempclause.push_back(-labelVarId);
+
+					for (Clause::const_iterator it_conn = conn->begin(); it_conn != conn->end(); ++it_conn) {
+						// not(x')
+						// for part 1
+						Clause tt = tempclause;
+						tt.push_back(-(*it_conn));
+						clauses->push_back(tt);
+					}
+
+					// x & ||(x')
+					// for part 2
+					ClauseList *tempclauses2 = new ClauseList();
+					Clause incclause2;
+					incclause2.push_back(labelVarId);
+					tempclauses2->push_back(incclause2);
+					tempclauses2->push_back(*conn);
+					clauses2 = combineClauses(tempclauses2, clauses2);
+
+					delete conn;
+				} else {
+					// x
+					int labelVarId = graphformula.getLabelVarId(it_inedges->first, *it_prenodes);
+
+					// K_reach v not(x)
+					// for part 1
+					Clause tempclause;
+					tempclause.push_back(varId);
+					tempclause.push_back(-labelVarId);
+					clauses->push_back(tempclause);
+
+					// x
+					// for part 2
+					ClauseList *tempclauses2 = new ClauseList();
+					Clause incclause2;
+					incclause2.push_back(labelVarId);
+					tempclauses2->push_back(incclause2);
+					clauses2 = combineClauses(tempclauses2, clauses2);
+				}
+			}
+		}
+	}
+
+	clauses2->insert(clauses2->end(), clauses->begin(), clauses->end());
+	delete clauses;
+
+	return clauses2;
+}
+
+Clause* Graph::computeConnectionSet(Node* node, std::string label, Node* source) {
+	Clause* result = new Clause();
+
+	if (source->lastSearchId < lastSearchId) {
+		//status("(%u, %s, %u), %i", node->id, label.c_str(), source->id, source->cycleList.count(label));
+		if (source != node) {
+			if (source->cycleList.count(label) == 0 || source == root) {
+				int labelVarId = graphformula.getLabelVarId(label, source);
+				result->push_back(labelVarId);
+				//status("found");
+			} else {
+				node->lastSearchId = lastSearchId;
+
+				for (std::map<std::string, std::vector<Node*> >::const_iterator it = source->inEdges.begin(); it != source->inEdges.end(); ++it) {
+					for (std::vector<Node*>::const_iterator it_inner = it->second.begin(); it_inner != it->second.end(); ++it_inner) {
+						Clause* temp = computeConnectionSet(source, it->first, *it_inner);
+						result->insert(result->end(), temp->begin(), temp->end());
+						delete temp;
+					}
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+bool Graph::cyclesEqual(std::map<std::string, std::vector<int> >* list1, std::string label, std::map<std::string, std::vector<int> >* list2) {
+	if (list2->count(label) == 0) {
+		if (list1->empty())
+			return true;
+		else
+			return false;
+	}
+
+	bool found = false;
+
+	// iterate over all the node's cycles
+	for (std::map<std::string, std::vector<int> >::const_iterator it1 = list1->begin(); it1 != list1->end(); ++it1) {
+		for (std::vector<int>::const_iterator it_trans2 = it1->second.begin(); it_trans2 != it1->second.end(); ++it_trans2) {
+			found = false;
+			// iterate over incoming transition's cycles
+			for (std::vector<int>::const_iterator it_trans = (*list2)[label].begin(); it_trans != (*list2)[label].end(); ++it_trans) {
+				if (*it_trans == *it_trans2) {
+					found = true;
+					break;
+				}
+			}
+			if (found) {
+				break;
+			}
+		}
+		// if node's cycle is not in transition's cycles then return false
+		if (!found) {
+			return false;
+		}
+	}
+	return true;
+}
+
 ClauseList* Graph::addFormulaCycleReachable(Cycle *cycle, std::vector<int> cycleSeen) {
 	ClauseList *result = new ClauseList();
 
@@ -250,17 +439,17 @@ ClauseList* Graph::addFormulaCycleReachable(Cycle *cycle, std::vector<int> cycle
 
 	// iterate over the incoming edges that don't belong to the cycle
 	for (std::vector<NodeAndInEdge>::const_iterator it_edges = cycle->incomingEdges.begin(); it_edges != cycle->incomingEdges.end(); ++it_edges) {
-		std::vector<int> c = edgeBelongsToCycles(*it_edges);
+		std::vector<int>* c = edgeBelongsToCycles(*it_edges);
 		int labelVarId = graphformula.getLabelVarId(it_edges->inEdge.first, it_edges->inEdge.second);
 		// if the edge doesn't belong to another cycle then return the label's variable
-		if (c.empty()) {
+		if (c == NULL || c->empty()) {
 //			status("edge doesn't belong to a cycle");
 			Clause temp;
 			temp.push_back(-labelVarId);
 			result->push_back(temp);
 		} else {
 //			status("iterate over cycles");
-			for (std::vector<int>::const_iterator it_cycles = c.begin(); it_cycles != c.end(); ++it_cycles) {
+			for (std::vector<int>::const_iterator it_cycles = c->begin(); it_cycles != c->end(); ++it_cycles) {
 //				status("now in cycle %i", *it_cycles);
 				// if the cycle was already seen then discard the current part of the formula
 				bool found = false;
@@ -320,9 +509,12 @@ ClauseList* Graph::ClauseIntoNegClauseList(Clause clause) {
 	return result;
 }
 
-std::vector<int> Graph::edgeBelongsToCycles(NodeAndInEdge edge) {
+std::vector<int>* Graph::edgeBelongsToCycles(NodeAndInEdge edge) {
 //	status("edge (%i, %s, %i) belongs to which cycles?", edge.inEdge.second->id, edge.inEdge.first.c_str(), edge.node->id);
-	return edge.inEdge.second->cycleList[edge.inEdge.first];
+	if (edge.inEdge.second->cycleList.count(edge.inEdge.first) > 0)
+		return &(edge.inEdge.second->cycleList[edge.inEdge.first]);
+	else
+		return NULL;
 }
 
 /**
@@ -427,7 +619,6 @@ bool Graph::insertCycleWithoutDuplicates(std::vector<NodeAndOutEdge> nodeVector)
 	cycle.cycleEdges = nodeVector;
 
 	cycles.push_back(cycle);
-	++graphformula.lastLabelIndex;
 	return true;
 }
 
@@ -439,7 +630,7 @@ void Graph::computeIncomingEdgesForCycles() {
 		// iterate over all edges of the current cycle
 		for (std::vector<NodeAndOutEdge>::iterator it_inner = it_cycles->cycleEdges.begin(); it_inner != it_cycles->cycleEdges.end(); ++it_inner) {
 			// add id to list of cycle-ids that the node is in
-//			status("node: %i, push back cycle id: %i", it_inner->node->id, cycleID);
+			//status("node: %i, label: %s, push back cycle id: %i", it_inner->node->id, it_inner->outEdge.first.c_str(), cycleID);
 			it_inner->node->cycleList[it_inner->outEdge.first].push_back(cycleID);
 			// iterate over all incoming edges of destination node of the current edge
 			for (std::map<std::string, std::vector<Node*> >::iterator it_edges = it_inner->outEdge.second->inEdges.begin(); it_edges != it_inner->outEdge.second->inEdges.end(); ++it_edges) {

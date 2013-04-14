@@ -7,6 +7,7 @@
 #include "Formula.h"
 #include "types.h"
 #include "helpers.h"
+#include "verbose.h"
 
 
 /****************************************************************************
@@ -439,6 +440,7 @@ ClauseList *FormulaAND::toClauseList() const {
 ClauseList *FormulaLit::toClauseList() const {
 	Clause temp;
 	int literalID = graph->graphformula.getLabelVarId(literal, node);
+	//status("%u, %s: %i",node->id, literal.c_str(), literalID);
 	temp.push_back(literalID);
 	ClauseList *result = new ClauseList();
 	result->push_back(temp);

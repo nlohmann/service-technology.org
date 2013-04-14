@@ -27,6 +27,8 @@ class Graph {
 
         Type type;
 
+        unsigned int lastSearchId;
+
     public:
 
         Cycles cycles;
@@ -50,11 +52,17 @@ class Graph {
         /// add a node to the graph
         void addNode(Node *n);
 
-        ClauseList* calculateGraphFormula(int noCycle_flag);
+        ClauseList* calculateGraphFormula(int noCycle_flag, optionType option);
 
         ClauseList* addFormulaNotReachable(Node *node);
 
         ClauseList* addFormulaReachable(Node *node);
+
+        ClauseList* addFormulaReachable2(Node *node);
+
+        Clause* computeConnectionSet(Node* node, std::string label, Node* source);
+
+        bool cyclesEqual(std::map<std::string, std::vector<int> >* list1, std::string label, std::map<std::string, std::vector<int> >* list2);
 
         ClauseList* addFormulaCycleReachable(Cycle *cycle, std::vector<int> cycleSeen);
 
@@ -62,7 +70,7 @@ class Graph {
 
         ClauseList* ClauseIntoNegClauseList(Clause clause);
 
-        std::vector<int> edgeBelongsToCycles(NodeAndInEdge edge);
+        std::vector<int>* edgeBelongsToCycles(NodeAndInEdge edge);
 
         ClauseList* combineClauses(ClauseList *list1, ClauseList *list2);
 

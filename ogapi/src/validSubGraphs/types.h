@@ -53,6 +53,13 @@ typedef struct {
 	Values surplus;
 } AssignCount;
 
+enum optionType {
+    VAR1,
+    VAR2,
+    VAR1NOFORMULA,
+    VAR2NOFORMULA
+};
+
 enum formulaType {
     FORMULA_AND,    ///< a conjunction
     FORMULA_OR,     ///< a disjunction

@@ -5,9 +5,22 @@ purpose "This tool is made for counting valid subgraphs of operating guidelines.
 
 section "Feature selection"
 
+option "variant" -
+  "Select the variant of formula creation. (1 or 2)"
+  details="Select the variant of formula creation. '1' for variant with cycle-variables. '2' for variant without cycle-variables. The default is 1."
+  int
+  typestr="VARIANT"
+  default="1"
+  optional
+
 option "noCycles" c
   "Ignore cycles other than self-loops. May deliver false results."
   details="Don't search for cycles other than self-loops. May deliver false results but enhances performance. Searching cycles is done by a complete depth search which will take time depending on the underlying graph."
+  flag off
+  
+option "noFormula" -
+  "Ignore the nodes' formulas."
+  details="Ignore the nodes' formulas. Allows for all random combinations of outgoing edges."
   flag off
   
 option "timebound" -

@@ -28,21 +28,10 @@ class Node {
 
         bool hasCycles;
 
-        /// list of cycle-ids that the node is in
+        unsigned int lastSearchId;
+
+        /// list of cycle-ids that the node is in (divided into the outgoing edges)
         std::map<std::string, std::vector<int> > cycleList;
-
-//        int subgraphcount;
-
-        ///
-        VisitedByNodes visitedBy;
-
-        ///
-        std::vector<std::vector<Node*> > pathsToNode;
-
-        ///
-        std::map<std::string, AssignCount> results;
-
-        std::map<std::string, int > labelmap;
 
         ///  a bit assigned to this node
         enum Bit { NONE, S, F, T } bit;

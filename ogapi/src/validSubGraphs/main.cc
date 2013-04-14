@@ -70,7 +70,25 @@ int main(int argc, char **argv)
   /// a variable holding the time of the call
   clock_t start_clock = clock();
 
-  G.graphformula.cnfClauses = G.calculateGraphFormula(args_info.noCycles_flag);
+  optionType option;
+
+  if (args_info.variant_arg == 1) {
+	  if (!args_info.noFormula_flag) {
+		  option = VAR1;
+	  } else {
+		  option = VAR1NOFORMULA;
+	  }
+  } else if (args_info.variant_arg == 2) {
+	  if (!args_info.noFormula_flag) {
+		  option = VAR2;
+	  } else {
+		  option = VAR2NOFORMULA;
+	  }
+  } else {
+	  abort(10, "invalid command-line parameter(s)");
+  }
+
+  G.graphformula.cnfClauses = G.calculateGraphFormula(args_info.noCycles_flag, option);
 
   double duration = (double)(clock()-start_clock) / CLOCKS_PER_SEC;
 
@@ -81,9 +99,9 @@ int main(int argc, char **argv)
   if (args_info.formulaoutput_given) {
 	  std::string filename = (args_info.inputs_num) ? args_info.inputs[0] : "validateSubGraph_formulaoutput";
 
-	  std::string bool_filename = args_info.output_arg ? args_info.output_arg : filename + ".bool";
+	  std::string bool_filename = args_info.formulaoutput_arg ? args_info.formulaoutput_arg : filename + ".bool";
 	  Output output(bool_filename, "boolean formula");
-	  G.graphformula.booleanOut(output, args_info.inputs[0], G.graphformula.cnfClauses, &(G.cycles));
+	  G.graphformula.booleanOut(output, bool_filename, G.graphformula.cnfClauses, &(G.cycles));
   }
 
   // CNF output
@@ -92,7 +110,7 @@ int main(int argc, char **argv)
 
     std::string cnf_filename = args_info.output_arg ? args_info.output_arg : filename + ".cnf";
     Output output(cnf_filename, "conjunctive normal form");
-    G.graphformula.cnfOut(output, args_info.inputs[0], duration, args_info.noCycles_flag, &(G.cycles));
+    G.graphformula.cnfOut(output, cnf_filename, duration, args_info.noCycles_flag, &(G.cycles));
   }
 
   return EXIT_SUCCESS;

@@ -26,7 +26,12 @@ option "encoder" -
 
 option "bucketing" -
   "Activate bucketing, if the selected store supports it."
-  flag off
+  details="The Argument is valid for the SweepLine method only, should be a power of two, and determines the number of buckets per progress value."
+  typestr="BUCKETS"
+  int
+  optional
+  default="16"
+  argoptional
 
 option "hashfunctions" -
   "Hash functions for the Bloom filter"

@@ -84,7 +84,7 @@ Sweep<T>::Sweep(SimpleProperty& property, NetState& ns, SweepEmptyStore& st, Fir
 	// choose the number of buckets (hash values)
 	// (to avoid synchronisation in the store when multithreading) 
 	nr_of_buckets = 1;
-	if (args_info.bucketing_given) nr_of_buckets = 16;
+	if (args_info.bucketing_given) nr_of_buckets = args_info.bucketing_arg;
 
 	// obtain initial (empty) lists of stores for persistent states
 	start_new_persistent = new SweepListStore<T>(nr_of_threads, nr_of_buckets, store_size);

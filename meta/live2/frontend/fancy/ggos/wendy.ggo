@@ -52,7 +52,8 @@ option "tg" -
 
 option "format" f
   "Defines the format of the formulas output \n(only relevant for test guidelines)."
-  values = "tgConform", "ogConform" enum
+#  values = "tgConform", "ogConform" enum
+  values = "tgConform", "ogConform", "tgConform2", "ogConform2", "tgConform3", "ogConform3" enum
   default="tgConform"
   typestr="FORMAT"
   optional

@@ -14,12 +14,6 @@ var inputs = [
         out: '<input data-stlive-argname="${argname}" name="${argname}" id="${id}" class="input-large" type="text" >',
         useLabel: true
     },
-    valueOperations: {
-        selector: 'input#${id}',
-        updateSelector: 'input#${id}',
-        updateCall: 'val',
-        updateParams: '${newValue}'
-    }
   },
   { // TITLE
     type: 'title',
@@ -42,7 +36,8 @@ var inputs = [
          'if(e.attr(\'data-content\'))e.popover().addClass(\'btn-link\');' + 
          '" />'
 */
-         out: ' ', // <p class="well-small well"><small><em>${sectiondescription}</small></em></p>'
+// COMMENT: behaviour of sections as tabs is written in InputSetManager.Create()
+        out: ' ',
         useLabel: false
     },
   },
@@ -51,15 +46,8 @@ var inputs = [
     type: 'checkbox',
     required: ['name', 'argname'],
     html: {
-       out: '<input data-stlive-default="${default}" type="checkbox" data-stlive-argname="${argname}" name="${argname}" id="${id}" ${checked}>',
+       out: '<input type="checkbox" onclick="this.value=this.value?\'\':\'true\'" onchange="this.checked=this.value?\'checked\':\'\';" data-stlive-argname="${argname}" value="" name="${argname}" id="${id}">',
        useLabel: true
-    },
-    valueOperations: {
-        selector: 'input#${id}:checked',
-        updateSelect: 'input#${id}:unchecked',
-        // TODO: need to define this call...
-        updateCall: 'setChecked', // this is an extra jQuery Plugin, see above
-        updateParam: '${newValue}'
     }
   },
   { // SUBMIT BUTTON
@@ -75,11 +63,9 @@ var inputs = [
     required: ['name', 'argname', 'options'],
     html : {
         options : '<option value="${options}">${options}</option>',
-        out : '<select name="${argname}" id="${id}" data-stlive-argname="${argname}">${options}</select>',
+        out : '<select name="${argname}" id="${id}" data-stlive-argname="${argname}">'
+            + '<option value="">${default}</option>${options}</select>',
         useLabel: true
-    },
-    valueOperations: {
-        selector: 'input#${id}'
     }
   },
   { // ENUM SMALL
@@ -88,24 +74,22 @@ var inputs = [
     html : {
     // each optons is a button
     // need some js to active the changes
-        options : '<button class="btn" data-stlive-argname="${argname}" onclick="$(this).button(\'toggle\').change();return false;" type="button" name="${argname}" value="${options}">${options}</button>',
+        options : '<button class="btn" onclick="$(${id}).val(this.value).change();return false;" type="button" value="${options}">${options}</button>',
     // creating a button group
-        out : '<div class="btn-group" data-toggle="buttons-radio"><span class="btn active" onclick="$(this).button(\'toggle\').change();return false;">${default}</span>${options}</div>',
+        out : '<input type="hidden" value="" id="${id}" onchange="$(\'#${id}_grp button[value=\'+this.value+\']\').button(\'toggle\')">'
+            + '<div class="btn-group" id="${id}_grp" data-toggle="buttons-radio"><button class="btn active" onclick="$(${id}).val(\'\').change();return false;">${default}</button>${options}</div>',
     useLabel: true
-    },
+    }
     //command : {
       //  out : '-${argname}="${value}"'
     //},
-    valueOperations: {
-        selector: 'button[data-stlive-argname=${argname}].active'
-    }
   },
   {
     type: 'file',
     required:  ['name', 'argname'],
     html : {
-    // first the hidden field which eventually holds the file
-    // (will be copied to json-form later
+        // first the hidden field which eventually holds the file
+        // (will be copied to json-form later
         out : '<input style="display:none;" type="file" name="${id}_hidden" id="${id}_hidden" ' + 
               'onchange="if(this.style.display==\'none\')$(\'#\\\\${id}\').val(this.value).change();">'+
           // the visible button just triggers the hidden file input
@@ -116,16 +100,13 @@ var inputs = [
           // the parameter-name is taken by this input element
             '<input id="${id}" data-stlive-argname="${argname}" type="text" style="color:#000;cursor:default;border:none;background-color:transparent;" class="input-medium forceDisabled" disabled="disabled"></div>',
         useLabel: true
-    },
-    valueOperations: {
-        selector: 'input#${id}'
     }
   }
 ];
 
 // now register the set
 for(var i = 0, c = null; c = inputs[i]; ++i) {
-  INPUTS.registerInput(c.type, c.required, c.html, c.valueOperations);
+  INPUTS.registerInput(c.type, c.required, c.html);
 }
 
 // wrapper for hiding scope

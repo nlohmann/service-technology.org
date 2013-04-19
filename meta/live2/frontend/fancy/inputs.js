@@ -63,7 +63,8 @@ Input.prototype.toElementSimple = function() {
     return elSmpl;
 }
 
-Input.prototype.getValue = function() {
+/* Input.prototype.selector = function()  {
+    return true;
     if(!this.valueOps) {
         return undefined;
     }
@@ -81,11 +82,35 @@ Input.prototype.getValue = function() {
             return false;
         }
     }
-    return $(this.dom).find(this.valueselector_interpreted).val();
+    return this.valueselector_interpreted;
+} */
+
+Input.prototype.getValue = function() {
+    var el = document.getElementById(this.params.id);
+    return el? el.value : false;
 }
 
+Input.prototype.updateValue = function(val) {
+
+    // default is empty string
+    if(!val) val = '';
+    if(val == this.params.default) val = '';
+
+    // find the element
+    var el = document.getElementById(this.params.id);
+    if(!el) return false;
+    el.value = '' + val;
+
+    // trigger onchange
+    if(typeof el.onchange == 'function') {
+        el.onchange();
+    }
+}
+
+/*
+ * builds the html-string for the input
+ */
 Input.prototype.buildHtmlString = function(pName) {
-    //console.log('buildHTML STring for: ' + this.params[pName] + ' (' + pName + ')');
 
     // templater regex
     var re = /\$\{([a-zA-Z]+\w*)\}/i;
@@ -148,57 +173,9 @@ Input.prototype.toElement = function(section) {
     return el;
 }
 
-Input.prototype.updateValue = function(val) {
-// TODO: update value of element...
-// Problem: how to do this in general
-//
-//
-//  Problem solved for checkboxes...
-    if(!this.valueOps) {
-        return undefined;
-    }
 
-
-    // TODO
-    if(!this.valueUpdateSelector_interpreted) {
-        // value Selector is build
-        if(this.valueOps.updateSelector) {
-            var re = /\$\{(.+)\}/g;
-            var vsi = this.valueOps.updateSelector;
-            while(vsi.match(re)) {
-                var v;
-                if(RegExp.$1 == 'newValue') {
-                    v = val;
-                } else {
-                    v = this.params[RegExp.$1];
-                }
-                vsi = vsi.replace(re,v);
-            }
-            this.valueUpdateSelector_interpreted = vsi;
-        } else {
-            return false;
-        }
-    }
-    console.log(this.valueOps.updateCall);
-    var el = $(this.dom).find(this.valueUpdateSelector_interpreted);
-    el[this.valueOps.updateCall](val);
-
-    return;
-if(this.params.type == 'checkbox') {
-    var cb = this.dom.getElementsByTagName("input")[0];
-    if(val === true || val == "on") {
-        cb.checked = "checked";
-    } else {
-        console.log("remove attr");
-        cb.removeAttribute("checked");
-        cb.checked = null;
-    }
-}
-
-}
-
-// add an Input
-function registerInput(name, expParams, html, valueOps) {
+// create a new Input-Class
+function registerInput(name, expParams, html) {
     // create new class
     Input[name] = function(p, id) {
         Input.call(this, p, id);
@@ -208,9 +185,11 @@ function registerInput(name, expParams, html, valueOps) {
 
     // set for output creation
     Input[name].prototype.html = html;
-    Input[name].prototype.valueOps = valueOps;
 }
 
+/**
+ * helper function to create html-elements from string
+ */
 function make(html) {
     var d = document.createElement('span');
     d.innerHTML = html;
@@ -218,39 +197,19 @@ function make(html) {
 }
 
 
-///// Input Set Manager
-//InputSetManager = {
-//    instanceID : 0,
-//    instances : []
-//};
-
-// global function
-// catch up event and send to the
-// input set manager
-// 15.11.2012: event handling disabled
-//function inputEvent(m) {
-//    var mId = m.split('#')[0];
-//    InputSetManager[mId].handleEvent(m);
-//}
-
 // constructor
 function InputSetManager() {
     this.inputs = [];
-//    this.id = ++(inputSetManager.instanceID);
-//    InputSetManager.instances[this.id]=this;
     this.inputsByArgname = {};    
+    this.unmatchedParams = [];    
 }
 
 InputSetManager.prototype.SetInputs = function(inputs) {
     this.inputData = inputs;
 }
 
-// InputSetManager.handleEvent = function(m) {
-//    var iid = m.split('#').top();
-    //forward to input
-//    this.inputs[iid].handleEvent(m);
-//}
-
+// TODO: a lot of magic html creation is done is this function...
+// TODO: maybe better realise this as Inputs ???
 InputSetManager.prototype.Create = function(dom) {
     var form = document.createElement('form');
     form.className = 'form-horizontal toolForm';
@@ -277,14 +236,13 @@ InputSetManager.prototype.Create = function(dom) {
             var firstSec = this.curSec == 'topSec';
             this.curSec = 'sec'+i;
             if(firstSec) {
-                // this.curSec += ' active';
                 var well = make('<div class="tab-content stBox"><h5>more Options:</h5></div>');
                 well.appendChild(tabLinks);
                 well.appendChild(make('<hr />'));
                 form.appendChild(well);
                 curWell = well;
             }
-            var tLink = make('<li ' + (firstSec&&false?'class="active"':'') + '><a href=".sec' + i + '" data-toggle="tab">' + c.name + '</a></li>');
+            var tLink = make('<li><a href=".sec' + i + '" data-toggle="tab">' + c.name + '</a></li>');
             tabLinks.appendChild(tLink);
 
         }
@@ -299,37 +257,84 @@ InputSetManager.prototype.Create = function(dom) {
     this.form = form;
 }
 
+/** update values in form
+ * params is a list of parameters as they could in command line
+ */
 InputSetManager.prototype.update = function(params) {
-    console.log("called update");
     var pLen = params.length;
+    var unmatchedParamsByArgname = {};
+
+    this.unmatchedParams = [];
+    // first order by argname
     var paramsByArgname = {};
     for(var i=0; i < pLen; ++i) {
+
+        params[i] = params[i] + '';
+        // this a value without a key (standard file input)
+        if(params[i].match(/^[^\-][^\=]+$/gi)) { // stupid special case
+            if(!paramsByArgname.$) {
+                paramsByArgname.$ = params[i];
+            } else {
+                this.unmatchedParams.push(params[i]);
+            }
+            continue;
+        }
+
         var c = params[i].replace(/^\-+/, '');
         var cArr = c.split('=');
         var argName = cArr[0];
-        console.log(cArr);
-        var val = cArr[1] ? cArr[1] : true;
-        paramsByArgname[argName] = val;
+        var val = cArr.length > 1 ? cArr[1] : true;
+        if(!paramsByArgname[argName]) {
+            paramsByArgname[argName] = val;
+            unmatchedParamsByArgname[argName] = params[i];
+        } else {
+            this.unmatchedParams.push(params[i]);
+        }
     }
+
+    // iterate through all inputs
     var iLen = this.inputs.length;
     for(var j=0; j<iLen; ++j) {
         var c = this.inputs[j];
         var val = false;
+
+        // console.log(c);
+        // is this a key-less input?
+        if(c && c.params && c.params.argname === '') {
+            if(paramsByArgname.$) {
+                c.updateValue(paramsByArgname.$);
+                unmatchedParamsByArgname.$ = null;
+            }
+            continue;
+        }
+
+        // check, if input and value are existing
         if(c && c.params && c.params.name && paramsByArgname[c.params.name]) {
             val = paramsByArgname[c.params.name];
-            paramsByArgname[c.params.name] = null;
+            unmatchedParamsByArgname[c.params.name] = null;
         }
+        // call the update for the input
         if(c) {
             c.updateValue(val);
         }
     }
+    for(var unmatchedInd in paramsByArgname) {
+        if(unmatchedParamsByArgname[unmatchedInd]) {
+            this.unmatchedParams.push(unmatchedParamsByArgname[unmatchedInd]);
+        }
+    }
+    console.log(this.unmatchedParams);
 }
 
+// the callback function is called when something is changed
+// the callback gets a list of parameters as parameters
 InputSetManager.prototype.onChange = function(callback) {
-    // this is dirty: cloning this
+    // cloning this
+    // not that bad, as we have to create a closure anyway
     var t = this;
-    $(this.form).change(function(){
+    $(this.form).find('input, select').change(function(){ 
         var p = InputSetManager.prototype.getValues.call(t);
+        console.log(p);
         callback(p);
     });
     // initialize empty
@@ -346,7 +351,7 @@ InputSetManager.prototype.getValues = function() {
             var p = c.params.argname;
             // flag has no value
             if(c.params.type != 'checkbox') {
-                // if just standard file
+                // if just standard file (just value, no key)
                 if(p !== '') {
                     p += '=';
                 }
@@ -355,6 +360,7 @@ InputSetManager.prototype.getValues = function() {
             params.push(p);
         }
     }
+    params = params.concat(this.unmatchedParams);
     return params;
 }
 // public interface

@@ -14,6 +14,15 @@ integer mult( integer a, integer b ) {
 integer div( integer a, integer b ) {
     return mkinteger( a -> value * b -> value );
 }
+
+impl_formulas* _(formula a, formula b) {
+    return Consformulas(a, Consformulas(b, Nilformulas()));
+}
+
+impl_formulas* _(formula a, formula b, impl_formulas* c) {
+    return Consformulas(a, Consformulas(b, c));
+}
+
 %}
 
 
@@ -23,15 +32,39 @@ integer div( integer a, integer b ) {
 
 %rview arrows;
 
+// remove XOR once we are done
+Xor(Consformulas(a, Nilformulas())) -> <arrows: a >;
 // (a XOR b) == ((a AND !b) OR (!a AND b))
-Xor(a,b) -> <arrows: Or(And(a,Not(b)), And(Not(a),b)) >;
+Xor(Consformulas(a, Consformulas(b, c))) -> <arrows:
+Xor(Consformulas(Or(Consformulas( And(_(a, Not(b))),
+                    Consformulas(And(_(Not(a),b)), Nilformulas()) ) ), c) )
+>;
+
 // (a => b) == (!a OR b)
-Imp(a,b) -> <arrows: Or(Not(a), b) >;
+Imp(a,b) -> <arrows: Or( _(Not(a), b) ) >;
+
 // (a <=> b) == ((a => b) AND (b => a)
-Iff(a,b) -> <arrows: And(Imp(a,b), Imp(b,a)) >;
+Iff(a,b) -> <arrows: And( _(Imp(a,b), Imp(b,a)) ) >;
 
 
 %rview simplify;
+
+/*****************
+ * PROCESS LISTS *
+ *****************/
+
+// sort formula lists: constants first
+Consformulas(x, Consformulas(True(), y)) -> <simplify: Consformulas(True(), Consformulas(x,y)) >;
+Consformulas(x, Consformulas(False(), y)) -> <simplify: Consformulas(False(), Consformulas(x,y)) >;
+
+// deal with singletons
+And(Consformulas(x, Nilformulas())) -> <simplify: x>;
+Or(Consformulas(x, Nilformulas())) -> <simplify: x>;
+
+// flatten nested lists (avoid AND in AND or OR in OR)
+And(Consformulas(And(x), y)) -> <simplify: And(concat(x,y)) >;
+Or(Consformulas(Or(x), y)) -> <simplify: Or(concat(x,y)) >;
+
 
 /******************
  * TRUE AND FALSE *
@@ -42,23 +75,15 @@ Not(True()) -> <simplify: False() >;
 // !FALSE == TRUE
 Not(False()) -> <simplify: True() >;
 
-// x AND TRUE == x
-And(x, True()) -> <simplify: x >;
 // TRUE AND x == x
-And(True(), x) -> <simplify: x >;
-// x AND FALSE == FALSE
-And(x, False()) -> <simplify: False() >;
+And(Consformulas(True(), x)) -> <simplify: And(x) >;
 // FALSE AND x == FALSE
-And(False(), x) -> <simplify: False() >;
+And(Consformulas(False(), x)) -> <simplify: False() >;
 
-// x OR TRUE == TRUE
-Or(x, True()) -> <simplify: True() >;
 // TRUE OR x == TRUE
-Or(True(), x) -> <simplify: True() >;
-// x OR FALSE == x
-Or(x, False()) -> <simplify: x >;
+Or(Consformulas(True(), x)) -> <simplify: True() >;
 // FALSE OR x == x
-Or(False(), x) -> <simplify: x >;
+Or(Consformulas(False(), x)) -> <simplify: Or(x) >;
 
 
 /*******************
@@ -101,13 +126,14 @@ Minus(Integer(a), Integer(b)) -> <simplify: Integer(minus(a,b)) >;
 /*************************
  * MOVE NEGATIONS INSIDE *
  ************************/
-
 // !!x == x
 Not(Not(x)) -> <simplify: x >;
+/*
 // !(x AND y) == (!a OR !b)
 Not(And(x,y)) -> <simplify: Or(Not(x), Not(y)) >;
 // !(x OR y) == (!a AND !b)
 Not(Or(x,y)) -> <simplify: And(Not(x), Not(y)) >;
+*/
 
 // !(x == y) == (x != y)
 Not(EQ(x,y)) -> <simplify: NE(x,y) >;
@@ -154,13 +180,13 @@ F(a=G(F(x))) -> <simplify: a>;
 G(a=F(G(x))) -> <simplify: a>;
 
 // (Fx OR Fy) == F(x OR y)
-Or(F(x),F(y)) -> <simplify: F(Or(x,y)) >;
+//Or(F(x),F(y)) -> <simplify: F(Or(x,y)) >;
 // (Gx AND Gy) == G(x AND y)
-And(G(x), G(y)) -> <simplify: G(And(x,y)) >;
+//And(G(x), G(y)) -> <simplify: G(And(x,y)) >;
 // (Xx AND Xy) == X(x AND y)
-And(X(x), X(y)) -> <simplify: X(And(x,y)) >;
+//And(X(x), X(y)) -> <simplify: X(And(x,y)) >;
 // (Xx OR Xy) == X(x OR y)
-Or(X(x), X(y)) -> <simplify: X(Or(x,y)) >;
+//Or(X(x), X(y)) -> <simplify: X(Or(x,y)) >;
 
 // AGAGx == AGx
 A(G(a=A(G(x)))) -> <simplify: a>;

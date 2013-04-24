@@ -11,8 +11,8 @@ formula:
   True()
 | False()
 | Not(formula)
-| I(formula)
-| N(formula)
+| I(formula)                    /* fliegt raus */
+| N(formula)                    /* fliegt raus */
 | A(formula)
 | E(formula)
 | X(formula)
@@ -31,13 +31,17 @@ formula:
 | GE(expression expression)
 | LT(expression expression)
 | LE(expression expression)
-| And(formula formula)
-| Or(formula formula)
-| Xor(formula formula)         /* fliegt raus */
+| And(formulas)
+| Or(formulas)
+| Xor(formulas)                /* fliegt raus */
 | Imp(formula formula)         /* fliegt raus */
 | Iff(formula formula)         /* fliegt raus */
 | W(formula formula)
 | U(formula formula)
+;
+
+formulas:
+  list formula
 ;
 
 expression:

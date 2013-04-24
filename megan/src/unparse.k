@@ -1,4 +1,16 @@
+%{ KC_UNPARSE_HEADER
+#include <config.h>
+%}
+
 %uview lola;
+
+// some assertions
+Xor(*) -> [lola: { assert(false); } ];
+Imp(*,*) -> [lola: { assert(false); } ];
+Iff(*,*) -> [lola: { assert(false); } ];
+And(Consformulas(*,Nilformulas())) -> [lola: { assert(false); } ];
+Or(Consformulas(*,Nilformulas())) -> [lola: { assert(false); } ];
+
 
 Property(name, f) -> [lola: name ":\n" f "\n\n" ];
 ReachabilityProperty(name, f) -> [lola: name " (reachability):\n" f "\n\n" ];
@@ -14,8 +26,39 @@ LT(a,b) -> [lola: "(" a " < " b ")"];
 LE(a,b) -> [lola: "(" a " <= " b ")"];
 
 Not(a) -> [lola: "!(" a ")" ];
-And(a,b) -> [lola: "(" a " AND " b ")"];
-Or(a,b) -> [lola: "(" a " Or " b ")"];
+
+And(x) -> [lola:
+"("
+{
+    bool comma = false;
+    foreach( a; formulas x ) {
+        if (comma) {
+            mkcasestring(" AND ")->unparse(kc_printer, kc_current_view);
+        }
+        comma = true;
+        a->unparse(kc_printer, kc_current_view);
+    }
+}
+")"
+];
+
+Or(x) -> [lola:
+"("
+{
+    bool comma = false;
+    foreach( a; formulas x ) {
+        if (comma) {
+            mkcasestring(" OR ")->unparse(kc_printer, kc_current_view);
+        }
+        comma = true;
+        a->unparse(kc_printer, kc_current_view);
+    }
+}
+")"
+];
+
+Consformulas(x,Nilformulas()) -> [lola: x];
+Consformulas(x,y) -> [lola: x ", " y];
 
 Add(a,b) -> [lola: "(" a " + " b ")"];
 Minus(a,b) -> [lola: "(" a " - " b ")"];

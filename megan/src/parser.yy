@@ -39,9 +39,9 @@ using namespace kc;
 %type <yt_property> property
 %type <yt_formula> simple_formula
 %type <yt_formula> complex_formula
-%type <yt_formula> AND_sequence
-%type <yt_formula> OR_sequence
-%type <yt_formula> XOR_sequence
+%type <yt_formulas> AND_sequence
+%type <yt_formulas> OR_sequence
+%type <yt_formulas> XOR_sequence
 %type <yt_expression> simple_expression
 %type <yt_expression> complex_expression
 %type <yt_casestring> identifier
@@ -97,9 +97,9 @@ simple_formula:
 
 complex_formula:
   simple_formula                         { $$ = $1; }
-| simple_formula _AND AND_sequence       { $$ = And($1, $3); }
-| simple_formula _OR OR_sequence         { $$ = Or($1, $3); }
-| simple_formula _XOR XOR_sequence       { $$ = Xor($1, $3); }
+| simple_formula _AND AND_sequence       { $$ = And(Consformulas($1, $3)); }
+| simple_formula _OR OR_sequence         { $$ = Or(Consformulas($1, $3)); }
+| simple_formula _XOR XOR_sequence       { $$ = Xor(Consformulas($1, $3)); }
 | simple_formula _IMPLY simple_formula   { $$ = Imp($1, $3); }
 | simple_formula _EQUIV simple_formula   { $$ = Iff($1, $3); }
 | simple_formula _SUNTIL simple_formula  { $$ = U($1, $3); }
@@ -107,18 +107,18 @@ complex_formula:
 ;
 
 AND_sequence:
-  simple_formula                    { $$ = $1; }
-| simple_formula _AND AND_sequence  { $$ = And($1, $3); }
+  simple_formula                    { $$ = Consformulas($1, Nilformulas()); }
+| AND_sequence _AND simple_formula  { $$ = Consformulas($3, $1); }
 ;
 
 OR_sequence:
-  simple_formula                  { $$ = $1; }
-| simple_formula _OR OR_sequence  { $$ = Or($1, $3); }
+  simple_formula                  { $$ = Consformulas($1, Nilformulas()); }
+| OR_sequence _OR simple_formula  { $$ = Consformulas($3, $1); }
 ;
 
 XOR_sequence:
-  simple_formula                    { $$ = $1; }
-| simple_formula _XOR XOR_sequence  { $$ = Xor($1, $3); }
+  simple_formula                    { $$ = Consformulas($1, Nilformulas()); }
+| XOR_sequence _XOR simple_formula  { $$ = Consformulas($3, $1); }
 ;
 
 complex_expression:

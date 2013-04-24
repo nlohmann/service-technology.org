@@ -1,0 +1,45 @@
+.PHONY: clean
+
+BISON = /usr/local/Cellar/bison/2.7.1/bin/bison
+FLEX = /usr/local/Cellar/flex/2.5.37/bin/flex
+OBJECTS := main.o scanner.o parser.o
+
+all: form
+
+############
+
+KCFILES = abstract.k unparse.k rewrite.k
+KCFLAGS = --no-csgio --yystype --suffix=cc
+KCDUMMY = .timestamp
+KCSYSTEM = unpk.cc unpk.h k.cc k.h rk.cc rk.h yystype.h $(KCFILES:.k=.cc) $(KCFILES:.k=.h)
+
+$(KCSYSTEM): $(KCDUMMY)
+
+$(KCDUMMY): $(KCFILES)
+	touch $@
+	kc++ $(KCFLAGS) $^
+	gsed -i 's/reinterpret_cast<int>/reinterpret_cast<size_t>/g' k.cc
+
+OBJECTS += rk.o k.o unpk.o $(KCFILES:.k=.o)
+
+KCCLEANFILES = $(KCDUMMY) $(KCSYSTEM)
+
+############
+
+form: $(OBJECTS)
+	$(CXX) $(LDFLAGS) $^ -o $@
+
+scanner.cc: scanner.l parser.h
+	$(FLEX) scanner.l
+
+scanner.h: scanner.cc
+
+parser.cc: parser.y
+	$(BISON) parser.y
+
+parser.h: parser.cc yystype.h
+
+main.cc: scanner.h parser.h
+
+clean:
+	$(RM) $(OBJECTS) scanner.cc scanner.h parser.cc parser.h form $(KCCLEANFILES)

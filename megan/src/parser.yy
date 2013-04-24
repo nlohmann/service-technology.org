@@ -39,6 +39,9 @@ using namespace kc;
 %type <yt_property> property
 %type <yt_formula> simple_formula
 %type <yt_formula> complex_formula
+%type <yt_formula> AND_sequence
+%type <yt_formula> OR_sequence
+%type <yt_formula> XOR_sequence
 %type <yt_expression> simple_expression
 %type <yt_expression> complex_expression
 %type <yt_casestring> identifier
@@ -94,13 +97,28 @@ simple_formula:
 
 complex_formula:
   simple_formula                         { $$ = $1; }
-| simple_formula _AND simple_formula     { $$ = And($1, $3); }
-| simple_formula _OR simple_formula      { $$ = Or($1, $3); }
-| simple_formula _XOR simple_formula     { $$ = Xor($1, $3); }
+| simple_formula _AND AND_sequence       { $$ = And($1, $3); }
+| simple_formula _OR OR_sequence         { $$ = Or($1, $3); }
+| simple_formula _XOR XOR_sequence       { $$ = Xor($1, $3); }
 | simple_formula _IMPLY simple_formula   { $$ = Imp($1, $3); }
 | simple_formula _EQUIV simple_formula   { $$ = Iff($1, $3); }
 | simple_formula _SUNTIL simple_formula  { $$ = U($1, $3); }
 | simple_formula _WUNTIL simple_formula  { $$ = W($1, $3); }
+;
+
+AND_sequence:
+  simple_formula                    { $$ = $1; }
+| simple_formula _AND AND_sequence  { $$ = And($1, $3); }
+;
+
+OR_sequence:
+  simple_formula                  { $$ = $1; }
+| simple_formula _OR OR_sequence  { $$ = Or($1, $3); }
+;
+
+XOR_sequence:
+  simple_formula                    { $$ = $1; }
+| simple_formula _XOR XOR_sequence  { $$ = Xor($1, $3); }
 ;
 
 complex_expression:

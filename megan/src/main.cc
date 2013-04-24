@@ -1,8 +1,8 @@
-#include <cstdio>       /* for FILE io */
+#include <cstdio>                  /* for FILE io */
 #include "ast-system-k.h"          /* for kc namespace */
 #include "ast-system-yystype.h"    /* for flex/bison bridge */
-#include "scanner.h"    /* for yyin, yylex_destroy */
-#include "parser.h"     /* for yyparse */
+#include "scanner.h"               /* for yyin, yylex_destroy */
+#include "parser.h"                /* for yyparse */
 #include "ast-system-unpk.h"       /* for unparsers */
 #include "ast-system-rk.h"         /* for rewriters */
 
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
     root = root->rewrite(kc::arrows);
     root = root->rewrite(kc::simplify);
 
-    root->print();
+    //root->print();
 
     root->unparse(printer, kc::lola);
     //fprintf(yyout, "\n");

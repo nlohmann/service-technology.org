@@ -199,6 +199,9 @@ A(G(E(F(a=A(G(E(F(x)))))))) -> <simplify: a>;
 // EFAGEFAGx == EFAGx
 E(F(A(G(a=E(F(A(G(x)))))))) -> <simplify: a>;
 
+// not A(phi W psi) = E ( not psi U not phi & not psi)
+A(W(x,y)) -> <simplify: Not(E(U(Not(y),And(Not(x),Not(y)))))>
+
 
 /******************
  * PROBLEM FINDER *

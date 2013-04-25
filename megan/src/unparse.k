@@ -10,13 +10,17 @@ Imp(*,*) -> [lola: { assert(false); } ];
 Iff(*,*) -> [lola: { assert(false); } ];
 And(Consformulas(*,Nilformulas())) -> [lola: { assert(false); } ];
 Or(Consformulas(*,Nilformulas())) -> [lola: { assert(false); } ];
+I(*) -> [lola: { assert(false); } ];
+N(*) -> [lola: { assert(false); } ];
 
-
+Negation(x) -> [lola: "NEGATION: " x ];
 Property(name, f) -> [lola: name ":\n" f "\n\n" ];
-ReachabilityProperty(name, f) -> [lola: name " (reachability):\n" f "\n\n" ];
+ReachabilityProperty(name, f) -> [lola: name " (reachability):\nFORMULA REACHABLE (" f ");\n\n" ];
+DeadlockNet(name) -> [lola: name " (deadlock check)\n\n"];
+DeadlockInitial(name) -> [lola: name " (initial state deadlocks)\n\n"];
 
-True()  -> [lola: "true"];
-False() -> [lola: "false"];
+True()  -> [lola: "TRUE"];
+False() -> [lola: "FALSE"];
 
 EQ(a,b) -> [lola: "(" a " = " b ")"];
 NE(a,b) -> [lola: "(" a " != " b ")"];
@@ -67,6 +71,7 @@ Div(a,b) -> [lola: "(" a " / " b ")"];
 
 Marking(x) -> [lola: x];
 Card(x) -> [lola: x];
+Fireable(x) -> [lola: "FIREABLE(" x ")"];
 
 A(x) -> [lola: "A" x];
 E(x) -> [lola: "E" x];

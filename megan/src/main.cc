@@ -39,7 +39,6 @@ int main(int argc, char* argv[]) {
     //root->print();
 
     root->unparse(printer, kc::lola);
-    //fprintf(yyout, "\n");
 
     // tidy up
     fclose(yyin);

@@ -5,6 +5,8 @@ property:
   Property(casestring formula)
 | ReachabilityProperty(casestring formula)
 | Negation(property)
+| DeadlockInitial(casestring)
+| DeadlockNet(casestring)
 ;
 
 formula:

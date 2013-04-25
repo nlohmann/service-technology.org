@@ -12,15 +12,24 @@ integer mult( integer a, integer b ) {
 }
 
 integer div( integer a, integer b ) {
-    return mkinteger( a -> value * b -> value );
+    return mkinteger( a -> value / b -> value );
 }
 
-impl_formulas* _(formula a, formula b) {
+formulas _(formula a, formula b) {
     return Consformulas(a, Consformulas(b, Nilformulas()));
 }
 
-impl_formulas* _(formula a, formula b, impl_formulas* c) {
+formulas _(formula a, formula b, formulas c) {
     return Consformulas(a, Consformulas(b, c));
+}
+
+// helper function for the map-function in negateList
+formula negateElement(formula f) {
+    return Not(f);
+}
+
+formulas negateList(formulas l) {
+    return l->map(*negateElement);
 }
 
 %}
@@ -128,12 +137,12 @@ Minus(Integer(a), Integer(b)) -> <simplify: Integer(minus(a,b)) >;
  ************************/
 // !!x == x
 Not(Not(x)) -> <simplify: x >;
-/*
+
 // !(x AND y) == (!a OR !b)
-Not(And(x,y)) -> <simplify: Or(Not(x), Not(y)) >;
+Not(And(x)) -> <simplify: Or(negateList(x)) >;
+
 // !(x OR y) == (!a AND !b)
-Not(Or(x,y)) -> <simplify: And(Not(x), Not(y)) >;
-*/
+Not(Or(x)) -> <simplify: And(negateList(x)) >;
 
 // !(x == y) == (x != y)
 Not(EQ(x,y)) -> <simplify: NE(x,y) >;
@@ -200,17 +209,25 @@ A(G(E(F(a=A(G(E(F(x)))))))) -> <simplify: a>;
 E(F(A(G(a=E(F(A(G(x)))))))) -> <simplify: a>;
 
 // not A(phi W psi) = E ( not psi U not phi & not psi)
-A(W(x,y)) -> <simplify: Not(E(U(Not(y),And(Not(x),Not(y)))))>
+A(W(x,y)) -> <simplify: Not(E(U(Not(y),And(_(Not(x),Not(y))))))>;
 
 
 /******************
  * PROBLEM FINDER *
  ******************/
 
+// special care for deadlocks
+Property(name, I(Deadlock())) -> <simplify: DeadlockInitial(name) >;
+Property(name, N(Deadlock())) -> <simplify: Negation(DeadlockNet(name)) >;
+
 // invariant == AG
 Property(name, I(x)) -> <simplify: Property(name, A(G(x))) >;
 // impossibility == !EF
 Property(name, N(x)) -> <simplify: Property(name, Not(E(F(x)))) >;
 
+// replace top operators by known problem
 Property(name, E(F(x))) -> <simplify: ReachabilityProperty(name, x) >;
 Property(name, A(G(x))) -> <simplify: Negation(ReachabilityProperty(name, x)) >;
+
+// remove double negations
+Negation(Negation(x)) -> <simplify: x>;

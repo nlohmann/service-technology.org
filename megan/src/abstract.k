@@ -1,3 +1,7 @@
+%{ KC_TYPES_HEADER
+#include <cstring>
+%}
+
 property_set:
   list property;
 

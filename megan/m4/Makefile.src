@@ -12,10 +12,11 @@ DISTCLEANFILES =
 # GENERIC: organize distribution and cleaning of Bison sources #
 #--------------------------------------------------------------#
 
+FLEX_FILES = $(filter %.ll,$($(PACKAGE)_SOURCES))
 BISON_FILES = $(filter %.yy,$($(PACKAGE)_SOURCES))
-BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
-EXTRA_DIST += $(BISON_FILES:.yy=.hh)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
+BUILT_SOURCES += $(BISON_FILES:.yy=.cc) $(FLEX_FILES:.ll=.cc)
+EXTRA_DIST += $(BISON_FILES:.yy=.h) $(FLEX_FILES:.ll=.h)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h) $(FLEX_FILES:.ll=.h)
 
 # fix for Automake 1.12
 $(BISON_FILES:.yy=.hh):

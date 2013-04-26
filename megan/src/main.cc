@@ -11,6 +11,7 @@
 #include <libgen.h>
 #include <unistd.h>
 #include <sstream>
+#include <csignal>
 
 extern int yyerror(const char *);
 kc::property_set root;

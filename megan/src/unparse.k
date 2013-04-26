@@ -1,6 +1,20 @@
 %{ KC_UNPARSE_HEADER
 #include <config.h>
+#include "Task.h"
 %}
+
+%uview task;
+
+Negation(ReachabilityProperty(name, f)) -> [task: { new ReachabilityTask(name->name, f, true); } ];
+Negation(DeadlockNet(name)) ->             [task: { new DeadlockTask(name->name, true); } ];
+Negation(DeadlockInitial(name)) ->         [task: { new DeadlockInitialTask(name->name, true); } ];
+
+ReachabilityProperty(name, f) -> [task: { new ReachabilityTask(name->name, f); } ];
+DeadlockNet(name) ->             [task: { new DeadlockTask(name->name); } ];
+DeadlockInitial(name) ->         [task: { new DeadlockInitialTask(name->name); } ];
+Property(name, f) ->             [task: { new UnknownTask(name->name, f); }];
+
+
 
 %uview lola;
 

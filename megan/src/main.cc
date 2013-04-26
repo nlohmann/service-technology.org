@@ -8,9 +8,12 @@
 #include "cmdline.h"
 #include "verbose.h"
 #include "Socket.h"
+#include "Task.h"
+#include "Tool.h"
 #include <libgen.h>
 #include <unistd.h>
 #include <sstream>
+#include <iostream>
 #include <csignal>
 
 extern int yyerror(const char *);
@@ -85,8 +88,7 @@ void handler__termination() {
     et.send(json.c_str());
 }
 
-void callHome(int argc, char** argv)
-{
+void callHome(int argc, char** argv) {
     std::stringstream s;
     std::string json = "";
 
@@ -131,42 +133,51 @@ void callHome(int argc, char** argv)
     et.send(json.c_str());
 }
 
-
-void printer(const char *s, kc::uview v)
-{
+void printer(const char *s, kc::uview v) {
     fprintf(stdout, "%s", s);
 }
 
-int main(int argc, char* argv[]) {
-    callHome(argc, argv);
-    evaluateParameters(argc, argv);
+void dummy_printer(const char *s, kc::uview v) {
+}
 
+int main(int argc, char* argv[]) {
     signal(SIGSEGV, handler__SIGTERM);
     signal(SIGABRT, handler__SIGTERM);
     signal(SIGTERM, handler__SIGTERM);
     signal(SIGINT, handler__SIGTERM);
     atexit(handler__termination);
 
+    callHome(argc, argv);
+    evaluateParameters(argc, argv);
+
     // initialize global variables
     yyin = stdin;
     yyout = stdout;
 
     if (args_info.inputs_num == 1) {
-        yyin = fopen(argv[1], "r");
+        yyin = fopen(args_info.inputs[0], "r");
         if (yyin == NULL) {
             abort(8, "cannot open file for reading");
+        } else {
+            status("reading %s", _cfilename_(args_info.inputs[0]));
         }
     }
 
     // start the parser
     yyparse();
 
+    // rewrite the formula
     root = root->rewrite(kc::arrows);
     root = root->rewrite(kc::simplify);
 
-    //root->print();
+    // root->unparse(printer, kc::lola);
+    root->unparse(dummy_printer, kc::task);
 
-    root->unparse(printer, kc::lola);
+    status("read %d tasks", Task::queue.size());
+
+    //Task::queue[0]->worker = new Tool_LoLA_Deadlock();
+    //result_t res = Task::queue[0]->solve();
+    //status("result: %d", res);
 
     // tidy up
     fclose(yyin);

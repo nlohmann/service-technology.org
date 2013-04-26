@@ -29,6 +29,8 @@ AC_ST_VERBOSE
 # look for Kimwitu++
 AM_MISSING_PROG(KC, kc++)
 
+AC_DEFINE_UNQUOTED([TOOL_PATH], ["`pwd`/tools"], [The absolute tool path.])
+
 AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(void*)
 AC_CHECK_SIZEOF(sockaddr_in,, [#include <sys/types.h>

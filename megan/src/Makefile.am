@@ -8,6 +8,8 @@ megan_SOURCES = \
 				parser.yy scanner.ll \
 				verbose.cc verbose.h \
 				Socket.cc Socket.h \
+				Task.cc Task.h \
+				Tool.cc Tool.h \
                 main.cc
 
 # only add the local Petri net API if necessary

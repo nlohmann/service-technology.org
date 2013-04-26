@@ -26,6 +26,7 @@
 #include <pthread.h>
 
 #include <Socket.h>
+#include "verbose.h"
 //#include <InputOutput/Reporter.h>
 
 
@@ -48,6 +49,7 @@ Socket::Socket(u_short port, const char* hostname) :
     // LCOV_EXCL_START
     if (UNLIKELY(sock == -1))
     {
+        return;
         //ReporterStream rep(true);
         // rep.message("could not initialize socket at port %s", // rep.markup(MARKUP_FILE, "%d", port).str());
         // rep.abort(ERROR_NETWORK);
@@ -82,6 +84,7 @@ Socket::Socket(u_short port, const char* hostname) :
         // LCOV_EXCL_START
         if (UNLIKELY(record == NULL))
         {
+            return;
             //ReporterStream rep(true);
             // rep.message("host %s is not available", // rep.markup(MARKUP_FILE, "%s", hostname).str());
             // rep.abort(ERROR_NETWORK);

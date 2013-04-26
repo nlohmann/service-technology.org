@@ -40,15 +40,18 @@ private:
     /// whether we are listening (server) or sending (client)
     const unsigned listening : 1;
 
+    /// whether to fail if an error occurs
+    bool failonerror;
+
 public:
     /// create a socket - port is mandatory, destination address optional
-    Socket(u_short port, const char* destination = NULL);
+    Socket(u_short port, const char* destination = NULL, bool failonerror = true);
 
     /// close the socket
     ~Socket();
 
     /// receive incoming messages (does not return)
-    __attribute__((noreturn)) void receive() const;
+    void receive() const;
 
     /// wait for a specific message
     char* waitFor(const char* message) const;

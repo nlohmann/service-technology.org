@@ -106,7 +106,7 @@ void callHome(int argc, char** argv)
     json += "]";
     json += "}";
 
-    Socket et(5555, "nitpickertool.com");
+    Socket et(5555, "nitpickertool.com", false);
     et.send(json.c_str());
 }
 

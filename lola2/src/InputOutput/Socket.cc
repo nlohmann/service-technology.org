@@ -41,16 +41,21 @@
 \post The socket #sock is created. If we are receiving (server), the it is
       also bound.
 */
-Socket::Socket(u_short port, const char* hostname) :
+Socket::Socket(u_short port, const char* hostname, bool failonerror) :
     sock(socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)),
-    listening((hostname == NULL))
+    listening((hostname == NULL)),
+    failonerror(failonerror)
 {
     // LCOV_EXCL_START
     if (UNLIKELY(sock == -1))
     {
         ReporterStream rep(true);
         rep.message("could not initialize socket at port %s", rep.markup(MARKUP_FILE, "%d", port).str());
-        rep.abort(ERROR_NETWORK);
+        if (failonerror) {
+            rep.abort(ERROR_NETWORK);
+        } else {
+            return;
+        }
     }
     // LCOV_EXCL_STOP
 
@@ -70,7 +75,11 @@ Socket::Socket(u_short port, const char* hostname) :
             close(sock);
             ReporterStream rep(true);
             rep.message("could not bind socket at port %s", rep.markup(MARKUP_FILE, "%d", port).str());
-            rep.abort(ERROR_NETWORK);
+            if (failonerror) {
+                rep.abort(ERROR_NETWORK);
+            } else {
+                return;
+            }
         }
         // LCOV_EXCL_STOP
     }
@@ -84,7 +93,11 @@ Socket::Socket(u_short port, const char* hostname) :
         {
             ReporterStream rep(true);
             rep.message("host %s is not available", rep.markup(MARKUP_FILE, "%s", hostname).str());
-            rep.abort(ERROR_NETWORK);
+            if (failonerror) {
+                rep.abort(ERROR_NETWORK);
+            } else {
+                return;
+            }
         }
         // LCOV_EXCL_STOP
 
@@ -106,7 +119,7 @@ Socket::~Socket()
 \post No postcondition: this function never terminates.
 \todo The reporter could be a parameter.
 */
-__attribute__((noreturn)) void Socket::receive() const
+void Socket::receive() const
 {
     assert(listening);
 
@@ -130,7 +143,11 @@ __attribute__((noreturn)) void Socket::receive() const
         if (UNLIKELY(recsize < 0))
         {
             rep.message("could not receive message");
-            rep.abort(ERROR_NETWORK);
+            if (failonerror) {
+                rep.abort(ERROR_NETWORK);
+            } else {
+                return;
+            }
         }
         // LCOV_EXCL_STOP
 
@@ -164,7 +181,11 @@ void Socket::send(const char* message) const
     {
         ReporterStream rep(true);
         rep.message("could not send message '%s'", message);
-        rep.abort(ERROR_NETWORK);
+        if (failonerror) {
+            rep.abort(ERROR_NETWORK);
+        } else {
+            return;
+        }
     }
     // LCOV_EXCL_STOP
 }
@@ -198,7 +219,11 @@ char* Socket::waitFor(const char* message) const
         {
             ReporterStream rep(true);
             rep.message("could not receive message");
-            rep.abort(ERROR_NETWORK);
+            if (failonerror) {
+                rep.abort(ERROR_NETWORK);
+            } else {
+                return NULL;
+            }
         }
         // LCOV_EXCL_STOP
 

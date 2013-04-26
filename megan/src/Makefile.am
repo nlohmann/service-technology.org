@@ -6,6 +6,8 @@ megan_SOURCES = \
                 $(KCSOURCES) \
                 cmdline.c cmdline.h \
 				parser.yy scanner.ll \
+				verbose.cc verbose.h \
+				Socket.cc Socket.h \
                 main.cc
 
 # only add the local Petri net API if necessary

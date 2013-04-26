@@ -15,6 +15,9 @@ AC_PROG_YACC
 AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
 AC_DEFINE_UNQUOTED([VERSION_SVN], ["${VERSION_SVN}"], [The SVN revision.])
 
+# store the hostname
+AC_DEFINE_UNQUOTED([CONFIG_HOSTNAME], ["${ac_hostname}"], [The hostname.])
+
 # look up canonical build name and write it to config.h
 AC_CANONICAL_BUILD
 AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["${build}"], [The platform.])

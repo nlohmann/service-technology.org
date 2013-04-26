@@ -29,6 +29,20 @@ AC_ST_VERBOSE
 # look for Kimwitu++
 AM_MISSING_PROG(KC, kc++)
 
+AC_CHECK_SIZEOF(char)
+AC_CHECK_SIZEOF(void*)
+AC_CHECK_SIZEOF(sockaddr_in,, [#include <sys/types.h>
+#ifdef WIN32
+#include <winsock.h>
+#include <windows.h>
+#include <stdint.h>
+typedef uint32_t socklen_t;
+#else
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#endif])
+
+
 # Checks for header files.
 AC_FUNC_ALLOCA
 

@@ -1,8 +1,33 @@
+#include <fstream>
 #include "Task.h"
 #include "verbose.h"
+#include "cmdline.h"
+
+extern gengetopt_args_info args_info;
 
 std::vector<Task*> Task::queue;
+pnapi::PetriNet * Task::net = NULL;
 const char* result_t_names[] = { "true", "false", "true?", "false?", "?", "not implemented", "error" };
+
+pnapi::PetriNet *getNet() {
+    if (Task::net == NULL) {
+        Task::net = new pnapi::PetriNet();
+
+        // open net file
+        std::ifstream netfile(args_info.net_arg);
+        if (!netfile) {
+            abort(11, "could not read Petri net from file %s", _cfilename_(args_info.net_arg));
+        }
+
+        // read net from file
+        status("reading net from file %s", _cfilename_(args_info.net_arg));
+        netfile >> meta(pnapi::io::INPUTFILE, args_info.net_arg)
+                >> (args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::lola)
+                >> *(Task::net);
+    }
+    
+    return Task::net;
+}
 
 Task::Task(std::string name, bool negate) : negate(negate), name(name), worker(NULL) {
 }

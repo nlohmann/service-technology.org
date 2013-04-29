@@ -5,6 +5,7 @@ typedef enum { t_UnknownTask, t_ReachabilityTask, t_DeadlockTask, t_DeadlockInit
 
 #include <string>
 #include <vector>
+#include <pnapi/pnapi.h>
 #include "ast-system-k.h"
 #include "Tool.h"
 #include "profile.h"
@@ -19,12 +20,15 @@ class Task {
         std::string name;
         /// a function to negate results of type result_t
         static result_t negate_result(result_t);
-
     public:
         /// a task queue to which all tasks are added
         static std::vector<Task*> queue;
         /// the worker for the task (depending on the used profile)
         Tool *worker;
+        /// the Petri net for the current task family
+        static pnapi::PetriNet *net;
+        /// return the net
+        static pnapi::PetriNet *getNet();
         /// return the name of the task
         std::string getName() const;
         /// solve the task

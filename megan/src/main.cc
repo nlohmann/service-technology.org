@@ -168,11 +168,6 @@ int main(int argc, char* argv[]) {
     // start the parser
     yyparse();
 
-    // test code for Sara
-    if (false) {
-        root = root->rewrite(kc::sara_unfold);
-    }
-    
     // rewrite the formula
     root = root->rewrite(kc::arrows);
     root = root->rewrite(kc::simplify);

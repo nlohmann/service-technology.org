@@ -4,3 +4,15 @@ option "verbose" v
   "Show verbose messages."
   details="Show verbose information reporting intermediate steps.\n"
   flag off
+
+section "Input/output"
+
+option "net" n
+  "Read Petri net from file."
+  string
+  typestr="FILENAME"
+  optional
+
+option "pnml" -
+  "Read Petri net as PNML."
+  flag off

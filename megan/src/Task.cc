@@ -31,7 +31,7 @@ result_t Task::solve() const {
         result = negate_result(result);
     }
 
-    status("result of task %s: %s", _coutput_(name), _cimportant_(result_t_names[result]));
+    message("result of task %s: %s", _coutput_(name), _cimportant_(result_t_names[result]));
     return result;
 }
 
@@ -41,24 +41,24 @@ std::string Task::getName() const {
 
 UnknownTask::UnknownTask(std::string name, kc::formula f, bool negate) : Task(name, negate), f(f) {
     queue.push_back(this);
-    worker = task2tool(t_UnknownTask);
+    worker = task2tool(t_UnknownTask, this);
     status("created %sunknown task %s", (negate ? "negated " : ""), _coutput_(name));
 }
 
 ReachabilityTask::ReachabilityTask(std::string name, kc::formula f, bool negate) : Task(name, negate), f(f) {
     queue.push_back(this);
-    worker = task2tool(t_ReachabilityTask);
+    worker = task2tool(t_ReachabilityTask, this);
     status("created %sreachability task %s", (negate ? "negated " : ""), _coutput_(name));
 }
 
 DeadlockTask::DeadlockTask(std::string name, bool negate) : Task(name, negate) {
     queue.push_back(this);
-    worker = task2tool(t_DeadlockTask);
+    worker = task2tool(t_DeadlockTask, this);
     status("created %sdeadlock task %s", (negate ? "negated " : ""), _coutput_(name));
 }
 
 DeadlockInitialTask::DeadlockInitialTask(std::string name, bool negate) : Task(name, negate) {
     queue.push_back(this);
-    worker = task2tool(t_DeadlockInitialTask);
+    worker = task2tool(t_DeadlockInitialTask, this);
     status("created %sinitial deadlock task %s", (negate ? "negated " : ""), _coutput_(name));
 }

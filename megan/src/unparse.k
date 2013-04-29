@@ -44,7 +44,7 @@ GE(a,b) -> [lola: "(" a " >= " b ")"];
 LT(a,b) -> [lola: "(" a " < " b ")"];
 LE(a,b) -> [lola: "(" a " <= " b ")"];
 
-Not(a) -> [lola: "!(" a ")" ];
+Not(a) -> [lola: "NOT(" a ")" ];
 
 And(x) -> [lola:
 "("
@@ -52,7 +52,7 @@ And(x) -> [lola:
     bool comma = false;
     foreach( a; formulas x ) {
         if (comma) {
-            mkcasestring(" AND ")->unparse(kc_printer, kc_current_view);
+            mkcasestring("\nAND ")->unparse(kc_printer, kc_current_view);
         }
         comma = true;
         a->unparse(kc_printer, kc_current_view);
@@ -67,7 +67,7 @@ Or(x) -> [lola:
     bool comma = false;
     foreach( a; formulas x ) {
         if (comma) {
-            mkcasestring(" OR ")->unparse(kc_printer, kc_current_view);
+            mkcasestring("\nOR ")->unparse(kc_printer, kc_current_view);
         }
         comma = true;
         a->unparse(kc_printer, kc_current_view);

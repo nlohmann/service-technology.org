@@ -25,6 +25,8 @@ gengetopt_args_info args_info;
 /// the invocation string
 std::string invocation;
 
+FILE *outfile = stdout;
+
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
@@ -134,7 +136,7 @@ void callHome(int argc, char** argv) {
 }
 
 void printer(const char *s, kc::uview v) {
-    fprintf(stdout, "%s", s);
+    fprintf(outfile, "%s", s);
 }
 
 void dummy_printer(const char *s, kc::uview v) {
@@ -180,10 +182,13 @@ int main(int argc, char* argv[]) {
 
     status("read %d tasks", Task::queue.size());
 
-    /*
-    Task::queue[0]->solve();
-    Task::queue[1]->solve();
-*/
+    // solve tasks
+    for (int i = 0; i < Task::queue.size(); ++i) {
+        Task::queue[i]->solve();
+    }
+
+    status("processed %d tasks", Task::queue.size());
+
     // tidy up
     fclose(yyin);
     yylex_destroy();

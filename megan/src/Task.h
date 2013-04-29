@@ -18,7 +18,7 @@ class Task {
         /// the name of the task
         std::string name;
         /// a function to negate results of type result_t
-        static result_t negate_result(result_t );
+        static result_t negate_result(result_t);
 
     public:
         /// a task queue to which all tasks are added

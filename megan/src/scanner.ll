@@ -67,7 +67,7 @@ extern int yyerror(const char *);
 
 [0-9]+              { yylval.yt_integer = kc::mkinteger(atoi(yytext)); return _INTEGER; }
 [a-zA-Z0-9_]+       { yylval.yt_casestring = kc::mkcasestring(yytext); return _IDENTIFIER; }
-"\""[^"]*"\""       { yylval.yt_casestring = kc::mkcasestring(yytext); return _QUOTED; }
+"\""[^"]*"\""       { std::string s = yytext; s = s.substr(1, s.length()-2); yylval.yt_casestring = kc::mkcasestring(s.c_str()); return _QUOTED; }
 
 [\r\n]+             { return _EOL; }
 

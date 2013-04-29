@@ -1,11 +1,15 @@
 #include <config.h>
 #include <fstream>
+#include <cstdio>
 #include <pnapi/pnapi.h>
 #include "Tool.h"
 #include "verbose.h"
 #include "cmdline.h"
+#include "ast-system-unpk.h"       /* for unparsers */
 
 extern gengetopt_args_info args_info;
+extern FILE *outfile;
+extern void printer(const char *s, kc::uview v);
 
 /// needed to evaluate exit status of system call
 #define __WEXITSTATUS(status)   (((status) & 0xff00) >> 8)	
@@ -16,16 +20,18 @@ bool contains(std::string filename, std::string s) {
     return __WEXITSTATUS(return_value_grep);
 }
 
+Tool::Tool(Task* t) : t(t) {}
+
 
 /********
  * LoLA *
  ********/
 
-LoLA::LoLA() {
-    executable = std::string(TOOL_PATH) + "/lola-2.0-unreleased/bin/lola";
+LoLA::LoLA(Task *t) : Tool(t) {
+    basedir = std::string(TOOL_PATH) + "/lola-2.0-unreleased";
 }
 
-Tool_LoLA_Deadlock::Tool_LoLA_Deadlock() : LoLA() {}
+Tool_LoLA_Deadlock::Tool_LoLA_Deadlock(Task *t) : LoLA(t) {}
 
 
 result_t Tool_LoLA_Deadlock::execute() {
@@ -37,7 +43,8 @@ result_t Tool_LoLA_Deadlock::execute() {
     }
     assert(args_info.net_arg);
 
-    std::string call_tool = executable + " --nolog --check=deadlock " + args_info.net_arg + " &> /tmp/foo";
+    // call tool
+    std::string call_tool = basedir + "/bin/lola --check=deadlock " + args_info.net_arg + " &> /tmp/foo";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -56,11 +63,47 @@ result_t Tool_LoLA_Deadlock::execute() {
     return MAYBE;
 }
 
-Tool_LoLA_Reachability::Tool_LoLA_Reachability() : LoLA() {}
+Tool_LoLA_Reachability::Tool_LoLA_Reachability(Task *t) : LoLA(t) {}
 
 result_t Tool_LoLA_Reachability::execute() {
     status("checking reachability");
-    return DEFINITELY_TRUE;
+
+    // creating formula file
+    fclose(outfile);
+    outfile = fopen("/tmp/formula", "w");
+    assert(outfile);
+
+    fprintf(outfile, "FORMULA REACHABLE (");
+    ((ReachabilityTask*)t)->f->unparse(printer, kc::lola);
+    fprintf(outfile, ");");
+
+    fclose(outfile);
+    status("created formula file");
+
+    // check if net file parameter is given
+    if (not args_info.net_given) {
+        abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
+    }
+    assert(args_info.net_arg);
+
+    // call tool
+    std::string call_tool = basedir + "/bin/lola --check=modelchecking " + args_info.net_arg + " --formula=/tmp/formula " + " &> /tmp/foo";
+    status("calling %s", call_tool.c_str());
+    int return_value_tool = system(call_tool.c_str());
+    return_value_tool = __WEXITSTATUS(return_value_tool);
+
+    if (return_value_tool == 2) {
+        return ERROR;
+    }
+
+    if (contains("/tmp/foo", "lola: result: yes")) {
+        return DEFINITELY_TRUE;
+    }
+    if (contains("/tmp/foo", "lola: result: no")) {
+        return DEFINITELY_FALSE;
+    }
+
+    return MAYBE;
 }
 
 
@@ -68,9 +111,9 @@ result_t Tool_LoLA_Reachability::execute() {
  * Megan *
  *********/
 
-Megan::Megan() {}
+Megan::Megan(Task *t) : Tool(t) {}
 
-Tool_Megan_InitialDeadlock::Tool_Megan_InitialDeadlock() : Megan() {}
+Tool_Megan_InitialDeadlock::Tool_Megan_InitialDeadlock(Task *t) : Megan(t) {}
 
 result_t Tool_Megan_InitialDeadlock::execute() {
     status("checking initial deadlock");
@@ -115,6 +158,6 @@ result_t Tool_Megan_InitialDeadlock::execute() {
  * Sara *
  ********/
 
-Sara::Sara() {
-    executable = std::string(TOOL_PATH) + "/sara-1.10/bin/sara";
+Sara::Sara(Task *t) : Tool(t) {
+    basedir = std::string(TOOL_PATH) + "/sara-1.10";
 }

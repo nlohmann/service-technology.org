@@ -50,7 +50,7 @@ AC_FUNC_ALLOCA
 
 # write files
 AC_CONFIG_FILES([
-	Makefile libs/pnapi/Makefile src/Makefile
+	Makefile libs/pnapi/Makefile src/Makefile tools/Makefile
 	doc/Doxyfile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

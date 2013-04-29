@@ -4,31 +4,33 @@
 #include "Task.h"
 #include "ast-system-k.h"
 
+class Task;
 class ReachabilityTask;
 
 class Tool {
     public:
-        std::string executable;
+        std::string basedir;
         virtual result_t execute() = 0;
+        Task* t;
+        Tool(Task *);
 };
 
 
 
 class LoLA : public Tool {
     public:
-        LoLA();
+        LoLA(Task *t);
 };
 
 class Tool_LoLA_Reachability : public LoLA {
     public:
-        Tool_LoLA_Reachability();
+        Tool_LoLA_Reachability(Task*);
         result_t execute();
-        ReachabilityTask *t;
 };
 
 class Tool_LoLA_Deadlock : public LoLA {
     public:
-        Tool_LoLA_Deadlock();
+        Tool_LoLA_Deadlock(Task *);
         result_t execute();
 };
 
@@ -36,12 +38,12 @@ class Tool_LoLA_Deadlock : public LoLA {
 
 class Megan : public Tool {
     public:
-        Megan();
+        Megan(Task *t);
 };
 
 class Tool_Megan_InitialDeadlock : public Megan {
     public:
-        Tool_Megan_InitialDeadlock();
+        Tool_Megan_InitialDeadlock(Task*);
         result_t execute();
 };
 
@@ -49,12 +51,11 @@ class Tool_Megan_InitialDeadlock : public Megan {
 
 class Sara : public Tool {
     public:
-        Sara();
+        Sara(Task *t);
 };
 
 class Tool_Sara_Reachability : public Sara {
     public:
-        Tool_Sara_Reachability();
+        Tool_Sara_Reachability(Task*);
         result_t execute();
-        ReachabilityTask *t;
 };

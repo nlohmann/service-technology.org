@@ -1,4 +1,15 @@
+%{ KC_REWRITE_HEADER
+#include <fstream>
+#include <config.h>
+#include <pnapi/pnapi.h>
+#include "cmdline.h"
+#include "verbose.h"
+extern gengetopt_args_info args_info;
+%}
+
 %{ KC_REWRITE /* code redirection */
+
+// functions to immediately process constants
 integer add( integer a, integer b ) {
     return mkinteger( a -> value + b -> value );
 }
@@ -15,23 +26,75 @@ integer div( integer a, integer b ) {
     return mkinteger( a -> value / b -> value );
 }
 
+// helpers for lists -- TODO: Check if constructors need to be called
 formulas _(formula a, formula b) {
     return Consformulas(a, Consformulas(b, Nilformulas()));
 }
-
 formulas _(formula a, formula b, formulas c) {
     return Consformulas(a, Consformulas(b, c));
 }
 
 // helper function for the map-function in negateList
 formula negateElement(formula f) {
-    return Not(f);
+    return new impl_formula_Not(f);
 }
-
 formulas negateList(formulas l) {
     return l->map(*negateElement);
 }
 
+formula unfoldFireability(casestring transition_name) {
+    pnapi::PetriNet *net = NULL;
+
+    // on first call, parse net
+    if (net == NULL) {
+        net = new pnapi::PetriNet();
+
+        // check if net file parameter is given
+        if (not args_info.net_given) {
+            abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
+        }
+        assert(args_info.net_arg);
+
+        // open net file
+        std::ifstream netfile(args_info.net_arg);
+        if (!netfile) {
+            abort(11, "could not read Petri net from file %s", _cfilename_(args_info.net_arg));
+        }
+
+        // read net from file
+        status("reading net from file %s", _cfilename_(args_info.net_arg));
+        netfile >> meta(pnapi::io::INPUTFILE, args_info.net_arg)
+                >> (args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::lola)
+                >> (*net);
+    }
+    assert(net);
+
+    // get Petri net transition
+    pnapi::Transition *t = net->findTransition(transition_name->name);
+    if (!t) {
+        abort(12, "could not find transition %s", transition_name->name);
+    }
+
+    // a list to collect expressions
+    formulas l = new impl_formulas();
+
+    // traverse preset of t
+    status("unfolding...");
+    PNAPI_FOREACH(a, t->getPresetArcs()) {
+        const casestring place_name = mkcasestring((*a)->getSourceNode().getName().c_str());
+        const integer arc_weight = mkinteger((*a)->getWeight());
+        const formula f = new impl_formula_GE(new impl_expression_Marking(place_name), new impl_expression_Integer(arc_weight));
+        l->append(f);
+    }
+
+    if (l->is_nil()) {
+        formula res = new impl_formula_True();
+        return res;
+    } else {
+        formula res = new impl_formula_And(l);
+        return res;
+    }
+}
 %}
 
 
@@ -231,3 +294,13 @@ Property(name, A(G(x))) -> <simplify: Negation(ReachabilityProperty(name, x)) >;
 
 // remove double negations
 Negation(Negation(x)) -> <simplify: x>;
+
+
+
+/******************************
+ * UNFOLD FIREABLE PREDICATES *
+ ******************************/
+
+%rview sara_unfold;
+
+Fireable(t) -> <sara_unfold: unfoldFireability(t) >;

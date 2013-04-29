@@ -10,6 +10,7 @@ megan_SOURCES = \
 				Socket.cc Socket.h \
 				Task.cc Task.h \
 				Tool.cc Tool.h \
+				profile.cc profile.h \
                 main.cc
 
 # only add the local Petri net API if necessary

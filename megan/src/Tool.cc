@@ -29,9 +29,15 @@ Tool_LoLA_Deadlock::Tool_LoLA_Deadlock() : LoLA() {}
 
 
 result_t Tool_LoLA_Deadlock::execute() {
-    status("searching deadlocks");
+    status("searching for deadlocks");
 
-    std::string call_tool = executable + " --nolog --check=deadlock t/model.pnml.lola &> /tmp/foo";
+    // check if net file parameter is given
+    if (not args_info.net_given) {
+        abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
+    }
+    assert(args_info.net_arg);
+
+    std::string call_tool = executable + " --nolog --check=deadlock " + args_info.net_arg + " &> /tmp/foo";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -50,6 +56,8 @@ result_t Tool_LoLA_Deadlock::execute() {
     return MAYBE;
 }
 
+Tool_LoLA_Reachability::Tool_LoLA_Reachability() : LoLA() {}
+
 result_t Tool_LoLA_Reachability::execute() {
     status("checking reachability");
     return DEFINITELY_TRUE;
@@ -65,6 +73,8 @@ Megan::Megan() {}
 Tool_Megan_InitialDeadlock::Tool_Megan_InitialDeadlock() : Megan() {}
 
 result_t Tool_Megan_InitialDeadlock::execute() {
+    status("checking initial deadlock");
+
     // check if net file parameter is given
     if (not args_info.net_given) {
         abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
@@ -78,20 +88,33 @@ result_t Tool_Megan_InitialDeadlock::execute() {
     }
 
     // read net from file
+    status("reading net from file %s", _cfilename_(args_info.net_arg));
     pnapi::PetriNet net;
     netfile >> meta(pnapi::io::INPUTFILE, args_info.net_arg)
-                >> (args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::owfn)
-                >> net;
+            >> (args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::lola)
+            >> net;
 
-    // foreach transition t:
-    // if transition is enabled: return DEFINITELY_FALSE
-    // endforeach
-    // return DEFINITELY_TRUE
+    // get initial marking
+    pnapi::Marking m0(net);
 
-    return MAYBE;
+    // check if initial marking activates a transition
+    PNAPI_FOREACH(t, net.getTransitions()) {
+        if (m0.activates(**t)) {
+            // the net is not dead in every marking
+            status("transition %s is enabled", (*t)->getName().c_str());
+            return DEFINITELY_FALSE;
+        }
+    }
+
+    // the net is dead in every marking (because it is in m0)
+    return DEFINITELY_TRUE;
 }
 
 
 /********
  * Sara *
  ********/
+
+Sara::Sara() {
+    executable = std::string(TOOL_PATH) + "/sara-1.10/bin/sara";
+}

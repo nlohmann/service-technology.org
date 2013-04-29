@@ -1,6 +1,7 @@
 %{ KC_UNPARSE_HEADER
 #include <config.h>
 #include "Task.h"
+#include "profile.h"
 %}
 
 %uview task;

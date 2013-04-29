@@ -166,6 +166,11 @@ int main(int argc, char* argv[]) {
     // start the parser
     yyparse();
 
+    // test code for Sara
+    if (false) {
+        root = root->rewrite(kc::sara_unfold);
+    }
+    
     // rewrite the formula
     root = root->rewrite(kc::arrows);
     root = root->rewrite(kc::simplify);
@@ -175,10 +180,10 @@ int main(int argc, char* argv[]) {
 
     status("read %d tasks", Task::queue.size());
 
-    //Task::queue[0]->worker = new Tool_LoLA_Deadlock();
-    //result_t res = Task::queue[0]->solve();
-    //status("result: %d", res);
-
+    /*
+    Task::queue[0]->solve();
+    Task::queue[1]->solve();
+*/
     // tidy up
     fclose(yyin);
     yylex_destroy();

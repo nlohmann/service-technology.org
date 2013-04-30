@@ -184,7 +184,7 @@ function watchJsonBox(jqObj, updateHandler) {
     });
 }
 
-function updateValues(jqObj) {
+function updateValues(jqObj, toolName) {
     return function(updateParams) {
         var params = [];
         try {
@@ -192,7 +192,7 @@ function updateValues(jqObj) {
             jso.parameters = updateParams;
         } catch(e) {
             jso = {
-                tool: 'tttoooolname',
+                tool: toolName,
                 parameters: updateParams
             };
             var overwrite = true;

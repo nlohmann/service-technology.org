@@ -236,7 +236,8 @@ InputSetManager.prototype.Create = function(dom) {
             var firstSec = this.curSec == 'topSec';
             this.curSec = 'sec'+i;
             if(firstSec) {
-                var well = make('<div class="tab-content stBox"><h5>more Options:</h5></div>');
+                form.appendChild(make("<h5 style=\"margin-bottom:-20px;\">more Options:</h5>"));
+                var well = make('<div class="tab-content stBox"></div>');
                 well.appendChild(tabLinks);
                 well.appendChild(make('<hr />'));
                 form.appendChild(well);
@@ -304,6 +305,8 @@ InputSetManager.prototype.update = function(params) {
             if(paramsByArgname.$) {
                 c.updateValue(paramsByArgname.$);
                 unmatchedParamsByArgname.$ = null;
+            } else {
+                c.updateValue("");
             }
             continue;
         }

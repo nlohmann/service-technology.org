@@ -23,6 +23,9 @@
       .stBox .stBox {
         border: 2px solid rgb(221, 221, 221);
       }
+      .toolname {
+        color: rgb(0, 136, 204);
+      }
     </style>
     <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -55,10 +58,11 @@
     </div>
 
     <div class="container">
-    <h1 style="text-transform:uppercase;">service-technology.org/live<br><small>solutions that make services behave well</small></h1>
+    <h1 style="text-transform:uppercase;">service-technology.org/live/<span class="toolname" /><br><small>solutions that make services behave well</small></h1>
       <div class="row">
         <div class="span6">
           <div class="stBox">
+            <h3>Graphical Edit</h3>
              <span id="form_container">
               loading ... </span>
           </div>
@@ -71,15 +75,15 @@
                 title="Click right and select copy">
           </div>
           <div class="stBox">
-            <h1><!-- data-toggle="collapse" style="cursor:pointer" data-target="#json-output-container" -->
-                 JSON for Server
-            </h1>
+            <h3><!-- data-toggle="collapse" style="cursor:pointer" data-target="#json-output-container" -->
+                 Textual Edit
+            </h3>
             <div id="json-output-container">
             <form class="input-append">
                 <input id="json_typeahead" type="text" class="input-xlarge" data-provide="typeahead" autocomplete="off" _disabled="disabled"/>
                 <button type="submit" class="btn" _disabled="disabled">Add Param</button>
             </form>
-            <form action="http://localhost:1337" enctype="multipart/form-data" id="outForm" method="POST">
+            <form action="http://turgon.informatik.hu-berlin.de:1337" enctype="multipart/form-data" id="outForm" method="POST">
 <div class="control-group">
                 <textarea name="data" _disabled="disabled" class="controls input-block-level monospace" style="font-family:monospace;" id="json-output" rows="20">...</textarea>
 </div>
@@ -88,9 +92,27 @@
           </div>
         </div>
       </div> <!-- "row" -->
-      <span class="btn btn-large btn-primary submitButton" style="width:97%;">Submit</span>
-      <hr />
-      <div id="output_container" class="stBox" style="display:none;">
+      <div class="row" style="text-align:center;">
+            <!-- TODO: implement history -->
+          <span class="btn btn-large btn-info disabled" id="undo"><i class="icon-circle-arrow-left"></i>Undo</span>
+          <span class="btn btn-large btn-info disabled" id="redo"><i class="icon-circle-arrow-right"></i>Redo</span>
+          <span class="btn btn-large disabled"><i class="icon-step-backward"></i>reset to last running setup</span>
+          <span class="btn btn-large disabled"><i class="icon-fast-backward"></i>reset to last Setup</span>
+          <span class="btn btn-large btn-primary submitButton">Submit <i class="icon-play icon-white"></i></span>
+      </div>
+
+<!-- output modal -->
+    <div id="output_container" class="modal hide fade" role="dialog">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>service technology</h3>
+        </div>
+        <div class="modal-body">
+
+<div id="output_loading_info">
+            waiting for server response..
+</div>
+        <div id="output_contents">
           <h2>stdout</h2>
           <pre id="stdout"></pre>
           <h2>stderr</h2>
@@ -98,7 +120,12 @@
           <h2>Infos</h2>
           <pre id="meta"></pre>
           <div id="files_output_container"></div>
-      </div>
+         </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" data-dismiss="modal" class="btn">Close</a>
+        </div>
+    </div>
     </div> <!-- /container -->
 
     <!-- Le javascript
@@ -140,22 +167,26 @@ var tool = window.location.search;
 // no XSS:
 tool = tool.replace(/[^a-z0-9_\-]/gi,'');
 
+//replace placeholders of toolname
+$("span.toolname").text(tool);
+
 // and now build the form, will be callback function for ggo-parser
 buildForm = function(inputs) {
+    //create graphical inputsetmanager
     im = new INPUTS.InputSetManager();
     im.SetInputs(inputs);
     var b = $('#form_container').hide().empty();
     im.Create(b.get(0));
-    im.onChange(JSON_BOX.updateValues($('#json-output')));
+    // when things change, forward to json
+    im.onChange(JSON_BOX.updateValues($('#json-output'), tool));
     b.fadeIn();
-    // start listening to the formular
-    //Form2Command.toolName = tool;
-    //Form2Command.listen();
 
+    // create typeahead for json box
     JSON_BOX.createTypeahead($('#json_typeahead'), inputs);
     // TODO: using a closure here is not the best way...
     // TODO: maybe this can cause memory leak or bad performance?
     JSON_BOX.watchJsonBox($('#json-output'), function(p){im.update(p);} );
+    // when things change in json,  forward to GUI
 }
 
 // TOOL AS JSON

@@ -3,9 +3,6 @@
 // wrapper for hiding scope
 (function(){
 
-// small helper function for checkboxes
-$.fn.setChecked = function(v) { this.attr('checked', v); }
-
 var inputs = [
   { // TEXT INPUT
     type: 'text',
@@ -19,7 +16,8 @@ var inputs = [
     type: 'title',
     required: ['name', 'shortDesc'],
     html: {
-        out: '<h1 style="margin-bottom:0px;">${name}</h1><div class="muted"><small>${shortDesc}</small></div><hr />',
+        // out: '<h1 style="margin-bottom:0px;">${name}</h1><div class="muted"><small>${shortDesc}</small></div><hr />',
+        out: ' ',
         useLabel: false
     },
   },

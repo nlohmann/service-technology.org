@@ -1,5 +1,8 @@
 
 function errorHandler() {
+    // hide loading modal
+    $('#output_container').modal("hide");
+
     var e = 'An error occured when the Request was sent to server.';
     var h = 'Error in Request';
 
@@ -29,9 +32,13 @@ function errorHandler() {
     modal.appendTo('body');
 } */ 
 
+function beforeHandler() {
+    $("#output_contents").hide();
+    $('#output_container').modal();
+    $("#output_loading_info").fadeIn();
+}
 
 function completeHandler(r) {
-    $('#output_container').fadeIn();
     var stdout = r.result.output.stdout.join('\n') || '(empty)';
     var stderr = r.result.output.stderr.join('\n') || '(empty)';
     var files = r.result.output.files;
@@ -61,6 +68,8 @@ function completeHandler(r) {
         f += '<h2>'+h+'</h2><pre>'+t+'</pre>';
     }
     $('#files_output_container').html(f);
+    $("#output_loading_info").fadeOut();
+    $('#output_contents').fadeIn();
 
 }
 
@@ -75,7 +84,7 @@ $('#outForm').submit(function(){
         type: 'POST',
 
         //Ajax events
-        beforeSend: function(){$('#output_container').fadeOut();}, 
+        beforeSend: beforeHandler, //function(){$('#output_container').fadeOut();},
         success: completeHandler,
         error: errorHandler,
         // Form data

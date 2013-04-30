@@ -28,10 +28,12 @@ integer div( integer a, integer b ) {
 
 // helpers for lists -- TODO: Check if constructors need to be called
 formulas _(formula a, formula b) {
-    return Consformulas(a, Consformulas(b, Nilformulas()));
+    //return Consformulas(a, Consformulas(b, Nilformulas()));
+    return new impl_formulas(a, new impl_formulas(b, new impl_formulas()));
 }
 formulas _(formula a, formula b, formulas c) {
-    return Consformulas(a, Consformulas(b, c));
+    //return Consformulas(a, Consformulas(b, c));
+    return new impl_formulas(a, new impl_formulas(b,c));
 }
 
 // helper function for the map-function in negateList
@@ -304,3 +306,13 @@ Negation(Negation(x)) -> <simplify: x>;
 %rview sara_unfold;
 
 Fireable(t) -> <sara_unfold: unfoldFireability(t) >;
+
+// x > y --> x >= y+1
+GT(x,y) -> <sara_unfold: GE(x, Add(y, Integer(mkinteger(1)))) >;
+// x < y --> x <= y-1
+LT(x,y) -> <sara_unfold: LE(x, Minus(y, Integer(mkinteger(1)))) >;
+
+
+LT(x, Add(y,z)) -> <sara_unfold: LT(Minus(x,y), z) >;
+GT(x, Add(y,z)) -> <sara_unfold: GT(Minus(x,y), z) >;
+

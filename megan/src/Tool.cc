@@ -21,6 +21,11 @@ bool contains(std::string filename, std::string s) {
     return __WEXITSTATUS(return_value_grep);
 }
 
+std::string getTmpName() {
+    char *tmp = tmpnam(NULL);
+    return std::string(tmp);
+}
+
 Tool::Tool(Task* t) : t(t) {}
 
 
@@ -45,7 +50,7 @@ result_t Tool_LoLA_Deadlock::execute() {
     assert(args_info.net_arg);
 
     // call tool
-    char *filename_output = tmpnam(NULL);
+    std::string filename_output = getTmpName();
     std::string call_tool = basedir + "/bin/lola --check=deadlock " + args_info.net_arg + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
@@ -72,13 +77,13 @@ result_t Tool_LoLA_Reachability::execute() {
 
     // creating formula file
     fclose(outfile);
-    char *filename_formula = tmpnam(NULL);
-    outfile = fopen(filename_formula, "w");
+    std::string filename_formula = getTmpName();
+    outfile = fopen(filename_formula.c_str(), "w");
     assert(outfile);
 
     fprintf(outfile, "FORMULA REACHABLE (");
     ((ReachabilityTask*)t)->f->unparse(printer, kc::lola);
-    fprintf(outfile, ");");
+    fprintf(outfile, ");\n");
 
     fclose(outfile);
     status("created formula file %s", _cfilename_(filename_formula));
@@ -90,7 +95,7 @@ result_t Tool_LoLA_Reachability::execute() {
     assert(args_info.net_arg);
 
     // call tool
-    char *filename_output = tmpnam(NULL);
+    std::string filename_output = getTmpName();
     std::string call_tool = basedir + "/bin/lola --check=modelchecking " + args_info.net_arg + " --formula=" + filename_formula + " " + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
@@ -171,22 +176,24 @@ Tool_Sara_Reachability::Tool_Sara_Reachability(Task *t) : Sara(t) {}
 result_t Tool_Sara_Reachability::execute() {
     status("checking reachability");
 
-    ((ReachabilityTask*)t)->f = ((ReachabilityTask*)t)->f->rewrite(kc::sara_unfold);
-    ((ReachabilityTask*)t)->f = ((ReachabilityTask*)t)->f->rewrite(kc::simplify);
     status("rewriting formula");
-    
+    kc::formula tmp = ((ReachabilityTask*)t)->f;
+    tmp = tmp->rewrite(kc::sara_unfold);
+    tmp = tmp->rewrite(kc::simplify);
+    assert(tmp);
+
     // creating formula file
     fclose(outfile);
-    char *filename_formula = tmpnam(NULL);
-    outfile = fopen(filename_formula, "w");
+    std::string filename_formula = getTmpName();
+    outfile = fopen(filename_formula.c_str(), "w");
     assert(outfile);
 
     fprintf(outfile, "FORMULA (");
-    ((ReachabilityTask*)t)->f->unparse(printer, kc::lola);
-    fprintf(outfile, ");");
+    tmp->unparse(printer, kc::lola);
+    fprintf(outfile, ");\n");
 
     fclose(outfile);
-    status("created formula file");
+    status("created formula file %s", _cfilename_(filename_formula));
 
     // check if net file parameter is given
     if (not args_info.net_given) {
@@ -195,7 +202,7 @@ result_t Tool_Sara_Reachability::execute() {
     assert(args_info.net_arg);
 
     // translate formula
-    char *filename_sara = tmpnam(NULL);
+    std::string filename_sara = getTmpName();
     std::string call_ttool = basedir + "/bin/lola2sara --net=" + args_info.net_arg + " --lola --formula=" + filename_formula + " " + " > " + filename_sara;
     status("calling %s", call_ttool.c_str());
     int return_value_ttool = system(call_ttool.c_str());
@@ -208,7 +215,7 @@ result_t Tool_Sara_Reachability::execute() {
     status("translated formula file");
 
     // call tool
-    char *filename_output = tmpnam(NULL);
+    std::string filename_output = getTmpName();
     std::string call_tool = basedir + "/bin/sara --input=" + filename_sara + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());

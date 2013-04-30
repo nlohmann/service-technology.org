@@ -45,7 +45,7 @@ result_t Tool_LoLA_Deadlock::execute() {
     assert(args_info.net_arg);
 
     // call tool
-    std::string call_tool = basedir + "/bin/lola --check=deadlock " + args_info.net_arg + " &> /tmp/foo";
+    std::string call_tool = basedir + "/bin/lola --check=deadlock " + args_info.net_arg + " > /tmp/foo 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -88,7 +88,7 @@ result_t Tool_LoLA_Reachability::execute() {
     assert(args_info.net_arg);
 
     // call tool
-    std::string call_tool = basedir + "/bin/lola --check=modelchecking " + args_info.net_arg + " --formula=/tmp/formula " + " &> /tmp/foo";
+    std::string call_tool = basedir + "/bin/lola --check=modelchecking " + args_info.net_arg + " --formula=/tmp/formula " + " > /tmp/foo 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -203,7 +203,7 @@ result_t Tool_Sara_Reachability::execute() {
     status("translated formula file");
 
     // call tool
-    std::string call_tool = basedir + "/bin/sara --input=/tmp/formula.sara &> /tmp/foo";
+    std::string call_tool = basedir + "/bin/sara --input=/tmp/formula.sara > /tmp/foo 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);

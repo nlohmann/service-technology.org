@@ -32,6 +32,10 @@ pnapi::PetriNet *getNet() {
 Task::Task(std::string name, bool negate) : negate(negate), name(name), worker(NULL) {
 }
 
+Task::~Task() {
+    status("destroyed task %s", name.c_str());
+}
+
 result_t Task::negate_result(result_t r) {
     switch (r) {
         case(DEFINITELY_TRUE): return DEFINITELY_FALSE;

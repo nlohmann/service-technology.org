@@ -35,6 +35,8 @@ class Task {
         result_t solve() const;
         /// constructor
         Task(std::string, bool=false);
+        /// destructor
+        ~Task();
 };
 
 class UnknownTask : public Task {

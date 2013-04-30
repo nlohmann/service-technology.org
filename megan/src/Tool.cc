@@ -45,7 +45,8 @@ result_t Tool_LoLA_Deadlock::execute() {
     assert(args_info.net_arg);
 
     // call tool
-    std::string call_tool = basedir + "/bin/lola --check=deadlock " + args_info.net_arg + " > /tmp/foo 2>&1";
+    char *filename_output = tmpnam(NULL);
+    std::string call_tool = basedir + "/bin/lola --check=deadlock " + args_info.net_arg + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -54,10 +55,10 @@ result_t Tool_LoLA_Deadlock::execute() {
         return ERROR;
     }
 
-    if (contains("/tmp/foo", "lola: result: yes")) {
+    if (contains(filename_output, "lola: result: yes")) {
         return DEFINITELY_TRUE;
     }
-    if (contains("/tmp/foo", "lola: result: no")) {
+    if (contains(filename_output, "lola: result: no")) {
         return DEFINITELY_FALSE;
     }
 
@@ -71,7 +72,8 @@ result_t Tool_LoLA_Reachability::execute() {
 
     // creating formula file
     fclose(outfile);
-    outfile = fopen("/tmp/formula", "w");
+    char *filename_formula = tmpnam(NULL);
+    outfile = fopen(filename_formula, "w");
     assert(outfile);
 
     fprintf(outfile, "FORMULA REACHABLE (");
@@ -79,7 +81,7 @@ result_t Tool_LoLA_Reachability::execute() {
     fprintf(outfile, ");");
 
     fclose(outfile);
-    status("created formula file");
+    status("created formula file %s", _cfilename_(filename_formula));
 
     // check if net file parameter is given
     if (not args_info.net_given) {
@@ -88,7 +90,8 @@ result_t Tool_LoLA_Reachability::execute() {
     assert(args_info.net_arg);
 
     // call tool
-    std::string call_tool = basedir + "/bin/lola --check=modelchecking " + args_info.net_arg + " --formula=/tmp/formula " + " > /tmp/foo 2>&1";
+    char *filename_output = tmpnam(NULL);
+    std::string call_tool = basedir + "/bin/lola --check=modelchecking " + args_info.net_arg + " --formula=" + filename_formula + " " + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -97,10 +100,10 @@ result_t Tool_LoLA_Reachability::execute() {
         return ERROR;
     }
 
-    if (contains("/tmp/foo", "lola: result: yes")) {
+    if (contains(filename_output, "lola: result: yes")) {
         return DEFINITELY_TRUE;
     }
-    if (contains("/tmp/foo", "lola: result: no")) {
+    if (contains(filename_output, "lola: result: no")) {
         return DEFINITELY_FALSE;
     }
 
@@ -174,7 +177,8 @@ result_t Tool_Sara_Reachability::execute() {
     
     // creating formula file
     fclose(outfile);
-    outfile = fopen("/tmp/formula", "w");
+    char *filename_formula = tmpnam(NULL);
+    outfile = fopen(filename_formula, "w");
     assert(outfile);
 
     fprintf(outfile, "FORMULA (");
@@ -191,31 +195,33 @@ result_t Tool_Sara_Reachability::execute() {
     assert(args_info.net_arg);
 
     // translate formula
-    std::string call_ttool = basedir + "/bin/lola2sara --net=" + args_info.net_arg + " --lola --formula=/tmp/formula " + " > /tmp/formula.sara";
+    char *filename_sara = tmpnam(NULL);
+    std::string call_ttool = basedir + "/bin/lola2sara --net=" + args_info.net_arg + " --lola --formula=" + filename_formula + " " + " > " + filename_sara;
     status("calling %s", call_ttool.c_str());
     int return_value_ttool = system(call_ttool.c_str());
     return_value_ttool = __WEXITSTATUS(return_value_ttool);
 
-    if (return_value_ttool == 2) {
+    if (return_value_ttool != 0) {
         return ERROR;
     }
 
     status("translated formula file");
 
     // call tool
-    std::string call_tool = basedir + "/bin/sara --input=/tmp/formula.sara > /tmp/foo 2>&1";
+    char *filename_output = tmpnam(NULL);
+    std::string call_tool = basedir + "/bin/sara --input=" + filename_sara + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
 
-    if (return_value_tool == 2) {
+    if (return_value_tool != 0) {
         return ERROR;
     }
 
-    if (contains("/tmp/foo", "fulfilled")) {
+    if (contains(filename_output, "fulfilled")) {
         return DEFINITELY_TRUE;
     }
-    if (contains("/tmp/foo", "hold")) {
+    if (contains(filename_output, "hold")) {
         return DEFINITELY_FALSE;
     }
 

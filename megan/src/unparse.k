@@ -6,14 +6,14 @@
 
 %uview task;
 
-Negation(ReachabilityProperty(name, f)) -> [task: { new ReachabilityTask(name->name, f, true); } ];
-Negation(DeadlockNet(name)) ->             [task: { new DeadlockTask(name->name, true); } ];
-Negation(DeadlockInitial(name)) ->         [task: { new DeadlockInitialTask(name->name, true); } ];
+Negation(ReachabilityProperty(name, f)) -> [task: { Task *t = new ReachabilityTask(name->name, f, true); } ];
+Negation(DeadlockNet(name)) ->             [task: { Task *t = new DeadlockTask(name->name, true); } ];
+Negation(DeadlockInitial(name)) ->         [task: { Task *t = new DeadlockInitialTask(name->name, true); } ];
 
-ReachabilityProperty(name, f) -> [task: { new ReachabilityTask(name->name, f); } ];
-DeadlockNet(name) ->             [task: { new DeadlockTask(name->name); } ];
-DeadlockInitial(name) ->         [task: { new DeadlockInitialTask(name->name); } ];
-Property(name, f) ->             [task: { new UnknownTask(name->name, f); }];
+ReachabilityProperty(name, f) -> [task: { Task *t = new ReachabilityTask(name->name, f); } ];
+DeadlockNet(name) ->             [task: { Task *t = new DeadlockTask(name->name); } ];
+DeadlockInitial(name) ->         [task: { Task *t = new DeadlockInitialTask(name->name); } ];
+Property(name, f) ->             [task: { Task *t = new UnknownTask(name->name, f); }];
 
 
 

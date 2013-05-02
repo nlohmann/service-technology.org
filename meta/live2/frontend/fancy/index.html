@@ -11,8 +11,11 @@
     <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
     <style>
       body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        padding-top: 40px; /* 60px to make the container go all the way to the bottom of the topbar */
+        padding-bottom: 20px; /* 60px to make the container go all the way to the bottom of the topbar */
+        background-color: #ddd;
       }
+      /* a class for the boxes */
       .stBox {
         border: 2px solid rgb(153, 153, 153);
         margin:25px 0px;
@@ -42,8 +45,9 @@
     <link rel="apple-touch-icon-precomposed" href="bootstrap/ico/apple-touch-icon-57-precomposed.png">
   </head>
 
-  <body style="background-color:#ddd;">
+  <body>
 
+<!-- alert modal dialog -->
     <div id="myAlert" class="modal hide fade" role="dialog">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -61,6 +65,7 @@
     <h1 style="text-transform:uppercase;">service-technology.org/live/<span class="toolname" /><br><small>solutions that make services behave well</small></h1>
       <div class="row">
         <div class="span6">
+          <!-- GUI -->
           <div class="stBox">
             <h3>Graphical Edit</h3>
              <span id="form_container">
@@ -69,13 +74,8 @@
         </div>
 
         <div id="command-container" class="span6">
-          <div class="stBox" style="display:none;">
-            <h3>Command <small>for CLI</small></h3>
-                <input type="text" style="width:90%;font-family:monospace;" class="btn selAllOnFocus uneditable-input" id="command-output" 
-                title="Click right and select copy">
-          </div>
           <div class="stBox">
-            <h3><!-- data-toggle="collapse" style="cursor:pointer" data-target="#json-output-container" -->
+            <h3>
                  Textual Edit
             </h3>
             <div id="json-output-container">
@@ -92,12 +92,13 @@
           </div>
         </div>
       </div> <!-- "row" -->
+
+      <!-- menu -->
       <div class="row" style="text-align:center;">
-            <!-- TODO: implement history -->
-          <span class="btn btn-large btn-info disabled" id="undo"><i class="icon-circle-arrow-left"></i>Undo</span>
-          <span class="btn btn-large btn-info disabled" id="redo"><i class="icon-circle-arrow-right"></i>Redo</span>
-          <span class="btn btn-large disabled"><i class="icon-step-backward"></i>reset to last running setup</span>
-          <span class="btn btn-large disabled"><i class="icon-fast-backward"></i>reset to last Setup</span>
+          <span class="btn btn-large btn-info disabled" id="undo"><i class="icon-circle-arrow-left"></i> Undo</span>
+          <span class="btn btn-large btn-info disabled" id="redo"><i class="icon-circle-arrow-right"></i> Redo</span>
+          <span class="btn btn-large disabled"><i class="icon-fast-backward"></i> reset to last running setup</span>
+          <span class="btn btn-large disabled"><i class="icon-step-backward"></i> reset to last Setup</span>
           <span class="btn btn-large btn-primary submitButton">Submit <i class="icon-play icon-white"></i></span>
       </div>
 
@@ -135,26 +136,8 @@
     <script src="bootstrap/js/jquery.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
 
-<script type="text/javascript">
-// TODO: put this hack somewhere else
-$('input.inputFileHack').change(function() {
-$('#'+this.id+'_').val($(this).val());
-});
-
-(function(){
-  $('.selAllOnFocus').click(function() { // select text on focus
-  $(this).select(); 
-});
-$('.selAllOnFocus').mouseup(function(e){ // fix for chrome and safari
-  e.preventDefault();
- });
-})(); //​
-
-</script>
-
 <script src="inputs.js"></script>
 <script src="inputList.js"></script>
-<script src="form2command.js"></script>
 <script src="jquery.base64.min.js"></script>
 <script src="formatOutput.js"></script>
 <script src="peg-0.7.0.min.js"></script>
@@ -181,32 +164,23 @@ buildForm = function(inputs) {
     im.onChange(JSON_BOX.updateValues($('#json-output'), tool));
     b.fadeIn();
 
+    var fileInputs = b.find('input[type=file]');
+    $('#json-output').append(fileInputs);
+
     // create typeahead for json box
     JSON_BOX.createTypeahead($('#json_typeahead'), inputs);
     // TODO: using a closure here is not the best way...
     // TODO: maybe this can cause memory leak or bad performance?
     JSON_BOX.watchJsonBox($('#json-output'), function(p){im.update(p);} );
     // when things change in json,  forward to GUI
-}
-
-// TOOL AS JSON
-// $.getJSON('tools/'+tool+'.json', buildForm).error(function(){alert('loading ' + tool + ' failed.');});
+};
 
 // PARSE FROM GGO
 GGO_CONVERSION.initParse(tool, buildForm);
 
+// redirect the submit to the correct formular
 $('.submitButton').click(function(){
-        // before and after submit reenable... ugly
-        var jsonOut = $('#json-output');
-        if(jsonOut.attr('disabled')) {
-            jsonOut.removeAttr('disabled');
-            $('form#outForm').submit();
-            jsonOut.attr('disabled', 'disabled');
-        } else {
-        // here just submit the form
-        // further handling can be done be watching this event
-            $('form#outForm').submit();
-        }
+    $('form#outForm').submit();
 });
 
 </script>

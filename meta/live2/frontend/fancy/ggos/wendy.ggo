@@ -21,7 +21,6 @@ option "messagebound" m
   int
   typestr="BOUND"
   default="1"
-#LIVE hidden
   optional
 
 option "ignoreUnreceivedMessages" -
@@ -29,7 +28,6 @@ option "ignoreUnreceivedMessages" -
   details="If the correctness criterion is deadlock freedom, then the composition might reach a livelock in which a message is pending on a channel, but is never received.\n"
   flag off
   hidden
-  #LIVE expert
 
 
 section "Input/Output"
@@ -40,22 +38,6 @@ option "og" -
   string
   typestr="FILENAME"
   argoptional
-  optional
-#LIVE top
-
-option "tg" -
-  "Test guidelines output."
-  string
-  typestr="FILENAME"
-  optional
-  argoptional
-
-option "format" f
-  "Defines the format of the formulas output \n(only relevant for test guidelines)."
-#  values = "tgConform", "ogConform" enum
-  values = "tgConform", "ogConform", "tgConform2", "ogConform2", "tgConform3", "ogConform3" enum
-  default="tgConform"
-  typestr="FORMAT"
   optional
 
 option "sa" -
@@ -72,7 +54,6 @@ option "dot" -
   typestr="FILENAME"
   argoptional
   optional
-#live output
 
 option "im" -
   "Instance migration information output."

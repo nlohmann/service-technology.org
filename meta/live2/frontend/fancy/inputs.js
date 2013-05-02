@@ -19,7 +19,6 @@ Input.prototype.checkParams = function () {
             console.log("Parameter "+c+" not given...");
             return false;
         }
-        // console.log("param "+c+" is okay..");
     }
     return true;
 }
@@ -62,28 +61,6 @@ Input.prototype.toElementSimple = function() {
     this.dom = elSmpl;
     return elSmpl;
 }
-
-/* Input.prototype.selector = function()  {
-    return true;
-    if(!this.valueOps) {
-        return undefined;
-    }
-    if(!this.valueselector_interpreted) {
-        // value Selector is build
-        if(this.valueOps.selector) {
-            var re = /\$\{(.+)\}/g;
-            var vsi = this.valueOps.selector;
-            while(vsi.match(re)) {
-                var v = this.params[RegExp.$1];
-                vsi = vsi.replace(re,v);
-            }
-            this.valueselector_interpreted = vsi;
-        } else {
-            return false;
-        }
-    }
-    return this.valueselector_interpreted;
-} */
 
 Input.prototype.getValue = function() {
     var el = document.getElementById(this.params.id);
@@ -299,7 +276,6 @@ InputSetManager.prototype.update = function(params) {
         var c = this.inputs[j];
         var val = false;
 
-        // console.log(c);
         // is this a key-less input?
         if(c && c.params && c.params.argname === '') {
             if(paramsByArgname.$) {
@@ -326,7 +302,6 @@ InputSetManager.prototype.update = function(params) {
             this.unmatchedParams.push(unmatchedParamsByArgname[unmatchedInd]);
         }
     }
-    console.log(this.unmatchedParams);
 }
 
 // the callback function is called when something is changed
@@ -337,7 +312,6 @@ InputSetManager.prototype.onChange = function(callback) {
     var t = this;
     $(this.form).find('input, select').change(function(){ 
         var p = InputSetManager.prototype.getValues.call(t);
-        console.log(p);
         callback(p);
     });
     // initialize empty

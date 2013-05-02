@@ -1,36 +1,21 @@
+// scope wrapper
+(function(){
+//
+var noSent = 0;
+var noRec = 0;
 
-function errorHandler() {
+function errorHandler(err) {
+    ++noRec;
     // hide loading modal
     $('#output_container').modal("hide");
 
-    var e = 'An error occured when the Request was sent to server.';
+    var e = 'An error occured when the Request was sent to server';
     var h = 'Error in Request';
 
     $('#myAlert h3').text(h);
     $('#myAlert p').text(e);
     $('#myAlert').modal();
 }
-
-
-/*function myAlert(headLine, text) {
-    var modal =$('<div />');
-    var modheader = $('<div/>').addClass('modal-header');
-    var close = $('<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>');
-    var header = $('<h3>' + headLine + '</h3>');
-    var msg = $('<div>' + text + '</div>').addClass('modal-body');
-    var footer =$('<div />').addClass('modal-footer');
-
-    close.appendTo(modheader);
-    header.appendTo(modheader);
-    modheader.appendTo(modal);
-    msg.appendTo(modal);
-
-    close.clone().removeClass('close').addClass('btn').text('close').appendTo(footer);
-    footer.appendTo(modal);
-
-    modal.addClass('modal').modal();
-    modal.appendTo('body');
-} */ 
 
 function beforeHandler() {
     $("#output_contents").hide();
@@ -39,6 +24,9 @@ function beforeHandler() {
 }
 
 function completeHandler(r) {
+    if(noSent != this.number) {
+        console.log('received request number '+noRec+', but number '+noSent+' was already sent');
+    }
     var stdout = r.result.output.stdout.join('\n') || '(empty)';
     var stderr = r.result.output.stderr.join('\n') || '(empty)';
     var files = r.result.output.files;
@@ -65,10 +53,16 @@ function completeHandler(r) {
     for(var i=0, c=null; c = files[i]; ++i) {
         var h = c.filename;
         var t = $.base64.decode(c.content);
-        f += '<h2>'+h+'</h2><pre>'+t+'</pre>';
+        a = '<a ' +
+            ' download="'+h+'"' +
+            ' href="data:Application/octet-stream,' + encodeURIComponent(t) + '"' +
+            '>download ' + h + '</a>';
+        // document.location = 'data:Application/octet-stream,' + encodeURIComponent(t);
+        f += '<h2>'+h+'</h2>' + a + '<pre>'+t+'</pre>';
     }
+
     $('#files_output_container').html(f);
-    $("#output_loading_info").fadeOut();
+    $('#output_loading_info').fadeOut();
     $('#output_contents').fadeIn();
 
 }
@@ -93,7 +87,8 @@ $('#outForm').submit(function(){
         //Options to tell JQuery not to process data or worry about content-type
         cache: false,
         contentType: false,
-        processData: false
+        processData: false,
+        context: { number: ++noSent }
     });
     return false;
 });
@@ -132,3 +127,7 @@ function dumpObject(obj, indent)
   }
   return result.replace(/,\n$/, "");
 }
+
+
+// scope wrapper
+})();

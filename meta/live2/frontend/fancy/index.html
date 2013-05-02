@@ -87,7 +87,9 @@
 <div class="control-group">
                 <textarea name="data" _disabled="disabled" class="controls input-block-level monospace" style="font-family:monospace;" id="json-output" rows="20">...</textarea>
 </div>
+<input type="file" style="display:none;" id="file_template" name="file">
             </form>
+<p class="btn" onclick="$('#file_template').clone().attr('id', 'file_hidden_'+ $('input[type=file]').size()).appendTo('#outForm').click()">Add File</p>
             </div>
           </div>
         </div>
@@ -164,8 +166,9 @@ buildForm = function(inputs) {
     im.onChange(JSON_BOX.updateValues($('#json-output'), tool));
     b.fadeIn();
 
-    var fileInputs = b.find('input[type=file]');
-    $('#json-output').append(fileInputs);
+    //move file inputs
+    $('form#outForm').append(b.find('input[type=file]'));
+    // $('form#outForm').find('input[type=file]').fadeIn();
 
     // create typeahead for json box
     JSON_BOX.createTypeahead($('#json_typeahead'), inputs);

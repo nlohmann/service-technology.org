@@ -182,6 +182,8 @@ function watchJsonBox(jqObj, updateHandler) {
         }
         updateHandler(jso.parameters);
     });
+
+    jqObj.closest('form').change(updateFile);
 }
 
 function updateValues(jqObj, toolName) {
@@ -203,7 +205,28 @@ function updateValues(jqObj, toolName) {
         if(overwrite) {
             jqObj.change();
         }
+        updateFile.call(jqObj.closest('form').get(0));
    };
+}
+
+function updateFile() {
+    var form = $(this); //jqObj.closest('form');
+    form.find('li').remove();
+    var fList = $('<ul class="unstyled">');
+    form.append(fList);
+
+    form.find("input[type=file][value!='']").each(
+            function() {
+                fList.append($('<li>' + this.value + ' </li>'));
+                var link = $('<a class="btn btn-mini"><i class="icon-remove"></i></a></li>');
+                var origin = $(this);
+                link.click(
+                    function(){ origin.val(''); $(this).parent().fadeOut();}
+                );
+                fList.find('li:last').append(link);
+
+            }
+    );
 }
 
 return {

@@ -4,7 +4,7 @@
 #include "scanner.h"
 int yyerror(const char *msg);
 extern int yylineno;
-extern kc::property_set root;
+extern std::vector<kc::property> properties;
 
 using namespace kc;
 %}
@@ -35,7 +35,6 @@ using namespace kc;
 %token <yt_casestring> _IDENTIFIER
 %token <yt_casestring> _QUOTED
 
-%type <yt_property_set> propertyset
 %type <yt_property> property
 %type <yt_formula> simple_formula
 %type <yt_formula> complex_formula
@@ -48,21 +47,17 @@ using namespace kc;
 
 %%
 
-start:
-  propertyset { root = $1; }
-;
-
 propertyset:
-  property              { $$ = Consproperty_set($1, Nilproperty_set()); }
-| property propertyset  { $$ = Consproperty_set($1, $2); }
+  property
+| property propertyset
 ;
 
 property:
-  identifier _COLON complex_formula _EOL         { $$ = Property($1, $3); }
-| _REACH identifier _COLON complex_formula _EOL  { $$ = Property($2, $4); }
-| _STRUCT identifier _COLON complex_formula _EOL { $$ = Property($2, $4); }
-| _CTL identifier _COLON complex_formula _EOL    { $$ = Property($2, $4); }
-| _LTL identifier _COLON complex_formula _EOL    { $$ = Property($2, $4); }
+  identifier _COLON complex_formula _EOL         { $$ = Property($1, $3); properties.push_back($$); }
+| _REACH identifier _COLON complex_formula _EOL  { $$ = Property($2, $4); properties.push_back($$); }
+| _STRUCT identifier _COLON complex_formula _EOL { $$ = Property($2, $4); properties.push_back($$); }
+| _CTL identifier _COLON complex_formula _EOL    { $$ = Property($2, $4); properties.push_back($$); }
+| _LTL identifier _COLON complex_formula _EOL    { $$ = Property($2, $4); properties.push_back($$); }
 ;
 
 simple_formula:

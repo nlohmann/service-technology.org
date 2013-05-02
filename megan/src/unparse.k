@@ -6,14 +6,14 @@
 
 %uview task;
 
-Negation(ReachabilityProperty(name, f)) -> [task: { Task *t = new ReachabilityTask(name->name, f, true); } ];
+Negation(ReachabilityProperty(name, f)) -> [task: { Task *t = new ReachabilityTask(name->name, true); } ];
 Negation(DeadlockNet(name)) ->             [task: { Task *t = new DeadlockTask(name->name, true); } ];
 Negation(DeadlockInitial(name)) ->         [task: { Task *t = new DeadlockInitialTask(name->name, true); } ];
 
-ReachabilityProperty(name, f) -> [task: { Task *t = new ReachabilityTask(name->name, f); } ];
+ReachabilityProperty(name, f) -> [task: { Task *t = new ReachabilityTask(name->name); } ];
 DeadlockNet(name) ->             [task: { Task *t = new DeadlockTask(name->name); } ];
 DeadlockInitial(name) ->         [task: { Task *t = new DeadlockInitialTask(name->name); } ];
-Property(name, f) ->             [task: { Task *t = new UnknownTask(name->name, f); }];
+Property(name, f) ->             [task: { Task *t = new UnknownTask(name->name); }];
 
 
 
@@ -28,11 +28,11 @@ Or(Consformulas(*,Nilformulas())) -> [lola: { assert(false); } ];
 I(*) -> [lola: { assert(false); } ];
 N(*) -> [lola: { assert(false); } ];
 
-Negation(x) -> [lola: "NEGATION: " x ];
-Property(name, f) -> [lola: name ":\n" f "\n\n" ];
-ReachabilityProperty(name, f) -> [lola: name " (reachability):\nFORMULA REACHABLE (" f ");\n\n" ];
-DeadlockNet(name) -> [lola: name " (deadlock check)\n\n"];
-DeadlockInitial(name) -> [lola: name " (initial state deadlocks)\n\n"];
+//Negation(x) -> [lola: "NEGATION: " x ];
+//Property(name, f) -> [lola: name ":\n" f "\n\n" ];
+ReachabilityProperty(name, f) -> [lola: f ];
+//DeadlockNet(name) -> [lola: name " (deadlock check)\n\n"];
+//DeadlockInitial(name) -> [lola: name " (initial state deadlocks)\n\n"];
 
 True()  -> [lola: "TRUE"];
 False() -> [lola: "FALSE"];

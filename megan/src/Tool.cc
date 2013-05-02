@@ -10,6 +10,7 @@
 
 extern gengetopt_args_info args_info;
 extern FILE *outfile;
+extern std::vector<kc::property> properties;
 extern void printer(const char *s, kc::uview v);
 
 /// needed to evaluate exit status of system call
@@ -76,15 +77,14 @@ result_t Tool_LoLA_Reachability::execute() {
     status("checking reachability");
 
     // creating formula file
-    fclose(outfile);
     std::string filename_formula = getTmpName();
     outfile = fopen(filename_formula.c_str(), "w");
     assert(outfile);
-
     fprintf(outfile, "FORMULA REACHABLE (");
-    ((ReachabilityTask*)t)->f->unparse(printer, kc::lola);
+    kc::property tmp = properties[t->property_id];
+    assert(tmp);
+    tmp->unparse(printer, kc::lola);
     fprintf(outfile, ");\n");
-
     fclose(outfile);
     status("created formula file %s", _cfilename_(filename_formula));
 
@@ -176,22 +176,19 @@ Tool_Sara_Reachability::Tool_Sara_Reachability(Task *t) : Sara(t) {}
 result_t Tool_Sara_Reachability::execute() {
     status("checking reachability");
 
-    status("rewriting formula");
-    kc::formula tmp = ((ReachabilityTask*)t)->f;
+    // rewriting formula
+    kc::property tmp = properties[t->property_id];
     tmp = tmp->rewrite(kc::sara_unfold);
     tmp = tmp->rewrite(kc::simplify);
-    assert(tmp);
+    status("rewrote formula");
 
     // creating formula file
-    fclose(outfile);
     std::string filename_formula = getTmpName();
     outfile = fopen(filename_formula.c_str(), "w");
     assert(outfile);
-
     fprintf(outfile, "FORMULA (");
     tmp->unparse(printer, kc::lola);
     fprintf(outfile, ");\n");
-
     fclose(outfile);
     status("created formula file %s", _cfilename_(filename_formula));
 

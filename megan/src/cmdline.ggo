@@ -5,6 +5,11 @@ option "verbose" v
   details="Show verbose information reporting intermediate steps.\n"
   flag off
 
+option "dry" -
+  "Do not solve tasks"
+  flag
+  off
+
 section "Input/output"
 
 option "net" n
@@ -14,5 +19,5 @@ option "net" n
   optional
 
 option "pnml" -
-  "Read Petri net as PNML."
+  "Read Petri net as PNML (not supported yet)."
   flag off

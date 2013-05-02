@@ -17,7 +17,7 @@
 #include <csignal>
 
 extern int yyerror(const char *);
-kc::property_set root;
+std::vector<kc::property> properties;
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -25,7 +25,7 @@ gengetopt_args_info args_info;
 /// the invocation string
 std::string invocation;
 
-FILE *outfile = stdout;
+FILE *outfile = NULL;
 
 
 /// evaluate the command line parameters
@@ -167,26 +167,30 @@ int main(int argc, char* argv[]) {
 
     // start the parser
     yyparse();
+    status("parsed %d properties", properties.size());
 
-    // rewrite the formula
-    root = root->rewrite(kc::arrows);
-    root = root->rewrite(kc::simplify);
-
-    // root->unparse(printer, kc::lola);
-    root->unparse(dummy_printer, kc::task);
-
-    status("read %d tasks", Task::queue.size());
+    // simplify properties and create tasks
+    for (int i = 0; i < properties.size(); ++i) {
+        properties[i] = properties[i]->rewrite(kc::arrows);
+        properties[i] = properties[i]->rewrite(kc::simplify);
+        properties[i]->unparse(dummy_printer, kc::task);
+    }
+    status("created %d tasks", Task::queue.size());
 
     // solve tasks
-    for (int i = 0; i < Task::queue.size(); ++i) {
-        Task::queue[i]->solve();
+    if (not args_info.dry_given)
+    {
+        for (int i = 0; i < Task::queue.size(); ++i) {
+            Task::queue[i]->solve();
+        }
+        status("processed %d tasks", Task::queue.size());
     }
-
-    status("processed %d tasks", Task::queue.size());
 
     // tidy up
     fclose(yyin);
     yylex_destroy();
+
+    message("done");
 
     return 0;
 }

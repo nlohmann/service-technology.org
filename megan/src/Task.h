@@ -21,6 +21,9 @@ class Task {
         /// a function to negate results of type result_t
         static result_t negate_result(result_t);
     public:
+        /// an id to access the global list of properties
+        size_t property_id;
+        static size_t current_property_id;
         /// a task queue to which all tasks are added
         static std::vector<Task*> queue;
         /// the worker for the task (depending on the used profile)
@@ -41,16 +44,12 @@ class Task {
 
 class UnknownTask : public Task {
     public:
-        /// the formula to solve
-        kc::formula f;
-        UnknownTask(std::string, kc::formula, bool=false);
+        UnknownTask(std::string, bool=false);
 };
 
 class ReachabilityTask : public Task {
     public:
-        /// the formula to solve
-        kc::formula f;
-        ReachabilityTask(std::string, kc::formula, bool=false);
+        ReachabilityTask(std::string, bool=false);
 };
 
 class DeadlockTask : public Task {

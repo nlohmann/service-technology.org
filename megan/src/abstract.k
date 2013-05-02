@@ -2,9 +2,6 @@
 #include <cstring>
 %}
 
-property_set:
-  list property;
-
 property:
   Property(casestring formula)
 | ReachabilityProperty(casestring formula)

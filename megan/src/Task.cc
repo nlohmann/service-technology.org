@@ -8,6 +8,7 @@ extern gengetopt_args_info args_info;
 std::vector<Task*> Task::queue;
 pnapi::PetriNet * Task::net = NULL;
 const char* result_t_names[] = { "true", "false", "true?", "false?", "?", "not implemented", "error" };
+size_t Task::current_property_id = 0;
 
 pnapi::PetriNet *getNet() {
     if (Task::net == NULL) {
@@ -29,7 +30,7 @@ pnapi::PetriNet *getNet() {
     return Task::net;
 }
 
-Task::Task(std::string name, bool negate) : negate(negate), name(name), worker(NULL) {
+Task::Task(std::string name, bool negate) : negate(negate), name(name), property_id(current_property_id++), worker(NULL) {
 }
 
 Task::~Task() {
@@ -68,13 +69,13 @@ std::string Task::getName() const {
     return name;
 }
 
-UnknownTask::UnknownTask(std::string name, kc::formula f, bool negate) : Task(name, negate), f(f) {
+UnknownTask::UnknownTask(std::string name, bool negate) : Task(name, negate) {
     queue.push_back(this);
     worker = task2tool(t_UnknownTask, this);
     status("created %sunknown task %s", (negate ? "negated " : ""), _coutput_(name));
 }
 
-ReachabilityTask::ReachabilityTask(std::string name, kc::formula f, bool negate) : Task(name, negate), f(f) {
+ReachabilityTask::ReachabilityTask(std::string name, bool negate) : Task(name, negate) {
     queue.push_back(this);
     worker = task2tool(t_ReachabilityTask, this);
     status("created %sreachability task %s", (negate ? "negated " : ""), _coutput_(name));

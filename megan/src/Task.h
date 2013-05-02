@@ -1,7 +1,7 @@
 #pragma once
 
 typedef enum { DEFINITELY_TRUE, DEFINITELY_FALSE, MAYBE_TRUE, MAYBE_FALSE, MAYBE, NOT_IMPLEMENTED, ERROR } result_t;
-typedef enum { t_UnknownTask, t_ReachabilityTask, t_DeadlockTask, t_DeadlockInitialTask } task_t;
+typedef enum { t_UnknownTask, t_ReachabilityTask, t_DeadlockTask, t_DeadlockInitialTask, t_TrueTask } task_t;
 
 #include <string>
 #include <vector>
@@ -23,6 +23,7 @@ class Task {
     public:
         /// an id to access the global list of properties
         size_t property_id;
+        /// a counter for the current index
         static size_t current_property_id;
         /// a task queue to which all tasks are added
         static std::vector<Task*> queue;
@@ -60,4 +61,9 @@ class DeadlockTask : public Task {
 class DeadlockInitialTask : public Task {
     public:
         DeadlockInitialTask(std::string, bool=false);
+};
+
+class TrueTask : public Task {
+    public:
+        TrueTask(std::string, bool=false);
 };

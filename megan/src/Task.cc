@@ -92,3 +92,9 @@ DeadlockInitialTask::DeadlockInitialTask(std::string name, bool negate) : Task(n
     worker = task2tool(t_DeadlockInitialTask, this);
     status("created %sinitial deadlock task %s", (negate ? "negated " : ""), _coutput_(name));
 }
+
+TrueTask::TrueTask(std::string name, bool negate) : Task(name, negate) {
+    queue.push_back(this);
+    worker = task2tool(t_DeadlockInitialTask, this);
+    status("created %strue task %s", (negate ? "negated " : ""), _coutput_(name));
+}

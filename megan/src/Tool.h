@@ -47,6 +47,11 @@ class Tool_Megan_InitialDeadlock : public Megan {
         result_t execute();
 };
 
+class Tool_Megan_True : public Megan {
+    public:
+        Tool_Megan_True(Task*);
+        result_t execute();
+};
 
 
 class Sara : public Tool {

@@ -28,11 +28,11 @@ formula:
 | Live2(casestring)
 | Live3(casestring)
 | Live4(casestring)
-| EQ(expression expression)
-| NE(expression expression)
-| GT(expression expression)
-| GE(expression expression)
-| LT(expression expression)
+| EQ(expression expression)    /* fliegt raus */
+| NE(expression expression)    /* fliegt raus */
+| GT(expression expression)    /* fliegt raus */
+| GE(expression expression)    /* fliegt raus */
+| LT(expression expression)    /* fliegt raus */
 | LE(expression expression)
 | And(formulas)
 | Or(formulas)

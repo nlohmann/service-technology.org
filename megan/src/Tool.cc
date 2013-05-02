@@ -163,6 +163,14 @@ result_t Tool_Megan_InitialDeadlock::execute() {
 }
 
 
+Tool_Megan_True::Tool_Megan_True(Task *t) : Megan(t) {}
+
+result_t Tool_Megan_True::execute() {
+    status("checking truth");
+    return DEFINITELY_TRUE;
+}
+
+
 /********
  * Sara *
  ********/
@@ -178,7 +186,10 @@ result_t Tool_Sara_Reachability::execute() {
 
     // rewriting formula
     kc::property tmp = properties[t->property_id];
+    //tmp->print();
+    
     tmp = tmp->rewrite(kc::sara_unfold);
+    //tmp->print();
     tmp = tmp->rewrite(kc::simplify);
     status("rewrote formula");
 
@@ -187,7 +198,7 @@ result_t Tool_Sara_Reachability::execute() {
     outfile = fopen(filename_formula.c_str(), "w");
     assert(outfile);
     fprintf(outfile, "FORMULA (");
-    tmp->unparse(printer, kc::lola);
+    tmp->unparse(printer, kc::sara);
     fprintf(outfile, ");\n");
     fclose(outfile);
     status("created formula file %s", _cfilename_(filename_formula));
@@ -206,6 +217,8 @@ result_t Tool_Sara_Reachability::execute() {
     return_value_ttool = __WEXITSTATUS(return_value_ttool);
 
     if (return_value_ttool != 0) {
+        //tmp->print();
+        //exit(1);
         return ERROR;
     }
 

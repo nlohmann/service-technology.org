@@ -173,6 +173,8 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < properties.size(); ++i) {
         properties[i] = properties[i]->rewrite(kc::arrows);
         properties[i] = properties[i]->rewrite(kc::simplify);
+        //properties[i] = properties[i]->rewrite(kc::sara_unfold);
+        //properties[i] = properties[i]->rewrite(kc::simplify);
         properties[i]->unparse(dummy_printer, kc::task);
     }
     status("created %d tasks", Task::queue.size());

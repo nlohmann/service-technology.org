@@ -95,3 +95,48 @@ G(x) -> [lola: "G" x];
 F(x) -> [lola: "F" x];
 W(x,y) -> [lola: "(" x " W " y ")"];
 U(x,y) -> [lola: "(" x " U " y ")"];
+
+
+
+
+%uview sara;
+
+ReachabilityProperty(name, f) -> [sara: f];
+LE(a,b) -> [sara: "(" a " <= " b ")"];
+And(x) -> [sara:
+"("
+{
+    bool comma = false;
+    foreach( a; formulas x ) {
+        if (comma) {
+            mkcasestring("\nAND ")->unparse(kc_printer, kc_current_view);
+        }
+        comma = true;
+        a->unparse(kc_printer, kc_current_view);
+    }
+}
+")"
+];
+
+Or(x) -> [sara:
+"("
+{
+    bool comma = false;
+    foreach( a; formulas x ) {
+        if (comma) {
+            mkcasestring("\nOR ")->unparse(kc_printer, kc_current_view);
+        }
+        comma = true;
+        a->unparse(kc_printer, kc_current_view);
+    }
+}
+")"
+];
+
+Add(a,b) -> [sara: a " " b];
+Mult(Integer(a),b) provided (a->value > 1) -> [sara: b ":" a];
+Mult(Integer(a),b) provided (a->value == 1) -> [sara: b];
+Mult(Integer(a),b) provided (a->value < 0) -> [sara: "- " b ":"  { mkinteger(- (a->value))->unparse(kc_printer, kc_current_view); } ];
+
+Marking(x) -> [sara: x];
+Card(x) -> [sara: x];

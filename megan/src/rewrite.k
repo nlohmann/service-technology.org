@@ -174,6 +174,7 @@ Mult(Integer(a), x) provided (a->value == 0) -> <simplify: Integer(mkinteger(0))
 Mult(x, Integer(a)) provided (a->value == 0) -> <simplify: Integer(mkinteger(0)) >;
 // integer multiplication
 Mult(Integer(a), Integer(b)) -> <simplify: Integer(mult(a,b)) >;
+Mult(Integer(a), Mult(Integer(b), c)) -> <simplify: Mult(Integer(mult(a,b)), c) >;
 
 // x/1 == x
 Div(x, Integer(a)) provided (a->value == 1) -> <simplify: x >;
@@ -233,6 +234,65 @@ Not(G(x)) -> <simplify: F(Not(x)) >;
 // !(Xx) == X(!x)
 Not(X(x)) -> <simplify: X(Not(x)) >;
 
+
+/***************************
+ * EVERYTHING SHOULD BE <= *
+ ***************************/
+
+// x == y  -->  x <= y AND y <= x
+EQ(x,y) -> <simplify: And(Consformulas(LE(x,y), Consformulas(LE(y,x), Nilformulas()))) >;
+// x != y  -->  x < y AND y < x
+NE(x,y) -> <simplify: And(Consformulas(LT(x,y), Consformulas(LT(y,x), Nilformulas()))) >;
+// x > y --> x >= y+1
+GT(x,y) -> <simplify: GE(x, Add(y, Integer(mkinteger(1)))) >;
+// x < y --> x <= y-1
+LT(x,y) -> <simplify: LE(x, Minus(y, Integer(mkinteger(1)))) >;
+// x >= y  -->  y <= x
+GE(x,y) -> <simplify: LE(y,x) >;
+
+
+/*******************************
+ * TAKE RIGHT SIDE TO THE LEFT *
+ *******************************/
+
+// x <= y+z  ->  x-(y+z) <= 0
+LE(x, y=Add(*,*)) -> <simplify: LE(Minus(x,y), Integer(mkinteger(0))) >;
+// x <= y*z  ->  x-(y*z) <= 0
+LE(x, y=Mult(*,*)) -> <simplify: LE(Minus(x,y), Integer(mkinteger(0))) >;
+// x <= y-z  ->  x-(y-z) <= 0
+LE(x, y=Minus(*,*)) -> <simplify: LE(Minus(x,y), Integer(mkinteger(0))) >;
+// x <= y/z  ->  x-(y/z) <= 0
+LE(x, y=Div(*,*)) -> <simplify: LE(Minus(x,y), Integer(mkinteger(0))) >;
+// x <= p  ->  x-p <= 0
+LE(x, y=Marking(*)) -> <simplify: LE(Minus(x,y), Integer(mkinteger(0))) >;
+
+
+/******************************
+ * TAKE NUMBERS BACK TO RIGHT *
+ ******************************/
+
+LE(Add(x=Integer(*), y), z) -> <simplify: LE(y, Minus(z,x)) >;
+
+
+Minus(x,y) -> <simplify: Add(x, Mult(Integer(mkinteger(-1)), y)) >;
+
+
+
+/*
+// 1+y >= z  -> y >= z-1
+LE(Add(x=Integer(*),y),z) -> <simplify: LE(x, Minus(z,x)) >;
+*/
+
+// move integers to front
+Add(x,y=Integer(*)) -> <simplify: Add(y,x) >;
+
+
+// take integers back to right
+
+
+// if only numbers are left, we can immediately calculate the formula's value
+LE(Integer(x), Integer(y)) provided (x->value <= y->value) -> <simplify: True() >;
+LE(Integer(x), Integer(y)) provided (x->value > y->value) -> <simplify: False() >;
 
 /****************
  * SIMPLIFY CTL *
@@ -307,12 +367,8 @@ Negation(Negation(x)) -> <simplify: x>;
 
 Fireable(t) -> <sara_unfold: unfoldFireability(t) >;
 
-// x > y --> x >= y+1
-GT(x,y) -> <sara_unfold: GE(x, Add(y, Integer(mkinteger(1)))) >;
-// x < y --> x <= y-1
-LT(x,y) -> <sara_unfold: LE(x, Minus(y, Integer(mkinteger(1)))) >;
 
 
-LT(x, Add(y,z)) -> <sara_unfold: LT(Minus(x,y), z) >;
-GT(x, Add(y,z)) -> <sara_unfold: GT(Minus(x,y), z) >;
+//LT(x, Add(y,z)) -> <sara_unfold: LT(Minus(x,y), z) >;
+//GT(x, Add(y,z)) -> <sara_unfold: GT(Minus(x,y), z) >;
 

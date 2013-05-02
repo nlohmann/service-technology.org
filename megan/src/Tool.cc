@@ -57,7 +57,8 @@ result_t Tool_LoLA_Deadlock::execute() {
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
 
-    if (return_value_tool == 2) {
+    // LoLA exists normally with codes 0 and 1
+    if (return_value_tool > 1) {
         return ERROR;
     }
 
@@ -101,7 +102,10 @@ result_t Tool_LoLA_Reachability::execute() {
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
 
-    if (return_value_tool == 2) {
+    // LoLA exists normally with codes 0 and 1
+    if (return_value_tool > 1) {
+        message("error");
+        exit(1);
         return ERROR;
     }
 
@@ -141,16 +145,13 @@ result_t Tool_Megan_InitialDeadlock::execute() {
 
     // read net from file
     status("reading net from file %s", _cfilename_(args_info.net_arg));
-    pnapi::PetriNet net;
-    netfile >> meta(pnapi::io::INPUTFILE, args_info.net_arg)
-            >> (args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::lola)
-            >> net;
-
+    pnapi::PetriNet *net = Task::getNet();
+    
     // get initial marking
-    pnapi::Marking m0(net);
+    pnapi::Marking m0(*net);
 
     // check if initial marking activates a transition
-    PNAPI_FOREACH(t, net.getTransitions()) {
+    PNAPI_FOREACH(t, net->getTransitions()) {
         if (m0.activates(**t)) {
             // the net is not dead in every marking
             status("transition %s is enabled", (*t)->getName().c_str());
@@ -186,10 +187,8 @@ result_t Tool_Sara_Reachability::execute() {
 
     // rewriting formula
     kc::property tmp = properties[t->property_id];
-    //tmp->print();
     
     tmp = tmp->rewrite(kc::sara_unfold);
-    //tmp->print();
     tmp = tmp->rewrite(kc::simplify);
     status("rewrote formula");
 
@@ -231,6 +230,7 @@ result_t Tool_Sara_Reachability::execute() {
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
 
+    // Sara exists normally with code 0
     if (return_value_tool != 0) {
         return ERROR;
     }

@@ -10,7 +10,7 @@ pnapi::PetriNet * Task::net = NULL;
 const char* result_t_names[] = { "true", "false", "true?", "false?", "?", "not implemented", "error" };
 size_t Task::current_property_id = 0;
 
-pnapi::PetriNet *getNet() {
+pnapi::PetriNet *Task::getNet() {
     if (Task::net == NULL) {
         Task::net = new pnapi::PetriNet();
 

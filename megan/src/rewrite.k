@@ -2,6 +2,7 @@
 #include <fstream>
 #include <config.h>
 #include <pnapi/pnapi.h>
+#include "Task.h"
 #include "cmdline.h"
 #include "verbose.h"
 extern gengetopt_args_info args_info;
@@ -45,31 +46,7 @@ formulas negateList(formulas l) {
 }
 
 formula unfoldFireability(casestring transition_name) {
-    pnapi::PetriNet *net = NULL;
-
-    // on first call, parse net
-    if (net == NULL) {
-        net = new pnapi::PetriNet();
-
-        // check if net file parameter is given
-        if (not args_info.net_given) {
-            abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
-        }
-        assert(args_info.net_arg);
-
-        // open net file
-        std::ifstream netfile(args_info.net_arg);
-        if (!netfile) {
-            abort(11, "could not read Petri net from file %s", _cfilename_(args_info.net_arg));
-        }
-
-        // read net from file
-        status("reading net from file %s", _cfilename_(args_info.net_arg));
-        netfile >> meta(pnapi::io::INPUTFILE, args_info.net_arg)
-                >> (args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::lola)
-                >> (*net);
-    }
-    assert(net);
+    pnapi::PetriNet *net = Task::getNet();
 
     // get Petri net transition
     pnapi::Transition *t = net->findTransition(transition_name->name);
@@ -81,7 +58,6 @@ formula unfoldFireability(casestring transition_name) {
     formulas l = new impl_formulas();
 
     // traverse preset of t
-    status("unfolding...");
     PNAPI_FOREACH(a, t->getPresetArcs()) {
         const casestring place_name = mkcasestring((*a)->getSourceNode().getName().c_str());
         const integer arc_weight = mkinteger((*a)->getWeight());
@@ -239,16 +215,18 @@ Not(X(x)) -> <simplify: X(Not(x)) >;
  * EVERYTHING SHOULD BE <= *
  ***************************/
 
+%rview simplify_sara;
+
 // x == y  -->  x <= y AND y <= x
-EQ(x,y) -> <simplify: And(Consformulas(LE(x,y), Consformulas(LE(y,x), Nilformulas()))) >;
+EQ(x,y) -> <simplify_sara: And(Consformulas(LE(x,y), Consformulas(LE(y,x), Nilformulas()))) >;
 // x != y  -->  x < y AND y < x
-NE(x,y) -> <simplify: And(Consformulas(LT(x,y), Consformulas(LT(y,x), Nilformulas()))) >;
+NE(x,y) -> <simplify_sara: And(Consformulas(LT(x,y), Consformulas(LT(y,x), Nilformulas()))) >;
 // x > y --> x >= y+1
-GT(x,y) -> <simplify: GE(x, Add(y, Integer(mkinteger(1)))) >;
+GT(x,y) -> <simplify_sara: GE(x, Add(y, Integer(mkinteger(1)))) >;
 // x < y --> x <= y-1
-LT(x,y) -> <simplify: LE(x, Minus(y, Integer(mkinteger(1)))) >;
+LT(x,y) -> <simplify_sara: LE(x, Minus(y, Integer(mkinteger(1)))) >;
 // x >= y  -->  y <= x
-GE(x,y) -> <simplify: LE(y,x) >;
+GE(x,y) -> <simplify_sara: LE(y,x) >;
 
 
 /*******************************
@@ -256,25 +234,25 @@ GE(x,y) -> <simplify: LE(y,x) >;
  *******************************/
 
 // x <= y+z  ->  x-(y+z) <= 0
-LE(x, y=Add(*,*)) -> <simplify: LE(Minus(x,y), Integer(mkinteger(0))) >;
+LE(x, y=Add(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
 // x <= y*z  ->  x-(y*z) <= 0
-LE(x, y=Mult(*,*)) -> <simplify: LE(Minus(x,y), Integer(mkinteger(0))) >;
+LE(x, y=Mult(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
 // x <= y-z  ->  x-(y-z) <= 0
-LE(x, y=Minus(*,*)) -> <simplify: LE(Minus(x,y), Integer(mkinteger(0))) >;
+LE(x, y=Minus(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
 // x <= y/z  ->  x-(y/z) <= 0
-LE(x, y=Div(*,*)) -> <simplify: LE(Minus(x,y), Integer(mkinteger(0))) >;
+LE(x, y=Div(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
 // x <= p  ->  x-p <= 0
-LE(x, y=Marking(*)) -> <simplify: LE(Minus(x,y), Integer(mkinteger(0))) >;
+LE(x, y=Marking(*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
 
 
 /******************************
  * TAKE NUMBERS BACK TO RIGHT *
  ******************************/
 
-LE(Add(x=Integer(*), y), z) -> <simplify: LE(y, Minus(z,x)) >;
+LE(Add(x=Integer(*), y), z) -> <simplify_sara: LE(y, Minus(z,x)) >;
 
 
-Minus(x,y) -> <simplify: Add(x, Mult(Integer(mkinteger(-1)), y)) >;
+Minus(x,y) -> <simplify_sara: Add(x, Mult(Integer(mkinteger(-1)), y)) >;
 
 
 
@@ -284,7 +262,7 @@ LE(Add(x=Integer(*),y),z) -> <simplify: LE(x, Minus(z,x)) >;
 */
 
 // move integers to front
-Add(x,y=Integer(*)) -> <simplify: Add(y,x) >;
+Add(x,y=Integer(*)) -> <simplify_sara: Add(y,x) >;
 
 
 // take integers back to right

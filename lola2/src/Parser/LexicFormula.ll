@@ -101,7 +101,7 @@ IMPOSSIBLE                               { ptformula_setcol(); return _IMPOSSIBL
 [\n\r]                                   { ptformula_colno = 1; /* whitespace */ }
 [\t ]                                    { ptformula_setcol();  /* whitespace */ }
 
-[0-9]+                                   { ptformula_setcol(); ptformula_lval.yt_integer = kc::mkinteger(atoi(ptformula_text)); return NUMBER; }
+"-"?[0-9]+                               { ptformula_setcol(); ptformula_lval.yt_integer = kc::mkinteger(atoi(ptformula_text)); return NUMBER; }
 
 "{"[^\n\r]*"}"                           { ptformula_setcol(); /* comments */ }
 

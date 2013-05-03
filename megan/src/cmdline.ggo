@@ -5,6 +5,13 @@ option "verbose" v
   details="Show verbose information reporting intermediate steps.\n"
   flag off
 
+option "profile" p
+  "Which tool set to use"
+  values="lola","sara" enum
+  typestr="TOOLSET"
+  default="lola"
+  optional
+
 option "dry" -
   "Do not solve tasks"
   flag

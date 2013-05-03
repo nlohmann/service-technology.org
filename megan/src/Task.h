@@ -20,23 +20,28 @@ class Task {
         std::string name;
         /// a function to negate results of type result_t
         static result_t negate_result(result_t);
+
     public:
-        /// an id to access the global list of properties
-        size_t property_id;
         /// a counter for the current index
         static size_t current_property_id;
         /// a task queue to which all tasks are added
         static std::vector<Task*> queue;
-        /// the worker for the task (depending on the used profile)
-        Tool *worker;
         /// the Petri net for the current task family
         static pnapi::PetriNet *net;
         /// return the net
         static pnapi::PetriNet *getNet();
+
+        /// an id to access the global list of properties
+        size_t property_id;
+        /// the worker for the task (depending on the used profile)
+        Tool *worker;
         /// return the name of the task
         std::string getName() const;
         /// solve the task
-        result_t solve() const;
+        result_t solve();
+        /// cached solution of the task
+        result_t solution;
+
         /// constructor
         Task(std::string, bool=false);
         /// destructor

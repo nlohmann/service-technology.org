@@ -30,13 +30,6 @@ pnapi::PetriNet *Task::getNet() {
     return Task::net;
 }
 
-Task::Task(std::string name, bool negate) : negate(negate), name(name), property_id(current_property_id++), worker(NULL) {
-}
-
-Task::~Task() {
-    status("destroyed task %s", name.c_str());
-}
-
 result_t Task::negate_result(result_t r) {
     switch (r) {
         case(DEFINITELY_TRUE): return DEFINITELY_FALSE;
@@ -47,7 +40,7 @@ result_t Task::negate_result(result_t r) {
     }
 }
 
-result_t Task::solve() const {
+result_t Task::solve() {
     status("solving task %s", _coutput_(name));
     result_t result = NOT_IMPLEMENTED;
 
@@ -62,12 +55,25 @@ result_t Task::solve() const {
     }
 
     message("result of task %s: %s", _coutput_(name), _cimportant_(result_t_names[result]));
+    solution = result;
     return result;
 }
 
 std::string Task::getName() const {
     return name;
 }
+
+Task::Task(std::string name, bool negate) : negate(negate), name(name), property_id(current_property_id++), worker(NULL), solution(MAYBE) {
+}
+
+Task::~Task() {
+    status("destroyed task %s", name.c_str());
+}
+
+
+/****************
+ * CONSTRUCTORS *
+ ****************/
 
 UnknownTask::UnknownTask(std::string name, bool negate) : Task(name, negate) {
     queue.push_back(this);

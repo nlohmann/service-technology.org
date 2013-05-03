@@ -52,7 +52,7 @@ result_t Tool_LoLA_Deadlock::execute() {
 
     // call tool
     std::string filename_output = getTmpName();
-    std::string call_tool = basedir + "/bin/lola --check=deadlock " + args_info.net_arg + " > " + filename_output + " 2>&1";
+    std::string call_tool = basedir + "/bin/lola --timelimit=60 --verbose --check=deadlock " + args_info.net_arg + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -97,7 +97,7 @@ result_t Tool_LoLA_Reachability::execute() {
 
     // call tool
     std::string filename_output = getTmpName();
-    std::string call_tool = basedir + "/bin/lola --check=modelchecking " + args_info.net_arg + " --formula=" + filename_formula + " " + " > " + filename_output + " 2>&1";
+    std::string call_tool = basedir + "/bin/lola --timelimit=60 --verbose --check=modelchecking " + args_info.net_arg + " --formula=" + filename_formula + " " + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -144,7 +144,6 @@ result_t Tool_Megan_InitialDeadlock::execute() {
     }
 
     // read net from file
-    status("reading net from file %s", _cfilename_(args_info.net_arg));
     pnapi::PetriNet *net = Task::getNet();
     
     // get initial marking

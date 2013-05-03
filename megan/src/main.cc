@@ -21,6 +21,7 @@ std::vector<kc::property> properties;
 
 /// the command line parameters
 gengetopt_args_info args_info;
+extern const char *cmdline_parser_profile_values[];
 
 /// the invocation string
 std::string invocation;
@@ -151,6 +152,8 @@ int main(int argc, char* argv[]) {
 
     callHome(argc, argv);
     evaluateParameters(argc, argv);
+    
+    status("using profile %s", _ctool_(cmdline_parser_profile_values[args_info.profile_arg]));
 
     // initialize global variables
     yyin = stdin;
@@ -163,6 +166,8 @@ int main(int argc, char* argv[]) {
         } else {
             status("reading %s", _cfilename_(args_info.inputs[0]));
         }
+    } else {
+        status("reading from standard input...");
     }
 
     // start the parser
@@ -173,8 +178,12 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < properties.size(); ++i) {
         properties[i] = properties[i]->rewrite(kc::arrows);
         properties[i] = properties[i]->rewrite(kc::simplify);
-        //properties[i] = properties[i]->rewrite(kc::sara_unfold);
-        //properties[i] = properties[i]->rewrite(kc::simplify);
+        
+        if (args_info.profile_arg == profile_arg_sara) {
+            properties[i] = properties[i]->rewrite(kc::sara_unfold);
+            properties[i] = properties[i]->rewrite(kc::simplify);
+        }
+
         properties[i]->unparse(dummy_printer, kc::task);
     }
     status("created %d tasks", Task::queue.size());

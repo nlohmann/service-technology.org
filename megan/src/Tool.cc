@@ -22,9 +22,9 @@ bool contains(std::string filename, std::string s) {
     return __WEXITSTATUS(return_value_grep);
 }
 
-std::string getTmpName() {
+std::string getTmpName(std::string suffix="") {
     char *tmp = tmpnam(NULL);
-    return std::string(tmp);
+    return std::string(tmp) + suffix;
 }
 
 Tool::Tool(Task* t) : t(t) {}
@@ -51,7 +51,7 @@ result_t Tool_LoLA_Deadlock::execute() {
     assert(args_info.net_arg);
 
     // call tool
-    std::string filename_output = getTmpName();
+    std::string filename_output = getTmpName(".log");
     std::string call_tool = basedir + "/bin/lola --timelimit=60 --verbose --check=deadlock " + args_info.net_arg + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
@@ -78,7 +78,7 @@ result_t Tool_LoLA_Reachability::execute() {
     status("checking reachability");
 
     // creating formula file
-    std::string filename_formula = getTmpName();
+    std::string filename_formula = getTmpName(".formula");
     outfile = fopen(filename_formula.c_str(), "w");
     assert(outfile);
     fprintf(outfile, "FORMULA REACHABLE (");
@@ -96,7 +96,7 @@ result_t Tool_LoLA_Reachability::execute() {
     assert(args_info.net_arg);
 
     // call tool
-    std::string filename_output = getTmpName();
+    std::string filename_output = getTmpName(".log");
     std::string call_tool = basedir + "/bin/lola --timelimit=60 --verbose --check=modelchecking " + args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
@@ -104,8 +104,14 @@ result_t Tool_LoLA_Reachability::execute() {
 
     // LoLA exists normally with codes 0 and 1
     if (return_value_tool > 1) {
-        message("error");
+
+        tmp->print();
+        outfile = stdout;
+        fprintf(outfile, "LOLA: \n");
+        tmp->unparse(printer, kc::lola);
+        fprintf(outfile, "\n");
         exit(1);
+
         return ERROR;
     }
 
@@ -187,12 +193,12 @@ result_t Tool_Sara_Reachability::execute() {
     // rewriting formula
     kc::property tmp = properties[t->property_id];
     
-    tmp = tmp->rewrite(kc::sara_unfold);
-    tmp = tmp->rewrite(kc::simplify);
-    status("rewrote formula");
+    //tmp = tmp->rewrite(kc::sara_unfold);
+    //tmp = tmp->rewrite(kc::simplify);
+    //status("rewrote formula");
 
     // creating formula file
-    std::string filename_formula = getTmpName();
+    std::string filename_formula = getTmpName(".formula");
     outfile = fopen(filename_formula.c_str(), "w");
     assert(outfile);
     fprintf(outfile, "FORMULA (");
@@ -208,29 +214,48 @@ result_t Tool_Sara_Reachability::execute() {
     assert(args_info.net_arg);
 
     // translate formula
-    std::string filename_sara = getTmpName();
+    std::string filename_sara = getTmpName(".sara");
     std::string call_ttool = basedir + "/bin/lola2sara --net=" + args_info.net_arg + " --lola --formula=" + filename_formula + " > " + filename_sara;
     status("calling %s", call_ttool.c_str());
     int return_value_ttool = system(call_ttool.c_str());
     return_value_ttool = __WEXITSTATUS(return_value_ttool);
 
     if (return_value_ttool != 0) {
-        //tmp->print();
-        //exit(1);
+        tmp->print();
+        outfile = stdout;
+        fprintf(outfile, "LOLA: \n");
+        tmp->unparse(printer, kc::lola);
+        fprintf(outfile, "\n\n");
+        fprintf(outfile, "SARA: \n");
+        tmp->unparse(printer, kc::sara);
+        fprintf(outfile, "\n");
+        exit(1);
         return ERROR;
     }
 
     status("translated formula file");
 
     // call tool
-    std::string filename_output = getTmpName();
-    std::string call_tool = basedir + "/bin/sara --input=" + filename_sara + " > " + filename_output + " 2>&1";
+    std::string filename_output = getTmpName(".log");
+    std::string call_tool = basedir + "/bin/sara --verbose --input=" + filename_sara + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
 
     // Sara exists normally with code 0
     if (return_value_tool != 0) {
+
+
+        tmp->print();
+        outfile = stdout;
+        fprintf(outfile, "LOLA: \n");
+        tmp->unparse(printer, kc::lola);
+        fprintf(outfile, "\n\n");
+        fprintf(outfile, "SARA: \n");
+        tmp->unparse(printer, kc::sara);
+        fprintf(outfile, "\n");
+        exit(1);
+
         return ERROR;
     }
 

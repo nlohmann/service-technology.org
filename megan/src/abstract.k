@@ -54,6 +54,6 @@ expression:
 | Marking(casestring)
 | Add(expression expression)
 | Mult(expression expression)
-| Minus(expression expression)
+| Minus(expression expression)  /* fliegt raus */
 | Div(expression expression)
 ;

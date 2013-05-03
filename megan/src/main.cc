@@ -181,7 +181,12 @@ int main(int argc, char* argv[]) {
         
         if (args_info.profile_arg == profile_arg_sara) {
             properties[i] = properties[i]->rewrite(kc::sara_unfold);
+            //properties[i] = properties[i]->rewrite(kc::simplify_sara);
             properties[i] = properties[i]->rewrite(kc::simplify);
+            //properties[i] = properties[i]->rewrite(kc::simplify_sara);
+            //properties[i] = properties[i]->rewrite(kc::simplify);
+            //properties[i] = properties[i]->rewrite(kc::simplify_sara);
+            //properties[i] = properties[i]->rewrite(kc::simplify);
         }
 
         properties[i]->unparse(dummy_printer, kc::task);

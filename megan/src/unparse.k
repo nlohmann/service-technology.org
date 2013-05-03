@@ -103,6 +103,7 @@ U(x,y) -> [lola: "(" x " U " y ")"];
 
 ReachabilityProperty(name, f) -> [sara: f];
 LE(a,b) -> [sara: "(" a " <= " b ")"];
+
 And(x) -> [sara:
 "("
 {

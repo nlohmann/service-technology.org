@@ -6,6 +6,8 @@
 #include "cmdline.h"
 #include "verbose.h"
 extern gengetopt_args_info args_info;
+
+
 %}
 
 %{ KC_REWRITE /* code redirection */
@@ -76,6 +78,9 @@ formula unfoldFireability(casestring transition_name) {
 %}
 
 
+
+
+
 /******************************************************
  * REPLACE COMPLEX BOOLEAN CONNECTORS BY SIMPLER ONES *
  ******************************************************/
@@ -97,7 +102,12 @@ Imp(a,b) -> <arrows: Or( _(Not(a), b) ) >;
 Iff(a,b) -> <arrows: And( _(Imp(a,b), Imp(b,a)) ) >;
 
 
+
+
+
 %rview simplify;
+
+
 
 /*****************
  * PROCESS LISTS *
@@ -135,6 +145,20 @@ Or(Consformulas(True(), x)) -> <simplify: True() >;
 // FALSE OR x == x
 Or(Consformulas(False(), x)) -> <simplify: Or(x) >;
 
+// if only numbers are left, we can immediately calculate the formula's value
+EQ(Integer(x), Integer(y)) provided (x->value == y->value) -> <simplify: True() >;
+EQ(Integer(x), Integer(y)) provided (x->value != y->value) -> <simplify: False() >;
+NE(Integer(x), Integer(y)) provided (x->value != y->value) -> <simplify: True() >;
+NE(Integer(x), Integer(y)) provided (x->value == y->value) -> <simplify: False() >;
+GT(Integer(x), Integer(y)) provided (x->value > y->value) -> <simplify: True() >;
+GT(Integer(x), Integer(y)) provided (x->value <= y->value) -> <simplify: False() >;
+GE(Integer(x), Integer(y)) provided (x->value >= y->value) -> <simplify: True() >;
+GE(Integer(x), Integer(y)) provided (x->value < y->value) -> <simplify: False() >;
+LT(Integer(x), Integer(y)) provided (x->value < y->value) -> <simplify: True() >;
+LT(Integer(x), Integer(y)) provided (x->value >= y->value) -> <simplify: False() >;
+LE(Integer(x), Integer(y)) provided (x->value <= y->value) -> <simplify: True() >;
+LE(Integer(x), Integer(y)) provided (x->value > y->value) -> <simplify: False() >;
+
 
 /*******************
  * SIMPLIFIED MATH *
@@ -151,6 +175,8 @@ Mult(x, Integer(a)) provided (a->value == 0) -> <simplify: Integer(mkinteger(0))
 // integer multiplication
 Mult(Integer(a), Integer(b)) -> <simplify: Integer(mult(a,b)) >;
 Mult(Integer(a), Mult(Integer(b), c)) -> <simplify: Mult(Integer(mult(a,b)), c) >;
+// x*(y+z) -> (x*y)+(x*z)
+Mult(x,Add(y,z)) -> <simplify: Add(Mult(x,y),Mult(x,z)) >;
 
 // x/1 == x
 Div(x, Integer(a)) provided (a->value == 1) -> <simplify: x >;
@@ -174,9 +200,33 @@ Minus(x,x) -> <simplify: Integer(mkinteger(0)) >;
 Minus(Integer(a), Integer(b)) -> <simplify: Integer(minus(a,b)) >;
 
 
+/********************
+ * MOVE PARENTHESES *
+ ********************/
+
+Add(Add(x,y),z) -> <simplify: Add(x,Add(y,z)) >;
+
+
+/**************************
+ * MOVE INTEGERS TO FRONT *
+ **************************/
+
+// x+n == n+x
+Add(x,n=Integer(*)) -> <simplify: Add(n,x) >;
+// n1+(n2+x) == (n1+n2)+x
+Add(n1=Integer(*),Add(n2=Integer(*),x)) -> <simplify: Add(Add(n1,n2),x) >;
+// x*n == n*x
+Mult(x,n=Integer(*)) -> <simplify: Mult(n,x) >;
+// x+(n+y) == n+(x+y)
+Add(x,Add(n=Integer(*),y)) -> <simplify_sara: Add(n,Add(x,y)) >;
+// n1*(n2+x) == (n1*n2)+(n1*x)
+Mult(n1=Integer(*),Add(n2=Integer(*),x)) -> <simplify_sara: Add(Mult(n1,n2),Mult(n1,x)) >;
+
+
 /*************************
  * MOVE NEGATIONS INSIDE *
  ************************/
+
 // !!x == x
 Not(Not(x)) -> <simplify: x >;
 
@@ -215,62 +265,17 @@ Not(X(x)) -> <simplify: X(Not(x)) >;
  * EVERYTHING SHOULD BE <= *
  ***************************/
 
-%rview simplify_sara;
-
 // x == y  -->  x <= y AND y <= x
-EQ(x,y) -> <simplify_sara: And(Consformulas(LE(x,y), Consformulas(LE(y,x), Nilformulas()))) >;
+EQ(x,y) -> <simplify: And(Consformulas(LE(x,y), Consformulas(LE(y,x), Nilformulas()))) >;
 // x != y  -->  x < y AND y < x
-NE(x,y) -> <simplify_sara: And(Consformulas(LT(x,y), Consformulas(LT(y,x), Nilformulas()))) >;
+NE(x,y) -> <simplify: And(Consformulas(LT(x,y), Consformulas(LT(y,x), Nilformulas()))) >;
 // x > y --> x >= y+1
-GT(x,y) -> <simplify_sara: GE(x, Add(y, Integer(mkinteger(1)))) >;
+GT(x,y) -> <simplify: GE(x, Add(y, Integer(mkinteger(1)))) >;
 // x < y --> x <= y-1
-LT(x,y) -> <simplify_sara: LE(x, Minus(y, Integer(mkinteger(1)))) >;
+LT(x,y) -> <simplify: LE(x, Minus(y, Integer(mkinteger(1)))) >;
 // x >= y  -->  y <= x
-GE(x,y) -> <simplify_sara: LE(y,x) >;
+GE(x,y) -> <simplify: LE(y,x) >;
 
-
-/*******************************
- * TAKE RIGHT SIDE TO THE LEFT *
- *******************************/
-
-// x <= y+z  ->  x-(y+z) <= 0
-LE(x, y=Add(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
-// x <= y*z  ->  x-(y*z) <= 0
-LE(x, y=Mult(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
-// x <= y-z  ->  x-(y-z) <= 0
-LE(x, y=Minus(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
-// x <= y/z  ->  x-(y/z) <= 0
-LE(x, y=Div(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
-// x <= p  ->  x-p <= 0
-LE(x, y=Marking(*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
-
-
-/******************************
- * TAKE NUMBERS BACK TO RIGHT *
- ******************************/
-
-LE(Add(x=Integer(*), y), z) -> <simplify_sara: LE(y, Minus(z,x)) >;
-
-
-Minus(x,y) -> <simplify_sara: Add(x, Mult(Integer(mkinteger(-1)), y)) >;
-
-
-
-/*
-// 1+y >= z  -> y >= z-1
-LE(Add(x=Integer(*),y),z) -> <simplify: LE(x, Minus(z,x)) >;
-*/
-
-// move integers to front
-Add(x,y=Integer(*)) -> <simplify_sara: Add(y,x) >;
-
-
-// take integers back to right
-
-
-// if only numbers are left, we can immediately calculate the formula's value
-LE(Integer(x), Integer(y)) provided (x->value <= y->value) -> <simplify: True() >;
-LE(Integer(x), Integer(y)) provided (x->value > y->value) -> <simplify: False() >;
 
 /****************
  * SIMPLIFY CTL *
@@ -336,7 +341,6 @@ Property(name, A(G(x))) -> <simplify: Negation(ReachabilityProperty(name, x)) >;
 Negation(Negation(x)) -> <simplify: x>;
 
 
-
 /******************************
  * UNFOLD FIREABLE PREDICATES *
  ******************************/
@@ -347,6 +351,40 @@ Fireable(t) -> <sara_unfold: unfoldFireability(t) >;
 
 
 
-//LT(x, Add(y,z)) -> <sara_unfold: LT(Minus(x,y), z) >;
-//GT(x, Add(y,z)) -> <sara_unfold: GT(Minus(x,y), z) >;
+
+
+
+
+
+
+
+
+%rview simplify_sara;
+
+/*******************************
+ * TAKE RIGHT SIDE TO THE LEFT *
+ *******************************/
+
+// x <= y+z  ->  x-(y+z) <= 0
+LE(x, y=Add(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
+// x <= y*z  ->  x-(y*z) <= 0
+LE(x, y=Mult(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
+// x <= y-z  ->  x-(y-z) <= 0
+LE(x, y=Minus(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
+// x <= y/z  ->  x-(y/z) <= 0
+LE(x, y=Div(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
+// x <= p  ->  x-p <= 0
+LE(x, y=Marking(*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
+
+
+/******************************
+ * TAKE NUMBERS BACK TO RIGHT *
+ ******************************/
+
+LE(Add(x=Integer(*), y), z) -> <simplify_sara: LE(y, Minus(z,x)) >;
+
+
+// replace minus by multiplications
+Minus(x,y) -> <simplify_sara: Add(x, Mult(Integer(mkinteger(-1)), y)) >;
+
 

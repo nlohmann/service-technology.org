@@ -193,6 +193,21 @@ int main(int argc, char* argv[]) {
     {
         for (int i = 0; i < Task::queue.size(); ++i) {
             Task::queue[i]->solve();
+
+            // MCC 2013
+            std::cout << "FORMULA " << Task::queue[i]->getName() << " ";
+            switch (Task::queue[i]->solution) {
+                case(DEFINITELY_TRUE): std::cout << "TRUE"; break;
+                case(DEFINITELY_FALSE): std::cout << "FALSE"; break;
+                case(NOT_IMPLEMENTED): std::cout << "DO_NOT_COMPETE"; break;
+                default: std::cout << "CANNOT_COMPUTE"; break;
+            }
+            std::cout << " TECHNIQUES ";
+            switch (args_info.profile_arg) {
+                case(profile_arg_lola): std::cout << "EXPLICIT STATE_COMPRESSION STUBBORN_SETS"; break;
+                case(profile_arg_sara): std::cout << "TOPOLOGICAL STUBBORN_SETS SAT_SMT"; break;
+            }
+            std::cout << std::endl;
         }
         status("processed %d tasks", Task::queue.size());
     }

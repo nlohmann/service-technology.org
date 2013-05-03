@@ -6,7 +6,6 @@
 #include "verbose.h"
 #include "cmdline.h"
 #include "ast-system-unpk.h"       /* for unparsers */
-#include "ast-system-rk.h"         /* for rewriters */
 
 extern gengetopt_args_info args_info;
 extern FILE *outfile;
@@ -104,14 +103,14 @@ result_t Tool_LoLA_Reachability::execute() {
 
     // LoLA exists normally with codes 0 and 1
     if (return_value_tool > 1) {
-
+        /*
         tmp->print();
         outfile = stdout;
         fprintf(outfile, "LOLA: \n");
         tmp->unparse(printer, kc::lola);
         fprintf(outfile, "\n");
         exit(1);
-
+        */
         return ERROR;
     }
 
@@ -190,14 +189,8 @@ Tool_Sara_Reachability::Tool_Sara_Reachability(Task *t) : Sara(t) {}
 result_t Tool_Sara_Reachability::execute() {
     status("checking reachability");
 
-    // rewriting formula
-    kc::property tmp = properties[t->property_id];
-    
-    //tmp = tmp->rewrite(kc::sara_unfold);
-    //tmp = tmp->rewrite(kc::simplify);
-    //status("rewrote formula");
-
     // creating formula file
+    kc::property tmp = properties[t->property_id];
     std::string filename_formula = getTmpName(".formula");
     outfile = fopen(filename_formula.c_str(), "w");
     assert(outfile);
@@ -221,6 +214,7 @@ result_t Tool_Sara_Reachability::execute() {
     return_value_ttool = __WEXITSTATUS(return_value_ttool);
 
     if (return_value_ttool != 0) {
+        /*
         tmp->print();
         outfile = stdout;
         fprintf(outfile, "LOLA: \n");
@@ -230,6 +224,7 @@ result_t Tool_Sara_Reachability::execute() {
         tmp->unparse(printer, kc::sara);
         fprintf(outfile, "\n");
         exit(1);
+        */
         return ERROR;
     }
 
@@ -244,8 +239,7 @@ result_t Tool_Sara_Reachability::execute() {
 
     // Sara exists normally with code 0
     if (return_value_tool != 0) {
-
-
+        /*
         tmp->print();
         outfile = stdout;
         fprintf(outfile, "LOLA: \n");
@@ -255,7 +249,7 @@ result_t Tool_Sara_Reachability::execute() {
         tmp->unparse(printer, kc::sara);
         fprintf(outfile, "\n");
         exit(1);
-
+        */
         return ERROR;
     }
 

@@ -175,19 +175,15 @@ int main(int argc, char* argv[]) {
     status("parsed %d properties", properties.size());
 
     // simplify properties and create tasks
-    for (int i = 0; i < properties.size(); ++i) {
-        properties[i] = properties[i]->rewrite(kc::arrows);
-        properties[i] = properties[i]->rewrite(kc::simplify);
-        
+    for (size_t i = 0; i < properties.size(); ++i) {
         if (args_info.profile_arg == profile_arg_sara) {
             properties[i] = properties[i]->rewrite(kc::sara_unfold);
-            //properties[i] = properties[i]->rewrite(kc::simplify_sara);
-            properties[i] = properties[i]->rewrite(kc::simplify);
-            //properties[i] = properties[i]->rewrite(kc::simplify_sara);
-            //properties[i] = properties[i]->rewrite(kc::simplify);
-            //properties[i] = properties[i]->rewrite(kc::simplify_sara);
-            //properties[i] = properties[i]->rewrite(kc::simplify);
         }
+
+        properties[i] = properties[i]->rewrite(kc::arrows);
+        properties[i] = properties[i]->rewrite(kc::simplify);
+        properties[i] = properties[i]->rewrite(kc::sides);
+        properties[i] = properties[i]->rewrite(kc::simplify);
 
         properties[i]->unparse(dummy_printer, kc::task);
     }
@@ -196,7 +192,7 @@ int main(int argc, char* argv[]) {
     // solve tasks
     if (not args_info.dry_given)
     {
-        for (int i = 0; i < Task::queue.size(); ++i) {
+        for (size_t i = 0; i < Task::queue.size(); ++i) {
             Task::queue[i]->solve();
 
             // MCC 2013
@@ -211,6 +207,7 @@ int main(int argc, char* argv[]) {
             switch (args_info.profile_arg) {
                 case(profile_arg_lola): std::cout << "EXPLICIT STATE_COMPRESSION STUBBORN_SETS"; break;
                 case(profile_arg_sara): std::cout << "TOPOLOGICAL STUBBORN_SETS SAT_SMT"; break;
+                default: assert(false);
             }
             std::cout << std::endl;
         }

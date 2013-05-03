@@ -8,11 +8,12 @@ property:
 | Negation(property)
 | DeadlockInitial(casestring)
 | DeadlockNet(casestring)
+| TrueProperty(casestring)
 ;
 
 formula:
-  True()
-| False()
+  True()                        /* fliegt raus */
+| False()                       /* fliegt raus */
 | Not(formula)
 | I(formula)                    /* fliegt raus */
 | N(formula)                    /* fliegt raus */
@@ -21,7 +22,7 @@ formula:
 | X(formula)
 | G(formula)
 | F(formula)
-| Deadlock()
+| Deadlock()                    /* fliegt raus */
 | Fireable(casestring)
 | Live0(casestring)
 | Live1(casestring)

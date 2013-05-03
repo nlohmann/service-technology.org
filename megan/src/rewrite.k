@@ -1,13 +1,8 @@
 %{ KC_REWRITE_HEADER
-#include <fstream>
 #include <config.h>
 #include <pnapi/pnapi.h>
 #include "Task.h"
-#include "cmdline.h"
 #include "verbose.h"
-extern gengetopt_args_info args_info;
-
-
 %}
 
 %{ KC_REWRITE /* code redirection */
@@ -29,7 +24,7 @@ integer div( integer a, integer b ) {
     return mkinteger( a -> value / b -> value );
 }
 
-// helpers for lists -- TODO: Check if constructors need to be called
+// helpers for lists
 formulas _(formula a, formula b) {
     //return Consformulas(a, Consformulas(b, Nilformulas()));
     return new impl_formulas(a, new impl_formulas(b, new impl_formulas()));
@@ -47,6 +42,7 @@ formulas negateList(formulas l) {
     return l->map(*negateElement);
 }
 
+// unfold Fireable predicate
 formula unfoldFireability(casestring transition_name) {
     pnapi::PetriNet *net = Task::getNet();
 
@@ -75,25 +71,27 @@ formula unfoldFireability(casestring transition_name) {
         return res;
     }
 }
+
 %}
 
 
 
-
-
-/******************************************************
+/****************************************************************************
  * REPLACE COMPLEX BOOLEAN CONNECTORS BY SIMPLER ONES *
- ******************************************************/
+ ****************************************************************************/
 
 %rview arrows;
+
+/////////////////////////////////////////////////////////
+// postcondition: Xor, Imp, Iff will disappear
+/////////////////////////////////////////////////////////
 
 // remove XOR once we are done
 Xor(Consformulas(a, Nilformulas())) -> <arrows: a >;
 // (a XOR b) == ((a AND !b) OR (!a AND b))
 Xor(Consformulas(a, Consformulas(b, c))) -> <arrows:
 Xor(Consformulas(Or(Consformulas( And(_(a, Not(b))),
-                    Consformulas(And(_(Not(a),b)), Nilformulas()) ) ), c) )
->;
+                    Consformulas(And(_(Not(a),b)), Nilformulas()) ) ), c) ) >;
 
 // (a => b) == (!a OR b)
 Imp(a,b) -> <arrows: Or( _(Not(a), b) ) >;
@@ -104,9 +102,18 @@ Iff(a,b) -> <arrows: And( _(Imp(a,b), Imp(b,a)) ) >;
 
 
 
+/****************************************************************************
+ * FORMULA SIMPLIFICATION
+ ****************************************************************************/
 
 %rview simplify;
 
+/////////////////////////////////////////////////////////
+// postcondition: I and N will will disappear
+// postcondition: True and False will disappear
+// postcondition: EQ, NE, GT, GE, LT will disappear
+// postcondition: Not only occurs in front of Fireable
+/////////////////////////////////////////////////////////
 
 
 /*****************
@@ -150,14 +157,14 @@ EQ(Integer(x), Integer(y)) provided (x->value == y->value) -> <simplify: True() 
 EQ(Integer(x), Integer(y)) provided (x->value != y->value) -> <simplify: False() >;
 NE(Integer(x), Integer(y)) provided (x->value != y->value) -> <simplify: True() >;
 NE(Integer(x), Integer(y)) provided (x->value == y->value) -> <simplify: False() >;
-GT(Integer(x), Integer(y)) provided (x->value > y->value) -> <simplify: True() >;
+GT(Integer(x), Integer(y)) provided (x->value  > y->value) -> <simplify: True() >;
 GT(Integer(x), Integer(y)) provided (x->value <= y->value) -> <simplify: False() >;
 GE(Integer(x), Integer(y)) provided (x->value >= y->value) -> <simplify: True() >;
-GE(Integer(x), Integer(y)) provided (x->value < y->value) -> <simplify: False() >;
-LT(Integer(x), Integer(y)) provided (x->value < y->value) -> <simplify: True() >;
+GE(Integer(x), Integer(y)) provided (x->value  < y->value) -> <simplify: False() >;
+LT(Integer(x), Integer(y)) provided (x->value  < y->value) -> <simplify: True() >;
 LT(Integer(x), Integer(y)) provided (x->value >= y->value) -> <simplify: False() >;
 LE(Integer(x), Integer(y)) provided (x->value <= y->value) -> <simplify: True() >;
-LE(Integer(x), Integer(y)) provided (x->value > y->value) -> <simplify: False() >;
+LE(Integer(x), Integer(y)) provided (x->value  > y->value) -> <simplify: False() >;
 
 
 /*******************
@@ -204,6 +211,7 @@ Minus(Integer(a), Integer(b)) -> <simplify: Integer(minus(a,b)) >;
  * MOVE PARENTHESES *
  ********************/
 
+// (x+y)+z  ==  x+(y+z)
 Add(Add(x,y),z) -> <simplify: Add(x,Add(y,z)) >;
 
 
@@ -218,9 +226,9 @@ Add(n1=Integer(*),Add(n2=Integer(*),x)) -> <simplify: Add(Add(n1,n2),x) >;
 // x*n == n*x
 Mult(x,n=Integer(*)) -> <simplify: Mult(n,x) >;
 // x+(n+y) == n+(x+y)
-Add(x,Add(n=Integer(*),y)) -> <simplify_sara: Add(n,Add(x,y)) >;
+Add(x,Add(n=Integer(*),y)) -> <simplify: Add(n,Add(x,y)) >;
 // n1*(n2+x) == (n1*n2)+(n1*x)
-Mult(n1=Integer(*),Add(n2=Integer(*),x)) -> <simplify_sara: Add(Mult(n1,n2),Mult(n1,x)) >;
+Mult(n1=Integer(*),Add(n2=Integer(*),x)) -> <simplify: Add(Mult(n1,n2),Mult(n1,x)) >;
 
 
 /*************************
@@ -264,6 +272,10 @@ Not(X(x)) -> <simplify: X(Not(x)) >;
 /***************************
  * EVERYTHING SHOULD BE <= *
  ***************************/
+
+/////////////////////////////////////////////////////////
+// postcondition: EQ, NE, GT, GE, LT will disappear
+/////////////////////////////////////////////////////////
 
 // x == y  -->  x <= y AND y <= x
 EQ(x,y) -> <simplify: And(Consformulas(LE(x,y), Consformulas(LE(y,x), Nilformulas()))) >;
@@ -324,6 +336,12 @@ A(W(x,y)) -> <simplify: Not(E(U(Not(y),And(_(Not(x),Not(y))))))>;
  * PROBLEM FINDER *
  ******************/
 
+/////////////////////////////////////////////////////////
+// postcondition: I and N will will disappear
+// postcondition: True and False will disappear
+// postcondition: Deadlock will disappear
+/////////////////////////////////////////////////////////
+
 // special care for deadlocks
 Property(name, I(Deadlock())) -> <simplify: DeadlockInitial(name) >;
 Property(name, N(Deadlock())) -> <simplify: Negation(DeadlockNet(name)) >;
@@ -337,54 +355,61 @@ Property(name, N(x)) -> <simplify: Property(name, Not(E(F(x)))) >;
 Property(name, E(F(x))) -> <simplify: ReachabilityProperty(name, x) >;
 Property(name, A(G(x))) -> <simplify: Negation(ReachabilityProperty(name, x)) >;
 
+// replace top constant by dedicated Task
+Property(name, True()) -> <simplify: TrueProperty(name) >;
+Property(name, False()) -> <simplify: Negation(TrueProperty(name)) >;
+
 // remove double negations
 Negation(Negation(x)) -> <simplify: x>;
 
-
-/******************************
- * UNFOLD FIREABLE PREDICATES *
- ******************************/
-
-%rview sara_unfold;
-
-Fireable(t) -> <sara_unfold: unfoldFireability(t) >;
-
-
-
-
-
-
-
-
-
-
-
-%rview simplify_sara;
 
 /*******************************
  * TAKE RIGHT SIDE TO THE LEFT *
  *******************************/
 
+%rview sides;
+
 // x <= y+z  ->  x-(y+z) <= 0
-LE(x, y=Add(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
+LE(x, y=Add(*,*)) -> <sides: LE(Minus(x,y), Integer(mkinteger(0))) >;
 // x <= y*z  ->  x-(y*z) <= 0
-LE(x, y=Mult(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
+LE(x, y=Mult(*,*)) -> <sides: LE(Minus(x,y), Integer(mkinteger(0))) >;
 // x <= y-z  ->  x-(y-z) <= 0
-LE(x, y=Minus(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
+LE(x, y=Minus(*,*)) -> <sides: LE(Minus(x,y), Integer(mkinteger(0))) >;
 // x <= y/z  ->  x-(y/z) <= 0
-LE(x, y=Div(*,*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
+LE(x, y=Div(*,*)) -> <sides: LE(Minus(x,y), Integer(mkinteger(0))) >;
 // x <= p  ->  x-p <= 0
-LE(x, y=Marking(*)) -> <simplify_sara: LE(Minus(x,y), Integer(mkinteger(0))) >;
+LE(x, y=Marking(*)) -> <sides: LE(Minus(x,y), Integer(mkinteger(0))) >;
+// x <= |p|  ->  x-|p| <= 0
+LE(x, y=Bound(*)) -> <sides: LE(Minus(x,y), Integer(mkinteger(0))) >;
+// x <= |p|  ->  x-|p| <= 0
+LE(x, y=Card(*)) -> <sides: LE(Minus(x,y), Integer(mkinteger(0))) >;
+
+// x - y  ->  x + (-1)*y
+Minus(x,y) -> <sides: Add(x, Mult(Integer(mkinteger(-1)), y)) >;
+
+// n1 + x <= n2  ->  x <= (n2 - n1)
+LE(Add(Integer(n1),x), Integer(n2)) -> <simplify: LE(x, Integer(minus(n2,n1)))>;
 
 
-/******************************
- * TAKE NUMBERS BACK TO RIGHT *
- ******************************/
-
-LE(Add(x=Integer(*), y), z) -> <simplify_sara: LE(y, Minus(z,x)) >;
 
 
-// replace minus by multiplications
-Minus(x,y) -> <simplify_sara: Add(x, Mult(Integer(mkinteger(-1)), y)) >;
+//%rview lola_prep;
 
+// x + ((-y) * z)   ->  x - (y * z)
+//Add(x, Mult(Integer(y), z)) provided (y->value < 0) -> <simplify: Minus(x, Mult(Integer(minus(mkinteger(0),y)),z)) >;
+
+
+
+
+/****************************************************************************
+ * UNFOLD FIREABLE PREDICATES *
+ ***************************************************************************/
+
+%rview sara_unfold;
+
+/////////////////////////////////////////////////////////
+// postcondition: Fireable will disappear
+/////////////////////////////////////////////////////////
+
+Fireable(t) -> <sara_unfold: unfoldFireability(t) >;
 

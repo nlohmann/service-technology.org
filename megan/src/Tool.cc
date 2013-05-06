@@ -15,10 +15,13 @@ extern void printer(const char *s, kc::uview v);
 /// needed to evaluate exit status of system call
 #define __WEXITSTATUS(status)   (((status) & 0xff00) >> 8)	
 
+/// returns true iff the given file contains the given string
 bool contains(std::string filename, std::string s) {
     std::string call_grep = std::string(TOOL_GREP) + " -q \"" + s + "\" " + filename;
     int return_value_grep = system(call_grep.c_str());
-    return __WEXITSTATUS(return_value_grep);
+
+    // grep returns 0 iff string was found
+    return (__WEXITSTATUS(return_value_grep) == 0);
 }
 
 std::string getTmpName(std::string suffix="") {
@@ -127,6 +130,8 @@ result_t Tool_LoLA_Deadlock_optimistic_incomplete::execute() {
 
     if (contains(filename_output, "lola: result: yes")) {
         return DEFINITELY_TRUE;
+    } else {
+        return MAYBE_FALSE;
     }
 
     // this LoLA is incomplete: if we do not find a deadlock, we cannot be sure there is none
@@ -315,6 +320,8 @@ result_t Tool_LoLA_Reachability_optimistic_incomplete::execute() {
 
     if (contains(filename_output, "lola: result: yes")) {
         return DEFINITELY_TRUE;
+    } else {
+        return MAYBE_FALSE;
     }
 
     // this LoLA is incomplete: if we do not find a state satisfying the formula, we cannot be sure there is none

@@ -205,8 +205,13 @@ int main(int argc, char* argv[]) {
             }
             std::cout << " TECHNIQUES ";
             switch (args_info.profile_arg) {
-                case(profile_arg_lola): std::cout << "EXPLICIT STATE_COMPRESSION STUBBORN_SETS"; break;
-                case(profile_arg_sara): std::cout << "TOPOLOGICAL STUBBORN_SETS SAT_SMT"; break;
+                case(profile_arg_lola):
+                case(profile_arg_lola_optimistic):
+                case(profile_arg_lola_optimistic_incomplete):
+                case(profile_arg_lola_pessimistic):
+                    std::cout << "EXPLICIT STATE_COMPRESSION STUBBORN_SETS"; break;
+                case(profile_arg_sara):
+                    std::cout << "TOPOLOGICAL STUBBORN_SETS SAT_SMT"; break;
                 default: assert(false);
             }
             std::cout << std::endl;

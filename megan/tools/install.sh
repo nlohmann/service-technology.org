@@ -10,7 +10,7 @@ mv $TOOLNAME tmp
 PREFIX=`pwd`/$TOOLNAME
 
 cd tmp
-CC=$CC CXX=$CXX ./configure --prefix=$PREFIX
+CC=$CC CXX=$CXX CPPFLAGS=-O3 ./configure --prefix=$PREFIX --disable-assert
 make all install
 cd ..
 

@@ -7,7 +7,7 @@ option "verbose" v
 
 option "profile" p
   "Which tool set to use"
-  values="lola","sara" enum
+  values="lola","lola_optimistic","lola_optimistic_incomplete","lola_pessimistic","sara" enum
   typestr="TOOLSET"
   default="lola"
   optional

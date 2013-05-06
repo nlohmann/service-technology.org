@@ -144,7 +144,8 @@ constr:
 ;
 
 constraint:
-	cnodes comparator NUMBER { sara::crhs = $3; }
+  cnodes comparator NUMBER { sara::crhs = $3; }
+| cnodes comparator MINUS NUMBER { sara::crhs = -$3; }
 ;
 
 cnodes:
@@ -157,6 +158,7 @@ cnode:
 	PLUS NAME { sara::clhs[sara_NAME_token] = 1; }
 |	MINUS NAME { sara::clhs[sara_NAME_token] = -1; }
 |	PLUS NUMBER NAME { sara::clhs[sara_NAME_token] = $2; }
+|	MINUS NUMBER NAME { sara::clhs[sara_NAME_token] = -$2; }
 |	NUMBER NAME { sara::clhs[sara_NAME_token] = $1; }
 ;
 

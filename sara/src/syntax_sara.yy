@@ -145,7 +145,7 @@ constr:
 
 constraint:
   cnodes comparator NUMBER { sara::crhs = $3; }
-| cnodes comparator MINUS NUMBER { sara::crhs = -$3; }
+| cnodes comparator MINUS NUMBER { sara::crhs = -$4; }
 ;
 
 cnodes:

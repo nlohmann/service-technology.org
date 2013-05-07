@@ -211,19 +211,25 @@ function updateValues(jqObj, toolName) {
 
 function updateFile() {
     var form = $(this); //jqObj.closest('form');
-    form.find('li').remove();
-    var fList = $('<ul class="unstyled">');
-    form.append(fList);
+    var fList = $('ul#file_list');
+    fList.find('li').remove();
 
+    // form.find("input[type=file]").hide();
+    form.find("input.fromTemplate[type=file]:not([value!=''])[id!=file_template]").remove();
     form.find("input[type=file][value!='']").each(
-            function() {
-                var v = this.value;
-                v = v.replace(/^.*[\\\/]/gi, "");
+            function(i) {
+	        var cur = $(this);
+		// overwrite ids for file inputs from template
+		if(cur.hasClass("fromTemplate")) {
+		    cur.attr('id', 'file_'+i);
+		}
+                var v = cur.show().focus().prettyVal();
+		cur.hide();
                 fList.append($('<li>' + v + ' </li>'));
-                var link = $('<a class="btn btn-mini"><i class="icon-remove"></i></a></li>');
+                var link = $('<a class="btn btn-mini"><i class="icon-remove"></i></a>');
                 var origin = $(this);
                 link.click(
-                    function(){ origin.val(''); $(this).parent().fadeOut();}
+                    function(){ origin.val('').change(); $(this).parent().fadeOut();}
                 );
                 fList.find('li:last').append(link);
 

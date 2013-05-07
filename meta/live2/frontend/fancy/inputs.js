@@ -78,6 +78,8 @@ Input.prototype.updateValue = function(val) {
     if(!el) return false;
     el.value = '' + val;
 
+    el.setAttribute('data-stlive-dirty', 'dirty');
+
     // trigger onchange
     if(typeof el.onchange == 'function') {
         el.onchange();

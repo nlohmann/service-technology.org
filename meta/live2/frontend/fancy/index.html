@@ -29,6 +29,16 @@
       .toolname {
         color: rgb(0, 136, 204);
       }
+      .fileHideSafari {
+        visibility:hidden;
+	width:0px;
+        height:0px;
+	margin:0px;
+        padding:0px;
+        position:absolute;
+        left:-200px;
+        top:-200px;
+      }
     </style>
     <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -87,9 +97,10 @@
 <div class="control-group">
                 <textarea name="data" _disabled="disabled" class="controls input-block-level monospace" style="font-family:monospace;" id="json-output" rows="20">...</textarea>
 </div>
-<input type="file" style="display:none;" id="file_template" name="file">
+<input type="file" style="" class="fileHideSafari fromTemplate" id="file_template" name="file">
             </form>
-<p class="btn" onclick="$('#file_template').clone().attr('id', 'file_hidden_'+ $('input[type=file]').size()).appendTo('#outForm').click()">Add File</p>
+<ul class="unstyled" id="file_list"></ul>
+<p class="btn" onclick="$('#file_template').clone().attr('id', 'newFile').appendTo('#outForm').show().focus().click()">Add File</p>
             </div>
           </div>
         </div>
@@ -146,6 +157,15 @@
 <script src="ggoConversion.js"></script>
 <script src="jsonEdit.js"></script>
 <script type="text/javascript">
+// thank you chrome+safari#
+$.fn.prettyVal = function() {
+	var v = this.val();
+	if(typeof v != 'string') return '';
+	return this.val().replace(/^.*[\\\/]/g,'');
+};
+
+
+
 // read the input hash
 // put to global scope
 var tool = window.location.search;

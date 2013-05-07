@@ -44,7 +44,7 @@ var inputs = [
     type: 'checkbox',
     required: ['name', 'argname'],
     html: {
-       out: '<input type="checkbox" onchange="this.value=this.value?\'\':\'true\';this.checked=this.value?\'checked\':\'\';" data-stlive-argname="${argname}" value="" name="${argname}" id="${id}">',
+out: '<input type="checkbox" onchange="if(this.getAttribute(\'data-stlive-dirty\')) { this.setAttribute(\'data-stlive-dirty\', \'\'); this.checked=this.value;return true;} this.value=this.checked?true:\'\';" data-stlive-dirty="" data-stlive-argname="${argname}" value="" name="${argname}" id="${id}">',
        useLabel: true
     }
   },
@@ -88,11 +88,11 @@ var inputs = [
     html : {
         // first the hidden field which eventually holds the file
         // (will be copied to json-form later
-        out : '<input style="display:none;" type="file" name="${id}_hidden" id="${id}_hidden" ' + 
-              'onchange="$(\'#\\\\${id}\').val(this.value).change();">'+
+        out : '<input type="file" class="fileHideSafari" name="${id}_hidden" id="${id}_hidden" ' + 
+              'onchange="$(\'#\\\\${id}\').val($(this).prettyVal()).change();">'+
           // the visible button just triggers the hidden file input
               '<div class="input-prepend" ' +
-          'onclick="if(this.disabled)return false;document.getElementById(\'${id}_hidden\').click()">' + 
+          'onclick="if(this.disabled)return false;$(\'#${id}_hidden\').show().focus().click()">' + 
           '<p type="button" class="add-on btn" value="Select File">Select File</p>' +
           // and here we let the user see the filename (readOnly)
           // the parameter-name is taken by this input element

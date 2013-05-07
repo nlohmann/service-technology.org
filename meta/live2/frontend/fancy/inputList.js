@@ -44,7 +44,7 @@ var inputs = [
     type: 'checkbox',
     required: ['name', 'argname'],
     html: {
-       out: '<input type="checkbox" onclick="this.value=this.value?\'\':\'true\'" onchange="this.checked=this.value?\'checked\':\'\';" data-stlive-argname="${argname}" value="" name="${argname}" id="${id}">',
+       out: '<input type="checkbox" onchange="this.value=this.value?\'\':\'true\';this.checked=this.value?\'checked\':\'\';" data-stlive-argname="${argname}" value="" name="${argname}" id="${id}">',
        useLabel: true
     }
   },

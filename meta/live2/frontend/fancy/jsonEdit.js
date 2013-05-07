@@ -217,6 +217,8 @@ function updateFile() {
 
     form.find("input[type=file][value!='']").each(
             function() {
+                var v = this.value;
+                v = v.replace(/^.*[\\\/]/gi, "");
                 fList.append($('<li>' + this.value + ' </li>'));
                 var link = $('<a class="btn btn-mini"><i class="icon-remove"></i></a></li>');
                 var origin = $(this);

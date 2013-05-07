@@ -219,7 +219,7 @@ function updateFile() {
             function() {
                 var v = this.value;
                 v = v.replace(/^.*[\\\/]/gi, "");
-                fList.append($('<li>' + this.value + ' </li>'));
+                fList.append($('<li>' + v + ' </li>'));
                 var link = $('<a class="btn btn-mini"><i class="icon-remove"></i></a></li>');
                 var origin = $(this);
                 link.click(

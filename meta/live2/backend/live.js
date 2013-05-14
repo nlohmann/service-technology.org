@@ -46,6 +46,21 @@ setInterval(function() {
     }
 }, 2000);
 
+
+/* Allow Cross-Domain-Scripting */
+app.all("/", function(req, res, next) {
+res.header("Access-Control-Allow-Origin", "*");
+res.header("Access-Control-Allow-Headers", "X-Requested-With");
+res.header("Access-Control-Allow-Methods", "POST");
+res.header("X-Powered-By", "service-tech");
+next();
+}); 
+
+/* OPTIONS -request, put them back asap */
+app.options("/", function(_,res) {
+        res.end();
+        });
+
 app.post('/', function(req, res){
     // increase timelimit
     req.connection.setTimeout((TIMELIMIT + 30) * 1000);
@@ -95,6 +110,10 @@ app.post('/', function(req, res){
         console.log(user_data);
         console.log('Tool: ' + user_data.tool);
         console.log('Parameters: ' + user_data.parameters);
+        // avoid little hacks
+        if(user_data.tool.match(/\//gi)) {
+            throw 'Tool does not exist.';
+        }
     } catch(e) {
         // there was a problem (malformed JSON or missing entries)
         res.writeHead(500, { 'Content-Type': 'application/json' });

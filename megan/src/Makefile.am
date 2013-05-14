@@ -5,12 +5,12 @@ bin_PROGRAMS = megan
 megan_SOURCES = \
                 $(KCSOURCES) \
                 cmdline.c cmdline.h \
-				parser.yy scanner.ll \
-				verbose.cc verbose.h \
-				Socket.cc Socket.h \
-				Task.cc Task.h \
-				Tool.cc Tool.h \
-				profile.cc profile.h \
+                parser.yy scanner.ll \
+                verbose.cc verbose.h \
+                Socket.cc Socket.h \
+                Task.cc Task.h \
+                Tool.cc Tool.h \
+                profile.cc profile.h \
                 main.cc
 
 # only add the local Petri net API if necessary

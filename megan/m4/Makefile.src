@@ -18,10 +18,6 @@ BUILT_SOURCES += $(BISON_FILES:.yy=.cc) $(FLEX_FILES:.ll=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h) $(FLEX_FILES:.ll=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h) $(FLEX_FILES:.ll=.h)
 
-# fix for Automake 1.12
-$(BISON_FILES:.yy=.hh):
-	$(AM_V_GEN) mv $(@:.hh=.h) $@
-
 
 #----------------------------------------------------------------#
 # GENERIC: copy the content of the config.log file to a C header #

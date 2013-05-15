@@ -11,7 +11,8 @@ megan_SOURCES = \
                 Task.cc Task.h \
                 Tool.cc Tool.h \
                 profile.cc profile.h \
-                main.cc
+                main.cc \
+                JSON.cc JSON.h
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI

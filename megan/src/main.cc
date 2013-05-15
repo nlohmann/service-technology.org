@@ -10,6 +10,7 @@
 #include "Socket.h"
 #include "Task.h"
 #include "Tool.h"
+#include "JSON.h"
 #include <libgen.h>
 #include <unistd.h>
 #include <sstream>
@@ -55,85 +56,45 @@ void evaluateParameters(int argc, char** argv) {
 }
 
 void handler__SIGTERM(int signum) {
-    std::stringstream s;
-    std::string json = "";
+    JSON j;
 
-    json += "{";
-    json += "\"pid\":";
-    s << getpid();
-    json += s.str();
-    json += ",";
-    json += "\"signal\":\"";
-    json += strsignal(signum);
-    json += "\"";
-    json += "}";
+    j.add("pid", getpid());
+    j.add("signal", strsignal(signum));
 
     Socket et(5555, "nitpickertool.com");
-    et.send(json.c_str());
+    et.send(j);
     exit(3);
 }
 
 void handler__termination() {
-    std::stringstream s;
-    std::string json = "";
+    JSON j;
 
-    json += "{";
-    json += "\"pid\":";
-    s << getpid();
-    json += s.str();
-    json += ",";
-    json += "\"exit\":\"";
-    json += "termination";
-    json += "\"";
-    json += "}";
+    j.add("pid", getpid());
+    j.add("exit", "termination");
 
     Socket et(5555, "nitpickertool.com");
-    et.send(json.c_str());
+    et.send(j);
 }
 
 void callHome(int argc, char** argv) {
-    std::stringstream s;
-    std::string json = "";
+    JSON j;
 
-    json += "{";
-    json += "\"name\":\"";
-    json += PACKAGE_NAME;
-    json += "\",";
-    json += "\"package_version\":\"";
-    json += PACKAGE_VERSION;
-    json += "\",";
-    json += "\"svn_version\":\"";
-    json += VERSION_SVN;
-    json += "\",";
-    json += "\"pid\":";
-    s << getpid();
-    json += s.str();
-    json += ",";
-    json += "\"build_system\":\"";
-    json += CONFIG_BUILDSYSTEM;
-    json += "\",";
-    json += "\"hostname\":\"";
-    json += CONFIG_HOSTNAME;
-    json += "\",";
-    json += "\"architecture\":";
-    json += (SIZEOF_VOIDP * 8 == 32) ? "32" : "64";
-    json += ",";
-    json += "\"parameters\":[";
-    for (int i = 1; i < argc; ++i)
-    {
-        if (i != 1)
-        {
-            json += ",";
-        }
-        json += "\"";
-        json += argv[i];
-        json += "\"";
+    j.add("name", PACKAGE_NAME);
+    j.add("package_version", PACKAGE_VERSION);
+    j.add("svn_version", VERSION_SVN);
+    j.add("pod", getpid());
+    j.add("build_system", CONFIG_BUILDSYSTEM);
+    j.add("hostname", CONFIG_HOSTNAME);
+    j.add("architecture", SIZEOF_VOIDP * 8);
+
+    JSON parameters;
+    for (int i = 1; i < argc; ++i) {
+        parameters.add(argv[i]);
     }
-    json += "]";
-    json += "}";
+    j.add("parameters", parameters);
 
     Socket et(5555, "nitpickertool.com");
-    et.send(json.c_str());
+    et.send(j);
 }
 
 void printer(const char *s, kc::uview v) {

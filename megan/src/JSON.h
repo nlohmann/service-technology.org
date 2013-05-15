@@ -3,10 +3,9 @@
 #include <vector>
 #include <map>
 
-typedef enum { JSON_ARRAY, JSON_OBJECT, JSON_NULL, JSON_STRING, JSON_BOOLEAN, JSON_NUMBER_INT, JSON_NUMBER_FLOAT } json_t;
-
 class JSON {
     private:
+        typedef enum { JSON_ARRAY, JSON_OBJECT, JSON_NULL, JSON_STRING, JSON_BOOLEAN, JSON_NUMBER_INT, JSON_NUMBER_FLOAT } json_t;
         json_t type;
         union {
             std::vector<JSON> *a;
@@ -18,8 +17,13 @@ class JSON {
         } payload;
 
     public:
-        std::string toString() const;
+        const std::string toString() const;
         operator const char *() const;
+        operator const std::string() const;
+
+        operator const int() const;
+        operator const float() const;
+        operator const bool() const;
 
         void add();
         void add(std::string);
@@ -42,5 +46,5 @@ class JSON {
         JSON(bool);
         JSON(int);
         JSON(float);
+        JSON(const JSON&);
 };
-

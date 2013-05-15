@@ -2,28 +2,88 @@
 #include <sstream>
 #include "JSON.h"
 
-JSON::JSON() : type(JSON_NULL) {}
+JSON::JSON() : type(JSON_NULL) {
+    
+}
+
 JSON::JSON(std::string s) : type(JSON_STRING) {
     payload.s = new std::string(s);
 }
+
 JSON::JSON(const char* s) : type(JSON_STRING) {
     payload.s = new std::string(s);
 }
+
 JSON::JSON(bool b) : type(JSON_BOOLEAN) {
     payload.b = b;
 }
+
 JSON::JSON(int i) : type(JSON_NUMBER_INT) {
     payload.i = i;
 }
+
 JSON::JSON(float f) : type(JSON_NUMBER_FLOAT) {
     payload.f = f;
 }
+
+JSON::JSON(const JSON &other) : type(other.type) {
+    switch(other.type) {
+        case(JSON_ARRAY): {
+            payload.a = new std::vector<JSON>(*(other.payload.a));
+            break;
+        }
+        
+        case(JSON_OBJECT): {
+            payload.o = new std::map<std::string, JSON>(*(other.payload.o));
+            break;
+        }
+
+        case(JSON_STRING): {
+            payload.s = new std::string(*(other.payload.s));
+            break;
+        }
+        
+        default: {
+            payload = other.payload;
+            break;
+        }
+    }
+}
+
 
 JSON::operator const char *() const {
     return toString().c_str();
 }
 
-std::string JSON::toString() const {
+JSON::operator const std::string() const {
+    return toString();
+}
+
+JSON::operator const int() const {
+    switch(type) {
+        case(JSON_NUMBER_INT): return payload.i;
+        case(JSON_NUMBER_FLOAT): return static_cast<int>(payload.f);
+        default: assert(false);
+    }
+}
+
+JSON::operator const float() const {
+    switch(type) {
+        case(JSON_NUMBER_INT): return static_cast<float>(payload.i);
+        case(JSON_NUMBER_FLOAT): return payload.f;
+        default: assert(false);
+    }
+}
+
+JSON::operator const bool() const {
+    switch(type) {
+        case(JSON_BOOLEAN): return payload.b;
+        default: assert(false);
+    }
+}
+
+
+const std::string JSON::toString() const {
     switch (type) {
         case(JSON_NULL): {
             return "null";
@@ -77,6 +137,7 @@ std::string JSON::toString() const {
         }
     }
 }
+
 
 void JSON::add(JSON o) {
     if (not (type == JSON_NULL or type == JSON_ARRAY)) {

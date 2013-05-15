@@ -162,7 +162,7 @@ int main(int argc, char* argv[]) {
     if (args_info.inputs_num == 1) {
         yyin = fopen(args_info.inputs[0], "r");
         if (yyin == NULL) {
-            abort(8, "cannot open file for reading");
+            abort(8, "cannot open file '%s' for reading", args_info.inputs[0]);
         } else {
             status("reading %s", _cfilename_(args_info.inputs[0]));
         }

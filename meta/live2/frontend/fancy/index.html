@@ -89,16 +89,23 @@
                  Textual Edit
             </h3>
             <div id="json-output-container">
-            <form class="input-append">
-                <input id="json_typeahead" type="text" class="input-xlarge" data-provide="typeahead" autocomplete="off" _disabled="disabled"/>
-                <button type="submit" class="btn" _disabled="disabled">Add Param</button>
+            <form>
+                <span class="input-append">
+                    <input id="json_typeahead" type="text" class="input-xlarge" data-provide="typeahead" autocomplete="off" />
+                    <button type="submit" class="btn" _disabled="disabled">Add Param</button>
+                </span>&nbsp;
+                <span class="dropdown">
+                    <p class="btn dropdown-toggle" 
+                        onclick="FILE_EXPLORER.select_dropdown.call(this,function(v){var e=$('#json_typeahead');e.val(e.val()+v);});"
+                        data-toggle="dropdown">
+                      <i class="icon-folder-open"></i> Files...
+                    </p>
             </form>
             <form action="http://turgon.informatik.hu-berlin.de:1337" enctype="multipart/form-data" id="outForm" method="POST">
 <div class="control-group">
                 <textarea name="data" _disabled="disabled" class="controls input-block-level monospace" style="font-family:monospace;" id="json-output" rows="20">...</textarea>
 </div>
             </form>
-<p class="btn" onclick="FILE_EXPLORER.add();"><i class="icon-upload"></i> new File</p>
             </div>
           </div>
         </div>

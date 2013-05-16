@@ -53,25 +53,21 @@ function select_modal(callback) {
 function select_dropdown(callback) {
     $this = $(this);
     $(this).parent().children('ul').remove();
+    // dropdown unordered list
     var ddUl = $('<ul class="dropdown-menu" role="menu">').insertAfter($(this));
-    /* fileForm.find('input[type=file]').each(function(i) {
-        $this = $(this);
-        var prettyVal =$this.prettyVal();
-        if(!prettyVal) {
-            $this.remove();
-            return true;
-        }
-        */
+
+    // item link to add a new file
+    var linkNew = $('<li class="btn btn-link"><i class="icon-upload"></i> new File</li><li class="divider"></li>');
+    // if clicked, call add function
+    linkNew.click(function(){ add(callback); });
+    linkNew.appendTo(ddUl);
+
+    // now all known file names
     for(var i = 0, c = null; c = fileNames[i]; ++i) {
         var li = $('<li><span class="btn btn-link">' + c +'</span></li>');
         li.children('span.btn').click(function(){callback($(this).text());});
         li.appendTo(ddUl);
-    } // );
-    // item link to add a new file
-    var linkNew = $('<li class="divider"></li><li class="btn btn-link"><i class="icon-upload"></i> new File</li>');
-    // if clicked, call add function
-    linkNew.click(function(){ add(callback); });
-    linkNew.appendTo(ddUl);
+    } 
     $(this).dropdown();
     // show();
 }

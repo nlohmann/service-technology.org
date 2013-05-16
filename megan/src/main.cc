@@ -1,4 +1,9 @@
-#include <cstdio>                  /* for FILE io */
+#include <libgen.h>
+#include <unistd.h>
+#include <sstream>
+#include <iostream>
+#include <csignal>
+
 #include "ast-system-k.h"          /* for kc namespace */
 #include "ast-system-yystype.h"    /* for flex/bison bridge */
 #include "scanner.h"               /* for yyin, yylex_destroy */
@@ -11,11 +16,6 @@
 #include "Task.h"
 #include "Tool.h"
 #include "JSON.h"
-#include <libgen.h>
-#include <unistd.h>
-#include <sstream>
-#include <iostream>
-#include <csignal>
 
 extern int yyerror(const char *);
 std::vector<kc::property> properties;
@@ -24,21 +24,11 @@ std::vector<kc::property> properties;
 gengetopt_args_info args_info;
 extern const char *cmdline_parser_profile_values[];
 
-/// the invocation string
-std::string invocation;
-
-FILE *outfile = NULL;
-
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
     // overwrite invocation for consistent error messages
     argv[0] = basename(argv[0]);
-
-    // store invocation in a std::string for meta information in file output
-    for (int i = 0; i < argc; ++i) {
-        invocation += (i == 0 ? "" : " ") + std::string(argv[i]);
-    }
 
     // initialize the parameters structure
     struct cmdline_parser_params* params = cmdline_parser_params_create();
@@ -55,7 +45,7 @@ void evaluateParameters(int argc, char** argv) {
     free(params);
 }
 
-void handler__SIGTERM(int signum) {
+void handler__signals(int signum) {
     JSON j;
 
     j.add("pid", getpid());
@@ -97,18 +87,11 @@ void callHome(int argc, char** argv) {
     et.send(j);
 }
 
-void printer(const char *s, kc::uview v) {
-    fprintf(outfile, "%s", s);
-}
-
-void dummy_printer(const char *s, kc::uview v) {
-}
-
 int main(int argc, char* argv[]) {
-    signal(SIGSEGV, handler__SIGTERM);
-    signal(SIGABRT, handler__SIGTERM);
-    signal(SIGTERM, handler__SIGTERM);
-    signal(SIGINT, handler__SIGTERM);
+    signal(SIGSEGV, handler__signals);
+    signal(SIGABRT, handler__signals);
+    signal(SIGTERM, handler__signals);
+    signal(SIGINT, handler__signals);
     atexit(handler__termination);
 
     callHome(argc, argv);

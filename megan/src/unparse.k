@@ -2,6 +2,21 @@
 #include <config.h>
 #include "Task.h"
 #include "profile.h"
+
+void dummy_printer(const char *s, kc::uview v);
+extern FILE *outfile;
+%}
+
+%{ KC_UNPARSE
+/// a file that is used in the printer unparser
+FILE *outfile = NULL;
+
+void printer(const char *s, kc::uview v) {
+    fprintf(outfile, "%s", s);
+}
+
+void dummy_printer(const char *s, kc::uview v) {
+}
 %}
 
 %uview task;

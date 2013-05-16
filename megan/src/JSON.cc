@@ -1,9 +1,8 @@
-#include <cassert>
 #include <sstream>
+#include <exception>
 #include "JSON.h"
 
 JSON::JSON() : type(JSON_NULL) {
-    
 }
 
 JSON::JSON(std::string s) : type(JSON_STRING) {
@@ -26,24 +25,25 @@ JSON::JSON(float f) : type(JSON_NUMBER_FLOAT) {
     payload.f = f;
 }
 
-JSON::JSON(const JSON &other) : type(other.type) {
-    switch(other.type) {
-        case(JSON_ARRAY): {
+JSON::JSON(const JSON& other) : type(other.type) {
+    switch (other.type) {
+        case (JSON_ARRAY): {
             payload.a = new std::vector<JSON>(*(other.payload.a));
             break;
         }
-        
-        case(JSON_OBJECT): {
+
+        case (JSON_OBJECT): {
             payload.o = new std::map<std::string, JSON>(*(other.payload.o));
             break;
         }
 
-        case(JSON_STRING): {
+        case (JSON_STRING): {
             payload.s = new std::string(*(other.payload.s));
             break;
         }
-        
+
         default: {
+            // payloads without constructor can be copied straightforardly
             payload = other.payload;
             break;
         }
@@ -51,7 +51,7 @@ JSON::JSON(const JSON &other) : type(other.type) {
 }
 
 
-JSON::operator const char *() const {
+JSON::operator const char* () const {
     return toString().c_str();
 }
 
@@ -60,57 +60,64 @@ JSON::operator const std::string() const {
 }
 
 JSON::operator const int() const {
-    switch(type) {
-        case(JSON_NUMBER_INT): return payload.i;
-        case(JSON_NUMBER_FLOAT): return static_cast<int>(payload.f);
-        default: assert(false);
+    switch (type) {
+        case (JSON_NUMBER_INT):
+            return payload.i;
+        case (JSON_NUMBER_FLOAT):
+            return static_cast<int>(payload.f);
+        default:
+            throw std::exception();
     }
 }
 
 JSON::operator const float() const {
-    switch(type) {
-        case(JSON_NUMBER_INT): return static_cast<float>(payload.i);
-        case(JSON_NUMBER_FLOAT): return payload.f;
-        default: assert(false);
+    switch (type) {
+        case (JSON_NUMBER_INT):
+            return static_cast<float>(payload.i);
+        case (JSON_NUMBER_FLOAT):
+            return payload.f;
+        default:
+            throw std::exception();
     }
 }
 
 JSON::operator const bool() const {
-    switch(type) {
-        case(JSON_BOOLEAN): return payload.b;
-        default: assert(false);
+    switch (type) {
+        case (JSON_BOOLEAN):
+            return payload.b;
+        default:
+            throw std::exception();
     }
 }
 
 
 const std::string JSON::toString() const {
     switch (type) {
-        case(JSON_NULL): {
+        case (JSON_NULL): {
             return "null";
         }
 
-        case(JSON_STRING): {
-            assert(payload.s);
+        case (JSON_STRING): {
             return std::string("\"") + *(payload.s) + "\"";
         }
 
-        case(JSON_BOOLEAN): {
+        case (JSON_BOOLEAN): {
             return payload.b ? "true" : "false";
         }
 
-        case(JSON_NUMBER_INT): {
+        case (JSON_NUMBER_INT): {
             std::stringstream ss;
             ss << payload.i;
             return ss.str();
         }
 
-        case(JSON_NUMBER_FLOAT): {
+        case (JSON_NUMBER_FLOAT): {
             std::stringstream ss;
             ss << payload.f;
             return ss.str();
         }
 
-        case(JSON_ARRAY): {
+        case (JSON_ARRAY): {
             std::string result;
 
             for (std::vector<JSON>::const_iterator i = payload.a->begin(); i != payload.a->end(); ++i) {
@@ -123,7 +130,7 @@ const std::string JSON::toString() const {
             return "[" + result + "]";
         }
 
-        case(JSON_OBJECT): {
+        case (JSON_OBJECT): {
             std::string result;
 
             for (std::map<std::string, JSON>::const_iterator i = payload.o->begin(); i != payload.o->end(); ++i) {
@@ -140,15 +147,15 @@ const std::string JSON::toString() const {
 
 
 void JSON::add(JSON o) {
-    if (not (type == JSON_NULL or type == JSON_ARRAY)) {
-        assert(false);
+    if (not(type == JSON_NULL or type == JSON_ARRAY)) {
+        throw std::exception();
     }
 
     if (type == JSON_NULL) {
         type = JSON_ARRAY;
         payload.a = new std::vector<JSON>;
     }
-    
+
     payload.a->push_back(o);
 }
 
@@ -184,15 +191,15 @@ void JSON::add(float f) {
 
 
 void JSON::add(std::string n, JSON o) {
-    if (not (type == JSON_NULL or type == JSON_OBJECT)) {
-        assert(false);
+    if (not(type == JSON_NULL or type == JSON_OBJECT)) {
+        throw std::exception();
     }
 
     if (type == JSON_NULL) {
         type = JSON_OBJECT;
         payload.o = new std::map<std::string, JSON>;
     }
-    
+
     (*(payload.o))[n] = o;
 }
 

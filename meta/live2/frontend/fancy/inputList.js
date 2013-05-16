@@ -86,17 +86,21 @@ out: '<input type="checkbox" onchange="if(this.getAttribute(\'data-stlive-dirty\
     type: 'file',
     required:  ['name', 'argname'],
     html : {
-        // first the hidden field which eventually holds the file
-        // (will be copied to json-form later
-        out : '<input type="file" class="fileHideSafari" name="${id}_hidden" id="${id}_hidden" ' + 
-              'onchange="$(\'#\\\\${id}\').val($(this).prettyVal()).change();">'+
-          // the visible button just triggers the hidden file input
-              '<div class="input-prepend" ' +
-          'onclick="if(this.disabled)return false;$(\'#${id}_hidden\').show().focus().click()">' + 
-          '<p type="button" class="add-on btn" value="Select File">Select File</p>' +
+        out : 
+          // the visible value field
+          '<div class="input-append">' +
+          '<input id="${id}" data-stlive-argname="${argname}" type="text" style="color:#000;cursor:default;border:none;background-color:transparent;" class="input-medium forceDisabled">'+
+          '<span class="btn btn-mini" onclick="$(\'#${id}\').val(\'\').change()"><i class="icon-remove"></i></span></div><br >' +
+          // the two buttons for controlling the file explorer
+          '<p class="btn btn-link" onclick="FILE_EXPLORER.add.call(this,function(v){$(\'#${id}\').val(v).change();});">' +
+             '<i class="icon-upload"></i> new File</p>' +
+          '<span class="dropdown">'+
+          '<p class="btn btn-link dropdown-toggle" data-toggle="dropdown" ' + 
+          'onclick="FILE_EXPLORER.select_dropdown.call(this,function(v){$(\'#${id}\').val(v).change();});">' +
+             '<i class="icon-folder-open"></i> Select File</p>' +
+          '</span>',
           // and here we let the user see the filename (readOnly)
           // the parameter-name is taken by this input element
-            '<input id="${id}" data-stlive-argname="${argname}" type="text" style="color:#000;cursor:default;border:none;background-color:transparent;" class="input-medium forceDisabled" disabled="disabled"></div>',
         useLabel: true
     }
   }

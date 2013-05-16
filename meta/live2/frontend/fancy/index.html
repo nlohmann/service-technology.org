@@ -97,10 +97,8 @@
 <div class="control-group">
                 <textarea name="data" _disabled="disabled" class="controls input-block-level monospace" style="font-family:monospace;" id="json-output" rows="20">...</textarea>
 </div>
-<input type="file" style="" class="fileHideSafari fromTemplate" id="file_template" name="file">
             </form>
-<ul class="unstyled" id="file_list"></ul>
-<p class="btn" onclick="$('#file_template').clone().attr('id', 'newFile').appendTo('#outForm').show().focus().click()">Add File</p>
+<p class="btn" onclick="FILE_EXPLORER.add();"><i class="icon-upload"></i> new File</p>
             </div>
           </div>
         </div>
@@ -115,6 +113,15 @@
           <span class="btn btn-large btn-primary submitButton">Submit <i class="icon-play icon-white"></i></span>
       </div>
 
+<!-- file explorer -->
+    <div id="fileExplorer_container" class="modal hide fade" role="dialog">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>service technology</h3>
+        </div>
+        <div class="modal-body">
+        </div>
+    </div>
 <!-- output modal -->
     <div id="output_container" class="modal hide fade" role="dialog">
         <div class="modal-header">
@@ -123,9 +130,9 @@
         </div>
         <div class="modal-body">
 
-<div id="output_loading_info">
+        <div id="output_loading_info">
             waiting for server response..
-</div>
+        </div>
         <div id="output_contents">
           <h2>stdout</h2>
           <pre id="stdout"></pre>
@@ -149,6 +156,7 @@
     <script src="bootstrap/js/jquery.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
 
+<script src="fileExplorer.js"></script>
 <script src="inputs.js"></script>
 <script src="inputList.js"></script>
 <script src="jquery.base64.min.js"></script>
@@ -177,6 +185,9 @@ $("span.toolname").text(tool);
 
 // and now build the form, will be callback function for ggo-parser
 buildForm = function(inputs) {
+    // create file explorer
+    FILE_EXPLORER.setId('fileExplorer_container');
+
     //create graphical inputsetmanager
     im = new INPUTS.InputSetManager();
     im.SetInputs(inputs);

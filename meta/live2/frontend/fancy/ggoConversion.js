@@ -171,12 +171,12 @@ function convertItem(item, toolName) {
     if (item.typestr == 'FILE' || item.typestr == 'FILENAME') {
 
         // assume:
-        // (1)  if we find the word 'out' or 'output', we have an output file
+        // (1)  if we find the word 'out' or 'output' or 'create', we (probably) have an output file
         // (2)  an output file cannot be uploaded
         // (3)  an argoptional output file behaves like a flag
         //
 
-        re = /out(\.| |put)/gi;
+        re = /(out(\.| |put)|create)/gi;
         if(!input.desc.match(re) && !item.output && !item.out) {
             input.type='file';
         } else if (item.optional) {

@@ -1,10 +1,8 @@
-#include "cmdline.h"
 #include "profile.h"
-
-extern gengetopt_args_info args_info;
+#include "Runtime.h"
 
 Tool *task2tool(task_t task, Task *t) {
-    switch (args_info.profile_arg) {
+    switch (Runtime::args_info.profile_arg) {
         case (profile_arg_lola): {
             switch (task) {
                 case(t_UnknownTask):         return NULL;

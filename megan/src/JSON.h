@@ -31,13 +31,12 @@ class JSON {
         /// explicit conversion to string representation (C style)
         const char* c_str() const;
         /// explicit conversion to string representation (C++ style)
-        const std::string string() const;
+        const std::string toString() const;
 
         /// implicit conversion to string representation (C style)
         operator const char* () const;
         /// implicit conversion to string representation (C++ style)
         operator const std::string() const;
-
         /// implicit conversion to integer (only for numbers)
         operator const int() const;
         /// implicit conversion to double (only for numbers)
@@ -45,8 +44,6 @@ class JSON {
         /// implicit conversion to Boolean (only for Booleans)
         operator const bool() const;
 
-        /// add a null object to an array
-        void add();
         /// add a string to an array
         void add(const std::string&);
         /// add a string to an array
@@ -58,7 +55,7 @@ class JSON {
         /// add a number to an array
         void add(double);
         /// add an object/array to an array
-        void add(JSON);
+        void add(JSON&);
 
         /// operator to set an element in an object
         JSON& operator[](const std::string&);
@@ -78,7 +75,7 @@ class JSON {
         /// add a number to an object
         void add(std::string, double);
         /// add an object/array to an object
-        void add(std::string, JSON);
+        void add(std::string, JSON&);
 
         /// create an empty (null) object
         JSON();

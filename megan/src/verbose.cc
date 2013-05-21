@@ -24,10 +24,8 @@
 #include <cstring>
 #include <string>
 #include <fstream>
-#include "cmdline.h"
+#include "Runtime.h"
 #include "verbose.h"
-
-extern gengetopt_args_info args_info;
 
 
 /***************************************************************************\
@@ -86,7 +84,7 @@ void message(const char* format, ...) {
  \param format  the status message formatted as printf string
 */
 void status(const char* format, ...) {
-    if (not args_info.verbose_flag) {
+    if (not Runtime::args_info.verbose_flag) {
         return;
     }
 

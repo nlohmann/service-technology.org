@@ -1,9 +1,7 @@
 #include <fstream>
 #include "Task.h"
 #include "verbose.h"
-#include "cmdline.h"
-
-extern gengetopt_args_info args_info;
+#include "Runtime.h"
 
 std::vector<Task*> Task::queue;
 pnapi::PetriNet * Task::net = NULL;
@@ -15,15 +13,15 @@ pnapi::PetriNet *Task::getNet() {
         Task::net = new pnapi::PetriNet();
 
         // open net file
-        std::ifstream netfile(args_info.net_arg);
+        std::ifstream netfile(Runtime::args_info.net_arg);
         if (!netfile) {
-            abort(11, "could not read Petri net from file %s", _cfilename_(args_info.net_arg));
+            abort(11, "could not read Petri net from file %s", _cfilename_(Runtime::args_info.net_arg));
         }
 
         // read net from file
-        status("reading net from file %s", _cfilename_(args_info.net_arg));
-        netfile >> meta(pnapi::io::INPUTFILE, args_info.net_arg)
-                >> (args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::lola)
+        status("reading net from file %s", _cfilename_(Runtime::args_info.net_arg));
+        netfile >> meta(pnapi::io::INPUTFILE, Runtime::args_info.net_arg)
+                >> (Runtime::args_info.pnml_flag ? pnapi::io::pnml : pnapi::io::lola)
                 >> *(Task::net);
     }
     

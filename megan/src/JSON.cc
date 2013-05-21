@@ -11,7 +11,7 @@ JSON::JSON() : type(JSON_NULL) {
 }
 
 JSON::JSON(const std::string& s) : type(JSON_STRING) {
-    payload.s = new std::string(s.c_str());
+    payload.s = new std::string(s);
 }
 
 JSON::JSON(const char* s) : type(JSON_STRING) {
@@ -30,6 +30,7 @@ JSON::JSON(const double f) : type(JSON_NUMBER_FLOAT) {
     payload.f = f;
 }
 
+// copy constructor
 JSON::JSON(const JSON& other) : type(other.type) {
     switch (other.type) {
         case (JSON_ARRAY): {
@@ -66,7 +67,7 @@ JSON::~JSON() {
             break;
         }
         case (JSON_STRING): {
-            delete payload.s;
+            //delete payload.s;
             break;
         }
         default: {
@@ -81,11 +82,11 @@ JSON::~JSON() {
  *****************************/
 
 JSON::operator const char* () const {
-    return string().c_str();
+    return toString().c_str();
 }
 
 JSON::operator const std::string() const {
-    return string();
+    return toString();
 }
 
 
@@ -120,7 +121,7 @@ JSON::operator const bool() const {
     }
 }
 
-const std::string JSON::string() const {
+const std::string JSON::toString() const {
     switch (type) {
         case (JSON_NULL): {
             return "null";
@@ -153,7 +154,7 @@ const std::string JSON::string() const {
                 if (i != payload.a->begin()) {
                     result += ", ";
                 }
-                result += (*i).string();
+                result += (*i).toString();
             }
 
             return "[" + result + "]";
@@ -166,7 +167,7 @@ const std::string JSON::string() const {
                 if (i != payload.o->begin()) {
                     result += ", ";
                 }
-                result += "\"" + i->first + "\": " + (i->second).string();
+                result += "\"" + i->first + "\": " + (i->second).toString();
             }
 
             return "{" + result + "}";
@@ -175,7 +176,7 @@ const std::string JSON::string() const {
 }
 
 const char* JSON::c_str() const {
-    return string().c_str();
+    return toString().c_str();
 }
 
 
@@ -183,7 +184,7 @@ const char* JSON::c_str() const {
  * ADDING ELEMENTS TO OBJECTS AND ARRAYS *
  *****************************************/
 
-void JSON::add(JSON o) {
+void JSON::add(JSON &o) {
     if (not(type == JSON_NULL or type == JSON_ARRAY)) {
         throw std::runtime_error("cannot add element to primitive type");
     }
@@ -194,11 +195,6 @@ void JSON::add(JSON o) {
     }
 
     payload.a->push_back(o);
-}
-
-void JSON::add() {
-    JSON tmp;
-    add(tmp);
 }
 
 void JSON::add(const std::string& s) {
@@ -227,7 +223,7 @@ void JSON::add(double f) {
 }
 
 
-void JSON::add(std::string n, JSON o) {
+void JSON::add(std::string n, JSON &o) {
     if (not(type == JSON_NULL or type == JSON_OBJECT)) {
         throw std::runtime_error("cannot add element to primitive type");
     }

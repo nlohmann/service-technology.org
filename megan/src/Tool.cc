@@ -3,11 +3,10 @@
 #include <cstdio>
 #include <pnapi/pnapi.h>
 #include "Tool.h"
+#include "Runtime.h"
 #include "verbose.h"
-#include "cmdline.h"
 #include "ast-system-unpk.h"       /* for unparsers */
 
-extern gengetopt_args_info args_info;
 extern FILE *outfile;
 extern std::vector<kc::property> properties;
 extern void printer(const char *s, kc::uview v);
@@ -49,14 +48,14 @@ result_t Tool_LoLA_Deadlock::execute() {
     status("searching for deadlocks");
 
     // check if net file parameter is given
-    if (not args_info.net_given) {
+    if (not Runtime::args_info.net_given) {
         abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
     }
-    assert(args_info.net_arg);
+    assert(Runtime::args_info.net_arg);
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock " + args_info.net_arg + " > " + filename_output + " 2>&1";
+    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -80,14 +79,14 @@ result_t Tool_LoLA_Deadlock_optimistic::execute() {
     status("searching for deadlocks");
 
     // check if net file parameter is given
-    if (not args_info.net_given) {
+    if (not Runtime::args_info.net_given) {
         abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
     }
-    assert(args_info.net_arg);
+    assert(Runtime::args_info.net_arg);
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock --encoder=copy --store=prefix " + args_info.net_arg + " > " + filename_output + " 2>&1";
+    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock --encoder=copy --store=prefix " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -111,14 +110,14 @@ result_t Tool_LoLA_Deadlock_optimistic_incomplete::execute() {
     status("searching for deadlocks");
 
     // check if net file parameter is given
-    if (not args_info.net_given) {
+    if (not Runtime::args_info.net_given) {
         abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
     }
-    assert(args_info.net_arg);
+    assert(Runtime::args_info.net_arg);
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock --store=bloom " + args_info.net_arg + " > " + filename_output + " 2>&1";
+    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock --store=bloom " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -143,14 +142,14 @@ result_t Tool_LoLA_Deadlock_pessimistic::execute() {
     status("searching for deadlocks");
 
     // check if net file parameter is given
-    if (not args_info.net_given) {
+    if (not Runtime::args_info.net_given) {
         abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
     }
-    assert(args_info.net_arg);
+    assert(Runtime::args_info.net_arg);
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock --store=prefix --encode=copy --stubborn=deletion " + args_info.net_arg + " > " + filename_output + " 2>&1";
+    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock --store=prefix --encode=copy --stubborn=deletion " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -191,14 +190,14 @@ result_t Tool_LoLA_Reachability::execute() {
     status("created formula file %s", _cfilename_(filename_formula));
 
     // check if net file parameter is given
-    if (not args_info.net_given) {
+    if (not Runtime::args_info.net_given) {
         abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
     }
-    assert(args_info.net_arg);
+    assert(Runtime::args_info.net_arg);
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking " + args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
+    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -242,14 +241,14 @@ result_t Tool_LoLA_Reachability_optimistic::execute() {
     status("created formula file %s", _cfilename_(filename_formula));
 
     // check if net file parameter is given
-    if (not args_info.net_given) {
+    if (not Runtime::args_info.net_given) {
         abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
     }
-    assert(args_info.net_arg);
+    assert(Runtime::args_info.net_arg);
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking --encoder=copy --store=prefix " + args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
+    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking --encoder=copy --store=prefix " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -293,14 +292,14 @@ result_t Tool_LoLA_Reachability_optimistic_incomplete::execute() {
     status("created formula file %s", _cfilename_(filename_formula));
 
     // check if net file parameter is given
-    if (not args_info.net_given) {
+    if (not Runtime::args_info.net_given) {
         abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
     }
-    assert(args_info.net_arg);
+    assert(Runtime::args_info.net_arg);
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking --store=bloom " + args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
+    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking --store=bloom " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -345,14 +344,14 @@ result_t Tool_LoLA_Reachability_pessimistic::execute() {
     status("created formula file %s", _cfilename_(filename_formula));
 
     // check if net file parameter is given
-    if (not args_info.net_given) {
+    if (not Runtime::args_info.net_given) {
         abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
     }
-    assert(args_info.net_arg);
+    assert(Runtime::args_info.net_arg);
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking --store=prefix --encode=copy --stubborn=deletion " + args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
+    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking --store=prefix --encode=copy --stubborn=deletion " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
     status("calling %s", call_tool.c_str());
     int return_value_tool = system(call_tool.c_str());
     return_value_tool = __WEXITSTATUS(return_value_tool);
@@ -393,15 +392,15 @@ result_t Tool_Megan_InitialDeadlock::execute() {
     status("checking initial deadlock");
 
     // check if net file parameter is given
-    if (not args_info.net_given) {
+    if (not Runtime::args_info.net_given) {
         abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
     }
-    assert(args_info.net_arg);
+    assert(Runtime::args_info.net_arg);
 
     // open net file
-    std::ifstream netfile(args_info.net_arg);
+    std::ifstream netfile(Runtime::args_info.net_arg);
     if (!netfile) {
-        abort(11, "could not read Petri net from file %s", _cfilename_(args_info.net_arg));
+        abort(11, "could not read Petri net from file %s", _cfilename_(Runtime::args_info.net_arg));
     }
 
     // read net from file
@@ -457,14 +456,14 @@ result_t Tool_Sara_Reachability::execute() {
     status("created formula file %s", _cfilename_(filename_formula));
 
     // check if net file parameter is given
-    if (not args_info.net_given) {
+    if (not Runtime::args_info.net_given) {
         abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
     }
-    assert(args_info.net_arg);
+    assert(Runtime::args_info.net_arg);
 
     // translate formula
     std::string filename_sara = getTmpName(".sara");
-    std::string call_translation_tool = basedir + "/bin/lola2sara --net=" + args_info.net_arg + " --lola --formula=" + filename_formula + " > " + filename_sara;
+    std::string call_translation_tool = basedir + "/bin/lola2sara --net=" + Runtime::args_info.net_arg + " --lola --formula=" + filename_formula + " > " + filename_sara;
     status("calling %s", call_translation_tool.c_str());
     int return_value_translation_tool = system(call_translation_tool.c_str());
     return_value_translation_tool = __WEXITSTATUS(return_value_translation_tool);

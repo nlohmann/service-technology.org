@@ -1,4 +1,4 @@
-AC_INIT([Megan], 0.1, megan@service-technology.org, megan, http://service-technology.org/megan)
+AC_INIT([Megan], 0.2, megan@service-technology.org, megan, http://service-technology.org/megan)
 
 AC_MSG_NOTICE([ __  __                        ])
 AC_MSG_NOTICE([|  \/  | ___  __ _  __ _ _ __  ])

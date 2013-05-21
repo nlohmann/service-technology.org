@@ -2,26 +2,31 @@
 #include <config.h>
 #include "JSON.h"
 
+
+/*******************************
+ * CONSTRUCTORS AND DESTRUCTOR *
+ *******************************/
+
 JSON::JSON() : type(JSON_NULL) {
 }
 
-JSON::JSON(std::string s) : type(JSON_STRING) {
-    payload.s = new std::string(s);
+JSON::JSON(const std::string& s) : type(JSON_STRING) {
+    payload.s = new std::string(s.c_str());
 }
 
 JSON::JSON(const char* s) : type(JSON_STRING) {
     payload.s = new std::string(s);
 }
 
-JSON::JSON(bool b) : type(JSON_BOOLEAN) {
+JSON::JSON(const bool b) : type(JSON_BOOLEAN) {
     payload.b = b;
 }
 
-JSON::JSON(int i) : type(JSON_NUMBER_INT) {
+JSON::JSON(const int i) : type(JSON_NUMBER_INT) {
     payload.i = i;
 }
 
-JSON::JSON(double f) : type(JSON_NUMBER_FLOAT) {
+JSON::JSON(const double f) : type(JSON_NUMBER_FLOAT) {
     payload.f = f;
 }
 
@@ -50,12 +55,37 @@ JSON::JSON(const JSON& other) : type(other.type) {
     }
 }
 
+JSON::~JSON() {
+    switch (type) {
+        case (JSON_ARRAY): {
+            delete payload.a;
+            break;
+        }
+        case (JSON_OBJECT): {
+            delete payload.o;
+            break;
+        }
+        case (JSON_STRING): {
+            delete payload.s;
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+}
+
+
+/*****************************
+ * OPERATORS AND CONVERSIONS *
+ *****************************/
+
 JSON::operator const char* () const {
-    return toString().c_str();
+    return string().c_str();
 }
 
 JSON::operator const std::string() const {
-    return toString();
+    return string();
 }
 
 
@@ -90,7 +120,7 @@ JSON::operator const bool() const {
     }
 }
 
-const std::string JSON::toString() const {
+const std::string JSON::string() const {
     switch (type) {
         case (JSON_NULL): {
             return "null";
@@ -123,7 +153,7 @@ const std::string JSON::toString() const {
                 if (i != payload.a->begin()) {
                     result += ", ";
                 }
-                result += (*i).toString();
+                result += (*i).string();
             }
 
             return "[" + result + "]";
@@ -136,7 +166,7 @@ const std::string JSON::toString() const {
                 if (i != payload.o->begin()) {
                     result += ", ";
                 }
-                result += "\"" + i->first + "\": " + (i->second).toString();
+                result += "\"" + i->first + "\": " + (i->second).string();
             }
 
             return "{" + result + "}";
@@ -144,6 +174,14 @@ const std::string JSON::toString() const {
     }
 }
 
+const char* JSON::c_str() const {
+    return string().c_str();
+}
+
+
+/*****************************************
+ * ADDING ELEMENTS TO OBJECTS AND ARRAYS *
+ *****************************************/
 
 void JSON::add(JSON o) {
     if (not(type == JSON_NULL or type == JSON_ARRAY)) {
@@ -163,7 +201,7 @@ void JSON::add() {
     add(tmp);
 }
 
-void JSON::add(std::string s) {
+void JSON::add(const std::string& s) {
     JSON tmp(s);
     add(tmp);
 }
@@ -229,7 +267,7 @@ void JSON::add(std::string n, double f) {
 
 
 /// operator to set an element in an object
-JSON & JSON::operator[](const std::string & key) {
+JSON& JSON::operator[](const std::string& key) {
     if (type == JSON_NULL) {
         type = JSON_OBJECT;
         payload.o = new std::map<std::string, JSON>;
@@ -243,7 +281,7 @@ JSON & JSON::operator[](const std::string & key) {
 }
 
 /// operator to set an element in an object
-JSON & JSON::operator[](const char *key) {
+JSON& JSON::operator[](const char* key) {
     if (type == JSON_NULL) {
         type = JSON_OBJECT;
         payload.o = new std::map<std::string, JSON>;
@@ -257,7 +295,7 @@ JSON & JSON::operator[](const char *key) {
 }
 
 /// operator to get an element in an object
-const JSON & JSON::operator[](const std::string & key) const {
+const JSON& JSON::operator[](const std::string& key) const {
     if (payload.o->find(key) == payload.o->end()) {
         throw std::runtime_error("key " + key + " not found");
     } else {

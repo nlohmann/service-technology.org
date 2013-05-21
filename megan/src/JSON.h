@@ -28,8 +28,10 @@ class JSON {
         } payload;
 
     public:
-        /// explicit conversion to string representation
-        const std::string toString() const;
+        /// explicit conversion to string representation (C style)
+        const char* c_str() const;
+        /// explicit conversion to string representation (C++ style)
+        const std::string string() const;
 
         /// implicit conversion to string representation (C style)
         operator const char* () const;
@@ -46,7 +48,7 @@ class JSON {
         /// add a null object to an array
         void add();
         /// add a string to an array
-        void add(std::string);
+        void add(const std::string&);
         /// add a string to an array
         void add(const char*);
         /// add a Boolean to an array
@@ -59,11 +61,11 @@ class JSON {
         void add(JSON);
 
         /// operator to set an element in an object
-        JSON & operator[](const std::string & key);
+        JSON& operator[](const std::string&);
         /// operator to set an element in an object
-        JSON & operator[](const char* key);
+        JSON& operator[](const char*);
         /// operator to get an element in an object
-        const JSON & operator[](const std::string & key) const;
+        const JSON& operator[](const std::string&) const;
 
         /// add a string to an object
         void add(std::string, std::string);
@@ -81,15 +83,17 @@ class JSON {
         /// create an empty (null) object
         JSON();
         /// create a string object from C++ string
-        JSON(std::string);
+        JSON(const std::string&);
         /// create a string object from C string
         JSON(const char*);
         /// create a Boolean object
-        JSON(bool);
+        JSON(const bool);
         /// create a number object
-        JSON(int);
+        JSON(const int);
         /// create a number object
-        JSON(double);
+        JSON(const double);
         /// copy constructor (also for objects and arrays)
         JSON(const JSON&);
+        /// destructor
+        ~JSON();
 };

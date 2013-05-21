@@ -1,4 +1,5 @@
 #include <sstream>
+#include <config.h>
 #include "JSON.h"
 
 JSON::JSON() : type(JSON_NULL) {
@@ -49,7 +50,6 @@ JSON::JSON(const JSON& other) : type(other.type) {
     }
 }
 
-
 JSON::operator const char* () const {
     return toString().c_str();
 }
@@ -57,6 +57,7 @@ JSON::operator const char* () const {
 JSON::operator const std::string() const {
     return toString();
 }
+
 
 JSON::operator const int() const {
     switch (type) {
@@ -88,7 +89,6 @@ JSON::operator const bool() const {
             throw std::runtime_error("cannot cast to JSON Boolean");
     }
 }
-
 
 const std::string JSON::toString() const {
     switch (type) {
@@ -225,4 +225,42 @@ void JSON::add(std::string n, int i) {
 void JSON::add(std::string n, double f) {
     JSON tmp(f);
     add(n, tmp);
+}
+
+
+/// operator to set an element in an object
+JSON & JSON::operator[](const std::string & key) {
+    if (type == JSON_NULL) {
+        type = JSON_OBJECT;
+        payload.o = new std::map<std::string, JSON>;
+    }
+
+    if (payload.o->find(key) == payload.o->end()) {
+        (*(payload.o))[key] = JSON();
+    }
+
+    return (*(payload.o))[key];
+}
+
+/// operator to set an element in an object
+JSON & JSON::operator[](const char *key) {
+    if (type == JSON_NULL) {
+        type = JSON_OBJECT;
+        payload.o = new std::map<std::string, JSON>;
+    }
+
+    if (payload.o->find(key) == payload.o->end()) {
+        (*(payload.o))[key] = JSON();
+    }
+
+    return (*(payload.o))[key];
+}
+
+/// operator to get an element in an object
+const JSON & JSON::operator[](const std::string & key) const {
+    if (payload.o->find(key) == payload.o->end()) {
+        throw std::runtime_error("key " + key + " not found");
+    } else {
+        return payload.o->find(key)->second;
+    }
 }

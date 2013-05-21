@@ -35,6 +35,7 @@ class JSON {
         operator const char* () const;
         /// implicit conversion to string representation (C++ style)
         operator const std::string() const;
+
         /// implicit conversion to integer (only for numbers)
         operator const int() const;
         /// implicit conversion to double (only for numbers)
@@ -56,6 +57,13 @@ class JSON {
         void add(double);
         /// add an object/array to an array
         void add(JSON);
+
+        /// operator to set an element in an object
+        JSON & operator[](const std::string & key);
+        /// operator to set an element in an object
+        JSON & operator[](const char* key);
+        /// operator to get an element in an object
+        const JSON & operator[](const std::string & key) const;
 
         /// add a string to an object
         void add(std::string, std::string);

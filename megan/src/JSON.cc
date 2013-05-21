@@ -1,5 +1,4 @@
 #include <sstream>
-#include <exception>
 #include "JSON.h"
 
 JSON::JSON() : type(JSON_NULL) {
@@ -21,7 +20,7 @@ JSON::JSON(int i) : type(JSON_NUMBER_INT) {
     payload.i = i;
 }
 
-JSON::JSON(float f) : type(JSON_NUMBER_FLOAT) {
+JSON::JSON(double f) : type(JSON_NUMBER_FLOAT) {
     payload.f = f;
 }
 
@@ -66,18 +65,18 @@ JSON::operator const int() const {
         case (JSON_NUMBER_FLOAT):
             return static_cast<int>(payload.f);
         default:
-            throw std::exception();
+            throw std::runtime_error("cannot cast to JSON number");
     }
 }
 
-JSON::operator const float() const {
+JSON::operator const double() const {
     switch (type) {
         case (JSON_NUMBER_INT):
-            return static_cast<float>(payload.i);
+            return static_cast<double>(payload.i);
         case (JSON_NUMBER_FLOAT):
             return payload.f;
         default:
-            throw std::exception();
+            throw std::runtime_error("cannot cast to JSON number");
     }
 }
 
@@ -86,7 +85,7 @@ JSON::operator const bool() const {
         case (JSON_BOOLEAN):
             return payload.b;
         default:
-            throw std::exception();
+            throw std::runtime_error("cannot cast to JSON Boolean");
     }
 }
 
@@ -148,7 +147,7 @@ const std::string JSON::toString() const {
 
 void JSON::add(JSON o) {
     if (not(type == JSON_NULL or type == JSON_ARRAY)) {
-        throw std::exception();
+        throw std::runtime_error("cannot add element to primitive type");
     }
 
     if (type == JSON_NULL) {
@@ -184,7 +183,7 @@ void JSON::add(int i) {
     add(tmp);
 }
 
-void JSON::add(float f) {
+void JSON::add(double f) {
     JSON tmp(f);
     add(tmp);
 }
@@ -192,7 +191,7 @@ void JSON::add(float f) {
 
 void JSON::add(std::string n, JSON o) {
     if (not(type == JSON_NULL or type == JSON_OBJECT)) {
-        throw std::exception();
+        throw std::runtime_error("cannot add element to primitive type");
     }
 
     if (type == JSON_NULL) {
@@ -223,7 +222,7 @@ void JSON::add(std::string n, int i) {
     add(n, tmp);
 }
 
-void JSON::add(std::string n, float f) {
+void JSON::add(std::string n, double f) {
     JSON tmp(f);
     add(n, tmp);
 }

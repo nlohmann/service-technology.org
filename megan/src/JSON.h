@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <stdexcept>
 
 class JSON {
     private:
@@ -22,8 +23,8 @@ class JSON {
             bool b;
             /// number: integer
             int i;
-            /// number: float
-            float f;
+            /// number: double
+            double f;
         } payload;
 
     public:
@@ -36,8 +37,8 @@ class JSON {
         operator const std::string() const;
         /// implicit conversion to integer (only for numbers)
         operator const int() const;
-        /// implicit conversion to float (only for numbers)
-        operator const float() const;
+        /// implicit conversion to double (only for numbers)
+        operator const double() const;
         /// implicit conversion to Boolean (only for Booleans)
         operator const bool() const;
 
@@ -52,7 +53,7 @@ class JSON {
         /// add a number to an array
         void add(int);
         /// add a number to an array
-        void add(float);
+        void add(double);
         /// add an object/array to an array
         void add(JSON);
 
@@ -65,7 +66,7 @@ class JSON {
         /// add a number to an object
         void add(std::string, int);
         /// add a number to an object
-        void add(std::string, float);
+        void add(std::string, double);
         /// add an object/array to an object
         void add(std::string, JSON);
 
@@ -80,7 +81,7 @@ class JSON {
         /// create a number object
         JSON(int);
         /// create a number object
-        JSON(float);
+        JSON(double);
         /// copy constructor (also for objects and arrays)
         JSON(const JSON&);
 };

@@ -135,6 +135,41 @@ function newId() {
     return 'file_input_'+ ++counter;
 }
 
+function validateInputs(inputs) {
+    return function() {
+        var iLen = inputs.length;
+        var inputFilenames = {};
+        fileNames.map(function(f){inputFilenames[f]=true});
+
+        // all existing alerts should fade out and then be removed
+        var alrtContainer = $('#alertContainer').empty();
+        for(var i = 0; i < iLen; ++i) {
+            var cur = inputs[i];
+            var curInput = $('#' + cur.params.id);
+            var controlGroup = curInput.closest('.control-group').removeClass('warning');
+            controlGroup.attr('title', '');
+            controlGroup.tooltip('destroy');
+            if(cur.params.type != 'file') continue;
+            var curVal = cur.getValue();
+            if(curVal && !inputFilenames[curVal]) {
+                // put a red box around
+                var param = curInput.attr('data-stlive-argname');
+                if(!param) param = 'File Input';
+                var msg = 'filename <b><i>' + curVal + '</i></b> was specified in parameter <b>' + param + '</b> but no such file was uploaded yet';
+                // first show alert on top
+                var alrt = $('<div>' + msg + '</div>').addClass('alert').hide();
+                alrt.appendTo(alrtContainer);
+                alrt.fadeIn();
+
+                // now show tooltip above input
+                controlGroup.addClass('warning');
+                controlGroup.attr('title', msg);
+                controlGroup.tooltip( {html: true });
+            }
+        }
+    }
+}
+
 // public interface
 return {
     show: show,
@@ -144,7 +179,8 @@ return {
     select_dropdown: select_dropdown,
     collectFileInputs: collectFileInputs,
     //getFileNames: function(){return fileNames;}
-    onchange: onchange
+    onchange: onchange,
+    validateInputs: validateInputs
 }
 
 // scope wrapper

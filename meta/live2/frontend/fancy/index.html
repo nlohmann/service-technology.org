@@ -73,7 +73,9 @@
 
     <div class="container">
     <h1 style="text-transform:uppercase;">service-technology.org/live/<span class="toolname" /><br><small>solutions that make services behave well</small></h1>
+
       <div class="row">
+        <span class="span12" id="alertContainer"></span>
         <div class="span6">
           <!-- GUI -->
           <div class="stBox">
@@ -205,6 +207,7 @@ buildForm = function(inputs) {
     im.Create(b.get(0));
     // when things change, forward to json
     im.onChange(JSON_BOX.updateValues($('#json-output'), tool));
+    im.onChange(FILE_EXPLORER.validateInputs(im.inputs));
     b.fadeIn();
 
     //move file inputs
@@ -217,6 +220,9 @@ buildForm = function(inputs) {
     // TODO: maybe this can cause memory leak or bad performance?
     JSON_BOX.watchJsonBox($('#json-output'), function(p){im.update(p);} );
     // when things change in json,  forward to GUI
+
+    // when json changes, check file for validity
+    JSON_BOX.watchJsonBox($('#json-output'), FILE_EXPLORER.validateInputs(im.inputs));
 };
 
 // PARSE FROM GGO

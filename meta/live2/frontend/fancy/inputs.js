@@ -314,7 +314,7 @@ InputSetManager.prototype.onChange = function(callback) {
     var t = this;
     $(this.form).find('input, select').change(function(){ 
         var p = InputSetManager.prototype.getValues.call(t);
-        callback(p);
+        callback.call(this, p);
     });
     // initialize empty
     callback([]);

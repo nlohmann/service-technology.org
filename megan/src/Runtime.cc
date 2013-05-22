@@ -22,6 +22,7 @@ bool Runtime::callHome = true;
 FILE *Runtime::output = NULL;
 gengetopt_args_info Runtime::args_info;
 
+
 __attribute__((noreturn)) void Runtime::signalHandler(int signum) {
     log["exit"]["signal"] = strsignal(signum);
     exit(EXIT_TERMINATION);
@@ -80,11 +81,11 @@ void Runtime::init(int argc, char** argv) {
 
     // initialize log
     log["pid"] = getpid();
+    log["hostname"] = CONFIG_HOSTNAME;
     log["tool"]["name"] = PACKAGE_NAME;
     log["tool"]["package_version"] = PACKAGE_VERSION;
     log["tool"]["svn_version"] = VERSION_SVN;
     log["tool"]["build_system"] = CONFIG_BUILDSYSTEM;
-    log["tool"]["hostname"] = CONFIG_HOSTNAME;
     log["tool"]["architecture"] = SIZEOF_VOIDP * 8;
     log["runtime"]["start_time"] = static_cast<int>(start_time);
     log["call"]["binary"] = argv[0];

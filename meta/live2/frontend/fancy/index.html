@@ -195,6 +195,9 @@ buildForm = function(inputs) {
     // create file explorer
     FILE_EXPLORER.setId('fileExplorer_container');
 
+    // update typeahead with file names, when they change
+    FILE_EXPLORER.onchange(JSON_BOX.changeFilenames);
+
     //create graphical inputsetmanager
     im = new INPUTS.InputSetManager();
     im.SetInputs(inputs);

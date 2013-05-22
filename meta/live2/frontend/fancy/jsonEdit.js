@@ -16,12 +16,13 @@ function createTypeahead(jqObj, inputs) {
     var reDash = /^\-+/;
     for(var i = 0; i < inputsLen; ++i) {
         var c = inputs[i];
-        if(c.argname) {
+        if(c.argname || c.argname === '') {
             var n = c.argname.replace(reDash, '');
             args.push(n);
             values[n] = {
                 argname : c.argname,
                 isFlag : c.type == 'checkbox',
+                isFile : c.type == 'file',
                 options: c.options,
                 default: c.default
             }
@@ -32,6 +33,7 @@ function createTypeahead(jqObj, inputs) {
             values[n] = {
                 argname : c.argname,
                 isFlag : c.type == 'checkbox',
+                isFile : c.type == 'file',
                 options: c.options,
                 default: c.default
             };
@@ -64,59 +66,55 @@ function source(q) {
     var fst = q.charAt(0) == '-';
     var snd = q.charAt(1) == '-';
 
-    var lead = '';
+    var leader = '';
     if(fst) { leader = '-';
         if(snd) leader = '--';
-    } else {
-        return args;
     }
 
-    var leadArgs = args.map( function(s){return leader + s;} );
-    return currentArgs.concat(leadArgs);
+    var leadArgs = currentArgs.concat(args).map(function(s){return leader + s;} );
+    return leadArgs;
 }
 
 function resetTypeahead() {
     jqIn.typeahead({source:source, updater:updater});
 }
 
+function changeFilenames(fns) {
+    ca = [];
+    var fnsl = fns.length;
+    for(i in values) {
+        val = values[i];
+        var cleanArgname = val.argname.replace(/^\-+/gi, '');
+        if(val.isFile) {
+            for(var fi = 0; fi < fnsl; fi ++) {
+                if(cleanArgname) {
+                    cleanArgname += '=';
+                }
+                currentArgs.push(cleanArgname + fns[fi]);
+            }
+        }
+    }
+    resetTypeahead();
+}
+
 function updater(leading_dashes_item) {
     var item = leading_dashes_item.replace(/^\-+/, '');;
 
-    var ioEq = item.indexOf('=');
     if( item.indexOf('=') > -1) {
         var keyVal = item.split('=');
         var p = values[keyVal[0]].argname + '=' + keyVal[1];
-        currentArgs = [];
 
-        // addParam(p);
-        // return '';
         return p;
 
     } else {
         var val = values[item];
         if(!val) {
-            alert('somewhere something went terribly wrong');
+            return leading_dashes_item;
         }
         if(val.isFlag) {
-            //addParam(val.argname);
-            //return '';
             return val.argname;
         }
-        var cleanArgname = val.argname;
-        if(val.options) {
-            var ca = [];
-            var oLen = val.options.length;
-            console.log(val.options);
-            for(var i = 0; i < oLen; ++i) {
-                var c = val.options[i];
-                ca.push(cleanArgname + '=' + c);
-            }
-            if(val.default && val.default.indexOf('<') == -1) {
-                ca.push(cleanArgname + '=' + val.default);
-            }
-            // currentArgs = ca;
-        }
-        return cleanArgname + '=';
+        return val.argname + '=';
     }
     alert('unreachable code ???');
 }
@@ -240,7 +238,8 @@ function updateFile() {
 return {
     createTypeahead: createTypeahead,
     watchJsonBox: watchJsonBox,
-    updateValues: updateValues
+    updateValues: updateValues,
+    changeFilenames: changeFilenames
 };
 
 // end wrapper

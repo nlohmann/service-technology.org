@@ -5,11 +5,22 @@ FILE_EXPLORER = (function(){
 var fileNames = [];
 var jqObj;
 var fileForm;
+var onchangeFunctions = [];
 function setId(id) {
     jqObj = $('#'+id);
 
     fileForm = $('<form>');
     fileForm.appendTo(jqObj);
+}
+
+function onchange(callback) {
+    if(typeof callback == 'function') {
+        onchangeFunctions.push(callback);
+    } else {
+        for(var i = 0, c = null; c =onchangeFunctions[i]; ++i) {
+            c(fileNames);
+        }
+    }
 }
 
 function show(callback) {
@@ -107,6 +118,8 @@ function add(callback) {
         fileNames.push(newVal);
         // call callback
         callback(newVal);
+        // trigger event functions
+        onchange();
     });
 }
 function collectFileInputs() {
@@ -129,7 +142,9 @@ return {
     add: add,
     select_modal: select_modal,
     select_dropdown: select_dropdown,
-    collectFileInputs: collectFileInputs
+    collectFileInputs: collectFileInputs,
+    //getFileNames: function(){return fileNames;}
+    onchange: onchange
 }
 
 // scope wrapper

@@ -2,67 +2,40 @@
 // scope wrapper
 FILE_EXPLORER = (function(){
 
-var fileNames = [];
-var jqObj;
-var fileForm;
+// var files;
+// var fileNames = [];
+var filesByFilename = {};
 var onchangeFunctions = [];
-function setId(id) {
-    jqObj = $('#'+id);
 
-    fileForm = $('<form>');
-    fileForm.appendTo(jqObj);
-}
+// a form, where the file inputs are
+var fileForm = $('<form>');
+fileForm.appendTo('body');
 
 function onchange(callback) {
     if(typeof callback == 'function') {
         onchangeFunctions.push(callback);
     } else {
-        for(var i = 0, c = null; c =onchangeFunctions[i]; ++i) {
+        // create the list of filenames
+        var fileNames = [];
+        for(i in filesByFilename) {
+            fileNames.push(i);
+        }
+        // go through all callbacks
+        for(var i = 0, c = null; c = onchangeFunctions[i]; ++i) {
             c(fileNames);
         }
     }
 }
 
-function show(callback) {
-    
-    jqObj.unbind('hide');
-    if(typeof callback == 'function') {
-        jqObj.on('hide', callback);
-    }
-    jqObj.modal('show');
-}
-
-function select_modal(callback) {
-    var modalBody = jqObj.find('div.modal-body').empty();
-    var fileUl = $('<ul class="unstyled">').appendTo(modalBody);
-    fileForm.find('input[type=file]').each(function(i) {
-        $this = $(this);
-        var prettyVal =$this.prettyVal();
-        if(!prettyVal) {
-            $this.remove();
-            return true;
-        }
-        var li = $('<li><span data-dismiss="modal" class="btn btn-link">' + prettyVal +'</span></li>');
-        li.children('span.btn').click(function(){callback($(this).text());});
-        li.appendTo(fileUl);
-    });
-    // item link to add a new file
-    var linkNew = $('<span class="btn">add new...</span>');
-    // if clicked, call add function
-    linkNew.click(function(){
-            add(
-                // if add clicked and something is returned, call callback
-                function(v){
-                    jqObj.modal('hide');
-                    callback(v);
-            });
-        }
-    );
-    linkNew.insertAfter(fileUl);
-    show();
-}
+/* this function creates a dropdown menu to select a file
+ * after files is selected (or new file for upload selected),
+ * the callback function is called with filename as argument
+ *
+ * must be run on html-object scope, where the drop-down should appear
+ */
 function select_dropdown(callback) {
     $this = $(this);
+    // remove old dropdowns
     $(this).parent().children('ul').remove();
     // dropdown unordered list
     var ddUl = $('<ul class="dropdown-menu" role="menu">').insertAfter($(this));
@@ -74,84 +47,86 @@ function select_dropdown(callback) {
     linkNew.appendTo(ddUl);
 
     // now all known file names
-    for(var i = 0, c = null; c = fileNames[i]; ++i) {
-        var li = $('<li><span class="btn btn-link">' + c +'</span></li>');
+    for(var i in filesByFilename) {
+        var li = $('<li><span class="btn btn-link">' + i +'</span></li>');
         li.children('span.btn').click(function(){callback($(this).text());});
         li.appendTo(ddUl);
     } 
     $(this).dropdown();
-    // show();
 }
 
-function add(callback) {
-    var newFile = $('<input type="file" name="file">').addClass('fileHideSafari');    
-    newFile.attr('id', newId()).appendTo(fileForm);
-    newFile.click();
-    // callback is only called, if value is assigned
-    newFile.change(function() {
-        // check file name
-        var $this = $(this);
-        $this.attr('data-stlive-current', 'true');
-        var newVal = $this.prettyVal();
+// returns a function, which is called after a change
+// and checks, whether files already exists
+function checkAddedFile(newFile, callback) {
 
         // in case we don't have a value, remove it
-        if(!newVal) {
+        if(!newFile.name) {
+            alert('TODO');
             $this.remove();
         }
 
         // check if file name is already in use
-        fileForm.find('input[type=file]').each(function() {
-            var $cur = $(this);
-            if($cur.attr('data-stlive-current')) {
-                $cur.removeAttr('data-stlive-current');
-                return true;
+        if( !filesByFilename[newFile.name]
+            || window.confirm('this filename is already in use.\nOverwrite the old ' + newFile.name + '?')
+          ) {
+                filesByFilename[newFile.name] = newFile;
             }
-            if($cur.prettyVal() == newVal) {
-                // if filename in use, ask to overwrite
-                if(window.confirm('this filename is already in use.\nOverwrite the old '+newVal+'?')) {
-                    $this.remove();
-                } else {
-                    $cur.remove();
-                }
-            }
-        });
-        fileNames.push(newVal);
+        
         // call callback
-        callback(newVal);
+        callback(newFile.name);
         // trigger event functions
         onchange();
-    });
-}
-function collectFileInputs() {
-    return jqObj.find('input[type=file]').each(function(){
-        if(!$(this).prettyVal()) {
-            $(this).remove();
-        }
-    });
 }
 
+function dropFile(evt, callback) {
+    var newFile = evt.dataTransfer.files[0];
+    checkAddedFile(newFile, callback);
+}
+
+// select a new file for upload, and after that call callback with filename
+function add(callback) {
+    var newFile = $('<input type="file" name="file" multiple>').addClass('fileHideSafari');
+    newFile.attr('id', newId()).appendTo(fileForm);
+    newFile.click();
+    // callback is only called, if value is assigned
+    newFile.change(
+            function(e) {
+                var newFile = this.files[0];
+                checkAddedFile(newFile, callback);
+            }
+    );
+}
+
+// little helper as we need unique ids
 var counter = 0;
 function newId() {
     return 'file_input_'+ ++counter;
 }
 
+// here the files can be accessed, for request
+function getFiles() {
+    return filesByFilename;
+}
+
 function validateInputs(inputs) {
     return function() {
         var iLen = inputs.length;
-        var inputFilenames = {};
-        fileNames.map(function(f){inputFilenames[f]=true});
 
         // all existing alerts should fade out and then be removed
         var alrtContainer = $('#alertContainer').empty();
         for(var i = 0; i < iLen; ++i) {
             var cur = inputs[i];
             var curInput = $('#' + cur.params.id);
+            if(cur.params.type != 'file') continue;
+
+            // reset style
             var controlGroup = curInput.closest('.control-group').removeClass('warning');
             controlGroup.attr('title', '');
             controlGroup.tooltip('destroy');
-            if(cur.params.type != 'file') continue;
+
+            // check, if we have such a file
             var curVal = cur.getValue();
-            if(curVal && !inputFilenames[curVal]) {
+            if(curVal && !filesByFilename[curVal]) {
                 // put a red box around
                 var param = curInput.attr('data-stlive-argname');
                 if(!param) param = 'File Input';
@@ -172,15 +147,12 @@ function validateInputs(inputs) {
 
 // public interface
 return {
-    show: show,
-    setId: setId,
     add: add,
-    select_modal: select_modal,
     select_dropdown: select_dropdown,
-    collectFileInputs: collectFileInputs,
-    //getFileNames: function(){return fileNames;}
+    getFiles: getFiles,
     onchange: onchange,
-    validateInputs: validateInputs
+    validateInputs: validateInputs,
+    dropFile: dropFile
 }
 
 // scope wrapper

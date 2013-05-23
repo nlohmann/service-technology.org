@@ -74,10 +74,14 @@ function progressHandlingFunction(s) {
 $('#outForm').submit(function(){
 
     // get the file inputs to this form
-    $(this).find('input[type=file]').remove();
-    FILE_EXPLORER.collectFileInputs().clone().appendTo(this);
+    //$(this).find('input[type=file]').remove();
+    //FILE_EXPLORER.collectFileInputs().clone().appendTo(this);
 
+    var files = FILE_EXPLORER.getFiles();
     var formData = new FormData(this);
+    for(var i in files) {
+        formData.append(i, files[i]);
+    }
     $.ajax({
         url: this.action,  //server script to process data
         type: 'POST',

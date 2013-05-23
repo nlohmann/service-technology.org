@@ -80,17 +80,18 @@ function resetTypeahead() {
 }
 
 function changeFilenames(fns) {
-    ca = [];
+    currentArgs = [];
     var fnsl = fns.length;
     for(i in values) {
-        val = values[i];
-        var cleanArgname = val.argname.replace(/^\-+/gi, '');
+        var val = values[i];
+        var cleanArgname = i.replace(/^\-+/gi, '');
         if(val.isFile) {
             for(var fi = 0; fi < fnsl; fi ++) {
+                var eq = ''
                 if(cleanArgname) {
-                    cleanArgname += '=';
+                    eq = '=';
                 }
-                currentArgs.push(cleanArgname + fns[fi]);
+                currentArgs.push(cleanArgname + eq + fns[fi]);
             }
         }
     }

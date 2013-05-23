@@ -94,7 +94,8 @@ out: '<input type="checkbox" onchange="if(this.getAttribute(\'data-stlive-dirty\
           'onclick="FILE_EXPLORER.select_dropdown.call(this,function(v){$(\'#${id}\').val(v).change();});">' +
              '<i class="icon-folder-open"></i></p>' +
           '</span>' +
-          '<input id="${id}" data-stlive-argname="${argname}" data-stlive-type="file" type="text" style="color:#000;cursor:default;border:none;background-color:transparent;" class="input-medium">'+
+          '<input id="${id}" data-stlive-argname="${argname}" data-stlive-type="file" type="text" style="color:#000;cursor:default;border:none;background-color:transparent;" class="input-medium" ' +
+          ' ondragover="event.preventDefault()" ondrop="FILE_EXPLORER.dropFile(event, function(v){$(\'#${id}\').val(v).change();});return false;">' +
           '<span class="btn btn-mini" onclick="$(\'#${id}\').val(\'\').change()"><i class="icon-remove"></i></span></div>',
         useLabel: true
     }

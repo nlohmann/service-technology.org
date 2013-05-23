@@ -1,6 +1,7 @@
 // scope wrapper
-(function(){
+SERVER_CONNECT = function(sucHistory){
 //
+
 var noSent = 0;
 var noRec = 0;
 
@@ -40,6 +41,10 @@ function completeHandler(r) {
     var timeDiff = r.result.time.end - r.result.time.begin;
     var code = r.result.exit.code;
     var signal = r.result.exit.signal;
+
+    if(code == '0') {
+        sucHistory.addState();
+    }
 
     //now build the info sentence
     var s = 'The tool exited in <b>' + timeDiff + 'ms</b><br>';
@@ -139,4 +144,4 @@ function dumpObject(obj, indent)
 
 
 // scope wrapper
-})();
+};

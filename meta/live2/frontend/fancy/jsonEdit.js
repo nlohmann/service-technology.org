@@ -161,11 +161,19 @@ function addParam(p, jqTa) {
 }
 
 function watchJsonBox(jqObj, updateHandler) {
-    var alrt = $('<p style="margin-top:1em;margin-bottom:0">');
-    alrt.addClass('alert alert-error');
-    alrt.html('<h4>No valid JSON</h4><div/>');
-    alrt.hide();
-    alrt.insertBefore(jqObj);
+    if(!this.alrts) {
+        this.alrts = {};
+    }
+    var id =jqObj.attr('id');
+    var alrt = this.alrts[id];
+    if(!alrt) {
+        this.alrts[id] = $('<p style="margin-top:1em;margin-bottom:0">');
+        alrt = this.alrts[id];
+        alrt.addClass('alert alert-error');
+        alrt.html('<h4>No valid JSON</h4><div/>');
+        alrt.hide();
+        alrt.insertBefore(jqObj);
+    }
 
     jqObj.change(function() {
         var s = jqObj.val();

@@ -94,7 +94,7 @@
             <form>
                 <span class="input-append">
                     <input id="json_typeahead" type="text" class="input-xlarge" data-provide="typeahead" autocomplete="off" />
-                    <button type="submit" class="btn" _disabled="disabled">Add Param</button>
+                    <button type="submit" class="btn">Add Param</button>
                 </span>&nbsp;
                 <span class="dropdown">
                     <p class="btn dropdown-toggle" 
@@ -105,7 +105,7 @@
             </form>
             <form action="http://turgon.informatik.hu-berlin.de:1337" enctype="multipart/form-data" id="outForm" method="POST">
 <div class="control-group">
-                <textarea name="data" _disabled="disabled" class="controls input-block-level monospace" style="font-family:monospace;" id="json-output" rows="20">...</textarea>
+                <textarea name="data" class="controls input-block-level monospace" style="font-family:monospace;" id="json-output" rows="20">...</textarea>
 </div>
             </form>
             </div>
@@ -117,8 +117,8 @@
       <div class="row" style="text-align:center;">
           <span class="btn btn-large btn-info disabled" id="undo"><i class="icon-circle-arrow-left"></i> Undo</span>
           <span class="btn btn-large btn-info disabled" id="redo"><i class="icon-circle-arrow-right"></i> Redo</span>
-          <span class="btn btn-large disabled"><i class="icon-fast-backward"></i> reset to last running setup</span>
-          <span class="btn btn-large disabled"><i class="icon-step-backward"></i> reset to last Setup</span>
+          <span class="btn btn-large disabled" id="undoRun"><i class="icon-fast-backward"></i> reset to previous running setup</span>
+          <span class="btn btn-large disabled" id="redoRun"><i class="icon-fast-forward"></i> reset to next running setup</span>
           <span class="btn btn-large btn-primary submitButton">Submit <i class="icon-play icon-white"></i></span>
       </div>
 
@@ -143,12 +143,12 @@
             waiting for server response..
         </div>
         <div id="output_contents">
+          <h2>Infos</h2>
+          <div id="info"></div>
           <h2>stdout</h2>
           <pre id="stdout"></pre>
           <h2>stderr</h2>
           <pre id="stderr"></pre>
-          <h2>Infos</h2>
-          <pre id="meta"></pre>
           <div id="files_output_container"></div>
          </div>
         </div>
@@ -173,6 +173,7 @@
 <script src="peg-0.7.0.min.js"></script>
 <script src="ggoConversion.js"></script>
 <script src="jsonEdit.js"></script>
+<script src="history.js"></script>
 <script type="text/javascript">
 // thank you chrome+safari#
 $.fn.prettyVal = function() {
@@ -221,6 +222,23 @@ buildForm = function(inputs) {
 
     // when json changes, check file for validity
     JSON_BOX.watchJsonBox($('#json-output'), FILE_EXPLORER.validateInputs(im.inputs));
+
+    // undo-redo history
+    var setState = function(s){$('#json-output').val(s).change()};
+    var getState = function(){return $('#json-output').val()};
+    jsonHistory = new HISTORY(getState, setState, $('#undo'), $('#redo'));
+    jsonHistory.onchange( );
+    JSON_BOX.watchJsonBox($('#json-output'), function(){jsonHistory.addState.call(jsonHistory);});
+    im.onChange( function(){jsonHistory.addState.call(jsonHistory);});
+
+
+    // successful setups history
+    // TODO: GET THIS WORKING
+    //var sucHist = new HISTORY(getState, setState, $('#undoRun'), $('#redoRun'));
+    var sucHist = new HISTORY(getState, setState, $(), $());
+
+    //prepare for output formatting and submit-to-server
+    SERVER_CONNECT(sucHist);
 };
 
 // PARSE FROM GGO

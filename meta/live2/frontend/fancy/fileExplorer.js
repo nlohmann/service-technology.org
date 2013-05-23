@@ -8,8 +8,7 @@ var filesByFilename = {};
 var onchangeFunctions = [];
 
 // a form, where the file inputs are
-var fileForm = $('<form>');
-fileForm.appendTo('body');
+var fileInput = $('<input type="file">').addClass('fileHideSafari').appendTo('body');
 
 function onchange(callback) {
     if(typeof callback == 'function') {
@@ -85,15 +84,10 @@ function dropFile(evt, callback) {
 
 // select a new file for upload, and after that call callback with filename
 function add(callback) {
-    var newFile = $('<input type="file" name="file">').addClass('fileHideSafari');
-    newFile.appendTo(fileForm);
-    var id = newId();
-    newFile.attr('id', id);
-    // reselect element to be sure it is there, even in safari
-    
-    $('#'+id).click();
+    fileInput.unbind('change');
+    fileInput.click();
     // callback is only called, if value is assigned
-    newFile.change(
+    fileInput.change(
             function(e) {
                 var newFile = this.files[0];
                 checkAddedFile(newFile, callback);

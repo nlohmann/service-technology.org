@@ -86,8 +86,12 @@ function dropFile(evt, callback) {
 // select a new file for upload, and after that call callback with filename
 function add(callback) {
     var newFile = $('<input type="file" name="file">').addClass('fileHideSafari');
-    newFile.attr('id', newId()).appendTo(fileForm);
-    newFile.click();
+    newFile.appendTo(fileForm);
+    var id = newId();
+    newFile.attr('id', id);
+    // reselect element to be sure it is there, even in safari
+    
+    $('#'+id).click();
     // callback is only called, if value is assigned
     newFile.change(
             function(e) {

@@ -8,7 +8,7 @@ var filesByFilename = {};
 var onchangeFunctions = [];
 
 // a form, where the file inputs are
-var fileInput = $('<input type="file">').addClass('fileHideSafari').appendTo('body');
+var fileInput = $('<input type="file" multiple>').addClass('fileHideSafari').appendTo('body');
 
 function onchange(callback) {
     if(typeof callback == 'function') {
@@ -128,16 +128,20 @@ function validateInputs(inputs) {
                 // put a red box around
                 var param = curInput.attr('data-stlive-argname');
                 if(!param) param = 'File Input';
-                var msg = 'filename <b><i>' + curVal + '</i></b> was specified in parameter <b>' + param + '</b> but no such file was uploaded yet';
-                // first show alert on top
-                var alrt = $('<div>' + msg + '</div>').addClass('alert').hide();
-                alrt.appendTo(alrtContainer);
-                alrt.fadeIn();
-
+                var msg = '<h4>Missing file</h4><p>Filename <b>"' + curVal + '"</b> was specified in parameter <b>' + param + '</b> but no such file was uploaded yet</p>';
                 // now show tooltip above input
                 controlGroup.addClass('warning');
                 controlGroup.attr('title', msg);
                 controlGroup.tooltip( {html: true });
+
+                // now create alert
+                msg += '<p> <span class="btn" onclick="$(\'#' + cur.params.id + '\').val(\'\').change();"><i class="icon-remove"></i> Remove file name</span>';
+                msg += ' <span class="dropdown"><span data-toggle="dropdown" class="dropdown-toggle btn btn-danger" onclick="FILE_EXPLORER.select_dropdown.call(this, function(v){$(\'#' + cur.params.id + '\').val(v).change();})"><i class="icon-folder-open icon-white"></i> Select File...</span></span></p>';
+                // first show alert on top
+                var alrt = $('<div>' + msg + '</div>').addClass('alert alert-error alert-block').hide();
+                alrt.appendTo(alrtContainer);
+                alrt.fadeIn();
+
             }
         }
     }

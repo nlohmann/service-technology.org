@@ -1,4 +1,9 @@
 @c <<-- CHANGE START (version information) -->>
+@heading Version 1.11-unreleased (29 May 2013)
+@itemize
+@item nothing new so far
+@end itemize
+
 @heading Version 1.10 (22 Jun 2012)
 @itemize
 @item towards parallelisation: multithreaded search in firing sequence tree

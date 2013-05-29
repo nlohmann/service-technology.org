@@ -21,8 +21,4 @@ endif
 
 include $(top_srcdir)/m4/Makefile.src
 
-#.hh.h:
-#	mv $(@:.hh=.h) $@
-$(BISON_FILES:.yy=.hh):
-	$(AM_V_GEN) mv $(@:.hh=.h) $@
 

@@ -279,8 +279,8 @@ Not(X(x)) -> <simplify: X(Not(x)) >;
 
 // x == y  -->  x <= y AND y <= x
 EQ(x,y) -> <simplify: And(Consformulas(LE(x,y), Consformulas(LE(y,x), Nilformulas()))) >;
-// x != y  -->  x < y AND y < x
-NE(x,y) -> <simplify: And(Consformulas(LT(x,y), Consformulas(LT(y,x), Nilformulas()))) >;
+// x != y  -->  x < y OR y < x
+NE(x,y) -> <simplify: Or(Consformulas(LT(x,y), Consformulas(LT(y,x), Nilformulas()))) >;
 // x > y --> x >= y+1
 GT(x,y) -> <simplify: GE(x, Add(y, Integer(mkinteger(1)))) >;
 // x < y --> x <= y-1

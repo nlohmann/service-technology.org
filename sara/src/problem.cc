@@ -127,13 +127,30 @@ void Problem::setInit(string s, int i) { initial[s]=i; }
 	@param s The name of a place or transition in the Petri net file.
 	@param f The number of tokens finally on place s or the number of times the transition must fire.
 */
-void Problem::setFinal(string s, int f) { required[s]=f; }
+//void Problem::setFinal(string s, int f) { required[s]=f; }
 
 /** Set the mode for a place in the final marking.
 	@param s The name of a place in the Petri net file.
 	@param mode EQ (reach exactly), GE (cover), or LE (bound).
 */
-void Problem::setCover(string s, int mode) { cover[s]=mode; }
+//void Problem::setCover(string s, int mode) { cover[s]=mode; }
+
+/** Set the mode and token requirement for a place in the final marking.
+	Additionally checks for duplicates may falsify or verify the condition.
+	@param s The name of a place in the Petri net file.
+	@param mode EQ (reach exactly), GE (cover), or LE (bound).
+	@param f The number of tokens finally on place s or the number of times the transition must fire.
+*/
+void Problem::setFinal(string s, int mode, int f) {
+	if (required.find(s)==required.end()) {
+		required[s] = f;
+		if (mode!=EQ) cover[s] = mode;
+		return;
+	}
+	map<string,int> tmp;
+	tmp[s] = 1;
+	addConstraint(tmp,mode,f);
+}
 
 /** Set the mode for all places unmentioned in the final marking.
 	@param cov Whether those places should have >=0 token (true) or ==0 tokens (false)

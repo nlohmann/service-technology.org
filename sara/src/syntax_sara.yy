@@ -122,13 +122,13 @@ fnodes:
 
 fnode:
   NAME
-	{ sara::pbl.setFinal(sara_NAME_token,1); if (sara::cov) sara::pbl.setCover(sara_NAME_token,GE); }
+	{ sara::pbl.setFinal(sara_NAME_token,(sara::cov ? GE : EQ),1); }
 | NAME COLON NUMBER
-    { sara::pbl.setFinal(sara_NAME_token,$3); }
+    { sara::pbl.setFinal(sara_NAME_token,EQ,$3); }
 | NAME MYGEQ NUMBER
-    { sara::pbl.setFinal(sara_NAME_token,$3); sara::pbl.setCover(sara_NAME_token,GE); }
+    { sara::pbl.setFinal(sara_NAME_token,GE,$3); }
 | NAME MYLEQ NUMBER
-    { sara::pbl.setFinal(sara_NAME_token,$3); sara::pbl.setCover(sara_NAME_token,LE); }
+    { sara::pbl.setFinal(sara_NAME_token,LE,$3); }
 ;
 
 constraints:
@@ -144,8 +144,7 @@ constr:
 ;
 
 constraint:
-  cnodes comparator NUMBER { sara::crhs = $3; }
-| cnodes comparator MINUS NUMBER { sara::crhs = -$4; }
+	cnodes comparator NUMBER { sara::crhs = $3; }
 ;
 
 cnodes:
@@ -158,7 +157,6 @@ cnode:
 	PLUS NAME { sara::clhs[sara_NAME_token] = 1; }
 |	MINUS NAME { sara::clhs[sara_NAME_token] = -1; }
 |	PLUS NUMBER NAME { sara::clhs[sara_NAME_token] = $2; }
-|	MINUS NUMBER NAME { sara::clhs[sara_NAME_token] = -$2; }
 |	NUMBER NAME { sara::clhs[sara_NAME_token] = $1; }
 ;
 

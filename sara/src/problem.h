@@ -68,10 +68,13 @@ public:
 	void setInit(string s, int i);
 
 	/// Set final token number for a place name
-	void setFinal(string s, int f);
+//	void setFinal(string s, int f);
 
 	/// Set cover mode for a place name
-	void setCover(string s, int mode);
+//	void setCover(string s, int mode);
+
+	/// Set final token number and cover mode for a place name
+	void setFinal(string s, int mode, int f);
 
 	/// Set cover mode for all places not appearing in the final marking
 	void setGeneralCover(bool cov);

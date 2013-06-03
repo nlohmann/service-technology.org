@@ -22,7 +22,7 @@
 TESTFILES = test1.owfn test1.sara test10.owfn test10.sara test11.owfn \
             test11.sara test12.sara test13.sara test14.sara test15.owfn \
             test15.sara test2.owfn test2.sara test3.owfn test3.sara \
-            test4.owfn test4.sara test5.owfn test5.sara test6.owfn \
+            test4.owfn test4.sara test5.owfn test5.sara test5b.sara test6.owfn \
             test6.sara test7.sara test7_1.owfn test7_2.owfn test7_3.owfn \
             test7_4.owfn test7_5.owfn test7_6.owfn test7_7.owfn \
             test7_8.owfn test7_9.owfn test7_X.owfn test8.sara test8_1.owfn \

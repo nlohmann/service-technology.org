@@ -99,6 +99,14 @@ AT_CHECK([GREP -q "is_unreachable" stdout])
 AT_KEYWORDS(solver)
 AT_CLEANUP
 
+AT_SETUP([Self-contradicting final marking])
+AT_CHECK([cp TESTFILES/test5b.sara TESTFILES/test5.owfn .])
+AT_CHECK([SARA -i test5b.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "1 job done, 0 in queue, 1 failure, 0 solutions" stdout])
+AT_CHECK([GREP -q "INFEASIBLE: the marking equation is infeasible" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Finding infeasible T-invariants])
 ############################################################################

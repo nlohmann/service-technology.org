@@ -99,9 +99,9 @@ void Tara::evaluateParameters(int argc, char** argv) {
 
 
     // check whether at most one file is given
-    if (Tara::args_info.inputs_num > 1) {
-        abort(4, "at most one reachability graph must be given");
-    }
+   // if (Tara::args_info.inputs_num > 1) {
+   //     abort(4, "at most one reachability graph must be given");
+   // }
 
     free(params);
 }

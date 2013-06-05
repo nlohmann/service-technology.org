@@ -8,6 +8,7 @@ tara_SOURCES =  main.cc \
         cmdline.c cmdline.h \
         Output.cc Output.h \
         MaxCost.cc MaxCost.h \
+        Usecase.cc Usecase.h \
         lexic_graph.ll syntax_graph.yy \
         lexic_costfunction.ll syntax_costfunction.yy \
         iModification.cc iModification.h \

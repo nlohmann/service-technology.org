@@ -33,7 +33,7 @@
 #include "Output.h"
 #include "verbose.h"
 #include "Tara.h"
-#include "syntax_graph.hh"
+#include "Usecase.h"
 #include "MaxCost.h"
 #include "ServiceTools.h"
 #include "iModification.h"
@@ -86,7 +86,6 @@ int main(int argc, char** argv) {
 	try {
 
 		// parse either from standard input or from a given file
-	
 		std::ifstream inputStream;
 		inputStream.open(Tara::args_info.net_arg);
 		inputStream >> pnapi::io::owfn >> *(Tara::net);
@@ -101,46 +100,13 @@ int main(int argc, char** argv) {
 		std::stringstream inputerror;
 		inputerror << error;
 		abort(3, "pnapi error %i", inputerror.str().c_str());
-		}
-
-    /*----------------------------------.
-    | 2. get most permissive Partner MP |
-    `----------------------------------*/
-
-    computeMP(*Tara::net, Tara::tempFile.name());
-     
-    // first create automaton partner
-    pnapi::Automaton partner;
-    std::ifstream partnerStream;
-
-    //stream automaton
-    partnerStream.open(Tara::tempFile.name().c_str(), std::ifstream::in);
-    if(!partnerStream) { 
-        message("net is not controllable. Exit.");
-        exit(EXIT_FAILURE);
-    }
-
-    partnerStream >> pnapi::io::sa >> partner;
-    
-    // convert to petri Tara::net
-    pnapi::PetriNet composition(partner);
-    
-    //and now we compose
-    composition.compose(*Tara::net, "mp-partner-", "");
-
-    /*------------------------.
-    | 3. call lola with n+mp  |
-    `------------------------*/
-
-    message("Step 2: Build the state space of '%s' and its most-permissive partner", Tara::args_info.net_arg);    
-
-    // run lola-statespace from the service tools
-    getLolaStatespace(composition,Tara::tempFile.name());
+	}
 
     /*-------------------------------------.
-    | 4. Parse Costfunction to partial map |
+    | 2. Parse Costfunction to partial map |
     \-------------------------------------*/
-    message("Step 3: Parse the cost function from '%s' and apply it to the built statespace", Tara::args_info.costfunction_arg);    
+
+    message("Step 2: Parse the cost function from '%s' and apply it to the built statespace", Tara::args_info.costfunction_arg);    
 
     status("parsing costfunction");
     if(strcmp(Tara::args_info.costfunction_arg,"-r")!=0)
@@ -173,6 +139,69 @@ int main(int argc, char** argv) {
        }
     }
 
+    /*----------------------------------.
+    | 2. check for  USECASE             |
+    `----------------------------------*/
+
+    if(Tara::args_info.usecase_given) {
+
+        // first parse usecase
+        pnapi::PetriNet* usecase = new pnapi::PetriNet();
+
+        try {
+            // parse from a given file
+            std::ifstream usecaseStream;
+            usecaseStream.open(Tara::args_info.usecase_arg);
+            usecaseStream >> pnapi::io::owfn >> *(usecase);
+            usecaseStream.close();
+
+            /*maybe only with verbose-flag?*/
+            //std::stringstream pnstats;
+            //pnstats << pnapi::io::stat << *(usecase);
+
+        } catch (pnapi::exception::InputError error) {
+		    std::stringstream inputerror;
+    		inputerror << error;
+	    	abort(3, "pnapi error %i", inputerror.str().c_str());
+	    }
+
+        applyUsecase(Tara::net, usecase, &Tara::partialCostFunction);
+    }
+
+    /*----------------------------------.
+    | 3. get most permissive Partner MP |
+    `----------------------------------*/
+
+    computeMP(*Tara::net, Tara::tempFile.name());
+     
+    // first create automaton partner
+    pnapi::Automaton partner;
+    std::ifstream partnerStream;
+
+    //stream automaton
+    partnerStream.open(Tara::tempFile.name().c_str(), std::ifstream::in);
+    if(!partnerStream) {
+        message("net is not controllable. Exit.");
+        exit(EXIT_FAILURE);
+    }
+
+    partnerStream >> pnapi::io::sa >> partner;
+    
+    // convert to petri Tara::net
+    pnapi::PetriNet composition(partner);
+    
+    //and now we compose
+    composition.compose(*Tara::net, "mp-partner-", "");
+
+    /*------------------------.
+    | 4. call lola with n+mp  |
+    `------------------------*/
+
+    message("Step 2: Build the state space of '%s' and its most-permissive partner", Tara::args_info.net_arg);    
+
+    // run lola-statespace from the service tools
+    getLolaStatespace(composition,Tara::tempFile.name());
+
     /*-------------------------.
     | 5. Parse the inner Graph |
     \-------------------------*/
@@ -180,7 +209,7 @@ int main(int argc, char** argv) {
     Parser::lola.parse(Tara::tempFile.name().c_str()); 
 
     /*------------------------------------------.
-    | 5. Compute MaxCosts from the parsed graph | 
+    | 6. Compute MaxCosts from the parsed graph | 
     \------------------------------------------*/
     message("Step 4: Find an upper bound for the minimal budget w.r.t. Tara::net '%s' and cost function '%s'", Tara::args_info.net_arg, Tara::args_info.costfunction_arg);    
 
@@ -191,7 +220,7 @@ int main(int argc, char** argv) {
 
 
     /*------------------------------------------.
-    | 6. Find a corresponding partner           | 
+    | 7. Find a corresponding partner           | 
     \------------------------------------------*/
 
     // Build the modified Tara::net for maxCostOfComposition

@@ -7,7 +7,8 @@
 # --unamed-opts=FILE: accept options without names
 # --no-handle-error: TODO
 # --conf-parser: TODO
-args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+# args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+args "--include-getopt --show-required --no-handle-error --conf-parser"
 
 description "About Tara:"
 purpose "Tackling non-functional properties for stateful services.\n Tara computes a finite representation of all policy-satisfying partners. \n\n  Report bugs to tara@service-technology.org.\n  Visit Tara's home page at http://service-technology.org/tara"
@@ -42,6 +43,12 @@ option "net" n
   "Please provide an open net file explaining the interface bindings of the transitions occurring in the reachability graph. NB: The rest of the file is ignored."
   string
   typestr="FILENAME"
+
+option "usecase" u
+  "Provide the usecase. It is assumed that the behaviour of the usecase is acyclic and corresponds to the behaviour of the provided net"
+  string
+  typestr="FILENAME"
+  optional
 
 option "sa" -
   "Synthesizes a cost-minimal partner (service automaton) and saves it in FILENAME. If FILENAME equals a dash, the partner is written to standard out."

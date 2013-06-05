@@ -112,7 +112,7 @@ void iModification::init() {
 	 out = Tara::highestTransitionCosts - curCost;
      
 	 //add arc from availableCost to that transition
-	 if (in > 0) net->createArc(*availableCost,**it, in);
+	 if (in > 0) net->createArc(*availableCost, **it, in);
 	
 	 //add arc from transition to availableCost
 	 if (out > 0) net->createArc(**it, *availableCost, out);

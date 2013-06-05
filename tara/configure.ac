@@ -50,8 +50,8 @@ AC_PROG_LIBTOOL
 
 
 # check for libconfig
-AC_LANG([C++])
-AC_CHECK_LIB(config++, config_init)
+# AC_LANG([C++])
+# AC_CHECK_LIB(config++, config_init)
 
 # write files
 AC_CONFIG_FILES([

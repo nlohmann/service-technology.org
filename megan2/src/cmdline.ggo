@@ -1,0 +1,30 @@
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+
+option "profile" p
+  "Which tool set to use"
+  values="lola","lola_optimistic","lola_optimistic_incomplete","lola_pessimistic","sara" enum
+  typestr="TOOLSET"
+  default="lola"
+  optional
+
+option "dry" -
+  "Do not solve tasks"
+  flag
+  off
+
+section "Input/output"
+
+option "net" n
+  "Read Petri net from file."
+  string
+  typestr="FILENAME"
+  optional
+
+option "pnml" -
+  "Read Petri net as PNML (not supported yet)."
+  flag off

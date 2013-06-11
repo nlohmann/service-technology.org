@@ -6,6 +6,8 @@
 # You MUST NOT change this file. #
 ##################################
 
+AM_CXXFLAGS = -std=c++0x -stdlib=libc++
+
 noinst_LIBRARIES = libpnapi.a
 
 # [CUSTOMER_B_SRC] this line is needed to build a customer Makefile. Do not remove!

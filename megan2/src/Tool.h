@@ -9,6 +9,9 @@ class ReachabilityTask;
 
 class Tool {
     public:
+        static int call_tool(std::string &callstring);
+
+    public:
         std::string basedir;
         virtual result_t execute() = 0;
         Task* t;

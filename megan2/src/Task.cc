@@ -1,15 +1,16 @@
 #include <fstream>
+#include <future>
 #include "Task.h"
 #include "verbose.h"
 #include "Runtime.h"
 
 std::vector<Task*> Task::queue;
-pnapi::PetriNet * Task::net = NULL;
+pnapi::PetriNet * Task::net = nullptr;
 const char* result_t_names[] = { "true", "false", "true?", "false?", "?", "not implemented", "error" };
 size_t Task::current_property_id = 0;
 
 pnapi::PetriNet *Task::getNet() {
-    if (Task::net == NULL) {
+    if (Task::net == nullptr) {
         Task::net = new pnapi::PetriNet();
 
         // open net file
@@ -38,30 +39,43 @@ result_t Task::negate_result(result_t r) {
     }
 }
 
-result_t Task::solve() {
+void Task::solve() {
     status("solving task %s", _coutput_(name));
-    result_t result = NOT_IMPLEMENTED;
+    //auto result = NOT_IMPLEMENTED;
 
     // if we assigned a worker, execute it
     if (worker) {
-        result = worker->execute();
+        // call worker->execute()
+        solution = std::async(&Tool::execute, worker);
+        status("worker started");
     }
-
-    // negate result if necessary
-    if (negate) {
-        result = negate_result(result);
-    }
-
-    message("result of task %s: %s", _coutput_(name), _cimportant_(result_t_names[result]));
-    solution = result;
-    return result;
 }
 
 std::string Task::getName() const {
     return name;
 }
 
-Task::Task(std::string name, bool negate) : negate(negate), name(name), property_id(current_property_id++), worker(NULL), solution(MAYBE) {
+result_t Task::getSolution() {
+    // take old/default solution
+    auto result = cached_solution;
+
+    // if solution not is not yet finished, force to determine value
+    if (solution.valid()) {
+        result = solution.get();
+
+        // negate result if necessary
+        if (negate) {
+            result = negate_result(result);
+        }
+
+        // cache value
+        cached_solution = result;
+    }
+
+    return result;
+}
+
+Task::Task(std::string name, bool negate) : negate(negate), name(name), property_id(current_property_id++) {
 }
 
 Task::~Task() {

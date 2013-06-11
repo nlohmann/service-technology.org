@@ -5,6 +5,7 @@ typedef enum { t_UnknownTask, t_ReachabilityTask, t_DeadlockTask, t_DeadlockInit
 
 #include <string>
 #include <vector>
+#include <future>
 #include <pnapi/pnapi.h>
 #include "ast-system-k.h"
 #include "Tool.h"
@@ -15,9 +16,13 @@ class Tool;
 class Task {
     private:
         /// whether to negate the final result
-        bool negate;
+        bool negate = false;
         /// the name of the task
         std::string name;
+        /// future solution of the task
+        std::future<result_t> solution;
+        /// cached solution of the task
+        result_t cached_solution = MAYBE;
         /// a function to negate results of type result_t
         static result_t negate_result(result_t);
 
@@ -34,13 +39,13 @@ class Task {
         /// an id to access the global list of properties
         size_t property_id;
         /// the worker for the task (depending on the used profile)
-        Tool *worker;
+        Tool *worker = nullptr;
         /// return the name of the task
         std::string getName() const;
         /// solve the task
-        result_t solve();
-        /// cached solution of the task
-        result_t solution;
+        void solve();
+        /// get the solution
+        result_t getSolution();
 
         /// constructor
         Task(std::string, bool=false);

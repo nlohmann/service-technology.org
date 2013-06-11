@@ -50,29 +50,30 @@ int main(int argc, char* argv[]) {
     status("parsed %d properties", properties.size());
 
     // simplify properties and create tasks
-    for (size_t i = 0; i < properties.size(); ++i) {
+    for (auto& property : properties) {
         if (Runtime::args_info.profile_arg == profile_arg_sara) {
-            properties[i] = properties[i]->rewrite(kc::sara_unfold);
+            property = property->rewrite(kc::sara_unfold);
         }
 
-        properties[i] = properties[i]->rewrite(kc::arrows);
-        properties[i] = properties[i]->rewrite(kc::simplify);
-        properties[i] = properties[i]->rewrite(kc::sides);
-        properties[i] = properties[i]->rewrite(kc::simplify);
+        property = property->rewrite(kc::arrows);
+        property = property->rewrite(kc::simplify);
+        property = property->rewrite(kc::sides);
+        property = property->rewrite(kc::simplify);
 
-        properties[i]->unparse(dummy_printer, kc::task);
+        property->unparse(dummy_printer, kc::task);
     }
     status("created %d tasks", Task::queue.size());
 
     // solve tasks
     if (not Runtime::args_info.dry_given)
     {
-        for (size_t i = 0; i < Task::queue.size(); ++i) {
-            Task::queue[i]->solve();
+        for (auto& task : Task::queue) {
+            task->solve();
+            //task->getSolution();
 
             // MCC 2013
-            std::cout << "FORMULA " << Task::queue[i]->getName() << " ";
-            switch (Task::queue[i]->solution) {
+            std::cout << "FORMULA " << task->getName() << " ";
+            switch (task->getSolution()) {
                 case(DEFINITELY_TRUE): std::cout << "TRUE"; break;
                 case(DEFINITELY_FALSE): std::cout << "FALSE"; break;
                 case(NOT_IMPLEMENTED): std::cout << "DO_NOT_COMPETE"; break;

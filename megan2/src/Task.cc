@@ -40,14 +40,17 @@ result_t Task::negate_result(result_t r) {
 }
 
 void Task::solve() {
-    status("solving task %s", _coutput_(name));
-    //auto result = NOT_IMPLEMENTED;
-
     // if we assigned a worker, execute it
     if (worker) {
-        // call worker->execute()
-        solution = std::async(&Tool::execute, worker);
-        status("worker started");
+        status("solving task %s", _coutput_(name));
+
+        if (Runtime::args_info.async_given) {
+            // spawn worker
+            solution = std::async(&Tool::execute, worker);
+        } else {
+            // synchronous call
+            cached_solution = worker->execute();
+        }
     }
 }
 

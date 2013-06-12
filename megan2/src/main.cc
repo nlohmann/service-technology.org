@@ -69,7 +69,6 @@ int main(int argc, char* argv[]) {
     {
         for (auto& task : Task::queue) {
             task->solve();
-            //task->getSolution();
         }
 
         for (auto& task : Task::queue) {

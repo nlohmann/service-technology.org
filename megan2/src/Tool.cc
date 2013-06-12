@@ -34,7 +34,7 @@ Tool::Tool(Task* t) : t(t) {}
 int Tool::call_tool(std::string &callstring) {
     status("calling %s", callstring.c_str());
     const auto return_value_tool = system(callstring.c_str());
-    status("done calling %s", callstring.c_str());
+    //status("done calling %s", callstring.c_str());
     return __WEXITSTATUS(return_value_tool);
 }
 

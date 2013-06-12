@@ -21,6 +21,8 @@ void dummy_printer(const char *s, kc::uview v) {
 
 %uview task;
 
+/* when a task object is created, it is automatically added to Task::queue */
+
 Negation(ReachabilityProperty(name, f)) -> [task: { new ReachabilityTask(name->name, true); } ];
 Negation(DeadlockNet(name)) ->             [task: { new DeadlockTask(name->name, true); } ];
 Negation(DeadlockInitial(name)) ->         [task: { new DeadlockInitialTask(name->name, true); } ];

@@ -19,7 +19,7 @@
 time_t Runtime::start_time;
 JSON Runtime::log;
 bool Runtime::callHome = true;
-FILE *Runtime::output = NULL;
+FILE *Runtime::output = nullptr;
 gengetopt_args_info Runtime::args_info;
 
 
@@ -48,7 +48,7 @@ void Runtime::exitHandler() {
     }
 
     // write to file if required
-    if (output != NULL) {
+    if (output != nullptr) {
         fprintf(output, "%s\n", log.toString().c_str());
     }
 
@@ -89,7 +89,7 @@ void Runtime::init(int argc, char** argv) {
     log["tool"]["architecture"] = SIZEOF_VOIDP * 8;
     log["runtime"]["start_time"] = static_cast<int>(start_time);
     log["call"]["binary"] = argv[0];
-    for (int i = 1; i < argc; ++i) {
+    for (auto i = 1; i < argc; ++i) {
         log["call"]["parameters"].add(argv[i]);
     }
 

@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 
     if (Runtime::args_info.inputs_num == 1) {
         yyin = fopen(Runtime::args_info.inputs[0], "r");
-        if (yyin == NULL) {
+        if (yyin == nullptr) {
             abort(8, "cannot open file '%s' for reading", Runtime::args_info.inputs[0]);
         } else {
             status("reading %s", _cfilename_(Runtime::args_info.inputs[0]));
@@ -70,7 +70,9 @@ int main(int argc, char* argv[]) {
         for (auto& task : Task::queue) {
             task->solve();
             //task->getSolution();
+        }
 
+        for (auto& task : Task::queue) {
             // MCC 2013
             std::cout << "FORMULA " << task->getName() << " ";
             switch (task->getSolution()) {

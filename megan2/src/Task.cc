@@ -47,7 +47,7 @@ void Task::solve() {
     if (worker) {
         // call worker->execute()
         solution = std::async(&Tool::execute, worker);
-        status("worker started");
+        message("worker started");
     }
 }
 

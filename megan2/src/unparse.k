@@ -21,9 +21,9 @@ void dummy_printer(const char *s, kc::uview v) {
 
 %uview task;
 
-Negation(ReachabilityProperty(name, f)) -> [task: { Task *t = new ReachabilityTask(name->name, true); } ];
-Negation(DeadlockNet(name)) ->             [task: { Task *t = new DeadlockTask(name->name, true); } ];
-Negation(DeadlockInitial(name)) ->         [task: { Task *t = new DeadlockInitialTask(name->name, true); } ];
+Negation(ReachabilityProperty(name, f)) -> [task: { new ReachabilityTask(name->name, true); } ];
+Negation(DeadlockNet(name)) ->             [task: { new DeadlockTask(name->name, true); } ];
+Negation(DeadlockInitial(name)) ->         [task: { new DeadlockInitialTask(name->name, true); } ];
 
 ReachabilityProperty(name, f) -> [task: { Task *t = new ReachabilityTask(name->name); } ];
 DeadlockNet(name) ->             [task: { Task *t = new DeadlockTask(name->name); } ];
@@ -64,7 +64,7 @@ Not(a) -> [lola: "NOT(" a ")" ];
 And(x) -> [lola:
 "("
 {
-    bool comma = false;
+    auto comma = false;
     foreach( a; formulas x ) {
         if (comma) {
             mkcasestring("\nAND ")->unparse(kc_printer, kc_current_view);
@@ -79,7 +79,7 @@ And(x) -> [lola:
 Or(x) -> [lola:
 "("
 {
-    bool comma = false;
+    auto comma = false;
     foreach( a; formulas x ) {
         if (comma) {
             mkcasestring("\nOR ")->unparse(kc_printer, kc_current_view);
@@ -122,7 +122,7 @@ LE(a,b) -> [sara: "(" a " <= " b ")"];
 And(x) -> [sara:
 "("
 {
-    bool comma = false;
+    auto comma = false;
     foreach( a; formulas x ) {
         if (comma) {
             mkcasestring("\nAND ")->unparse(kc_printer, kc_current_view);
@@ -137,7 +137,7 @@ And(x) -> [sara:
 Or(x) -> [sara:
 "("
 {
-    bool comma = false;
+    auto comma = false;
     foreach( a; formulas x ) {
         if (comma) {
             mkcasestring("\nOR ")->unparse(kc_printer, kc_current_view);

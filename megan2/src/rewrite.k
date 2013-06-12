@@ -44,30 +44,30 @@ formulas negateList(formulas l) {
 
 // unfold Fireable predicate
 formula unfoldFireability(casestring transition_name) {
-    pnapi::PetriNet *net = Task::getNet();
+    auto *net = Task::getNet();
 
     // get Petri net transition
-    pnapi::Transition *t = net->findTransition(transition_name->name);
+    auto *t = net->findTransition(transition_name->name);
     if (!t) {
         abort(12, "could not find transition %s", transition_name->name);
     }
 
     // a list to collect expressions
-    formulas l = new impl_formulas();
+    auto l = new impl_formulas();
 
     // traverse preset of t
-    PNAPI_FOREACH(a, t->getPresetArcs()) {
-        const casestring place_name = mkcasestring((*a)->getSourceNode().getName().c_str());
-        const integer arc_weight = mkinteger((*a)->getWeight());
-        const formula f = new impl_formula_GE(new impl_expression_Marking(place_name), new impl_expression_Integer(arc_weight));
+    for (auto &a : t->getPresetArcs()) {
+        const auto place_name = mkcasestring(a->getSourceNode().getName().c_str());
+        const auto arc_weight = mkinteger(a->getWeight());
+        const auto f = new impl_formula_GE(new impl_expression_Marking(place_name), new impl_expression_Integer(arc_weight));
         l->append(f);
     }
 
     if (l->is_nil()) {
-        formula res = new impl_formula_True();
+        auto res = new impl_formula_True();
         return res;
     } else {
-        formula res = new impl_formula_And(l);
+        auto res = new impl_formula_And(l);
         return res;
     }
 }

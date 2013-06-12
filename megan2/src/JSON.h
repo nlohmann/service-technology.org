@@ -91,6 +91,7 @@ class JSON {
         JSON(const double);
         /// copy constructor (also for objects and arrays)
         JSON(const JSON&);
+
         /// destructor
         ~JSON();
 };

@@ -1,5 +1,4 @@
 #include <sstream>
-#include <config.h>
 #include "JSON.h"
 
 

@@ -26,6 +26,9 @@
 #include <fstream>
 #include "Runtime.h"
 #include "verbose.h"
+#include <mutex>
+
+std::mutex iomutex;
 
 
 /***************************************************************************\
@@ -63,6 +66,8 @@ namespace st {
  \note use this function rather sparsely in order not to spam the output
 */
 void message(const char* format, ...) {
+    std::lock_guard<std::mutex> lg(iomutex);
+
     fprintf(stderr, "%s: ", _ctool_(PACKAGE));
 
     va_list args;
@@ -84,6 +89,8 @@ void message(const char* format, ...) {
  \param format  the status message formatted as printf string
 */
 void status(const char* format, ...) {
+    std::lock_guard<std::mutex> lg(iomutex);
+
     if (not Runtime::args_info.verbose_flag) {
         return;
     }
@@ -112,6 +119,8 @@ void status(const char* format, ...) {
  \note The codes should be documented in the manual.
 */
 void abort(unsigned short code, const char* format, ...) {
+    std::lock_guard<std::mutex> lg(iomutex);
+
     fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _bold_);
 
     va_list args;
@@ -138,6 +147,8 @@ void abort(unsigned short code, const char* format, ...) {
 
 
 void displayFileError(char* filename, int lineno, char* token) {
+    std::lock_guard<std::mutex> lg(iomutex);
+
     std::ifstream f(filename);
     std::string line;
     for (int i = 0; i < lineno; ++i) {

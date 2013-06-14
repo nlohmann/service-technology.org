@@ -470,6 +470,36 @@ locretia: no final state reachable in given SA with Trace length of @samp{xy}
 @end cartouche
 @end smallexample
 
+@item #17
+The log count parameter's argument has to be a positive integer.
+
+@smallexample
+@cartouche
+locretia: argument of `--logCount' parameter has to be a positive
+          integer -- aborting [#17]
+@end cartouche
+@end smallexample
+
+@item #18
+The maximal trace repeat parameter's argument has to be an integer greater than 0.
+
+@smallexample
+@cartouche
+locretia: argument of `--maxRepeat' parameter has to be an integer
+          greater than 0 -- aborting [#18]
+@end cartouche
+@end smallexample
+
+@item #19
+The lambda parameter's argument has to be a positive double.
+
+@smallexample
+@cartouche
+locretia: argument of `--lambda' parameter has to be a positive
+          double -- aborting [#19]
+@end cartouche
+@end smallexample
+
 @end table
 
 

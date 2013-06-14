@@ -47,6 +47,9 @@ class generateLog {
         										   const int trace_count ,
 				  	  	  	  	  	  	  	  	   const int trace_min_length,
 				  	  	  	  	  	  	  	  	   const int trace_max_length,
+				  	  	  	  	  	  	  	  	   const int repeated_max,
+				  	  	  	  	  	  	  	  	   const bool is_exp,
+				  	  	  	  	  	  	  	  	   const double lambda,
 				  	  	  	  	  	  	  	  	   const bool finalEnd,
 				  	  	  	  	  	  	  	  	   const bool enforceTraceCount);
 
@@ -59,7 +62,7 @@ class generateLog {
 
         /// creates a trace and writes it to the output file
         static bool create_trace(std::ostream& file, bool isOWFN, const int trace_number,
-            								const int trace_max_length, const bool finalEnd);
+            					 const int trace_max_length, const int repeated_count, const bool finalEnd);
 
 };
 

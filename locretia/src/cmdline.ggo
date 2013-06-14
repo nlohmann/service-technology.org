@@ -82,7 +82,7 @@ option "count" n
   optional
   
 option "maxLength" u
-  "maximal length of traces to appear in the log-file."
+  "Maximal length of traces to appear in the log-file."
   details="The max-trace-length sets the maximal length of traces within the log. The default is set to 10. Remark: This option also restricts the number of messages to be sent and received in the case of using the asynchronous environment.\n"
   int
   typestr="MAXLENGTH"
@@ -90,11 +90,32 @@ option "maxLength" u
   optional
   
 option "minLength" l
-  "minimal length of traces to appear in the log-file."
+  "Minimal length of traces to appear in the log-file."
   details="The min-trace-length sets the minimal length of traces within the log. The default is set to 0.\n"
   int
   typestr="MINLENGTH"
   default="0"
+  optional
+  
+option "maxRepeat" -
+  "Maximal number of repeated (copied) traces in the log."
+  details="The maximal number of repeated traces sets an upper bound for copying traces in the log. The default is set to 1.\n"
+  int
+  typestr="MAXREPEAT"
+  default="1"
+  optional
+  
+option "expDist" -
+  "Set the distribution of random numbers for the maximal number of repeated traces to be (sort of) exponential."
+  details="Using this option, the distribution of random numbers is set to be exponential instead of equal. The underlying formula transforming equal distributed random numbers x \in [0,1] into exponentially distributed numbers y \in [0,1] is y = (1-e^(-\lambda*x)) / (1-e^(-\lambda)). The second term is required for normalization."
+  flag off
+  
+option "lambda" -
+  "Set a parameter \lambda > 0 which affects the exponential distribution."
+  details="Speaks for itself. Sets the value of \lambda in (1-e^(-\lambda*x)) / (1-e^(-\lambda)). The higher the value the more bent the graph becomes. \lambda has to be greater than 0."
+  double
+  typestr="LAMBDA"
+  default="4"
   optional
   
 option "final" f

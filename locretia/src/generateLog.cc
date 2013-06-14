@@ -21,6 +21,7 @@
 #include <config.h>
 #include <string>
 #include <sstream>
+#include <math.h>
 #include "generateLog.h"
 #include "InnerMarking.h"
 #include "serviceAutomaton.h"
@@ -50,16 +51,22 @@ using std::vector;
 
  \param[in,out]	file 				the output stream to write the log to
  \param[in,out]	filename			the filename
- \param[in]		isOWFN			is the input an OWFN? (or a SA)
+ \param[in]		isOWFN				is the input an OWFN? (or a SA)
  \param[in]		trace_count  		the total number of traces to be created
  \param[in]		trace_min_length	the minimal length of a trace
  \param[in]		trace_max_length	the maximal length of a trace
- \param[in]		finalEnd		only generate traces that end in a final state?
+ \param[in]		repeated_max		the maximal number of repeated traces
+ \param[in]		is_exp				sets exponential distribution
+ \param[in]		finalEnd			only generate traces that end in a final state?
+ \param[in]		enforceTraceCount	enforces the total number of traces to be created
  */
 void generateLog::createLog(std::ostream& file, std::string& filename, const bool isOWFN,
 												  const int trace_count ,
 												  const int trace_min_length,
 												  const int trace_max_length,
+												  const int repeated_max,
+												  const bool is_exp,
+												  const double lambda,
 												  const bool finalEnd,
 												  const bool enforceTraceCount) {
 	status("creating log-file with %i traces, each with lengths %i to %i",
@@ -70,12 +77,33 @@ void generateLog::createLog(std::ostream& file, std::string& filename, const boo
     // initialize the random number generator
     std::srand(time(NULL));
 
-    int length, counter = 1;
+    int length, repeatedcount = 1, counter = 1;
     bool finishedTrace = false;
+
+    double r = trace_max_length - trace_min_length + 1;
+    //double lambda = exp(1);
+    //double normalizer = lambda * exp(lambda) - 1;
+    double normalizer = 1 - exp(-lambda);
+
     // create 'trace_count' traces
     for (int i = 0; i < trace_count; ++i) {
     	// randomize the (maximal) length of the next trace
-    	length = (std::rand() % (trace_max_length + 1 - trace_min_length)) + trace_min_length;
+    	length = trace_min_length + (int)(r * std::rand()/(RAND_MAX+1.0));
+    	//length = (std::rand() % (trace_max_length + 1 - trace_min_length)) + trace_min_length;
+
+    	if (repeated_max > 1) {
+    		// randomize the number of repeated traces based on the current trace
+    		if (is_exp) {
+    			// use exponential distribution
+    			//repeatedcount = 1 + (int)((double)repeated_max * (lambda * (exp(lambda * std::rand()/(RAND_MAX+1.0))) - 1) / normalizer);
+    			repeatedcount = 1 + (int)((double)repeated_max * (double)(1 - exp(-lambda * std::rand()/(RAND_MAX+1.0))) / normalizer);
+    		} else {
+    			// use equal distribution
+    			repeatedcount = 1 + (int)((double)repeated_max * std::rand()/(RAND_MAX+1.0));
+    		}
+    		//status("repeat: %i, %f", repeatedcount, (1 - exp(-exp(1)*std::rand()/(RAND_MAX+1.0)))/(1-exp(-exp(1))));
+    	}
+
     	finishedTrace = false;
 
     	// If the log has to contain a defined number of traces then repeat the procedure of creating
@@ -84,9 +112,9 @@ void generateLog::createLog(std::ostream& file, std::string& filename, const boo
     	// Else just discard the current trace and start with a new one.
     	if (enforceTraceCount)
     		while(!finishedTrace)
-    			finishedTrace = create_trace(file, isOWFN, counter, length, finalEnd);
+    			finishedTrace = create_trace(file, isOWFN, counter, length, repeatedcount, finalEnd);
     	else
-    		finishedTrace = create_trace(file, isOWFN, counter, length, finalEnd);
+    		finishedTrace = create_trace(file, isOWFN, counter, length, repeatedcount, finalEnd);
 
     	if (finishedTrace)
     		++counter;
@@ -141,12 +169,13 @@ void generateLog::fileFooter(std::ostream& file) {
  \param[in]		isOWFN			is the input an OWFN? (or a SA)
  \param[in]		trace_number  	the number of the trace
  \param[in]		trace_maxlength	the maximal length of the trace
+ \param[in]		repeatedcount	the number this trace is repeated in the log
  \param[in]		finalEnd		only generate traces that end in a final state?
 
  \return bool if the trace has been written to the output
  */
 bool generateLog::create_trace(std::ostream& file, const bool isOWFN, const int trace_number,
-											const int trace_max_length, const bool finalEnd) {
+							   const int trace_max_length, const int repeated_count, const bool finalEnd) {
 	status("creating trace %i with maximal length %i", trace_number, trace_max_length);
 
 	bool trace_is_final = false;
@@ -230,13 +259,15 @@ bool generateLog::create_trace(std::ostream& file, const bool isOWFN, const int 
 	if (finalEnd && !trace_is_final) {
 		status("ignored trace %i, length: %i, because it didn't end in a final state", trace_number, counter);
 	} else {
-		// write the trace to the output stream
-		file << "\t<trace>\n"
-				<< "\t\t<string key=\"" << TRACE_KEY_NAME << "\" value=\"Case" << trace_number << ".0\"/>\n"
-				//<< "\t\t<int key=\"" << TRACE_KEY_LENGTH << "\" value=\"" << counter << "\"/>\n"
-				<< tempstring.str()
-				<< "\t</trace>\n";
-		status("done with trace %i, length: %i", trace_number, counter);
+		for (int i = 0; i < repeated_count; ++i) {
+			// write the trace to the output stream
+			file << "\t<trace>\n"
+					<< "\t\t<string key=\"" << TRACE_KEY_NAME << "\" value=\"Case" << trace_number << ".0\"/>\n"
+					//<< "\t\t<int key=\"" << TRACE_KEY_LENGTH << "\" value=\"" << counter << "\"/>\n"
+					<< tempstring.str()
+					<< "\t</trace>\n";
+		}
+		status("done with trace %i, length: %i. (copied %i times)", trace_number, counter, repeated_count);
 		finishedTrace = true;
 	}
 	tempstring.clear();

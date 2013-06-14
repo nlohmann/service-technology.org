@@ -188,6 +188,16 @@ void evaluateParameters(int argc, char** argv) {
     	abort(17, "argument of `--logCount' parameter has to be a positive integer");
     }
 
+    // the maximal repeat parameter's argument has to be greater than 0
+    if (args_info.maxRepeat_arg < 1) {
+    	abort(18, "argument of `--maxRepeat' parameter has to be an integer greater than 0");
+    }
+
+    // the lambda parameter's argument has to be a positive double
+    if (args_info.lambda_arg <= 0) {
+    	abort(19, "argument of `--lambda' parameter has to be a positive double");
+    }
+
     free(params);
 }
 
@@ -465,7 +475,8 @@ int main(int argc, char** argv) {
     			Output output(log_filename, "XES Log");
     			number.clear();
 
-    			generateLog::createLog(output, filename, !args_info.sa_flag, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg, args_info.final_flag, args_info.enforceTraceCount_flag);
+    			generateLog::createLog(output, filename, !args_info.sa_flag, args_info.count_arg, args_info.minLength_arg, args_info.maxLength_arg,
+    									args_info.maxRepeat_arg, args_info.expDist_flag, args_info.lambda_arg, args_info.final_flag, args_info.enforceTraceCount_flag);
     		}
 
     	}

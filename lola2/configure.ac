@@ -43,7 +43,7 @@ CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 # CC="$PTHREAD_CC"
 
 # check for OpenMP
-AX_OPENMP([], [AC_MSG_ERROR([Please use a compiler supporting OpenMP.])])
+AX_OPENMP([], [AC_MSG_WARN([Please use a compiler supporting OpenMP.])])
 CFLAGS="$CFLAGS $OPENMP_CFLAGS"
 CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
 

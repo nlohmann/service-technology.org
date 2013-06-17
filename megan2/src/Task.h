@@ -58,6 +58,16 @@ class UnknownTask : public Task {
         UnknownTask(std::string, bool=false);
 };
 
+class CTLTask : public Task {
+    public:
+        CTLTask(std::string, bool=false);
+};
+
+class LTLTask : public Task {
+    public:
+        LTLTask(std::string, bool=false);
+};
+
 class ReachabilityTask : public Task {
     public:
         ReachabilityTask(std::string, bool=false);

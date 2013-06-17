@@ -336,6 +336,8 @@ A(W(x,y)) -> <simplify: Not(E(U(Not(y),And(_(Not(x),Not(y))))))>;
  * PROBLEM FINDER *
  ******************/
 
+%rview problem;
+
 /////////////////////////////////////////////////////////
 // postcondition: I and N will will disappear
 // postcondition: True and False will disappear
@@ -343,8 +345,8 @@ A(W(x,y)) -> <simplify: Not(E(U(Not(y),And(_(Not(x),Not(y))))))>;
 /////////////////////////////////////////////////////////
 
 // special care for deadlocks
-Property(name, I(Deadlock())) -> <simplify: DeadlockInitial(name) >;
-Property(name, N(Deadlock())) -> <simplify: Negation(DeadlockNet(name)) >;
+Property(name, I(Deadlock())) -> <problem: DeadlockInitial(name) >;
+Property(name, N(Deadlock())) -> <problem: Negation(DeadlockNet(name)) >;
 
 // invariant == AG
 Property(name, I(x)) -> <simplify: Property(name, A(G(x))) >;
@@ -352,12 +354,16 @@ Property(name, I(x)) -> <simplify: Property(name, A(G(x))) >;
 Property(name, N(x)) -> <simplify: Property(name, Not(E(F(x)))) >;
 
 // replace top operators by known problem
-Property(name, E(F(x))) -> <simplify: ReachabilityProperty(name, x) >;
-Property(name, A(G(x))) -> <simplify: Negation(ReachabilityProperty(name, x)) >;
+Property(name, E(F(x))) -> <problem: ReachabilityProperty(name, x) >;
+Property(name, A(G(x))) -> <problem: Negation(ReachabilityProperty(name, x)) >;
+
+// CTL / LTL
+P=Property(name, x) provided (P->isCTL) -> <problem: CTLProperty(name, x) >;
+P=Property(name, x) provided (P->isLTL) -> <problem: LTLProperty(name, x) >;
 
 // replace top constant by dedicated Task
-Property(name, True()) -> <simplify: TrueProperty(name) >;
-Property(name, False()) -> <simplify: Negation(TrueProperty(name)) >;
+Property(name, True()) -> <problem: TrueProperty(name) >;
+Property(name, False()) -> <problem: Negation(TrueProperty(name)) >;
 
 // remove double negations
 Negation(Negation(x)) -> <simplify: x>;

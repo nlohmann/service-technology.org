@@ -55,11 +55,17 @@ int main(int argc, char* argv[]) {
             property = property->rewrite(kc::sara_unfold);
         }
 
+        // simplify property
         property = property->rewrite(kc::arrows);
         property = property->rewrite(kc::simplify);
         property = property->rewrite(kc::sides);
         property = property->rewrite(kc::simplify);
 
+        // check type
+        property->unparse(dummy_printer, kc::ctl);
+
+        // extract property and create task
+        property = property->rewrite(kc::problem);
         property->unparse(dummy_printer, kc::task);
     }
     status("created %d tasks", Task::queue.size());

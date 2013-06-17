@@ -96,6 +96,18 @@ UnknownTask::UnknownTask(std::string name, bool negate) : Task(name, negate) {
     status("created %sunknown task %s", (negate ? "negated " : ""), _coutput_(name));
 }
 
+LTLTask::LTLTask(std::string name, bool negate) : Task(name, negate) {
+    queue.push_back(this);
+    worker = task2tool(t_UnknownTask, this);
+    status("created %sLTL task %s", (negate ? "negated " : ""), _coutput_(name));
+}
+
+CTLTask::CTLTask(std::string name, bool negate) : Task(name, negate) {
+    queue.push_back(this);
+    worker = task2tool(t_UnknownTask, this);
+    status("created %sCTL task %s", (negate ? "negated " : ""), _coutput_(name));
+}
+
 ReachabilityTask::ReachabilityTask(std::string name, bool negate) : Task(name, negate) {
     queue.push_back(this);
     worker = task2tool(t_ReachabilityTask, this);

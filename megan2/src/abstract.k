@@ -9,6 +9,12 @@ property:
 | DeadlockInitial(casestring)
 | DeadlockNet(casestring)
 | TrueProperty(casestring)
+| CTLProperty(casestring formula)
+| LTLProperty(casestring formula)
+    {
+        bool isCTL = false;
+        bool isLTL = false;
+    }
 ;
 
 formula:

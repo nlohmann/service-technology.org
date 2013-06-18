@@ -348,14 +348,9 @@ A(W(x,y)) -> <simplify: Not(E(U(Not(y),And(_(Not(x),Not(y))))))>;
 Property(name, I(Deadlock())) -> <problem: DeadlockInitial(name) >;
 Property(name, N(Deadlock())) -> <problem: Negation(DeadlockNet(name)) >;
 
-// invariant == AG
-Property(name, I(x)) -> <simplify: Property(name, A(G(x))) >;
-// impossibility == !EF
-Property(name, N(x)) -> <simplify: Property(name, Not(E(F(x)))) >;
-
 // replace top operators by known problem
-Property(name, E(F(x))) -> <problem: ReachabilityProperty(name, x) >;
-Property(name, A(G(x))) -> <problem: Negation(ReachabilityProperty(name, x)) >;
+Property(name, E(F(x))) provided (!x->isTemporal) -> <problem: ReachabilityProperty(name, x) >;
+Property(name, A(G(x))) provided (!x->isTemporal) -> <problem: Negation(ReachabilityProperty(name, x)) >;
 
 // CTL / LTL
 P=Property(name, x) provided (P->isCTL) -> <problem: CTLProperty(name, x) >;
@@ -364,6 +359,12 @@ P=Property(name, x) provided (P->isLTL) -> <problem: LTLProperty(name, x) >;
 // replace top constant by dedicated Task
 Property(name, True()) -> <problem: TrueProperty(name) >;
 Property(name, False()) -> <problem: Negation(TrueProperty(name)) >;
+
+
+// invariant == AG
+Property(name, I(x)) -> <simplify: Property(name, A(G(x))) >;
+// impossibility == !EF
+Property(name, N(x)) -> <simplify: Property(name, Not(E(F(x)))) >;
 
 // remove double negations
 Negation(Negation(x)) -> <simplify: x>;

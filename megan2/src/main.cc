@@ -63,6 +63,7 @@ int main(int argc, char* argv[]) {
 
         // check type
         property->unparse(dummy_printer, kc::ctl);
+        property->unparse(dummy_printer, kc::temporal);
 
         // extract property and create task
         property = property->rewrite(kc::problem);

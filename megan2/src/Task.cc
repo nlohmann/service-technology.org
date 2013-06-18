@@ -98,13 +98,13 @@ UnknownTask::UnknownTask(std::string name, bool negate) : Task(name, negate) {
 
 LTLTask::LTLTask(std::string name, bool negate) : Task(name, negate) {
     queue.push_back(this);
-    worker = task2tool(t_UnknownTask, this);
+    worker = task2tool(t_LTLTask, this);
     status("created %sLTL task %s", (negate ? "negated " : ""), _coutput_(name));
 }
 
 CTLTask::CTLTask(std::string name, bool negate) : Task(name, negate) {
     queue.push_back(this);
-    worker = task2tool(t_UnknownTask, this);
+    worker = task2tool(t_CTLTask, this);
     status("created %sCTL task %s", (negate ? "negated " : ""), _coutput_(name));
 }
 

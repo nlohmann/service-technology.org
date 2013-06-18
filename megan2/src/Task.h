@@ -1,7 +1,7 @@
 #pragma once
 
 typedef enum { DEFINITELY_TRUE, DEFINITELY_FALSE, MAYBE_TRUE, MAYBE_FALSE, MAYBE, NOT_IMPLEMENTED, ERROR } result_t;
-typedef enum { t_UnknownTask, t_ReachabilityTask, t_DeadlockTask, t_DeadlockInitialTask, t_TrueTask } task_t;
+typedef enum { t_UnknownTask, t_ReachabilityTask, t_DeadlockTask, t_DeadlockInitialTask, t_TrueTask, t_CTLTask, t_LTLTask } task_t;
 
 #include <string>
 #include <vector>

@@ -119,22 +119,25 @@ void status(const char* format, ...) {
  \note The codes should be documented in the manual.
 */
 void abort(unsigned short code, const char* format, ...) {
-    std::lock_guard<std::mutex> lg(iomutex);
+    {
+        std::lock_guard<std::mutex> lg(iomutex);
 
-    fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _bold_);
+        fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _bold_);
 
-    va_list args;
-    va_start(args, format);
-    vfprintf(stderr, format, args);
-    va_end(args);
+        va_list args;
+        va_start(args, format);
+        vfprintf(stderr, format, args);
+        va_end(args);
 
 #ifdef USE_SYSLOG
-    va_start(args, format);
-    vsyslog(LOG_ERR, format, args);
-    va_end(args);
+        va_start(args, format);
+        vsyslog(LOG_ERR, format, args);
+        va_end(args);
 #endif
 
-    fprintf(stderr, "%s -- %saborting [#%02d]%s\n", _c_, _cR_, code, _c_);
+        fprintf(stderr, "%s -- %saborting [#%02d]%s\n", _c_, _cR_, code, _c_);
+    }
+
     status("see manual for a documentation of this error");
 
     if (errno != 0) {

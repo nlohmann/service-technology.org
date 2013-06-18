@@ -53,6 +53,14 @@ class Tool_LoLA_Reachability_pessimistic : public LoLA {
         result_t execute();
 };
 
+// CTL/LTL
+
+class Tool_LoLA_Modelchecking : public LoLA {
+    public:
+        Tool_LoLA_Modelchecking(Task*);
+        result_t execute();
+};
+
 // deadlocks
 
 class Tool_LoLA_Deadlock : public LoLA {

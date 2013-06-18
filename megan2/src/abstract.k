@@ -18,36 +18,39 @@ property:
 ;
 
 formula:
-  True()                        /* fliegt raus */
-| False()                       /* fliegt raus */
+  True()                        /* fliegt raus: simplify/problem */
+| False()                       /* fliegt raus: simplify/problem */
 | Not(formula)
-| I(formula)                    /* fliegt raus */
-| N(formula)                    /* fliegt raus */
+| I(formula)                    /* fliegt raus: simplify/problem */
+| N(formula)                    /* fliegt raus: simplify/problem */
 | A(formula)
 | E(formula)
 | X(formula)
 | G(formula)
 | F(formula)
-| Deadlock()                    /* fliegt raus */
+| Deadlock()                    /* fliegt raus: problem */
 | Fireable(casestring)
 | Live0(casestring)
 | Live1(casestring)
 | Live2(casestring)
 | Live3(casestring)
 | Live4(casestring)
-| EQ(expression expression)    /* fliegt raus */
-| NE(expression expression)    /* fliegt raus */
-| GT(expression expression)    /* fliegt raus */
-| GE(expression expression)    /* fliegt raus */
-| LT(expression expression)    /* fliegt raus */
+| EQ(expression expression)    /* fliegt raus: simplify */
+| NE(expression expression)    /* fliegt raus: simplify */
+| GT(expression expression)    /* fliegt raus: simplify */
+| GE(expression expression)    /* fliegt raus: simplify */
+| LT(expression expression)    /* fliegt raus: simplify */
 | LE(expression expression)
 | And(formulas)
 | Or(formulas)
-| Xor(formulas)                /* fliegt raus */
-| Imp(formula formula)         /* fliegt raus */
-| Iff(formula formula)         /* fliegt raus */
+| Xor(formulas)                /* fliegt raus: arrows */
+| Imp(formula formula)         /* fliegt raus: arrows */
+| Iff(formula formula)         /* fliegt raus: arrows */
 | W(formula formula)
 | U(formula formula)
+      {
+          bool isTemporal = false;
+      }
 ;
 
 formulas:

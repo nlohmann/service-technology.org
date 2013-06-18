@@ -47,13 +47,13 @@ LoLA::LoLA(Task *t) : Tool(t) {
     basedir = std::string(TOOL_PATH) + "/lola-2.0-unreleased";
 }
 
-Tool_LoLA_Deadlock::Tool_LoLA_Deadlock(Task *t) : LoLA(t) {}
-Tool_LoLA_Deadlock_optimistic::Tool_LoLA_Deadlock_optimistic(Task *t) : LoLA(t) {}
-Tool_LoLA_Deadlock_optimistic_incomplete::Tool_LoLA_Deadlock_optimistic_incomplete(Task *t) : LoLA(t) {}
-Tool_LoLA_Deadlock_pessimistic::Tool_LoLA_Deadlock_pessimistic(Task *t) : LoLA(t) {}
+Tool_LoLA_Deadlock::Tool_LoLA_Deadlock(Task *t) : LoLA {t} {}
+Tool_LoLA_Deadlock_optimistic::Tool_LoLA_Deadlock_optimistic(Task *t) : LoLA {t} {}
+Tool_LoLA_Deadlock_optimistic_incomplete::Tool_LoLA_Deadlock_optimistic_incomplete(Task *t) : LoLA {t} {}
+Tool_LoLA_Deadlock_pessimistic::Tool_LoLA_Deadlock_pessimistic(Task *t) : LoLA {t} {}
 
 result_t Tool_LoLA_Deadlock::execute() {
-    status("searching for deadlocks");
+    status("searching for deadlocks...");
 
     // check if net file parameter is given
     if (not Runtime::args_info.net_given) {
@@ -82,7 +82,7 @@ result_t Tool_LoLA_Deadlock::execute() {
 }
 
 result_t Tool_LoLA_Deadlock_optimistic::execute() {
-    status("searching for deadlocks");
+    status("searching for deadlocks...");
 
     // check if net file parameter is given
     if (not Runtime::args_info.net_given) {
@@ -111,7 +111,7 @@ result_t Tool_LoLA_Deadlock_optimistic::execute() {
 }
 
 result_t Tool_LoLA_Deadlock_optimistic_incomplete::execute() {
-    status("searching for deadlocks");
+    status("searching for deadlocks...");
 
     // check if net file parameter is given
     if (not Runtime::args_info.net_given) {
@@ -141,7 +141,7 @@ result_t Tool_LoLA_Deadlock_optimistic_incomplete::execute() {
 }
 
 result_t Tool_LoLA_Deadlock_pessimistic::execute() {
-    status("searching for deadlocks");
+    status("searching for deadlocks...");
 
     // check if net file parameter is given
     if (not Runtime::args_info.net_given) {
@@ -169,13 +169,13 @@ result_t Tool_LoLA_Deadlock_pessimistic::execute() {
     return MAYBE;
 }
 
-Tool_LoLA_Reachability::Tool_LoLA_Reachability(Task *t) : LoLA(t) {}
-Tool_LoLA_Reachability_optimistic::Tool_LoLA_Reachability_optimistic(Task *t) : LoLA(t) {}
-Tool_LoLA_Reachability_optimistic_incomplete::Tool_LoLA_Reachability_optimistic_incomplete(Task *t) : LoLA(t) {}
-Tool_LoLA_Reachability_pessimistic::Tool_LoLA_Reachability_pessimistic(Task *t) : LoLA(t) {}
+Tool_LoLA_Reachability::Tool_LoLA_Reachability(Task *t) : LoLA {t} {}
+Tool_LoLA_Reachability_optimistic::Tool_LoLA_Reachability_optimistic(Task *t) : LoLA {t} {}
+Tool_LoLA_Reachability_optimistic_incomplete::Tool_LoLA_Reachability_optimistic_incomplete(Task *t) : LoLA {t} {}
+Tool_LoLA_Reachability_pessimistic::Tool_LoLA_Reachability_pessimistic(Task *t) : LoLA {t} {}
 
 result_t Tool_LoLA_Reachability::execute() {
-    status("checking reachability");
+    status("checking reachability...");
 
     // creating formula file
     auto filename_formula = getTmpName(".formula");
@@ -216,7 +216,7 @@ result_t Tool_LoLA_Reachability::execute() {
 }
 
 result_t Tool_LoLA_Reachability_optimistic::execute() {
-    status("checking reachability");
+    status("checking reachability...");
 
     // creating formula file
     auto filename_formula = getTmpName(".formula");
@@ -257,7 +257,7 @@ result_t Tool_LoLA_Reachability_optimistic::execute() {
 }
 
 result_t Tool_LoLA_Reachability_optimistic_incomplete::execute() {
-    status("checking reachability");
+    status("checking reachability...");
 
     // creating formula file
     auto filename_formula = getTmpName(".formula");
@@ -299,7 +299,7 @@ result_t Tool_LoLA_Reachability_optimistic_incomplete::execute() {
 }
 
 result_t Tool_LoLA_Reachability_pessimistic::execute() {
-    status("checking reachability");
+    status("checking reachability...");
 
     // creating formula file
     auto filename_formula = getTmpName(".formula");
@@ -339,6 +339,48 @@ result_t Tool_LoLA_Reachability_pessimistic::execute() {
     return MAYBE;
 }
 
+Tool_LoLA_Modelchecking::Tool_LoLA_Modelchecking(Task *t) : LoLA {t} {}
+
+result_t Tool_LoLA_Modelchecking::execute() {
+    status("modelchecking...");
+
+    // creating formula file
+    auto filename_formula = getTmpName(".formula");
+    outfile = fopen(filename_formula.c_str(), "w");
+    assert(outfile);
+    fprintf(outfile, "FORMULA (");
+    kc::property tmp = properties[t->property_id];
+    assert(tmp);
+    tmp->unparse(printer, kc::lola);
+    fprintf(outfile, ");\n");
+    fclose(outfile);
+    status("created formula file %s", _cfilename_(filename_formula));
+
+    // check if net file parameter is given
+    if (not Runtime::args_info.net_given) {
+        abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
+    }
+    assert(Runtime::args_info.net_arg);
+
+    // call tool
+    auto filename_output = getTmpName(".log");
+    auto callstring = basedir + "/bin/lola --verbose --check=modelchecking " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
+    auto return_value_tool = call_tool(callstring);
+
+    // LoLA exists normally with codes 0 and 1
+    if (return_value_tool > 1) {
+        return ERROR;
+    }
+
+    if (contains(filename_output, "lola: result: yes")) {
+        return DEFINITELY_TRUE;
+    }
+    if (contains(filename_output, "lola: result: no")) {
+        return DEFINITELY_FALSE;
+    }
+
+    return MAYBE;
+}
 
 /*********
  * Megan *
@@ -349,7 +391,7 @@ Megan::Megan(Task *t) : Tool(t) {}
 Tool_Megan_InitialDeadlock::Tool_Megan_InitialDeadlock(Task *t) : Megan(t) {}
 
 result_t Tool_Megan_InitialDeadlock::execute() {
-    status("checking initial deadlock");
+    status("checking initial deadlock...");
 
     // check if net file parameter is given
     if (not Runtime::args_info.net_given) {
@@ -386,7 +428,7 @@ result_t Tool_Megan_InitialDeadlock::execute() {
 Tool_Megan_True::Tool_Megan_True(Task *t) : Megan(t) {}
 
 result_t Tool_Megan_True::execute() {
-    status("checking truth");
+    status("checking truth...");
     return DEFINITELY_TRUE;
 }
 
@@ -402,7 +444,7 @@ Sara::Sara(Task *t) : Tool(t) {
 Tool_Sara_Reachability::Tool_Sara_Reachability(Task *t) : Sara(t) {}
 
 result_t Tool_Sara_Reachability::execute() {
-    status("checking reachability");
+    status("checking reachability...");
 
     // creating formula file
     auto tmp = properties[t->property_id];

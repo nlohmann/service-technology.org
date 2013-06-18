@@ -116,11 +116,11 @@ Fireable(x) -> [lola: "FIREABLE(" x ")"];
 
 A(x) -> [lola: "ALLPATH " x];
 E(x) -> [lola: "EXPATH " x];
-X(x) -> [lola: "X" x];
+X(x) -> [lola: "NEXTSTEP " x];
 G(x) -> [lola: "ALWAYS " x];
 F(x) -> [lola: "EVENTUALLY " x];
 W(x,y) -> [lola: "(" x " W " y ")"];
-U(x,y) -> [lola: "(" x " U " y ")"];
+U(x,y) -> [lola: "(" x " UNTIL " y ")"];
 
 
 

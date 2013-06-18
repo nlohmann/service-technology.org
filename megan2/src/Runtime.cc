@@ -43,9 +43,9 @@ void Runtime::exitHandler() {
     log["runtime"]["seconds"] = difftime(end_time, start_time);
 
     // record last error
-    if (errno != 0) {
-        log["error"] = strerror(errno);
-    }
+    //if (errno != 0) {
+    //    log["error"] = strerror(errno);
+    //}
 
     // write to file if required
     if (output != nullptr) {

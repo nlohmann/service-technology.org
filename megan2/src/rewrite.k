@@ -331,6 +331,16 @@ E(F(A(G(a=E(F(A(G(x)))))))) -> <simplify: a>;
 // not A(phi W psi) = E ( not psi U not phi & not psi)
 A(W(x,y)) -> <simplify: Not(E(U(Not(y),And(_(Not(x),Not(y))))))>;
 
+// from http://i12www.ira.uka.de/~pschmitt/FM210/Folien/CTL.pdf
+
+// A(true U phi) == AF phi
+A(U(True(), phi)) -> <simplify: A(F(phi)) >;
+// E(true U phi) == EF phi
+E(U(True(), phi)) -> <simplify: E(F(phi)) >;
+// !A(true U !phi) == EG phi
+Not(A(U(True(), Not(phi)))) -> <simplify: E(G(phi)) >;
+// !E(true U !phi) == AG phi
+Not(E(U(True(), Not(phi)))) -> <simplify: A(G(phi)) >;
 
 /******************
  * PROBLEM FINDER *

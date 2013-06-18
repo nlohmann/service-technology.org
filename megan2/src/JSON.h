@@ -4,28 +4,35 @@
 #include <vector>
 #include <map>
 #include <stdexcept>
+#include <mutex>
 
 class JSON {
     private:
         /// possible types of a JSON object
-        typedef enum { JSON_ARRAY, JSON_OBJECT, JSON_NULL, JSON_STRING, JSON_BOOLEAN, JSON_NUMBER_INT, JSON_NUMBER_FLOAT } json_t;
+        enum class json_t {
+            array,
+            object,
+            null,
+            string,
+            boolean,
+            number_int,
+            number_float
+        };
         /// the type of this object
         json_t type;
         /// the payload of this object
         union {
-            /// array
-            std::vector<JSON>* a;
-            /// object
-            std::map<std::string, JSON>* o;
-            /// string
-            std::string* s;
-            /// Boolean
-            bool b;
-            /// number: integer
-            int i;
-            /// number: double
-            double f;
+            
+            std::vector<JSON>* a;           ///< array
+            std::map<std::string, JSON>* o; ///< object
+            std::string* s;                 ///< string
+            bool b;                         ///< Boolean
+            int i;                          ///< number: integer
+            double f;                       ///< number: float
         } payload;
+
+        // mutex to guard payload
+        static std::mutex token;
 
     public:
         /// explicit conversion to string representation (C style)
@@ -34,7 +41,7 @@ class JSON {
         const std::string toString() const;
 
         /// implicit conversion to string representation (C style)
-        operator const char* () const;
+        operator const char*() const;
         /// implicit conversion to string representation (C++ style)
         operator const std::string() const;
         /// implicit conversion to integer (only for numbers)
@@ -89,8 +96,6 @@ class JSON {
         JSON(const int);
         /// create a number object
         JSON(const double);
-        /// copy constructor (also for objects and arrays)
-        JSON(const JSON&);
 
         /// destructor
         ~JSON();

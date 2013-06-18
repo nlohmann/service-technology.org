@@ -1,71 +1,46 @@
-#include <sstream>
 #include "JSON.h"
 
+// a mutex to ensure thread safety
+std::mutex JSON::token;
 
 /*******************************
  * CONSTRUCTORS AND DESTRUCTOR *
  *******************************/
 
-JSON::JSON() : type(JSON_NULL) {
+JSON::JSON() : type(json_t::null) {
 }
 
-JSON::JSON(const std::string& s) : type(JSON_STRING) {
+JSON::JSON(const std::string& s) : type(json_t::string) {
     payload.s = new std::string(s);
 }
 
-JSON::JSON(const char* s) : type(JSON_STRING) {
+JSON::JSON(const char* s) : type(json_t::string) {
     payload.s = new std::string(s);
 }
 
-JSON::JSON(const bool b) : type(JSON_BOOLEAN) {
+JSON::JSON(const bool b) : type(json_t::boolean) {
     payload.b = b;
 }
 
-JSON::JSON(const int i) : type(JSON_NUMBER_INT) {
+JSON::JSON(const int i) : type(json_t::number_int) {
     payload.i = i;
 }
 
-JSON::JSON(const double f) : type(JSON_NUMBER_FLOAT) {
+JSON::JSON(const double f) : type(json_t::number_float) {
     payload.f = f;
-}
-
-// copy constructor
-JSON::JSON(const JSON& other) : type(other.type) {
-    switch (other.type) {
-        case (JSON_ARRAY): {
-            payload.a = new std::vector<JSON>(*(other.payload.a));
-            break;
-        }
-
-        case (JSON_OBJECT): {
-            payload.o = new std::map<std::string, JSON>(*(other.payload.o));
-            break;
-        }
-
-        case (JSON_STRING): {
-            payload.s = new std::string(*(other.payload.s));
-            break;
-        }
-
-        default: {
-            // payloads without constructor can be copied straightforardly
-            payload = other.payload;
-            break;
-        }
-    }
 }
 
 JSON::~JSON() {
     switch (type) {
-        case (JSON_ARRAY): {
+        case (json_t::array): {
             delete payload.a;
             break;
         }
-        case (JSON_OBJECT): {
+        case (json_t::object): {
             delete payload.o;
             break;
         }
-        case (JSON_STRING): {
+        case (json_t::string): {
             //delete payload.s;
             break;
         }
@@ -91,9 +66,9 @@ JSON::operator const std::string() const {
 
 JSON::operator const int() const {
     switch (type) {
-        case (JSON_NUMBER_INT):
+        case (json_t::number_int):
             return payload.i;
-        case (JSON_NUMBER_FLOAT):
+        case (json_t::number_float):
             return static_cast<int>(payload.f);
         default:
             throw std::runtime_error("cannot cast to JSON number");
@@ -102,9 +77,9 @@ JSON::operator const int() const {
 
 JSON::operator const double() const {
     switch (type) {
-        case (JSON_NUMBER_INT):
+        case (json_t::number_int):
             return static_cast<double>(payload.i);
-        case (JSON_NUMBER_FLOAT):
+        case (json_t::number_float):
             return payload.f;
         default:
             throw std::runtime_error("cannot cast to JSON number");
@@ -113,7 +88,7 @@ JSON::operator const double() const {
 
 JSON::operator const bool() const {
     switch (type) {
-        case (JSON_BOOLEAN):
+        case (json_t::boolean):
             return payload.b;
         default:
             throw std::runtime_error("cannot cast to JSON Boolean");
@@ -122,34 +97,30 @@ JSON::operator const bool() const {
 
 const std::string JSON::toString() const {
     switch (type) {
-        case (JSON_NULL): {
+        case (json_t::null): {
             return "null";
         }
 
-        case (JSON_STRING): {
+        case (json_t::string): {
             return std::string("\"") + *(payload.s) + "\"";
         }
 
-        case (JSON_BOOLEAN): {
+        case (json_t::boolean): {
             return payload.b ? "true" : "false";
         }
 
-        case (JSON_NUMBER_INT): {
-            std::stringstream ss;
-            ss << payload.i;
-            return ss.str();
+        case (json_t::number_int): {
+            return std::to_string(payload.i);
         }
 
-        case (JSON_NUMBER_FLOAT): {
-            std::stringstream ss;
-            ss << payload.f;
-            return ss.str();
+        case (json_t::number_float): {
+            return std::to_string(payload.f);
         }
 
-        case (JSON_ARRAY): {
+        case (json_t::array): {
             std::string result;
 
-            for (std::vector<JSON>::const_iterator i = payload.a->begin(); i != payload.a->end(); ++i) {
+            for (auto i = payload.a->begin(); i != payload.a->end(); ++i) {
                 if (i != payload.a->begin()) {
                     result += ", ";
                 }
@@ -159,10 +130,10 @@ const std::string JSON::toString() const {
             return "[" + result + "]";
         }
 
-        case (JSON_OBJECT): {
+        case (json_t::object): {
             std::string result;
 
-            for (std::map<std::string, JSON>::const_iterator i = payload.o->begin(); i != payload.o->end(); ++i) {
+            for (auto i = payload.o->begin(); i != payload.o->end(); ++i) {
                 if (i != payload.o->begin()) {
                     result += ", ";
                 }
@@ -184,12 +155,14 @@ const char* JSON::c_str() const {
  *****************************************/
 
 void JSON::add(JSON &o) {
-    if (not(type == JSON_NULL or type == JSON_ARRAY)) {
+    std::lock_guard<std::mutex> lg(token);
+
+    if (not(type == json_t::null or type == json_t::array)) {
         throw std::runtime_error("cannot add element to primitive type");
     }
 
-    if (type == JSON_NULL) {
-        type = JSON_ARRAY;
+    if (type == json_t::null) {
+        type = json_t::array;
         payload.a = new std::vector<JSON>;
     }
 
@@ -223,12 +196,14 @@ void JSON::add(double f) {
 
 
 void JSON::add(std::string n, JSON &o) {
-    if (not(type == JSON_NULL or type == JSON_OBJECT)) {
+    std::lock_guard<std::mutex> lg(token);
+
+    if (not(type == json_t::null or type == json_t::object)) {
         throw std::runtime_error("cannot add element to primitive type");
     }
 
-    if (type == JSON_NULL) {
-        type = JSON_OBJECT;
+    if (type == json_t::null) {
+        type = json_t::object;
         payload.o = new std::map<std::string, JSON>;
     }
 
@@ -263,8 +238,10 @@ void JSON::add(std::string n, double f) {
 
 /// operator to set an element in an object
 JSON& JSON::operator[](const std::string& key) {
-    if (type == JSON_NULL) {
-        type = JSON_OBJECT;
+    std::lock_guard<std::mutex> lg(token);
+
+    if (type == json_t::null) {
+        type = json_t::object;
         payload.o = new std::map<std::string, JSON>;
     }
 
@@ -277,8 +254,10 @@ JSON& JSON::operator[](const std::string& key) {
 
 /// operator to set an element in an object
 JSON& JSON::operator[](const char* key) {
-    if (type == JSON_NULL) {
-        type = JSON_OBJECT;
+    std::lock_guard<std::mutex> lg(token);
+
+    if (type == json_t::null) {
+        type = json_t::object;
         payload.o = new std::map<std::string, JSON>;
     }
 

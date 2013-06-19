@@ -15,7 +15,7 @@ megan_SOURCES = \
                 JSON.cc JSON.h \
                 Runtime.cc Runtime.h
 
-AM_CXXFLAGS = -std=c++0x -stdlib=libc++
+AM_CXXFLAGS = -std=c++11 #-stdlib=libc++
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI

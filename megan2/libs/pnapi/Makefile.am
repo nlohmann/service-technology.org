@@ -6,7 +6,7 @@
 # You MUST NOT change this file. #
 ##################################
 
-AM_CXXFLAGS = -std=c++0x -stdlib=libc++
+AM_CXXFLAGS = -std=c++11# -stdlib=libc++
 
 noinst_LIBRARIES = libpnapi.a
 

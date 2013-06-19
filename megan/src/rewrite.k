@@ -355,8 +355,8 @@ Not(E(U(True(), Not(phi)))) -> <simplify: A(G(phi)) >;
 /////////////////////////////////////////////////////////
 
 // special care for deadlocks
-Property(name, I(Deadlock())) -> <problem: DeadlockInitial(name) >;
-Property(name, N(Deadlock())) -> <problem: Negation(DeadlockNet(name)) >;
+Property(name, A(G(Deadlock()))) -> <problem: DeadlockInitial(name) >;
+Property(name, A(G(Not(Deadlock())))) -> <problem: Negation(DeadlockNet(name)) >;
 
 // replace top operators by known problem
 Property(name, E(F(x))) provided (!x->isTemporal) -> <problem: ReachabilityProperty(name, x) >;

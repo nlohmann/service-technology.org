@@ -38,6 +38,7 @@ number    [0-9][0-9]*
 %%
 
 
+"RESET"       { return CF_RESET; }
 ":"          { return CF_COLON; }
 
 {number}     { costfunction_lval.val = atoi(costfunction_text); return CF_NUMBER; }

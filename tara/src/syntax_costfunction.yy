@@ -23,7 +23,7 @@ NOTE: This syntax-scanner does not recognize semantic errors!
 Wrong Input causes undefined behaviour and not necessarily an error message.
 */
 
-%token CF_COLON CF_NUMBER CF_NAME
+%token CF_RESET CF_COLON CF_NUMBER CF_NAME
 
 %expect 0
 %defines
@@ -50,7 +50,6 @@ extern int costfunction_error(const char *);
 
 %type <val> CF_NUMBER
 %type <str> CF_NAME
-
 %%
 
 empty: costs | ;
@@ -62,6 +61,14 @@ costs:
 
 cost:
    CF_NAME CF_COLON CF_NUMBER {
+       pnapi::Transition* t=Tara::net->findTransition($1);
+       if(t!=NULL) {
+           Tara::partialCostFunction[t]=$3;
+	   if (Tara::highestTransitionCosts < $3) Tara::highestTransitionCosts = $3;
+	}
+       free($1); //free string
+   }
+   | CF_NAME CF_COLON CF_NUMBER CF_RESET {
        pnapi::Transition* t=Tara::net->findTransition($1);
        if(t!=NULL) {
            Tara::partialCostFunction[t]=$3;

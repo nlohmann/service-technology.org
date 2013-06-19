@@ -228,6 +228,9 @@ int main(int argc, char** argv) {
 
     // Check whether N is controllable under budget maxCostOfComposition. If not, return the most permissive partner.
    bool bounded = isControllable(*Tara::net, true); 
+   if(not bounded) {
+       status("costs are unboundend for any partner");
+   }
 
     // If N is not controllable under budget maxCostofComposition, return the mpp. 
     if (!bounded) {

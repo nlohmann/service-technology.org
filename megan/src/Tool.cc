@@ -24,11 +24,19 @@ bool contains(std::string filename, std::string s) {
 }
 
 std::string getTmpName(std::string suffix="") {
-    char *tmp = tmpnam(NULL);
+    char * tmp = tmpnam(NULL);
     return std::string(tmp) + suffix;
 }
 
 Tool::Tool(Task* t) : t(t) {}
+
+
+int Tool::call_tool(std::string &callstring) {
+    status("calling %s", callstring.c_str());
+    const int return_value_tool = system(callstring.c_str());
+    //status("done calling %s", callstring.c_str());
+    return __WEXITSTATUS(return_value_tool);
+}
 
 
 /********
@@ -45,7 +53,7 @@ Tool_LoLA_Deadlock_optimistic_incomplete::Tool_LoLA_Deadlock_optimistic_incomple
 Tool_LoLA_Deadlock_pessimistic::Tool_LoLA_Deadlock_pessimistic(Task *t) : LoLA(t) {}
 
 result_t Tool_LoLA_Deadlock::execute() {
-    status("searching for deadlocks");
+    status("searching for deadlocks...");
 
     // check if net file parameter is given
     if (not Runtime::args_info.net_given) {
@@ -55,10 +63,8 @@ result_t Tool_LoLA_Deadlock::execute() {
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
-    status("calling %s", call_tool.c_str());
-    int return_value_tool = system(call_tool.c_str());
-    return_value_tool = __WEXITSTATUS(return_value_tool);
+    std::string callstring = basedir + "/bin/lola --verbose --check=deadlock " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
+    int return_value_tool = call_tool(callstring);
 
     // LoLA exists normally with codes 0 and 1
     if (return_value_tool > 1) {
@@ -76,7 +82,7 @@ result_t Tool_LoLA_Deadlock::execute() {
 }
 
 result_t Tool_LoLA_Deadlock_optimistic::execute() {
-    status("searching for deadlocks");
+    status("searching for deadlocks...");
 
     // check if net file parameter is given
     if (not Runtime::args_info.net_given) {
@@ -86,10 +92,8 @@ result_t Tool_LoLA_Deadlock_optimistic::execute() {
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock --encoder=copy --store=prefix " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
-    status("calling %s", call_tool.c_str());
-    int return_value_tool = system(call_tool.c_str());
-    return_value_tool = __WEXITSTATUS(return_value_tool);
+    std::string callstring = basedir + "/bin/lola --verbose --check=deadlock --encoder=copy --store=prefix " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
+    int return_value_tool = call_tool(callstring);
 
     // LoLA exists normally with codes 0 and 1
     if (return_value_tool > 1) {
@@ -107,7 +111,7 @@ result_t Tool_LoLA_Deadlock_optimistic::execute() {
 }
 
 result_t Tool_LoLA_Deadlock_optimistic_incomplete::execute() {
-    status("searching for deadlocks");
+    status("searching for deadlocks...");
 
     // check if net file parameter is given
     if (not Runtime::args_info.net_given) {
@@ -117,10 +121,8 @@ result_t Tool_LoLA_Deadlock_optimistic_incomplete::execute() {
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock --store=bloom " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
-    status("calling %s", call_tool.c_str());
-    int return_value_tool = system(call_tool.c_str());
-    return_value_tool = __WEXITSTATUS(return_value_tool);
+    std::string callstring = basedir + "/bin/lola --verbose --check=deadlock --store=bloom " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
+    int return_value_tool = call_tool(callstring);
 
     // LoLA exists normally with codes 0 and 1
     if (return_value_tool > 1) {
@@ -139,7 +141,7 @@ result_t Tool_LoLA_Deadlock_optimistic_incomplete::execute() {
 }
 
 result_t Tool_LoLA_Deadlock_pessimistic::execute() {
-    status("searching for deadlocks");
+    status("searching for deadlocks...");
 
     // check if net file parameter is given
     if (not Runtime::args_info.net_given) {
@@ -149,10 +151,8 @@ result_t Tool_LoLA_Deadlock_pessimistic::execute() {
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=deadlock --store=prefix --encode=copy --stubborn=deletion " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
-    status("calling %s", call_tool.c_str());
-    int return_value_tool = system(call_tool.c_str());
-    return_value_tool = __WEXITSTATUS(return_value_tool);
+    std::string callstring = basedir + "/bin/lola --verbose --check=deadlock --store=prefix --encode=copy --stubborn=deletion " + Runtime::args_info.net_arg + " > " + filename_output + " 2>&1";
+    int return_value_tool = call_tool(callstring);
 
     // LoLA exists normally with codes 0 and 1
     if (return_value_tool > 1) {
@@ -175,7 +175,7 @@ Tool_LoLA_Reachability_optimistic_incomplete::Tool_LoLA_Reachability_optimistic_
 Tool_LoLA_Reachability_pessimistic::Tool_LoLA_Reachability_pessimistic(Task *t) : LoLA(t) {}
 
 result_t Tool_LoLA_Reachability::execute() {
-    status("checking reachability");
+    status("checking reachability...");
 
     // creating formula file
     std::string filename_formula = getTmpName(".formula");
@@ -197,21 +197,11 @@ result_t Tool_LoLA_Reachability::execute() {
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
-    status("calling %s", call_tool.c_str());
-    int return_value_tool = system(call_tool.c_str());
-    return_value_tool = __WEXITSTATUS(return_value_tool);
+    std::string callstring = basedir + "/bin/lola --verbose --check=modelchecking " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
+    int return_value_tool = call_tool(callstring);
 
     // LoLA exists normally with codes 0 and 1
     if (return_value_tool > 1) {
-        /*
-        tmp->print();
-        outfile = stdout;
-        fprintf(outfile, "LOLA: \n");
-        tmp->unparse(printer, kc::lola);
-        fprintf(outfile, "\n");
-        exit(1);
-        */
         return ERROR;
     }
 
@@ -226,7 +216,7 @@ result_t Tool_LoLA_Reachability::execute() {
 }
 
 result_t Tool_LoLA_Reachability_optimistic::execute() {
-    status("checking reachability");
+    status("checking reachability...");
 
     // creating formula file
     std::string filename_formula = getTmpName(".formula");
@@ -248,21 +238,11 @@ result_t Tool_LoLA_Reachability_optimistic::execute() {
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking --encoder=copy --store=prefix " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
-    status("calling %s", call_tool.c_str());
-    int return_value_tool = system(call_tool.c_str());
-    return_value_tool = __WEXITSTATUS(return_value_tool);
+    std::string callstring = basedir + "/bin/lola --verbose --check=modelchecking --encoder=copy --store=prefix " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
+    int return_value_tool = call_tool(callstring);
 
     // LoLA exists normally with codes 0 and 1
     if (return_value_tool > 1) {
-        /*
-        tmp->print();
-        outfile = stdout;
-        fprintf(outfile, "LOLA: \n");
-        tmp->unparse(printer, kc::lola);
-        fprintf(outfile, "\n");
-        exit(1);
-        */
         return ERROR;
     }
 
@@ -277,7 +257,7 @@ result_t Tool_LoLA_Reachability_optimistic::execute() {
 }
 
 result_t Tool_LoLA_Reachability_optimistic_incomplete::execute() {
-    status("checking reachability");
+    status("checking reachability...");
 
     // creating formula file
     std::string filename_formula = getTmpName(".formula");
@@ -299,21 +279,11 @@ result_t Tool_LoLA_Reachability_optimistic_incomplete::execute() {
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking --store=bloom " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
-    status("calling %s", call_tool.c_str());
-    int return_value_tool = system(call_tool.c_str());
-    return_value_tool = __WEXITSTATUS(return_value_tool);
+    std::string callstring = basedir + "/bin/lola --verbose --check=modelchecking --store=bloom " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
+    int return_value_tool = call_tool(callstring);
 
     // LoLA exists normally with codes 0 and 1
     if (return_value_tool > 1) {
-        /*
-        tmp->print();
-        outfile = stdout;
-        fprintf(outfile, "LOLA: \n");
-        tmp->unparse(printer, kc::lola);
-        fprintf(outfile, "\n");
-        exit(1);
-        */
         return ERROR;
     }
 
@@ -329,7 +299,7 @@ result_t Tool_LoLA_Reachability_optimistic_incomplete::execute() {
 }
 
 result_t Tool_LoLA_Reachability_pessimistic::execute() {
-    status("checking reachability");
+    status("checking reachability...");
 
     // creating formula file
     std::string filename_formula = getTmpName(".formula");
@@ -351,21 +321,11 @@ result_t Tool_LoLA_Reachability_pessimistic::execute() {
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/lola --verbose --check=modelchecking --store=prefix --encode=copy --stubborn=deletion " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
-    status("calling %s", call_tool.c_str());
-    int return_value_tool = system(call_tool.c_str());
-    return_value_tool = __WEXITSTATUS(return_value_tool);
+    std::string callstring = basedir + "/bin/lola --verbose --check=modelchecking --store=prefix --encode=copy --stubborn=deletion " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
+    int return_value_tool = call_tool(callstring);
 
     // LoLA exists normally with codes 0 and 1
     if (return_value_tool > 1) {
-        /*
-        tmp->print();
-        outfile = stdout;
-        fprintf(outfile, "LOLA: \n");
-        tmp->unparse(printer, kc::lola);
-        fprintf(outfile, "\n");
-        exit(1);
-        */
         return ERROR;
     }
 
@@ -379,6 +339,48 @@ result_t Tool_LoLA_Reachability_pessimistic::execute() {
     return MAYBE;
 }
 
+Tool_LoLA_Modelchecking::Tool_LoLA_Modelchecking(Task *t) : LoLA(t) {}
+
+result_t Tool_LoLA_Modelchecking::execute() {
+    status("modelchecking...");
+
+    // creating formula file
+    std::string filename_formula = getTmpName(".formula");
+    outfile = fopen(filename_formula.c_str(), "w");
+    assert(outfile);
+    fprintf(outfile, "FORMULA (");
+    kc::property tmp = properties[t->property_id];
+    assert(tmp);
+    tmp->unparse(printer, kc::lola);
+    fprintf(outfile, ");\n");
+    fclose(outfile);
+    status("created formula file %s", _cfilename_(filename_formula));
+
+    // check if net file parameter is given
+    if (not Runtime::args_info.net_given) {
+        abort(10, "no Petri net file given via parameter %s", _cparameter_("--net"));
+    }
+    assert(Runtime::args_info.net_arg);
+
+    // call tool
+    std::string filename_output = getTmpName(".log");
+    std::string callstring = basedir + "/bin/lola --verbose --check=modelchecking " + Runtime::args_info.net_arg + " --formula=" + filename_formula + " > " + filename_output + " 2>&1";
+    int return_value_tool = call_tool(callstring);
+
+    // LoLA exists normally with codes 0 and 1
+    if (return_value_tool > 1) {
+        return ERROR;
+    }
+
+    if (contains(filename_output, "lola: result: yes")) {
+        return DEFINITELY_TRUE;
+    }
+    if (contains(filename_output, "lola: result: no")) {
+        return DEFINITELY_FALSE;
+    }
+
+    return MAYBE;
+}
 
 /*********
  * Megan *
@@ -389,7 +391,7 @@ Megan::Megan(Task *t) : Tool(t) {}
 Tool_Megan_InitialDeadlock::Tool_Megan_InitialDeadlock(Task *t) : Megan(t) {}
 
 result_t Tool_Megan_InitialDeadlock::execute() {
-    status("checking initial deadlock");
+    status("checking initial deadlock...");
 
     // check if net file parameter is given
     if (not Runtime::args_info.net_given) {
@@ -426,7 +428,7 @@ result_t Tool_Megan_InitialDeadlock::execute() {
 Tool_Megan_True::Tool_Megan_True(Task *t) : Megan(t) {}
 
 result_t Tool_Megan_True::execute() {
-    status("checking truth");
+    status("checking truth...");
     return DEFINITELY_TRUE;
 }
 
@@ -442,7 +444,7 @@ Sara::Sara(Task *t) : Tool(t) {
 Tool_Sara_Reachability::Tool_Sara_Reachability(Task *t) : Sara(t) {}
 
 result_t Tool_Sara_Reachability::execute() {
-    status("checking reachability");
+    status("checking reachability...");
 
     // creating formula file
     kc::property tmp = properties[t->property_id];
@@ -464,22 +466,9 @@ result_t Tool_Sara_Reachability::execute() {
     // translate formula
     std::string filename_sara = getTmpName(".sara");
     std::string call_translation_tool = basedir + "/bin/lola2sara --net=" + Runtime::args_info.net_arg + " --lola --formula=" + filename_formula + " > " + filename_sara;
-    status("calling %s", call_translation_tool.c_str());
-    int return_value_translation_tool = system(call_translation_tool.c_str());
-    return_value_translation_tool = __WEXITSTATUS(return_value_translation_tool);
+    int return_value_translation_tool = call_tool(call_translation_tool);
 
     if (return_value_translation_tool != 0) {
-        /*
-        tmp->print();
-        outfile = stdout;
-        fprintf(outfile, "LOLA: \n");
-        tmp->unparse(printer, kc::lola);
-        fprintf(outfile, "\n\n");
-        fprintf(outfile, "SARA: \n");
-        tmp->unparse(printer, kc::sara);
-        fprintf(outfile, "\n");
-        exit(1);
-        */
         return ERROR;
     }
 
@@ -487,24 +476,11 @@ result_t Tool_Sara_Reachability::execute() {
 
     // call tool
     std::string filename_output = getTmpName(".log");
-    std::string call_tool = basedir + "/bin/sara --verbose --input=" + filename_sara + " > " + filename_output + " 2>&1";
-    status("calling %s", call_tool.c_str());
-    int return_value_tool = system(call_tool.c_str());
-    return_value_tool = __WEXITSTATUS(return_value_tool);
+    std::string callstring = basedir + "/bin/sara --verbose --input=" + filename_sara + " > " + filename_output + " 2>&1";
+    int return_value_tool = call_tool(callstring);
 
     // Sara exists normally with code 0
     if (return_value_tool != 0) {
-        /*
-        tmp->print();
-        outfile = stdout;
-        fprintf(outfile, "LOLA: \n");
-        tmp->unparse(printer, kc::lola);
-        fprintf(outfile, "\n\n");
-        fprintf(outfile, "SARA: \n");
-        tmp->unparse(printer, kc::sara);
-        fprintf(outfile, "\n");
-        exit(1);
-        */
         return ERROR;
     }
 

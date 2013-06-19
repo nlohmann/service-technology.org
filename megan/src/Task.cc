@@ -1,4 +1,5 @@
 #include <fstream>
+//#include <future>
 #include "Task.h"
 #include "verbose.h"
 #include "Runtime.h"
@@ -38,30 +39,34 @@ result_t Task::negate_result(result_t r) {
     }
 }
 
-result_t Task::solve() {
-    status("solving task %s", _coutput_(name));
-    result_t result = NOT_IMPLEMENTED;
-
+void Task::solve() {
     // if we assigned a worker, execute it
     if (worker) {
-        result = worker->execute();
-    }
+        status("solving task %s", _coutput_(name));
 
-    // negate result if necessary
-    if (negate) {
-        result = negate_result(result);
+        //if (Runtime::args_info.async_given) {
+        //    // spawn worker
+        //    solution = std::async(&Tool::execute, worker);
+        //} else {
+            // synchronous call
+            cached_solution = worker->execute();
+        //}
     }
-
-    message("result of task %s: %s", _coutput_(name), _cimportant_(result_t_names[result]));
-    solution = result;
-    return result;
 }
 
 std::string Task::getName() const {
     return name;
 }
 
-Task::Task(std::string name, bool negate) : negate(negate), name(name), property_id(current_property_id++), worker(NULL), solution(MAYBE) {
+result_t Task::getSolution() {
+    // take old/default solution
+    result_t result = cached_solution;
+
+
+    return result;
+}
+
+Task::Task(std::string name, bool negate) : negate(negate), name(name), property_id(current_property_id++), cached_solution(MAYBE), worker(NULL) {
 }
 
 Task::~Task() {
@@ -77,6 +82,18 @@ UnknownTask::UnknownTask(std::string name, bool negate) : Task(name, negate) {
     queue.push_back(this);
     worker = task2tool(t_UnknownTask, this);
     status("created %sunknown task %s", (negate ? "negated " : ""), _coutput_(name));
+}
+
+LTLTask::LTLTask(std::string name, bool negate) : Task(name, negate) {
+    queue.push_back(this);
+    worker = task2tool(t_LTLTask, this);
+    status("created %sLTL task %s", (negate ? "negated " : ""), _coutput_(name));
+}
+
+CTLTask::CTLTask(std::string name, bool negate) : Task(name, negate) {
+    queue.push_back(this);
+    worker = task2tool(t_CTLTask, this);
+    status("created %sCTL task %s", (negate ? "negated " : ""), _coutput_(name));
 }
 
 ReachabilityTask::ReachabilityTask(std::string name, bool negate) : Task(name, negate) {

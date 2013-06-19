@@ -9,6 +9,9 @@ class ReachabilityTask;
 
 class Tool {
     public:
+        static int call_tool(std::string &callstring);
+
+    public:
         std::string basedir;
         virtual result_t execute() = 0;
         Task* t;
@@ -47,6 +50,14 @@ class Tool_LoLA_Reachability_optimistic_incomplete : public LoLA {
 class Tool_LoLA_Reachability_pessimistic : public LoLA {
     public:
         Tool_LoLA_Reachability_pessimistic(Task*);
+        result_t execute();
+};
+
+// CTL/LTL
+
+class Tool_LoLA_Modelchecking : public LoLA {
+    public:
+        Tool_LoLA_Modelchecking(Task*);
         result_t execute();
 };
 

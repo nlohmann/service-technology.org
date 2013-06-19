@@ -55,11 +55,18 @@ int main(int argc, char* argv[]) {
             properties[i] = properties[i]->rewrite(kc::sara_unfold);
         }
 
+        // simplify property
         properties[i] = properties[i]->rewrite(kc::arrows);
         properties[i] = properties[i]->rewrite(kc::simplify);
         properties[i] = properties[i]->rewrite(kc::sides);
         properties[i] = properties[i]->rewrite(kc::simplify);
 
+        // check type
+        properties[i]->unparse(dummy_printer, kc::ctl);
+        properties[i]->unparse(dummy_printer, kc::temporal);
+
+        // extract property and create task
+        properties[i] = properties[i]->rewrite(kc::problem);
         properties[i]->unparse(dummy_printer, kc::task);
     }
     status("created %d tasks", Task::queue.size());
@@ -69,10 +76,12 @@ int main(int argc, char* argv[]) {
     {
         for (size_t i = 0; i < Task::queue.size(); ++i) {
             Task::queue[i]->solve();
+        }
 
+        for (size_t i = 0; i < Task::queue.size(); ++i) {
             // MCC 2013
             std::cout << "FORMULA " << Task::queue[i]->getName() << " ";
-            switch (Task::queue[i]->solution) {
+            switch (Task::queue[i]->getSolution()) {
                 case(DEFINITELY_TRUE): std::cout << "TRUE"; break;
                 case(DEFINITELY_FALSE): std::cout << "FALSE"; break;
                 case(NOT_IMPLEMENTED): std::cout << "DO_NOT_COMPETE"; break;

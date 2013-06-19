@@ -17,6 +17,11 @@ option "dry" -
   flag
   off
 
+option "async" -
+  "Execute tasks asynchronously"
+  flag
+  off
+
 section "Input/output"
 
 option "net" n

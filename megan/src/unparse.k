@@ -17,14 +17,25 @@ void printer(const char *s, kc::uview v) {
 
 void dummy_printer(const char *s, kc::uview v) {
 }
+
+bool temp_isCTL = true;
+bool temp_isLTL = true;
+bool temp_inQuantor = false;
+bool temp_isTemporal = false;
 %}
 
 %uview task;
 
-Negation(ReachabilityProperty(name, f)) -> [task: { Task *t = new ReachabilityTask(name->name, true); } ];
-Negation(DeadlockNet(name)) ->             [task: { Task *t = new DeadlockTask(name->name, true); } ];
-Negation(DeadlockInitial(name)) ->         [task: { Task *t = new DeadlockInitialTask(name->name, true); } ];
+/* when a task object is created, it is automatically added to Task::queue */
 
+Negation(CTLProperty(name, f)) ->          [task: { new CTLTask(name->name, true); } ];
+Negation(LTLProperty(name, f)) ->          [task: { new LTLTask(name->name, true); } ];
+Negation(ReachabilityProperty(name, f)) -> [task: { new ReachabilityTask(name->name, true); } ];
+Negation(DeadlockNet(name)) ->             [task: { new DeadlockTask(name->name, true); } ];
+Negation(DeadlockInitial(name)) ->         [task: { new DeadlockInitialTask(name->name, true); } ];
+
+CTLProperty(name, f) ->          [task: { new CTLTask(name->name); } ];
+LTLProperty(name, f) ->          [task: { new LTLTask(name->name); } ];
 ReachabilityProperty(name, f) -> [task: { Task *t = new ReachabilityTask(name->name); } ];
 DeadlockNet(name) ->             [task: { Task *t = new DeadlockTask(name->name); } ];
 DeadlockInitial(name) ->         [task: { Task *t = new DeadlockInitialTask(name->name); } ];
@@ -45,7 +56,7 @@ N(*) -> [lola: { assert(false); } ];
 
 //Negation(x) -> [lola: "NEGATION: " x ];
 //Property(name, f) -> [lola: name ":\n" f "\n\n" ];
-ReachabilityProperty(name, f) -> [lola: f ];
+ReachabilityProperty(name, f), CTLProperty(name, f), LTLProperty(name, f) -> [lola: f ];
 //DeadlockNet(name) -> [lola: name " (deadlock check)\n\n"];
 //DeadlockInitial(name) -> [lola: name " (initial state deadlocks)\n\n"];
 
@@ -103,13 +114,13 @@ Marking(x) -> [lola: x];
 Card(x) -> [lola: x];
 Fireable(x) -> [lola: "FIREABLE(" x ")"];
 
-A(x) -> [lola: "A" x];
-E(x) -> [lola: "E" x];
-X(x) -> [lola: "X" x];
-G(x) -> [lola: "G" x];
-F(x) -> [lola: "F" x];
+A(x) -> [lola: "ALLPATH " x];
+E(x) -> [lola: "EXPATH " x];
+X(x) -> [lola: "NEXTSTEP " x];
+G(x) -> [lola: "ALWAYS " x];
+F(x) -> [lola: "EVENTUALLY " x];
 W(x,y) -> [lola: "(" x " W " y ")"];
-U(x,y) -> [lola: "(" x " U " y ")"];
+U(x,y) -> [lola: "(" x " UNTIL " y ")"];
 
 
 
@@ -156,3 +167,28 @@ Mult(Integer(a),b) provided (a->value < 0) -> [sara: "- " b ":"  { mkinteger(- (
 
 Marking(x) -> [sara: x];
 Card(x) -> [sara: x];
+
+
+
+/*
+Traverse the formula and check if it belongs to the LTL or CTL subset of CTL*.
+*/
+
+%uview ctl;
+
+P=Property(n,f) ->  [ctl: { isCTL = true; temp_isLTL = true; } f { P->isCTL = temp_isCTL; P->isLTL = temp_isLTL; } ];
+A(x), E(x) ->       [ctl: { if  (temp_inQuantor) temp_isCTL = false; temp_inQuantor = true; temp_isLTL = false; } x ];
+X(x), G(x), F(x) -> [ctl: { if (!temp_inQuantor) temp_isCTL = false; temp_inQuantor = false; } x ];
+U(x,y), W(x,y) ->   [ctl: { if (!temp_inQuantor) temp_isCTL = false; temp_inQuantor = false; } x ];
+
+/*
+Traverse the formula and mark each part whether it contains a temporal part later on. This is used to treat AG or EF as reachability problems.
+*/
+
+%uview temporal;
+
+A(x), E(x), X(x), G(x), F(x) -> [temporal: x { isTemporal = true; temp_isTemporal = true; } ];
+W(x,y), U(x,y) -> [temporal: x y { isTemporal = true; temp_isTemporal = true; } ];
+And(x), Or(x) -> [temporal: x { isTemporal = temp_isTemporal; } ];
+LE(*,*) -> [temporal: { isTemporal = false; temp_isTemporal = false; } ];
+Fireable(*), Live0(*), Live1(*), Live2(*), Live3(*), Live4(*) -> [temporal: { isTemporal = false; temp_isTemporal = false; } ];

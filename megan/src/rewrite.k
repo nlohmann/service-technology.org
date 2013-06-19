@@ -331,10 +331,22 @@ E(F(A(G(a=E(F(A(G(x)))))))) -> <simplify: a>;
 // not A(phi W psi) = E ( not psi U not phi & not psi)
 A(W(x,y)) -> <simplify: Not(E(U(Not(y),And(_(Not(x),Not(y))))))>;
 
+// from http://i12www.ira.uka.de/~pschmitt/FM210/Folien/CTL.pdf
+
+// A(true U phi) == AF phi
+A(U(True(), phi)) -> <simplify: A(F(phi)) >;
+// E(true U phi) == EF phi
+E(U(True(), phi)) -> <simplify: E(F(phi)) >;
+// !A(true U !phi) == EG phi
+Not(A(U(True(), Not(phi)))) -> <simplify: E(G(phi)) >;
+// !E(true U !phi) == AG phi
+Not(E(U(True(), Not(phi)))) -> <simplify: A(G(phi)) >;
 
 /******************
  * PROBLEM FINDER *
  ******************/
+
+%rview problem;
 
 /////////////////////////////////////////////////////////
 // postcondition: I and N will will disappear
@@ -343,21 +355,26 @@ A(W(x,y)) -> <simplify: Not(E(U(Not(y),And(_(Not(x),Not(y))))))>;
 /////////////////////////////////////////////////////////
 
 // special care for deadlocks
-Property(name, I(Deadlock())) -> <simplify: DeadlockInitial(name) >;
-Property(name, N(Deadlock())) -> <simplify: Negation(DeadlockNet(name)) >;
+Property(name, I(Deadlock())) -> <problem: DeadlockInitial(name) >;
+Property(name, N(Deadlock())) -> <problem: Negation(DeadlockNet(name)) >;
+
+// replace top operators by known problem
+Property(name, E(F(x))) provided (!x->isTemporal) -> <problem: ReachabilityProperty(name, x) >;
+Property(name, A(G(x))) provided (!x->isTemporal) -> <problem: Negation(ReachabilityProperty(name, x)) >;
+
+// CTL / LTL
+P=Property(name, x) provided (P->isCTL) -> <problem: CTLProperty(name, x) >;
+P=Property(name, x) provided (P->isLTL) -> <problem: LTLProperty(name, x) >;
+
+// replace top constant by dedicated Task
+Property(name, True()) -> <problem: TrueProperty(name) >;
+Property(name, False()) -> <problem: Negation(TrueProperty(name)) >;
+
 
 // invariant == AG
 Property(name, I(x)) -> <simplify: Property(name, A(G(x))) >;
 // impossibility == !EF
 Property(name, N(x)) -> <simplify: Property(name, Not(E(F(x)))) >;
-
-// replace top operators by known problem
-Property(name, E(F(x))) -> <simplify: ReachabilityProperty(name, x) >;
-Property(name, A(G(x))) -> <simplify: Negation(ReachabilityProperty(name, x)) >;
-
-// replace top constant by dedicated Task
-Property(name, True()) -> <simplify: TrueProperty(name) >;
-Property(name, False()) -> <simplify: Negation(TrueProperty(name)) >;
 
 // remove double negations
 Negation(Negation(x)) -> <simplify: x>;

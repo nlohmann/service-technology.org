@@ -1,10 +1,11 @@
 #pragma once
 
 typedef enum { DEFINITELY_TRUE, DEFINITELY_FALSE, MAYBE_TRUE, MAYBE_FALSE, MAYBE, NOT_IMPLEMENTED, ERROR } result_t;
-typedef enum { t_UnknownTask, t_ReachabilityTask, t_DeadlockTask, t_DeadlockInitialTask, t_TrueTask } task_t;
+typedef enum { t_UnknownTask, t_ReachabilityTask, t_DeadlockTask, t_DeadlockInitialTask, t_TrueTask, t_CTLTask, t_LTLTask } task_t;
 
 #include <string>
 #include <vector>
+//#include <future>
 #include <pnapi/pnapi.h>
 #include "ast-system-k.h"
 #include "Tool.h"
@@ -18,6 +19,10 @@ class Task {
         bool negate;
         /// the name of the task
         std::string name;
+        /// future solution of the task
+        //std::future<result_t> solution;
+        /// cached solution of the task
+        result_t cached_solution;
         /// a function to negate results of type result_t
         static result_t negate_result(result_t);
 
@@ -38,9 +43,9 @@ class Task {
         /// return the name of the task
         std::string getName() const;
         /// solve the task
-        result_t solve();
-        /// cached solution of the task
-        result_t solution;
+        void solve();
+        /// get the solution
+        result_t getSolution();
 
         /// constructor
         Task(std::string, bool=false);
@@ -51,6 +56,16 @@ class Task {
 class UnknownTask : public Task {
     public:
         UnknownTask(std::string, bool=false);
+};
+
+class CTLTask : public Task {
+    public:
+        CTLTask(std::string, bool=false);
+};
+
+class LTLTask : public Task {
+    public:
+        LTLTask(std::string, bool=false);
 };
 
 class ReachabilityTask : public Task {

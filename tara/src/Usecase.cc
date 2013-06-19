@@ -71,7 +71,6 @@ void applyUsecase(
    \*----------------------------*/
     status("before creating complement places");
 
-    
    // a map for remebering the complement
    std::map<pnapi::Place*, pnapi::Place*> complement;
 
@@ -119,16 +118,19 @@ void applyUsecase(
     status("created in_usecase place with arcs");
 
 
-    // add conditional jump in
-    // PRE_USECASE place
-    pnapi::Place* pre_usecase = &orig->createPlace("pre_usecase");
-    // TODO: jump_in: what is the pre-condition
-
     // add conditional jump back
     pnapi::Transition* cond_jump_back = &orig->createTransition("cond_jump_back");
-    // TODO
     // IN_USECASE + FINAL_COND -> WAY_HOME_DUTY
     pnapi::Place* way_home = &usecase->createPlace("way_home");
+
+    pnapi::Condition* finalCond = &usecase->getFinalCondition();
+
+    // here, we transform final condition to a transition-precondition
+    // using pnapi interval
+    // TODO: for each place
+    // pnapi::formula::Intervall* interval = &finalCond->getPlaceInterval( --place-- );
+    // int upper =  interval->getUpper();
+    // int lower =  interval->getLower();
 
     // add PAY_FOR_INVOICE trans
     // WAY_HOME_DUTY + INVOICE -> COMPLEMENT (INVOICE)
@@ -150,38 +152,38 @@ void applyUsecase(
         orig->createArc(*in_orig, *(*it), 1);
     }
 
-    //DEBUG
-    //std::cout << pnapi::io::owfn << *orig;
-    // std::cout << pnapi::io::owfn << *usecase;
-
-    // compose & prefix
- 
-    // COMPOSING with pnapi does not the right thing..
-/*    status("trying to compose");
-    try {
-       status("almost there");
-       // TODO: why the hell does this just exit without error?
-       
-       orig->compose(*usecase, "a", "b");
-       status("composed");
-    }
-    catch(int i) {std::cout << "int execption: " << i; }
-    catch(char c) {std::cout << "char execption: " << c; }
-    catch(pnapi::exception::Error e) {std::cout << "pnapi execption: " << e.message; }
-    catch(...) {std::cout << "other execption " ; }
-
-    std::cout << std::endl;
-    status("composed with modified usecase");
-*/
+    // copy all places from usecase to orig
     std::set<pnapi::Place*> allUcPlaces = usecase->getPlaces();
     for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
-        std::cout << (*it)->getName() << std::endl;
+        // create prefix
         orig->createPlace("usecase-" + (*it)->getName(), (*it)->getTokenCount());
     }
+    // copy all transitions from usecase to orig
     std::set<pnapi::Transition*> allUcTrans = usecase->getTransitions();
     for(std::set<pnapi::Transition*>::iterator it = allUcTrans.begin(); it != allUcTrans.end(); ++it) {
+        // create prefix
         orig->createTransition("usecase-" + (*it)->getName());
     }
+
+    // add conditional jump in
+    // PRE_USECASE place
+    pnapi::Place* pre_usecase = &orig->createPlace("pre_usecase", 1);
+    pnapi::Transition* cond_jump_in = &orig->createTransition("cond_jump_in");
+    orig->createArc(*in_orig, *cond_jump_in);
+    orig->createArc(*cond_jump_in, *in_usecase);
+
+    // jump_in: set the pre-condition
+    for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
+        pnapi::Place* ucPlace = orig->findPlace("usecase-" + (*it)->getName());
+        // inital marking (in usecase) for the current Placd
+        int tokenCount = (*it)->getTokenCount();
+        orig->createArc(*ucPlace, *cond_jump_in, tokenCount);
+        orig->createArc(*cond_jump_in, *ucPlace, tokenCount);
+        orig->createArc(*(complement[ucPlace]), *cond_jump_in, SOME_BIG_INT - tokenCount);
+        orig->createArc(*cond_jump_in, *(complement[ucPlace]), SOME_BIG_INT - tokenCount);
+    }
+
+
     //DEBUG
     std::cout << pnapi::io::owfn << *orig;
 

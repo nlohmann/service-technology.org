@@ -35,7 +35,7 @@ void lola2sara_error(const char *);
 %}
 
 
-name      [a-zA-Z_][^,;:\t \n\{\}<>+\-]*
+name      [a-zA-Z_][^,;:\t \n\{\}<>=!()\[\]+\-]*
 number    [0-9][0-9]*
 
 %%

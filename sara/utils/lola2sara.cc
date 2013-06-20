@@ -287,6 +287,7 @@ int main(int argc, char** argv) {
 			cout << "\tRESULT" << " "; //(quant[i]?" OR ":" ");
 			if (roots[i]->isLeaf()==BFNode::BFFORM && roots[i]->getOp()==BFNode::BFNOT) 
 				cout << "NEGATE ";
+			else cout << "OR ";
 /*
 			{ if (quant[i])	cout << "NEGATE "; }
 			else if (!quant[i]) cout << "NEGATE ";

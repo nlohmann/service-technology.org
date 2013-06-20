@@ -41,8 +41,8 @@ void applyUsecase(
     
     // DEBUG
     // std::cout << pnapi::io::owfn << *usecase;
+    // std::cout << pnapi::io::owfn << *orig;
 
-     orig->prefixNames("orig-");
 
     // Add INVOICE place for costs
     pnapi::Place* invoice = & usecase->createPlace("invoice");
@@ -59,6 +59,7 @@ void applyUsecase(
         it->second = 0;
     }
 
+    orig->prefixNodeNames("orig_");
 
     //  TODO:
     //  Compute #p (max value) for each place
@@ -94,7 +95,6 @@ void applyUsecase(
            pnapi::Arc* curArc = usecase->findArc(*(*it), *(*postIt));
            usecase->createArc(*(*postIt), *curCompl, curArc->getWeight());
            ++i; // count new arcs
-
        }
 
        status("Created complement place (%s)  for: %s with %i arcs", curCompl->getName().c_str() , (*it)->getName().c_str(), i);
@@ -118,26 +118,6 @@ void applyUsecase(
     status("created in_usecase place with arcs");
 
 
-    // add conditional jump back
-    pnapi::Transition* cond_jump_back = &orig->createTransition("cond_jump_back");
-    // IN_USECASE + FINAL_COND -> WAY_HOME_DUTY
-    pnapi::Place* way_home = &usecase->createPlace("way_home");
-
-    pnapi::Condition* finalCond = &usecase->getFinalCondition();
-
-    // here, we transform final condition to a transition-precondition
-    // using pnapi interval
-    // TODO: for each place
-    // pnapi::formula::Intervall* interval = &finalCond->getPlaceInterval( --place-- );
-    // int upper =  interval->getUpper();
-    // int lower =  interval->getLower();
-
-    // add PAY_FOR_INVOICE trans
-    // WAY_HOME_DUTY + INVOICE -> COMPLEMENT (INVOICE)
-    pnapi::Transition* pay_for_invoice = &orig->createTransition("pay_for_invoice");
-    // costs = 1
-
-
     
     /*---------------------*\
     | 2. compose with orig  |
@@ -156,36 +136,21 @@ void applyUsecase(
     std::set<pnapi::Place*> allUcPlaces = usecase->getPlaces();
     for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
         // create prefix
-        orig->createPlace("usecase-" + (*it)->getName(), (*it)->getTokenCount());
+        orig->createPlace("uc_" + (*it)->getName(), (*it)->getTokenCount());
     }
     // copy all transitions from usecase to orig
     std::set<pnapi::Transition*> allUcTrans = usecase->getTransitions();
     for(std::set<pnapi::Transition*>::iterator it = allUcTrans.begin(); it != allUcTrans.end(); ++it) {
         // create prefix
-        orig->createTransition("usecase-" + (*it)->getName());
+        pnapi::Transition* newTrans = &orig->createTransition("uc_" + (*it)->getName());
+        //copy labels
+        std::map<pnapi::Label*,unsigned int> allLabels = (*it)->getLabels();
+        for(std::map<pnapi::Label*,unsigned int>::iterator lIt = allLabels.begin(); lIt != allLabels.end(); ++lIt) {
+            newTrans->addLabel(*(lIt->first), lIt->second);
+        }
+        
     }
-
-    // add conditional jump in
-    // PRE_USECASE place
-    pnapi::Place* pre_usecase = &orig->createPlace("pre_usecase", 1);
-    pnapi::Transition* cond_jump_in = &orig->createTransition("cond_jump_in");
-    orig->createArc(*in_orig, *cond_jump_in);
-    orig->createArc(*cond_jump_in, *in_usecase);
-
-    // jump_in: set the pre-condition
-    for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
-        pnapi::Place* ucPlace = orig->findPlace("usecase-" + (*it)->getName());
-        // inital marking (in usecase) for the current Placd
-        int tokenCount = (*it)->getTokenCount();
-        orig->createArc(*ucPlace, *cond_jump_in, tokenCount);
-        orig->createArc(*cond_jump_in, *ucPlace, tokenCount);
-        orig->createArc(*(complement[ucPlace]), *cond_jump_in, SOME_BIG_INT - tokenCount);
-        orig->createArc(*cond_jump_in, *(complement[ucPlace]), SOME_BIG_INT - tokenCount);
-    }
-
-
-    //DEBUG
-    std::cout << pnapi::io::owfn << *orig;
+    status("merged usecase and orig net");
 
     std::set<pnapi::Arc*> allUcArcs = usecase->getArcs();
     for(std::set<pnapi::Arc*>::iterator it = allUcArcs.begin(); it != allUcArcs.end(); ++it) {
@@ -193,43 +158,127 @@ void applyUsecase(
         pnapi::Node* target;
         std::cout << "interface source place: " <<(*it)->getSourceNode().getName() << std::endl;
         std::cout << "interface target place: " <<(*it)->getTargetNode().getName() << std::endl;
-        if(orig->containsNode("usecase-" + (*it)->getSourceNode().getName())) {
-            src = orig->findNode("usecase-" + (*it)->getSourceNode().getName());
+        if(orig->containsNode("uc_" + (*it)->getSourceNode().getName())) {
+            src = orig->findNode("uc_" + (*it)->getSourceNode().getName());
         } else { // place is from interface
             src = orig->findNode((*it)->getSourceNode().getName());
         }
-        std::cout << "zweite haelfte" << std::endl;
-        if(orig->containsNode("usecase-" + (*it)->getTargetNode().getName())) {
-            target = orig->findNode("usecase-" + (*it)->getTargetNode().getName());
+        if(orig->containsNode("uc_" + (*it)->getTargetNode().getName())) {
+            target = orig->findNode("uc_" + (*it)->getTargetNode().getName());
         } else { // place is from interface
             target = orig->findNode((*it)->getTargetNode().getName());
         }
         std::cout << "o interface source place: " << src->getName() << std::endl;
         std::cout << "o interface target place: " << target->getName() << std::endl;
         orig->createArc(*src, *target);
+
+        // also create arcs to orig
+        if(orig->findPlace("orig_" + (*it)->getSourceNode().getName())) {
+            src = orig->findPlace("orig_" + (*it)->getSourceNode().getName());
+            orig->createArc(*src, *target);
+        } else if(orig->findPlace("orig_" + (*it)->getTargetNode().getName())) {
+            target = orig->findPlace("orig_" + (*it)->getTargetNode().getName());
+            orig->createArc(*src, *target);
+        } 
     }
     status("union of usecase and orig created");
 
-
-    /*--------------------------------------------*\
-    | 3. create connection, jump in and jump back  |
-    \*--------------------------------------------*/
-
+    /*----------------------*\
+    | 3. jump in / jump back |
+    \*----------------------*/
 
     // add unconditional jump back
     pnapi::Transition* uncond_jump_back = &orig->createTransition("unconditional_jump_back");
-    pnapi::Place* uc_in_usecase = orig->findPlace("usecase-in_usecase");
+    pnapi::Place* uc_in_usecase = orig->findPlace("uc_in_usecase");
     orig->createArc(*uc_in_usecase, *uncond_jump_back, 1);
     orig->createArc(*uncond_jump_back, *in_orig, 1);
 
-    // add INVOICE_PAID trans
-    // COMPLEMENT((INVOICE) -> IN_S
-    pnapi::Transition* invoice_paid = &usecase->createTransition("invoice_paid");
-    usecase->createArc(*complement[invoice], *invoice_paid, SOME_BIG_INT);
-    usecase->createArc(*way_home, *invoice_paid, 1);
-    usecase->createArc(*invoice_paid, *in_orig, 1);
+    // add conditional jump in
+    // PRE_USECASE place
+    pnapi::Place* pre_usecase = &orig->createPlace("pre_usecase", 1);
+    pnapi::Transition* cond_jump_in = &orig->createTransition("cond_jump_in");
+    orig->createArc(*pre_usecase, *cond_jump_in);
+    orig->createArc(*in_orig, *cond_jump_in);
+    orig->createArc(*cond_jump_in, *uc_in_usecase);
+
+    status("added conditional jump in");
+
+    // jump_in: set the pre-condition
+    for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
+        status("orig_%s", (*it)->getName().c_str());
+        pnapi::Place* ucPlace = orig->findPlace("orig_" + (*it)->getName());
+        if(!ucPlace) continue;
+//        status("inital cond for uc_%s", (*it)->getName().c_str());
+        // pnapi::Place* ucComplPlace = orig->findPlace("usecase-~" + (*it)->getName());
+ // without compl place it is not interesting
+        // if(!ucComplPlace) continue;
+        // inital marking (in usecase) for the current Placd
+        int tokenCount = (*it)->getTokenCount();
+        status("orig_%s wiith tokencount: %d", (*it)->getName().c_str(), tokenCount);
+        if(tokenCount > 0) {
+            orig->createArc(*ucPlace, *cond_jump_in, tokenCount);
+            orig->createArc(*cond_jump_in, *ucPlace, tokenCount);
+        }
+        // TODO: else
+        // orig->createArc(*ucComplPlace, *cond_jump_in, SOME_BIG_INT - tokenCount);
+        // orig->createArc(*cond_jump_in, *ucComplPlace, SOME_BIG_INT - tokenCount);
+    }
+
+    status("added conditional jump in conditions");
+
+    // add conditional jump back
+    pnapi::Transition* cond_jump_back = &orig->createTransition("cond_jump_back");
+    // IN_USECASE + FINAL_COND -> WAY_HOME_DUTY
+    pnapi::Place* way_home = &orig->createPlace("way_home");
+    orig->createArc(*uc_in_usecase, *cond_jump_back);
+    orig->createArc(*cond_jump_back, *way_home);
+
+    pnapi::Condition* finalCond = &usecase->getFinalCondition();
+
+    // here, we transform final condition to a transition-precondition
+    // using pnapi interval
+    // jump_back: set the pre-condition
+    for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
+        pnapi::Place* ucPlace = orig->findPlace("uc_" + (*it)->getName());
+        pnapi::Place* ucComplPlace = orig->findPlace("uc_~" + (*it)->getName());
+        // without compl place it is not interesting
+        status("hheerrrr  %s", (*it)->getName().c_str());
+        if(!ucComplPlace) continue;
+        pnapi::formula::Interval interval = finalCond->getPlaceInterval(*(*it));
+        int upper =  interval.getUpper();
+        int lower =  interval.getLower();
+        status("at place  uc_%s", (*it)->getName().c_str());
+        status("at interval %d   %d", lower, upper);
+        if(lower > 0) {
+            orig->createArc(*ucPlace, *cond_jump_back, lower);
+            orig->createArc(*cond_jump_in, *ucPlace, lower);
+        }
+        status("at interval 2");
+        if(upper > 0) {
+            orig->createArc(*ucComplPlace, *cond_jump_back, SOME_BIG_INT - upper);
+            orig->createArc(*cond_jump_in, *ucComplPlace, SOME_BIG_INT - upper);
+        }
+    }
+
+    status("added conditional jump back with conditions");
+
+    // add PAY_FOR_INVOICE trans
+    // WAY_HOME_DUTY + INVOICE -> COMPLEMENT (INVOICE)
+    pnapi::Transition* pay_for_invoice = &orig->createTransition("pay_for_invoice");
+    (*costfunction)[pay_for_invoice] = 1;
+    pnapi::Place* complInvoice = orig->findPlace("uc_~invoice");
+    pnapi::Place* ucInvoice = orig->findPlace("uc_invoice");
+    orig->createArc(*ucInvoice, *pay_for_invoice);
+    orig->createArc(*pay_for_invoice, *complInvoice);
+    orig->createArc(*pay_for_invoice, *way_home);
+    orig->createArc(*way_home, *pay_for_invoice);
+
+
+    // aadd INVOICE_PAID trans
+    pnapi::Transition* invoice_paid = &orig->createTransition("invoice_paid");
+    orig->createArc(*complInvoice, *invoice_paid, SOME_BIG_INT);
+    orig->createArc(*way_home, *invoice_paid, 1);
+    orig->createArc(*invoice_paid, *in_orig, 1);
 
     std::cout << pnapi::io::owfn << *orig;
 }
-
-

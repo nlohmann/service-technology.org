@@ -1,0 +1,26 @@
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,		
+  p2;
+INPUT
+  i;
+OUTPUT
+  o;
+
+INITIALMARKING
+  p0:	1
+ ;
+
+FINALMARKING
+  p1:	1
+ ;
+
+TRANSITION t1	 { !o }
+CONSUME
+  p0:	1;
+PRODUCE
+   o:   1,
+  p1:	1;
+
+{ END OF FILE }

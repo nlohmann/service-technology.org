@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
 	} catch (pnapi::exception::InputError error) {
 		std::stringstream inputerror;
 		inputerror << error;
-		abort(3, "pnapi error %i", inputerror.str().c_str());
+		abort(3, "pnapi error %s", inputerror.str().c_str());
 	}
 
     /*-------------------------------------.
@@ -162,9 +162,8 @@ int main(int argc, char** argv) {
         } catch (pnapi::exception::InputError error) {
 		    std::stringstream inputerror;
     		inputerror << error;
-	    	abort(3, "pnapi error %i", inputerror.str().c_str());
+	    	abort(3, "pnapi error %s", inputerror.str().c_str());
 	    }
-
         applyUsecase(Tara::net, usecase, &Tara::partialCostFunction);
     }
 
@@ -187,11 +186,17 @@ int main(int argc, char** argv) {
 
     partnerStream >> pnapi::io::sa >> partner;
     
-    // convert to petri Tara::net
+    // convert to petri net
     pnapi::PetriNet composition(partner);
     
     //and now we compose
-    composition.compose(*Tara::net, "mp-partner-", "");
+    try {
+        composition.compose(*Tara::net, "mpp-", "");
+	} catch (pnapi::exception::Error error) {
+		std::stringstream inputerror;
+		inputerror << error;
+		abort(3, "pnapi error %s", inputerror.str().c_str());
+	} 
 
     /*------------------------.
     | 4. call lola with n+mp  |

@@ -59,12 +59,14 @@ std::string Task::getName() const {
 }
 
 result_t Task::getSolution() {
-    // take old/default solution
-    auto result = cached_solution;
+    if (not solution_present) {
+        // take old/default solution
+        auto result = cached_solution;
 
-    // if solution not is not yet finished, force to determine value
-    if (solution.valid()) {
-        result = solution.get();
+        // if async call, get result
+        if (solution.valid()) {
+            result = solution.get();
+        }
 
         // negate result if necessary
         if (negate) {
@@ -74,8 +76,8 @@ result_t Task::getSolution() {
         // cache value
         cached_solution = result;
     }
-
-    return result;
+    
+    return cached_solution;
 }
 
 Task::Task(std::string name, bool negate) : negate(negate), name(name), property_id(current_property_id++) {

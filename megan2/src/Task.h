@@ -25,6 +25,8 @@ class Task {
         result_t cached_solution = MAYBE;
         /// a function to negate results of type result_t
         static result_t negate_result(result_t);
+        /// whether the result has been calculated
+        bool solution_present = false;
 
     public:
         /// a counter for the current index

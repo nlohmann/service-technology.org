@@ -44,13 +44,7 @@ void Task::solve() {
     if (worker) {
         status("solving task %s", _coutput_(name));
 
-        //if (Runtime::args_info.async_given) {
-        //    // spawn worker
-        //    solution = std::async(&Tool::execute, worker);
-        //} else {
-            // synchronous call
-            cached_solution = worker->execute();
-        //}
+        cached_solution = worker->execute();
     }
 }
 
@@ -59,14 +53,23 @@ std::string Task::getName() const {
 }
 
 result_t Task::getSolution() {
-    // take old/default solution
-    result_t result = cached_solution;
+    if (not solution_present) {
+        // take old/default solution
+        result_t result = cached_solution;
 
+        // negate result if necessary
+        if (negate) {
+            result = negate_result(result);
+        }
 
-    return result;
+        // cache value
+        cached_solution = result;
+    }
+    
+    return cached_solution;
 }
 
-Task::Task(std::string name, bool negate) : negate(negate), name(name), property_id(current_property_id++), cached_solution(MAYBE), worker(NULL) {
+Task::Task(std::string name, bool negate) : negate(negate), name(name), property_id(current_property_id++), cached_solution(MAYBE), worker(NULL), solution_present(false) {
 }
 
 Task::~Task() {

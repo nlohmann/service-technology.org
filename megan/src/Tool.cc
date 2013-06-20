@@ -438,7 +438,7 @@ result_t Tool_Megan_True::execute() {
  ********/
 
 Sara::Sara(Task *t) : Tool(t) {
-    basedir = std::string(TOOL_PATH) + "/sara-1.10";
+    basedir = std::string(TOOL_PATH) + "/sara-1.11-unreleased";
 }
 
 Tool_Sara_Reachability::Tool_Sara_Reachability(Task *t) : Sara(t) {}

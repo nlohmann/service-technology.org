@@ -3,10 +3,13 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <stdexcept>
 #include <mutex>
 
 class JSON {
+    private:
+        /// mutex to guard payload
+        static std::mutex token;
+
     private:
         /// possible types of a JSON object
         enum class json_t {
@@ -19,24 +22,27 @@ class JSON {
             number_float
         };
         /// the type of this object
-        json_t type;
-        /// the payload of this object
-        union {
-            
-            std::vector<JSON>* a;           ///< array
-            std::map<std::string, JSON>* o; ///< object
-            std::string* s;                 ///< string
-            bool b;                         ///< Boolean
-            int i;                          ///< number: integer
-            double f;                       ///< number: float
-        } payload;
+        json_t type = json_t::null;
 
-        // mutex to guard payload
-        static std::mutex token;
+        /// the payload
+        void *payload = nullptr;
+
+    private:
+        // getter for typed pointers to the payload
+        std::vector<JSON>* getArray();
+        std::vector<JSON>* getArray() const;
+        std::map<std::string, JSON>* getObject();
+        std::map<std::string, JSON>* getObject() const;
+        std::string * getString();
+        std::string * getString() const;
+        bool * getBoolean();
+        bool * getBoolean() const;
+        int * getInteger();
+        int * getInteger() const;
+        double * getFloat();
+        double * getFloat() const;
 
     public:
-        /// explicit conversion to string representation (C style)
-        const char* c_str() const;
         /// explicit conversion to string representation (C++ style)
         const std::string toString() const;
 
@@ -85,7 +91,7 @@ class JSON {
         void add(std::string, JSON&);
 
         /// create an empty (null) object
-        JSON();
+        JSON() = default;
         /// create a string object from C++ string
         JSON(const std::string&);
         /// create a string object from C string
@@ -96,6 +102,15 @@ class JSON {
         JSON(const int);
         /// create a number object
         JSON(const double);
+
+        /// copy constructor
+        JSON(const JSON&);
+        
+        /// move constructor
+        JSON(JSON &&);
+
+        /// copy assignment
+        JSON &operator=(JSON);
 
         /// destructor
         ~JSON();

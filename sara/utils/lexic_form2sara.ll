@@ -35,7 +35,7 @@ void form2sara_error(const char *);
 %}
 
 
-name      [a-zA-Z_][a-zA-Z0-9_]*
+name      [a-zA-Z_][^,;:\t \n\{\}<>+\-]*
 number    [0-9][0-9]*
 
 %%

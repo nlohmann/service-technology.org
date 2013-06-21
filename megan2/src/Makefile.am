@@ -1,6 +1,8 @@
 # the main program
 bin_PROGRAMS = megan
 
+noinst_PROGRAMS = json
+
 # the plain sources you need to compile (no generated code)
 megan_SOURCES = \
                 $(KCSOURCES) \
@@ -14,6 +16,8 @@ megan_SOURCES = \
                 main.cc \
                 JSON.cc JSON.h \
                 Runtime.cc Runtime.h
+
+json_SOURCES = JSON.cc JSON.h JSON_test.cc
 
 AM_CXXFLAGS = -std=c++11 #-stdlib=libc++
 

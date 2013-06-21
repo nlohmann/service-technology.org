@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <new>
 #include <cerrno>
+#include <iostream>
 
 #include "Socket.h"
 #include "Runtime.h"
@@ -90,15 +91,27 @@ void Runtime::init(int argc, char** argv) {
     log["runtime"]["start_time"] = static_cast<int>(start_time);
     log["call"]["binary"] = argv[0];
     for (auto i = 1; i < argc; ++i) {
-        log["call"]["parameters"].add(argv[i]);
+        log["call"]["parameters"] += argv[i];
     }
-
+    
     // command line parser
     struct cmdline_parser_params* params = cmdline_parser_params_create();
     if (cmdline_parser(argc, argv, &Runtime::args_info) != 0) {
         abort(7, "invalid command-line parameter(s)");
     }
     free(params);
+
+    /*
+    {
+        message("BEGIN");
+        JSON j1;
+        j1["j1"] = "content for j1";
+        JSON j2;
+        j2 = "content for j2";
+        j1["j2"] = j2;
+        message("END");
+    }
+    */
 }
 
 void Runtime::setOutput(FILE *_output) {

@@ -191,7 +191,9 @@ int main(int argc, char** argv) {
     
     //and now we compose
     try {
+        status("vorher");
         composition.compose(*Tara::net, "mpp-", "");
+        status("nachher");
 	} catch (pnapi::exception::Error error) {
 		std::stringstream inputerror;
 		inputerror << error;

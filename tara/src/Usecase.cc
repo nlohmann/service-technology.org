@@ -47,13 +47,14 @@ void applyUsecase(
     // Add INVOICE place for costs
     pnapi::Place* invoice = & usecase->createPlace("invoice");
 
-    // Add invoice args
+    // Add invoice archs
     // for all elements in costfunction
     for(std::map<pnapi::Transition*,unsigned int>::iterator it = costfunction->begin(); it !=  costfunction->end(); ++it) {
         // transition in usecase
         pnapi::Transition* t = usecase->findTransition(it->first->getName());
         // put cost tokens on invoice
         if(t) {
+            status("costarc: %d", it->second);
             usecase->createArc(*t,*invoice,it->second);
         }
         it->second = 0;
@@ -146,7 +147,9 @@ void applyUsecase(
         //copy labels
         std::map<pnapi::Label*,unsigned int> allLabels = (*it)->getLabels();
         for(std::map<pnapi::Label*,unsigned int>::iterator lIt = allLabels.begin(); lIt != allLabels.end(); ++lIt) {
-            newTrans->addLabel(*(lIt->first), lIt->second);
+            pnapi::Label * label = orig->getInterface().findLabel(lIt->first->getName());
+            //newTrans->addLabel(*(lIt->first), lIt->second);
+            newTrans->addLabel(*label, lIt->second);
         }
         
     }
@@ -170,15 +173,15 @@ void applyUsecase(
         }
         std::cout << "o interface source place: " << src->getName() << std::endl;
         std::cout << "o interface target place: " << target->getName() << std::endl;
-        orig->createArc(*src, *target);
+        orig->createArc(*src, *target, (*it)->getWeight());
 
         // also create arcs to orig
         if(orig->findPlace("orig_" + (*it)->getSourceNode().getName())) {
             src = orig->findPlace("orig_" + (*it)->getSourceNode().getName());
-            orig->createArc(*src, *target);
+            orig->createArc(*src, *target, (*it)->getWeight());
         } else if(orig->findPlace("orig_" + (*it)->getTargetNode().getName())) {
             target = orig->findPlace("orig_" + (*it)->getTargetNode().getName());
-            orig->createArc(*src, *target);
+            orig->createArc(*src, *target, (*it)->getWeight());
         } 
     }
     status("union of usecase and orig created");

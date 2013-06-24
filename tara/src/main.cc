@@ -291,7 +291,7 @@ int main(int argc, char** argv) {
                     // Set the new budget to the middle of the interval
                     iMod.setToValue((bsLower + bsUpper) / 2);
                         
-                    status("Checking budget %d (lower bound: %d, upper bound: %d)", iMod.getI(), bsLower, bsUpper);             
+                    status("Checking budget %d (lower bound: %d, upper bound: %d)", iMod.getI(), bsLower, bsUpper);
                     bool bsControllable = isControllable(*Tara::net, true);
                     if (bsControllable) {
                         minBudget = iMod.getI();        

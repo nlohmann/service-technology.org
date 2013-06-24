@@ -159,8 +159,6 @@ void applyUsecase(
     for(std::set<pnapi::Arc*>::iterator it = allUcArcs.begin(); it != allUcArcs.end(); ++it) {
         pnapi::Node* src;
         pnapi::Node* target;
-        std::cout << "interface source place: " <<(*it)->getSourceNode().getName() << std::endl;
-        std::cout << "interface target place: " <<(*it)->getTargetNode().getName() << std::endl;
         if(orig->containsNode("uc_" + (*it)->getSourceNode().getName())) {
             src = orig->findNode("uc_" + (*it)->getSourceNode().getName());
         } else { // place is from interface
@@ -171,8 +169,6 @@ void applyUsecase(
         } else { // place is from interface
             target = orig->findNode((*it)->getTargetNode().getName());
         }
-        std::cout << "o interface source place: " << src->getName() << std::endl;
-        std::cout << "o interface target place: " << target->getName() << std::endl;
         orig->createArc(*src, *target, (*it)->getWeight());
 
         // also create arcs to orig
@@ -282,5 +278,5 @@ void applyUsecase(
     orig->createArc(*way_home, *invoice_paid, 1);
     orig->createArc(*invoice_paid, *in_orig, 1);
 
-    std::cout << pnapi::io::owfn << *orig;
+    // std::cout << pnapi::io::owfn << *orig;
 }

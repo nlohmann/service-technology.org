@@ -6,51 +6,56 @@
 #include <iostream>
 
 // a mutex to ensure thread safety
-std::mutex JSON::token;
+std::mutex JSON::_token;
 
 /*******************************
  * CONSTRUCTORS AND DESTRUCTOR *
  *******************************/
 
-JSON::JSON(const std::string& s) : type(json_t::string), payload(new std::string(s)) {}
-JSON::JSON(const char* s) : type(json_t::string), payload(new std::string(s)) {}
-JSON::JSON(const bool b) : type(json_t::boolean), payload(new bool(b)) {}
-JSON::JSON(const int i) : type(json_t::number_int), payload(new int(i)) {}
-JSON::JSON(const double f) : type(json_t::number_float), payload(new double(f)) {}
-JSON::JSON(std::initializer_list<JSON> l) : type(json_t::array), payload(new std::vector<JSON>(l)) {}
+JSON::JSON(const std::string& s) : _type(json_t::string), _payload(new std::string(s)) {}
+JSON::JSON(const char* s) : _type(json_t::string), _payload(new std::string(s)) {}
+JSON::JSON(const bool b) : _type(json_t::boolean), _payload(new bool(b)) {}
+JSON::JSON(const int i) : _type(json_t::number_int), _payload(new int(i)) {}
+JSON::JSON(const double f) : _type(json_t::number_float), _payload(new double(f)) {}
+JSON::JSON(array a) : _type(json_t::array), _payload(new std::vector<JSON>(a)) {}
+
+JSON::JSON(object o) : _type(json_t::object), _payload(new std::map<std::string, JSON>) {
+    (*this)[std::get<0>(o)] = std::get<1>(o);
+}
+
 
 /// copy constructor
-JSON::JSON(const JSON &o) : type(o.type) {
-    switch (type) {
-        case (json_t::array): payload = new std::vector<JSON>(*static_cast<std::vector<JSON>*>(o.payload)); break;
-        case (json_t::object): payload = new std::map<std::string, JSON>(*static_cast<std::map<std::string, JSON>*>(o.payload)); break;
-        case (json_t::string): payload = new std::string(*static_cast<std::string*>(o.payload)); break;
-        case (json_t::boolean): payload = new bool(*static_cast<bool*>(o.payload)); break;
-        case (json_t::number_int): payload = new int(*static_cast<int*>(o.payload)); break;
-        case (json_t::number_float): payload = new double(*static_cast<double*>(o.payload)); break;
+JSON::JSON(const JSON &o) : _type(o._type) {
+    switch (_type) {
+        case (json_t::array): _payload = new std::vector<JSON>(*static_cast<std::vector<JSON>*>(o._payload)); break;
+        case (json_t::object): _payload = new std::map<std::string, JSON>(*static_cast<std::map<std::string, JSON>*>(o._payload)); break;
+        case (json_t::string): _payload = new std::string(*static_cast<std::string*>(o._payload)); break;
+        case (json_t::boolean): _payload = new bool(*static_cast<bool*>(o._payload)); break;
+        case (json_t::number_int): _payload = new int(*static_cast<int*>(o._payload)); break;
+        case (json_t::number_float): _payload = new double(*static_cast<double*>(o._payload)); break;
         case (json_t::null): break;
     }
 }
 
 /// move constructor
-JSON::JSON(JSON &&o) : type(std::move(o.type)), payload(std::move(o.payload)) {}
+JSON::JSON(JSON &&o) : _type(std::move(o._type)), _payload(std::move(o._payload)) {}
 
 /// copy assignment
 JSON & JSON::operator=(JSON o) {
-    std::swap(type, o.type);
-    std::swap(payload, o.payload);
+    std::swap(_type, o._type);
+    std::swap(_payload, o._payload);
     return *this;
 }
 
 /// destructor
 JSON::~JSON() {
-    switch (type) {
-        case (json_t::array):        delete static_cast<std::vector<JSON>*>(payload); break;
-        case (json_t::object):       delete static_cast<std::map<std::string, JSON>*>(payload); break;
-        case (json_t::string):       delete static_cast<std::string*>(payload); break;
-        case (json_t::boolean):      delete static_cast<bool*>(payload); break;
-        case (json_t::number_int):   delete static_cast<int*>(payload); break;
-        case (json_t::number_float): delete static_cast<double*>(payload); break;
+    switch (_type) {
+        case (json_t::array):        delete static_cast<std::vector<JSON>*>(_payload); break;
+        case (json_t::object):       delete static_cast<std::map<std::string, JSON>*>(_payload); break;
+        case (json_t::string):       delete static_cast<std::string*>(_payload); break;
+        case (json_t::boolean):      delete static_cast<bool*>(_payload); break;
+        case (json_t::number_int):   delete static_cast<int*>(_payload); break;
+        case (json_t::number_float): delete static_cast<double*>(_payload); break;
         case (json_t::null): break;
     }
 }
@@ -66,62 +71,62 @@ JSON::operator const std::string() const {
 
 
 JSON::operator const int() const {
-    switch (type) {
+    switch (_type) {
         case (json_t::number_int):
-            return *static_cast<int*>(payload);
+            return *static_cast<int*>(_payload);
         case (json_t::number_float):
-            return static_cast<int>(*static_cast<double*>(payload));
+            return static_cast<int>(*static_cast<double*>(_payload));
         default:
             throw std::runtime_error("cannot cast to JSON number");
     }
 }
 
 JSON::operator const double() const {
-    switch (type) {
+    switch (_type) {
         case (json_t::number_int):
-            return static_cast<double>(*static_cast<int*>(payload));
+            return static_cast<double>(*static_cast<int*>(_payload));
         case (json_t::number_float):
-            return *static_cast<double*>(payload);
+            return *static_cast<double*>(_payload);
         default:
             throw std::runtime_error("cannot cast to JSON number");
     }
 }
 
 JSON::operator const bool() const {
-    switch (type) {
+    switch (_type) {
         case (json_t::boolean):
-            return *static_cast<bool*>(payload);
+            return *static_cast<bool*>(_payload);
         default:
             throw std::runtime_error("cannot cast to JSON Boolean");
     }
 }
 
 const std::string JSON::toString() const {
-    switch (type) {
+    switch (_type) {
         case (json_t::null): {
             return "null";
         }
 
         case (json_t::string): {
-            return std::string("\"") + *static_cast<std::string*>(payload) + "\"";
+            return std::string("\"") + *static_cast<std::string*>(_payload) + "\"";
         }
 
         case (json_t::boolean): {
-            return *static_cast<bool*>(payload) ? "true" : "false";
+            return *static_cast<bool*>(_payload) ? "true" : "false";
         }
 
         case (json_t::number_int): {
-            return std::to_string(*static_cast<int*>(payload));
+            return std::to_string(*static_cast<int*>(_payload));
         }
 
         case (json_t::number_float): {
-            return std::to_string(*static_cast<double*>(payload));
+            return std::to_string(*static_cast<double*>(_payload));
         }
 
         case (json_t::array): {
             std::string result;
 
-            const auto array = static_cast<std::vector<JSON>*>(payload);
+            const auto array = static_cast<std::vector<JSON>*>(_payload);
             for (auto i = array->begin(); i != array->end(); ++i) {
                 if (i != array->begin()) {
                     result += ", ";
@@ -135,7 +140,7 @@ const std::string JSON::toString() const {
         case (json_t::object): {
             std::string result;
 
-            const auto object = static_cast<std::map<std::string, JSON>*>(payload);
+            const auto object = static_cast<std::map<std::string, JSON>*>(_payload);
             for (auto i = object->begin(); i != object->end(); ++i) {
                 if (i != object->begin()) {
                     result += ", ";
@@ -154,18 +159,18 @@ const std::string JSON::toString() const {
  *****************************************/
 
 JSON& JSON::operator+=(const JSON& o) {
-    std::lock_guard<std::mutex> lg(token);
+    std::lock_guard<std::mutex> lg(_token);
 
-    if (not(type == json_t::null or type == json_t::array)) {
+    if (not(_type == json_t::null or _type == json_t::array)) {
         throw std::runtime_error("cannot add element to " + _typename());
     }
 
-    if (type == json_t::null) {
-        type = json_t::array;
-        payload = new std::vector<JSON>;
+    if (_type == json_t::null) {
+        _type = json_t::array;
+        _payload = new std::vector<JSON>;
     }
 
-    static_cast<std::vector<JSON>*>(payload)->push_back(o);
+    static_cast<std::vector<JSON>*>(_payload)->push_back(o);
 
     return *this;
 }
@@ -201,19 +206,41 @@ JSON& JSON::operator+=(double f) {
 }
 
 /// operator to set an element in an object
-JSON& JSON::operator[](const std::string& key) {
-    std::lock_guard<std::mutex> lg(token);
+JSON& JSON::operator[](int index) {
+    std::lock_guard<std::mutex> lg(_token);
 
-    if (type == json_t::null) {
-        type = json_t::object;
-        payload = new std::map<std::string, JSON>;
+    if (_type != json_t::array) {
+        throw std::runtime_error("cannot add entry with index " + std::to_string(index) + " to " + _typename());
     }
 
-    if (type != json_t::object) {
+    auto array = static_cast<std::vector<JSON>*>(_payload);
+    return array->at(index);
+}
+
+/// operator to get an element in an object
+const JSON& JSON::operator[](const int index) const {
+    if (_type != json_t::array) {
+        throw std::runtime_error("cannot get entry with index " + std::to_string(index) + " from " + _typename());
+    }
+
+    auto array = static_cast<std::vector<JSON>*>(_payload);
+    return array->at(index);
+}
+
+/// operator to set an element in an object
+JSON& JSON::operator[](const std::string& key) {
+    std::lock_guard<std::mutex> lg(_token);
+
+    if (_type == json_t::null) {
+        _type = json_t::object;
+        _payload = new std::map<std::string, JSON>;
+    }
+
+    if (_type != json_t::object) {
         throw std::runtime_error("cannot add entry with key " + std::string(key) + " to " + _typename());
     }
 
-    auto object = static_cast<std::map<std::string, JSON>*>(payload);
+    auto object = static_cast<std::map<std::string, JSON>*>(_payload);
     if (object->find(key) == object->end()) {
         (*object)[key] = JSON();
     }
@@ -223,18 +250,18 @@ JSON& JSON::operator[](const std::string& key) {
 
 /// operator to set an element in an object
 JSON& JSON::operator[](const char* key) {
-    std::lock_guard<std::mutex> lg(token);
+    std::lock_guard<std::mutex> lg(_token);
 
-    if (type == json_t::null) {
-        type = json_t::object;
-        payload = new std::map<std::string, JSON>;
+    if (_type == json_t::null) {
+        _type = json_t::object;
+        _payload = new std::map<std::string, JSON>;
     }
 
-    if (type != json_t::object) {
+    if (_type != json_t::object) {
         throw std::runtime_error("cannot add entry with key " + std::string(key) + " to " + _typename());
     }
 
-    auto object = static_cast<std::map<std::string, JSON>*>(payload);
+    auto object = static_cast<std::map<std::string, JSON>*>(_payload);
     if (object->find(key) == object->end()) {
         (*object)[key] = JSON();
     }
@@ -244,11 +271,11 @@ JSON& JSON::operator[](const char* key) {
 
 /// operator to get an element in an object
 const JSON& JSON::operator[](const std::string& key) const {
-    if (type != json_t::object) {
+    if (_type != json_t::object) {
         throw std::runtime_error("cannot get entry with key " + std::string(key) + " from " + _typename());
     }
 
-    const auto object = static_cast<std::map<std::string, JSON>*>(payload);
+    const auto object = static_cast<std::map<std::string, JSON>*>(_payload);
     if (object->find(key) == object->end()) {
         throw std::runtime_error("key " + key + " not found");
     } else {
@@ -256,9 +283,97 @@ const JSON& JSON::operator[](const std::string& key) const {
     }
 }
 
+/// return the number of stored values
+size_t JSON::size() const {
+    switch (_type) {
+        case(json_t::array):        return static_cast<std::vector<JSON>*>(_payload)->size();
+        case(json_t::object):       return static_cast<std::map<std::string, JSON>*>(_payload)->size();
+        case(json_t::null):         return 0;
+        case(json_t::string):       return 1;
+        case(json_t::boolean):      return 1;
+        case(json_t::number_int):   return 1;
+        case(json_t::number_float): return 1;
+    }
+}
+
+/// checks whether object is empty
+bool JSON::empty() const {
+    switch (_type) {
+        case(json_t::array):        return static_cast<std::vector<JSON>*>(_payload)->empty();
+        case(json_t::object):       return static_cast<std::map<std::string, JSON>*>(_payload)->empty();
+        case(json_t::null):         return true;
+        case(json_t::string):       return false;
+        case(json_t::boolean):      return false;
+        case(json_t::number_int):   return false;
+        case(json_t::number_float): return false;
+    }
+}
+
+/// return the type of the object
+JSON::json_t JSON::type() const {
+    return _type;
+}
+
+/// lexicographically compares the values
+bool JSON::operator==(const JSON &o) const {
+    switch (_type) {
+        case(json_t::array): {
+            if (o._type == json_t::array) {
+                auto a = static_cast<std::vector<JSON>*>(_payload);
+                auto b = static_cast<std::vector<JSON>*>(o._payload);
+                return *a == *b;
+            }
+        }
+        case(json_t::object): {
+            if (o._type == json_t::object) {
+                auto a = static_cast<std::map<std::string, JSON>*>(_payload);
+                auto b = static_cast<std::map<std::string, JSON>*>(o._payload);
+                return *a == *b;
+            }
+        }
+        case(json_t::null): {
+            if (o._type == json_t::null) {
+                return true;
+            }
+        }
+        case(json_t::string): {
+            if (o._type == json_t::string) {
+                const std::string a = *this;
+                const std::string b = o;
+                return a == b;
+            }
+        }
+        case(json_t::boolean): {
+            if (o._type == json_t::boolean) {
+                bool a = *this;
+                bool b = o;
+                return a == b;
+            }
+        }
+        case(json_t::number_int): {
+            if (o._type == json_t::number_int or o._type == json_t::number_float) {
+                int a = *this;
+                int b = o;
+                return a == b;
+            }
+        }
+        case(json_t::number_float): {
+            if (o._type == json_t::number_int or o._type == json_t::number_float) {
+                double a = *this;
+                double b = o;
+                return a == b;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+
 /// return the type as string
 std::string JSON::_typename() const {
-    switch (type) {
+    switch (_type) {
         case(json_t::array):        return "array";
         case(json_t::object):       return "object";
         case(json_t::null):         return "null";
@@ -278,7 +393,7 @@ void JSON::parseError(unsigned int pos, std::string tok) const {
 }
 
 
-bool JSON::checkDelim(char*& buf, unsigned int& len, unsigned int max, char tok) const {
+bool JSON::checkDelim(char*& buf, unsigned int& len, char tok) const {
     // skip whitespace
     while (std::isspace(*buf) && len > 0) { ++buf; --len; }
 
@@ -292,7 +407,7 @@ bool JSON::checkDelim(char*& buf, unsigned int& len, unsigned int max, char tok)
 
 std::string JSON::getString(char*& buf, unsigned int& len, unsigned int max) const {
     // string should begin with quotes
-    if (!checkDelim(buf,len,max,'"'))
+    if (!checkDelim(buf,len,'"'))
         parseError(max-len, "\"");
 
     // string should end with quotes
@@ -315,7 +430,6 @@ void JSON::parse(char*& buf, unsigned int& len, unsigned int max) {
     if (len == 0)
         parseError(max, "?");
 
-    char* tmp;
     switch (*buf)
     {
         // parse an object
@@ -327,15 +441,15 @@ void JSON::parse(char*& buf, unsigned int& len, unsigned int max) {
                 std::string left(getString(buf,len,max));
 
                 // then a colon
-                if (!checkDelim(buf,len,max,':'))
+                if (!checkDelim(buf,len,':'))
                     parseError(max-len, ":");
 
                 // then a value which we store using the first string
                 (*this)[left].parse(buf,len,max);
-            } while (checkDelim(buf,len,max,','));
+            } while (checkDelim(buf,len,','));
 
             // objects should end with '}'
-            if (!checkDelim(buf,len,max,'}'))
+            if (!checkDelim(buf,len,'}'))
                 parseError(max-len, "}");
             break;
         }
@@ -349,10 +463,10 @@ void JSON::parse(char*& buf, unsigned int& len, unsigned int max) {
                 JSON tmp;
                 tmp.parse(buf,len,max);
                 operator+=(tmp);
-            } while (checkDelim(buf,len,max,','));
+            } while (checkDelim(buf,len,','));
 
             // arrays should end with "]"
-            if (!checkDelim(buf,len,max,']'))
+            if (!checkDelim(buf,len,']'))
                 parseError(max-len, "]");
             break;
         }

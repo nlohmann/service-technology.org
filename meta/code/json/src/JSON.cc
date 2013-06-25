@@ -619,7 +619,6 @@ void JSON::parseStream(std::istream& is) {
 
 // http://stackoverflow.com/questions/7758580/writing-your-own-stl-container/7759622#7759622
 
-/*
 JSON::iterator JSON::begin() {
     return JSON::iterator(this);
 }
@@ -627,13 +626,35 @@ JSON::iterator JSON::end() {
     return JSON::iterator();
 }
 
-JSON::iterator::iterator() : _object(nullptr) {}
+JSON::iterator::iterator() : _object(nullptr), _vi(nullptr), _oi(nullptr) {}
 
-JSON::iterator::iterator(JSON *j) : _object(j) {
-    
+JSON::iterator::iterator(JSON *j) : _object(j), _vi(nullptr), _oi(nullptr) {
+    switch (_object->_type) {
+        case(array): {
+            _vi = new std::vector<JSON>::iterator(static_cast<std::vector<JSON>*>(_object->_payload)->begin());
+            break;
+        }
+        case(object): {
+            _oi = new std::map<std::string, JSON>::iterator(static_cast<std::map<std::string, JSON>*>(_object->_payload)->begin());
+            break;
+        }
+        default: break;
+    }
 }
 
-JSON::iterator::iterator(const JSON::iterator& o) : _object(o._object) {}
+JSON::iterator::iterator(const JSON::iterator& o) : _object(o._object), _vi(nullptr), _oi(nullptr) {
+    switch (_object->_type) {
+        case(array): {
+            _vi = new std::vector<JSON>::iterator(static_cast<std::vector<JSON>*>(_object->_payload)->begin());
+            break;
+        }
+        case(object): {
+            _oi = new std::map<std::string, JSON>::iterator(static_cast<std::map<std::string, JSON>*>(_object->_payload)->begin());
+            break;
+        }
+        default: break;
+    }
+}
 
 JSON::iterator::~iterator() {
     delete _vi;
@@ -653,24 +674,22 @@ bool JSON::iterator::operator!=(const JSON::iterator &o) const {
     return _object != o._object;
 }
 
+
 JSON::iterator & JSON::iterator::operator++() {
     // iterator cannot be incremented
     if (_object == nullptr) {
         return *this;
     }
- 
-    static std::vector<JSON>::iterator vi = static_cast<std::vector<JSON>*>(_object->_payload)->begin();
-    static std::map<std::string, JSON>::iterator oi = static_cast<std::map<std::string, JSON>*>(_object->_payload)->begin();
 
     switch (_object->_type) {
         case(array): {
-            if (++vi == static_cast<std::vector<JSON>*>(_object->_payload)->end()) {
+            if (++(*_vi) == static_cast<std::vector<JSON>*>(_object->_payload)->end()) {
                 _object = nullptr;
             }
             break;
         }
         case(object): {
-            if (++oi == static_cast<std::map<std::string, JSON>*>(_object->_payload)->end()) {
+            if (++(*_oi) == static_cast<std::map<std::string, JSON>*>(_object->_payload)->end()) {
                 _object = nullptr;
             }
             break;
@@ -683,10 +702,46 @@ JSON::iterator & JSON::iterator::operator++() {
 }
 
 JSON & JSON::iterator::operator*() const {
-    return *_object;
+    if (_object == nullptr) {
+        throw std::runtime_error("cannot get value");
+    }
+
+    switch(_object->_type) {
+        case (array):  return **_vi;
+        case (object): return (*_oi)->second;
+        default: return *_object;
+    }
 }
 
 JSON * JSON::iterator::operator->() const {
-    return _object;
+    if (_object == nullptr) {
+        throw std::runtime_error("cannot get value");
+    }
+
+    switch(_object->_type) {
+        case (array):  return &(**_vi);
+        case (object): return &((*_oi)->second);
+        default: return _object;
+    }
 }
-*/
+
+std::string JSON::iterator::key() {
+    if (_object != nullptr and _object->_type == object) {
+        return (*_oi)->first;
+    }
+    else {
+        throw std::runtime_error("cannot get key");
+    }
+}
+
+JSON & JSON::iterator::value() {
+    if (_object == nullptr) {
+        throw std::runtime_error("cannot get value");
+    }
+
+    switch(_object->_type) {
+        case (array):  return **_vi;
+        case (object): return (*_oi)->second;
+        default: return *_object;
+    }
+}

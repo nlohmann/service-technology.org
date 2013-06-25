@@ -1,9 +1,11 @@
 #pragma once
 
+// a helper macro to detect C++11 compliant compilers
 #if __cplusplus >= 201103L
 #define __cplusplus11
 #endif
 
+// allow us to use "nullptr" everywhere
 #ifndef nullptr
 #define nullptr NULL
 #endif
@@ -11,6 +13,8 @@
 #include <string>
 #include <vector>
 #include <map>
+
+// additional C++11 header
 #ifdef __cplusplus11
 #include <mutex>
 #include <initializer_list>
@@ -155,8 +159,8 @@ class JSON {
         std::string getString(char*& buf, unsigned int& len, unsigned int max) const;
         void parse(char*& buf, unsigned int& len, unsigned int max);
 
-        /*
     public:
+        /// an iterator
         class iterator {
             public:
                 iterator();
@@ -171,14 +175,21 @@ class JSON {
                 JSON& operator*() const;
                 JSON* operator->() const;
 
+                /// getter for the key (in case of objects)
+                std::string key();
+                /// getter for the value
+                JSON& value();
+
             private:
-                JSON *_object = nullptr;
-                std::vector<JSON>::iterator *_vi = nullptr;
-                std::map<std::string, JSON>::iterator *_oi = nullptr;
+                /// a JSON value
+                JSON *_object;
+                /// an iterator for JSON arrays
+                std::vector<JSON>::iterator *_vi;
+                /// an iterator for JSON objects
+                std::map<std::string, JSON>::iterator *_oi;
         };
 
     public:
         iterator begin();
         iterator end();
-        */
 };

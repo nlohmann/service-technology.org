@@ -157,10 +157,39 @@ void test_array() {
 }
 
 int main() {
-    test_null();
-    test_string();
+    //test_null();
+    //test_string();
 
-    test_array();
+    //test_array();
+
+    JSON a;
+    a += JSON();
+    a += 1;
+    a += 1.0;
+    a += true;
+    a += "string";
+
+    std::cerr << a << '\n';
+
+    for (JSON::iterator i = a.begin(); i != a.end(); ++i) {
+        std::cerr << *i << '\n';
+    }
+    
+    std::cerr << a << '\n';
+    
+    JSON o;
+    o["foo"] = "meh";
+    o["boo"] = "bla";
+    o["sss"] = "fof";
+
+    for (JSON::iterator i = o.begin(); i != o.end(); ++i) {
+        std::cerr << i.key() << " -> " << i.value() << '\n';
+    }
+    
+    JSON b = true;
+    for (JSON::iterator i = b.begin(); i != b.end(); ++i) {
+        std::cerr << *i << '\n';
+    }
 
     /*
     

@@ -53,7 +53,7 @@ void applyUsecase(
         // transition in usecase
         pnapi::Transition* t = usecase->findTransition(it->first->getName());
         // put cost tokens on invoice
-        if(t) {
+        if(t and it->second > 0) {
             //status("costarc: %d", it->second);
             usecase->createArc(*t,*invoice,it->second);
         }
@@ -136,6 +136,7 @@ void applyUsecase(
     // copy all places from usecase to orig
     std::set<pnapi::Place*> allUcPlaces = usecase->getPlaces();
     for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
+        // TODO: copy only those places which are NOT in orig net
         // create prefix
         orig->createPlace("uc_" + (*it)->getName(), (*it)->getTokenCount());
     }
@@ -218,9 +219,6 @@ void applyUsecase(
             orig->createArc(*ucPlace, *cond_jump_in, tokenCount);
             orig->createArc(*cond_jump_in, *ucPlace, tokenCount);
         }
-        // TODO: else
-        // orig->createArc(*ucComplPlace, *cond_jump_in, SOME_BIG_INT - tokenCount);
-        // orig->createArc(*cond_jump_in, *ucComplPlace, SOME_BIG_INT - tokenCount);
     }
 
     //status("added conditional jump in conditions");
@@ -237,6 +235,8 @@ void applyUsecase(
     // here, we transform final condition to a transition-precondition
     // using pnapi interval
     // jump_back: set the pre-condition
+    // TODO: FOREACH clause in DNF
+    // TODO: validate literals in clause -> warnings
     for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
         pnapi::Place* ucPlace = orig->findPlace("uc_" + (*it)->getName());
         pnapi::Place* ucComplPlace = orig->findPlace("uc_~" + (*it)->getName());
@@ -253,6 +253,7 @@ void applyUsecase(
         }
         //status("at interval 2");
         if(upper > 0) {
+            //  TODO warning!!
             orig->createArc(*ucComplPlace, *cond_jump_back, SOME_BIG_INT - upper);
             orig->createArc(*cond_jump_in, *ucComplPlace, SOME_BIG_INT - upper);
         }

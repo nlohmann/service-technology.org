@@ -17,42 +17,23 @@
  along with Hello.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef I_MODIFICATION_H
-#define I_MODIFICATION_H
+#ifndef MODIFICATION_H
+#define MODIFICATION_H
 
 #include <list>
 #include <pnapi/pnapi.h>
-#include "Modification.h"
 
 
-// do the i-Modification with the a given petri net and an integer
-// inital modification starts by creating an object
-// iterative modification can be achieved by calling iterare
-// changes cannot be undone
-class iModification : public Modification {
-
+/**
+ * abstract class
+ */
+class Modification {
    public:
-      iModification(pnapi::PetriNet* , unsigned int);
-      virtual unsigned int getI();
-      virtual void setToValue(unsigned int);
+      Modification() {}; 
+      virtual ~Modification() {};
 
-      //TODO: these arent used ???
-      void iterate();
-      unsigned int decrease();
-      unsigned int increase();
-  
-   private:
-
-      void update();        
-    
-      pnapi::PetriNet* net;
-      unsigned int i;
-
-
-      pnapi::Place* availableCost;
-      pnapi::Arc* outOfCreditArc;
-
-      void init();
+      virtual unsigned int getI() = 0;
+      virtual void setToValue(unsigned int) = 0;
 };
 
 

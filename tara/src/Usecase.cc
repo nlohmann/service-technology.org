@@ -25,13 +25,18 @@
 #include "Usecase.h"
 #include "verbose.h"
 
+
+// TODO: transform to class
+// inherit from Modification !!
+
 /**
  * apply a usecase
  */
-void applyUsecase(
+Usecase::Usecase(
         pnapi::PetriNet* orig,
         pnapi::PetriNet* usecase,
-        std::map<pnapi::Transition*,unsigned int>* costfunction
+        std::map<pnapi::Transition*,unsigned int>* costfunction,
+        unsigned int initialI
     ) {
     //status("applying usecase");
 
@@ -281,3 +286,6 @@ void applyUsecase(
 
     // std::cout << pnapi::io::owfn << *orig;
 }
+
+unsigned int Usecase::getI() { return i; }
+void Usecase::setToValue(unsigned int newI) { i = newI; }

@@ -36,6 +36,7 @@
 #include "Usecase.h"
 #include "MaxCost.h"
 #include "ServiceTools.h"
+#include "Modification.h"
 #include "iModification.h"
 #include "CCSearch.h"
 
@@ -143,6 +144,7 @@ int main(int argc, char** argv) {
     | 2. check for  USECASE             |
     `----------------------------------*/
 
+    // TODO: do later
     if(Tara::args_info.usecase_given) {
 
         // first parse usecase
@@ -164,7 +166,7 @@ int main(int argc, char** argv) {
     		inputerror << error;
 	    	abort(3, "pnapi error %s", inputerror.str().c_str());
 	    }
-        applyUsecase(Tara::net, usecase, &Tara::partialCostFunction);
+        Modification* ucMod = new Usecase(Tara::net, usecase, &Tara::partialCostFunction, 0);
     }
 
     /*----------------------------------.
@@ -231,7 +233,7 @@ int main(int argc, char** argv) {
     \------------------------------------------*/
 
     // Build the modified Tara::net for maxCostOfComposition
-    iModification iMod(Tara::net, maxCostOfComposition);
+    Modification* modification = new iModification(Tara::net, maxCostOfComposition);
 
     // Check whether N is controllable under budget maxCostOfComposition. If not, return the most permissive partner.
    bool bounded = Tara::args_info.usecase_given or isControllable(*Tara::net, true); 
@@ -289,15 +291,15 @@ int main(int argc, char** argv) {
                 while (bsLower <= bsUpper) {
                    
                     // Set the new budget to the middle of the interval
-                    iMod.setToValue((bsLower + bsUpper) / 2);
+                    modification->setToValue((bsLower + bsUpper) / 2);
                         
-                    status("Checking budget %d (lower bound: %d, upper bound: %d)", iMod.getI(), bsLower, bsUpper);
+                    status("Checking budget %d (lower bound: %d, upper bound: %d)", modification->getI(), bsLower, bsUpper);
                     bool bsControllable = isControllable(*Tara::net, true);
                     if (bsControllable) {
-                        minBudget = iMod.getI();        
-                        bsUpper = iMod.getI()-1;
+                        minBudget = modification->getI();        
+                        bsUpper = modification->getI()-1;
                     } else {
-                        bsLower = iMod.getI()+1;
+                        bsLower = modification->getI()+1;
                     }
                 }
             }
@@ -318,7 +320,7 @@ int main(int argc, char** argv) {
                 s += "file '" + std::string(Tara::args_info.sa_arg) + "'";
             }
             message("Computing cost-minimal partner, %s.", s.c_str());
-            iMod.setToValue(minBudget);
+            modification->setToValue(minBudget);
             computeMP(*Tara::net, Tara::args_info.sa_arg);
     	}
         if (Tara::args_info.og_given) {
@@ -329,7 +331,7 @@ int main(int argc, char** argv) {
                 s += "file '" + std::string(Tara::args_info.og_arg) + "'";
             }
             message("Computing representation of all cost-minimal partners, %s.", s.c_str());
-            iMod.setToValue(minBudget);
+            modification->setToValue(minBudget);
             computeOG(*Tara::net, Tara::args_info.og_arg);
         }
     } 

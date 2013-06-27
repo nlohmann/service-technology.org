@@ -24,12 +24,12 @@
 #include "verbose.h"
 #include "Tara.h"
 
-// arguments are the net and the inter i
-iModification::iModification(pnapi::PetriNet* netToModify, unsigned int startI)
-   : net(netToModify), i(startI)
+// create the modification based on the net
+iModification::iModification(pnapi::PetriNet* netToModify)
+   : net(netToModify)
 {
    // do the init modification
-   this->init();
+   // this->init();
 } 
 
 void iModification::iterate() {
@@ -91,6 +91,7 @@ unsigned int iModification::getI() { return this->i; }
 void iModification::init() {
 
    status("Initializing modification. Highest transition costs are: %d", Tara::highestTransitionCosts);
+   status("max i is: %d", this->i);
 
    //create the place for the availble costs
    // tokens will be set later

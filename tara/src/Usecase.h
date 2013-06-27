@@ -14,6 +14,7 @@ class Usecase : public Modification {
             std::map<pnapi::Transition*,unsigned int>* costfunction,
             unsigned int i
         );
+        virtual void init();
 
         virtual unsigned int getI();
         virtual void setToValue(unsigned int i);

@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
     | 2. Parse Costfunction to partial map |
     \-------------------------------------*/
 
-    message("Step 2: Parse the cost function from '%s' and apply it to the built statespace", Tara::args_info.costfunction_arg);    
+    message("Step 2: Parse the cost function from '%s' and apply it to the built statespace", Tara::args_info.costfunction_arg);
 
     status("parsing costfunction");
     if(strcmp(Tara::args_info.costfunction_arg,"-r")!=0)
@@ -141,10 +141,34 @@ int main(int argc, char** argv) {
     }
 
     /*----------------------------------.
-    | 2. check for  USECASE             |
+    | 2. get most permissive Partner MP |
     `----------------------------------*/
 
-    // TODO: do later
+    computeMP(*Tara::net, Tara::tempFile.name());
+     
+    // first create automaton partner
+    pnapi::Automaton partner;
+    std::ifstream partnerStream;
+
+    //stream automaton
+    partnerStream.open(Tara::tempFile.name().c_str(), std::ifstream::in);
+    if(!partnerStream) {
+        message("net is not controllable. Exit.");
+        exit(EXIT_FAILURE);
+    }
+
+    partnerStream >> pnapi::io::sa >> partner;
+    
+    // convert to petri net
+    pnapi::PetriNet composition(partner);
+
+    /*---------------------.
+    | 3. set modification  |
+    `---------------------*/
+
+    // set to default
+    Tara::modification = new iModification(Tara::net);
+
     if(Tara::args_info.usecase_given) {
 
         // first parse usecase
@@ -166,66 +190,54 @@ int main(int argc, char** argv) {
     		inputerror << error;
 	    	abort(3, "pnapi error %s", inputerror.str().c_str());
 	    }
-        Modification* ucMod = new Usecase(Tara::net, usecase, &Tara::partialCostFunction, 0);
+        // overwrite the modification
+        // // TODO: Usecase modification cannot yet handle this
+        // delete Tara::modification;
+        // Tara::modification = new Usecase(Tara::net, usecase, &Tara::partialCostFunction, 0);
+        //
+        // TEMP: create dummy that modification works
+        Modification* dummy = new Usecase(Tara::net, usecase, &Tara::partialCostFunction, 0);
     }
 
-    /*----------------------------------.
-    | 3. get most permissive Partner MP |
-    `----------------------------------*/
-
-    computeMP(*Tara::net, Tara::tempFile.name());
-     
-    // first create automaton partner
-    pnapi::Automaton partner;
-    std::ifstream partnerStream;
-
-    //stream automaton
-    partnerStream.open(Tara::tempFile.name().c_str(), std::ifstream::in);
-    if(!partnerStream) {
-        message("net is not controllable. Exit.");
-        exit(EXIT_FAILURE);
-    }
-
-    partnerStream >> pnapi::io::sa >> partner;
+    /*----------------------.
+    | 5. Compute cost bound |
+    `----------------------*/
     
-    // convert to petri net
-    pnapi::PetriNet composition(partner);
-    
-    //and now we compose
+    // compose
     try {
-        status("vorher");
         composition.compose(*Tara::net, "mpp-", "");
-        status("nachher");
 	} catch (pnapi::exception::Error error) {
 		std::stringstream inputerror;
 		inputerror << error;
 		abort(3, "pnapi error %s", inputerror.str().c_str());
 	} 
 
-    /*------------------------.
-    | 4. call lola with n+mp  |
-    `------------------------*/
-
+    /*--------------------------.
+    | 5.1. call lola with n+mp  |
+    `--------------------------*/
     message("Step 2: Build the state space of '%s' and its most-permissive partner", Tara::args_info.net_arg);    
 
     // run lola-statespace from the service tools
     getLolaStatespace(composition,Tara::tempFile.name());
 
-    /*-------------------------.
-    | 5. Parse the inner Graph |
-    \-------------------------*/
+    /*--------------------------.
+    | 5.2 Parse the inner Graph |
+    \--------------------------*/
     status("parsing inner graph");
     Parser::lola.parse(Tara::tempFile.name().c_str()); 
 
-    /*------------------------------------------.
-    | 6. Compute MaxCosts from the parsed graph | 
-    \------------------------------------------*/
+    /*--------------------------------------------.
+    | 5.3. Compute MaxCosts from the parsed graph | 
+    \--------------------------------------------*/
     message("Step 4: Find an upper bound for the minimal budget w.r.t. Tara::net '%s' and cost function '%s'", Tara::args_info.net_arg, Tara::args_info.costfunction_arg);    
 
     // max Costs are the costs of the most expensive path through
     // the inner state graph
     
+    status("be fore heere");
     unsigned int maxCostOfComposition=maxCost(Tara::net);
+
+    status("heeere");
 
 
     /*------------------------------------------.
@@ -233,7 +245,8 @@ int main(int argc, char** argv) {
     \------------------------------------------*/
 
     // Build the modified Tara::net for maxCostOfComposition
-    Modification* modification = new iModification(Tara::net, maxCostOfComposition);
+    //Modification* modification = new iModification(Tara::net, maxCostOfComposition);
+    Tara::modification->init(maxCostOfComposition);
 
     // Check whether N is controllable under budget maxCostOfComposition. If not, return the most permissive partner.
    bool bounded = Tara::args_info.usecase_given or isControllable(*Tara::net, true); 
@@ -291,15 +304,15 @@ int main(int argc, char** argv) {
                 while (bsLower <= bsUpper) {
                    
                     // Set the new budget to the middle of the interval
-                    modification->setToValue((bsLower + bsUpper) / 2);
+                    Tara::modification->setToValue((bsLower + bsUpper) / 2);
                         
-                    status("Checking budget %d (lower bound: %d, upper bound: %d)", modification->getI(), bsLower, bsUpper);
+                    status("Checking budget %d (lower bound: %d, upper bound: %d)", Tara::modification->getI(), bsLower, bsUpper);
                     bool bsControllable = isControllable(*Tara::net, true);
                     if (bsControllable) {
-                        minBudget = modification->getI();        
-                        bsUpper = modification->getI()-1;
+                        minBudget = Tara::modification->getI();        
+                        bsUpper = Tara::modification->getI()-1;
                     } else {
-                        bsLower = modification->getI()+1;
+                        bsLower = Tara::modification->getI()+1;
                     }
                 }
             }
@@ -320,7 +333,7 @@ int main(int argc, char** argv) {
                 s += "file '" + std::string(Tara::args_info.sa_arg) + "'";
             }
             message("Computing cost-minimal partner, %s.", s.c_str());
-            modification->setToValue(minBudget);
+            Tara::modification->setToValue(minBudget);
             computeMP(*Tara::net, Tara::args_info.sa_arg);
     	}
         if (Tara::args_info.og_given) {
@@ -331,7 +344,7 @@ int main(int argc, char** argv) {
                 s += "file '" + std::string(Tara::args_info.og_arg) + "'";
             }
             message("Computing representation of all cost-minimal partners, %s.", s.c_str());
-            modification->setToValue(minBudget);
+            Tara::modification->setToValue(minBudget);
             computeOG(*Tara::net, Tara::args_info.og_arg);
         }
     } 

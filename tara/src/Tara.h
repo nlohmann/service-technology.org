@@ -9,6 +9,7 @@
 #include <pnapi/pnapi.h>
 #include <lp_solve/lp_lib.h>
 
+#include "Modification.h"
 #include "MaxCost.h"
 #include "cmdline.h"
 #include "verbose.h"
@@ -41,6 +42,9 @@ public:
 
     ///the input net
     static pnapi::PetriNet* net;
+
+    ///the input net
+    static Modification* modification;
 
     /// The actual inner graph, realized by a deque (quick insertion, quick access)
     static std::deque<innerState *> graph;

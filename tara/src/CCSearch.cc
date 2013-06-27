@@ -92,10 +92,10 @@ inline bool fileExists(const std::string& filename) {
 }
 bool CCSearch::isLessEq(unsigned int x) {
     static tthread::mutex m;
-    static iModification iMod(Tara::net,x);
+
     //only one may change the net, so lock the mutex
     m.lock();
-    iMod.setToValue(x);
+    Tara::modification->setToValue(x);
 
     std::stringstream ss("");
     ss << pnapi::io::owfn << (*Tara::net) << std::flush;

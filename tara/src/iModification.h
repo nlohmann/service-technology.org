@@ -32,7 +32,8 @@
 class iModification : public Modification {
 
    public:
-      iModification(pnapi::PetriNet* , unsigned int);
+      iModification(pnapi::PetriNet*);
+      virtual void init();
       virtual unsigned int getI();
       virtual void setToValue(unsigned int);
 
@@ -43,16 +44,15 @@ class iModification : public Modification {
   
    private:
 
-      void update();        
+      void update();
     
       pnapi::PetriNet* net;
-      unsigned int i;
+      // unsigned int i;
 
 
       pnapi::Place* availableCost;
       pnapi::Arc* outOfCreditArc;
 
-      void init();
 };
 
 

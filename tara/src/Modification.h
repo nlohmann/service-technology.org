@@ -22,6 +22,7 @@
 
 #include <list>
 #include <pnapi/pnapi.h>
+#include "verbose.h"
 
 
 /**
@@ -34,6 +35,16 @@ class Modification {
 
       virtual unsigned int getI() = 0;
       virtual void setToValue(unsigned int) = 0;
+      virtual void init() = 0;
+
+      void init(unsigned int newI) {
+          status("init before");
+          i = newI;
+          status("init before 2");
+          this->init();
+      }
+   protected:
+      unsigned int i;
 };
 
 

@@ -10,6 +10,7 @@ int Tara::nrOfFinals = 0;
 std::map<pnapi::Transition* ,unsigned int> Tara::partialCostFunction;
 
 pnapi::PetriNet* Tara::net = 0; 
+Modification* Tara::modification = 0; 
 
 gengetopt_args_info Tara::args_info;
 

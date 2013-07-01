@@ -2286,6 +2286,15 @@ unsigned int PetriNet::reduce_series_places()
  * 
  * \post  this rule preserves lifeness and k-boundedness
  *        according to [Pil08], def. 4.31.
+ *
+ * \note Precondition 7 of this rule is incorrect. Say t1 has another
+ *       place p2 in its postset, and in the postset of p2 there is
+ *       a labelled transition t3. Then, t2 and t3 are concurrent and
+ *       so are their communications. After applying the rule, the
+ *       communications become ordered, first that of the former t2,
+ *       attached to the new t1, then that of t3. The code has been
+ *       changed accordingly: (t2 is not labeled) (precondition 7a).
+ *       (2013/7/1)
  * 
  * \return  number of removed places 
  * 
@@ -2324,7 +2333,8 @@ unsigned int PetriNet::reduce_series_transitions()
           (seenTransitions[t2]) ||
           (t1->isSynchronized()) || // precondition 6
           (t2->isSynchronized()) || // precondition 6
-          ((!(t1->getLabels().empty())) && (!(t2->getLabels().empty()))) ) // precondition 7
+//        ((!(t1->getLabels().empty())) && (!(t2->getLabels().empty()))) ) // precondition 7
+          (!(t2->getLabels().empty())) ) // precondition 7a
       {
         continue;
       }
@@ -2488,6 +2498,12 @@ unsigned int PetriNet::reduce_self_loop_places()
  *       arcs, it is an internal place. Thus, t does not communicate
  *       and its removal does not affect controllability or the set of
  *       communicating partners.
+ *
+ * \note The rule does preserve liveness but not non-liveness.
+ *       If a non-live loop-transition is removed, the net may become live.
+ *       Starke's rule 8 suggests an additional transition with a preset
+ *       encompassing the preset of the removed transition for that purpose. 
+ *       (Not implemented here, 2013/7/1)
  *
  * \return number of removed transitions
  * 

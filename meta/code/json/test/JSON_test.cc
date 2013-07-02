@@ -58,8 +58,7 @@ void test_null() {
 
     // invalid conversion to bool
     try {
-        bool b = false;
-        b = a;
+        bool b = a;
         assert(false);
     } catch(const std::exception& ex) {
         assert (ex.what() == std::string("cannot cast null to JSON Boolean"));
@@ -154,109 +153,62 @@ void test_array() {
 
     // output
     std::cout << a << '\n';
-}
 
-int main() {
-    //test_null();
-    //test_string();
+    // check for elements
+    assert(a[1] == JSON(1));
+    assert(a[2] == JSON(1.0));
+    assert(a[3] == JSON(true));
+    assert(a[4] == JSON("string"));
 
-    //test_array();
+    // invalid access to element
+    try {
+        a[5] = 1;
+        assert(false);
+    } catch(const std::exception& ex) {
+        assert (ex.what() == std::string("cannot access element at index 5"));
+    }
 
-    JSON a;
-    a += JSON();
-    a += 1;
-    a += 1.0;
-    a += true;
-    a += "string";
-
-    std::cerr << a << '\n';
-
+    // get elements
+    {
+        int i = a[1];
+        double d = a[2];
+        bool b = a[3];
+        std::string s = a[4];
+    }
+    
+    // set elements
+    a[1] = 2;
+    
+#ifdef __cplusplus11
+    // construction from initializer list
+    JSON b = {JSON(), 2, 1.0, true, "string"};
+    assert(a == b);
+#endif
+        
+    // iterators
     for (JSON::iterator i = a.begin(); i != a.end(); ++i) {
         std::cerr << *i << '\n';
     }
-    
-    std::cerr << a << '\n';
-    
-    JSON o;
-    o["foo"] = "meh";
-    o["boo"] = "bla";
-    o["sss"] = "fof";
 
-    for (JSON::iterator i = o.begin(); i != o.end(); ++i) {
-        std::cerr << i.key() << " -> " << i.value() << '\n';
-    }
-    
-    JSON b = true;
-    for (JSON::iterator i = b.begin(); i != b.end(); ++i) {
+    for (JSON::const_iterator i = a.cbegin(); i != a.cend(); ++i) {
         std::cerr << *i << '\n';
     }
-
-    /*
     
-    JSON J_int = 1;
-    JSON J_float = 1.0;
-    JSON J_string = "Hello, world!";
-    JSON J_null;
-    JSON J_bool = false;
-
 #ifdef __cplusplus11
-    JSON J_array = {1, 1.0, "Hello, world", false};
-
-    J_array += JSON("additional element");
-
-    J_array[0] = 2;
-    std::cout << J_array[2] << std::endl;
-    std::cout << J_array.size() << std::endl;
-
-    std::cout << J_array << '\n';
-#endif
-
-    JSON J_object;
-    
-    J_object["a"] = "b";
-    J_object["b"] = 1.0;
-    J_object["c"]["nested"] = true;
-
-#ifdef __cplusplus11
-    JSON::object t = {"hello", 1};
-    JSON J_object2 = t;
-
-    std::cout << J_object << '\n';
-    std::cout << J_object2 << '\n';
-#endif
-
-    std::cout << J_int << " == " << J_float << ": " << ((J_int == J_float) ? "true" : "false") << '\n';
-
-    std::cout << J_int << '\n';
-    std::cout << J_float << '\n';
-    std::cout << J_string << '\n';
-    std::cout << J_null << '\n';
-    std::cout << J_bool << '\n';
-*/
-    /*
-    for(auto e : J_array) {
-        std::cout << e << '\n';
-    }*/
-  /*  
-    {
-    JSON a;
-    a["foo"]["bar"] = "foo";
-    a["foo"]["baz"] = false;
-    
-    std::cout << " a = " << a << '\n';
-    
-    JSON b;
-    b["test"] = a["foo"];
-
-    std::cout << " b = " << b << '\n';
+    for (auto element : a) {
+        std::cerr << element << '\n';
     }
-*/    
-    /*
-    JSON foo;
-    std::ifstream myFile;
-    myFile.open("test.json");
-    myFile >> foo;
-    std::cout << foo << '\n';
-*/
+#endif
+}
+
+int main() {
+//    test_null();
+//    test_string();
+//    test_array();
+
+    std::ifstream i("foo.json");
+    JSON::parser p(i);
+    p.parse();
+
     return 0;
 }

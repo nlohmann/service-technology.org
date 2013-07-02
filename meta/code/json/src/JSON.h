@@ -38,7 +38,7 @@ class JSON {
         json_t _type;
 
         /// the payload
-        void *_payload;
+        void* _payload;
 
     public:
 #ifdef __cplusplus11
@@ -75,14 +75,14 @@ class JSON {
 
 #ifdef __cplusplus11
         /// move constructor
-        JSON(JSON &&);
+        JSON(JSON&&);
 #endif
 
         /// copy assignment
 #ifdef __cplusplus11
-        JSON &operator=(JSON);
+        JSON& operator=(JSON);
 #else
-        JSON &operator=(const JSON &);
+        JSON& operator=(const JSON&);
 #endif
 
         /// destructor
@@ -98,13 +98,13 @@ class JSON {
         operator bool() const;
 
         /// write to stream
-        friend std::ostream& operator<<(std::ostream &o, const JSON &j) {
+        friend std::ostream& operator<<(std::ostream& o, const JSON& j) {
             o << j.toString();
             return o;
         }
 
         /// read from stream
-        friend std::istream& operator>>(std::istream &i, JSON &j) {
+        friend std::istream& operator>>(std::istream& i, JSON& j) {
             j.parseStream(i);
             return i;
         }
@@ -117,7 +117,7 @@ class JSON {
         /// add a string to an array
         JSON& operator+=(const std::string&);
         /// add a string to an array
-        JSON& operator+=(const char *);
+        JSON& operator+=(const char*);
         /// add a Boolean to an array
         JSON& operator+=(bool);
         /// add a number to an array
@@ -145,6 +145,11 @@ class JSON {
         /// return the type of the object
         json_t type() const;
 
+        /// direct access to the underlying payload
+        void* data();
+        /// direct access to the underlying payload
+        const void* data() const;
+
         /// lexicographically compares the values
         bool operator==(const JSON&) const;
 
@@ -159,12 +164,17 @@ class JSON {
         std::string getString(char*& buf, unsigned int& len, unsigned int max) const;
         void parse(char*& buf, unsigned int& len, unsigned int max);
 
+    // forward declaration to friend this class
+    public:
+        class const_iterator;
+
     public:
         /// an iterator
         class iterator {
+            friend class JSON::const_iterator;
             public:
                 iterator();
-                iterator(JSON *);
+                iterator(JSON*);
                 iterator(const iterator&);
                 ~iterator();
 
@@ -176,20 +186,76 @@ class JSON {
                 JSON* operator->() const;
 
                 /// getter for the key (in case of objects)
-                std::string key();
+                std::string key() const;
                 /// getter for the value
-                JSON& value();
+                JSON& value() const;
 
             private:
                 /// a JSON value
-                JSON *_object;
+                JSON* _object;
                 /// an iterator for JSON arrays
-                std::vector<JSON>::iterator *_vi;
+                std::vector<JSON>::iterator* _vi;
                 /// an iterator for JSON objects
-                std::map<std::string, JSON>::iterator *_oi;
+                std::map<std::string, JSON>::iterator* _oi;
+        };
+
+        /// a const iterator
+        class const_iterator {
+            public:
+                const_iterator();
+                const_iterator(const JSON*);
+                const_iterator(const const_iterator&);
+                const_iterator(const iterator&);
+                ~const_iterator();
+
+                const_iterator& operator=(const const_iterator&);
+                bool operator==(const const_iterator&) const;
+                bool operator!=(const const_iterator&) const;
+                const_iterator& operator++();
+                const JSON& operator*() const;
+                const JSON* operator->() const;
+
+                /// getter for the key (in case of objects)
+                std::string key() const;
+                /// getter for the value
+                const JSON& value() const;
+
+            private:
+                /// a JSON value
+                const JSON* _object;
+                /// an iterator for JSON arrays
+                std::vector<JSON>::const_iterator* _vi;
+                /// an iterator for JSON objects
+                std::map<std::string, JSON>::const_iterator* _oi;
         };
 
     public:
         iterator begin();
         iterator end();
+        const_iterator begin() const;
+        const_iterator end() const;
+        const_iterator cbegin() const;
+        const_iterator cend() const;
+
+    public:
+        class parser {
+            public:
+                parser(std::istream&);
+
+                void parse();
+
+                bool next();
+                void error(std::string = "");
+                std::string parseString();
+                void parseTrue();
+                void parseFalse();
+                void parseNull();
+                bool delimiter(char);
+                void skipSpace();
+
+            private:
+                std::istream &_is;
+                char _current;
+        };
+
 };

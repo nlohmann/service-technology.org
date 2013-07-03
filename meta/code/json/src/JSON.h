@@ -153,12 +153,14 @@ class JSON {
         /// lexicographically compares the values
         bool operator==(const JSON&) const;
 
+        static JSON myparseStream(std::istream&);
+        void parseStream(std::istream&);
+
     private:
         /// return the type as string
         std::string _typename() const;
 
         // additional parser functions
-        void parseStream(std::istream&);
         void parseError(unsigned int pos, std::string tok) const;
         bool checkDelim(char*& buf, unsigned int& len, char tok) const;
         std::string getString(char*& buf, unsigned int& len, unsigned int max) const;
@@ -237,25 +239,23 @@ class JSON {
         const_iterator cbegin() const;
         const_iterator cend() const;
 
-    public:
+    private:
         class parser {
             public:
-                parser(std::istream&);
+                parser(std::istream& is);
+                JSON parse();
 
-                void parse();
-
+            private:
                 bool next();
                 void error(std::string = "");
                 std::string parseString();
-                void parseTrue();
-                void parseFalse();
+                bool parseTrue();
+                bool parseFalse();
                 void parseNull();
-                bool delimiter(char);
-                void skipSpace();
+                void expect(char);
 
-            private:
-                std::istream &_is;
                 char _current;
+                std::istream& _is;
+                char _buf[1000];
         };
-
 };

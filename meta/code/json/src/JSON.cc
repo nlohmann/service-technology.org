@@ -713,40 +713,30 @@ void JSON::parseStream(std::istream& is) {
 }
 
 
-
-
-
-
-
-JSON::parser::parser(std::istream &is) : _is(is) {
+JSON::parser::parser(std::istream& _is) : _is(_is) {
+    // read first character
     next();
 }
 
 void JSON::parser::error(std::string msg) {
-    throw std::runtime_error("parse error at position " + to_string(_is.tellg()) + ": " + msg + ", last read: " + _current);
-}
-
-void JSON::parser::skipSpace() {
-    while (std::isspace(_current)) {
-        next();
-    }
+    throw std::runtime_error("parse error at position " + to_string(_is.tellg()) + ": " + msg + ", last read: '" + _current + "'");
 }
 
 bool JSON::parser::next() {
     _current = _is.get();
+
+    // skip trailing whitespace
+    while (std::isspace(_current)) {
+        _current = _is.get();
+    }
+
     return true;
 }
 
 /// \todo: escaped strings
 std::string JSON::parser::parseString() {
-    // strings should begin with an opening quote
-    if (_current != '\"') {
-        error("expected \"");
-    }
-
     // read everything until closing quotes
-    char buf[1000];
-    _is.get(buf, 1000, '\"');
+    _is.get(_buf, 1000, '\"');
 
     // eat closing quote
     next();
@@ -754,49 +744,41 @@ std::string JSON::parser::parseString() {
     // read next character (optional?)
     next();
 
-    return std::string(buf);
+    return std::string(_buf);
 }
 
-void JSON::parser::parseTrue() {
-    if (_current != 't') {
-        error("expected true");
-    }
-
+bool JSON::parser::parseTrue() {
     char buf[4];
     _is.get(buf, 4);
-    
+
     if (strcmp(buf, "rue")) {
         error("expected true");
     }
 
     // read next character (optional?)
     next();
+    
+    return true;
 }
 
-void JSON::parser::parseFalse() {
-    if (_current != 'f') {
-        error("expected false");
-    }
-
+bool JSON::parser::parseFalse() {
     char buf[5];
     _is.get(buf, 5);
-    
+
     if (strcmp(buf, "alse")) {
         error("expected false");
     }
 
     // read next character (optional?)
     next();
+    
+    return false;
 }
 
 void JSON::parser::parseNull() {
-    if (_current != 'n') {
-        error("expected null");
-    }
-
     char buf[4];
     _is.get(buf, 4);
-    
+
     if (strcmp(buf, "ull")) {
         error("expected null");
     }
@@ -805,140 +787,126 @@ void JSON::parser::parseNull() {
     next();
 }
 
-bool JSON::parser::delimiter(char c) {
-    return (_current == c);
+void JSON::parser::expect(char c) {
+    if (_current != c) {
+        std::string msg = "expected '";
+        msg.append(1, c);
+        msg += "'";
+        error(msg.c_str());
+    } else {
+        next();
+    }
 }
 
-void JSON::parser::parse() {
-    skipSpace();
-
+JSON JSON::parser::parse() {
     if (_is.eof()) {
         error("unexpected end of file");
     }
-    
+
+    JSON result;
+
     switch(_current) {
         case('{'): {
-            std::cerr << "parsing object\n";
+            // explicitly set result to object to cope with {}
+            result._type = object;
+            result._payload = new std::map<std::string, JSON>;
+
             next();
-            skipSpace();
 
-            if (!delimiter('}')) {
+            // process nonempty object
+            if (_current != '}') {
                 do {
-                    skipSpace();
-
-                    // string
-                    std::string s = parseString();
-                    std::cerr << s << '\n';
-
-                    // whitespace
-                    skipSpace();
+                    // key
+                    const std::string key = parseString();
 
                     // colon
-                    if (!delimiter(':')) {
-                        error("expected :");
-                    } else {
-                        next();
-                    }
-
-                    // whitespace
-                    skipSpace();
+                    expect(':');
 
                     // value
-                    parse();
-
-                    // whitespace
-                    skipSpace();
-                } while (delimiter(',') && next());
-            } else {
-                // object is empty
-                next();
+                    result[key] = parse();
+                } while (_current == ',' && next());
             }
 
-            std::cerr << "parsed object\n";
+            // closing brace
+            expect('}');
+
             break;
         }
 
         case('['): {
-            std::cerr << "parsing array\n";
+            // explicitly set result to array to cope with []
+            result._type = array;
+            result._payload = new std::vector<JSON>;
+
             next();
 
-            if (!delimiter(']')) {
+            // process nonempty array
+            if (_current != ']') {
                 do {
-                    // whitespace
-                    skipSpace();
-
-                    // value
-                    parse();
-                
-                    // whitespace
-                    skipSpace();
-                } while (delimiter(',') && next());
-            } else {
-                // array is empty
-                next();
+                    // add values
+                    result += parse();
+                } while (_current == ',' && next());
             }
 
-            std::cerr << "parsed array\n";
+            // closing bracket
+            expect(']');
+
             break;
         }
 
         case('\"'): {
-            std::cerr << "parsing string\n";
-            parseString();
-            std::cerr << "parsed string\n";
+            result = parseString();
             break;
         }
 
         case('t'): {
-            std::cerr << "parsing true\n";
-            parseTrue();
-            std::cerr << "parsed true\n";
+            result = parseTrue();
             break;
         }
 
         case('f'): {
-            std::cerr << "parsing false\n";
-            parseFalse();
-            std::cerr << "parsed false\n";
+            result = parseFalse();
             break;
         }
 
         case('n'): {
-            std::cerr << "parsing null\n";
             parseNull();
-            std::cerr << "parsed null\n";
+            // nothing to do with result: is null by default
             break;
         }
-        
+
         default: {
             if (std::isdigit(_current) || _current == '-') {
-                std::cerr << "parsing number\n";
-
+                // collect number in tmp string
                 std::string tmp;
                 do {
                     tmp += _current;
                     next();
                 } while (std::isdigit(_current) || _current == '.' || _current == 'e' || _current == 'E' || _current == '+' || _current == '-');
-                
-                if (tmp.find(".") != std::string::npos) {
-                    // integer
+
+                if (tmp.find(".") == std::string::npos) {
+                    // integer (we use atof, because it can cope with e)
+                    result = (int)std::atof(tmp.c_str());
                 } else {
                     // float
+                    result = std::atof(tmp.c_str());
                 }
-
-                std::cerr << "parsed number\n";
+                break;
             } else {
                 error("unexpected character");
             }
         }
     }
+    
+    return result;
 }
 
-// TODO: http://www.cplusplus.com/reference/istream/istream/get/
+JSON JSON::myparseStream(std::istream& is) {
+    parser p(is);
+    return p.parse();
+}
 
-/*
 
-*/
 
 // http://stackoverflow.com/questions/7758580/writing-your-own-stl-container/7759622#7759622
 

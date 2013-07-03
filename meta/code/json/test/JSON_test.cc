@@ -206,9 +206,15 @@ int main() {
 //    test_string();
 //    test_array();
 
-    std::ifstream i("foo.json");
-    JSON::parser p(i);
-    p.parse();
+
+    std::ifstream i("citylots.json");
+
+    //JSON b;
+    //b.parseStream(i);
+
+    JSON b = JSON::myparseStream(i);
+
+    //std::cout << b << std::endl;
 
     return 0;
 }

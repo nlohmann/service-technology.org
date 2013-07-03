@@ -105,7 +105,13 @@ class JSON {
 
         /// read from stream
         friend std::istream& operator>>(std::istream& i, JSON& j) {
-            j.parseStream(i);
+            parser(i).parse(j);
+            return i;
+        }
+
+        /// read from stream
+        friend std::istream& operator<<(JSON &j, std::istream& i) {
+            parser(i).parse(j);
             return i;
         }
 
@@ -153,18 +159,9 @@ class JSON {
         /// lexicographically compares the values
         bool operator==(const JSON&) const;
 
-        static JSON myparseStream(std::istream&);
-        void parseStream(std::istream&);
-
     private:
         /// return the type as string
         std::string _typename() const;
-
-        // additional parser functions
-        void parseError(unsigned int pos, std::string tok) const;
-        bool checkDelim(char*& buf, unsigned int& len, char tok) const;
-        std::string getString(char*& buf, unsigned int& len, unsigned int max) const;
-        void parse(char*& buf, unsigned int& len, unsigned int max);
 
     // forward declaration to friend this class
     public:
@@ -246,14 +243,14 @@ class JSON {
                 parser(std::string&);
                 parser(std::istream&);
                 ~parser();
-                JSON parse();
+                void parse(JSON&);
 
             private:
                 bool next();
                 void error(std::string = "");
                 std::string parseString();
-                bool parseTrue();
-                bool parseFalse();
+                void parseTrue();
+                void parseFalse();
                 void parseNull();
                 void expect(char);
 

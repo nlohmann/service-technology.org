@@ -7,7 +7,6 @@
 #include <iostream>
 #include <streambuf>
 #include <sstream>
-#include <cassert>
 
 #ifndef __cplusplus11
 #include <cstring>
@@ -527,192 +526,6 @@ std::string JSON::_typename() const {
 }
 
 
-////////////////////////////////////////////////////
-
-/// reports a parse error in case an excpeted token is not present
-void JSON::parseError(unsigned int pos, std::string tok) const {
-    throw std::runtime_error("parse error: expected " + tok + " at position " + to_string(pos));
-}
-
-
-bool JSON::checkDelim(char*& buf, unsigned int& len, char tok) const {
-    // skip whitespace
-    while (std::isspace(*buf) && len > 0) {
-        ++buf;
-        --len;
-    }
-
-    // check if next character is given token
-    if (len == 0 || *buf != tok) {
-        return false;
-    }
-
-    ++buf;
-    --len;
-    return true;
-}
-
-std::string JSON::getString(char*& buf, unsigned int& len, unsigned int max) const {
-    // string should begin with quotes
-    if (!checkDelim(buf, len, '"')) {
-        parseError(max - len, "\"");
-    }
-
-    // string should end with quotes
-    char* aim(strchr(buf, '"'));
-    if (!aim) {
-        parseError(max - len, "\"");
-    }
-
-    // return string
-    *aim = 0;
-    std::string tmp(buf);
-    len -= aim - buf + 1;
-    buf = aim + 1;
-    return tmp;
-}
-
-void JSON::parse(char*& buf, unsigned int& len, unsigned int max) {
-    // skip whitespace
-    while (std::isspace(*buf) && len > 0) {
-        ++buf;
-        --len;
-    }
-
-    // we are not done with parsing yet
-    if (len == 0) {
-        parseError(max, "?");
-    }
-
-    switch (*buf) {
-        // parse an object
-        // TODO: objects may be empty
-        case '{': {
-            ++buf;
-            --len;
-            do {
-                // we first expect a string
-                std::string left(getString(buf, len, max));
-
-                // then a colon
-                if (!checkDelim(buf, len, ':')) {
-                    parseError(max - len, ":");
-                }
-
-                // then a value which we store using the first string
-                (*this)[left].parse(buf, len, max);
-            } while (checkDelim(buf, len, ','));
-
-            // objects should end with '}'
-            if (!checkDelim(buf, len, '}')) {
-                parseError(max - len, "}");
-            }
-            break;
-        }
-
-        // parse an array
-        // TODO: arrays may be empty
-        case '[': {
-            ++buf;
-            --len;
-            do {
-                // parse the next value
-                JSON tmp;
-                tmp.parse(buf, len, max);
-                operator+=(tmp);
-            } while (checkDelim(buf, len, ','));
-
-            // arrays should end with "]"
-            if (!checkDelim(buf, len, ']')) {
-                parseError(max - len, "]");
-            }
-            break;
-        }
-
-        // parse a string
-        case '"': {
-            *this = getString(buf, len, max);
-            break;
-        }
-
-        // parse a Boolean (true)
-        case 't': {
-            const size_t length_of_true = 4;
-            if (strncmp(buf, "true", length_of_true) == 0) {
-                buf += length_of_true;
-                len -= length_of_true;
-                *this = true;
-            } else {
-                parseError(max - len, "t");
-            }
-            break;
-        }
-
-        // parse a Boolean (false)
-        case 'f': {
-            const size_t length_of_false = 5;
-            if (strncmp(buf, "false", length_of_false) == 0) {
-                buf += length_of_false;
-                len -= length_of_false;
-                *this = false;
-            } else {
-                parseError(max - len, "f");
-            }
-            break;
-        }
-
-        // parse null
-        case 'n': {
-            const size_t length_of_null = 4;
-            if (strncmp(buf, "null", length_of_null) == 0) {
-                buf += length_of_null;
-                len -= length_of_null;
-                // nothing to do
-            } else {
-                parseError(max - len, "n");
-            }
-            break;
-        }
-
-        // parse a number
-        default: {
-            char* tmp(buf);
-            unsigned int tmplen(len);
-            while (*tmp != '.' && *tmp != ',' && *tmp != ']' && *tmp != '}' && tmplen > 0) {
-                ++tmp;
-                --tmplen;
-            }
-
-            if (*tmp == '.') {
-                *this = strtod(buf, &tmp);
-            } else {
-                *this = (int)strtol(buf, &tmp, 10);
-            }
-
-            len -= tmp - buf;
-            buf = tmp;
-        }
-    }
-}
-
-///parse input into JSON object
-void JSON::parseStream(std::istream& is) {
-    int pos1 = is.tellg();
-    is.seekg(0, is.end);
-    int pos2 = is.tellg();
-    is.seekg(pos1);
-
-    char* buffer = new char[pos2 - pos1 + 1];
-    is.read(buffer, pos2 - pos1);
-    //is.close();
-
-    unsigned int len(pos2 - pos1);
-    char* buf(buffer);
-    parse(buf, len, len);
-
-    delete[] buffer;
-}
-
 JSON::parser::parser(char *s) : _pos(0) {
     _buffer = new char[strlen(s)+1];
     strcpy(_buffer, s);
@@ -768,9 +581,16 @@ bool JSON::parser::next() {
 
 /// \todo: escaped strings
 std::string JSON::parser::parseString() {
+    // get position of closing quote
     const char *p = strchr(_buffer + _pos, '\"');
-    const size_t length = p - _buffer - _pos;
 
+    // check if quotes were found
+    if (!p) {
+        error("expected '\"'");
+    }
+
+    // copy string to return value
+    const size_t length = p - _buffer - _pos;
     char *tmp = new char[length+1];
     strncpy(tmp, _buffer+_pos, length);
     std::string result(tmp);
@@ -779,36 +599,32 @@ std::string JSON::parser::parseString() {
     // +1 to eat closing quote
     _pos += length + 1;
 
-    // read next character (optional?)
+    // read next character
     next();
 
     return result;
 }
 
-bool JSON::parser::parseTrue() {
+void JSON::parser::parseTrue() {
     if (strncmp(_buffer + _pos, "rue", 3)) {
         error("expected true");
     }
 
     _pos += 3;
 
-    // read next character (optional?)
+    // read next character
     next();
-    
-    return true;
 }
 
-bool JSON::parser::parseFalse() {
+void JSON::parser::parseFalse() {
     if (strncmp(_buffer + _pos, "alse", 4)) {
         error("expected false");
     }
 
     _pos += 4;
 
-    // read next character (optional?)
+    // read next character
     next();
-    
-    return false;
 }
 
 void JSON::parser::parseNull() {
@@ -833,12 +649,12 @@ void JSON::parser::expect(char c) {
     }
 }
 
-JSON JSON::parser::parse() {
+void JSON::parser::parse(JSON &result) {
     if (!_buffer) {
         error("unexpected end of file");
     }
 
-    JSON result;
+    //JSON result;
 
     switch(_current) {
         case('{'): {
@@ -858,7 +674,7 @@ JSON JSON::parser::parse() {
                     expect(':');
 
                     // value
-                    result[key] = parse();
+                    parse(result[key]);
                 } while (_current == ',' && next());
             }
 
@@ -877,9 +693,11 @@ JSON JSON::parser::parse() {
 
             // process nonempty array
             if (_current != ']') {
+                size_t element_count = 0;
                 do {
-                    // add values
-                    result += parse();
+                    // add a dummy value and continue parsing at its position
+                    result += JSON();
+                    parse(result[element_count++]);
                 } while (_current == ',' && next());
             }
 
@@ -890,17 +708,22 @@ JSON JSON::parser::parse() {
         }
 
         case('\"'): {
-            result = parseString();
+            result._type = string;
+            result._payload = new std::string(parseString());
             break;
         }
 
         case('t'): {
-            result = parseTrue();
+            parseTrue();
+            result._type = boolean;
+            result._payload = new bool(true);
             break;
         }
 
         case('f'): {
-            result = parseFalse();
+            parseFalse();
+            result._type = boolean;
+            result._payload = new bool(false);
             break;
         }
 
@@ -921,10 +744,12 @@ JSON JSON::parser::parse() {
 
                 if (tmp.find(".") == std::string::npos) {
                     // integer (we use atof, because it can cope with e)
-                    result = (int)std::atof(tmp.c_str());
+                    result._type = number_int;
+                    result._payload = new int(std::atof(tmp.c_str()));
                 } else {
                     // float
-                    result = std::atof(tmp.c_str());
+                    result._type = number_float;
+                    result._payload = new double(std::atof(tmp.c_str()));
                 }
                 break;
             } else {
@@ -932,13 +757,6 @@ JSON JSON::parser::parse() {
             }
         }
     }
-    
-    return result;
-}
-
-JSON JSON::myparseStream(std::istream& is) {
-    parser p(is);
-    return p.parse();
 }
 
 

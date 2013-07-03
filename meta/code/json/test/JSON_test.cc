@@ -206,16 +206,10 @@ int main() {
 //    test_string();
 //    test_array();
 
-
-    //std::ifstream i("citylots.json");
     std::ifstream i("citylots.json");
 
-    //JSON b;
-    //b.parseStream(i);
-
-    JSON b = JSON::myparseStream(i);
-
-    //std::cout << b << std::endl;
+    JSON b;
+    b << i;
 
     return 0;
 }

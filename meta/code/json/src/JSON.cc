@@ -7,6 +7,7 @@
 #include <iostream>
 #include <streambuf>
 #include <sstream>
+#include <cassert>
 
 #ifndef __cplusplus11
 #include <cstring>
@@ -712,22 +713,54 @@ void JSON::parseStream(std::istream& is) {
     delete[] buffer;
 }
 
+JSON::parser::parser(char *s) : _pos(0) {
+    _buffer = new char[strlen(s)+1];
+    strcpy(_buffer, s);
 
-JSON::parser::parser(std::istream& _is) : _is(_is) {
     // read first character
     next();
 }
 
+JSON::parser::parser(std::string& s) : _pos(0) {
+    _buffer = new char[s.length()+1];
+    strcpy(_buffer, s.c_str());
+
+    // read first character
+    next();
+}
+
+JSON::parser::parser(std::istream& _is) : _pos(0) {
+    // determine length of input stream
+    _is.seekg (0, std::ios::end);
+    std::streampos length = _is.tellg();
+    _is.seekg (0, std::ios::beg);
+
+    // copy stream to buffer
+    _buffer = new char[length];
+    _is.read (_buffer,length);
+
+    // read first character
+    next();
+}
+
+JSON::parser::~parser() {
+    delete [] _buffer;
+}
+
 void JSON::parser::error(std::string msg) {
-    throw std::runtime_error("parse error at position " + to_string(_is.tellg()) + ": " + msg + ", last read: '" + _current + "'");
+    throw std::runtime_error("parse error at position " + to_string(_pos) + ": " + msg + ", last read: '" + _current + "'");
 }
 
 bool JSON::parser::next() {
-    _current = _is.get();
+    _current = _buffer[_pos++];
+
+    if (_buffer == nullptr) {
+        return false;
+    }
 
     // skip trailing whitespace
     while (std::isspace(_current)) {
-        _current = _is.get();
+        _current = _buffer[_pos++];
     }
 
     return true;
@@ -735,25 +768,29 @@ bool JSON::parser::next() {
 
 /// \todo: escaped strings
 std::string JSON::parser::parseString() {
-    // read everything until closing quotes
-    _is.get(_buf, 1000, '\"');
+    const char *p = strchr(_buffer + _pos, '\"');
+    const size_t length = p - _buffer - _pos;
 
-    // eat closing quote
-    next();
+    char *tmp = new char[length+1];
+    strncpy(tmp, _buffer+_pos, length);
+    std::string result(tmp);
+    delete [] tmp;
+
+    // +1 to eat closing quote
+    _pos += length + 1;
 
     // read next character (optional?)
     next();
 
-    return std::string(_buf);
+    return result;
 }
 
 bool JSON::parser::parseTrue() {
-    char buf[4];
-    _is.get(buf, 4);
-
-    if (strcmp(buf, "rue")) {
+    if (strncmp(_buffer + _pos, "rue", 3)) {
         error("expected true");
     }
+
+    _pos += 3;
 
     // read next character (optional?)
     next();
@@ -762,12 +799,11 @@ bool JSON::parser::parseTrue() {
 }
 
 bool JSON::parser::parseFalse() {
-    char buf[5];
-    _is.get(buf, 5);
-
-    if (strcmp(buf, "alse")) {
+    if (strncmp(_buffer + _pos, "alse", 4)) {
         error("expected false");
     }
+
+    _pos += 4;
 
     // read next character (optional?)
     next();
@@ -776,12 +812,11 @@ bool JSON::parser::parseFalse() {
 }
 
 void JSON::parser::parseNull() {
-    char buf[4];
-    _is.get(buf, 4);
-
-    if (strcmp(buf, "ull")) {
+    if (strncmp(_buffer + _pos, "ull", 3)) {
         error("expected null");
     }
+
+    _pos += 3;
 
     // read next character (optional?)
     next();
@@ -799,7 +834,7 @@ void JSON::parser::expect(char c) {
 }
 
 JSON JSON::parser::parse() {
-    if (_is.eof()) {
+    if (!_buffer) {
         error("unexpected end of file");
     }
 

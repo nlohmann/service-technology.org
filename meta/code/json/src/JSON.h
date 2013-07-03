@@ -242,7 +242,10 @@ class JSON {
     private:
         class parser {
             public:
-                parser(std::istream& is);
+                parser(char*);
+                parser(std::string&);
+                parser(std::istream&);
+                ~parser();
                 JSON parse();
 
             private:
@@ -255,7 +258,7 @@ class JSON {
                 void expect(char);
 
                 char _current;
-                std::istream& _is;
-                char _buf[1000];
+                char *_buffer;
+                size_t _pos;
         };
 };

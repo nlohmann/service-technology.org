@@ -207,6 +207,7 @@ int main() {
 //    test_array();
 
 
+    //std::ifstream i("citylots.json");
     std::ifstream i("citylots.json");
 
     //JSON b;

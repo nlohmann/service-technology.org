@@ -110,7 +110,7 @@ class JSON {
         }
 
         /// read from stream
-        friend std::istream& operator<<(JSON &j, std::istream& i) {
+        friend std::istream& operator<<(JSON& j, std::istream& i) {
             parser(i).parse(j);
             return i;
         }
@@ -163,14 +163,14 @@ class JSON {
         /// return the type as string
         std::string _typename() const;
 
-    // forward declaration to friend this class
+        // forward declaration to friend this class
     public:
         class const_iterator;
 
     public:
         /// an iterator
         class iterator {
-            friend class JSON::const_iterator;
+                friend class JSON::const_iterator;
             public:
                 iterator();
                 iterator(JSON*);
@@ -255,7 +255,7 @@ class JSON {
                 void expect(char);
 
                 char _current;
-                char *_buffer;
+                char* _buffer;
                 size_t _pos;
         };
 };

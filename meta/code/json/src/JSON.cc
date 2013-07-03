@@ -526,8 +526,8 @@ std::string JSON::_typename() const {
 }
 
 
-JSON::parser::parser(char *s) : _pos(0) {
-    _buffer = new char[strlen(s)+1];
+JSON::parser::parser(char* s) : _pos(0) {
+    _buffer = new char[strlen(s) + 1];
     strcpy(_buffer, s);
 
     // read first character
@@ -535,7 +535,7 @@ JSON::parser::parser(char *s) : _pos(0) {
 }
 
 JSON::parser::parser(std::string& s) : _pos(0) {
-    _buffer = new char[s.length()+1];
+    _buffer = new char[s.length() + 1];
     strcpy(_buffer, s.c_str());
 
     // read first character
@@ -544,13 +544,13 @@ JSON::parser::parser(std::string& s) : _pos(0) {
 
 JSON::parser::parser(std::istream& _is) : _pos(0) {
     // determine length of input stream
-    _is.seekg (0, std::ios::end);
+    _is.seekg(0, std::ios::end);
     std::streampos length = _is.tellg();
-    _is.seekg (0, std::ios::beg);
+    _is.seekg(0, std::ios::beg);
 
     // copy stream to buffer
     _buffer = new char[length];
-    _is.read (_buffer,length);
+    _is.read(_buffer, length);
 
     // read first character
     next();
@@ -582,7 +582,7 @@ bool JSON::parser::next() {
 /// \todo: escaped strings
 std::string JSON::parser::parseString() {
     // get position of closing quote
-    const char *p = strchr(_buffer + _pos, '\"');
+    const char* p = strchr(_buffer + _pos, '\"');
 
     // check if quotes were found
     if (!p) {
@@ -591,8 +591,8 @@ std::string JSON::parser::parseString() {
 
     // copy string to return value
     const size_t length = p - _buffer - _pos;
-    char *tmp = new char[length+1];
-    strncpy(tmp, _buffer+_pos, length);
+    char* tmp = new char[length + 1];
+    strncpy(tmp, _buffer + _pos, length);
     std::string result(tmp);
     delete [] tmp;
 
@@ -649,15 +649,15 @@ void JSON::parser::expect(char c) {
     }
 }
 
-void JSON::parser::parse(JSON &result) {
+void JSON::parser::parse(JSON& result) {
     if (!_buffer) {
         error("unexpected end of file");
     }
 
     //JSON result;
 
-    switch(_current) {
-        case('{'): {
+    switch (_current) {
+        case ('{'): {
             // explicitly set result to object to cope with {}
             result._type = object;
             result._payload = new std::map<std::string, JSON>;
@@ -684,7 +684,7 @@ void JSON::parser::parse(JSON &result) {
             break;
         }
 
-        case('['): {
+        case ('['): {
             // explicitly set result to array to cope with []
             result._type = array;
             result._payload = new std::vector<JSON>;
@@ -707,27 +707,27 @@ void JSON::parser::parse(JSON &result) {
             break;
         }
 
-        case('\"'): {
+        case ('\"'): {
             result._type = string;
             result._payload = new std::string(parseString());
             break;
         }
 
-        case('t'): {
+        case ('t'): {
             parseTrue();
             result._type = boolean;
             result._payload = new bool(true);
             break;
         }
 
-        case('f'): {
+        case ('f'): {
             parseFalse();
             result._type = boolean;
             result._payload = new bool(false);
             break;
         }
 
-        case('n'): {
+        case ('n'): {
             parseNull();
             // nothing to do with result: is null by default
             break;

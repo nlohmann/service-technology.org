@@ -207,9 +207,12 @@ int main() {
 //    test_array();
 
     std::ifstream i("citylots.json");
-
+    
     JSON b;
     b << i;
+    
+    std::ofstream o("output2.json");
+    o << b;
 
     return 0;
 }

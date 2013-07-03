@@ -192,11 +192,11 @@ int main(int argc, char** argv) {
 	    }
         // overwrite the modification
         // // TODO: Usecase modification cannot yet handle this
-        // delete Tara::modification;
-        // Tara::modification = new Usecase(Tara::net, usecase, &Tara::partialCostFunction, 0);
+        delete Tara::modification;
+        Tara::modification = new Usecase(Tara::net, usecase, &Tara::partialCostFunction, 0);
         //
         // TEMP: create dummy that modification works
-        Modification* dummy = new Usecase(Tara::net, usecase, &Tara::partialCostFunction, 0);
+        // Modification* dummy = new Usecase(Tara::net, usecase, &Tara::partialCostFunction, 0);
     }
 
     /*----------------------.
@@ -234,11 +234,8 @@ int main(int argc, char** argv) {
     // max Costs are the costs of the most expensive path through
     // the inner state graph
     
-    status("be fore heere");
     unsigned int maxCostOfComposition=maxCost(Tara::net);
-
-    status("heeere");
-
+    status("max cost of composition bound: %d", maxCostOfComposition);
 
     /*------------------------------------------.
     | 7. Find a corresponding partner           | 

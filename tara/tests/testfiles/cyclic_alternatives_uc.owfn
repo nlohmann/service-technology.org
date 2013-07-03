@@ -13,8 +13,8 @@ INITIALMARKING
   p0:	1, p00 : 1
  ;
 
-FINALMARKING
-  p0:	1
+FINALCONDITION
+  p0 >	0
  ;
 
 TRANSITION t1	 { !o }

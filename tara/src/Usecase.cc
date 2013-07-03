@@ -27,6 +27,13 @@
 
 
 void Usecase::init() {
+    pnapi::Condition* c = &this->net->getFinalCondition();
+    *c = c->getFormula() && ((*invoice == 0) || (*finish == 0)) ;
+
+    net->createArc(*credit, *pay_for_invoice);
+    credit->setTokenCount(i);
+
+    // std::cout << pnapi::io::owfn << *net;
 }
 
 /**
@@ -40,37 +47,109 @@ Usecase::Usecase(
     ) {
     //status("applying usecase");
 
-    /*------------------*\
-    | 1. Modify usecase  |
-    \*------------------*/
     
     // DEBUG
     // std::cout << pnapi::io::owfn << *usecase;
     // std::cout << pnapi::io::owfn << *orig;
 
+    // add IN_ORIG place and IN_USECASE place
+    pnapi::Place* in_usecase = &orig->createPlace("in_usecase");
+    // create loops to in_usecase place
+    std::set<pnapi::Transition*> allUsecaseTransitions = usecase->getTransitions();
+    for(std::set<pnapi::Transition*>::iterator it = allUsecaseTransitions.begin(); it != allUsecaseTransitions.end(); ++it) {
+        pnapi::Transition* t = orig->findTransition( "uc_" + (*it)->getName());
+        usecase->createArc(*(*it), *in_usecase, 1);
+        usecase->createArc(*in_usecase, *(*it), 1);
+    }
+    //status("created in_usecase place with arcs");
+
+    // create in_orig place
+    pnapi::Place* in_orig = &orig->createPlace("in_orig", 1);
+    // add loops to in_orig place
+    std::set<pnapi::Transition*> allOrigTransitions = orig->getTransitions();
+    for(std::set<pnapi::Transition*>::iterator it = allOrigTransitions.begin(); it != allOrigTransitions.end(); ++it) {
+        orig->createArc(*(*it), *in_orig, 1);
+        orig->createArc(*in_orig, *(*it), 1);
+    }
+
+    /*--------------------------*\
+    | 1. merge usecase and orig  |
+    \*--------------------------*/
+
+
+    // copy those places which are NOT in orig net
+    std::set<pnapi::Place*> allUcPlaces = usecase->getPlaces();
+    for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
+        if(not orig->findPlace( (*it)->getName())) {
+            // create prefix
+            orig->createPlace((*it)->getName(), (*it)->getTokenCount());
+        }
+    }
+
+
+    // copy all transitions from usecase to orig
+    std::set<pnapi::Transition*> allUcTrans = usecase->getTransitions();
+    for(std::set<pnapi::Transition*>::iterator it = allUcTrans.begin(); it != allUcTrans.end(); ++it) {
+        // create prefix
+        pnapi::Transition* newTrans = &orig->createTransition("uc_" + (*it)->getName());
+        //copy labels
+        std::map<pnapi::Label*,unsigned int> allLabels = (*it)->getLabels();
+        for(std::map<pnapi::Label*,unsigned int>::iterator lIt = allLabels.begin(); lIt != allLabels.end(); ++lIt) {
+            pnapi::Label * label = orig->getInterface().findLabel(lIt->first->getName());
+            newTrans->addLabel(*label, lIt->second);
+        }
+    }
+
+    // copy all arcs
+    std::set<pnapi::Arc*> allUcArcs = usecase->getArcs();
+    for(std::set<pnapi::Arc*>::iterator it = allUcArcs.begin(); it != allUcArcs.end(); ++it) {
+        pnapi::Node* src;
+        pnapi::Node* target;
+
+        // find target
+        if(orig->containsNode("uc_" + (*it)->getSourceNode().getName())) {
+            src = orig->findNode("uc_" + (*it)->getSourceNode().getName());
+        } else {
+            src = orig->findNode((*it)->getSourceNode().getName());
+        }
+
+        // find source
+        if(orig->containsNode("uc_" + (*it)->getTargetNode().getName())) {
+            target = orig->findNode("uc_" + (*it)->getTargetNode().getName());
+        } else {
+            target = orig->findNode((*it)->getTargetNode().getName());
+        }
+
+        orig->createArc(*src, *target, (*it)->getWeight());
+    }
+
+
+    // status("merged usecase and orig net");
 
     // Add INVOICE place for costs
-    pnapi::Place* invoice = & usecase->createPlace("invoice");
+    invoice = & orig->createPlace("invoice");
+#define SOME_BIG_INT 999
+    credit = & orig->createPlace("credit", 0);
 
     // Add invoice archs
     // for all elements in costfunction
     for(std::map<pnapi::Transition*,unsigned int>::iterator it = costfunction->begin(); it !=  costfunction->end(); ++it) {
         // transition in usecase
-        pnapi::Transition* t = usecase->findTransition(it->first->getName());
+        
+        pnapi::Transition* t = orig->findTransition("uc_" + it->first->getName());
+
         // put cost tokens on invoice
         if(t and it->second > 0) {
-            //status("costarc: %d", it->second);
-            usecase->createArc(*t,*invoice,it->second);
+            usecase->createArc(*t, *invoice, it->second);
+        //    usecase->createArc(*credit, *t,it->second);
         }
         it->second = 0;
     }
 
-    orig->prefixNodeNames("orig_");
 
-    //  TODO:
+    //  TODO: strict
     //  Compute #p (max value) for each place
     //  -> Lola
-#define SOME_BIG_INT 99999
 
 
    /*----------------------------*\
@@ -78,6 +157,7 @@ Usecase::Usecase(
    \*----------------------------*/
     //status("before creating complement places");
 
+   /*
    // a map for remebering the complement
    std::map<pnapi::Place*, pnapi::Place*> complement;
 
@@ -111,17 +191,8 @@ Usecase::Usecase(
        // set the initial marking
        curCompl->setTokenCount(SOME_BIG_INT - (*it)->getTokenCount());
        
-   }
+   }*/
     
-    // add IN_ORIG place and IN_USECASE place
-    pnapi::Place* in_usecase = &usecase->createPlace("in_usecase");
-    // create loops to in_usecase place
-    std::set<pnapi::Transition*> allUsecaseTransitions = usecase->getTransitions();
-    for(std::set<pnapi::Transition*>::iterator it = allUsecaseTransitions.begin(); it != allUsecaseTransitions.end(); ++it) {
-        usecase->createArc(*(*it), *in_usecase, 1);
-        usecase->createArc(*in_usecase, *(*it), 1);
-    }
-    //status("created in_usecase place with arcs");
 
 
     
@@ -129,63 +200,8 @@ Usecase::Usecase(
     | 2. compose with orig  |
     \*---------------------*/
 
-    // create in_orig place
-    pnapi::Place* in_orig = &orig->createPlace("in_orig", 1);
-    // add loops to in_orig place
-    std::set<pnapi::Transition*> allOrigTransitions = orig->getTransitions();
-    for(std::set<pnapi::Transition*>::iterator it = allOrigTransitions.begin(); it != allOrigTransitions.end(); ++it) {
-        orig->createArc(*(*it), *in_orig, 1);
-        orig->createArc(*in_orig, *(*it), 1);
-    }
 
-    // copy all places from usecase to orig
-    std::set<pnapi::Place*> allUcPlaces = usecase->getPlaces();
-    for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
-        // TODO: copy only those places which are NOT in orig net
-        // create prefix
-        orig->createPlace("uc_" + (*it)->getName(), (*it)->getTokenCount());
-    }
-    // copy all transitions from usecase to orig
-    std::set<pnapi::Transition*> allUcTrans = usecase->getTransitions();
-    for(std::set<pnapi::Transition*>::iterator it = allUcTrans.begin(); it != allUcTrans.end(); ++it) {
-        // create prefix
-        pnapi::Transition* newTrans = &orig->createTransition("uc_" + (*it)->getName());
-        //copy labels
-        std::map<pnapi::Label*,unsigned int> allLabels = (*it)->getLabels();
-        for(std::map<pnapi::Label*,unsigned int>::iterator lIt = allLabels.begin(); lIt != allLabels.end(); ++lIt) {
-            pnapi::Label * label = orig->getInterface().findLabel(lIt->first->getName());
-            //newTrans->addLabel(*(lIt->first), lIt->second);
-            newTrans->addLabel(*label, lIt->second);
-        }
-        
-    }
-    // status("merged usecase and orig net");
 
-    std::set<pnapi::Arc*> allUcArcs = usecase->getArcs();
-    for(std::set<pnapi::Arc*>::iterator it = allUcArcs.begin(); it != allUcArcs.end(); ++it) {
-        pnapi::Node* src;
-        pnapi::Node* target;
-        if(orig->containsNode("uc_" + (*it)->getSourceNode().getName())) {
-            src = orig->findNode("uc_" + (*it)->getSourceNode().getName());
-        } else { // place is from interface
-            src = orig->findNode((*it)->getSourceNode().getName());
-        }
-        if(orig->containsNode("uc_" + (*it)->getTargetNode().getName())) {
-            target = orig->findNode("uc_" + (*it)->getTargetNode().getName());
-        } else { // place is from interface
-            target = orig->findNode((*it)->getTargetNode().getName());
-        }
-        orig->createArc(*src, *target, (*it)->getWeight());
-
-        // also create arcs to orig
-        if(orig->findPlace("orig_" + (*it)->getSourceNode().getName())) {
-            src = orig->findPlace("orig_" + (*it)->getSourceNode().getName());
-            orig->createArc(*src, *target, (*it)->getWeight());
-        } else if(orig->findPlace("orig_" + (*it)->getTargetNode().getName())) {
-            target = orig->findPlace("orig_" + (*it)->getTargetNode().getName());
-            orig->createArc(*src, *target, (*it)->getWeight());
-        } 
-    }
     // status("union of usecase and orig created");
 
     /*----------------------*\
@@ -194,7 +210,7 @@ Usecase::Usecase(
 
     // add unconditional jump back
     pnapi::Transition* uncond_jump_back = &orig->createTransition("unconditional_jump_back");
-    pnapi::Place* uc_in_usecase = orig->findPlace("uc_in_usecase");
+    pnapi::Place* uc_in_usecase = orig->findPlace("in_usecase");
     orig->createArc(*uc_in_usecase, *uncond_jump_back, 1);
     orig->createArc(*uncond_jump_back, *in_orig, 1);
 
@@ -211,7 +227,7 @@ Usecase::Usecase(
     // jump_in: set the pre-condition
     for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
         // status("orig_%s", (*it)->getName().c_str());
-        pnapi::Place* ucPlace = orig->findPlace("orig_" + (*it)->getName());
+        pnapi::Place* ucPlace = orig->findPlace((*it)->getName());
         if(!ucPlace) continue;
 //        status("inital cond for uc_%s", (*it)->getName().c_str());
         // pnapi::Place* ucComplPlace = orig->findPlace("usecase-~" + (*it)->getName());
@@ -231,9 +247,12 @@ Usecase::Usecase(
     // add conditional jump back
     pnapi::Transition* cond_jump_back = &orig->createTransition("cond_jump_back");
     // IN_USECASE + FINAL_COND -> WAY_HOME_DUTY
-    pnapi::Place* way_home = &orig->createPlace("way_home");
+  //  pnapi::Place* way_home = &orig->createPlace("way_home");
+    finish = &orig->createPlace("finish");
     orig->createArc(*uc_in_usecase, *cond_jump_back);
-    orig->createArc(*cond_jump_back, *way_home);
+ //   orig->createArc(*cond_jump_back, *way_home);
+    orig->createArc(*cond_jump_back, *finish);
+    orig->createArc(*cond_jump_back, *in_orig);
 
     pnapi::Condition* finalCond = &usecase->getFinalCondition();
 
@@ -243,10 +262,12 @@ Usecase::Usecase(
     // TODO: FOREACH clause in DNF
     // TODO: validate literals in clause -> warnings
     for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
-        pnapi::Place* ucPlace = orig->findPlace("uc_" + (*it)->getName());
-        pnapi::Place* ucComplPlace = orig->findPlace("uc_~" + (*it)->getName());
+        pnapi::Place* ucPlace = orig->findPlace((*it)->getName());
+
+        // pnapi::Place* ucComplPlace = orig->findPlace( (*it)->getName());
         // without compl place it is not interesting
-        if(!ucComplPlace) continue;
+        // if(!ucComplPlace) continue;
+        
         pnapi::formula::Interval interval = finalCond->getPlaceInterval(*(*it));
         int upper =  interval.getUpper();
         int lower =  interval.getLower();
@@ -254,13 +275,16 @@ Usecase::Usecase(
         //status("at interval %d   %d", lower, upper);
         if(lower > 0) {
             orig->createArc(*ucPlace, *cond_jump_back, lower);
-            orig->createArc(*cond_jump_in, *ucPlace, lower);
+            orig->createArc(*cond_jump_back, *ucPlace, lower);
         }
         //status("at interval 2");
         if(upper > 0) {
-            //  TODO warning!!
-            orig->createArc(*ucComplPlace, *cond_jump_back, SOME_BIG_INT - upper);
-            orig->createArc(*cond_jump_in, *ucComplPlace, SOME_BIG_INT - upper);
+            //TODO: strict
+            message("there is an upper bound for place %s", (*it)->getName().c_str());
+            /*
+              orig->createArc(*ucComplPlace, *cond_jump_back, SOME_BIG_INT - upper);
+              orig->createArc(*cond_jump_in, *ucComplPlace, SOME_BIG_INT - upper);
+            */
         }
     }
 
@@ -268,24 +292,31 @@ Usecase::Usecase(
 
     // add PAY_FOR_INVOICE trans
     // WAY_HOME_DUTY + INVOICE -> COMPLEMENT (INVOICE)
-    pnapi::Transition* pay_for_invoice = &orig->createTransition("pay_for_invoice");
+    pay_for_invoice = &orig->createTransition("pay_for_invoice");
     (*costfunction)[pay_for_invoice] = 1;
-    pnapi::Place* complInvoice = orig->findPlace("uc_~invoice");
-    pnapi::Place* ucInvoice = orig->findPlace("uc_invoice");
-    orig->createArc(*ucInvoice, *pay_for_invoice);
-    orig->createArc(*pay_for_invoice, *complInvoice);
-    orig->createArc(*pay_for_invoice, *way_home);
-    orig->createArc(*way_home, *pay_for_invoice);
+    //pnapi::Place* ucInvoice = orig->findPlace("invoice");
+    orig->createArc(*invoice, *pay_for_invoice);
+    orig->createArc(*pay_for_invoice, *finish);
+    orig->createArc(*finish, *pay_for_invoice); 
+    // orig->createArc(*pay_for_invoice, *way_home);
+    // orig->createArc(*way_home, *pay_for_invoice); 
 
 
     // aadd INVOICE_PAID trans
-    pnapi::Transition* invoice_paid = &orig->createTransition("invoice_paid");
-    orig->createArc(*complInvoice, *invoice_paid, SOME_BIG_INT);
+/*    pnapi::Transition* invoice_paid = &orig->createTransition("invoice_paid");
+    // orig->createArc(*credit, *invoice_paid, SOME_BIG_INT);
     orig->createArc(*way_home, *invoice_paid, 1);
     orig->createArc(*invoice_paid, *in_orig, 1);
+    */
 
+    // remember
+    this->net = orig;
     // std::cout << pnapi::io::owfn << *orig;
 }
 
 unsigned int Usecase::getI() { return i; }
-void Usecase::setToValue(unsigned int newI) { i = newI; }
+void Usecase::setToValue(unsigned int newI) {
+    i = newI;
+    credit->setTokenCount(i);
+    // std::cout << pnapi::io::owfn << *net;
+}

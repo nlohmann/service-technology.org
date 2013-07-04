@@ -25,6 +25,8 @@
 #include "Usecase.h"
 #include "verbose.h"
 
+#define UC_DEBUG(x) x
+
 
 void Usecase::init() {
     pnapi::Condition* c = &this->net->getFinalCondition();
@@ -45,14 +47,17 @@ Usecase::Usecase(
         std::map<pnapi::Transition*,unsigned int>* costfunction,
         unsigned int initialI = 0
     ) {
-    //status("applying usecase");
+    UC_DEBUG(status("applying usecase");)
 
     
     // DEBUG
     // std::cout << pnapi::io::owfn << *usecase;
     // std::cout << pnapi::io::owfn << *orig;
 
-    // add IN_ORIG place and IN_USECASE place
+    /*-----------------------------------------*\
+    | 1. add IN_ORIG place and IN_USECASE place |
+    \*-----------------------------------------*/
+
     pnapi::Place* in_usecase = &orig->createPlace("in_usecase");
     // create loops to in_usecase place
     std::set<pnapi::Transition*> allUsecaseTransitions = usecase->getTransitions();
@@ -61,7 +66,8 @@ Usecase::Usecase(
         usecase->createArc(*(*it), *in_usecase, 1);
         usecase->createArc(*in_usecase, *(*it), 1);
     }
-    //status("created in_usecase place with arcs");
+
+    UC_DEBUG(status("created in_usecase place with arcs");)
 
     // create in_orig place
     pnapi::Place* in_orig = &orig->createPlace("in_orig", 1);
@@ -73,7 +79,7 @@ Usecase::Usecase(
     }
 
     /*--------------------------*\
-    | 1. merge usecase and orig  |
+    | 2. merge usecase and orig  |
     \*--------------------------*/
 
 
@@ -87,7 +93,7 @@ Usecase::Usecase(
     }
 
 
-    // copy all transitions from usecase to orig
+    // copy all transitions from usecase to orig (and prefix)
     std::set<pnapi::Transition*> allUcTrans = usecase->getTransitions();
     for(std::set<pnapi::Transition*>::iterator it = allUcTrans.begin(); it != allUcTrans.end(); ++it) {
         // create prefix
@@ -123,25 +129,22 @@ Usecase::Usecase(
         orig->createArc(*src, *target, (*it)->getWeight());
     }
 
-
-    // status("merged usecase and orig net");
+    UC_DEBUG(status("merged usecase and orig net");)
 
     // Add INVOICE place for costs
     invoice = & orig->createPlace("invoice");
-#define SOME_BIG_INT 999
     credit = & orig->createPlace("credit", 0);
+    // this two places will be updated later
 
     // Add invoice archs
     // for all elements in costfunction
     for(std::map<pnapi::Transition*,unsigned int>::iterator it = costfunction->begin(); it !=  costfunction->end(); ++it) {
         // transition in usecase
-        
         pnapi::Transition* t = orig->findTransition("uc_" + it->first->getName());
 
         // put cost tokens on invoice
         if(t and it->second > 0) {
             usecase->createArc(*t, *invoice, it->second);
-        //    usecase->createArc(*credit, *t,it->second);
         }
         it->second = 0;
     }
@@ -150,14 +153,13 @@ Usecase::Usecase(
     //  TODO: strict
     //  Compute #p (max value) for each place
     //  -> Lola
-
-
    /*----------------------------*\
-   | 1.1 Create Complement places |
+   | 3. Create Complement places |
    \*----------------------------*/
     //status("before creating complement places");
 
    /*
+#define SOME_BIG_INT 999
    // a map for remebering the complement
    std::map<pnapi::Place*, pnapi::Place*> complement;
 
@@ -194,18 +196,8 @@ Usecase::Usecase(
    }*/
     
 
-
-    
-    /*---------------------*\
-    | 2. compose with orig  |
-    \*---------------------*/
-
-
-
-    // status("union of usecase and orig created");
-
     /*----------------------*\
-    | 3. jump in / jump back |
+    | 4. jump in / jump back |
     \*----------------------*/
 
     // add unconditional jump back
@@ -215,42 +207,35 @@ Usecase::Usecase(
     orig->createArc(*uncond_jump_back, *in_orig, 1);
 
     // add conditional jump in
-    // PRE_USECASE place
     pnapi::Place* pre_usecase = &orig->createPlace("pre_usecase", 1);
     pnapi::Transition* cond_jump_in = &orig->createTransition("cond_jump_in");
     orig->createArc(*pre_usecase, *cond_jump_in);
     orig->createArc(*in_orig, *cond_jump_in);
     orig->createArc(*cond_jump_in, *uc_in_usecase);
 
-    // status("added conditional jump in");
+    UC_DEBUG(status("added conditional jump in");)
 
     // jump_in: set the pre-condition
     for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
-        // status("orig_%s", (*it)->getName().c_str());
+        // find corresponding place in orig
         pnapi::Place* ucPlace = orig->findPlace((*it)->getName());
         if(!ucPlace) continue;
-//        status("inital cond for uc_%s", (*it)->getName().c_str());
-        // pnapi::Place* ucComplPlace = orig->findPlace("usecase-~" + (*it)->getName());
- // without compl place it is not interesting
-        // if(!ucComplPlace) continue;
-        // inital marking (in usecase) for the current Placd
+        // inital marking (in usecase) for the current Place
         int tokenCount = (*it)->getTokenCount();
-        //status("orig_%s wiith tokencount: %d", (*it)->getName().c_str(), tokenCount);
         if(tokenCount > 0) {
             orig->createArc(*ucPlace, *cond_jump_in, tokenCount);
             orig->createArc(*cond_jump_in, *ucPlace, tokenCount);
         }
+        // TODO: if strict, add complement place arc
     }
 
-    //status("added conditional jump in conditions");
+    UC_DEBUG(status("added conditional jump in conditions");)
 
     // add conditional jump back
     pnapi::Transition* cond_jump_back = &orig->createTransition("cond_jump_back");
-    // IN_USECASE + FINAL_COND -> WAY_HOME_DUTY
-  //  pnapi::Place* way_home = &orig->createPlace("way_home");
+    // this place signals that the usecase was complete finished
     finish = &orig->createPlace("finish");
     orig->createArc(*uc_in_usecase, *cond_jump_back);
- //   orig->createArc(*cond_jump_back, *way_home);
     orig->createArc(*cond_jump_back, *finish);
     orig->createArc(*cond_jump_back, *in_orig);
 
@@ -262,12 +247,10 @@ Usecase::Usecase(
     // TODO: FOREACH clause in DNF
     // TODO: validate literals in clause -> warnings
     for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
+        // find new place in orig
         pnapi::Place* ucPlace = orig->findPlace((*it)->getName());
 
-        // pnapi::Place* ucComplPlace = orig->findPlace( (*it)->getName());
-        // without compl place it is not interesting
-        // if(!ucComplPlace) continue;
-        
+        // TODO interval not precise enough
         pnapi::formula::Interval interval = finalCond->getPlaceInterval(*(*it));
         int upper =  interval.getUpper();
         int lower =  interval.getLower();
@@ -277,7 +260,6 @@ Usecase::Usecase(
             orig->createArc(*ucPlace, *cond_jump_back, lower);
             orig->createArc(*cond_jump_back, *ucPlace, lower);
         }
-        //status("at interval 2");
         if(upper > 0) {
             //TODO: strict
             message("there is an upper bound for place %s", (*it)->getName().c_str());
@@ -288,26 +270,16 @@ Usecase::Usecase(
         }
     }
 
-    //status("added conditional jump back with conditions");
+    UC_DEBUG(status("added conditional jump back with conditions");)
 
     // add PAY_FOR_INVOICE trans
-    // WAY_HOME_DUTY + INVOICE -> COMPLEMENT (INVOICE)
     pay_for_invoice = &orig->createTransition("pay_for_invoice");
+    // set costfunction for computing the bound
     (*costfunction)[pay_for_invoice] = 1;
-    //pnapi::Place* ucInvoice = orig->findPlace("invoice");
     orig->createArc(*invoice, *pay_for_invoice);
     orig->createArc(*pay_for_invoice, *finish);
     orig->createArc(*finish, *pay_for_invoice); 
-    // orig->createArc(*pay_for_invoice, *way_home);
-    // orig->createArc(*way_home, *pay_for_invoice); 
-
-
-    // aadd INVOICE_PAID trans
-/*    pnapi::Transition* invoice_paid = &orig->createTransition("invoice_paid");
-    // orig->createArc(*credit, *invoice_paid, SOME_BIG_INT);
-    orig->createArc(*way_home, *invoice_paid, 1);
-    orig->createArc(*invoice_paid, *in_orig, 1);
-    */
+    // the arc to credit will be added later
 
     // remember
     this->net = orig;

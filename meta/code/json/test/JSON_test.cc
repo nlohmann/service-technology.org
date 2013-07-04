@@ -135,6 +135,13 @@ void test_string() {
     } catch (const std::exception& ex) {
         assert(ex.what() == std::string("cannot cast string to JSON Boolean"));
     }
+
+    {
+        // get payload
+        std::string* s1 = static_cast<std::string*>(a.data());
+        std::string s2 = a;
+        assert(*s1 == s2);
+    }
 }
 
 void test_array() {
@@ -200,6 +207,13 @@ void test_array() {
         std::cerr << element << '\n';
     }
 #endif
+
+    {
+        // get payload
+        std::vector<JSON>* array = static_cast<std::vector<JSON>*>(a.data());
+        assert (array->size() == a.size());
+        assert (array->empty() == a.empty());
+    }
 }
 
 void test_streaming() {
@@ -223,6 +237,30 @@ void test_streaming() {
         j >> o;
         o >> k;
         assert(j.toString() == k.toString());
+    }
+    
+    // check numbers
+    {
+        std::stringstream number_stream;
+        number_stream << "[0, -1, 1, 1.0, -1.0, 1.0e+1, 1.0e-1, 1.0E+1, 1.0E-1, -1.2345678e-12345678]";
+        JSON j;
+        j << number_stream;
+    }
+    
+    // check Unicode
+    {
+        std::stringstream unicode_stream;
+        unicode_stream << "[\"öäüÖÄÜß\", \"ÀÁÂÃĀĂȦ\", \"★☆→➠♥︎♦︎☁︎\"]";
+        JSON j;
+        j << unicode_stream;
+    }
+
+    // check escaped strings
+    {
+        std::stringstream escaped_stream;
+        escaped_stream << "[\"\\\"Hallo\\\"\", \"\u0123\"]";
+        JSON j;
+        j << escaped_stream;
     }
 }
 

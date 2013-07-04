@@ -623,13 +623,21 @@ bool JSON::parser::next() {
     return true;
 }
 
-/// \todo: escaped strings
 std::string JSON::parser::parseString() {
-    // get position of closing quote
-    const char* p = strchr(_buffer + _pos, '\"');
+    // get position of closing quotes
+    char* p = strchr(_buffer + _pos, '\"');
 
-    // check if quotes were found
-    if (!p) {
+    // if the closing quotes are escaped (viz. *(p-1) is '\\'),
+    // we continue looking for the "right" quotes
+    while (p != nullptr and *(p-1) == '\\') {
+        // length of the string so far
+        const size_t length = p - _buffer - _pos;
+        // continue checking after escaped quote
+        p = strchr(_buffer + _pos + length + 1, '\"');
+    }
+
+    // check if closing quotes were found
+    if (p == nullptr) {
         error("expected '\"'");
     }
 
@@ -642,6 +650,8 @@ std::string JSON::parser::parseString() {
 
     // +1 to eat closing quote
     _pos += length + 1;
+
+    bool ready = (_buffer[_pos-2] == '\\');
 
     // read next character
     next();
@@ -697,8 +707,6 @@ void JSON::parser::parse(JSON& result) {
     if (!_buffer) {
         error("unexpected end of file");
     }
-
-    //JSON result;
 
     switch (_current) {
         case ('{'): {

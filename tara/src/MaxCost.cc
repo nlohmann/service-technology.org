@@ -81,9 +81,10 @@ unsigned int maxCost(pnapi::PetriNet* net) {
    Tara::graph[Tara::initialState]->curTransition = Tara::graph[Tara::initialState]->transitions.begin();
    nodeStack.push_back(Tara::initialState);
     
-   unsigned int maxCost=0;
-   unsigned int curCost=0;
-   unsigned int curLen=0;
+   unsigned int maxCost = 0;
+   int minCost = -1;
+   unsigned int curCost = 0;
+   unsigned int curLen  = 0;
 
    while(!nodeStack.empty()) {
        int tos(nodeStack.back()); /* tos = Top Of Stack */
@@ -91,7 +92,13 @@ unsigned int maxCost(pnapi::PetriNet* net) {
        if (maxCost == Tara::sumOfLocalMaxCosts) { status("Found a path which is equal to maxout upper bound."); return maxCost; }
        // if accepting state, update MaxCost
        if(Tara::graph[tos]->final) {
-           maxCost=maxCost>curCost ? maxCost:curCost;
+           maxCost = maxCost > curCost ? maxCost : curCost;
+           if(minCost == -1) {
+               minCost = curCost;
+           }
+           else {
+              minCost = minCost < curCost ? minCost : curCost;
+           }
 	//   status("Final state found. Current max: %d", maxCost);
         }
     
@@ -133,6 +140,8 @@ unsigned int maxCost(pnapi::PetriNet* net) {
        ++(Tara::graph[tos]->curTransition);
    }
  	status("Using upper bound: %d", maxCost);        
+ 	status("Using lower bound: %d", minCost);        
+    Tara::minCosts = minCost;
   	return maxCost;
    //printf("\n maxCost: %d \n\n", maxCost);
 }

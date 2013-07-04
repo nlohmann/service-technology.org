@@ -4,6 +4,7 @@
 unsigned int Tara::highestTransitionCosts = 0;
 unsigned int Tara::sumOfLocalMaxCosts = 0;
 unsigned int Tara::initialState = 0;
+unsigned int Tara::minCosts = 0; // gna task #7709
 lprec* Tara::lp = 0; 
 int Tara::nrOfEdges = 0;
 int Tara::nrOfFinals = 0;
@@ -174,8 +175,16 @@ void Tara::constructLP() {
 int Tara::solveLP() {
 
     solve(lp);
+    int res = get_objective(lp);
 
-    return get_objective(lp);
+    // gna task #7709
+    set_minim(lp);
+    solve(lp);
+    int min = get_objective(lp);
+    Tara::minCosts = min;
+    status("Using LP lower bound: %d", min);
+
+    return res;
 
 }
 

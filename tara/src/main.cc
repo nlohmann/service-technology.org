@@ -296,7 +296,7 @@ int main(int argc, char** argv) {
                 status("Step 5: Find the minimal budget with a binary search");
 
                 int bsUpper = maxCostOfComposition-1; // for maxCostofComposition, it is controllable anyway. 
-                int bsLower = 0;
+                int bsLower = Tara::minCosts; // gna task #7709
             
                 while (bsLower <= bsUpper) {
                    

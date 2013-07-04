@@ -28,6 +28,9 @@ public:
     /// the initial state of the taraGraph, parsed from Lola
     static unsigned int initialState;
 
+    // minimal costs (gna task#7709)
+    static unsigned int minCosts;
+
     /**
      * @brief returns the cost of a given transition,
      * returns 0 if no costs for this transition are known

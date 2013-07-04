@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cassert>
 #include <JSON.h>
+#include <sstream>
 
 void test_null() {
     /* a null object */
@@ -15,7 +16,7 @@ void test_null() {
 
     // copy construct
     JSON c(a);
-    
+
     // copy construct
     JSON d = a;
 
@@ -23,14 +24,14 @@ void test_null() {
     JSON e = JSON();
 
     // compare
-    assert (a == b);
+    assert(a == b);
 
     // type
-    assert (a.type() == JSON::null);
+    assert(a.type() == JSON::null);
 
     // empty and size
-    assert (a.size() == 0);
-    assert (a.empty() == true);
+    assert(a.size() == 0);
+    assert(a.empty() == true);
 
     // output
     std::cout << a << '\n';
@@ -43,8 +44,8 @@ void test_null() {
         int i = 0;
         i = a;
         assert(false);
-    } catch(const std::exception& ex) {
-        assert (ex.what() == std::string("cannot cast null to JSON number"));
+    } catch (const std::exception& ex) {
+        assert(ex.what() == std::string("cannot cast null to JSON number"));
     }
 
     // invalid conversion to double
@@ -52,24 +53,24 @@ void test_null() {
         double f = 0;
         f = a;
         assert(false);
-    } catch(const std::exception& ex) {
-        assert (ex.what() == std::string("cannot cast null to JSON number"));
+    } catch (const std::exception& ex) {
+        assert(ex.what() == std::string("cannot cast null to JSON number"));
     }
 
     // invalid conversion to bool
     try {
         bool b = a;
         assert(false);
-    } catch(const std::exception& ex) {
-        assert (ex.what() == std::string("cannot cast null to JSON Boolean"));
+    } catch (const std::exception& ex) {
+        assert(ex.what() == std::string("cannot cast null to JSON Boolean"));
     }
 
     // invalid conversion to string
     try {
         std::string s = a;
         assert(false);
-    } catch(const std::exception& ex) {
-        assert (ex.what() == std::string("cannot cast null to JSON string"));
+    } catch (const std::exception& ex) {
+        assert(ex.what() == std::string("cannot cast null to JSON string"));
     }
 }
 
@@ -85,7 +86,7 @@ void test_string() {
 
     // copy construct
     JSON c(a);
-    
+
     // copy construct
     JSON d = a;
 
@@ -93,14 +94,14 @@ void test_string() {
     JSON e = JSON("");
 
     // compare
-    assert (a == b);
+    assert(a == b);
 
     // type
-    assert (a.type() == JSON::string);
+    assert(a.type() == JSON::string);
 
     // empty and size
-    assert (a.size() == 1);
-    assert (a.empty() == false);
+    assert(a.size() == 1);
+    assert(a.empty() == false);
 
     // output
     std::cout << a << '\n';
@@ -113,8 +114,8 @@ void test_string() {
         int i = 0;
         i = a;
         assert(false);
-    } catch(const std::exception& ex) {
-        assert (ex.what() == std::string("cannot cast string to JSON number"));
+    } catch (const std::exception& ex) {
+        assert(ex.what() == std::string("cannot cast string to JSON number"));
     }
 
     // invalid conversion to double
@@ -122,8 +123,8 @@ void test_string() {
         double f = 0;
         f = a;
         assert(false);
-    } catch(const std::exception& ex) {
-        assert (ex.what() == std::string("cannot cast string to JSON number"));
+    } catch (const std::exception& ex) {
+        assert(ex.what() == std::string("cannot cast string to JSON number"));
     }
 
     // invalid conversion to bool
@@ -131,8 +132,8 @@ void test_string() {
         bool b = false;
         b = a;
         assert(false);
-    } catch(const std::exception& ex) {
-        assert (ex.what() == std::string("cannot cast string to JSON Boolean"));
+    } catch (const std::exception& ex) {
+        assert(ex.what() == std::string("cannot cast string to JSON Boolean"));
     }
 }
 
@@ -145,11 +146,11 @@ void test_array() {
     a += "string";
 
     // type
-    assert (a.type() == JSON::array);
+    assert(a.type() == JSON::array);
 
     // empty and size
-    assert (a.size() == 5);
-    assert (a.empty() == false);
+    assert(a.size() == 5);
+    assert(a.empty() == false);
 
     // output
     std::cout << a << '\n';
@@ -164,8 +165,8 @@ void test_array() {
     try {
         a[5] = 1;
         assert(false);
-    } catch(const std::exception& ex) {
-        assert (ex.what() == std::string("cannot access element at index 5"));
+    } catch (const std::exception& ex) {
+        assert(ex.what() == std::string("cannot access element at index 5"));
     }
 
     // get elements
@@ -175,16 +176,16 @@ void test_array() {
         bool b = a[3];
         std::string s = a[4];
     }
-    
+
     // set elements
     a[1] = 2;
-    
+
 #ifdef __cplusplus11
     // construction from initializer list
     JSON b = {JSON(), 2, 1.0, true, "string"};
     assert(a == b);
 #endif
-        
+
     // iterators
     for (JSON::iterator i = a.begin(); i != a.end(); ++i) {
         std::cerr << *i << '\n';
@@ -193,7 +194,7 @@ void test_array() {
     for (JSON::const_iterator i = a.cbegin(); i != a.cend(); ++i) {
         std::cerr << *i << '\n';
     }
-    
+
 #ifdef __cplusplus11
     for (auto element : a) {
         std::cerr << element << '\n';
@@ -201,18 +202,35 @@ void test_array() {
 #endif
 }
 
-int main() {
-//    test_null();
-//    test_string();
-//    test_array();
+void test_streaming() {
+    // stream text representation into stream
+    std::stringstream i;
+    i << "{ \"foo\": true, \"baz\": [1,2,3,4] }";
 
-    std::ifstream i("citylots.json");
-    
-    JSON b;
-    b << i;
-    
-    std::ofstream o("output2.json");
-    o << b;
+    // create JSON from stream
+    {
+        JSON j, k;
+        i >> j;
+        k << i;
+        assert(j.toString() == k.toString());
+    }
+
+    // roundtrip
+    {
+        std::stringstream o;
+        JSON j, k;
+        i >> j;
+        j >> o;
+        o >> k;
+        assert(j.toString() == k.toString());
+    }
+}
+
+int main() {
+    test_null();
+    test_string();
+    test_array();
+    test_streaming();
 
     return 0;
 }

@@ -103,6 +103,12 @@ class JSON {
             return o;
         }
 
+        /// write to stream
+        friend std::ostream& operator>>(const JSON& j, std::ostream& o) {
+            o << j.toString();
+            return o;
+        }
+
         /// read from stream
         friend std::istream& operator>>(std::istream& i, JSON& j) {
             parser(i).parse(j);

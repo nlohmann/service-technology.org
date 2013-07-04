@@ -74,6 +74,14 @@ void test_null() {
     }
 }
 
+
+void test_bool() {
+    JSON True = true;
+    JSON False = false;
+
+    bool x = True;
+}
+
 void test_string() {
     /* a string object */
 
@@ -211,8 +219,8 @@ void test_array() {
     {
         // get payload
         std::vector<JSON>* array = static_cast<std::vector<JSON>*>(a.data());
-        assert (array->size() == a.size());
-        assert (array->empty() == a.empty());
+        assert(array->size() == a.size());
+        assert(array->empty() == a.empty());
     }
 }
 
@@ -238,7 +246,7 @@ void test_streaming() {
         o >> k;
         assert(j.toString() == k.toString());
     }
-    
+
     // check numbers
     {
         std::stringstream number_stream;
@@ -246,7 +254,7 @@ void test_streaming() {
         JSON j;
         j << number_stream;
     }
-    
+
     // check Unicode
     {
         std::stringstream unicode_stream;
@@ -266,6 +274,7 @@ void test_streaming() {
 
 int main() {
     test_null();
+    test_bool();
     test_string();
     test_array();
     test_streaming();

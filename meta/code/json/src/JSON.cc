@@ -93,6 +93,11 @@ JSON& JSON::operator=(JSON o) {
 }
 #else
 JSON& JSON::operator=(const JSON& o) {
+    // check for self-assignment
+    if (&o == this) {
+        return *this;
+    }
+
     switch (_type) {
         case (array): {
             delete static_cast<std::vector<JSON>*>(_payload);
@@ -611,10 +616,6 @@ void JSON::parser::error(std::string msg) {
 bool JSON::parser::next() {
     _current = _buffer[_pos++];
 
-    if (_buffer == nullptr) {
-        return false;
-    }
-
     // skip trailing whitespace
     while (std::isspace(_current)) {
         _current = _buffer[_pos++];
@@ -629,7 +630,7 @@ std::string JSON::parser::parseString() {
 
     // if the closing quotes are escaped (viz. *(p-1) is '\\'),
     // we continue looking for the "right" quotes
-    while (p != nullptr and *(p-1) == '\\') {
+    while (p != nullptr and * (p - 1) == '\\') {
         // length of the string so far
         const size_t length = p - _buffer - _pos;
         // continue checking after escaped quote
@@ -650,8 +651,6 @@ std::string JSON::parser::parseString() {
 
     // +1 to eat closing quote
     _pos += length + 1;
-
-    bool ready = (_buffer[_pos-2] == '\\');
 
     // read next character
     next();

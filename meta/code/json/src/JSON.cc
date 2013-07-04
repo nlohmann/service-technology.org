@@ -93,28 +93,65 @@ JSON& JSON::operator=(JSON o) {
 }
 #else
 JSON& JSON::operator=(const JSON& o) {
+    switch (_type) {
+        case (array): {
+            delete static_cast<std::vector<JSON>*>(_payload);
+            break;
+        }
+        case (object): {
+            delete static_cast<std::map<std::string, JSON>*>(_payload);
+            break;
+        }
+        case (string): {
+            delete static_cast<std::string*>(_payload);
+            break;
+        }
+        case (boolean): {
+            delete static_cast<bool*>(_payload);
+            break;
+        }
+        case (number_int): {
+            delete static_cast<int*>(_payload);
+            break;
+        }
+        case (number_float): {
+            delete static_cast<double*>(_payload);
+            break;
+        }
+        case (null): {
+            break;
+        }
+    }
+
     _type = o._type;
     switch (_type) {
-        case (array):
+        case (array): {
             _payload = new std::vector<JSON>(*static_cast<std::vector<JSON>*>(o._payload));
             break;
-        case (object):
+        }
+        case (object): {
             _payload = new std::map<std::string, JSON>(*static_cast<std::map<std::string, JSON>*>(o._payload));
             break;
-        case (string):
+        }
+        case (string): {
             _payload = new std::string(*static_cast<std::string*>(o._payload));
             break;
-        case (boolean):
+        }
+        case (boolean): {
             _payload = new bool(*static_cast<bool*>(o._payload));
             break;
-        case (number_int):
+        }
+        case (number_int): {
             _payload = new int(*static_cast<int*>(o._payload));
             break;
-        case (number_float):
+        }
+        case (number_float): {
             _payload = new double(*static_cast<double*>(o._payload));
             break;
-        case (null):
+        }
+        case (null): {
             break;
+        }
     }
 
     return *this;
@@ -124,26 +161,33 @@ JSON& JSON::operator=(const JSON& o) {
 /// destructor
 JSON::~JSON() {
     switch (_type) {
-        case (array):
+        case (array): {
             delete static_cast<std::vector<JSON>*>(_payload);
             break;
-        case (object):
+        }
+        case (object): {
             delete static_cast<std::map<std::string, JSON>*>(_payload);
             break;
-        case (string):
+        }
+        case (string): {
             delete static_cast<std::string*>(_payload);
             break;
-        case (boolean):
+        }
+        case (boolean): {
             delete static_cast<bool*>(_payload);
             break;
-        case (number_int):
+        }
+        case (number_int): {
             delete static_cast<int*>(_payload);
             break;
-        case (number_float):
+        }
+        case (number_float): {
             delete static_cast<double*>(_payload);
             break;
-        case (null):
+        }
+        case (null): {
             break;
+        }
     }
 }
 

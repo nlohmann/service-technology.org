@@ -100,18 +100,6 @@ void Runtime::init(int argc, char** argv) {
         abort(7, "invalid command-line parameter(s)");
     }
     free(params);
-
-    /*
-    {
-        message("BEGIN");
-        JSON j1;
-        j1["j1"] = "content for j1";
-        JSON j2;
-        j2 = "content for j2";
-        j1["j2"] = j2;
-        message("END");
-    }
-    */
 }
 
 void Runtime::setOutput(FILE *_output) {

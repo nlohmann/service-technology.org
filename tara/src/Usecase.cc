@@ -25,7 +25,8 @@
 #include "Usecase.h"
 #include "verbose.h"
 
-#define UC_DEBUG(x) x
+// #define UC_DEBUG(x) x
+#define UC_DEBUG(x) ;
 
 
 void Usecase::init() {
@@ -33,8 +34,9 @@ void Usecase::init() {
     *c = c->getFormula() && ((*invoice == 0) || (*finish == 0)) ;
 
     net->createArc(*credit, *pay_for_invoice);
-    credit->setTokenCount(i);
+    net->createArc(*invoice, *pay_for_invoice);
 
+    setToValue(i);
     // std::cout << pnapi::io::owfn << *net;
 }
 
@@ -92,7 +94,6 @@ Usecase::Usecase(
         }
     }
 
-
     // copy all transitions from usecase to orig (and prefix)
     std::set<pnapi::Transition*> allUcTrans = usecase->getTransitions();
     for(std::set<pnapi::Transition*>::iterator it = allUcTrans.begin(); it != allUcTrans.end(); ++it) {
@@ -138,6 +139,7 @@ Usecase::Usecase(
 
     // Add invoice archs
     // for all elements in costfunction
+    std::map<pnapi::Transition*, unsigned int> newCostfunction;
     for(std::map<pnapi::Transition*,unsigned int>::iterator it = costfunction->begin(); it !=  costfunction->end(); ++it) {
         // transition in usecase
         pnapi::Transition* t = orig->findTransition("uc_" + it->first->getName());
@@ -146,8 +148,10 @@ Usecase::Usecase(
         if(t and it->second > 0) {
             usecase->createArc(*t, *invoice, it->second);
         }
+        newCostfunction[t] = it->second;
         it->second = 0;
     }
+    (*costfunction) = newCostfunction;
 
 
     //  TODO: strict
@@ -242,31 +246,104 @@ Usecase::Usecase(
     pnapi::Condition* finalCond = &usecase->getFinalCondition();
 
     // here, we transform final condition to a transition-precondition
-    // using pnapi interval
-    // jump_back: set the pre-condition
-    // TODO: FOREACH clause in DNF
-    // TODO: validate literals in clause -> warnings
-    for(std::set<pnapi::Place*>::iterator it = allUcPlaces.begin(); it != allUcPlaces.end(); ++it) {
-        // find new place in orig
-        pnapi::Place* ucPlace = orig->findPlace((*it)->getName());
+    // jump_back-transitions: set the pre-condition
+    const pnapi::formula::Formula* ucFormula = &finalCond->getFormula();
+    pnapi::formula::Disjunction* formula;
+    const pnapi::formula::Formula* fTrue = new pnapi::formula::FormulaTrue();
+    const pnapi::formula::Formula* fFalse = new pnapi::formula::FormulaFalse();
 
-        // TODO interval not precise enough
-        pnapi::formula::Interval interval = finalCond->getPlaceInterval(*(*it));
-        int upper =  interval.getUpper();
-        int lower =  interval.getLower();
-        //status("at place  uc_%s", (*it)->getName().c_str());
-        //status("at interval %d   %d", lower, upper);
-        if(lower > 0) {
-            orig->createArc(*ucPlace, *cond_jump_back, lower);
-            orig->createArc(*cond_jump_back, *ucPlace, lower);
+    // create dnf
+    ucFormula->dnf();
+    ucFormula->removeNegation();
+    UC_DEBUG(status("formula type is: %d", ucFormula->getType());)
+
+    // make sure we have full dnf
+    switch(ucFormula->getType()) {
+        case pnapi::formula::Formula::F_DISJUNCTION:
+            // we have a full DNF
+            formula = dynamic_cast<pnapi::formula::Disjunction*> (ucFormula->clone());
+            break;
+        case pnapi::formula::Formula::F_CONJUNCTION:
+            // complete to full DNF
+            formula = new pnapi::formula::Disjunction((*ucFormula) , (*fFalse));
+            break;
+        default: // everything else should be literal
+            formula = new pnapi::formula::Disjunction(((*ucFormula) , (*fTrue)) || (*fFalse));
+            break;
+    }
+
+    UC_DEBUG(status("new formula type is: %d", formula->getType());)
+    const std::set<const pnapi::formula::Formula*> clauseSet = formula->getChildren();
+    unsigned int jb_counter = 0;
+
+    // for all clauses in disjunction
+    for(std::set<const pnapi::formula::Formula*>::iterator clauseIt = clauseSet.begin(); clauseSet.end() != clauseIt; ++clauseIt) {
+
+        // assume: every claus is conjunction
+        if( (*clauseIt)->getType() != pnapi::formula::Formula::F_CONJUNCTION) {
+            message("somewhere somthing went wrong. Please report bug.");
+            abort();
         }
-        if(upper > 0) {
-            //TODO: strict
-            message("there is an upper bound for place %s", (*it)->getName().c_str());
-            /*
-              orig->createArc(*ucComplPlace, *cond_jump_back, SOME_BIG_INT - upper);
-              orig->createArc(*cond_jump_in, *ucComplPlace, SOME_BIG_INT - upper);
-            */
+
+        // create Transition for each clause
+        ++jb_counter;
+        std::stringstream newName;
+        newName << "jump_back_" << jb_counter;
+        pnapi::Transition* newTrans = &orig->createTransition(newName.str().c_str());
+
+        orig->createArc(*uc_in_usecase, *newTrans);
+        orig->createArc(*newTrans, *finish);
+        orig->createArc(*newTrans, *in_orig);
+
+        // for each literal create arc
+        const pnapi::formula::Conjunction* clause = dynamic_cast<pnapi::formula::Conjunction*> ((*clauseIt)->clone());
+        const std::set<const pnapi::formula::Formula*> literals = clause->getChildren();
+        for(std::set<const pnapi::formula::Formula*>::iterator litIt = literals.begin(); litIt != literals.end(); ++litIt) {
+            // each literals is a proposition
+            const pnapi::formula::Proposition* proposition = dynamic_cast<const pnapi::formula::Proposition*> (*litIt);
+            pnapi::Place* place = orig->findPlace(proposition->getPlace().getName());
+            unsigned int tokens = proposition->getTokens();
+            switch( (*litIt)->getType()) {
+                case pnapi::formula::Formula::F_FALSE:
+                    // AND FALSE <=> trans aint gonna firin
+                    orig->deleteTransition(*newTrans);
+                    break;
+                case pnapi::formula::Formula::F_TRUE:
+                    // AND TRUE <=> do nothing
+                    break;
+                // EQUAL literal
+                case pnapi::formula::Formula::F_EQUAL:
+                    {
+                        char m[] = "in usecase final condition: %s = %d not possible in non-strict mode, interpreted as %s > %d";
+                        message(m, place->getName().c_str(), tokens, place->getName().c_str(), tokens);
+                    }
+                // GREATER literal
+                case pnapi::formula::Formula::F_GREATER_EQUAL:
+                    orig->createArc(*place, *newTrans, tokens);
+                    orig->createArc(*newTrans, *place, tokens);
+                    break;
+                // GREATER EQUAL literal
+                case pnapi::formula::Formula::F_GREATER:
+                    orig->createArc(*place, *newTrans, tokens + 1);
+                    orig->createArc(*newTrans, *place, tokens + 1);
+                    break;
+                // LESS literal
+                case pnapi::formula::Formula::F_LESS:
+                    {
+                        char m[] = "in usecase final condition: %s < %d not possible in non-strict mode, interpreted as 'always true'";
+                        message(m, place->getName().c_str(), tokens);
+                    }
+                    break;
+                // LESS EQUAL literal
+                case pnapi::formula::Formula::F_LESS_EQUAL:
+                    {
+                        char m[] = "in usecase final condition: %s <= %d not possible in non-strict mode, interpreted as 'always true'";
+                        message(m, place->getName().c_str(), tokens);
+                    }
+                    break;
+                default:
+                    message("such things not allowed in non-strict mode. Pleae report bug.");
+            }
         }
     }
 
@@ -274,9 +351,6 @@ Usecase::Usecase(
 
     // add PAY_FOR_INVOICE trans
     pay_for_invoice = &orig->createTransition("pay_for_invoice");
-    // set costfunction for computing the bound
-    (*costfunction)[pay_for_invoice] = 1;
-    orig->createArc(*invoice, *pay_for_invoice);
     orig->createArc(*pay_for_invoice, *finish);
     orig->createArc(*finish, *pay_for_invoice); 
     // the arc to credit will be added later

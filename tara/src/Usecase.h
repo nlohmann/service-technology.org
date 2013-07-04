@@ -3,6 +3,7 @@
 
 #include <map>
 #include <pnapi/pnapi.h>
+#include <sstream>
 #include "Modification.h"
 
 class Usecase : public Modification {

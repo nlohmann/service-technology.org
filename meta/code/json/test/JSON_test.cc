@@ -74,7 +74,6 @@ void test_null() {
     }
 }
 
-
 void test_bool() {
     JSON True = true;
     JSON False = false;
@@ -282,6 +281,29 @@ void test_array() {
     }
 }
 
+void test_object() {
+    // check find()
+    {
+        JSON o;
+        o["foo"] = "bar";
+
+        JSON::iterator i1 = o.find("foo");
+        assert(i1 != o.end());
+        assert(i1.value() == "bar");
+        assert(i1.key() == "foo");
+        assert(*i1 == "bar");
+
+        JSON::iterator i2 = o.find("baz");
+        assert(i2 == o.end());
+        
+        JSON a;
+        a += "foo";
+        a += "bar";
+        JSON::iterator i = a.find("foo");
+        assert(i == a.end());
+    }
+}
+
 void test_streaming() {
     // stream text representation into stream
     std::stringstream i;
@@ -335,6 +357,7 @@ int main() {
     test_bool();
     test_string();
     test_array();
+    test_object();
     test_streaming();
 
     return 0;

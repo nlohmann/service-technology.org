@@ -643,7 +643,7 @@ std::string JSON::parser::parseString() {
     const size_t length = p - _buffer - _pos;
     char* tmp = new char[length + 1];
     std::strncpy(tmp, _buffer + _pos, length);
-	tmp[length] = 0;
+    tmp[length] = 0;
     std::string result(tmp);
     delete [] tmp;
 

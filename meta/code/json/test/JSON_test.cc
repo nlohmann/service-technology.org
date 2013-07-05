@@ -211,14 +211,12 @@ void test_array() {
     }
 
     {
-        /*
         size_t count = 0;
         for (JSON::const_iterator i = a.begin(); i != a.end(); ++i) {
             std::cerr << *i << '\n';
             count++;
         }
         assert(count == a.size());
-        */
     }
 
     {
@@ -252,7 +250,6 @@ void test_array() {
     }
 
     {
-        /*
         JSON::const_iterator i;
         size_t count = 0;
         for (i = a.begin(); i != a.end(); ++i) {
@@ -260,7 +257,6 @@ void test_array() {
             count++;
         }
         assert(count == a.size());
-        */
     }
 
     {
@@ -299,7 +295,8 @@ void test_object() {
         JSON a;
         a += "foo";
         a += "bar";
-        JSON::iterator i = a.find("foo");
+        JSON::iterator i;
+        i = a.find("foo");
         assert(i == a.end());
     }
 }

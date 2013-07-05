@@ -643,6 +643,7 @@ std::string JSON::parser::parseString() {
     const size_t length = p - _buffer - _pos;
     char* tmp = new char[length + 1];
     std::strncpy(tmp, _buffer + _pos, length);
+	tmp[length] = 0;
     std::string result(tmp);
     delete [] tmp;
 
@@ -838,7 +839,7 @@ JSON::iterator::iterator(JSON* j) : _object(j), _vi(nullptr), _oi(nullptr) {
 JSON::iterator::iterator(const JSON::iterator& o) : _object(o._object), _vi(nullptr), _oi(nullptr) {
     switch (_object->_type) {
         case (array): {
-            _vi = new std::vector<JSON>::iterator(*(o_.vi));
+            _vi = new std::vector<JSON>::iterator(*(o._vi));
             break;
         }
         case (object): {
@@ -859,7 +860,7 @@ JSON::iterator& JSON::iterator::operator=(const JSON::iterator& o) {
     _object = o._object;
     switch (_object->_type) {
         case (array): {
-            _vi = new std::vector<JSON>::iterator(*(o_.vi));
+            _vi = new std::vector<JSON>::iterator(*(o._vi));
             break;
         }
         case (object): {

@@ -1,0 +1,161 @@
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+
+option "debug" d
+  "Show debug messages."
+  details="Show information on rule application. If FLAGS are given, only the corresponding rules can be applied.\n"
+  int
+  typestr="FLAGS"
+  argoptional
+  optional
+
+option "threads" t
+  "Number of threads to run."
+  int
+  typestr="THREADS"
+  optional
+
+section "Input/output"
+
+option "readjson" r
+  "Read JSON property file to translate a path from the reduced net to the original net."
+  string
+  typestr="FILENAME"
+  optional
+
+option "writejson" w
+  "Write properties or translated path to a JSON file instead of stdout."
+  string
+  typestr="FILENAME"
+  optional
+
+option "outputnet" o
+  "Write Petri net to a file."
+  string
+  typestr="FILENAME"
+  optional
+
+option "pnml" -
+  "Read Petri net as PNML."
+  flag off
+
+option "lola" -
+  "Read Petri net in LoLA format."
+  flag off
+
+section "Node visibility"
+
+option "persistent" p
+  "Make a place or transition unremovable."
+  string
+  typestr="NODE"
+  optional
+  multiple
+
+option "seen" s
+  "Make a place or transition visible. Parmida will then suggest changes for formulas if the node is removed."
+  string
+  typestr="NODE"
+  optional
+  multiple
+
+option "label" l
+  "Roles in the Petri net are taken as visible action labels of transitions. The specified label is assumed to occur in a formula."
+  string
+  typestr="ACTION"
+  optional
+  multiple
+
+option "allplaces" P
+  "All places are visible."
+  flag off
+
+option "alltransitions" T
+  "All transitions are visible."
+  flag off
+
+section "Required Properties"
+
+option "ctl" -
+  "The reduced net should be equivalent with respect to CTL formulas."
+  flag off
+
+option "ctlx" -
+  "The reduced net should be equivalent with respect to CTL-X formulas."
+  flag off
+
+option "ltl" -
+  "The reduced net should be equivalent with respect to state-based LTL formulas."
+  flag off
+
+option "ltlx" -
+  "The reduced net should be equivalent with respect to state-based LTL-X formulas."
+  flag off
+
+option "altl" -
+  "The reduced net should be equivalent with respect to action-based LTL formulas."
+  flag off
+
+option "altlx" -
+  "The reduced net should be equivalent with respect to action-based LTL-X formulas."
+  flag off
+
+option "live" -
+  "Liveness should be deducable from the reduced net."
+  flag off
+
+option "nonlive" -
+  "Non-liveness should be deducable from the reduced net."
+  flag off
+
+option "LIVE" -
+  "Original and reduced net should be equivalent regarding liveness."
+  flag off
+
+option "bounded" -
+  "Boundedness should be deducable from the reduced net."
+  flag off
+
+option "nonbounded" -
+  "Unboundedness should be deducable from the reduced net."
+  flag off
+
+option "BOUNDED" -
+  "Original and reduced net should be equivalent regarding boundedness."
+  flag off
+
+option "path" -
+  "Firing sequences in the reduced net must be translatable to the original net."
+  flag off
+
+option "complexpath" -
+  "Firing sequences in the reduced net must be translatable to boolean expressions in the original net."
+  flag off
+
+option "safe" -
+  "Safety should be deducable from the reduced net."
+  flag off
+
+option "unsafe" -
+  "Non-safety should be deducable from the reduced net."
+  flag off
+
+option "SAFE" -
+  "Original and reduced net should be equivalent regarding safety."
+  flag off
+
+option "bisimulation" -
+  "Original and reduced net should be bisimulation equivalent."
+  flag off
+
+option "reversibility" -
+  "Original and reduced net should be both reversible or both not."
+  flag off
+
+option "final" f
+  "The final condition given in the Petri net file must be considered."
+  flag off

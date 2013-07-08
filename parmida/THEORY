@@ -1,0 +1,27 @@
+                ____                        _     _       
+               |  _ \  __ _ _ __  _ __ ___ (_) __| | __ _ 
+               | |_) |/ _` | '__\| '_ ' _ \| |/ _  |/ _` |
+               |  __/| (_| | |   | | | | | | | (_| | (_| |
+               |_|    \__,_|_|   |_| |_| |_|_|\____|\__,_|
+                                           
+          PArallel Reduction Methods wIth Distributed Analysis
+                  http://service-technology.org/parmida
+
+
+Parmida implements several algorithms and result published in several
+scientific articles.  Parmida implements several reduction rules for Petri
+nets.
+
+Reduction Rules
+===============
+
+Most of the reduction rules stem from Peter Starke:
+
+     P.H. Starke. Analyse von Petri-Netz-Modellen. Teubner, ISBN
+     978-3-519-02244-3, 1990.
+
+
+
+
+See `http://service-technology.org/publications' for more information.
+

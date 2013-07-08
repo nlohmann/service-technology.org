@@ -1,0 +1,12 @@
+{
+"toolname": "Parmida", 
+"shortname": "parmida", 
+"svnname": "parmida", 
+"authors": [
+    "Harro Wimmel"
+], 
+"maintainer": "Harro Wimmel", 
+"tagline": "Petri Net Reduction", 
+"purpose": "Parallel Reduction Methods for P/T Nets", 
+"license": "AGPL3+"
+}

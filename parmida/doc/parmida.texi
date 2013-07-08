@@ -1,0 +1,742 @@
+\input texinfo
+@setfilename parmida.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle Parmida User's Manual
+
+
+@c --------------------------------------------------------------------------
+
+
+@copying
+@b{About this document:}
+
+This manual is for Parmida, version @value{VERSION}, a parallel net reduction tool, last updated @value{UPDATED}.
+
+Copyright @copyright{} Harro Wimmel
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@dircategory service-technology.org
+@direntry
+* Parmida: (parmida).       Parallel Reduction Methods wIth Distributed Analysis.
+@end direntry
+
+
+@c --------------------------------------------------------------------------
+
+
+@titlepage
+
+@title Parmida
+
+@subtitle Parallel Reduction Methods wIth Distributed Analysis
+@subtitle @url{http://service-technology.org/parmida}
+@vskip 0.5em
+@subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author Harro Wimmel
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+
+@c --------------------------------------------------------------------------
+
+
+@ifnottex
+@node Top
+@top Parmida
+@insertcopying
+@end ifnottex
+
+
+@c --------------------------------------------------------------------------
+
+
+@menu
+* First Steps::How to set up and install Parmida.
+* Command Line Options::How to run Parmida.
+* Theory::The theory behind Parmida.
+* Exit and Error Codes::What the error and exit codes of Parmida mean.
+* ChangeLog::Version history.
+* GNU Free Documentation License::The license of this manual.
+@end menu
+
+@c --------------------------------------------------------------------------
+
+
+@contents
+@paragraphindent none
+
+
+@c --------------------------------------------------------------------------
+
+
+@node First Steps
+@chapter First Steps
+@section Setup and Installation
+
+@enumerate
+@item Go to @url{http://service-technology.org/files/parmida} and download the latest release version of Parmida, say @file{parmida-@value{VERSION}.tar.gz}. To setup and compile Parmida, change into your download directory and type
+
+@cartouche
+@smallexample
+tar xfz parmida-@value{VERSION}.tar.gz
+cd parmida-@value{VERSION}
+./configure
+make
+@end smallexample
+@end cartouche
+
+After compilation, a binary @samp{src/parmida} is generated.@footnote{On Microsoft Windows, the file will be called @file{parmida.exe}.} If you experience any compiler warnings, don't panic: Parmida contains some generated or third party code that we cannot influence.
+
+@item To test whether everything went fine, type
+
+@cartouche
+@smallexample
+make check
+@end smallexample
+@end cartouche
+
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
+
+@smallexample
+## ------------- ##
+## Test results. ##
+## ------------- ##
+
+All <<-- TESTNUM -->> tests were successful.
+@end smallexample
+
+If an error occurs, please send the output to @email{parmida@@service-technology.org}.
+
+@item To install the binary, the manpage, and the documentation, type
+
+@cartouche
+@smallexample
+make install
+@end smallexample
+@end cartouche
+
+You might need superuser permissions to do so.
+@end enumerate
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of Parmida. The documentation can be created using @samp{make pdf}. Note you need to have Parmida properly installed before (see installation description above).
+
+@item libs
+The Petri Net @acronym{API} used by Parmida to parse and organize a Petri net.
+
+@c @item man
+@c The manpage of Parmida which can be displayed using @samp{man parmida} after having Parmida installed (see installation description above).
+
+@item src
+The source code of Parmida.
+
+@item tests
+Testcases for Parmida which check the generated binary.
+@end table
+
+
+@c --------------------------------------------------------------------------
+
+
+@section Requirements
+@anchor{Requirements}
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+In order to run, compile, and develop Parmida, several tools are required.
+
+@c <<-- CHANGE START (tools required, etc.) -->>
+
+@subsection Runtime
+@itemize
+@item No additional tools are necessary at runtime.
+@end itemize
+
+@c <<-- CHANGE END -->>
+
+@subsection Compilation
+To compile the source code from a source distribution, the following tools are required.
+
+@itemize
+@item GCC (@url{http://gcc.gnu.org/})
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
+@end itemize
+
+
+@subsection Development
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile Parmida.
+
+@itemize
+@item Autoconf, @url{http://www.gnu.org/software/autoconf/}
+@item Automake, @url{http://www.gnu.org/software/automake/}
+@item Bison, @url{http://www.gnu.org/software/bison/}
+@item flex, @url{http://flex.sourceforge.net/}
+@item Gengetopt, @url{http://www.gnu.org/software/gengetopt/}
+@item help2man, @url{http://www.gnu.org/software/help2man/}
+@item Texinfo, @url{http://www.gnu.org/software/texinfo/}
+@end itemize
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Command Line Options
+@chapter Invoking Parmida
+
+Parmida is a command line tool and does not come with a fancy @acronym{GUI}. However, Parmida can be easily scripted and combined with other tools.
+
+@section What Parmida can do
+
+Parmida is a tool to reduce Petri nets. The reduction will respect given properties to be selected from:
+Safety, boundedness, liveness, reversibility, bisimulation equivalence, witness paths, and temporal
+logic (state or action based, with or without the NEXT operator). For this purpose, places and transitions
+of the Petri net can explicitly be made visible or even irremovable. Labelling is respected, action labels
+of transitions as well as communication labels in open nets (OWFN).
+
+In general, the result of a test for a selected property in the reduced net can directly be transferred to
+the original net, if the test is done for the net as a whole. Parmida will collect additional information of
+node related properties. This information may decide the property for a node or tell the user how to test
+the node using the reduced net. E.g., Parmida may tell the user that a place p is unbounded (deciding that
+property) or perhaps that a place p in the original net is safe if and only if a certain (but different)
+place q in the reduced net is safe. Such detailed information is collected for safety, boundedness, liveness
+and withness paths.
+
+The witness path information allows for a direct translation of a path in the reduced net to an equivalent
+path in the original net (i.e. showing the same behaviour and reaching an equivalent state). If the output
+is directed to a JSON object, a second call to Parmida can even do this translation automatically.
+
+For temporal logic formulae, Parmida must be notified which nodes are visible in the formula. If the reduction
+affects such a node (e.g. deletes it), Parmida will tell how to replace occurrences of the node in the formula.
+Such a revised formula can then be used on the reduced net to decide the original formula (for the original net). 
+
+
+@section Command Line Options
+
+For an overview of the command line options, type @samp{parmida --detailed-help} to see the following help screen:
+
+@smallexample
+@verbatiminclude cmdline.out
+@end smallexample
+
+@section Net formats
+
+Parmida currently supports three net formats (via PNAPI): PNML, the open net format OWFN, and the LoLA format.
+The open net format supports all features available in Parmida and is strongly advised. The PNAPI
+may not be able to handle labels with another format, if they are defined for such a format at all.
+
+If a Petri net in another format should be read, the according option, either @option{--pnml} or
+@option{--lola}, must be given on the command line.
+
+@section Checking safety, boundedness, and liveness
+
+Assume we want to test boundedness for a Petri net given in a file 'test.owfn'.
+A possible call would look like this:
+
+@cartouche
+@smallexample
+parmida test.owfn --BOUNDED -P -oresult.owfn
+@end smallexample
+@end cartouche
+
+The option @option{--BOUNDED} tells Parmida that we are interested in a reduced net that is bounded
+if and only if the original net is bounded. We might instead specify @option{--bounded} if we are
+only interested in transfering a positive result for the boundedness test to the original net, and
+@option{--unbounded} for the negative partial result. In general, specifying the full option
+@option{--BOUNDED} may lead to less reduction and thus a larger resulting net.
+
+The option @option{-o} tells Parmida where to put the resulting net. If the option is missing,
+the net will be written to stdout (seldom a good choice).
+
+The option @option{-P} makes all places in the original net visible. Parmida will then construct
+information about each place if it can be determined.
+
+Parmida writes its conclusions about the original and the reduced net to stdout. They might look
+like this:
+
+@cartouche
+@smallexample
+Deduced properties: unbounded
+Checkable properties: unbounded, bounded, unsafe, safe, paths
+
+Equivalences (original net --> reduced net):
+m(p1) --> 3
+m(p2) --> m(p3)+2
+bounded(p1) --> true
+safe(p1) --> false
+bounded(p2) --> bounded(p3)
+bounded(p4) --> false
+bounded(p5)&bounded(p6) --> bounded(p5)
+
+Path translations (reduced net --> original net):
+t1 --> t3 t1
+t2 --> t3 t2
+*init* -> t4
+@end smallexample
+@end cartouche
+
+Parmida has deduced that the original net is unbounded (in the line 'deduced properties'),
+so a general check for boundedness of the reduced net becomes unneccessary. The line
+'bounded(p4) --> false' tells us that especially place p4 is unbounded. We also know that
+the place p1 is bounded ('bounded(p1) --> true'), but all further places must be tested.
+The words 'bounded' and 'unbounded' under 'checkable properties' tell us that we may
+use the presented information and further tests on the reduced net to obtain information
+on the boundedness of visible places in the original net.
+
+The place p2 in the original net can be tested for boundedness by testing the place p3
+in the reduced net, and transfering the result ('bounded(p2) -> bounded(p3)').
+
+There is no rule for the place p3 in the original net. Since p3 exists in the reduced net,
+we may just test p3 in the reduced net. It will either be bounded in both nets or in none of them.
+
+Note: This only works if @option{-P} or @option{-sp3} has been specified. Only then will
+parmida present information collected on p3. And only then the absence of p3 from all
+left hand sides means that p3 can be tested directly. Without one of the options the absence 
+of a rule for p3 might also mean that boundedness for p3 cannot be tested.
+
+The places p5 and p6 cannot be tested, but if p5 is bounded in the reduced net, both places
+are bounded in the original net. This is what 'bounded(p5)&bounded(p6) --> bounded(p5)'
+tells us. Bot places occur one a left hand side, but not alone, so they cannot be tested.
+
+If there were an additional place p7 in the original net not existing in the reduced net,
+we could not test the boundedness of that place. If such a test was necessary,
+we would need to add the option @option{-pp7} to the command line. This will make the
+place p7 irremovable, so it can be individually tested in the reduced net. Alternatively,
+@option{-sp7} will make p7 visible and Parmida will collect rules for testing p7.
+
+Some additional information has been obtained. We know that p1 always carries 3 tokens
+('m(p1) --> 3') and that p2 always carries two more tokens in the original net than
+p3 in the reduced net ('m(p2) --> m(p3)+2'). We also know that p1 is not safe.
+Since 'safe' and 'unsafe' appear under checkable properties, safety of the remaining
+places can be checked by the same mechanisms as boundedness above.
+
+Also, whenever path information is available, it will be presented. If we have a firing
+sequence 't1 t2 t3 t1' in the reduced net, it can be translated to
+'t4 t3 t1 t3 t2 t3 t3 t1' in the original net to reach an equivalent state there.
+Both sequences will be firable in their respective nets (or both will not).
+Note the '*init*' part of the translation which becomes a fixed prefix to any
+translated path.
+
+Other properties can be checked analogously:
+
+@cartouche
+@smallexample
+parmida test.owfn --SAFE -P -oresult.owfn
+parmida test.owfn --LIVE -T -oresult.owfn
+@end smallexample
+@end cartouche
+
+In the latter case, @option{-T} makes all transitions visible, so information about
+them is collected and presented. The equivalences then might look like this:
+
+@cartouche
+@smallexample
+Equivalences (original net --> reduced net):
+live(t1) --> live(t2)
+live(t5) --> live(t2)|live(t3)
+live(t6)|live(t7) --> live(t2)
+live(t8) --> true
+@end smallexample
+@end cartouche
+
+So t1 is live in the original net if and only if t2 is live in the reduced net.
+For the liveness of t5 in the original net we may test both t2 and t3 in the
+reduced net; t5 is live if at least one of t2/t3 is live. Also, if t2 is live
+at least one of t6/t7 is live in the original net. Finally, t8 is live in
+the original net. If there is a transition t9 existing in both nets, it has
+the same liveness in both nets (identity rules are not computed/shown).
+If there is a transition t10 that exists in the original net only, we can
+make no conclusions. The option @option{-pt10} will make t10 irremovable
+so that a result can be obtained.
+
+@section Final markings and conditions
+
+If the original net has final markings or a final condition, these will usually
+be invalidated by the reduction process. To make the final condition transfer
+to the reduced net the option @option{--final} can be specified. It is a short
+cut that makes all places involved in the final condition visible (via option
+@option{-s}) and selects @option{--ltlx} to force correct state mapping by
+the reduction. Parmida will then translate the original final condition to
+a new final condition which becomes part of the reduced net.
+
+@section State based logics
+
+Assume we would like to test whether the temporal logic formula
+'AG (m(p1)=3 -> m(p2)>1)' holds for a given Petri net, but we would
+like to reduce the net first. Two likely calls would be
+
+@cartouche
+@smallexample
+parmida test.owfn -oresult.owfn --ctlx -sp1 -sp2
+parmida test.owfn -oresult.owfn --ctlx -pp1 -pp2
+@end smallexample
+@end cartouche
+
+The latter call will make the places p1 and p2 irremovable (option @option{-p}) and tell
+Parmida to preserve temporal logic formulas of the CTL persuasion
+without any NEXT operators. If the formula contains a NEXT operator
+we would replace @option{--ctlx} by @option{--ctl}. For LTL formulas,
+the options would be @option{--ltl} or @option{--ltlx}, though at
+this time, there are no reduction rules that distinguish between
+CTL and LTL. The formula can be tested directly on the reduced net.
+
+With the former call with the options @option{-sp1} and @option{-sp2},
+Parmida is allowed to remove the places from the net as long as
+information is provided on how to change the formula. The output
+
+@cartouche
+@smallexample
+m(p1) --> m(p3)+2
+m(p2) --> 1
+@end smallexample
+@end cartouche
+
+would then lead to a new formula 'AG (m(p3)=1 -> 1>1)', or shorter,
+'AG m(p3)@math{\not=}1'. Parmida will not convert the formula for you, as
+the syntax of formulas may vary widely. If you would like to write
+such a converter, Parmida can be convinced to write a JSON object
+containing the necessary information to a file. Parmida's sources include
+files JSON.cc and JSON.h that contain a parser for reading such a file
+back into a JSON object that can be used by a converter.
+
+@section Action based logics
+
+Action based logics may be based on the visibility of transitions
+and/or on labels attached to the transitions. For the latter,
+the Petri net must allow such label specifications. At this time,
+only the OWFN format allows for this. There is a dedicated line
+in the Petri net file reading 'ROLES label1,...,labeln;' that
+enumerates all labels that may occur in this net and one line
+directly after the key 'TRANSITION name' that should read
+'ROLES label;' if the transition 'name' should be attached with
+the action label 'label'. The calls to Parmida would look like:
+
+@cartouche
+@smallexample
+parmida test.owfn -oresult.owfn --altl -st1 -st2
+parmida test.owfn -oresult.owfn --altl -la -lb
+parmida test.owfn -oresult.owfn --altl -l* -st1 -st2
+@end smallexample
+@end cartouche
+
+The first line makes the transitions t1 and t2 visible, if the
+formula contains the unique names of the transitions themselves.
+All other transitions will be invisible, even if the Petri net
+defines a label for them.
+The second line declares that all transitions labelled 'a' and 'b'
+are visible, i.e. the labels 'a' and 'b' appear in the formula.
+If there are transitions with other labels, they may influence
+the next operator, if it appears in the formula. Transitions
+without a label (that have a tau/lambda label) will have no
+impact on the formula. If the formula has no next operator,
+@option{--altlx} can be specified. The option @option{-l*}
+in the final line assumes that '*' is a string that does
+not occur as a label. In that case, Parmida will be label
+sensitive even if no label is visible in the formula. Labelled 
+transitions will be considered for the LTL path.
+
+As with state based logic, replacing @option{-st1} by @option{-pt1}
+will make t1 not only visible but also irremovable for reduction
+purposes.
+
+@section Communication channels
+
+The format OWFN not only allows for action labels, but also for
+communication through named channels as well as synchronisation
+labels for transitions. Internally, the channels
+are handled as input and output places of the Petri net. Such
+places will never be removed by the reduction process.
+Transitions with synchronisation labels will not be removed
+from the net either.
+
+Both kinds of 'labels', channels as well as synchronisation,
+are respected by Parmida and thus considered to be relevant
+for paths in action based LTL as well.
+
+@section Witness paths
+
+When Parmida finds that the reduction process respects path information,
+she will print that path information to stdout or a JSON object.
+This is especially the case if one of the options @option{--path} or
+@option{--complexpath} is given. 
+The first option, possibly leading to less
+reduction in the net, will create a simple translation for each transition
+in the reduced Petri net as well as an initial sequence.
+If a translation for a transition in the reduced net is not mentioned,
+the translation is the transition itself (identity).
+
+The translation of a firing sequence from the reduced net can be acquired by
+taking the initial sequence and appending, for each transition in the firing
+sequence, its translation. Firing this translation in the original net and
+converting the state reached according to the reduction process will lead
+to the same state in the reduced net as directly firing the untranslated
+firing sequence. Also, any additionally specified properties (e.g. visible
+labels in the sequence) will be respected.
+
+The option @option{--complexpath} allows translations of the form
+
+@cartouche
+@smallexample
+t1 --> t2 (t3 | t4) t5
+@end smallexample
+@end cartouche
+
+with the meaning: to simulate t1, fire first t2, then whichever of t3/t4
+is enabled, and finally t5 in the original net. It is guaranteed that at least one
+of t3/t4 is enabled at that point. Since such or-constructs can be nested,
+it can get complicated easily. Parmida provides a way to compute a translation
+path automatically, using JSON objects and files.
+
+@cartouche
+@smallexample
+parmida test3.owfn -oresult.owfn --complexpath --writejson=result.json
+parmida path.json --readjson=result.json --writejson=translation.json
+@end smallexample
+@end cartouche
+
+The first call will write all necessary information into the file 'result.json',
+the second call will retrieve this information to translate a path. The translated path
+will be written to the file 'translation.json' in form of a JSON object, or --
+if the parameter is missing -- as a simple string containing the transition sequence
+to stdout.
+The path must be given in a JSON file in the form
+
+@cartouche
+@smallexample
+@{"path": @{"name1", "name2", ... , "namen"@}@}
+@end smallexample
+@end cartouche
+
+where 'name1' is the first transition in the firing sequence, 'name2' is the second, and so on.
+The entry 'path' can be at the top-level of the JSON file, but it can also be inside some
+nested expression. If there is more than one occurrence of 'path' mapped to a JSON array
+containing a firing sequence, all such instances will be found and translated, with the
+surrounding structure of the JSON file kept intact.
+
+@section Reversibility
+
+The option @option{--reversibility} forces Parmida to respect reversibility, i.e.
+if every firing sequence can be reversed somehow (leading back to the previous state)
+in the original net, this is also the case in the reduced net, and vice versa.
+
+@section Bisimulation Equivalence
+
+The option @option{--bisimulation} forces Parmida to ensure bisimulation
+equivalence between the original and the reduced net. Visible
+transitions are respected as well as action labels, communication channels,
+and synchronsation labels, if they occur.
+
+@section JSON output
+
+Parmida will write the computed properties to a JSON file if the respective
+option is present.
+
+@cartouche
+@smallexample
+parmida test.owfn --writejson=result.json
+@end smallexample
+@end cartouche
+
+The JSON file has several entries at the top-level, which could look like this:
+
+@cartouche
+@smallexample
+@{"bounded":               @{"p1": true", "p2": ["|", "p3", "p4"], "p3": ["p8"], "p5&p6": ["p7"]@},
+ "checkable properties":  @{"prop1", "prop2", ...@},
+ "deduced properties":    @{"prop1", "prop2", ...@},
+ "live":                  @{"t1": false, "t2": ["|", "t3", "t4"], "t3": ["t8"], "t5|t6": ["t7"]@},
+ "marking":               @{"p1": [1], "p2": ["+", "p3", 2]@},
+ "net":                   "original_filename",
+ "path":                  @{"*init*": ["t1", "t2"], "t3": ["t4"], 
+                           "t5": [@{"*if*": ["p1"], "else": ["t7"], "then": ["t6"]@}] @},
+ "safe":                  @{"p1": true", "p2": ["|", "p3", "p4"], "p3": ["p8"], "p5&p6": ["p7"]@},
+ "xchange":               @{ ... @} @}
+@end smallexample
+@end cartouche
+
+Note how for 'bounded(p2)' the right side is given in prefix notation with the or-operator
+in front, while in 'bounded(p5)&bounded(p6)' the left side is a single string 'p5\&p6'.
+This is due to the limitations of JSON.
+Operators can be &, |, and +. The or-expression in the "path" has been resolved into
+an if-then-else clause, where the information from "xchange" can be used by Parmida
+to automatically compute the if-clause. In general, "xchange" contains information about the
+incidence matrix of the original net, and the "*if*"-place(s) are to be tested for tokens.
+
+@section Parallelism
+
+Parmida will use multiple threads that try to apply different reduction rules
+at different spots in the net at the same time. The option to enable this
+feature is @option{--threads=n} where n is the number of parallel threads
+Parmida should work with.
+
+@c --------------------------------------------------------------------------
+
+
+@node Theory
+@chapter Theory
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Parmida implements several algorithms and result published in several scientific articles.
+Parmida implements several reduction rules for Petri nets.
+
+@section Reduction Rules
+
+Most of the reduction rules stem from Peter Starke:
+
+@quotation
+P.H. Starke. @b{Analyse von Petri-Netz-Modellen}. Teubner, ISBN 978-3-519-02244-3, 1990.
+@end quotation
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Exit and Error Codes
+@chapter Exit and Error Codes
+@section Exit Codes
+
+Parmida will exit with code @samp{0} in case everything went fine. 
+That is, the command-line parameters were valid, the input file(s) could be read,
+and Sara terminated with some result, but did not abort the computation.
+It does not matter if the result was positive (a solution was found) or
+negative (the marking equation is infeasible or no transition vector could be
+realized).
+
+In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+
+@section Error Codes
+
+In case any error occurs, Sara aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+
+@table @asis
+
+@c <<-- CHANGE START (exit/error codes) -->>
+
+@item #01
+The specified file could not be opened. Wrong filename?
+
+@smallexample
+@cartouche
+parmida: could not open file '[filename]' -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@item #02
+The Petri net could not be read from the file given.
+
+@smallexample
+@cartouche
+parmida: '[parser error message]' -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #03
+Parmida tried to create threads for parallel reduction, and this failed.
+
+@smallexample
+@cartouche
+parmida: threads could not be created -- aborting [#03]
+@end cartouche
+@end smallexample
+
+@item #04
+Parmida tried to delete threads for parallel reduction, and this failed.
+
+@smallexample
+@cartouche
+parmida: threads could not be joined -- aborting [#04]
+@end cartouche
+@end smallexample
+
+@item #05
+The user tried to use more than one input file (Petri net).
+
+@smallexample
+@cartouche
+parmida: at most one input file can be given -- aborting [#05]
+@end cartouche
+@end smallexample
+
+@item #07
+Some parameter on the command-line is probably misspelled. 
+
+@smallexample
+@cartouche
+parmida: invalid command-line parameters -- aborting [#07]
+@end cartouche
+@end smallexample
+
+@item #09
+The JSON file was corrupted (or it was not a JSON file produced by Parmida).
+
+@smallexample
+@cartouche
+parmida: error in JSON translation file -- aborting [#09]
+@end cartouche
+@end smallexample
+
+@item #11
+The path file containing the path to translate is missing.
+
+@smallexample
+@cartouche
+parmida: missing input file for path -- aborting [#11]
+@end cartouche
+@end smallexample
+
+@c <<-- CHANGE END -->>
+
+@end table
+
+
+@c --------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Parmida is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+The most recent change log is available at Parmida's website at @url{http://service-technology.org/files/parmida/ChangeLog}.
+
+
+@c --------------------------------------------------------------------------
+
+@node GNU Free Documentation License
+@appendix The GNU Free Documentation License
+
+@include fdl.texi
+
+@bye

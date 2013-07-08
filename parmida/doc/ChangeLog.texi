@@ -1,0 +1,14 @@
+@c <<-- CHANGE START (version information) -->>
+
+@heading Version 1.0 (4 Jul 2013)
+@itemize
+@item First version of Parmida
+@item Parallel reduction method applications to Petri nets
+@item Respecting on demand: safety, boundedness, liveness, temporal logic (state or action based, with or without NEXT), bisimulation equivalence, reversibility, and witness paths
+@item Petri net nodes can be made invisible, visible, or persistent
+@item Output to stdout or into JSON objects
+@end itemize
+
+@heading Version 0.0 (4 Jul 2013)
+
+@c <<-- CHANGE END -->>

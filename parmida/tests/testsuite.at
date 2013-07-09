@@ -1,0 +1,568 @@
+AT_INIT
+AT_COLOR_TESTS
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([PARMIDA --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([PARMIDA --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Rule: Initially Dead Place])
+############################################################################
+
+AT_SETUP([Removing a dead place])
+AT_CHECK([cp TESTFILES/test1a.owfn .])
+AT_CHECK([PARMIDA -d1 test1a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "|P|= 1" owfn])
+AT_CHECK([GREP -q "|T|= 1" owfn])
+AT_CHECK([GREP -q "|F|= 2" owfn])
+AT_CHECK([GREP -q "apply 1.p." stderr])
+AT_CHECK([GREP -q "\"deduced properties\": .\"non-live\"." json])
+AT_CHECK([GREP -q "\"live\"" json])
+AT_CHECK([GREP -q "\"CTL\"" json])
+AT_CHECK([GREP -q "\"LTL\"" json])
+AT_CHECK([GREP -q "\"unbounded\"" json])
+AT_CHECK([GREP -q "\"bounded\"" json])
+AT_CHECK([GREP -q "\"ALTL\"" json])
+AT_CHECK([GREP -q "\"paths\"" json])
+AT_CHECK([GREP -q "\"unsafe\"" json])
+AT_CHECK([GREP -q "\"safe\"" json])
+AT_CHECK([GREP -q "\"bisimulation\"" json])
+AT_CHECK([GREP -q "\"reversibility\"" json])
+AT_KEYWORDS(rule1)
+AT_CLEANUP
+
+AT_SETUP([Removing a dead place, properties to stdout])
+AT_CHECK([cp TESTFILES/test1a.owfn .])
+AT_CHECK([PARMIDA -d1 test1a.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "|P|= 1" stdout])
+AT_CHECK([GREP -q "|T|= 1" stdout])
+AT_CHECK([GREP -q "|F|= 2" stdout])
+AT_CHECK([GREP -q "non-live" stdout])
+AT_CHECK([GREP -q "live" stdout])
+AT_CHECK([GREP -q "CTL" stdout])
+AT_CHECK([GREP -q " LTL" stdout])
+AT_CHECK([GREP -q "unbounded" stdout])
+AT_CHECK([GREP -q " bounded" stdout])
+AT_CHECK([GREP -q "ALTL" stdout])
+AT_CHECK([GREP -q "paths" stdout])
+AT_CHECK([GREP -q "unsafe" stdout])
+AT_CHECK([GREP -q " safe" stdout])
+AT_CHECK([GREP -q "bisimulation" stdout])
+AT_CHECK([GREP -q "reversibility" stdout])
+AT_KEYWORDS(rule1)
+AT_CLEANUP
+
+AT_SETUP([A non-dead transition])
+AT_CHECK([cp TESTFILES/test1b.owfn .])
+AT_CHECK([PARMIDA -d1 test1b.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 1.p." stderr],1)
+AT_KEYWORDS(rule1)
+AT_CLEANUP
+
+AT_SETUP([A persistent transition])
+AT_CHECK([cp TESTFILES/test1a.owfn .])
+AT_CHECK([PARMIDA -d1 -pt test1a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 1.p." stderr],1)
+AT_KEYWORDS(rule1)
+AT_CLEANUP
+
+AT_SETUP([A persistent place])
+AT_CHECK([cp TESTFILES/test1a.owfn .])
+AT_CHECK([PARMIDA -d1 -pp test1a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 1.p." stderr],1)
+AT_KEYWORDS(rule1)
+AT_CLEANUP
+
+AT_SETUP([A non-contained preset])
+AT_CHECK([cp TESTFILES/test1c.owfn .])
+AT_CHECK([PARMIDA -d1 test1c.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 1.p." stderr],1)
+AT_KEYWORDS(rule1)
+AT_CLEANUP
+
+AT_SETUP([An input place])
+AT_CHECK([cp TESTFILES/test1d.owfn .])
+AT_CHECK([PARMIDA -d1 test1d.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 1.p." stderr],1)
+AT_KEYWORDS(rule1)
+AT_CLEANUP
+
+AT_SETUP([A visible place])
+AT_CHECK([cp TESTFILES/test1a.owfn .])
+AT_CHECK([PARMIDA -d1 --final test1a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "bounded\": .\"p\": true" json])
+AT_CHECK([GREP -q "safe\": .\"p\": true" json])
+AT_CHECK([GREP -q "marking\": .\"p\": 0" json])
+AT_CHECK([GREP -q "FALSE;" owfn])
+AT_KEYWORDS(rule1)
+AT_CLEANUP
+
+AT_SETUP([A visible transition])
+AT_CHECK([cp TESTFILES/test1a.owfn .])
+AT_CHECK([PARMIDA -d1 -st test1a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "live\": .\"t\": false" json])
+AT_CHECK([GREP -q "\"path\"" json],1)
+AT_KEYWORDS(rule1)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Rule: Parallel Places])
+############################################################################
+
+AT_SETUP([Removing one of two parallel places])
+AT_CHECK([cp TESTFILES/test2a.owfn .])
+AT_CHECK([PARMIDA -d2 test2a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "|P|= 2" owfn])
+AT_CHECK([GREP -q "|T|= 2" owfn])
+AT_CHECK([GREP -q "|F|= 4" owfn])
+AT_CHECK([GREP -q "apply 2" stderr])
+AT_CHECK([GREP -q "\"non-live\"" json])
+AT_CHECK([GREP -q "\"live\"" json])
+AT_CHECK([GREP -q "\"CTL\"" json])
+AT_CHECK([GREP -q "\"LTL\"" json])
+AT_CHECK([GREP -q "\"unbounded\"" json])
+AT_CHECK([GREP -q "\"bounded\"" json])
+AT_CHECK([GREP -q "\"ALTL\"" json])
+AT_CHECK([GREP -q "\"paths\"" json])
+AT_CHECK([GREP -q "\"unsafe\"" json])
+AT_CHECK([GREP -q "\"safe\"" json])
+AT_CHECK([GREP -q "\"bisimulation\"" json])
+AT_CHECK([GREP -q "\"reversibility\"" json])
+AT_KEYWORDS(rule2)
+AT_CLEANUP
+
+AT_SETUP([An input place])
+AT_CHECK([cp TESTFILES/test2b.owfn .])
+AT_CHECK([PARMIDA -d2 test2b.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 2.p." stderr],1)
+AT_CHECK([GREP -q "apply 2.q." stderr],1)
+AT_KEYWORDS(rule2)
+AT_CLEANUP
+
+AT_SETUP([A persistent place])
+AT_CHECK([cp TESTFILES/test2a.owfn .])
+AT_CHECK([PARMIDA -pp -d2 test2a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 2" stderr],1)
+AT_KEYWORDS(rule2)
+AT_CLEANUP
+
+AT_SETUP([Disabling the safety check])
+AT_CHECK([cp TESTFILES/test2a.owfn .])
+AT_CHECK([PARMIDA --SAFE -d2 test2a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 2" stderr],1)
+AT_KEYWORDS(rule2)
+AT_CLEANUP
+
+AT_SETUP([No parallel places])
+AT_CHECK([cp TESTFILES/test2c.owfn .])
+AT_CHECK([PARMIDA -d2 test2c.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 2" stderr],1)
+AT_KEYWORDS(rule2)
+AT_CLEANUP
+
+AT_SETUP([Final Condition])
+AT_CHECK([cp TESTFILES/test2a.owfn .])
+AT_CHECK([PARMIDA -d2 test2a.owfn --final -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "q >= 1" owfn])
+AT_KEYWORDS(rule2)
+AT_CLEANUP
+
+AT_SETUP([Checking simple properties])
+AT_CHECK([cp TESTFILES/test2a.owfn .])
+AT_CHECK([PARMIDA -d2 test2a.owfn -P -T -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "\"non-live\"" json])
+AT_CHECK([GREP -q "\"live\"" json])
+AT_CHECK([GREP -q "\"CTL\"" json])
+AT_CHECK([GREP -q "\"LTL\"" json])
+AT_CHECK([GREP -q "\"unbounded\"" json])
+AT_CHECK([GREP -q "\"bounded\"" json])
+AT_CHECK([GREP -q "\"ALTL\"" json])
+AT_CHECK([GREP -q "\"paths\"" json])
+AT_CHECK([GREP -q "\"safe\"" json])
+AT_CHECK([GREP -q "\"unsafe\"" json])
+AT_CHECK([GREP -q "\"bisimulation\"" json])
+AT_CHECK([GREP -q "\"reversibility\"" json])
+AT_CHECK([GREP -q "\"marking\": .\"p\": .\"+\", \"q\", 1" json])
+AT_CHECK([GREP -q "\"bounded\": .\"p\": .\"q\"" json])
+AT_CHECK([GREP -q "\"safe\":" json],1)
+AT_CHECK([GREP -q "\"live\":" json],1)
+AT_KEYWORDS(rule2)
+AT_CLEANUP
+
+AT_SETUP([Deduced non-safety])
+AT_CHECK([cp TESTFILES/test2d.owfn .])
+AT_CHECK([PARMIDA -d2 test2d.owfn -P -T -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "\"deduced properties\": .\"unsafe\"" json])
+AT_CHECK([GREP -q "\"safe\": .\"p\": false" json])
+AT_KEYWORDS(rule2)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Rule: Parallel Transitions])
+############################################################################
+
+AT_SETUP([Removing one of two parallel transitions])
+AT_CHECK([cp TESTFILES/test3a.owfn .])
+AT_CHECK([PARMIDA -d4 -P -T test3a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "|P|= 2" owfn])
+AT_CHECK([GREP -q "|T|= 2" owfn])
+AT_CHECK([GREP -q "|F|= 4" owfn])
+AT_CHECK([GREP -q "apply 4" stderr])
+AT_CHECK([GREP -q "\"non-live\"" json])
+AT_CHECK([GREP -q "\"live\"" json])
+AT_CHECK([GREP -q "\"CTL\"" json])
+AT_CHECK([GREP -q "\"LTL\"" json])
+AT_CHECK([GREP -q "\"unbounded\"" json])
+AT_CHECK([GREP -q "\"bounded\"" json])
+AT_CHECK([GREP -q "\"ALTL\"" json],1)
+AT_CHECK([GREP -q "\"paths\"" json])
+AT_CHECK([GREP -q "\"unsafe\"" json])
+AT_CHECK([GREP -q "\"safe\"" json])
+AT_CHECK([GREP -q "\"bisimulation\"" json],1)
+AT_CHECK([GREP -q "\"reversibility\"" json])
+AT_CHECK([GREP -q "\"live\": .\".\": .\".\"" json])
+AT_KEYWORDS(rule3)
+AT_CLEANUP
+
+AT_SETUP([A persistent transition])
+AT_CHECK([cp TESTFILES/test3a.owfn .])
+AT_CHECK([PARMIDA -d4 -pt test3a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 4" stderr],1)
+AT_KEYWORDS(rule3)
+AT_CLEANUP
+
+AT_SETUP([An action-labelled transition])
+AT_CHECK([cp TESTFILES/test3a.owfn .])
+AT_CHECK([PARMIDA -d4 --altl -lx test3a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 4" stderr],1)
+AT_CHECK([PARMIDA -d4 --bisim -lx test3a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 4" stderr],1)
+AT_KEYWORDS(rule3)
+AT_CLEANUP
+
+AT_SETUP([A visible transition])
+AT_CHECK([cp TESTFILES/test3a.owfn .])
+AT_CHECK([PARMIDA -d4 --altlx -st test3a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 4" stderr],1)
+AT_CHECK([PARMIDA -d4 --bisim -st test3a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 4" stderr],1)
+AT_KEYWORDS(rule3)
+AT_CLEANUP
+
+AT_SETUP([No parallel transitions])
+AT_CHECK([cp TESTFILES/test3b.owfn .])
+AT_CHECK([PARMIDA -d4 test3b.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 4" stderr],1)
+AT_KEYWORDS(rule2)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Rule: Equivalent Places])
+############################################################################
+
+AT_SETUP([Removing a place/transition pair])
+AT_CHECK([cp TESTFILES/test4a.owfn .])
+AT_CHECK([PARMIDA -d8 -P -T test4a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "|P|= 3" owfn])
+AT_CHECK([GREP -q "|T|= 2" owfn])
+AT_CHECK([GREP -q "|F|= 6" owfn])
+AT_CHECK([GREP -q "apply 8" stderr])
+AT_CHECK([GREP -q "\"non-live\"" json])
+AT_CHECK([GREP -q "\"live\"" json])
+AT_CHECK([GREP -q "\"CTL\"" json],1)
+AT_CHECK([GREP -q "\"LTL\"" json],1)
+AT_CHECK([GREP -q "\"unbounded\"" json])
+AT_CHECK([GREP -q "\"bounded\"" json])
+AT_CHECK([GREP -q "\"ALTL\"" json],1)
+AT_CHECK([GREP -q "\"complex paths\"" json])
+AT_CHECK([GREP -q "\"unsafe\"" json])
+AT_CHECK([GREP -q "\"safe\"" json])
+AT_CHECK([GREP -q "\"bisimulation\"" json],1)
+AT_CHECK([GREP -q "\"reversibility\"" json])
+AT_CHECK([GREP -q "\"live\": .\".|.\": .\".\"" json])
+AT_CHECK([GREP -q "\"bounded\": .\".&.\": .\".\"" json])
+AT_CHECK([GREP -q "\"marking\": .\".+.\": .\".\"" json])
+AT_CHECK([GREP -q "\"safe\":" json],1)
+AT_CHECK([GREP -q "\"path\":" json])
+AT_CHECK([GREP -q "\".if.\": .\".\"" json])
+AT_CHECK([GREP -q "\"then\": .\".\"" json])
+AT_CHECK([GREP -q "\"else\": .\".\"" json])
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+AT_SETUP([Places have arc weight > 1])
+AT_CHECK([cp TESTFILES/test4b.owfn .])
+AT_CHECK([PARMIDA -d8 -P -T test4b.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+AT_SETUP([An input place])
+AT_CHECK([cp TESTFILES/test4c.owfn .])
+AT_CHECK([PARMIDA -d8 -P -T test4c.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+AT_SETUP([A persistent place])
+AT_CHECK([cp TESTFILES/test4a.owfn .])
+AT_CHECK([PARMIDA -d8 -pp test4a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+AT_SETUP([Losing reversibility])
+AT_CHECK([cp TESTFILES/test4d.owfn .])
+AT_CHECK([PARMIDA -d8 --reversibility test4d.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+AT_SETUP([A visible place])
+AT_CHECK([cp TESTFILES/test4a.owfn .])
+AT_CHECK([PARMIDA -d8 --ltlx -sp test4a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+AT_SETUP([A persistent transition])
+AT_CHECK([cp TESTFILES/test4a.owfn .])
+AT_CHECK([PARMIDA -d8 -pt test4a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+AT_SETUP([Losing the next operator])
+AT_CHECK([cp TESTFILES/test4a.owfn .])
+AT_CHECK([PARMIDA -d8 --altl -lb test4a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+AT_SETUP([Losing action-based LTL-X])
+AT_CHECK([cp TESTFILES/test4a.owfn .])
+AT_CHECK([PARMIDA -d8 --altlx -la test4a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_CHECK([PARMIDA -d8 --altlx -st test4a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+AT_SETUP([Losing bisimulation])
+AT_CHECK([cp TESTFILES/test4a.owfn .])
+AT_CHECK([PARMIDA -d8 --bisim -lb test4a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+AT_SETUP([No equivalent place])
+AT_CHECK([cp TESTFILES/test4e.owfn .])
+AT_CHECK([PARMIDA -d8 test4e.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+AT_SETUP([Losing safety])
+AT_CHECK([cp TESTFILES/test4f.owfn .])
+AT_CHECK([PARMIDA -d8 --SAFE test4f.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr])
+AT_CHECK([cp TESTFILES/test4a.owfn .])
+AT_CHECK([PARMIDA -d8 --SAFE test4a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 8" stderr],1)
+AT_KEYWORDS(rule4)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Rule: Meld pre- and postset of a place (|pre|>=1, |post|=1)])
+############################################################################
+
+AT_SETUP([Removing the place])
+AT_CHECK([cp TESTFILES/test5a.owfn .])
+AT_CHECK([PARMIDA -d16 -P -T test5a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "|P|= 3" owfn])
+AT_CHECK([GREP -q "|T|= 2" owfn])
+AT_CHECK([GREP -q "|F|= 4" owfn])
+AT_CHECK([GREP -q "apply 16" stderr])
+AT_CHECK([GREP -q "\"non-live\"" json])
+AT_CHECK([GREP -q "\"live\"" json])
+AT_CHECK([GREP -q "\"CTL\"" json],1)
+AT_CHECK([GREP -q "\"LTL\"" json],1)
+AT_CHECK([GREP -q "\"unbounded\"" json])
+AT_CHECK([GREP -q "\"bounded\"" json])
+AT_CHECK([GREP -q "\"ALTL\"" json],1)
+AT_CHECK([GREP -q "\"paths\"" json])
+AT_CHECK([GREP -q "\"unsafe\"" json])
+AT_CHECK([GREP -q "\"safe\"" json])
+AT_CHECK([GREP -q "\"bisimulation\"" json],1)
+AT_CHECK([GREP -q "\"reversibility\"" json],1)
+AT_CHECK([GREP -q "\"live\": .\"v\": .\"|\"" json])
+AT_CHECK([GREP -q "\"path\": .\".init.\": .\"v\", \"v\"., \"t\": .\"t\", \"v\", \"v\", \"v\"., \"u\": .\"u\", \"v\"" json])
+AT_CHECK([GREP -q "\"safe\": .\"q\". false" json])
+AT_KEYWORDS(rule5)
+AT_CLEANUP
+
+AT_SETUP([Larger postset])
+AT_CHECK([cp TESTFILES/test6a.owfn .])
+AT_CHECK([PARMIDA -d16 -P -T test6a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 16" stderr],1)
+AT_KEYWORDS(rule5)
+AT_CLEANUP
+
+AT_SETUP([A persistent place])
+AT_CHECK([cp TESTFILES/test5b.owfn .])
+AT_CHECK([PARMIDA -d16 -pq test5b.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 16" stderr],1)
+AT_KEYWORDS(rule5)
+AT_CLEANUP
+
+AT_SETUP([A visible place])
+AT_CHECK([cp TESTFILES/test5b.owfn .])
+AT_CHECK([PARMIDA -d16 --ctlx -sq test5b.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 16" stderr],1)
+AT_KEYWORDS(rule5)
+AT_CLEANUP
+
+AT_SETUP([Too many tokens])
+AT_CHECK([cp TESTFILES/test5a.owfn .])
+AT_CHECK([PARMIDA -d16 --ctlx test5a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 16" stderr],1)
+AT_CHECK([PARMIDA -d16 --reversibility test5a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 16" stderr],1)
+AT_KEYWORDS(rule5)
+AT_CLEANUP
+
+AT_SETUP([Losing safety])
+AT_CHECK([cp TESTFILES/test5c.owfn .])
+AT_CHECK([PARMIDA -d16 --SAFE test5c.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 16" stderr],1)
+AT_KEYWORDS(rule5)
+AT_CLEANUP
+
+AT_SETUP([Intersecting pre-/postsets])
+AT_CHECK([cp TESTFILES/test5d.owfn .])
+AT_CHECK([PARMIDA -d16 test5d.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 16" stderr],1)
+AT_KEYWORDS(rule5)
+AT_CLEANUP
+
+AT_SETUP([A persistent posttransition])
+AT_CHECK([cp TESTFILES/test5a.owfn .])
+AT_CHECK([PARMIDA -d16 -pv test5a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 16" stderr],1)
+AT_KEYWORDS(rule5)
+AT_CLEANUP
+
+AT_SETUP([Losing action-based LTL-X])
+AT_CHECK([cp TESTFILES/test5a.owfn .])
+AT_CHECK([PARMIDA -d16 --altlx -sv test5a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 16" stderr],1)
+AT_CHECK([PARMIDA -d16 --altlx -lb test5a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 16" stderr],1)
+AT_CHECK([PARMIDA -d16 --altlx -la test5a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 16" stderr])
+AT_KEYWORDS(rule5)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Rule: Meld pre- and postset of a place (|pre|=1, |post|>=1)])
+############################################################################
+
+AT_SETUP([Removing the place])
+AT_CHECK([cp TESTFILES/test6a.owfn .])
+AT_CHECK([PARMIDA -d32 -P -T test6a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "|P|= 3" owfn])
+AT_CHECK([GREP -q "|T|= 2" owfn])
+AT_CHECK([GREP -q "|F|= 4" owfn])
+AT_CHECK([GREP -q "apply 32" stderr])
+AT_CHECK([GREP -q "\"non-live\"" json])
+AT_CHECK([GREP -q "\"live\"" json])
+AT_CHECK([GREP -q "\"CTL\"" json],1)
+AT_CHECK([GREP -q "\"LTL\"" json],1)
+AT_CHECK([GREP -q "\"unbounded\"" json])
+AT_CHECK([GREP -q "\"bounded\"" json])
+AT_CHECK([GREP -q "\"ALTL\"" json],1)
+AT_CHECK([GREP -q "\"paths\"" json])
+AT_CHECK([GREP -q "\"unsafe\"" json])
+AT_CHECK([GREP -q "\"safe\"" json])
+AT_CHECK([GREP -q "\"bisimulation\"" json],1)
+AT_CHECK([GREP -q "\"reversibility\"" json])
+AT_CHECK([GREP -q "\"live\": .\"t\": .\".\"" json])
+AT_CHECK([GREP -q "\"path\": .\"u\": .\"t\", \"u\"., \"v\": .\"t\", \"v\"" json])
+AT_CHECK([GREP -q "\"safe\":" json],1)
+AT_KEYWORDS(rule6)
+AT_CLEANUP
+
+AT_SETUP([Larger preset])
+AT_CHECK([cp TESTFILES/test5a.owfn .])
+AT_CHECK([PARMIDA -d32 -P -T test5a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr],1)
+AT_KEYWORDS(rule6)
+AT_CLEANUP
+
+AT_SETUP([A persistent place])
+AT_CHECK([cp TESTFILES/test6a.owfn .])
+AT_CHECK([PARMIDA -d32 -pq test6a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr],1)
+AT_KEYWORDS(rule6)
+AT_CLEANUP
+
+AT_SETUP([A visible place])
+AT_CHECK([cp TESTFILES/test6a.owfn .])
+AT_CHECK([PARMIDA -d32 --ctlx -sq test6a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr],1)
+AT_KEYWORDS(rule6)
+AT_CLEANUP
+
+AT_SETUP([Too many tokens])
+AT_CHECK([cp TESTFILES/test6b.owfn .])
+AT_CHECK([PARMIDA -d32 test6b.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr],1)
+AT_KEYWORDS(rule6)
+AT_CLEANUP
+
+AT_SETUP([Losing safety])
+AT_CHECK([cp TESTFILES/test6c.owfn .])
+AT_CHECK([PARMIDA -d32 --SAFE test6c.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr],1)
+AT_KEYWORDS(rule6)
+AT_CLEANUP
+
+AT_SETUP([Intersecting pre-/postsets])
+AT_CHECK([cp TESTFILES/test6d.owfn .])
+AT_CHECK([PARMIDA -d32 test6d.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr],1)
+AT_KEYWORDS(rule6)
+AT_CLEANUP
+
+AT_SETUP([A persistent pre- or posttransition])
+AT_CHECK([cp TESTFILES/test6a.owfn .])
+AT_CHECK([PARMIDA -d32 -pt test6a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr],1)
+AT_CHECK([PARMIDA -d32 -pv test6a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr],1)
+AT_KEYWORDS(rule6)
+AT_CLEANUP
+
+AT_SETUP([Losing action-based LTL-X])
+AT_CHECK([cp TESTFILES/test6a.owfn .])
+AT_CHECK([PARMIDA -d32 --altlx -sv test6a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr],1)
+AT_CHECK([PARMIDA -d32 --altlx -lc test6a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr],1)
+AT_CHECK([PARMIDA -d32 --altlx -la test6a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr],1)
+AT_CHECK([PARMIDA -d32 --altlx -ld test6a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "apply 32" stderr])
+AT_KEYWORDS(rule6)
+AT_CLEANUP
+

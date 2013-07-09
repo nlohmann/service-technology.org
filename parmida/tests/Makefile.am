@@ -16,12 +16,17 @@
 
 # If you want to use a new test file in a test case, proceed as follows:
 # 1. Edit the file `testsuite.at' and add your test case
-# 2. Add the files you need for the test to the `testfile' directory.
+# 2. Add the files you need for the test to the `testfiles' directory.
 # 3. Add these files (without path) to the `TESTFILES' list.
 # 4. Add the file to the SVN repository.
 
 # <<-- CHANGE START (testfiles) -->>
-TESTFILES = 
+TESTFILES = test1a.owfn test1b.owfn test1c.owfn test1d.owfn \
+			test2a.owfn test2b.owfn test2c.owfn test2d.owfn \
+			test3a.owfn test3b.owfn \
+			test4a.owfn test4b.owfn test4c.owfn test4e.owfn test4f.owfn \
+			test5a.owfn test5b.owfn test5c.owfn test5d.owfn \
+			test6a.owfn test6b.owfn test6c.owfn test6d.owfn
 # <<-- CHANGE END -->>
 
 
@@ -37,7 +42,7 @@ TESTFILES =
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sources called 'cmdline.c'.
-NO_COVER_FILES = */libs/* */lexic_*.cc */syntax_*.cc */cmdline.* */verbose.* */Output.*
+NO_COVER_FILES = */libs/* */lexic_*.cc */syntax_*.cc */cmdline.* */verbose.* */Output.* */JSON.* */Runtime.* */Socket.*
 
 
 #------------------------------#
@@ -46,7 +51,7 @@ NO_COVER_FILES = */libs/* */lexic_*.cc */syntax_*.cc */cmdline.* */verbose.* */O
 
 # If LoLA is not installed, the path to the binary needs to be passed as an
 # environment variable to the test scripts.
-TESTSUITEFLAGS = LOLA=$(LOLA)
+#TESTSUITEFLAGS = LOLA=$(LOLA)
 
 #--------------------------------------------------------#
 # Part 3: Generics -- YOU MUST NOT CHANGE ANYTHING BELOW #

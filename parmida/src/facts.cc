@@ -148,14 +148,14 @@ void Facts::printFacts() {
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
 		{
 			xit = state.find(*sit);
-			if (xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
+			if (blit->first.size()<2 && xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
 				flag = true;
 			if (!im.isInvisible(*sit)) comma = false;
 		}
 		for(sit=blit->second.begin(); sit!=blit->second.end(); ++sit)
 		{
 			xit = state.find(*sit);
-			if (xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
+			if (!im.exists(*sit) && xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
 				flag = true;
 		}
 		if (flag || comma) continue;
@@ -389,7 +389,7 @@ void Facts::printFacts(JSON& log) {
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
 		{
 			xit = state.find(*sit);
-			if (xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
+			if (blit->first.size()<2 && xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
 				flag = true;
 			if (!im.isInvisible(*sit))
 				comma = false;
@@ -397,7 +397,7 @@ void Facts::printFacts(JSON& log) {
 		for(sit=blit->second.begin(); sit!=blit->second.end(); ++sit)
 		{
 			xit = state.find(*sit);
-			if (xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
+			if (!im.exists(*sit) && xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
 				flag = true;
 		}
 		if (flag || comma) continue;
@@ -412,7 +412,9 @@ void Facts::printFacts(JSON& log) {
 			log["marking"][tmp] += "+";
 		for(sit=blit->second.begin(); sit!=blit->second.end(); ++sit)
 			log["marking"][tmp] += im.getName(*sit);
-		if (markadd[blit->first]!=0)
+		if (blit->second.empty())
+			log["marking"][tmp] = markadd[blit->first];
+		else if (markadd[blit->first]!=0)
 			log["marking"][tmp] += markadd[blit->first];
 	}
 	for(blit=bounded.begin(); blit!=bounded.end(); ++blit)

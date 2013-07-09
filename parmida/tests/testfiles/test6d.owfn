@@ -1,0 +1,27 @@
+
+PLACE
+  INTERNAL
+    p, q, r, s;
+
+ROLES 
+  a, b;
+
+INITIALMARKING
+  p:2, r;
+
+FINALCONDITION
+  (s >= 1);
+
+TRANSITION t
+  ROLES a;
+  CONSUME q;
+  PRODUCE q;
+
+TRANSITION u
+  ROLES b;
+  CONSUME q;
+  PRODUCE s;
+
+TRANSITION v
+  CONSUME q;
+  PRODUCE r;

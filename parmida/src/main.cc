@@ -314,7 +314,8 @@ std::cout << paths.toString() << std::endl;
             abort(1, "could not open file '%s'", Runtime::args_info.writejson_arg);
         }
 		facts.printFacts(log);
-		log["net"] = string(Runtime::args_info.writejson_arg);
+		if (Runtime::args_info.inputs_num > 0)
+			log["net"] = string(Runtime::args_info.inputs[0]);
 		outputStream2 << log.toString() << std::endl;
 	    if (Runtime::args_info.verbose_flag) {
     	    status("write JSON properties file: %s", Runtime::args_info.writejson_arg);

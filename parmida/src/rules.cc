@@ -2142,11 +2142,7 @@ void Rules::initiallyDeadPlace2(Mode mode) {
 		// check the rule: all postset transitions need more tokens than available on mainid
 	    Map::iterator mit;
 	    for(mit=post.begin(); mit!=post.end(); ++mit)
-		{
 	        if (mit->second<=tokens) break;
-			// additionally check if the transition must remain visible (transition would be removed!)
-			if (im.isPersistent(mit->first)) break;
-		}
 
 		// if the rule is not fulfilled look for a new first place
 	    if (mit!=post.end() || im.isIO(mainid) || im.isPersistent(mainid) || !contains(post,pre))
@@ -2164,8 +2160,16 @@ void Rules::initiallyDeadPlace2(Mode mode) {
 			// all transitions in mainid's postset are affected
 			// transitions may be locked after places
 			nodestamp[mit->first] = im.rdlock(mit->first);
+			if (im.isPersistent(mit->first)) break;
 			collectNeighbors(mit->first, nodestamp);
 			im.unlock(mit->first);
+		}
+		// if any postset transition is persistent, look for a new place
+	    if (mit!=post.end())
+		{
+			im.unlock(mit->first);
+			im.unlock(mainid,mode);
+			continue;
 		}
 	    im.unlock(mainid);
 	

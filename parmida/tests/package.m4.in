@@ -67,10 +67,10 @@ m4_define([SED],                  [@SED@])
 #------------------------------------------#
 
 # the main executable, called through a shell script for code coverage
-m4_define([ANICA],                [cover.sh @abs_top_builddir@/src/anica])
+m4_define([PARMIDA],                [cover.sh @abs_top_builddir@/src/parmida])
 
 # the main executable, directly called to allow for analysis
-m4_define([ANICA_RAW],            [@abs_top_builddir@/src/anica])
+m4_define([PARMIDA_RAW],            [@abs_top_builddir@/src/parmida])
 
 
 #---------------------------------------------#
@@ -82,6 +82,6 @@ m4_define([ANICA_RAW],            [@abs_top_builddir@/src/anica])
 # m4_define([FIONA],                [wrap.sh @FIONA@])
 # m4_define([MIA],                  [wrap.sh @MIA@])
 # m4_define([MARLENE],              [wrap.sh @MARLENE@])
-m4_define([LOLA],                 [@LOLA@])
-m4_define([VALGRIND],             [wrap.sh @VALGRIND@])
+# m4_define([LOLA],                 [@LOLA@])
+# m4_define([VALGRIND],             [wrap.sh @VALGRIND@])
 

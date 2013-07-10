@@ -916,7 +916,7 @@ void Rules::meldTransitions1(Mode mode) {
 
 		// if the transition does not fulfill the prerequisites
 		bool flag(false);
-		if (postt1.empty()) flag=true;
+		if (postt1.empty() && facts.checkCondition(Facts::BOUNDEDNESS)) flag=true;
 		if (pret1.size()>1 || pret1.begin()->first!=mainid) flag=true;
 		if (im.isPersistent(t1)) flag=true;
 		if (condition && im.getLabelVis(t1)) flag=true;
@@ -956,6 +956,8 @@ void Rules::meldTransitions1(Mode mode) {
 		for(mit=prep1.begin(); mit!=prep1.end(); ++mit)
 			facts.addPath(mit->first, deque<Vertex>(mit->second/v,t1), false);
 		facts.setStatus(Facts::PATH,t1,Facts::UNUSABLE);
+		if (postt1.empty())
+			facts.removeFact(Facts::BOUNDEDNESS);
 
 		// apply the rule
 		while (im.fire(t1))  // fire t1 as long as possible
@@ -1034,12 +1036,12 @@ void Rules::meldTransitions2(Mode mode) {
 		nodestamp[mainid] = im.getTimeStamp(mainid);
 
 		// get info about the postset transitions
-		bool flag(true);
+		bool flag(false),flag2(true);
 		for(mit=postp1.begin(); mit!=postp1.end(); ++mit)
 		{
 			nodestamp[mit->first] = im.rdlock(mit->first);
 			if (im.getPre(mit->first).size()>1) break;
-			if (!im.getPost(mit->first).empty()) flag=false;
+			if (!im.getPost(mit->first).empty()) flag2=false;
 			if (im.isPersistent(mit->first)) break;
 			if (condition && im.getLabelVis(mit->first)) break;
 			if (condition && !im.isInvisible(mit->first)) break;
@@ -1047,7 +1049,7 @@ void Rules::meldTransitions2(Mode mode) {
 			if (conditio4 && (!im.isInvisible(mit->first) || im.getLabel(mit->first))) break;
 			im.unlock(mit->first);
 		}
-		if (flag || mit!=postp1.end()) {
+		if ((flag2 && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
 			im.unlock(mit->first);
 			im.unlock(mainid,mode);
 			continue;
@@ -1111,6 +1113,8 @@ void Rules::meldTransitions2(Mode mode) {
 			facts.setStatus(Facts::SAFE,mainid,Facts::ISFALSE);
 			facts.addFact(Facts::UNSAFE,false);
 		}
+		if (flag2)
+			facts.removeFact(Facts::BOUNDEDNESS);
 
 		// mark surrounding area as changed
 		propagateChange(nodestamp);
@@ -1180,7 +1184,7 @@ void Rules::meldTransitions3(Mode mode) {
 			collectNeighbors(mit->first,nodestamp);
 			im.unlock(mit->first);
 		}
-		if (flag || mit!=postp1.end()) {
+		if ((flag && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
 			im.unlock(mit->first);
 			im.unlock(mainid,mode);
 			continue;
@@ -1261,6 +1265,8 @@ void Rules::meldTransitions3(Mode mode) {
 			facts.setStatus(Facts::SAFE,mainid,Facts::ISFALSE);
 			facts.addFact(Facts::UNSAFE,false);
 		}
+		if (flag)
+			facts.removeFact(Facts::BOUNDEDNESS);
 
 		// mark surrounding area as changed
 		propagateChange(nodestamp);
@@ -1323,9 +1329,11 @@ void Rules::meldTransitions4(Mode mode) {
 		// check the pre-transition of mainid
 		Vertex t1(prep1.begin()->first);
 		nodestamp[t1] = im.rdlock(t1);
+		Map pret1(im.getPre(t1)); // make a copy
 
 		// if the transition does not fulfill the prerequisites
 		bool flag(false);
+		if (pret1.empty() && facts.checkCondition(Facts::BOUNDEDNESS)) flag=true;
 		if (im.getPost(t1).size()>1) flag=true;
 		if (im.isPersistent(t1)) flag=true;
 		if (condition && im.getLabelVis(t1)) flag=true;
@@ -1338,8 +1346,7 @@ void Rules::meldTransitions4(Mode mode) {
 			continue;
 		}
 		
-		// collect IDs of affected nodes
-		Map pret1(im.getPre(t1)); // make a copy
+		// unlock the nodes before locking others
 	    im.unlock(t1);
 		im.unlock(mainid);
 
@@ -1390,6 +1397,8 @@ void Rules::meldTransitions4(Mode mode) {
 			if (im.isVisible(t1)) im.makeVisible(mit->first);
 		}
 		facts.addChange(Facts::LIVE,t1,tmp2);
+		if (pret1.empty())
+			facts.removeFact(Facts::BOUNDEDNESS);
 
 		// apply the rule
 		for(mit=postp1.begin(); mit!=postp1.end(); ++mit)
@@ -1472,7 +1481,7 @@ void Rules::meldTransitions5(Mode mode) {
 			collectNeighbors(mit->first,nodestamp);
 			im.unlock(mit->first);
 		}
-		if (flag || mit!=postp1.end()) {
+		if ((flag && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
 			im.unlock(mit->first);
 			im.unlock(mainid,mode);
 			continue;
@@ -1531,8 +1540,8 @@ void Rules::meldTransitions5(Mode mode) {
 			facts.addPath(*sit, Path(1,mit2->first));
 			facts.addPath(*sit, Path(1,mit->first));
 			if (mit2==postp1.begin()) {
-				facts.addChange(Facts::LIVE,mit->first,mit2->first);
-				if (im.isVisible(mit->first)) im.makeVisible(mit2->first);
+				facts.addChange(Facts::LIVE,mit->first,*sit);
+				if (im.isVisible(mit->first)) im.makeVisible(*sit);
 			}
 			if (mit==prep1.begin()) {
 				facts.addChange(Facts::LIVE,mit2->first,precollection);
@@ -1568,6 +1577,9 @@ void Rules::meldTransitions5(Mode mode) {
 			facts.setStatus(Facts::SAFE, mainid, Facts::ISFALSE);
 			facts.addFact(Facts::UNSAFE,false);
 		}
+
+		if (flag)
+			facts.removeFact(Facts::BOUNDEDNESS);
 
 		// remove the old pre/post-transitions
 		for(mit=prep1.begin(); mit!=prep1.end(); ++mit)
@@ -1680,6 +1692,7 @@ void Rules::loopTransition(Mode mode) {
 	bool condition(facts.checkCondition(Facts::ALTL | Facts::ALTLX));
 	bool conditio2(facts.checkCondition(Facts::ALTL));
 	bool conditio3(facts.checkCondition(Facts::BISIM));
+	bool conditio4(facts.checkCondition(Facts::LIVENESS));
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
@@ -1732,6 +1745,8 @@ void Rules::loopTransition(Mode mode) {
 			{
 				contained = true;
 				nodestamp[mit->first] = im.getTimeStamp(mit->first);
+				im.unlock(mit->first);
+				im.unlock(mainid);
 				break;
 			}
 			im.unlock(mit->first);
@@ -1742,8 +1757,6 @@ void Rules::loopTransition(Mode mode) {
 			im.setMode(mainid,mode);
 			continue;
 		}
-		im.unlock(mit->first);
-		im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
 		if (!im.wrlock(nodestamp)) continue;

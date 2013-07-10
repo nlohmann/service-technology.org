@@ -24,9 +24,12 @@
 TESTFILES = test1a.owfn test1b.owfn test1c.owfn test1d.owfn \
 			test2a.owfn test2b.owfn test2c.owfn test2d.owfn \
 			test3a.owfn test3b.owfn \
-			test4a.owfn test4b.owfn test4c.owfn test4e.owfn test4f.owfn \
-			test5a.owfn test5b.owfn test5c.owfn test5d.owfn \
-			test6a.owfn test6b.owfn test6c.owfn test6d.owfn
+			test4a.owfn test4b.owfn test4c.owfn test4d.owfn test4e.owfn test4f.owfn \
+			test5a.owfn test5b.owfn test5c.owfn test5d.owfn test5e.owfn test5f.owfn \
+			test6a.owfn test6b.owfn test6c.owfn test6d.owfn test6e.owfn test6f.owfn \
+			test7a.owfn test7b.owfn test7c.owfn test7d.owfn test7e.owfn test7f.owfn \
+			test8a.owfn test8b.owfn test8c.owfn test8d.owfn test8e.owfn test8f.owfn test8g.owfn \
+			test9a.owfn test9b.owfn test9c.owfn test9d.owfn
 # <<-- CHANGE END -->>
 
 

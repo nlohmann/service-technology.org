@@ -29,7 +29,12 @@ TESTFILES = test1a.owfn test1b.owfn test1c.owfn test1d.owfn \
 			test6a.owfn test6b.owfn test6c.owfn test6d.owfn test6e.owfn test6f.owfn \
 			test7a.owfn test7b.owfn test7c.owfn test7d.owfn test7e.owfn test7f.owfn \
 			test8a.owfn test8b.owfn test8c.owfn test8d.owfn test8e.owfn test8f.owfn test8g.owfn \
-			test9a.owfn test9b.owfn test9c.owfn test9d.owfn
+			test9a.owfn test9b.owfn test9c.owfn test9d.owfn \
+			test10a.owfn test11a.owfn test11b.owfn \
+			test12a.owfn test12b.owfn test12c.owfn test12d.owfn test12e.owfn \ 
+			test12f.owfn test12g.owfn test12h.owfn test12i.owfn \ 
+			test13a.owfn
+
 # <<-- CHANGE END -->>
 
 

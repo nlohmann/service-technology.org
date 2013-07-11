@@ -46,7 +46,8 @@ public:
 	bool checkAppl(Vertex node, unsigned int mode);
 
 	enum rulenames { // changing these values will break autotests (see --debug option)
-		INITDEADPLACE = 0x0L, // deleted
+		INITDEADPLACE = 0x80000000L, // deleted
+		MELDPLACE = 0x40000000L, // deleted
 		INITDEADPL2 = 0x1L,
 		PARPLACE = 0x2L,
 		PARTRANSITION = 0x4L,
@@ -57,16 +58,15 @@ public:
 		MELDTRANS4 = 0x80L,
 		LOOPPLACE = 0x100L,
 		LOOPTRANS = 0x200L,
-		MELDPLACE = 0x400L,
+		ISOLATEDTRANS = 0x400L,
 		LIVETRANS = 0x800L,
 		MELDTRANS5 = 0x1000L,
-		ISOLATEDTRANS = 0x2000L,
-		SERIESPLACE = 0x4000L,
-		FINALPLACE = 0x8000L,
-		FINALTRANS = 0x10000L,
+		SERIESPLACE = 0x2000L,
+		FINALPLACE = 0x4000L,
+		FINALTRANS = 0x8000L,
 
-		ALLMODES = 0x1FFFFL,
-		MAXMODE = 17
+		ALLMODES = 0xFFFFL,
+		MAXMODE = 16
 	};
 
 private:

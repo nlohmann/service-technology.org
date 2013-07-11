@@ -1,0 +1,21 @@
+
+PLACE
+  INTERNAL
+    q, r;
+  INPUT
+    p;
+
+ROLES 
+  a, b;
+
+INITIALMARKING
+  ;
+
+FINALCONDITION
+  TRUE;
+
+TRANSITION t
+  ROLES a;
+  CONSUME p;
+  PRODUCE q;
+

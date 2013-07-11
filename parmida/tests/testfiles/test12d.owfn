@@ -1,0 +1,19 @@
+
+PLACE
+  INTERNAL
+    p, q;
+
+ROLES 
+  a, b;
+
+INITIALMARKING
+  p:2;
+
+FINALCONDITION
+  (p >= 1);
+
+TRANSITION t
+  ROLES a;
+  CONSUME p;
+  PRODUCE q:2;
+

@@ -619,7 +619,7 @@ void Rules::isolatedTransitions(Mode mode) {
 			if (conditio2 && im.getLabel(mit->first)==0 
 						  && im.getLabel(mit2->first)!=0) continue;
 			if (condition && im.getLabelVis(mit->first)!=im.getLabelVis(mit2->first) 
-						  && im.getLabelVis(mit2->first)>0) continue; 
+						  && im.getLabel(mit2->first)>0) continue; 
 			if (im.getLabel(mit->first)!=im.getLabel(mit2->first)
 				|| im.isVisible(mit2->first) || im.isVisible(mit->first)) {
 					if (conditio4) continue;
@@ -641,13 +641,15 @@ void Rules::isolatedTransitions(Mode mode) {
 		if (condition && im.getLabelVis(mit->first)>0 && samevislabel==0) flag=false;
 		if (conditio2 && im.getLabel(mit->first)>0 && samelabel==0) flag=false;
 		if (conditio3 && remaining==1) flag=false;
-		if (conditio4) flag=false;
+		if (conditio4 && (im.isVisible(mit->first) || im.getLabel(mit->first))) flag=false;
 		if (flag) { 
 			mit->second = 0; 			
 			facts.setStatus(Facts::PATH,mit->first,Facts::UNUSABLE);
 			facts.setStatus(Facts::LIVE,mit->first,Facts::ISTRUE);
-			facts.removeFact(Facts::BISIM);
+			if (im.isVisible(mit->first) || im.getLabel(mit->first))
+				facts.removeFact(Facts::BISIM);
 			--remaining; 
+			if (!remaining) facts.removeFact(Facts::CTL | Facts::LTL);
 		}
 		++mit;
 	}
@@ -2068,7 +2070,7 @@ void Rules::finalPlace(Mode mode) {
 		if (tokens>1) {
 			facts.setStatus(Facts::SAFE, mainid, Facts::ISFALSE);
 			facts.addFact(Facts::UNSAFE,false);
-		}
+		} else facts.removeFact(Facts::SAFETY);
 
 		// mark surrounding area as changed
 		propagateChange(nodestamp);

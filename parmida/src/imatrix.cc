@@ -252,6 +252,15 @@ IMatrix::IMatrix(PetriNet& pn, JSON& log) : petrinet(pn) {
 		timestamp[id] = 1;
 	}
 
+	// check for unconnected transitions
+	set<Transition*>::iterator tit;
+	for(tit=tset.begin(); tit!=tset.end(); ++tit)
+		if (nodeToID.find(*tit)==nodeToID.end())
+		{
+			idvec[tidcnt] = *tit;
+			nodeToID[*tit] = tidcnt++;
+		}
+
 	// list transitions according to pre/postset sizes
 	for(id=numplaces; id<numplaces+numtransitions; ++id)
 	{

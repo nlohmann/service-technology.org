@@ -1,12 +1,14 @@
-noinst_PROGRAMS = json json98
-TESTS = ./json ./json98
+AUTOMAKE_OPTIONS = subdir-objects
+
+noinst_PROGRAMS = json11 json98
+TESTS = ./json11 ./json98
 
 #CXXFLAGS = -O3 -flto
 #CXXFLAGS = -Wall -pedantic -Wextra -W -ansi -Wdocumentation
 
-json_SOURCES = src/JSON.cc src/JSON.h test/JSON_test.cc
-json_CXXFLAGS = -std=c++11
-json_CPPFLAGS = -I$(top_srcdir)/src
+json11_SOURCES = src/JSON.cc src/JSON.h test/JSON_test.cc
+json11_CXXFLAGS = -std=c++11
+json11_CPPFLAGS = -I$(top_srcdir)/src
 
 json98_SOURCES = src/JSON.cc src/JSON.h test/JSON_test.cc
 json98_CXXFLAGS = -std=c++98

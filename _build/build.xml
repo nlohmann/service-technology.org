@@ -133,6 +133,7 @@
         <exec executable="make" failonerror="false" resultproperty="result">
             <arg value="check" />
         </exec>
+        <touch file="tests/testsuite.log" mkdirs="true" />
         <copy file="tests/testsuite.log" todir="artifacts" failonerror="false" />
         <fail>
             <condition>

@@ -16,6 +16,112 @@ AT_KEYWORDS(basic)
 AT_CLEANUP
 
 ############################################################################
+AT_BANNER([Net Formats])
+############################################################################
+
+AT_SETUP([OWFN (default)])
+AT_CHECK([cp TESTFILES/test1a.owfn .])
+AT_CHECK([PARMIDA --BOUNDED --LIVE -P -T -v test1a.owfn -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "read net" stderr])
+AT_CHECK([GREP -q "write net" stderr])
+AT_CHECK([GREP -q "write JSON" stderr])
+AT_CHECK([GREP -q "Parmida" owfn])
+AT_CHECK([GREP -q "checkable properties" json])
+AT_KEYWORDS(format)
+AT_CLEANUP
+
+AT_SETUP([LoLA])
+AT_CHECK([cp TESTFILES/garavel.llnet .])
+AT_CHECK([PARMIDA --BOUNDED --LIVE -P -T -v garavel.llnet --lola -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "read net" stderr])
+AT_CHECK([GREP -q "write net" stderr])
+AT_CHECK([GREP -q "write JSON" stderr])
+AT_CHECK([GREP -q "Parmida" owfn])
+AT_CHECK([GREP -q "checkable properties" json])
+AT_KEYWORDS(format)
+AT_CLEANUP
+
+AT_SETUP([PNML])
+AT_CHECK([cp TESTFILES/MAPK320.pnml .])
+AT_CHECK([PARMIDA --BOUNDED --LIVE -P -T -v MAPK320.pnml --pnml -oowfn --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "read net" stderr])
+AT_CHECK([GREP -q "write net" stderr])
+AT_CHECK([GREP -q "write JSON" stderr])
+AT_CHECK([GREP -q "Parmida" owfn])
+AT_CHECK([GREP -q "checkable properties" json])
+AT_KEYWORDS(format)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Error Codes])
+############################################################################
+
+AT_SETUP([Net does not exist])
+AT_CHECK([PARMIDA -P -T -v test1a.owfn -oowfn --writejson=json],1,stdout,stderr)
+AT_CHECK([GREP -q "could not open file" stderr])
+AT_CHECK([GREP -q "aborting ..01" stderr])
+AT_KEYWORDS(errors)
+AT_CLEANUP
+
+AT_SETUP([Net parsing failed])
+AT_CHECK([cp TESTFILES/test1z.owfn .])
+AT_CHECK([PARMIDA -P -T -v test1z.owfn -oowfn --writejson=json],1,stdout,stderr)
+AT_CHECK([GREP -q "error near 'PLACE'" stderr])
+AT_CHECK([GREP -q "aborting ..02" stderr])
+AT_KEYWORDS(errors)
+AT_CLEANUP
+
+AT_SETUP([More than one input file])
+AT_CHECK([cp TESTFILES/test1a.owfn TESTFILES/test1b.owfn .])
+AT_CHECK([PARMIDA -P -T -v test1a.owfn test1b.owfn -oowfn --writejson=json],1,stdout,stderr)
+AT_CHECK([GREP -q "at most one input file" stderr])
+AT_CHECK([GREP -q "aborting ..05" stderr])
+AT_KEYWORDS(errors)
+AT_CLEANUP
+
+AT_SETUP([Invalid command line parameter])
+AT_CHECK([cp TESTFILES/test1a.owfn .])
+AT_CHECK([PARMIDA -P -T -v test1a.owfn --exoskeleton -oowfn --writejson=json],1,stdout,stderr)
+AT_CHECK([GREP -q "invalid command-line parameter(s)" stderr])
+AT_CHECK([GREP -q "aborting ..07" stderr])
+AT_KEYWORDS(errors)
+AT_CLEANUP
+
+AT_SETUP([Corrupted JSON translation file])
+AT_CHECK([cp TESTFILES/test5b.json TESTFILES/test5a.path .])
+AT_CHECK([PARMIDA -P -T -v --readjson=test5b.json test5a.path --writejson=json],1,stdout,stderr)
+AT_CHECK([GREP -q "error in JSON translation file" stderr])
+AT_CHECK([GREP -q "aborting ..09" stderr])
+AT_KEYWORDS(errors)
+AT_CLEANUP
+
+AT_SETUP([Missing JSON path file])
+AT_CHECK([cp TESTFILES/test5a.json .])
+AT_CHECK([PARMIDA -P -T -v --readjson=test5a.json --writejson=json],1,stdout,stderr)
+AT_CHECK([GREP -q "missing input file for path" stderr])
+AT_CHECK([GREP -q "aborting ..11" stderr])
+AT_KEYWORDS(errors)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Path Translation])
+############################################################################
+
+AT_SETUP([Translating a simple path])
+AT_CHECK([cp TESTFILES/test5a.json TESTFILES/test5a.path .])
+AT_CHECK([PARMIDA -P -T -v --readjson=test5a.json test5a.path --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "\"path\": .\"v\", \"v\", \"t\", \"v\", \"v\", \"v\", \"u\", \"v\", \"w\"" json])
+AT_KEYWORDS(path)
+AT_CLEANUP
+
+AT_SETUP([Translating a complex path])
+AT_CHECK([cp TESTFILES/test4a.json TESTFILES/test4a.path .])
+AT_CHECK([PARMIDA -P -T -v --readjson=test4a.json test4a.path --writejson=json],0,stdout,stderr)
+AT_CHECK([GREP -q "\"path\": .\"v\", \"v\", \"u\", \"u\", \"t\", \"t\"" json])
+AT_KEYWORDS(path)
+AT_CLEANUP
+
+############################################################################
 AT_BANNER([Rule: Initially Dead Place])
 ############################################################################
 

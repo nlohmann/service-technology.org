@@ -33,7 +33,8 @@ TESTFILES = test1a.owfn test1b.owfn test1c.owfn test1d.owfn \
 			test10a.owfn test11a.owfn test11b.owfn \
 			test12a.owfn test12b.owfn test12c.owfn test12d.owfn test12e.owfn \ 
 			test12f.owfn test12g.owfn test12h.owfn test12i.owfn \ 
-			test13a.owfn
+			test13a.owfn garavel.llnet MAPK320.pnml test1z.owfn \
+			test4a.json test4a.path test5a.json test5b.json test5a.path
 
 # <<-- CHANGE END -->>
 

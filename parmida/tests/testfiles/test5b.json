@@ -1,0 +1,1 @@
+{"checkable properties": ["non-live", "live", "unbounded", "bounded", "paths", "safe", "unsafe"], "deduced properties": ["unsafe"], "live": {"v": ["|", "t", "u"]}, "net": "tests/testfiles/test5a.owfn", "path": {"*init*": ["v", "v"], "t": ["t", "v", "v", 3.7], "u": ["u", "v"]}}

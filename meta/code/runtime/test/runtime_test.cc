@@ -3,12 +3,11 @@
 
 Runtime rt;
 
-int main() {
+int main(int argc, char** argv) {
+    rt.arguments(argc, argv);
+    
     rt.status("I like %d turtles", 3);
     rt.status("Welt");
-
-    char *foo;
-    rt.status("%s", foo);
 
     return 0;
 }

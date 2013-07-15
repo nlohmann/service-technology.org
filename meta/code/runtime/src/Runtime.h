@@ -4,6 +4,7 @@
 #include <ctime>
 #include <cstdio>
 #include <ostream>
+#include <string>
 
 class Runtime {
     private:
@@ -25,6 +26,9 @@ class Runtime {
         /// new handler
         __attribute__((noreturn)) static void newHandler();
 
+        /// whether to use colored output
+        static bool _useColor;
+
         /// a buffer for messages
         char _buffer[1024];
 
@@ -34,7 +38,9 @@ class Runtime {
     public:
         Runtime();
         ~Runtime();
-        
+
+        void arguments(int argc, char** argv);
+
         /// unconditionally print a message
         void status(const char* format, ...);
 

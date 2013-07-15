@@ -1,4 +1,7 @@
-AUTOMAKE_OPTIONS = subdir-objects
+# tell aclocal about the macros in the "m4" folder
+ACLOCAL_AMFLAGS = -I m4 --install
+
+AUTOMAKE_OPTIONS = subdir-objects foreign
 
 noinst_PROGRAMS = runtime_test
 TESTS = ./runtime_test

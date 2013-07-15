@@ -1,3 +1,5 @@
+#include <config.h>
+
 #include <cstdio>
 #include <cstdarg>
 #include <cstdlib>
@@ -11,6 +13,25 @@
 #include "Runtime.h"
 
 Runtime *Runtime::_rt = NULL;
+
+#if !defined(__MINGW32__) && !defined(USE_SYSLOG)
+bool Runtime::_useColor = isatty(fileno(stderr)) && (
+    !strcmp(getenv("TERM"), "linux") ||
+    !strcmp(getenv("TERM"), "cygwin") ||
+    !strcmp(getenv("TERM"), "xterm") ||
+    !strcmp(getenv("TERM"), "xterm-color") ||
+    !strcmp(getenv("TERM"), "xterm-256color"));
+#else
+bool Runtime::_useColor = false;
+#endif
+
+//std::string Runtime::_red     = (_useColor ? "\033[0;31m" : "");
+//std::string Runtime::_green   = (_useColor ? "\033[0;32m" : "");
+//std::string Runtime::_yellow  = (_useColor ? "\033[0;33m" : "");
+//std::string Runtime::_blue    = (_useColor ? "\033[0;34m" : "");
+//std::string Runtime::_magenta = (_useColor ? "\033[0;35m" : "");
+//std::string Runtime::_cyan    = (_useColor ? "\033[0;36m" : "");
+//std::string Runtime::_grey    = (_useColor ? "\033[0;37m" : "");
 
 
 Runtime::Runtime() {
@@ -37,12 +58,36 @@ Runtime::Runtime() {
     time(&start_time);
 
     // initialize log
-    _log["pid"] = getpid();
+#ifdef CONFIG_HOSTNAME
+    _log["hostname"] = CONFIG_HOSTNAME;
+#endif
+#ifdef PACKAGE_NAME
     _log["tool"]["name"] = PACKAGE_NAME;
+#endif
+#ifdef PACKAGE_VERSION
     _log["tool"]["package_version"] = PACKAGE_VERSION;
+#endif
+#ifdef VERSION_SVN
+    _log["tool"]["svn_version"] = VERSION_SVN;
+#endif
+#ifdef CONFIG_BUILDSYSTEM
+    _log["tool"]["build_system"] = CONFIG_BUILDSYSTEM;
+#endif
     _log["tool"]["architecture"] = static_cast<int>(sizeof(void*) * 8);
+#ifdef __cplusplus
+    _log["tool"]["cpp_standard"] = static_cast<int>(__cplusplus);
+#endif
+#ifdef __VERSION__
+    _log["tool"]["compiler_version"] = __VERSION__;
+#endif
     _log["runtime"]["start_time"] = static_cast<int>(start_time);
+}
 
+void Runtime::arguments(int argc, char** argv) {
+    _log["call"]["binary"] = argv[0];
+    for (int i = 1; i < argc; ++i) {
+        _log["call"]["parameters"] += argv[i];
+    }
 }
 
 Runtime::~Runtime() {

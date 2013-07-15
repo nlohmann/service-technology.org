@@ -35,9 +35,14 @@ class Runtime {
         /// whether verbose messages should be shown
         bool verbose;
 
+        static int exitcode;
+
     public:
         Runtime();
         ~Runtime();
+
+        JSON& operator[](const std::string&);
+        JSON& operator[](const char*);
 
         void arguments(int argc, char** argv);
 
@@ -46,6 +51,8 @@ class Runtime {
 
         /// print a message if "--verbose" parameter was given
         void message(const char* format, ...);
+        
+        __attribute__((noreturn)) void exit(int);
 
         /// abort with an error message and an error code
         __attribute__((noreturn)) void error(int code, const char* format, ...);

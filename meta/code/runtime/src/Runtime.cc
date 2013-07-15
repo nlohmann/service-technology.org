@@ -9,10 +9,12 @@
 #include <new>
 #include <csignal>
 #include <cerrno>
+#include <iomanip>
 
 #include "Runtime.h"
 
 Runtime *Runtime::_rt = NULL;
+int Runtime::exitcode = -1;
 
 #if !defined(__MINGW32__) && !defined(USE_SYSLOG)
 bool Runtime::_useColor = isatty(fileno(stderr)) && (
@@ -58,9 +60,8 @@ Runtime::Runtime() {
     time(&start_time);
 
     // initialize log
-#ifdef CONFIG_HOSTNAME
-    _log["hostname"] = CONFIG_HOSTNAME;
-#endif
+    _log["log"] = JSON(JSON::object);
+    
 #ifdef PACKAGE_NAME
     _log["tool"]["name"] = PACKAGE_NAME;
 #endif
@@ -70,21 +71,37 @@ Runtime::Runtime() {
 #ifdef VERSION_SVN
     _log["tool"]["svn_version"] = VERSION_SVN;
 #endif
-#ifdef CONFIG_BUILDSYSTEM
-    _log["tool"]["build_system"] = CONFIG_BUILDSYSTEM;
+#ifdef CONFIG_HOSTNAME
+    _log["system"]["hostname"] = CONFIG_HOSTNAME;
 #endif
-    _log["tool"]["architecture"] = static_cast<int>(sizeof(void*) * 8);
+#ifdef CONFIG_BUILDSYSTEM
+    _log["system"]["build_system"] = CONFIG_BUILDSYSTEM;
+#endif
+    _log["system"]["architecture"] = static_cast<int>(sizeof(void*) * 8);
 #ifdef __cplusplus
-    _log["tool"]["cpp_standard"] = static_cast<int>(__cplusplus);
+    _log["system"]["cpp_standard"] = static_cast<int>(__cplusplus);
 #endif
 #ifdef __VERSION__
-    _log["tool"]["compiler_version"] = __VERSION__;
+    _log["system"]["compiler_version"] = __VERSION__;
 #endif
     _log["runtime"]["start_time"] = static_cast<int>(start_time);
 }
 
+JSON& Runtime::operator[](const std::string& key) {
+    return _log["log"][key];
+}
+JSON& Runtime::operator[](const char* key) {
+    return _log["log"][key];
+}
+
+void Runtime::exit(int code) {
+    exitcode = code;
+    std::exit(code);
+}
+
 void Runtime::arguments(int argc, char** argv) {
     _log["call"]["binary"] = argv[0];
+    _log["call"]["parameters"] = JSON(JSON::array);
     for (int i = 1; i < argc; ++i) {
         _log["call"]["parameters"] += argv[i];
     }
@@ -99,9 +116,11 @@ Runtime::~Runtime() {
     _log["runtime"]["end_time"] = static_cast<int>(end_time);
     _log["runtime"]["seconds"] = difftime(end_time, start_time);
 
+    _log["call"]["exitcode"] = exitcode;
+
     // record last error
     if (errno != 0) {
-        _log["error"] = strerror(errno);
+        _log["error"]["message"].push_back(std::strerror(errno));
     }
 
     std::cout << _log << '\n';
@@ -113,7 +132,8 @@ __attribute__((noreturn)) void Runtime::signalHandler(int signum) {
         _rt->_log["exit"]["code"] = EXIT_FAILURE;
     }
 
-    exit(EXIT_FAILURE);
+    exitcode = EXIT_FAILURE;
+    std::exit(EXIT_FAILURE);
 }
 
 __attribute__((noreturn)) void Runtime::newHandler() {
@@ -122,7 +142,8 @@ __attribute__((noreturn)) void Runtime::newHandler() {
         _rt->_log["error"] = "memory allocation failed";
     }
 
-    exit(EXIT_FAILURE);
+    exitcode = EXIT_FAILURE;
+    std::exit(EXIT_FAILURE);
 }
 
 void Runtime::exitHandler() {
@@ -142,10 +163,11 @@ void Runtime::message(const char* format, ...) {
 
     JSON entry(JSON::object);
     entry["time"] = static_cast<int>(std::time(0));
-    entry["message"] = _buffer;
+    entry["text"] = _buffer;
+    entry["message"] = "error";
     _log["messages"].push_back(entry);
 
-    std::cerr << _buffer << '\n';
+    std::cerr << PACKAGE << ": " << _buffer << '\n';
 }
 
 /*!
@@ -159,11 +181,12 @@ void Runtime::status(const char* format, ...) {
 
     JSON entry(JSON::object);
     entry["time"] = static_cast<int>(std::time(0));
-    entry["message"] = _buffer;
+    entry["text"] = _buffer;
+    entry["type"] = "status";
     _log["messages"].push_back(entry);
 
     if (verbose) {
-        std::cerr << _buffer << '\n';
+        std::cerr << PACKAGE << ": " << _buffer << '\n';
     }
 }
 
@@ -179,14 +202,24 @@ void Runtime::error(int code, const char* format, ...) {
     vsprintf(_buffer, format, args);
     va_end(args);
 
-    std::cerr << _buffer << '\n';
+    JSON entry(JSON::object);
+    entry["time"] = static_cast<int>(std::time(0));
+    entry["text"] = _buffer;
+    entry["type"] = "error";
+    _log["messages"].push_back(entry);
+    _log["error"]["code"] = code;
+    _log["error"]["message"].push_back(_buffer);
 
-    //fprintf(stderr, "%s -- %saborting [#%02d]%s\n", _c_, _cR_, code, _c_);
+    std::cerr << PACKAGE << ": " << _buffer << " -- aborting [#";
+    std::cerr << std::setfill('0') << std::setw(2) << code;
+    std::cerr << "]\n";
+
     status("see manual for a documentation of this error");
 
     if (errno != 0) {
-        status("last error message: %s", strerror(errno));
+        status("last error message: %s", std::strerror(errno));
     }
 
-    std::exit(0);
+    exitcode = EXIT_FAILURE;
+    std::exit(EXIT_FAILURE);
 }

@@ -35,15 +35,19 @@ class Runtime {
         /// whether verbose messages should be shown
         bool verbose;
 
+        /// a stored exit code
         static int exitcode;
 
     public:
         Runtime();
         ~Runtime();
 
+        /// access to the log JSON object
         JSON& operator[](const std::string&);
+        /// access to the log JSON object
         JSON& operator[](const char*);
 
+        /// pass the command-line arguments
         void arguments(int argc, char** argv);
 
         /// unconditionally print a message
@@ -51,7 +55,8 @@ class Runtime {
 
         /// print a message if "--verbose" parameter was given
         void message(const char* format, ...);
-        
+
+        /// abort with an error message and an error code
         __attribute__((noreturn)) void exit(int);
 
         /// abort with an error message and an error code

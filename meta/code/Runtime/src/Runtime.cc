@@ -126,7 +126,7 @@ Runtime::~Runtime() {
     std::cout << _log << '\n';
 }
 
-__attribute__((noreturn)) void Runtime::signalHandler(int signum) {
+void Runtime::signalHandler(int signum) {
     if (_rt) {
         _rt->_log["exit"]["signal"] = strsignal(signum);
         _rt->_log["exit"]["code"] = EXIT_FAILURE;
@@ -136,7 +136,7 @@ __attribute__((noreturn)) void Runtime::signalHandler(int signum) {
     std::exit(EXIT_FAILURE);
 }
 
-__attribute__((noreturn)) void Runtime::newHandler() {
+void Runtime::newHandler() {
     if (_rt) {
         _rt->_log["exit"]["code"] = EXIT_FAILURE;
         _rt->_log["error"] = "memory allocation failed";

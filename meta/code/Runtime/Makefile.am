@@ -10,9 +10,9 @@ TESTS = ./runtime_test
 #CXXFLAGS = -Wall -pedantic -Wextra -W -ansi -Wdocumentation
 
 dependencies:
-	svn co http://svn.gna.org/svn/service-tech/trunk/meta/code/json /tmp/json
-	cp /tmp/json/src/JSON.cc /tmp/json/src/JSON.h src
-	rm -fr /tmp/json
+	svn co http://svn.gna.org/svn/service-tech/trunk/meta/code/JSON /tmp/JSON
+	cp /tmp/JSON/src/JSON.cc /tmp/JSON/src/JSON.h src
+	rm -fr /tmp/JSON
 
 runtime_test_SOURCES = src/Runtime.cc src/Runtime.h test/runtime_test.cc src/JSON.cc src/JSON.h
 runtime_test_CPPFLAGS = -I$(top_srcdir)/src

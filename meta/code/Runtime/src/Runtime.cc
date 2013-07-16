@@ -13,8 +13,11 @@
 
 #include "Runtime.h"
 
+/// the runtime for your program - lives in the global scope
+Runtime rt;
+
 Runtime *Runtime::_rt = NULL;
-int Runtime::exitcode = -1;
+int Runtime::_exitcode = EXIT_SUCCESS;
 
 #if !defined(__MINGW32__) && !defined(USE_SYSLOG)
 bool Runtime::_useColor = isatty(fileno(stderr)) && (
@@ -26,15 +29,6 @@ bool Runtime::_useColor = isatty(fileno(stderr)) && (
 #else
 bool Runtime::_useColor = false;
 #endif
-
-//std::string Runtime::_red     = (_useColor ? "\033[0;31m" : "");
-//std::string Runtime::_green   = (_useColor ? "\033[0;32m" : "");
-//std::string Runtime::_yellow  = (_useColor ? "\033[0;33m" : "");
-//std::string Runtime::_blue    = (_useColor ? "\033[0;34m" : "");
-//std::string Runtime::_magenta = (_useColor ? "\033[0;35m" : "");
-//std::string Runtime::_cyan    = (_useColor ? "\033[0;36m" : "");
-//std::string Runtime::_grey    = (_useColor ? "\033[0;37m" : "");
-
 
 Runtime::Runtime() {
     _rt = this;
@@ -90,12 +84,13 @@ Runtime::Runtime() {
 JSON& Runtime::operator[](const std::string& key) {
     return _log["log"][key];
 }
+
 JSON& Runtime::operator[](const char* key) {
     return _log["log"][key];
 }
 
 void Runtime::exit(int code) {
-    exitcode = code;
+    _exitcode = code;
     std::exit(code);
 }
 
@@ -116,7 +111,7 @@ Runtime::~Runtime() {
     _log["runtime"]["end_time"] = static_cast<int>(end_time);
     _log["runtime"]["seconds"] = difftime(end_time, start_time);
 
-    _log["call"]["exitcode"] = exitcode;
+    _log["call"]["exitcode"] = _exitcode;
 
     // record last error
     if (errno != 0) {
@@ -132,7 +127,7 @@ void Runtime::signalHandler(int signum) {
         _rt->_log["exit"]["code"] = EXIT_FAILURE;
     }
 
-    exitcode = EXIT_FAILURE;
+    _exitcode = EXIT_FAILURE;
     std::exit(EXIT_FAILURE);
 }
 
@@ -142,12 +137,11 @@ void Runtime::newHandler() {
         _rt->_log["error"] = "memory allocation failed";
     }
 
-    exitcode = EXIT_FAILURE;
+    _exitcode = EXIT_FAILURE;
     std::exit(EXIT_FAILURE);
 }
 
 void Runtime::exitHandler() {
-    std::cout << "That's it" << std::endl;
 }
 
 /*!
@@ -185,7 +179,7 @@ void Runtime::status(const char* format, ...) {
     entry["type"] = "status";
     _log["messages"].push_back(entry);
 
-    if (verbose) {
+    if (_verbose) {
         std::cerr << PACKAGE << ": " << _buffer << '\n';
     }
 }
@@ -220,6 +214,6 @@ void Runtime::error(int code, const char* format, ...) {
         status("last error message: %s", std::strerror(errno));
     }
 
-    exitcode = EXIT_FAILURE;
+    _exitcode = EXIT_FAILURE;
     std::exit(EXIT_FAILURE);
 }

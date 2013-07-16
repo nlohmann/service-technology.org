@@ -26,6 +26,7 @@ class Runtime {
         /// new handler
         __attribute__((noreturn)) static void newHandler();
 
+    private:
         /// whether to use colored output
         static bool _useColor;
 
@@ -33,13 +34,16 @@ class Runtime {
         char _buffer[1024];
 
         /// whether verbose messages should be shown
-        bool verbose;
+        bool _verbose;
 
         /// a stored exit code
-        static int exitcode;
+        static int _exitcode;
 
     public:
+        /// constructor
         Runtime();
+
+        /// destructor
         ~Runtime();
 
         /// access to the log JSON object
@@ -52,13 +56,14 @@ class Runtime {
 
         /// unconditionally print a message
         void status(const char* format, ...);
-
         /// print a message if "--verbose" parameter was given
         void message(const char* format, ...);
 
-        /// abort with an error message and an error code
+        /// quit the program with a given exit code (similar to return in main)
         __attribute__((noreturn)) void exit(int);
 
         /// abort with an error message and an error code
         __attribute__((noreturn)) void error(int code, const char* format, ...);
 };
+
+extern Runtime rt;

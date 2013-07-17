@@ -28,13 +28,18 @@
 // #define UC_DEBUG(x) x
 #define UC_DEBUG(x) ;
 
+// TODO: use UC_FASTER as default
+#define UC_FASTER true
+
 
 void Usecase::init() {
     pnapi::Condition* c = &this->net->getFinalCondition();
-    *c = c->getFormula() && ((*invoice == 0) || (*finish == 0)) ;
 
-    net->createArc(*credit, *pay_for_invoice);
-    net->createArc(*invoice, *pay_for_invoice);
+    if(!UC_FASTER) {
+        *c = c->getFormula() && ((*invoice == 0) || (*finish == 0)) ;
+        net->createArc(*credit, *pay_for_invoice);
+        net->createArc(*invoice, *pay_for_invoice);
+    }
 
     setToValue(i);
     // std::cout << pnapi::io::owfn << *net;
@@ -147,8 +152,8 @@ Usecase::Usecase(
         // put cost tokens on invoice
         if(t and it->second > 0) {
             usecase->createArc(*t, *invoice, it->second);
+            newCostfunction[t] = it->second;
         }
-        newCostfunction[t] = it->second;
         it->second = 0;
     }
     (*costfunction) = newCostfunction;
@@ -236,12 +241,8 @@ Usecase::Usecase(
     UC_DEBUG(status("added conditional jump in conditions");)
 
     // add conditional jump back
-    pnapi::Transition* cond_jump_back = &orig->createTransition("cond_jump_back");
     // this place signals that the usecase was complete finished
     finish = &orig->createPlace("finish");
-    orig->createArc(*uc_in_usecase, *cond_jump_back);
-    orig->createArc(*cond_jump_back, *finish);
-    orig->createArc(*cond_jump_back, *in_orig);
 
     pnapi::Condition* finalCond = &usecase->getFinalCondition();
 
@@ -268,7 +269,7 @@ Usecase::Usecase(
             formula = new pnapi::formula::Disjunction((*ucFormula) , (*fFalse));
             break;
         default: // everything else should be literal
-            formula = new pnapi::formula::Disjunction(((*ucFormula) , (*fTrue)) || (*fFalse));
+            formula = new pnapi::formula::Disjunction( (*ucFormula) && (*fTrue) , *fFalse );
             break;
     }
 
@@ -281,7 +282,7 @@ Usecase::Usecase(
 
         // assume: every claus is conjunction
         if( (*clauseIt)->getType() != pnapi::formula::Formula::F_CONJUNCTION) {
-            message("somewhere somthing went wrong. Please report bug.");
+            message("somewhere something went wrong. Please report bug.");
             abort();
         }
 
@@ -319,8 +320,10 @@ Usecase::Usecase(
                     }
                 // GREATER literal
                 case pnapi::formula::Formula::F_GREATER_EQUAL:
-                    orig->createArc(*place, *newTrans, tokens);
-                    orig->createArc(*newTrans, *place, tokens);
+                    if(tokens > 0) {
+                        orig->createArc(*place, *newTrans, tokens);
+                        orig->createArc(*newTrans, *place, tokens);
+                    }
                     break;
                 // GREATER EQUAL literal
                 case pnapi::formula::Formula::F_GREATER:
@@ -355,6 +358,7 @@ Usecase::Usecase(
     orig->createArc(*finish, *pay_for_invoice); 
     // the arc to credit will be added later
 
+    oldFormula = (orig->getFinalCondition().getFormula().clone());
     // remember
     this->net = orig;
     // std::cout << pnapi::io::owfn << *orig;
@@ -363,6 +367,15 @@ Usecase::Usecase(
 unsigned int Usecase::getI() { return i; }
 void Usecase::setToValue(unsigned int newI) {
     i = newI;
-    credit->setTokenCount(i);
+
+    if(UC_FASTER) {
+        pnapi::Condition* c = &this->net->getFinalCondition();
+        *c = (*oldFormula) && (*invoice <= i || *finish == 0);
+    }
+
+    if(!UC_FASTER) {
+        credit->setTokenCount(i);
+    }
+
     // std::cout << pnapi::io::owfn << *net;
 }

@@ -27,6 +27,7 @@ class Usecase : public Modification {
         pnapi::Place* invoice;
         pnapi::Place* finish;
         pnapi::Transition* pay_for_invoice;
+        pnapi::formula::Formula* oldFormula;
 };
 
 #endif // USECASE_H

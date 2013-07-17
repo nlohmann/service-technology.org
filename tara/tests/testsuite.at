@@ -142,6 +142,15 @@ AT_KEYWORDS(basic)
 AT_CLEANUP
 
 
+AT_SETUP([Cyclic simple concurrent with usecase])
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/cyclic_conc.owfn .])
+AT_CHECK([cp TESTFILES/cyclic_conc_uc.owfn .])
+AT_CHECK([cp TESTFILES/cyclic_conc.cf .])
+AT_CHECK([TARA -n cyclic_conc.owfn -u cyclic_conc_uc.owfn -f cyclic_conc.cf -h maxout],0,ignore,stderr)    
+AT_CHECK([GREP -q "Minimal budget found: 1011" stderr])
+AT_KEYWORDS(basic)
+AT_CLEANUP
 
 
 # <<-- CHANGE END -->>

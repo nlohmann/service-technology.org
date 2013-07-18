@@ -306,7 +306,7 @@ void Facts::printFacts() {
 		}
 	}
 
-	if (checkCondition(PATHS | COMPLEXPATHS) || (transfer_facts & (PATHS|COMPLEXPATHS)))
+	if (checkCondition(PATHS | COMPLEXPATHS)) // || (transfer_facts & (PATHS|COMPLEXPATHS)))
 	{
 		if (!path.empty()) 
 			cout << endl << "Path Translations (reduced net --> original net):" << endl;
@@ -533,7 +533,7 @@ void Facts::printFacts(JSON& log) {
 		}
 	}
 
-	if (checkCondition(PATHS | COMPLEXPATHS) || (transfer_facts & (PATHS|COMPLEXPATHS)))
+	if (checkCondition(PATHS | COMPLEXPATHS)) // || (transfer_facts & (PATHS|COMPLEXPATHS)))
 		for(map<Vertex, Path>::iterator pit=path.begin(); pit!=path.end(); ++pit)
 			if (((state[pit->first] >> PATH) & 7L) == NONE)
 				for(unsigned int i=0; i<pit->second.size(); ++i)
@@ -728,7 +728,7 @@ void Facts::setStatus(unsigned int type, Vertex id, unsigned int status) {
 	@param before If the path is to be insert in front of the property (default: true) or after it (false)
 */
 void Facts::addPath(Vertex id, Path out, bool before) {
-//	if (Runtime::args_info.netonly_given) return;
+	if (!checkCondition(PATHS | COMPLEXPATHS)) return;
 	pthread_rwlock_wrlock(locks + PATH);
 	if (id != NO_NODE && path.find(id)==path.end()) 
 		path[id].push_back(id);
@@ -747,7 +747,7 @@ void Facts::addPath(Vertex id, Path out, bool before) {
 	@param before If the path is to be insert in front of the property (default: true) or after it (false)
 */
 void Facts::addFixedPath(Vertex id, Path out, bool before) {
-//	if (Runtime::args_info.netonly_given) return;
+	if (!checkCondition(PATHS | COMPLEXPATHS)) return;
 	pthread_rwlock_wrlock(locks + PATH);
 	if (id != NO_NODE && path.find(id)==path.end()) 
 		path[id].push_back(id);
@@ -760,13 +760,15 @@ void Facts::addFixedPath(Vertex id, Path out, bool before) {
 	@return The unwound path in the original net
 */
 Path Facts::getPath(Path& in) {
-	pthread_rwlock_rdlock(locks + PATH);
 	Path tmp;
-	for(unsigned int i=0; i<in.size(); ++i)
-		if (path.find(in[i])!=path.end())
-			tmp.insert(tmp.end(),path[in[i]].begin(),path[in[i]].end());
-		else tmp.push_back(in[i]);
-	pthread_rwlock_unlock(locks + PATH);
+	if (checkCondition(PATHS | COMPLEXPATHS)) {
+		pthread_rwlock_rdlock(locks + PATH);
+		for(unsigned int i=0; i<in.size(); ++i)
+			if (path.find(in[i])!=path.end())
+				tmp.insert(tmp.end(),path[in[i]].begin(),path[in[i]].end());
+			else tmp.push_back(in[i]);
+		pthread_rwlock_unlock(locks + PATH);
+	}
 	return tmp;
 }
 
@@ -775,7 +777,7 @@ Path Facts::getPath(Path& in) {
 	@param out The path to be set.
 */
 void Facts::setPath(Vertex id, const Path& out) {
-//	if (Runtime::args_info.netonly_given) return;
+	if (!checkCondition(PATHS | COMPLEXPATHS)) return;
 	pthread_rwlock_wrlock(locks + PATH);
 	path[id] = out;
 	pthread_rwlock_unlock(locks + PATH);

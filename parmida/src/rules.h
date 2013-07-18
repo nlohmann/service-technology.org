@@ -40,7 +40,7 @@ public:
 	Rules(IMatrix& im, Facts& facts);
 
 	/// Call of a reduction rule by its mode number
-	void apply(unsigned int mode);
+	void apply(unsigned int mode, unsigned int tid);
 
 	/// Applicability check of Rule mode for Node node
 	bool checkAppl(Vertex node, unsigned int mode);
@@ -71,58 +71,58 @@ public:
 
 private:
 	/// Starke rule 1
-	void liveTransitions(Mode mode);
+	void liveTransitions(unsigned int tid);
 
 	/// Starke rule 2
-	void initiallyDeadPlace(Mode mode);
+	void initiallyDeadPlace(unsigned int tid);
 
 	/// extended Starke rule 2
-	void initiallyDeadPlace2(Mode mode);
+	void initiallyDeadPlace2(unsigned int tid);
 
 	/// Starke rule 3(a)
-	void parallelPlaces(Mode mode);
+	void parallelPlaces(unsigned int tid);
 
 	/// Starke rule 3(b)
-	void parallelTransitions(Mode mode);
+	void parallelTransitions(unsigned int tid);
 
 	/// Starke rule 3(c)
-	void isolatedTransitions(Mode mode);
+	void isolatedTransitions(unsigned int tid);
 
 	/// Starke rule 4
-	void equivalentPlaces(Mode mode);
+	void equivalentPlaces(unsigned int tid);
 
 	/// Starke rule 5(a)
-	void meldTransitions1(Mode mode);
+	void meldTransitions1(unsigned int tid);
 
 	/// Starke rule 5(b)
-	void meldTransitions2(Mode mode);
+	void meldTransitions2(unsigned int tid);
 
 	/// Starke rule 5(c)
-	void meldTransitions3(Mode mode);
+	void meldTransitions3(unsigned int tid);
 
 	/// Starke rule 6
-	void meldTransitions4(Mode mode);
+	void meldTransitions4(unsigned int tid);
 
 	/// Starke rule 5(d)
-	void meldTransitions5(Mode mode);
+	void meldTransitions5(unsigned int tid);
 
 	/// Starke rule 7
-	void loopPlace(Mode mode);
+	void loopPlace(unsigned int tid);
 
 	/// Starke rule 8
-	void loopTransition(Mode mode);
+	void loopTransition(unsigned int tid);
 
 	/// Starke rule 9
-	void meldPlaces(Mode mode);
+	void meldPlaces(unsigned int tid);
 
 	/// Murata's series place rule
-	void seriesPlace(Mode mode);
+	void seriesPlace(unsigned int tid);
 
 	/// remove a place with empty postset
-	void finalPlace(Mode mode);
+	void finalPlace(unsigned int tid);
 
 	/// remove a transition with empty postset
-	void finalTransition(Mode mode);
+	void finalTransition(unsigned int tid);
 
 	// Move the preset from one node to another (adding)
 	void movePre(Vertex id, Vertex id2);

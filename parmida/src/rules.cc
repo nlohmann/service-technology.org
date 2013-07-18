@@ -40,27 +40,27 @@ Rules::Rules(IMatrix& mat, Facts& fkt) : im(mat), facts(fkt) {}
 /** Apply a rule given by its rule number
     @param mode The number of the rule
 */
-void Rules::apply(unsigned int mode) {
+void Rules::apply(unsigned int mode, unsigned int tid) {
 	Mode flag(1L<<mode);
 	switch (flag) {
-		case INITDEADPLACE:	initiallyDeadPlace(flag); break;
-		case PARPLACE:		parallelPlaces(flag); break;
-		case PARTRANSITION:	parallelTransitions(flag); break;
-		case ISOLATEDTRANS: isolatedTransitions(flag); break;
-		case EQUIVPLACE:	equivalentPlaces(flag); break;
-		case MELDTRANS1:	meldTransitions1(flag); break;
-		case MELDTRANS2:	meldTransitions2(flag); break;
-		case MELDTRANS3:	meldTransitions3(flag); break;
-		case MELDTRANS4:	meldTransitions4(flag); break;
-		case MELDTRANS5:	meldTransitions5(flag); break;
-		case LOOPPLACE:		loopPlace(flag); break;
-		case LOOPTRANS:		loopTransition(flag); break;
-		case MELDPLACE:		meldPlaces(flag); break;
-		case LIVETRANS:		liveTransitions(flag); break;
-		case SERIESPLACE:	seriesPlace(flag); break;
-		case FINALPLACE:	finalPlace(flag); break;
-		case FINALTRANS:	finalTransition(flag); break;
-		case INITDEADPL2:	initiallyDeadPlace2(flag); break;
+		case INITDEADPLACE:	initiallyDeadPlace(tid); break;
+		case PARPLACE:		parallelPlaces(tid); break;
+		case PARTRANSITION:	parallelTransitions(tid); break;
+		case ISOLATEDTRANS: isolatedTransitions(tid); break;
+		case EQUIVPLACE:	equivalentPlaces(tid); break;
+		case MELDTRANS1:	meldTransitions1(tid); break;
+		case MELDTRANS2:	meldTransitions2(tid); break;
+		case MELDTRANS3:	meldTransitions3(tid); break;
+		case MELDTRANS4:	meldTransitions4(tid); break;
+		case MELDTRANS5:	meldTransitions5(tid); break;
+		case LOOPPLACE:		loopPlace(tid); break;
+		case LOOPTRANS:		loopTransition(tid); break;
+		case MELDPLACE:		meldPlaces(tid); break;
+		case LIVETRANS:		liveTransitions(tid); break;
+		case SERIESPLACE:	seriesPlace(tid); break;
+		case FINALPLACE:	finalPlace(tid); break;
+		case FINALTRANS:	finalTransition(tid); break;
+		case INITDEADPL2:	initiallyDeadPlace2(tid); break;
 	}
 }
 
@@ -79,85 +79,61 @@ bool Rules::checkAppl(Vertex node, unsigned int mode) {
 	switch (1L<<mode) {
 		case LIVETRANS:		if (facts.checkCondition(Facts::CTL | Facts::LTL | Facts::REVERSE))
 								return false;
-							im.rdlock(node);
 							if (im.getPre(node).size()>0) place = true;
-							im.unlock(node);
 							return !place;
-		case INITDEADPLACE:	im.rdlock(node);
-							if (im.getPre(node).size()>0) place = false;
-							im.unlock(node);
+		case INITDEADPLACE:	if (im.getPre(node).size()>0) place = false;
 							return place;
 		case INITDEADPL2:	return place;
 		case PARPLACE:		return place;
 		case LOOPTRANS:		if (facts.checkCondition(Facts::CTL | Facts::LTL))
 								return false;
 		case PARTRANSITION: return !place;
-		case ISOLATEDTRANS:	im.rdlock(node);
-							if (im.getPost(node).size()>0) place = true;
+		case ISOLATEDTRANS:	if (im.getPost(node).size()>0) place = true;
 							if (im.getPre(node).size()>0) place = true;
-							im.unlock(node);
 							return !place;
 		case MELDPLACE:
 		case MELDTRANS1:	if (facts.checkCondition(Facts::CTL | Facts::LTL))
 								return false;
-							im.rdlock(node);
 							if (im.getPre(node).size()==0) place = false;
 							if (im.getPost(node).size()!=1) place = false;
-							im.unlock(node);
 							return place;
 		case EQUIVPLACE:	if (facts.checkCondition(Facts::PATHS)) return false;
-							im.rdlock(node);
 							if (im.getPre(node).size()==0) place = false;
 							if (im.getPost(node).size()!=1) place = false;
-							im.unlock(node);
 							return place;
 		case MELDTRANS4:
 		case MELDTRANS2:	if (facts.checkCondition(Facts::CTL | Facts::LTL))
 								return false;
-							im.rdlock(node);
 							if (im.getPost(node).size()==0) place = false;
 							if (im.getPre(node).size()!=1) place = false;
-							im.unlock(node);
 							return place;
 		case MELDTRANS3:	if (facts.checkCondition(Facts::CTL | Facts::LTL))
 								return false;
-							im.rdlock(node);
 							if (im.getPost(node).size()!=2) place = false;
 							if (im.getPre(node).size()!=2) place = false;
-							im.unlock(node);
 							return place;
 		case MELDTRANS5:	if (facts.checkCondition(Facts::CTL | Facts::LTL))
 								return false;
-							im.rdlock(node);
 							if (im.getPost(node).size()<2) place = false;
 							if (im.getPre(node).size()<2) place = false;
-							im.unlock(node);
 							return place;
-		case LOOPPLACE:		im.rdlock(node);
-							if (im.getPost(node).size()==0) place = false;
+		case LOOPPLACE:		if (im.getPost(node).size()==0) place = false;
 							if (im.getPre(node).size()==0) place = false;
-							im.unlock(node);
 							return place;
 		case SERIESPLACE:	if (facts.checkCondition(Facts::CTL | Facts::LTL))
 								return false;
-							im.rdlock(node);
 							if (im.getPre(node).size()!=1) place = false;
-							im.unlock(node);
 							return place;
 		case FINALPLACE:	if (facts.checkCondition(Facts::BOUNDEDNESS | Facts::REVERSE))
 								return false;
-							im.rdlock(node);
 							if (im.getPre(node).size()==0) place = false;
 							if (im.getPost(node).size()>0) place = false;
-							im.unlock(node);
 							return place;
 		case FINALTRANS:	if (facts.checkCondition(Facts::CTL | Facts::LTL | Facts::CTLX | Facts::LTLX 
 													| Facts::LIVENESS | Facts::BISIM | Facts::REVERSE))
 								return false;
-							im.rdlock(node);
 							if (im.getPost(node).size()>0) place = true;
 							if (im.getPre(node).size()==0) place = true;
-							im.unlock(node);
 							return !place;
 	}
 }
@@ -165,7 +141,7 @@ bool Rules::checkAppl(Vertex node, unsigned int mode) {
 /** Starke's rule 1: Transitions with empty presets are removed together with their postsets
     @param mode The mode flag for this rule
 */
-void Rules::liveTransitions(Mode mode) {
+void Rules::liveTransitions(unsigned int tid) {
 	// if the rule is inapplicable we are done
 	if (facts.checkCondition(Facts::CTL | Facts::LTL | Facts::REVERSE)) return;
 
@@ -177,7 +153,7 @@ void Rules::liveTransitions(Mode mode) {
 
 	// find a starting transition "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::TR,mode,0,0,0,NODE_SET_LIMIT))
+	while (im.getFirstNode(mainid,tid,IMatrix::TR,LIVETRANS,0,0,0,NODE_SET_LIMIT))
 	{
 
         // if we cannot remove mainid, get out
@@ -185,7 +161,7 @@ void Rules::liveTransitions(Mode mode) {
 		|| (condition && (im.isVisible(mainid) || im.getLabelVis(mainid)))
 		|| (conditio4 && (im.isVisible(mainid) || im.getLabel(mainid)))
 		|| (conditio2 && im.getLabel(mainid))) {
-			im.unlock(mainid,mode);
+			im.unlock(mainid,LIVETRANS);
 			continue;
 		}
 
@@ -211,13 +187,13 @@ void Rules::liveTransitions(Mode mode) {
 			im.unlock(mit->first);
 		}
 		if (mit!=post.end()) {
-			im.setMode(mainid,mode);
+			im.setMode(mainid,LIVETRANS);
 			continue;
 		}
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp); // logging only
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(LIVETRANS,mainid,nodestamp); // logging only
 
 		// calculate path prefix (option --path or --complexpath)
 		Map factor;
@@ -270,10 +246,10 @@ void Rules::liveTransitions(Mode mode) {
 	This rule has been replaced by initiallyDeadPlace2().
     @param mode The mode flag for this rule
 */
-void Rules::initiallyDeadPlace(Mode mode) {
+void Rules::initiallyDeadPlace(unsigned int tid) {
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,0,0,0,NODE_SET_LIMIT))
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,INITDEADPLACE,0,0,0,NODE_SET_LIMIT))
 	{
 		// get postset and marking of mainid
 	    Map& post(im.getPost(mainid));
@@ -291,7 +267,7 @@ void Rules::initiallyDeadPlace(Mode mode) {
 		// if the rule is not fulfilled look for a new first place
 	    if (mit!=post.end() || im.isIO(mainid) || im.isPersistent(mainid)) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,INITDEADPLACE);
 			continue;
 		}
 
@@ -310,8 +286,8 @@ void Rules::initiallyDeadPlace(Mode mode) {
 	    im.unlock(mainid);
 	
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp); // logging only
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(INITDEADPLACE,mainid,nodestamp); // logging only
 
 		// change inheritable properties
 		if (nodestamp.size()>1)
@@ -349,10 +325,11 @@ void Rules::initiallyDeadPlace(Mode mode) {
 /** Starke's rule 3, places only: Two places have identical pre- and postsets (including arc weights)
     @param mode The mode flag for this rule
 */
-void Rules::parallelPlaces(Mode mode) {
+void Rules::parallelPlaces(unsigned int tid) {
+
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,0,NODE_SET_LIMIT,0,NODE_SET_LIMIT)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,PARPLACE,0,NODE_SET_LIMIT,0,NODE_SET_LIMIT)) {
 
 		// get pre/postset and marking of mainid
 	    Map& post1(im.getPost(mainid));
@@ -365,7 +342,7 @@ void Rules::parallelPlaces(Mode mode) {
 		if (!pre1.empty()) { t = pre1.begin()->first; inPre = true; }
 		else if (!post1.empty()) t = post1.begin()->first;
 		else {
-			im.unlock(mainid,mode);
+			im.unlock(mainid,PARPLACE);
 			continue;
 		}
 
@@ -414,7 +391,7 @@ void Rules::parallelPlaces(Mode mode) {
 		}
 		if (mit==par.end()) {
 			// no place parallel to mainid found
-			im.setMode(mainid,mode);
+			im.setMode(mainid,PARPLACE);
 			continue;
 		}
 
@@ -428,8 +405,8 @@ void Rules::parallelPlaces(Mode mode) {
 	    im.unlock(mainid);
 	
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(PARPLACE,mainid,nodestamp);
 
 		// determine which place to remove (depends on token number and possibly on visibility)
 		bool removemain(tokens1>tokens2);
@@ -463,7 +440,7 @@ void Rules::parallelPlaces(Mode mode) {
 /** Starke's rule 3, transitions only: Two transitions have identical pre- and postsets
     @param mode The mode flag for this rule
 */
-void Rules::parallelTransitions(Mode mode) {
+void Rules::parallelTransitions(unsigned int tid) {
 	// conditions for later checks
 	bool condition(facts.checkCondition(Facts::ALTL | Facts::ALTLX));
 	bool conditio2(facts.checkCondition(Facts::ALTL));
@@ -471,7 +448,7 @@ void Rules::parallelTransitions(Mode mode) {
 
 	// find a starting transition "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::TR,mode,0,NODE_SET_LIMIT,0,NODE_SET_LIMIT)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::TR,PARTRANSITION,0,NODE_SET_LIMIT,0,NODE_SET_LIMIT)) {
 
 		// get pre/postset of mainid
 	    Map& post1(im.getPost(mainid));
@@ -483,7 +460,7 @@ void Rules::parallelTransitions(Mode mode) {
 		if (!pre1.empty()) { p = pre1.begin()->first; inPre = true; }
 		else if (!post1.empty()) p = post1.begin()->first;
 		else {
-			im.unlock(mainid,mode);
+			im.unlock(mainid,PARTRANSITION);
 			continue;
 		}
 
@@ -535,7 +512,7 @@ void Rules::parallelTransitions(Mode mode) {
 		}
 		if (mit==par.end()) {
 			// no transition parallel to mainid found
-			im.setMode(mainid,mode);
+			im.setMode(mainid,PARTRANSITION);
 			continue;
 		}
 
@@ -549,8 +526,8 @@ void Rules::parallelTransitions(Mode mode) {
 	    im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(PARTRANSITION,mainid,nodestamp);
 
 		// determine which transition to remove (depends on visibility)
 		bool removemain(im.isInvisible(mainid) || im.isPersistent(secid));
@@ -583,15 +560,15 @@ void Rules::parallelTransitions(Mode mode) {
 /** Starke's rule 3, for isolated transitions
     @param mode The mode flag for this rule
 */
-void Rules::isolatedTransitions(Mode mode) {
+void Rules::isolatedTransitions(unsigned int tid) {
 	// a condition for later checks
 	bool condition(facts.checkCondition(Facts::ALTL | Facts::ALTLX));
 	bool conditio2(facts.checkCondition(Facts::ALTL));
 	bool conditio3(facts.checkCondition(Facts::CTL | Facts::LTL));
 	bool conditio4(facts.checkCondition(Facts::BISIM));
 
-	Map nodestamp(im.getIsolated(IMatrix::TR,mode));
-	printApply(mode,nodestamp.begin()->first,nodestamp); // logging only
+	Map nodestamp(im.getIsolated(IMatrix::TR,ISOLATEDTRANS));
+	printApply(ISOLATEDTRANS,nodestamp.begin()->first,nodestamp); // logging only
 
     // in general, at least one transition must remain, and any of two transitions
     // with the same label, at least one can be removed. The next operator for
@@ -600,7 +577,7 @@ void Rules::isolatedTransitions(Mode mode) {
     // check every node against ...
 	Map::iterator mit(nodestamp.begin());
 	while (mit != nodestamp.end()) {
-		im.setMode(mit->first,mode,false);
+		im.setMode(mit->first,ISOLATEDTRANS,false);
 		if (mit->second == 0 || im.isPersistent(mit->first)) 
 			{ ++mit; continue; } // already deleted this one or cannot merge it
 
@@ -660,7 +637,7 @@ void Rules::isolatedTransitions(Mode mode) {
 /** Starke's rule 4: Equivalent places (two transitions with identical pre-/postsets except for one place in each preset)
     @param mode The mode flag for this rule
 */
-void Rules::equivalentPlaces(Mode mode) {
+void Rules::equivalentPlaces(unsigned int tid) {
     // We cannot uphold strict paths, only complex ones (with or-operators in them)
 	if (facts.checkCondition(Facts::PATHS)) return;
 
@@ -673,7 +650,7 @@ void Rules::equivalentPlaces(Mode mode) {
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,1,NODE_SET_LIMIT,1,1)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,EQUIVPLACE,1,NODE_SET_LIMIT,1,1)) {
 
 		// get pre/postset of mainid for this
 	    Map& postp1(im.getPost(mainid));
@@ -684,7 +661,7 @@ void Rules::equivalentPlaces(Mode mode) {
 		// as well as IO
 		if (postp1.begin()->second != 1 || im.isIO(mainid) || im.isPersistent(mainid)
 			|| (conditio5 && tokens1>0) || (conditio2 && !im.isInvisible(mainid))) {
-			im.unlock(mainid,mode);
+			im.unlock(mainid,EQUIVPLACE);
 			continue;
 		}
 
@@ -710,7 +687,7 @@ void Rules::equivalentPlaces(Mode mode) {
 		if (!inPre && !postt1.empty()) p = postt1.begin()->first;
 		else if (!inPre) {
 			im.unlock(t1);
-			im.setMode(mainid,mode);
+			im.setMode(mainid,EQUIVPLACE);
 			continue;
 		}
 		im.unlock(t1);
@@ -773,7 +750,7 @@ void Rules::equivalentPlaces(Mode mode) {
 		}
 		if (mit==par.end()) {
 			// no transition parallel to t1 found
-			im.setMode(mainid,mode);
+			im.setMode(mainid,EQUIVPLACE);
 			continue;
 		}
 
@@ -793,8 +770,8 @@ void Rules::equivalentPlaces(Mode mode) {
 		im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(EQUIVPLACE,mainid,nodestamp);
 
 		// determine which transition to remove (depends on visibility)
 		bool removemain(im.isPersistent(p2) || im.isPersistent(t2));
@@ -863,7 +840,7 @@ void Rules::equivalentPlaces(Mode mode) {
 /** Starke's rule 5, n=1: Melding of preset and postset of one place, here: singleton postset
     @param mode The mode flag for this rule
 */
-void Rules::meldTransitions1(Mode mode) {
+void Rules::meldTransitions1(unsigned int tid) {
 	// the rule will destroy state-based next-operators
 	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
 
@@ -876,12 +853,12 @@ void Rules::meldTransitions1(Mode mode) {
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,1,NODE_SET_LIMIT,1,1)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,MELDTRANS1,1,NODE_SET_LIMIT,1,1)) {
 
 		// check for invisibility in formulas
 		if (im.isPersistent(mainid) || (conditio3 && im.isVisible(mainid))) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS1);
 			continue;
 		}
 
@@ -902,7 +879,7 @@ void Rules::meldTransitions1(Mode mode) {
 			(v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY)) ||
 			!disjoint(prep1,postp1)) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS1);
 			continue;
 		}
 
@@ -927,7 +904,7 @@ void Rules::meldTransitions1(Mode mode) {
 		if (conditio4 && (!im.isInvisible(t1) || im.getLabel(t1))) flag=true;
 		if (flag) {
 			im.unlock(t1);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS1);
 			continue;
 		}
 		
@@ -938,8 +915,8 @@ void Rules::meldTransitions1(Mode mode) {
 		im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(MELDTRANS1,mainid,nodestamp);
 
 		// deduced properties
 		set<Vertex> tmp;
@@ -991,7 +968,7 @@ void Rules::meldTransitions1(Mode mode) {
 /** Starke's rule 5, n>1, k=1: Melding of preset and postset of one place, here: singleton preset
     @param mode The mode flag for this rule
 */
-void Rules::meldTransitions2(Mode mode) {
+void Rules::meldTransitions2(unsigned int tid) {
 	// the rule will destroy state-based next-operators
 	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
 
@@ -1003,12 +980,12 @@ void Rules::meldTransitions2(Mode mode) {
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,1,1,1,NODE_SET_LIMIT)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,MELDTRANS2,1,1,1,NODE_SET_LIMIT)) {
 
 		// check for invisibility in formulas
 		if (im.isPersistent(mainid) || (conditio3 && im.isVisible(mainid))) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS2);
 			continue;
 		}
 
@@ -1029,7 +1006,7 @@ void Rules::meldTransitions2(Mode mode) {
 			(v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY)) ||
 			!disjoint(prep1,postp1)) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS2);
 			continue;
 		}
 
@@ -1053,7 +1030,7 @@ void Rules::meldTransitions2(Mode mode) {
 		}
 		if ((flag2 && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
 			if (mit!=postp1.end()) im.unlock(mit->first);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS2);
 			continue;
 		}
 
@@ -1069,7 +1046,7 @@ void Rules::meldTransitions2(Mode mode) {
 		if (conditio4 && (!im.isInvisible(t1) || im.getLabel(t1))) flag=true;
 		if (flag) {
 			im.unlock(t1);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS2);
 			continue;
 		}
 		
@@ -1079,8 +1056,8 @@ void Rules::meldTransitions2(Mode mode) {
 		im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(MELDTRANS2,mainid,nodestamp);
 
 		// path modifications
 		for(mit=postp1.begin(); mit!=postp1.end(); ++mit)
@@ -1127,7 +1104,7 @@ void Rules::meldTransitions2(Mode mode) {
 /** Starke's rule 5, n=2, k=2, no new transitions: Melding of preset (size 2) and postset (size 2) of one place
     @param mode The mode flag for this rule
 */
-void Rules::meldTransitions3(Mode mode) {
+void Rules::meldTransitions3(unsigned int tid) {
 	// the rule will destroy state-based next-operators
 	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
 
@@ -1139,12 +1116,12 @@ void Rules::meldTransitions3(Mode mode) {
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,2,2,2,2)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,MELDTRANS3,2,2,2,2)) {
 
 		// check for invisibility in formulas
 		if (im.isPersistent(mainid) || (conditio3 && im.isVisible(mainid))) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS3);
 			continue;
 		}
 
@@ -1162,7 +1139,7 @@ void Rules::meldTransitions3(Mode mode) {
 			|| (v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY))
 			|| !disjoint(prep1,postp1)) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS3);
 			continue;
 		}
 
@@ -1188,7 +1165,7 @@ void Rules::meldTransitions3(Mode mode) {
 		}
 		if ((flag && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
 			if (mit!=postp1.end()) im.unlock(mit->first);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS3);
 			continue;
 		}
 
@@ -1203,14 +1180,14 @@ void Rules::meldTransitions3(Mode mode) {
 		}
 		if (mit!=prep1.end()) {
 			im.unlock(mit->first);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS3);
 			continue;
 		}
 		im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(MELDTRANS3,mainid,nodestamp);
 
 		// new names for the four surrounding transitions
 		Vertex t1(prep1.begin()->first);
@@ -1281,7 +1258,7 @@ void Rules::meldTransitions3(Mode mode) {
 	on p is less; remove p and t1
     @param mode The mode flag for this rule
 */
-void Rules::meldTransitions4(Mode mode) {
+void Rules::meldTransitions4(unsigned int tid) {
 	// the rule will destroy state-based next-operators
 	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
 
@@ -1293,12 +1270,12 @@ void Rules::meldTransitions4(Mode mode) {
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,1,1,1,NODE_SET_LIMIT)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,MELDTRANS4,1,1,1,NODE_SET_LIMIT)) {
 
 		// check for invisibility in formulas
 		if (im.isPersistent(mainid) || (conditio3 && im.isVisible(mainid))) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS4);
 			continue;
 		}
 
@@ -1319,7 +1296,7 @@ void Rules::meldTransitions4(Mode mode) {
 			|| (v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY))
 			|| !disjoint(prep1,postp1)) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS4);
 			continue;
 		}
 
@@ -1344,7 +1321,7 @@ void Rules::meldTransitions4(Mode mode) {
 		if (conditio4 && (!im.isInvisible(t1) || im.getLabel(t1))) flag=true;
 		if (flag) {
 			im.unlock(t1);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS4);
 			continue;
 		}
 		
@@ -1361,13 +1338,13 @@ void Rules::meldTransitions4(Mode mode) {
 		}
 		if (mit!=pret1.end()) {
 			im.unlock(mit->first);
-			im.setMode(mainid,mode);
+			im.setMode(mainid,MELDTRANS4);
 			continue;
 		}
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(MELDTRANS4,mainid,nodestamp);
 
 		// path modifications
 		for(mit=postp1.begin(); mit!=postp1.end(); ++mit)
@@ -1419,7 +1396,7 @@ void Rules::meldTransitions4(Mode mode) {
 /** Starke's rule 5, n>1, k>1: Melding of preset and postset of one place, here: by creating new transitions
     @param mode The mode flag for this rule
 */
-void Rules::meldTransitions5(Mode mode) {
+void Rules::meldTransitions5(unsigned int tid) {
 	// the rule will destroy state-based next-operators
 	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
 
@@ -1431,12 +1408,12 @@ void Rules::meldTransitions5(Mode mode) {
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,2,NODE_SET_LIMIT,2,NODE_SET_LIMIT)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,MELDTRANS5,2,NODE_SET_LIMIT,2,NODE_SET_LIMIT)) {
 
 		// check for invisibility in formulas
 		if (im.isPersistent(mainid) || (conditio3 && im.isVisible(mainid))) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS5);
 			continue;
 		}
 
@@ -1460,7 +1437,7 @@ void Rules::meldTransitions5(Mode mode) {
 			(v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY)) ||
 			!disjoint(prep1,postp1)) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS5);
 			continue;
 		}
 
@@ -1485,7 +1462,7 @@ void Rules::meldTransitions5(Mode mode) {
 		}
 		if ((flag && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
 			if (mit!=postp1.end()) im.unlock(mit->first);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS5);
 			continue;
 		}
 
@@ -1500,20 +1477,20 @@ void Rules::meldTransitions5(Mode mode) {
 		}
 		if (mit!=prep1.end()) {
 			im.unlock(mit->first);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDTRANS5);
 			continue;
 		}
 		im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(MELDTRANS5,mainid,nodestamp);
 
 		// get new transitions if possible
-		set<Vertex> tnew(im.reserveTransitions(prep1.size()*postp1.size(), nodestamp));
+		set<Vertex> tnew(im.reserveTransitions(tid,prep1.size()*postp1.size(), nodestamp));
 		if (tnew.empty()) { // we could not get enough new transitions
 			im.unlock(nodestamp);
-			im.setMode(mainid,mode);
+			im.setMode(mainid,MELDTRANS5);
 			continue;
 		}
 
@@ -1606,7 +1583,7 @@ void Rules::meldTransitions5(Mode mode) {
 /** Starke's rule 7: A place on which all transitions loop with a weight of at most its initial marking. Place is removed
     @param mode The mode flag for this rule
 */
-void Rules::loopPlace(Mode mode) {
+void Rules::loopPlace(unsigned int tid) {
 	// Starke Rule 7
 
 	// conditions that need to be checked later
@@ -1616,7 +1593,7 @@ void Rules::loopPlace(Mode mode) {
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,1,NODE_SET_LIMIT,1,NODE_SET_LIMIT)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,LOOPPLACE,1,NODE_SET_LIMIT,1,NODE_SET_LIMIT)) {
 
 		// get pre/postset of mainid, weight of the preset edge, and token number
 	    Map& postp1(im.getPost(mainid));
@@ -1636,15 +1613,15 @@ void Rules::loopPlace(Mode mode) {
 		}
 		if (mit!=postp1.end() || mit2!=prep1.end() || im.isPersistent(mainid))
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,LOOPPLACE);
 			continue;
 		}
 
 		im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(LOOPPLACE,mainid,nodestamp);
 
 		// change properties
 		bool flag(true);
@@ -1686,7 +1663,7 @@ void Rules::loopPlace(Mode mode) {
 /** Starke's rule 8: A looping transition may be removed if there is another transition with equal or larger preset (regarding arc weights)
     @param mode The mode flag for this rule
 */
-void Rules::loopTransition(Mode mode) {
+void Rules::loopTransition(unsigned int tid) {
 	// the rule will ruin next in CTL/LTL
 	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
 
@@ -1698,7 +1675,7 @@ void Rules::loopTransition(Mode mode) {
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::TR,mode,0,NODE_SET_LIMIT,0,NODE_SET_LIMIT)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::TR,LOOPTRANS,0,NODE_SET_LIMIT,0,NODE_SET_LIMIT)) {
 
 		if (im.isPersistent(mainid)
 			|| (condition && im.getLabelVis(mainid))
@@ -1706,7 +1683,7 @@ void Rules::loopTransition(Mode mode) {
 			|| (condition && im.isVisible(mainid))
 			|| (conditio3 && (im.isVisible(mainid) || im.getLabel(mainid))))
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,LOOPTRANS);
 			continue;
 		}
 
@@ -1727,7 +1704,7 @@ void Rules::loopTransition(Mode mode) {
 		}
 		if (mit!=postt1.end() || mit2!=pret1.end())
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,LOOPTRANS);
 			continue;
 		}
 
@@ -1756,13 +1733,13 @@ void Rules::loopTransition(Mode mode) {
 		}
 		im.unlock(p);
 		if (!contained && facts.checkCondition(Facts::LIVENESS)) {
-			im.setMode(mainid,mode);
+			im.setMode(mainid,LOOPTRANS);
 			continue;
 		}
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(LOOPTRANS,mainid,nodestamp);
 
 		// apply the rule
 		im.removeArcs(mainid);
@@ -1784,7 +1761,7 @@ void Rules::loopTransition(Mode mode) {
 /** Starke's rule 9 (corrected version)
     @param mode The mode flag for this rule
 */
-void Rules::meldPlaces(Mode mode) {
+void Rules::meldPlaces(unsigned int tid) {
 	// the rule will ruin next in CTL/LTL
 	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
 
@@ -1797,11 +1774,11 @@ void Rules::meldPlaces(Mode mode) {
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,1,NODE_SET_LIMIT,1,1)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,MELDPLACE,1,NODE_SET_LIMIT,1,1)) {
 
 		// can the place be removed?
 		if (im.isPersistent(mainid)	|| (conditio3 && im.isVisible(mainid))) {
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDPLACE);
 			continue;
 		}
 
@@ -1838,7 +1815,7 @@ void Rules::meldPlaces(Mode mode) {
 		|| ((conditio3 || conditio5) && tokens>0)
 		|| (conditio4 && (im.isVisible(t1) || im.getLabel(t1)))) {
 			im.unlock(t1);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,MELDPLACE);
 			continue;
 		}
 
@@ -1848,8 +1825,8 @@ void Rules::meldPlaces(Mode mode) {
 		im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(MELDPLACE,mainid,nodestamp);
 
 		// deduce properties
 		facts.removeFact(Facts::CTL | Facts::LTL);
@@ -1904,7 +1881,7 @@ void Rules::meldPlaces(Mode mode) {
 /** Murata's Series Place: Place with singleton preset, preset with singleton pre- and postset
     @param mode The mode flag for this rule
 */
-void Rules::seriesPlace(Mode mode) {
+void Rules::seriesPlace(unsigned int tid) {
 	// the rule will destroy state-based next-operators
 	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
 
@@ -1916,7 +1893,7 @@ void Rules::seriesPlace(Mode mode) {
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,1,1,0,NODE_SET_LIMIT)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,SERIESPLACE,1,1,0,NODE_SET_LIMIT)) {
 
 		// get pre/postset of mainid and its pretransition
 	    Map& postp1(im.getPost(mainid));
@@ -1929,7 +1906,7 @@ void Rules::seriesPlace(Mode mode) {
 		if (im.isIO(mainid) || im.isPersistent(mainid) || (conditio3 && im.isVisible(mainid))
 			|| prep1.begin()->second != 1 || tokens>0) 
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,SERIESPLACE);
 			continue;
 		}
 
@@ -1954,7 +1931,7 @@ void Rules::seriesPlace(Mode mode) {
 			|| (conditio4 && (im.isVisible(t1) || im.getLabel(t1))))
 		{
 			im.unlock(t1);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,SERIESPLACE);
 			continue;
 		}
 
@@ -1966,7 +1943,7 @@ void Rules::seriesPlace(Mode mode) {
 			|| (conditio3 && im.isVisible(p2)))
 		{
 			im.unlock(t1);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,SERIESPLACE);
 			continue;
 		}		
 
@@ -1975,8 +1952,8 @@ void Rules::seriesPlace(Mode mode) {
 		im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(SERIESPLACE,mainid,nodestamp);
 
 		// path modifications
 	    Map& prep2(im.getPre(p2));
@@ -2024,7 +2001,7 @@ void Rules::seriesPlace(Mode mode) {
 /** Invisible place with empty postset
     @param mode The mode flag for this rule
 */
-void Rules::finalPlace(Mode mode) {
+void Rules::finalPlace(unsigned int tid) {
 
 	// the rule may remove an unbounded place
 	if (facts.checkCondition(Facts::BOUNDEDNESS | Facts::REVERSE)) return;
@@ -2034,7 +2011,7 @@ void Rules::finalPlace(Mode mode) {
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,1,NODE_SET_LIMIT,0,0)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,FINALPLACE,1,NODE_SET_LIMIT,0,0)) {
 
 		unsigned int tokens(im.getTokens(mainid));
 
@@ -2043,7 +2020,7 @@ void Rules::finalPlace(Mode mode) {
 			(tokens<2 && facts.checkCondition(Facts::SAFETY)) ||
 			(condition && im.isVisible(mainid)))
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,FINALPLACE);
 			continue;
 		}
 
@@ -2054,8 +2031,8 @@ void Rules::finalPlace(Mode mode) {
 		im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(FINALPLACE,mainid,nodestamp);
 
 		// apply the rule
 		im.removeArcs(mainid);
@@ -2081,8 +2058,7 @@ void Rules::finalPlace(Mode mode) {
 /** Transition with empty postset
     @param mode The mode flag for this rule
 */
-void Rules::finalTransition(Mode mode) {
-
+void Rules::finalTransition(unsigned int tid) {
 	// the rule may remove an unbounded place
 	if (facts.checkCondition(Facts::CTL | Facts::CTLX | Facts::LTL | Facts::LTLX 
 							| Facts::LIVENESS | Facts::BISIM | Facts::REVERSE)) return;
@@ -2093,14 +2069,14 @@ void Rules::finalTransition(Mode mode) {
 
 	// find a starting transition "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::TR,mode,1,NODE_SET_LIMIT,0,0)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::TR,FINALTRANS,1,NODE_SET_LIMIT,0,0)) {
 
 		// check for invisibility in formulas
 		if (im.isPersistent(mainid) 
 			|| (conditio2 && im.getLabel(mainid))
 			|| (condition && (im.isVisible(mainid) || im.getLabelVis(mainid))))
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,FINALTRANS);
 			continue;
 		}
 
@@ -2111,8 +2087,8 @@ void Rules::finalTransition(Mode mode) {
 		im.unlock(mainid);
 
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp);
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(FINALTRANS,mainid,nodestamp);
 
         // change properties
 	    Map& pret1(im.getPre(mainid));
@@ -2141,13 +2117,13 @@ void Rules::finalTransition(Mode mode) {
 /** Starke's rule 2 modified: Place with preset contained in postset (weighted) and its postset transitions are removed, if none of them can fire
     @param mode The mode flag for this rule
 */
-void Rules::initiallyDeadPlace2(Mode mode) {
+void Rules::initiallyDeadPlace2(unsigned int tid) {
 	// for later checks
 	bool condition(facts.checkCondition(Facts::LIVENESS));
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,IMatrix::PL,mode,0,NODE_SET_LIMIT,0,NODE_SET_LIMIT))
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,INITDEADPL2,0,NODE_SET_LIMIT,0,NODE_SET_LIMIT))
 	{
 		// get postset and marking of mainid
 	    Map& post(im.getPost(mainid));
@@ -2162,7 +2138,7 @@ void Rules::initiallyDeadPlace2(Mode mode) {
 		// if the rule is not fulfilled look for a new first place
 	    if (mit!=post.end() || im.isIO(mainid) || im.isPersistent(mainid) || !contains(post,pre))
 		{
-			im.unlock(mainid,mode);
+			im.unlock(mainid,INITDEADPL2);
 			continue;
 		}
 
@@ -2183,14 +2159,14 @@ void Rules::initiallyDeadPlace2(Mode mode) {
 	    if (mit!=post.end())
 		{
 			im.unlock(mit->first);
-			im.unlock(mainid,mode);
+			im.unlock(mainid,INITDEADPL2);
 			continue;
 		}
 	    im.unlock(mainid);
 	
 		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp)) continue;
-		printApply(mode,mainid,nodestamp); // logging only
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(INITDEADPL2,mainid,nodestamp); // logging only
 
 		// apply the rule
 		for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)

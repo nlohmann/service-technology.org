@@ -42,7 +42,6 @@ struct tpArguments {
 };
 
 
-
 int main(int argc, char* argv[]) {
     Runtime::init(argc, argv);
 
@@ -225,13 +224,12 @@ std::cout << paths.toString() << std::endl;
 
 	if (!Runtime::args_info.threads_given || Runtime::args_info.threads_arg<2)
 	{
-		unsigned int mode;
-		while ((mode = im.findMode(rules,0)) != Rules::MAXMODE) {
-//std::cout << "Mode " << mode << std::endl;
-			rules.apply(mode);
-//PetriNet* pn2(im.exportNet());
-//std::cout << pnapi::io::owfn << *pn2;
-		}
+		tpArguments args;
+        args.threadNumber = 0;
+        args.im = &im;
+		args.rules = &rules;
+		threadReduce(&args);
+
 	} else {
 		// allocate space for thread arguments
 	    tpArguments* args = (tpArguments*) calloc(Runtime::args_info.threads_arg,
@@ -330,11 +328,8 @@ void* threadReduce(void* args) {
 	IMatrix* im(((tpArguments*)args)->im);
 	Rules* rules(((tpArguments*)args)->rules);
 	unsigned int mode;
-	while ((mode = im->findMode(*rules,id)) != Rules::MAXMODE) {
-//		std::cout << "Thread " << id << " Mode " << mode << " MAX " << Rules::MAXMODE << std::endl;
-		rules->apply(mode);
-	}
-//	std::cout << "T" << id << std::endl;
+	while ((mode = im->findMode(*rules,id)) != Rules::MAXMODE)
+		rules->apply(mode,id);
 }
 
 void translate(JSON& item, JSON& plist, vector<string>& out) {

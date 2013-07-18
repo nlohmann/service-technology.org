@@ -102,14 +102,10 @@ IMatrix::IMatrix(PetriNet& pn, JSON& log) : petrinet(pn) {
 	name = new string[numnodes];
 
 	// locks for nodes and their checked reduction rules
-	writing = (bool*) calloc(numnodes, sizeof(bool));
+	writing = (unsigned int*) calloc(numnodes, sizeof(unsigned int));
     rwlocks = (pthread_rwlock_t*) calloc(numnodes, sizeof(pthread_rwlock_t));
-	modelocks = (pthread_rwlock_t*) calloc(numnodes, sizeof(pthread_rwlock_t));
     for (unsigned int i = 0; i < numnodes; ++i)
-	{
         pthread_rwlock_init(rwlocks+i, NULL);
-        pthread_rwlock_init(modelocks+i, NULL);
-	}
 	modes = (Mode*) calloc(numnodes, sizeof(uint32_t));
 
 	// pointer from nodes to their equivalence class (regarding pre-/postset sizes), -1 = deleted node
@@ -119,17 +115,25 @@ IMatrix::IMatrix(PetriNet& pn, JSON& log) : petrinet(pn) {
 	timestamp = (unsigned int*) malloc(sizeof(unsigned int) * numnodes);
 
 	// locks for the equivalence classes list
-    listlocks = (pthread_rwlock_t***) malloc(sizeof(pthread_rwlock_t**) * 2);
-    listlocks[PL] = (pthread_rwlock_t**) malloc(sizeof(pthread_rwlock_t*) * (NODE_SET_LIMIT+1));
-    listlocks[TR] = (pthread_rwlock_t**) malloc(sizeof(pthread_rwlock_t*) * (NODE_SET_LIMIT+1));
+	unsigned int tnum(Runtime::args_info.threads_arg);
+	if (tnum<1) tnum=1;
+    listlocks = (pthread_rwlock_t****) malloc(sizeof(pthread_rwlock_t***) * 2);
+    listlocks[PL] = (pthread_rwlock_t***) malloc(sizeof(pthread_rwlock_t**) * (NODE_SET_LIMIT+1));
+    listlocks[TR] = (pthread_rwlock_t***) malloc(sizeof(pthread_rwlock_t**) * (NODE_SET_LIMIT+1));
     for (unsigned int i=0; i <= NODE_SET_LIMIT; ++i)
     {
-        listlocks[PL][i] = (pthread_rwlock_t*) calloc(NODE_SET_LIMIT+1, sizeof(pthread_rwlock_t));
-        listlocks[TR][i] = (pthread_rwlock_t*) calloc(NODE_SET_LIMIT+1, sizeof(pthread_rwlock_t));
+        listlocks[PL][i] = (pthread_rwlock_t**) calloc(NODE_SET_LIMIT+1, sizeof(pthread_rwlock_t*));
+        listlocks[TR][i] = (pthread_rwlock_t**) calloc(NODE_SET_LIMIT+1, sizeof(pthread_rwlock_t*));
         for(unsigned int j=0; j <= NODE_SET_LIMIT; ++j)
         {
-            pthread_rwlock_init(&listlocks[PL][i][j], NULL);
-            pthread_rwlock_init(&listlocks[TR][i][j], NULL);
+	        listlocks[PL][i][j] = (pthread_rwlock_t*) calloc(tnum, sizeof(pthread_rwlock_t));
+    	    listlocks[TR][i][j] = (pthread_rwlock_t*) calloc(tnum, sizeof(pthread_rwlock_t));
+			nodelists[PL][i][j] = new set<unsigned int>[tnum];
+			nodelists[TR][i][j] = new set<unsigned int>[tnum];
+			for(unsigned int k=0; k<tnum; ++k) {
+	            pthread_rwlock_init(&listlocks[PL][i][j][k], NULL);
+	            pthread_rwlock_init(&listlocks[TR][i][j][k], NULL);
+			}
         }
     }
 
@@ -145,7 +149,6 @@ IMatrix::IMatrix(PetriNet& pn, JSON& log) : petrinet(pn) {
 			iovec[lid] = *sit;
 			timestamp[lid] = 1;
 			ioToID[*sit] = lid;
-//			visibility[lid] = PERSISTENT;
 			iotype[lid] = INPUT;
 			modes[lid] = Rules::ALLMODES;
 
@@ -153,7 +156,7 @@ IMatrix::IMatrix(PetriNet& pn, JSON& log) : petrinet(pn) {
 			unsigned int tmp((*sit)->getTransitions().size());
 	        if (tmp > NODE_SET_LIMIT) tmp = NODE_SET_LIMIT;
 	        list[lid] = tmp;
-	        nodelists[PL][0][tmp].insert(lid);
+	        nodelists[PL][0][tmp][lid%tnum].insert(lid);
 
 			++lid;
 		}	
@@ -164,7 +167,6 @@ IMatrix::IMatrix(PetriNet& pn, JSON& log) : petrinet(pn) {
 			iovec[lid] = *sit;
 			timestamp[lid] = 1;
 			ioToID[*sit] = lid;
-//			visibility[lid] = PERSISTENT;
 			iotype[lid] = OUTPUT;
 			modes[lid] = Rules::ALLMODES;
 
@@ -172,7 +174,7 @@ IMatrix::IMatrix(PetriNet& pn, JSON& log) : petrinet(pn) {
 			unsigned int tmp((*sit)->getTransitions().size());
 	        if (tmp > NODE_SET_LIMIT) tmp = NODE_SET_LIMIT;
 	        list[lid] = tmp * (NODE_SET_LIMIT+1);
-	        nodelists[PL][tmp][0].insert(lid);
+	        nodelists[PL][tmp][0][lid%tnum].insert(lid);
 
 			++lid;
 		}	
@@ -246,7 +248,7 @@ IMatrix::IMatrix(PetriNet& pn, JSON& log) : petrinet(pn) {
         if (tmp1 > NODE_SET_LIMIT) tmp1 = NODE_SET_LIMIT;
         if (tmp2 > NODE_SET_LIMIT) tmp2 = NODE_SET_LIMIT;
         list[id] = tmp1 * (NODE_SET_LIMIT+1) + tmp2;
-        nodelists[PL][tmp1][tmp2].insert(id);
+        nodelists[PL][tmp1][tmp2][id%tnum].insert(id);
 
 		// lowest timestamp
 		timestamp[id] = 1;
@@ -291,7 +293,7 @@ IMatrix::IMatrix(PetriNet& pn, JSON& log) : petrinet(pn) {
         if (tmp1 > NODE_SET_LIMIT) tmp1 = NODE_SET_LIMIT;
         if (tmp2 > NODE_SET_LIMIT) tmp2 = NODE_SET_LIMIT;
         list[id] = tmp1 * (NODE_SET_LIMIT+1) + tmp2;
-        nodelists[TR][tmp1][tmp2].insert(id);
+        nodelists[TR][tmp1][tmp2][id%tnum].insert(id);
 		timestamp[id] = 1;
 
 		// get action label info if the user specified any visible labels
@@ -341,6 +343,12 @@ IMatrix::IMatrix(PetriNet& pn, JSON& log) : petrinet(pn) {
 	numtransitions *= 2;
 
 	propagated = (char*) calloc(numnodes,sizeof(char));
+
+	// owners of nodes
+	owner = (unsigned int*) calloc(numnodes, sizeof(unsigned int));
+	if (Runtime::args_info.threads_given)
+		for(unsigned int i=0; i<numnodes; ++i)
+			owner[i] = i % tnum;
 }
 
 /** Destructor
@@ -355,22 +363,27 @@ IMatrix::~IMatrix() {
 	free(iovec);
 	free(iotype);
     for (unsigned int i = 0; i < numplaces+numtransitions; ++i)
-	{
         pthread_rwlock_destroy(rwlocks+i);
-        pthread_rwlock_destroy(modelocks+i);
-	}
     free(rwlocks);
-	free(modelocks);
 	free(modes);
 	free(writing);
 	free(list);
 	free(timestamp);
+	unsigned int tnum(Runtime::args_info.threads_arg);
+	if (tnum<1) tnum=1;
     for (unsigned int i=0; i <= NODE_SET_LIMIT; ++i)
     {
         for(unsigned int j=0; j <= NODE_SET_LIMIT; ++j)
         {
-            pthread_rwlock_destroy(&listlocks[PL][i][j]);
-            pthread_rwlock_destroy(&listlocks[TR][i][j]);
+			for(unsigned int k=0; k<tnum; ++k)
+			{
+	            pthread_rwlock_destroy(&listlocks[PL][i][j][k]);
+	            pthread_rwlock_destroy(&listlocks[TR][i][j][k]);
+			}
+			delete[] nodelists[PL][i][j];
+			delete[] nodelists[TR][i][j];
+			free(listlocks[PL][i][j]);
+			free(listlocks[TR][i][j]);
         }
         free(listlocks[PL][i]);
         free(listlocks[TR][i]);
@@ -382,6 +395,7 @@ IMatrix::~IMatrix() {
 	pthread_rwlock_destroy(&labellock);
 	pthread_rwlock_destroy(&unusedlock);
 	free(propagated);
+	free(owner);
 }
 
 /** Check if a node is a place
@@ -416,9 +430,9 @@ bool IMatrix::exists(Vertex id) {
 	// check first if we are in range
     if (id>numplaces+numtransitions) return false;
 	// lock the node and check if it is in use
-	pthread_rwlock_rdlock(modelocks + id);
+	rdlock(id);
     bool retval(list[id]>=0);
-	pthread_rwlock_unlock(modelocks + id);
+	unlock(id);
 	return retval;
 }
 
@@ -516,12 +530,19 @@ unsigned int IMatrix::rdlock(Vertex id1, Vertex id2) {
 	return timestamp;
 }
 
+/** Get a write-lock for a node (no right to change pre/postsets)
+	@param id The ID of the node
+*/
+void IMatrix::mllock(Vertex id) {
+    pthread_rwlock_wrlock(rwlocks + id);
+}
+
 /** Get a write-lock for a node
 	@param id The ID of the node
 */
-void IMatrix::wrlock(Vertex id) {
+void IMatrix::wrlock(Vertex id, unsigned int tid) {
     pthread_rwlock_wrlock(rwlocks + id);
-	writing[id] = true;
+	writing[id] = tid+1;
 }
 
 /** Get write-locks for a set of nodes if the time stamps of all these nodes are unchanged.
@@ -531,16 +552,13 @@ void IMatrix::wrlock(Vertex id) {
 		time stamps will be incremented. Otherwise, no locks
 		will be acquired at all and the return value is false.
 */
-bool IMatrix::wrlock(Map& nodestamp) {
-	// get the locks for reduction rules first
+bool IMatrix::wrlock(Map& nodestamp, unsigned int tid) {
 	Map::iterator mit;
-	for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
-		pthread_rwlock_wrlock(modelocks + mit->first);
 
-	// now get the node's locks and check the stamps
+	// get the node's locks and check the stamps
 	for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
 	{
-		wrlock(mit->first);
+		wrlock(mit->first, tid);
 		if (!mit->second) mit->second = 1;
 		else if (mit->second != timestamp[mit->first]) break;
 	}
@@ -556,13 +574,11 @@ bool IMatrix::wrlock(Map& nodestamp) {
 	// otherwise free the acquired locks and return false
 	for(; mit!=nodestamp.begin(); --mit)
 	{
-		writing[mit->first] = false;
+		writing[mit->first] = 0;
 		unlock(mit->first);
 	}
-	writing[mit->first] = false;
+	writing[mit->first] = 0;
 	unlock(mit->first);
-	for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
-		pthread_rwlock_unlock(modelocks + mit->first);
 	return false;
 }
 
@@ -574,9 +590,9 @@ bool IMatrix::wrlock(Map& nodestamp) {
 void IMatrix::unlock(unsigned int id, Mode mode, bool remove) {
 	// if we had a write lock, adapt the equivalence classes for the pre-/postsets
 	// as the latter may have changed
-	if (writing[id]) { 
-		adaptList(id,remove);
-		writing[id] = false;
+	if (writing[id] > 0) { 
+		adaptList(id,writing[id]-1,remove);
+		writing[id] = 0;
 	}
     pthread_rwlock_unlock(rwlocks + id);
 	// set the reduction rule as "done"
@@ -589,11 +605,9 @@ void IMatrix::unlock(unsigned int id, Mode mode, bool remove) {
 */
 void IMatrix::unlock(Map& nodes) {
 	Map::iterator mit;
-	for(mit=nodes.begin(); mit!=nodes.end(); ++mit)
-		unlock(mit->first,0,(mit->second==0));
 	for(mit=nodes.begin(); mit!=nodes.end(); ++mit) {
 		if (mit->second==0) modes[mit->first] = Rules::ALLMODES;
-		pthread_rwlock_unlock(modelocks + mit->first);
+		unlock(mit->first,0,(mit->second==0));
 	}
 }
 
@@ -603,17 +617,9 @@ void IMatrix::unlock(Map& nodes) {
 	@param lock If the reduction rule flags should be write-locked
 */
 void IMatrix::setMode(Vertex id, Mode flag, bool lock) {
-	if (lock) pthread_rwlock_wrlock(modelocks + id);
+	if (lock) mllock(id);
 	modes[id] |= flag;
-	if (lock) pthread_rwlock_unlock(modelocks + id);
-}
-
-/** Get all reduction rule flags for a given node. The ID's reduction rule lock must be acquired.
-	@param id The ID of the node
-	@return All reduction rule flags
-*/
-Mode IMatrix::getModes(Vertex id) {
-	return modes[id];
+	if (lock) unlock(id);
 }
 
 /** Mark a node as unchecked for all reduction rules. The ID's reduction rule flags must be write-locked.
@@ -621,21 +627,9 @@ Mode IMatrix::getModes(Vertex id) {
 	@param lock If the necessary locks (see above) should be acquired
 */
 void IMatrix::clearModes(Vertex id, bool lock) {
-	if (lock) pthread_rwlock_wrlock(modelocks + id);
+	if (lock) mllock(id);
 	if (list[id]>=0) modes[id] = 0;
-	if (lock) pthread_rwlock_unlock(modelocks + id);
-}
-
-/** Check if a given reduction rule has been done for a node. The node must not be locked.
-	@param id The ID of the node
-	@param flag The reduction rule for which to check
-	@return If the reduction rule has already been checked for this node.
-*/
-bool IMatrix::isDone(unsigned int id, Mode flag) {
-	pthread_rwlock_rdlock(modelocks + id);
-	bool val(modes[id] & flag);
-	pthread_rwlock_unlock(modelocks + id);
-	return val;
+	if (lock) unlock(id);
 }
 
 /** Find a reduction rule for which at least one node has not been checked.
@@ -655,9 +649,8 @@ unsigned int IMatrix::findMode(Rules& rules, unsigned int start) {
 	// run through all nodes
 	do {
 		// get the reduction rule modes
-		pthread_rwlock_rdlock(modelocks + i);
-		uint32_t mode(modes[i]);
-		pthread_rwlock_unlock(modelocks + i);
+		rdlock(i);
+		Mode mode(modes[i]);
 
 		// find starting point in the modes
 		unsigned int j(start);
@@ -666,9 +659,10 @@ unsigned int IMatrix::findMode(Rules& rules, unsigned int start) {
 
 		// run through all modes and look for something to do
 		do {
-			if (!(mode & (1L<<j)) && rules.checkAppl(i,j)) return j;
+			if (!(mode & (1L<<j)) && rules.checkAppl(i,j)) { unlock(i); return j; }
 			if (++j==maxmode) j=0;
 		} while (j!=jstart);
+		unlock(i);
 
 		// increment and cross-over
 		if (++i==numplaces+numtransitions) i=0;
@@ -685,7 +679,7 @@ unsigned int IMatrix::findMode(Rules& rules, unsigned int start) {
 	@param postsize The size of the postset of the node to be found (like presize)
 	@return If such a node was found
 */
-bool IMatrix::getFirstNode(unsigned int& id, unsigned int type, Mode flag, unsigned int presize, unsigned int postsize) {
+bool IMatrix::getFirstNode(unsigned int& id, unsigned int tid, unsigned int type, Mode flag, unsigned int presize, unsigned int postsize) {
 /*
 	// get the list of nodes with correct pre-/postset size
     pthread_rwlock_rdlock(&listlocks[type][presize][postsize]);
@@ -744,36 +738,34 @@ bool IMatrix::getFirstNode(unsigned int& id, unsigned int type, Mode flag, unsig
 	while (true) {
 
 		// get the list of nodes with correct pre-/postset size
-	    pthread_rwlock_rdlock(&listlocks[type][presize][postsize]);
-	    set<unsigned int>& thelist(nodelists[type][presize][postsize]);
+	    pthread_rwlock_rdlock(&listlocks[type][presize][postsize][tid]);
+	    set<unsigned int>& thelist(nodelists[type][presize][postsize][tid]);
 
 	    set<unsigned int>::iterator it(thelist.lower_bound(id+1));
 		if (thelist.empty() || it==thelist.end()) {
-		    pthread_rwlock_unlock(&listlocks[type][presize][postsize]);
+		    pthread_rwlock_unlock(&listlocks[type][presize][postsize][tid]);
 			id = NO_NODE;
 			return false;
 		}
 		id = *it;
-	    pthread_rwlock_unlock(&listlocks[type][presize][postsize]);
+	    pthread_rwlock_unlock(&listlocks[type][presize][postsize][tid]);
 
 		// lock the node and check its reduction rule mode and its pre/postset sizes
-		pthread_rwlock_rdlock(&modelocks[id]);
+		rdlock(id);
 	    if (!(modes[id] & flag)) {
 
 			// recheck the pre-/postset sizes as the may have changed
 			if (presize==list[id]/(NODE_SET_LIMIT+1) &&
 				postsize==list[id]%(NODE_SET_LIMIT+1)) {
 				// we have found our node
-				rdlock(id);
-				pthread_rwlock_unlock(&modelocks[id]);
 				return true;
 			}
 
 			// the net structure has changed, call ourselves again
-	        pthread_rwlock_unlock(&modelocks[id]);
-			return getFirstNode(--id,type,flag,presize,postsize);
+	        unlock(id);
+			return getFirstNode(--id,tid,type,flag,presize,postsize);
 	    }
-	    pthread_rwlock_unlock(&modelocks[id]);
+	    unlock(id);
 
     }
 
@@ -792,7 +784,7 @@ bool IMatrix::getFirstNode(unsigned int& id, unsigned int type, Mode flag, unsig
 	@param postsizemax The maximal size of the postset of the node to be found. NODE_SET_LIMIT means no maximum.
 	@return If such a node was found
 */
-bool IMatrix::getFirstNode(unsigned int& id, unsigned int type, Mode flag, unsigned int presizemin, unsigned int presizemax, unsigned int postsizemin, unsigned int postsizemax) {
+bool IMatrix::getFirstNode(unsigned int& id, unsigned int tid, unsigned int type, Mode flag, unsigned int presizemin, unsigned int presizemax, unsigned int postsizemin, unsigned int postsizemax) {
 	// check the maxima
     if (presizemax > NODE_SET_LIMIT) presizemax = NODE_SET_LIMIT;
     if (postsizemax > NODE_SET_LIMIT) postsizemax = NODE_SET_LIMIT;
@@ -800,7 +792,7 @@ bool IMatrix::getFirstNode(unsigned int& id, unsigned int type, Mode flag, unsig
 	// call the function for exact sizes
     for(unsigned int i=presizemin; i <= presizemax; ++i)
         for(unsigned int j=postsizemin; j <= postsizemax; ++j)
-            if (getFirstNode(id,type,flag,i,j))
+            if (getFirstNode(id,tid,type,flag,i,j))
                 return true;
 
     return false;
@@ -814,10 +806,17 @@ bool IMatrix::getFirstNode(unsigned int& id, unsigned int type, Mode flag, unsig
 		the returned map will be empty.
 */
 Map IMatrix::getIsolated(unsigned int type, Mode flag) {
+	// count threads
+	unsigned int tnum(Runtime::args_info.threads_arg);
+	if (tnum<1) tnum=1;
+
 	// get all isolated nodes
-    pthread_rwlock_rdlock(&listlocks[type][0][0]);
-    set<unsigned int> thelist(nodelists[type][0][0]);
-    pthread_rwlock_unlock(&listlocks[type][0][0]);
+	set<unsigned int> thelist;
+	for(unsigned int k=0; k<tnum; ++k) {
+	    pthread_rwlock_rdlock(&listlocks[type][0][0][k]);
+	    thelist.insert(nodelists[type][0][0][k].begin(),nodelists[type][0][0][k].end());
+	    pthread_rwlock_unlock(&listlocks[type][0][0][k]);
+	}
 
 	// if empty: nothing to do
 	Map res;
@@ -828,8 +827,7 @@ Map IMatrix::getIsolated(unsigned int type, Mode flag) {
 	set<unsigned int>::iterator sit;
 	for(sit=thelist.begin(); sit!=thelist.end(); ++sit)
 	{
-        pthread_rwlock_wrlock(modelocks + *sit);
-		wrlock(*sit);
+		wrlock(*sit,0); // dummy thread ID 0
         if (!(modes[*sit] & flag)) todo=true;
 		if (list[*sit]) break; // make sure we still have empty pre-/postsets
 		res[*sit] = getTimeStamp(*sit);
@@ -840,7 +838,6 @@ Map IMatrix::getIsolated(unsigned int type, Mode flag) {
 		if (sit != thelist.end()) --sit;
 		do {
 			unlock(*sit);
-			pthread_rwlock_unlock(modelocks + *sit);
 		} while (--sit != thelist.begin());
 		res.clear();
 	}
@@ -853,7 +850,7 @@ Map IMatrix::getIsolated(unsigned int type, Mode flag) {
 	@param id The ID of the node
 	@param remove If the node should be deleted
 */
-void IMatrix::adaptList(Vertex id, bool remove) {
+void IMatrix::adaptList(Vertex id, unsigned int tid, bool remove) {
     // changes to pre/postset of id must already have happened
     unsigned int type(id<numplaces ? PL : TR);
     unsigned int presize, postsize;
@@ -862,10 +859,10 @@ void IMatrix::adaptList(Vertex id, bool remove) {
     if (list[id]>=0) {
         presize = list[id]/(NODE_SET_LIMIT+1);
         postsize = list[id]%(NODE_SET_LIMIT+1);
-        if (!remove && presize == pre[id].size() && postsize == post[id].size()) return;
-        pthread_rwlock_wrlock(&listlocks[type][presize][postsize]);
-        nodelists[type][presize][postsize].erase(id);
-        pthread_rwlock_unlock(&listlocks[type][presize][postsize]);
+        if (!remove && owner[id]==tid && presize == pre[id].size() && postsize == post[id].size()) return;
+        pthread_rwlock_wrlock(&listlocks[type][presize][postsize][owner[id]]);
+        nodelists[type][presize][postsize][owner[id]].erase(id);
+        pthread_rwlock_unlock(&listlocks[type][presize][postsize][owner[id]]);
     }
 
 	// check if the node must be deleted
@@ -875,31 +872,35 @@ void IMatrix::adaptList(Vertex id, bool remove) {
     }
 
 	// reinsert the node into its new equivalence class
+	owner[id] = tid;
     presize = pre[id].size();
     postsize = post[id].size();
 	if (presize > NODE_SET_LIMIT) presize = NODE_SET_LIMIT;
 	if (postsize > NODE_SET_LIMIT) postsize = NODE_SET_LIMIT;
     list[id] = presize * (NODE_SET_LIMIT+1) + postsize;
-    pthread_rwlock_wrlock(&listlocks[type][presize][postsize]);
-    nodelists[type][presize][postsize].insert(id);
-    pthread_rwlock_unlock(&listlocks[type][presize][postsize]);
+    pthread_rwlock_wrlock(&listlocks[type][presize][postsize][tid]);
+    nodelists[type][presize][postsize][tid].insert(id);
+    pthread_rwlock_unlock(&listlocks[type][presize][postsize][tid]);
 }
 
 /** Debug output: Print the equivalence classes for pre-/postset size
 */
 void IMatrix::printLists() {
+	unsigned int tnum(Runtime::args_info.threads_arg);
+	if (tnum<1) tnum=1;
 	set<unsigned int>::iterator it;
 	for(unsigned int t=PL; t<=TR; ++t)
 	{
 		std::cout << "t=" << t << std::endl;
 		for(unsigned int i=0; i<=NODE_SET_LIMIT; ++i)
 			for(unsigned int j=0; j<=NODE_SET_LIMIT; ++j)
-			{
-				std::cout << "[" << i << ":" << j << "] ";
-				for(it=nodelists[t][i][j].begin(); it!=nodelists[t][i][j].end(); ++it)
-					std::cout << getName(*it) << " ";
-				std::cout << endl;
-			}
+				for(unsigned int k=0; k<tnum; ++k)
+				{
+					std::cout << "[" << i << ":" << j << "]{" << k << "} ";
+					for(it=nodelists[t][i][j][k].begin(); it!=nodelists[t][i][j][k].end(); ++it)
+						std::cout << getName(*it) << " ";
+					std::cout << endl;
+				}
 	}
 }
 
@@ -1217,15 +1218,14 @@ void IMatrix::removeArcs(Vertex id) {
 	@param nodestamp A map for time stamps to which to add the new transitions (including stamp)
 	@return The set of new transitions, either exactly num many or zero (in case of failure)
 */
-set<Vertex> IMatrix::reserveTransitions(unsigned int num, Map& nodestamp) {
+set<Vertex> IMatrix::reserveTransitions(unsigned int tid, unsigned int num, Map& nodestamp) {
 	set<Vertex> result;
 	pthread_rwlock_wrlock(&unusedlock);
 	if (unused.size()>=num)
 	{
 		while (num-->0) {
 			Vertex tmp = *(unused.begin());
-			pthread_rwlock_wrlock(modelocks + tmp);
-			wrlock(tmp);
+			wrlock(tmp, tid);
 			stamp(tmp);
 			nodestamp[tmp] = getTimeStamp(tmp);
 			unused.erase(tmp);

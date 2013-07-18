@@ -38,7 +38,7 @@ using std::string;
 // nodes will be put into equivalence classes according to their pre/postset sizes
 // sizes are differentiated only below the following number
 #define NODE_SET_LIMIT 3
-// ID representing "no node found"
+// ID representing "no node found", must be 0-1
 #define NO_NODE 0xFFFFFFFF
 
 // nodes
@@ -114,11 +114,14 @@ public:
 	/// Get read locks for two nodes
 	unsigned int rdlock(Vertex id1, Vertex id2);
 
+	/// Get a write lock for a node, no right to change pre/postsets
+	void mllock(Vertex id);
+
 	/// Get a write lock for a node
-	void wrlock(Vertex id);
+	void wrlock(Vertex id, unsigned int tid);
 
 	/// Get write locks for a set of nodes
-	bool wrlock(Map& stamps);
+	bool wrlock(Map& stamps, unsigned int tid);
 
 	/// Return lock for a node, set the reduction done, and possibly delete the node
 	void unlock(Vertex id, Mode mode = 0, bool remove = false);
@@ -129,14 +132,8 @@ public:
 	/// Set the checked reduction rule for this node
 	void setMode(Vertex id, Mode flag, bool lock = true);
 
-	/// Get all reductions checked for this node
-	Mode getModes(Vertex id);
-
 	/// Enable re-checking of all reduction rules for this node
 	void clearModes(Vertex id, bool lock = false);
-
-	/// If a reduction rule for a node has been checked
-	bool isDone(Vertex id, Mode flag);
 
 	/// get the number of a reduction rule that needs to be done
 	unsigned int findMode(Rules& rules, unsigned int start);
@@ -148,16 +145,16 @@ public:
 	};
 
 	/// Find a node that needs a reduction check (with NodeType type, reduction rule flag, and given pre-/postset sizes)
-	bool getFirstNode(Vertex& id, unsigned int type, Mode flag, unsigned int presize, unsigned int postsize);
+	bool getFirstNode(Vertex& id, unsigned int tid, unsigned int type, Mode flag, unsigned int presize, unsigned int postsize);
 
 	/// Find a node that needs a reduction check (as above but with a range of pre-/postset sizes)
-	bool getFirstNode(Vertex& id, unsigned int type, Mode flag, unsigned int presizemin, unsigned int presizemax, unsigned int postsizemin, unsigned int postsizemax);
+	bool getFirstNode(Vertex& id, unsigned int tid, unsigned int type, Mode flag, unsigned int presizemin, unsigned int presizemax, unsigned int postsizemin, unsigned int postsizemax);
 
 	/// Get all isolated nodes (of NodeType type) if at least one of them needs to be check with the given reduction rule
 	Map getIsolated(unsigned int type, Mode flag);
 
 	/// Put a node into the list for the correct pre-/postsize sets (or delete it)
-	void adaptList(Vertex id, bool remove);
+	void adaptList(Vertex id, unsigned int tid, bool remove);
 
 	/// Create a PetriNet object from the internal data structures
 	PetriNet* exportNet(Facts& facts);
@@ -242,7 +239,7 @@ public:
 	void removePost(Vertex id);
 
 	/// Return num new transitions and lock them (with time stamps) if available
-	set<Vertex> reserveTransitions(unsigned int num, Map& stamp);
+	set<Vertex> reserveTransitions(unsigned int tid, unsigned int num, Map& stamp);
 
 	/// Return the node belonging to an ID
 	Node* getNode(Vertex id);
@@ -292,7 +289,10 @@ public:
 	pthread_rwlock_t* rwlocks;
 
 	/// Flags showing write locks
-	bool* writing;
+	unsigned int* writing;
+
+	/// The thread owning a node
+	unsigned int* owner;
 
 	/// In which list of the node partition the node resides (-1 = node does not exist)
 	int* list;
@@ -306,18 +306,15 @@ public:
 	/// time stamp
 	unsigned int* timestamp;
 
-	/// Locks for Modes
-	pthread_rwlock_t* modelocks;
-
 	/// Modes
 	Mode* modes;
 
 
 	/// Locks for NodeLists
-	pthread_rwlock_t*** listlocks;
+	pthread_rwlock_t**** listlocks;
 
 	/// NodeLists
-	set<unsigned int> nodelists[2][NODE_SET_LIMIT+1][NODE_SET_LIMIT+1];
+	set<unsigned int>* nodelists[2][NODE_SET_LIMIT+1][NODE_SET_LIMIT+1];
 
 
 	/// node to id

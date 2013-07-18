@@ -16,6 +16,7 @@
 
 #include "facts.h"
 #include "imatrix.h"
+#include "Runtime.h"
 #include <pthread.h>
 #include <string>
 #include <sstream>
@@ -600,6 +601,7 @@ bool Facts::checkCondition(uint64_t fact) {
 	@param add A fixed value to be added to the property (MARKING only)
 */
 void Facts::addChange(unsigned int type, Vertex id, Vertex out, int add) {
+	if (Runtime::args_info.netonly_given) return;
 	set<Vertex> tmp;
 	tmp.insert(out);
 	addChange(type,id,tmp,add);
@@ -612,6 +614,7 @@ void Facts::addChange(unsigned int type, Vertex id, Vertex out, int add) {
 	@param add A fixed value to be added to the property (MARKING only)
 */
 void Facts::addChange(unsigned int type, Vertex id, set<Vertex>& out, int add) {
+	if (Runtime::args_info.netonly_given) return;
 	pthread_rwlock_wrlock(locks + type);
 	map<set<Vertex>,set<Vertex> >& tmp2(type==MARKING ? mark2 : (type==BOUNDED ? bounded : (type==LIVE ? live : safe)));
 	map<set<Vertex>,set<Vertex> >::iterator mit;
@@ -644,6 +647,7 @@ void Facts::addChange(unsigned int type, Vertex id, set<Vertex>& out, int add) {
 	@param add A fixed value to be added to the property (MARKING only)
 */
 void Facts::addChange(unsigned int type, set<Vertex>& id, Vertex out, int add) {
+	if (Runtime::args_info.netonly_given) return;
 	pthread_rwlock_wrlock(locks + type);
 	if (id.find(out)!=id.end())
 	{
@@ -684,6 +688,7 @@ void Facts::addChange(unsigned int type, set<Vertex>& id, Vertex out, int add) {
 		ISFALSE and ISTRUE are for BOUNDED, SAFE, and LIVE only.
 */
 void Facts::setStatus(unsigned int type, Vertex id, unsigned int status) {
+	if (Runtime::args_info.netonly_given && type!=PATH) return;
 	pthread_rwlock_wrlock(locks + STATUS);
 	if ((state[id] >> type) & 7L == UNUSABLE) {
 		pthread_rwlock_unlock(locks + STATUS);
@@ -723,6 +728,7 @@ void Facts::setStatus(unsigned int type, Vertex id, unsigned int status) {
 	@param before If the path is to be insert in front of the property (default: true) or after it (false)
 */
 void Facts::addPath(Vertex id, Path out, bool before) {
+//	if (Runtime::args_info.netonly_given) return;
 	pthread_rwlock_wrlock(locks + PATH);
 	if (id != NO_NODE && path.find(id)==path.end()) 
 		path[id].push_back(id);
@@ -741,6 +747,7 @@ void Facts::addPath(Vertex id, Path out, bool before) {
 	@param before If the path is to be insert in front of the property (default: true) or after it (false)
 */
 void Facts::addFixedPath(Vertex id, Path out, bool before) {
+//	if (Runtime::args_info.netonly_given) return;
 	pthread_rwlock_wrlock(locks + PATH);
 	if (id != NO_NODE && path.find(id)==path.end()) 
 		path[id].push_back(id);
@@ -768,6 +775,7 @@ Path Facts::getPath(Path& in) {
 	@param out The path to be set.
 */
 void Facts::setPath(Vertex id, const Path& out) {
+//	if (Runtime::args_info.netonly_given) return;
 	pthread_rwlock_wrlock(locks + PATH);
 	path[id] = out;
 	pthread_rwlock_unlock(locks + PATH);

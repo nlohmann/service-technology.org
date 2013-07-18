@@ -339,6 +339,8 @@ IMatrix::IMatrix(PetriNet& pn, JSON& log) : petrinet(pn) {
 		timestamp[i] = 1;
 	}
 	numtransitions *= 2;
+
+	propagated = (char*) calloc(numnodes,sizeof(char));
 }
 
 /** Destructor
@@ -379,6 +381,7 @@ IMatrix::~IMatrix() {
 	free(visibility);
 	pthread_rwlock_destroy(&labellock);
 	pthread_rwlock_destroy(&unusedlock);
+	free(propagated);
 }
 
 /** Check if a node is a place
@@ -413,9 +416,9 @@ bool IMatrix::exists(Vertex id) {
 	// check first if we are in range
     if (id>numplaces+numtransitions) return false;
 	// lock the node and check if it is in use
-    rdlock(id);
+	pthread_rwlock_rdlock(modelocks + id);
     bool retval(list[id]>=0);
-    unlock(id);
+	pthread_rwlock_unlock(modelocks + id);
 	return retval;
 }
 
@@ -613,21 +616,14 @@ Mode IMatrix::getModes(Vertex id) {
 	return modes[id];
 }
 
-/** Mark a node as unchecked for all reduction rules. The ID must be read-locked (at least), 
-		its reduction rule flags must be write-locked.
+/** Mark a node as unchecked for all reduction rules. The ID's reduction rule flags must be write-locked.
 	@param id The ID of the node
 	@param lock If the necessary locks (see above) should be acquired
 */
 void IMatrix::clearModes(Vertex id, bool lock) {
-	if (lock) {
-		pthread_rwlock_wrlock(modelocks + id);
-		rdlock(id);
-	}
+	if (lock) pthread_rwlock_wrlock(modelocks + id);
 	if (list[id]>=0) modes[id] = 0;
-	if (lock) {
-		unlock(id);
-		pthread_rwlock_unlock(modelocks + id);
-	}
+	if (lock) pthread_rwlock_unlock(modelocks + id);
 }
 
 /** Check if a given reduction rule has been done for a node. The node must not be locked.
@@ -690,6 +686,7 @@ unsigned int IMatrix::findMode(Rules& rules, unsigned int start) {
 	@return If such a node was found
 */
 bool IMatrix::getFirstNode(unsigned int& id, unsigned int type, Mode flag, unsigned int presize, unsigned int postsize) {
+/*
 	// get the list of nodes with correct pre-/postset size
     pthread_rwlock_rdlock(&listlocks[type][presize][postsize]);
     set<unsigned int> thelist(nodelists[type][presize][postsize]);
@@ -718,19 +715,19 @@ bool IMatrix::getFirstNode(unsigned int& id, unsigned int type, Mode flag, unsig
         pthread_rwlock_rdlock(&modelocks[*it]);
         retval = !(modes[*it] & flag);
         if (retval) {
-			rdlock(*it);
-			pthread_rwlock_unlock(&modelocks[*it]);
 
 			// recheck the pre-/postset sizes as the may have changed
 			if (presize==list[*it]/(NODE_SET_LIMIT+1) &&
 				postsize==list[*it]%(NODE_SET_LIMIT+1)) {
 				// we have found our node
+				rdlock(*it);
+				pthread_rwlock_unlock(&modelocks[*it]);
 	            id = *it;
 				return true;
 			}
-			unlock(*it);
 
 			// the net structure has changed, call ourselves again
+			pthread_rwlock_unlock(&modelocks[*it]);
 			return getFirstNode(id,type,flag,presize,postsize);
         }
         pthread_rwlock_unlock(&modelocks[*it]);
@@ -741,6 +738,48 @@ bool IMatrix::getFirstNode(unsigned int& id, unsigned int type, Mode flag, unsig
 
 	// no node to be done
 	return false;
+/*/
+
+	Vertex start(id);
+	while (true) {
+
+		// get the list of nodes with correct pre-/postset size
+	    pthread_rwlock_rdlock(&listlocks[type][presize][postsize]);
+	    set<unsigned int>& thelist(nodelists[type][presize][postsize]);
+
+	    set<unsigned int>::iterator it(thelist.lower_bound(id+1));
+		if (thelist.empty() || it==thelist.end()) {
+		    pthread_rwlock_unlock(&listlocks[type][presize][postsize]);
+			id = NO_NODE;
+			return false;
+		}
+		id = *it;
+	    pthread_rwlock_unlock(&listlocks[type][presize][postsize]);
+
+		// lock the node and check its reduction rule mode and its pre/postset sizes
+		pthread_rwlock_rdlock(&modelocks[id]);
+	    if (!(modes[id] & flag)) {
+
+			// recheck the pre-/postset sizes as the may have changed
+			if (presize==list[id]/(NODE_SET_LIMIT+1) &&
+				postsize==list[id]%(NODE_SET_LIMIT+1)) {
+				// we have found our node
+				rdlock(id);
+				pthread_rwlock_unlock(&modelocks[id]);
+				return true;
+			}
+
+			// the net structure has changed, call ourselves again
+	        pthread_rwlock_unlock(&modelocks[id]);
+			return getFirstNode(--id,type,flag,presize,postsize);
+	    }
+	    pthread_rwlock_unlock(&modelocks[id]);
+
+    }
+
+	// no node to be done
+	return false;
+
 }
 
 /** Find a node that meets certain conditions. The caller must not have any write-locks. The node found will be read-locked.
@@ -1214,5 +1253,65 @@ Node* IMatrix::getNode(Vertex id) {
 */
 Vertex IMatrix::getID(const Node& n) {
 	return nodeToID[&n];
+}
+
+/** Unlocks the given nodes ands marks all surrounding nodes so they will be checked again by all rules
+    @param nodestamp A map with nodes as keys
+*/
+void IMatrix::propagateChange(Map& nodestamp) {
+/*
+	set<Vertex> tmp;
+	Map::iterator mit,mit2;
+	for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
+	{
+		clearModes(mit->first);
+		Map& xpre(pre[mit->first]);
+		for(mit2=xpre.begin(); mit2!=xpre.end(); ++mit2)
+			if (nodestamp.find(mit2->first)==nodestamp.end())
+				tmp.insert(mit2->first);
+		Map& xpost(post[mit->first]);
+		for(mit2=xpost.begin(); mit2!=xpost.end(); ++mit2)
+			if (nodestamp.find(mit2->first)==nodestamp.end())
+				tmp.insert(mit2->first);
+	}
+	unlock(nodestamp);
+	set<Vertex>::iterator sit;
+	for(sit=tmp.begin(); sit!=tmp.end(); ++sit)
+		clearModes(*sit,true);
+/*/
+	vector<Vertex> tmp;
+	tmp.reserve(16);
+	Map::iterator mit,mit2;
+	for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
+	{
+		clearModes(mit->first);
+		propagated[mit->first]=1;
+	}
+	for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
+	{
+		Map& xpre(pre[mit->first]);
+		for(mit2=xpre.begin(); mit2!=xpre.end(); ++mit2)
+		{
+			if (propagated[mit2->first]) continue;
+			propagated[mit2->first]=1;
+			tmp.push_back(mit2->first);
+		}
+		Map& xpost(post[mit->first]);
+		for(mit2=xpost.begin(); mit2!=xpost.end(); ++mit2)
+		{
+			if (propagated[mit2->first]) continue;
+			propagated[mit2->first]=1;
+			tmp.push_back(mit2->first);
+		}
+	}
+	for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
+		propagated[mit->first]=0;
+	unlock(nodestamp);
+	for(unsigned int i=0; i<tmp.size(); ++i)
+	{
+		propagated[tmp[i]]=0;
+		clearModes(tmp[i],true);
+	}
+
 }
 

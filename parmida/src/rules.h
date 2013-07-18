@@ -124,9 +124,6 @@ private:
 	/// remove a transition with empty postset
 	void finalTransition(Mode mode);
 
-	/// Mark surroundings of nodes to be rechecked
-	void propagateChange(Map& stamps);
-
 	// Move the preset from one node to another (adding)
 	void movePre(Vertex id, Vertex id2);
 

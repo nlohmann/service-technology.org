@@ -250,6 +250,8 @@ public:
 	/// Return the node belonging to an ID
 	Vertex getID(const Node&);
 
+	/// Mark surroundings of nodes to be rechecked
+	void propagateChange(Map& stamps);
 
 private:
 	/// The Petri net for this incidence matrix
@@ -347,6 +349,9 @@ public:
 
 	/// lock for unused transitions set
 	pthread_rwlock_t unusedlock;
+
+	/// array to avoid double change propagation
+	char* propagated;
 };
 
 #endif

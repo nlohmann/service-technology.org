@@ -261,7 +261,7 @@ void Rules::liveTransitions(Mode mode) {
 		}
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -341,7 +341,7 @@ void Rules::initiallyDeadPlace(Mode mode) {
 		}
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -455,7 +455,7 @@ void Rules::parallelPlaces(Mode mode) {
 			facts.addChange(Facts::SAFE, delid, keepid);
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -575,7 +575,7 @@ void Rules::parallelTransitions(Mode mode) {
 		if (im.isVisible(delid)) im.makeVisible(keepid);
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -855,7 +855,7 @@ void Rules::equivalentPlaces(Mode mode) {
 			facts.removeFact(Facts::REVERSE);
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -983,7 +983,7 @@ void Rules::meldTransitions1(Mode mode) {
 			facts.removeFact(Facts::REVERSE);
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -1052,7 +1052,7 @@ void Rules::meldTransitions2(Mode mode) {
 			im.unlock(mit->first);
 		}
 		if ((flag2 && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
-			im.unlock(mit->first);
+			if (mit!=postp1.end()) im.unlock(mit->first);
 			im.unlock(mainid,mode);
 			continue;
 		}
@@ -1119,7 +1119,7 @@ void Rules::meldTransitions2(Mode mode) {
 			facts.removeFact(Facts::BOUNDEDNESS);
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -1187,7 +1187,7 @@ void Rules::meldTransitions3(Mode mode) {
 			im.unlock(mit->first);
 		}
 		if ((flag && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
-			im.unlock(mit->first);
+			if (mit!=postp1.end()) im.unlock(mit->first);
 			im.unlock(mainid,mode);
 			continue;
 		}
@@ -1271,7 +1271,7 @@ void Rules::meldTransitions3(Mode mode) {
 			facts.removeFact(Facts::BOUNDEDNESS);
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -1411,7 +1411,7 @@ void Rules::meldTransitions4(Mode mode) {
 		nodestamp[t1] = 0; // remove the transition
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -1484,7 +1484,7 @@ void Rules::meldTransitions5(Mode mode) {
 			im.unlock(mit->first);
 		}
 		if ((flag && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
-			im.unlock(mit->first);
+			if (mit!=postp1.end()) im.unlock(mit->first);
 			im.unlock(mainid,mode);
 			continue;
 		}
@@ -1598,7 +1598,7 @@ void Rules::meldTransitions5(Mode mode) {
 		}
 		
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -1678,7 +1678,7 @@ void Rules::loopPlace(Mode mode) {
 		nodestamp[mainid] = 0; // remove the place
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -1776,7 +1776,7 @@ void Rules::loopTransition(Mode mode) {
 			facts.removeFact(Facts::ALTL | Facts::BISIM);
 		facts.setStatus(Facts::LIVE,mainid,Facts::UNKNOWN);
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -1896,7 +1896,7 @@ void Rules::meldPlaces(Mode mode) {
 		nodestamp[t1] = 0; // delete node
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -2016,7 +2016,7 @@ void Rules::seriesPlace(Mode mode) {
 		}
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -2073,7 +2073,7 @@ void Rules::finalPlace(Mode mode) {
 		} else facts.removeFact(Facts::SAFETY);
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -2133,7 +2133,7 @@ void Rules::finalTransition(Mode mode) {
 		nodestamp[mainid] = 0; // remove the place
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
 }
@@ -2221,33 +2221,9 @@ void Rules::initiallyDeadPlace2(Mode mode) {
 			facts.addFact(Facts::UNSAFE,false);
 
 		// mark surrounding area as changed
-		propagateChange(nodestamp);
+		im.propagateChange(nodestamp);
 //		im.unlock(nodestamp);
 	}
-}
-
-/** Unlocks the given nodes ands marks all surrounding nodes so they will be checked again by all rules
-    @param nodestamp A map with nodes as keys
-*/
-void Rules::propagateChange(Map& nodestamp) {
-	set<Vertex> tmp;
-	Map::iterator mit,mit2;
-	for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
-	{
-		im.clearModes(mit->first);
-		Map& pre(im.getPre(mit->first));
-		for(mit2=pre.begin(); mit2!=pre.end(); ++mit2)
-			if (nodestamp.find(mit2->first)==nodestamp.end())
-				tmp.insert(mit2->first);
-		Map& post(im.getPost(mit->first));
-		for(mit2=post.begin(); mit2!=post.end(); ++mit2)
-			if (nodestamp.find(mit2->first)==nodestamp.end())
-				tmp.insert(mit2->first);
-	}
-	im.unlock(nodestamp);
-	set<Vertex>::iterator sit;
-	for(sit=tmp.begin(); sit!=tmp.end(); ++sit)
-		im.clearModes(*sit);
 }
 
 /** Shift the preset of a node to another node (adding to its preset). All surrounding nodes must be write-locked.

@@ -39,6 +39,10 @@ option "outputnet" o
   typestr="FILENAME"
   optional
 
+option "netonly" -
+  "Do not collect facts for any nodes, only for the whole net."
+  flag off
+
 option "pnml" -
   "Read Petri net as PNML."
   flag off

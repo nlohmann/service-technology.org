@@ -9,7 +9,7 @@
  *
  * \since   2009/14/07
  *
- * \date    $Date: 2013-06-26 12:00:00 +0200 (Mi, 26. Jun 2013) $
+ * \date    $Date: 2013-07-19 12:00:00 +0200 (Fr, 19. Jul 2013) $
  *
  * \version $Revision: 1.00 $
  */
@@ -416,7 +416,7 @@ bool IMatrix::isIO(Vertex id) {
 
 /** Check if a node is in the original net
 	@param id The node.
-	@return True if so. False if it is newly created transition or NO_NODE.
+	@return True if so. False if it is a newly created transition or NO_NODE.
 */
 bool IMatrix::isOriginal(Vertex id) {
 	return (id<orignodes);
@@ -486,7 +486,7 @@ unsigned int IMatrix::getTimeStamp(Vertex id) {
 }
 
 /** Collect time stamps for those nodes in the map with a value of zero. The zero will be replaced
-	by the actual time stamp.
+	by the actual time stamp. The nodes with time stamp zero should not be locked
 	@param stamps A map from nodes to time stamps, where a value of zero indicates that the stamp should be collected
 */
 void IMatrix::completeTimeStamps(Map& stamps) {
@@ -539,6 +539,7 @@ void IMatrix::mllock(Vertex id) {
 
 /** Get a write-lock for a node
 	@param id The ID of the node
+	@param tid The ID of the thread acquiring this lock
 */
 void IMatrix::wrlock(Vertex id, unsigned int tid) {
     pthread_rwlock_wrlock(rwlocks + id);
@@ -546,8 +547,8 @@ void IMatrix::wrlock(Vertex id, unsigned int tid) {
 }
 
 /** Get write-locks for a set of nodes if the time stamps of all these nodes are unchanged.
-	Additionally, for all nodes also the locks for reduction rule checks are acquired.
 	@param nodestamp A map from the nodes to be write-locked to their expected time stamps.
+	@param tid The ID of the thread acquiring the locks.
 	@return True if all nodes could be locked with identical time stamps. As a result, all
 		time stamps will be incremented. Otherwise, no locks
 		will be acquired at all and the return value is false.
@@ -588,9 +589,9 @@ bool IMatrix::wrlock(Map& nodestamp, unsigned int tid) {
 	@param remove If the node should be deleted (default: false = no)
 */
 void IMatrix::unlock(unsigned int id, Mode mode, bool remove) {
-	// if we had a write lock, adapt the equivalence classes for the pre-/postsets
+	// if we had a full write lock, adapt the equivalence classes for the pre-/postsets
 	// as the latter may have changed
-	if (writing[id] > 0) { 
+	if (writing[id] > 0) {
 		adaptList(id,writing[id]-1,remove);
 		writing[id] = 0;
 	}
@@ -599,9 +600,10 @@ void IMatrix::unlock(unsigned int id, Mode mode, bool remove) {
 	if (mode) setMode(id,mode);
 }
 
-/** Unlock a set of nodes as well as the locks for reduction rule checks.
+/** Unlock a set of nodes.
 	@param nodes A map from the nodes to be unlocked to a value. A value of zero indicates that
-			a write-locked node should be deleted. For read-locked nodes the value is of no consequence.
+			a fully write-locked node should be deleted. For nodes locked by rdlock() or mllock()
+			all rules will be marked 'done' but they will not be deleted.
 */
 void IMatrix::unlock(Map& nodes) {
 	Map::iterator mit;
@@ -614,7 +616,7 @@ void IMatrix::unlock(Map& nodes) {
 /** Set the flag for a given reduction rule check so it won't be done twice
 	@param id The ID of the node
 	@param flag A bit indicating the reduction rule
-	@param lock If the reduction rule flags should be write-locked
+	@param lock If the necessary lock should be acquired by the function
 */
 void IMatrix::setMode(Vertex id, Mode flag, bool lock) {
 	if (lock) mllock(id);
@@ -634,15 +636,15 @@ void IMatrix::clearModes(Vertex id, bool lock) {
 
 /** Find a reduction rule for which at least one node has not been checked.
 	@param rules The reduction rules definition, needed for an applicability check of a node against a rule
-	@param start An arbitrary offset for nodes/rules so that different threads may start the check with
+	@param tid The thread id. Will be used as an arbitrary offset for nodes/rules so that different threads may start the check with
 		different rules and nodes to increase chances of finding a result early.
 	@return The rule that may be applied (its number, where its flag would be 1<<number)
 */
-unsigned int IMatrix::findMode(Rules& rules, unsigned int start) {
+unsigned int IMatrix::findMode(Rules& rules, unsigned int tid) {
 	Mode maxmode(Rules::MAXMODE);
 
 	// find starting point in the nodes
-	unsigned int i(start);
+	unsigned int i(tid);
 	while (i>=numplaces+numtransitions) i-=numplaces+numtransitions;
 	unsigned int istart(i);
 
@@ -650,18 +652,20 @@ unsigned int IMatrix::findMode(Rules& rules, unsigned int start) {
 	do {
 		// get the reduction rule modes
 		rdlock(i);
-		Mode mode(modes[i]);
+		if (owner[i] == tid) {
+			Mode mode(modes[i]);
 
-		// find starting point in the modes
-		unsigned int j(start);
-		if (j>=maxmode) j=0;
-		unsigned int jstart(j);
+			// find starting point in the modes
+			unsigned int j(tid);
+			if (j>=maxmode) j=0;
+			unsigned int jstart(j);
 
-		// run through all modes and look for something to do
-		do {
-			if (!(mode & (1L<<j)) && rules.checkAppl(i,j)) { unlock(i); return j; }
-			if (++j==maxmode) j=0;
-		} while (j!=jstart);
+			// run through all modes and look for something to do
+			do {
+				if (!(mode & (1L<<j)) && rules.checkAppl(i,j)) { unlock(i); return j; }
+				if (++j==maxmode) j=0;
+			} while (j!=jstart);
+		}
 		unlock(i);
 
 		// increment and cross-over
@@ -673,8 +677,9 @@ unsigned int IMatrix::findMode(Rules& rules, unsigned int start) {
 
 /** Find a node that meets certain conditions. The caller must not have any write-locks. The node found will be read-locked.
 	@param id The ID of the node found, NO_NODE if none was found. If ID is given, search will commence after that ID.
-	@param type The type of node (IMatrix::PL or IMatrix::TR)
-	@param flag A reduction rule that still needs to be checked for the node found
+	@param tid The ID of the thread looking for a node.
+	@param type The type of node (IMatrix::PL or IMatrix::TR) to be found.
+	@param flag A reduction rule that still needs to be checked for the node found.
 	@param presize The size of the preset of the node to be found (all below NODE_SET_LIMIT are exact, NODE_SET_LIMIT is the union of all higher sizes)
 	@param postsize The size of the postset of the node to be found (like presize)
 	@return If such a node was found
@@ -741,6 +746,7 @@ bool IMatrix::getFirstNode(unsigned int& id, unsigned int tid, unsigned int type
 	    pthread_rwlock_rdlock(&listlocks[type][presize][postsize][tid]);
 	    set<unsigned int>& thelist(nodelists[type][presize][postsize][tid]);
 
+		// find the next ID in the list
 	    set<unsigned int>::iterator it(thelist.lower_bound(id+1));
 		if (thelist.empty() || it==thelist.end()) {
 		    pthread_rwlock_unlock(&listlocks[type][presize][postsize][tid]);
@@ -776,8 +782,9 @@ bool IMatrix::getFirstNode(unsigned int& id, unsigned int tid, unsigned int type
 
 /** Find a node that meets certain conditions. The caller must not have any write-locks. The node found will be read-locked.
 	@param id The ID of the node found, NO_NODE if none was found.
-	@param type The type of node (IMatrix::PL or IMatrix::TR)
-	@param flag A reduction rule that still needs to be checked for the node found
+	@param tid The ID of the calling thread.
+	@param type The type of node (IMatrix::PL or IMatrix::TR).
+	@param flag A reduction rule that still needs to be checked for the node found.
 	@param presizemin The minimal size of the preset of the node to be found. Will fail for minima above NODE_SET_LIMIT.
 	@param presizemax The maximal size of the preset of the node to be found. NODE_SET_LIMIT means no maximum.
 	@param postsizemin The minimal size of the postset of the node to be found. Will fail for minima above NODE_SET_LIMIT.
@@ -827,7 +834,7 @@ Map IMatrix::getIsolated(unsigned int type, Mode flag) {
 	set<unsigned int>::iterator sit;
 	for(sit=thelist.begin(); sit!=thelist.end(); ++sit)
 	{
-		wrlock(*sit,0); // dummy thread ID 0
+		wrlock(*sit,0); // dummy thread ID 0, ownership of a node will not change unless deleted
         if (!(modes[*sit] & flag)) todo=true;
 		if (list[*sit]) break; // make sure we still have empty pre-/postsets
 		res[*sit] = getTimeStamp(*sit);
@@ -847,8 +854,9 @@ Map IMatrix::getIsolated(unsigned int type, Mode flag) {
 }
 
 /** Adapt the equivalence class membership for pre-/postset size and handle deletion of a node. The node must be write-locked.
-	@param id The ID of the node
-	@param remove If the node should be deleted
+	@param id The ID of the node.
+	@param tid The ID of the calling thread to which ownership of the node will transfer.
+	@param remove If the node should be deleted.
 */
 void IMatrix::adaptList(Vertex id, unsigned int tid, bool remove) {
     // changes to pre/postset of id must already have happened
@@ -1212,7 +1220,7 @@ void IMatrix::removeArcs(Vertex id) {
 }
 
 /** Obtain new transitions from a pool (until it becomes empty). If the request can be handled,
-		the new transitions will be write-locked together with their reduction rule locks.
+		the new transitions will be write-locked.
 		The new transitions will have empty pre-/postsets and will be marked unchecked regarding reduction rules.
 	@param num How many transitions to obtain
 	@param nodestamp A map for time stamps to which to add the new transitions (including stamp)
@@ -1226,6 +1234,7 @@ set<Vertex> IMatrix::reserveTransitions(unsigned int tid, unsigned int num, Map&
 		while (num-->0) {
 			Vertex tmp = *(unused.begin());
 			wrlock(tmp, tid);
+			// ownership of the nodes will be set on unlock() automatically
 			stamp(tmp);
 			nodestamp[tmp] = getTimeStamp(tmp);
 			unused.erase(tmp);
@@ -1255,7 +1264,7 @@ Vertex IMatrix::getID(const Node& n) {
 	return nodeToID[&n];
 }
 
-/** Unlocks the given nodes ands marks all surrounding nodes so they will be checked again by all rules
+/** Unlocks the given nodes and marks all surrounding nodes so they will be checked again by all rules
     @param nodestamp A map with nodes as keys
 */
 void IMatrix::propagateChange(Map& nodestamp) {
@@ -1282,11 +1291,19 @@ void IMatrix::propagateChange(Map& nodestamp) {
 	vector<Vertex> tmp;
 	tmp.reserve(16);
 	Map::iterator mit,mit2;
+
+	// first mark all given nodes as changed and exclude them from being marked again
+	// The latter is done by 'propagated'-flags which are not thread-safe. No harm
+	// will come from this even if several threads use the flag for the same node
+	// at the same time. In case of conflicts a node may be marked 'changed' by
+	// more than one thread or by one thread twice.
 	for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
 	{
 		clearModes(mit->first);
 		propagated[mit->first]=1;
 	}
+
+	// collect all surrounding nodes except the given nodes
 	for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
 	{
 		Map& xpre(pre[mit->first]);
@@ -1304,9 +1321,15 @@ void IMatrix::propagateChange(Map& nodestamp) {
 			tmp.push_back(mit2->first);
 		}
 	}
+
+	// uncheck the flags so they can be used again
 	for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
 		propagated[mit->first]=0;
+
+	// unlock the given nodes
 	unlock(nodestamp);
+
+	// mark the collected nodes as changed
 	for(unsigned int i=0; i<tmp.size(); ++i)
 	{
 		propagated[tmp[i]]=0;

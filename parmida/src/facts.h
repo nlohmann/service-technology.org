@@ -138,6 +138,8 @@ public:
 		MAXTYPES = 13
 	};
 
+	bool hasStatus(unsigned int status, Types type);
+
 	enum Status {
 		NONE = 0,
 		ISFALSE = 4,

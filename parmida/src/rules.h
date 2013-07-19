@@ -9,7 +9,7 @@
  *
  * \since   2013-05-21
  *
- * \date    $Date: 2013-05-21 12:00:00 +0200 (Di, 21. May 2013) $
+ * \date    $Date: 2013-07-19 12:00:00 +0200 (Fr, 19. Jul 2013) $
  *
  * \version $Revision: 1.00 $
  */
@@ -137,7 +137,7 @@ private:
 	void collectNeighbors(Vertex id, Map& stamps);
 
 	// Debug info on rule application
-	void printApply(uint32_t mode, Vertex id, const Map& nodestamp);
+	void printApply(Mode mode, Vertex id, const Map& nodestamp);
 
 	// Make sure two edge maps have no common nodes
 	bool disjoint(const Map& map1, const Map& map2);

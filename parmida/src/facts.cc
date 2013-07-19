@@ -128,6 +128,11 @@ void Facts::reduceFacts(uint64_t& facts, bool direction) {
 	}
 }
 
+bool Facts::hasStatus(unsigned int status, Types type)
+{
+	return (((status >> type) & 7L) != NONE);
+}
+
 /** Print properties to screen
 */
 void Facts::printFacts() {
@@ -149,14 +154,14 @@ void Facts::printFacts() {
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
 		{
 			xit = state.find(*sit);
-			if (blit->first.size()<2 && xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
+			if (blit->first.size()<2 && xit!=state.end() && hasStatus(xit->second,MARKING))
 				flag = true;
 			if (!im.isInvisible(*sit)) comma = false;
 		}
 		for(sit=blit->second.begin(); sit!=blit->second.end(); ++sit)
 		{
 			xit = state.find(*sit);
-			if (!im.exists(*sit) && xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
+			if (!im.exists(*sit) && xit!=state.end() && hasStatus(xit->second,MARKING))
 				flag = true;
 		}
 		if (flag || comma) continue;
@@ -187,7 +192,12 @@ void Facts::printFacts() {
 			if (!im.exists(*sit)) comma = false;
 		if (!comma) continue;
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
+		{
+			xit = state.find(*sit);
+			if (blit->first.size()<2 && xit!=state.end() && hasStatus(xit->second,BOUNDED))
+				comma = false;
 			if (!im.isInvisible(*sit)) comma = false;
+		}
 		if (comma) continue;
 
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
@@ -214,7 +224,12 @@ void Facts::printFacts() {
 			if (!im.exists(*sit)) comma = false;
 		if (!comma) continue;
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
+		{
+			xit = state.find(*sit);
+			if (blit->first.size()<2 && xit!=state.end() && hasStatus(xit->second,SAFE))
+				comma = false;
 			if (!im.isInvisible(*sit)) comma = false;
+		}
 		if (comma) continue;
 
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
@@ -241,7 +256,12 @@ void Facts::printFacts() {
 			if (!im.exists(*sit)) comma = false;
 		if (!comma) continue;
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
+		{
+			xit = state.find(*sit);
+			if (blit->first.size()<2 && xit!=state.end() && hasStatus(xit->second,LIVE))
+				comma = false;
 			if (!im.isInvisible(*sit)) comma = false;
+		}
 		if (comma) continue;
 
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
@@ -291,7 +311,7 @@ void Facts::printFacts() {
 				}
 			}
 		} else {
-			if ((status = (xit->second >> LIVE) & 7L) > 0 && !im.isInvisible(xit->first) && im.isOriginal(xit->first))
+			if ((status = (xit->second >> LIVE) & 7L) != NONE && !im.isInvisible(xit->first) && im.isOriginal(xit->first))
 			{
 				switch (status) {
 					case ISFALSE:	cout << "live(" << im.getName(xit->first) << ") --> false" << endl; 
@@ -390,7 +410,7 @@ void Facts::printFacts(JSON& log) {
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
 		{
 			xit = state.find(*sit);
-			if (blit->first.size()<2 && xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
+			if (blit->first.size()<2 && xit!=state.end() && hasStatus(xit->second,MARKING))
 				flag = true;
 			if (!im.isInvisible(*sit))
 				comma = false;
@@ -398,7 +418,7 @@ void Facts::printFacts(JSON& log) {
 		for(sit=blit->second.begin(); sit!=blit->second.end(); ++sit)
 		{
 			xit = state.find(*sit);
-			if (!im.exists(*sit) && xit!=state.end() && ((xit->second >> MARKING) & 7L) != NONE)
+			if (!im.exists(*sit) && xit!=state.end() && hasStatus(xit->second,MARKING))
 				flag = true;
 		}
 		if (flag || comma) continue;
@@ -425,7 +445,12 @@ void Facts::printFacts(JSON& log) {
 			if (!im.exists(*sit)) comma = false;
 		if (!comma) continue;
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
+		{
+			xit = state.find(*sit);
+			if (blit->first.size()<2 && xit!=state.end() && hasStatus(xit->second,BOUNDED))
+				comma = false;
 			if (!im.isInvisible(*sit)) comma = false;
+		}
 		if (comma) continue;
 
 		string tmp;
@@ -446,7 +471,12 @@ void Facts::printFacts(JSON& log) {
 			if (!im.exists(*sit)) comma = false;
 		if (!comma) continue;
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
+		{
+			xit = state.find(*sit);
+			if (blit->first.size()<2 && xit!=state.end() && hasStatus(xit->second,SAFE))
+				comma = false;
 			if (!im.isInvisible(*sit)) comma = false;
+		}
 		if (comma) continue;
 
 		string tmp;
@@ -467,7 +497,12 @@ void Facts::printFacts(JSON& log) {
 			if (!im.exists(*sit)) comma = false;
 		if (!comma) continue;
 		for(sit=blit->first.begin(); sit!=blit->first.end(); ++sit)
+		{
+			xit = state.find(*sit);
+			if (blit->first.size()<2 && xit!=state.end() && hasStatus(xit->second,LIVE))
+				comma = false;
 			if (!im.isInvisible(*sit)) comma=false;
+		}
 		if (comma) continue;
 
 		string tmp;
@@ -489,11 +524,11 @@ void Facts::printFacts(JSON& log) {
 		unsigned status;
 		if (im.isPlace(xit->first))
 		{
-			if ((status = (xit->second >> MARKING) & 7L) > 0)
+			if ((status = (xit->second >> MARKING) & 7L) != NONE)
 				if (condition && status == UNKNOWN && !im.isInvisible(xit->first))
 					log["marking"][im.getName(xit->first)] = "N/A";
 
-			if ((status = (xit->second >> BOUNDED) & 7L) > 0 && !im.isInvisible(xit->first))
+			if ((status = (xit->second >> BOUNDED) & 7L) != NONE && !im.isInvisible(xit->first))
 			{
 				switch (status) {
 					case ISFALSE:	log["bounded"][im.getName(xit->first)] = false; 
@@ -505,7 +540,7 @@ void Facts::printFacts(JSON& log) {
 									break;
 				}
 			}
-			if ((status = (xit->second >> SAFE) & 7L) > 0 && !im.isInvisible(xit->first))
+			if ((status = (xit->second >> SAFE) & 7L) != NONE && !im.isInvisible(xit->first))
 			{
 				switch (status) {
 					case ISFALSE:	log["safe"][im.getName(xit->first)] = false; 
@@ -518,7 +553,7 @@ void Facts::printFacts(JSON& log) {
 				}
 			}
 		} else {
-			if ((status = (xit->second >> LIVE) & 7L) > 0 && !im.isInvisible(xit->first) && im.isOriginal(xit->first))
+			if ((status = (xit->second >> LIVE) & 7L) != NONE && !im.isInvisible(xit->first) && im.isOriginal(xit->first))
 			{
 				switch (status) {
 					case ISFALSE:	log["live"][im.getName(xit->first)] = false; 

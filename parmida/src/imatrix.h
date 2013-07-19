@@ -9,7 +9,7 @@
  *
  * \since   2009/14/07
  *
- * \date    $Date: 2013-05-17 12:00:00 +0200 (Fr, 17. May 2013) $
+ * \date    $Date: 2013-07-19 12:00:00 +0200 (Fr, 19. Jul 2013) $
  *
  * \version $Revision: 1.00 $
  */
@@ -117,7 +117,7 @@ public:
 	/// Get a write lock for a node, no right to change pre/postsets
 	void mllock(Vertex id);
 
-	/// Get a write lock for a node
+	/// Get a write lock for a node with full rights
 	void wrlock(Vertex id, unsigned int tid);
 
 	/// Get write locks for a set of nodes
@@ -153,7 +153,7 @@ public:
 	/// Get all isolated nodes (of NodeType type) if at least one of them needs to be check with the given reduction rule
 	Map getIsolated(unsigned int type, Mode flag);
 
-	/// Put a node into the list for the correct pre-/postsize sets (or delete it)
+	/// Put a node into the thread's list for the correct pre-/postsize sets (or delete it)
 	void adaptList(Vertex id, unsigned int tid, bool remove);
 
 	/// Create a PetriNet object from the internal data structures
@@ -288,7 +288,7 @@ public:
 	/// Locks for Nodes
 	pthread_rwlock_t* rwlocks;
 
-	/// Flags showing write locks
+	/// Flags showing full write locks
 	unsigned int* writing;
 
 	/// The thread owning a node
@@ -300,22 +300,20 @@ public:
 	/// action labels (for transitions, 0=tau)
 	unsigned int* label;
 
-	/// names
+	/// names of nodes
 	string* name;
 
-	/// time stamp
+	/// time stamp of nodes
 	unsigned int* timestamp;
 
-	/// Modes
+	/// Modes (reduction rule flags) for nodes
 	Mode* modes;
-
 
 	/// Locks for NodeLists
 	pthread_rwlock_t**** listlocks;
 
-	/// NodeLists
+	/// NodeLists (PL/TR, preset size, postset size, thread ID)
 	set<unsigned int>* nodelists[2][NODE_SET_LIMIT+1][NODE_SET_LIMIT+1];
-
 
 	/// node to id
 	map<const Node*, unsigned int> nodeToID;

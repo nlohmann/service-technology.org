@@ -9,7 +9,7 @@
  *
  * \since   2013-05-21
  *
- * \date    $Date: 2013-06-26 12:00:00 +0200 (Mi, 26. Jun 2013) $
+ * \date    $Date: 2013-07-19 12:00:00 +0200 (Fr, 19. Jul 2013) $
  *
  * \version $Revision: 1.00 $
  */
@@ -39,6 +39,7 @@ Rules::Rules(IMatrix& mat, Facts& fkt) : im(mat), facts(fkt) {}
 
 /** Apply a rule given by its rule number
     @param mode The number of the rule
+	@param tid The ID of the calling thread
 */
 void Rules::apply(unsigned int mode, unsigned int tid) {
 	Mode flag(1L<<mode);
@@ -139,7 +140,7 @@ bool Rules::checkAppl(Vertex node, unsigned int mode) {
 }
 
 /** Starke's rule 1: Transitions with empty presets are removed together with their postsets
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::liveTransitions(unsigned int tid) {
 	// if the rule is inapplicable we are done
@@ -244,7 +245,7 @@ void Rules::liveTransitions(unsigned int tid) {
 
 /** Starke's rule 2: Places with empty presets and their postset transitions are removed, if none of them can fire.
 	This rule has been replaced by initiallyDeadPlace2().
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::initiallyDeadPlace(unsigned int tid) {
 	// find a starting place "mainid" for the rule if possible
@@ -323,7 +324,7 @@ void Rules::initiallyDeadPlace(unsigned int tid) {
 }
 
 /** Starke's rule 3, places only: Two places have identical pre- and postsets (including arc weights)
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::parallelPlaces(unsigned int tid) {
 
@@ -438,7 +439,7 @@ void Rules::parallelPlaces(unsigned int tid) {
 }
 
 /** Starke's rule 3, transitions only: Two transitions have identical pre- and postsets
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::parallelTransitions(unsigned int tid) {
 	// conditions for later checks
@@ -558,7 +559,7 @@ void Rules::parallelTransitions(unsigned int tid) {
 }
 
 /** Starke's rule 3, for isolated transitions
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::isolatedTransitions(unsigned int tid) {
 	// a condition for later checks
@@ -635,7 +636,7 @@ void Rules::isolatedTransitions(unsigned int tid) {
 }
 
 /** Starke's rule 4: Equivalent places (two transitions with identical pre-/postsets except for one place in each preset)
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::equivalentPlaces(unsigned int tid) {
     // We cannot uphold strict paths, only complex ones (with or-operators in them)
@@ -838,7 +839,7 @@ void Rules::equivalentPlaces(unsigned int tid) {
 }
 
 /** Starke's rule 5, n=1: Melding of preset and postset of one place, here: singleton postset
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::meldTransitions1(unsigned int tid) {
 	// the rule will destroy state-based next-operators
@@ -966,7 +967,7 @@ void Rules::meldTransitions1(unsigned int tid) {
 }
 
 /** Starke's rule 5, n>1, k=1: Melding of preset and postset of one place, here: singleton preset
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::meldTransitions2(unsigned int tid) {
 	// the rule will destroy state-based next-operators
@@ -1102,7 +1103,7 @@ void Rules::meldTransitions2(unsigned int tid) {
 }
 
 /** Starke's rule 5, n=2, k=2, no new transitions: Melding of preset (size 2) and postset (size 2) of one place
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::meldTransitions3(unsigned int tid) {
 	// the rule will destroy state-based next-operators
@@ -1256,7 +1257,7 @@ void Rules::meldTransitions3(unsigned int tid) {
 /** Starke's rule 6: t1 with only p in its postset, p with only t1 in its preset, preset of t1 has t1 as
 	its only post-transition, t1 not in postset of p; all arcs around p have same weight, initial marking
 	on p is less; remove p and t1
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::meldTransitions4(unsigned int tid) {
 	// the rule will destroy state-based next-operators
@@ -1394,7 +1395,7 @@ void Rules::meldTransitions4(unsigned int tid) {
 }
 
 /** Starke's rule 5, n>1, k>1: Melding of preset and postset of one place, here: by creating new transitions
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::meldTransitions5(unsigned int tid) {
 	// the rule will destroy state-based next-operators
@@ -1581,7 +1582,7 @@ void Rules::meldTransitions5(unsigned int tid) {
 }
 
 /** Starke's rule 7: A place on which all transitions loop with a weight of at most its initial marking. Place is removed
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::loopPlace(unsigned int tid) {
 	// Starke Rule 7
@@ -1661,7 +1662,7 @@ void Rules::loopPlace(unsigned int tid) {
 }
 
 /** Starke's rule 8: A looping transition may be removed if there is another transition with equal or larger preset (regarding arc weights)
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::loopTransition(unsigned int tid) {
 	// the rule will ruin next in CTL/LTL
@@ -1759,7 +1760,7 @@ void Rules::loopTransition(unsigned int tid) {
 }
 
 /** Starke's rule 9 (corrected version)
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::meldPlaces(unsigned int tid) {
 	// the rule will ruin next in CTL/LTL
@@ -1879,7 +1880,7 @@ void Rules::meldPlaces(unsigned int tid) {
 }
 
 /** Murata's Series Place: Place with singleton preset, preset with singleton pre- and postset
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::seriesPlace(unsigned int tid) {
 	// the rule will destroy state-based next-operators
@@ -1999,7 +2000,7 @@ void Rules::seriesPlace(unsigned int tid) {
 }
 
 /** Invisible place with empty postset
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::finalPlace(unsigned int tid) {
 
@@ -2056,7 +2057,7 @@ void Rules::finalPlace(unsigned int tid) {
 }
 
 /** Transition with empty postset
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::finalTransition(unsigned int tid) {
 	// the rule may remove an unbounded place
@@ -2115,7 +2116,7 @@ void Rules::finalTransition(unsigned int tid) {
 }
 
 /** Starke's rule 2 modified: Place with preset contained in postset (weighted) and its postset transitions are removed, if none of them can fire
-    @param mode The mode flag for this rule
+    @param The ID of the calling thread
 */
 void Rules::initiallyDeadPlace2(unsigned int tid) {
 	// for later checks

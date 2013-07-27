@@ -143,6 +143,10 @@ void evaluateParameters(int argc, char** argv) {
         abort(4, "at most one input file must be given");
     }
 
+    if (args_info.bound_arg < 1) {
+    	abort(1337, "bound has to be a positive integer");
+    }
+
 
     free(params);
 }
@@ -312,7 +316,10 @@ int main(int argc, char** argv) {
 
     BSD::printBSD(BSD::graph);
 
-    std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filename + ".dot";
+    std::stringstream bound (std::stringstream::in | std::stringstream::out);
+    bound << args_info.bound_arg;
+
+    std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filename + "_b" + bound.str() + ".dot";
     Output output(dot_filename, "BSD automaton");
     output.stream() << pnapi::io::sa;
     Output::dotoutput(output.stream(), *BSD::graph, filename);

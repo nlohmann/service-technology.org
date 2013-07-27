@@ -1,0 +1,28 @@
+                       _                    _   _  
+                      | | ___  ____ _ _ ___| |_|_| __ _  
+                      | |/ _ \|  __| '_|_ \   _| |/ _' |
+                      | |_|_| | |__| |  __/| |_| | |_| | 
+                      |____|_/|____|_|\___||___|_|\__,__|
+                      generating logs...
+                      http://service-technology.org/locretia
+
+
+COPYRIGHT
+    Copyright (c) 2013 Simon Heiden
+
+
+AUTHORS
+    Simon Heiden
+	 implemented the functionality of BSD
+    Niels Lohmann
+	 The tool 'Wendy' was used as a base for Locretia. Some functionality 
+	 concerning the computation of the reachability graph of the inner of
+	 the OWFNs was used especially.
+
+
+MAINTAINER
+    BSD is maintained by Simon Heiden.
+
+
+CONTACT
+    E-Mail: BSD@service-technology.org

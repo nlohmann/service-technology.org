@@ -15,6 +15,7 @@ tara_SOURCES =  main.cc \
         ServiceTools.cc ServiceTools.h \
 		Tara.cc Tara.h \
         CCSearch.h CCSearch.cc \
+        Risk.h Risk.cc \
         tinythread.h tinythread.cpp \
         Parser.cc Parser.h
                 

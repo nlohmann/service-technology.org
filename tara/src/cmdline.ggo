@@ -31,6 +31,14 @@ option "costfunction" f
   string
   typestr="FILENAME"
 
+option "riskcosts" -
+  "Whether the costs are risks. Give Value to define base (default = 100)"
+  details="When given risk-costs. Minimazation of Min-Risk will be done. Give value to change base, e.g. 1000 for per mille."
+  int
+  default="100"
+  argoptional
+  optional
+
 option "pol" p
   "A policy file"
   details="Use this option to provide a policy. You can provide more than one policy, e.g. -p foo.pol -p bar.pol .\n"

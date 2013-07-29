@@ -39,6 +39,7 @@
 #include "Modification.h"
 #include "iModification.h"
 #include "CCSearch.h"
+#include "Risk.h"
 
 using std::cerr;
 using std::cout;
@@ -110,8 +111,9 @@ int main(int argc, char** argv) {
     message("Step 2: Parse the cost function from '%s' and apply it to the built statespace", Tara::args_info.costfunction_arg);
 
     status("parsing costfunction");
-    if(strcmp(Tara::args_info.costfunction_arg,"-r")!=0)
-	Parser::costfunction.parse(Tara::args_info.costfunction_arg);
+    if (strcmp(Tara::args_info.costfunction_arg, "-r") != 0) {
+	    Parser::costfunction.parse(Tara::args_info.costfunction_arg);
+    }
     else {  // if costfunction should be random
        status("generating random costfunction");
        const std::set<pnapi::Transition*> transitions=Tara::net->getTransitions();
@@ -138,6 +140,10 @@ int main(int argc, char** argv) {
             if(cur>Tara::highestTransitionCosts) Tara::highestTransitionCosts=cur;
             status("random costfunction:  %s -> %d", (*it)->getName().c_str(), cur);
        }
+    }
+    if (Tara::args_info.riskcosts_given) {
+        status("risk costs given with base %d", Tara::args_info.riskcosts_given);
+        transformRiskCosts(& Tara::partialCostFunction, Tara::args_info.riskcosts_arg);
     }
 
     /*----------------------------------.
@@ -315,6 +321,12 @@ int main(int argc, char** argv) {
             }
         
         } 
+
+        if(Tara::args_info.riskcosts_given) {
+            message("1  Minimal budget found: %d", minBudget);
+            minBudget = backtransformRiskCost(minBudget);
+            message("2  Maximal budget found: %d", minBudget);
+        }
         
         // Binary search done. The minimal budget is found. Return the partner for the minimal budget.    
         

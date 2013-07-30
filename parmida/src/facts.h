@@ -38,9 +38,6 @@ class Facts {
 
 public:
 	/// Constructor
-	Facts(IMatrix& mat);
-
-	/// Constructor with condition
 	Facts(IMatrix& mat, uint64_t cond);
 
 	/// Destructor
@@ -64,8 +61,9 @@ public:
 		UNSAFE = 0x2000LL,
 		BISIM = 0x4000LL,
 		REVERSE = 0x8000LL,
+		INVARIANT = 0x10000LL,
 
-		ALLFACTS = 0xFFFFLL,
+		ALLFACTS = 0x1FFFFLL,
 		NOFACTS = 0x0LL
 	};
 
@@ -76,7 +74,7 @@ public:
 	void printFacts();
 
 	/// Recursive path builder with screen output
-	void printPathElement(const map<Vertex,Path>::iterator& it, unsigned int& pos);
+	void printPathElement(const Path& rhs, unsigned int& pos);
 
 	/// Print general facts to JSON object
 	void print(JSON& log, string name, uint64_t facts);
@@ -85,7 +83,7 @@ public:
 	void printFacts(JSON& log);
 
 	/// Recursive path builder with JSON object construction
-	void printPathElement(JSON& json, const map<Vertex,Path>::iterator& it, unsigned int& pos);
+	void printPathElement(JSON& json, const Path& rhs, unsigned int& pos);
 
 	/// add a general fact that can be deduced directly from the reduction process
 	void addFact(uint64_t facts, bool remove = true);
@@ -96,23 +94,33 @@ public:
 	/// remove facts that strictly less expressive than others
 	void reduceFacts(uint64_t& facts, bool direction);
 
+	/// check if a general fact has been deduced
+	bool checkFact(uint64_t facts);
+
 	/// check if a general fact is a prerequisite
 	bool checkCondition(uint64_t facts);
 
 	/// add to the right side of a property map
-	void addChange(unsigned int type, Vertex id, Vertex out, int add=0);
+	void setMarking(Vertex id, Vertex out, int add=0);
+	void setBounded(Vertex id, Vertex out);
+	void setSafe(Vertex id, Vertex out);
+	void setLive(Vertex id, Vertex out);
 
 	/// add to the right side of a property map
-	void addChange(unsigned int type, Vertex id, set<Vertex>& out, int add=0);
+	void setMarking(Vertex id, set<Vertex>& out, int add=0);
+	void setBounded(Vertex id, set<Vertex>& out);
+	void setSafe(Vertex id, set<Vertex>& out);
+	void setLive(Vertex id, set<Vertex>& out);
 
 	/// add to the right side of a property map
-	void addChange(unsigned int type, set<Vertex>& id, Vertex out, int add=0);
-
-	/// set the status of a property
-	void setStatus(unsigned int type, Vertex id, unsigned int status);
+	void setMarking(map<Vertex,int>& id, Vertex out, int factor);
+//	void setMarking(set<Vertex>& id, Vertex out);
+	void setBounded(set<Vertex>& id, Vertex out);
+	void setSafe(set<Vertex>& id, Vertex out);
+	void setLive(set<Vertex>& id, Vertex out);
 
 	/// add a path to a property after unwinding
-	void addPath(Vertex id, Path out, bool before = true);
+	void addPath(Vertex id, Path out, bool before = true, bool empty = false);
 
 	/// add a path to a property directly
 	void addFixedPath(Vertex id, Path out, bool before = true);
@@ -121,7 +129,7 @@ public:
 	Path getPath(Path& in);
 
 	/// set a path to a property directly
-	void setPath(Vertex id, const Path& out);
+//	void setPath(Vertex id, const Path& out);
 
 	/// Adapt the final condition to the reduced net
 	Formula* transferFormula(const Formula& oldf, map<const Place*,const Place*>& translate);
@@ -138,8 +146,6 @@ public:
 		MAXTYPES = 13
 	};
 
-	bool hasStatus(unsigned int status, Types type);
-
 	enum Status {
 		NONE = 0,
 		ISFALSE = 4,
@@ -147,6 +153,12 @@ public:
 		UNKNOWN = 6,
 		UNUSABLE = 7
 	};
+
+	bool hasStatus(unsigned int status, Types type, Status val = NONE);
+
+	/// set the status of a property
+	void setStatus(Types type, Vertex id, Status status);
+
 
 private:
 
@@ -163,33 +175,40 @@ private:
 	uint64_t transfer_facts;
 
 	/// general state of specific property
-	map<Vertex, unsigned int> state;
+	unsigned int* state;
 
 	/// marking info: fixed tokens to add to a property
-	map<set<Vertex>, int> markadd;
+	int* mark_add;
 
 	/// marking info
-	map<set<Vertex>, set<Vertex> > mark2;
+//	set<Vertex>* mark_lhs;
+	set<Vertex>* mark_rhs;
+	set<Vertex>* mark_ih;
+	map<Vertex,int>* mark_lhs;
+	int* mark_lhs_factor;
+	int* mark_lhs_fix;
 
 	/// boundedness info
-	map<set<Vertex>, set<Vertex> > bounded;
+	set<Vertex>* bounded_lhs;
+	set<Vertex>* bounded_rhs;
+	set<Vertex>* bounded_ih;
 
 	/// safety info
-	map<set<Vertex>, set<Vertex> > safe;
+	set<Vertex>* safe_lhs;
+	set<Vertex>* safe_rhs;
+	set<Vertex>* safe_ih;
 
 	/// liveness info
-	map<set<Vertex>, set<Vertex> > live;
+	set<Vertex>* live_lhs;
+	set<Vertex>* live_rhs;
+	set<Vertex>* live_ih;
 
 	/// path info
-	map<Vertex, Path> path;
+	Path* path;
 
-//	map<Vertex, map<Vertex, int> > pathcond;
-
-	pthread_rwlock_t* locks;
-	// TYPES: unchanged
-	// 1: facts
-	// 2: state
-	// 5: markadd
+	pthread_rwlock_t* factlock;
+	pthread_rwlock_t* pathlock;
+	pthread_rwlock_t* dellock;
 };
 
 #endif

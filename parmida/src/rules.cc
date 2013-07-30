@@ -44,19 +44,17 @@ Rules::Rules(IMatrix& mat, Facts& fkt) : im(mat), facts(fkt) {}
 void Rules::apply(unsigned int mode, unsigned int tid) {
 	Mode flag(1L<<mode);
 	switch (flag) {
-		case INITDEADPLACE:	initiallyDeadPlace(tid); break;
 		case PARPLACE:		parallelPlaces(tid); break;
 		case PARTRANSITION:	parallelTransitions(tid); break;
 		case ISOLATEDTRANS: isolatedTransitions(tid); break;
 		case EQUIVPLACE:	equivalentPlaces(tid); break;
 		case MELDTRANS1:	meldTransitions1(tid); break;
 		case MELDTRANS2:	meldTransitions2(tid); break;
-		case MELDTRANS3:	meldTransitions3(tid); break;
+		case MELDTRANS3:	break; //meldTransitions3(tid); break;
 		case MELDTRANS4:	meldTransitions4(tid); break;
 		case MELDTRANS5:	meldTransitions5(tid); break;
-		case LOOPPLACE:		loopPlace(tid); break;
+		case LOOPPLACE:		loopPlace2(tid); break;
 		case LOOPTRANS:		loopTransition(tid); break;
-		case MELDPLACE:		meldPlaces(tid); break;
 		case LIVETRANS:		liveTransitions(tid); break;
 		case SERIESPLACE:	seriesPlace(tid); break;
 		case FINALPLACE:	finalPlace(tid); break;
@@ -82,17 +80,17 @@ bool Rules::checkAppl(Vertex node, unsigned int mode) {
 								return false;
 							if (im.getPre(node).size()>0) place = true;
 							return !place;
-		case INITDEADPLACE:	if (im.getPre(node).size()>0) place = false;
-							return place;
 		case INITDEADPL2:	return place;
 		case PARPLACE:		return place;
 		case LOOPTRANS:		if (facts.checkCondition(Facts::CTL | Facts::LTL))
 								return false;
+							if (im.getPre(node).size()==0) place = true;
+							if (im.getPost(node).size()==0) place = true;
+							return !place;
 		case PARTRANSITION: return !place;
 		case ISOLATEDTRANS:	if (im.getPost(node).size()>0) place = true;
 							if (im.getPre(node).size()>0) place = true;
 							return !place;
-		case MELDPLACE:
 		case MELDTRANS1:	if (facts.checkCondition(Facts::CTL | Facts::LTL))
 								return false;
 							if (im.getPre(node).size()==0) place = false;
@@ -103,17 +101,13 @@ bool Rules::checkAppl(Vertex node, unsigned int mode) {
 							if (im.getPost(node).size()!=1) place = false;
 							return place;
 		case MELDTRANS4:
-		case MELDTRANS2:	if (facts.checkCondition(Facts::CTL | Facts::LTL))
+		case MELDTRANS2:	if (facts.checkCondition(Facts::CTL | Facts::LTL | Facts::INVARIANT))
 								return false;
 							if (im.getPost(node).size()==0) place = false;
 							if (im.getPre(node).size()!=1) place = false;
 							return place;
-		case MELDTRANS3:	if (facts.checkCondition(Facts::CTL | Facts::LTL))
-								return false;
-							if (im.getPost(node).size()!=2) place = false;
-							if (im.getPre(node).size()!=2) place = false;
-							return place;
-		case MELDTRANS5:	if (facts.checkCondition(Facts::CTL | Facts::LTL))
+		case MELDTRANS3:	return false;
+		case MELDTRANS5:	if (facts.checkCondition(Facts::CTL | Facts::LTL | Facts::INVARIANT))
 								return false;
 							if (im.getPost(node).size()<2) place = false;
 							if (im.getPre(node).size()<2) place = false;
@@ -125,14 +119,18 @@ bool Rules::checkAppl(Vertex node, unsigned int mode) {
 								return false;
 							if (im.getPre(node).size()!=1) place = false;
 							return place;
-		case FINALPLACE:	if (facts.checkCondition(Facts::BOUNDEDNESS | Facts::REVERSE))
+		case FINALPLACE:	if (facts.checkCondition(Facts::REVERSE | Facts::INVARIANT))
+								return false;
+							if (facts.checkCondition(Facts::BOUNDEDNESS) && !facts.checkFact(Facts::UNBOUNDED))
 								return false;
 							if (im.getPre(node).size()==0) place = false;
 							if (im.getPost(node).size()>0) place = false;
 							return place;
 		case FINALTRANS:	if (facts.checkCondition(Facts::CTL | Facts::LTL | Facts::CTLX | Facts::LTLX 
-													| Facts::LIVENESS | Facts::BISIM | Facts::REVERSE))
+													| Facts::BISIM | Facts::REVERSE | Facts::INVARIANT))
 								return false;
+							if (facts.checkCondition(Facts::LIVENESS)
+								&& !facts.checkFact(Facts::NONLIVE)) return false;
 							if (im.getPost(node).size()>0) place = true;
 							if (im.getPre(node).size()==0) place = true;
 							return !place;
@@ -228,98 +226,19 @@ void Rules::liveTransitions(unsigned int tid) {
 				mit->second = 0; // remove the place
 
 				// export formula rule if the node is visible
-				facts.setStatus(Facts::MARKING,mit->first,Facts::UNKNOWN);
+				map<Vertex,int> tmp;
+				facts.setMarking(tmp,mit->first,-1); // any number of tokens possible
+				facts.setStatus(Facts::MARKING,mit->first,Facts::UNUSABLE);
 				facts.setStatus(Facts::BOUNDED,mit->first,Facts::ISFALSE);
 				facts.setStatus(Facts::SAFE,mit->first,Facts::ISFALSE);
 			} else { // transitions after one of the places must be prefixed in paths with the removed transition
 				if (factor[mit->first] > 0)
-					facts.addPath(mit->first, deque<Vertex>(factor[mit->first],mainid));
+					facts.addPath(mit->first, Path(factor[mit->first],mainid));
 			}
 		}
 
-		// mark surrounding area as changed
+		// mark surrounding area as changed and unlock node
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
-	}
-}
-
-/** Starke's rule 2: Places with empty presets and their postset transitions are removed, if none of them can fire.
-	This rule has been replaced by initiallyDeadPlace2().
-    @param The ID of the calling thread
-*/
-void Rules::initiallyDeadPlace(unsigned int tid) {
-	// find a starting place "mainid" for the rule if possible
-	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,tid,IMatrix::PL,INITDEADPLACE,0,0,0,NODE_SET_LIMIT))
-	{
-		// get postset and marking of mainid
-	    Map& post(im.getPost(mainid));
-	    unsigned int tokens(im.getTokens(mainid));
-
-		// check the rule: all postset transitions need more tokens than available on mainid
-	    Map::iterator mit;
-	    for(mit=post.begin(); mit!=post.end(); ++mit)
-		{
-	        if (mit->second<=tokens) break;
-			// additionally check if the transition must remain visible (transition would be removed!)
-			if (im.isPersistent(mit->first)) break;
-		}
-
-		// if the rule is not fulfilled look for a new first place
-	    if (mit!=post.end() || im.isIO(mainid) || im.isPersistent(mainid)) 
-		{
-			im.unlock(mainid,INITDEADPLACE);
-			continue;
-		}
-
-		// collect IDs of affected nodes and save the timestamp of mainid
-		// if anyone tampers with the place or its adjacent edges, we will know
-	    Map nodestamp;
-		nodestamp[mainid] = im.getTimeStamp(mainid);
-	    for(mit=post.begin(); mit!=post.end(); ++mit)
-		{
-			// all transitions in mainid's postset are affected
-			// transitions may be locked after places
-			nodestamp[mit->first] = im.rdlock(mit->first);
-			collectNeighbors(mit->first, nodestamp);
-			im.unlock(mit->first);
-		}
-	    im.unlock(mainid);
-	
-		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp,tid)) continue;
-		printApply(INITDEADPLACE,mainid,nodestamp); // logging only
-
-		// change inheritable properties
-		if (nodestamp.size()>1)
-			facts.addFact(Facts::NONLIVE,false);
-		if (tokens>1)
-			facts.addFact(Facts::UNSAFE,false);
-
-		// apply the rule
-		for(mit=nodestamp.begin(); mit!=nodestamp.end(); ++mit)
-		{
-			if (mit->first == mainid) { // the dead place
-				mit->second = 0; // remove mainid
-				set<Vertex> tmp;
-				facts.addChange(Facts::MARKING,mainid,tmp,tokens);
-				facts.setStatus(Facts::BOUNDED,mainid,Facts::ISTRUE);
-				facts.setStatus(Facts::SAFE,mainid,(tokens>1 ? Facts::ISFALSE : Facts::ISTRUE));
-			} else if (!im.isPlace(mit->first)) { // a dead transition
-				// erase the transition with all its edges
-				im.removeArcs(mit->first);
-				mit->second = 0; // remove the transition
-
-				// export liveness and path info
-				facts.setStatus(Facts::PATH, mit->first, Facts::UNUSABLE);
-				facts.setStatus(Facts::LIVE, mit->first, Facts::ISFALSE);
-				if (im.getLabel(mit->first)) im.clearLabel(mit->first);
-			}
-		}
-
-		// mark surrounding area as changed
-		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 
@@ -381,7 +300,10 @@ void Rules::parallelPlaces(unsigned int tid) {
 			if (tokens1>tokens2 && im.isPersistent(mainid)) flag=true;
 
 			// check if we can transfer the safety check to the reduced net
-			if (tokens1+tokens2==1 && facts.checkCondition(Facts::SAFETY)) flag=true;
+			if (tokens1+tokens2==1 && facts.checkCondition(Facts::SAFETY)
+				&& !facts.checkFact(Facts::UNSAFE)) flag=true;
+			if (tokens1+tokens2==1 && facts.checkCondition(Facts::SAFETY)
+				&& im.isVisible(tokens1==1 ? mainid : mit->first)) flag=true;
 
 			// check if the places have the same pre- and postset
 			if (!flag && checkParallel(mainid,mit->first)) break;
@@ -421,20 +343,25 @@ void Rules::parallelPlaces(unsigned int tid) {
 		// apply the rule
 		im.removeArcs(delid);
 		nodestamp[delid] = 0; // remove the node
-		facts.addChange(Facts::MARKING, delid, keepid, tokendiff);
-		facts.addChange(Facts::BOUNDED, delid, keepid);
-		if (im.isVisible(delid)) im.makeVisible(keepid);
+		map<Vertex,int> tmp;
+		tmp[delid] = 1;
+		tmp[NO_NODE] = -tokendiff;
+		facts.setMarking(tmp, keepid, 1);
+//		facts.setMarking(delid, keepid, tokendiff);
+		facts.setBounded(delid, keepid);
+		if (im.isVisible(delid) && im.isInvisible(keepid)) im.makeVisible(keepid);
 		if (tokens1>1 && tokens2>1)
 			facts.setStatus(Facts::SAFE, keepid, Facts::ISFALSE);
 		if (tokens1>1 || tokens2>1) {
 			facts.setStatus(Facts::SAFE, delid, Facts::ISFALSE);
 			facts.addFact(Facts::UNSAFE,false);
-		} else if (!tokendiff)
-			facts.addChange(Facts::SAFE, delid, keepid);
+		} else if (!tokendiff) {
+			facts.setSafe(delid, keepid);
+			if (!im.isInvisible(delid) && im.isInvisible(keepid)) im.makeVisible(keepid);
+		}
 
-		// mark surrounding area as changed
+		// mark surrounding area as changed and unlock nodes
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 
@@ -531,7 +458,7 @@ void Rules::parallelTransitions(unsigned int tid) {
 		printApply(PARTRANSITION,mainid,nodestamp);
 
 		// determine which transition to remove (depends on visibility)
-		bool removemain(im.isInvisible(mainid) || im.isPersistent(secid));
+		bool removemain(im.isInvisible(mainid));
 		unsigned int delid(removemain ? mainid : secid);
 		unsigned int keepid(removemain ? secid : mainid);
 
@@ -549,12 +476,11 @@ void Rules::parallelTransitions(unsigned int tid) {
 			facts.removeFact(Facts::ALTL);
 		if (im.getLabel(delid)!=im.getLabel(keepid))
 			facts.removeFact(Facts::BISIM);
-		facts.addChange(Facts::LIVE,delid,keepid);
-		if (im.isVisible(delid)) im.makeVisible(keepid);
+		facts.setLive(delid,keepid);
+		if (im.isVisible(delid) && im.isInvisible(keepid)) im.makeVisible(keepid);
 
-		// mark surrounding area as changed
+		// mark surrounding area as changed and unlock nodes
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 
@@ -614,7 +540,6 @@ void Rules::isolatedTransitions(unsigned int tid) {
 
         // check if we can delete the "outer" transition
 		bool flag(true);
-//		if (im.isPersistent(mit->first)) flag=false;
 		if (condition && im.isVisible(mit->first)) flag=false;
 		if (condition && im.getLabelVis(mit->first)>0 && samevislabel==0) flag=false;
 		if (conditio2 && im.getLabel(mit->first)>0 && samelabel==0) flag=false;
@@ -648,6 +573,9 @@ void Rules::equivalentPlaces(unsigned int tid) {
 	bool conditio3(facts.checkCondition(Facts::ALTL));
 	bool conditio4(facts.checkCondition(Facts::BISIM));
 	bool conditio5(facts.checkCondition(Facts::REVERSE));
+	bool conditio6(facts.checkCondition(Facts::LIVENESS | Facts::NONLIVE));
+	bool conditio7(facts.checkCondition(Facts::BOUNDEDNESS | Facts::UNBOUNDED));
+	bool conditio8(facts.checkCondition(Facts::SAFETY | Facts::UNSAFE));
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
@@ -661,7 +589,9 @@ void Rules::equivalentPlaces(unsigned int tid) {
 		// check for postset singleton edge and invisibility in formulas
 		// as well as IO
 		if (postp1.begin()->second != 1 || im.isIO(mainid) || im.isPersistent(mainid)
-			|| (conditio5 && tokens1>0) || (conditio2 && !im.isInvisible(mainid))) {
+			|| (conditio5 && tokens1>0) 
+			|| (conditio8 && im.isVisible(mainid) && tokens1<2)
+			|| ((conditio2 || conditio7) && !im.isInvisible(mainid))) {
 			im.unlock(mainid,EQUIVPLACE);
 			continue;
 		}
@@ -726,6 +656,9 @@ void Rules::equivalentPlaces(unsigned int tid) {
 				if (!im.isInvisible(mit->first)	|| !im.isInvisible(t1)) flag=true;
 				if (im.getLabel(t1)!=im.getLabel(mit->first)) flag=true;
 			}
+			if (conditio6) { // check if single transition liveness gets lost
+				if (!im.isInvisible(mit->first) || !im.isInvisible(t1)) flag=true;
+			}
 
 			// check if the transitions have the same pre- and postset (except for mainid, p2)
 			if (!flag) p2 = checkParallel(t1,mit->first,mainid);
@@ -737,15 +670,15 @@ void Rules::equivalentPlaces(unsigned int tid) {
 			// check if the transitions are parallel (except for mainid, p2)
 			if (flag || p2 == NO_NODE) continue;
 
-			// the place must be removable
-			if (conditio2 && !im.isInvisible(p2)) continue;
-			if (im.isIO(p2) || im.isPersistent(p2)) continue;
-
-			// check for simple edge from p2 to t2 and initial tokens
+			// the place must be removable among other things
+			// check also for simple edge from p2 to t2 and initial tokens
 			stampp2 = im.rdlock(p2);
 			tokens2 = im.getTokens(p2);
 			if (im.getPost(p2).size()==1 && im.getPost(p2)[mit->first]==1
+				&& !im.isIO(p2) && !im.isPersistent(p2)
 				&& (!conditio5 || tokens2==0)
+				&& (!conditio8 || im.isInvisible(p2) || tokens2>1)
+				&& ((!conditio2 && !conditio7) || im.isInvisible(p2))
 				&& ((tokens1>1 && tokens2>1) || !facts.checkCondition(Facts::UNSAFE))) break;
 			im.unlock(p2);
 		}
@@ -775,7 +708,7 @@ void Rules::equivalentPlaces(unsigned int tid) {
 		printApply(EQUIVPLACE,mainid,nodestamp);
 
 		// determine which transition to remove (depends on visibility)
-		bool removemain(im.isPersistent(p2) || im.isPersistent(t2));
+		bool removemain(im.isInvisible(mainid));
 
 		// construct path translation
 		facts.addFixedPath(removemain?t2:t1, Path(1,removemain?mainid:p2), false);
@@ -800,12 +733,12 @@ void Rules::equivalentPlaces(unsigned int tid) {
 		if (!removemain && im.isVisible(t2)) im.makeVisible(t1);
 		if (removemain && im.isVisible(mainid)) im.makeVisible(p2);
 		if (!removemain && im.isVisible(p2)) im.makeVisible(mainid);
-		facts.setStatus(Facts::LIVE, t1, Facts::UNKNOWN);
-		facts.setStatus(Facts::LIVE, t2, Facts::UNKNOWN);
+		facts.setStatus(Facts::LIVE, t1, Facts::UNUSABLE);
+		facts.setStatus(Facts::LIVE, t2, Facts::UNUSABLE);
 		set<Vertex> tmp;
 		tmp.insert(t1);
 		tmp.insert(t2);
-		facts.addChange(Facts::LIVE,tmp,removemain?t2:t1);
+		facts.setLive(tmp,removemain?t2:t1);
 		if (im.getLabelVis(t1)!=im.getLabelVis(t2))
 			facts.removeFact(Facts::ALTL | Facts::ALTLX);
 		if (im.getLabel(t1)==0 && im.getLabel(t2)!=0)
@@ -816,25 +749,27 @@ void Rules::equivalentPlaces(unsigned int tid) {
 			facts.removeFact(Facts::BISIM);
 		if (!im.isInvisible(mainid) || !im.isInvisible(p2))
 			facts.removeFact(Facts::CTL | Facts::CTLX | Facts::LTL | Facts::LTLX);
-		facts.setStatus(Facts::MARKING, mainid, Facts::UNKNOWN);
+		facts.setStatus(Facts::MARKING, mainid, Facts::UNUSABLE);
 		facts.setStatus(Facts::BOUNDED, removemain ? p2 : mainid, Facts::UNUSABLE);
 		facts.setStatus(Facts::SAFE, mainid, tokens1>1 ? Facts::ISFALSE : Facts::UNUSABLE);
-		facts.setStatus(Facts::MARKING, p2, Facts::UNKNOWN);
-//		facts.setStatus(Facts::BOUNDED, removemain ? mainid : p2, Facts::UNUSABLE);
+		facts.setStatus(Facts::MARKING, p2, Facts::UNUSABLE);
+		facts.setStatus(Facts::BOUNDED, removemain ? mainid : p2, Facts::UNUSABLE);
 		facts.setStatus(Facts::SAFE, p2, tokens2>1 ? Facts::ISFALSE : Facts::UNUSABLE);
 		set<Vertex> tmp2;
 		tmp2.insert(mainid);
 		tmp2.insert(p2);
-		facts.addChange(Facts::MARKING,tmp2,removemain?p2:mainid);
-		facts.addChange(Facts::BOUNDED,tmp2,removemain?p2:mainid);
+		map<Vertex,int> tmp3;
+		tmp3[mainid] = 1;
+		tmp3[p2] = 1;
+		facts.setMarking(tmp3,removemain?p2:mainid,1);
+		facts.setBounded(tmp2,removemain?p2:mainid);
 		if (tokens1>1 || tokens2>1)
 			facts.addFact(Facts::UNSAFE,false);
 		if (tokens1>0 || tokens2>0)
 			facts.removeFact(Facts::REVERSE);
 
-		// mark surrounding area as changed
+		// mark surrounding area as changed and unlock nodes
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 
@@ -851,13 +786,16 @@ void Rules::meldTransitions1(unsigned int tid) {
 	bool conditio3(facts.checkCondition(Facts::CTLX | Facts::LTLX));
 	bool conditio4(facts.checkCondition(Facts::BISIM));
 	bool conditio5(facts.checkCondition(Facts::REVERSE));
+	bool conditio6(facts.checkCondition(Facts::LIVENESS | Facts::NONLIVE));
+	bool conditio7(facts.checkCondition(Facts::BOUNDEDNESS | Facts::UNBOUNDED));
+	bool conditio8(facts.checkCondition(Facts::SAFETY | Facts::UNSAFE));
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
 	while (im.getFirstNode(mainid,tid,IMatrix::PL,MELDTRANS1,1,NODE_SET_LIMIT,1,1)) {
 
 		// check for invisibility in formulas
-		if (im.isPersistent(mainid) || (conditio3 && im.isVisible(mainid))) 
+		if (im.isPersistent(mainid) || ((conditio3 || conditio7) && im.isVisible(mainid))) 
 		{
 			im.unlock(mainid,MELDTRANS1);
 			continue;
@@ -877,7 +815,8 @@ void Rules::meldTransitions1(unsigned int tid) {
 		// or pre/postset are not disjoint, choose another place
 		if (mit!=prep1.end() || 
 			((conditio3 || conditio5) && tokens>=v) || 
-			(v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY)) ||
+			(v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY) && !facts.checkFact(Facts::UNSAFE)) ||
+			(conditio8 && tokens<2 && im.isVisible(mainid)) ||
 			!disjoint(prep1,postp1)) 
 		{
 			im.unlock(mainid,MELDTRANS1);
@@ -896,7 +835,8 @@ void Rules::meldTransitions1(unsigned int tid) {
 
 		// if the transition does not fulfill the prerequisites
 		bool flag(false);
-		if (postt1.empty() && facts.checkCondition(Facts::BOUNDEDNESS)) flag=true;
+		if (postt1.empty() && facts.checkCondition(Facts::BOUNDEDNESS) 
+			&& !facts.checkFact(Facts::UNBOUNDED)) flag=true;
 		if (pret1.size()>1 || pret1.begin()->first!=mainid) flag=true;
 		if (im.isPersistent(t1)) flag=true;
 		if (condition && im.getLabelVis(t1)) flag=true;
@@ -923,18 +863,28 @@ void Rules::meldTransitions1(unsigned int tid) {
 		set<Vertex> tmp;
 		for(mit=prep1.begin(); mit!=prep1.end(); ++mit)
 			tmp.insert(mit->first);
-		facts.addChange(Facts::LIVE,t1,tmp);
-		if (tokens>=v)
-			for(mit=postt1.begin(); mit!=postt1.end(); ++mit)
-				facts.setStatus(Facts::MARKING,mit->first,im.isInvisible(mit->first)?Facts::UNUSABLE:Facts::UNKNOWN); // ???
-		facts.setStatus(Facts::MARKING,mainid,Facts::UNKNOWN);
-		facts.setStatus(Facts::BOUNDED,mainid,Facts::UNKNOWN);
+		facts.setLive(t1,tmp);
+		if (conditio6 && !im.isInvisible(t1)) {
+			for(mit=prep1.begin(); mit!=prep1.end(); ++mit)
+				if (im.isInvisible(mit->first)) im.makeVisible(mit->first);
+		}
+		for(mit=postt1.begin(); mit!=postt1.end(); ++mit) {
+			if (tokens>=v) 
+				facts.setStatus(Facts::MARKING,mit->first,Facts::UNUSABLE);
+			map<Vertex,int> tmp2;
+			tmp2[mit->first] = v;
+			tmp2[mainid] = mit->second;
+			tmp2[NO_NODE] = (tokens%v) * mit->second;
+			facts.setMarking(tmp2, mit->first, v);
+		}
+		facts.setStatus(Facts::MARKING,mainid,Facts::UNUSABLE);
+		facts.setStatus(Facts::BOUNDED,mainid,Facts::UNUSABLE);
 		if (tokens>1) {
 			facts.setStatus(Facts::SAFE,mainid,Facts::ISFALSE);
 			facts.addFact(Facts::UNSAFE,false);
-		}
+		} else facts.setStatus(Facts::SAFE,mainid,Facts::UNUSABLE);
 		for(mit=prep1.begin(); mit!=prep1.end(); ++mit)
-			facts.addPath(mit->first, deque<Vertex>(mit->second/v,t1), false);
+			facts.addPath(mit->first, Path(mit->second/v,t1), false);
 		facts.setStatus(Facts::PATH,t1,Facts::UNUSABLE);
 		if (postt1.empty())
 			facts.removeFact(Facts::BOUNDEDNESS);
@@ -971,20 +921,23 @@ void Rules::meldTransitions1(unsigned int tid) {
 */
 void Rules::meldTransitions2(unsigned int tid) {
 	// the rule will destroy state-based next-operators
-	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
+	if (facts.checkCondition(Facts::CTL | Facts::LTL | Facts::INVARIANT)) return;
 
 	// conditions that need to be checked later
 	bool condition(facts.checkCondition(Facts::ALTL | Facts::ALTLX));
 	bool conditio2(facts.checkCondition(Facts::ALTL));
 	bool conditio3(facts.checkCondition(Facts::CTLX | Facts::LTLX));
 	bool conditio4(facts.checkCondition(Facts::BISIM));
+	bool conditio5(facts.checkCondition(Facts::LIVENESS | Facts::NONLIVE));
+	bool conditio6(facts.checkCondition(Facts::BOUNDEDNESS | Facts::UNBOUNDED));
+	bool conditio7(facts.checkCondition(Facts::SAFETY | Facts::UNSAFE));
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
 	while (im.getFirstNode(mainid,tid,IMatrix::PL,MELDTRANS2,1,1,1,NODE_SET_LIMIT)) {
 
 		// check for invisibility in formulas
-		if (im.isPersistent(mainid) || (conditio3 && im.isVisible(mainid))) 
+		if (im.isPersistent(mainid) || ((conditio3 || conditio6) && im.isVisible(mainid))) 
 		{
 			im.unlock(mainid,MELDTRANS2);
 			continue;
@@ -1004,7 +957,8 @@ void Rules::meldTransitions2(unsigned int tid) {
 		// or pre/postset are not disjoint, choose another place
 		if (mit!=postp1.end() || 
 			tokens>=v || 
-			(v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY)) ||
+			(v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY) && !facts.checkFact(Facts::UNSAFE)) ||
+			(tokens<2 && conditio7 && im.isVisible(mainid)) ||
 			!disjoint(prep1,postp1)) 
 		{
 			im.unlock(mainid,MELDTRANS2);
@@ -1029,10 +983,11 @@ void Rules::meldTransitions2(unsigned int tid) {
 			if (conditio4 && (!im.isInvisible(mit->first) || im.getLabel(mit->first))) break;
 			im.unlock(mit->first);
 		}
-		if ((flag2 && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
-			if (mit!=postp1.end()) im.unlock(mit->first);
-			im.unlock(mainid,MELDTRANS2);
-			continue;
+		if ((flag2 && facts.checkCondition(Facts::BOUNDEDNESS) && !facts.checkFact(Facts::UNBOUNDED)) 
+			|| mit!=postp1.end()) {
+				if (mit!=postp1.end()) im.unlock(mit->first);
+				im.unlock(mainid,MELDTRANS2);
+				continue;
 		}
 
 		// check the pre-transition of mainid
@@ -1062,13 +1017,24 @@ void Rules::meldTransitions2(unsigned int tid) {
 
 		// path modifications
 		for(mit=postp1.begin(); mit!=postp1.end(); ++mit)
-			facts.addPath(mit->first, deque<Vertex>(1,t1));
+			facts.addPath(mit->first, Path(1,t1));
 		facts.setStatus(Facts::PATH,t1,Facts::UNUSABLE);
+
+		// marking invariant projection
+		Map& pret1(im.getPre(t1));
+		for(mit=pret1.begin(); mit!=pret1.end(); ++mit) {
+			map<Vertex,int> tmp2;
+			tmp2[mit->first] = v;
+			tmp2[mainid] = mit->second;
+			tmp2[NO_NODE] = tokens * mit->second;
+			facts.setMarking(tmp2, mit->first, v);
+		}
 
 		// apply the rule
 		Vertex save(postp1.begin()->first);
 		for(mit=postp1.begin(); mit!=postp1.end(); ++mit)
 		{
+			if (!im.isInvisible(mit->first)) save=mit->first;
 			im.addPre(t1,mit->first,1);
 			im.addPost(t1,mit->first,1);
 		}
@@ -1085,172 +1051,20 @@ void Rules::meldTransitions2(unsigned int tid) {
 			facts.removeFact(Facts::ALTL | Facts::BISIM);
 		if (!im.isInvisible(mainid))
 			facts.removeFact(Facts::CTLX | Facts::LTLX);
-		facts.setStatus(Facts::MARKING,mainid,Facts::UNKNOWN);
-		facts.setStatus(Facts::BOUNDED,mainid,Facts::UNKNOWN);
-		facts.addChange(Facts::LIVE,t1,save);
-		if (im.isVisible(t1)) im.makeVisible(save);
+		facts.setStatus(Facts::MARKING,mainid,Facts::UNUSABLE);
+		facts.setStatus(Facts::BOUNDED,mainid,Facts::UNUSABLE);
+		facts.setLive(t1,save);
+		if (conditio5 && im.isVisible(t1) && im.isInvisible(save)) 
+			im.makeVisible(save);
 		if (tokens>1) {
 			facts.setStatus(Facts::SAFE,mainid,Facts::ISFALSE);
 			facts.addFact(Facts::UNSAFE,false);
-		}
+		} else facts.setStatus(Facts::SAFE,mainid,Facts::UNUSABLE);
 		if (flag2)
 			facts.removeFact(Facts::BOUNDEDNESS);
 
-		// mark surrounding area as changed
+		// mark surrounding area as changed and unlock nodes
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
-	}
-}
-
-/** Starke's rule 5, n=2, k=2, no new transitions: Melding of preset (size 2) and postset (size 2) of one place
-    @param The ID of the calling thread
-*/
-void Rules::meldTransitions3(unsigned int tid) {
-	// the rule will destroy state-based next-operators
-	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
-
-	// conditions that need to be checked later
-	bool condition(facts.checkCondition(Facts::ALTL | Facts::ALTLX));
-	bool conditio2(facts.checkCondition(Facts::ALTL));
-	bool conditio3(facts.checkCondition(Facts::CTLX | Facts::LTLX));
-	bool conditio4(facts.checkCondition(Facts::BISIM));
-
-	// find a starting place "mainid" for the rule if possible
-	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,tid,IMatrix::PL,MELDTRANS3,2,2,2,2)) {
-
-		// check for invisibility in formulas
-		if (im.isPersistent(mainid) || (conditio3 && im.isVisible(mainid))) 
-		{
-			im.unlock(mainid,MELDTRANS3);
-			continue;
-		}
-
-		// get pre/postset of mainid, weight of the preset edge, and token number
-	    Map& postp1(im.getPost(mainid));
-		Map& prep1(im.getPre(mainid));
-		unsigned int v(prep1.begin()->second);
-		unsigned int tokens(im.getTokens(mainid));
-
-		// all pre/postset edges must have v as weight
-		// if not, or if state-based logic would get hurt,
-		// or pre/postset are not disjoint, choose another place
-		if (prep1.rbegin()->second!=v || postp1.begin()->second!=v
-			|| postp1.rbegin()->second!=v || tokens>=v 
-			|| (v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY))
-			|| !disjoint(prep1,postp1)) 
-		{
-			im.unlock(mainid,MELDTRANS3);
-			continue;
-		}
-
-		// save the timestamp of mainid
-		Map nodestamp;
-		nodestamp[mainid] = im.getTimeStamp(mainid);
-
-		// get info about the postset transitions
-		bool flag(true); // if all transitions have empty postsets
-		Map::iterator mit;
-		for(mit=postp1.begin(); mit!=postp1.end(); ++mit)
-		{
-			nodestamp[mit->first] = im.rdlock(mit->first);
-			if (im.getPre(mit->first).size()>1) break;
-			if (!im.getPost(mit->first).empty()) flag=false;
-			if (im.isPersistent(mit->first)) break;
-			if (condition && im.getLabelVis(mit->first)) break;
-			if (condition && !im.isInvisible(mit->first)) break;
-			if (conditio2 && im.getLabel(mit->first)) break;
-			if (conditio4 && (!im.isInvisible(mit->first) || im.getLabel(mit->first))) break;
-			collectNeighbors(mit->first,nodestamp);
-			im.unlock(mit->first);
-		}
-		if ((flag && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
-			if (mit!=postp1.end()) im.unlock(mit->first);
-			im.unlock(mainid,MELDTRANS3);
-			continue;
-		}
-
-		// get info about the preset transitions
-		for(mit=prep1.begin(); mit!=prep1.end(); ++mit)
-		{
-			nodestamp[mit->first] = im.rdlock(mit->first);
-			if (im.isPersistent(mit->first)) break;
-			if ((condition || conditio4) && !im.isInvisible(mit->first)) break;
-			collectNeighbors(mit->first,nodestamp);
-			im.unlock(mit->first);
-		}
-		if (mit!=prep1.end()) {
-			im.unlock(mit->first);
-			im.unlock(mainid,MELDTRANS3);
-			continue;
-		}
-		im.unlock(mainid);
-
-		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp,tid)) continue;
-		printApply(MELDTRANS3,mainid,nodestamp);
-
-		// new names for the four surrounding transitions
-		Vertex t1(prep1.begin()->first);
-		Vertex t2(prep1.rbegin()->first);
-		Vertex t3(postp1.begin()->first);
-		Vertex t4(postp1.rbegin()->first);
-
-		// path modifications: t4->t2t4 t1->t1t3 t2->t2t3 t3->t1t4
-		deque<Vertex> dtmp(1,t1);
-		dtmp.push_back(t4);
-		dtmp = facts.getPath(dtmp); // save value for t1t4
-		facts.addPath(t4,deque<Vertex>(1,t2));
-		facts.addPath(t1,deque<Vertex>(1,t3),false);
-		facts.addPath(t2,deque<Vertex>(1,t3),false);
-		facts.setPath(t3,dtmp);
-
-		// apply the rule
-		im.removeArcs(mainid);
-		nodestamp[mainid] = 0; // remove the place
-		im.addPre(t1,t3,1);
-		im.addPre(t2,t4,1);
-		Map postt3(im.getPost(t3)); // copy postset of t3 before deleting
-		im.removePost(t3);
-		im.addPost(t4,t3,1);
-		im.addPost(t1,t3,1);
-		im.addPost(t2,t4,1);
-		im.addPost(postt3,t1,1);
-		im.addPost(postt3,t2,1);
-
-        // change properties
-		facts.removeFact(Facts::CTL | Facts::LTL);
-		if (!im.isInvisible(t1) || !im.isInvisible(t2) 
-			|| !im.isInvisible(t3) || !im.isInvisible(t4)
-			|| im.getLabelVis(t3) || im.getLabelVis(t4))
-			facts.removeFact(Facts::ALTL | Facts::ALTLX | Facts::BISIM);
-		else if (im.getLabel(t3) || im.getLabel(t4))
-			facts.removeFact(Facts::ALTL | Facts::BISIM);
-		if (!im.isInvisible(mainid))
-			facts.removeFact(Facts::CTLX | Facts::LTLX);
-		facts.setStatus(Facts::MARKING,mainid,Facts::UNKNOWN);
-		facts.setStatus(Facts::BOUNDED,mainid,Facts::UNKNOWN);
-		im.setLabel(t3,im.getLabel(t1));
-		im.setLabel(t4,im.getLabel(t2));
-		set<Vertex> tmp,tmp2;
-		tmp.insert(t1);
-		tmp.insert(t2);
-		facts.addChange(Facts::LIVE,t3,tmp);
-		if (im.isVisible(t3)) { im.makeVisible(t1); im.makeVisible(t2); }
-		tmp2.insert(t3);
-		tmp2.insert(t4);
-		facts.addChange(Facts::LIVE,t4,tmp2);
-		if (im.isVisible(t4)) { im.makeVisible(t3); im.makeVisible(t4); }
-		if (tokens>1) {
-			facts.setStatus(Facts::SAFE,mainid,Facts::ISFALSE);
-			facts.addFact(Facts::UNSAFE,false);
-		}
-		if (flag)
-			facts.removeFact(Facts::BOUNDEDNESS);
-
-		// mark surrounding area as changed
-		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 
@@ -1268,6 +1082,8 @@ void Rules::meldTransitions4(unsigned int tid) {
 	bool conditio2(facts.checkCondition(Facts::ALTL));
 	bool conditio3(facts.checkCondition(Facts::CTLX | Facts::LTLX));
 	bool conditio4(facts.checkCondition(Facts::BISIM));
+	bool conditio5(facts.checkCondition(Facts::LIVENESS | Facts::NONLIVE));
+	bool conditio6(facts.checkCondition(Facts::SAFETY | Facts::UNSAFE));
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
@@ -1294,7 +1110,8 @@ void Rules::meldTransitions4(unsigned int tid) {
 		// or pre/postset are not disjoint, choose another place
 		if (mit!=postp1.end()
 			|| tokens>=v 
-			|| (v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY))
+			|| (v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY) && !facts.checkFact(Facts::UNSAFE))
+			|| (tokens<2 && conditio6 && im.isVisible(mainid))
 			|| !disjoint(prep1,postp1)) 
 		{
 			im.unlock(mainid,MELDTRANS4);
@@ -1313,11 +1130,11 @@ void Rules::meldTransitions4(unsigned int tid) {
 
 		// if the transition does not fulfill the prerequisites
 		bool flag(false);
-		if (pret1.empty() && facts.checkCondition(Facts::BOUNDEDNESS)) flag=true;
+		if (pret1.empty()) flag=true;
 		if (im.getPost(t1).size()>1) flag=true;
 		if (im.isPersistent(t1)) flag=true;
 		if (condition && im.getLabelVis(t1)) flag=true;
-		if (condition && !im.isInvisible(t1)) flag=true;
+		if ((condition || conditio5) && !im.isInvisible(t1)) flag=true;
 		if (conditio2 && im.getLabel(t1)) flag=true;
 		if (conditio4 && (!im.isInvisible(t1) || im.getLabel(t1))) flag=true;
 		if (flag) {
@@ -1349,7 +1166,7 @@ void Rules::meldTransitions4(unsigned int tid) {
 
 		// path modifications
 		for(mit=postp1.begin(); mit!=postp1.end(); ++mit)
-			facts.addPath(mit->first, deque<Vertex>(1,t1));
+			facts.addPath(mit->first, Path(1,t1));
 		facts.setStatus(Facts::PATH, t1, Facts::UNUSABLE);
 
         // change properties
@@ -1360,25 +1177,27 @@ void Rules::meldTransitions4(unsigned int tid) {
 			facts.removeFact(Facts::ALTL | Facts::BISIM);
 		if (!im.isInvisible(mainid))
 			facts.removeFact(Facts::CTLX | Facts::LTLX);
+		// the place is unbounded if all pre-places are unbounded
 		set<Vertex> tmp;
 		for(mit=pret1.begin(); mit!=pret1.end(); ++mit) {
 			tmp.insert(mit->first);
-			if (im.isVisible(mainid)) im.makeVisible(mit->first);
+			if (im.isVisible(mainid) && im.isInvisible(mit->first)) im.makeVisible(mit->first);
 		}
-		facts.addChange(Facts::BOUNDED,mainid,tmp);
-		facts.setStatus(Facts::MARKING,mainid,Facts::UNKNOWN);
+		facts.setBounded(mainid,tmp);
+		facts.setStatus(Facts::MARKING,mainid,Facts::UNUSABLE);
+		// marking invariant projection
+		for(mit=pret1.begin(); mit!=pret1.end(); ++mit) {
+			map<Vertex,int> tmp2;
+			tmp2[mit->first] = v;
+			tmp2[mainid] = mit->second;
+			tmp2[NO_NODE] = tokens * mit->second;
+			facts.setMarking(tmp2, mit->first, v);
+		}
+		// safety cannot be inherited, but possibly decided
 		if (tokens>1) {
 			facts.setStatus(Facts::SAFE, mainid, Facts::ISFALSE);
 			facts.addFact(Facts::UNSAFE,false);
-		}
-		set<Vertex> tmp2;
-		for(mit=postp1.begin(); mit!=postp1.end(); ++mit) {
-			tmp2.insert(mit->first);
-			if (im.isVisible(t1)) im.makeVisible(mit->first);
-		}
-		facts.addChange(Facts::LIVE,t1,tmp2);
-		if (pret1.empty())
-			facts.removeFact(Facts::BOUNDEDNESS);
+		} else facts.setStatus(Facts::SAFE, mainid, Facts::UNUSABLE);
 
 		// apply the rule
 		for(mit=postp1.begin(); mit!=postp1.end(); ++mit)
@@ -1388,9 +1207,8 @@ void Rules::meldTransitions4(unsigned int tid) {
 		nodestamp[mainid] = 0; // remove the place
 		nodestamp[t1] = 0; // remove the transition
 
-		// mark surrounding area as changed
+		// mark surrounding area as changed and unlock nodes
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 
@@ -1399,20 +1217,23 @@ void Rules::meldTransitions4(unsigned int tid) {
 */
 void Rules::meldTransitions5(unsigned int tid) {
 	// the rule will destroy state-based next-operators
-	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
+	if (facts.checkCondition(Facts::CTL | Facts::LTL | Facts::INVARIANT)) return;
 
 	// conditions that need to be checked later
 	bool condition(facts.checkCondition(Facts::ALTL | Facts::ALTLX));
 	bool conditio2(facts.checkCondition(Facts::ALTL));
 	bool conditio3(facts.checkCondition(Facts::CTLX | Facts::LTLX));
 	bool conditio4(facts.checkCondition(Facts::BISIM));
+	bool conditio5(facts.checkCondition(Facts::LIVENESS | Facts::NONLIVE));
+	bool conditio6(facts.checkCondition(Facts::BOUNDEDNESS | Facts::UNBOUNDED));
+	bool conditio7(facts.checkCondition(Facts::SAFETY | Facts::UNSAFE));
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
 	while (im.getFirstNode(mainid,tid,IMatrix::PL,MELDTRANS5,2,NODE_SET_LIMIT,2,NODE_SET_LIMIT)) {
 
 		// check for invisibility in formulas
-		if (im.isPersistent(mainid) || (conditio3 && im.isVisible(mainid))) 
+		if (im.isPersistent(mainid) || ((conditio3 || conditio6) && im.isVisible(mainid))) 
 		{
 			im.unlock(mainid,MELDTRANS5);
 			continue;
@@ -1435,7 +1256,8 @@ void Rules::meldTransitions5(unsigned int tid) {
 				if (mit->second != v) break;
 		if (mit!=postp1.end() || 
 			tokens>=v || 
-			(v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY)) ||
+			(v>1 && tokens<2 && facts.checkCondition(Facts::SAFETY) && !facts.checkFact(Facts::UNSAFE)) ||
+			(tokens<2 && conditio7 && im.isVisible(mainid)) ||
 			!disjoint(prep1,postp1)) 
 		{
 			im.unlock(mainid,MELDTRANS5);
@@ -1461,10 +1283,11 @@ void Rules::meldTransitions5(unsigned int tid) {
 			collectNeighbors(mit->first,nodestamp);
 			im.unlock(mit->first);
 		}
-		if ((flag && facts.checkCondition(Facts::BOUNDEDNESS)) || mit!=postp1.end()) {
-			if (mit!=postp1.end()) im.unlock(mit->first);
-			im.unlock(mainid,MELDTRANS5);
-			continue;
+		if ((flag && facts.checkCondition(Facts::BOUNDEDNESS) && !facts.checkFact(Facts::UNBOUNDED)) 
+			|| mit!=postp1.end()) {
+				if (mit!=postp1.end()) im.unlock(mit->first);
+				im.unlock(mainid,MELDTRANS5);
+				continue;
 		}
 
 		// get info about the preset transitions
@@ -1513,25 +1336,26 @@ void Rules::meldTransitions5(unsigned int tid) {
 		{
 			im.setName(*sit,im.getName(mit->first)+"_"+im.getName(mit2->first));
 			im.setLabel(*sit,im.getLabel(mit->first));
+			if (im.isVisible(mit->first) || im.isVisible(mit2->first))
+				im.makeVisible(*sit);
 			im.addPre(mit->first,*sit,1);
 			im.addPost(mit->first,*sit,1);
 			im.addPost(mit2->first,*sit,1);
-			facts.setPath(*sit, Path());
-			facts.addPath(*sit, Path(1,mit2->first));
+//			facts.setPath(*sit, Path());
+			facts.addPath(*sit, Path(1,mit2->first), true, true);
 			facts.addPath(*sit, Path(1,mit->first));
-			if (mit2==postp1.begin()) {
-				facts.addChange(Facts::LIVE,mit->first,*sit);
-				if (im.isVisible(mit->first)) im.makeVisible(*sit);
-			}
+			if (mit2==postp1.begin())
+				facts.setLive(mit->first,*sit);
 			if (mit==prep1.begin()) {
-				facts.addChange(Facts::LIVE,mit2->first,precollection);
+				set<Vertex> tmp(precollection);
+				facts.setLive(mit2->first,tmp);
 				makevis = true;
 			}
 			if (++mit == prep1.end()) { mit = prep1.begin(); ++mit2; }
 		}
-		if (makevis)
+		if (makevis && conditio5)
 			for(set<Vertex>::iterator sit=precollection.begin(); sit!=precollection.end(); ++sit)
-				im.makeVisible(*sit);
+				if (im.isInvisible(*sit)) im.makeVisible(*sit);
 
 		// check other facts
 		facts.removeFact(Facts::CTL | Facts::LTL);
@@ -1550,13 +1374,13 @@ void Rules::meldTransitions5(unsigned int tid) {
 		if (!im.isInvisible(mainid))
 			facts.removeFact(Facts::CTLX | Facts::LTLX);
 
-		facts.setStatus(Facts::MARKING,mainid,Facts::UNKNOWN);
-		facts.setStatus(Facts::BOUNDED,mainid,Facts::UNKNOWN);
+		facts.setStatus(Facts::MARKING,mainid,Facts::UNUSABLE);
+		facts.setStatus(Facts::BOUNDED,mainid,Facts::UNUSABLE);
 
 		if (tokens>1) {
 			facts.setStatus(Facts::SAFE, mainid, Facts::ISFALSE);
 			facts.addFact(Facts::UNSAFE,false);
-		}
+		} else facts.setStatus(Facts::SAFE, mainid, Facts::UNUSABLE);
 
 		if (flag)
 			facts.removeFact(Facts::BOUNDEDNESS);
@@ -1575,9 +1399,8 @@ void Rules::meldTransitions5(unsigned int tid) {
 			facts.setStatus(Facts::PATH,mit->first,Facts::UNUSABLE);
 		}
 		
-		// mark surrounding area as changed
+		// mark surrounding area as changed and unlock nodes
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 
@@ -1643,8 +1466,10 @@ void Rules::loopPlace(unsigned int tid) {
 					facts.setStatus(Facts::LIVE, mit->first, Facts::ISTRUE);
 				}
 			}
-		set<Vertex> tmp;
-		facts.addChange(Facts::MARKING,mainid,tmp,tokens);
+//		set<Vertex> tmp;
+//		facts.setMarking(mainid,tmp,tokens);
+		map<Vertex,int> tmp;
+		facts.setMarking(tmp,mainid,tokens);
 		facts.setStatus(Facts::BOUNDED,mainid,Facts::ISTRUE);
 		if (tokens>1) {
 			facts.setStatus(Facts::SAFE, mainid, Facts::ISFALSE);
@@ -1661,7 +1486,85 @@ void Rules::loopPlace(unsigned int tid) {
 	}
 }
 
-/** Starke's rule 8: A looping transition may be removed if there is another transition with equal or larger preset (regarding arc weights)
+/** Starke's rule 7 extended: A place on which all transitions loop. Place is removed together with dead neighbors.
+    @param The ID of the calling thread
+*/
+void Rules::loopPlace2(unsigned int tid) {
+	// Starke Rule 7 extended
+
+	// conditions that need to be checked later
+	bool condition(facts.checkCondition(Facts::ALTL | Facts::ALTLX));
+	bool conditio2(facts.checkCondition(Facts::ALTL));
+	bool conditio3(facts.checkCondition(Facts::CTL | Facts::LTL));
+
+	// find a starting place "mainid" for the rule if possible
+	Vertex mainid(NO_NODE);
+	while (im.getFirstNode(mainid,tid,IMatrix::PL,LOOPPLACE,1,NODE_SET_LIMIT,1,NODE_SET_LIMIT)) {
+
+		// get pre/postset of mainid, weight of the preset edge, and token number
+	    Map& postp1(im.getPost(mainid));
+		Map& prep1(im.getPre(mainid));
+		unsigned int tokens(im.getTokens(mainid));
+
+		// save the timestamp of mainid
+		Map nodestamp;
+		nodestamp[mainid] = im.getTimeStamp(mainid);
+
+		// all edges must be loops, if weight > tokens, the transition is dead
+		Map::iterator mit,mit2;
+		bool flag(false);
+		for(mit=postp1.begin(),mit2=prep1.begin(); mit!=postp1.end()&&mit2!=prep1.end(); ++mit,++mit2)
+		{
+			if (mit->first!=mit2->first || mit->second!=mit2->second) break;
+			nodestamp[mit->first] = im.rdlock(mit->first);
+			bool flag(false);
+			if (tokens < mit->second) {
+				collectNeighbors(mit->first,nodestamp);
+				if (im.isPersistent(mit->first)) flag=true;
+			}
+			im.unlock(mit->first);
+		}
+		if (mit!=postp1.end() || mit2!=prep1.end() || flag || im.isPersistent(mainid))
+		{
+			im.unlock(mainid,LOOPPLACE);
+			continue;
+		}
+
+		im.unlock(mainid);
+
+		// get write-locks and check all time-stamps
+		if (!im.wrlock(nodestamp,tid)) continue;
+		printApply(LOOPPLACE,mainid,nodestamp);
+
+		// delete dead transitions
+		for(mit=postp1.begin(); mit!=postp1.end(); ++mit)
+			if (tokens < mit->second) {
+				im.removeArcs(mit->first);
+				nodestamp[mit->first] = 0; // delete dead transition
+				facts.addFact(Facts::NONLIVE,false);
+				facts.setStatus(Facts::LIVE, mit->first, Facts::ISFALSE);
+				facts.setStatus(Facts::PATH, mit->first, Facts::UNUSABLE);
+			}
+
+		// change properties
+//		set<Vertex> tmp;
+//		facts.setMarking(mainid,tmp,tokens);
+		map<Vertex,int> tmp;
+		facts.setMarking(tmp,mainid,tokens);
+		facts.setStatus(Facts::BOUNDED,mainid,Facts::ISTRUE);
+		facts.setStatus(Facts::SAFE, mainid, tokens>1 ? Facts::ISFALSE : Facts::ISTRUE);
+		if (tokens>1) facts.addFact(Facts::UNSAFE,false);
+
+		// apply the rule
+		im.removeArcs(mainid);
+		nodestamp[mainid] = 0; // remove the place
+
+		// mark surrounding area as changed and unlock nodes
+		im.propagateChange(nodestamp);
+	}
+}
+
+/** Starke's rule 8 extended: A looping transition may be removed
     @param The ID of the calling thread
 */
 void Rules::loopTransition(unsigned int tid) {
@@ -1673,15 +1576,16 @@ void Rules::loopTransition(unsigned int tid) {
 	bool conditio2(facts.checkCondition(Facts::ALTL));
 	bool conditio3(facts.checkCondition(Facts::BISIM));
 	bool conditio4(facts.checkCondition(Facts::LIVENESS));
+	bool conditio5(facts.checkCondition(Facts::LIVENESS | Facts::NONLIVE));
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,tid,IMatrix::TR,LOOPTRANS,0,NODE_SET_LIMIT,0,NODE_SET_LIMIT)) {
+	while (im.getFirstNode(mainid,tid,IMatrix::TR,LOOPTRANS,1,NODE_SET_LIMIT,1,NODE_SET_LIMIT)) {
 
 		if (im.isPersistent(mainid)
 			|| (condition && im.getLabelVis(mainid))
 			|| (conditio2 && im.getLabel(mainid))
-			|| (condition && im.isVisible(mainid))
+			|| ((condition || conditio5) && im.isVisible(mainid))
 			|| (conditio3 && (im.isVisible(mainid) || im.getLabel(mainid))))
 		{
 			im.unlock(mainid,LOOPTRANS);
@@ -1733,9 +1637,11 @@ void Rules::loopTransition(unsigned int tid) {
 			im.unlock(mainid);
 		}
 		im.unlock(p);
-		if (!contained && facts.checkCondition(Facts::LIVENESS)) {
-			im.setMode(mainid,LOOPTRANS);
-			continue;
+		if (!contained 
+			&& facts.checkCondition(Facts::LIVENESS) 
+			&& !facts.checkFact(Facts::NONLIVE)) {
+				im.setMode(mainid,LOOPTRANS);
+				continue;
 		}
 
 		// get write-locks and check all time-stamps
@@ -1752,130 +1658,10 @@ void Rules::loopTransition(unsigned int tid) {
 			facts.removeFact(Facts::ALTL | Facts::ALTLX | Facts::BISIM);
 		else if (im.getLabel(mainid))
 			facts.removeFact(Facts::ALTL | Facts::BISIM);
-		facts.setStatus(Facts::LIVE,mainid,Facts::UNKNOWN);
-		// mark surrounding area as changed
+		facts.setStatus(Facts::LIVE,mainid,Facts::UNUSABLE);
+
+		// mark surrounding area as changed and unlock nodes
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
-	}
-}
-
-/** Starke's rule 9 (corrected version)
-    @param The ID of the calling thread
-*/
-void Rules::meldPlaces(unsigned int tid) {
-	// the rule will ruin next in CTL/LTL
-	if (facts.checkCondition(Facts::CTL | Facts::LTL)) return;
-
-	// conditions that need to be checked later
-	bool condition(facts.checkCondition(Facts::ALTL | Facts::ALTLX));
-	bool conditio2(facts.checkCondition(Facts::ALTL));
-	bool conditio3(facts.checkCondition(Facts::CTLX | Facts::LTLX));
-	bool conditio4(facts.checkCondition(Facts::BISIM));
-	bool conditio5(facts.checkCondition(Facts::REVERSE));
-
-	// find a starting place "mainid" for the rule if possible
-	Vertex mainid(NO_NODE);
-	while (im.getFirstNode(mainid,tid,IMatrix::PL,MELDPLACE,1,NODE_SET_LIMIT,1,1)) {
-
-		// can the place be removed?
-		if (im.isPersistent(mainid)	|| (conditio3 && im.isVisible(mainid))) {
-			im.unlock(mainid,MELDPLACE);
-			continue;
-		}
-
-		// get pre/postset of mainid, weight of the preset edge, and token number
-	    Map& postp1(im.getPost(mainid));
-		Map& prep1(im.getPre(mainid));
-		unsigned int tokens(im.getTokens(mainid));
-
-		// save the timestamp of mainid
-		Map nodestamp;
-		nodestamp[mainid] = im.getTimeStamp(mainid);
-
-		// get the following transition
-		Vertex t1(postp1.begin()->first);
-		nodestamp[t1] = im.rdlock(t1);
-		Map& postt1(im.getPost(t1));
-		Map& pret1(im.getPre(t1));
-
-		// if we have the wrong connectivity or the transition is irremovable
-		// These criteria must hold:
-		// 1) mainid notin t1 F
-		// 2) F t1 = {mainid}
-		// 3) t1 F not empty
-		// 4) mainid F = {t1}
-		// 5) F(mainid,t1) = 1
-		// 6) For ALTL-X: t1 not in formula
-		// 7) for ALTL: t1 not labelled
-		// 8) For C/LTL-X: no need to fire t1
-		if (postt1.find(mainid)!=postt1.end() || pret1.size()!=1
-		|| postt1.size()==0 || postp1.size()!=1 || postp1[t1]!=1
-		|| im.isPersistent(t1)
-		|| (condition && (im.getLabelVis(t1) || im.isVisible(t1)))
-		|| (conditio2 && im.getLabel(t1))
-		|| ((conditio3 || conditio5) && tokens>0)
-		|| (conditio4 && (im.isVisible(t1) || im.getLabel(t1)))) {
-			im.unlock(t1);
-			im.unlock(mainid,MELDPLACE);
-			continue;
-		}
-
-		collectNeighbors(mainid,nodestamp);
-		collectNeighbors(t1,nodestamp);
-		im.unlock(t1);
-		im.unlock(mainid);
-
-		// get write-locks and check all time-stamps
-		if (!im.wrlock(nodestamp,tid)) continue;
-		printApply(MELDPLACE,mainid,nodestamp);
-
-		// deduce properties
-		facts.removeFact(Facts::CTL | Facts::LTL);
-		if (im.isVisible(mainid) || tokens>0)
-			facts.removeFact(Facts::CTLX | Facts::LTLX);
-		if (im.getLabelVis(t1) || im.isVisible(t1))
-			facts.removeFact(Facts::ALTL | Facts::ALTLX | Facts::BISIM);
-		else if (im.getLabel(t1))
-			facts.removeFact(Facts::ALTL | Facts::BISIM);
-		if (tokens>0)
-			facts.removeFact(Facts::REVERSE);
-		set<Vertex> tmp;
-		Map::iterator mit;
-		for(mit=prep1.begin(); mit!=prep1.end(); ++mit) {
-			tmp.insert(mit->first);
-			if (im.isVisible(t1)) im.makeVisible(mit->first);
-		}
-		facts.addChange(Facts::LIVE,t1,tmp);
-		facts.setStatus(Facts::MARKING,mainid,Facts::UNKNOWN);
-		facts.setStatus(Facts::BOUNDED,mainid,Facts::UNKNOWN);
-		if (tokens>1) {
-			facts.setStatus(Facts::SAFE, mainid, Facts::ISFALSE);
-			facts.addFact(Facts::UNSAFE,false);
-		}
-		Map::iterator mit1,mit2;
-		if (tokens>0)
-			for(mit1=postt1.begin(); mit1!=postt1.end(); ++mit1)
-				facts.setStatus(Facts::MARKING,mit1->first,Facts::UNUSABLE);
-		for(mit1=postt1.begin(); mit1!=postt1.end(); ++mit1)
-			facts.addPath(mit1->first, Path(mit1->second, mainid));
-
-		// apply the rule
-		while (im.fire(t1))
-			facts.addPath(NO_NODE, Path(1,t1), false); 
-		for(mit1=prep1.begin(); mit1!=prep1.end(); ++mit1)
-			for(mit2=postt1.begin(); mit2!=postt1.end(); ++mit2)
-			{
-				im.getPost(mit1->first)[mit2->first] += mit1->second * mit2->second;
-				im.getPre(mit2->first)[mit1->first] += mit1->second * mit2->second;
-			}
-		im.removeArcs(mainid);
-		nodestamp[mainid] = 0; // delete node
-		im.removeArcs(t1);
-		nodestamp[t1] = 0; // delete node
-
-		// mark surrounding area as changed
-		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 
@@ -1891,6 +1677,7 @@ void Rules::seriesPlace(unsigned int tid) {
 	bool conditio2(facts.checkCondition(Facts::ALTL));
 	bool conditio3(facts.checkCondition(Facts::CTLX | Facts::LTLX));
 	bool conditio4(facts.checkCondition(Facts::BISIM));
+	bool conditio5(facts.checkCondition(Facts::LIVENESS | Facts::NONLIVE));
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
@@ -1961,7 +1748,7 @@ void Rules::seriesPlace(unsigned int tid) {
 	    Map& postp2(im.getPost(p2));
 		Map::iterator mit;
 		for(mit=postp1.begin(); mit!=postp1.end(); ++mit)
-			facts.addPath(mit->first, deque<Vertex>(1,t1));
+			facts.addPath(mit->first, Path(1,t1));
 		facts.setStatus(Facts::PATH,t1,Facts::UNUSABLE);
 
 		// apply the rule
@@ -1981,21 +1768,23 @@ void Rules::seriesPlace(unsigned int tid) {
 			facts.removeFact(Facts::CTLX | Facts::LTLX);
 		if (im.isIO(p2))
 			facts.removeFact(Facts::BISIM);
-		set<Vertex> tmp;
-		tmp.insert(mainid);
-		tmp.insert(p2);
-		facts.addChange(Facts::MARKING,tmp,p2);
-		facts.addChange(Facts::BOUNDED,mainid,p2);
-		facts.addChange(Facts::SAFE,mainid,p2);
-		if (im.isVisible(mainid)) im.makeVisible(p2);
+		map<Vertex,int> tmp;
+		tmp[mainid] = 1;
+		tmp[p2] = 1;
+		facts.setMarking(tmp,p2,1);
+		facts.setBounded(mainid,p2);
+		facts.setSafe(mainid,p2);
+		if (im.isVisible(mainid) && im.isInvisible(p2)) im.makeVisible(p2);
+		set<Vertex> tmp2;
 		for(mit=prep2.begin(); mit!=prep2.end(); ++mit) {
-			facts.addChange(Facts::LIVE,t1,mit->first);
-			if (im.isVisible(t1)) im.makeVisible(mit->first);
+			tmp2.insert(mit->first);
+			if (conditio5 && im.isVisible(t1) && im.isInvisible(mit->first)) 
+				im.makeVisible(mit->first);
 		}
+		facts.setLive(t1,tmp2);
 
-		// mark surrounding area as changed
+		// mark surrounding area as changed and unlock nodes
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 
@@ -2005,10 +1794,12 @@ void Rules::seriesPlace(unsigned int tid) {
 void Rules::finalPlace(unsigned int tid) {
 
 	// the rule may remove an unbounded place
-	if (facts.checkCondition(Facts::BOUNDEDNESS | Facts::REVERSE)) return;
+	if (facts.checkCondition(Facts::REVERSE | Facts::INVARIANT)) return;
+	if (facts.checkCondition(Facts::BOUNDEDNESS) && !facts.checkFact(Facts::UNBOUNDED)) return;
 
 	// conditions that need to be checked later
-	bool condition(facts.checkCondition(Facts::CTL | Facts::LTL | Facts::CTLX | Facts::LTLX));
+	bool condition(facts.checkCondition(Facts::CTL | Facts::LTL | Facts::CTLX | Facts::LTLX | Facts::BOUNDEDNESS | Facts::UNBOUNDED));
+	bool conditio2(facts.checkCondition(Facts::SAFETY | Facts::UNSAFE));
 
 	// find a starting place "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
@@ -2016,10 +1807,11 @@ void Rules::finalPlace(unsigned int tid) {
 
 		unsigned int tokens(im.getTokens(mainid));
 
-		// check for invisibility in formulas
+		// check if the rule must be excluded for the place
 		if (im.isIO(mainid) || im.isPersistent(mainid) || 
-			(tokens<2 && facts.checkCondition(Facts::SAFETY)) ||
-			(condition && im.isVisible(mainid)))
+			(tokens<2 && facts.checkCondition(Facts::SAFETY) && !facts.checkFact(Facts::UNSAFE)) ||
+			(condition && im.isVisible(mainid)) ||
+			(conditio2 && tokens<2 && im.isVisible(mainid)))
 		{
 			im.unlock(mainid,FINALPLACE);
 			continue;
@@ -2041,18 +1833,17 @@ void Rules::finalPlace(unsigned int tid) {
 
         // change properties
 		if (!im.isInvisible(mainid))
-			facts.removeFact(Facts::CTL | Facts::CTLX | Facts::LTL | Facts::LTLX);
+			facts.removeFact(Facts::CTL | Facts::CTLX | Facts::LTL | Facts::LTLX | Facts::UNBOUNDED);
 		facts.setStatus(Facts::MARKING,mainid,Facts::UNUSABLE);
-		facts.setStatus(Facts::BOUNDED,mainid,Facts::UNKNOWN);
+		facts.setStatus(Facts::BOUNDED,mainid,Facts::UNUSABLE);
 		facts.removeFact(Facts::BOUNDEDNESS | Facts::REVERSE);
-		if (tokens>1) {
-			facts.setStatus(Facts::SAFE, mainid, Facts::ISFALSE);
-			facts.addFact(Facts::UNSAFE,false);
-		} else facts.removeFact(Facts::SAFETY);
+		facts.setStatus(Facts::SAFE, mainid, tokens>1 ? Facts::ISFALSE : Facts::UNUSABLE);
+		if (tokens>1) facts.addFact(Facts::UNSAFE,false);
+		else if (!facts.checkFact(Facts::UNSAFE))
+			facts.removeFact(Facts::SAFETY);
 
-		// mark surrounding area as changed
+		// mark surrounding area as changed and unlock nodes
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 
@@ -2062,11 +1853,13 @@ void Rules::finalPlace(unsigned int tid) {
 void Rules::finalTransition(unsigned int tid) {
 	// the rule may remove an unbounded place
 	if (facts.checkCondition(Facts::CTL | Facts::CTLX | Facts::LTL | Facts::LTLX 
-							| Facts::LIVENESS | Facts::BISIM | Facts::REVERSE)) return;
+							| Facts::BISIM | Facts::REVERSE | Facts::INVARIANT)) return;
+	if (facts.checkCondition(Facts::LIVENESS) && !facts.checkFact(Facts::NONLIVE)) return;
 
 	// conditions that need to be checked later
 	bool condition(facts.checkCondition(Facts::ALTL | Facts::ALTLX));
 	bool conditio2(facts.checkCondition(Facts::ALTL));
+	bool conditio3(facts.checkCondition(Facts::LIVENESS | Facts::NONLIVE));
 
 	// find a starting transition "mainid" for the rule if possible
 	Vertex mainid(NO_NODE);
@@ -2075,6 +1868,7 @@ void Rules::finalTransition(unsigned int tid) {
 		// check for invisibility in formulas
 		if (im.isPersistent(mainid) 
 			|| (conditio2 && im.getLabel(mainid))
+			|| (conditio3 && !im.isInvisible(mainid))
 			|| (condition && (im.isVisible(mainid) || im.getLabelVis(mainid))))
 		{
 			im.unlock(mainid,FINALTRANS);
@@ -2109,9 +1903,8 @@ void Rules::finalTransition(unsigned int tid) {
 		im.removeArcs(mainid);
 		nodestamp[mainid] = 0; // remove the place
 
-		// mark surrounding area as changed
+		// mark surrounding area as changed and unlock nodes
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 
@@ -2174,8 +1967,10 @@ void Rules::initiallyDeadPlace2(unsigned int tid) {
 		{
 			if (mit->first == mainid) { // the dead place
 				mit->second = 0; // remove mainid
-				set<Vertex> tmp;
-				facts.addChange(Facts::MARKING, mainid, tmp, tokens);
+//				set<Vertex> tmp;
+//				facts.setMarking(mainid, tmp, tokens);
+				map<Vertex,int> tmp;
+				facts.setMarking(tmp, mainid, tokens);
 				facts.setStatus(Facts::BOUNDED, mainid, Facts::ISTRUE);
 				facts.setStatus(Facts::SAFE, mainid, tokens>1 ? Facts::ISFALSE : Facts::ISTRUE);
 			} else if (!im.isPlace(mit->first)) { // a dead transition
@@ -2197,9 +1992,8 @@ void Rules::initiallyDeadPlace2(unsigned int tid) {
 		if (tokens>1)
 			facts.addFact(Facts::UNSAFE,false);
 
-		// mark surrounding area as changed
+		// mark surrounding area as changed and unlock nodes
 		im.propagateChange(nodestamp);
-//		im.unlock(nodestamp);
 	}
 }
 

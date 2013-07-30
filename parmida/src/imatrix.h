@@ -250,6 +250,9 @@ public:
 	/// Mark surroundings of nodes to be rechecked
 	void propagateChange(Map& stamps);
 
+	/// Get the maximal number of nodes available
+	Vertex getMaxVertex();
+
 private:
 	/// The Petri net for this incidence matrix
 	const PetriNet& petrinet;

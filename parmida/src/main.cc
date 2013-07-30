@@ -214,6 +214,7 @@ std::cout << paths.toString() << std::endl;
 	if (Runtime::args_info.complexpath_given) cond |= Facts::COMPLEXPATHS;
 	if (Runtime::args_info.bisimulation_given) cond |= Facts::BISIM;
 	if (Runtime::args_info.reversibility_given) cond |= Facts::REVERSE;
+	if (Runtime::args_info.marking_given) cond |= Facts::INVARIANT;
 	Facts facts(im,cond);
 
     /*------------------------.
@@ -314,6 +315,8 @@ std::cout << paths.toString() << std::endl;
 		facts.printFacts(log);
 		if (Runtime::args_info.inputs_num > 0)
 			log["net"] = string(Runtime::args_info.inputs[0]);
+		if (Runtime::args_info.outputnet_given)
+			log["reduced net"] = string(Runtime::args_info.outputnet_arg);
 		outputStream2 << log.toString() << std::endl;
 	    if (Runtime::args_info.verbose_flag) {
     	    status("write JSON properties file: %s", Runtime::args_info.writejson_arg);

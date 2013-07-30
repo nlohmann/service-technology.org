@@ -46,15 +46,13 @@ public:
 	bool checkAppl(Vertex node, unsigned int mode);
 
 	enum rulenames { // changing these values will break autotests (see --debug option)
-		INITDEADPLACE = 0x80000000L, // deleted
-		MELDPLACE = 0x40000000L, // deleted
 		INITDEADPL2 = 0x1L,
 		PARPLACE = 0x2L,
 		PARTRANSITION = 0x4L,
 		EQUIVPLACE = 0x8L,
 		MELDTRANS1 = 0x10L,
 		MELDTRANS2 = 0x20L,
-		MELDTRANS3 = 0x40L,
+		MELDTRANS3 = 0x40L, // deleted
 		MELDTRANS4 = 0x80L,
 		LOOPPLACE = 0x100L,
 		LOOPTRANS = 0x200L,
@@ -72,9 +70,6 @@ public:
 private:
 	/// Starke rule 1
 	void liveTransitions(unsigned int tid);
-
-	/// Starke rule 2
-	void initiallyDeadPlace(unsigned int tid);
 
 	/// extended Starke rule 2
 	void initiallyDeadPlace2(unsigned int tid);
@@ -98,22 +93,22 @@ private:
 	void meldTransitions2(unsigned int tid);
 
 	/// Starke rule 5(c)
-	void meldTransitions3(unsigned int tid);
+//	void meldTransitions3(unsigned int tid);
 
 	/// Starke rule 6
 	void meldTransitions4(unsigned int tid);
 
-	/// Starke rule 5(d)
+	/// Starke rule 5(c)
 	void meldTransitions5(unsigned int tid);
 
 	/// Starke rule 7
 	void loopPlace(unsigned int tid);
 
+	/// Starke rule 7 extended
+	void loopPlace2(unsigned int tid);
+
 	/// Starke rule 8
 	void loopTransition(unsigned int tid);
-
-	/// Starke rule 9
-	void meldPlaces(unsigned int tid);
 
 	/// Murata's series place rule
 	void seriesPlace(unsigned int tid);

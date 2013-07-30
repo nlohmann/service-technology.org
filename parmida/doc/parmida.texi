@@ -271,7 +271,15 @@ The option @option{-o} tells Parmida where to put the resulting net. If the opti
 the net will be written to stdout (seldom a good choice).
 
 The option @option{-P} makes all places in the original net visible. Parmida will then construct
-information about each place if it can be determined.
+information about each place if it can be determined. This is usually not such a good idea as
+it can restrict the applicable reduction rules very much and lead to a large reduced net.
+If only few places are of interest, it is better to make them visible individually using the
+option @option{-s}.
+
+An option like @option{--BOUNDED} tells Parmida that there is an interest in that property for
+the whole net as well as for all individually VISIBLE nodes. To just be able to check the
+property for the net as a whole, do not specify any nodes as visible, i.e. do not use the
+options @option{-P}, @option{-s}, or @option{-p}.
 
 Parmida writes its conclusions about the original and the reduced net to stdout. They might look
 like this:
@@ -282,18 +290,10 @@ Deduced properties: unbounded
 Checkable properties: unbounded, bounded, unsafe, safe, paths
 
 Equivalences (original net --> reduced net):
-m(p1) --> 3
-m(p2) --> m(p3)+2
 bounded(p1) --> true
-safe(p1) --> false
-bounded(p2) --> bounded(p3)
+bounded(p2) --> bounded(p3)|bounded(p5)
 bounded(p4) --> false
 bounded(p5)&bounded(p6) --> bounded(p5)
-
-Path translations (reduced net --> original net):
-t1 --> t3 t1
-t2 --> t3 t2
-*init* -> t4
 @end smallexample
 @end cartouche
 
@@ -305,39 +305,21 @@ The words 'bounded' and 'unbounded' under 'checkable properties' tell us that we
 use the presented information and further tests on the reduced net to obtain information
 on the boundedness of visible places in the original net.
 
-The place p2 in the original net can be tested for boundedness by testing the place p3
-in the reduced net, and transfering the result ('bounded(p2) -> bounded(p3)').
+The place p2 in the original net can be tested for boundedness by testing the places p3 and p5
+in the reduced net, and transfering the result ('bounded(p2) -> bounded(p3)|bounded(p5)').
+If at least one of p3/p5 is bounded, so is p2.
 
 There is no rule for the place p3 in the original net. Since p3 exists in the reduced net,
 we may just test p3 in the reduced net. It will either be bounded in both nets or in none of them.
 
-Note: This only works if @option{-P} or @option{-sp3} has been specified. Only then will
+Note: This only works if @option{-P} or @option{-sp3} or @option{-pp3} has been specified. Only then will
 parmida present information collected on p3. And only then the absence of p3 from all
 left hand sides means that p3 can be tested directly. Without one of the options the absence 
 of a rule for p3 might also mean that boundedness for p3 cannot be tested.
 
 The places p5 and p6 cannot be tested, but if p5 is bounded in the reduced net, both places
 are bounded in the original net. This is what 'bounded(p5)&bounded(p6) --> bounded(p5)'
-tells us. Bot places occur one a left hand side, but not alone, so they cannot be tested.
-
-If there were an additional place p7 in the original net not existing in the reduced net,
-we could not test the boundedness of that place. If such a test was necessary,
-we would need to add the option @option{-pp7} to the command line. This will make the
-place p7 irremovable, so it can be individually tested in the reduced net. Alternatively,
-@option{-sp7} will make p7 visible and Parmida will collect rules for testing p7.
-
-Some additional information has been obtained. We know that p1 always carries 3 tokens
-('m(p1) --> 3') and that p2 always carries two more tokens in the original net than
-p3 in the reduced net ('m(p2) --> m(p3)+2'). We also know that p1 is not safe.
-Since 'safe' and 'unsafe' appear under checkable properties, safety of the remaining
-places can be checked by the same mechanisms as boundedness above.
-
-Also, whenever path information is available, it will be presented. If we have a firing
-sequence 't1 t2 t3 t1' in the reduced net, it can be translated to
-'t4 t3 t1 t3 t2 t3 t3 t1' in the original net to reach an equivalent state there.
-Both sequences will be firable in their respective nets (or both will not).
-Note the '*init*' part of the translation which becomes a fixed prefix to any
-translated path.
+tells us. Both places occur one a left hand side, but not alone, so they cannot be tested.
 
 Other properties can be checked analogously:
 
@@ -348,28 +330,40 @@ parmida test.owfn --LIVE -T -oresult.owfn
 @end smallexample
 @end cartouche
 
+The option @option{--SAFE} checks for safety of the net and -- with @option{-P} --
+of every single place. Analogue to @option{--BOUNDED}, there are checks for the
+posisitve or the negative case only via @option{--safe} and @option{--unsafe}.
 In the latter case, @option{-T} makes all transitions visible, so information about
-them is collected and presented. The equivalences then might look like this:
+them is collected and presented. While @option{-T} can also lead to less reduction,
+it is usually better in that regard compared to @option{-P} for boundedness.
+Again, there are options @option{--live} and @option{--nonlive} for the
+semi-decisions. As a result of the second call we might get
+equivalences looking like this:
 
 @cartouche
 @smallexample
 Equivalences (original net --> reduced net):
 live(t1) --> live(t2)
-live(t5) --> live(t2)|live(t3)
+live(t5) --> live(t2+t3)
 live(t6)|live(t7) --> live(t2)
 live(t8) --> true
 @end smallexample
 @end cartouche
 
 So t1 is live in the original net if and only if t2 is live in the reduced net.
-For the liveness of t5 in the original net we may test both t2 and t3 in the
-reduced net; t5 is live if at least one of t2/t3 is live. Also, if t2 is live
+For the liveness of t5 in the original net we may test the set t2+t3 in the
+reduced net; t5 is live if and only if the set consisting of t2 and t3 is set-live in the reduced net. 
+This means that from any reachable marking we can reach another marking such 
+that at least one transition in the set, t2 or t3, becomes activated.
+Note that this is decidable but less than t2 or t3 being live.
+
+We can make more conclusions from the given rules: If (and only if) t2 is live in the reduced net
 at least one of t6/t7 is live in the original net. Finally, t8 is live in
 the original net. If there is a transition t9 existing in both nets, it has
 the same liveness in both nets (identity rules are not computed/shown).
 If there is a transition t10 that exists in the original net only, we can
-make no conclusions. The option @option{-pt10} will make t10 irremovable
-so that a result can be obtained.
+make no conclusions. The option @option{-T} or @option{-st10} or @option{-pt10} 
+ensures that such a thing cannot happen.
 
 @section Final markings and conditions
 
@@ -408,7 +402,7 @@ information is provided on how to change the formula. The output
 
 @cartouche
 @smallexample
-m(p1) --> m(p3)+2
+m(p1) - 2 --> m(p3)
 m(p2) --> 1
 @end smallexample
 @end cartouche
@@ -420,6 +414,49 @@ such a converter, Parmida can be convinced to write a JSON object
 containing the necessary information to a file. Parmida's sources include
 files JSON.cc and JSON.h that contain a parser for reading such a file
 back into a JSON object that can be used by a converter.
+
+@section Reverse mapping of markings and invariants
+
+Markings can also be mapped from the reduced net to the original net,
+at least partially. A call with the option @option{--marking} (no visible
+places required) might yield
+
+@cartouche
+@smallexample
+m(p1) --> 3
+m(p2) + m(p7) - 2 --> m(p3)
+3m(p4) + 2m(p5) + 3 --> 2m(p5)
+m(p6) --> any
+@end smallexample
+@end cartouche
+
+We know here that p1 always carries 3 tokens ('m(p1) --> 3') and that p3 always 
+carries two tokens less in the reduced net than p2 and p7 together in the original
+net. The third line shows how complex things can become. It could be the result of
+a transition being reduced from the net that has exactly two incoming arcs from p4
+and three outgoing arcs to p5 as well as a single token on p4. The place p4 is
+taken from the net together with the transition. If we have a marking with two
+tokens on p3 and six on p5, there will be a behaviourally equivalent marking in
+the original net with four tokens on p2 plus p7, three on p1, and tokens with a
+total weight of nine on p4 plus p5, where any token on p4 weighs three and any
+token on p5 weighs two. So, m(p4)=1+1 and m(p5)=3 is a possibility as well as m(p4)=3+1
+and m(p5)=0, and both are valid choices. Note that the "+1"-token stems from the
+original net's initial marking which has one token with weight three on p4 that
+can never be moved -- hence the constant "+3" in the rule.
+The number of tokens on p6 can be chosen
+arbitrarily high, but not all numbers may be possible. Restrictions come from
+the arc weights of the transitions putting tokens onto p6 as well as potential
+other places marked "any" which might be linearly related to p6.
+
+Any place invariant of the reduced net can be transferred to the original net in
+the same way. If p3 + 2p5 is such an invariant in the reduced net, the original
+net has the invariant p2 + 3p4 + 2p5 + p7. The constants in the rules show how
+the weighted token sums for the invariants differ from each other, here the
+reduced invariant has one more weighted token (-2+3) than the invariant from the original net.
+
+Note: If a place still exists in the reduced net and is not mentioned in any
+rule, its number of tokens remains unchanged when projecting from the reduced
+to the original net. This is just like for liveness and boundedness.
 
 @section Action based logics
 
@@ -437,7 +474,7 @@ the action label 'label'. The calls to Parmida would look like:
 @smallexample
 parmida test.owfn -oresult.owfn --altl -st1 -st2
 parmida test.owfn -oresult.owfn --altl -la -lb
-parmida test.owfn -oresult.owfn --altl -l* -st1 -st2
+parmida test.owfn -oresult.owfn --altl -lz -st1 -st2
 @end smallexample
 @end cartouche
 
@@ -451,8 +488,8 @@ If there are transitions with other labels, they may influence
 the next operator, if it appears in the formula. Transitions
 without a label (that have a tau/lambda label) will have no
 impact on the formula. If the formula has no next operator,
-@option{--altlx} can be specified. The option @option{-l*}
-in the final line assumes that '*' is a string that does
+@option{--altlx} can be specified. The option @option{-lz}
+in the final line assumes that 'z' is a string that does
 not occur as a label. In that case, Parmida will be label
 sensitive even if no label is visible in the formula. Labelled 
 transitions will be considered for the LTL path.
@@ -477,23 +514,33 @@ for paths in action based LTL as well.
 
 @section Witness paths
 
-When Parmida finds that the reduction process respects path information,
-she will print that path information to stdout or a JSON object.
-This is especially the case if one of the options @option{--path} or
-@option{--complexpath} is given. 
+If one of the options @option{--path} or @option{--complexpath}
+is given, Parmida will collect path information during the reduction
+process and print that path information to stdout or a JSON object.
 The first option, possibly leading to less
 reduction in the net, will create a simple translation for each transition
 in the reduced Petri net as well as an initial sequence.
 If a translation for a transition in the reduced net is not mentioned,
 the translation is the transition itself (identity).
 
+@cartouche
+@smallexample
+Path translations (reduced net --> original net):
+t1 --> t3 t1
+t2 --> t3 t2
+*init* -> t4
+@end smallexample
+@end cartouche
+
 The translation of a firing sequence from the reduced net can be acquired by
-taking the initial sequence and appending, for each transition in the firing
-sequence, its translation. Firing this translation in the original net and
+taking the initial sequence (on the right side after "*init*", here "t4")
+and appending, for each transition in the firing sequence, its translation. 
+The translation of "t1 t1 t2" would be "t4 t3 t1 t3 t1 t3 t2".
+Firing this translation in the original net and
 converting the state reached according to the reduction process will lead
 to the same state in the reduced net as directly firing the untranslated
 firing sequence. Also, any additionally specified properties (e.g. visible
-labels in the sequence) will be respected.
+labels in the sequence) will be respected. 
 
 The option @option{--complexpath} allows translations of the form
 
@@ -504,7 +551,7 @@ t1 --> t2 (t3 | t4) t5
 @end cartouche
 
 with the meaning: to simulate t1, fire first t2, then whichever of t3/t4
-is enabled, and finally t5 in the original net. It is guaranteed that at least one
+is enabled (but only one of them), and finally t5 in the original net. It is guaranteed that at least one
 of t3/t4 is enabled at that point. Since such or-constructs can be nested,
 it can get complicated easily. Parmida provides a way to compute a translation
 path automatically, using JSON objects and files.
@@ -535,6 +582,8 @@ nested expression. If there is more than one occurrence of 'path' mapped to a JS
 containing a firing sequence, all such instances will be found and translated, with the
 surrounding structure of the JSON file kept intact.
 
+Note that the translations of paths can easily be extended to transition invariants.
+
 @section Reversibility
 
 The option @option{--reversibility} forces Parmida to respect reversibility, i.e.
@@ -559,37 +608,58 @@ parmida test.owfn --writejson=result.json
 @end smallexample
 @end cartouche
 
-The JSON file has several entries at the top-level, which could look like this:
+The JSON file has several (potential) entries at the top-level, which could look like this:
 
 @cartouche
 @smallexample
-@{"bounded":               @{"p1": true", "p2": ["|", "p3", "p4"], "p3": ["p8"], "p5&p6": ["p7"]@},
+@{"bounded":               @{"p1": true", "p2": ["|", "p3", "p4"], "p3": ["p8"], "p5&p6": "p7"@},
  "checkable properties":  @{"prop1", "prop2", ...@},
  "deduced properties":    @{"prop1", "prop2", ...@},
- "live":                  @{"t1": false, "t2": ["|", "t3", "t4"], "t3": ["t8"], "t5|t6": ["t7"]@},
- "marking":               @{"p1": [1], "p2": ["+", "p3", 2]@},
+ "live":                  @{"t1": false, "t2": ["+", "t3", "t4"], "t3": ["t8"], "t5|t6": "t7"@},
+ "marking":               @{"p1": @{"*factor*": 2, "*fixed*": 3, "*init*": 4, "p1": 1, "p2": 5@}@},
  "net":                   "original_filename",
  "path":                  @{"*init*": ["t1", "t2"], "t3": ["t4"], 
                            "t5": [@{"*if*": ["p1"], "else": ["t7"], "then": ["t6"]@}] @},
- "safe":                  @{"p1": true", "p2": ["|", "p3", "p4"], "p3": ["p8"], "p5&p6": ["p7"]@},
+ "reduced net":           "reduced_filename",
+ "safe":                  @{"p1": true", "p2": ["|", "p3", "p4"], "p3": ["p8"], "p5&p6": "p7"@},
  "xchange":               @{ ... @} @}
 @end smallexample
 @end cartouche
 
 Note how for 'bounded(p2)' the right side is given in prefix notation with the or-operator
 in front, while in 'bounded(p5)&bounded(p6)' the left side is a single string 'p5\&p6'.
-This is due to the limitations of JSON.
+That the left hand side is a formula here and not a single place can be deduced from the
+fact that the right hand side is a string and not an array.
+This construction is due to the limitations of JSON.
 Operators can be &, |, and +. The or-expression in the "path" has been resolved into
 an if-then-else clause, where the information from "xchange" can be used by Parmida
 to automatically compute the if-clause. In general, "xchange" contains information about the
 incidence matrix of the original net, and the "*if*"-place(s) are to be tested for tokens.
+The marking rule reads "1m(p1) + 5m(p2) + 4 --> 2m(p1) = 6" where the six is the
+product of *factor* with *fixed*. p1 will not occur in the reduced net.
+Note the the net should not contain places or transitions beginning and ending with an
+asterisk, though only certain key words will be problematic.
 
-@section Parallelism
+@section Making Parmida faster
 
 Parmida will use multiple threads that try to apply different reduction rules
 at different spots in the net at the same time. The option to enable this
 feature is @option{--threads=n} where n is the number of parallel threads
 Parmida should work with.
+
+Note that only the reduction process itself will be done in parallel.
+Parsing of the input net can also be quite time consuming and will always
+be done in single threaded mode. The parsing is done by the PNAPI and
+not by Parmida.
+
+Another option to increase the speed of Parmida's reduction process is
+@option{-N} or @option{--netonly}. This will forbid Parmida to collect
+any information for nodes of the net. Only properties of the net
+as a whole can be tested. Especially, information about boundedness and
+safety of specific places and liveness of specific transitions will not 
+be generated. Path and marking information is independent and will be collected
+if and only if one of the corresponding options is set, no matter if
+@option{-N} is given.
 
 @c --------------------------------------------------------------------------
 

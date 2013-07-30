@@ -1338,3 +1338,6 @@ void IMatrix::propagateChange(Map& nodestamp) {
 
 }
 
+Vertex IMatrix::getMaxVertex() {
+	return numplaces+numtransitions;
+}

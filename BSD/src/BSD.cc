@@ -125,7 +125,6 @@ void BSD::computeBSD() {
 // compute closure of BSD node after performing step with given label
 BSDNode* BSD::computeClosure(BSDNode &node, Label_ID label) {
 	status("computing closure of node %x with label %s", &node, Label::id2name[label].c_str());
-	BSDNode* result = new BSDNode;
 	MarkingList resultlist;
 	// iterate through all marking ids in the BSD node
 	for (MarkingList::const_iterator it = node.list.begin(); it != node.list.end(); ++it) {
@@ -162,6 +161,7 @@ BSDNode* BSD::computeClosure(BSDNode &node, Label_ID label) {
 		return NULL;
 	}
 
+	BSDNode* result = new BSDNode;
 	result->list = resultlist;
 	result->pointer = new BSDNode*[Label::events+1];
 	return result;
@@ -337,5 +337,21 @@ void BSD::printlist(MarkingList *list) {
 	}
 
 	status("list: %s", temp.str().c_str());
+}
+
+void BSD::finalize() {
+	for (BSDNodeList::const_iterator it = graph->begin(); it != graph->end(); ++it) {
+		delete[] (*it)->pointer;
+		delete *it;
+	}
+	delete graph;
+
+	delete[] U->pointer;
+	delete U;
+
+	delete[] emptyset->pointer;
+	delete emptyset;
+
+	delete templist;
 }
 

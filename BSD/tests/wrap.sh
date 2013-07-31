@@ -2,7 +2,7 @@
 
 #============================================================================#
 # AUTOTEST WRAPPER SCRIPT FOR EXTERNAL TOOLS                                 #
-# written by Niels Lohmann <niels.lohmann@uni-rostock.de>               		     #
+# written by Niels Lohmann <niels.lohmann@uni-rostock.de>                    #
 #============================================================================#
 
 # This script is used to call executables in optional tests of the testsuite.
@@ -11,6 +11,7 @@
 # http://www.gnu.org/software/autoconf/manual/autoconf.html#Writing-Testsuites.
 # If the executable is found, it is executed with all given parameters and its
 # exit code is passed to the caller of this script.
+
 
 if test -f $1
   then eval $*

@@ -68,10 +68,10 @@ m4_define([SED],                  [@SED@])
 #------------------------------------------#
 
 # the main executable, called through a shell script for code coverage
-m4_define([LOCRETIA],                [cover.sh @abs_top_builddir@/src/locretia])
+m4_define([BSD_],                [cover.sh @abs_top_builddir@/src/BSD])
 
 # the main executable, directly called to allow for analysis
-m4_define([LOCRETIA_RAW],            [@abs_top_builddir@/src/locretia])
+m4_define([BSD_RAW],            [@abs_top_builddir@/src/BSD])
 
 
 #---------------------------------------------#

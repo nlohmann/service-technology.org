@@ -144,7 +144,7 @@ void evaluateParameters(int argc, char** argv) {
     }
 
     if (args_info.bound_arg < 1) {
-    	abort(1337, "bound has to be a positive integer");
+    	abort(5, "bound has to be a positive integer");
     }
 
 
@@ -160,6 +160,7 @@ void terminationHandler() {
         time(&start_time);
         cmdline_parser_free(&args_info);
         InnerMarking::finalize();
+        BSD::finalize();
 
         delete openNet::net;
 

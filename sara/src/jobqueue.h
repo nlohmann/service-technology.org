@@ -21,6 +21,7 @@
 #include <map>
 #include <deque>
 #include "partialsolution.h"
+#include "JSON.h"
 
 using std::set;
 using std::map;
@@ -97,7 +98,7 @@ public:
 	bool cleanFailure(map<Transition*,int>& p);
 
 	/// Print a failure queue
-	void printFailure(IMatrix& im, Problem& pb, int pbnr);
+	void printFailure(IMatrix& im, Problem& pb, int pbnr, JSON& json);
 
 	/// Get the true size of a failure queue (excluding obsolete entries)
 	int trueSize();
@@ -106,7 +107,7 @@ public:
 	bool push_solved(PartialSolution* job);
 
 	/// Print all solutions and return the maximal and sum trace length
-	int printSolutions(int& sum, Problem& pb, int pbnr);
+	int printSolutions(int& sum, Problem& pb, int pbnr, JSON& json);
 
 #ifdef SARALIB
 	/// Get one solution (or a vector containing NULL pointer).

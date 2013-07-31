@@ -25,6 +25,7 @@
 #endif
 #include "lpwrapper.h"
 #include "jobqueue.h"
+#include "JSON.h"
 
 using pnapi::PetriNet;
 using pnapi::Marking;
@@ -56,7 +57,7 @@ public:
 	void doSingleJob(unsigned int threadID, PartialSolution* ps);
 
 	/// Print out the result on stdout
-	void printResult(int pbnr);
+	void printResult(int pbnr, JSON& json);
 #ifdef SARALIB
 	/// Get one solution (or a vector containing one NULL pointer)
 	vector<Transition*> getOneSolution();

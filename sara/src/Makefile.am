@@ -2,7 +2,7 @@
 bin_PROGRAMS = sara
 
 # the plain sources you need to compile (no generated code)
-sara_SOURCES = main.cc sthread.cc sthread.h problem.cc problem.h reachalyzer.cc reachalyzer.h imatrix.cc imatrix.h constraint.cc constraint.h lpwrapper.cc lpwrapper.h pathfinder.cc pathfinder.h partialsolution.cc partialsolution.h jobqueue.cc jobqueue.h cmdline.c cmdline.h verbose.cc verbose.h tarjan.cc tarjan.h syntax_sara.yy lexic_sara.ll sara_lib.h
+sara_SOURCES = main.cc sthread.cc sthread.h problem.cc problem.h reachalyzer.cc reachalyzer.h imatrix.cc imatrix.h constraint.cc constraint.h lpwrapper.cc lpwrapper.h pathfinder.cc pathfinder.h partialsolution.cc partialsolution.h jobqueue.cc jobqueue.h cmdline.c cmdline.h verbose.cc verbose.h tarjan.cc tarjan.h syntax_sara.yy lexic_sara.ll sara_lib.h JSON.cc JSON.h
 
 # pass the sysconfdir to Sara (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 sara_CPPFLAGS = -I$(top_srcdir)/libs

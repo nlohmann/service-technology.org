@@ -464,7 +464,7 @@ bool JobQueue::cleanFailure(map<Transition*,int>& p) {
 	@param pb The problem instance (for saving a visually colored net).
 	@param pbnr An identifying number for the problem instance (used for filename construction)
 */
-void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr) {
+void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr, JSON& json) {
 	int failcnt(0); // counting the failures for adapting filenames
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
@@ -473,6 +473,7 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr) {
 			PartialSolution* ps(jit->second[i]);
 			if (ps->isSolved()) continue; // this failure is obsolete
 			cout << "After the firing sequence \"";
+			JSON tmp,tmp3;
 			if (ps->getSequence().size()>0)
 			{
 				bool blank = false;
@@ -481,12 +482,14 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr) {
 					if (blank) cout << " ";
 					blank = true;
 					cout << ps->getSequence()[j]->getName();
+					tmp += ps->getSequence()[j]->getName();
 				}
 				resetColors(*(pb.getPetriNet()));
 				colorSequence(ps->getSequence());
 			}
-			else cout << "<empty>";
+			else { cout << "<empty>"; tmp += "<empty>"; }
 			cout << "\":" << endl;
+			tmp3["AFTER SEQUENCE"] = tmp;
 
 			// At this point color the remainder of transitions blue but do not print anything
 			map<Transition*,int> tmx(ps->getRemains());
@@ -528,6 +531,8 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr) {
 						if (diff<0 || miss<diff) diff=miss;
 					}
 				}
+				JSON tmp2;
+				tmp2["NEED"] = diff;
 				cout << " - need at least " << diff
 						<< " more token" << (diff==1?"":"s") << " on place" 
 						<< (pmap.size()==1?" ":" set {");
@@ -537,6 +542,7 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr) {
 					if (comma) cout << ",";
 					comma = true;
 					cout << mit->first->getName() << ":" << ps->getMarking()[*(mit->first)];
+					tmp2["ON"][mit->first->getName()] = (int)(ps->getMarking()[*(mit->first)]);
 				}
 				colorPlaces(pmap,false);
 				cout << (pmap.size()==1?"":"}") << " to fire ";
@@ -558,11 +564,14 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr) {
 					if (comma) cout << ",";
 					comma = true;
 					cout << (*tit)->getName();
+					tmp2["TO FIRE"] += (*tit)->getName();
 				}
 				colorTransitions(tset,false);
 				cout << (tset.size()==1?"":"}") << endl;
+				tmp3["DEADLOCKS"] += tmp2;
 			}
 			saveColoredNet(pb,pbnr,++failcnt);
+			json[pb.getName()]["COUNTEREXAMPLE"] += tmp3;
 		}
 }
 
@@ -652,7 +661,7 @@ bool JobQueue::push_solved(PartialSolution* job) {
 	@param pbnr An identifying number for the problem instance (used for filename construction)
 	@return The maximal length of a solution.
 */
-int JobQueue::printSolutions(int& sum, Problem& pb, int pbnr) {
+int JobQueue::printSolutions(int& sum, Problem& pb, int pbnr, JSON& json) {
 	int sollength(-1); // solution length
 	int colcnt(0); // counting the solutions for adapting filenames
 	vector<Transition*> tmpsolv;
@@ -669,9 +678,14 @@ int JobQueue::printSolutions(int& sum, Problem& pb, int pbnr) {
 				cout << "sara: SOLUTION(" << solution.size() << "): ";
 				if ((int)(solution.size())>sollength) sollength=(int)(solution.size());
 				sum += solution.size();
+				JSON tmp;
 				for(unsigned int j=0; j<solution.size(); ++j)
+				{
 					cout << solution[j]->getName() << " ";
+					tmp += solution[j]->getName();
+				}
 				cout << endl;
+				json[pb.getName()]["SOLUTION"] += tmp;
 				resetColors(*(pb.getPetriNet()));
 				colorSequence(solution);
 				saveColoredNet(pb,pbnr,++colcnt);
@@ -684,7 +698,10 @@ int JobQueue::printSolutions(int& sum, Problem& pb, int pbnr) {
 				cout << "sara: SOLUTION(" << tmpsolv.size() << "): ";
 				sum += tmpsolv.size();
 				for(unsigned int j=0; j<tmpsolv.size(); ++j)
+				{
 					cout << tmpsolv[j]->getName() << " ";
+					json[pb.getName()]["SOLUTION"] += tmpsolv[j]->getName();
+				}
 				cout << endl;
 				resetColors(*(pb.getPetriNet()));
 				colorSequence(tmpsolv);

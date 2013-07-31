@@ -24,6 +24,8 @@
 #include "problem.h"
 #include "verbose.h"
 #include "sthread.h"
+#include "JSON.h"
+#include "lp_solve_5.5/lp_lib.h"
 
 using std::cerr;
 using std::cout;
@@ -123,6 +125,101 @@ void evaluateParameters(int argc, char** argv) {
     free(params);
 }
 
+void parse_constraint(string in, bool cov, map<string,int>& lhs, int& comp, int& rhs) {
+	size_t comppos(in.find_last_of("<>:="));
+	if (comppos == string::npos) { comp = (cov ? GE : EQ); rhs = 1; comppos = in.size(); }
+	else { switch (in.at(comppos)) {
+		case '<': comp = LE; break;
+		case '>': comp = GE; break;
+		case '=':
+		case ':': comp = EQ; break;
+		}
+		rhs = std::strtol(in.substr(comppos+1,string::npos).c_str(),NULL,10);
+	}
+	size_t fpos(0);
+	while (fpos<comppos) {
+		int lhsval(1);
+		size_t startname(in.find_first_not_of("+- 0123456789",fpos));
+		size_t lastplus(in.find_last_of("+",startname-1));
+		if (lastplus == string::npos || lastplus < fpos) lastplus = fpos;
+		else ++lastplus;
+		if (lastplus < startname) lhsval = std::strtol(in.substr(lastplus,startname-lastplus).c_str(),NULL,10);
+		fpos = in.find_first_of("+- ");
+		if (fpos > comppos) fpos = comppos;
+		lhs[in.substr(startname,fpos-startname)] = lhsval;
+	}
+}
+
+void parse_marking(string in, bool cov, map<string,int>& m, map<string, int>& comp) {
+	size_t fpos(0);
+	while (fpos < in.size()) {
+		map<string,int> mtmp;
+		int cmp, rhs;
+		size_t next(in.find_first_of(",",fpos));
+		if (next == string::npos) next = in.size();
+		parse_constraint(in.substr(fpos,next-fpos),cov,mtmp,cmp,rhs);
+		fpos = next+1;
+		m[mtmp.begin()->first] = rhs;
+		comp[mtmp.begin()->first] = cmp;
+	}
+}
+
+void json_parse(JSON& jin) {
+	for(JSON::iterator jit=jin.begin(); jit!=jin.end(); ++jit)
+	{
+		Problem pbl;
+		std::map<string,int> clhs;
+		int ccomp,crhs;
+
+		pbl.setName(jit.key());
+		if ((*jit)["GOAL"] == "REACHABILITY")
+			pbl.setGoal(Problem::REACHABLE);
+		else if ((*jit)["GOAL"] == "REALIZABILITY")
+			pbl.setGoal(Problem::REALIZABLE);
+		else pbl.setGoal(Problem::DUMMY);
+		pbl.setFilename((*jit)["FILE"]);
+		if ((*jit)["TYPE"] == "OWFN")
+			pbl.setNetType(Problem::OWFN);
+		else if ((*jit)["TYPE"] == "LOLA")
+			pbl.setNetType(Problem::LOLA);
+		else
+			pbl.setNetType(Problem::PNML);
+		if (!(*jit)["INITIAL"].empty()) {
+			map<string,int> tmp1,tmp2;
+			parse_marking((*jit)["INITIAL"],false,tmp1,tmp2);
+			map<string,int>::iterator mit;
+			for(mit=tmp1.begin(); mit!=tmp1.end(); ++mit)
+				pbl.setInit(mit->first,mit->second);
+		}
+		bool cov(false);
+		if ((*jit).find("COVER")!=(*jit).end()) 
+			if ((*jit)["COVER"]) cov = true;
+		pbl.setGeneralCover(cov);
+		if (!(*jit)["FINAL"].empty()) {
+			map<string,int> tmp1,tmp2;
+			parse_marking((*jit)["FINAL"],cov,tmp1,tmp2);
+			map<string,int>::iterator mit;
+			for(mit=tmp1.begin(); mit!=tmp1.end(); ++mit)
+				pbl.setFinal(mit->first,tmp2[mit->first],mit->second);
+		}
+		if ((*jit).find("CONSTRAINT")!=(*jit).end()) {
+			for(unsigned int i=0; i<(*jit)["CONSTRAINT"].size(); ++i)
+			{
+				map<string,int> tmp;
+				int cmp, rhs;
+				parse_constraint((*jit)["CONSTRAINT"][i],false,tmp,cmp,rhs);
+				pbl.addConstraint(tmp,cmp,rhs);
+			}
+		}
+		if ((*jit).find("RESULT")!=(*jit).end()) {
+			if ((*jit)["RESULT"]["OR"]) pbl.setOrResult(true); else pbl.setOrResult(false);
+			if ((*jit)["RESULT"]["NEGATE"]) pbl.setNegateResult(true); else pbl.setNegateResult(false);
+			pbl.setResultText((*jit)["RESULT"]["TEXT"]);
+		}
+
+		pbls.push_back(pbl);
+	}
+}
 
 /*! Main method of Sara.
 	\param argc Number of arguments.
@@ -256,44 +353,86 @@ if (args_info.reachable_given || args_info.realize_given) {
 	Marking m(Marking(*pn,false));
 	// open the .sara file for output
 	string outname = pbl.getFilename() + ".sara";
+	if (args_info.json_given) outname += ".json";
 	problemfile = outname; // redirect later pipe input
 	ofstream outfile(outname.c_str(), ofstream::trunc);
 	if (!outfile.is_open()) abort(3,"error: could not write to file '%s'",outname.c_str());
 	// print the problem
-	outfile << "PROBLEM " << (args_info.reachable_given?"reach":"realiz") << "ability_in_" << pbl.getFilename() << ":" << endl;
-	if (args_info.reachable_given) outfile << "GOAL REACHABILITY;" << endl;
-	else outfile << "GOAL REALIZABILITY;" << endl;
-	outfile << "FILE " << pbl.getFilename() << " TYPE ";
-	switch(nettype) {
-		case Problem::OWFN: outfile << "OWFN"; break;
-		case Problem::LOLA: outfile << "LOLA"; break;
-		case Problem::PNML: outfile << "PNML"; break;
-	}
-	outfile << ";" << endl << "INITIAL ";
-	bool first = true;
-	map<const Place*,unsigned int>::const_iterator pit;
-	for(pit=m.begin(); pit!=m.end(); ++pit)
-		if (pit->second>0) {
-			if (!first) outfile << ",";
-			outfile << pit->first->getName() << ":" << pit->second;
-			first = false;
+	if (args_info.json_given) {
+		JSON jout;
+		std::stringstream pbname;
+
+		if (args_info.reachable_given) {
+			pbname << "reachability_in_" << pbl.getFilename();
+			jout[pbname.str()]["GOAL"] = "REACHABILITY";
+		} else {
+			pbname << "realizability_in_" << pbl.getFilename();
+			jout[pbname.str()]["GOAL"] = "REALIZABILITY";
 		}
-	outfile << ";" << endl;
-	outfile << "FINAL ";
-	if (args_info.final_given) outfile << args_info.final_arg;
-	outfile << ";" << endl;
-	if (args_info.constraint_given) {
-		outfile << "CONSTRAINTS ";
-		first = true;
-		for(unsigned int i=0; i<args_info.constraint_given; ++i)
-		{
-			if (!first) outfile << ", ";
-			outfile << args_info.constraint_arg[i];
-			first = false;
+		jout[pbname.str()]["FILE"] = pbl.getFilename();
+		switch(nettype) {
+			case Problem::OWFN: jout[pbname.str()]["TYPE"] = "OWFN"; break;
+			case Problem::LOLA: jout[pbname.str()]["TYPE"] = "LOLA"; break;
+			case Problem::PNML: jout[pbname.str()]["TYPE"] = "PNML"; break;
 		}
+		bool first = true;
+		std::stringstream init;
+		map<const Place*,unsigned int>::const_iterator pit;
+		for(pit=m.begin(); pit!=m.end(); ++pit)
+			if (pit->second>0) {
+				if (!first) init << ",";
+				init << pit->first->getName() << ":" << pit->second;
+				first = false;
+			}
+		jout[pbname.str()]["INITIAL"] = init.str();
+		if (args_info.final_given) {
+			bool cover(strstr(args_info.final_arg,"COVER"));
+			jout[pbname.str()]["FINAL"] = args_info.final_arg + (cover ? 5 : 0);
+			if (cover) jout[pbname.str()]["COVER"] = true; 
+			else jout[pbname.str()]["COVER"] = false;
+		}
+		if (args_info.constraint_given) {
+			for(unsigned int i=0; i<args_info.constraint_given; ++i)
+				jout[pbname.str()]["CONSTRAINT"] += args_info.constraint_arg[i];
+		}
+
+		outfile << jout << endl;
+	} else {
+		outfile << "PROBLEM " << (args_info.reachable_given?"reach":"realiz") << "ability_in_" << pbl.getFilename() << ":" << endl;
+		if (args_info.reachable_given) outfile << "GOAL REACHABILITY;" << endl;
+		else outfile << "GOAL REALIZABILITY;" << endl;
+		outfile << "FILE " << pbl.getFilename() << " TYPE ";
+		switch(nettype) {
+			case Problem::OWFN: outfile << "OWFN"; break;
+			case Problem::LOLA: outfile << "LOLA"; break;
+			case Problem::PNML: outfile << "PNML"; break;
+		}
+		outfile << ";" << endl << "INITIAL ";
+		bool first = true;
+		map<const Place*,unsigned int>::const_iterator pit;
+		for(pit=m.begin(); pit!=m.end(); ++pit)
+			if (pit->second>0) {
+				if (!first) outfile << ",";
+				outfile << pit->first->getName() << ":" << pit->second;
+				first = false;
+			}
 		outfile << ";" << endl;
+		outfile << "FINAL ";
+		if (args_info.final_given) outfile << args_info.final_arg;
+		outfile << ";" << endl;
+		if (args_info.constraint_given) {
+			outfile << "CONSTRAINTS ";
+			first = true;
+			for(unsigned int i=0; i<args_info.constraint_given; ++i)
+			{
+				if (!first) outfile << ", ";
+				outfile << args_info.constraint_arg[i];
+				first = false;
+			}
+			outfile << ";" << endl;
+		}
+		outfile << endl;
 	}
-	outfile << endl;
 	outfile.close();
 }
 
@@ -307,12 +446,22 @@ if (args_info.input_given || args_info.pipe_given) {
 	else status("passing on problems.");
 
 	// try to open file to read problem from
-	if (args_info.input_given) problemfile = args_info.input_arg;
-	if (problemfile=="stdin") sara_in = stdin;
-	else sara_in = fopen(problemfile.c_str(),"r");
-	if (!sara_in) abort(1, "could not read problem information");
-	sara_parse();
-	if (sara_in!=stdin) fclose(sara_in);
+	JSON json;
+	if (args_info.json_given) {
+		if (args_info.input_given) {
+			std::ifstream inputStream(args_info.input_arg);
+	        if (!inputStream) abort(1, "could not read problem information");
+			inputStream >> json;
+		} else std::cin >> json;
+		json_parse(json);
+	} else {
+		if (args_info.input_given) problemfile = args_info.input_arg;
+		if (problemfile=="stdin") sara_in = stdin;
+		else sara_in = fopen(problemfile.c_str(),"r");
+		if (!sara_in) abort(1, "could not read problem information");
+		sara_parse();
+		if (sara_in!=stdin) fclose(sara_in);
+	}
 
 	// set verbosity and debug mode
 	bool verbose(args_info.verbose_given);
@@ -393,7 +542,7 @@ if (args_info.input_given || args_info.pipe_given) {
 				waitForAllIdle(debug);
 				if (!solutions.almostEmpty()) // solve the problem and print a possible solution
 				{ 
-					int mtl = solutions.printSolutions(avetracelen,pbls.at(x),x); // get the solution length for this problem
+					int mtl = solutions.printSolutions(avetracelen,pbls.at(x),x,json); // get the solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
 					solcnt+=solutions.size();
 					if (pbls.at(x).isNegateResult() ^ pbls.at(x).isOrResult())
@@ -431,7 +580,7 @@ if (args_info.input_given || args_info.pipe_given) {
 						if (!pbls.at(x).isNegateResult() ^ pbls.at(x).isOrResult())
 							results[pbls.at(x).getResultText()] = false;
 					}
-					if (!flag_yesno) reach.printResult(x+1); // ... and print the result
+					if (!flag_yesno) reach.printResult(x+1,json); // ... and print the result
 					int mtl = reach.getMaxTraceLength(); // get the maximal solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
 					avetracelen += reach.getSumTraceLength(); // sum up solution lengths for average calculation
@@ -495,13 +644,26 @@ if (args_info.input_given || args_info.pipe_given) {
 			{
 				cout << "sara: The property of " << resorder[i];
 				if (indecisive.find(resorder[i])==indecisive.end()) {
-					if (results[resorder[i]] ^ orresult[resorder[i]]) cout << " is fulfilled." << endl;
-					else cout << " does not hold." << endl;
+					if (results[resorder[i]] ^ orresult[resorder[i]]) {
+						cout << " is fulfilled." << endl;
+						json["PROPERTIES"][resorder[i]] = true;
+					} else {
+						cout << " does not hold." << endl;
+						json["PROPERTIES"][resorder[i]] = false;
+					}
 				} else {
-					if (results[resorder[i]]) cout << " could not be decided." << endl;
-					else 
-						if (orresult[resorder[i]]) cout << " is fulfilled." << endl;
-						else cout << " does not hold." << endl;
+					if (results[resorder[i]]) {
+						cout << " could not be decided." << endl;
+						json["PROPERTIES"][resorder[i]] = "error";
+					} else { 
+						if (orresult[resorder[i]]) {
+							cout << " is fulfilled." << endl;
+							json["PROPERTIES"][resorder[i]] = true;
+						} else {
+							cout << " does not hold." << endl;
+							json["PROPERTIES"][resorder[i]] = false;
+						}
+					}
 				}
 			}
 	}
@@ -526,6 +688,12 @@ if (args_info.input_given || args_info.pipe_given) {
 	// stop the threads (if any)
 	stopThreads();
 	destroyThreadData();
+
+	if (args_info.json_arg) {
+		std::ofstream outputStream(args_info.json_arg);
+        if (!outputStream) abort(3, "could not write to file '%s'", args_info.json_arg);
+		outputStream << json << endl;
+	}
 }
 
 /*************************

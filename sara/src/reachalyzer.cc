@@ -420,16 +420,22 @@ void Reachalyzer::doSingleJob(unsigned int threadID, PartialSolution* ps) {
 /** Print the results of the reachability analysis. 
 	@param pbnr An identifying number for the problem instance for use in filenames
 */
-void Reachalyzer::printResult(int pbnr) {
+void Reachalyzer::printResult(int pbnr, JSON& json) {
 	// print all solutions first and find the longest solution length
 	if (!solutions.almostEmpty()) 
 	{
 		if (passedon) cout << "sara: A shorter realizable firing sequence with the same token effect would be:" << endl;
-		maxsollen = solutions.printSolutions(sumsollen,*problem,pbnr);
+		maxsollen = solutions.printSolutions(sumsollen,*problem,pbnr,json);
+	} else if (errors) {
+		cout << "sara: UNSOLVED: Result is indecisive due to failure of lp_solve." << endl;
+		json[problem->getName()]["UNSOLVED"] = "failure of lp_solve";
+	} else if (suboptimal) {
+		cout << "sara: UNSOLVED: Result is indecisive due to non-minimal solutions by lp_solve." << endl;
+		json[problem->getName()]["UNSOLVED"] = "non-minimal solutions of lp_solve";
+	} else if (flag_treemaxjob || val_maxdepth>0) {
+		cout << "sara: UNSOLVED: solutions may have been cut off due to command line switch -M/-T" << endl;
+		json[problem->getName()]["UNSOLVED"] = "cut off due to command line option -M/-T";
 	}
-	else if (errors) cout << "sara: UNSOLVED: Result is indecisive due to failure of lp_solve." << endl;
-	else if (suboptimal) cout << "sara: UNSOLVED: Result is indecisive due to non-minimal solutions by lp_solve." << endl;
-	else if (flag_treemaxjob || val_maxdepth>0) cout << "sara: UNSOLVED: solutions may have been cut off due to command line switch -M/-T" << endl;
 	if (!errors && !flag_treemaxjob && val_maxdepth==0 && (flag_witness || solutions.almostEmpty()))
 	{ // if we have no solution or witnesses are sought anyway
 		if (suboptimal) cout << "sara: The following information might therefore not be relevant." << endl;
@@ -441,19 +447,23 @@ void Reachalyzer::printResult(int pbnr) {
 					if (failure.checkMEInfeasible() && solutions.almostEmpty() && loops<=1)
 					{ // it might be that the initial marking equation has no solution
 						cout << "the marking equation is infeasible." << endl; 
+						json[problem->getName()]["INFEASIBLE"] = "marking equation has no solution";
 						if (stateinfo) if (!lpwrap.findNearest())
 							cout << "sara: warning: unable to suggest changes, probably a failure of lp_solve" << endl;
 						return; 
 					}
 					// or the marking equation is feasible but still we cannot reach a solution 
 					cout << "unable to borrow enough tokens via T-invariants." << endl;
+					json[problem->getName()]["INFEASIBLE"] = "borrowing of tokens via T-invariants failed";
 				}
 				if (stateinfo) cout << "There are firing sequences that could not be extended towards the final marking." << endl;
 			} else if (passedon && stateinfo) cout << "sara: at the following points the algorithm could not continue:" << endl;
 			else if (stateinfo) cout << "sara: at the following points the algorithm needed to backtrack:" << endl;
-			if (stateinfo || flag_show) failure.printFailure(im,*problem,pbnr); // then print the counterexample; the following shouldn't happen:
-		} else if (solutions.almostEmpty())
+			if (stateinfo || flag_show) failure.printFailure(im,*problem,pbnr,json); // then print the counterexample; the following shouldn't happen:
+		} else if (solutions.almostEmpty()) {
 			cout << "sara: UNSOLVED: Result is indecisive" << (flag_break?" due to a break.":", no counterexamples found.") << endl;
+			json[problem->getName()]["UNSOLVED"] = (flag_break?"due to a break":"no counterexamples found");
+		}
 	}
 }
 

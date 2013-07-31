@@ -22,7 +22,7 @@ option "threads" t
 section "Input/output"
 
 option "readjson" r
-  "Read JSON property file to translate a path from the reduced net to the original net."
+  "Read JSON property file to translate a path from the reduced net to the original net. The path itself must reside in the (JSON) input file."
   string
   typestr="FILENAME"
   optional
@@ -46,6 +46,13 @@ option "pnml" -
 option "lola" -
   "Read Petri net in LoLA format."
   flag off
+
+option "keyword" k
+  "For path translations, the key (string) under which the path can be found in the JSON input file. The path itself has to be an array of strings."
+  string
+  typestr="KEYWORD"
+  default="path"
+  optional
 
 section "Node visibility"
 
@@ -163,3 +170,8 @@ option "reversibility" -
 option "final" f
   "The final condition given in the Petri net file must be considered."
   flag off
+
+option "marking" m
+  "Forces collection of information about marking projection from the reduced to the original net."
+  flag off
+

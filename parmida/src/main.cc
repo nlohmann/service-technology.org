@@ -90,47 +90,21 @@ int main(int argc, char* argv[]) {
 		}
 
 		translatePaths(paths,json);
-/*
-		unsigned int len(paths["path"].size());
-		vector<string> out;
-		unsigned int plen(json["path"]["*init*"].size());
-		for(unsigned int j=0; j<plen; ++j)
-			translate(json["path"]["*init*"][j],json["xchange"],out);
-std::cout << "len=" << len << std::endl;
-std::cout << paths.toString() << std::endl;
-		for(unsigned int i=0; i<len; ++i)
-		{
-			string tmp = paths["path"][i];
-			unsigned int plen(json["path"][tmp].size());
-			if (plen==0) out.push_back(tmp);
-			else for(unsigned int j=0; j<plen; ++j)
-					translate(json["path"][tmp][j],json["xchange"],out);
-		}
-*/
 
-	    if (!Runtime::args_info.writejson_given) {
-/*
-			for(unsigned int i=0; i<out.size(); ++i)
-				std::cout << out[i] << " ";
-			std::cout << endl;
-*/
-		} else {
-/*
-			JSON outpath;
-			for(unsigned int i=0; i<out.size(); ++i)
-				outpath["path"] += out[i];
-*/
+		// if we want the translation in a JSON file:
+	    if (Runtime::args_info.writejson_given) {
+			// open JSON output stream
 	        std::ofstream outputStream(Runtime::args_info.writejson_arg);
 	        // ... and abort, if an error occurs
 	        if (!outputStream) {
 	            abort(1, "could not open file '%s'", Runtime::args_info.writejson_arg);
 	        }
-//			outputStream << outpath.toString() << std::endl;
 			outputStream << paths.toString() << std::endl;
 		    if (Runtime::args_info.verbose_flag) {
 	    	    status("write JSON path file: %s", Runtime::args_info.writejson_arg);
 	    	}		
 		}
+
 		return EXIT_SUCCESS;
 	}
 
@@ -401,8 +375,8 @@ void translatePaths(JSON& item, JSON& dict) {
 		case JSON::object:
 			for(JSON::iterator jit=item.begin(); jit!=item.end(); ++jit)
 			{
-				if (jit.key() == "path" && jit.value().type() == JSON::array)
-					item["path"] = translateOnePath(jit.value(),dict);
+				if (jit.key() == Runtime::args_info.keyword_arg && jit.value().type() == JSON::array)
+					item[(string)Runtime::args_info.keyword_arg] = translateOnePath(jit.value(),dict);
 				else
 					translatePaths(jit.value(),dict);
 			}

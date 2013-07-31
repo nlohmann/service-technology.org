@@ -64,6 +64,8 @@ class BSD {
 
         static void printlist(MarkingList *list);
 
+        static void finalize();
+
         static BSDNodeList* graph;
 
         static BSDNode* U;

@@ -153,4 +153,14 @@ AT_KEYWORDS(basic)
 AT_CLEANUP
 
 
+AT_SETUP([Risk Simple])
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/myCoffeeCyclic.owfn .])
+AT_CHECK([cp TESTFILES/marvin3.cf .])
+AT_CHECK([TARA -n myCoffeeCyclic.owfn -f marvin3.cf --riskcosts=10 ],0,ignore,stderr)    
+AT_CHECK([GREP -q "Maximal Propability found: 0.15/10 = 1.5" stderr])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
 # <<-- CHANGE END -->>

@@ -312,26 +312,27 @@ int main(int argc, char** argv) {
                     status("Checking budget %d (lower bound: %d, upper bound: %d)", Tara::modification->getI(), bsLower, bsUpper);
                     bool bsControllable = isControllable(*Tara::net, true);
                     if (bsControllable) {
-                        minBudget = Tara::modification->getI();        
-                        bsUpper = Tara::modification->getI()-1;
+                        minBudget = Tara::modification->getI();
+                        bsUpper = Tara::modification->getI() - 1;
                     } else {
-                        bsLower = Tara::modification->getI()+1;
+                        bsLower = Tara::modification->getI() + 1;
                     }
                 }
             }
-        
         } 
 
         if(Tara::args_info.riskcosts_given) {
-            message("1  Minimal budget found: %d", minBudget);
-            minBudget = backtransformRiskCost(minBudget);
-            message("2  Maximal budget found: %d", minBudget);
+            double maxProb = backtransformRiskCost(minBudget);
+            double percentBudget = (100.0 * maxProb);
+            double budgetBase = (1.0 * Tara::args_info.riskcosts_arg) * maxProb;
+            message("Maximal Propability found: %g/%d = %g%% ", budgetBase, Tara::args_info.riskcosts_arg, percentBudget);
         }
-        
-        // Binary search done. The minimal budget is found. Return the partner for the minimal budget.    
-        
-        message("Minimal budget found: %d", minBudget);
 
+        else {
+            message("Minimal budget found: %d", minBudget);
+        }
+
+        // Binary search done. The minimal budget is found. Return the partner for the minimal budget.    
 
         if(Tara::args_info.sa_given) {
             message("Synthesized a cost-minimal partner. (Costs = %d)", minBudget);

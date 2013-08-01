@@ -104,7 +104,7 @@ void iModification::init() {
    for(std::set<pnapi::Transition*>::iterator it=allTransitions.begin();it!=allTransitions.end();++it) {
 
       // the cost of that transition
-      int curCost=Tara::cost(*it);
+      int curCost = Tara::cost(*it);
 
       unsigned int in = 0;
       unsigned int out = 0;

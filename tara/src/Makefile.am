@@ -9,7 +9,7 @@ tara_SOURCES =  main.cc \
         Output.cc Output.h \
         MaxCost.cc MaxCost.h \
         Usecase.cc Usecase.h \
-        lexic_graph.ll syntax_graph.yy \
+        syntax_graph.yy lexic_graph.ll \
         lexic_costfunction.ll syntax_costfunction.yy \
         iModification.cc iModification.h \
         ServiceTools.cc ServiceTools.h \
@@ -58,8 +58,8 @@ EXTRA_DIST += $(BISON_FILES:.yy=.hh)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
 
 # fix for Automake 1.12
-$(BISON_FILES:.yy=.hh):
-	$(AM_V_GEN) mv $(@:.hh=.h) $@
+$(BISON_FILES:.yy=.h):
+	$(AM_V_GEN) mv $(@:.h=.hh) $@
 
 #----------------------------------------------------------------#
 # GENERIC: copy the content of the config.log file to a C header #

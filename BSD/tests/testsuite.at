@@ -143,7 +143,7 @@ AT_CLEANUP
 
 AT_SETUP([Multiple file input])
 AT_CHECK([cp TESTFILES/error04* .])
-AT_CHECK([BSD_ error04-1.owfn error04-2.owfn --lola=],1,ignore,stderr)
+AT_CHECK([BSD_ error04-1.owfn error04-2.owfn error04-2.owfn --lola=],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#04\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP

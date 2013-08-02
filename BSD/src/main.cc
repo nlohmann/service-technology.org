@@ -138,9 +138,9 @@ void evaluateParameters(int argc, char** argv) {
         args_info.lola_arg = strdup(getenv("LOLA"));
     }
 
-    // check whether at most one file is given
-    if (args_info.inputs_num > 1) {
-        abort(4, "at most one input file must be given");
+    // check whether at most two files are given
+    if (args_info.inputs_num > 2) {
+        abort(4, "at most two input files must be given");
     }
 
     if (args_info.bound_arg < 1) {
@@ -159,10 +159,6 @@ void terminationHandler() {
         time_t start_time, end_time;
         time(&start_time);
         cmdline_parser_free(&args_info);
-        InnerMarking::finalize();
-        BSD::finalize();
-
-        delete openNet::net;
 
         time(&end_time);
         status("released memory [%.0f sec]", difftime(end_time, start_time));
@@ -188,8 +184,12 @@ int main(int argc, char** argv) {
     // set the function to call on normal termination
     atexit(terminationHandler);
 
-    // set a standard filename
-    std::string filename = std::string(PACKAGE) + "_output";
+    // set standard filenames
+    std::string filename[2];
+    filename[0] = std::string(PACKAGE) + "_output";
+    filename[1] = std::string(PACKAGE) + "_output";
+
+    BSDgraph _BSDgraph[2];
 
     /*--------------------------------------.
     | 1. parse the command line parameters  |
@@ -198,132 +198,174 @@ int main(int argc, char** argv) {
     Output::setTempfileTemplate(args_info.tmpfile_arg);
     Output::setKeepTempfiles(args_info.noClean_flag);
 
+    bool done = false;
+    for (int i = 0; !done; ++i) {
 
+    	openNet::initialize();
 
     	/*----------------------.
     	| 2. parse the open net |
     	`----------------------*/
-    try {
-    	// parse either from standard input or from a given file
-    	if (args_info.inputs_num == 0) {
-    		status("reading from stdin...");
-    		std::cin >> pnapi::io::owfn >> *openNet::net;
-    	} else {
-    		// strip suffix from input filename
-    		filename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
+    	try {
+    		// parse either from standard input or from a given file
+    		if (args_info.inputs_num == 0) {
+    			status("reading from stdin...");
+    			std::cin >> pnapi::io::owfn >> *openNet::net;
+    			done = true;
+    		} else {
+    			// strip suffix from input filename
+    			filename[i] = std::string(args_info.inputs[i]).substr(0, std::string(args_info.inputs[i]).find_last_of("."));
 
-    		std::ifstream inputStream(args_info.inputs[0]);
-    		if (!inputStream) {
-    			abort(1, "could not open file '%s'", args_info.inputs[0]);
+    			std::ifstream inputStream(args_info.inputs[i]);
+    			if (!inputStream) {
+    				abort(1, "could not open file '%s'", args_info.inputs[i]);
+    			}
+
+    			inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[i])
+    						>> pnapi::io::owfn >> *openNet::net;
+    			if (args_info.inputs_num == i+1)
+    				done = true;
     		}
-
-    		inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-    					>> pnapi::io::owfn >> *openNet::net;
-    	}
-    	if (args_info.verbose_flag) {
+    		if (args_info.verbose_flag) {
+    			std::ostringstream s;
+    			s << pnapi::io::stat << *openNet::net;
+    			status("read net: %s", s.str().c_str());
+    		}
+    	} catch (const pnapi::exception::InputError& error) {
     		std::ostringstream s;
-    		s << pnapi::io::stat << *openNet::net;
-    		status("read net: %s", s.str().c_str());
+    		s << error;
+    		abort(2, "\b%s", s.str().c_str());
     	}
-    } catch (const pnapi::exception::InputError& error) {
-    	std::ostringstream s;
-    	s << error;
-    	abort(2, "\b%s", s.str().c_str());
-    }
 
 
-    // "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
-    if (openNet::net->getTransitions().empty()) {
-    	status("net has no transitions -- adding dead dummy transition");
-    	openNet::net->createArc(openNet::net->createPlace(), openNet::net->createTransition());
-    }
+    	// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
+    	if (openNet::net->getTransitions().empty()) {
+    		status("net %i has no transitions -- adding dead dummy transition", i+1);
+    		openNet::net->createArc(openNet::net->createPlace(), openNet::net->createTransition());
+    	}
 
-    // only normal nets are supported so far
-    if (not openNet::net->isNormal()) {
-    	abort(3, "the input open net must be normal");
-    }
+    	// only normal nets are supported so far
+    	if (not openNet::net->isNormal()) {
+    		abort(3, "the input open net must be normal (net %i)", i+1);
+    	}
 
 
 
-    /*===================================..
-    || OWFN -> BSD automaton             ||
-    ``===================================*/
+    	/*===================================..
+    	|| OWFN -> BSD automaton             ||
+    	``===================================*/
 
-    openNet::changeView(openNet::net, args_info.bound_arg);
+    	openNet::changeView(openNet::net, args_info.bound_arg);
 
-    /*--------------------------------------------.
-    | 1. initialize labels and interface markings |
-    `--------------------------------------------*/
-    Label::initialize();
-
-
-    /*--------------------------------------------.
-    | 2. write inner of the open net to LoLA file |
-    `--------------------------------------------*/
-    Output* temp = new Output();
-    std::stringstream ss;
-    ss << pnapi::io::lola << *openNet::net;
-    std::string lola_net = ss.str();
-
-//    std::stringstream tempstring;
-//    tempstring << " SAFE " << args_info.count_arg << " : ";
-//    std::string bound = tempstring.str();
-//
-//    std::size_t found = lola_net.find("PLACE");
-//    lola_net.insert(found+5, bound);
-
-    //    	//test output!!
-    //    	std::string lola_filename = filename + ".lola";
-    //    	Output outputLola(lola_filename, "LoLa Net");
-    //    	outputLola << lola_net << std::endl;
-
-    temp->stream() << lola_net << std::endl;
-
-    status("%s", lola_net.c_str());
+    	/*--------------------------------------------.
+    	| 1. initialize labels and interface markings |
+    	`--------------------------------------------*/
+    	Label::initialize();
 
 
-    /*------------------------------------------.
-    | 3. call LoLA and parse reachability graph |
-    `------------------------------------------*/
-    // select LoLA binary and build LoLA command
+    	/*--------------------------------------------.
+    	| 2. write inner of the open net to LoLA file |
+    	`--------------------------------------------*/
+    	Output* temp = new Output();
+    	std::stringstream ss;
+    	ss << pnapi::io::lola << *openNet::net;
+    	std::string lola_net = ss.str();
+
+    	temp->stream() << lola_net << std::endl;
+
+    	status("%s", lola_net.c_str());
+
+
+    	/*------------------------------------------.
+    	| 3. call LoLA and parse reachability graph |
+    	`------------------------------------------*/
+    	// select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
-    //    // MinGW does not understand pathnames with "/", so we use the basename
-    const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
+    	//    // MinGW does not understand pathnames with "/", so we use the basename
+    	const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
 #else
-    const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
+    	const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
 #endif
 
-    // call LoLA
-    status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
-    time(&start_time);
-    graph_in = popen(command_line.c_str(), "r");
+    	// call LoLA
+    	status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
+    	time(&start_time);
+    	graph_in = popen(command_line.c_str(), "r");
 
-    graph_parse();
-    pclose(graph_in);
-    graph_lex_destroy();
-    time(&end_time);
-    status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
-    delete temp;
+    	graph_parse();
+    	pclose(graph_in);
+    	graph_lex_destroy();
+    	time(&end_time);
+    	status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
+    	delete temp;
 
 
-    /*-------------------------------.
-    | 4. organize reachability graph |
-    `-------------------------------*/
-    InnerMarking::initialize();
+    	/*-------------------------------.
+    	| 4. organize reachability graph |
+    	`-------------------------------*/
+    	InnerMarking::initialize();
 
-    BSD::initialize();
+    	BSD::initialize();
 
-    BSD::computeBSD();
+    	BSD::computeBSD();
 
-    BSD::printBSD(BSD::graph);
+    	_BSDgraph[i].graph = BSD::graph;
 
-    std::stringstream bound (std::stringstream::in | std::stringstream::out);
-    bound << args_info.bound_arg;
+//    	BSD::printBSD(BSD::graph);
 
-    std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filename + "_b" + bound.str() + ".dot";
-    Output output(dot_filename, "BSD automaton");
-    output.stream() << pnapi::io::sa;
-    Output::dotoutput(output.stream(), *BSD::graph, filename);
+    	_BSDgraph[i].name2id = Label::name2id;
+    	_BSDgraph[i].id2name = Label::id2name;
+    	_BSDgraph[i].U = BSD::U;
+    	_BSDgraph[i].emptyset = BSD::emptyset;
+    	_BSDgraph[i].events = Label::events;
+
+    	_BSDgraph[i].first_receive = Label::first_receive;
+    	_BSDgraph[i].last_receive = Label::last_receive;
+    	_BSDgraph[i].first_send = Label::first_send;
+    	_BSDgraph[i].last_send = Label::last_send;
+
+    	_BSDgraph[i].receive_events = Label::receive_events;
+    	_BSDgraph[i].send_events = Label::send_events;
+
+        delete openNet::net;
+        Label::finalize();
+        InnerMarking::finalize();
+
+    }
+
+    if (args_info.inputs_num == 2) {
+    	bool valid = BSD::checkBiSimAndLambda(_BSDgraph[0], _BSDgraph[1]);
+
+    	if (valid) {
+    		status("net 1 is a br-controller of net 2!");
+    	} else {
+    		status("net 1 is NOT a br-controller of net 2!");
+    	}
+    }
+
+    if (args_info.inputs_num < 2) {
+    	std::stringstream bound (std::stringstream::in | std::stringstream::out);
+    	bound << args_info.bound_arg;
+
+    	done = false;
+    	for (int i = 0; !done; ++i) {
+    		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filename[i] + "_b" + bound.str() + ".dot";
+    		Output output(dot_filename, "BSD automaton");
+    		output.stream() << pnapi::io::sa;
+    		Output::dotoutput(output.stream(), _BSDgraph[i], filename[i]);
+
+    		for (BSDNodeList::const_iterator it = _BSDgraph[i].graph->begin(); it != _BSDgraph[i].graph->end(); ++it) {
+    			delete[] (*it)->pointer;
+    			delete *it;
+    		}
+    		delete _BSDgraph[i].graph;
+
+    		if (args_info.inputs_num == 0 || args_info.inputs_num == i+1)
+    			done = true;
+    	}
+    }
+
+    BSD::finalize();
 
     return EXIT_SUCCESS;
 }

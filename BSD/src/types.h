@@ -49,3 +49,18 @@ typedef struct _BSDNode {
 
 // stores all nodes of the BSD automaton
 typedef std::list<BSDNode *> BSDNodeList;
+
+typedef struct _BSDgraph {
+	BSDNodeList* graph;
+	Label_ID first_receive;
+	Label_ID last_receive;
+	Label_ID first_send;
+	Label_ID last_send;
+	Label_ID send_events;
+	Label_ID receive_events;
+	Label_ID events;
+	BSDNode* U;
+	BSDNode* emptyset;
+	std::map<Label_ID, std::string> id2name;
+	std::map<std::string, Label_ID> name2id;
+} BSDgraph;

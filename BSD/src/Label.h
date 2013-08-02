@@ -67,6 +67,8 @@ class Label {
         /// initialize the interface labels and prepare the necessary mappings
         static void initialize();
 
+        static void finalize();
+
     public: /* static attributes */
         /// a list of visisble transitions (used by LoLA)
         static std::string visible_transitions;

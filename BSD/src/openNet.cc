@@ -33,11 +33,15 @@ using std::vector;
  * STATIC MEMBERS *
  ******************/
 
-pnapi::PetriNet* openNet::net = new pnapi::PetriNet();
+pnapi::PetriNet* openNet::net = NULL;
 
 /******************
  * STATIC METHODS *
  ******************/
+
+void openNet::initialize() {
+	net = new pnapi::PetriNet();
+}
 
 /*!
  \brief Change the viewpoint to the environment.

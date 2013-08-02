@@ -61,6 +61,17 @@ std::map<string, Label_ID> Label::name2id;
  synchronous events). Each event then gets a unique identifier.
  */
 void Label::initialize() {
+	first_receive = 2;  //sic! (0 is the id for tau, 1 is the id for bound_broken-transition)
+	last_receive = 0;
+	first_send = 0;
+	last_send = 0;
+	first_sync = 0;
+	last_sync = 0;
+	send_events = 0;
+	receive_events = 0;
+	sync_events = 0;
+	events = 1; // (sic!)
+	visible_transitions = "";
 
 	// set label for internal transitions (tau)
 	id2name[0] = "\\tau";
@@ -130,5 +141,10 @@ void Label::initialize() {
     }
 
     last_sync = events;
+}
+
+void Label::finalize() {
+	id2name.clear();
+	name2id.clear();
 }
 

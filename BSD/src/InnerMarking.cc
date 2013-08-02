@@ -100,6 +100,11 @@ void InnerMarking::finalize() {
     delete[] inner_markings;
 
     status("InnerMarking: deleted %d objects", stats.markings);
+
+    stats.bad_states = 0;
+    stats.final_markings = 0;
+    stats.markings = 0;
+    stats.inevitable_deadlocks = 0;
 }
 
 

@@ -43,6 +43,8 @@ BSDNode* BSD::U = NULL;
 BSDNode* BSD::emptyset = NULL;
 MarkingList* BSD::templist = NULL;
 
+std::list<std::pair<BSDNode*, BSDNode*> >* BSD::bisimtemp = NULL;
+
 
 /******************
  * STATIC METHODS *
@@ -124,7 +126,7 @@ void BSD::computeBSD() {
 
 // compute closure of BSD node after performing step with given label
 BSDNode* BSD::computeClosure(BSDNode &node, Label_ID label) {
-	status("computing closure of node %x with label %s", &node, Label::id2name[label].c_str());
+	status("computing closure of BSD node %x with label %s", &node, Label::id2name[label].c_str());
 	MarkingList resultlist;
 	// iterate through all marking ids in the BSD node
 	for (MarkingList::const_iterator it = node.list.begin(); it != node.list.end(); ++it) {
@@ -188,31 +190,31 @@ BSDNode* BSD::computeClosure(BSDNode &node, Label_ID label) {
 //}
 
 bool BSD::computeClosure(InnerMarking_ID id) {
-	status("touching node %u", id);
+	status("touching marking %u", id);
 	for (MarkingList::const_iterator it = templist->begin(); it != templist->end(); ++it) {
 		if (*it == id) {
-			status("node already in templist");
+			status("marking already touched");
 			return false;
 		}
 	}
 	// add the current marking to the closure
 	templist->push_back(id);
 	// iterate through all successors of the given marking
-	status("\titerating through succesors of node %u:", id);
+	status("\titerating through successors of marking %u:", id);
 	for (uint8_t i = 0; i < InnerMarking::inner_markings[id]->out_degree; ++i) {
 		// if the given bound is broken return NULL as an indication
 		if (InnerMarking::inner_markings[id]->labels[i] == BOUND) {
-			status("\tbound broken from node %u", id);
+			status("\tbound broken from marking %u", id);
 			return true;
 		}
 		// only consider \tau-steps
 		if (InnerMarking::inner_markings[id]->labels[i] == TAU) {
-			status("\ttau step possible from node %u to node %u", id, InnerMarking::inner_markings[id]->successors[i]);
+			status("\ttau step possible from marking %u to marking %u", id, InnerMarking::inner_markings[id]->successors[i]);
 			// compute closure of successor
 			bool boundbroken = computeClosure(InnerMarking::inner_markings[id]->successors[i]);
 			// if bound was broken return NULL recursively
 			if (boundbroken) {
-				status("\tbound broken (recursive abort, node %u)", id);
+				status("\tbound broken (recursive abort, marking %u)", id);
 				return true; //\todo?
 			}
 		}
@@ -340,18 +342,100 @@ void BSD::printlist(MarkingList *list) {
 }
 
 void BSD::finalize() {
-	for (BSDNodeList::const_iterator it = graph->begin(); it != graph->end(); ++it) {
-		delete[] (*it)->pointer;
-		delete *it;
-	}
-	delete graph;
+//	for (BSDNodeList::const_iterator it = graph->begin(); it != graph->end(); ++it) {
+//		delete[] (*it)->pointer;
+//		delete *it;
+//	}
+//	delete graph;
 
-	delete[] U->pointer;
-	delete U;
-
-	delete[] emptyset->pointer;
-	delete emptyset;
+//	delete[] U->pointer;
+//	delete U;
+//
+//	delete[] emptyset->pointer;
+//	delete emptyset;
 
 	delete templist;
+}
+
+bool BSD::checkBiSimAndLambda(BSDgraph & graph1, BSDgraph & graph2) {
+	if (graph1.receive_events != graph2.send_events ||
+		graph1.send_events != graph2.receive_events) {
+		status("Size of interface differs! No bisimulation possible.");
+		return false;
+	}
+
+	std::map<Label_ID, Label_ID>* mapping = computeMapping(graph1, graph2);
+
+	if (mapping == NULL) {
+		status("Different Interfaces. Nets not composable");
+		return false;
+	}
+
+	// bisim?
+	bisimtemp = new std::list<std::pair<BSDNode*, BSDNode*> >;
+
+	bool result = computeBiSim(*graph1.graph->begin(), *graph2.graph->begin(), mapping, graph1.events);
+
+	delete bisimtemp;
+	delete mapping;
+
+	return result;
+}
+
+bool BSD::computeBiSim(BSDNode * node_g1, BSDNode * node_g2, std::map<Label_ID, Label_ID> * mapping, Label_ID events) {
+	for (std::list<std::pair<BSDNode*, BSDNode*> >::const_iterator it = bisimtemp->begin(); it != bisimtemp->end(); ++it) {
+		if (it->first == node_g1 && it->second == node_g2)
+			return true;
+	}
+
+	if (node_g1->lambda + node_g2->lambda <= 2) {
+		return false;
+	} else {
+		std::pair<BSDNode*, BSDNode*> temp (node_g1, node_g2);
+		bisimtemp->push_back(temp);
+	}
+
+	bool valid = true;
+	for (uint id = 2; id <= events; ++id) {
+		valid = computeBiSim(node_g1->pointer[id], node_g2->pointer[(*mapping)[id]], mapping, events);
+		if (!valid) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+std::map<Label_ID, Label_ID>* BSD::computeMapping(BSDgraph & graph1, BSDgraph & graph2) {
+	std::map<Label_ID, Label_ID>* result = new std::map<Label_ID, Label_ID>;
+	for (std::map<Label_ID, std::string>::const_iterator it1 = graph1.id2name.begin(); it1 != graph1.id2name.end(); ++it1) {
+		if (it1->first < 2)
+			continue;
+		bool found = false;
+		for (std::map<Label_ID, std::string>::const_iterator it2 = graph2.id2name.begin(); it2 != graph2.id2name.end(); ++it2) {
+			if (it2->first < 2)
+				continue;
+			if (it1->second.compare(it2->second) == 0) {
+				found = true;
+				if ((it1->first >= graph1.first_receive && it1->first <= graph1.last_receive &&		// (label 1 receiving and
+						it2->first >= graph2.first_send && it2->first <= graph2.last_send) ||		// label 2 sending) or
+					(it1->first >= graph1.first_send && it1->first <= graph1.last_send &&			// (label 1 sending and
+						it2->first >= graph2.first_receive && it2->first <= graph2.last_receive)) {	// label 2 receiving)
+					// add the mapping from id 1 to id 2
+					(*result)[it1->first] = it2->first;
+					break;
+				} else {
+					status("label %s of net 1 and net 2 are either both input or both output labels", it1->second.c_str(), it2->second.c_str());
+					return NULL;
+				}
+			}
+		}
+		if (!found) {
+			status("label %s of net 1 doesn't match any label of net 2", it1->second.c_str());
+			return NULL;
+		}
+	}
+
+	return result;
 }
 

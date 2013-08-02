@@ -83,9 +83,9 @@ class Output {
         std::ostream& stream() const;
 
         /// dot output
-        static std::ostream & dotoutput(std::ostream &, const BSDNodeList & graph, std::string & filename);
+        static std::ostream & dotoutput(std::ostream &, BSDgraph & graph, std::string & filename);
 
-        static std::string dotnodeName(BSDNode & node);
+        static std::string dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset);
 
         /*!
          * \brief write vector elements, seperated by given delimeter, to stream

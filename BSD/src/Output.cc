@@ -183,7 +183,7 @@ void Output::setKeepTempfiles(bool b) {
 /*!
  * \brief dot output
  */
-std::ostream & Output::dotoutput(std::ostream & os, const BSDNodeList & graph, std::string & filename)
+std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::string & filename)
 {
 //	digraph graphname {
 //	     a -> b;
@@ -192,21 +192,21 @@ std::ostream & Output::dotoutput(std::ostream & os, const BSDNodeList & graph, s
 
 	os << "digraph {\n";
 
-	for (BSDNodeList::const_iterator it = graph.begin(); it != graph.end(); ++it) {
-		for (uint id = 2; id <= Label::events; ++id) {
-			os << "\t" << dotnodeName(**it) << " -> " << dotnodeName(*((*it)->pointer[id]))
-			   << " [label=\"" << Label::id2name[id] << "\"];" << endl;
+	for (BSDNodeList::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
+		for (uint id = 2; id <= graph.events; ++id) {
+			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(*((*it)->pointer[id]), graph.U, graph.emptyset)
+			   << " [label=\"" << graph.id2name[id] << "\"];" << endl;
 		}
 	}
 
 	return os << "}" << endl;
 }
 
-std::string Output::dotnodeName(BSDNode & node) {
-	if (&node == BSD::U) {
+std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset) {
+	if (&node == U) {
 		return "\"U.3\"";
 	}
-	if (&node == BSD::emptyset) {
+	if (&node == emptyset) {
 		return "\"empty.0\"";
 	}
 	std::stringstream temp (std::stringstream::in | std::stringstream::out);

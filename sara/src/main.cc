@@ -86,7 +86,7 @@ bool flag_joborder(false);
 bool flag_yesno(false);
 int val_maxdepth(0);
 
-} // end namespace sara
+} // end of namespace sara
 
 /*
 template <class T>

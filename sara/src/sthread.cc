@@ -92,7 +92,7 @@ bool multithreaded;
 	*****************************************/
 
 /** Initialise the global thread related variables.
-	@param The number of additional threads.
+	@param max The number of additional threads.
 */
 void initThreadData(int max) {
 
@@ -584,9 +584,6 @@ void makeThreadsIdle(int debug) {
 */
 void waitForAllIdle(int debug) {
 	// this function must be called by the main process only
-
-	// flag is set if some depending thread is still working
-	bool somework;
 
 	// wait until all threads are idle
 	pthread_mutex_lock(&main_mutex);

@@ -71,6 +71,7 @@ extern pthread_cond_t main_cond;
 	\param out If we print to stdout.
 	\param brk The value of the option --break, if set.
 	\param passedon If the problem was passed on from an earlier run of the PathFinder.
+	\param im0 The indicence matrix for the Petri net.
 */
 Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk, bool passedon, IMatrix* im0)
 	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(*im0),breakafter(brk),problem(&pb),loops(0),suboptimal(false),jsum(0),jmax(1),jloop(0),jold(0),dsum(0),dmax(1),dloop(0),recstepsum(0) {
@@ -224,7 +225,7 @@ PartialSolution* Reachalyzer::getSingleJob(unsigned int threadID) {
 		pthread_mutex_unlock(&tps_mutex);
 		if (!ps) return NULL; // if there is no active job, we can't do anything
 
-		if (stateinfo && out) { // overwrite job info if stdout (screen) is used
+		if (stateinfo && out && isatty(fileno(stdout))) { // overwrite job info if stdout (screen) is used
 			pthread_mutex_lock(&print_mutex);
 			cout << setw(7) << loops << "/" << setw(7) << jtmp << "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"; 
 			cout.flush();
@@ -419,6 +420,7 @@ void Reachalyzer::doSingleJob(unsigned int threadID, PartialSolution* ps) {
 
 /** Print the results of the reachability analysis. 
 	@param pbnr An identifying number for the problem instance for use in filenames
+	@param json The JSON object to which the result will be written.
 */
 void Reachalyzer::printResult(int pbnr, JSON& json) {
 	// print all solutions first and find the longest solution length
@@ -499,6 +501,8 @@ int Reachalyzer::getStatus() {
 /*! Check whether a solution of lp_solve has been found earlier. If this happened, use that
 	former solution to create the necessary new jobs without again trying to find realizations
 	of the solution in form of firing sequences, using a lookup table.
+	\param ttps A thread-local job queue having the new partial solution as its first entry.
+	\param excl A former partial solution excluded from the comparison (usually father node)
 	\param tv The new? solution.
 	\return If the solution has been calculated before.
 */
@@ -537,6 +541,7 @@ bool Reachalyzer::solutionSeen(JobQueue& ttps, PartialSolution* excl, map<Transi
 }
 
 /*! Precompute a list of jumps to be done. Create a job for the first one.
+	\param ttps A thread-local job queue having the new partial solution as its first entry.
 	\param diff The values in the new solution that are greater than the old (father) solution.
 	\param ps The job on which the jumps are to be based.
 */
@@ -571,6 +576,7 @@ void Reachalyzer::createJumps(JobQueue& ttps, map<Transition*,int>& diff, Partia
 }
 
 /*! Create a job for the next precomputed jump.
+	\param ttps A thread-local job queue having the new partial solution as its first entry.
 	\param ps The job for the former jump containing the precomputed jump list.
 */
 void Reachalyzer::nextJump(JobQueue& ttps, PartialSolution* ps) {
@@ -659,7 +665,7 @@ void Reachalyzer::transferJobs(JobQueue& ttps, bool killactive) {
 	The number if computed dynamically from the number of recursion
 	steps in PathFinder instances of the recent past and the numbers
 	of jobs already done and in queue.
-	@param A completed PathFinder instance.
+	@param pf A completed PathFinder instance.
 */
 void Reachalyzer::adaptNumberOfJobbers(PathFinder& pf) {
 	unsigned int pfrs(pf.getRecSteps());

@@ -72,10 +72,10 @@ PartialSolution::~PartialSolution() {}
 */
 Marking& PartialSolution::getMarking() { return m; }
 
-/** Set the marking reached after firing the partial firing sequence.
+/* Set the marking reached after firing the partial firing sequence.
 	@param m1 The Marking.
 */
-void PartialSolution::setMarking(Marking& m1) { m=m1; }
+//void PartialSolution::setMarking(Marking& m1) { m=m1; }
 
 /** Get method for the partial firing sequence.
 	@return The partial firing sequence.
@@ -367,6 +367,15 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 				// necessary tokens must come from the outside.
 				if (tcomp[i].size()>0) // there are transitions in the component
 				{
+					// first check if there were more tokens earlier
+/**/
+					map<Place*,int> red;
+					reduceUndermarking(im,pcomp[i],red);
+					for(map<Place*,int>::iterator mpit=red.begin(); mpit!=red.end(); ++mpit) {
+						undermarking[mpit->first] -= mpit->second;
+						if (undermarking[mpit->first] < 1) undermarking[mpit->first] = 1;
+					}
+
 					for(fit=tcomp[i].begin(); fit!=tcomp[i].end(); ++fit)
 					{
 						int addtimes(remains[*fit]); // additional required firings of a forbidden transition to activate others
@@ -432,9 +441,14 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 //cerr << (*pit)->getName() << " cons: " << constmp << " post: " << posttmp << " cfm: " << cfm[*pit] << endl;
 					}
 					incr = cons+postneed; // the overall minimum number of tokens needed in this component for the forbidden transitions 
+/**/
+					// reduce increment if there were more tokens earlier
+					map<Place*,int> red;
+					reduceUndermarking(im,pcomp[i],red);
+					if (incr-red.begin()->second<1) incr=1; else incr -= red.begin()->second;
 				}
 				// we now know a number of additional tokens needed, so we can build the constraint 
-				buildMultiConstraint(ptmp,incr,forbidden);
+				buildMultiConstraint(ptmp,(incr>1 ? incr:1),forbidden);
 			}
 		}
 }
@@ -619,5 +633,28 @@ void PartialSolution::transformJumps(map<Transition*,int>& fullvector) {
 			setConstraint(c);
 		}	
 }
+
+
+/** Reduce the number of missing tokens if there were more tokens earlier in the firing sequence.
+	@param im The incidence matrix of the Petri net.
+	@param pcomp The set of places that miss tokens.
+	@param red The reduction values, i.e. how many more tokens have been encountered earlier.
+*/
+void PartialSolution::reduceUndermarking(IMatrix& im, const set<Place*>& pcomp, map<Place*,int>& red)
+{
+	map<Place*,int> tmp;
+	set<Place*>::iterator pit;
+	for(int i=tseq.size()-1; i>=0; --i) {
+		map<Place*,int>& pmap(im.getColumn(*tseq[i])); // get the change for firing a transition
+		for(pit=pcomp.begin(); pit!=pcomp.end(); ++pit) {
+			map<Place*,int>::iterator ppit(pmap.find(*pit));
+			if (ppit!=pmap.end()) {
+				int x(tmp[*pit] -= ppit->second); // and subtract it from the marking (reverse-fire)
+				if (x > red[*pit]) red[*pit] = x; // save the maximum token overhead in the sequence
+			}
+		}
+	}
+}
+
 
 } // end namespace sara

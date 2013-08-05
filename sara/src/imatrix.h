@@ -79,7 +79,7 @@ public:
 	int getWeight(Place& p, Transition& t);
 
 	/// Get the number of loops between a transition and all its neighboring places.
-	map<Place*,int>& getLoopColumn(Transition& t);
+//	map<Place*,int>& getLoopColumn(Transition& t);
 
 	/// Calculate the predecessor marking (before t has been fired).
 	void predecessor(Marking& m, Transition& t);
@@ -100,16 +100,16 @@ public:
 	unsigned int pMaxPreset();
 
 	/// Get the size of the largest postset of a place.
-	unsigned int pMaxPostset();
+//	unsigned int pMaxPostset();
 
 	/// Get the size of the largest preset of a transition.
-	unsigned int tMaxPreset();
+//	unsigned int tMaxPreset();
 
 	/// Get the size of the largest postset of a transition.
-	unsigned int tMaxPostset();
+//	unsigned int tMaxPostset();
 
 	/// Get an overapproximated number of conflicting transitions for any transition.
-	unsigned int maxConflict();
+//	unsigned int maxConflict();
 
 	/// Get the number of places in the net.
 	unsigned int numPlaces();

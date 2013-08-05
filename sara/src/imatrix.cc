@@ -191,11 +191,11 @@ int IMatrix::getWeight(Place& p, Transition& t) {
 	return (pit!=pre[&t].end() ? pit->second : 0); // check if there is a place so we won't change the map
 }
 
-/** Calculate the loops at some transition.
+/* Calculate the loops at some transition.
 	@param t The transition.
 	@return A map from all places with loops at t to the (lesser) arc weight in the loop.
 */
-map<Place*,int>& IMatrix::getLoopColumn(Transition&t) {	return loop[&t]; }
+//map<Place*,int>& IMatrix::getLoopColumn(Transition&t) {	return loop[&t]; }
 
 /** Calculate the marking previous to firing a transition.
 	@param m The marking. The method changes this marking by reverse-firing t. No checks
@@ -230,6 +230,7 @@ void IMatrix::successor(Marking& m, Transition &t)
 /** Compares the effect of two Transitions t1 and t2; if fired under
 	the same marking the result on some place p is lower for t1
 	than for t2, the place p is in the resulting output set.
+	@param thr The calling thread (for reuse of local memory).
 	@param t1 Anchor transition.
 	@param t2 The transition to compare t1 to.
 	@return The set of places that are marked lower by t1 than by t2.
@@ -325,25 +326,25 @@ map<Place*,int> IMatrix::getChange(map<Transition*,int>& fv) {
 */
 unsigned int IMatrix::pMaxPreset() { return pmaxpreset; }
 
-/** Get the maximal size of postsets of places.
+/* Get the maximal size of postsets of places.
 	@return The maximal size.
 */
-unsigned int IMatrix::pMaxPostset() { return pmaxpostset; }
+//unsigned int IMatrix::pMaxPostset() { return pmaxpostset; }
 
-/** Get the maximal size of presets of transitions.
+/* Get the maximal size of presets of transitions.
 	@return The maximal size.
 */
-unsigned int IMatrix::tMaxPreset() { return tmaxpreset; }
+//unsigned int IMatrix::tMaxPreset() { return tmaxpreset; }
 
-/** Get the maximal size of postsets of transitions.
+/* Get the maximal size of postsets of transitions.
 	@return The maximal size.
 */
-unsigned int IMatrix::tMaxPostset() { return tmaxpostset; }
+//unsigned int IMatrix::tMaxPostset() { return tmaxpostset; }
 
-/** Get the maximal number of conflicting transitions for a single transition.
+/* Get the maximal number of conflicting transitions for a single transition.
 	@return An overaproximation of the maximal number of conflicting transitions.
 */
-unsigned int IMatrix::maxConflict() { return maxconflict; }
+//unsigned int IMatrix::maxConflict() { return maxconflict; }
 
 /** Get the number of places in the Petri net.
 	@return The number of places.

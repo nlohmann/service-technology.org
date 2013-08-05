@@ -23,6 +23,7 @@
 #include "jobqueue.h"
 #include "verbose.h"
 #include <pthread.h>
+#include <unistd.h>
 #include "sthread.h"
 
 #include <vector>
@@ -145,7 +146,7 @@ bool PathFinder::recurse(unsigned int tid) {
 
 	// on screen progress indicator
 	++recsteps;
-	if (flag_verbose && !flag_output)
+	if (flag_verbose && !flag_output && isatty(fileno(stderr)))
 	{
 		switch (recsteps&0xFFFF) {
 			case 0x0000: cerr << "|\b"; cerr.flush(); break;
@@ -262,11 +263,10 @@ bool PathFinder::recurse(unsigned int tid) {
 	todo.clear(); // and empty it 
 	todo.push_back(revtorder[tstart]); // tstart is the first element that needs to be "done"
 	unsigned int todoptr(0); // pointer to the active element in todo
-	int npos; // the number of the next transition to work on
 
 	// now go through the list until all elements in it are done
 	while (todoptr<todo.size()) {
-		npos = todo[todoptr]; // get the number of the transition to work upon
+		int npos(todo[todoptr]); // get the number of the transition to work upon
 
 		// create stubborn set conflict&dependency graph for "npos" transition
 		if (!thr->cftab[npos].empty()) { // check if there are conflicts/dependencies at all

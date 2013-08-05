@@ -70,7 +70,7 @@ public:
 	Marking& getMarking();
 
 	/// Set method for the marking
-	void setMarking(Marking& m);
+//	void setMarking(Marking& m);
 
 	/// Get the initially firable sequence
 	vector<Transition*>& getSequence();
@@ -161,6 +161,8 @@ public:
 
 	/// Alter all jump constraints into normal ones
 	void transformJumps(map<Transition*,int>& fullvector);
+
+	void reduceUndermarking(IMatrix& im, const set<Place*>& pcomp, map<Place*,int>& red);
 
 private:	
 	/// The partial firing sequence

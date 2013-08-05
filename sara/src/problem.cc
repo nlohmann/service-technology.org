@@ -332,10 +332,9 @@ bool Problem::calcPTOrder() {
 	map<int,set<pnapi::Transition*> >::iterator tmit;
 	map<int,set<pnapi::Place*> >::iterator pmit;
 	set<pnapi::Arc*>::iterator ait;
-	int min;
 	for(int i=0; i<6; ++i) // Probably five rounds are enough to make the order deterministic, but we can't be sure!
 	{
-		min = 0;
+		int min = 0;
 		for(tmit=tord.begin(); tmit!=tord.end(); ++tmit)
 		{
 			int minval = 0;

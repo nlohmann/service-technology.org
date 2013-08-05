@@ -168,8 +168,8 @@ void json_parse(JSON& jin) {
 	for(JSON::iterator jit=jin.begin(); jit!=jin.end(); ++jit)
 	{
 		Problem pbl;
-		std::map<string,int> clhs;
-		int ccomp,crhs;
+//		std::map<string,int> clhs;
+//		int ccomp,crhs;
 
 		pbl.setName(jit.key());
 		if ((*jit)["GOAL"] == "REACHABILITY")
@@ -479,6 +479,7 @@ if (args_info.input_given || args_info.pipe_given) {
 	int solcnt = 0;
 	int maxtracelen = -1; // maximal solution length (-1=no solution)
 	int avetracelen = 0; // average solution length
+
 	// walk through the problem list
 	for(unsigned int x=0; x<pbls.size(); ++x)
 	{
@@ -499,6 +500,7 @@ if (args_info.input_given || args_info.pipe_given) {
 		Marking m2(pbls.at(x).getFinalMarking()); // get the extended final marking (if there is one)
 		map<Place*,int> cover; // for the cover directives for the places 
 		bool passedon(false); // set to true when the problem is passed on from PathFinder to Reachalyzer 
+
 		if (verbose) // print the problem statement
 		{
 			cout << "sara: Trying to " << (pbls.at(x).getGoal()==Problem::REALIZABLE?"realize a transition vector ":"solve a reachability problem ") << "with inputs:" << endl;
@@ -521,8 +523,10 @@ if (args_info.input_given || args_info.pipe_given) {
 				cout << endl;
 			}
 		}
+
 		cover = pbls.at(x).getCoverRequirement(); // get the cover directives for the places, if there are any 
 		switch (pbls.at(x).getGoal()) { // check for reachability or realizability?
+
 			case Problem::REALIZABLE: {
 				map<Transition*,int> tv(pbls.at(x).getVectorToRealize()); // the vector to realize
 //				IMatrix im(*pn); // incidence matrix of the net
@@ -550,7 +554,7 @@ if (args_info.input_given || args_info.pipe_given) {
 				}
 				else { 
 					if (!flag_yesno) cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
-					if (!pbls.at(x).isNegateResult() ^ pbls.at(x).isOrResult())
+					if ((!pbls.at(x).isNegateResult()) ^ pbls.at(x).isOrResult())
 						results[pbls.at(x).getResultText()] = false;
 				}
 				if ((!solutions.almostEmpty() || !verbose) && !args_info.continue_given) break;
@@ -562,6 +566,8 @@ if (args_info.input_given || args_info.pipe_given) {
 				for(mit=change.begin(); mit!=change.end(); ++mit)
 					m2[*(mit->first)]+=mit->second;
 			}
+			// no break here! We might want to pass on the problem to the reachability solver
+
 			case Problem::REACHABLE: {
 				// obtain an instance of the reachability solver
 				Reachalyzer reach(*pn,m1,m2,cover,pbls.at(x),verbose,debug,out,(args_info.break_given?args_info.break_arg:0),passedon,im);
@@ -577,7 +583,7 @@ if (args_info.input_given || args_info.pipe_given) {
 								|| reach.getStatus()==Reachalyzer::LPSOLVE_RUNTIME_ERROR) {
 						indecisive[pbls.at(x).getResultText()] = true;
 					} else {
-						if (!pbls.at(x).isNegateResult() ^ pbls.at(x).isOrResult())
+						if ((!pbls.at(x).isNegateResult()) ^ pbls.at(x).isOrResult())
 							results[pbls.at(x).getResultText()] = false;
 					}
 					if (!flag_yesno) reach.printResult(x+1,json); // ... and print the result
@@ -602,6 +608,7 @@ if (args_info.input_given || args_info.pipe_given) {
 				}
 				break;
 			}
+
 			case Problem::DUMMY: donotcompute[pbls.at(x).getResultText()] = true; break;
 		}
 		if (!flag_yesno) cout << endl;
@@ -618,7 +625,9 @@ if (args_info.input_given || args_info.pipe_given) {
 			cout << "." << endl;
 		}
 	}
-	if (flag_yesno) {
+
+	if (flag_yesno) { // for reduced output (Model checking contest 2011)
+
 		for(unsigned int i=0; i<resorder.size(); ++i)
 			if (resorder[i]!="")
 			{
@@ -638,7 +647,9 @@ if (args_info.input_given || args_info.pipe_given) {
 				}
 				if (tech) cout << "TECHNIQUES ABSTRACTIONS PARTIAL_ORDERS OTHERS" << endl;
 			}
-	} else {
+
+	} else { // normal output
+
 		for(unsigned int i=0; i<resorder.size(); ++i)
 			if (resorder[i]!="" && donotcompute.find(resorder[i])==donotcompute.end())
 			{
@@ -667,21 +678,7 @@ if (args_info.input_given || args_info.pipe_given) {
 				}
 			}
 	}
-/*
-	map<string,bool>::iterator mbit;
-	for(mbit=results.begin(); mbit!=results.end(); ++mbit)
-		if (mbit->first!="")
-		{
-			cout << "sara: The property of " << mbit->first;
-			if (indecisive.find(mbit->first)==indecisive.end()) {
-				if (mbit->second) cout << " is fulfilled." << endl;
-				else cout << " does not hold in general." << endl;
-			} else {
-				if (mbit->second) cout << " could not be decided." << endl;
-				else cout << " does not hold in general." << endl;
-			}
-		}
-*/
+
 	if (args_info.time_given) // print time use if --time was specified
 		cout << "sara: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;
 
@@ -689,6 +686,7 @@ if (args_info.input_given || args_info.pipe_given) {
 	stopThreads();
 	destroyThreadData();
 
+	// write the JSON object with solution/counter examples to a file
 	if (args_info.json_arg) {
 		std::ofstream outputStream(args_info.json_arg);
         if (!outputStream) abort(3, "could not write to file '%s'", args_info.json_arg);

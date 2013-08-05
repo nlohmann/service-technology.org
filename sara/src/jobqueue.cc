@@ -463,6 +463,7 @@ bool JobQueue::cleanFailure(map<Transition*,int>& p) {
 	@param im Incidence matrix of the Petri net
 	@param pb The problem instance (for saving a visually colored net).
 	@param pbnr An identifying number for the problem instance (used for filename construction)
+	@param json The JSON object to which the failure information will additionally be written.
 */
 void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr, JSON& json) {
 	int failcnt(0); // counting the failures for adapting filenames
@@ -659,6 +660,7 @@ bool JobQueue::push_solved(PartialSolution* job) {
 	@param sum On Return: The sum over all solution lengths.
 	@param pb The problem instance for saving a colored solution.
 	@param pbnr An identifying number for the problem instance (used for filename construction)
+	@param json The JSON object to which the solution will be written (additionally).
 	@return The maximal length of a solution.
 */
 int JobQueue::printSolutions(int& sum, Problem& pb, int pbnr, JSON& json) {

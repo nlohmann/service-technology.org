@@ -368,14 +368,14 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 				if (tcomp[i].size()>0) // there are transitions in the component
 				{
 					// first check if there were more tokens earlier
-/**/
+/*
 					map<Place*,int> red;
 					reduceUndermarking(im,pcomp[i],red);
 					for(map<Place*,int>::iterator mpit=red.begin(); mpit!=red.end(); ++mpit) {
 						undermarking[mpit->first] -= mpit->second;
 						if (undermarking[mpit->first] < 1) undermarking[mpit->first] = 1;
 					}
-
+*/
 					for(fit=tcomp[i].begin(); fit!=tcomp[i].end(); ++fit)
 					{
 						int addtimes(remains[*fit]); // additional required firings of a forbidden transition to activate others
@@ -441,11 +441,12 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 //cerr << (*pit)->getName() << " cons: " << constmp << " post: " << posttmp << " cfm: " << cfm[*pit] << endl;
 					}
 					incr = cons+postneed; // the overall minimum number of tokens needed in this component for the forbidden transitions 
-/**/
+/*
 					// reduce increment if there were more tokens earlier
 					map<Place*,int> red;
 					reduceUndermarking(im,pcomp[i],red);
 					if (incr-red.begin()->second<1) incr=1; else incr -= red.begin()->second;
+*/
 				}
 				// we now know a number of additional tokens needed, so we can build the constraint 
 				buildMultiConstraint(ptmp,(incr>1 ? incr:1),forbidden);

@@ -71,7 +71,8 @@ cost:
    | CF_NAME CF_COLON CF_NUMBER CF_RESET {
        pnapi::Transition* t=Tara::net->findTransition($1);
        if(t!=NULL) {
-           Tara::partialCostFunction[t]=$3;
+           Tara::partialCostFunction[t] = $3;
+           Tara::resetMap[t] = true;
 	   if (Tara::highestTransitionCosts < $3) Tara::highestTransitionCosts = $3;
 	}
        free($1); //free string

@@ -8,7 +8,8 @@ unsigned int Tara::minCosts = 0; // gna task #7709
 lprec* Tara::lp = 0; 
 int Tara::nrOfEdges = 0;
 int Tara::nrOfFinals = 0;
-std::map<pnapi::Transition* ,unsigned int> Tara::partialCostFunction;
+std::map<pnapi::Transition*, unsigned int> Tara::partialCostFunction;
+std::map<pnapi::Transition*, bool> Tara::resetMap;
 
 pnapi::PetriNet* Tara::net = 0; 
 Modification* Tara::modification = 0; 
@@ -23,6 +24,14 @@ unsigned int Tara::cost(pnapi::Transition* t) {
       return 0;
 
    return cost->second;
+}
+
+bool Tara::isReset(pnapi::Transition* t) {
+   std::map<pnapi::Transition*, bool>::iterator r = Tara::resetMap.find(t);
+   if(r == Tara::resetMap.end())  {
+      return false;
+   }
+   return r->second;
 }
 
 /// The global temp file, used for lola & wendy calls

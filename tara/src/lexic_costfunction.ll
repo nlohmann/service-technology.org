@@ -23,6 +23,7 @@
 %option full
 %option outfile="lex.yy.c"
 %option prefix="costfunction_"
+%option case-insensitive
 
 %{
 #include <cstring>

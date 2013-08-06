@@ -17,6 +17,7 @@ tara_SOURCES =  main.cc \
 	Tara.cc Tara.h \
         CCSearch.h CCSearch.cc \
         Risk.h Risk.cc \
+        Reset.h Reset.cc \
         tinythread.h tinythread.cpp \
         Parser.cc Parser.h
                 

@@ -43,6 +43,9 @@ public:
      */
     static std::map<pnapi::Transition* ,unsigned int> partialCostFunction;
 
+    static bool isReset(pnapi::Transition*);
+    static std::map<pnapi::Transition* ,bool> resetMap;
+
     ///the input net
     static pnapi::PetriNet* net;
 

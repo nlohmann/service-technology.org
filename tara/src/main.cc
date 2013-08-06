@@ -40,6 +40,7 @@
 #include "iModification.h"
 #include "CCSearch.h"
 #include "Risk.h"
+#include "Reset.h"
 
 using std::cerr;
 using std::cout;
@@ -144,6 +145,10 @@ int main(int argc, char** argv) {
     if (Tara::args_info.riskcosts_given) {
         status("risk costs given with base %d", Tara::args_info.riskcosts_given);
         transformRiskCosts(& Tara::partialCostFunction, Tara::args_info.riskcosts_arg);
+    }
+    if (Tara::resetMap.size() > 0) {
+        status("transforming %d Reset- Transitions", Tara::resetMap.size());
+        Reset::transformNet();
     }
 
     /*----------------------------------.

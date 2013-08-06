@@ -26,7 +26,7 @@
 
 %{
 #include <cstring>
-#include "syntax_costfunction.h"
+#include "syntax_costfunction.hh"
 #include "verbose.h"
 
 void graph_error(const char*);

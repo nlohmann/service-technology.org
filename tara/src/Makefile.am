@@ -10,10 +10,10 @@ tara_SOURCES =  main.cc \
         MaxCost.cc MaxCost.h \
         Usecase.cc Usecase.h \
         syntax_graph.yy lexic_graph.ll \
-        lexic_costfunction.ll syntax_costfunction.yy \
+        syntax_costfunction.yy lexic_costfunction.ll \
         iModification.cc iModification.h \
         ServiceTools.cc ServiceTools.h \
-		Tara.cc Tara.h \
+	Tara.cc Tara.h \
         CCSearch.h CCSearch.cc \
         Risk.h Risk.cc \
         tinythread.h tinythread.cpp \
@@ -54,12 +54,13 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$(tara_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
+BUILT_SOURCES += $(BISON_FILES:.yy=.hh)
 EXTRA_DIST += $(BISON_FILES:.yy=.hh)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
 
-# fix for Automake 1.12
-$(BISON_FILES:.yy=.h):
-	$(AM_V_GEN) mv $(@:.h=.hh) $@
+# fix for Automake 1.11
+$(BISON_FILES:.yy=.hh):
+	$(AM_V_GEN) mv $(@:.hh=.h) $@
 
 #----------------------------------------------------------------#
 # GENERIC: copy the content of the config.log file to a C header #

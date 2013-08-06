@@ -19,18 +19,45 @@
 
 #include "Reset.h"
 #include "Tara.h"
+#include "PnapiHelper.h"
 
 namespace Reset {
     void transformNet() {
         message("Reset- Transformation ist not yet working !!");
-        // go through all reset-transitions
-        std::map<pnapi::Transition*, bool>::iterator it;
-        it = Tara::resetMap.begin();
-        std::map<pnapi::Transition*, bool>::iterator end;
-        end = Tara::resetMap.end();
 
-        for(; it != end; ++it) {
-            status("%s is Reset- Transition", it->first->getName().c_str());
+        std::map<pnapi::Transition*, pnapi::Transition*> freeTrans;
+
+
+        // TODO: 3 places
+        // init, count_costs, finished
+
+        // go through all non-free transitions
+        {
+            std::map<pnapi::Transition*, unsigned int>::iterator it;
+            it = Tara::partialCostFunction.begin();
+            std::map<pnapi::Transition*, unsigned int>::iterator end;
+            end = Tara::partialCostFunction.end();
+
+            for(; it != end; ++it) {
+                pnapi::Transition* newT = dynamic_cast<pnapi::Transition*>(pnapiHelper::clone(it->first));
+                freeTrans[it->first] = newT;
+
+                // TODO: clone Transition without costs
+
+            }
+        }
+        // go through all reset-transitions
+        {
+            std::map<pnapi::Transition*, bool>::iterator it;
+            it = Tara::resetMap.begin();
+            std::map<pnapi::Transition*, bool>::iterator end;
+            end = Tara::resetMap.end();
+
+            for(; it != end; ++it) {
+                status("%s is Reset- Transition", it->first->getName().c_str());
+                 // TODO: each reset-transition can enable costs or must disable
+                 // costs
+            }
         }
     }
 }

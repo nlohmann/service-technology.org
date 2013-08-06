@@ -14,10 +14,11 @@ tara_SOURCES =  main.cc \
         Modification.h \
         iModification.cc iModification.h \
         ServiceTools.cc ServiceTools.h \
-	Tara.cc Tara.h \
+        Tara.cc Tara.h \
         CCSearch.h CCSearch.cc \
         Risk.h Risk.cc \
         Reset.h Reset.cc \
+        PnapiHelper.h PnapiHelper.cc \
         tinythread.h tinythread.cpp \
         Parser.cc Parser.h
                 

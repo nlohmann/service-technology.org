@@ -11,6 +11,7 @@ tara_SOURCES =  main.cc \
         Usecase.cc Usecase.h \
         syntax_graph.yy lexic_graph.ll \
         syntax_costfunction.yy lexic_costfunction.ll \
+        Modification.h \
         iModification.cc iModification.h \
         ServiceTools.cc ServiceTools.h \
 	Tara.cc Tara.h \

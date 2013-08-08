@@ -75,6 +75,7 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$(libpnapi_la_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=-location.h) # bison hack
+BUILT_SOURCES += $(BISON_FILES:.yy=.h) # bison hack
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 EXTRA_DIST += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=-location.h)

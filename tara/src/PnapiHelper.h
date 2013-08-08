@@ -24,7 +24,7 @@
 #include "verbose.h"
 
 namespace pnapiHelper {
-    pnapi::Node* clone(pnapi::Node*);
+    pnapi::Transition* clone(pnapi::Transition*);
 }
 
 #endif

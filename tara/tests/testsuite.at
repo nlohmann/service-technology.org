@@ -163,4 +163,14 @@ AT_KEYWORDS(basic)
 AT_CLEANUP
 
 
+AT_SETUP([Cyclic simple Reset])
+AT_CHECK_WENDY
+AT_CHECK([cp TESTFILES/cyclic_simple.owfn .])
+AT_CHECK([cp TESTFILES/simpleReset.cf .])
+AT_CHECK([TARA -n cyclic_simple.owfn -f simpleReset.cf],0,ignore,stderr)    
+AT_CHECK([GREP -q "Minimal budget found: 130" stderr])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
 # <<-- CHANGE END -->>

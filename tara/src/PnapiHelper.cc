@@ -21,18 +21,19 @@
 
 #include <pnapi/pnapi.h>
 #include "verbose.h"
+#include "Tara.h"
 
 namespace pnapiHelper {
-    pnapi::Node* clone(pnapi::Node* n) {
+    pnapi::Transition* clone(pnapi::Transition* n) {
         pnapi::PetriNet* net = & n->getPetriNet();
-        pnapi::Node* cl = & net->createTransition();
+        pnapi::Transition* cl = & net->createTransition();
 
         // copy pre-set
         {
             std::set<pnapi::Arc*>::iterator it;
             it = n->getPresetArcs().begin();
             std::set<pnapi::Arc*>::iterator end;
-            it = n->getPresetArcs().end();
+            end = n->getPresetArcs().end();
 
             for(; it != end; ++it) {
                 net->createArc((*it)->getSourceNode(), *cl, (*it)->getWeight());
@@ -44,11 +45,24 @@ namespace pnapiHelper {
             std::set<pnapi::Arc*>::iterator it;
             it = n->getPostsetArcs().begin();
             std::set<pnapi::Arc*>::iterator end;
-            it = n->getPostsetArcs().end();
+            end = n->getPostsetArcs().end();
 
             for(; it != end; ++it) {
                 net->createArc(*cl, (*it)->getTargetNode(), (*it)->getWeight());
             }
         }
+
+        //copy labels
+        {
+            std::map<pnapi::Label*, unsigned int>::const_iterator it;
+            it = n->getLabels().begin();
+            std::map<pnapi::Label*, unsigned int>::const_iterator end;
+            end = n->getLabels().end();
+
+            for(; it != end; ++it) {
+                cl->addLabel( *(it->first), it->second);
+            }
+        }
+        return cl;
     }
 }

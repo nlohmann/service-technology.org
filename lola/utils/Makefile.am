@@ -23,8 +23,13 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$(graph2dot_SOURCES)) $(filter %.yy,$(form_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
+BUILT_SOURCES += $(BISON_FILES:.yy=.hh)
 EXTRA_DIST += $(BISON_FILES:.yy=.hh)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.hh)
+
+# fix for Automake 1.11
+$(BISON_FILES:.yy=.hh):
+	$(AM_V_GEN) mv $(@:.hh=.h) $@
 
 #----------------------------------------------------------#
 # GENERIC: use GNU gengetopt to create command line parser #

@@ -377,7 +377,7 @@ Adapter::buildController() {
 #if defined(HAVE_LIBCONFIG__) and HAVE_LIBCONFIG__ == 1
         diagnose(owfn_filename);
 #else
-        message("Diagnosis not possible, because a required library was not present during compilation.")
+        message("Diagnosis not possible, because a required library was not present during compilation.");
 #endif
     } else
     {

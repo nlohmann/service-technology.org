@@ -1,12 +1,12 @@
 {
-  "toolname": "Locretia",
-  "shortname": "locretia",
+  "toolname": "BSD",
+  "shortname": "BSD",
   "status": "active",
-  "tagline": "generating logs...",
-  "purpose": "This tool generates XES logs of runs of owfn.",
-  "copyright": "2012 Simon Heiden",
+  "tagline": "generating BSD automata...",
+  "purpose": "This tool generates BSD automata of owfn.",
+  "copyright": "2013 Simon Heiden",
   "authors": [
-    "Simon Heiden implemented the functionality of generating XES logs"
+    "Simon Heiden implemented the functionality of generating BSD automata"
   ],
   "maintainer": "Simon Heiden",
   "license": "AGPL3+",

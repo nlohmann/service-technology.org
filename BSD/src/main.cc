@@ -1,20 +1,20 @@
 /*****************************************************************************\
- Locretia -- generating logs...
+ BSD -- generating BSD automata
 
- Copyright (c) 2012 Simon Heiden
+ Copyright (c) 2013 Simon Heiden
 
- Locretia is free software: you can redistribute it and/or modify it under the
+ BSD is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
  Software Foundation, either version 3 of the License, or (at your option)
  any later version.
 
- Locretia is distributed in the hope that it will be useful, but WITHOUT ANY
+ BSD is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Locretia.  If not, see <http://www.gnu.org/licenses/>.
+ along with BSD.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -303,17 +303,25 @@ int main(int argc, char** argv) {
     	/*-------------------------------.
     	| 4. organize reachability graph |
     	`-------------------------------*/
+
     	InnerMarking::initialize();
+
+
+    	/*-------------------------------.
+       	| 5. compute the BSD automaton   |
+    	`-------------------------------*/
 
     	BSD::initialize();
 
     	BSD::computeBSD();
 
+
+    	/*----------------------------------------------------.
+       	| 6. save the BSD automaton and some important values |
+ 	   	`----------------------------------------------------*/
+
     	_BSDgraph[i].graph = BSD::graph;
 
-//    	BSD::printBSD(BSD::graph);
-
-    	_BSDgraph[i].name2id = Label::name2id;
     	_BSDgraph[i].id2name = Label::id2name;
     	_BSDgraph[i].U = BSD::U;
     	_BSDgraph[i].emptyset = BSD::emptyset;
@@ -327,11 +335,21 @@ int main(int argc, char** argv) {
     	_BSDgraph[i].receive_events = Label::receive_events;
     	_BSDgraph[i].send_events = Label::send_events;
 
+
+    	/*---------------.
+ 	   	| 7. tidy up	 |
+       	`---------------*/
+
         delete openNet::net;
         Label::finalize();
         InnerMarking::finalize();
 
     }
+
+
+    /*-------------------------------------------------------.
+   	| 8. check for Bisimulation if two nets have been given	 |
+   	`-------------------------------------------------------*/
 
     if (args_info.inputs_num == 2) {
     	bool valid = BSD::checkBiSimAndLambda(_BSDgraph[0], _BSDgraph[1]);
@@ -342,6 +360,11 @@ int main(int argc, char** argv) {
     		status("net 1 is NOT a br-controller of net 2!");
     	}
     }
+
+
+    /*----------------------------------------------.
+   	| 9. DOT output if only one input net is given  |
+    `----------------------------------------------*/
 
     if (args_info.inputs_num < 2) {
     	std::stringstream bound (std::stringstream::in | std::stringstream::out);

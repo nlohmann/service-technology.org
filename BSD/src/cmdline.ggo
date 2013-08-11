@@ -1,7 +1,7 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About BSD:"
-purpose "BSD: generating BSDs...\n\n  Report bugs to BSD@service-technology.org.\n  Visit BSD's home page at http://service-technology.org/BSD"
+purpose "BSD: generating BSD automata...\n\n  Report bugs to BSD@service-technology.org.\n  Visit BSD's home page at http://service-technology.org/BSD"
 
 
 section "Basic functionality (input)"
@@ -53,11 +53,11 @@ option "stats" -
 
 
 section "Configuration"
-sectiondesc="Locretia relies on several other tools. These options configure Locretia to find these tools.\n"
+sectiondesc="BSD relies on several other tools. These options configure Locretia to find these tools.\n"
 
 option "config" c
   "Read configuration from file."
-  details="If no file is given, Locretia first tries to parse file `locretia.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Locretia was installed) and then from the current working directory. If neither file was found, the standard values for `lola' are assumed.\n"
+  details="If no file is given, BSD first tries to parse file `locretia.conf' from the sysconf directory (usually `/usr/local/etc'; written in case BSD was installed) and then from the current working directory. If neither file was found, the standard values for `lola' are assumed.\n"
   string
   typestr="FILE"
   optional
@@ -73,15 +73,15 @@ option "lola" -
 
 option "tmpfile" -
   "Set the path and name of temporary files"
-  details="The filename Locretia should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  details="The filename BSD should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
   string
   typestr="FILENAME"
-  default="/tmp/locretia-XXXXXX"
+  default="/tmp/BSD-XXXXXX"
   optional
   hidden
 
 option "noClean" -
   "Do not delete temporary files."
-  details="Any temporary files created by Locretia is kept after Locretia terminates.\n"
+  details="Any temporary files created by BSD is kept after BSD terminates.\n"
   flag off
   hidden

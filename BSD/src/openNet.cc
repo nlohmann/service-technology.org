@@ -1,20 +1,20 @@
 /*****************************************************************************\
- Locretia -- generating logs...
+ BSD -- generating BSD automata
 
- Copyright (c) 2012 Simon Heiden
+ Copyright (c) 2013 Simon Heiden
 
- Locretia is free software: you can redistribute it and/or modify it under the
+ BSD is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
  Software Foundation, either version 3 of the License, or (at your option)
  any later version.
 
- Locretia is distributed in the hope that it will be useful, but WITHOUT ANY
+ BSD is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Locretia.  If not, see <http://www.gnu.org/licenses/>.
+ along with BSD.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 #include <config.h>

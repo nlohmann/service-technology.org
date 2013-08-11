@@ -217,7 +217,7 @@ std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset) {
 			temp << ".";
 		}
 	}
-	temp << ")." << (uint)node.lambda << "\"";
+	temp << ")." << (unsigned int)node.lambda << "\"";
 
 	return temp.str();
 }

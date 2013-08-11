@@ -279,7 +279,7 @@ void BSD::mergeWithoutDuplicates(MarkingList &result, MarkingList &temp) {
  */
 BSDNode* BSD::checkInsertIntoGraph(BSDNode &node) {
 	// the size of the list of markings (closure) in the given node
-	uint nodesize = node.list.size();
+	unsigned int nodesize = node.list.size();
 
 	// iterate through the graph
 	for (std::list<BSDNode *>::iterator it = graph->begin(); it != graph->end(); ++it) {
@@ -370,7 +370,7 @@ void BSD::printBSD(BSDNodeList *graph) {
 	std::stringstream temp (std::stringstream::in | std::stringstream::out);
 	temp << "U: " << U << ", empty: " << emptyset << std::endl;
 	for (BSDNodeList::const_iterator it = graph->begin(); it != graph->end(); ++it) {
-		temp << *it << ":  lambda: " << (uint)(*it)->lambda << ",  list: (";
+		temp << *it << ":  lambda: " << (unsigned int)(*it)->lambda << ",  list: (";
 		for (MarkingList::const_iterator listit = (*it)->list.begin(); listit != (*it)->list.end();) {
 			temp << *listit;
 			if (++listit != (*it)->list.end()) {
@@ -480,7 +480,7 @@ bool BSD::computeBiSim(BSDNode * node_g1, BSDNode * node_g2, std::map<Label_ID, 
 
 	// check successors
 	bool valid = true;
-	for (uint id = 2; id <= events; ++id) {
+	for (unsigned int id = 2; id <= events; ++id) {
 		valid = computeBiSim(node_g1->pointer[id], node_g2->pointer[(*mapping)[id]], mapping, events);
 		if (!valid) {
 			// abort recursively

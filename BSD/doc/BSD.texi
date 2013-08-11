@@ -379,7 +379,7 @@ BSD: error reading configuration file `myconf.conf' -- aborting [#15]
 @end cartouche
 @end smallexample
 
-
+@end table
 
 
 

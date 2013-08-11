@@ -378,7 +378,7 @@ void BSD::printBSD(BSDNodeList *graph) {
 			}
 		}
 		temp << ")" << std::endl << "\t";
-		for (uint id = 2; id <= Label::events; ++id) {
+		for (unsigned int id = 2; id <= Label::events; ++id) {
 			temp << "(" << Label::id2name[id] << "," << (*it)->pointer[id] << ")";
 			if (id != Label::events) {
 				temp << ", ";

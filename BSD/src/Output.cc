@@ -193,7 +193,7 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 	os << "digraph {\n";
 
 	for (BSDNodeList::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
-		for (uint id = 2; id <= graph.events; ++id) {
+		for (unsigned int id = 2; id <= graph.events; ++id) {
 			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(*((*it)->pointer[id]), graph.U, graph.emptyset)
 			   << " [label=\"" << graph.id2name[id] << "\"];" << endl;
 		}

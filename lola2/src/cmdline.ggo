@@ -112,6 +112,10 @@ option "sweeplinespread" -
   default="1"
   optional
   hidden
+  
+option "cycle" -
+  "Using transition invariant based analysis."
+  flag off
 
 section "Input/Output"
 

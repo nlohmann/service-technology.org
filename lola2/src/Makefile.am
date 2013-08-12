@@ -105,7 +105,10 @@ lola_SOURCES = \
                 SweepLine/SweepListStore.h SweepLine/SweepListStore.inc \
                 SweepLine/SweepEmptyStore.h SweepLine/SweepEmptyStore.cc \
                 \
-                Witness/Event.h Witness/Event.cc Witness/Condition.h Witness/Condition.cc
+                Witness/Event.h Witness/Event.cc Witness/Condition.h Witness/Condition.cc \
+                \
+                Invariants/Invariants.h Invariants/Invariants.cc \
+                Invariants/InvStore.h Invariants/InvStore.inc
 
 ###
 

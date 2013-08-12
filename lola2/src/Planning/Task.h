@@ -17,7 +17,8 @@
 #include <Stores/EmptyStore.h>
 #include <Stores/CompareStore.h>
 #include <Stores/Store.h>
-
+#include <Invariants/InvStore.h>
+#include <Invariants/Invariants.h>
 
 class StatePredicate;
 class CTLFormula;
@@ -50,29 +51,35 @@ public:
 	      case encoder_arg_fullcopy:
 	          enc = new FullCopyEncoder(number_of_threads);
 	          break;
-	      }
-  	
-        switch (args_info.store_arg)
-        {
-        case store_arg_comp:
-       		return new CompareStore<T>(
-           		new PluginStore<T>(enc, new PrefixTreeStore<T>(), number_of_threads),
-           		new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads),
-           		number_of_threads
-           		);
-        case store_arg_prefix:
-            if(args_info.bucketing_given)
-              return new PluginStore<T>(enc, new HashingWrapperStore<T>(new NullaryVectorStoreCreator<T,PrefixTreeStore<T> >()), number_of_threads);
-            else
-           	  return new PluginStore<T>(enc, new PrefixTreeStore<T>(), number_of_threads);
-        case store_arg_stl:
-            if(args_info.bucketing_given)
-              return new PluginStore<T>(enc, new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
-            else
-           	  return new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads);
-        default:
-        	return createSpecializedStore(number_of_threads);
-        }
+	      }	   
+		if(args_info.cycle_given) {
+			//TODO
+			TransitionInv *tinv = new TransitionInv(/*k*/);
+			return new TInvStore<T>(tinv, enc, new PrefixTreeStore<T>(), number_of_threads);
+		}
+		else {
+		    switch (args_info.store_arg)
+		    {
+		    case store_arg_comp:
+		   		return new CompareStore<T>(
+		       		new PluginStore<T>(enc, new PrefixTreeStore<T>(), number_of_threads),
+		       		new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads),
+		       		number_of_threads
+		       		);
+		    case store_arg_prefix:
+		        if(args_info.bucketing_given)
+		          return new PluginStore<T>(enc, new HashingWrapperStore<T>(new NullaryVectorStoreCreator<T,PrefixTreeStore<T> >()), number_of_threads);
+		        else
+		       	  return new PluginStore<T>(enc, new PrefixTreeStore<T>(), number_of_threads);
+		    case store_arg_stl:
+		        if(args_info.bucketing_given)
+		          return new PluginStore<T>(enc, new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
+		        else
+		       	  return new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads);
+		    default:
+		    	return createSpecializedStore(number_of_threads);
+		    }
+		}
 	}
 
 private:

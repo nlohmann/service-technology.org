@@ -53,7 +53,7 @@ option "stats" -
 
 
 section "Configuration"
-sectiondesc="BSD relies on several other tools. These options configure Locretia to find these tools.\n"
+sectiondesc="BSD relies on several other tools. These options configure BSD to find these tools.\n"
 
 option "config" c
   "Read configuration from file."

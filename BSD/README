@@ -24,22 +24,22 @@ LICENSE
     License AGPLv3+: GNU Affero General Public License version 3 or later
     <http://www.gnu.org/licenses/agpl.html>
 
-    Locretia is free software: you are free to change and redistribute it.
+    BSD is free software: you are free to change and redistribute it.
     There is NO WARRANTY, to the extent permitted by law.
 
-    See file "COPYING" for the license of Locretia.
+    See file "COPYING" for the license of BSD.
 
     Any different licensing scheme may be negotiated with the author(s).
 
 
 INSTALLATION
-    Locretia can be easily compiled and installed. See file "INSTALL" for
+    BSD can be easily compiled and installed. See file "INSTALL" for
     instructions. Please also have a look at the file "REQUIREMENTS" for
-    information on the tools required to run, compile, and develop Locretia.
+    information on the tools required to run, compile, and develop BSD.
 
 
 DOCUMENTATION
-    The directory "doc" contains a documentation of Locretia. It can also be
-    downloaded at <http://service-technology.org/files/locretia/locretia.pdf>. A
-    tool paper describing a case study conducted with Locretia can be found in
+    The directory "doc" contains a documentation of BSD. It can also be
+    downloaded at <http://service-technology.org/files/BSD/BSD.pdf>. A
+    tool paper describing a case study conducted with BSD can be found in
     the file "doc/toolpaper.pdf".

@@ -104,6 +104,9 @@ public:
 	/// Gets the weighted sum of transitions if it has been calculated
 	const map<Transition*,int>& getLHS() const;
 
+	/// Delete the weighted sum (for recalculation)
+	void clearLHS();
+
 	/// Compares two constraints, 0:incomparable (different LHS), 1:RHS>c.RHS, -1:RHS<=c.RHS
 	int compare(const Constraint& c) const;
 

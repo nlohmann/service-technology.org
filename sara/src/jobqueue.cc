@@ -274,6 +274,7 @@ bool JobQueue::findPast(PartialSolution* job, PartialSolution* excl) {
 		{
 				// don't check the excluded job
 				if (deq[i]==excl) continue;
+
 				// compare the constraints
 				set<Constraint>& cs2(deq[i]->getConstraints());
 				if (cs==cs2) return true;

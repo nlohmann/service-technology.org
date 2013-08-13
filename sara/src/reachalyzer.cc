@@ -287,7 +287,7 @@ void Reachalyzer::doSingleJob(unsigned int threadID, PartialSolution* ps) {
 			if (ret!=2) { if (!errors) { if (out) cerr << "\r"; 
 											status("warning, failure of lp_solve (at job %d)",loops); }
 							errors = true; // print the warning once only
-			} else { // lp_solve denies a solution, this may be part of a counterexample
+			} else if (!ps->isExtendable()) { // lp_solve denies a solution, this may be part of a counterexample
 				set<Constraint>::iterator cit;
 				// newly introduced jumps cannot lead to counterexamples, so check for them
 				for(cit=ps->getConstraints().begin(); cit!=ps->getConstraints().end(); ++cit)

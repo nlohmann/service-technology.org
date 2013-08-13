@@ -50,7 +50,7 @@ namespace sara {
 /** Constructor for the first partial solution (no output from lp_solve yet).
 	@param m1 The initial marking.
 */ 
-PartialSolution::PartialSolution(Marking& m1) : m(m1),markingEquation(false),jumpsdone(0) {
+PartialSolution::PartialSolution(Marking& m1) : m(m1),markingEquation(false),extendConstraints(false),jumpsdone(0) {
 	fullSolution = false;
 } 
 
@@ -59,7 +59,7 @@ PartialSolution::PartialSolution(Marking& m1) : m(m1),markingEquation(false),jum
 	@param m1 The marking reached after the partial firing sequence.
 	@param rvec The remaining (nonfirable) transitions. 
 */
-PartialSolution::PartialSolution(vector<Transition*>& ts,Marking& m1,map<Transition*,int>& rvec) : tseq(ts),m(m1),remains(rvec),markingEquation(false),jumpsdone(0) {
+PartialSolution::PartialSolution(vector<Transition*>& ts,Marking& m1,map<Transition*,int>& rvec) : tseq(ts),m(m1),remains(rvec),markingEquation(false),extendConstraints(false),jumpsdone(0) {
 	fullSolution = false;
 }
 
@@ -200,7 +200,7 @@ void PartialSolution::show() {
 		if (vit->second>0)
 			cerr << vit->first->getName() << ":" << vit->second << " ";
 	cerr << endl;
-	cerr << "Constraints: ";
+	cerr << "Constraints" << (isExtendable()?" (ext)":"") << ": ";
 	set<Constraint>::iterator cit;
 	for(cit=constraints.begin(); cit!=constraints.end(); ++cit)
 		cit->showConstraint(cerr);
@@ -290,7 +290,8 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 		for(pit=pre.begin(); pit!=pre.end(); ++pit) // go through the preset
 		{
 			int cons = pit->second;
-			if (cons>(int)(m[*(pit->first)])) { // additional tokens are needed
+//			if (cons>(int)(m[*(pit->first)])) { // additional tokens are needed
+			if (cons>(int)(m[*(pit->first)]) && noSimpleConstraint.find(pit->first)==noSimpleConstraint.end()) { // and a constraint was not built earlier
 				undermarked.insert(pit->first); // place hasn't got enough tokens, so tag it
 				if (undermarking[pit->first]==0 || undermarking[pit->first]>cons-(int)(m[*(pit->first)]))
 					undermarking[pit->first]=cons-m[*(pit->first)]; // minimum amount needed to activate some transition
@@ -368,14 +369,14 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 				if (tcomp[i].size()>0) // there are transitions in the component
 				{
 					// first check if there were more tokens earlier
-/*
+//
 					map<Place*,int> red;
 					reduceUndermarking(im,pcomp[i],red);
 					for(map<Place*,int>::iterator mpit=red.begin(); mpit!=red.end(); ++mpit) {
 						undermarking[mpit->first] -= mpit->second;
 						if (undermarking[mpit->first] < 1) undermarking[mpit->first] = 1;
 					}
-*/
+//
 					for(fit=tcomp[i].begin(); fit!=tcomp[i].end(); ++fit)
 					{
 						int addtimes(remains[*fit]); // additional required firings of a forbidden transition to activate others
@@ -441,12 +442,15 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 //cerr << (*pit)->getName() << " cons: " << constmp << " post: " << posttmp << " cfm: " << cfm[*pit] << endl;
 					}
 					incr = cons+postneed; // the overall minimum number of tokens needed in this component for the forbidden transitions 
-/*
+//
 					// reduce increment if there were more tokens earlier
 					map<Place*,int> red;
 					reduceUndermarking(im,pcomp[i],red);
-					if (incr-red.begin()->second<1) incr=1; else incr -= red.begin()->second;
-*/
+					if (!red.empty()) {
+						if (incr-red.begin()->second<1) incr=1; 
+						else incr -= red.begin()->second;
+					}
+//
 				}
 				// we now know a number of additional tokens needed, so we can build the constraint 
 				buildMultiConstraint(ptmp,(incr>1 ? incr:1),forbidden);
@@ -657,5 +661,240 @@ void PartialSolution::reduceUndermarking(IMatrix& im, const set<Place*>& pcomp, 
 	}
 }
 
+/*
+bool PartialSolution::checkConstraintExtension(IMatrix& im) {
+	set<Place*> hplaces;
+	map<Transition*,int>::iterator rit;
+	for(rit=remains.begin(); rit!=remains.end(); ++rit)
+		if (rit->second > 0) {
+			map<Place*,int>& pre(im.getPreset(*(rit->first)));
+			map<Place*,int>::iterator pit;
+			for(pit=pre.begin(); pit!=pre.end(); ++pit)
+				if (m[*(pit->first)] < pit->second)
+					hplaces.insert(pit->first);
+		}
+	
+	map<Place*,int> add;
+	map<const Constraint*, set<Transition*> > done;
+	map<const Constraint*, Constraint> copy;
+	set<Constraint>::iterator cit;
+	for(cit=constraints.begin(); cit!=constraints.end(); ++cit)
+		if (cit->isRecent())
+			done[&(*cit)] = cit->getSubTransitions();
+
+	for(int i=tseq.size()-1; i>=0; --i) {
+		// reverse-fire a transition in the sequence
+		map<Place*,int>& change(im.getColumn(*tseq[i]));
+		map<Place*,int>::iterator pit;
+		for(pit=change.begin(); pit!=change.end(); ++pit)
+			add[pit->first] -= pit->second;
+
+		for(cit=constraints.begin(); cit!=constraints.end(); ++cit) {
+			if (!cit->isRecent()) continue;
+			const map<Place*,int>& cs(cit->getPlaces());
+			map<Place*,int>::const_iterator cpit;
+			for(cpit=cs.begin(); cpit!=cs.end(); ++cpit) {
+				if (hplaces.find(cpit->first)==hplaces.end()) continue;
+				pit = add.find(cpit->first);
+				if (pit==add.end() || pit->second<=0) continue;
+				map<Transition*,int>& ppre(im.getPreset(*(pit->first)));
+				map<Transition*,int>::iterator tit;
+				for(tit=ppre.begin(); tit!=ppre.end(); ++tit) {
+					if (done[&(*cit)].find(tit->first)!=done[&(*cit)].end()) continue;
+					map<Place*,int>& tpre(im.getPreset(*(tit->first)));
+					map<Place*,int>::iterator xit;
+					for(xit=tpre.begin(); xit!=tpre.end(); ++xit)
+						if (cs.find(xit->first)!=cs.end()) break;
+					if (xit!=tpre.end()) continue;
+					for(xit=tpre.begin(); xit!=tpre.end(); ++xit)
+						if (m[*(xit->first)]+add[xit->first]<xit->second) break;
+					if (xit==tpre.end()) continue;
+					done[&(*cit)].insert(tit->first);
+
+					if (!extendConstraints) { extendConstraints = true; return true; }
+					// modify the constraint
+					if (copy.find(&(*cit))==copy.end()) copy[&(*cit)] = Constraint(*cit);
+					copy[&(*cit)].addPlace(*(xit->first), pit->second); // weight??
+					map<Transition*,int>& ppost(im.getPostset(*(pit->first)));
+					map<Transition*,int>::iterator yit;
+					for(yit=ppost.begin(); yit!=ppost.end(); ++yit)
+						if (copy[&(*cit)].checkSubTransition(*(yit->first)))
+							copy[&(*cit)].addSubTransition(*(yit->first));
+					for(yit=ppre.begin(); yit!=ppre.end(); ++yit)
+						if (copy[&(*cit)].checkSubTransition(*(yit->first)))
+							copy[&(*cit)].addSubTransition(*(yit->first));
+				}	
+			}
+		}
+	}
+
+	for(cit=constraints.begin(); cit!=constraints.end(); ++cit)
+		if (copy.find(&(*cit))!=copy.end()) {
+			copy[&(*cit)].clearLHS();
+			copy[&(*cit)].calcConstraint();
+			copy[&(*cit)].setRecent(true);
+			if (copy[&(*cit)].checkAnyTransition()) setConstraint(copy[&(*cit)]);
+		}
+
+	extendConstraints = false;
+	return false;
+
+}
+*/
+
+bool PartialSolution::isExtendable() { return !noSimpleConstraint.empty(); }
+
+void PartialSolution::checkAddedInvariants(IMatrix& im, Marking m0, PartialSolution* father) {
+	// did we really have an increment constraint (no jumps!)?
+	map<Transition*,int>::iterator rit;
+	for(rit=father->fulltv.begin(); rit!=father->fulltv.end(); ++rit)
+		if (rit->second > fulltv[rit->first]) break;
+	if (rit!=father->fulltv.end()) return;	
+
+	// collect pre-places of non-fireables that could fire more than last time
+	set<Place*> better;
+	map<Place*,int>::iterator pit;
+	for(rit=remains.begin(); rit!=remains.end(); ++rit)
+		if (rit->second>0 && father->remains[rit->first]>rit->second)
+		{
+			map<Place*,int>& pre(im.getPreset(*rit->first));
+			for(pit=pre.begin(); pit!=pre.end(); ++pit)
+				if (pit->second>0) better.insert(pit->first);
+		}
+
+	map<Transition*,map<Place*,int> > fireatzero; // below zero hinders a remainder transition from firing
+	for(rit=remains.begin(); rit!=remains.end(); ++rit)
+		if (rit->second>0 && father->remains[rit->first]==rit->second) {
+			map<Place*,int>& pre(im.getPreset(*rit->first));
+			map<Place*,int>& change(im.getColumn(*rit->first));
+			for(pit=pre.begin(); pit!=pre.end(); ++pit)
+				if (pit->second>0 && better.find(pit->first)==better.end()) {
+					fireatzero[rit->first][pit->first] = (int)(m0[*(pit->first)]) - pit->second + (fulltv[rit->first]-rit->second)*change[pit->first];
+//std::cout << rit->first->getName() << ":" << pit->first->getName() << ";" << fireatzero[rit->first][pit->first] << std::endl;
+				}
+		}
+
+	map<Transition*,map<Place*,int> >::iterator mit;
+	map<Transition*,int> gain, maxgain;
+	map<Place*,int> invadd;
+	map<Transition*,int> ffull(father->fulltv);
+	for(int i=0; i<tseq.size(); ++i) {
+		map<Place*,int>& change(im.getColumn(*tseq[i]));
+		for(mit=fireatzero.begin(); mit!=fireatzero.end(); ++mit)
+			for(pit=mit->second.begin(); pit!=mit->second.end(); ++pit) {
+				map<Place*,int>::iterator fit(change.find(pit->first));
+				if (fit!=change.end() && tseq[i]!=mit->first) 
+					pit->second += fit->second;
+			}
+		if (ffull[tseq[i]]-father->remains[tseq[i]]>0) --ffull[tseq[i]];
+		else for(pit=change.begin(); pit!=change.end(); ++pit)
+				invadd[pit->first] += pit->second;
+		for(mit=fireatzero.begin(); mit!=fireatzero.end(); ++mit) {
+			gain[mit->first] = 0;
+			for(pit=mit->second.begin(); pit!=mit->second.end(); ++pit) {
+				if (invadd[pit->first]>0 && invadd[pit->first]>pit->second)
+					gain[mit->first] += invadd[pit->first] - (pit->second>0 ? pit->second : 0);
+				if (invadd[pit->first]<0 && pit->second<0)
+					gain[mit->first] += (pit->second<=invadd[pit->first] ? invadd[pit->first] : pit->second); 
+			}
+			if (gain[mit->first]>maxgain[mit->first])
+				maxgain[mit->first] = gain[mit->first];
+		}
+	}
+	// maxgain now contains the additional number of tokens that the added T-invariant
+	// was able to temporarily produce in the preset of the non-fireable transitions
+
+	// collect the places in those transitions' presets that had no gain at all
+	set<Place*> hplaces;
+	for(rit=maxgain.begin(); rit!=maxgain.end(); ++rit)
+		if (rit->second == 0)
+			for(pit=fireatzero[rit->first].begin(); pit!=fireatzero[rit->first].end(); ++pit)
+				if (pit->second < 0) {
+					hplaces.insert(pit->first);
+//std::cout << "HPLACE: " << pit->first->getName() << endl;
+				}
+
+	// expand all recent constraints containing such a place
+	checkConstraintExtension(im,hplaces);
+}
+
+void PartialSolution::checkConstraintExtension(IMatrix& im, set<Place*>& hplaces) {
+	map<Place*,int> add;
+	map<const Constraint*, set<Transition*> > done;
+	vector<set<Place*> > real; // the places that really affected the constraint building
+	vector<Constraint> copy;
+	unsigned int copylen(0);
+	set<Constraint>::iterator cit;
+	for(cit=constraints.begin(); cit!=constraints.end(); ++cit)
+		if (cit->isRecent())
+			done[&(*cit)] = cit->getSubTransitions();
+
+	for(int i=tseq.size()-1; i>=0; --i) {
+		// reverse-fire a transition in the sequence
+		map<Place*,int>& change(im.getColumn(*tseq[i]));
+		map<Place*,int>::iterator pit;
+		for(pit=change.begin(); pit!=change.end(); ++pit)
+			add[pit->first] -= pit->second;
+
+		for(cit=constraints.begin(); cit!=constraints.end(); ++cit) {
+			if (!cit->isRecent()) continue;
+			const map<Place*,int>& cs(cit->getPlaces());
+			map<Place*,int>::const_iterator cpit;
+			for(cpit=cs.begin(); cpit!=cs.end(); ++cpit) {
+				if (hplaces.find(cpit->first)==hplaces.end()) continue;
+				pit = add.find(cpit->first);
+				if (pit==add.end() || pit->second<=0) continue;
+				map<Transition*,int>& ppre(im.getPreset(*(pit->first)));
+				map<Transition*,int>::iterator tit;
+				for(tit=ppre.begin(); tit!=ppre.end(); ++tit) {
+					if (done[&(*cit)].find(tit->first)!=done[&(*cit)].end()) continue;
+					map<Place*,int>& tpre(im.getPreset(*(tit->first)));
+					map<Place*,int>::iterator xit;
+					for(xit=tpre.begin(); xit!=tpre.end(); ++xit)
+						if (cs.find(xit->first)!=cs.end()) break;
+					if (xit!=tpre.end()) continue;
+					for(xit=tpre.begin(); xit!=tpre.end(); ++xit)
+						if (m[*(xit->first)]+add[xit->first]<xit->second) break;
+					if (xit==tpre.end()) continue;
+					done[&(*cit)].insert(tit->first);
+
+					// modify the constraint
+					if (copylen == copy.size()) {
+						copy.push_back(Constraint(*cit));
+						real.push_back(set<Place*>());
+					}
+					copy.back().addPlace(*(xit->first), pit->second); // weight??
+					map<Transition*,int>& ppost(im.getPostset(*(pit->first)));
+					map<Transition*,int>::iterator yit;
+					for(yit=ppost.begin(); yit!=ppost.end(); ++yit)
+						if (copy.back().checkSubTransition(*(yit->first)))
+							copy.back().addSubTransition(*(yit->first));
+					for(yit=ppre.begin(); yit!=ppre.end(); ++yit)
+						if (copy.back().checkSubTransition(*(yit->first)))
+							copy.back().addSubTransition(*(yit->first));
+					real.back().insert(cpit->first);
+				}	
+			}
+		}
+	}
+
+	for(unsigned int i=0; i<copy.size(); ++i)
+	{
+		copy[i].clearLHS();
+		copy[i].calcConstraint();
+		copy[i].setRecent(true);
+		if (copy[i].checkAnyTransition()) {
+			// exclude the contributing places from later constraint increments by buildSimpleContraint()
+			noSimpleConstraint.insert(real[i].begin(),real[i].end());
+			// add the new constraint
+//			std::cout << "*C* "; copy[i].showConstraint(std::cout);
+//			std::cout << "*P* ";
+//			for(set<Place*>::iterator sxit=real[i].begin(); sxit!=real[i].end(); ++sxit)
+//				std::cout << (*sxit)->getName() << " ";
+//			std::cout << std::endl;
+			setConstraint(copy[i]);
+		}
+	}
+}
 
 } // end namespace sara

@@ -164,6 +164,11 @@ public:
 
 	void reduceUndermarking(IMatrix& im, const set<Place*>& pcomp, map<Place*,int>& red);
 
+//	bool checkConstraintExtension(IMatrix& im);
+	bool isExtendable();
+	void checkAddedInvariants(IMatrix& im, Marking m0, PartialSolution* father);
+	void checkConstraintExtension(IMatrix& im, set<Place*>& hplaces);
+
 private:	
 	/// The partial firing sequence
 	vector<Transition*> tseq;
@@ -196,6 +201,10 @@ private:
 
 	/// Flag marking this partial solution as a full solution
 	bool fullSolution;
+
+	/// Flag showing that this' partial solutions recent constraints must be extended
+	bool extendConstraints;
+	set<Place*> noSimpleConstraint;
 
 	/// Map of transitions for creating jump constraints
 	map<int,int> jc;

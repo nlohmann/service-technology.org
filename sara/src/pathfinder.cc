@@ -210,12 +210,17 @@ bool PathFinder::recurse(unsigned int tid) {
 		} else {
 			// no solution so far, so check if we came closer to it than the father job
 			if (thr->tps.first()->compareSequence(thr->fseq,thr->tv) && !thr->tps.first()->getRemains().empty()) {
-				pthread_mutex_lock(&fail_mutex);
-				failure.push_fail(new PartialSolution(newps)); // sequence was not extended, this is part of a counterexample
-				pthread_mutex_unlock(&fail_mutex);
+				if (!thr->tps.first()->isExtendable()) {
+					pthread_mutex_lock(&fail_mutex);
+					failure.push_fail(new PartialSolution(newps)); // sequence was not extended, this is part of a counterexample
+					pthread_mutex_unlock(&fail_mutex);
+				}
 			} else { // no solution, no failure, so we have a new job to do
-				if (thr->tps.find(&newps)>=0) { // check if the job hase been done before
-					thr->tps.push_back(new PartialSolution(newps)); // if not, put it into the job queue
+				if (thr->tps.find(&newps)>=0) { // check if the job has been done before
+
+					// check if invariants go us closer, otherwise expand them 
+					newps.checkAddedInvariants(im,m0,thr->tps.first());
+					thr->tps.push_back(new PartialSolution(newps));
 
 					// try to add this partial solution to the lookup table
 					pthread_mutex_lock(&(threaddata[thr->rootID]->mutex));
@@ -233,7 +238,7 @@ bool PathFinder::recurse(unsigned int tid) {
 			else if (terminate) cerr << "Full Solution found:" << endl; 
 			else if (thr->tps.first()->compareSequence(thr->fseq,thr->tv) && !thr->tps.first()->getRemains().empty()) 
 				cerr << "Failure:" << endl;
-			else cerr << "Partial Solution:" << endl;
+			else cerr << "Partial Solution" << (newps.isExtendable() ? " (ext)":"") << ":" << endl;
 			newps.show();
 			cerr << "*** PF ***" << endl;
 			pthread_mutex_unlock(&print_mutex);

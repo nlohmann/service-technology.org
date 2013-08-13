@@ -190,6 +190,8 @@ map<Transition*,int>& Constraint::calcConstraint() {
 */
 const map<Transition*,int>& Constraint::getLHS() const { return cs; }
 
+void Constraint::clearLHS() { cs.clear(); }
+
 /** Checks if forbidding a transition will have any effect on an increment constraint. It is advised
 	not to forbid transitions if it would not have any effect.
 	@param tr The transition to be checked for.

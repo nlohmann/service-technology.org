@@ -9,9 +9,6 @@
 #include <Net/Net.h>
 #include <Net/LinearAlgebra.h>
 
-
-using namespace std;
-
 void TransitionInv::solve() {
 	// initiate matrix for equations
 	Matrix equations(Net::Card[TR]);

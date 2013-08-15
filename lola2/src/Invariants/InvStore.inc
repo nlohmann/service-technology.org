@@ -23,12 +23,15 @@ bool TInvStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadInd
     bitindex_t bitlen;
     vectordata_t* input = this->netStateEncoder->encodeNetState(ns, bitlen, threadIndex);
     
+    // enabled transitions
     bool *enabled = new bool[Net::Card[TR]];
     
+    // get enabled transitions
     for(int i = 0; i < Net::Card[TR]; i++) {
     	enabled[i] = true;
 		for(int j = 0; j < Net::CardArcs[TR][PRE][i]; j++) {
 			if(ns.Current[Net::Arc[TR][PRE][i][j]] < Net::Mult[TR][PRE][i][j]) {
+				// place has not enough token to satisfy an enabled transition i
 				enabled[i] = false;
 				break;
 			}

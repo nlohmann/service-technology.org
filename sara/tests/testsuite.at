@@ -134,16 +134,16 @@ AT_CLEANUP
 AT_SETUP([Failing Hay-stack 2, x=4, y=2, added loop])
 AT_CHECK([cp TESTFILES/test9.sara TESTFILES/test9.owfn .])
 AT_CHECK([SARA -i test9.sara -v -d2],0,stdout,stderr)
-AT_CHECK([GREP -q "*** LOOKUP ***" stderr])
+#AT_CHECK([GREP -q "*** LOOKUP ***" stderr])
 AT_CHECK([GREP -q "failures, 0 solutions" stdout])
 AT_CHECK([GREP -q "INFEASIBLE: unable to borrow enough tokens via T-invariants" stdout])
 AT_KEYWORDS(solver)
 AT_CLEANUP
 
-AT_SETUP([Failing Hay-stack 2 as above, break at 28])
+AT_SETUP([Failing Hay-stack 2 as above, break at 24])
 AT_CHECK([cp TESTFILES/test9.sara TESTFILES/test9.owfn .])
-AT_CHECK([SARA -i test9.sara -v -b28],0,stdout,stderr)
-AT_CHECK([GREP -q "28 jobs done" stdout])
+AT_CHECK([SARA -i test9.sara -v -b24],0,stdout,stderr)
+AT_CHECK([GREP -q "24 jobs done" stdout])
 AT_CHECK([GREP -q "UNSOLVED" stdout])
 AT_KEYWORDS(solver)
 AT_CLEANUP

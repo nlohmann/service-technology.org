@@ -167,7 +167,7 @@ public:
 //	bool checkConstraintExtension(IMatrix& im);
 	bool isExtendable();
 	void checkAddedInvariants(IMatrix& im, Marking m0, PartialSolution* father);
-	void checkConstraintExtension(IMatrix& im, set<Place*>& hplaces);
+	void checkConstraintExtension(IMatrix& im, set<Place*>& hplaces, PartialSolution* father);
 
 private:	
 	/// The partial firing sequence
@@ -211,6 +211,8 @@ private:
 
 	/// Number of jump constraints we have gone through so far, for job ordering
 	int jumpsdone;
+
+//	map<Transition*, map<Place*,int> > invgain;
 };
 
 }

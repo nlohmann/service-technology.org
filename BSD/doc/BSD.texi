@@ -319,11 +319,11 @@ BSD: the input open net must be normal -- aborting [#03]
 @end smallexample
 
 @item #04
-At most two files can be read at once. If no input filename is given, the open net is read from standard input.
+At most one basic option must be given.
 
 @smallexample
 @cartouche
-BSD: at most two input files must be given -- aborting [#04]
+BSD: only one basic option is allowed at a time -- aborting [#04]
 @end cartouche
 @end smallexample
 
@@ -333,6 +333,24 @@ The bound parameter's argument has to be a positive integer.
 @smallexample
 @cartouche
 BSD: bound has to be a positive integer -- aborting [#05]
+@end cartouche
+@end smallexample
+
+@item #06
+In the case of checking the theorem two input files must be given.
+
+@smallexample
+@cartouche
+BSD: two input files must be given. -- aborting [#06]
+@end cartouche
+@end smallexample
+
+@item #07
+In the other cases only one file must be given.
+
+@smallexample
+@cartouche
+BSD: at most one input file must be given. -- aborting [#07]
 @end cartouche
 @end smallexample
 

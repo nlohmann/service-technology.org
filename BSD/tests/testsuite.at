@@ -28,7 +28,7 @@ AT_SETUP([Piping from stdin])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([cat myCoffee.owfn | BSD_ --verbose --bound=1],0,ignore,ignore)
-AT_CHECK([test -f BSD_output_b1.dot])
+AT_CHECK([test -f BSD_output_BSD_b1.dot])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -52,7 +52,7 @@ AT_SETUP([DOT output])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([BSD_ myCoffee.owfn --verbose --bound=1],0,ignore,ignore)
-AT_CHECK([test -f myCoffee_b1.dot])
+AT_CHECK([test -f myCoffee_BSD_b1.dot])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -141,12 +141,34 @@ AT_CHECK([GREP -q "aborting \[[#03\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
-AT_SETUP([Multiple file input])
-AT_CHECK([cp TESTFILES/error04* .])
-AT_CHECK([BSD_ error04-1.owfn error04-2.owfn error04-2.owfn --lola=],1,ignore,stderr)
+AT_SETUP([Multiple options])
+AT_CHECK([cp TESTFILES/error02* .])
+AT_CHECK([BSD_ --uBSD --check error02.owfn --lola=],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#04\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
+
+AT_SETUP([bound not positive])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([BSD_ myCoffee.owfn --bound=-1],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#05\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Multiple file input (check theorem)])
+AT_CHECK([cp TESTFILES/error04* .])
+AT_CHECK([BSD_ --check error04-1.owfn error04-2.owfn error04-2.owfn --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#06\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Multiple file input (other cases)])
+AT_CHECK([cp TESTFILES/error04* .])
+AT_CHECK([BSD_ error04-1.owfn error04-2.owfn --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#07\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
 
 AT_SETUP([Error building the reachability graph])
 AT_CHECK([cp TESTFILES/error06.* .])
@@ -161,18 +183,11 @@ AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
-AT_SETUP([bound not positive])
-AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([BSD_ myCoffee.owfn --bound=-1],1,ignore,stderr)
-AT_CHECK([GREP -q "aborting \[[#05\]]" stderr])
-AT_KEYWORDS(error)
-AT_CLEANUP
-
 AT_SETUP([Cannot write to file])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([touch myCoffee_b1.dot])
-AT_CHECK([chmod a-w myCoffee_b1.dot])
+AT_CHECK([touch myCoffee_BSD_b1.dot])
+AT_CHECK([chmod a-w myCoffee_BSD_b1.dot])
 AT_CHECK([BSD_ myCoffee.owfn --bound=1 --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#13\]]" stderr])
 AT_KEYWORDS(error)

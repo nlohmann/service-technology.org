@@ -138,13 +138,23 @@ void evaluateParameters(int argc, char** argv) {
         args_info.lola_arg = strdup(getenv("LOLA"));
     }
 
-    // check whether at most two files are given
-    if (args_info.inputs_num > 2) {
-        abort(4, "at most two input files must be given");
+    // only one option is allowed at one time
+    if (args_info.uBSD_flag && args_info.check_flag) {
+        abort(4, "only one basic option is allowed at a time.");
     }
 
     if (args_info.bound_arg < 1) {
     	abort(5, "bound has to be a positive integer");
+    }
+
+    // check whether two files are given in the case of theorem check
+    if (args_info.inputs_num != 2 && args_info.check_flag) {
+    	abort(6, "two input files must be given.");
+    }
+
+    // check whether at most two files are given
+    if (args_info.inputs_num > 1 && !args_info.check_flag) {
+    	abort(7, "at most one input file must be given.");
     }
 
 
@@ -347,11 +357,11 @@ int main(int argc, char** argv) {
     }
 
 
-    /*-------------------------------------------------------.
-   	| 8. check for Bisimulation if two nets have been given	 |
-   	`-------------------------------------------------------*/
+    /*-------------------------------.
+   	| 8. check for bisimulation		 |
+   	`-------------------------------*/
 
-    if (args_info.inputs_num == 2) {
+    if (args_info.check_flag) {
     	bool valid = BSD::checkBiSimAndLambda(_BSDgraph[0], _BSDgraph[1]);
 
     	if (valid) {
@@ -362,30 +372,52 @@ int main(int argc, char** argv) {
     }
 
 
-    /*----------------------------------------------.
-   	| 9. DOT output if only one input net is given  |
-    `----------------------------------------------*/
+    /*-------------------------------.
+    | 9. check for bisimulation		 |
+    `-------------------------------*/
 
-    if (args_info.inputs_num < 2) {
+    if (args_info.uBSD_flag) {
+    	BSD::computeUBSD(_BSDgraph[0]);
+    }
+
+
+    /*--------------------.
+   	| 10. DOT output	  |
+    `--------------------*/
+
+    // delete the if-statement to generate dot-file output even if two nets are given
+    if (!args_info.check_flag) {
     	std::stringstream bound (std::stringstream::in | std::stringstream::out);
-    	bound << args_info.bound_arg;
+    	if (args_info.uBSD_flag)
+    		bound << "_uBSD";
+    	else
+    		bound << "_BSD";
+    	bound << "_b" << args_info.bound_arg;
 
     	done = false;
     	for (int i = 0; !done; ++i) {
-    		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filename[i] + "_b" + bound.str() + ".dot";
+    		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filename[i] + bound.str() + ".dot";
     		Output output(dot_filename, "BSD automaton");
     		output.stream() << pnapi::io::sa;
     		Output::dotoutput(output.stream(), _BSDgraph[i], filename[i]);
 
-    		for (BSDNodeList::const_iterator it = _BSDgraph[i].graph->begin(); it != _BSDgraph[i].graph->end(); ++it) {
-    			delete[] (*it)->pointer;
-    			delete *it;
-    		}
-    		delete _BSDgraph[i].graph;
-
     		if (args_info.inputs_num == 0 || args_info.inputs_num == i+1)
     			done = true;
     	}
+    }
+
+
+    // delete the graph(s)
+    done = false;
+    for (int i = 0; !done; ++i) {
+    	for (BSDNodeList::const_iterator it = _BSDgraph[i].graph->begin(); it != _BSDgraph[i].graph->end(); ++it) {
+    		delete[] (*it)->pointer;
+    		delete *it;
+    	}
+    	delete _BSDgraph[i].graph;
+
+    	if (args_info.inputs_num == 0 || args_info.inputs_num == i+1)
+    		done = true;
     }
 
     BSD::finalize();

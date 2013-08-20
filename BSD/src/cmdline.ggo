@@ -4,8 +4,18 @@ description "About BSD:"
 purpose "BSD: generating BSD automata...\n\n  Report bugs to BSD@service-technology.org.\n  Visit BSD's home page at http://service-technology.org/BSD"
 
 
-section "Basic functionality (input)"
-sectiondesc="Options which change the basic functionality of the tool. Only one option at a time is allowed.\n"
+section "Basic functionality"
+sectiondesc="Options which change the basic functionality of the tool. Only one option at a time is allowed. If no other option is given the tool just computes the BSD automaton of the given OWFN.\n"
+
+option "uBSD" -
+  "Compute the uBSD automaton."
+  details="This option lets the tool compute the uBSD automaton.\n"
+  flag off
+  
+option "check" -
+  "Check theorem 1.3 (Bisimulation of two BSD automata and lambda values)."
+  details="This option checks theorem 1.3 (Bisimulation of two BSD automata and lambda values). Two OWFNs have to be given as an input in this case.\n"
+  flag off
   
 option "bound" b
   "The bound applied to the places."
@@ -53,7 +63,7 @@ option "stats" -
 
 
 section "Configuration"
-sectiondesc="BSD relies on several other tools. These options configure BSD to find these tools.\n"
+sectiondesc="BSD relies on several other tools. These options configure Locretia to find these tools.\n"
 
 option "config" c
   "Read configuration from file."

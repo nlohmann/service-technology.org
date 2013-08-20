@@ -44,7 +44,6 @@ class BSD {
 
 		static void initialize();
 
-        /// create the XES log
         static void computeBSD();
 
         static BSDNode* computeClosure(BSDNode &node, Label_ID label);
@@ -72,6 +71,8 @@ class BSD {
         static bool computeBiSim(BSDNode * node_g1, BSDNode * node_g2, std::map<Label_ID, Label_ID> * mapping, Label_ID events);
 
         static std::map<Label_ID, Label_ID>* computeMapping(BSDgraph & graph1, BSDgraph & graph2);
+
+        static void computeUBSD(BSDgraph & graph);
 
         static BSDNodeList* graph;
 

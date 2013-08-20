@@ -203,7 +203,7 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 }
 
 std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset) {
-	if (&node == U) {
+	if (node.isU) {
 		return "\"U.3\"";
 	}
 	if (&node == emptyset) {

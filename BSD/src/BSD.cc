@@ -61,11 +61,13 @@ void BSD::initialize() {
 	U = new BSDNode;
 	U->lambda = 0;
 	U->pointer = new BSDNode*[Label::events+1];
+	U->isU = true;
 
 	// the empty node
 	emptyset = new BSDNode;
 	emptyset->lambda = 3;
 	emptyset->pointer = new BSDNode*[Label::events+1];
+	emptyset->isU = false;
 
 	// set up the pointers ( which are all loops to the same nodes )
 	for (Label_ID id = 2; id <= Label::events; ++id) {
@@ -105,6 +107,7 @@ void BSD::computeBSD() {
 	initial->list = *templist;
 	// set up the pointer to further nodes (just the structure)
 	initial->pointer = new BSDNode*[Label::events+1];
+	initial->isU = false;
 
 	// add the initial closure to the (still empty) graph
 	graph->push_back(initial);
@@ -186,6 +189,7 @@ BSDNode* BSD::computeClosure(BSDNode &node, Label_ID label) {
 	// set up the result node and return it
 	BSDNode* result = new BSDNode;
 	result->list = resultlist;
+	result->isU = false;
 //	result->pointer = new BSDNode*[Label::events+1]; // will be done if inserted later!!!!!
 	return result;
 }
@@ -379,7 +383,12 @@ void BSD::printBSD(BSDNodeList *graph) {
 		}
 		temp << ")" << std::endl << "\t";
 		for (unsigned int id = 2; id <= Label::events; ++id) {
-			temp << "(" << Label::id2name[id] << "," << (*it)->pointer[id] << ")";
+			temp << "(" << Label::id2name[id] << ",";
+			if ((*it)->pointer[id]->isU)
+				temp << U;
+			else
+				temp << (*it)->pointer[id];
+			temp << ")";
 			if (id != Label::events) {
 				temp << ", ";
 			}
@@ -433,7 +442,7 @@ bool BSD::checkBiSimAndLambda(BSDgraph & graph1, BSDgraph & graph2) {
 
 	// if no mapping could be found return false
 	if (mapping == NULL) {
-		status("Different Interfaces. Nets not composable");
+		status("Interfaces do not match. Nets not composable");
 		return false;
 	}
 
@@ -543,5 +552,45 @@ std::map<Label_ID, Label_ID>* BSD::computeMapping(BSDgraph & graph1, BSDgraph & 
 
 	// return the mapping
 	return result;
+}
+
+
+/*!
+ \brief Creates the uBSD automaton based on the BSD automaton.
+
+ */
+void BSD::computeUBSD(BSDgraph & graph) {
+	bool graphChanged = true;
+
+	// repeat while graph changes
+	while (graphChanged) {
+		// assume the graph doesn't change
+		graphChanged = false;
+
+		// iterate through all nodes
+		for (BSDNodeList::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
+			// ignore the current node if lambda equals 1 or the node is the U node
+			if ((*it)->lambda != 1 || (*it)->isU)
+				break;
+
+			// iterate through the sending labels (receiving for the environment)
+			bool allSuccAreU = true;
+			for (unsigned int id = graph.first_receive; id <= graph.last_receive; ++id) {
+				// if a successor is not the U node then stop the iteration, nothing to do here...
+				if (!(*it)->pointer[id]->isU) {
+					allSuccAreU = false;
+					break;
+				}
+			}
+
+			// if all sending labels successors are the U node then change the current node to the U node
+			// and prepare for another round of computation (graph has changed)
+			if (allSuccAreU) {
+				(*it)->isU = true;
+				graphChanged = true;
+			}
+		}
+
+	}
 }
 

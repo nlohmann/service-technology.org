@@ -40,9 +40,15 @@ typedef uint32_t InnerMarking_ID;
 // represents a node of the BSD automaton
 typedef std::list<InnerMarking_ID> MarkingList;
 
+// a node of the BSD automaton
 typedef struct _BSDNode {
+	// is this node actually the U node? (for computation of uBSD automaton)
+	bool isU;
+	// list of markings in the closure
 	MarkingList list;
+	// pointers to other BSD nodes (ordered and accessible by label id)
 	struct _BSDNode** pointer;
+	// lambda value of the node (see paper for more information)
 	uint8_t lambda;
 } BSDNode;
 
@@ -50,16 +56,28 @@ typedef struct _BSDNode {
 // stores all nodes of the BSD automaton
 typedef std::list<BSDNode *> BSDNodeList;
 
+// representation of a BSD automaton with needed values for computations
 typedef struct _BSDgraph {
+	// the automaton
 	BSDNodeList* graph;
+	// first id of receiving labels
 	Label_ID first_receive;
+	// last id of receiving labels
 	Label_ID last_receive;
+	// first id of sending labels
 	Label_ID first_send;
+	// last id of sending labels
 	Label_ID last_send;
+	// number of sending events
 	Label_ID send_events;
+	// number of receiving events
 	Label_ID receive_events;
+	// number of total events
 	Label_ID events;
+	// pointer to U node
 	BSDNode* U;
+	// pointer to empty node
 	BSDNode* emptyset;
+	// mapping of label ids to label names (strings)
 	std::map<Label_ID, std::string> id2name;
 } BSDgraph;

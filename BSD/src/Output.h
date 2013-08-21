@@ -85,6 +85,8 @@ class Output {
         /// dot output
         static std::ostream & dotoutput(std::ostream &, BSDgraph & graph, std::string & filename);
 
+        static void traverse(BSDNode * node);
+
         static std::string dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset);
 
         /*!
@@ -134,4 +136,6 @@ class Output {
 
         /// the kind of the file
         const std::string kind;
+
+        static BSDNodeList* templist;
 };

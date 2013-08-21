@@ -44,6 +44,8 @@ std::string Output::tempfileTemplate = "/tmp/temp-XXXXXX";
 #endif
 bool Output::keepTempfiles = true;
 
+BSDNodeList* Output::templist = NULL;
+
 
 /***************
  * CONSTRUCTOR *
@@ -192,14 +194,38 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 
 	os << "digraph {\n";
 
-	for (BSDNodeList::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
+	templist = new BSDNodeList;
+	templist->push_back(graph.U);
+	traverse(*(graph.graph->begin()));
+
+	for (BSDNodeList::const_iterator it = templist->begin(); it != templist->end(); ++it) {
 		for (unsigned int id = 2; id <= graph.events; ++id) {
 			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(*((*it)->pointer[id]), graph.U, graph.emptyset)
 			   << " [label=\"" << graph.id2name[id] << "\"];" << endl;
 		}
 	}
 
+	delete templist;
+
 	return os << "}" << endl;
+}
+
+void Output::traverse(BSDNode* node) {
+	if (node->isU)
+		return;
+
+	// test if the marking was already visited
+	for (BSDNodeList::const_iterator it = templist->begin(); it != templist->end(); ++it) {
+		if (*it == node) {
+			return;
+		}
+	}
+	// if not then add the current marking to the closure
+	templist->push_back(node);
+
+	for (unsigned int id = 2; id <= Label::events; ++id) {
+		traverse(node->pointer[id]);
+	}
 }
 
 std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset) {

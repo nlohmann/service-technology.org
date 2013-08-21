@@ -569,25 +569,37 @@ void BSD::computeUBSD(BSDgraph & graph) {
 
 		// iterate through all nodes
 		for (BSDNodeList::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
-			// ignore the current node if lambda equals 1 or the node is the U node
-			if ((*it)->lambda != 1 || (*it)->isU)
+			// ignore the current node if the node is the U node
+			if ((*it)->isU)
 				break;
 
-			// iterate through the sending labels (receiving for the environment)
-			bool allSuccAreU = true;
-			for (unsigned int id = graph.first_receive; id <= graph.last_receive; ++id) {
-				// if a successor is not the U node then stop the iteration, nothing to do here...
-				if (!(*it)->pointer[id]->isU) {
-					allSuccAreU = false;
-					break;
+			if ((*it)->lambda == 1) {
+				// iterate through the receiving labels (sending for the environment)
+				bool allSuccAreU = true;
+				for (unsigned int id = graph.first_send; id <= graph.last_send; ++id) {
+					// if a successor is not the U node then stop the iteration, nothing to do here...
+					if (!(*it)->pointer[id]->isU) {
+						allSuccAreU = false;
+						break;
+					}
 				}
-			}
 
-			// if all sending labels successors are the U node then change the current node to the U node
-			// and prepare for another round of computation (graph has changed)
-			if (allSuccAreU) {
-				(*it)->isU = true;
-				graphChanged = true;
+				// if all sending labels successors are the U node then change the current node to the U node
+				// and prepare for another round of computation (graph has changed)
+				if (allSuccAreU) {
+					(*it)->isU = true;
+					graphChanged = true;
+				}
+			} else {
+				// iterate through the sending labels (receiving for the environment)
+				for (unsigned int id = graph.first_receive; id <= graph.last_receive; ++id) {
+					// if a successor is the U node then stop the iteration...
+					if ((*it)->pointer[id]->isU) {
+						(*it)->isU = true;
+						graphChanged = true;
+						break;
+					}
+				}
 			}
 		}
 

@@ -316,6 +316,7 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 	for(unsigned int i=0; i<pcomp.size(); ++i)
 		if (pcomp[i].size()>0) // only create a new constraint if there are places at all
 		{
+//cerr << "PCOMP " << i << ": ";
 			bool b=true; // true as long as all pre-pre-places of places are in the same component,
 			// i.e. the component is a sink in the component graph
 			for(pit=pcomp[i].begin(); pit!=pcomp[i].end(); ++pit)
@@ -386,50 +387,55 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 				else // there are no transitions in the component (which should consist of one place only) 
 				{
 					int postneed=0; // tokens that must remain in the component after the last forbidden transition has fired
-					int cons=0; // effective consumption due to firing all forbidden transitions
-					for(pit=pcomp[i].begin(); pit!=pcomp[i].end(); ++pit) // go through all places anyway
+					// effective consumption due to firing all forbidden transitions
+					Place* p(*pcomp[i].begin());
+					int posttmpi=0; // minimal weight of the place in the transition vector's postset (cumulative)
+					int cons=0; //-m[*p]-igtmp; // additional tokens needed on this place, at least 0
+					map<int,set<Transition*> > post; // transitions ordered by the weight of the place pit in their postset
+					for(fit=forbidden.begin(); fit!=forbidden.end(); ++fit)
 					{
-						int posttmp=0,posttmpi=0; // minimal weight of the place in the transition vector's postset (cumulative)
-						int constmp=-m[**pit]; // additional tokens needed on this place, at least 0
-						map<int,set<Transition*> > post; // transitions ordered by the weight of the place pit in their postset
-						for(fit=forbidden.begin(); fit!=forbidden.end(); ++fit)
-						{
-							pnapi::Arc* a(m.getPetriNet().findArc(**fit,**pit)); // get the weight of the place in the postset
-							if (a) post[a->getWeight()].insert(*fit); else post[0].insert(*fit); // fit the place into the post map accordingly
-							// calculate how many tokens get lost due to firing the forbidden transition as often as required, and add this number
-							constmp -= im.getEntry(**fit,**pit)*remains[*fit];
-						}
-						// now go through the post map and approximate how many tokens must remain on the place
-						map<int,set<Transition*> >::iterator poit;
-						for(poit=post.begin(); poit!=post.end(); ++poit)
-						{
-							if (posttmpi<poit->first) { posttmp += poit->first-posttmpi; posttmpi=0; } // some tokens cannot be consumed
-							else posttmpi-=poit->first; // the late transitions can still consume more
-							// now check the next set of transitions for how many tokens they consume
-							set<Transition*>::iterator xit;
-							for(xit=poit->second.begin(); xit!=poit->second.end(); ++xit)
-							{
-								posttmpi += im.getLoops(**xit,**pit);
-								if (im.getEntry(**xit,**pit)<0) posttmpi -= im.getEntry(**xit,**pit)*remains[*xit];
-							}
-							// iterate, the next set becoming the late set of transitions, getting a new next set
-						}
-						if (constmp<0) { posttmp+=constmp; constmp=0; } // tokens produced may be forwarded to posttmp
-						if (posttmp<0) { posttmp=0; } // need of less than zero is need zero
-						postneed += posttmp;
-						cons += constmp;
-//cerr << (*pit)->getName() << " cons: " << constmp << " post: " << posttmp << endl;
+						pnapi::Arc* a(m.getPetriNet().findArc(**fit,*p)); // get the weight of the place in the postset
+						if (a) post[a->getWeight()].insert(*fit); else post[0].insert(*fit); // fit the place into the post map accordingly
+						// calculate how many tokens get lost due to firing the forbidden transition as often as required, and add this number
+						cons -= im.getEntry(**fit,*p)*remains[*fit];
 					}
+					// now go through the post map and approximate how many tokens must remain on the place
+					map<int,set<Transition*> >::iterator poit;
+					for(poit=post.begin(); poit!=post.end(); ++poit)
+					{
+						if (posttmpi<poit->first) { postneed += poit->first-posttmpi; posttmpi=0; } // some tokens cannot be consumed
+						else posttmpi-=poit->first; // the late transitions can still consume more
+						// now check the next set of transitions for how many tokens they consume
+						set<Transition*>::iterator xit;
+						for(xit=poit->second.begin(); xit!=poit->second.end(); ++xit)
+						{
+							posttmpi += im.getLoops(**xit,*p);
+							if (im.getEntry(**xit,*p)<0) posttmpi -= im.getEntry(**xit,*p)*remains[*xit];
+						}
+						// iterate, the next set becoming the late set of transitions, getting a new next set
+					}
+//					if (cons<0) { postneed+=cons; cons=0; } // tokens produced may be forwarded to posttmp
+//					if (postneed<0) { postneed=0; } // need of less than zero is need zero
+//cerr << (*pit)->getName() << " cons: " << constmp << " post: " << posttmp << endl;
 					incr = cons+postneed; // the overall minimum number of tokens needed in this component for the forbidden transitions 
+//
+					// subtract the token need from the tokens available
+					int igtmp(0);
+					for(fit=forbidden.begin(); fit!=forbidden.end(); ++fit)
+						if (invgain[*fit][p]>igtmp) igtmp = invgain[*fit][p];
+					incr -= igtmp+m[*p];
+					if (incr<0) incr=0;
+//cerr << "CONS " << cons << " PN " << postneed << " IGTMP " << igtmp << " INCR " << incr << endl;
 //
 					// reduce increment if there were more tokens earlier
 					map<Place*,int> red;
 					reduceUndermarking(im,pcomp[i],red);
 					if (!red.empty()) {
-						if (incr-red.begin()->second<1) incr=1; 
+						if (incr-red.begin()->second<0) incr=0; 
 						else incr -= red.begin()->second;
 					}
 //
+//cerr << "INCR " << incr << endl;
 				}
 				// we now know a number of additional tokens needed, so we can build the constraint 
 				buildMultiConstraint(ptmp,(incr>0 ? incr:0),forbidden);
@@ -685,7 +691,7 @@ void PartialSolution::checkAddedInvariants(IMatrix& im, Marking m0, PartialSolut
 
 	// walk through the firing sequence and compute the token gain
 	// on undermarked places by the newly added T-invariant
-//	map<Transition*,map<Place*,int> > gainmap;
+	map<Transition*,map<Place*,int> > gainmap;
 	map<Transition*,map<Place*,int> >::iterator mit;
 	map<Transition*,int> gain, maxgain;
 	map<Place*,int> invadd;
@@ -706,16 +712,16 @@ void PartialSolution::checkAddedInvariants(IMatrix& im, Marking m0, PartialSolut
 			for(pit=mit->second.begin(); pit!=mit->second.end(); ++pit) {
 				if (invadd[pit->first]>0 && invadd[pit->first]>pit->second) {
 					gain[mit->first] += invadd[pit->first] - (pit->second>0 ? pit->second : 0);
-//					gainmap[mit->first][pit->first] += invadd[pit->first] - (pit->second>0 ? pit->second : 0);
+					gainmap[mit->first][pit->first] += invadd[pit->first] - (pit->second>0 ? pit->second : 0);
 				}
 				if (invadd[pit->first]<0 && pit->second<0) {
 					gain[mit->first] += (pit->second<=invadd[pit->first] ? invadd[pit->first] : pit->second); 
-//					gainmap[mit->first][pit->first] += (pit->second<=invadd[pit->first] ? invadd[pit->first] : pit->second);
+					gainmap[mit->first][pit->first] += (pit->second<=invadd[pit->first] ? invadd[pit->first] : pit->second);
 				}
 			}
 			if (gain[mit->first]>maxgain[mit->first]) {
 				maxgain[mit->first] = gain[mit->first];
-//				invgain[mit->first] = gainmap[mit->first];
+				invgain[mit->first] = gainmap[mit->first];
 			}
 		}
 	}

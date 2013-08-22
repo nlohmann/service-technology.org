@@ -341,6 +341,7 @@ bool PathFinder::recurse(unsigned int tid) {
 		im.successor(*(thr->m),*(tord[o])); // calc successor marking
 		--(thr->tv[tord[o]]); // one instance less of this transition to fire
 		thr->fseq.push_back(tord[o]); // add to partial firing sequence
+//cerr << ">" << tord[o]->getName() << " ";
 
 		// check if a diamond has just been completed, no need to traverse the same
 		// subtree twice
@@ -355,6 +356,7 @@ bool PathFinder::recurse(unsigned int tid) {
 				--(thr->recursedepth);
 		} 
 
+//cerr << "<" << tord[o]->getName() << " ";
 		// the transition we just tried does not lead to a success, revert all side effects:
 		im.predecessor(*(thr->m),*(tord[o])); // calculate predecessor marking
 		++(thr->tv[tord[o]]); // add the instance of the transition to the remaining transitions

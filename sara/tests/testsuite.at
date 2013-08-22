@@ -153,11 +153,10 @@ AT_CHECK([cp TESTFILES/test16.sara TESTFILES/test16.owfn .])
 AT_CHECK([SARA -i test16.sara -v],0,stdout,stderr)
 AT_CHECK([GREP -q "jobs done" stdout])
 AT_CHECK([GREP -q "INFEASIBLE: unable to borrow enough tokens via T-invariants" stdout])
-AT_CHECK([GREP -q "6 failures" stdout])
+AT_CHECK([GREP -q "0 solutions" stdout])
 AT_CHECK([GREP -q "e1 e1 e1" stdout])
 AT_CHECK([GREP -q "e2 e2 e2" stdout])
-AT_CHECK([GREP -q "x1" stdout])
-AT_CHECK([GREP -q "x2" stdout])
+AT_CHECK([GREP -q "e. e. .. .. .. .. x." stdout])
 AT_KEYWORDS(solver)
 AT_CLEANUP
 
@@ -315,7 +314,7 @@ AT_CLEANUP
 AT_SETUP([Create .dot Output])
 AT_CHECK([cp TESTFILES/test16.sara TESTFILES/test16.owfn .])
 AT_CHECK([SARA -i test16.sara -s],0,stdout,stderr)
-AT_CHECK([GREP -q "Petri net" test16_P1S6.dot])
+AT_CHECK([GREP -q "Petri net" test16_P1S3.dot])
 AT_KEYWORDS(options)
 AT_CLEANUP
 

@@ -523,7 +523,17 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr, JSON& json) {
 				int diff = (cit->getRHS()-ps->getActualRHS(*cit)); // needed tokens (at least)
 				if (diff==0 || !tset.empty()) // calculate the missing tokens directly in this case
 				{
-					if (diff==0) { // recalculate places if the constraint was not helpful
+					if (tset.empty()) { // recalculate places if the constraint was not helpful
+						pmap.clear();
+						for(tmxit=tmx.begin(); tmxit!=tmx.end(); ++tmxit)
+							if (tmxit->second>0)
+								for(mit=im.getPreset(*tmxit->first).begin(); mit!=im.getPreset(*tmxit->first).end(); ++mit)
+									if (ps->getMarking()[*(mit->first)]<(unsigned int)(mit->second)) {
+										pmap[mit->first] = mit->second-ps->getMarking()[*(mit->first)];						
+										tset.insert(tmxit->first);
+									}
+					}
+					else if (diff==0) { // recalculate places if the constraint was not helpful
 						pmap.clear();
 						for(tit=tset.begin(); tit!=tset.end(); ++tit)
 							for(mit=im.getPreset(**tit).begin(); mit!=im.getPreset(**tit).end(); ++mit)

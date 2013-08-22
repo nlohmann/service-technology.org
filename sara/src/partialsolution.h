@@ -212,7 +212,7 @@ private:
 	/// Number of jump constraints we have gone through so far, for job ordering
 	int jumpsdone;
 
-//	map<Transition*, map<Place*,int> > invgain;
+	map<Transition*, map<Place*,int> > invgain;
 };
 
 }

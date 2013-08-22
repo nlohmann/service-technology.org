@@ -521,8 +521,15 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr, JSON& json) {
 				set<Transition*> tset(cit->getSubTransitions());
 				set<Transition*>::iterator tit;
 				int diff = (cit->getRHS()-ps->getActualRHS(*cit)); // needed tokens (at least)
-				if (!tset.empty()) // calculate the missing tokens directly in this case
+				if (diff==0 || !tset.empty()) // calculate the missing tokens directly in this case
 				{
+					if (diff==0) { // recalculate places if the constraint was not helpful
+						pmap.clear();
+						for(tit=tset.begin(); tit!=tset.end(); ++tit)
+							for(mit=im.getPreset(**tit).begin(); mit!=im.getPreset(**tit).end(); ++mit)
+								if (ps->getMarking()[*(mit->first)]<(unsigned int)(mit->second))
+									pmap[mit->first] = mit->second-ps->getMarking()[*(mit->first)];						
+					}
 					diff=-1;
 					for(tit=tset.begin(); tit!=tset.end(); ++tit)
 					{

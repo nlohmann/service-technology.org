@@ -250,7 +250,7 @@ bool PartialSolution::buildMultiConstraint(map<Place*,int>& pmap, int incr, set<
 }
 
 /** Create constraints for places that hinder transitions by missing tokens. The new constraint
-	forces an additional token on each such place.
+	forces at least one additional token on each such place.
 	@param im The incidence matrix of the Petri net.
 */
 void PartialSolution::buildSimpleConstraints(IMatrix& im) {
@@ -348,7 +348,8 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 				// necessary tokens must come from the outside.
 				if (tcomp[i].size()>0) // there are transitions in the component
 				{
-					// first check if there were more tokens earlier
+					// first check if there was a delayable token loss on the place
+					// and lower the token need accordingly (but not below one)
 //
 					map<Place*,int> red;
 					reduceUndermarking(im,pcomp[i],red);
@@ -386,12 +387,22 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 				}
 				else // there are no transitions in the component (which should consist of one place only) 
 				{
+					// we calculate two values now: 1) how many tokens the forbidden
+					// transitions need to fire (with their given multiplicity), this
+					// value will be found in the variable cons. 2) how many tokens
+					// at least remain on the place after all this firing has been done.
+					// This will be kept in the variable postneed. The right hand side
+					// of the constraint can then be incremented by at most the 
+					// value of cons+postneed.
 					int postneed=0; // tokens that must remain in the component after the last forbidden transition has fired
 					// effective consumption due to firing all forbidden transitions
 					Place* p(*pcomp[i].begin());
 					int posttmpi=0; // minimal weight of the place in the transition vector's postset (cumulative)
 					int cons=0; //-m[*p]-igtmp; // additional tokens needed on this place, at least 0
 					map<int,set<Transition*> > post; // transitions ordered by the weight of the place pit in their postset
+					// order the forbidden transitions by their post-value for the place.
+					// transitions with lower post value should fire last to keep the
+					// postneed as low as possible.
 					for(fit=forbidden.begin(); fit!=forbidden.end(); ++fit)
 					{
 						pnapi::Arc* a(m.getPetriNet().findArc(**fit,*p)); // get the weight of the place in the postset
@@ -403,6 +414,9 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 					map<int,set<Transition*> >::iterator poit;
 					for(poit=post.begin(); poit!=post.end(); ++poit)
 					{
+						// posttmpi is the token need of all the transitions we already
+						// dealt with; these fire after the current transition. All
+						// transitions with the same postvalue can be handled in any order.
 						if (posttmpi<poit->first) { postneed += poit->first-posttmpi; posttmpi=0; } // some tokens cannot be consumed
 						else posttmpi-=poit->first; // the late transitions can still consume more
 						// now check the next set of transitions for how many tokens they consume
@@ -419,7 +433,7 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 //cerr << (*pit)->getName() << " cons: " << constmp << " post: " << posttmp << endl;
 					incr = cons+postneed; // the overall minimum number of tokens needed in this component for the forbidden transitions 
 //
-					// subtract the token need from the tokens available
+					// subtract the total token need from the tokens available
 					int igtmp(0);
 					for(fit=forbidden.begin(); fit!=forbidden.end(); ++fit)
 						if (invgain[*fit][p]>igtmp) igtmp = invgain[*fit][p];
@@ -427,7 +441,7 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 					if (incr<0) incr=0;
 //cerr << "CONS " << cons << " PN " << postneed << " IGTMP " << igtmp << " INCR " << incr << endl;
 //
-					// reduce increment if there were more tokens earlier
+					// reduce increment if there is a delayable token loss on the place
 					map<Place*,int> red;
 					reduceUndermarking(im,pcomp[i],red);
 					if (!red.empty()) {

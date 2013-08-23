@@ -1,0 +1,6 @@
+PROBLEM reachability_in_ce5.owfn:
+GOAL REACHABILITY;
+FILE ce5.owfn TYPE OWFN;
+INITIAL p4:3;
+FINAL p0:1,p4:3;
+

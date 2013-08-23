@@ -1,5 +1,5 @@
 @c <<-- CHANGE START (version information) -->>
-@heading Version 1.12-unreleased (19 Aug 2013)
+@heading Version 1.12 (23 Aug 2013)
 @itemize
 @item bug fixes for examples by Andras Vörös
 @end itemize

@@ -365,15 +365,15 @@ int main(int argc, char** argv) {
     	bool valid = BSD::checkBiSimAndLambda(_BSDgraph[0], _BSDgraph[1]);
 
     	if (valid) {
-    		status("net 1 is a br-controller of net 2!");
+    		message("net 1 is a br-controller of net 2!");
     	} else {
-    		status("net 1 is NOT a br-controller of net 2!");
+    		message("net 1 is NOT a br-controller of net 2!");
     	}
     }
 
 
     /*-------------------------------.
-    | 9. check for bisimulation		 |
+    | 9. create uBSD from BSD		 |
     `-------------------------------*/
 
     if (args_info.uBSD_flag) {

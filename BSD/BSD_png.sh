@@ -19,7 +19,7 @@ INPUTFILE=`basename $1 | sed -e 's/\.owfn//'`
 
 # parameter 2: bound b
 if [ ! $2 ]; then
-   echo "$0: Usage: $0 'OWFN file' 'bound' ['output filename']"
+   echo "$0: Usage: $0 'OWFN file' 'bound' ['output filename (.dot)']"
    exit
 fi
 
@@ -27,7 +27,7 @@ fi
 # parameter 3: filename for output
 if [ ! $3 ]; then
    OUTDIR=`dirname $1`
-   OUTFILE=${INPUTFILE}_BSD_b${2}.dot
+   OUTFILE="BSD_${2}(${INPUTFILE}).dot"
 else
    OUTDIR=`dirname $3`
    OUTFILE=`basename $3`

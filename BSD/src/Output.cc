@@ -224,12 +224,30 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 		}
 
 		if ((**it).isU || *it == graph.emptyset) {
-			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(**it, graph.U, graph.emptyset)
-				<< " [label=\"";
-			for (unsigned int id = 2; id < graph.events; ++id) {
-				os << graph.id2name[id] << ",";
+//			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(**it, graph.U, graph.emptyset)
+//				<< " [label=\"";
+//			for (unsigned int id = 2; id < graph.events; ++id) {
+//				os << graph.id2name[id] << ",";
+//			}
+//			os << graph.id2name[(unsigned int)graph.events] << "\"];" << endl;
+
+			if ((unsigned int)graph.last_receive - (unsigned int)graph.first_receive >= 0) {
+				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(**it, graph.U, graph.emptyset)
+											<< " [label=\"";
+				for (unsigned int id = graph.first_receive; id < graph.last_receive; ++id) {
+					os << graph.id2name[id] << ",";
+				}
+				os << graph.id2name[(unsigned int)graph.last_receive] << "\",color=red];" << endl;
 			}
-			os << graph.id2name[(unsigned int)graph.events] << "\"];" << endl;
+
+			if ((unsigned int)graph.last_send - (unsigned int)graph.first_send >= 0) {
+				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(**it, graph.U, graph.emptyset)
+																<< " [label=\"";
+				for (unsigned int id = graph.first_send; id < graph.last_send; ++id) {
+					os << graph.id2name[id] << ",";
+				}
+				os << graph.id2name[(unsigned int)graph.last_send] << "\",color=green];" << endl;
+			}
 		} else {
 			for (unsigned int id = 2; id <= graph.events; ++id) {
 				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(*((*it)->pointer[id]), graph.U, graph.emptyset)
@@ -245,6 +263,8 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 	}
 
 	delete templist;
+
+	os << "\tfootnote [shape=box,label=\"red: sending labels\\ngreen: receiving labels\"];" << endl;
 
 	return os << "}" << endl;
 }

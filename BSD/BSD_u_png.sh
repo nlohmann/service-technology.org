@@ -27,7 +27,7 @@ fi
 # parameter 3: filename for output
 if [ ! $3 ]; then
    OUTDIR=`dirname $1`
-   OUTFILE=${INPUTFILE}_uBSD_b${2}.dot
+   OUTFILE="uBSD_${2}(${INPUTFILE}).dot"
 else
    OUTDIR=`dirname $3`
    OUTFILE=`basename $3`

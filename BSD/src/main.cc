@@ -389,14 +389,14 @@ int main(int argc, char** argv) {
     if (!args_info.check_flag) {
     	std::stringstream bound (std::stringstream::in | std::stringstream::out);
     	if (args_info.uBSD_flag)
-    		bound << "_uBSD";
+    		bound << "uBSD";
     	else
-    		bound << "_BSD";
-    	bound << "_b" << args_info.bound_arg;
+    		bound << "BSD";
+    	bound << "_" << args_info.bound_arg << "(";
 
     	done = false;
     	for (int i = 0; !done; ++i) {
-    		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filename[i] + bound.str() + ".dot";
+    		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : bound.str() + filename[i] + ").dot";
     		Output output(dot_filename, "BSD automaton");
     		output.stream() << pnapi::io::sa;
     		Output::dotoutput(output.stream(), _BSDgraph[i], filename[i]);

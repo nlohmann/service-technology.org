@@ -433,7 +433,7 @@ bool BSD::checkBiSimAndLambda(BSDgraph & graph1, BSDgraph & graph2) {
 	// check if the interface sizes differ
 	if (graph1.receive_events != graph2.send_events ||
 		graph1.send_events != graph2.receive_events) {
-		status("Size of interface differs! No bisimulation possible.");
+		message("Size of interface differs! No bisimulation possible.");
 		return false;
 	}
 
@@ -442,7 +442,7 @@ bool BSD::checkBiSimAndLambda(BSDgraph & graph1, BSDgraph & graph2) {
 
 	// if no mapping could be found return false
 	if (mapping == NULL) {
-		status("Interfaces do not match. Nets not composable");
+		message("Interfaces do not match. Nets not composable");
 		return false;
 	}
 

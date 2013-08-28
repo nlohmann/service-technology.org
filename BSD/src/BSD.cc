@@ -570,8 +570,8 @@ void BSD::computeUBSD(BSDgraph & graph) {
 		// iterate through all nodes
 		for (BSDNodeList::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
 			// ignore the current node if the node is the U node
-			if ((*it)->isU)
-				break;
+			if ((*it)->isU || *it == graph.emptyset)
+				continue;
 
 			if ((*it)->lambda == 1) {
 				// iterate through the receiving labels (sending for the environment)
@@ -590,17 +590,18 @@ void BSD::computeUBSD(BSDgraph & graph) {
 					(*it)->isU = true;
 					graphChanged = true;
 				}
-			} else {
-				// iterate through the sending labels (receiving for the environment)
-				for (unsigned int id = graph.first_receive; id <= graph.last_receive; ++id) {
-					// if a successor is the U node then stop the iteration...
-					if ((*it)->pointer[id]->isU) {
-						(*it)->isU = true;
-						graphChanged = true;
-						break;
-					}
+			}
+
+			// iterate through the sending labels (receiving for the environment)
+			for (unsigned int id = graph.first_receive; id <= graph.last_receive; ++id) {
+				// if a successor is the U node then stop the iteration...
+				if ((*it)->pointer[id]->isU) {
+					(*it)->isU = true;
+					graphChanged = true;
+					break;
 				}
 			}
+
 		}
 
 	}

@@ -192,16 +192,55 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 //	     b -> d [label=f];
 //	 }
 
-	os << "digraph {\n";
+	os //< output everything to this stream
+
+		<< "/*\n"
+		<< "  generator:   " << PACKAGE_STRING << endl //net.getMetaInformation(os, pnapi::io::CREATOR, PACKAGE_STRING) << endl
+		<< "  input file:  " << filename << ".owfn" << endl
+		<< "  #labels:     " << (unsigned int)graph.events-1 << endl
+		<< "  #sending labels:   " << (unsigned int)graph.receive_events << endl
+		<< "  #receiving labels: " << (unsigned int)graph.send_events << endl
+		<< "*/\n\n"
+
+		<< "digraph {\n";
 
 	templist = new BSDNodeList;
-	templist->push_back(graph.U);
+	// fill the templist (to get only the reachable nodes)
 	traverse(*(graph.graph->begin()));
+	templist->push_back(graph.U);
+
+	// define a fake initial node... (is there a better way?) \todo
+	os << "\tinitialNode [shape=point,label=\"\",style=invis,weight=100];" << endl;
+	// an arrow to the 'real' initial node
+	os << "\tinitialNode -> " << dotnodeName(**(templist->begin()), graph.U, graph.emptyset) << ";" << endl;
 
 	for (BSDNodeList::const_iterator it = templist->begin(); it != templist->end(); ++it) {
-		for (unsigned int id = 2; id <= graph.events; ++id) {
-			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(*((*it)->pointer[id]), graph.U, graph.emptyset)
-			   << " [label=\"" << graph.id2name[id] << "\"];" << endl;
+		if ((**it).lambda == 1) {
+			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " [style=dashed];" << endl;
+		} else if ((**it).isU) {
+			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " [shape=plaintext];" << endl;
+		} else if (*it == graph.emptyset) {
+			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " [shape=plaintext];" << endl;
+		}
+
+		if ((**it).isU || *it == graph.emptyset) {
+			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(**it, graph.U, graph.emptyset)
+				<< " [label=\"";
+			for (unsigned int id = 2; id < graph.events; ++id) {
+				os << graph.id2name[id] << ",";
+			}
+			os << graph.id2name[(unsigned int)graph.events] << "\"];" << endl;
+		} else {
+			for (unsigned int id = 2; id <= graph.events; ++id) {
+				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(*((*it)->pointer[id]), graph.U, graph.emptyset)
+					   << " [label=\"" << graph.id2name[id] << "\"";
+				if (id >= graph.first_receive && id <= graph.last_receive) {
+					os << ",color=red";
+				} else {
+					os << ",color=green";
+				}
+				os << "];" << endl;
+			}
 		}
 	}
 
@@ -210,6 +249,7 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 	return os << "}" << endl;
 }
 
+// search for all reachable nodes and put them into the templist
 void Output::traverse(BSDNode* node) {
 	if (node->isU)
 		return;

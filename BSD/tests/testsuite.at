@@ -28,7 +28,7 @@ AT_SETUP([Piping from stdin])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([cat myCoffee.owfn | BSD_ --verbose --bound=1],0,ignore,ignore)
-AT_CHECK([test -f BSD_output_BSD_b1.dot])
+AT_CHECK([test -f BSD_1(BSD_output).dot])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -52,7 +52,7 @@ AT_SETUP([DOT output])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK([BSD_ myCoffee.owfn --verbose --bound=1],0,ignore,ignore)
-AT_CHECK([test -f myCoffee_BSD_b1.dot])
+AT_CHECK([test -f BSD_1(myCoffee).dot])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -186,8 +186,8 @@ AT_CLEANUP
 AT_SETUP([Cannot write to file])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([touch myCoffee_BSD_b1.dot])
-AT_CHECK([chmod a-w myCoffee_BSD_b1.dot])
+AT_CHECK([touch BSD_1(myCoffee).dot])
+AT_CHECK([chmod a-w BSD_1(myCoffee).dot])
 AT_CHECK([BSD_ myCoffee.owfn --bound=1 --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#13\]]" stderr])
 AT_KEYWORDS(error)

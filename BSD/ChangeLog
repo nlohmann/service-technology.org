@@ -6,3 +6,11 @@
                       generating BSD automata...
                       http://service-technology.org/BSD
 
+
+
+Version 1.0-unreleased
+======================
+
+* generate BSD automata from OWFN input
+
+* test: is input net A a br-controller of input net B?

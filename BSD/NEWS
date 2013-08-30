@@ -7,12 +7,3 @@
                       http://service-technology.org/BSD
 
 
-
-Version 1.1-unreleased
-======================
-
-* generate logs in the XES format from SA input
-
-
-See file ChangeLog <http://service-technology.org/files/locretia/ChangeLog> for
-complete version history.

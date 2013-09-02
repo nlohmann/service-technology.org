@@ -68,9 +68,6 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 		// create a place which represents the interface
 		pnapi::Place *p = &net->createPlace((*label)->getName() + "_input");
 
-		// create a complement place with bound b
-		pnapi::Place *compPlace = &net->createPlace((*label)->getName() + "_comp", b+1);
-
 		// iterate through all transitions belonging to the current label
 		set<pnapi::Transition *> t_in = (*label)->getTransitions();
 		PNAPI_FOREACH(t, t_in)
@@ -82,9 +79,6 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 			// add an arc from the "interface place" to the transition
 			// \TODO: weight????!!!
 			net->createArc(*p,**t, 1);
-
-			// add an arc from the transition to the complement place
-			net->createArc(**t, *compPlace, 1);
 		}
 
 		// create a new transition (new input transition)
@@ -95,8 +89,6 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 
 		// add an arc from the new transition to the "interface place"
 		net->createArc(*t, *p, 1);
-		// ...and one from the complement place to the new transition
-		net->createArc(*compPlace, *t, 1);
 	}
 
 	// iterate through output labels
@@ -105,9 +97,6 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 	{
 		//create a place which represents the interface
 		pnapi::Place *p = &net->createPlace((*label)->getName() + "_output");
-
-		// create a complement place with bound b
-		pnapi::Place *compPlace = &net->createPlace((*label)->getName() + "_comp", b+1);
 
 		// iterate through all transitions belonging to the current label
 		set<pnapi::Transition *> t_in = (*label)->getTransitions();
@@ -120,9 +109,6 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 			// add an arc from the transition to the "interface place"
 			// \TODO: weight????!!!
 			net->createArc(**t, *p, 1);
-
-			// add an arc from the complement place to the transition
-			net->createArc(*compPlace, **t, 1);
 		}
 
 		// create a new transition (new output transition)
@@ -133,28 +119,53 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 
 		// add an arc from the "interface place" to the new transition
 		net->createArc(*p, *t, 1);
-		// ...and one from the new transition to the complement place
-		net->createArc(*t, *compPlace, 1);
 	}
 
 	//\TODO: what about synchronous labels?...
 
 	// made bound_broken a sync label just for better recognition... \todo
 	pnapi::Label *label = &net->getInterface().addSynchronousLabel("bound_broken", "");
+
+	// create the complement places for all places
 	set<pnapi::Place *> places = net->getPlaces();
 	PNAPI_FOREACH(place, places)
 	{
-		if ((*place)->getName().find("_comp") == std::string::npos) {
-			// create a new transition (new input transition)
-			pnapi::Transition *t = &net->createTransition();
-			// add label
-			// \TODO: weight????!!!
-			t->addLabel(*label, b+1);
+		// create a complement place with intial marking 'bound + 1 - init(place)'
+		pnapi::Place *compPlace = &net->createPlace((*place)->getName() + "_comp", b+1-(*place)->getTokenCount());
 
-			// add arcs
-			net->createArc(*t, **place, b+1);
-			net->createArc(**place, *t, b+1);
+		set<pnapi::Arc *> postset = (*place)->getPostsetArcs();
+		PNAPI_FOREACH(arc, postset) {
+			// add an arc from the transition to the complement place
+			net->createArc((*arc)->getTargetNode(), *compPlace, (*arc)->getWeight());
 		}
+
+		set<pnapi::Arc *> preset = (*place)->getPresetArcs();
+		PNAPI_FOREACH(arc, preset) {
+			// add an arc from the complement place to the transition
+			net->createArc(*compPlace, (*arc)->getSourceNode(), (*arc)->getWeight());
+
+			// if an arc weight is greater than the added markings of place and complement place minus the bound
+			// then it might be the case that a transition cannot fire because there are not enough tokens on a complement place
+			// but the number of tokens on the corresponding place isn't breaking the bound
+			if ((*arc)->getWeight() > (*place)->getTokenCount() + compPlace->getTokenCount() - b) {
+				compPlace->setTokenCount(b + (*arc)->getWeight() - (*place)->getTokenCount());
+			}
+		}
+
+//		// if place isn't a complement place!
+//		if ((*place)->getName().find("_comp") == std::string::npos) {
+
+		// create a new transition which can only fire if the bound is broken on this place
+		pnapi::Transition *t = &net->createTransition();
+		// add label
+		// \TODO: weight????!!!
+		t->addLabel(*label, b+1);
+
+		// add arcs with weight bound+1
+		net->createArc(*t, **place, b+1);
+		net->createArc(**place, *t, b+1);
+
+//		}
 	}
 }
 

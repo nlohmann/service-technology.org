@@ -225,6 +225,7 @@ int main(int argc, char** argv) {
     		} else {
     			// strip suffix from input filename
     			filename[i] = std::string(args_info.inputs[i]).substr(0, std::string(args_info.inputs[i]).find_last_of("."));
+    			filename[i] = filename[i].substr(filename[i].find_last_of("/")+1, filename[i].length());
 
     			std::ifstream inputStream(args_info.inputs[i]);
     			if (!inputStream) {

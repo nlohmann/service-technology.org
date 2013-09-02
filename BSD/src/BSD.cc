@@ -43,6 +43,12 @@ BSDNode* BSD::U = NULL;
 BSDNode* BSD::emptyset = NULL;
 MarkingList* BSD::templist = NULL;
 
+std::map<InnerMarking_ID, int> * BSD::dfs = NULL;
+std::map<InnerMarking_ID, int> * BSD::lowlink = NULL;
+int BSD::maxdfs = 0;
+std::stack<InnerMarking_ID> * BSD::S = NULL;
+std::map<InnerMarking_ID, bool>* BSD::inStack = NULL;
+
 std::list<std::pair<BSDNode*, BSDNode*> >* BSD::bisimtemp = NULL;
 
 
@@ -77,6 +83,11 @@ void BSD::initialize() {
 
 	// a temporary list to save already visited markings
 	templist = new MarkingList;
+
+	dfs = new std::map<InnerMarking_ID, int>;
+	lowlink = new std::map<InnerMarking_ID, int>;
+	S = new std::stack<InnerMarking_ID>;
+	inStack = new std::map<InnerMarking_ID, bool>;
 }
 
 
@@ -341,29 +352,126 @@ bool BSD::checkEquality(MarkingList &list1, MarkingList &list2) {
  */
 void BSD::assignLambdas(BSDNodeList *graph) {
 	// iterate through all nodes of the graph
+	// (U and empty node will be added later so we don't need to take care of that here)
 	for (BSDNodeList::const_iterator it = graph->begin(); it != graph->end(); ++it) {
 		// assume that there doesn't exist a marking m that is a stop except for inputs
 		(*it)->lambda = 2;
-		// iterate through all markings in the current node
-		for (MarkingList::const_iterator itlist = (*it)->list.begin(); itlist != (*it)->list.end(); ++itlist) {
-			bool receiveortau = false;
-			// iterate through all successor labels
-			for (uint8_t i = 0; i < InnerMarking::inner_markings[*itlist]->out_degree; ++i) {
-				// test if the label is receiving (for the environment) or if it is a \tau transition
-				if (RECEIVING(InnerMarking::inner_markings[*itlist]->labels[i]) ||
-						InnerMarking::inner_markings[*itlist]->labels[i] == TAU) {
-					receiveortau = true;
+		// search all SCCs in the current node (Tarjan algorithm)
+		std::list<MarkingList> SCCs = SCCsearch(*it);
+		// iterate through all SCCs
+		for (std::list<MarkingList>::const_iterator itSCC = SCCs.begin(); itSCC != SCCs.end(); ++itSCC) {
+			bool found_outlabel = false;
+			for (MarkingList::const_iterator itlist = (*it)->list.begin(); itlist != (*it)->list.end(); ++itlist) {
+				// iterate through all successor labels
+				for (uint8_t i = 0; i < InnerMarking::inner_markings[*itlist]->out_degree; ++i) {
+					// test if the label is receiving (for the environment)
+					if (RECEIVING(InnerMarking::inner_markings[*itlist]->labels[i])) {
+						found_outlabel = true;
+						break;
+					}
 				}
 			}
-			if (!receiveortau) {
-				// found a marking that is a stop except for inputs
-				// (no receive possible for the environment and no \tau transition)
-				(*it)->lambda = 1;
+
+			if (!found_outlabel) {
+				(*it)->lambda = 1;     // found a stop except for inputs
 				break;
 			}
 		}
 	}
 }
+
+std::list<MarkingList> BSD::SCCsearch(BSDNode * node) {
+	std::list<MarkingList> result;
+
+	// clear all helper structures
+	dfs->clear();
+	lowlink->clear();
+	inStack->clear();
+
+	// input: graph G = (node->list (V), E)
+
+	maxdfs = 0;						// counter for dfs
+	MarkingList U = node->list;		// unvisited markings
+
+	for (MarkingList::iterator it = U.begin(); it != U.end(); ++it) {
+		(*dfs)[*it] = 0;
+		(*lowlink)[*it] = 0;
+		(*inStack)[*it] = false;
+	}
+
+	// make sure the stack is empty
+	while (!S->empty())
+		S->pop();
+
+	while (!U.empty()) {										// while there are unvisited markings in U
+		InnerMarking_ID id = U.back();							// take a marking v from U
+		U.pop_back();											// remove v from U
+		std::list<MarkingList> temp = tarjan(id, node, U);		// the call to tarjan visits all markings in U reachable from v
+		result.insert(result.end(), temp.begin(), temp.end());	// add computed SCCs to result list
+	}
+
+	return result;
+}
+
+
+std::list<MarkingList> BSD::tarjan(InnerMarking_ID markingID, BSDNode * node, MarkingList & U) {
+	(*dfs)[markingID] = maxdfs;			// set dfs index of current marking v
+	(*lowlink)[markingID] = maxdfs;		// v.lowlink <= v.dfs
+	maxdfs++;							// increment counter
+	S->push(markingID);					// push v on top of stack
+	(*inStack)[markingID] = true;		// set to true (v is in stack)
+//	U.pop_back();						// remove v from U
+
+	std::list<MarkingList> result;
+
+	// iterate through neighbour markings v' of v
+	for (uint8_t i = 0; i < InnerMarking::inner_markings[markingID]->out_degree; ++i) {
+		InnerMarking_ID idNeighbour = InnerMarking::inner_markings[markingID]->successors[i];
+		// only consider \tau-steps (other steps don't matter for the closures)
+		if (InnerMarking::inner_markings[markingID]->labels[i] == TAU) {
+			bool found = false; // v' found in U?
+			// iterate through all markings in U
+			for (MarkingList::iterator it = U.begin(); it != U.end(); ++it) {
+				// if v' found in U
+				if (idNeighbour == *it) {
+					found = true; 												// v' found in U
+					U.erase(it);												// remove v' from U
+					std::list<MarkingList> temp = tarjan(idNeighbour, node, U);	// recursive call
+
+					result.insert(result.end(), temp.begin(), temp.end());		// insert into the result list
+
+					(*lowlink)[markingID] = std::min((*lowlink)[markingID], (*lowlink)[idNeighbour]); // v.lowlink := min(v.lowlink, v'.lowlink);
+					// v' was found in U so break the for-loop
+					break;
+				}
+			}
+			if (!found) { // v' is not in U
+				// if v' is in the stack S
+				if ((*inStack)[idNeighbour]) {
+					(*lowlink)[markingID] = std::min((*lowlink)[markingID], (*dfs)[idNeighbour]); // v.lowlink := min(v.lowlink, v'.dfs);
+				}
+			}
+		}
+	}
+
+	// if v.lowlink == v.dfs
+	if ((*lowlink)[markingID] == (*dfs)[markingID]) { // root of a SCC
+		MarkingList SCC;
+		// compute the SCC
+		InnerMarking_ID id = -1;
+		while (id != markingID) {
+			id = S->top();			// take top of stack v*
+			S->pop();				// remove top of stack
+			(*inStack)[id] = false;	// set to false (v* isn't in stack any more)
+			SCC.push_back(id);		// add v* to the SCC
+		}
+
+		result.push_back(SCC);
+	}
+
+	return result;
+}
+
 
 /*!
  \brief print the BSD automaton in the shell (if verbose is switched on)
@@ -417,6 +525,10 @@ void BSD::printlist(MarkingList *list) {
 
 void BSD::finalize() {
 	delete templist;
+	delete dfs;
+	delete lowlink;
+	delete S;
+	delete inStack;
 }
 
 /*!

@@ -60,6 +60,10 @@ class BSD {
 
         static void assignLambdas(BSDNodeList *graph);
 
+        static std::list<MarkingList> SCCsearch(BSDNode * node);
+
+        static std::list<MarkingList> tarjan(InnerMarking_ID markingID, BSDNode * node, MarkingList & U);
+
         static void printBSD(BSDNodeList *graph);
 
         static void printlist(MarkingList *list);
@@ -87,6 +91,13 @@ class BSD {
         static std::list<std::pair<BSDNode*, BSDNode*> >* bisimtemp;
 
         static MarkingList* templist;
+
+        // helpers for tarjan algorithm (lambda value computation)
+        static std::map<InnerMarking_ID, int>* dfs;
+        static std::map<InnerMarking_ID, int>* lowlink;
+        static int maxdfs;
+        static std::stack<InnerMarking_ID>* S;
+        static std::map<InnerMarking_ID, bool>* inStack;
 
 };
 

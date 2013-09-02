@@ -17,7 +17,7 @@ BSD_SOURCES = cmdline.c cmdline.h \
 # the configuration files
 sysconf_DATA = BSD.conf
 
-# pass the sysconfdir to Locretia (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
+# pass the sysconfdir to BSD (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 BSD_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 
 # only add the local Petri net API if necessary

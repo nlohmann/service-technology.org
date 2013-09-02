@@ -117,6 +117,13 @@ option "cycle" -
   "Using transition invariant based analysis."
   flag off
 
+option "cycleheuristic" -
+  "Heuristical parameter for transition invariant based analysis."
+  int
+  typestr="K"
+  optional
+  hidden
+
 section "Input/Output"
 
 option "compressed" -

@@ -54,7 +54,11 @@ public:
 	      }	   
 		if(args_info.cycle_given) {
 			//TODO
-			TransitionInv *tinv = new TransitionInv(/*k*/);
+			TransitionInv *tinv = new TransitionInv();
+			if(args_info.cycleheuristic_given) {
+				tinv->using_k = true;
+				tinv->k = args_info.cycleheuristic_arg;
+			}
 			return new TInvStore<T>(tinv, enc, new PrefixTreeStore<T>(), number_of_threads);
 		}
 		else {

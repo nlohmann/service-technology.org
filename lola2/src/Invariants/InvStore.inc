@@ -10,7 +10,7 @@
 
 template <typename T>
 TInvStore<T>::TInvStore(TransitionInv* tinv, NetStateEncoder* _netStateEncoder, VectorStore<T>* _vectorStore, uint32_t _number_of_threads)
-		: PluginStore<T>(_netStateEncoder, _vectorStore, _number_of_threads), tinv(tinv), depth(0) {
+		: PluginStore<T>(_netStateEncoder, _vectorStore, _number_of_threads), tinv(tinv) {
 	this->tinv->solve();
 }
 
@@ -41,12 +41,16 @@ bool TInvStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadInd
 	// check whether state should be saved
 	bool noinsert = true;
 	
-	for(int i = 0; i < Net::Card[TR]; i++) {
-		//TODO more efficiency
-		//if(ns.Enabled[i] && this->tinv->u[i]) {
-		if(enabled[i] && this->tinv->u[i]) {
-			noinsert = false;
-			break;
+	if(this->tinv->using_k && !(ns.depth % this->tinv->k))
+		noinsert = false;
+	else {
+		for(int i = 0; i < Net::Card[TR]; i++) {
+			//TODO more efficiency
+			//if(ns.Enabled[i] && this->tinv->u[i]) {
+			if(enabled[i] && this->tinv->u[i]) {
+				noinsert = false;
+				break;
+			}
 		}
 	}
 	

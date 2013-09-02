@@ -58,6 +58,10 @@ public:
 
     /// These are the transitions for which this place is the scapegoat.
     index_t** Disabled;
+    
+    // current depth in net
+    //TODO implementation of depth in operator= and swap
+    uint64_t depth;
 
     /// create a NetState object from the global variables set by the parsing process
     static NetState* createNetStateFromInitial();

@@ -19,7 +19,6 @@ public:
     bool searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex);
 
 private:
-	int depth;
 	TransitionInv* tinv;
 };
 

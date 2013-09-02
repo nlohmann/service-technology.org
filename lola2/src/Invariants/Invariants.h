@@ -12,10 +12,12 @@
 
 class TransitionInv {
 public:
-	TransitionInv() : u(NULL) {}
+	TransitionInv() : u(NULL), using_k(false) {}
 	void solve();
 	
 	bool *u;
+	int k;
+	bool using_k;
 };
 
 #endif /* INVARIANTS_H */

@@ -7,7 +7,8 @@
 # --unamed-opts=FILE: accept options without names
 # --no-handle-error: TODO
 # --conf-parser: TODO
-args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+# args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+args "--include-getopt --show-required --no-handle-error --conf-parser"
 
 description "About Tara:"
 purpose "Tackling non-functional properties for stateful services.\n Tara computes a finite representation of all policy-satisfying partners. \n\n  Report bugs to tara@service-technology.org.\n  Visit Tara's home page at http://service-technology.org/tara"
@@ -15,33 +16,26 @@ purpose "Tackling non-functional properties for stateful services.\n Tara comput
 # <<-- CHANGE START (parameters) -->>
 section "Input/Output"
 sectiondesc="When called without an input file, Tara reads from the standard input stream. Tara takes reachability graphs as input. Tara writes the result - a dot file - to the standard output stream. \n"
-  
-option "dfa" d
-  "A DFA file"
-  details="Use this option to provide a deterministic finite automaton that can be used inside cost functions. You can provide more than one dfa, e.g. -d foo.dfa -d bar.dfa .\n"
+
+
+option "net" n 
+  "Please provide an open net file."
   string
   typestr="FILENAME"
-  optional
-  multiple
-
+#live top
+  
 option "costfunction" f
   "A cost function file, -r for random costs"
   details="Use this option to provide a cost function. Write -r to generate random cost function.\n"
   string
   typestr="FILENAME"
+#live top
 
-option "pol" p
-  "A policy file"
-  details="Use this option to provide a policy. You can provide more than one policy, e.g. -p foo.pol -p bar.pol .\n"
+option "usecase" u
+  "Provide the usecase. It is assumed that the behaviour of the usecase is acyclic and corresponds to the behaviour of the provided net"
   string
   typestr="FILENAME"
   optional
-  multiple
-
-option "net" n 
-  "Please provide an open net file explaining the interface bindings of the transitions occurring in the reachability graph. NB: The rest of the file is ignored."
-  string
-  typestr="FILENAME"
 
 option "sa" -
   "Synthesizes a cost-minimal partner (service automaton) and saves it in FILENAME. If FILENAME equals a dash, the partner is written to standard out."
@@ -54,6 +48,27 @@ option "og" -
   string
   typestr="FILENAME"
   optional
+
+section "Costs"
+sectiondesc="Define the costs."
+
+option "riskcosts" -
+  "Whether the costs are risks. Give Value to define base (default = 100)"
+  details="When given risk-costs. Minimazation of Min-Risk will be done. Give value to change base, e.g. 1000 for per mille."
+  int
+  default="100"
+  argoptional
+  optional
+
+option "minrandomcost" t
+   "minimal costs, if random cost function"
+   int
+   optional
+
+option "maxrandomcost" r
+   "maximal costs, if random cost function"
+   int
+   optional
 
 section "Optimization" 
 sectiondesc="There are some optimization techniques availabe to (hopefully) speed up Tara. \n"
@@ -69,24 +84,6 @@ option "concurrency" m
   int
   optional
 
-option "maxrandomcost" r
-   "maximal costs, if random"
-   int
-   optional
-   #live top
-
-option "minrandomcost" t
-   "minimal costs, if random cost function"
-   int
-   optional
-   #live top
-
-option "randomseed" -
-   "set the random seed, used for automated tests"
-   int
-   default="0"
-   optional
-   hidden
 
 section "Configuration"
 sectiondesc="Configuration files are used to control some options of Tara. Don't worry, a default configuration file is created and - if nothing else is specified - used. \n"
@@ -111,6 +108,7 @@ option "noClean" -
   "Do not delete temporary files."
   details="Any temporary files created will be kept after Tara terminates.\n"
   flag off
+#live hidden
 
 
 section "Debugging"
@@ -120,7 +118,6 @@ option "verbose" v
   "Show verbose messages."
   details="Show verbose information reporting intermediate steps.\n"
   flag off
-  #live hidden
 
 option "bug" -
   "Write configuration information into a file `bug.log'."
@@ -133,5 +130,13 @@ option "stats" -
   details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
   flag off
   hidden
+
+option "randomseed" -
+   "set the random seed, used for automated tests"
+   int
+   default="0"
+   optional
+   hidden
+#live hidden
   
 # <<-- CHANGE END -->>

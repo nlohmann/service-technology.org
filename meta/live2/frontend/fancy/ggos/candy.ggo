@@ -1,0 +1,116 @@
+# the purpose of the program
+purpose "Candy is a tool to synthesize cost efficient partners out of a service's operating guideline.\n\n  Report bugs to candy@service-technology.org.\n  Visit Candy's home page at http://service-technology.org/candy"
+
+# the description string will be printet with the help after usage
+description "About Candy:"
+
+# arguments for gengetopt ... what do they do?
+# --long-help: long usage line in help
+# --include-getopt: adds code for getopt_long in generated C file
+# --show-required: output of help will specify which options are mandatory
+# --unamed-opts=FILE: accept options without names
+# --no-handle-error: an error in the parsing does not provoke the exit of the program
+# --conf-parser: generate additional parser for configuration files
+args "--long-help --include-getopt --show-required --no-handle-error"
+
+
+
+# -----------------------------------------------------------------
+section "Input and Output" 
+sectiondesc="This section explains where to get the operating guideline and where to write the calculated partner.\n"
+
+option "input" i
+  "The input file containing an operating guideline. If this option isn't used the operation guideline will be read from standard in."
+  string
+  typestr="FILENAME"
+  optional
+
+option "output" o
+  "The output file containing the calculated partner. If this option isn't used the partner will be written to standard out. If this option is used without giving a filename the input filename's prefix will be used for writing a '_efficient.og' file."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+option "automata" a
+  "Service automaton output."
+  details="The output should be a service automata."
+  flag off
+
+
+
+# -----------------------------------------------------------------
+section "Cost" 
+#sectiondesc="This section explains where to get the cost for calculating a cost efficient partner. Exactly one out of these two options always has to be used.\n"
+sectiondesc="This section explains where to get the cost for calculating a cost efficient partner.\n"
+
+option "costfile" c
+  "Use a costfile."
+  details="Use a given costfile for the transition cost. If no filename is given the input filename's prefix will be used for finding a '.cf' file."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+#option "netfile" n
+#  "Use a netfile."
+#  details="Use a given open net for the transition cost. If no filename is given the input filenames's prefix will be used for finding a '.owfn' file."
+#  string
+#  typestr="FILENAME"
+#  argoptional
+#  optional
+
+
+
+# -----------------------------------------------------------------
+section "Debugging"
+sectiondesc="These options control how much debug output Candy creates.\n"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+
+option "debug" d
+  "Show debug messages."
+  details="Show debug information reporting critical steps.\n"
+  flag off
+
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine Candy was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden
+
+option "finalize" -
+  "Release all allocated memory."
+  details="This option calls the destructors of all objects that have been created by Candy. This is usually not necessary, because the operating system cleans up once Candy terminates. However, this option can be used to detect memory leaks.\n"
+  flag off
+  hidden
+
+option "stats" -
+  "Display time and memory consumption on termination."
+  details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
+  flag off
+  hidden
+
+
+
+# -----------------------------------------------------------------
+section "Configuration"
+sectiondesc="These options configure Candy.\n"
+
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename Candy should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/candy-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by Candy is kept after Candy terminates.\n"
+  flag off
+  

@@ -1,0 +1,52 @@
+args "--long-help --include-getopt --show-required --unamed-opts=FILE"
+
+purpose "Diane - Decomposition Into Atomic NEts."
+
+description "Diane cuts a Petri net into parts."
+
+option "mode" m
+	"Specifies a certain mode in which Diane will run where 'standard' uses a union-find approach to find the smallest service parts in a non-open net (input: LoLA format), and 'freechoice' finds service parts by manipulating free-choice cluster (input: oWFN format)."
+	string
+	values="standard","freechoice" enum
+	default="standard"
+	typestr="MODE"
+	optional
+	
+option "service" -
+	"Makes the result interpretable as services."
+	flag off
+
+section "Input and Output"
+
+option "prefix" p
+	"Specifies the output files' prefix. If not specified Diane will derive the output filenames from the input filename."
+	string
+	typestr="FILEPREFIX"
+	optional
+
+option "quiet" q
+	"No output file will be written by Diane."
+	flag off
+
+section "Debug Options"
+
+option "verbose" v
+	"Verbose output."
+	flag off
+
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine Wendy was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden
+
+section "Statistical Options"
+	
+option "statistics" s
+	"Statistical output."
+	flag off
+	
+option "csv" -
+	"Writes the statistical output to 'stdout' in CSV format. The column heads are given on 'stderr'."
+	dependon="statistics"
+	flag off

@@ -1,4 +1,4 @@
-args "--long-help --include-getopt --show-required --unamed-opts=FILE --conf-parser"
+args "--long-help --include-getopt --show-required --unamed-opts=FILE --no-handle-version --conf-parser"
 
 purpose "Synthesizing behavioral adapters."
 description "About Marlene:"
@@ -69,11 +69,6 @@ option "engineonly" -
   "Only return the engine part of the adapter"
   flag off
 
-option "composedonly" -
-  "Only return the composition of engine and input services (as passed to Wendy)"
-  flag off
-  hidden
-
 option "diagnosis" -
   "Output diagnostic information in case adapter is not controllable"
   flag off
@@ -83,13 +78,6 @@ option "withprefix" -
   details="In order to read one net multiple time, a prefix to the net's nodes
   is needed. This options adds this prefix."
   flag off
-
-option "useasif" -
-  "Uses net with index <n> as interface specification for characterization of all adaptable nets."
-  int
-  typestr="<n>"
-  default="1"
-  optional
 
 
 section "Debug"
@@ -159,14 +147,6 @@ option "petrify" -
   string
   typestr="FILE"
   default="petrify"
-  optional
-  hidden
-
-option "pruner" -
-  "Set the name of the pruner binary needed for deciding adaptability."
-  string
-  typestr="FILE"
-  default="pruner"
   optional
   hidden
 

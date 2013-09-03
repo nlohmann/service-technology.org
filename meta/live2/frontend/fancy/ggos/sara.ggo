@@ -1,0 +1,215 @@
+args "--include-getopt --show-required --no-handle-error"
+
+purpose "Structures for Automated Reachability Analysis:
+Deciding the reachability problem for Petri nets and more
+
+Given a problem of the form (N,i,f) with a low level Petri net N in *.llnet (LOLA), *.owfn (OWFN), or PNML format, an initial marking i, and an extended final marking f, Sara tries to decide whether f is reachable from i in the net N.
+
+It is also possible to solve realizability, i.e. whether some transition vector can be tranformed into a firing sequence for given (N,i)."
+
+section "Input and Output"
+sectiondesc="Input must be given explicitly (file or pipe), output goes to stdout/stderr by default."
+
+option "input" i
+  "Read problems from an input file and solve them."
+  typestr="FILENAME"
+  string
+  optional
+
+option "pipe" p
+  "Solve just created problems or take them from stdin."
+  details="If one of the options -q/-r/-R is specified, the problems generated there will be solved immediately. If no source of input can be found, the problems will be read from stdin and then solved.
+"
+  flag off
+
+option "output" o
+  "Redirect output messages from stdout to a file."
+  details="
+Sara will yield one of the following results:
+SOLUTION: A firing sequence.
+INFEASIBLE: The marking equation is infeasible or it was impossible to borrow enough tokens (via T-invariants) to make some transition firable. Use the -v option for details/reasoning.
+UNSOLVED: A problem was detected, e.g. due to a numerical instability encountered by lp_solve.
+Finally, Sara could run for a long time or terminate due to insufficient memory, which also falls under the UNSOLVED case.
+"
+  typestr="FILENAME"
+  string
+  optional
+
+option "log" l
+  "Redirect log and error messages to a file."
+  typestr="FILENAME"
+  string
+  optional
+
+section "Creating problem files"
+sectiondesc="See detailed help for the syntax of problems (e.g. for manual creation).\n"
+
+option "quasilive" q
+  "Create problems for checking enabling."
+  details="A problem file FILENAME.sara is generated for checking which transitions can be enabled at all in a given Petri net FILENAME
+"
+  typestr="FILENAME"
+  string
+  optional
+
+option "reachable" r
+  "Create a reachability problem (also coverability)."
+  details="Generates a problem file FILENAME.sara from the Petri net FILENAME for solving a reachability problem. The final marking has to be specified via option -f.
+The problem will have the following syntax in the file:
+
+PROBLEM namestring:
+	GOAL REACHABILITY;
+	FILE petrinetfilename TYPE {LOLA|OWFN|PNML};
+	INITIAL initialmarking;
+	FINAL [COVER] finalmarking;
+
+The option COVER declares that all unmentioned places may contain arbitrary many tokens (instead of exactly zero).
+"
+  typestr="FILENAME"
+  string
+  optional
+
+option "realize" R
+  "Create a realizability problem."
+  details="Generates a problem file FILENAME.sara from the Petri net FILENAME for solving a realizability problem. The initial marking is also taken from this file, while the transition multiset must be specified via -f.
+The problem will have the following syntax in the file:
+
+PROBLEM namestring:
+	GOAL REALIZABILITY;
+	FILE petrinetfilename TYPE {LOLA|OWFN|PNML};
+	INITIAL initialmarking;
+	FINAL transitionmultiset;
+"
+  typestr="FILENAME"
+  string
+  optional
+
+option "final" f
+  "Specify an extended final marking."
+  details="An extended final marking (option -r) or transition multiset (option -R) must be given. In the former, for a place p with n tokens, specify \"p:n\" (exactly n), \"p>n\" (at least n) or \"p<n\" (at most n). \":1\" can be omitted. Combinations as in \"p:3,q>2,r<5,s\" are allowed. Use quotation marks to avoid misinterpretation of < and >. Transition multisets contain transitions instead of places and < and > are forbidden.
+"
+  typestr="string"
+  string
+  optional
+
+option "constraint" c
+  "Specify a global place/transition constraint."
+  details="A constraint works much like a final marking and is an (in)equation where the left hand side is a weighted sum of places and transitions. Places denote tokens in the final marking while a transition stands for its number of occurrences in a firing sequence. The right hand side must be an integer. Examples would be \"p+q>5\" (p and q together can have 5 or more tokens) or \"2p-t:0\" (t occurs twice as often as there are tokens on p finally) or even \"3p1-4p2+t1-t2<17\".
+"
+  typestr="string"
+  dependon="reachable"
+  string
+  multiple
+  optional
+
+option "owfn" -
+  "Specify net as being in OWFN format (instead of PNML)."
+  details="The Petri net used for creating a problem file is assumed to be in OWFN format (*.owfn). The option is not necessary if the filename contains 'owfn'.
+"
+  flag off
+
+option "lola" -
+  "Specify net as being in LOLA llnet format (instead of PNML)."
+  details="The Petri net used for creating a problem file is assumed to be in LOLA format (*.llnet). The option is not necessary if the filename contains 'llnet'.
+"
+  flag off
+
+option "pnml" -
+  "Specify net as being in PNML format."
+  details="The Petri net used for creating a problem file is assumed to be in PNML format. The option may be necessary if the filename contains either 'owfn' or 'llnet'."
+  flag off
+
+section "Miscellaneous"
+
+option "time" t
+  "Measure time."
+  details="Show used time for each problem instance and all problems together.
+"
+  flag off
+
+option "verbose" v
+  "Show verbose output and reasoning."
+  details="Information about the number of jobs executed, how many are still in the queue, and (finally) how many crucial failures (that may lead to counterexamples) were encountered are given. If the marking equation fails a suggestion of how to change the markings is made. If the marking equation is feasible but the final marking unreachable the crucial failures constituting a counterexample are presented. At the end, the number of solutions found is summed up.
+"
+  flag off
+
+section "Influencing the algorithm"
+sectiondesc="These options allow to obtain control over some parts of the algorithm.\n"
+
+option "continue" C
+  "Find 'all' solutions."
+  details="Continues the search for solutions after the first solution has been found. Tries to find all solutions minimal with respect to parikh vector comparison. The search might go on infinitely if the number of solutions is not finite. For realizability problems, solutions with a smaller parikh image than the one given in the problem are sought. Information about counterexample witnesses may be lost when using this option.
+" 
+  flag off
+
+option "forceprint" P
+  "Force printing of a solution the moment it is found."
+  details="Normally, solutions are stored, compared to each other, and, if comparable, the worse solution is thrown away when using the -C option. Finally, all remaining solutions are printed. With this option, solutions are printed immediately, even duplicates might appear, but one will not have to wait for program termination.
+"
+  flag off
+
+option "witness" W
+  "Show witnesses for non-reachability even for solved problems."
+  details="Such witnesses are points were the algorithm cannot fire any transition it would like to fire and adding T-invariants to the to-be-fired list is not possible. The algorithm is stuck and has to backtrack.
+"
+  flag off
+  hidden
+
+option "scapegoat" S
+  "Choose scapegoat nondeterministically." 
+  details="The scapegoat for the stubborn set method is chosen randomly instead of using the best place according to the global ordering of places. This might considerably change the run time, though it is unclear whether it becomes shorter or longer. Runs of the program will no longer be deterministic.
+"
+  flag off
+
+option "joborder" J
+  "Change job priorities." 
+  details="Normally, jobs are prioritized by their number of constraints; this tends towards a depth-first-search. Setting this option will sort the jobs by expected firing sequences length which tends toward a breadth-first-search.
+"
+  flag off
+  hidden
+
+option "lookup" L
+  "Size of the lookup table."
+  details="The lookup table contains saved solutions of lp_solve including their (partial) realizability. Its size is normally unbounded, but you may limit it to any number (e.g. 1000) if you have memory problems.
+"
+  typestr="n"
+  int
+  optional
+  hidden
+
+option "treemaxjob" T
+  "Maximal number of jobs per tree."
+  details="Stop trying to realize a transition vector after n new partial solutions (jobs) have been found. Solutions may be lost but the program may run faster (or not).
+"
+  typestr="n"
+  int
+  optional
+  hidden
+
+option "droppast" D
+  "Forget past jobs after some time."
+  details="Past jobs are normally remembered forever for comparison with future jobs to avoid doing jobs twice. With this option, the past memory becomes limited. Use this only if you have memory issues. A good first try might be a value of around 20. If you get repeated warnings that past jobs with the same priority have been dropped, you have set this option too low."
+  typestr="n"
+  int
+  optional
+  hidden
+  
+section "Debugging"
+
+option "break" b
+  "Break after n jobs."
+  details="The program execution is stopped after the n-th job has been executed. All job queues (jobs to do, solutions, and failures) are printed. A value of zero will not terminate the program prematurely but will still print the job queues.
+"
+  typestr="n"
+  int
+  optional
+  hidden
+
+option "debug" d
+  "Show debug info."
+  details="Show debug output: 0=none, 1=some, 2=more detail, 3=most detail."
+  typestr="0-3"
+  int
+  optional
+  hidden
+

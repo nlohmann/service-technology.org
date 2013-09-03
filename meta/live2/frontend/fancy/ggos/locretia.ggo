@@ -1,0 +1,215 @@
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+description "About Locretia:"
+purpose "Locretia: generating logs...\n\n  Report bugs to locretia@service-technology.org.\n  Visit Locretia's home page at http://service-technology.org/locretia"
+
+
+section "Basic functionality (input)"
+sectiondesc="Options which change the basic functionality of the tool. Only one option at a time is allowed.\n"
+
+option "tpn" -
+  "TPN -> OWFN."
+  details="Using this option, the input file is expected to be in a (special) TPN file format. An output file (.owfn) is generated which is the given net plus a random generated interface."
+  flag off
+
+option "owfn" -
+  "OWFN -> XES log or synchronous or asynchronous environment (PNML) ."
+  details="Using this option, the input file is expected to be in OWFN file format."
+  flag off
+
+option "sa" -
+  "SA -> XES log."
+  details="Using this option, the input file is expected to be in SA file format."
+  flag off
+
+section "TPN input"
+sectiondesc="Options which are used if the 'tpn'-flag is set....\n"
+
+option "icount" -
+  "Maximal number of interface places to be randomly generated."
+  details="icount sets the maximal number of interface places to be created. At most 1 interface place per transition is generated. The default is set to -1 which means every visible transition gets an interface place.\n"
+  int
+  typestr="COUNT"
+  default="-1"
+  optional
+  
+section "OWFN input"
+sectiondesc="Options which are used if the 'owfn'-flag is set...\n"
+
+option "syncEnv" -
+  "OWFN -> synchronous environment."
+  details="Using this option, a PNML file will be generated containing the synchronous environment of the given OWFN."
+  flag off
+  
+option "asyncEnv" -
+  "OWFN -> asynchronous environment."
+  details="Using this option, a PNML file will be generated containing the asynchronous environment of the given OWFN."
+  flag off
+  
+section "OWFN or SA input"
+sectiondesc="Options which are used if the 'owfn'-flag or the 'sa'-flag is set...\n"
+
+option "log" -
+  "OWFN or SA -> XES log."
+  details="Using this option, a XES log is generated from the underlying SA or an OWFN which was given as an input file."
+  flag off
+  
+section "XES log generation (OWFN only)"
+sectiondesc="Options which are used if the 'log'-flag is set and the input is an OWFN...\n"
+
+option "partnerView" p
+  "Change to the environment's point of view."
+  details="Using this option, the log will be generated using the asynchronous environment of the given net."
+  flag off
+  
+section "XES log generation (OWFN or SA input)"
+sectiondesc="Options which are used if the 'log'-flag is set and the input is either an OWFN or a SA...\n"
+
+option "logCount" -
+  "Number of logs to be created."
+  details="Sets the number of logs which are generated. The default is set to 1. if a number greater than 1 is chosen, a counter '_xyz' is appended to the filename.\n"
+  int
+  typestr="COUNT"
+  default="1"
+  optional
+  
+option "count" n
+  "Number of traces to appear in the log-file."
+  details="The trace-count sets the number of traces which are generated. The default is set to 10 traces.\n"
+  int
+  typestr="COUNT"
+  default="10"
+  optional
+  
+option "maxLength" u
+  "Maximal length of traces to appear in the log-file."
+  details="The max-trace-length sets the maximal length of traces within the log. The default is set to 10. Remark: This option also restricts the number of messages to be sent and received in the case of using the asynchronous environment.\n"
+  int
+  typestr="MAXLENGTH"
+  default="10"
+  optional
+  
+option "minLength" l
+  "Minimal length of traces to appear in the log-file."
+  details="The min-trace-length sets the minimal length of traces within the log. The default is set to 0.\n"
+  int
+  typestr="MINLENGTH"
+  default="0"
+  optional
+  
+option "maxRepeat" -
+  "Maximal number of repeated (copied) traces in the log."
+  details="The maximal number of repeated traces sets an upper bound for copying traces in the log. The default is set to 1.\n"
+  int
+  typestr="MAXREPEAT"
+  default="1"
+  optional
+  
+option "expDist" -
+  "Set the distribution of random numbers for the maximal number of repeated traces to be (sort of) exponential."
+  details="Using this option, the distribution of random numbers is set to be exponential instead of equal. The underlying formula transforming equal distributed random numbers x \in [0,1] into exponentially distributed numbers y \in [0,1] is y = (1-e^(-\lambda*x)) / (1-e^(-\lambda)). The second term is required for normalization."
+  flag off
+  
+option "lambda" -
+  "Set a parameter \lambda > 0 which affects the exponential distribution."
+  details="Speaks for itself. Sets the value of \lambda in (1-e^(-\lambda*x)) / (1-e^(-\lambda)). The higher the value the more bent the graph becomes. \lambda has to be greater than 0."
+  double
+  typestr="LAMBDA"
+  default="4"
+  optional
+  
+option "final" f
+  "Only generate traces that end in a final state."
+  details="Using this option, only traces are generated that end in a final state. Other traces will just be discarded. A retry is done based on the following option."
+  flag off
+  
+option "enforceTraceCount" e
+  "If the 'final'-flag is set, enforces the program to generate the full count of traces specified by the 'count' argument. Setting this flag may lead to a heavily increased run duration."
+  details="Using this option, a log with the full count of traces is generated by simply retrying as many times as possible to get runs that end in a final state. The run duration may be heavily increased in some cases."
+  flag off
+
+
+section "Input/Output"
+sectiondesc="When called without an input file, Locretia reads from the standard input stream. When called without an output parameter, Locretia creates a log file, a PNML file and/or an OWFN file based on the chosen options. If no filename is given for one of the options below, the input filename's suffix (`.owfn'/`.tpn'/`.sa') is replaced by the name of the respective option (e.g., `.xes'). If the filename `-' is given, Locretia will pipe the respective output to the standard output stream.\n"
+
+option "owfnFile" -
+  "Filename for the OWFN file."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+  
+option "logFile" -
+  "Filename for the XES log-file."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+  
+option "pnmlFile" -
+  "Filename for the synchronous environment or the asynchronous environment."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+section "Debugging"
+sectiondesc="These options control how much debug output Locretia creates.\n"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine Locretia was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden
+
+option "finalize" -
+  "Release all allocated memory."
+  details="This option calls the destructors of all objects that have been created by Locretia. This is usually not necessary, because the operating system cleans up once Locretia terminates. However, this option can be used to detect memory leaks.\n"
+  flag off
+  hidden
+
+option "stats" -
+  "Display time and memory consumption on termination."
+  details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
+  flag off
+  hidden
+
+
+section "Configuration"
+sectiondesc="Locretia relies on several other tools. These options configure Locretia to find these tools.\n"
+
+option "config" c
+  "Read configuration from file."
+  details="If no file is given, Locretia first tries to parse file `locretia.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Locretia was installed) and then from the current working directory. If neither file was found, the standard values for `lola' are assumed.\n"
+  string
+  typestr="FILE"
+  optional
+
+option "lola" -
+  "Set the path and binary of LoLA."
+  details="The LoLA binary that is compiled with the option `STATESPACE' without reduction techniques. LoLA can be downloaded at http://service-technology.org/lola and compiled using `make lola-statespace'.\n"
+  string
+  typestr="FILENAME"
+  default="lola-statespace"
+  optional
+  hidden
+
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename Locretia should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/locretia-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by Locretia is kept after Locretia terminates.\n"
+  flag off
+  hidden

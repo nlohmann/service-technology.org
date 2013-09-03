@@ -1,5 +1,5 @@
 [EXIT STATUS]
-Locretia exits with 0 on success, and with 1 if an error occurs. See Texinfo manual for detailed information.
+BSD exits with 0 on success, and with 1 if an error occurs. See Texinfo manual for detailed information.
 
 [EXAMPLES]
 To generate a BSD automaton with bound 1 from an open workflow net `service.owfn', execute

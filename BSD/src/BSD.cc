@@ -458,13 +458,13 @@ std::list<MarkingList> BSD::tarjan(InnerMarking_ID markingID, BSDNode * node, Ma
 	if ((*lowlink)[markingID] == (*dfs)[markingID]) { // root of a SCC
 		MarkingList SCC;
 		// compute the SCC
-		InnerMarking_ID id = -1;
-		while (id != markingID) {
+		InnerMarking_ID id = 0;
+		do {
 			id = S->top();			// take top of stack v*
 			S->pop();				// remove top of stack
 			(*inStack)[id] = false;	// set to false (v* isn't in stack any more)
 			SCC.push_back(id);		// add v* to the SCC
-		}
+		} while (id != markingID);
 
 		result.push_back(SCC);
 	}

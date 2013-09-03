@@ -17,6 +17,7 @@ Input.prototype.checkParams = function () {
     for(var i = 0, c = null; c = this.expectedParams[i]; ++i) {
         if(typeof this.params[c] == 'undefined') {
             console.log("Parameter "+c+" not given...");
+            console.log(this);
             return false;
         }
     }

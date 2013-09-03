@@ -16,7 +16,9 @@ if(typeof c != 'undefined') cleanList.push(c);
 return cleanList;
 }
 
-ITEM "ITEM" = SP* i:(PURPOSE / IGNORE / SECTION / OPTION / COMMENT / ARGS) { return i; }
+ITEM "ITEM" = SP* i:(PURPOSE / IGNORE / SECTION / OPTION / COMMENT / ARGS / GROUP ) { return i; }
+
+GROUP = "defgroup" SP+ STRING (SP+ "groupdesc=" SP* STRING)? (SP+ "required")? { return; }
 
 ARGS = "args" SP+ "\"" [\"]* s:[^\"]* "\"" { return { top:true, unamed_opts_file : (s.join('').indexOf('--unamed-opts=FILE')>-1) }; }
 
@@ -28,15 +30,16 @@ IGNORE = IGNORE_WORD ([ ]* "\"" [^\"]*  "\"")? { return; }
 COMMENT = SP* "#" [^\n]* {return;}
 
 
-IGNORE_WORD = "description"
+IGNORE_WORD = "description" / "text"
 
-SECTION = "section" SP+ s:STRING SP+
-         secdesc:("sectiondesc" SP* "=" SP* ds:STRING {return ds;})?
+SECTION = "section" SP+ s:STRING
+         COMMENT*
+         secdesc:(SP+ "sectiondesc" SP* "=" SP* ds:STRING {return ds;})?
 {
   return { section: s, sectiondesc: secdesc };
 }
 
-OPTION = "option" SP+
+OPTION = ("option" / "groupoption") SP+
          long:IDENTIFIER SP+
          short:IDENTIFIER SP+
          desc:STRING SP+
@@ -71,10 +74,10 @@ SINGLE_PROPERTY = s:("required" / "argoptional" / "multiple" / "hidden" / "optio
 
 FLAG = f:"flag" SP+ o:("on"/"off") { return [f,o]; }
 
-KEY_VAL_PROPERTY = key:("default" / "details" / "dependon" / "typestr") SP* "=" SP* val:STRING
+KEY_VAL_PROPERTY = key:("default" / "details" / "dependon" / "typestr" / "group") SP* "=" SP* val:STRING
 {return [key,val];}
 
-VALUES_PROPERTY = "values" SP* "=" SP* list:(STRING "," SP*)* last:STRING SP+ "enum"?
+VALUES_PROPERTY = "values" SP* "=" SP* list:(STRING "," SP*)* last:STRING (SP+ "enum")?
 {
 var vals = [];
 for(var i=0,c=null;c=list[i];++i) {
@@ -86,10 +89,13 @@ return ['values',vals];
 
 /// LEXER
 
-SP = [ \n] { return ''; }
+SP = [ \n\t] { return ''; }
 
-IDENTIFIER = "\"" id:[_a-zA-z0-9\-]+ "\"" { return id.join('');; } /
+IDENTIFIER = "\"" id:[_a-zA-z0-9\-]+ "\"" { return id.join(''); } /
 id:[_a-zA-z0-9\-]+ { return id.join('');; }
 
-STRING = "\"" s:[^\"]+ "\"" {return s.join('');}
+STRING = "\"" stringParts:STRING_PART+ "\"" { return stringParts.join(''); }
+
+STRING_PART = s:[^\\\"]+ {return s.join('');}
+              / "\\" c:. { return c; }
 

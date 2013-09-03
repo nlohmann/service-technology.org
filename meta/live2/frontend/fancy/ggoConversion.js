@@ -30,6 +30,7 @@ function parse(ggoString, toolName) {
     try {
         var parsed = PARSER.parse(ggo);
     } catch(e) {
+        console.log(e);
         $('#myAlert h3').text('Error');
         $('#myAlert p').text('Could not parse the ggo file: \n' + e);
         $('#myAlert').modal();
@@ -88,6 +89,8 @@ function convertItem(item, toolName) {
             name : 'Standard File Input',
             top: true
         };
+    } else if (item.unamed_opts_file === false) {
+        return null;
     }
 
     if(item.hidden) return null

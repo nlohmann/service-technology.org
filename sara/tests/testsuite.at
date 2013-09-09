@@ -56,7 +56,7 @@ AT_CLEANUP
 AT_SETUP([Delayed Token Removal 1])
 AT_CHECK([cp TESTFILES/ce.sara TESTFILES/ce.owfn .])
 AT_CHECK([SARA -i ce.sara],0,stdout,stderr)
-AT_CHECK([GREP -q "SOLUTION(14): t1 pq pq pq t2 qp" stdout])
+AT_CHECK([GREP -q "SOLUTION(14): .. .. pq pq t2 qp" stdout])
 AT_KEYWORDS(solver)
 AT_CLEANUP
 

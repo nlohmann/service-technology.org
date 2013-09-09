@@ -31,7 +31,7 @@ TESTFILES = test1.owfn test1.sara test10.owfn test10.sara test11.owfn \
             test8_6.sara test8_7.owfn test8_7.sara test8_8.owfn test8_8.sara \
             test8_9.owfn test8_9.sara test8_X.owfn test8_X.sara test9.owfn \
             test9.sara tests.pdf garavel.llnet.sara garavel.llnet test16.sara test16.owfn \
-			MAPK320.pnml MAPK320.sara ce2.owfn ce2.sara \
+			MAPK320.pnml MAPK320.sara ce.owfn ce.sara ce2.owfn ce2.sara \
 			ce3.owfn ce3.sara ce4.owfn ce4.sara ce5.owfn ce5.sara
 
 

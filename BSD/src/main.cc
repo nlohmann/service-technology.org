@@ -140,7 +140,7 @@ void evaluateParameters(int argc, char** argv) {
 
     // only one option is allowed at one time
     if (args_info.uBSD_flag && args_info.check_flag) {
-        abort(4, "only one basic option is allowed at a time.");
+        abort(4, "only one basic option is allowed at a time");
     }
 
     if (args_info.bound_arg < 1) {
@@ -149,12 +149,12 @@ void evaluateParameters(int argc, char** argv) {
 
     // check whether two files are given in the case of theorem check
     if (args_info.inputs_num != 2 && args_info.check_flag) {
-    	abort(6, "two input files must be given.");
+    	abort(6, "two input files must be given");
     }
 
     // check whether at most two files are given
     if (args_info.inputs_num > 1 && !args_info.check_flag) {
-    	abort(7, "at most one input file must be given.");
+    	abort(7, "at most one input file must be given");
     }
 
 

@@ -61,6 +61,14 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 //	// create a place which represents the maximal count of messages to be sent...
 //	counterPlace = &net->createPlace("counter_place", c);
 
+	// iterate through arcs
+	set<pnapi::Arc *> arcs = net->getArcs();
+	PNAPI_FOREACH(arc, arcs)
+	{
+		if ((*arc)->getWeight() != 1)
+			abort(8, "all arc weights have to be equal to 1");
+	}
+
 	// iterate through input labels
 	set<pnapi::Label *> inputs = net->getInterface().getInputLabels();
 	PNAPI_FOREACH(label, inputs)
@@ -136,20 +144,20 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 		set<pnapi::Arc *> postset = (*place)->getPostsetArcs();
 		PNAPI_FOREACH(arc, postset) {
 			// add an arc from the transition to the complement place
-			net->createArc((*arc)->getTargetNode(), *compPlace, (*arc)->getWeight());
+			net->createArc((*arc)->getTargetNode(), *compPlace, 1);
 		}
 
 		set<pnapi::Arc *> preset = (*place)->getPresetArcs();
 		PNAPI_FOREACH(arc, preset) {
 			// add an arc from the complement place to the transition
-			net->createArc(*compPlace, (*arc)->getSourceNode(), (*arc)->getWeight());
+			net->createArc(*compPlace, (*arc)->getSourceNode(), 1);
 
-			// if an arc weight is greater than the added markings of place and complement place minus the bound
-			// then it might be the case that a transition cannot fire because there are not enough tokens on a complement place
-			// but the number of tokens on the corresponding place isn't breaking the bound
-			if ((*arc)->getWeight() > (*place)->getTokenCount() + compPlace->getTokenCount() - b) {
-				compPlace->setTokenCount(b + (*arc)->getWeight() - (*place)->getTokenCount());
-			}
+//			// if an arc weight is greater than the added markings of place and complement place minus the bound
+//			// then it might be the case that a transition cannot fire because there are not enough tokens on a complement place
+//			// but the number of tokens on the corresponding place isn't breaking the bound
+//			if ((*arc)->getWeight() > (*place)->getTokenCount() + compPlace->getTokenCount() - b) {
+//				compPlace->setTokenCount(b + (*arc)->getWeight() - (*place)->getTokenCount());
+//			}
 		}
 
 //		// if place isn't a complement place!

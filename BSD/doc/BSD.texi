@@ -341,7 +341,7 @@ In the case of checking the theorem two input files must be given.
 
 @smallexample
 @cartouche
-BSD: two input files must be given. -- aborting [#06]
+BSD: two input files must be given -- aborting [#06]
 @end cartouche
 @end smallexample
 
@@ -350,7 +350,16 @@ In the other cases only one file must be given.
 
 @smallexample
 @cartouche
-BSD: at most one input file must be given. -- aborting [#07]
+BSD: at most one input file must be given -- aborting [#07]
+@end cartouche
+@end smallexample
+
+@item #08
+All arc weights in the input net have to be equal to one.
+
+@smallexample
+@cartouche
+BSD: all arc weights have to be equal to 1 -- aborting [#08]
 @end cartouche
 @end smallexample
 

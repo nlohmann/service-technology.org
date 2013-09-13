@@ -42,6 +42,6 @@ for i in `find $1 -name "*.owfn" | sort`; do
 
    # convert OWFNs in '$INPUTDIR' to pngs in '$OUTDIR'
    sh BSD_png.sh $i $2 $OUTDIR/BSD_${2}\(${file}\).dot
-   sh BSD_u_png.sh $i $2 $OUTDIR/uBSD_${2}\(${file}\).dot
+   sh BSD_CSD_png.sh $i $2 $OUTDIR/CSD_${2}\(${file}\).dot
 
 done

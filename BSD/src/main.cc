@@ -196,8 +196,11 @@ int main(int argc, char** argv) {
 
     // set standard filenames
     std::string filename[2];
+    std::string filepath[2];
     filename[0] = std::string(PACKAGE) + "_output";
     filename[1] = std::string(PACKAGE) + "_output";
+    filepath[0] = "./";
+    filepath[1] = "./";
 
     BSDgraph _BSDgraph[2];
 
@@ -225,6 +228,7 @@ int main(int argc, char** argv) {
     		} else {
     			// strip suffix from input filename
     			filename[i] = std::string(args_info.inputs[i]).substr(0, std::string(args_info.inputs[i]).find_last_of("."));
+    			filepath[i] = std::string(args_info.inputs[i]).substr(0, filename[i].find_last_of("/")+1);
     			filename[i] = filename[i].substr(filename[i].find_last_of("/")+1, filename[i].length());
 
     			std::ifstream inputStream(args_info.inputs[i]);
@@ -388,16 +392,16 @@ int main(int argc, char** argv) {
 
     // delete the if-statement to generate dot-file output even if two nets are given
     if (!args_info.check_flag) {
-    	std::stringstream bound (std::stringstream::in | std::stringstream::out);
+    	std::stringstream temp (std::stringstream::in | std::stringstream::out);
     	if (args_info.uBSD_flag)
-    		bound << "uBSD";
+    		temp << "uBSD";
     	else
-    		bound << "BSD";
-    	bound << "_" << args_info.bound_arg << "(";
+    		temp << "BSD";
+    	temp << "_" << args_info.bound_arg << "(";
 
     	done = false;
     	for (int i = 0; !done; ++i) {
-    		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : bound.str() + filename[i] + ").dot";
+    		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filepath[i] + temp.str() + filename[i] + ").dot";
     		Output output(dot_filename, "BSD automaton");
     		output.stream() << pnapi::io::sa;
     		Output::dotoutput(output.stream(), _BSDgraph[i], filename[i]);

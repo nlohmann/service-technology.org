@@ -41,6 +41,7 @@ BSD::BSD() {
 BSDNodeList* BSD::graph = NULL;
 BSDNode* BSD::U = NULL;
 BSDNode* BSD::emptyset = NULL;
+
 MarkingList* BSD::templist = NULL;
 
 std::map<InnerMarking_ID, int> * BSD::dfs = NULL;
@@ -90,6 +91,19 @@ void BSD::initialize() {
 	inStack = new std::map<InnerMarking_ID, bool>;
 }
 
+void BSD::finalize() {
+	delete templist;
+	delete dfs;
+	delete lowlink;
+	delete S;
+	delete inStack;
+}
+
+
+/*========================================================
+ *-------------------- BSD computation -------------------
+ *========================================================*/
+
 
 /*!
  \brief Creates the BSD automaton based on the given reachability graph.
@@ -100,28 +114,18 @@ void BSD::computeBSD() {
 	graph->clear();
 
 	// start with the initial marking
-	BSDNode *initial = new BSDNode;
-
-	// compute the \tau-closure of the initial marking
-	bool boundbroken = computeClosure(0);
+	std::list<MarkingList>* SCCs = computeClosureTarjan(0);
 
 	// if the bound was broken in the initial node then the BSD automaton consists of only
 	// the U node
-	if (boundbroken) {
+	if (SCCs == NULL) {
 		status("bound broken in initial node...");
 		graph->push_back(U);
 		return;
 	}
 
-	// the \tau-closure of the initial marking is in the templist
-	templist->sort();
-	initial->list = *templist;
-	// set up the pointer to further nodes (just the structure)
-	initial->pointer = new BSDNode*[Label::events+1];
-	initial->isU = false;
-
-	// add the initial closure to the (still empty) graph
-	graph->push_back(initial);
+	setup(*SCCs);
+	delete SCCs;
 
 	// iterate through the graph (start with the initial)
 	// new nodes will be inserted on the fly at the back of the list
@@ -129,39 +133,29 @@ void BSD::computeBSD() {
 	while (it != graph->end()) {
 		// iterate through all the labels (except of \tau=0 and bound_broken=1)
 		for (Label_ID id = 2/*sic!*/; id <= Label::events; ++id) {
-			// compute the \tau-closure after taking a step with current label
-			BSDNode* temp = computeClosure(**it, id);
-			// if bound was not broken or the goal node is not the empty node
-			if (temp != NULL) {
-				// check for the node in the graph and if not present insert it
-				BSDNode* p = checkInsertIntoGraph(*temp);
-				// set the pointer of the current node with the current label to the inserted node
-				(**it).pointer[id] = p;
-			}
+			// compute the successor node after taking a step with current label
+			computeSuccessor(**it, id);
 		}
-
 		++it;
 	}
-
-	// assign the lambda values to the nodes
-	assignLambdas(graph);
 
 	// add the U node and the empty node at the back of the node list
 	graph->push_back(U);
 	graph->push_back(emptyset);
 }
 
+
 /*!
- \brief Compute closure of BSD node after performing step with given label (if possible)
+ \brief Compute the successor node of the given BSD node after performing a step with given label (if possible)
 
  \param[in]	node	the current node of the BSD automaton
  \param[in]	label	the label id
 
  \return pointer to computed BSD node or NULL if the bound was broken or if no step was possible
  */
-BSDNode* BSD::computeClosure(BSDNode &node, Label_ID label) {
+void BSD::computeSuccessor(BSDNode &node, Label_ID label) {
 	status("computing closure of BSD node %x after step with label %s", &node, Label::id2name[label].c_str());
-	MarkingList resultlist;
+	std::list<MarkingList> resultlist;
 	// iterate through all marking ids in the BSD node
 	for (MarkingList::const_iterator it = node.list.begin(); it != node.list.end(); ++it) {
 		status("node %x, visiting marking id: %u", &node, *it);
@@ -169,132 +163,61 @@ BSDNode* BSD::computeClosure(BSDNode &node, Label_ID label) {
 		for (uint8_t i = 0; i < InnerMarking::inner_markings[*it]->out_degree; ++i) {
 			// if there is a successor with the given label id then compute the closure of the successor marking
 			if (InnerMarking::inner_markings[*it]->labels[i] == label) {
-				templist->clear();
-				bool boundbroken = computeClosure(InnerMarking::inner_markings[*it]->successors[i]);
+				std::list<MarkingList>* SCCs = computeClosureTarjan(InnerMarking::inner_markings[*it]->successors[i]);
 
 				// if the bound was broken by taking a step with the current label then add a pointer from this node
 				// to the U node with the current label and abort the computation
-				if (boundbroken) {
+				if (SCCs == NULL) {
 					node.pointer[label] = U;
-					return NULL;
+					return;
 				}
 
-				// the closure is saved in the templist
-				templist->sort();
 				// merge the closure with the already computed closures
-				mergeWithoutDuplicates(resultlist, *templist);
+				mergeSCCsWithoutDuplicates(resultlist, *SCCs);
+				delete SCCs;
 
 				// if label was found and the step was performed then break the for-loop
 				break;
 			}
 		}
-
 	}
 
 	// if no step was possible then add a pointer from this node to the empty node with the current label
 	if (resultlist.empty()) {
 		node.pointer[label] = emptyset;
-		return NULL;
+		return;
 	}
 
-	// set up the result node and return it
-	BSDNode* result = new BSDNode;
-	result->list = resultlist;
-	result->isU = false;
-//	result->pointer = new BSDNode*[Label::events+1]; // will be done if inserted later!!!!!
-	return result;
+	// else test if the node already exists and add a pointer from this node to the inserted (or existing) node
+	node.pointer[label] = setup(resultlist);
 }
 
-/*!
- \brief Compute \tau-closure of a given reachable marking
 
- \param[in]	id	the id of a marking
+/*!
+ \brief Given a list of SCCs as input, this function checks if the node is already in the graph and if not
+ 	 	 it creates a new node and assigns a lambda value to it. It also sets up the other needed structures.
+
+ \param[in]	SCCs	list of marking lists (SCCs)
 
  \return boolean value showing if the bound was broken
  */
-bool BSD::computeClosure(InnerMarking_ID id) {
-	status("visiting marking %u", id);
-	// test if the marking was already visited
-	for (MarkingList::const_iterator it = templist->begin(); it != templist->end(); ++it) {
-		if (*it == id) {
-			status("marking already visited");
-			return false;
-		}
+BSDNode* BSD::setup(std::list<MarkingList> &SCCs) {
+	MarkingList list;
+	for (std::list<MarkingList>::const_iterator it = SCCs.begin(); it != SCCs.end(); ++it) {
+		list.insert(list.end(), it->begin(), it->end());
 	}
-	// if not then add the current marking to the closure
-	templist->push_back(id);
+	list.sort();
 
-	// iterate through all successors of the given marking
-	status("\titerating through successors of marking %u:", id);
-	for (uint8_t i = 0; i < InnerMarking::inner_markings[id]->out_degree; ++i) {
-		// if the given bound is broken return true
-		if (InnerMarking::inner_markings[id]->labels[i] == BOUND) {
-			status("\tbound broken from marking %u", id);
-			return true;
-		}
-		// only consider \tau-steps
-		if (InnerMarking::inner_markings[id]->labels[i] == TAU) {
-			status("\ttau step possible from marking %u to marking %u", id, InnerMarking::inner_markings[id]->successors[i]);
-			// compute closure of successor
-			bool boundbroken = computeClosure(InnerMarking::inner_markings[id]->successors[i]);
-			// if bound was broken return true recursively
-			if (boundbroken) {
-				status("\tbound broken (recursive abort, marking %u)", id);
-				return true;
-			}
-		}
-	}
+	// set up the result node and return it
+	BSDNode* result = new BSDNode;
+	result->list = list;
+	result->isU = false;
+	BSDNode* p = NULL;
 
-	// if everything went fine return false (bound wasn't broken)
-	return false;
-}
+	// check for the node in the graph and if not present insert it
 
-/*!
- \brief merge two (sorted) marking lists and skip duplicates
-
- \param[in]	result	the first list (which will also be used as the resulting list after merging)
- \param[in]	temp	the second list
- */
-void BSD::mergeWithoutDuplicates(MarkingList &result, MarkingList &temp) {
-	MarkingList::iterator itresult = result.begin();
-	MarkingList::iterator ittemp = temp.begin();
-
-	// iterate through the temporary list
-	while (ittemp != temp.end()) {
-		// if we aren't at the end of the resulting list (and the temporary list isn't already empty)
-		if (itresult != result.end()) {
-			if (*ittemp < *itresult) {
-				// if the current element of the resulting list is greater than the element in the temporary list
-				// then insert the smaller element before the greater one and increment the temporary list pointer
-				result.insert(itresult, *ittemp);
-				++ittemp;
-			} else if (*ittemp == *itresult) {
-				// if both elements are equal then just increment both pointers (don't insert duplicates)
-				++ittemp;
-				++itresult;
-			} else {
-				// if the current element of the temporary list is greater than the element of the resulting list
-				// then increment the resulting list pointer to insert it further to the right
-				++itresult;
-			}
-		} else {
-			// if the resulting list is at its end then just add the items of the temporary list at the end
-			result.push_back(*ittemp);
-			++ittemp;
-		}
-	}
-}
-
-/*!
- \brief Check if the given node is already in the graph and if not insert it at the end
-
- \param[in]	node	the node to be checked for/ inserted
-
- \return pointer to the node in the graph
- */
-BSDNode* BSD::checkInsertIntoGraph(BSDNode &node) {
 	// the size of the list of markings (closure) in the given node
-	unsigned int nodesize = node.list.size();
+	unsigned int nodesize = result->list.size();
 
 	// iterate through the graph
 	for (std::list<BSDNode *>::iterator it = graph->begin(); it != graph->end(); ++it) {
@@ -302,21 +225,178 @@ BSDNode* BSD::checkInsertIntoGraph(BSDNode &node) {
 		if (nodesize == (**it).list.size()) {
 			// check for equality of the nodes. If so then delete the given node and
 			// return a pointer to the found node in the graph
-			if (checkEquality(node.list, (**it).list)) {
-				delete &node;
-				return *it;
+			if (checkEquality(result->list, (**it).list)) {
+				delete result;
+				p = *it;
 			}
 		}
 	}
 
-	// if the node wasn't found in the graph then insert it at the back  of the list
+	// if the node wasn't found in the graph then insert it at the back of the list
 	// and set up the pointers (structure)
-	graph->push_back(&node);
-	graph->back()->pointer = new BSDNode*[Label::events+1];
+	// and we may as well compute the lambda values here
+	if (p == NULL) {
+		graph->push_back(result);
+		graph->back()->pointer = new BSDNode*[Label::events+1];
 
-	// return the pointer to the inserted node
-	return graph->back();
+		// return the pointer to the inserted node
+		p = graph->back();
+
+		assignLambda(p, SCCs);
+	}
+
+	return p;
 }
+
+
+/*!
+ \brief Compute \tau-closure of a given reachable marking with Tarjan's algorithm
+
+ \param[in]	id	the id of a marking
+
+ \return list of SCCs (sorted) in the closure or NULL if bound was broken
+ */
+std::list<MarkingList>* BSD::computeClosureTarjan(InnerMarking_ID id) {
+	// clear all helper structures
+	dfs->clear();
+	lowlink->clear();
+	inStack->clear();
+
+	templist->clear();
+
+	// input: graph G = (node->list (V), E)
+
+	maxdfs = 0;						// counter for dfs
+
+	// make sure the stack is empty
+	while (!S->empty())
+		S->pop();
+
+	return tarjanClosure(id);		// the call to tarjan visits all markings reachable from v
+}
+
+/*!
+ \brief recursive and for BSD computation adjusted tarjan algorithm
+
+ \param[in]	id	the id of a marking
+
+ \return list of SCCs (sorted) in the closure or NULL if bound was broken
+ */
+std::list<MarkingList>* BSD::tarjanClosure(InnerMarking_ID markingID) {
+	status("visiting marking %u", markingID);
+	// add the current marking to the closure
+	templist->push_back(markingID);
+
+	(*dfs)[markingID] = maxdfs;			// set dfs index of current marking v
+	(*lowlink)[markingID] = maxdfs;		// v.lowlink <= v.dfs
+	maxdfs++;							// increment counter
+	S->push(markingID);					// push v on top of stack
+	(*inStack)[markingID] = true;		// set to true (v is in stack)
+
+	std::list<MarkingList>* result = new std::list<MarkingList>;
+
+	// iterate through neighbour markings v' of v
+	status("\titerating through successors of marking %u:", markingID);
+	for (uint8_t i = 0; i < InnerMarking::inner_markings[markingID]->out_degree; ++i) {
+		// if the given bound is broken return true
+		if (InnerMarking::inner_markings[markingID]->labels[i] == BOUND) {
+			status("\tbound broken from marking %u", markingID);
+			delete result;
+			return NULL;
+		}
+
+		InnerMarking_ID idNeighbour = InnerMarking::inner_markings[markingID]->successors[i];
+		// only consider \tau-steps (other steps don't matter for the closures)
+		if (InnerMarking::inner_markings[markingID]->labels[i] == TAU) {
+			status("\ttau step possible from marking %u to marking %u", markingID, InnerMarking::inner_markings[markingID]->successors[i]);
+			bool visited = false; // v' visited?
+
+			// test if the marking was already visited
+			for (MarkingList::const_iterator it = templist->begin(); it != templist->end(); ++it) {
+				if (*it == idNeighbour) {
+					status("marking already visited");
+					visited = true;
+					break;
+				}
+			}
+
+			if (!visited) {
+				std::list<MarkingList>* temp = tarjanClosure(idNeighbour);	// recursive call
+
+				if (temp == NULL) {
+					status("\tbound broken (recursive abort, marking %u)", markingID);
+					delete result;
+					return NULL;
+				}
+
+				result->insert(result->end(), temp->begin(), temp->end());		// insert into the result list
+				delete temp;
+
+				(*lowlink)[markingID] = std::min((*lowlink)[markingID], (*lowlink)[idNeighbour]); // v.lowlink := min(v.lowlink, v'.lowlink);
+			} else { // v' is visited
+				// if v' is in the stack S
+				if ((*inStack)[idNeighbour]) {
+					(*lowlink)[markingID] = std::min((*lowlink)[markingID], (*dfs)[idNeighbour]); // v.lowlink := min(v.lowlink, v'.dfs);
+				}
+			}
+		}
+	}
+
+	// if v.lowlink == v.dfs
+	if ((*lowlink)[markingID] == (*dfs)[markingID]) { // root of a SCC
+		MarkingList SCC;
+		// compute the SCC
+		InnerMarking_ID id = 0;
+		do {
+			id = S->top();			// take top of stack v*
+			S->pop();				// remove top of stack
+			(*inStack)[id] = false;	// set to false (v* isn't in stack any more)
+			SCC.push_back(id);		// add v* to the SCC
+		} while (id != markingID);
+
+		SCC.sort();
+		result->push_back(SCC);
+	}
+
+	return result;
+}
+
+
+/*!
+ \brief merge two lists of (sorted) marking lists (SCCs) and skip duplicates
+
+ \param[in]	result	the first list (which will also be used as the resulting list after merging)
+ \param[in]	temp	the second list
+ */
+void BSD::mergeSCCsWithoutDuplicates(std::list<MarkingList> &result, std::list<MarkingList> &temp) {
+	std::list<MarkingList> temporary;
+
+	// iterate through the second list whose elements shall be inserted into the first list
+	for (std::list<MarkingList>::iterator ittemp = temp.begin(); ittemp != temp.end(); ++ittemp) {
+		// found an equal list?
+		bool found_equal = false;
+		unsigned int temp_size = ittemp->size();
+		// iterate through the second list and look for the element of the first list
+		for (std::list<MarkingList>::iterator itresult = result.begin(); itresult != result.end(); ++itresult) {
+			// only check lists of equal size
+			if (temp_size == itresult->size()) {
+				found_equal = checkEquality(*ittemp, *itresult);
+				// if the two lists are equal then break the inner for-loop
+				if (found_equal)
+					break;
+			}
+		}
+
+		// if the element is not in the result list save it temporarily for later insertion
+		if (!found_equal) {
+			temporary.push_back(*ittemp);
+		}
+	}
+
+	// insert all elements from the second list which weren't found in the first list
+	result.insert(result.end(), temporary.begin(), temporary.end());
+}
+
 
 /*!
  \brief Check if the two given (sorted AND same size!!!) marking lists are equal
@@ -345,132 +425,64 @@ bool BSD::checkEquality(MarkingList &list1, MarkingList &list2) {
 }
 
 
+///*!
+// \brief Assign the lambda values to the nodes in the graph
+//
+// \param[in]	graph	the BSD automaton (list of BSD node pointers)
+// */
+//void BSD::assignLambdas(BSDNodeList *graph) {
+//	// iterate through all nodes of the graph
+//	// (U and empty node will be added later so we don't need to take care of that here)
+//	for (BSDNodeList::const_iterator it = graph->begin(); it != graph->end(); ++it) {
+//		assignLambda(*it);
+//	}
+//}
+
+
 /*!
- \brief Assign the lambda values to the nodes in the graph
+ \brief Assign the lambda value to a node of the graph
 
- \param[in]	graph	the BSD automaton (list of BSD node pointers)
+ \param[in]	node	a node of the BSD automaton
+ \param[in]	SCCs	a list of marking lists (SCCs of the node)
  */
-void BSD::assignLambdas(BSDNodeList *graph) {
-	// iterate through all nodes of the graph
-	// (U and empty node will be added later so we don't need to take care of that here)
-	for (BSDNodeList::const_iterator it = graph->begin(); it != graph->end(); ++it) {
-		// assume that there doesn't exist a marking m that is a stop except for inputs
-		(*it)->lambda = 2;
-		// search all SCCs in the current node (Tarjan algorithm)
-		std::list<MarkingList> SCCs = SCCsearch(*it);
-		// iterate through all SCCs
-		for (std::list<MarkingList>::const_iterator itSCC = SCCs.begin(); itSCC != SCCs.end(); ++itSCC) {
-			bool found_outlabel = false;
-			for (MarkingList::const_iterator itlist = (*it)->list.begin(); itlist != (*it)->list.end(); ++itlist) {
-				// iterate through all successor labels
-				for (uint8_t i = 0; i < InnerMarking::inner_markings[*itlist]->out_degree; ++i) {
-					// test if the label is receiving (for the environment)
-					if (RECEIVING(InnerMarking::inner_markings[*itlist]->labels[i])) {
-						found_outlabel = true;
-						break;
-					}
-				}
-			}
-
-			if (!found_outlabel) {
-				(*it)->lambda = 1;     // found a stop except for inputs
-				break;
-			}
-		}
+void BSD::assignLambda(BSDNode *node, std::list<MarkingList> &SCCs) {
+	if (node == U) {
+		node->lambda = 3;
+		return;
 	}
-}
-
-std::list<MarkingList> BSD::SCCsearch(BSDNode * node) {
-	std::list<MarkingList> result;
-
-	// clear all helper structures
-	dfs->clear();
-	lowlink->clear();
-	inStack->clear();
-
-	// input: graph G = (node->list (V), E)
-
-	maxdfs = 0;						// counter for dfs
-	MarkingList U = node->list;		// unvisited markings
-
-	for (MarkingList::iterator it = U.begin(); it != U.end(); ++it) {
-		(*dfs)[*it] = 0;
-		(*lowlink)[*it] = 0;
-		(*inStack)[*it] = false;
+	if (node == emptyset) {
+		node->lambda = 0;
+		return;
 	}
 
-	// make sure the stack is empty
-	while (!S->empty())
-		S->pop();
+	// assume that there doesn't exist a marking m that is a stop except for inputs
+	node->lambda = 2;
 
-	while (!U.empty()) {										// while there are unvisited markings in U
-		InnerMarking_ID id = U.back();							// take a marking v from U
-		U.pop_back();											// remove v from U
-		std::list<MarkingList> temp = tarjan(id, node, U);		// the call to tarjan visits all markings in U reachable from v
-		result.insert(result.end(), temp.begin(), temp.end());	// add computed SCCs to result list
-	}
-
-	return result;
-}
-
-
-std::list<MarkingList> BSD::tarjan(InnerMarking_ID markingID, BSDNode * node, MarkingList & U) {
-	(*dfs)[markingID] = maxdfs;			// set dfs index of current marking v
-	(*lowlink)[markingID] = maxdfs;		// v.lowlink <= v.dfs
-	maxdfs++;							// increment counter
-	S->push(markingID);					// push v on top of stack
-	(*inStack)[markingID] = true;		// set to true (v is in stack)
-//	U.pop_back();						// remove v from U
-
-	std::list<MarkingList> result;
-
-	// iterate through neighbour markings v' of v
-	for (uint8_t i = 0; i < InnerMarking::inner_markings[markingID]->out_degree; ++i) {
-		InnerMarking_ID idNeighbour = InnerMarking::inner_markings[markingID]->successors[i];
-		// only consider \tau-steps (other steps don't matter for the closures)
-		if (InnerMarking::inner_markings[markingID]->labels[i] == TAU) {
-			bool found = false; // v' found in U?
-			// iterate through all markings in U
-			for (MarkingList::iterator it = U.begin(); it != U.end(); ++it) {
-				// if v' found in U
-				if (idNeighbour == *it) {
-					found = true; 												// v' found in U
-					U.erase(it);												// remove v' from U
-					std::list<MarkingList> temp = tarjan(idNeighbour, node, U);	// recursive call
-
-					result.insert(result.end(), temp.begin(), temp.end());		// insert into the result list
-
-					(*lowlink)[markingID] = std::min((*lowlink)[markingID], (*lowlink)[idNeighbour]); // v.lowlink := min(v.lowlink, v'.lowlink);
-					// v' was found in U so break the for-loop
+	// iterate through all SCCs
+	for (std::list<MarkingList>::const_iterator itSCC = SCCs.begin(); itSCC != SCCs.end(); ++itSCC) {
+		bool found_outlabel = false;
+		for (MarkingList::const_iterator itlist = node->list.begin(); itlist != node->list.end(); ++itlist) {
+			// iterate through all successor labels
+			for (uint8_t i = 0; i < InnerMarking::inner_markings[*itlist]->out_degree; ++i) {
+				// test if the label is receiving (for the environment)
+				if (RECEIVING(InnerMarking::inner_markings[*itlist]->labels[i])) {
+					found_outlabel = true;
 					break;
 				}
 			}
-			if (!found) { // v' is not in U
-				// if v' is in the stack S
-				if ((*inStack)[idNeighbour]) {
-					(*lowlink)[markingID] = std::min((*lowlink)[markingID], (*dfs)[idNeighbour]); // v.lowlink := min(v.lowlink, v'.dfs);
-				}
-			}
+		}
+
+		if (!found_outlabel) {
+			node->lambda = 1;     // found a stop except for inputs
+			break;
 		}
 	}
-
-	// if v.lowlink == v.dfs
-	if ((*lowlink)[markingID] == (*dfs)[markingID]) { // root of a SCC
-		MarkingList SCC;
-		// compute the SCC
-		InnerMarking_ID id = 0;
-		do {
-			id = S->top();			// take top of stack v*
-			S->pop();				// remove top of stack
-			(*inStack)[id] = false;	// set to false (v* isn't in stack any more)
-			SCC.push_back(id);		// add v* to the SCC
-		} while (id != markingID);
-
-		result.push_back(SCC);
-	}
-
-	return result;
 }
+
+
+/*========================================================
+ *---------------------- TEST OUTPUT ---------------------
+ *========================================================*/
 
 
 /*!
@@ -508,6 +520,7 @@ void BSD::printBSD(BSDNodeList *graph) {
 	status("%s", temp.str().c_str());
 }
 
+
 /*!
  \brief print a marking list in the shell (if verbose is switched on)
 
@@ -523,13 +536,11 @@ void BSD::printlist(MarkingList *list) {
 	status("list: %s", temp.str().c_str());
 }
 
-void BSD::finalize() {
-	delete templist;
-	delete dfs;
-	delete lowlink;
-	delete S;
-	delete inStack;
-}
+
+/*========================================================
+ *---------------------- Bisimulation --------------------
+ *========================================================*/
+
 
 /*!
  \brief Checks theorem 1.3 (Bisimulation of two BSD automata and lambda values)
@@ -572,6 +583,7 @@ bool BSD::checkBiSimAndLambda(BSDgraph & graph1, BSDgraph & graph2) {
 	return result;
 }
 
+
 /*!
  \brief Checks theorem 1.3 (Bisimulation of two BSD automata and lambda values)
 
@@ -612,6 +624,7 @@ bool BSD::computeBiSim(BSDNode * node_g1, BSDNode * node_g2, std::map<Label_ID, 
 	// if all went well return true
 	return true;
 }
+
 
 /*!
  \brief compute mapping from labels of graph 1 to graph 2
@@ -665,6 +678,11 @@ std::map<Label_ID, Label_ID>* BSD::computeMapping(BSDgraph & graph1, BSDgraph & 
 	// return the mapping
 	return result;
 }
+
+
+/*========================================================
+ *------------------- uBSD computation -------------------
+ *========================================================*/
 
 
 /*!

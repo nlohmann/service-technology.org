@@ -41,34 +41,49 @@
 class BSD {
 
     public:
+		static BSDNodeList* graph;
+
+		static BSDNode* U;
+		static BSDNode* emptyset;
+
 
 		static void initialize();
 
+        static void finalize();
+
+		/*========================================================
+		 *-------------------- BSD computation -------------------
+		 *========================================================*/
+
         static void computeBSD();
 
-        static BSDNode* computeClosure(BSDNode &node, Label_ID label);
+        static void computeSuccessor(BSDNode &node, Label_ID label);
 
-//        static MarkingList* computeClosure(MarkingList &list);
+        static BSDNode* setup(std::list<MarkingList> &SCCs);
 
-        static bool computeClosure(InnerMarking_ID id);//, bool &boundbroken);
+        static std::list<MarkingList>* computeClosureTarjan(InnerMarking_ID id);
 
-        static void mergeWithoutDuplicates(MarkingList &result, MarkingList &temp);
+        static std::list<MarkingList>* tarjanClosure(InnerMarking_ID markingID);
 
-        static BSDNode* checkInsertIntoGraph(BSDNode &node);
+        static void mergeSCCsWithoutDuplicates(std::list<MarkingList> &result, std::list<MarkingList> &temp);
 
         static bool checkEquality(MarkingList &list1, MarkingList &list2);
 
-        static void assignLambdas(BSDNodeList *graph);
+//        static void assignLambdas(BSDNodeList *graph);
 
-        static std::list<MarkingList> SCCsearch(BSDNode * node);
+        static void assignLambda(BSDNode *node, std::list<MarkingList> &SCCs);
 
-        static std::list<MarkingList> tarjan(InnerMarking_ID markingID, BSDNode * node, MarkingList & U);
+        /*========================================================
+         *---------------------- TEST OUTPUT ---------------------
+         *========================================================*/
 
         static void printBSD(BSDNodeList *graph);
 
         static void printlist(MarkingList *list);
 
-        static void finalize();
+        /*========================================================
+         *---------------------- Bisimulation --------------------
+         *========================================================*/
 
         static bool checkBiSimAndLambda(BSDgraph & graph1, BSDgraph & graph2);
 
@@ -76,12 +91,11 @@ class BSD {
 
         static std::map<Label_ID, Label_ID>* computeMapping(BSDgraph & graph1, BSDgraph & graph2);
 
+        /*========================================================
+         *------------------- uBSD computation -------------------
+         *========================================================*/
+
         static void computeUBSD(BSDgraph & graph);
-
-        static BSDNodeList* graph;
-
-        static BSDNode* U;
-        static BSDNode* emptyset;
 
     private:
 
@@ -90,9 +104,8 @@ class BSD {
 
         static std::list<std::pair<BSDNode*, BSDNode*> >* bisimtemp;
 
-        static MarkingList* templist;
-
         // helpers for tarjan algorithm (lambda value computation)
+        static MarkingList* templist;
         static std::map<InnerMarking_ID, int>* dfs;
         static std::map<InnerMarking_ID, int>* lowlink;
         static int maxdfs;

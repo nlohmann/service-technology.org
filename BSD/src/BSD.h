@@ -95,7 +95,7 @@ class BSD {
          *------------------- uBSD computation -------------------
          *========================================================*/
 
-        static void computeUBSD(BSDgraph & graph);
+        static void computeCSD(BSDgraph & graph);
 
     private:
 

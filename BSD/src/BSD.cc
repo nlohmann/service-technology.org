@@ -64,24 +64,6 @@ void BSD::initialize() {
 	// the BSD automaton
 	graph = new BSDNodeList;
 
-	// the U node
-	U = new BSDNode;
-	U->lambda = 0;
-	U->pointer = new BSDNode*[Label::events+1];
-	U->isU = true;
-
-	// the empty node
-	emptyset = new BSDNode;
-	emptyset->lambda = 3;
-	emptyset->pointer = new BSDNode*[Label::events+1];
-	emptyset->isU = false;
-
-	// set up the pointers ( which are all loops to the same nodes )
-	for (Label_ID id = 2; id <= Label::events; ++id) {
-		U->pointer[id] = U;
-		emptyset->pointer[id] = emptyset;
-	}
-
 	// a temporary list to save already visited markings
 	templist = new MarkingList;
 
@@ -112,6 +94,26 @@ void BSD::finalize() {
 void BSD::computeBSD() {
 	// clear existing graph
 	graph->clear();
+
+	std::list<MarkingList> tempSCC;
+
+	// the U node
+	U = new BSDNode;
+	U->pointer = new BSDNode*[Label::events+1];
+	U->isU = true;
+	assignLambda(U, tempSCC);
+
+	// the empty node
+	emptyset = new BSDNode;
+	emptyset->pointer = new BSDNode*[Label::events+1];
+	emptyset->isU = false;
+	assignLambda(emptyset, tempSCC);
+
+	// set up the pointers ( which are all loops to the same nodes )
+	for (Label_ID id = 2; id <= Label::events; ++id) {
+		U->pointer[id] = U;
+		emptyset->pointer[id] = emptyset;
+	}
 
 	// start with the initial marking
 	std::list<MarkingList>* SCCs = computeClosureTarjan(0);
@@ -447,17 +449,19 @@ bool BSD::checkEquality(MarkingList &list1, MarkingList &list2) {
  */
 void BSD::assignLambda(BSDNode *node, std::list<MarkingList> &SCCs) {
 	if (node == U) {
-		node->lambda = 3;
-		return;
-	}
-	if (node == emptyset) {
 		node->lambda = 0;
 		return;
 	}
 
-	// assume that there doesn't exist a marking m that is a stop except for inputs
-	node->lambda = 2;
+	if (node == emptyset) {
+		node->lambda = 4;
+		return;
+	}
 
+	// assume that there doesn't exist a marking m that is a stop except for inputs
+	node->lambda = 3;
+
+	bool found_stop = false;
 	// iterate through all SCCs
 	for (std::list<MarkingList>::const_iterator itSCC = SCCs.begin(); itSCC != SCCs.end(); ++itSCC) {
 		bool found_outlabel = false;
@@ -473,9 +477,24 @@ void BSD::assignLambda(BSDNode *node, std::list<MarkingList> &SCCs) {
 		}
 
 		if (!found_outlabel) {
-			node->lambda = 1;     // found a stop except for inputs
-			break;
+			found_stop = true;     // found a stop except for inputs
+
+			bool found_final = false;
+			for (MarkingList::const_iterator it = itSCC->begin(); it != itSCC->end(); ++it) {
+				if (InnerMarking::inner_markings[*it]->is_final) {
+					found_final = true;
+					break;
+				}
+			}
+			if (!found_final) {
+				node->lambda = 1;   // found a dead except for inputs
+				return;             // abort the computation
+			}
 		}
+	}
+
+	if (found_stop) {
+		node->lambda = 2; // found a stop except for inputs but no dead except for inputs
 	}
 }
 
@@ -601,8 +620,8 @@ bool BSD::computeBiSim(BSDNode * node_g1, BSDNode * node_g2, std::map<Label_ID, 
 			return true;
 	}
 
-	// all nodes of the bisimulation have to have added lambda values bigger than 2
-	if (node_g1->lambda + node_g2->lambda <= 2) {
+	// all nodes of the bisimulation have to have added lambda values bigger than 3
+	if (node_g1->lambda + node_g2->lambda <= 3) {
 		// return false recursively (abort)
 		return false;
 	} else {
@@ -681,15 +700,15 @@ std::map<Label_ID, Label_ID>* BSD::computeMapping(BSDgraph & graph1, BSDgraph & 
 
 
 /*========================================================
- *------------------- uBSD computation -------------------
+ *-------------------- CSD computation -------------------
  *========================================================*/
 
 
 /*!
- \brief Creates the uBSD automaton based on the BSD automaton.
+ \brief Creates the CSD automaton based on the BSD automaton.
 
  */
-void BSD::computeUBSD(BSDgraph & graph) {
+void BSD::computeCSD(BSDgraph & graph) {
 	bool graphChanged = true;
 
 	// repeat while graph changes

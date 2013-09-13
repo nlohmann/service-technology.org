@@ -7,9 +7,9 @@ purpose "BSD: generating BSD automata...\n\n  Report bugs to BSD@service-technol
 section "Basic functionality"
 sectiondesc="Options which change the basic functionality of the tool. Only one option at a time is allowed. If no other option is given the tool just computes the BSD automaton of the given OWFN.\n"
 
-option "uBSD" -
-  "Compute the uBSD automaton."
-  details="This option lets the tool compute the uBSD automaton.\n"
+option "CSD" -
+  "Compute the CSD automaton."
+  details="This option lets the tool compute the CSD automaton.\n"
   flag off
   
 option "check" -

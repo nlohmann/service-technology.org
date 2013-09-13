@@ -139,7 +139,7 @@ void evaluateParameters(int argc, char** argv) {
     }
 
     // only one option is allowed at one time
-    if (args_info.uBSD_flag && args_info.check_flag) {
+    if (args_info.CSD_flag && args_info.check_flag) {
         abort(4, "only one basic option is allowed at a time");
     }
 
@@ -381,8 +381,8 @@ int main(int argc, char** argv) {
     | 9. create uBSD from BSD		 |
     `-------------------------------*/
 
-    if (args_info.uBSD_flag) {
-    	BSD::computeUBSD(_BSDgraph[0]);
+    if (args_info.CSD_flag) {
+    	BSD::computeCSD(_BSDgraph[0]);
     }
 
 
@@ -393,16 +393,17 @@ int main(int argc, char** argv) {
     // delete the if-statement to generate dot-file output even if two nets are given
     if (!args_info.check_flag) {
     	std::stringstream temp (std::stringstream::in | std::stringstream::out);
-    	if (args_info.uBSD_flag)
-    		temp << "uBSD";
-    	else
-    		temp << "BSD";
-    	temp << "_" << args_info.bound_arg << "(";
+    	std::string automaton = "BSD";
+    	if (args_info.CSD_flag)
+    		automaton = "CSD";
+
+    	temp << automaton << "_" << args_info.bound_arg << "(";
 
     	done = false;
     	for (int i = 0; !done; ++i) {
     		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filepath[i] + temp.str() + filename[i] + ").dot";
-    		Output output(dot_filename, "BSD automaton");
+
+    		Output output(dot_filename, automaton + " automaton");
     		output.stream() << pnapi::io::sa;
     		Output::dotoutput(output.stream(), _BSDgraph[i], filename[i]);
 

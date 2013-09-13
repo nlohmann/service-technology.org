@@ -8,8 +8,13 @@ section "Basic functionality"
 sectiondesc="Options which change the basic functionality of the tool. Only one option at a time is allowed. If no other option is given the tool just computes the BSD automaton of the given OWFN.\n"
 
 option "CSD" -
-  "Compute the CSD automaton."
-  details="This option lets the tool compute the CSD automaton.\n"
+  "Compute the CSD automaton. Set the BSD flag if the output of the BSD automaton is wanted."
+  details="This option lets the tool compute the CSD automaton. Set the BSD flag if the output of the BSD automaton is wanted. The simultaneous computation of the BSD and CSD automaton is more efficient than the sequential one because the BSD automaton will be computed twice.\n"
+  flag off
+  
+option "BSD" -
+  "BSD automaton output if CSD flag is set."
+  details="This option lets the tool output the BSD automaton even if the CSD flag is set.\n"
   flag off
   
 option "check" -

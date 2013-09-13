@@ -185,7 +185,7 @@ void Output::setKeepTempfiles(bool b) {
 /*!
  * \brief dot output
  */
-std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::string & filename)
+std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::string & filename, bool CSD, int bound)
 {
 //	digraph graphname {
 //	     a -> b;
@@ -197,17 +197,30 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 		<< "/*\n"
 		<< "  generator:   " << PACKAGE_STRING << endl //net.getMetaInformation(os, pnapi::io::CREATOR, PACKAGE_STRING) << endl
 		<< "  input file:  " << filename << ".owfn" << endl
-		<< "  #labels:     " << (unsigned int)graph.events-1 << endl
+		<< "  bound:             " << bound << endl
+		<< "  #labels (total):   " << (unsigned int)graph.events-1 << endl
 		<< "  #sending labels:   " << (unsigned int)graph.receive_events << endl
-		<< "  #receiving labels: " << (unsigned int)graph.send_events << endl
-		<< "*/\n\n"
+		<< "  #receiving labels: " << (unsigned int)graph.send_events << endl;
 
-		<< "digraph {\n";
+	if (CSD) {
+		templist = new BSDNodeList;
+		// fill the templist (to get only the reachable nodes)
+		traverse(*(graph.graph->begin()));
+		templist->push_back(graph.U);
+	} else {
+		templist = graph.graph;
+	}
 
-	templist = new BSDNodeList;
-	// fill the templist (to get only the reachable nodes)
-	traverse(*(graph.graph->begin()));
-	templist->push_back(graph.U);
+	os << "  #nodes:            " << (unsigned int)templist->size() << endl;
+
+	if (CSD) {
+		os << "  computation time:  " << (double)(graph.BSD_comp_time + graph.CSD_comp_time) << " s" << endl;
+	} else {
+		os << "  computation time:  " << (double)(graph.BSD_comp_time) << " s" << endl;
+	}
+
+	os << "*/\n\n"
+	   << "digraph {\n";
 
 	// define a fake initial node... (is there a better way?) \todo
 	os << "\tinitialNode [shape=point,label=\"\",style=invis,weight=100];" << endl;
@@ -217,20 +230,13 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 	for (BSDNodeList::const_iterator it = templist->begin(); it != templist->end(); ++it) {
 		if ((**it).lambda == 1) {
 			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " [style=dashed];" << endl;
-		} else if ((**it).isU) {
+		} else if (*it == graph.U) {
 			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " [shape=plaintext];" << endl;
 		} else if (*it == graph.emptyset) {
 			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " [shape=plaintext];" << endl;
 		}
 
-		if ((**it).isU || *it == graph.emptyset) {
-//			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(**it, graph.U, graph.emptyset)
-//				<< " [label=\"";
-//			for (unsigned int id = 2; id < graph.events; ++id) {
-//				os << graph.id2name[id] << ",";
-//			}
-//			os << graph.id2name[(unsigned int)graph.events] << "\"];" << endl;
-
+		if (*it == graph.U || *it == graph.emptyset) {
 			if ((unsigned int)graph.last_receive - (unsigned int)graph.first_receive >= 0) {
 				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(**it, graph.U, graph.emptyset)
 											<< " [label=\"";
@@ -262,14 +268,15 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 		}
 	}
 
-	delete templist;
+	if (CSD)
+		delete templist;
 
 	os << "\tfootnote [shape=box,label=\"red: sending labels\\ngreen: receiving labels\"];" << endl;
 
 	return os << "}" << endl;
 }
 
-// search for all reachable nodes and put them into the templist
+// search for all reachable nodes and put them into the templist (CSD automaton output)
 void Output::traverse(BSDNode* node) {
 	if (node->isU)
 		return;
@@ -289,21 +296,22 @@ void Output::traverse(BSDNode* node) {
 }
 
 std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset) {
-	if (node.isU) {
-		return "\"U.3\"";
-	}
-	if (&node == emptyset) {
-		return "\"empty.0\"";
-	}
 	std::stringstream temp (std::stringstream::in | std::stringstream::out);
-	temp << "\"(";
-	for (MarkingList::const_iterator itlist = node.list.begin(); itlist != node.list.end();) {
-		temp << *itlist;
-		if (++itlist != node.list.end()) {
-			temp << ".";
+	if (&node == U) {
+		temp << "\"U";
+	} else if (&node == emptyset) {
+		temp << "\"empty";
+	} else {
+		temp << "\"(";
+		for (MarkingList::const_iterator itlist = node.list.begin(); itlist != node.list.end();) {
+			temp << *itlist;
+			if (++itlist != node.list.end()) {
+				temp << ".";
+			}
 		}
+		temp << ")";
 	}
-	temp << ")." << (unsigned int)node.lambda << "\"";
 
+	temp << "." << (unsigned int)node.lambda << "\"";
 	return temp.str();
 }

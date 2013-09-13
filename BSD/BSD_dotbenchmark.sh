@@ -40,8 +40,10 @@ for i in `find $1 -name "*.owfn" | sort`; do
    file=`basename $i | sed -e 's/\.owfn//'`
    location=`dirname $i`
 
-   # convert OWFNs in '$INPUTDIR' to pngs in '$OUTDIR'
-   sh BSD_png.sh $i $2 $OUTDIR/BSD_${2}\(${file}\).dot
-   sh BSD_CSD_png.sh $i $2 $OUTDIR/CSD_${2}\(${file}\).dot
+   # convert OWFNs in '$INPUTDIR' to dots in '$OUTDIR'
+   sh BSD_BCSD2dot.sh $i $2 $OUTDIR/BSD_${2}\(${file}\).dot $OUTDIR/CSD_${2}\(${file}\).dot
 
 done
+
+sh BSD_create_table.sh $OUTDIR
+

@@ -58,8 +58,10 @@ typedef std::list<BSDNode *> BSDNodeList;
 
 // representation of a BSD automaton with needed values for computations
 typedef struct _BSDgraph {
-	// the automaton
+	// the BSD automaton
 	BSDNodeList* graph;
+	// the CSD automaton
+	BSDNodeList* csdgraph;
 	// first id of receiving labels
 	Label_ID first_receive;
 	// last id of receiving labels
@@ -80,4 +82,7 @@ typedef struct _BSDgraph {
 	BSDNode* emptyset;
 	// mapping of label ids to label names (strings)
 	std::map<Label_ID, std::string> id2name;
+
+	double BSD_comp_time;
+	double CSD_comp_time;
 } BSDgraph;

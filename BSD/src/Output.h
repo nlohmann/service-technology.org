@@ -83,7 +83,7 @@ class Output {
         std::ostream& stream() const;
 
         /// dot output
-        static std::ostream & dotoutput(std::ostream &, BSDgraph & graph, std::string & filename);
+        static std::ostream & dotoutput(std::ostream &, BSDgraph & graph, std::string & filename, bool CSD, int bound);
 
         static void traverse(BSDNode * node);
 

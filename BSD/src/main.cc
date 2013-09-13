@@ -326,10 +326,16 @@ int main(int argc, char** argv) {
        	| 5. compute the BSD automaton   |
     	`-------------------------------*/
 
+    	status("starting BSD automaton computation...");
+    	time(&start_time);
+
     	BSD::initialize();
 
     	BSD::computeBSD();
 
+    	time(&end_time);
+    	_BSDgraph[i].BSD_comp_time = difftime(end_time, start_time);
+    	status("computation is done [%.0f sec]", _BSDgraph[i].BSD_comp_time);
 
     	/*----------------------------------------------------.
        	| 6. save the BSD automaton and some important values |
@@ -378,11 +384,16 @@ int main(int argc, char** argv) {
 
 
     /*-------------------------------.
-    | 9. create uBSD from BSD		 |
+    | 9. create CSD from BSD		 |
     `-------------------------------*/
 
     if (args_info.CSD_flag) {
+    	status("starting CSD automaton computation...");
+    	time(&start_time);
     	BSD::computeCSD(_BSDgraph[0]);
+    	time(&end_time);
+    	_BSDgraph[0].CSD_comp_time = difftime(end_time, start_time);
+    	status("computation is done [%.0f sec]", _BSDgraph[0].CSD_comp_time);
     }
 
 
@@ -392,23 +403,34 @@ int main(int argc, char** argv) {
 
     // delete the if-statement to generate dot-file output even if two nets are given
     if (!args_info.check_flag) {
-    	std::stringstream temp (std::stringstream::in | std::stringstream::out);
-    	std::string automaton = "BSD";
-    	if (args_info.CSD_flag)
-    		automaton = "CSD";
+    	if (!args_info.CSD_flag || args_info.BSD_flag) {
+    		std::stringstream temp (std::stringstream::in | std::stringstream::out);
+    		temp << "BSD_" << args_info.bound_arg << "(";
 
-    	temp << automaton << "_" << args_info.bound_arg << "(";
+    		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filepath[0] + temp.str() + filename[0] + ").dot";
 
-    	done = false;
-    	for (int i = 0; !done; ++i) {
-    		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filepath[i] + temp.str() + filename[i] + ").dot";
-
-    		Output output(dot_filename, automaton + " automaton");
+    		Output output(dot_filename, "BSD automaton");
     		output.stream() << pnapi::io::sa;
-    		Output::dotoutput(output.stream(), _BSDgraph[i], filename[i]);
+    		Output::dotoutput(output.stream(), _BSDgraph[0], filename[0], false, args_info.bound_arg);
+    	}
 
-    		if (args_info.inputs_num == 0 || args_info.inputs_num == i+1)
-    			done = true;
+    	if (args_info.CSD_flag) {
+    		std::stringstream temp (std::stringstream::in | std::stringstream::out);
+    		temp << "CSD_" << args_info.bound_arg << "(";
+
+    		std::string dot_temp;
+    		if (args_info.dotFile_arg) {
+    			if (args_info.BSD_flag)
+    				dot_temp =  "CSD_" + (std::string)args_info.dotFile_arg;
+    			else
+    				dot_temp = args_info.dotFile_arg;
+    		}
+
+    		std::string dot_filename = args_info.dotFile_arg ? dot_temp : filepath[0] + temp.str() + filename[0] + ").dot";
+
+    		Output output(dot_filename, "CSD automaton");
+    		output.stream() << pnapi::io::sa;
+    		Output::dotoutput(output.stream(), _BSDgraph[0], filename[0], true, args_info.bound_arg);
     	}
     }
 

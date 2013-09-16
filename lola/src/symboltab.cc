@@ -24,7 +24,7 @@
 SymbolTab* PlaceTable, * TransitionTable;
 extern SymbolTab* GlobalTable, * LocalTable;
 
-SymbolTab::SymbolTab(unsigned int s = 65536) : card(0), size(s) {
+SymbolTab::SymbolTab(unsigned int s) : card(0), size(s) {
     table = new Symbol*[s];
     for (unsigned int i = 0; i < s; ++i) {
         table[i] = NULL;

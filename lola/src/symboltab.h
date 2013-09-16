@@ -34,7 +34,7 @@ class SymbolTab {
         Symbol** table;
         Symbol* lookup(char*);
         void add(Symbol*);
-        SymbolTab(unsigned int);
+        SymbolTab(unsigned int = 65536);
         ~SymbolTab();
         unsigned int card;
         unsigned int size;

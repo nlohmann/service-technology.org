@@ -1,6 +1,6 @@
 .SUFFIXES = .ggo
 
-bin_PROGRAMS =  graph2dot form
+noinst_PROGRAMS =  graph2dot form
 
 AM_CPPFLAGS = -I$(top_srcdir)
 

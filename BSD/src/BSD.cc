@@ -461,23 +461,40 @@ void BSD::assignLambda(BSDNode *node, std::list<MarkingList> &SCCs) {
 	// assume that there doesn't exist a marking m that is a stop except for inputs
 	node->lambda = 3;
 
-	bool found_stop = false;
 	// iterate through all SCCs
 	for (std::list<MarkingList>::const_iterator itSCC = SCCs.begin(); itSCC != SCCs.end(); ++itSCC) {
+		// is there a transition that leads out of the SCC (\tau or sending label)
 		bool found_outlabel = false;
-		for (MarkingList::const_iterator itlist = node->list.begin(); itlist != node->list.end(); ++itlist) {
+		// iterate through the markings of the SCC
+		for (MarkingList::const_iterator itlist = itSCC->begin(); itlist != itSCC->end(); ++itlist) {
 			// iterate through all successor labels
 			for (uint8_t i = 0; i < InnerMarking::inner_markings[*itlist]->out_degree; ++i) {
 				// test if the label is receiving (for the environment)
 				if (RECEIVING(InnerMarking::inner_markings[*itlist]->labels[i])) {
 					found_outlabel = true;
 					break;
+				} else if (InnerMarking::inner_markings[*itlist]->labels[i] == TAU) {
+					// test if the \tau-successor is in the same SCC
+					bool found_succ_in_SCC = false;
+					InnerMarking_ID succ = InnerMarking::inner_markings[*itlist]->successors[i];
+					// iterate through the markings of the SCC
+					for (MarkingList::const_iterator it = itSCC->begin(); it != itSCC->end(); ++it) {
+						if (*it == succ) {
+							found_succ_in_SCC = true;
+							break;
+						}
+					}
+					// if the \tau-successor is not in the same SCC we found a transition out of the SCC
+					if (!found_succ_in_SCC) {
+						found_outlabel = true;
+						break;
+					}
 				}
 			}
 		}
 
 		if (!found_outlabel) {
-			found_stop = true;     // found a stop except for inputs
+			node->lambda = 2; // found a stop except for inputs but no dead except for inputs (yet)
 
 			bool found_final = false;
 			for (MarkingList::const_iterator it = itSCC->begin(); it != itSCC->end(); ++it) {
@@ -491,10 +508,6 @@ void BSD::assignLambda(BSDNode *node, std::list<MarkingList> &SCCs) {
 				return;             // abort the computation
 			}
 		}
-	}
-
-	if (found_stop) {
-		node->lambda = 2; // found a stop except for inputs but no dead except for inputs
 	}
 }
 

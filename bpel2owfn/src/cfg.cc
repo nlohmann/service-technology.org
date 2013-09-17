@@ -298,7 +298,7 @@ void CFGBlock::checkForUninitializedVariables() {
     if (!prevBlocks.empty()) {
         /// for a while, we assume, that the body is never executed, so we drop that set
         list<CFGBlock*>::iterator blockBegin = prevBlocks.begin();
-        if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Repeat") {
+        if (type == CFGWhile || type == CFGForEach || (type == CFGRepeatUntil && label == "Repeat")) {
             blockBegin++;
         }
         for (list<CFGBlock*>::iterator iter = blockBegin; iter != prevBlocks.end(); iter++) {
@@ -314,7 +314,7 @@ void CFGBlock::checkForUninitializedVariables() {
         if (!prevBlocks.empty()) {
             list<CFGBlock*>::iterator blockBegin = prevBlocks.begin();
 
-            if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Repeat") {
+            if (type == CFGWhile || type == CFGForEach || (type == CFGRepeatUntil && label == "Repeat")) {
                 blockBegin++;
             }
 
@@ -472,7 +472,7 @@ void CFGBlock::checkForCyclicControlDependency() {
     if (!prevBlocks.empty()) {
         /// for a while, we assume, that the body is never executed, so we drop that set
         list<CFGBlock*>::iterator blockBegin = prevBlocks.begin();
-        if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Repeat") {
+        if (type == CFGWhile || type == CFGForEach || (type == CFGRepeatUntil && label == "Repeat")) {
             blockBegin++;
         }
 
@@ -499,7 +499,7 @@ void CFGBlock::checkForCyclicControlDependency() {
             if (parentId == 1 && parentId != possiblePeer) {
                 controllingPeers.insert(possiblePeer);
             }
-        } else if (type == CFGFlow && label == "Flow_end" || type == CFGSequence && label == "Sequence_end") //
+        } else if ((type == CFGFlow && label == "Flow_end") || (type == CFGSequence && label == "Sequence_end")) //
 //    else if ( type == CFGScope && label == "Scope_end" ) //
         {
             // find direct child scopes
@@ -591,7 +591,7 @@ void CFGBlock::checkForConflictingReceive() {
     if (!nextBlocks.empty()) {
         /// for a while, we assume, that the body is never executed, so we drop that set
         list<CFGBlock*>::iterator blockBegin = nextBlocks.begin();
-        if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Until") {
+        if (type == CFGWhile || type == CFGForEach || (type == CFGRepeatUntil && label == "Until")) {
             // blockBegin++;
         }
         for (list<CFGBlock*>::iterator iter = blockBegin; iter != nextBlocks.end(); iter++) {
@@ -606,13 +606,13 @@ void CFGBlock::checkForConflictingReceive() {
     if (allPrerequisites) {
         if (!nextBlocks.empty()) {
             list<CFGBlock*>::iterator blockBegin = nextBlocks.begin();
-            if (type == CFGWhile || type == CFGForEach || type == CFGRepeatUntil && label == "Until") {
+            if (type == CFGWhile || type == CFGForEach || (type == CFGRepeatUntil && label == "Until")) {
                 // blockBegin++;
             }
             receives = (*blockBegin)->receives;
             for (list<CFGBlock*>::iterator iter = blockBegin; iter != nextBlocks.end(); iter++) {
                 // the actual check for duplicate receives but only for flows
-                if (type == CFGFlow && label == "Flow_begin" || type == CFGProcess && label == "Process_begin" || type == CFGScope && label == "Scope_begin" || type == CFGPick && label == "Pick_begin") {
+                if ((type == CFGFlow && label == "Flow_begin") || (type == CFGProcess && label == "Process_begin") || (type == CFGScope && label == "Scope_begin") || (type == CFGPick && label == "Pick_begin")) {
                     for (set< pair< string, long> >::iterator elemA = (*iter)->receives.begin(); elemA != (*iter)->receives.end(); elemA++) {
                         for (set< pair< string, long> >::iterator elemB = receives.begin(); elemB != receives.end(); elemB++) {
                             if (elemA->first == elemB->first && elemA->second != elemB->second && receives.find(*elemA) == receives.end()) {

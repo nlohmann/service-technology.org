@@ -711,22 +711,25 @@ namespace PNapi {
         assert(my_source->nodeType != my_target->nodeType);
 
         // Tag the involved transition as communicating if it is.
-        if (my_source->nodeType == PLACE)
-            if (P_in.find(static_cast<Place*>(my_source)) != P_in.end())
+        if (my_source->nodeType == PLACE) {
+            if (P_in.find(static_cast<Place*>(my_source)) != P_in.end()) {
                 if ((static_cast<Transition*>(my_target))->type == OUT || (static_cast<Transition*>(my_target))->type == INOUT) {
                     (static_cast<Transition*>(my_target))->type = INOUT;
                 } else {
                     (static_cast<Transition*>(my_target))->type = IN;
                 }
+			}
+		}
 
-        if (my_target->nodeType == PLACE)
-            if (P_out.find(static_cast<Place*>(my_target)) != P_out.end())
+        if (my_target->nodeType == PLACE) {
+            if (P_out.find(static_cast<Place*>(my_target)) != P_out.end()) {
                 if ((static_cast<Transition*>(my_source))->type == IN || (static_cast<Transition*>(my_source))->type == INOUT) {
                     (static_cast<Transition*>(my_source))->type = INOUT;
                 } else {
                     (static_cast<Transition*>(my_source))->type = OUT;
                 }
-
+			}
+		}
 
         // Finally add the arc to the Petri net.
         Arc* f = new Arc(my_source, my_target, my_weight);
@@ -1653,7 +1656,7 @@ namespace PNapi {
         unsigned int w = 0;
 
         for (set<Arc*>::iterator f = F.begin(); f != F.end(); f++) {
-            if (((*f)->source == n) || ((*f)->target == n))
+            if (((*f)->source == n) || ((*f)->target == n)) {
                 if (first) {
                     first = false;
                     w = (*f)->weight;
@@ -1662,6 +1665,7 @@ namespace PNapi {
                         return false;
                     }
                 }
+			}
         }
 
         return true;

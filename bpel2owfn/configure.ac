@@ -1,4 +1,4 @@
-AC_INIT([GNU BPEL2oWFN],[2.4],[bpel2owfn@service-technology.org],[bpel2owfn],[http://service-technology.org/bpel2owfn])
+AC_INIT([GNU BPEL2oWFN],[2.5-unreleased],[bpel2owfn@service-technology.org],[bpel2owfn],[http://service-technology.org/bpel2owfn])
 
 AC_MSG_NOTICE([ ____  ____  _____ _     ____    __        _______ _   _ ])
 AC_MSG_NOTICE([| __ )|  _ \| ____| |   |___ \ __\ \      / /  ___| \ | |])
@@ -19,9 +19,6 @@ AC_CONFIG_AUX_DIR([build-aux])
 #############################################################################
 # check for prerequisites, programms, headers, and libraries
 #############################################################################
-
-AM_INIT_AUTOMAKE(gnits)
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # use the service-technology.org macros
 AC_ST_BASIC

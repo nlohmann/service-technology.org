@@ -285,7 +285,7 @@ as possible to analyze a chosen property. This is called @i{flexible model gener
 Furthermore, several design flaws can be detected using control and data flow analysis.
 
 BPEL2oWFN was written by Niels Lohmann, Christian Gierds and Martin Znamirowski.
-It is part of the Tools4BPEL project funded by the Bundesministerium für Bildung und
+It is part of the Tools4BPEL project funded by the Bundesministerium fÃ¼r Bildung und
 Forschung. See @url{http://www.informatik.hu-berlin.de/top/tools4bpel} for details.
 
 
@@ -667,7 +667,7 @@ under @url{http://www.informatik.hu-berlin.de/~kschmidt/lola.html}.
 @c finite-state system using a variety of modelling languages, and verify it using
 @c a variety of checkers, including deadlock-checkers, reachability-checkers, and
 @c model-checkers for the temporal logics CTL and LTL. The Model-Checking Kit is
-@c maintained by Javier Esparza, Claus Schröter and Stefan Schwoon at the
+@c maintained by Javier Esparza, Claus SchrÃ¶ter and Stefan Schwoon at the
 @c University of Stuttgart and is available under
 @c @url{http://www.fmi.uni-stuttgart.de/szs/tools/mckit}.
 
@@ -799,24 +799,24 @@ information from Flex and Bison about how the input is lexed and parsed.
 
 Debug level:
 @table @samp
-@itemx 0
+@item 0
 When errors are found, only display the error code and skip additional
 information.
-@itemx 1
+@item 1
 No debug information, but display warning and error messages. Furthermore,
 detailled information about syntax errors are displayed.
-@itemx 2
+@item 2
 All messages from @samp{-d1}. Additionally, information about the current
 steps is displayed.
-@itemx 3
+@item 3
 All messages from @samp{-d2}. Additionally, the structure of the process is
 shown, i.e. when a Petri net is generated...
-@itemx 4
+@item 4
 All messages from @samp{-d3}. Additionally, a message is displayed each time a
 function is entered or left.
-@itemx flex
+@item flex
 Displays messages from Flex. Can be combined with any other debug level.
-@itemx bison
+@item bison
 Displays messages from Bison. Can be combined with any other debug level.
 @end table
 
@@ -829,16 +829,16 @@ deadlocks, livelocks and all deadlock-free communicating partners. The rules
 are organized in reduction levels:
 
 @table @samp
-@itemx 0
+@item 0
 No rules are applied (standard).
-@itemx 1
+@item 1
 Structural dead nodes are removed; that is, unmarked places with empty preset
 and transitions with a dead place in its preset are removed.
-@itemx 2
+@item 2
 All reduction rules from @samp{-r1}. Additionally, unnecessary status places
 are removed. A status place is considered unnecessary if it has no outgoing
 arcs.
-@itemx 3
+@item 3
 All reduction rules from @samp{-r2}. Additionally, identical nodes are merged.
 Two nodes are considered identical if their presets and postsets are equal:
 
@@ -850,7 +850,7 @@ Two nodes are considered identical if their presets and postsets are equal:
 @end ifhtml
 
 
-@itemx 4
+@item 4
 All reduction rules from @samp{-r3}. Additionally, remove serial nodes:
 
 @iftex
@@ -860,7 +860,7 @@ All reduction rules from @samp{-r3}. Additionally, remove serial nodes:
 @center @image{images/ra1} @image{images/ra2}
 @end ifhtml
 
-@itemx 5
+@item 5
 All reduction rules from @samp{-r4}. Additionally, remove self-loop nodes.
 @end table
 
@@ -2285,26 +2285,22 @@ contact us via electronic mail to @email{nlohmann@@informatik.hu-berlin.de}.
 @section Contact Person
 Niels Lohmann
 
-Humboldt-Universit@"at zu Berlin@*
+Universit@"at Rostock@*
 Institut f@"ur Informatik@*
-Unter den Linden 6@*
-10099 Berlin, Germany
+18051 Rostock, Germany
 
 @table @asis
-@itemx Homepage
-@url{http://www.informatik.hu-berlin.de/top/mitarbeiter/lohmann}
+@item Homepage
+@url{http://www.informatik.uni-rostock.de/~nl}
 
-@itemx E-mail
-@email{nlohmann@@informatik.hu-berlin.de}
+@item E-mail
+@email{niels.lohmann@@uni-rostock.de}
 
-@itemx Skype
+@item Skype
 nlohmann
 
-@itemx Phone
-(+49) (30) 2093-3070
-
-@itemx Fax
-(+49) (30) 2093-3067
+@item Phone
+(+49) (381) 498-7674
 @end table
 
 

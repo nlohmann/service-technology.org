@@ -1,4 +1,8 @@
-@c <<-- CHANGE START (version information) -->>
+@heading Version 1.13-unreleased
+@itemize
+@item small fixes to allow compilation under OS X
+@end itemize
+
 @heading Version 1.12 (23 Aug 2013)
 @itemize
 @item bug fixes for examples by Andras Vörös

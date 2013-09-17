@@ -11,7 +11,7 @@ sara_LDADD = $(top_builddir)/libs/lp_solve_5.5/liblpsolve55.la
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
-sara_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a -lpthread -lrt
+sara_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a -lpthread
 endif
 
 

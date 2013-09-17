@@ -8,9 +8,12 @@
 
 
 PURPOSE
-Version 1.12 (23 Aug 2013)
-==========================
+Version 1.13-unreleased
+=======================
 
-* bug fixes for examples by Andras Vörös
+* small fixes to allow compilation under OS X
 
-\nSee file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for\ncomplete version history.\n
+
+See file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for
+complete version history.
+

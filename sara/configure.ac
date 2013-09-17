@@ -1,4 +1,4 @@
-AC_INIT([Sara], 1.12, sara@service-technology.org, sara, http://service-technology.org/sara)
+AC_INIT([Sara], 1.13-unreleased, sara@service-technology.org, sara, http://service-technology.org/sara)
 
 AC_MSG_NOTICE([ ____                  ])
 AC_MSG_NOTICE([/ ___|  __ _ _ __ __ _ ])
@@ -35,6 +35,7 @@ AC_PROG_LIBTOOL
 # check for dlopen/ftime (required by lp_solve)
 AC_SEARCH_LIBS([dlopen], [dl zrldsrl])
 AC_SEARCH_LIBS([ftime], [compat])
+AC_CHECK_LIB([rt], [sched_get_priority_min])
 
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use pipes -- expect bad performance]))

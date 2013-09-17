@@ -593,7 +593,7 @@ void PetriNet::output_dot(ostream* output, bool draw_interface) const {
     (*output) << "Petri net generated from " << globals::filename << "\"]" << endl;
     // REMEMBER The table size of the INOUT transitions depends on the size of a node!
     //          So a width of .3 (in) results in 21 pixel table width ( 0.3 in * 72 dpi ).
-    (*output) << " node [fontname=\"Helvetica\" fontsize=8 fixedsize width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white]" << endl;
+    (*output) << " node [fontname=\"Helvetica\" fontsize=8 fixedsize=true width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white]" << endl;
     (*output) << " edge [fontname=\"Helvetica\" fontsize=8 color=white arrowhead=none weight=\"20.0\"]" << endl << endl;
 
 

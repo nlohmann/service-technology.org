@@ -1,7 +1,7 @@
-bin_PROGRAMS = petri cdnf generator cphils configurator artifact pathify
+bin_PROGRAMS = petri
 dist_noinst_SCRIPTS = process.sh make_customer.sh
 
-noinst_PROGRAMS = sound
+noinst_PROGRAMS = sound cdnf generator cphils configurator artifact pathify
 
 petri_SOURCES = petri.cc cmdline.c cmdline.h \
                 Output.h Output.cc \

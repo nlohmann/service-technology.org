@@ -15,6 +15,7 @@
 @item LoLA will now be downloaded and compiled if missing
 @item unfolder will now use temporary files instead of /tmp/input
 @item added switch for standard compliant PNML
+@item the utilities are not installed any more
 @end itemize
 
 @heading Version 4.02 (2010-07-28)

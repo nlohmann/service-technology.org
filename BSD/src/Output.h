@@ -87,7 +87,7 @@ class Output {
 
         static void traverse(BSDNode * node);
 
-        static std::string dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset);
+        static std::string dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset, bool CSD);
 
         /*!
          * \brief write vector elements, seperated by given delimeter, to stream

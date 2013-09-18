@@ -373,6 +373,8 @@ public: /* public methods */
   const std::set<Arc *> & getArcs() const;
   /// get roles
   const std::set<std::string> & getRoles() const;
+  /// sets the final condition
+  void setFinalCondition(const formula::Formula & c);
   /// get the final condition
   Condition & getFinalCondition();
   /// get the final condition
@@ -384,8 +386,8 @@ public: /* public methods */
   /// returns net's conflict clusters
   std::vector<std::set<Node *> > getConflictClusters() const;
   //@}
-  
-  
+
+
   /*!
    * \name   Basic Structural Changes
    *

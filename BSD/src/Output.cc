@@ -225,20 +225,20 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 	// define a fake initial node... (is there a better way?) \todo
 	os << "\tinitialNode [shape=point,label=\"\",style=invis,weight=100];" << endl;
 	// an arrow to the 'real' initial node
-	os << "\tinitialNode -> " << dotnodeName(**(templist->begin()), graph.U, graph.emptyset) << ";" << endl;
+	os << "\tinitialNode -> " << dotnodeName(**(templist->begin()), graph.U, graph.emptyset, CSD) << ";" << endl;
 
 	for (BSDNodeList::const_iterator it = templist->begin(); it != templist->end(); ++it) {
 		if ((**it).lambda == 1) {
-			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " [style=dashed];" << endl;
+			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " [style=dashed];" << endl;
 		} else if (*it == graph.U) {
-			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " [shape=plaintext];" << endl;
+			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " [shape=plaintext];" << endl;
 		} else if (*it == graph.emptyset) {
-			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " [shape=plaintext];" << endl;
+			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " [shape=plaintext];" << endl;
 		}
 
 		if (*it == graph.U || *it == graph.emptyset) {
 			if ((unsigned int)graph.last_receive - (unsigned int)graph.first_receive >= 0) {
-				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(**it, graph.U, graph.emptyset)
+				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " -> " << dotnodeName(**it, graph.U, graph.emptyset, CSD)
 											<< " [label=\"";
 				for (unsigned int id = graph.first_receive; id < graph.last_receive; ++id) {
 					os << graph.id2name[id] << ",";
@@ -247,7 +247,7 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 			}
 
 			if ((unsigned int)graph.last_send - (unsigned int)graph.first_send >= 0) {
-				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(**it, graph.U, graph.emptyset)
+				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " -> " << dotnodeName(**it, graph.U, graph.emptyset, CSD)
 																<< " [label=\"";
 				for (unsigned int id = graph.first_send; id < graph.last_send; ++id) {
 					os << graph.id2name[id] << ",";
@@ -256,7 +256,7 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 			}
 		} else {
 			for (unsigned int id = 2; id <= graph.events; ++id) {
-				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset) << " -> " << dotnodeName(*((*it)->pointer[id]), graph.U, graph.emptyset)
+				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " -> " << dotnodeName(*((*it)->pointer[id]), graph.U, graph.emptyset, CSD)
 					   << " [label=\"" << graph.id2name[id] << "\"";
 				if (id >= graph.first_receive && id <= graph.last_receive) {
 					os << ",color=red";
@@ -295,9 +295,9 @@ void Output::traverse(BSDNode* node) {
 	}
 }
 
-std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset) {
+std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset, bool CSD) {
 	std::stringstream temp (std::stringstream::in | std::stringstream::out);
-	if (&node == U) {
+	if (&node == U || (CSD && node.isU)) {
 		temp << "\"U";
 	} else if (&node == emptyset) {
 		temp << "\"empty";
@@ -312,6 +312,10 @@ std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset) {
 		temp << ")";
 	}
 
-	temp << "." << (unsigned int)node.lambda << "\"";
+	if (CSD && node.isU) {
+		temp << "." << (unsigned int)U->lambda << "\"";
+	} else {
+		temp << "." << (unsigned int)node.lambda << "\"";
+	}
 	return temp.str();
 }

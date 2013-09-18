@@ -427,6 +427,14 @@ Condition & PetriNet::getFinalCondition()
   return finalCondition_;
 }
 
+/*!
+ * \brief sets the final condition
+ */
+void PetriNet::setFinalCondition(const formula::Formula & c)
+{
+  finalCondition_ = c;
+}
+
 
 /*!
  * \brief get the final condition

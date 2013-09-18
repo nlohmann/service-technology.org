@@ -1,6 +1,7 @@
 @heading Version 3.4-unreleased
 @itemize
 @item minor code cleanup
+@item maintainers: dropped support for Bison 2.x -- Wendy now needs Bison 3.0 to compile
 @end itemize
 
 

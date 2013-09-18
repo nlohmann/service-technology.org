@@ -20,8 +20,9 @@
 
 %token KEY_PLACES KEY_TRANSITIONS KEY_SYNCHRONOUS COMMA SEMICOLON NAME
 
-%defines
-%name-prefix="cover_"
+%defines "syntax_cover.h"
+%name-prefix "cover_"
+%output "syntax_cover.cc"
 
 %{
 #include <vector>

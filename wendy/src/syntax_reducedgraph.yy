@@ -21,9 +21,10 @@
 %token COLON COMMA ARROW INDENT QUESTION
 %token NUMBER NAME MESSAGE PATHARROW
 
-%token_table
-%defines
-%name-prefix="reducedgraph_"
+%token-table
+%defines "syntax_reducedgraph.h"
+%name-prefix "reducedgraph_"
+%output "syntax_reducedgraph.cc"
 
 
 %{

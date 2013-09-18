@@ -21,12 +21,12 @@
 %option noyywrap
 %option nounput
 %option full
-%option outfile="lex.yy.c"
+%option outfile="lexic_graph.cc"
 %option prefix="graph_"
 
 %{
 #include <cstring>
-#include "syntax_graph.hh"
+#include "syntax_graph.h"
 #include "verbose.h"
 
 void graph_error(const char*);

@@ -12,6 +12,8 @@ Version 3.4-unreleased
 ======================
 
 * minor code cleanup
+* maintainers: dropped support for Bison 2.x - Wendy now needs Bison
+  3.0 to compile
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

@@ -22,12 +22,12 @@
 %option yylineno
 %option nodefault
 %option nounput
-%option outfile="lex.yy.c"
+%option outfile="lexic_cover.cc"
 %option prefix="cover_"
 
 %{
 #include <cstring>
-#include "syntax_cover.hh"
+#include "syntax_cover.h"
 #include "verbose.h"
 
 

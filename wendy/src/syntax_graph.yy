@@ -21,8 +21,9 @@
 %token KW_STATE KW_LOWLINK KW_SCC COLON COMMA ARROW NUMBER NAME
 
 %expect 0
-%defines
-%name-prefix="graph_"
+%defines "syntax_graph.h"
+%name-prefix "graph_"
+%output "syntax_graph.cc"
 
 %{
 #include <fstream>

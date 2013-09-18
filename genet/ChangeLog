@@ -8,28 +8,26 @@
  http://www.lsi.upc.edu/~jcarmona/genet.html 
 
 
-Version 1.2-unreleased
-======================
+Version 1.2 (18 September 2013)
+===============================
 
 * patch libs (especially Cudd) to allow compilation on different
   architectures.
-
+* first release from Rostock/Berlin at
+  <http://gna.org/projects/service-tech>
 
 Version 1.1 (8 April 2011)
 ==========================
 
 * integration into ProM using JNA (Java Native Access)
-  `https://github.com/twall/jna'
-
-* patch libraries to be independent of Posix particulars, Genet compiles
-  now as pure Windows binary.
-
+  <https://github.com/twall/jna>
+* patch libraries to be independent of Posix particulars, Genet
+  compiles now as pure Windows binary.
 
 Version 1.0 (24 September 2009)
 ===============================
 
 * using autotools to distribute Genet.
-
 
 
 

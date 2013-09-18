@@ -1,4 +1,4 @@
-AC_INIT(Genet, 1.2-unreleased, jcarmona@lsi.upc.edu, genet, http://www.lsi.upc.edu/~jcarmona/genet.html)
+AC_INIT(Genet, 1.2, jcarmona@lsi.upc.edu, genet, http://www.lsi.upc.edu/~jcarmona/genet.html)
 
 AC_MSG_NOTICE([   ____                 _    ])
 AC_MSG_NOTICE([  / ___| ___ _ __   ___| |_  ])

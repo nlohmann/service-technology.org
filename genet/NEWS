@@ -8,11 +8,15 @@
  http://www.lsi.upc.edu/~jcarmona/genet.html 
 
 
-Version 1.2-unreleased
-======================
+Version 1.2 (18 September 2013)
+===============================
 
 * patch libs (especially Cudd) to allow compilation on different
   architectures.
+* first release from Rostock/Berlin at
+  <http://gna.org/projects/service-tech>
 
 
-\nSee file ChangeLog <http://service-technology.org/files/genet/ChangeLog> for\ncomplete version history.\n
+See file ChangeLog <http://service-technology.org/files/genet/ChangeLog> for
+complete version history.
+

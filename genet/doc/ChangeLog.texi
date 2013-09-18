@@ -1,8 +1,8 @@
-@heading Version 1.2-unreleased
+@heading Version 1.2 (18 September 2013)
 
 @itemize
 @item patch libs (especially Cudd) to allow compilation on different architectures.
-
+@item first release from Rostock/Berlin at @url{http://gna.org/projects/service-tech}
 @end itemize
 
 @heading Version 1.1 (8 April 2011)

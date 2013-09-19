@@ -18,6 +18,7 @@
  * \version $Revision: 5964 $
  */
 
+
 #include "config.h"
 
 #include "pnapi-assert.h"
@@ -425,14 +426,6 @@ PetriNet::copyPlaces(const PetriNet & net, const std::string & prefix)
 Condition & PetriNet::getFinalCondition()
 {
   return finalCondition_;
-}
-
-/*!
- * \brief sets the final condition
- */
-void PetriNet::setFinalCondition(const formula::Formula & c)
-{
-  finalCondition_ = c;
 }
 
 

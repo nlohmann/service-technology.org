@@ -61,8 +61,7 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 //	// create a place which represents the maximal count of messages to be sent...
 //	counterPlace = &net->createPlace("counter_place", c);
 
-	pnapi::formula::Formula * finalCondition = net->getFinalCondition().getFormula().clone();
-	pnapi::formula::Formula * temp;
+	pnapi::Condition * condition = new pnapi::Condition;
 
 	// iterate through arcs
 	set<pnapi::Arc *> arcs = net->getArcs();
@@ -79,9 +78,7 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 		// create a place which represents the interface
 		pnapi::Place *p = &net->createPlace((*label)->getName() + "_input");
 
-		temp = finalCondition;
-		finalCondition = ((*finalCondition) && (*p == 0)).clone();
-		delete temp;
+		(*condition) = ((condition->getFormula()) && (*p == 0));
 
 		// iterate through all transitions belonging to the current label
 		set<pnapi::Transition *> t_in = (*label)->getTransitions();
@@ -113,9 +110,7 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 		//create a place which represents the interface
 		pnapi::Place *p = &net->createPlace((*label)->getName() + "_output");
 
-		temp = finalCondition;
-		finalCondition = ((*finalCondition) && (*p == 0)).clone();
-		delete temp;
+		(*condition) = ((condition->getFormula()) && (*p == 0));
 
 		// iterate through all transitions belonging to the current label
 		set<pnapi::Transition *> t_in = (*label)->getTransitions();
@@ -140,7 +135,7 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 		net->createArc(*p, *t, 1);
 	}
 
-	net->setFinalCondition(*finalCondition);
+	net->getFinalCondition() = ((net->getFinalCondition().getFormula()) && (condition->getFormula()));
 
 	//\TODO: what about synchronous labels?...
 

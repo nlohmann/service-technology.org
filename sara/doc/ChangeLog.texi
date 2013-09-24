@@ -1,4 +1,9 @@
-@heading Version 1.13
+@heading Version 1.14-unreleased
+@itemize
+@item set dependency to PNAPI version 4.03
+@end itemize
+
+@heading Version 1.13 (24 Sep 2013)
 @itemize
 @item small fixes to allow compilation under OS X
 @end itemize

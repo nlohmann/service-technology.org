@@ -8,8 +8,13 @@
 
 
 PURPOSE
-Version 1.13
-============
+Version 1.14-unreleased
+=======================
+
+* set dependency to PNAPI version 4.03
+
+Version 1.13 (24 Sep 2013)
+==========================
 
 * small fixes to allow compilation under OS X
 

@@ -8,10 +8,10 @@
 
 
 PURPOSE
-Version 1.13
-============
+Version 1.14-unreleased
+=======================
 
-* small fixes to allow compilation under OS X
+* set dependency to PNAPI version 4.03
 
 
 See file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for

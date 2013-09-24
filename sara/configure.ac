@@ -1,4 +1,4 @@
-AC_INIT([Sara], 1.13, sara@service-technology.org, sara, http://service-technology.org/sara)
+AC_INIT([Sara], 1.14-unreleased, sara@service-technology.org, sara, http://service-technology.org/sara)
 
 AC_MSG_NOTICE([ ____                  ])
 AC_MSG_NOTICE([/ ___|  __ _ _ __ __ _ ])
@@ -26,7 +26,7 @@ AC_PROG_YACC
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_AUTOTEST
-AC_ST_PNAPI([4.02])
+AC_ST_PNAPI([4.03])
 AC_ST_VERBOSE
 
 # search for optional tools

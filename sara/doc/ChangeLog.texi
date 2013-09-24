@@ -1,11 +1,11 @@
-@heading Version 1.13-unreleased
+@heading Version 1.13
 @itemize
 @item small fixes to allow compilation under OS X
 @end itemize
 
 @heading Version 1.12 (23 Aug 2013)
 @itemize
-@item bug fixes for examples by Andras Vörös
+@item bug fixes for examples by Andras VÃ¶rÃ¶s
 @end itemize
 
 @heading Version 1.10 (22 Jun 2012)

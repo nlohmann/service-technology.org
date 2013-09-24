@@ -8,15 +8,15 @@
 
 
 PURPOSE
-Version 1.13-unreleased
-=======================
+Version 1.13
+============
 
 * small fixes to allow compilation under OS X
 
 Version 1.12 (23 Aug 2013)
 ==========================
 
-* bug fixes for examples by Andras Vörös
+* bug fixes for examples by Andras VÃ¶rÃ¶s
 
 Version 1.10 (22 Jun 2012)
 ==========================

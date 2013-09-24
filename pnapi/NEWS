@@ -7,40 +7,28 @@
                         http://service-technology.org/pnapi
 
 
-Version 4.03-unreleased
-=======================
+Version 4.03 (2013-09-24)
+=========================
 
 * added methods to set node color in dot output
-
 * fixed final condition generation in net composition (see
-  `https://gna.org/task/?6766')
-
+  <https://gna.org/task/?6766>)
 * added reduction option SET_MURATA and front end parameter option
   -reduce=murata
-
 * added arithmetic and comparison operators to Marking class
-
 * introduced classes PlaceIndexVector and OmegaMarking
-
 * disabled place-to-place arcs and transition-to-transition arcs
-
 * fixed transition types on interface "arc" removing
-
 * added confidence level for transitions (to check non-interference)
-
-* added new file format: IFN (information flow net) based on LoLA format
-
+* added new file format: IFN (information flow net) based on LoLA
+  format
 * creating arcs between two nets will now raise an exception
-
 * implemented INA file format (*.pnt) files
-
 * fixed bug in exception output
-
 * LoLA will now be downloaded and compiled if missing
-
 * unfolder will now use temporary files instead of /tmp/input
-
 * added switch for standard compliant PNML
+* the utilities are not installed any more
 
 
 See file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for

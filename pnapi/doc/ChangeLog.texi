@@ -1,4 +1,4 @@
-@heading Version 4.03-unreleased
+@heading Version 4.03 (2013-09-24)
 @itemize
 @item added methods to set node color in dot output
 @item fixed final condition generation in net composition (see @url{https://gna.org/task/?6766})

@@ -1,4 +1,4 @@
-AC_INIT([Petri Net API], 4.03-unreleased, pnapi@service-technology.org, pnapi, http://service-technology.org/pnapi)
+AC_INIT([Petri Net API], 4.03, pnapi@service-technology.org, pnapi, http://service-technology.org/pnapi)
 
 AC_MSG_NOTICE([ ____      _        _   _   _      _        _    ____ ___ ])
 AC_MSG_NOTICE([|  _ \ ___| |_ _ __(_) | \ | | ___| |_     / \  |  _ \_ _|])

@@ -115,6 +115,6 @@ m4_define([AT_CHECK_RUNLOLA], [
   AT_CHECK([GREP -q "lola: result: $9" stderr])
   AT_CHECK([GREP -q "$10 markings" stderr])
   AT_CHECK([GREP -q "$11 edges" stderr])
-  AT_KEYWORDS(stores)
+  AT_KEYWORDS(stores parallel)
   AT_CLEANUP
 ])

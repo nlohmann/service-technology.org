@@ -1466,7 +1466,7 @@ AT_CHECK([GREP -q "lola: witness state:" stderr])
 AT_CHECK([GREP -q "lola: hl.1 : 1" stderr])
 AT_CHECK([GREP -q "lola: witness path:" stderr])
 AT_CHECK([GREP -q "lola: tl.\[[y=9\]]" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 
 AT_SETUP([Phils 10 (super parallel)])
@@ -1477,7 +1477,7 @@ AT_CHECK([GREP -q "lola: witness state:" stderr])
 AT_CHECK([GREP -q "lola: hl.1 : 1" stderr])
 AT_CHECK([GREP -q "lola: witness path:" stderr])
 AT_CHECK([GREP -q "lola: tl.\[[y=9\]]" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 
 AT_SETUP([Kanban 5 (parallel)])
@@ -1486,7 +1486,7 @@ AT_CHECK([LOLA Kanban5.pnml.lola --check=deadlock -v --state --path --threads=4]
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: witness state:" stderr], 1)
 AT_CHECK([GREP -q "lola: witness path:" stderr], 1)
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 
 
@@ -1496,7 +1496,7 @@ AT_CHECK([LOLA Kanban5.pnml.lola --check=deadlock -v --state --path --threads=64
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: witness state:" stderr], 1)
 AT_CHECK([GREP -q "lola: witness path:" stderr], 1)
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 
 
@@ -1504,61 +1504,61 @@ AT_SETUP([Echo D3R3 (super parallel) (1/10)])
 AT_CHECK([cp TESTFILES/echo-d3r3.name.lola .])
 AT_CHECK([LOLA echo-d3r3.name.lola --check=deadlock -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 AT_SETUP([Echo D3R3 (super parallel) (2/10)])
 AT_CHECK([cp TESTFILES/echo-d3r3.name.lola .])
 AT_CHECK([LOLA echo-d3r3.name.lola --check=deadlock -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 AT_SETUP([Echo D3R3 (super parallel) (3/10)])
 AT_CHECK([cp TESTFILES/echo-d3r3.name.lola .])
 AT_CHECK([LOLA echo-d3r3.name.lola --check=deadlock -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 AT_SETUP([Echo D3R3 (super parallel) (4/10)])
 AT_CHECK([cp TESTFILES/echo-d3r3.name.lola .])
 AT_CHECK([LOLA echo-d3r3.name.lola --check=deadlock -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 AT_SETUP([Echo D3R3 (super parallel) (5/10)])
 AT_CHECK([cp TESTFILES/echo-d3r3.name.lola .])
 AT_CHECK([LOLA echo-d3r3.name.lola --check=deadlock -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 AT_SETUP([Echo D3R3 (super parallel) (6/10)])
 AT_CHECK([cp TESTFILES/echo-d3r3.name.lola .])
 AT_CHECK([LOLA echo-d3r3.name.lola --check=deadlock -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 AT_SETUP([Echo D3R3 (super parallel) (7/10)])
 AT_CHECK([cp TESTFILES/echo-d3r3.name.lola .])
 AT_CHECK([LOLA echo-d3r3.name.lola --check=deadlock -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 AT_SETUP([Echo D3R3 (super parallel) (8/10)])
 AT_CHECK([cp TESTFILES/echo-d3r3.name.lola .])
 AT_CHECK([LOLA echo-d3r3.name.lola --check=deadlock -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 AT_SETUP([Echo D3R3 (super parallel) (9/10)])
 AT_CHECK([cp TESTFILES/echo-d3r3.name.lola .])
 AT_CHECK([LOLA echo-d3r3.name.lola --check=deadlock -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 AT_SETUP([Echo D3R3 (super parallel) (10/10)])
 AT_CHECK([cp TESTFILES/echo-d3r3.name.lola .])
 AT_CHECK([LOLA echo-d3r3.name.lola --check=deadlock -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 
 
@@ -1586,21 +1586,21 @@ AT_SETUP([Garavel (parallel)])
 AT_CHECK([cp TESTFILES/garavel.lola TESTFILES/garavel.task .])
 AT_CHECK([LOLA garavel.lola --formula=garavel.task --check=modelchecking -v --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(statepredicate)
+AT_KEYWORDS(statepredicate parallel)
 AT_CLEANUP
 
 AT_SETUP([Garavel (super parallel)])
 AT_CHECK([cp TESTFILES/garavel.lola TESTFILES/garavel.task .])
 AT_CHECK([LOLA garavel.lola --formula=garavel.task --check=modelchecking -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(statepredicate)
+AT_KEYWORDS(statepredicate parallel)
 AT_CLEANUP
 
 AT_SETUP([positive formula (parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola TESTFILES/philpos.task .])
 AT_CHECK([LOLA phils5.lola --formula=philpos.task --check=modelchecking -v --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(statepredicate)
+AT_KEYWORDS(statepredicate parallel)
 AT_CLEANUP
 
 
@@ -1608,7 +1608,7 @@ AT_SETUP([positive formula (super parallel)])
 AT_CHECK([cp TESTFILES/phils5.lola TESTFILES/philpos.task .])
 AT_CHECK([LOLA phils5.lola --formula=philpos.task --check=modelchecking -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(statepredicate)
+AT_KEYWORDS(statepredicate parallel)
 AT_CLEANUP
 
 
@@ -1627,7 +1627,7 @@ AT_SETUP([Garavel (parallel)])
 AT_CHECK([cp TESTFILES/garavel.lola TESTFILES/garavel.task .])
 AT_CHECK([LOLA garavel.lola --formula=garavel.task --search=findpath --check=modelchecking -v --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
-AT_KEYWORDS(findpath)
+AT_KEYWORDS(findpath parallel)
 AT_CLEANUP
 
 
@@ -1648,7 +1648,7 @@ AT_CHECK([cp TESTFILES/phils10.lola .])
 AT_CHECK([LOLA phils10.lola --check=full -v --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 59048 markings" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 
 AT_SETUP([Kanban 5 (parallel)])
@@ -1656,7 +1656,7 @@ AT_CHECK([cp TESTFILES/Kanban5.pnml.lola .])
 AT_CHECK([LOLA Kanban5.pnml.lola --check=full --bucketing -v --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 2546432 markings" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 
 AT_SETUP([Phils 10 (super parallel)])
@@ -1664,7 +1664,7 @@ AT_CHECK([cp TESTFILES/phils10.lola .])
 AT_CHECK([LOLA phils10.lola --check=full -v --threads=64],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 59048 markings" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 
 AT_SETUP([Kanban 5 (super parallel)])
@@ -1672,7 +1672,7 @@ AT_CHECK([cp TESTFILES/Kanban5.pnml.lola .])
 AT_CHECK([LOLA Kanban5.pnml.lola --check=full -v --threads=64 --bucketing],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
 AT_CHECK([GREP -q "lola: 2546432 markings" stderr])
-AT_KEYWORDS(deadlock)
+AT_KEYWORDS(deadlock parallel)
 AT_CLEANUP
 
 ############################################################################
@@ -1710,7 +1710,7 @@ AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsinitial.task .])
 AT_CHECK([LOLA --check=modelchecking --formula=philsinitial.task phils5.lola -v --threads=4],0,ignore,stderr)
 AT_CHECK([GREP -q -E "0 markings, 0 edges" stderr])
-AT_KEYWORDS(statepredicate)
+AT_KEYWORDS(statepredicate parallel)
 AT_CLEANUP
 
 AT_SETUP([Findpath initially satisfied (parallel)])
@@ -1718,7 +1718,7 @@ AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsinitial.task .])
 AT_CHECK([LOLA --check=modelchecking --formula=philsinitial.task --search=findpath phils5.lola -v --threads=4],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: yes" stderr])
-AT_KEYWORDS(findpath)
+AT_KEYWORDS(findpath parallel)
 AT_CLEANUP
 
 AT_SETUP([TRUE (parallel)])
@@ -1727,7 +1727,7 @@ AT_DATA(formula.task,[FORMULA TRUE;
 ])
 AT_CHECK([LOLA garavel.lola --check=modelchecking --formula=formula.task --verbose --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q -E "result: yes" stderr])
-AT_KEYWORDS(statepredicate)
+AT_KEYWORDS(statepredicate parallel)
 AT_CLEANUP
 
 
@@ -1766,7 +1766,7 @@ AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsunsat.task .])
 AT_CHECK([LOLA --check=modelchecking --formula=philsunsat.task phils5.lola -v --threads=4],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
-AT_KEYWORDS(statepredicate)
+AT_KEYWORDS(statepredicate parallel)
 AT_CLEANUP
 
 AT_SETUP([Findpath unsatisfiable (parallel)])
@@ -1774,7 +1774,7 @@ AT_CHECK([cp TESTFILES/phils5.lola .])
 AT_CHECK([cp TESTFILES/philsunsat.task .])
 AT_CHECK([LOLA --check=modelchecking --formula=philsunsat.task --search=findpath --retrylimit=100 --depthlimit=1000 phils5.lola -v --threads=4],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
-AT_KEYWORDS(findpath)
+AT_KEYWORDS(findpath parallel)
 AT_CLEANUP
 
 AT_SETUP([FALSE (parallel)])
@@ -1783,7 +1783,7 @@ AT_DATA(formula.task,[FORMULA FALSE;
 ])
 AT_CHECK([LOLA garavel.lola --check=modelchecking --formula=formula.task --verbose --threads=4],0,stdout,stderr)
 AT_CHECK([GREP -q -E "result: no" stderr])
-AT_KEYWORDS(statepredicate)
+AT_KEYWORDS(statepredicate parallel)
 AT_CLEANUP
 
 
@@ -1802,7 +1802,7 @@ AT_SETUP(disabled tscc in deadlock stubborn sets (parallel))
 AT_CHECK([cp TESTFILES/m.lola .])
 AT_CHECK([LOLA --check=deadlock m.lola -v --threads=4],0,ignore,stderr)
 AT_CHECK([GREP -q -E "result: yes" stderr])
-AT_KEYWORDS(stubborn)
+AT_KEYWORDS(stubborn parallel)
 AT_CLEANUP
 
 AT_SETUP([deletion algorithm (Phils 10)])

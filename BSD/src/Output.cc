@@ -306,7 +306,7 @@ std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset, b
 		for (MarkingList::const_iterator itlist = node.list.begin(); itlist != node.list.end();) {
 			temp << *itlist;
 			if (++itlist != node.list.end()) {
-				temp << ".";
+				temp << ",";
 			}
 		}
 		temp << ")";

@@ -8,18 +8,18 @@ section "Basic functionality"
 sectiondesc="Options which change the basic functionality of the tool. Only one option at a time is allowed. If no other option is given the tool just computes the BSD automaton of the given OWFN.\n"
 
 option "CSD" -
-  "Compute the CSD automaton. Set the BSD flag if the output of the BSD automaton is wanted."
+  "Compute the CSD automaton CSD_b(N) of the input net N. Set the BSD flag if the output of the BSD automaton is wanted."
   details="This option lets the tool compute the CSD automaton. Set the BSD flag if the output of the BSD automaton is wanted. The simultaneous computation of the BSD and CSD automaton is more efficient than the sequential one because the BSD automaton will be computed twice.\n"
   flag off
   
 option "BSD" -
-  "BSD automaton output if CSD flag is set."
-  details="This option lets the tool output the BSD automaton even if the CSD flag is set.\n"
+  "Additional BSD automaton output if CSD flag is set."
+  details="This option lets the tool output the BSD automaton BSD_b(N) of input net N even if the CSD flag is set.\n"
   flag off
   
 option "check" -
-  "Check theorem 1.3 (Bisimulation of two BSD automata and lambda values)."
-  details="This option checks theorem 1.3 (Bisimulation of two BSD automata and lambda values). Two OWFNs have to be given as an input in this case.\n"
+  "Check for two given BSD automata BSD_b(N1) and BSD_b(N2) in DOT format if the two nets N1 and N2 are b-partners."
+  details="This option checks if two nets N1 and N2 are b-partners. The input files have to be the BSD automata of the two nets in DOT format.\n"
   flag off
   
 option "bound" b
@@ -34,7 +34,7 @@ section "Input/Output"
 sectiondesc="When called without an input file, BSD reads from the standard input stream. When called without an output parameter, BSD creates a DOT file based on the chosen options. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.dot'). If the filename `-' is given, BSD will pipe the respective output to the standard output stream.\n"
 
 option "dotFile" -
-  "Filename for the DOT file."
+  "Filename for the DOT file in case of BSD or CSD automata computation."
   string
   typestr="FILENAME"
   argoptional

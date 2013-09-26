@@ -194,16 +194,6 @@ int main(int argc, char** argv) {
     // set the function to call on normal termination
     atexit(terminationHandler);
 
-    // set standard filenames
-    std::string filename[2];
-    std::string filepath[2];
-    filename[0] = std::string(PACKAGE) + "_output";
-    filename[1] = std::string(PACKAGE) + "_output";
-    filepath[0] = "./";
-    filepath[1] = "./";
-
-    BSDgraph _BSDgraph[2];
-
     /*--------------------------------------.
     | 1. parse the command line parameters  |
     `--------------------------------------*/
@@ -211,8 +201,17 @@ int main(int argc, char** argv) {
     Output::setTempfileTemplate(args_info.tmpfile_arg);
     Output::setKeepTempfiles(args_info.noClean_flag);
 
-    bool done = false;
-    for (int i = 0; !done; ++i) {
+
+    // in case of BSD or CSD computation
+    if (!args_info.check_flag) {
+
+        // set standard filenames
+        std::string filename;
+        std::string filepath;
+        filename = std::string(PACKAGE) + "_output";
+        filepath = "./";
+
+        BSDgraph _BSDgraph;
 
     	openNet::initialize();
 
@@ -224,22 +223,19 @@ int main(int argc, char** argv) {
     		if (args_info.inputs_num == 0) {
     			status("reading from stdin...");
     			std::cin >> pnapi::io::owfn >> *openNet::net;
-    			done = true;
     		} else {
     			// strip suffix from input filename
-    			filename[i] = std::string(args_info.inputs[i]).substr(0, std::string(args_info.inputs[i]).find_last_of("."));
-    			filepath[i] = std::string(args_info.inputs[i]).substr(0, filename[i].find_last_of("/")+1);
-    			filename[i] = filename[i].substr(filename[i].find_last_of("/")+1, filename[i].length());
+    			filename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
+    			filepath = std::string(args_info.inputs[0]).substr(0, filename.find_last_of("/")+1);
+    			filename = filename.substr(filename.find_last_of("/")+1, filename.length());
 
-    			std::ifstream inputStream(args_info.inputs[i]);
+    			std::ifstream inputStream(args_info.inputs[0]);
     			if (!inputStream) {
-    				abort(1, "could not open file '%s'", args_info.inputs[i]);
+    				abort(1, "could not open file '%s'", args_info.inputs[0]);
     			}
 
-    			inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[i])
+    			inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
     						>> pnapi::io::owfn >> *openNet::net;
-    			if (args_info.inputs_num == i+1)
-    				done = true;
     		}
     		if (args_info.verbose_flag) {
     			std::ostringstream s;
@@ -255,13 +251,13 @@ int main(int argc, char** argv) {
 
     	// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
     	if (openNet::net->getTransitions().empty()) {
-    		status("net %i has no transitions -- adding dead dummy transition", i+1);
+    		status("net has no transitions -- adding dead dummy transition");
     		openNet::net->createArc(openNet::net->createPlace(), openNet::net->createTransition());
     	}
 
     	// only normal nets are supported so far
     	if (not openNet::net->isNormal()) {
-    		abort(3, "the input open net must be normal (net %i)", i+1);
+    		abort(3, "the input open net must be normal");
     	}
 
 
@@ -334,27 +330,27 @@ int main(int argc, char** argv) {
     	BSD::computeBSD();
 
     	time(&end_time);
-    	_BSDgraph[i].BSD_comp_time = difftime(end_time, start_time);
-    	status("computation is done [%.0f sec]", _BSDgraph[i].BSD_comp_time);
+    	_BSDgraph.BSD_comp_time = difftime(end_time, start_time);
+    	status("computation is done [%.0f sec]", _BSDgraph.BSD_comp_time);
 
     	/*----------------------------------------------------.
        	| 6. save the BSD automaton and some important values |
  	   	`----------------------------------------------------*/
 
-    	_BSDgraph[i].graph = BSD::graph;
+    	_BSDgraph.graph = BSD::graph;
 
-    	_BSDgraph[i].id2name = Label::id2name;
-    	_BSDgraph[i].U = BSD::U;
-    	_BSDgraph[i].emptyset = BSD::emptyset;
-    	_BSDgraph[i].events = Label::events;
+    	_BSDgraph.id2name = Label::id2name;
+    	_BSDgraph.U = BSD::U;
+    	_BSDgraph.emptyset = BSD::emptyset;
+    	_BSDgraph.events = Label::events;
 
-    	_BSDgraph[i].first_receive = Label::first_receive;
-    	_BSDgraph[i].last_receive = Label::last_receive;
-    	_BSDgraph[i].first_send = Label::first_send;
-    	_BSDgraph[i].last_send = Label::last_send;
+    	_BSDgraph.first_receive = Label::first_receive;
+    	_BSDgraph.last_receive = Label::last_receive;
+    	_BSDgraph.first_send = Label::first_send;
+    	_BSDgraph.last_send = Label::last_send;
 
-    	_BSDgraph[i].receive_events = Label::receive_events;
-    	_BSDgraph[i].send_events = Label::send_events;
+    	_BSDgraph.receive_events = Label::receive_events;
+    	_BSDgraph.send_events = Label::send_events;
 
 
     	/*---------------.
@@ -365,90 +361,115 @@ int main(int argc, char** argv) {
         Label::finalize();
         InnerMarking::finalize();
 
-    }
+
+        /*-------------------------------.
+        | 8. create CSD from BSD		 |
+        `-------------------------------*/
+
+        if (args_info.CSD_flag) {
+        	status("starting CSD automaton computation...");
+        	time(&start_time);
+        	BSD::computeCSD(_BSDgraph);
+        	time(&end_time);
+        	_BSDgraph.CSD_comp_time = difftime(end_time, start_time);
+        	status("computation is done [%.0f sec]", _BSDgraph.CSD_comp_time);
+        }
 
 
-    /*-------------------------------.
-   	| 8. check for bisimulation		 |
-   	`-------------------------------*/
+        /*--------------------.
+       	| 9. DOT output	 	  |
+        `--------------------*/
 
-    if (args_info.check_flag) {
-    	bool valid = BSD::checkBiSimAndLambda(_BSDgraph[0], _BSDgraph[1]);
+        // delete the if-statement to generate dot-file output even if two nets are given
+        if (!args_info.check_flag) {
+        	if (!args_info.CSD_flag || args_info.BSD_flag) {
+        		std::stringstream temp (std::stringstream::in | std::stringstream::out);
+        		temp << "BSD_" << args_info.bound_arg << "(";
 
-    	if (valid) {
-    		message("net 1 is a br-controller of net 2!");
-    	} else {
-    		message("net 1 is NOT a br-controller of net 2!");
-    	}
-    }
+        		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filepath + temp.str() + filename + ").dot";
+
+        		Output output(dot_filename, "BSD automaton");
+        		output.stream() << pnapi::io::sa;
+        		Output::dotoutput(output.stream(), _BSDgraph, filename, false, args_info.bound_arg);
+        	}
+
+        	if (args_info.CSD_flag) {
+        		std::stringstream temp (std::stringstream::in | std::stringstream::out);
+        		temp << "CSD_" << args_info.bound_arg << "(";
+
+        		std::string dot_temp;
+        		if (args_info.dotFile_arg) {
+        			if (args_info.BSD_flag)
+        				dot_temp =  "CSD_" + (std::string)args_info.dotFile_arg;
+        			else
+        				dot_temp = args_info.dotFile_arg;
+        		}
+
+        		std::string dot_filename = args_info.dotFile_arg ? dot_temp : filepath + temp.str() + filename + ").dot";
+
+        		Output output(dot_filename, "CSD automaton");
+        		output.stream() << pnapi::io::sa;
+        		Output::dotoutput(output.stream(), _BSDgraph, filename, true, args_info.bound_arg);
+        	}
+        }
 
 
-    /*-------------------------------.
-    | 9. create CSD from BSD		 |
-    `-------------------------------*/
+        // delete the graph
+        for (BSDNodeList::const_iterator it = _BSDgraph.graph->begin(); it != _BSDgraph.graph->end(); ++it) {
+        	delete[] (*it)->pointer;
+        	delete *it;
+        }
+        delete _BSDgraph.graph;
 
-    if (args_info.CSD_flag) {
-    	status("starting CSD automaton computation...");
-    	time(&start_time);
-    	BSD::computeCSD(_BSDgraph[0]);
-    	time(&end_time);
-    	_BSDgraph[0].CSD_comp_time = difftime(end_time, start_time);
-    	status("computation is done [%.0f sec]", _BSDgraph[0].CSD_comp_time);
-    }
+        BSD::finalize();
 
 
-    /*--------------------.
-   	| 10. DOT output	  |
-    `--------------------*/
+        // in case of partner check
+    } else if (args_info.check_flag) {
 
-    // delete the if-statement to generate dot-file output even if two nets are given
-    if (!args_info.check_flag) {
-    	if (!args_info.CSD_flag || args_info.BSD_flag) {
-    		std::stringstream temp (std::stringstream::in | std::stringstream::out);
-    		temp << "BSD_" << args_info.bound_arg << "(";
+        parsedBSDgraph _parsedBSDgraph[2];
 
-    		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filepath[0] + temp.str() + filename[0] + ").dot";
+    	/*---------------------------------.
+    	| 2. parse the BSD automata (DOT)  |
+    	`---------------------------------*/
+        for (int i = 0; i < 2; ++i) {
+        	try {
+        		// parse from given files
+        		std::ifstream inputStream(args_info.inputs[i]);
+        		if (!inputStream) {
+        			abort(1, "could not open file '%s'", args_info.inputs[i]);
+        		}
 
-    		Output output(dot_filename, "BSD automaton");
-    		output.stream() << pnapi::io::sa;
-    		Output::dotoutput(output.stream(), _BSDgraph[0], filename[0], false, args_info.bound_arg);
-    	}
+        		//\todo: parse into _BSDgraph[i]!
+        		_parsedBSDgraph[i] = BSD::dot2BSD_parse(inputStream);
 
-    	if (args_info.CSD_flag) {
-    		std::stringstream temp (std::stringstream::in | std::stringstream::out);
-    		temp << "CSD_" << args_info.bound_arg << "(";
+        		if (args_info.verbose_flag) {
+        			status("BSD graph %i:", i+1);
+        			BSD::printBSD(_parsedBSDgraph[i]);
+        		}
+        	} catch (const pnapi::exception::InputError& error) {
+        		std::ostringstream s;
+        		s << error;
+        		abort(2, "\b%s", s.str().c_str());
+        	}
+        }
 
-    		std::string dot_temp;
-    		if (args_info.dotFile_arg) {
-    			if (args_info.BSD_flag)
-    				dot_temp =  "CSD_" + (std::string)args_info.dotFile_arg;
-    			else
-    				dot_temp = args_info.dotFile_arg;
+    	/*-------------------------------.
+   		| 8. check for bisimulation		 |
+   		`-------------------------------*/
+
+    	if (args_info.check_flag) {
+    		bool valid = BSD::check_b_partner(_parsedBSDgraph[0], _parsedBSDgraph[1]);
+
+    		if (valid) {
+    			message("net 1 is a %i-partner of net 2!", args_info.bound_arg);
+    		} else {
+    			message("net 1 is NOT a %i-partner of net 2!", args_info.bound_arg);
     		}
-
-    		std::string dot_filename = args_info.dotFile_arg ? dot_temp : filepath[0] + temp.str() + filename[0] + ").dot";
-
-    		Output output(dot_filename, "CSD automaton");
-    		output.stream() << pnapi::io::sa;
-    		Output::dotoutput(output.stream(), _BSDgraph[0], filename[0], true, args_info.bound_arg);
     	}
+
     }
 
-
-    // delete the graph(s)
-    done = false;
-    for (int i = 0; !done; ++i) {
-    	for (BSDNodeList::const_iterator it = _BSDgraph[i].graph->begin(); it != _BSDgraph[i].graph->end(); ++it) {
-    		delete[] (*it)->pointer;
-    		delete *it;
-    	}
-    	delete _BSDgraph[i].graph;
-
-    	if (args_info.inputs_num == 0 || args_info.inputs_num == i+1)
-    		done = true;
-    }
-
-    BSD::finalize();
 
     return EXIT_SUCCESS;
 }

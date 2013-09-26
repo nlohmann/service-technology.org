@@ -77,7 +77,9 @@ class BSD {
          *---------------------- TEST OUTPUT ---------------------
          *========================================================*/
 
-        static void printBSD(BSDNodeList *graph);
+        static void printBSD(BSDgraph & graph);
+
+        static void printBSD(parsedBSDgraph & graph);
 
         static void printlist(MarkingList *list);
 
@@ -85,24 +87,28 @@ class BSD {
          *---------------------- Bisimulation --------------------
          *========================================================*/
 
-        static bool checkBiSimAndLambda(BSDgraph & graph1, BSDgraph & graph2);
+        static bool check_b_partner(parsedBSDgraph & graph1, parsedBSDgraph & graph2);
 
-        static bool computeBiSim(BSDNode * node_g1, BSDNode * node_g2, std::map<Label_ID, Label_ID> * mapping, Label_ID events);
+        static bool computeBiSim(parsedBSDNode * node_g1, parsedBSDNode * node_g2, std::map<Label_ID, Label_ID> * mapping, Label_ID events);
 
-        static std::map<Label_ID, Label_ID>* computeMapping(BSDgraph & graph1, BSDgraph & graph2);
+        static std::map<Label_ID, Label_ID>* computeMapping(parsedBSDgraph & graph1, parsedBSDgraph & graph2);
 
         /*========================================================
-         *------------------- uBSD computation -------------------
+         *-------------------- CSD computation -------------------
          *========================================================*/
 
         static void computeCSD(BSDgraph & graph);
+
+        static parsedBSDgraph & dot2BSD_parse(std::istream & is);
+
+        static void Tokenize(const std::string& str, std::list<std::string>& tokens, const std::string& delimiters);
 
     private:
 
         /// constructor
         BSD();
 
-        static std::list<std::pair<BSDNode*, BSDNode*> >* bisimtemp;
+        static std::list<std::pair<parsedBSDNode*, parsedBSDNode*> >* bisimtemp;
 
         // helpers for tarjan algorithm (lambda value computation)
         static MarkingList* templist;

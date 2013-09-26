@@ -574,21 +574,6 @@ void BSD::printBSD(parsedBSDgraph & graph) {
 }
 
 
-/*!
- \brief print a marking list in the shell (if verbose is switched on)
-
- \param[in]	list	the marking list to be printed
- */
-void BSD::printlist(MarkingList *list) {
-	std::stringstream temp (std::stringstream::in | std::stringstream::out);
-
-	for (MarkingList::const_iterator it = list->begin(); it != list->end(); ++it) {
-		temp << *it << ", ";
-	}
-
-	status("list: %s", temp.str().c_str());
-}
-
 
 /*========================================================
  *---------------------- Bisimulation --------------------
@@ -665,10 +650,8 @@ bool BSD::computeBiSim(parsedBSDNode * node_g1, parsedBSDNode * node_g2, std::ma
 	}
 
 	// check successors
-	bool valid = true;
 	for (unsigned int id = 0; id < events; ++id) {
-		valid = computeBiSim((*node_g1->pointer)[id], (*node_g2->pointer)[(*mapping)[id]], mapping, events);
-		if (!valid) {
+		if (!computeBiSim((*node_g1->pointer)[id], (*node_g2->pointer)[(*mapping)[id]], mapping, events)) {
 			// abort recursively
 			return false;
 		}
@@ -789,7 +772,7 @@ void BSD::computeCSD(BSDgraph & graph) {
 
 
 parsedBSDgraph & BSD::dot2BSD_parse(std::istream & is) {
-	std::string line, element;
+	std::string line;
 	bool in_comment = false;
 	int state = 0;
 	Label_ID idcounter = 0; // \todo?
@@ -935,7 +918,7 @@ parsedBSDgraph & BSD::dot2BSD_parse(std::istream & is) {
 
 				if (labels != "") {
 					tokens.clear();
-					Tokenize(labels.c_str(), tokens, ", ");
+					Tokenize(labels, tokens, ", ");
 					it = tokens.begin();
 					while (it != tokens.end()) {
 //						status("found label: %s", it->c_str());

@@ -81,8 +81,6 @@ class BSD {
 
         static void printBSD(parsedBSDgraph & graph);
 
-        static void printlist(MarkingList *list);
-
         /*========================================================
          *---------------------- Bisimulation --------------------
          *========================================================*/

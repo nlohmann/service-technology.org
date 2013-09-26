@@ -115,12 +115,10 @@ void Label::initialize() {
     first_sync = events + 1;
 
     // collect the labels
-    std::map<string, Label_ID> sync_labels;
     const set<pnapi::Label*> sync_label_names(openNet::net->getInterface().getSynchronousLabels());
 
     for (set<pnapi::Label*>::const_iterator l = sync_label_names.begin(); l != sync_label_names.end(); ++l, ++sync_events) {
-    	if ((**l).getName().compare("bound_broken") != 0) {
-    		sync_labels[(**l).getName()] = ++events;
+    	if ((**l).getName() != "bound_broken") {
     		id2name[events] = (**l).getName();
 
     		const set<Transition*> trans((**l).getTransitions());
@@ -129,7 +127,6 @@ void Label::initialize() {
     			name2id[(**t).getName()] = events;
     		}
     	} else {
-    		sync_labels[(**l).getName()] = 1;
     		id2name[1] = (**l).getName();
 
     		const set<Transition*> trans((**l).getTransitions());

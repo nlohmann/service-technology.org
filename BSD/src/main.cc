@@ -215,9 +215,9 @@ int main(int argc, char** argv) {
 
     	openNet::initialize();
 
-    	/*----------------------.
-    	| 2. parse the open net |
-    	`----------------------*/
+    	/*------------------------.
+    	| 1.0. parse the open net |
+    	`------------------------*/
     	try {
     		// parse either from standard input or from a given file
     		if (args_info.inputs_num == 0) {
@@ -268,15 +268,15 @@ int main(int argc, char** argv) {
 
     	openNet::changeView(openNet::net, args_info.bound_arg);
 
-    	/*--------------------------------------------.
-    	| 1. initialize labels and interface markings |
-    	`--------------------------------------------*/
+    	/*----------------------------------------------.
+    	| 1.1. initialize labels and interface markings |
+    	`----------------------------------------------*/
     	Label::initialize();
 
 
-    	/*--------------------------------------------.
-    	| 2. write inner of the open net to LoLA file |
-    	`--------------------------------------------*/
+    	/*----------------------------------------------.
+    	| 1.2. write inner of the open net to LoLA file |
+    	`----------------------------------------------*/
     	Output* temp = new Output();
     	std::stringstream ss;
     	ss << pnapi::io::lola << *openNet::net;
@@ -287,9 +287,9 @@ int main(int argc, char** argv) {
     	status("%s", lola_net.c_str());
 
 
-    	/*------------------------------------------.
-    	| 3. call LoLA and parse reachability graph |
-    	`------------------------------------------*/
+    	/*--------------------------------------------.
+    	| 1.3. call LoLA and parse reachability graph |
+    	`--------------------------------------------*/
     	// select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
     	//    // MinGW does not understand pathnames with "/", so we use the basename
@@ -311,16 +311,16 @@ int main(int argc, char** argv) {
     	delete temp;
 
 
-    	/*-------------------------------.
-    	| 4. organize reachability graph |
-    	`-------------------------------*/
+    	/*---------------------------------.
+    	| 1.4. organize reachability graph |
+    	`---------------------------------*/
 
     	InnerMarking::initialize();
 
 
-    	/*-------------------------------.
-       	| 5. compute the BSD automaton   |
-    	`-------------------------------*/
+    	/*---------------------------------.
+       	| 1.5. compute the BSD automaton   |
+    	`---------------------------------*/
 
     	status("starting BSD automaton computation...");
     	time(&start_time);
@@ -333,9 +333,9 @@ int main(int argc, char** argv) {
     	_BSDgraph.BSD_comp_time = difftime(end_time, start_time);
     	status("computation is done [%.0f sec]", _BSDgraph.BSD_comp_time);
 
-    	/*----------------------------------------------------.
-       	| 6. save the BSD automaton and some important values |
- 	   	`----------------------------------------------------*/
+    	/*------------------------------------------------------.
+       	| 1.6. save the BSD automaton and some important values |
+ 	   	`------------------------------------------------------*/
 
     	_BSDgraph.graph = BSD::graph;
 
@@ -354,7 +354,7 @@ int main(int argc, char** argv) {
 
 
     	/*---------------.
- 	   	| 7. tidy up	 |
+ 	   	| 1.7. tidy up	 |
        	`---------------*/
 
         delete openNet::net;
@@ -363,7 +363,7 @@ int main(int argc, char** argv) {
 
 
         /*-------------------------------.
-        | 8. create CSD from BSD		 |
+        | 1.8. create CSD from BSD		 |
         `-------------------------------*/
 
         if (args_info.CSD_flag) {
@@ -376,43 +376,45 @@ int main(int argc, char** argv) {
         }
 
 
-        /*--------------------.
-       	| 9. DOT output	 	  |
-        `--------------------*/
+        /*---------------------.
+       	| 1.9. DOT output	   |
+        `---------------------*/
 
         // delete the if-statement to generate dot-file output even if two nets are given
-        if (!args_info.check_flag) {
-        	if (!args_info.CSD_flag || args_info.BSD_flag) {
-        		std::stringstream temp (std::stringstream::in | std::stringstream::out);
-        		temp << "BSD_" << args_info.bound_arg << "(";
+        if (!args_info.CSD_flag || args_info.BSD_flag) {
+        	std::stringstream temp (std::stringstream::in | std::stringstream::out);
+        	temp << "BSD_" << args_info.bound_arg << "(";
 
-        		std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filepath + temp.str() + filename + ").dot";
+        	std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filepath + temp.str() + filename + ").dot";
 
-        		Output output(dot_filename, "BSD automaton");
-        		output.stream() << pnapi::io::sa;
-        		Output::dotoutput(output.stream(), _BSDgraph, filename, false, args_info.bound_arg);
-        	}
-
-        	if (args_info.CSD_flag) {
-        		std::stringstream temp (std::stringstream::in | std::stringstream::out);
-        		temp << "CSD_" << args_info.bound_arg << "(";
-
-        		std::string dot_temp;
-        		if (args_info.dotFile_arg) {
-        			if (args_info.BSD_flag)
-        				dot_temp =  "CSD_" + (std::string)args_info.dotFile_arg;
-        			else
-        				dot_temp = args_info.dotFile_arg;
-        		}
-
-        		std::string dot_filename = args_info.dotFile_arg ? dot_temp : filepath + temp.str() + filename + ").dot";
-
-        		Output output(dot_filename, "CSD automaton");
-        		output.stream() << pnapi::io::sa;
-        		Output::dotoutput(output.stream(), _BSDgraph, filename, true, args_info.bound_arg);
-        	}
+        	Output output(dot_filename, "BSD automaton");
+        	output.stream() << pnapi::io::sa;
+        	Output::dotoutput(output.stream(), _BSDgraph, filename, false, args_info.bound_arg);
         }
 
+        if (args_info.CSD_flag) {
+        	std::stringstream temp (std::stringstream::in | std::stringstream::out);
+        	temp << "CSD_" << args_info.bound_arg << "(";
+
+        	std::string dot_temp;
+        	if (args_info.dotFile_arg) {
+        		if (args_info.BSD_flag)
+        			dot_temp =  "CSD_" + (std::string)args_info.dotFile_arg;
+        		else
+        			dot_temp = args_info.dotFile_arg;
+        	}
+
+        	std::string dot_filename = args_info.dotFile_arg ? dot_temp : filepath + temp.str() + filename + ").dot";
+
+        	Output output(dot_filename, "CSD automaton");
+        	output.stream() << pnapi::io::sa;
+        	Output::dotoutput(output.stream(), _BSDgraph, filename, true, args_info.bound_arg);
+        }
+
+
+        /*---------------.
+ 	   	| 1.10. tidy up	 |
+        `---------------*/
 
         // delete the graph
         for (BSDNodeList::const_iterator it = _BSDgraph.graph->begin(); it != _BSDgraph.graph->end(); ++it) {
@@ -422,16 +424,16 @@ int main(int argc, char** argv) {
         delete _BSDgraph.graph;
 
         BSD::finalize();
+    }
 
-
-        // in case of partner check
-    } else if (args_info.check_flag) {
+    // in case of partner check
+    if (args_info.check_flag) {
 
         parsedBSDgraph _parsedBSDgraph[2];
 
-    	/*---------------------------------.
-    	| 2. parse the BSD automata (DOT)  |
-    	`---------------------------------*/
+    	/*-----------------------------------.
+    	| 2.1. parse the BSD automata (DOT)  |
+    	`-----------------------------------*/
         for (int i = 0; i < 2; ++i) {
         	try {
         		// parse from given files
@@ -454,9 +456,9 @@ int main(int argc, char** argv) {
         	}
         }
 
-    	/*-------------------------------.
-   		| 8. check for bisimulation		 |
-   		`-------------------------------*/
+    	/*---------------------------.
+   		| 2.2. check for b-partners	 |
+   		`---------------------------*/
 
     	if (args_info.check_flag) {
     		bool valid = BSD::check_b_partner(_parsedBSDgraph[0], _parsedBSDgraph[1]);

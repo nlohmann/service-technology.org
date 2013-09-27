@@ -5,21 +5,26 @@ purpose "BSD: generating BSD automata...\n\n  Report bugs to BSD@service-technol
 
 
 section "Basic functionality"
-sectiondesc="Options which change the basic functionality of the tool. Only one option at a time is allowed. If no other option is given the tool just computes the BSD automaton of the given OWFN.\n"
+sectiondesc="Options which change the basic functionality of the tool. Only one option at a time is allowed aside from simultaneous BSD and CSD computation of a net. If no option is given then the tool does nothing.\n"
 
-option "CSD" -
-  "Compute the CSD automaton CSD_b(N) of the input net N. Set the BSD flag if the output of the BSD automaton is wanted."
-  details="This option lets the tool compute the CSD automaton. Set the BSD flag if the output of the BSD automaton is wanted. The simultaneous computation of the BSD and CSD automaton is more efficient than the sequential one because the BSD automaton will be computed twice.\n"
-  flag off
-  
 option "BSD" -
-  "Additional BSD automaton output if CSD flag is set."
+  "Compute the BSD automaton BSD_b(N) of the input net N. Set the CSD flag if the output of the CSD automaton is wanted, too."
   details="This option lets the tool output the BSD automaton BSD_b(N) of input net N even if the CSD flag is set.\n"
   flag off
   
-option "check" -
+option "partnerCheck" -
   "Check for two given BSD automata BSD_b(N1) and BSD_b(N2) in DOT format if the two nets N1 and N2 are b-partners."
   details="This option checks if two nets N1 and N2 are b-partners. The input files have to be the BSD automata of the two nets in DOT format.\n"
+  flag off
+  
+option "CSD" -
+  "Compute the CSD automaton CSD_b(N) of the input net N. Set the BSD flag if the output of the BSD automaton is wanted, too."
+  details="This option lets the tool compute the CSD automaton. Set the BSD flag if the output of the BSD automaton is wanted. The simultaneous computation of the BSD and CSD automaton is more efficient than the sequential one because the BSD automaton will be computed twice.\n"
+  flag off
+  
+option "confCheck" -
+  "Check for two given CSD automata CSD_b('implementation') and CSD_b('specification') in DOT format if 'implementation' is b-conformant to 'specification'."
+  details="This option checks if a net 'implementation' is b-conformant to a net 'specification'. The input files have to be the CSD automata of the two nets in DOT format.\n"
   flag off
   
 option "bound" b

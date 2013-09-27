@@ -69,27 +69,17 @@ class BSD {
 
         static bool checkEquality(MarkingList &list1, MarkingList &list2);
 
-//        static void assignLambdas(BSDNodeList *graph);
-
         static void assignLambda(BSDNode *node, std::list<MarkingList> &SCCs);
 
         /*========================================================
-         *---------------------- TEST OUTPUT ---------------------
+         *------------------- b-partner check --------------------
          *========================================================*/
 
-        static void printBSD(BSDgraph & graph);
+        static bool check_b_partner(parsedGraph & graph1, parsedGraph & graph2);
 
-        static void printBSD(parsedBSDgraph & graph);
+        static bool computeBiSimBSD(parsedNode * node_g1, parsedNode * node_g2, std::map<Label_ID, Label_ID> * mapping, Label_ID events);
 
-        /*========================================================
-         *---------------------- Bisimulation --------------------
-         *========================================================*/
-
-        static bool check_b_partner(parsedBSDgraph & graph1, parsedBSDgraph & graph2);
-
-        static bool computeBiSim(parsedBSDNode * node_g1, parsedBSDNode * node_g2, std::map<Label_ID, Label_ID> * mapping, Label_ID events);
-
-        static std::map<Label_ID, Label_ID>* computeMapping(parsedBSDgraph & graph1, parsedBSDgraph & graph2);
+        static std::map<Label_ID, Label_ID>* computeMapping(parsedGraph & graph1, parsedGraph & graph2);
 
         /*========================================================
          *-------------------- CSD computation -------------------
@@ -97,16 +87,37 @@ class BSD {
 
         static void computeCSD(BSDgraph & graph);
 
-        static parsedBSDgraph & dot2BSD_parse(std::istream & is);
+        /*========================================================
+         *------------------- b-conformance check ----------------
+         *========================================================*/
+
+        static bool check_b_conformance(parsedGraph & graph1, parsedGraph & graph2);
+
+        static bool computeBiSimCSD(parsedNode * node_g1, parsedNode * node_g2, std::map<Label_ID, Label_ID> * mapping, Label_ID events);
+
+        /*========================================================
+         *--------------------- DOT to BSD parser ----------------
+         *========================================================*/
+
+        static parsedGraph & dot2graph_parse(std::istream & is);
 
         static void Tokenize(const std::string& str, std::list<std::string>& tokens, const std::string& delimiters);
+
+        /*========================================================
+         *---------------------- TEST OUTPUT ---------------------
+         *========================================================*/
+
+        static void printBSD(BSDgraph & graph);
+
+        static void printParsedGraph(parsedGraph & graph);
+
 
     private:
 
         /// constructor
         BSD();
 
-        static std::list<std::pair<parsedBSDNode*, parsedBSDNode*> >* bisimtemp;
+        static std::list<std::pair<parsedNode*, parsedNode*> >* bisimtemp;
 
         // helpers for tarjan algorithm (lambda value computation)
         static MarkingList* templist;

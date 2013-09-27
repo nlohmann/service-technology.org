@@ -88,28 +88,28 @@ typedef struct _BSDgraph {
 } BSDgraph;
 
 // a parsed node of the BSD automaton
-typedef struct _parsedBSDNode {
+typedef struct _parsedNode {
 	// list of markings in the closure
 	std::string name;
 	// pointers to other BSD nodes (ordered and accessible by label id)
-	std::map<Label_ID, struct _parsedBSDNode* > * pointer;
+	std::map<Label_ID, struct _parsedNode* > * pointer;
 	// lambda value of the node (see paper for more information)
 	uint8_t lambda;
-} parsedBSDNode;
+} parsedNode;
 
 // representation of a parsed BSD automaton with needed values for computations
-typedef struct _parsedBSDgraph {
+typedef struct _parsedGraph {
 	// the BSD automaton
-	std::list<parsedBSDNode *>* graph;
+	std::list<parsedNode *>* graph;
 	std::map<Label_ID, bool>* is_sending_label;
 	// number of total events
 	Label_ID events;
 	// pointer to U node
-	parsedBSDNode* U;
+	parsedNode* U;
 	// pointer to empty node
-	parsedBSDNode* emptyset;
+	parsedNode* emptyset;
 	// mapping of label ids to label names (strings)
 	std::map<Label_ID, std::string>* id2name;
 	// the reverse mapping
 	std::map<std::string, Label_ID>* name2id;
-} parsedBSDgraph;
+} parsedGraph;

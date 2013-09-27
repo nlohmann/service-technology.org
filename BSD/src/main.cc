@@ -139,21 +139,25 @@ void evaluateParameters(int argc, char** argv) {
     }
 
     // only one option is allowed at one time
-    if (args_info.CSD_flag && args_info.check_flag) {
-        abort(4, "only one basic option is allowed at a time");
+    if ((args_info.CSD_flag && args_info.partnerCheck_flag)
+    		|| (args_info.CSD_flag && args_info.confCheck_flag)
+    		|| (args_info.BSD_flag && args_info.partnerCheck_flag)
+    		|| (args_info.BSD_flag && args_info.confCheck_flag)
+    		|| (args_info.confCheck_flag && args_info.partnerCheck_flag)) {
+        abort(4, "the BSD and CSD flags are mutual exclusive to the other basic options");
     }
 
     if (args_info.bound_arg < 1) {
     	abort(5, "bound has to be a positive integer");
     }
 
-    // check whether two files are given in the case of theorem check
-    if (args_info.inputs_num != 2 && args_info.check_flag) {
+    // check whether two files are given in the case of partner or conformance check
+    if (args_info.inputs_num != 2 && (args_info.partnerCheck_flag || args_info.confCheck_flag)) {
     	abort(6, "two input files must be given");
     }
 
     // check whether at most two files are given
-    if (args_info.inputs_num > 1 && !args_info.check_flag) {
+    if (args_info.inputs_num > 1 && (args_info.BSD_flag || args_info.CSD_flag)) {
     	abort(7, "at most one input file must be given");
     }
 
@@ -203,7 +207,7 @@ int main(int argc, char** argv) {
 
 
     // in case of BSD or CSD computation
-    if (!args_info.check_flag) {
+    if (args_info.BSD_flag || args_info.CSD_flag) {
 
         // set standard filenames
         std::string filename;
@@ -381,7 +385,7 @@ int main(int argc, char** argv) {
         `---------------------*/
 
         // delete the if-statement to generate dot-file output even if two nets are given
-        if (!args_info.CSD_flag || args_info.BSD_flag) {
+        if (args_info.BSD_flag) {
         	std::stringstream temp (std::stringstream::in | std::stringstream::out);
         	temp << "BSD_" << args_info.bound_arg << "(";
 
@@ -426,14 +430,14 @@ int main(int argc, char** argv) {
         BSD::finalize();
     }
 
-    // in case of partner check
-    if (args_info.check_flag) {
+    // in case of partner or conformance check
+    if (args_info.partnerCheck_flag || args_info.confCheck_flag) {
 
-        parsedBSDgraph _parsedBSDgraph[2];
+        parsedGraph _parsedGraph[2];
 
-    	/*-----------------------------------.
-    	| 2.1. parse the BSD automata (DOT)  |
-    	`-----------------------------------*/
+    	/*------------------------------------------.
+    	| 2.1. parse the BSD or CSD automata (DOT)  |
+    	`------------------------------------------*/
         for (int i = 0; i < 2; ++i) {
         	try {
         		// parse from given files
@@ -442,12 +446,12 @@ int main(int argc, char** argv) {
         			abort(1, "could not open file '%s'", args_info.inputs[i]);
         		}
 
-        		//\todo: parse into _BSDgraph[i]!
-        		_parsedBSDgraph[i] = BSD::dot2BSD_parse(inputStream);
+        		// parse into _parsedGraph[i]
+        		_parsedGraph[i] = BSD::dot2graph_parse(inputStream);
 
         		if (args_info.verbose_flag) {
-        			status("BSD graph %i:", i+1);
-        			BSD::printBSD(_parsedBSDgraph[i]);
+        			status("parsed graph %i:", i+1);
+        			BSD::printParsedGraph(_parsedGraph[i]);
         		}
         	} catch (const pnapi::exception::InputError& error) {
         		std::ostringstream s;
@@ -460,8 +464,8 @@ int main(int argc, char** argv) {
    		| 2.2. check for b-partners	 |
    		`---------------------------*/
 
-    	if (args_info.check_flag) {
-    		bool valid = BSD::check_b_partner(_parsedBSDgraph[0], _parsedBSDgraph[1]);
+    	if (args_info.partnerCheck_flag) {
+    		bool valid = BSD::check_b_partner(_parsedGraph[0], _parsedGraph[1]);
 
     		if (valid) {
     			message("net 1 is a %i-partner of net 2!", args_info.bound_arg);
@@ -470,6 +474,36 @@ int main(int argc, char** argv) {
     		}
     	}
 
+    	/*-------------------------------.
+    	| 2.3. check for b-conformance	 |
+   		`-------------------------------*/
+
+    	if (args_info.confCheck_flag) {
+    		bool valid = BSD::check_b_conformance(_parsedGraph[0], _parsedGraph[1]);
+
+    		if (valid) {
+    			message("net 1 is %i-conformant to net 2!", args_info.bound_arg);
+    		} else {
+    			message("net 1 is NOT %i-conformant to net 2!", args_info.bound_arg);
+    		}
+    	}
+
+    	/*---------------.
+    	| 2.4. tidy up	 |
+    	`---------------*/
+
+    	// delete the graphs
+    	for (int i = 0; i < 2; ++i) {
+    		for (std::list<parsedNode *>::const_iterator it = _parsedGraph[i].graph->begin(); it != _parsedGraph[i].graph->end(); ++it) {
+    			delete (*it)->pointer;
+    			delete *it;
+    		}
+    		delete _parsedGraph[i].id2name;
+    		delete _parsedGraph[i].is_sending_label;
+    		delete _parsedGraph[i].name2id;
+
+    		delete _parsedGraph[i].graph;
+    	}
     }
 
 

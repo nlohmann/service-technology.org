@@ -45,7 +45,7 @@ fi
 OUTFILE=`echo $OUTFILE | sed -e 's/\.dot//'`
 
 echo $1 " --> " ${OUTDIR}/${OUTFILE}.dot
-${apps}/BSD/src/BSD ${INPUTDIR}/${INPUTFILE}.owfn --dotFile=${OUTDIR}/${OUTFILE}.dot --bound=${2}
+${apps}/BSD/src/BSD --BSD ${INPUTDIR}/${INPUTFILE}.owfn --dotFile=${OUTDIR}/${OUTFILE}.dot --bound=${2}
 
 echo ${OUTDIR}/${OUTFILE}.dot " --> " ${OUTDIR}/${OUTFILE}.png
 dot -Tpng ${OUTDIR}/${OUTFILE}.dot -o ${OUTDIR}/${OUTFILE}.png

@@ -251,7 +251,7 @@ BSDNode* BSD::setup(std::list<MarkingList> &SCCs) {
 
 
 /*!
- \brief Compute \tau-closure of a given reachable marking with Tarjan's algorithm
+ \brief Compute tau-closure of a given reachable marking with Tarjan's algorithm
 
  \param[in]	id	the id of a marking
 
@@ -280,7 +280,7 @@ std::list<MarkingList>* BSD::computeClosureTarjan(InnerMarking_ID id) {
 /*!
  \brief recursive and for BSD computation adjusted tarjan algorithm
 
- \param[in]	id	the id of a marking
+ \param[in]	markingID	the id of a marking
 
  \return list of SCCs (sorted) in the closure or NULL if bound was broken
  */
@@ -942,7 +942,7 @@ parsedGraph & BSD::dot2graph_parse(std::istream & is) {
  \brief Tokenizes the given string into the given list of strings devided by the chars in the delimiters.
 
  \param[in]		str			the string to be tokenized
- \param[in/out]	tokens		list of tokens	(list of strings)
+ \param[out]	tokens		list of tokens	(list of strings)
  \param[in]		delimiters	the delimiters	(string)
  */
 void BSD::Tokenize(const std::string& str, std::list<std::string>& tokens, const std::string& delimiters) {
@@ -966,37 +966,6 @@ void BSD::Tokenize(const std::string& str, std::list<std::string>& tokens, const
 /*========================================================
  *---------------------- TEST OUTPUT ---------------------
  *========================================================*/
-
-/*!
- \brief print the BSD automaton in the shell (if verbose is switched on)
-
- \param[in]	graph	the BSD automaton
- */
-void BSD::printBSD(BSDgraph & graph) {
-	std::stringstream temp (std::stringstream::in | std::stringstream::out);
-	temp << "U: " << graph.U << ", empty: " << graph.emptyset << std::endl;
-	for (std::list<BSDNode *>::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
-		temp << *it << ":  lambda: " << (unsigned int)(*it)->lambda << ",  list: (";
-		for (MarkingList::const_iterator listit = (*it)->list.begin(); listit != (*it)->list.end();) {
-			temp << *listit;
-			if (++listit != (*it)->list.end()) {
-				temp << ", ";
-			}
-		}
-		temp << ")" << std::endl << "\t";
-		for (unsigned int id = 2; id <= graph.events; ++id) {
-			temp << "(" << graph.id2name[id] << "," << (*it)->pointer[id] << ")";
-			if (id != graph.events) {
-				temp << ", ";
-			}
-		}
-		temp << std::endl;
-		temp << std::endl;
-	}
-
-	status("%s", temp.str().c_str());
-}
-
 
 /*!
  \brief print the BSD automaton in the shell (if verbose is switched on)

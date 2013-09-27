@@ -107,8 +107,6 @@ class BSD {
          *---------------------- TEST OUTPUT ---------------------
          *========================================================*/
 
-        static void printBSD(BSDgraph & graph);
-
         static void printParsedGraph(parsedGraph & graph);
 
 

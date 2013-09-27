@@ -467,9 +467,9 @@ int main(int argc, char** argv) {
     		bool valid = BSD::check_b_partner(_parsedGraph[0], _parsedGraph[1]);
 
     		if (valid) {
-    			message("net 1 is a %i-partner of net 2!", args_info.bound_arg);
+    			message("net 1 is a %i-partner of net 2!", _parsedGraph[0].bound);
     		} else {
-    			message("net 1 is NOT a %i-partner of net 2!", args_info.bound_arg);
+    			message("net 1 is NOT a %i-partner of net 2!", _parsedGraph[0].bound);
     		}
     	}
 
@@ -481,9 +481,9 @@ int main(int argc, char** argv) {
     		bool valid = BSD::check_b_conformance(_parsedGraph[0], _parsedGraph[1]);
 
     		if (valid) {
-    			message("net 1 is %i-conformant to net 2!", args_info.bound_arg);
+    			message("net 1 %i-conforms to net 2!", _parsedGraph[0].bound);
     		} else {
-    			message("net 1 is NOT %i-conformant to net 2!", args_info.bound_arg);
+    			message("net 1 does NOT %i-conform to net 2!", _parsedGraph[0].bound);
     		}
     	}
 

@@ -519,9 +519,15 @@ bool BSD::check_b_partner(parsedGraph & graph1, parsedGraph & graph2) {
 		return false;
 	}
 
+	// check if the bounds differ
+		if (graph1.bound != graph2.bound) {
+			message("bound differs! (net 1 - bound: %i, net 2 - bound: %i)", graph1.bound, graph2.bound);
+			return false;
+		}
+
 	status("computing mapping...");
 	// compute a mapping between label ids of net 1 and net 2 if possible
-	std::map<Label_ID, Label_ID>* mapping = computeMapping(graph1, graph2);
+	std::map<Label_ID, Label_ID>* mapping = computeMappingBSD(graph1, graph2);
 
 	// if no mapping could be found return false
 	if (mapping == NULL) {
@@ -562,7 +568,8 @@ bool BSD::computeBiSimBSD(parsedNode * node_g1, parsedNode * node_g2, std::map<L
 			return true;
 	}
 
-	// all nodes of the bisimulation have to have added lambda values bigger than 3
+	// for all nodes (node1,node2) in the bisimulation the following has to hold:
+	// lambda(node1) + lambda(node2) > 3
 	if (node_g1->lambda + node_g2->lambda <= 3) {
 		// return false recursively (abort)
 		return false;
@@ -593,7 +600,7 @@ bool BSD::computeBiSimBSD(parsedNode * node_g1, parsedNode * node_g2, std::map<L
 
  \return mapping
  */
-std::map<Label_ID, Label_ID>* BSD::computeMapping(parsedGraph & graph1, parsedGraph & graph2) {
+std::map<Label_ID, Label_ID>* BSD::computeMappingBSD(parsedGraph & graph1, parsedGraph & graph2) {
 	std::map<Label_ID, Label_ID>* result = new std::map<Label_ID, Label_ID>;
 
 	// iterate through the label ids of graph 1
@@ -617,7 +624,7 @@ std::map<Label_ID, Label_ID>* BSD::computeMapping(parsedGraph & graph1, parsedGr
 					break;
 				} else {
 					// abort
-					status("label %s of net 1 and net 2 are either both input or both output labels", it1->second.c_str(), it2->second.c_str());
+					status("label %s of net 1 and net 2 are of equal type (sending/receiving)", it1->second.c_str(), it2->second.c_str());
 					delete result;
 					return NULL;
 				}
@@ -698,9 +705,9 @@ void BSD::computeCSD(BSDgraph & graph) {
  *========================================================*/
 
 /*!
- \brief Checks for two CSD automata CSD_b(N1) and CSD_b(N2) if the two nets N1 and N2 are b-conformant.
+ \brief Checks for two CSD automata CSD_b(N1) and CSD_b(N2) if N1 b-conforms N2.
 
- The underlying open nets have to be composable and the composed net has to be closed.
+ The underlying open nets have to be interface-equivalent.
 
  \param[in]	graph1	the first CSD automaton
  \param[in]	graph2	the second CSD automaton
@@ -714,13 +721,19 @@ bool BSD::check_b_conformance(parsedGraph & graph1, parsedGraph & graph2) {
 		return false;
 	}
 
+	// check if the bounds differ
+	if (graph1.bound != graph2.bound) {
+		message("bound differs! (net 1 - bound: %i, net 2 - bound: %i)", graph1.bound, graph2.bound);
+		return false;
+	}
+
 	status("computing mapping...");
 	// compute a mapping between label ids of net 1 and net 2 if possible
-	std::map<Label_ID, Label_ID>* mapping = computeMapping(graph1, graph2);
+	std::map<Label_ID, Label_ID>* mapping = computeMappingCSD(graph1, graph2);
 
 	// if no mapping could be found return false
 	if (mapping == NULL) {
-		message("Interfaces do not match. Nets not composable");
+		message("Nets are not interface-equivalent.");
 		return false;
 	}
 
@@ -757,8 +770,9 @@ bool BSD::computeBiSimCSD(parsedNode * node_g1, parsedNode * node_g2, std::map<L
 			return true;
 	}
 
-	// all nodes of the bisimulation have to have added lambda values bigger than 3 \todo
-	if (node_g1->lambda + node_g2->lambda <= 3) {
+	// for all nodes (node1,node2) in the bisimulation the following has to hold:
+	// lambda(node1) >= lambda(node2)
+	if (node_g1->lambda < node_g2->lambda) {
 		// return false recursively (abort)
 		return false;
 	} else {
@@ -777,6 +791,56 @@ bool BSD::computeBiSimCSD(parsedNode * node_g1, parsedNode * node_g2, std::map<L
 
 	// if all went well return true
 	return true;
+}
+
+/*!
+ \brief compute mapping from labels of graph 1 to graph 2 (they may have different IDs for the corresponding labels)
+
+ \param[in]	graph1	the first CSD automaton (list of BSD node pointers)
+ \param[in]	graph2	the second CSD automaton (list of BSD node pointers)
+
+ \return mapping
+ */
+std::map<Label_ID, Label_ID>* BSD::computeMappingCSD(parsedGraph & graph1, parsedGraph & graph2) {
+	std::map<Label_ID, Label_ID>* result = new std::map<Label_ID, Label_ID>;
+
+	// iterate through the label ids of graph 1
+	for (std::map<Label_ID, std::string>::const_iterator it1 = graph1.id2name->begin(); it1 != graph1.id2name->end(); ++it1) {
+//		// skip the \tau and bound_broken label
+//		if (it1->first < 2)
+//			continue;
+		bool found = false;
+		// iterate through the label ids of graph 2
+		for (std::map<Label_ID, std::string>::const_iterator it2 = graph2.id2name->begin(); it2 != graph2.id2name->end(); ++it2) {
+//			// skip the \tau and bound_broken label
+//			if (it2->first < 2)
+//				continue;
+			// check for equality of the label names
+			if (it1->second == it2->second) {
+				found = true;
+				// the label has to be sending or receiving on both nets
+				if ((*graph1.is_sending_label)[it1->first] == (*graph2.is_sending_label)[it2->first]) {
+					// add the mapping from id 1 to id 2
+					(*result)[it1->first] = it2->first;
+					break;
+				} else {
+					// abort
+					status("label %s of net 1 and net 2 are of different type (one sending/one receiving)", it1->second.c_str(), it2->second.c_str());
+					delete result;
+					return NULL;
+				}
+			}
+		}
+		// if no corresponding label was found then abort
+		if (!found) {
+			status("label %s of net 1 doesn't match any label of net 2", it1->second.c_str());
+			delete result;
+			return NULL;
+		}
+	}
+
+	// return the mapping
+	return result;
 }
 
 
@@ -806,6 +870,16 @@ parsedGraph & BSD::dot2graph_parse(std::istream & is) {
 
 	status("parsing...");
 	while (std::getline(is, line)) {
+		// search for the bound
+		if (line.find("bound:") != std::string::npos) {
+			line = line.substr(line.find("bound:") + 6, line.length());
+			// Skip delimiters at beginning.
+			std::string::size_type start = line.find_first_not_of(" \t", 0);
+			// Find first "non-delimiter".
+			std::string::size_type end = line.find_first_of(" \t", start);
+			graph->bound = atoi(line.substr(start, end - start).c_str());
+		}
+
 		// we are only interested in parsing the edges (which also have labels assigned)
 		if (line.find("->") != std::string::npos && line.find("label") != std::string::npos) {
 			// (should be) form of the lines: "(node).lambda" -> "(node).lambda" [...,label="...",...];

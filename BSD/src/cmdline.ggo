@@ -23,7 +23,7 @@ option "CSD" -
   flag off
   
 option "confCheck" -
-  "Check for two given CSD automata CSD_b('implementation') and CSD_b('specification') in DOT format if 'implementation' is b-conformant to 'specification'."
+  "Check for two given CSD automata CSD_b('implementation') and CSD_b('specification') in DOT format if 'implementation' b-conforms to 'specification'."
   details="This option checks if a net 'implementation' is b-conformant to a net 'specification'. The input files have to be the CSD automata of the two nets in DOT format.\n"
   flag off
   

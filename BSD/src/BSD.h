@@ -79,7 +79,7 @@ class BSD {
 
         static bool computeBiSimBSD(parsedNode * node_g1, parsedNode * node_g2, std::map<Label_ID, Label_ID> * mapping, Label_ID events);
 
-        static std::map<Label_ID, Label_ID>* computeMapping(parsedGraph & graph1, parsedGraph & graph2);
+        static std::map<Label_ID, Label_ID>* computeMappingBSD(parsedGraph & graph1, parsedGraph & graph2);
 
         /*========================================================
          *-------------------- CSD computation -------------------
@@ -94,6 +94,8 @@ class BSD {
         static bool check_b_conformance(parsedGraph & graph1, parsedGraph & graph2);
 
         static bool computeBiSimCSD(parsedNode * node_g1, parsedNode * node_g2, std::map<Label_ID, Label_ID> * mapping, Label_ID events);
+
+        static std::map<Label_ID, Label_ID>* computeMappingCSD(parsedGraph & graph1, parsedGraph & graph2);
 
         /*========================================================
          *--------------------- DOT to BSD parser ----------------

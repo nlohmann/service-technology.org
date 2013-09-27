@@ -100,6 +100,8 @@ typedef struct _parsedGraph {
 	std::map<Label_ID, bool>* is_sending_label;
 	// number of total events
 	Label_ID events;
+	// the bound of the graph
+	int bound;
 	// pointer to U node
 	parsedNode* U;
 	// pointer to empty node

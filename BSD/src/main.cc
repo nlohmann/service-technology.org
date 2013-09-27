@@ -421,7 +421,7 @@ int main(int argc, char** argv) {
         `---------------*/
 
         // delete the graph
-        for (BSDNodeList::const_iterator it = _BSDgraph.graph->begin(); it != _BSDgraph.graph->end(); ++it) {
+        for (std::list<BSDNode *>::const_iterator it = _BSDgraph.graph->begin(); it != _BSDgraph.graph->end(); ++it) {
         	delete[] (*it)->pointer;
         	delete *it;
         }
@@ -498,11 +498,11 @@ int main(int argc, char** argv) {
     			delete (*it)->pointer;
     			delete *it;
     		}
+    		delete _parsedGraph[i].graph;
+
     		delete _parsedGraph[i].id2name;
     		delete _parsedGraph[i].is_sending_label;
     		delete _parsedGraph[i].name2id;
-
-    		delete _parsedGraph[i].graph;
     	}
     }
 

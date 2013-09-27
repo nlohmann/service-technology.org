@@ -137,5 +137,5 @@ class Output {
         /// the kind of the file
         const std::string kind;
 
-        static BSDNodeList* templist;
+        static std::list<BSDNode *>* templist;
 };

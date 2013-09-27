@@ -38,7 +38,7 @@ BSD::BSD() {
  ******************/
 
 
-BSDNodeList* BSD::graph = NULL;
+std::list<BSDNode *>* BSD::graph = NULL;
 BSDNode* BSD::U = NULL;
 BSDNode* BSD::emptyset = NULL;
 
@@ -62,7 +62,7 @@ std::list<std::pair<parsedNode*, parsedNode*> >* BSD::bisimtemp = NULL;
  */
 void BSD::initialize() {
 	// the BSD automaton
-	graph = new BSDNodeList;
+	graph = new std::list<BSDNode *>;
 
 	// a temporary list to save already visited markings
 	templist = new MarkingList;
@@ -652,7 +652,7 @@ void BSD::computeCSD(BSDgraph & graph) {
 		graphChanged = false;
 
 		// iterate through all nodes
-		for (BSDNodeList::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
+		for (std::list<BSDNode *>::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
 			// ignore the current node if the node is the U node
 			if ((*it)->isU || *it == graph.emptyset)
 				continue;
@@ -998,7 +998,7 @@ void BSD::Tokenize(const std::string& str, std::list<std::string>& tokens, const
 void BSD::printBSD(BSDgraph & graph) {
 	std::stringstream temp (std::stringstream::in | std::stringstream::out);
 	temp << "U: " << graph.U << ", empty: " << graph.emptyset << std::endl;
-	for (BSDNodeList::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
+	for (std::list<BSDNode *>::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
 		temp << *it << ":  lambda: " << (unsigned int)(*it)->lambda << ",  list: (";
 		for (MarkingList::const_iterator listit = (*it)->list.begin(); listit != (*it)->list.end();) {
 			temp << *listit;

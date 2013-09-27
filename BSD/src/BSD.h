@@ -41,7 +41,7 @@
 class BSD {
 
     public:
-		static BSDNodeList* graph;
+		static std::list<BSDNode *>* graph;
 
 		static BSDNode* U;
 		static BSDNode* emptyset;

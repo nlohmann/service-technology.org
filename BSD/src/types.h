@@ -40,9 +40,9 @@ typedef uint32_t InnerMarking_ID;
 // represents a node of the BSD automaton
 typedef std::list<InnerMarking_ID> MarkingList;
 
-// a node of the BSD automaton
+// a node of a BSD (or CSD) automaton
 typedef struct _BSDNode {
-	// is this node actually the U node? (for computation of uBSD automaton)
+	// is this node actually the U node? (for computation of CSD automata)
 	bool isU;
 	// list of markings in the closure
 	MarkingList list;
@@ -52,16 +52,10 @@ typedef struct _BSDNode {
 	uint8_t lambda;
 } BSDNode;
 
-
-// stores all nodes of the BSD automaton
-typedef std::list<BSDNode *> BSDNodeList;
-
-// representation of a BSD automaton with needed values for computations
+// representation of a BSD (or/and a CSD) automaton with needed values for computations
 typedef struct _BSDgraph {
-	// the BSD automaton
-	BSDNodeList* graph;
-	// the CSD automaton
-	BSDNodeList* csdgraph;
+	// the BSD (or/and CSD) automaton (list of nodes)
+	std::list<BSDNode *>* graph;
 	// first id of receiving labels
 	Label_ID first_receive;
 	// last id of receiving labels
@@ -83,24 +77,26 @@ typedef struct _BSDgraph {
 	// mapping of label ids to label names (strings)
 	std::map<Label_ID, std::string> id2name;
 
+	// computation times
 	double BSD_comp_time;
 	double CSD_comp_time;
 } BSDgraph;
 
-// a parsed node of the BSD automaton
+// a parsed node of a BSD or CSD automaton
 typedef struct _parsedNode {
-	// list of markings in the closure
+	// the name of the parsed node
 	std::string name;
-	// pointers to other BSD nodes (ordered and accessible by label id)
+	// pointers to other nodes
 	std::map<Label_ID, struct _parsedNode* > * pointer;
 	// lambda value of the node (see paper for more information)
 	uint8_t lambda;
 } parsedNode;
 
-// representation of a parsed BSD automaton with needed values for computations
+// representation of a parsed BSD or CSD automaton with needed values for computations
 typedef struct _parsedGraph {
-	// the BSD automaton
+	// the automaton (list of nodes)
 	std::list<parsedNode *>* graph;
+	// assignment of labels to sending if true (receiving if false)
 	std::map<Label_ID, bool>* is_sending_label;
 	// number of total events
 	Label_ID events;

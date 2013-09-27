@@ -44,7 +44,7 @@ std::string Output::tempfileTemplate = "/tmp/temp-XXXXXX";
 #endif
 bool Output::keepTempfiles = true;
 
-BSDNodeList* Output::templist = NULL;
+std::list<BSDNode *>* Output::templist = NULL;
 
 
 /***************
@@ -203,7 +203,7 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 		<< "  #receiving labels: " << (unsigned int)graph.send_events << endl;
 
 	if (CSD) {
-		templist = new BSDNodeList;
+		templist = new std::list<BSDNode *>;
 		// fill the templist (to get only the reachable nodes)
 		traverse(*(graph.graph->begin()));
 		templist->push_back(graph.U);
@@ -227,7 +227,7 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 	// an arrow to the 'real' initial node
 	os << "\tinitialNode -> " << dotnodeName(**(templist->begin()), graph.U, graph.emptyset, CSD) << ";" << endl;
 
-	for (BSDNodeList::const_iterator it = templist->begin(); it != templist->end(); ++it) {
+	for (std::list<BSDNode *>::const_iterator it = templist->begin(); it != templist->end(); ++it) {
 		if ((**it).lambda == 1) {
 			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " [style=dashed];" << endl;
 		} else if (*it == graph.U) {
@@ -282,7 +282,7 @@ void Output::traverse(BSDNode* node) {
 		return;
 
 	// test if the marking was already visited
-	for (BSDNodeList::const_iterator it = templist->begin(); it != templist->end(); ++it) {
+	for (std::list<BSDNode *>::const_iterator it = templist->begin(); it != templist->end(); ++it) {
 		if (*it == node) {
 			return;
 		}

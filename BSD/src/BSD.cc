@@ -519,10 +519,10 @@ bool BSD::check_b_partner(parsedGraph & graph1, parsedGraph & graph2) {
 		return false;
 	}
 
+	status("computing mapping...");
 	// compute a mapping between label ids of net 1 and net 2 if possible
 	std::map<Label_ID, Label_ID>* mapping = computeMapping(graph1, graph2);
 
-	status("mapping computed");
 	// if no mapping could be found return false
 	if (mapping == NULL) {
 		message("Interfaces do not match. Nets not composable");
@@ -532,6 +532,7 @@ bool BSD::check_b_partner(parsedGraph & graph1, parsedGraph & graph2) {
 	// create a list to store nodes of the bisimulation to be computed
 	bisimtemp = new std::list<std::pair<parsedNode*, parsedNode*> >;
 
+	status("computing bisimulation...");
 	// compute the bisimulation
 	bool result = computeBiSimBSD(*graph1.graph->begin(), *graph2.graph->begin(), mapping, graph1.events);
 
@@ -713,10 +714,10 @@ bool BSD::check_b_conformance(parsedGraph & graph1, parsedGraph & graph2) {
 		return false;
 	}
 
+	status("computing mapping...");
 	// compute a mapping between label ids of net 1 and net 2 if possible
 	std::map<Label_ID, Label_ID>* mapping = computeMapping(graph1, graph2);
 
-	status("mapping computed");
 	// if no mapping could be found return false
 	if (mapping == NULL) {
 		message("Interfaces do not match. Nets not composable");
@@ -726,6 +727,7 @@ bool BSD::check_b_conformance(parsedGraph & graph1, parsedGraph & graph2) {
 	// create a list to store nodes of the bisimulation to be computed
 	bisimtemp = new std::list<std::pair<parsedNode*, parsedNode*> >;
 
+	status("computing bisimulation...");
 	// compute the bisimulation
 	bool result = computeBiSimCSD(*graph1.graph->begin(), *graph2.graph->begin(), mapping, graph1.events);
 
@@ -782,11 +784,18 @@ bool BSD::computeBiSimCSD(parsedNode * node_g1, parsedNode * node_g2, std::map<L
  *--------------------- DOT to BSD parser ----------------
  *========================================================*/
 
+/*!
+ \brief Parses a DOT file which represents a BSD or CSD automaton.
+
+ The format of the edges should be: "(node).lambda" -> "(node).lambda" [...,label="...",...];
+
+ \param[in]	is		the input stream (the input file)
+
+ \return the parsed graph
+ */
 parsedGraph & BSD::dot2graph_parse(std::istream & is) {
 	std::string line;
-	bool in_comment = false;
-	int state = 0;
-	Label_ID idcounter = 0; // \todo?
+	Label_ID idcounter = 0;
 
 	parsedGraph * graph = new parsedGraph;
 	graph->graph = new std::list<parsedNode *>;
@@ -796,162 +805,130 @@ parsedGraph & BSD::dot2graph_parse(std::istream & is) {
 	graph->is_sending_label = new std::map<Label_ID, bool>;
 
 	status("parsing...");
+	while (std::getline(is, line)) {
+		// we are only interested in parsing the edges (which also have labels assigned)
+		if (line.find("->") != std::string::npos && line.find("label") != std::string::npos) {
+			// (should be) form of the lines: "(node).lambda" -> "(node).lambda" [...,label="...",...];
+			std::list<std::string> tokens;
+			// tokenize the current line
+			Tokenize(line, tokens, "(). \"->\t");
 
-	while (std::getline(is, line) && state != 2) {
-		if (!in_comment) {
-			int comment_start = line.find("/*");
-			if (comment_start != std::string::npos) {
-				line = line.substr(0, comment_start);
-				in_comment = true;
+			// iterate through the tokens and set node names and lambda values accordingly
+			std::list<std::string>::const_iterator it = tokens.begin();
+			std::string node1 = "";
+			if (it != tokens.end()) {
+				node1 = *it;
+				// status("node 1: %s", node1.c_str());
+				++it;
+			} else
+				continue;
+			std::string lambda1 = "";
+			if (it != tokens.end()) {
+				lambda1 = *it;
+				// status("lambda 1: %s", lambda1.c_str());
+				++it;
+			} else
+				continue;
+			std::string node2 = "";
+			if (it != tokens.end()) {
+				node2 = *it;
+				// status("node 2: %s", node2.c_str());
+				++it;
+			} else
+				continue;
+			std::string lambda2 = "";
+			if (it != tokens.end()) {
+				lambda2 = *it;
+				// status("lambda 2: %s", lambda2.c_str());
+				++it;
+			} else
+				continue;
+
+			// collect the labels and also all options
+			std::string labels = "";
+			std::string options = "";
+			bool nextAreLabels = false;
+			while (it != tokens.end()) {
+				options += *it;
+				if (nextAreLabels)
+					labels = *it;
+				if (it->find("label") != std::string::npos)
+					nextAreLabels = true;
+				else
+					nextAreLabels = false;
+				++it;
 			}
-		} else {
-			int comment_end = line.find("*/");
-			if (comment_end != std::string::npos) {
-				line = line.substr(comment_end + 2, line.size());
-				in_comment = false;
-			} else {
-				line = "";
-			}
-		}
+			// status("labels: %s", labels.c_str());
 
-		int item_found = std::string::npos;
-		if (state == 0) {
-			item_found = line.find("digraph");
-			if (item_found != std::string::npos) {
-//				status("found digraph");
-				line = line.substr(item_found + 7, line.size());
-				item_found = line.find("{");
-				line = line.substr(item_found + 1, line.size());
-				state = 1;
-			}
-		}
-
-		if (state == 1) {
-//			item_found = line.find("}");
-//			if (item_found != std::string::npos) {
-//				line = line.substr(0, item_found);
-//				state = 2;
-//			}
-
-			// we are only interested in parsing the edges
-			item_found = line.find("->");
-			if (item_found != std::string::npos) {
-//				status("found ->");
-				// form of the lines: "(node).lambda" -> "(node).lambda" [options];
-				std::list<std::string> tokens;
-				Tokenize(line, tokens, "(). \"->\t");
-				std::list<std::string>::const_iterator it = tokens.begin();
-				std::string node1 = "";
-				if (it != tokens.end()) {
-					node1 = *it;
-//					status("node 1: %s", node1.c_str());
-					if (node1 == "initialNode")
-						continue;
-					++it;
+			parsedNode * p_node1 = NULL;
+			parsedNode * p_node2 = NULL;
+			// iterate through the already parsed nodes and search for the two current parsed nodes
+			for (std::list<parsedNode *>::const_iterator it = graph->graph->begin(); it != graph->graph->end(); ++it) {
+				// status("searching...");
+				if (p_node1 == NULL && (*it)->name == node1) {
+					p_node1 = *it;
 				}
-				std::string lambda1 = "";
-				if (it != tokens.end()) {
-					lambda1 = *it;
-//					status("lambda 1: %s", lambda1.c_str());
-					++it;
+				if (p_node2 == NULL && (*it)->name == node2) {
+					p_node2 = *it;
 				}
-				std::string node2 = "";
-				if (it != tokens.end()) {
-					node2 = *it;
-//					status("node 2: %s", node2.c_str());
-					++it;
-				}
-				std::string lambda2 = "";
-				if (it != tokens.end()) {
-					lambda2 = *it;
-//					status("lambda 2: %s", lambda2.c_str());
-					++it;
-				}
-
-				std::string labels = "";
-				std::string options = "";
-				bool nextAreLabels = false;
-				while (it != tokens.end()) {
-					options += *it;
-					if (nextAreLabels)
-						labels = *it;
-					if (it->find("label") != std::string::npos)
-						nextAreLabels = true;
-					else
-						nextAreLabels = false;
-					++it;
-				}
-
-//				status("labels: %s", labels.c_str());
-
-				parsedNode * p_node1 = NULL;
-				parsedNode * p_node2 = NULL;
-				for (std::list<parsedNode *>::const_iterator it = graph->graph->begin(); it != graph->graph->end(); ++it) {
-//					status("searching...");
-					if (p_node1 == NULL && (*it)->name == node1) {
-						p_node1 = *it;
-					}
-					if (p_node2 == NULL && (*it)->name == node2) {
-						p_node2 = *it;
-					}
-					if (p_node1 != NULL && p_node2 != NULL) {
-						break;
-					}
-				}
-
-				if (p_node1 == NULL) {
-//					status("insert 1");
-					parsedNode * node = new parsedNode;
-					node->name = node1;
-					node->lambda = atoi(lambda1.c_str());
-					node->pointer = new std::map<Label_ID, parsedNode* >;
-					graph->graph->push_back(node);
-					p_node1 = graph->graph->back();
-
-					if (node1 == "U") {
-						status("found U");
-						graph->U = p_node1;
-					} else if (node1 == "empty") {
-						status("found empty");
-						graph->emptyset = p_node1;
-					}
-				}
-				if (p_node2 == NULL) {
-//					status("insert 2");
-					parsedNode * node = new parsedNode;
-					node->name = node2;
-					node->lambda = atoi(lambda2.c_str());
-					node->pointer = new std::map<Label_ID, parsedNode* >;
-					graph->graph->push_back(node);
-					p_node2 = graph->graph->back();
-				}
-
-
-				if (labels != "") {
-					tokens.clear();
-					Tokenize(labels, tokens, ", ");
-					it = tokens.begin();
-					while (it != tokens.end()) {
-//						status("found label: %s", it->c_str());
-						if (graph->name2id->find(*it) == graph->name2id->end()) {
-							(*graph->name2id)[*it] = idcounter;
-							(*graph->id2name)[idcounter] = *it;
-
-							item_found = options.find("color=red");
-							if (item_found != std::string::npos) {
-								(*graph->is_sending_label)[idcounter] = true;
-							} else {
-								(*graph->is_sending_label)[idcounter] = false;
-							}
-
-							++idcounter;
-						}
-						(*p_node1->pointer)[((*graph->name2id)[*it])] = p_node2;
-						++it;
-					}
+				// stop searching if both nodes were found
+				if (p_node1 != NULL && p_node2 != NULL) {
+					break;
 				}
 			}
 
+			// if node 1 was not found then insert it into the graph
+			if (p_node1 == NULL) {
+				parsedNode * node = new parsedNode;
+				node->name = node1;
+				node->lambda = atoi(lambda1.c_str());
+				node->pointer = new std::map<Label_ID, parsedNode* >;
+				graph->graph->push_back(node);
+				p_node1 = graph->graph->back();
+
+				// if the node is the U or empty node then set the pointers accordingly
+				if (node1 == "U") {
+					graph->U = p_node1;
+				} else if (node1 == "empty") {
+					graph->emptyset = p_node1;
+				}
+			}
+
+			// if node 2 was not found then insert it into the graph
+			if (p_node2 == NULL) {
+				parsedNode * node = new parsedNode;
+				node->name = node2;
+				node->lambda = atoi(lambda2.c_str());
+				node->pointer = new std::map<Label_ID, parsedNode* >;
+				graph->graph->push_back(node);
+				p_node2 = graph->graph->back();
+			}
+
+
+			// tokenize the label string (might be several labels on one edge)
+			tokens.clear();
+			Tokenize(labels, tokens, ", ");
+			it = tokens.begin();
+			while (it != tokens.end()) {
+				// status("found label: %s", it->c_str());
+				// save the parsed label and set a new id if it has not yet been processed
+				if (graph->name2id->find(*it) == graph->name2id->end()) {
+					(*graph->name2id)[*it] = idcounter;
+					(*graph->id2name)[idcounter] = *it;
+
+					if (options.find("color=red") != std::string::npos) {
+						(*graph->is_sending_label)[idcounter] = true;
+					} else {
+						(*graph->is_sending_label)[idcounter] = false;
+					}
+
+					// increase the label id counter
+					++idcounter;
+				}
+				// set the pointer accordingly
+				(*p_node1->pointer)[((*graph->name2id)[*it])] = p_node2;
+				++it;
+			}
 		}
 	}
 

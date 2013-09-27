@@ -384,7 +384,6 @@ int main(int argc, char** argv) {
        	| 1.9. DOT output	   |
         `---------------------*/
 
-        // delete the if-statement to generate dot-file output even if two nets are given
         if (args_info.BSD_flag) {
         	std::stringstream temp (std::stringstream::in | std::stringstream::out);
         	temp << "BSD_" << args_info.bound_arg << "(";

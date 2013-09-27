@@ -30,7 +30,7 @@
 /*!
  \brief XES log
 
- Contains all functions needed to generate logs in the XES format. (See @url{http://www.xes-standard.org/}.)
+ Contains all functions needed to generate logs in the XES format. (See <http://www.xes-standard.org/>.)
  The logs consist of traces which themselves consist of events. The number of traces in a log can be
  specified by the user as well as the number of events in a trace which also can be randomized.
  An event contains the label of a fired transition. A trace is a sequence of transitions which can be

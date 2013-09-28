@@ -136,6 +136,7 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 	}
 
 	net->getFinalCondition() = ((net->getFinalCondition().getFormula()) && (condition->getFormula()));
+	delete condition;
 
 	// made bound_broken a sync label just for better recognition... \todo
 	pnapi::Label *label = &net->getInterface().addSynchronousLabel("bound_broken", "");

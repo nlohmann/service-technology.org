@@ -209,16 +209,11 @@ BSDNode* BSD::setup(std::list<MarkingList> &SCCs) {
 	}
 	list.sort();
 
-	// set up the result node and return it
-	BSDNode* result = new BSDNode;
-	result->list = list;
-	result->isU = false;
+	// check for the node in the graph and if not present insert it
 	BSDNode* p = NULL;
 
-	// check for the node in the graph and if not present insert it
-
 	// the size of the list of markings (closure) in the given node
-	unsigned int nodesize = result->list.size();
+	unsigned int nodesize = list.size();
 
 	// iterate through the graph
 	for (std::list<BSDNode *>::iterator it = graph->begin(); it != graph->end(); ++it) {
@@ -226,8 +221,7 @@ BSDNode* BSD::setup(std::list<MarkingList> &SCCs) {
 		if (nodesize == (**it).list.size()) {
 			// check for equality of the nodes. If so then delete the given node and
 			// return a pointer to the found node in the graph
-			if (checkEquality(result->list, (**it).list)) {
-				delete result;
+			if (checkEquality(list, (**it).list)) {
 				p = *it;
 			}
 		}
@@ -237,11 +231,12 @@ BSDNode* BSD::setup(std::list<MarkingList> &SCCs) {
 	// and set up the pointers (structure)
 	// and we may as well compute the lambda values here
 	if (p == NULL) {
-		graph->push_back(result);
-		graph->back()->pointer = new BSDNode*[Label::events+1];
-
-		// return the pointer to the inserted node
+		// set up the result node and return it
+		graph->push_back(new BSDNode);
 		p = graph->back();
+		p->list = list;
+		p->isU = false;
+		p->pointer = new BSDNode*[Label::events+1];
 
 		assignLambda(p, SCCs);
 	}
@@ -857,7 +852,7 @@ std::map<Label_ID, Label_ID>* BSD::computeMappingCSD(parsedGraph & graph1, parse
 
  \return the parsed graph
  */
-parsedGraph & BSD::dot2graph_parse(std::istream & is) {
+parsedGraph * BSD::dot2graph_parse(std::istream & is) {
 	std::string line;
 	Label_ID idcounter = 0;
 
@@ -953,12 +948,11 @@ parsedGraph & BSD::dot2graph_parse(std::istream & is) {
 
 			// if node 1 was not found then insert it into the graph
 			if (p_node1 == NULL) {
-				parsedNode * node = new parsedNode;
-				node->name = node1;
-				node->lambda = atoi(lambda1.c_str());
-				node->pointer = new std::map<Label_ID, parsedNode* >;
-				graph->graph->push_back(node);
+				graph->graph->push_back(new parsedNode);
 				p_node1 = graph->graph->back();
+				p_node1->name = node1;
+				p_node1->lambda = atoi(lambda1.c_str());
+				p_node1->pointer = new std::map<Label_ID, parsedNode* >;
 
 				// if the node is the U or empty node then set the pointers accordingly
 				if (node1 == "U") {
@@ -970,12 +964,11 @@ parsedGraph & BSD::dot2graph_parse(std::istream & is) {
 
 			// if node 2 was not found then insert it into the graph
 			if (p_node2 == NULL) {
-				parsedNode * node = new parsedNode;
-				node->name = node2;
-				node->lambda = atoi(lambda2.c_str());
-				node->pointer = new std::map<Label_ID, parsedNode* >;
-				graph->graph->push_back(node);
+				graph->graph->push_back(new parsedNode);
 				p_node2 = graph->graph->back();
+				p_node2->name = node2;
+				p_node2->lambda = atoi(lambda2.c_str());
+				p_node2->pointer = new std::map<Label_ID, parsedNode* >;
 			}
 
 
@@ -1008,7 +1001,7 @@ parsedGraph & BSD::dot2graph_parse(std::istream & is) {
 
 	graph->events = idcounter;
 
-	return *graph;
+	return graph;
 }
 
 

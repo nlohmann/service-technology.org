@@ -77,7 +77,7 @@ AT_SETUP([b-conformance check])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/CSD1.dot .])
 AT_CHECK([cp TESTFILES/CSD2.dot .])
-AT_CHECK([BSD_ --confCheck CSD1.dot CSD2.dot --verbose --bound=1],0,ignore,stderr)
+AT_CHECK([BSD_ --confCheck CSD1.dot CSD2.dot --verbose --bound=1],1,ignore,stderr)
 AT_CHECK([GREP -q "conform" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -129,18 +129,35 @@ AT_CLEANUP
 
 
 #############################################################################
-#AT_BANNER([Memory Management])
+AT_BANNER([Memory Management])
 #############################################################################
 
 
-#AT_SETUP([Checking for memory leaks with Valgrind (OWFN -> DOT)])
-#AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-#AT_CHECK_LOLA
-#AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes BSD_RAW myCoffee.owfn --finalize],0,ignore,stderr)
-#AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
-#AT_KEYWORDS(valgrind)
-#AT_CLEANUP
+AT_SETUP([Checking for memory leaks with Valgrind (OWFN -> DOT)])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK_LOLA
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes BSD_RAW --BSD --CSD myCoffee.owfn --finalize],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
 
+AT_SETUP([Checking for memory leaks with Valgrind (b-partner check)])
+AT_CHECK([cp TESTFILES/BSD1.dot .])
+AT_CHECK([cp TESTFILES/BSD2.dot .])
+AT_CHECK_LOLA
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes BSD_RAW --partnerCheck BSD1.dot BSD2.dot --finalize],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks with Valgrind (b-conformance check)])
+AT_CHECK([cp TESTFILES/CSD1.dot .])
+AT_CHECK([cp TESTFILES/CSD2.dot .])
+AT_CHECK_LOLA
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes BSD_RAW --confCheck CSD1.dot CSD2.dot --finalize],1,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
 
 
 ############################################################################

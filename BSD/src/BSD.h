@@ -101,7 +101,7 @@ class BSD {
          *--------------------- DOT to BSD parser ----------------
          *========================================================*/
 
-        static parsedGraph & dot2graph_parse(std::istream & is);
+        static parsedGraph * dot2graph_parse(std::istream & is);
 
         static void Tokenize(const std::string& str, std::list<std::string>& tokens, const std::string& delimiters);
 

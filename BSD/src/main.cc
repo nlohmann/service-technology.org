@@ -194,6 +194,7 @@ void terminationHandler() {
 
 int main(int argc, char** argv) {
     time_t start_time, end_time;
+    int returnvalue = EXIT_SUCCESS;
 
     // set the function to call on normal termination
     atexit(terminationHandler);
@@ -432,7 +433,7 @@ int main(int argc, char** argv) {
     // in case of partner or conformance check
     if (args_info.partnerCheck_flag || args_info.confCheck_flag) {
 
-        parsedGraph _parsedGraph[2];
+        parsedGraph * _parsedGraph[2];
 
     	/*------------------------------------------.
     	| 2.1. parse the BSD or CSD automata (DOT)  |
@@ -450,7 +451,7 @@ int main(int argc, char** argv) {
 
         		if (args_info.verbose_flag) {
         			status("parsed graph %i:", i+1);
-        			BSD::printParsedGraph(_parsedGraph[i]);
+        			BSD::printParsedGraph(*_parsedGraph[i]);
         		}
         	} catch (const pnapi::exception::InputError& error) {
         		std::ostringstream s;
@@ -464,12 +465,13 @@ int main(int argc, char** argv) {
    		`---------------------------*/
 
     	if (args_info.partnerCheck_flag) {
-    		bool valid = BSD::check_b_partner(_parsedGraph[0], _parsedGraph[1]);
+    		bool valid = BSD::check_b_partner(*_parsedGraph[0], *_parsedGraph[1]);
 
     		if (valid) {
-    			message("net 1 is a %i-partner of net 2!", _parsedGraph[0].bound);
+    			message("net 1 is a %i-partner of net 2!", _parsedGraph[0]->bound);
     		} else {
-    			message("net 1 is NOT a %i-partner of net 2!", _parsedGraph[0].bound);
+    			message("net 1 is NOT a %i-partner of net 2!", _parsedGraph[0]->bound);
+    			returnvalue = EXIT_FAILURE;
     		}
     	}
 
@@ -478,12 +480,13 @@ int main(int argc, char** argv) {
    		`-------------------------------*/
 
     	if (args_info.confCheck_flag) {
-    		bool valid = BSD::check_b_conformance(_parsedGraph[0], _parsedGraph[1]);
+    		bool valid = BSD::check_b_conformance(*_parsedGraph[0], *_parsedGraph[1]);
 
     		if (valid) {
-    			message("net 1 %i-conforms to net 2!", _parsedGraph[0].bound);
+    			message("net 1 %i-conforms to net 2!", _parsedGraph[0]->bound);
     		} else {
-    			message("net 1 does NOT %i-conform to net 2!", _parsedGraph[0].bound);
+    			message("net 1 does NOT %i-conform to net 2!", _parsedGraph[0]->bound);
+    			returnvalue = EXIT_FAILURE;
     		}
     	}
 
@@ -493,18 +496,20 @@ int main(int argc, char** argv) {
 
     	// delete the graphs
     	for (int i = 0; i < 2; ++i) {
-    		for (std::list<parsedNode *>::const_iterator it = _parsedGraph[i].graph->begin(); it != _parsedGraph[i].graph->end(); ++it) {
+    		for (std::list<parsedNode *>::const_iterator it = _parsedGraph[i]->graph->begin(); it != _parsedGraph[i]->graph->end(); ++it) {
     			delete (*it)->pointer;
     			delete *it;
     		}
-    		delete _parsedGraph[i].graph;
+    		delete _parsedGraph[i]->graph;
 
-    		delete _parsedGraph[i].id2name;
-    		delete _parsedGraph[i].is_sending_label;
-    		delete _parsedGraph[i].name2id;
+    		delete _parsedGraph[i]->id2name;
+    		delete _parsedGraph[i]->is_sending_label;
+    		delete _parsedGraph[i]->name2id;
+
+    		delete _parsedGraph[i];
     	}
     }
 
 
-    return EXIT_SUCCESS;
+    return returnvalue;
 }

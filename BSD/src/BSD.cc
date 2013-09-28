@@ -30,8 +30,6 @@
 using std::set;
 using std::vector;
 
-BSD::BSD() {
-}
 
 /******************
  * STATIC MEMBERS *

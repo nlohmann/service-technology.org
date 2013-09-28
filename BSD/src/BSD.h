@@ -114,9 +114,6 @@ class BSD {
 
     private:
 
-        /// constructor
-        BSD();
-
         static std::list<std::pair<parsedNode*, parsedNode*> >* bisimtemp;
 
         // helpers for tarjan algorithm (lambda value computation)

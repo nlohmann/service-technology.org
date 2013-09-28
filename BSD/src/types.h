@@ -80,6 +80,10 @@ typedef struct _BSDgraph {
 	// computation times
 	double BSD_comp_time;
 	double CSD_comp_time;
+
+	// memory consumptions
+	unsigned int BSD_memory;
+	unsigned int CSD_memory;
 } BSDgraph;
 
 // a parsed node of a BSD or CSD automaton

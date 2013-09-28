@@ -338,6 +338,15 @@ int main(int argc, char** argv) {
     	_BSDgraph.BSD_comp_time = difftime(end_time, start_time);
     	status("computation is done [%.0f sec]", _BSDgraph.BSD_comp_time);
 
+    	std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
+    	FILE* ps = popen(call.c_str(), "r");
+    	unsigned int memory;
+    	int res = fscanf(ps, "%u", &memory);
+    	assert(res != EOF);
+    	pclose(ps);
+    	_BSDgraph.BSD_memory = memory;
+    	status("BSD memory consumption: %s%u KB %s", _bold_, memory, _c_);
+
     	/*------------------------------------------------------.
        	| 1.6. save the BSD automaton and some important values |
  	   	`------------------------------------------------------*/
@@ -378,6 +387,13 @@ int main(int argc, char** argv) {
         	time(&end_time);
         	_BSDgraph.CSD_comp_time = difftime(end_time, start_time);
         	status("computation is done [%.0f sec]", _BSDgraph.CSD_comp_time);
+
+        	ps = popen(call.c_str(), "r");
+        	res = fscanf(ps, "%u", &memory);
+        	assert(res != EOF);
+        	pclose(ps);
+        	_BSDgraph.CSD_memory = memory;
+        	status("CSD memory consumption: %s%u KB %s", _bold_, memory, _c_);
         }
 
 

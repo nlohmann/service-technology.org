@@ -27,9 +27,9 @@ touch $RESULT
 
 echo "\\begin{table}[h]" >> $RESULT
 echo "  \\begin{center}" >> $RESULT
-echo "    \\begin{tabular}{|c|c|c|c|c|c|}" >> $RESULT
+echo "    \\begin{tabular}{|c|c|c|c|c|c|c|}" >> $RESULT
 echo "      \\hline" >> $RESULT
-echo "      filename & type & bound & \\#nodes & \\#labels,(in/out) & time \\\\ \\hline \\hline" >> $RESULT
+echo "      filename & type & bound & \\#nodes & \\#labels,(in/out) & time (sec) & memory (KB) \\\\ \\hline \\hline" >> $RESULT
 
 
 echo "$0: parsing DOT files in $1..."
@@ -44,8 +44,9 @@ for i in `find ${INPUTDIR} -name "BSD*.dot" | sort`; do
    RLABELS=`grep -E '  #receiving labels: ' ${location}/${file}.dot | sed -r "s/  #receiving labels: ([0-9]+)/\1/"`
    NODES=`grep -E '  #nodes:            ' ${location}/${file}.dot | sed -r "s/  #nodes:            ([0-9]+)/\1/"`
    TIME=`grep -E '  computation time:  ' ${location}/${file}.dot | sed -r "s/  computation time:  ([0-9]+(.[0-9]+)?) s/\1/"`
+   MEMORY=`grep -E '  memory consumed:   ' ${location}/${file}.dot | sed -r "s/  memory consumed:   ([0-9]+(.[0-9]+)?) KB/\1/"`
 
-   echo "      ${FILE} & BSD & ${BOUND} & ${NODES} & ${LABELS},(${RLABELS}/${SLABELS}) & ${TIME} \\\\ \\hline" >> $RESULT
+   echo "      ${FILE} & BSD & ${BOUND} & ${NODES} & ${LABELS},(${RLABELS}/${SLABELS}) & ${TIME} & ${MEMORY} \\\\ \\hline" >> $RESULT
 
    file=C${file:1}
    FILE=`grep -E '  input file:  ' ${location}/${file}.dot | sed -r "s/  input file:  ([[:print:]]+)/\1/"`
@@ -55,8 +56,9 @@ for i in `find ${INPUTDIR} -name "BSD*.dot" | sort`; do
    RLABELS=`grep -E '  #receiving labels: ' ${location}/${file}.dot | sed -r "s/  #receiving labels: ([0-9]+)/\1/"`
    NODES=`grep -E '  #nodes:            ' ${location}/${file}.dot | sed -r "s/  #nodes:            ([0-9]+)/\1/"`
    TIME=`grep -E '  computation time:  ' ${location}/${file}.dot | sed -r "s/  computation time:  ([0-9]+(.[0-9]+)?) s/\1/"`
+   MEMORY=`grep -E '  memory consumed:   ' ${location}/${file}.dot | sed -r "s/  memory consumed:   ([0-9]+(.[0-9]+)?) KB/\1/"`
 
-   echo "      ${FILE} & CSD & ${BOUND} & ${NODES} & ${LABELS},(${RLABELS}/${SLABELS}) & ${TIME} \\\\ \\hline \\hline" >> $RESULT
+   echo "      ${FILE} & CSD & ${BOUND} & ${NODES} & ${LABELS},(${RLABELS}/${SLABELS}) & ${TIME} & ${MEMORY} \\\\ \\hline \\hline" >> $RESULT
 
 
 done

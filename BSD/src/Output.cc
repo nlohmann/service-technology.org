@@ -214,9 +214,11 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 	os << "  #nodes:            " << (unsigned int)templist->size() << endl;
 
 	if (CSD) {
-		os << "  computation time:  " << (double)(graph.BSD_comp_time + graph.CSD_comp_time) << " s" << endl;
+		os << "  computation time:  " << (graph.BSD_comp_time + graph.CSD_comp_time) << " s" << endl
+		   << "  memory consumed:   " << graph.CSD_memory << " KB" << endl;
 	} else {
-		os << "  computation time:  " << (double)(graph.BSD_comp_time) << " s" << endl;
+		os << "  computation time:  " << (graph.BSD_comp_time) << " s" << endl
+		   << "  memory consumed:   " << graph.BSD_memory << " KB" << endl;
 	}
 
 	os << "*/\n\n"

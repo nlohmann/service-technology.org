@@ -512,11 +512,11 @@ int main(int argc, char** argv) {
 
     	// delete the graphs
     	for (int i = 0; i < 2; ++i) {
-    		for (std::list<parsedNode *>::const_iterator it = _parsedGraph[i]->graph->begin(); it != _parsedGraph[i]->graph->end(); ++it) {
-    			delete (*it)->pointer;
-    			delete *it;
-    		}
-    		delete _parsedGraph[i]->graph;
+    		delete[] _parsedGraph[i]->names;
+    		delete[] _parsedGraph[i]->lambdas;
+    		for (unsigned int j = 0; j < _parsedGraph[i]->nodes; ++j)
+    			delete[] _parsedGraph[i]->pointer[j];
+    		delete[] _parsedGraph[i]->pointer;
 
     		delete _parsedGraph[i]->id2name;
     		delete _parsedGraph[i]->is_sending_label;

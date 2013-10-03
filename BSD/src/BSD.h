@@ -77,7 +77,7 @@ class BSD {
 
         static bool check_b_partner(parsedGraph & graph1, parsedGraph & graph2);
 
-        static bool computeBiSimBSD(parsedNode * node_g1, parsedNode * node_g2, std::map<Label_ID, Label_ID> * mapping, Label_ID events);
+        static bool computeBiSimBSD(parsedGraph & graph1, parsedGraph & graph2, unsigned int node_g1, unsigned int node_g2, std::map<Label_ID, Label_ID> * mapping);
 
         static std::map<Label_ID, Label_ID>* computeMappingBSD(parsedGraph & graph1, parsedGraph & graph2);
 
@@ -93,7 +93,7 @@ class BSD {
 
         static bool check_b_conformance(parsedGraph & graph1, parsedGraph & graph2);
 
-        static bool computeBiSimCSD(parsedNode * node_g1, parsedNode * node_g2, std::map<Label_ID, Label_ID> * mapping, Label_ID events);
+        static bool computeBiSimCSD(parsedGraph & graph1, parsedGraph & graph2, unsigned int node_g1, unsigned int node_g2, std::map<Label_ID, Label_ID> * mapping);
 
         static std::map<Label_ID, Label_ID>* computeMappingCSD(parsedGraph & graph1, parsedGraph & graph2);
 
@@ -111,10 +111,12 @@ class BSD {
 
         static void printParsedGraph(parsedGraph & graph);
 
+        static void printBiSim(parsedGraph & graph1, parsedGraph & graph2, std::list<unsigned int>* bisim);
+
 
     private:
 
-        static std::list<std::pair<parsedNode*, parsedNode*> >* bisimtemp;
+        static std::list<unsigned int>* bisimtemp;
 
         // helpers for tarjan algorithm (lambda value computation)
         static MarkingList* templist;

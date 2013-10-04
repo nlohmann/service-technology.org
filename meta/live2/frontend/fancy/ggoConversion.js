@@ -1,6 +1,11 @@
 // wrap scope
 var GGO_CONVERSION = (function(){
 
+/* configure here for paths to ggo-Files */
+function ggoPath(toolName) {
+  return 'ggos/' + toolName + '.ggo';
+}
+
 // the parser object
 var PARSER; 
 // overwrite funcion later
@@ -93,7 +98,8 @@ function convertItem(item, toolName) {
         return null;
     }
 
-    if(item.hidden) return null
+    if(item.unhidden) item.hidden = false;
+    if(item.hidden) return null;
 
     
     // convert text to html
@@ -202,7 +208,7 @@ function initParse(toolName, callback) {
         return;
     }
 
-    var req = 'ggos/' + toolName + '.ggo';
+    var req = ggoPath(toolName);
     $.get(
             req,
             function(i) {var t=parse(i, toolName); callback(t);},

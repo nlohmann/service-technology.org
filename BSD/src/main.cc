@@ -84,7 +84,7 @@ void evaluateParameters(int argc, char** argv) {
 
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0) {
-        abort(10, "invalid command-line parameter(s)");
+        abort(16, "invalid command-line parameter(s)");
     }
 
     // debug option

@@ -843,6 +843,16 @@ std::map<Label_ID, Label_ID>* BSD::computeMappingCSD(parsedGraph & graph1, parse
 /*!
  \brief Parses a DOT file which represents a BSD or CSD automaton.
 
+ There have to be parameters in the comments specifying the bound, the node count and the event count:
+ 	 bound:             x
+ 	 nodes:             y
+ 	 labels (total):    z
+
+ The initial node of the graph is assumed to be the first node parsed. There is a test on correct label
+ and node count. However, there is no test on correct graph input, meaning that the parser assumes that
+ for each node there is given all z labels. If some labels are missing for some nodes then they are
+ obviously also missing in the parsed graph. This may lead to wrong results or segmentation faults.
+
  The format of the edges should be: "(node).lambda" -> "(node).lambda" [...,label="...",...];
 
  \param[in]	is		the input stream (the input file)
@@ -980,8 +990,11 @@ parsedGraph * BSD::dot2graph_parse(std::istream & is) {
 					}
 				}
 
+
 				// if node 1 was not found then insert it into the graph
 				if (p_node1 == -1) {
+					if (currentnode >= graph->nodes)
+						abort(11, "Parsed parameter doesn't match parsed nodes' count.");
 					graph->names[currentnode] = node1;
 					graph->lambdas[currentnode] = atoi(lambda1.c_str());
 
@@ -998,6 +1011,8 @@ parsedGraph * BSD::dot2graph_parse(std::istream & is) {
 
 				// if node 2 was not found then insert it into the graph
 				if (p_node2 == -1) {
+					if (currentnode >= graph->nodes)
+						abort(11, "Parsed parameter doesn't match parsed nodes' count.");
 					graph->names[currentnode] = node2;
 					graph->lambdas[currentnode] = atoi(lambda2.c_str());
 
@@ -1014,6 +1029,8 @@ parsedGraph * BSD::dot2graph_parse(std::istream & is) {
 					// status("found label: %s", it->c_str());
 					// save the parsed label and set a new id if it has not yet been processed
 					if (graph->name2id->find(*it) == graph->name2id->end()) {
+						if (idcounter >= graph->events)
+							abort(12, "Parsed parameter doesn't match parsed labels' count.");
 						(*graph->name2id)[*it] = idcounter;
 						(*graph->id2name)[idcounter] = *it;
 
@@ -1036,8 +1053,14 @@ parsedGraph * BSD::dot2graph_parse(std::istream & is) {
 	}
 
 	if (state < 4) {
-		abort(1337, "Input file misses bound, nodes and/or events attributes.");
+		abort(10, "Input file misses bound, nodes and/or events attributes.");
 	}
+
+	// the cases when there are less parsed nodes or labels than given in the attributes
+	if (currentnode < graph->nodes)
+		abort(11, "Parsed parameter doesn't match parsed nodes' count.");
+	if (idcounter < graph->events)
+		abort(12, "Parsed parameter doesn't match parsed labels' count.");
 
 	return graph;
 }

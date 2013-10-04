@@ -372,7 +372,35 @@ BSD: error while parsing the reachability graph -- aborting [#09]
 @end cartouche
 @end smallexample
 
+@item #10
+This error occurs in case BSD could not parse an automaton from a dot file. There have to be attributes at the start of the dot file that specify the bound, the node count and the event count of the automaton.
 
+@smallexample
+@cartouche
+BSD: Input file misses bound, nodes and/or events attributes.
+      -- aborting [#10]
+@end cartouche
+@end smallexample
+
+@item #11
+This error occurs in case BSD could not parse an automaton from a dot file. In particular the number of parsed nodes doesn't match the parsed node count attribute.
+
+@smallexample
+@cartouche
+BSD: Parsed parameter doesn't match parsed nodes' count.
+      -- aborting [#11]
+@end cartouche
+@end smallexample
+
+@item #12
+This error occurs in case BSD could not parse an automaton from a dot file. In particular the number of parsed labels doesn't match the parsed event count attribute.
+
+@smallexample
+@cartouche
+BSD: Parsed parameter doesn't match parsed labels' count.
+      -- aborting [#12]
+@end cartouche
+@end smallexample
 
 
 @item #13
@@ -406,8 +434,17 @@ BSD: error reading configuration file `myconf.conf' -- aborting [#15]
 @end cartouche
 @end smallexample
 
-@end table
+@item #16
+Invalid option(s) were given in the command-line.
 
+@smallexample
+@cartouche
+BSD: invalid command-line parameter(s) -- aborting [#16]
+@end cartouche
+@end smallexample
+
+
+@end table
 
 
 @c --------------------------------------------------------------------------

@@ -98,23 +98,23 @@ typedef struct _parsedNode {
 
 // representation of a parsed BSD or CSD automaton with needed values for computations
 typedef struct _parsedGraph {
-	// the automaton (list of nodes)
+	// array of node names (names[node] = node.name)
 	std::string * names;
-
+	// array of array of pointers to successor nodes (pointer[node][labelID] = node.succ)
 	unsigned int ** pointer;
-
+	// array of lamba values (lambdas[node] = node.lambda)
 	int * lambdas;
 	// assignment of labels to sending if true (receiving if false)
 	std::map<Label_ID, bool>* is_sending_label;
-
+	// total count of nodes in the graph
 	unsigned int nodes;
 	// number of total events
 	Label_ID events;
 	// the bound of the graph
 	int bound;
-	// pointer to U node
+	// id of the U node
 	unsigned int U;
-	// pointer to empty node
+	// id of the empty node
 	unsigned int emptyset;
 	// mapping of label ids to label names (strings)
 	std::map<Label_ID, std::string>* id2name;

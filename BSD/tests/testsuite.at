@@ -226,9 +226,24 @@ AT_CHECK([GREP -q "aborting \[[#09\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
-AT_SETUP([Invalid command line parameter])
-AT_CHECK([BSD_ --BSD --foo],1,ignore,stderr)
+AT_SETUP([Missing attributes in parsed dot file])
+AT_CHECK([cp TESTFILES/error10.* .])
+AT_CHECK([BSD_ --partnerCheck error10.dot error10.dot],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Wrong number of nodes in parsed dot file])
+AT_CHECK([cp TESTFILES/error11.* .])
+AT_CHECK([BSD_ --partnerCheck error11.dot error11.dot],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Wrong number of labels in parsed dot file])
+AT_CHECK([cp TESTFILES/error12.* .])
+AT_CHECK([BSD_ --partnerCheck error12.dot error12.dot],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#12\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
@@ -263,5 +278,11 @@ AT_DATA([BSD.conf], [invalid="PARAMETER"
 ])
 AT_CHECK([BSD_ --BSD -v],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#15\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Invalid command line parameter])
+AT_CHECK([BSD_ --BSD --foo],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#16\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP

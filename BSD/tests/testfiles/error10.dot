@@ -1,0 +1,30 @@
+/*
+  generator:   BSD 1.0-unreleased
+  input file:  S.owfn
+  #labels (total):   4
+  #sending labels:   2
+  #receiving labels: 2
+  #nodes:            4
+  computation time:  0 s
+*/
+
+digraph {
+	initialNode [shape=point,label="",style=invis,weight=100];
+	initialNode -> "(0).1";
+	"(0).1" [style=dashed];
+	"(0).1" -> "empty.4" [label="f",color=red];
+	"(0).1" -> "empty.4" [label="d",color=red];
+	"(0).1" -> "U.0" [label="s",color=green];
+	"(0).1" -> "(1,2,3).3" [label="q",color=green];
+	"empty.4" [shape=plaintext];
+	"empty.4" -> "empty.4" [label="f,d",color=red];
+	"empty.4" -> "empty.4" [label="s,q",color=green];
+	"(1,2,3).3" -> "empty.4" [label="f",color=red];
+	"(1,2,3).3" -> "(0).1" [label="d",color=red];
+	"(1,2,3).3" -> "U.0" [label="s",color=green];
+	"(1,2,3).3" -> "U.0" [label="q",color=green];
+	"U.0" [shape=plaintext];
+	"U.0" -> "U.0" [label="f,d",color=red];
+	"U.0" -> "U.0" [label="s,q",color=green];
+	footnote [shape=box,label="red: sending labels\ngreen: receiving labels"];
+}

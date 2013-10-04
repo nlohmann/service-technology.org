@@ -21,7 +21,8 @@
 # 4. Add the file to the SVN repository.
 TESTFILES = myCoffee.owfn \
 		error02.owfn error03.owfn error04-1.owfn error04-2.owfn \
-		error06.owfn error08.owfn BSD1.dot BSD2.dot CSD1.dot CSD2.dot
+		error06.owfn error08.owfn BSD1.dot BSD2.dot CSD1.dot CSD2.dot \
+		error10.dot error11.dot error12.dot
 
 
 #-----------------------------------------#

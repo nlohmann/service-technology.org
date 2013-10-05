@@ -194,7 +194,8 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 
 	os //< output everything to this stream
 
-		<< "/*\n"
+		<< "/*" << endl
+		<< "  -- Don't delete or change the comment section. Parsing depends on several attributes in here. --" << endl
 		<< "  generator:   " << PACKAGE_STRING << endl //net.getMetaInformation(os, pnapi::io::CREATOR, PACKAGE_STRING) << endl
 		<< "  input file:  " << filename << ".owfn" << endl
 		<< "  bound:             " << bound << endl
@@ -221,8 +222,8 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 		   << "  memory consumed:   " << graph.BSD_memory << " KB" << endl;
 	}
 
-	os << "*/\n\n"
-	   << "digraph {\n";
+	os << "*/" << endl << endl
+	   << "digraph {" << endl;
 
 	// define a fake initial node... (is there a better way?) \todo
 	os << "\tinitialNode [shape=point,label=\"\",style=invis,weight=100];" << endl;
@@ -245,7 +246,7 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 				for (unsigned int id = graph.first_receive; id < graph.last_receive; ++id) {
 					os << graph.id2name[id] << ",";
 				}
-				os << graph.id2name[(unsigned int)graph.last_receive] << "\",color=red];" << endl;
+				os << graph.id2name[(unsigned int)graph.last_receive] << "\",color=red];  /*sending*/" << endl;
 			}
 
 			if ((unsigned int)graph.last_send - (unsigned int)graph.first_send >= 0) {
@@ -254,18 +255,18 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 				for (unsigned int id = graph.first_send; id < graph.last_send; ++id) {
 					os << graph.id2name[id] << ",";
 				}
-				os << graph.id2name[(unsigned int)graph.last_send] << "\",color=green];" << endl;
+				os << graph.id2name[(unsigned int)graph.last_send] << "\",color=green];  /*receiving*/" << endl;
 			}
 		} else {
 			for (unsigned int id = 2; id <= graph.events; ++id) {
 				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " -> " << dotnodeName(*((*it)->pointer[id]), graph.U, graph.emptyset, CSD)
 					   << " [label=\"" << graph.id2name[id] << "\"";
 				if (id >= graph.first_receive && id <= graph.last_receive) {
-					os << ",color=red";
+					os << ",color=red]; /*sending*/";
 				} else {
-					os << ",color=green";
+					os << ",color=green]; /*receiving*/";
 				}
-				os << "];" << endl;
+				os << endl;
 			}
 		}
 	}

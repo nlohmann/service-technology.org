@@ -45,5 +45,3 @@ for i in `find $1 -name "*.owfn" | sort`; do
 
 done
 
-sh BSD_create_table.sh $OUTDIR
-

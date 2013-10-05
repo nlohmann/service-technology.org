@@ -1,3 +1,10 @@
+@heading Version 1.1-unreleased
+@itemize
+@item generate CSD automata from OWFN input
+@item test: does input net A b-conform to input net B?
+@item parsing of BSD and CSD automata given as dot files
+@end itemize
+
 @heading Version 1.0-unreleased
 @itemize
 @item generate BSD automata from OWFN input

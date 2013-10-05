@@ -1034,7 +1034,7 @@ parsedGraph * BSD::dot2graph_parse(std::istream & is) {
 						(*graph->name2id)[*it] = idcounter;
 						(*graph->id2name)[idcounter] = *it;
 
-						if (options.find("color=red") != std::string::npos) {
+						if (options.find("/*sending*/") != std::string::npos) {
 							(*graph->is_sending_label)[idcounter] = true;
 						} else {
 							(*graph->is_sending_label)[idcounter] = false;

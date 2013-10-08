@@ -8,12 +8,14 @@
 
 
 
-Version 1.0-unreleased
+Version 1.1-unreleased
 ======================
 
-* generate BSD automata from OWFN input
+* generate CSD automata from OWFN input
 
-* test: is input net A a br-controller of input net B?
+* test: does input net A b-conform to input net B?
+
+* parsing of BSD and CSD automata given as dot files
 
 
 See file ChangeLog <http://service-technology.org/files/BSD/ChangeLog> for

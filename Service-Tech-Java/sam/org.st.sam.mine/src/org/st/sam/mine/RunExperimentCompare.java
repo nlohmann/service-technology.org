@@ -24,8 +24,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import lscminer.datastructure.LSC;
-import lscminer.datastructure.LSCEvent;
 
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
@@ -36,6 +34,8 @@ import org.st.sam.log.SScenario;
 import org.st.sam.log.XESImport;
 import org.st.sam.mine.MineLSC.Configuration;
 import org.st.sam.mine.collect.SimpleArrayList;
+import org.st.sam.mine.datastructure.LSC;
+import org.st.sam.mine.datastructure.LSCEvent;
 import org.st.sam.util.SAMOutput;
 
 import com.google.gwt.dev.util.collect.HashMap;
@@ -402,7 +402,11 @@ public class RunExperimentCompare {
     renderJobs = new LinkedList<String>();
     
     boolean render_trees = this.renderTrees == RENDER_AUTO || this.renderTrees == RENDER_ALWAYS;
-    if (this.renderTrees == RENDER_AUTO && minerBranch.getTree().nodes.size() > 3000) {
+    int nodeSize = 0;
+    if (mb) nodeSize = minerBranch.getTree().nodes.size();
+    else if (ml) nodeSize = minerLinear.getTree().nodes.size();
+    
+    if (this.renderTrees == RENDER_AUTO && nodeSize > 3000) {
       // disable tree rendering for large trees in case of automatic rendering
       render_trees = false;
     }
@@ -439,7 +443,9 @@ public class RunExperimentCompare {
 
     r.append("<h2>Input</h2>\n");
     
-    TreeStatistics stat = minerBranch.getTree().getStatistics();
+    TreeStatistics stat = null;
+    if (mb) stat = minerBranch.getTree().getStatistics();
+    else if (ml) stat = minerLinear.getTree().getStatistics();
     r.append("number of nodes: "+stat.size+"<br/>\n");
     r.append("number of events: "+stat.alphabetSize+"<br/>\n");
     r.append("avg. out degree: "+stat.averageOutDegree+"<br/>\n");
@@ -447,7 +453,9 @@ public class RunExperimentCompare {
     r.append("depth: "+stat.depth+"<br/>\n");
     r.append("width: "+stat.width+"<br/>\n");
     
-    Log_ChoiceConsistency choices = new Log_ChoiceConsistency(minerBranch.getTree());
+    Log_ChoiceConsistency choices = null;
+    if (mb) choices = new Log_ChoiceConsistency(minerBranch.getTree());
+    else if (ml) choices = new Log_ChoiceConsistency(minerLinear.getTree());
     choices.getChoiceConsistency();
     
     r.append("<b>max. support/confidence to find at least one alternative with k branches</b><br/>\n");
@@ -944,15 +952,14 @@ public class RunExperimentCompare {
   
   protected void printHelp() {
     System.out.println("Sam/Mine version "+props.getProperty("sam.version"));
-    System.out.println("usage:  sam_mine <inputfile.xes.gz> <support> <confidence B> <confidence L:>");
+    System.out.println("usage:  sam_mine <inputfile.xes.gz> <support> <confidence>");
     System.out.println("  <inputfile>     path to log file");
     System.out.println("  <support>       minimum support threshold (integers > 0)");
-    System.out.println("  <confidence B>  minimum confidence for branching scenarios (between 0.0 and 1.0)");
-    System.out.println("  <confidence L>  minimum confidence for linear scenarios (between 0.0 and 1.0)");
+    System.out.println("  <confidence>    minimum confidence for scenarios (between 0.0 and 1.0)");
   }
   
   public boolean readCommandLine(String[] args) {
-    if (args.length != 4) {
+    if (args.length != 3) {
       printHelp();
       return false;
     }
@@ -964,13 +971,12 @@ public class RunExperimentCompare {
     try {
       support = Integer.parseInt(args[1]);
       confidence_branch = Double.parseDouble(args[2]);
-      confidence_linear = Double.parseDouble(args[3]);
+      confidence_linear = confidence_branch;
       density = 1.0;
       fraction = 1.0;
       
       if (support < 1) throw new NumberFormatException("support must be larger than 0");
       if (confidence_branch < 0.0 || confidence_branch > 1.0) throw new NumberFormatException("confidence must be between 0.0 and 1.0");
-      if (confidence_linear < 0.0 || confidence_linear > 1.0) throw new NumberFormatException("confidence must be between 0.0 and 1.0");
       if (density < 0.0 || density > 1.0) throw new NumberFormatException("density must be between 0.0 and 1.0");
       
     } catch (NumberFormatException e) {
@@ -1076,7 +1082,7 @@ public class RunExperimentCompare {
     
     //exp.setParameters("./experiments/p_Afschriften/", "Afschriften_agg.xes.gz", 1.0 /*fract*/, 1 /*supp*/, 1.0 /* conf */);
     //exp.setParameters("./experiments/columba_v3/", "columba_v3_resampled_agg.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
-    exp.setParameters("./experiments/columba_v3/", "columba_v3_resampled_agg_filtered3c.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 0.5 /* conf B */, 0.5 /* conf L */);
+    //exp.setParameters("./experiments/columba_v3/", "columba_v3_resampled_agg_filtered3c.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 0.5 /* conf B */, 0.5 /* conf L */);
     //exp.setParameters("./experiments_fse2012/", "columba_filtered.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
     //exp.setParameters("./experiments/crossftp_succinct/", "crossftp_succinct_traceset.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */);
     //exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 5 /*supp*/, 1.0 /* conf */);
@@ -1086,9 +1092,9 @@ public class RunExperimentCompare {
     //exp.setParameters("./experiments_fse2012/", "columba.xes.gz", 1.0 /*fract*/, 100 /*supp*/, 1.0 /* conf */);
     //exp.setParameters("./experiments_fse2012/", "columba_filtered.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 0.5 /* conf B */, .5 /* conf L */);
     //exp.setParameters("./experiments_fse2012/", "crossftp_filtered.xes.gz", 1.0 /*fract*/, 10 /*supp*/, .4 /* conf B */, 1.0 /* conf L */);
+    exp.setParameters("./experiments_fse2012/", "crossftp.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 2.0 /* conf B */, 1.0 /* conf L */);
 
     //exp.setParameters("./experiments/crossftp_invariants/", "crossftp_invariants.xes.gz", 1.0 /*fract*/, 80 /*supp*/, 1.0 /* conf B */, 1.0 /* conf L */);
-
 
     exp.experiment();
 

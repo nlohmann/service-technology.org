@@ -1,5 +1,6 @@
 package org.st.sam.mine;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -8,8 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import lscminer.datastructure.LSC;
-import lscminer.datastructure.LSCEvent;
 
 import org.deckfour.xes.model.XLog;
 import org.st.sam.log.SLog;
@@ -17,9 +16,10 @@ import org.st.sam.log.SLogTree;
 import org.st.sam.log.SLogTree.SupportedWord;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
-import org.st.sam.log.XESImport;
 import org.st.sam.mine.MineLSC.Configuration;
 import org.st.sam.mine.collect.SimpleArrayList;
+import org.st.sam.mine.datastructure.LSC;
+import org.st.sam.mine.datastructure.LSCEvent;
 
 import com.google.gwt.dev.util.collect.HashMap;
 
@@ -215,22 +215,58 @@ public class RunExperimentEffect extends RunExperimentCompare {
   @Override
   protected void printHelp() {
     System.out.println("Sam/Mine for Effects, version "+props.getProperty("sam.version"));
-    System.out.println("usage:  sam_mine_effect <inputfile.xes.gz> <support> <confidence>");
+    System.out.println("usage:  sam_mine_effect <inputfile.xes.gz> <effect> <support> <confidence>");
     System.out.println("  <inputfile>     path to log file");
+    System.out.println("  <effect>        effect as a sequence of event ids, e.g. 3,2,12");
     System.out.println("  <support>       minimum support threshold (integers > 0)");
     System.out.println("  <confidence>    minimum confidence (between 0.0 and 1.0)");
+  }
+  
+  @Override
+  public boolean readCommandLine(String[] args) {
+    if (args.length != 4) {
+      printHelp();
+      return false;
+    }
+    
+    File f = new File(args[0]);
+    
+    experimentFileRoot = f.getParent();
+    inputFile = f.getName();
+    try {
+      effects = new LinkedList<short[]>();
+      effects.add(SScenario.getWord(args[1]));
+      support = Integer.parseInt(args[2]);
+      confidence_branch = Double.parseDouble(args[3]);
+      confidence_linear = confidence_branch;
+      density = 1.0;
+      fraction = 1.0;
+      
+      if (support < 1) throw new NumberFormatException("support must be larger than 0");
+      if (confidence_branch < 0.0 || confidence_branch > 1.0) throw new NumberFormatException("confidence must be between 0.0 and 1.0");
+      if (density < 0.0 || density > 1.0) throw new NumberFormatException("density must be between 0.0 and 1.0");
+      
+    } catch (Exception e) {
+      System.err.println(e);
+      printHelp();
+      return false;
+    }
+    
+    return true;
   }
   
   public static void main(String[] args) throws IOException {
     
     RunExperimentEffect exp = new RunExperimentEffect();
-    //if (!exp.readCommandLine(args)) return;
-    exp.setParameters("./experiments_fse2012/", "crossftp_filtered.xes.gz", 1.0 /*fract*/, 10 /*supp*/, .45 /* conf B */, .45 /* conf L */);
-    exp.effects = new LinkedList<short[]>();
-    //exp.effects.add(new short[] { 49, 50, 51, 52 });
-    //exp.effects.add(new short[] { 40, 41, 45 });
-    //exp.effects.add(new short[] {41, 27});
-    exp.effects.add(new short[] { 19 });
+    if (!exp.readCommandLine(args)) return;
+
+//    exp.setParameters("./experiments_fse2012/", "crossftp_filtered.xes.gz", 1.0 /*fract*/, 10 /*supp*/, .45 /* conf B */, .45 /* conf L */);
+//    exp.effects = new LinkedList<short[]>();
+//    //exp.effects.add(new short[] { 49, 50, 51, 52 });
+//    //exp.effects.add(new short[] { 40, 41, 45 });
+//    //exp.effects.add(new short[] {41, 27});
+//    exp.effects.add(new short[] { 19 });
+    
     exp.experiment();
   }
 

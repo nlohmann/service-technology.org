@@ -11,8 +11,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import lscminer.datastructure.LSC;
-import lscminer.datastructure.LSCEvent;
+import org.st.sam.mine.datastructure.LSC;
+import org.st.sam.mine.datastructure.LSCEvent;
+
 
 public class SAMOutput {
   

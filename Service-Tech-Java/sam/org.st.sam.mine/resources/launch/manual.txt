@@ -39,18 +39,23 @@ time, so running the experiment again will not overwrite the old results.
 
 There are some "Experiment Suites" available.
 
-  * To run a standard experiment with relatively high support and
-    confidence values, execute 'run_all_simple.bat'.
+  * To run a all experiments, execute 'run_ase2013_experiments.bat'.
     
-    The entire suite takes around 230 seconds to discover scenarios
+    The entire suite takes around 2 hours to discover scenarios
     (between 1 second and 160 seconds per individual experiment)
+    
     + additional time needed to render graphics of the result files which can 
     take several seconds to a few minutes per graph depending on size and
     complexity. (Time taken on an Intel CORE i5 with 2.4 GHz).
     
-  * For an experiment with varying support and confidence settings
-    on the same data set, execute <TODO: add>
-
+  * To obtain results quicker, execute 'run_ase2013_experiments_fast.bat'
+    which will skip the experiments with long running times. This suite
+    takes around 6 minutes to finish
+     
+    + additional time needed to render graphics of the result files which can 
+    take several seconds to a few minutes per graph depending on size and
+    complexity. (Time taken on an Intel CORE i5 with 2.4 GHz).
+    
     
 2. REQUIREMENTS AND PARAMETERS
 ------------------------------
@@ -77,6 +82,10 @@ The path to the binaries of these tools are stored in './sam_mine.properties'
 The default settings assume 'mscgen' to be stored in  ./resources/mscgen' and
 GraphViz Dot to be available on the path (i.e. can be called from anywhere).
 Adjust the settings in './sam_mine.properties' to your system to run the tool.
+
+Rendering of coverage trees (which may consume significant time) can be
+switched off by changing property "sam.render_trees" in file
+"sam_mine.properties".
 
 The default memory allocation for the tool is 2.0GB. You may want to adjust
 the default memory allocation if your machine has less memory available to

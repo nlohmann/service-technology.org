@@ -83,23 +83,7 @@ public class CheckLSC {
   }
   
   
-  private SScenario getScenario(String scenario) {
-    
-    String[] charts = scenario.split("---");
-    String[] preEvents = charts[0].split(",");
-    String[] mainEvents = charts[1].split(",");
-    
-    short[] pre = new short[preEvents.length];
-    for (int e=0; e<pre.length; e++) {
-      pre[e] = Short.parseShort(preEvents[e]);
-    }
-    short[] main = new short[mainEvents.length];
-    for (int e=0; e<main.length; e++) {
-      main[e] = Short.parseShort(mainEvents[e]);
-    }
-    
-    return new SScenario(pre, main, slog.originalNames.length);
-  }
+
   
   public void checkLSC(XLog xlog, String targetFilePrefix, String scenario) throws IOException {
     System.out.println("log contains "+xlog.size()+" traces");
@@ -108,7 +92,7 @@ public class CheckLSC {
     boolean mergeTraces = (mode == MineLSC.Configuration.MODE_BRANCHING) ? true : false;
     
     tree = new MineBranchingTree(getSLog(), mergeTraces);
-    SScenario s = getScenario(scenario);
+    SScenario s = SScenario.getScenario(scenario, slog.originalNames.length);
     
     System.out.println("checking "+s);
     

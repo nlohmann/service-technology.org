@@ -7,9 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import lscminer.datastructure.LSC;
 
 import org.deckfour.xes.model.XLog;
+import org.st.sam.mine.datastructure.LSC;
 
 public class RunExperimentBranching extends RunExperimentCompare {
 

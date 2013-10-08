@@ -173,17 +173,20 @@
 			</fileset>
 		</copy>
 		
+		<!--
 		<mkdir dir="${dir.distbindir}/examples" />
 		<copy todir="${dir.distbindir}/examples">
 			<fileset dir="${home}/examples">
 				<include name="*.xes.gz" />
 			</fileset>
 		</copy>
+		-->
 		
-		<mkdir dir="${dir.distbindir}/experiments" />
-		<copy todir="${dir.distbindir}/experiments" >
-			<fileset dir="${home}/experiments">
-				<include name="**/*.xes.gz" />
+		<mkdir dir="${dir.distbindir}/experiments_ase2013" />
+		<copy todir="${dir.distbindir}/experiments_ase2013" >
+			<fileset dir="${home}/experiments_ase2013">
+				<include name="**/columba.xes.gz" />
+				<include name="**/crossftp.xes.gz" />
 			</fileset>
 		</copy>
 		

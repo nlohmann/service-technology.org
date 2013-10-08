@@ -1,5 +1,6 @@
 package org.st.sam.mine;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -7,15 +8,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import lscminer.datastructure.LSC;
 
 import org.deckfour.xes.model.XLog;
-import org.st.sam.log.Log_ChoiceConsistency;
 import org.st.sam.log.SLog;
 import org.st.sam.log.SLogTree;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.mine.MineLSC.Configuration;
+import org.st.sam.mine.datastructure.LSC;
 
 import com.google.gwt.dev.util.collect.HashMap;
 
@@ -114,47 +114,58 @@ public class RunExperimentTrigger extends RunExperimentCompare {
   @Override
   protected void printHelp() {
     System.out.println("Sam/Mine for Triggers, version "+props.getProperty("sam.version"));
-    System.out.println("usage:  sam_mine_trigger <inputfile.xes.gz> <support> <confidence>");
+    System.out.println("usage:  sam_mine_trigger <inputfile.xes.gz> <trigger> <support> <confidence>");
     System.out.println("  <inputfile>     path to log file");
+    System.out.println("  <trigger>       trigger as a sequence of event ids, e.g. 3,2,12");
     System.out.println("  <support>       minimum support threshold (integers > 0)");
     System.out.println("  <confidence>    minimum confidence (between 0.0 and 1.0)");
+  }
+  
+  @Override
+  public boolean readCommandLine(String[] args) {
+    if (args.length != 4) {
+      printHelp();
+      return false;
+    }
+    
+    File f = new File(args[0]);
+    
+    experimentFileRoot = f.getParent();
+    inputFile = f.getName();
+    try {
+      triggers = new LinkedList<short[]>();
+      triggers.add(SScenario.getWord(args[1]));
+      support = Integer.parseInt(args[2]);
+      confidence_branch = Double.parseDouble(args[3]);
+      confidence_linear = confidence_branch;
+      density = 1.0;
+      fraction = 1.0;
+      
+      if (support < 1) throw new NumberFormatException("support must be larger than 0");
+      if (confidence_branch < 0.0 || confidence_branch > 1.0) throw new NumberFormatException("confidence must be between 0.0 and 1.0");
+      if (density < 0.0 || density > 1.0) throw new NumberFormatException("density must be between 0.0 and 1.0");
+      
+    } catch (Exception e) {
+      System.err.println(e);
+      printHelp();
+      return false;
+    }
+    
+    return true;
   }
   
   public static void main(String[] args) throws IOException {
     
     RunExperimentTrigger exp = new RunExperimentTrigger();
-    //if (!exp.readCommandLine(args)) return;
-    //exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 22 /*supp*/, 1.0 /* conf */);
-    
-    
-//    short trigger = 20;
-//    
-//    Log_ChoiceConsistency cons = new Log_ChoiceConsistency("./experiments_fse2012/"+"crossftp_filtered.xes.gz");
-//    cons.getChoiceConsistency();
-//    double confidence = cons.min_consistency_high[cons.min_consistency_high.length*2/3];
-//    if (trigger != -1 && cons.continuation_consistency[trigger] != null) {
-//      for (double c : cons.continuation_consistency[trigger].values()) {
-//        if (confidence > c) confidence = c;
-//      }
-//    }
-//    int support = cons.min_support_high[cons.min_consistency_high.length*2/3];    
-//    if (trigger != -1 && cons.continuation_consistency[trigger] != null) {
-//      for (int s : cons.continuation_support[trigger].values()) {
-//        if (support > s) support = s;
-//      }
-//    }
-//    exp.setParameters("./experiments_fse2012/", "crossftp_filtered.xes.gz", 1.0 /*fract*/, support /*supp*/, confidence /* conf B */, confidence /* conf L */);
-//    exp.triggers = new LinkedList<short[]>();
-//    exp.triggers.add(new short[] { trigger });
+    if (!exp.readCommandLine(args)) return;
 
-    
+    //exp.setParameters("./experiments/columba_ext/", "columba_ext_resampled2_agg.xes.gz", 1.0 /*fract*/, 22 /*supp*/, 1.0 /* conf */);
     //exp.setParameters("./experiments_fse2012/", "columba_filtered.xes.gz", 1.0 /*fract*/, 10 /*supp*/, 1.0 /* conf */, 1.0);
-    exp.setParameters("./experiments_fse2012/", "crossftp_filtered.xes.gz", 1.0 /*fract*/, 1 /*supp*/, .45 /* conf B */, .45 /* conf L */);
-    exp.triggers = new LinkedList<short[]>();
-    //exp.triggers.add(new short[] { 49, 52 });
-    exp.triggers.add(new short[] { 19 });
+//    exp.setParameters("./experiments_fse2012/", "crossftp_filtered.xes.gz", 1.0 /*fract*/, 1 /*supp*/, .45 /* conf B */, .45 /* conf L */);
+//    exp.triggers = new LinkedList<short[]>();
+//    //exp.triggers.add(new short[] { 49, 52 });
+//    exp.triggers.add(new short[] { 19 });
     
     exp.experiment();
   }
-
 }

@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.Set;
 //import java.util.TreeSet;
 
-import lscminer.datastructure.LSC;
-import lscminer.datastructure.LSCEvent;
 
 import org.deckfour.xes.model.XLog;
 import org.st.sam.log.SLog;
@@ -29,6 +27,8 @@ import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.log.XESImport;
 import org.st.sam.mine.collect.SimpleArrayList;
+import org.st.sam.mine.datastructure.LSC;
+import org.st.sam.mine.datastructure.LSCEvent;
 import org.st.sam.util.SAMOutput;
 
 public class MineLSC {

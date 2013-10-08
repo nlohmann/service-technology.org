@@ -1,4 +1,4 @@
-package lscminer.datastructure;
+package org.st.sam.mine.datastructure;
 /**
  *
  * @author Anh Cuong Nguyen

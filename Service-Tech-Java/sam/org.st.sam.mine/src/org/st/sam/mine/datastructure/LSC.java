@@ -1,4 +1,4 @@
-package lscminer.datastructure;
+package org.st.sam.mine.datastructure;
 
 import java.util.Set;
 

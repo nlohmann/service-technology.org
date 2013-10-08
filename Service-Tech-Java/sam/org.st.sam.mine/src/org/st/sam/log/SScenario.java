@@ -128,6 +128,22 @@ public class SScenario {
     }
     return true; // first letter of long_seq[] after the last letter of short_seq[]
   }
+  
+  public static short[] getWord(String word) {
+    String[] letters = word.split(",");
+    
+    short[] _word = new short[letters.length];
+    for (int e=0; e<_word.length; e++) {
+      _word[e] = Short.parseShort(letters[e]);
+    }
+    return _word;
+  }
+  
+  public static SScenario getScenario(String scenario, int alphabet_size) {
+    
+    String[] charts = scenario.split("---");
+    return new SScenario(getWord(charts[0]), getWord(charts[1]), alphabet_size);
+  }
 
   public static void main(String []args) {
     SScenario s1 = new SScenario(new short[] {5,  184, 185, 186, 187, 115}, new short[] {197, 189, 190, 191}, 198);

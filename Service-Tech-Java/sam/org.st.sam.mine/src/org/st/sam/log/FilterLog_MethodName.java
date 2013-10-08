@@ -6,11 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import lscminer.datastructure.LSCEvent;
 
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.st.sam.mine.datastructure.LSCEvent;
 import org.st.sam.util.SAMOutput;
 
 public class FilterLog_MethodName {

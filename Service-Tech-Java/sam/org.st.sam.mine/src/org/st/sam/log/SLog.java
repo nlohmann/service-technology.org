@@ -5,13 +5,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import lscminer.datastructure.LSC;
-import lscminer.datastructure.LSCEvent;
-import lscminer.datastructure.LSCEventTable;
 
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.st.sam.mine.datastructure.LSC;
+import org.st.sam.mine.datastructure.LSCEvent;
+import org.st.sam.mine.datastructure.LSCEventTable;
 
 public class SLog {
   

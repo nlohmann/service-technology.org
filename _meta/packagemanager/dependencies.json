@@ -1,0 +1,31 @@
+{
+    "lola": {
+        "1.17": {
+            "build": "make all-configs"
+        }
+    },
+    "genet": {
+        "1.2": {}
+    },
+    "wendy": {
+        "3.3": {
+            "dependencies": [
+                ["lola", "1.17"]
+            ]
+        }
+    },
+    "mia": {
+        "1.2": {
+            "dependencies": [
+                ["wendy", "3.3"], ["lola", "1.17"]
+            ]
+        }
+    },
+    "marlene": {
+        "1.2": {
+            "dependencies": [
+                ["wendy", "3.3"], ["genet", "1.2"]
+            ]
+        }
+    }
+}

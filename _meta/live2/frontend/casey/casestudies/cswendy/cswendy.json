@@ -1,0 +1,8 @@
+{
+  "name" : "Synthesizing Partners with Wendy" , 
+  "description" : "We synthesize..." , 
+  "tools" : [ "wendy" ] , 
+  "tags" : [ "controllability", "partner synthesis" ] ,
+  "tutorial" : "..." , 
+  "calls" : [ "wendy FILE" , "wendy --og FILE" ] 
+}

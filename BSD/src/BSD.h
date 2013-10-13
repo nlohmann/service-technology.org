@@ -28,15 +28,9 @@
 
 
 /*!
- \brief XES log
+ \brief BSD automata generation
 
- Contains all functions needed to generate logs in the XES format. (See <http://www.xes-standard.org/>.)
- The logs consist of traces which themselves consist of events. The number of traces in a log can be
- specified by the user as well as the number of events in a trace which also can be randomized.
- An event contains the label of a fired transition. A trace is a sequence of transitions which can be
- fired in the net or the service automaton from the initial state.
- The user may choose if a trace has to end in a final state or not.
-
+ Contains all functions needed to generate BSD automata from given OWFNs.
 */
 class BSD {
 
@@ -71,52 +65,7 @@ class BSD {
 
         static void assignLambda(BSDNode *node, std::list<MarkingList> &SCCs);
 
-        /*========================================================
-         *------------------- b-partner check --------------------
-         *========================================================*/
-
-        static bool check_b_partner(parsedGraph & graph1, parsedGraph & graph2);
-
-        static bool computeBiSimBSD(parsedGraph & graph1, parsedGraph & graph2, unsigned int node_g1, unsigned int node_g2, std::map<Label_ID, Label_ID> * mapping);
-
-        static std::map<Label_ID, Label_ID>* computeMappingBSD(parsedGraph & graph1, parsedGraph & graph2);
-
-        /*========================================================
-         *-------------------- CSD computation -------------------
-         *========================================================*/
-
-        static void computeCSD(BSDgraph & graph);
-
-        /*========================================================
-         *------------------- b-conformance check ----------------
-         *========================================================*/
-
-        static bool check_b_conformance(parsedGraph & graph1, parsedGraph & graph2);
-
-        static bool computeBiSimCSD(parsedGraph & graph1, parsedGraph & graph2, unsigned int node_g1, unsigned int node_g2, std::map<Label_ID, Label_ID> * mapping);
-
-        static std::map<Label_ID, Label_ID>* computeMappingCSD(parsedGraph & graph1, parsedGraph & graph2);
-
-        /*========================================================
-         *--------------------- DOT to BSD parser ----------------
-         *========================================================*/
-
-        static parsedGraph * dot2graph_parse(std::istream & is);
-
-        static void Tokenize(const std::string& str, std::list<std::string>& tokens, const std::string& delimiters);
-
-        /*========================================================
-         *---------------------- TEST OUTPUT ---------------------
-         *========================================================*/
-
-        static void printParsedGraph(parsedGraph & graph);
-
-        static void printBiSim(parsedGraph & graph1, parsedGraph & graph2, std::list<unsigned int>* bisim);
-
-
     private:
-
-        static std::list<unsigned int>* bisimtemp;
 
         // helpers for tarjan algorithm (lambda value computation)
         static MarkingList* templist;

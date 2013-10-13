@@ -2,7 +2,7 @@
 
 # parameter 1: directory with owfn files
 if [ ! $1 ]; then
-   echo "$0: Usage: $0 'directory with OWFNs' 'output directory (or '-')' 'bound1' ['bound2'] ..."
+   echo "$0: Usage: $0 'directory with OWFNs' ('output directory'|'-') 'bound1' ['bound2'] ..."
    exit
 fi
 
@@ -15,7 +15,7 @@ INPUTDIR=`basename $1`
 
 # parameter 2: directory for output
 if [ ! $2 ]; then
-   echo "$0: Usage: $0 'directory with OWFNs' 'output directory (or '-')' 'bound1' ['bound2'] ..."
+   echo "$0: Usage: $0 'directory with OWFNs' ('output directory'|'-') 'bound1' ['bound2'] ..."
    exit
 elif [ $2 == "-" ]; then
    # create new directory with timestamp
@@ -34,7 +34,7 @@ fi
 
 # parameter 3+: bounds
 if [ ! $3 ]; then
-   echo "$0: Usage: $0 'directory with OWFNs' 'output directory (or '-')' 'bound1' ['bound2'] ..."
+   echo "$0: Usage: $0 'directory with OWFNs' ('output directory'|'-') 'bound1' ['bound2'] ..."
    exit
 fi
 

@@ -31,6 +31,10 @@
 #include "InnerMarking.h"
 #include "openNet.h"
 #include "BSD.h"
+#include "CSD.h"
+#include "partnercheck.h"
+#include "confcheck.h"
+#include "parser.h"
 #include "Label.h"
 #include "cmdline.h"
 #include "Output.h"
@@ -383,7 +387,7 @@ int main(int argc, char** argv) {
         if (args_info.CSD_flag) {
         	status("starting CSD automaton computation...");
         	time(&start_time);
-        	BSD::computeCSD(_BSDgraph);
+        	CSD::computeCSD(_BSDgraph);
         	time(&end_time);
         	_BSDgraph.CSD_comp_time = difftime(end_time, start_time);
         	status("computation is done [%.0f sec]", _BSDgraph.CSD_comp_time);
@@ -463,11 +467,11 @@ int main(int argc, char** argv) {
         		}
 
         		// parse into _parsedGraph[i]
-        		_parsedGraph[i] = BSD::dot2graph_parse(inputStream);
+        		_parsedGraph[i] = parser::dot2graph_parse(inputStream);
 
         		if (args_info.verbose_flag) {
         			status("parsed graph %i:", i+1);
-        			BSD::printParsedGraph(*_parsedGraph[i]);
+        			parser::printParsedGraph(*_parsedGraph[i]);
         		}
         	} catch (const pnapi::exception::InputError& error) {
         		std::ostringstream s;
@@ -481,7 +485,7 @@ int main(int argc, char** argv) {
    		`---------------------------*/
 
     	if (args_info.partnerCheck_flag) {
-    		bool valid = BSD::check_b_partner(*_parsedGraph[0], *_parsedGraph[1]);
+    		bool valid = partnercheck::check_b_partner(*_parsedGraph[0], *_parsedGraph[1]);
 
     		if (valid) {
     			message("net 1 is a %i-partner of net 2!", _parsedGraph[0]->bound);
@@ -496,7 +500,7 @@ int main(int argc, char** argv) {
    		`-------------------------------*/
 
     	if (args_info.confCheck_flag) {
-    		bool valid = BSD::check_b_conformance(*_parsedGraph[0], *_parsedGraph[1]);
+    		bool valid = confcheck::check_b_conformance(*_parsedGraph[0], *_parsedGraph[1]);
 
     		if (valid) {
     			message("net 1 %i-conforms to net 2!", _parsedGraph[0]->bound);

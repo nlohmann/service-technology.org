@@ -5,6 +5,10 @@ bin_PROGRAMS = BSD
 BSD_SOURCES = cmdline.c cmdline.h \
                 InnerMarking.h InnerMarking.cc \
                 BSD.cc BSD.h \
+                CSD.cc CSD.h \
+                partnercheck.cc partnercheck.h \
+                confcheck.cc confcheck.h \
+                parser.cc parser.h \
                 openNet.cc openNet.h \
                 Label.h Label.cc \
                 main.cc \

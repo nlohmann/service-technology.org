@@ -1,0 +1,45 @@
+		       ____   ____ ____
+		      |  _  \/ ___|  _ \
+		      | |_/ /\__  \ | \ |
+		      | |_\ \___| | |_/ |
+		      |_____/\____/____/
+                      generating BSD automata...
+                      http://service-technology.org/BSD
+
+
+
+PURPOSE
+    BSD is a tool to generate BSD automata from OWFN input.
+
+
+COPYRIGHT
+    Copyright (c) 2013 Simon Heiden
+
+
+AUTHORS
+    See file "AUTHORS" for details.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    BSD is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of BSD.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+    BSD can be easily compiled and installed. See file "INSTALL" for
+    instructions. Please also have a look at the file "REQUIREMENTS" for
+    information on the tools required to run, compile, and develop BSD.
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of BSD. It can also be
+    downloaded at <http://service-technology.org/files/BSD/BSD.pdf>. A
+    tool paper describing a case study conducted with BSD can be found in
+    the file "doc/toolpaper.pdf".

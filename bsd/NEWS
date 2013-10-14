@@ -1,0 +1,22 @@
+		       ____   ____ ____
+		      |  _  \/ ___|  _ \
+		      | |_/ /\__  \ | \ |
+		      | |_\ \___| | |_/ |
+		      |_____/\____/____/
+                      generating BSD automata...
+                      http://service-technology.org/BSD
+
+
+
+Version 1.1-unreleased
+======================
+
+* generate CSD automata from OWFN input
+
+* test: does input net A b-conform to input net B?
+
+* parsing of BSD and CSD automata given as dot files
+
+
+See file ChangeLog <http://service-technology.org/files/BSD/ChangeLog> for
+complete version history.

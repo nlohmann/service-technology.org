@@ -1,0 +1,474 @@
+\input texinfo
+@setfilename BSD.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle BSD User's Manual
+
+@c --------------------------------------------------------------------------
+
+@copying
+
+@b{About this document:}
+
+This manual is for BSD, version @value{VERSION}, a tool to generate BSD automata from OWFN, last updated @value{UPDATED}.
+
+Copyright @copyright{} 2013 Simon Heiden
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@dircategory service-technology.org
+@direntry
+* BSD: (BSD).       generating BSD automata...
+@end direntry
+
+
+@c --------------------------------------------------------------------------
+
+@titlepage
+
+@title BSD
+
+@subtitle BSD automata...
+@subtitle @url{http://service-technology.org/BSD}
+@vskip 0.5em
+@subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author Simon Heiden
+@page
+
+
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c --------------------------------------------------------------------------
+
+@ifnottex
+@node Top
+@top BSD
+@insertcopying
+@end ifnottex
+
+@c --------------------------------------------------------------------------
+
+@menu
+* First Steps::How to set up and install BSD.
+* Command Line Options::How to run BSD.
+* Theory::The theory behind BSD.
+* Exit and Error Codes::What the error and exit codes of BSD mean.
+* ChangeLog::Version history.
+* GNU Free Documentation License::The license of this manual.
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@contents
+@paragraphindent none
+
+@c --------------------------------------------------------------------------
+
+@node First Steps
+@chapter First Steps
+
+@section Setup and Installation
+
+@enumerate
+@item Go to @url{http://service-technology.org/files/BSD} and download the latest release version of BSD, say @file{BSD-@value{VERSION}.tar.gz}. To setup and compile BSD, change into your download directory and type
+
+@cartouche
+@smallexample
+tar xfz BSD-@value{VERSION}.tar.gz
+cd BSD-@value{VERSION}
+./configure
+make
+@end smallexample
+@end cartouche
+
+After compilation, a binary @samp{src/BSD} is generated.@footnote{On Microsoft Windows, the file will be called @file{BSD.exe}.} If you experience any compiler warnings, don't panic: BSD contains some generated or third party code that we cannot influence.
+
+@item To test whether everything went fine, type
+
+@cartouche
+@smallexample
+make check
+@end smallexample
+@end cartouche
+
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
+
+@smallexample
+## ------------- ##
+## Test results. ##
+## ------------- ##
+
+All xy tests were successful.
+@end smallexample
+
+If an error occurs, please send the output to @email{BSD@@service-technology.org}.
+
+@item To install the binary, the manpage, and the documentation, type
+
+@cartouche
+@smallexample
+make install
+@end smallexample
+@end cartouche
+
+You might need superuser permissions to do so.
+@end enumerate
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of BSD. The documentation can be created using @samp{make pdf}. Note you need to have BSD properly installed before (see installation description above).
+
+@item libs
+The Petri Net @acronym{API} used by BSD to parse and organize the open net.
+
+@item man
+The manpage of BSD which can be displayed using @samp{man BSD} after having BSD installed (see installation description above).
+
+@item src
+The source code of BSD.
+
+@item tests
+Testcases for BSD which check the generated binary.
+@end table
+
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@section Requirements
+@anchor{Requirements}
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+In order to run, compile, and develop BSD, several tools are required.
+
+@subsection Runtime
+@itemize
+@item LoLA (@url{http://service-technology.org/lola}), compiled with the @samp{STATESPACE} option. A suitable LoLA (version 1.14 or above) binary can be created as follows:
+@enumerate
+@item download @url{http://service-technology.org/files/lola/lola.tar.gz}
+@item untar @file{lola.tar.gz}, configure
+@item call @samp{make lola-statespace}
+@item copy the binary @file{src/lola-statespace} to a directory of your path
+(e.g., @file{/usr/local/bin}) or call @samp{make install}
+@end enumerate
+
+If LoLA is not installed before BSD is configured, a source release of LoLA is automatically downloaded and compiled.
+@end itemize
+
+BSD's configure script checks whether LoLA (with binary @file{lola-statespace}) is found in the path and adjusts the configuration file @file{src/BSD.conf} accordingly.
+
+
+@subsection Compilation
+To compile the source code from a source distribution, the following tools are required.
+
+@itemize
+@item GCC (@url{http://gcc.gnu.org/}) or Clang (@url{http://clang.llvm.org/})
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
+@end itemize
+
+
+@subsection Development
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile BSD.
+
+@itemize
+@item Autoconf, @url{http://www.gnu.org/software/autoconf/}
+@item Automake, @url{http://www.gnu.org/software/automake/}
+@item Bison, @url{http://www.gnu.org/software/bison/}
+@item flex, @url{http://flex.sourceforge.net/}
+@item Gengetopt, @url{http://www.gnu.org/software/gengetopt/}
+@item help2man, @url{http://www.gnu.org/software/help2man/}
+@item Texinfo, @url{http://www.gnu.org/software/texinfo/}
+@end itemize
+
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Command Line Options
+@chapter Invoking BSD
+
+BSD is a command line tool and does not come with a fancy @acronym{GUI}. However, BSD can be easily scripted and combined with other tools.
+
+@section Command Line Options
+
+For an overview of the command line options, type @samp{BSD -h} to see the following help screen:
+
+@smallexample
+@verbatiminclude cmdline.out
+@end smallexample
+
+
+@section Configuration Files
+
+The parameters can also be controlled using a configuration file that can be read using the @samp{config} option; for example:
+
+@cartouche
+@smallexample
+BSD net.owfn --config=myconf.conf
+@end smallexample
+@end cartouche
+
+A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
+
+The configure script creates a default configuration file @file{BSD.conf} which located in the @file{src} folder. When installing BSD, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
+
+When BSD is executed, it evaluates parameters as follows:
+@enumerate
+@item When a configuration file is given via @option{--config}, it is used.
+@item Otherwise, the configuration file @file{BSD.conf} in the local directory is used if present.
+@item Otherwise, the configuration file @file{BSD.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
+@item Otherwise, no configuration file is used.
+@end enumerate
+Parameters given via command-line will overwrite parameters given via configuration files.
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Theory
+@chapter Theory
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+BSD implements several algorithms and result published in several scientific articles.
+
+@section BSD automata
+
+BSD's main function is to generate BSD automata from given OWFN and a bound b.
+
+The nets reachability graph is calculated by lola and used to compute the BSD automata. If two OWFN are given then BSD computes both nets' BSD automata and answers the question of net A being a br-controller of net B or vice versa. Therefore Net A and B have to be composable and the composition has to be a closed net.
+
+
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Exit and Error Codes
+@chapter Exit and Error Codes
+
+
+@section Exit Codes
+
+BSD will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input net or service automaton could be read, the other steps of the requested task have been taken successfully, and---if requested---output files could be successfully written. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+
+
+
+@section Error Codes
+
+In case any error occurs, BSD aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+
+@table @asis
+@item #01
+Error opening the input open net or input file not found.
+
+@smallexample
+@cartouche
+BSD: could not open file `foo.owfn' -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@item #02
+Error parsing the input open net. Usually indicates the line of the error and some more or less helpful message on the parse error.
+
+@smallexample
+@cartouche
+BSD:13: error near `Place': syntax error, unexpected IDENT,
+          expecting KEY_INTERFACE or KEY_PLACE -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #03
+The input open net is not normal. That is, it contains a transition that is connected to more than one interface place. Note that non-normal open net can be normalized using the frontend tool @samp{petri} of the Petri Net @acronym{API}.
+
+@smallexample
+@cartouche
+BSD: the input open net must be normal -- aborting [#03]
+@end cartouche
+@end smallexample
+
+@item #04
+At most one basic option must be given.
+
+@smallexample
+@cartouche
+BSD: only one basic option is allowed at a time -- aborting [#04]
+@end cartouche
+@end smallexample
+
+@item #05
+The bound parameter's argument has to be a positive integer.
+
+@smallexample
+@cartouche
+BSD: bound has to be a positive integer -- aborting [#05]
+@end cartouche
+@end smallexample
+
+@item #06
+In the case of checking the theorem two input files must be given.
+
+@smallexample
+@cartouche
+BSD: two input files must be given -- aborting [#06]
+@end cartouche
+@end smallexample
+
+@item #07
+In the other cases only one file must be given.
+
+@smallexample
+@cartouche
+BSD: at most one input file must be given -- aborting [#07]
+@end cartouche
+@end smallexample
+
+@item #08
+All arc weights in the input net have to be equal to one.
+
+@smallexample
+@cartouche
+BSD: all arc weights have to be equal to 1 -- aborting [#08]
+@end cartouche
+@end smallexample
+
+@item #09
+This error occurs in case BSD could not parse the reachability graph from LoLA. This might happen if a wrong version of LoLA (e.g., not using the @samp{STATESPACE} mode, see @ref{Requirements}) is used or LoLA runs out of memory. To get the exact parse error, use the command-line option @samp{--verbose}.
+
+@smallexample
+@cartouche
+BSD: error while parsing the reachability graph -- aborting [#09]
+@end cartouche
+@end smallexample
+
+@item #10
+This error occurs in case BSD could not parse an automaton from a dot file. There have to be attributes at the start of the dot file that specify the bound, the node count and the event count of the automaton.
+
+@smallexample
+@cartouche
+BSD: Input file misses bound, nodes and/or events attributes.
+      -- aborting [#10]
+@end cartouche
+@end smallexample
+
+@item #11
+This error occurs in case BSD could not parse an automaton from a dot file. In particular the number of parsed nodes doesn't match the parsed node count attribute.
+
+@smallexample
+@cartouche
+BSD: Parsed parameter doesn't match parsed nodes' count.
+      -- aborting [#11]
+@end cartouche
+@end smallexample
+
+@item #12
+This error occurs in case BSD could not parse an automaton from a dot file. In particular the number of parsed labels doesn't match the parsed event count attribute.
+
+@smallexample
+@cartouche
+BSD: Parsed parameter doesn't match parsed labels' count.
+      -- aborting [#12]
+@end cartouche
+@end smallexample
+
+
+@item #13
+Error opening a file to write. Usually, this error occurs in case BSD is called in a directory without writing permissions or the output file is already present, but write protected. Output files can be the target files of the @option{--og} or @option{--dot} parameter as well as the temporary LoLA file @file{tmp.lola} or the generated cover constraint file @file{ogfile.cover}.
+
+@smallexample
+@cartouche
+BSD: could not write to file `foo.og' -- aborting [#13]
+@end cartouche
+@end smallexample
+
+@item #14
+BSD cannot create a temporary file @file{/tmp/BSD-XXXXXX}, where @samp{XXXXXX} is replaced by a unique name. If this error occurs, check whether the @file{/tmp} folder exists and you have the rights to write there. One reason for this error can be that you are running BSD under Windows (outside Cygwin), where UNIX-style path names are not recognized. In that case, try using the @option{--tmpfile} parameter. In case you provide a filename without @samp{XXXXXX} suffix, make sure this file does not already exist.
+
+@smallexample
+@cartouche
+BSD: could not create a temporary file `/tmp/BSD-k4CS4x'
+          -- aborting [#14]
+@end cartouche
+@end smallexample
+
+The parameter @option{--verbose} can give you additional information on the nature of the error, e.g. `Permission denied' or `File exists'.
+
+@item #15
+BSD cannot find the configuration file given by @file{--config} parameter or it has syntax errors. For an example configuration file, see the standard configuration file @file{src/BSD.conf} created by the configure script. See @url{http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files} for more information on configuration file.
+
+@smallexample
+@cartouche
+BSD: Error opening configuration file `myconf.conf'
+BSD: error reading configuration file `myconf.conf' -- aborting [#15]
+@end cartouche
+@end smallexample
+
+@item #16
+Invalid option(s) were given in the command-line.
+
+@smallexample
+@cartouche
+BSD: invalid command-line parameter(s) -- aborting [#16]
+@end cartouche
+@end smallexample
+
+
+@end table
+
+
+@c --------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+BSD is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+The most recent change log is available at BSD's website at @url{http://service-technology.org/files/BSD/ChangeLog}.
+
+
+@c --------------------------------------------------------------------------
+
+@node GNU Free Documentation License
+@appendix The GNU Free Documentation License
+@include fdl.texi
+
+
+@bye

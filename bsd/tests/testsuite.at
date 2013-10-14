@@ -1,0 +1,288 @@
+AT_INIT
+AT_COLOR_TESTS
+
+m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([BSD_ --help],0,ignore)
+AT_CHECK([BSD_ --detailed-help],0,ignore)
+AT_CHECK([BSD_ --full-help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([BSD_ --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Parameters])
+############################################################################
+
+AT_SETUP([Piping from stdin])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cat myCoffee.owfn | BSD_ --BSD --verbose --bound=1],0,ignore,ignore)
+AT_CHECK([test -f BSD_1\(BSD_output\).dot])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Piping to stdout])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([BSD_ myCoffee.owfn --BSD --verbose --bound=1 --dotFile=-],0,stdout,ignore)
+AT_CHECK([GREP -q "digraph" stdout])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Piping from stdin to stdout])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([cat myCoffee.owfn | BSD_ --BSD --verbose --bound=1 --dotFile=-],0,stdout,ignore)
+AT_CHECK([GREP -q "digraph" stdout])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([DOT output (BSD)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([BSD_ myCoffee.owfn --BSD --verbose --bound=1],0,ignore,ignore)
+AT_CHECK([test -f BSD_1\(myCoffee\).dot])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([DOT output (CSD)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([BSD_ myCoffee.owfn --verbose --bound=1 --CSD],0,ignore,ignore)
+AT_CHECK([test -f CSD_1\(myCoffee\).dot])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([b-partner check])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/BSD1.dot .])
+AT_CHECK([cp TESTFILES/BSD2.dot .])
+AT_CHECK([BSD_ --partnerCheck BSD1.dot BSD2.dot --verbose --bound=1],0,ignore,stderr)
+AT_CHECK([GREP -q "partner" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([b-conformance check])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/CSD1.dot .])
+AT_CHECK([cp TESTFILES/CSD2.dot .])
+AT_CHECK([BSD_ --confCheck CSD1.dot CSD2.dot --verbose --bound=1],0,ignore,stderr)
+AT_CHECK([GREP -q "conform" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Using given output filename])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([BSD_ myCoffee.owfn --BSD --verbose --bound=1 --dotFile=test.dot],0,ignore,ignore)
+AT_CHECK([test -f test.dot])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Bug information output])
+AT_CHECK([BSD_ --bug],0,ignore,stderr)
+AT_CHECK([GREP -q "BSD: Please send file 'bug.log' to BSD@service-technology.org!" stderr])
+AT_CHECK([test -f bug.log])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Cleaning vs. no cleaning of temporary files])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([BSD_ --BSD myCoffee.owfn --tmpfile=BSD-XXXXXX -v],0,ignore,ignore)
+AT_CHECK([test -f BSD-*],1)
+AT_CHECK([BSD_ --BSD myCoffee.owfn --tmpfile=BSD-XXXXXX --noClean -v],0,ignore,ignore)
+AT_CHECK([test -f BSD-*],0)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Using a given configuration file])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_DATA([my_BSD.conf], [verbose
+])
+AT_CHECK([BSD_ --BSD --config=my_BSD.conf myCoffee.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "using configuration file 'my_BSD.conf'" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Using a present configuration file])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_DATA([BSD.conf], [verbose
+])
+AT_CHECK([BSD_ --BSD myCoffee.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "using configuration file 'BSD.conf'" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+
+#############################################################################
+AT_BANNER([Memory Management])
+#############################################################################
+
+
+AT_SETUP([Checking for memory leaks with Valgrind (OWFN -> DOT)])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK_LOLA
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes BSD_RAW --BSD --CSD myCoffee.owfn --finalize],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks with Valgrind (b-partner check)])
+AT_CHECK([cp TESTFILES/BSD1.dot .])
+AT_CHECK([cp TESTFILES/BSD2.dot .])
+AT_CHECK_LOLA
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes BSD_RAW --partnerCheck BSD1.dot BSD2.dot --finalize],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks with Valgrind (b-conformance check)])
+AT_CHECK([cp TESTFILES/CSD1.dot .])
+AT_CHECK([cp TESTFILES/CSD2.dot .])
+AT_CHECK_LOLA
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes BSD_RAW --confCheck CSD1.dot CSD2.dot --finalize],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Errors])
+############################################################################
+
+AT_SETUP([Input file not found])
+AT_CHECK([BSD_ --BSD foo.owfn --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#01\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Syntax error])
+AT_CHECK([cp TESTFILES/error02.* .])
+AT_CHECK([BSD_ --BSD error02.owfn --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#02\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Un-normal input net])
+AT_CHECK([cp TESTFILES/error03.* .])
+AT_CHECK([BSD_ --BSD error03.owfn --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#03\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Multiple options])
+AT_CHECK([cp TESTFILES/error02* .])
+AT_CHECK([BSD_ --CSD --confCheck error02.owfn --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#04\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([bound not positive])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([BSD_ --BSD myCoffee.owfn --bound=-1],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#05\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Multiple file input (check theorem)])
+AT_CHECK([cp TESTFILES/error04* .])
+AT_CHECK([BSD_ --partnerCheck error04-1.owfn error04-2.owfn error04-2.owfn --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#06\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Multiple file input (other cases)])
+AT_CHECK([cp TESTFILES/error04* .])
+AT_CHECK([BSD_ --BSD error04-1.owfn error04-2.owfn --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#07\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+#AT_SETUP([Arc weight greater than 1])
+#AT_CHECK([cp TESTFILES/error08* .])
+#AT_CHECK([BSD_ --BSD error08.owfn --bound=1],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#08\]]" stderr])
+#AT_KEYWORDS(error)
+#AT_CLEANUP
+
+AT_SETUP([Error building the reachability graph])
+AT_CHECK([cp TESTFILES/error06.* .])
+AT_CHECK([BSD_ --BSD error06.owfn --lola=foo],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#09\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Missing attributes in parsed dot file])
+AT_CHECK([cp TESTFILES/error10.* .])
+AT_CHECK([BSD_ --partnerCheck error10.dot error10.dot],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Wrong number of nodes in parsed dot file])
+AT_CHECK([cp TESTFILES/error11.* .])
+AT_CHECK([BSD_ --partnerCheck error11.dot error11.dot],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#11\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Wrong number of labels in parsed dot file])
+AT_CHECK([cp TESTFILES/error12.* .])
+AT_CHECK([BSD_ --partnerCheck error12.dot error12.dot],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#12\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cannot write to file])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([touch BSD_1\(myCoffee\).dot])
+AT_CHECK([chmod a-w BSD_1\(myCoffee\).dot])
+AT_CHECK([BSD_ --BSD myCoffee.owfn --bound=1 --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#13\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cannot create tempfile])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([touch foo])
+AT_CHECK([chmod a-w foo])
+AT_CHECK([BSD_ --BSD myCoffee.owfn --verbose --tmpfile=foo],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Missing configuration file])
+AT_CHECK([BSD_ --BSD --config=foo],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#15\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Invalid configuration file])
+AT_DATA([BSD.conf], [invalid="PARAMETER"
+])
+AT_CHECK([BSD_ --BSD -v],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#15\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Invalid command line parameter])
+AT_CHECK([BSD_ --BSD --foo],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#16\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP

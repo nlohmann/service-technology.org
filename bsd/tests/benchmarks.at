@@ -1,0 +1,2 @@
+AT_INIT([Benchmarks])
+AT_COLOR_TESTS

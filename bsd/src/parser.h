@@ -32,8 +32,11 @@
  The format should be like the following:
 
  There have to be parameters in the comments specifying the bound, the node count and the event count:
+
  	 bound:             x
+
  	 nodes:             y
+
  	 labels (total):    z
 
  The initial node of the graph is assumed to be the first node parsed. There is a test on correct label

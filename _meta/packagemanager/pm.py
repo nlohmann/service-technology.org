@@ -6,7 +6,7 @@ import sys
 import json
 
 BASEURL = 'http://download.gna.org/service-tech/'
-INSTALLDIR = 'cellar'
+INSTALLDIR = 'tools'
 
 DEPS = json.load(open("dependencies.json", 'r'))
 
@@ -38,6 +38,12 @@ def install(TOOL, VERSION):
         for entry in PATHS:
             result += os.path.abspath("./" + entry) + "/bin:"
         result += "$PATH"
+        
+        result += " LDFLAGS='"
+        for entry in PATHS:
+            result += "-L" + os.path.abspath("./" + entry) + "/lib "
+        result += "'"
+
         return result
 
     def download():
@@ -76,4 +82,6 @@ def install(TOOL, VERSION):
 #install('lola', '1.16')
 #install('lola', '1.17')
 #install('mia', '1.2')
-install('marlene', '1.2')
+#install('marlene', '1.2')
+install('wendy', '3.3')
+#install('sara', '1.13')

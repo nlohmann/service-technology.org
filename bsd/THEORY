@@ -14,13 +14,22 @@ articles.
 BSD automata
 ============
 
-BSD's main function is to generate BSD automata from given OWFN and a bound b.
+BSD's main function is to generate BSD__b_ and CSD__b_ automata from given
+OWFN and a bound _b_. BSD can also check if two nets are _b_-partners or if
+they _b_-conform.
 
-The nets reachability graph is calculated by lola and used to compute the BSD
-automata. If two OWFN are given then BSD computes both nets' BSD automata and
-answers the question of net A being a br-controller of net B or vice versa.
-Therefore Net A and B have to be composable and the composition has to be a
-closed net.
+The nets reachability graph is calculated by lola and used to compute the
+BSD__b_ and CSD__b_ automata. DOT files are generated as output.
+
+Two BSD__b_ automata BSD__b_(_A_) and BSD__b_(_B_) given as DOT files can be
+given as input to answer the question of net _A_ being a _b_-partner of net
+_B_ or vice versa. The underlying nets _A_ and _B_ have to be composable and
+the composition _A+B_ has to be a closed net.
+
+Two CSD__b_ automata CSD__b_(_implication_) and CSD__b_(_specification_) given
+as DOT files can be given as input to answer the question of net _implication_
+_b_-conforms to net _specification_. The underlying nets _implication_ and
+_specification_ have to have the same interfaces.
 
 
 

@@ -259,9 +259,13 @@ BSD implements several algorithms and result published in several scientific art
 
 @section BSD automata
 
-BSD's main function is to generate BSD automata from given OWFN and a bound b.
+BSD's main function is to generate BSD_@emph{b} and CSD_@emph{b} automata from given OWFN and a bound @emph{b}. BSD can also check if two nets are @emph{b}-partners or if they @emph{b}-conform.
 
-The nets reachability graph is calculated by lola and used to compute the BSD automata. If two OWFN are given then BSD computes both nets' BSD automata and answers the question of net A being a br-controller of net B or vice versa. Therefore Net A and B have to be composable and the composition has to be a closed net.
+The nets reachability graph is calculated by lola and used to compute the BSD_@emph{b} and CSD_@emph{b} automata. DOT files are generated as output.
+
+Two BSD_@emph{b} automata BSD_@emph{b}(@emph{A}) and BSD_@emph{b}(@emph{B}) given as DOT files can be given as input to answer the question of net @emph{A} being a @emph{b}-partner of net @emph{B} or vice versa. The underlying nets @emph{A} and @emph{B} have to be composable and the composition @emph{A+B} has to be a closed net.
+
+Two CSD_@emph{b} automata CSD_@emph{b}(@emph{implication}) and CSD_@emph{b}(@emph{specification}) given as DOT files can be given as input to answer the question of net @emph{implication} @emph{b}-conforms to net @emph{specification}. The underlying nets @emph{implication} and @emph{specification} have to have the same interfaces.
 
 
 

@@ -15,7 +15,7 @@ AUTHORS
     Simon Heiden
 	 implemented the functionality of BSD
     Niels Lohmann
-	 The tool 'Wendy' was used as a base for BSD. Some functionality 
+	 The tool 'Wendy' was used as a base for Locretia. Some functionality 
 	 concerning the computation of the reachability graph of the inner of
 	 the OWFNs was used especially.
 

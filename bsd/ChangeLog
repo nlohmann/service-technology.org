@@ -4,11 +4,11 @@
 		      | |_\ \___| | |_/ |
 		      |_____/\____/____/
                       generating BSD automata...
-                      http://service-technology.org/BSD
+                      http://service-technology.org/bsd
 
 
 
-Version 1.1-unreleased
+Version 1.1
 ======================
 
 * generate CSD automata from OWFN input

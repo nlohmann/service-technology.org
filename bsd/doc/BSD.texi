@@ -1,5 +1,5 @@
 \input texinfo
-@setfilename BSD.info
+@setfilename bsd.info
 @include version.texi
 @afourpaper
 @finalout
@@ -24,7 +24,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @dircategory service-technology.org
 @direntry
-* BSD: (BSD).       generating BSD automata...
+* BSD: (bsd).       generating BSD automata...
 @end direntry
 
 
@@ -35,7 +35,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @title BSD
 
 @subtitle BSD automata...
-@subtitle @url{http://service-technology.org/BSD}
+@subtitle @url{http://service-technology.org/bsd}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
 
@@ -79,18 +79,18 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @section Setup and Installation
 
 @enumerate
-@item Go to @url{http://service-technology.org/files/BSD} and download the latest release version of BSD, say @file{BSD-@value{VERSION}.tar.gz}. To setup and compile BSD, change into your download directory and type
+@item Go to @url{http://service-technology.org/files/bsd} and download the latest release version of BSD, say @file{bsd-@value{VERSION}.tar.gz}. To setup and compile BSD, change into your download directory and type
 
 @cartouche
 @smallexample
-tar xfz BSD-@value{VERSION}.tar.gz
-cd BSD-@value{VERSION}
+tar xfz bsd-@value{VERSION}.tar.gz
+cd bsd-@value{VERSION}
 ./configure
 make
 @end smallexample
 @end cartouche
 
-After compilation, a binary @samp{src/BSD} is generated.@footnote{On Microsoft Windows, the file will be called @file{BSD.exe}.} If you experience any compiler warnings, don't panic: BSD contains some generated or third party code that we cannot influence.
+After compilation, a binary @samp{src/bsd} is generated.@footnote{On Microsoft Windows, the file will be called @file{bsd.exe}.} If you experience any compiler warnings, don't panic: BSD contains some generated or third party code that we cannot influence.
 
 @item To test whether everything went fine, type
 
@@ -110,7 +110,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 All xy tests were successful.
 @end smallexample
 
-If an error occurs, please send the output to @email{BSD@@service-technology.org}.
+If an error occurs, please send the output to @email{bsd@@service-technology.org}.
 
 @item To install the binary, the manpage, and the documentation, type
 
@@ -138,7 +138,7 @@ The Texinfo documentation of BSD. The documentation can be created using @samp{m
 The Petri Net @acronym{API} used by BSD to parse and organize the open net.
 
 @item man
-The manpage of BSD which can be displayed using @samp{man BSD} after having BSD installed (see installation description above).
+The manpage of BSD which can be displayed using @samp{man bsd} after having BSD installed (see installation description above).
 
 @item src
 The source code of BSD.
@@ -173,7 +173,7 @@ In order to run, compile, and develop BSD, several tools are required.
 If LoLA is not installed before BSD is configured, a source release of LoLA is automatically downloaded and compiled.
 @end itemize
 
-BSD's configure script checks whether LoLA (with binary @file{lola-statespace}) is found in the path and adjusts the configuration file @file{src/BSD.conf} accordingly.
+BSD's configure script checks whether LoLA (with binary @file{lola-statespace}) is found in the path and adjusts the configuration file @file{src/bsd.conf} accordingly.
 
 
 @subsection Compilation
@@ -216,7 +216,7 @@ BSD is a command line tool and does not come with a fancy @acronym{GUI}. However
 
 @section Command Line Options
 
-For an overview of the command line options, type @samp{BSD -h} to see the following help screen:
+For an overview of the command line options, type @samp{bsd -h} to see the following help screen:
 
 @smallexample
 @verbatiminclude cmdline.out
@@ -229,19 +229,19 @@ The parameters can also be controlled using a configuration file that can be rea
 
 @cartouche
 @smallexample
-BSD net.owfn --config=myconf.conf
+bsd net.owfn --BSD --config=myconf.conf
 @end smallexample
 @end cartouche
 
 A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
 
-The configure script creates a default configuration file @file{BSD.conf} which located in the @file{src} folder. When installing BSD, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
+The configure script creates a default configuration file @file{bsd.conf} which located in the @file{src} folder. When installing BSD, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
 
 When BSD is executed, it evaluates parameters as follows:
 @enumerate
 @item When a configuration file is given via @option{--config}, it is used.
-@item Otherwise, the configuration file @file{BSD.conf} in the local directory is used if present.
-@item Otherwise, the configuration file @file{BSD.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
+@item Otherwise, the configuration file @file{bsd.conf} in the local directory is used if present.
+@item Otherwise, the configuration file @file{bsd.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
 @item Otherwise, no configuration file is used.
 @end enumerate
 Parameters given via command-line will overwrite parameters given via configuration files.
@@ -295,7 +295,7 @@ Error opening the input open net or input file not found.
 
 @smallexample
 @cartouche
-BSD: could not open file `foo.owfn' -- aborting [#01]
+bsd: could not open file `foo.owfn' -- aborting [#01]
 @end cartouche
 @end smallexample
 
@@ -304,7 +304,7 @@ Error parsing the input open net. Usually indicates the line of the error and so
 
 @smallexample
 @cartouche
-BSD:13: error near `Place': syntax error, unexpected IDENT,
+bsd:13: error near `Place': syntax error, unexpected IDENT,
           expecting KEY_INTERFACE or KEY_PLACE -- aborting [#02]
 @end cartouche
 @end smallexample
@@ -314,7 +314,7 @@ The input open net is not normal. That is, it contains a transition that is conn
 
 @smallexample
 @cartouche
-BSD: the input open net must be normal -- aborting [#03]
+bsd: the input open net must be normal -- aborting [#03]
 @end cartouche
 @end smallexample
 
@@ -323,7 +323,7 @@ At most one basic option must be given.
 
 @smallexample
 @cartouche
-BSD: only one basic option is allowed at a time -- aborting [#04]
+bsd: only one basic option is allowed at a time -- aborting [#04]
 @end cartouche
 @end smallexample
 
@@ -332,7 +332,7 @@ The bound parameter's argument has to be a positive integer.
 
 @smallexample
 @cartouche
-BSD: bound has to be a positive integer -- aborting [#05]
+bsd: bound has to be a positive integer -- aborting [#05]
 @end cartouche
 @end smallexample
 
@@ -341,7 +341,7 @@ In the case of checking the theorem two input files must be given.
 
 @smallexample
 @cartouche
-BSD: two input files must be given -- aborting [#06]
+bsd: two input files must be given -- aborting [#06]
 @end cartouche
 @end smallexample
 
@@ -350,7 +350,7 @@ In the other cases only one file must be given.
 
 @smallexample
 @cartouche
-BSD: at most one input file must be given -- aborting [#07]
+bsd: at most one input file must be given -- aborting [#07]
 @end cartouche
 @end smallexample
 
@@ -359,7 +359,7 @@ All arc weights in the input net have to be equal to one.
 
 @smallexample
 @cartouche
-BSD: all arc weights have to be equal to 1 -- aborting [#08]
+bsd: all arc weights have to be equal to 1 -- aborting [#08]
 @end cartouche
 @end smallexample
 
@@ -368,7 +368,7 @@ This error occurs in case BSD could not parse the reachability graph from LoLA. 
 
 @smallexample
 @cartouche
-BSD: error while parsing the reachability graph -- aborting [#09]
+bsd: error while parsing the reachability graph -- aborting [#09]
 @end cartouche
 @end smallexample
 
@@ -377,7 +377,7 @@ This error occurs in case BSD could not parse an automaton from a dot file. Ther
 
 @smallexample
 @cartouche
-BSD: Input file misses bound, nodes and/or events attributes.
+bsd: Input file misses bound, nodes and/or events attributes.
       -- aborting [#10]
 @end cartouche
 @end smallexample
@@ -387,7 +387,7 @@ This error occurs in case BSD could not parse an automaton from a dot file. In p
 
 @smallexample
 @cartouche
-BSD: Parsed parameter doesn't match parsed nodes' count.
+bsd: Parsed parameter doesn't match parsed nodes' count.
       -- aborting [#11]
 @end cartouche
 @end smallexample
@@ -397,7 +397,7 @@ This error occurs in case BSD could not parse an automaton from a dot file. In p
 
 @smallexample
 @cartouche
-BSD: Parsed parameter doesn't match parsed labels' count.
+bsd: Parsed parameter doesn't match parsed labels' count.
       -- aborting [#12]
 @end cartouche
 @end smallexample
@@ -408,7 +408,7 @@ Error opening a file to write. Usually, this error occurs in case BSD is called 
 
 @smallexample
 @cartouche
-BSD: could not write to file `foo.og' -- aborting [#13]
+bsd: could not write to file `foo.og' -- aborting [#13]
 @end cartouche
 @end smallexample
 
@@ -417,7 +417,7 @@ BSD cannot create a temporary file @file{/tmp/BSD-XXXXXX}, where @samp{XXXXXX} i
 
 @smallexample
 @cartouche
-BSD: could not create a temporary file `/tmp/BSD-k4CS4x'
+bsd: could not create a temporary file `/tmp/BSD-k4CS4x'
           -- aborting [#14]
 @end cartouche
 @end smallexample
@@ -429,8 +429,8 @@ BSD cannot find the configuration file given by @file{--config} parameter or it 
 
 @smallexample
 @cartouche
-BSD: Error opening configuration file `myconf.conf'
-BSD: error reading configuration file `myconf.conf' -- aborting [#15]
+bsd: Error opening configuration file `myconf.conf'
+bsd: error reading configuration file `myconf.conf' -- aborting [#15]
 @end cartouche
 @end smallexample
 
@@ -439,7 +439,7 @@ Invalid option(s) were given in the command-line.
 
 @smallexample
 @cartouche
-BSD: invalid command-line parameter(s) -- aborting [#16]
+bsd: invalid command-line parameter(s) -- aborting [#16]
 @end cartouche
 @end smallexample
 

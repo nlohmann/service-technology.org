@@ -4,7 +4,7 @@ BSD exits with 0 on success, and with 1 if an error occurs. See Texinfo manual f
 [EXAMPLES]
 To generate a BSD automaton with bound 1 from an open workflow net `service.owfn', execute
 .IP
-BSD service.owfn --bound=1
+bsd service.owfn --BSD --bound=1
 .PP
 The BSD automaton will be written to the file `service_b1.dot'.
 
@@ -12,18 +12,18 @@ The BSD automaton will be written to the file `service_b1.dot'.
 Unless a configuration file is explicitly given using the
 .B --config
 parameter, BSD first tries to parse file
-.I BSD.conf
+.I bsd.conf
 from the sysconf directory (usually `/usr/local/etc') and then from the current working directory.
 
 [REPORTING BUGS]
 If you experience a bug, please execute
 .IP
-BSD --bug
+bsd --bug
 .PP
 and send the generated file
-.I BSD.conf
+.I bsd.conf
 together with a description of the problem to
-.B BSD@service-technology.org.
+.B bsd@service-technology.org.
 At https://gna.org/bugs/?group=service-tech you can see a list of open bugs.
 
 [COPYRIGHT]

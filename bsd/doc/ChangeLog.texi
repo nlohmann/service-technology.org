@@ -1,4 +1,4 @@
-@heading Version 1.1-unreleased
+@heading Version 1.1
 @itemize
 @item generate CSD automata from OWFN input
 @item test: does input net A b-conform to input net B?

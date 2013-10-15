@@ -1,4 +1,4 @@
-AC_INIT([BSD], 1.1-unreleased, BSD@service-technology.org, BSD, http://service-technology.org/BSD)
+AC_INIT([BSD], 1.1, bsd@service-technology.org, bsd, http://service-technology.org/bsd)
 
 AC_MSG_NOTICE([ ____   ____ ____])
 AC_MSG_NOTICE([|  _  \\/ ___|  _ \\])
@@ -43,7 +43,7 @@ AC_CHECK_SIZEOF([void*])
 
 # write files
 AC_CONFIG_FILES([
-	Makefile libs/pnapi/Makefile src/Makefile src/BSD.conf doc/Makefile
+	Makefile libs/pnapi/Makefile src/Makefile src/bsd.conf doc/Makefile
 	doc/Doxyfile doc/Doxydetails tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

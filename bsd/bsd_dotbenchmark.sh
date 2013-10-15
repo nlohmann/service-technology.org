@@ -41,7 +41,7 @@ for i in `find $1 -name "*.owfn" | sort`; do
    location=`dirname $i`
 
    # convert OWFNs in '$INPUTDIR' to dots in '$OUTDIR'
-   sh BSD_BCSD2dot.sh $i $2 $OUTDIR/BSD_${2}\(${file}\).dot $OUTDIR/CSD_${2}\(${file}\).dot
+   sh bsd_BCSD2dot.sh $i $2 $OUTDIR/BSD_${2}\(${file}\).dot $OUTDIR/CSD_${2}\(${file}\).dot
 
 done
 

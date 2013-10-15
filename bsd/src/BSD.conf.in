@@ -4,7 +4,7 @@
 #		      | |_\ \___| | |_/ |
 #		      |_____/\____/____/
 #                    generating BSD automata...
-#                    http://service-technology.org/BSD
+#                    http://service-technology.org/bsd
 #
 #
 
@@ -28,4 +28,4 @@ lola = @LOLA@
 # 'XXXXXX' which is replaced at runtime with a random string. In case you use
 # MinGW, path names are ignored and the basename is used instead.
 
-tmpfile = /tmp/BSD-XXXXXX
+tmpfile = /tmp/bsd-XXXXXX

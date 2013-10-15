@@ -4,11 +4,11 @@
 		      | |_\ \___| | |_/ |
 		      |_____/\____/____/
                       generating BSD automata...
-                      http://service-technology.org/BSD
+                      http://service-technology.org/bsd
 
 
 
-Version 1.1-unreleased
+Version 1.1
 ======================
 
 * generate CSD automata from OWFN input
@@ -18,5 +18,5 @@ Version 1.1-unreleased
 * parsing of BSD and CSD automata given as dot files
 
 
-See file ChangeLog <http://service-technology.org/files/BSD/ChangeLog> for
+See file ChangeLog <http://service-technology.org/files/bsd/ChangeLog> for
 complete version history.

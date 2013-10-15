@@ -4,13 +4,23 @@
 		      | |_\ \___| | |_/ |
 		      |_____/\____/____/
                       generating BSD automata...
-                      http://service-technology.org/BSD
+                      http://service-technology.org/bsd
 
 
 
-BSD implements several algorithms and result published in several
-scientific articles.
+BSD implements several algorithms and result published in several scientific
+articles.
 
+BSD automata
+============
+
+BSD's main function is to generate BSD automata from given OWFN and a bound b.
+
+The nets reachability graph is calculated by lola and used to compute the BSD
+automata. If two OWFN are given then BSD computes both nets' BSD automata and
+answers the question of net A being a br-controller of net B or vice versa.
+Therefore Net A and B have to be composable and the composition has to be a
+closed net.
 
 
 

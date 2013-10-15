@@ -1,6 +1,6 @@
 {
   "toolname": "BSD",
-  "shortname": "BSD",
+  "shortname": "bsd",
   "status": "active",
   "tagline": "generating BSD automata...",
   "purpose": "This tool generates BSD automata of owfn.",

@@ -4,7 +4,7 @@
 		      | |_\ \___| | |_/ |
 		      |_____/\____/____/
                       generating BSD automata...
-                      http://service-technology.org/BSD
+                      http://service-technology.org/bsd
 
 
 
@@ -40,6 +40,6 @@ INSTALLATION
 
 DOCUMENTATION
     The directory "doc" contains a documentation of BSD. It can also be
-    downloaded at <http://service-technology.org/files/BSD/BSD.pdf>. A
+    downloaded at <http://service-technology.org/files/bsd/bsd.pdf>. A
     tool paper describing a case study conducted with BSD can be found in
     the file "doc/toolpaper.pdf".

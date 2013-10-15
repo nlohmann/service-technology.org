@@ -44,8 +44,8 @@ for var in "${@:3}"; do
       location=`dirname $i`
 
       # convert OWFNs in '$INPUTDIR' to dots in '$OUTDIR'
-      sh BSD_BCSD2dot.sh $i ${var} $OUTDIR/BSD_${var}\(${file}\).dot $OUTDIR/CSD_${var}\(${file}\).dot
+      sh bsd_BCSD2dot.sh $i ${var} $OUTDIR/BSD_${var}\(${file}\).dot $OUTDIR/CSD_${var}\(${file}\).dot
    done
 done
 
-sh BSD_create_table.sh ${OUTDIR}
+sh bsd_create_table.sh ${OUTDIR}

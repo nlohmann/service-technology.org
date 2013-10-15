@@ -1,8 +1,8 @@
 # the main program
-bin_PROGRAMS = BSD
+bin_PROGRAMS = bsd
 
 # the plain sources you need to compile (no generated code)
-BSD_SOURCES = cmdline.c cmdline.h \
+bsd_SOURCES = cmdline.c cmdline.h \
                 InnerMarking.h InnerMarking.cc \
                 BSD.cc BSD.h \
                 CSD.cc CSD.h \
@@ -19,15 +19,15 @@ BSD_SOURCES = cmdline.c cmdline.h \
                 verbose.cc verbose.h
 
 # the configuration files
-sysconf_DATA = BSD.conf
+sysconf_DATA = bsd.conf
 
 # pass the sysconfdir to BSD (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
-BSD_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
+bsd_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
-BSD_CPPFLAGS += -I$(top_srcdir)/libs -I$(top_srcdir)/libs/pnapi
-BSD_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
+bsd_CPPFLAGS += -I$(top_srcdir)/libs -I$(top_srcdir)/libs/pnapi
+bsd_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
 

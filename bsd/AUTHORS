@@ -3,26 +3,23 @@
 		      | |_/ /\__  \ | \ |
 		      | |_\ \___| | |_/ |
 		      |_____/\____/____/
-                      generating BSD automata...
-                      http://service-technology.org/BSD
+                      deciding conformance for b-bounded responsiveness
+                      http://service-technology.org/bsd
 
 
 COPYRIGHT
-    Copyright (c) 2013 Simon Heiden
+    Copyright (c) 2013 Simon Heiden, Richard Müller
 
 
 AUTHORS
     Simon Heiden
-	 implemented the functionality of BSD
-    Niels Lohmann
-	 The tool 'Wendy' was used as a base for Locretia. Some functionality 
-	 concerning the computation of the reachability graph of the inner of
-	 the OWFNs was used especially.
-
+	 implemented the functionality of bsd
+    Richard Müller
+         developed the algorithms of bsd
 
 MAINTAINER
-    BSD is maintained by Simon Heiden.
+    bsd is maintained by Simon Heiden.
 
 
 CONTACT
-    E-Mail: BSD@service-technology.org
+    E-Mail: bsd@service-technology.org

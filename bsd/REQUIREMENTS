@@ -3,12 +3,12 @@
 		      | |_/ /\__  \ | \ |
 		      | |_\ \___| | |_/ |
 		      |_____/\____/____/
-                      generating BSD automata...
+                      deciding conformance for b-bounded responsiveness
                       http://service-technology.org/bsd
 
 
 
-In order to run, compile, and develop BSD, several tools are required.
+In order to run, compile, and develop bsd, several tools are required.
 
 Runtime
 -------
@@ -25,10 +25,10 @@ Runtime
        4. copy the binary `src/lola-statespace' to a directory of your path
           (e.g., `/usr/local/bin') or call `make install'
 
-     If LoLA is not installed before BSD is configured, a source release of
+     If LoLA is not installed before bsd is configured, a source release of
      LoLA is automatically downloaded and compiled.
 
-BSD's configure script checks whether LoLA (with binary `lola-statespace') is
+bsd's configure script checks whether LoLA (with binary `lola-statespace') is
 found in the path and adjusts the configuration file `src/bsd.conf'
 accordingly.
 
@@ -46,7 +46,7 @@ Development
 -----------
 
 In case you want to make changes to the source code, the following tools are
-required to reconfigure and compile BSD.
+required to reconfigure and compile bsd.
 
    * Autoconf, `http://www.gnu.org/software/autoconf/'
 

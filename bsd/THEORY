@@ -3,19 +3,19 @@
 		      | |_/ /\__  \ | \ |
 		      | |_\ \___| | |_/ |
 		      |_____/\____/____/
-                      generating BSD automata...
+                      deciding conformance for b-bounded responsiveness
                       http://service-technology.org/bsd
 
 
 
-BSD implements several algorithms and result published in several scientific
+bsd implements several algorithms and result published in several scientific
 articles.
 
 BSD automata
 ============
 
-BSD's main function is to generate BSD__b_ and CSD__b_ automata from given
-OWFN and a bound _b_. BSD can also check if two nets are _b_-partners or if
+bsd's main function is to generate BSD__b_ and CSD__b_ automata from given
+OWFN and a bound _b_. bsd can also check if two nets are _b_-partners or if
 they _b_-conform.
 
 The nets reachability graph is calculated by lola and used to compute the

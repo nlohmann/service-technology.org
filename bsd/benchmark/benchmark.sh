@@ -49,9 +49,9 @@ for var in "${@:4}"; do
       location=`dirname $i`
 
       # computes BSD for owfn in '$INPUTDIR' to dots in '$OUTDIR'
-      ${APPS}/bsd/src/BSD ${i} --bound=${var} --BSD --dotFile=${OUTDIR}/BSD_${file}.dot
+      ${APPS}/bsd/src/bsd ${i} --bound=${var} --BSD --dotFile=${OUTDIR}/BSD_${file}.dot
       # computes CSD for owfn in '$INPUTDIR' to dots in '$OUTDIR'
-      ${APPS}/bsd/src/BSD ${i} --bound=${var} --CSD --dotFile=${OUTDIR}/CSD_${file}.dot
+      ${APPS}/bsd/src/bsd ${i} --bound=${var} --CSD --dotFile=${OUTDIR}/CSD_${file}.dot
    done
 done
 

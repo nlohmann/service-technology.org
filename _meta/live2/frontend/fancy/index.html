@@ -57,6 +57,30 @@
 
   <body>
 
+    <div class="navbar navbar-fixed-top" style="display:none;">
+    <div class="navbar-inner">
+    <ul class="nav">
+    <li>&nbsp;&nbsp;&nbsp;</li>
+    <li><a href="index.html?anica">anica</a></li> 
+    <li><a href="index.html?bpel2owfn">bpel2owfn</a></li>
+    <li><a href="index.html?candy"  >candy</a></li>
+    <li><a href="index.html?cosme">cosme</a></li>
+    <li><a href="index.html?diane">diane</a></li>
+    <li><a href="index.html?linda">linda</a></li>
+    <li><a href="index.html?locretia">locretia</a></li>
+    <li><a href="index.html?lola">lola</a></li>
+    <li><a href="index.html?marlene">marlene</a></li>
+    <li><a href="index.html?mia">mia</a></li>
+    <li><a href="index.html?rachel">rachel</a></li>
+    <li><a href="index.html?safira">safira</a></li>
+    <li><a href="index.html?sara" >sara</a></li>
+    <li><a href="index.html?tara">tara</a></li>
+    <li><a href="index.html?wendy">wendy</a></li>
+    <li><a href="index.html?yasmina">yasmina</a></li>
+    </ul>
+    </div>
+    </div>
+
 <!-- alert modal dialog -->
     <div id="myAlert" class="modal hide fade" role="dialog">
         <div class="modal-header">
@@ -72,7 +96,8 @@
     </div>
 
     <div class="container">
-    <h1 style="text-transform:uppercase;">service-technology.org/live/<span class="toolname" /><br><small>solutions that make services behave well</small></h1>
+    <h1 style="text-transform:uppercase;">service-technology.org/live/<span class="toolname"></span><br><small>solutions that make services behave well</small></h1>
+
 
       <div class="row">
         <span class="span12" id="alertContainer"></span>
@@ -103,7 +128,7 @@
                       <i class="icon-folder-open"></i> Files...
                     </p>
             </form>
-            <form action="http://turgon.informatik.hu-berlin.de:1337" enctype="multipart/form-data" id="outForm" method="POST">
+	    <form action="http://turgon.informatik.hu-berlin.de" enctype="multipart/form-data" id="outForm" method="POST">
 <div class="control-group">
                 <textarea name="data" class="controls input-block-level monospace" style="font-family:monospace;" id="json-output" rows="20">...</textarea>
 </div>
@@ -132,7 +157,7 @@
         </div>
     </div>
 <!-- output modal -->
-    <div id="output_container" class="modal hide fade" role="dialog">
+    <div id="output_container" class="modal hide fade" role="dialog" style="width:700px;" >
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h3>service technology</h3>
@@ -186,7 +211,9 @@ $.fn.prettyVal = function() {
 
 // read the input hash
 // put to global scope
-var tool = window.location.search;
+var search = window.location.search;
+var tool = search.replace(/init=([^\&]*)/gi, '');
+var init = decodeURIComponent(RegExp.$1);
 // no XSS:
 tool = tool.replace(/[^a-z0-9_\-]/gi,'');
 
@@ -222,6 +249,17 @@ buildForm = function(inputs) {
 
     // when json changes, check file for validity
     JSON_BOX.watchJsonBox($('#json-output'), FILE_EXPLORER.validateInputs(im.inputs));
+    if(init) {
+        try {
+            var initO = JSON.parse(init);
+            var initS = JSON.stringify(initO, null, 4);
+            $('#json-output').val(initS).change();
+        } catch(e) {
+            $('#myAlert h3').text('Error');
+            $('#myAlert p').text('Could not parse the initial state: \n' + e);
+            $('#myAlert').modal();
+        }
+    }
 
     // undo-redo history
     var setState = function(s){$('#json-output').val(s).change()};

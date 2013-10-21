@@ -212,10 +212,12 @@ $.fn.prettyVal = function() {
 // read the input hash
 // put to global scope
 var search = window.location.search;
-var tool = search.replace(/init=([^\&]*)/gi, '');
+var call = search.replace(/init=([^\&]*)/gi, '');
+call = decodeURIComponent(call.replace(/^\?/, ''));
 var init = decodeURIComponent(RegExp.$1);
 // no XSS:
-tool = tool.replace(/[^a-z0-9_\-]/gi,'');
+tool = call.replace(/^([a-z0-9_\-]+)($|[^a-z0-9_\-].*$)/gi,'$1');
+call = call.substring(tool.length, call.length);
 
 //replace placeholders of toolname
 $("span.toolname").text(tool);
@@ -249,16 +251,27 @@ buildForm = function(inputs) {
 
     // when json changes, check file for validity
     JSON_BOX.watchJsonBox($('#json-output'), FILE_EXPLORER.validateInputs(im.inputs));
+
+    var initS = '';
     if(init) {
         try {
             var initO = JSON.parse(init);
-            var initS = JSON.stringify(initO, null, 4);
-            $('#json-output').val(initS).change();
+            initS = JSON.stringify(initO, null, 4);
         } catch(e) {
             $('#myAlert h3').text('Error');
             $('#myAlert p').text('Could not parse the initial state: \n' + e);
             $('#myAlert').modal();
         }
+    } else if(call.trim() != tool.trim()) {
+        var callO = {
+            tool: tool,
+            parameters: call.trim().split(" ")
+        };
+        initS = JSON.stringify(callO, null, 4);
+    }
+
+    if(initS) {
+        $('#json-output').val(initS).change();
     }
 
     // undo-redo history

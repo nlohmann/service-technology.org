@@ -124,7 +124,7 @@ function validateInputs(inputs) {
 
             // check, if we have such a file
             var curVal = cur.getValue();
-            if(curVal && !filesByFilename[curVal]) {
+            if(curVal && !filesByFilename[curVal] && !curVal.match(/(^https?\:)|(^s?ftp\:)|(^svn\:)/i)) {
                 // put a red box around
                 var param = curInput.attr('data-stlive-argname');
                 if(!param) param = 'File Input';

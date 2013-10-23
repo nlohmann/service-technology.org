@@ -262,25 +262,41 @@ InputSetManager.prototype.update = function(params) {
         }
 
         var c = params[i].replace(/^\-+/, '');
-        var cArr = c.split('=');
-        var argName = cArr[0];
-        var val = cArr.length > 1 ? cArr[1] : true;
+        var argName;
+        var argVal;
+        var fstEq = c.indexOf('=');
+        var fstSp = c.indexOf(' ');
+
+        // split at first equal
+        if(fstEq >= 0 && (fstEq > fstSp | fstSp < 0)) {
+            argName = c.slice(0,fstEq);
+            argVal = c.slice(fstEq+1, c.length);
+        // split at first space
+        } else if (fstSp >= 0 && (fstSp > fstEq | fstEq < 0)) {
+            argName = c.slice(0,fstSp);
+            argVal = c.slice(fstSp+1, c.length);
+        // no param/value
+        } else {
+            argName = c;
+            argVal = true;
+        }
         if(!paramsByArgname[argName]) {
-            paramsByArgname[argName] = val;
+            paramsByArgname[argName] = argVal;
             unmatchedParamsByArgname[argName] = params[i];
         } else {
             this.unmatchedParams.push(params[i]);
         }
     }
+    console.log(paramsByArgname);
 
     // iterate through all inputs
     var iLen = this.inputs.length;
-    for(var j=0; j<iLen; ++j) {
+    for (var j=0; j<iLen; ++j) {
         var c = this.inputs[j];
         var val = false;
 
         // is this a key-less input?
-        if(c && c.params && c.params.argname === '') {
+        if (c && c.params && c.params.argname === '') {
             if(paramsByArgname.$) {
                 c.updateValue(paramsByArgname.$);
                 unmatchedParamsByArgname.$ = null;
@@ -291,9 +307,12 @@ InputSetManager.prototype.update = function(params) {
         }
 
         // check, if input and value are existing
-        if(c && c.params && c.params.name && paramsByArgname[c.params.name]) {
+        if (c && c.params && c.params.name && paramsByArgname[c.params.name]) {
             val = paramsByArgname[c.params.name];
             unmatchedParamsByArgname[c.params.name] = null;
+        } else if (c && c.params && c.params.shortArgname && paramsByArgname[c.params.shortArgname]) {
+            val = paramsByArgname[c.params.shortArgname];
+            unmatchedParamsByArgname[c.params.shortArgname] = null;
         }
         // call the update for the input
         if(c) {

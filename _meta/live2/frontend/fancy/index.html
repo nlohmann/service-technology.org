@@ -263,9 +263,14 @@ buildForm = function(inputs) {
             $('#myAlert').modal();
         }
     } else if(call.trim() != tool.trim()) {
+        var ps = call.trim().split(" -");
+        var psLength = ps.length;
+        for(var i = 1; i < psLength; ++i) {
+            ps[i] = '-' + ps[i];
+        }
         var callO = {
             tool: tool,
-            parameters: call.trim().split(" ")
+            parameters: ps
         };
         initS = JSON.stringify(callO, null, 4);
     }

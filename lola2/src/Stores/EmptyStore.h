@@ -19,7 +19,7 @@ public:
     int tries;
 
     EmptyStore(uint32_t number_of_threads);
-    bool searchAndInsert(NetState &ns, T** payload, index_t thread);
+    bool searchAndInsert(NetState &ns, T** payload, index_t thread, bool noinsert=false);
 };
 
 template <typename T>
@@ -28,7 +28,7 @@ EmptyStore<T>::EmptyStore(uint32_t number_of_threads) : Store<T>(number_of_threa
 }
 
 template <typename T>
-inline bool EmptyStore<T>::searchAndInsert(NetState &ns, T** payload, index_t thread){
+inline bool EmptyStore<T>::searchAndInsert(NetState &ns, T** payload, index_t thread, bool noinsert){
 	if(payload) *payload = NULL;
 	++this->calls[thread]; //We're using "this" since access to protected attributes is harder when using templates than when not.
 	return false;

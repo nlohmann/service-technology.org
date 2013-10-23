@@ -21,7 +21,7 @@ public:
     /// frees both components
     ~PluginStore();
 
-    bool searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex);
+    bool searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex, bool noinsert=false);
 
     /// gets and removes a state from the store
     /// @param ns NetState where the removed state will be written to

@@ -29,7 +29,7 @@ PluginStore<T>::~PluginStore()
 }
 
 template<typename T>
-bool PluginStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex)
+bool PluginStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex, bool noinsert)
 {
     // count calls
     ++(this->calls[threadIndex]);

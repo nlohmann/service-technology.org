@@ -29,7 +29,7 @@ CompareStore<T>::~CompareStore()
 }
 
 template<typename T>
-bool CompareStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex)
+bool CompareStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex, bool noinsert)
 {
    bool correctResult = correctStore->searchAndInsert(ns, payload, threadIndex);
    

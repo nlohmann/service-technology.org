@@ -78,8 +78,9 @@ public:
     /// @param ns NetState that needs to be checked
     /// @param payload reference to address of payload data. If the marking is found, the address is set to the (already existing) payload entry of that marking, if a new marking was added the address will be set to a newly allocated payload entry.
     /// @param thread the index of the thread that requests this call. Values will range from 0 to (number_of_threads - 1). Used to allow using thread-local auxiliary data structures without locking any variables.
+	/// @param noinsert if set to true only a search is done
 	/// @return true, if the marking was found in the store, otherwise false.
-    virtual bool searchAndInsert(NetState &ns, T** payload, index_t thread) = 0;
+    virtual bool searchAndInsert(NetState &ns, T** payload, index_t thread, bool noinsert = false) = 0;
 
     /// gets and removes a state from the store
     /// @param ns NetState where the removed state will be written to

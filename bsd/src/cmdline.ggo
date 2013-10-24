@@ -24,7 +24,17 @@ option "CSD" -
   
 option "confCheck" -
   "Check for two given CSD automata CSD_b('implementation') and CSD_b('specification') in DOT format if 'implementation' b-conforms to 'specification'."
-  details="This option checks if a net 'implementation' is b-conformant to a net 'specification'. The input files have to be the CSD automata of the two nets in DOT format.\n"
+  details="This option checks if a net 'implementation' b-conforms to a net 'specification'. The input files have to be the CSD automata of the two nets in DOT format.\n"
+  flag off
+  
+option "maxPartner" -
+  "Compute the maximal b-partner of an OWFN N from a given CSD automaton CSD_b(N)."
+  details="This option computes the maximal b-partner of an OWFN N from a given CSD automaton CSD_b(N). The input file has to be a DOT file and the output is an OWFN.\n"
+  flag off
+  
+option "matching" -
+  "Check for a given OWFN N1 if it is matching with a list of given OWFNs N2,...,Nn."
+  details="This option checks with matching to which of the OWFNs N2,...,Nn the OWFN N1 is a b-partner. The input is a list of OWFNs N1,N2,...,Nn.\n"
   flag off
   
 option "bound" b
@@ -38,8 +48,22 @@ option "bound" b
 section "Input/Output"
 sectiondesc="When called without an input file, BSD reads from the standard input stream. When called without an output parameter, BSD creates a DOT file based on the chosen options. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.dot'). If the filename `-' is given, BSD will pipe the respective output to the standard output stream.\n"
 
-option "dotFile" -
-  "Filename for the DOT file in case of BSD or CSD automata computation."
+option "dotFileBSD" -
+  "Filename for the DOT file in case of CSD automata computation."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+  
+option "dotFileCSD" -
+  "Filename for the DOT file in case of CSD automata computation."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+  
+option "owfnFile" -
+  "Filename for the OWFN file in case of maximal b-partner computation."
   string
   typestr="FILENAME"
   argoptional

@@ -42,6 +42,12 @@ class CSD {
 
         static void computeCSD(BSDgraph & graph);
 
+        /*========================================================
+         *------------------- maximal b-partner ------------------
+         *========================================================*/
+
+        static void computeMaxPartner(parsedGraph & graph);
+
     private:
 
 

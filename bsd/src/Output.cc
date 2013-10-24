@@ -198,7 +198,13 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 		<< "  -- Don't delete or change the comment section. Parsing depends on several attributes in here. --" << endl
 		<< "  generator:   " << PACKAGE_STRING << endl //net.getMetaInformation(os, pnapi::io::CREATOR, PACKAGE_STRING) << endl
 		<< "  input file:  " << filename << ".owfn" << endl
-		<< "  bound:             " << bound << endl
+		<< "  type:        ";
+	if (CSD)
+		os << "CSD" << endl;
+	else
+		os << "BSD" << endl;
+
+	os  << "  bound:             " << bound << endl
 		<< "  #labels (total):   " << (unsigned int)graph.events-1 << endl
 		<< "  #sending labels:   " << (unsigned int)graph.receive_events << endl
 		<< "  #receiving labels: " << (unsigned int)graph.send_events << endl;
@@ -321,4 +327,18 @@ std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset, b
 		temp << "." << (unsigned int)node.lambda << "\"";
 	}
 	return temp.str();
+}
+
+
+/*************************************************************************
+ ***** DOT output
+ *************************************************************************/
+
+/*!
+ * \brief dot output
+ */
+std::ostream & Output::owfnoutput(std::ostream & os, pnapi::PetriNet & net, std::string & filename)
+{
+	os << net;
+	return os;
 }

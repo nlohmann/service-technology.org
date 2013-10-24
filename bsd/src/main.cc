@@ -143,11 +143,10 @@ void evaluateParameters(int argc, char** argv) {
     }
 
     // only one option is allowed at one time
-    if ((args_info.CSD_flag && args_info.partnerCheck_flag)
-    		|| (args_info.CSD_flag && args_info.confCheck_flag)
-    		|| (args_info.BSD_flag && args_info.partnerCheck_flag)
-    		|| (args_info.BSD_flag && args_info.confCheck_flag)
-    		|| (args_info.confCheck_flag && args_info.partnerCheck_flag)) {
+    if ((args_info.partnerCheck_flag + args_info.confCheck_flag + args_info.matching_flag
+    		+ args_info.maxPartner_flag + args_info.BSD_flag > 1) ||
+    	(args_info.partnerCheck_flag + args_info.confCheck_flag + args_info.matching_flag
+    		+ args_info.maxPartner_flag + args_info.CSD_flag > 1)) {
         abort(4, "the BSD and CSD flags are mutual exclusive to the other basic options");
     }
 
@@ -155,13 +154,18 @@ void evaluateParameters(int argc, char** argv) {
     	abort(5, "bound has to be a positive integer");
     }
 
+    // check whether (at least) two files are given in the case of matching
+    if (args_info.inputs_num < 2 && (args_info.matching_flag)) {
+    	abort(6, "two input files must be given");
+    }
+
     // check whether two files are given in the case of partner or conformance check
     if (args_info.inputs_num != 2 && (args_info.partnerCheck_flag || args_info.confCheck_flag)) {
     	abort(6, "two input files must be given");
     }
 
-    // check whether at most two files are given
-    if (args_info.inputs_num > 1 && (args_info.BSD_flag || args_info.CSD_flag)) {
+    // check whether at most one file given
+    if (args_info.inputs_num > 1 && !(args_info.partnerCheck_flag || args_info.confCheck_flag || args_info.matching_flag)) {
     	abort(7, "at most one input file must be given");
     }
 
@@ -409,7 +413,7 @@ int main(int argc, char** argv) {
         	std::stringstream temp (std::stringstream::in | std::stringstream::out);
         	temp << "BSD_" << args_info.bound_arg << "(";
 
-        	std::string dot_filename = args_info.dotFile_arg ? args_info.dotFile_arg : filepath + temp.str() + filename + ").dot";
+        	std::string dot_filename = args_info.dotFileBSD_arg ? args_info.dotFileBSD_arg : filepath + temp.str() + filename + ").dot";
 
         	Output output(dot_filename, "BSD automaton");
         	output.stream() << pnapi::io::sa;
@@ -420,15 +424,7 @@ int main(int argc, char** argv) {
         	std::stringstream temp (std::stringstream::in | std::stringstream::out);
         	temp << "CSD_" << args_info.bound_arg << "(";
 
-        	std::string dot_temp;
-        	if (args_info.dotFile_arg) {
-        		if (args_info.BSD_flag)
-        			dot_temp =  "CSD_" + (std::string)args_info.dotFile_arg;
-        		else
-        			dot_temp = args_info.dotFile_arg;
-        	}
-
-        	std::string dot_filename = args_info.dotFile_arg ? dot_temp : filepath + temp.str() + filename + ").dot";
+        	std::string dot_filename = args_info.dotFileCSD_arg ? args_info.dotFileCSD_arg : filepath + temp.str() + filename + ").dot";
 
         	Output output(dot_filename, "CSD automaton");
         	output.stream() << pnapi::io::sa;
@@ -531,5 +527,406 @@ int main(int argc, char** argv) {
     }
 
 
+    // in case of maximal partner computation
+    if (args_info.maxPartner_flag) {
+
+    	parsedGraph * _parsedGraph;
+
+       	// set standard filenames
+    	std::string filename;
+    	std::string filepath;
+    	filename = std::string(PACKAGE) + "_output";
+    	filepath = "./";
+
+
+    	/*------------------------------------.
+        | 2.1. parse the CSD automaton (DOT)  |
+        `------------------------------------*/
+
+    	try {
+			// strip suffix from input filename
+			filename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
+			filepath = std::string(args_info.inputs[0]).substr(0, filename.find_last_of("/")+1);
+			filename = filename.substr(filename.find_last_of("/")+1, filename.length());
+
+    		// parse from given files
+    		std::ifstream inputStream(args_info.inputs[0]);
+    		if (!inputStream) {
+    			abort(1, "could not open file '%s'", args_info.inputs[0]);
+    		}
+
+    		// parse into _parsedGraph
+    		_parsedGraph = parser::dot2graph_parse(inputStream);
+
+    		if (args_info.verbose_flag) {
+    			status("parsed graph:");
+    			parser::printParsedGraph(*_parsedGraph);
+    		}
+    	} catch (const pnapi::exception::InputError& error) {
+    		std::ostringstream s;
+    		s << error;
+    		abort(2, "\b%s", s.str().c_str());
+    	}
+
+    	openNet::initialize();
+
+    	/*-----------------------------------.
+        | 2.2. compute maximal b-partner	 |
+       	`-----------------------------------*/
+
+    	CSD::computeMaxPartner(*_parsedGraph);
+
+    	/*---------------------.
+    	| 1.9. OWFN output	   |
+        `---------------------*/
+
+    	std::stringstream temp (std::stringstream::in | std::stringstream::out);
+    	temp << "max_" << _parsedGraph->bound << "(";
+
+    	std::string owfn_filename = args_info.owfnFile_arg ? args_info.owfnFile_arg : filepath + temp.str() + filename + ").owfn";
+
+    	Output output(owfn_filename, "OWFN");
+    	output.stream() << pnapi::io::owfn;
+    	//Output::owfnoutput(output.stream(), *openNet::net, filename);
+    	output.stream() << *openNet::net;
+
+    	/*---------------.
+        | 2.4. tidy up	 |
+       	`---------------*/
+
+    	delete openNet::net;
+
+    	// delete the graph
+    	delete[] _parsedGraph->names;
+    	delete[] _parsedGraph->lambdas;
+    	for (unsigned int j = 0; j < _parsedGraph->nodes; ++j)
+    		delete[] _parsedGraph->pointer[j];
+    	delete[] _parsedGraph->pointer;
+
+    	delete _parsedGraph->id2name;
+    	delete _parsedGraph->is_sending_label;
+    	delete _parsedGraph->name2id;
+
+    	delete _parsedGraph;
+    }
+
+
+    // in case of matching
+    if (args_info.matching_flag) {
+
+    	if (args_info.inputs_num < 2)
+    		abort(1337, "this shit is stupid, dawg!");
+
+    	// set standard filenames
+    	std::string filename;
+    	std::string filepath;
+    	filename = std::string(PACKAGE) + "_output";
+    	filepath = "./";
+
+    	BSDgraph _BSDgraph;
+
+    	openNet::initialize();
+
+    	/*------------------------.
+        | 1.0. parse the open net |
+        `------------------------*/
+    	try {
+			// strip suffix from input filename
+			filename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
+			filepath = std::string(args_info.inputs[0]).substr(0, filename.find_last_of("/")+1);
+			filename = filename.substr(filename.find_last_of("/")+1, filename.length());
+
+    		// parse the first input file
+    		std::ifstream inputStream(args_info.inputs[0]);
+    		if (!inputStream) {
+    			abort(1, "could not open file '%s'", args_info.inputs[0]);
+    		}
+
+    		inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
+        				>> pnapi::io::owfn >> *openNet::net;
+
+    		if (args_info.verbose_flag) {
+    			std::ostringstream s;
+    			s << pnapi::io::stat << *openNet::net;
+    			status("read net: %s", s.str().c_str());
+    		}
+    	} catch (const pnapi::exception::InputError& error) {
+    		std::ostringstream s;
+    		s << error;
+    		abort(2, "\b%s", s.str().c_str());
+    	}
+
+
+    	// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
+    	if (openNet::net->getTransitions().empty()) {
+    		status("net has no transitions -- adding dead dummy transition");
+    		openNet::net->createArc(openNet::net->createPlace(), openNet::net->createTransition());
+    	}
+
+    	// only normal nets are supported so far
+    	if (not openNet::net->isNormal()) {
+    		abort(3, "the input open net must be normal");
+    	}
+
+
+
+    	/*===================================..
+        || OWFN -> BSD automaton             ||
+        ``===================================*/
+
+    	openNet::changeView(openNet::net, args_info.bound_arg);
+
+    	/*----------------------------------------------.
+        | 1.1. initialize labels and interface markings |
+        `----------------------------------------------*/
+    	Label::initialize();
+
+
+    	/*----------------------------------------------.
+        | 1.2. write inner of the open net to LoLA file |
+        `----------------------------------------------*/
+    	Output* temp = new Output();
+    	std::stringstream ss;
+    	ss << pnapi::io::lola << *openNet::net;
+    	std::string lola_net = ss.str();
+
+    	temp->stream() << lola_net << std::endl;
+
+    	status("%s", lola_net.c_str());
+
+
+    	/*--------------------------------------------.
+        | 1.3. call LoLA and parse reachability graph |
+        `--------------------------------------------*/
+    	// select LoLA binary and build LoLA command
+#if defined(__MINGW32__)
+    	//    // MinGW does not understand pathnames with "/", so we use the basename
+    	const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
+#else
+    	const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
+#endif
+
+    	// call LoLA
+    	status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
+    	time(&start_time);
+    	graph_in = popen(command_line.c_str(), "r");
+
+    	graph_parse();
+    	pclose(graph_in);
+    	graph_lex_destroy();
+    	time(&end_time);
+    	status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
+    	delete temp;
+
+
+    	/*---------------------------------.
+        | 1.4. organize reachability graph |
+        `---------------------------------*/
+
+    	InnerMarking::initialize();
+
+
+    	/*---------------------------------.
+        | 1.5. compute the BSD automaton   |
+        `---------------------------------*/
+
+    	status("starting BSD automaton computation...");
+    	time(&start_time);
+
+    	BSD::initialize();
+
+    	BSD::computeBSD();
+
+    	time(&end_time);
+    	_BSDgraph.BSD_comp_time = difftime(end_time, start_time);
+    	status("computation is done [%.0f sec]", _BSDgraph.BSD_comp_time);
+
+    	std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
+    	FILE* ps = popen(call.c_str(), "r");
+    	unsigned int memory;
+    	int res = fscanf(ps, "%u", &memory);
+    	assert(res != EOF);
+    	pclose(ps);
+    	_BSDgraph.BSD_memory = memory;
+    	status("BSD memory consumption: %s%u KB %s", _bold_, memory, _c_);
+
+    	/*------------------------------------------------------.
+        | 1.6. save the BSD automaton and some important values |
+     	`------------------------------------------------------*/
+
+    	_BSDgraph.graph = BSD::graph;
+
+    	_BSDgraph.id2name = Label::id2name;
+    	_BSDgraph.U = BSD::U;
+    	_BSDgraph.emptyset = BSD::emptyset;
+    	_BSDgraph.events = Label::events;
+
+    	_BSDgraph.first_receive = Label::first_receive;
+    	_BSDgraph.last_receive = Label::last_receive;
+    	_BSDgraph.first_send = Label::first_send;
+    	_BSDgraph.last_send = Label::last_send;
+
+    	_BSDgraph.receive_events = Label::receive_events;
+    	_BSDgraph.send_events = Label::send_events;
+
+
+    	/*---------------.
+     	| 1.7. tidy up	 |
+        `---------------*/
+
+    	delete openNet::net;
+    	Label::finalize();
+    	InnerMarking::finalize();
+
+
+    	/*-------------------------------.
+        | 1.8. create CSD from BSD		 |
+        `-------------------------------*/
+
+    	status("starting CSD automaton computation...");
+    	time(&start_time);
+    	CSD::computeCSD(_BSDgraph);
+    	time(&end_time);
+    	_BSDgraph.CSD_comp_time = difftime(end_time, start_time);
+    	status("computation is done [%.0f sec]", _BSDgraph.CSD_comp_time);
+
+    	ps = popen(call.c_str(), "r");
+    	res = fscanf(ps, "%u", &memory);
+    	assert(res != EOF);
+    	pclose(ps);
+    	_BSDgraph.CSD_memory = memory;
+    	status("CSD memory consumption: %s%u KB %s", _bold_, memory, _c_);
+
+
+    	//\todo: got the first CSD automaton. now do stuff here i guess...
+    	// parse all input nets and match the reachability graphs to the CSD/MP automaton of net 1
+    	for (int i = 1; i < args_info.inputs_num; ++i) {
+    		// set standard filenames
+    		std::string filenamePartner;
+    		std::string filepathPartner;
+    		filenamePartner = std::string(PACKAGE) + "_output";
+    		filepathPartner = "./";
+
+    		openNet::initialize();
+
+    		/*------------------------.
+            | 1.0. parse the open net |
+            `------------------------*/
+    		try {
+    			// strip suffix from input filename
+    			filenamePartner = std::string(args_info.inputs[i]).substr(0, std::string(args_info.inputs[i]).find_last_of("."));
+    			filepathPartner = std::string(args_info.inputs[i]).substr(0, filenamePartner.find_last_of("/")+1);
+    			filenamePartner = filename.substr(filenamePartner.find_last_of("/")+1, filenamePartner.length());
+
+    			// parse the first input file
+    			std::ifstream inputStream(args_info.inputs[i]);
+    			if (!inputStream) {
+    				abort(1, "could not open file '%s'", args_info.inputs[i]);
+    			}
+
+    			inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[i])
+            				>> pnapi::io::owfn >> *openNet::net;
+
+    			if (args_info.verbose_flag) {
+    				std::ostringstream s;
+    				s << pnapi::io::stat << *openNet::net;
+    				status("read net: %s", s.str().c_str());
+    			}
+    		} catch (const pnapi::exception::InputError& error) {
+    			std::ostringstream s;
+    			s << error;
+    			abort(2, "\b%s", s.str().c_str());
+    		}
+
+
+    		// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
+    		if (openNet::net->getTransitions().empty()) {
+    			status("net has no transitions -- adding dead dummy transition");
+    			openNet::net->createArc(openNet::net->createPlace(), openNet::net->createTransition());
+    		}
+
+    		// only normal nets are supported so far
+    		if (not openNet::net->isNormal()) {
+    			abort(3, "the input open net must be normal");
+    		}
+
+
+    		/*----------------------------------------------.
+            | 1.1. initialize labels and interface markings |
+            `----------------------------------------------*/
+    		Label::initialize();
+
+
+    		/*----------------------------------------------.
+            | 1.2. write inner of the open net to LoLA file |
+            `----------------------------------------------*/
+    		Output* temp = new Output();
+    		std::stringstream ss;
+    		ss << pnapi::io::lola << *openNet::net;
+    		std::string lola_net = ss.str();
+
+    		temp->stream() << lola_net << std::endl;
+
+    		status("%s", lola_net.c_str());
+
+
+    		/*--------------------------------------------.
+            | 1.3. call LoLA and parse reachability graph |
+            `--------------------------------------------*/
+    		// select LoLA binary and build LoLA command
+#if defined(__MINGW32__)
+    		//    // MinGW does not understand pathnames with "/", so we use the basename
+    		const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
+#else
+    		const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
+#endif
+
+    		// call LoLA
+    		status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
+    		time(&start_time);
+    		graph_in = popen(command_line.c_str(), "r");
+
+    		graph_parse();
+    		pclose(graph_in);
+    		graph_lex_destroy();
+    		time(&end_time);
+    		status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
+    		delete temp;
+
+
+    		/*---------------------------------.
+            | 1.4. organize reachability graph |
+            `---------------------------------*/
+
+    		InnerMarking::initialize();
+
+    		// \todo: do stuff here with the CSD automaton and the RG
+
+    		partnercheck::match(_BSDgraph);
+
+        	/*---------------.
+         	| 1.7. tidy up	 |
+            `---------------*/
+
+        	delete openNet::net;
+        	Label::finalize();
+        	InnerMarking::finalize();
+    	}
+
+    	/*---------------.
+     	| 1.10. tidy up	 |
+        `---------------*/
+
+    	// delete the graph
+    	for (std::list<BSDNode *>::const_iterator it = _BSDgraph.graph->begin(); it != _BSDgraph.graph->end(); ++it) {
+    		delete[] (*it)->pointer;
+    		delete *it;
+    	}
+    	delete _BSDgraph.graph;
+
+    	BSD::finalize();
+    }
+
     return returnvalue;
 }
+

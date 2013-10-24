@@ -204,13 +204,20 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 
 					// if the node is the U or empty node then set the pointers accordingly
 					if (node1 == "U") {
+						status("U node index: %u", currentnode);
 						graph->U = currentnode;
 					} else if (node1 == "empty") {
+						status("empty node index: %u", currentnode);
 						graph->emptyset = currentnode;
 					}
 
 					p_node1 = currentnode;
 					++currentnode;
+				}
+
+				// in case of loops with (yet) unknown nodes
+				if (node1 == node2) {
+					p_node2 = p_node1;
 				}
 
 				// if node 2 was not found then insert it into the graph
@@ -219,6 +226,15 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 						abort(11, "Parsed parameter doesn't match parsed nodes' count.");
 					graph->names[currentnode] = node2;
 					graph->lambdas[currentnode] = atoi(lambda2.c_str());
+
+					// if the node is the U or empty node then set the pointers accordingly
+					if (node2 == "U") {
+						status("U node index: %u", currentnode);
+						graph->U = currentnode;
+					} else if (node2 == "empty") {
+						status("empty node index: %u", currentnode);
+						graph->emptyset = currentnode;
+					}
 
 					p_node2 = currentnode;
 					++currentnode;

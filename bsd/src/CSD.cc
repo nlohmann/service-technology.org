@@ -22,8 +22,7 @@
 #include <string>
 #include <sstream>
 #include "CSD.h"
-#include "InnerMarking.h"
-#include "Label.h"
+#include "openNet.h"
 
 #include "verbose.h"
 
@@ -96,3 +95,119 @@ void CSD::computeCSD(BSDgraph & graph) {
 	}
 }
 
+
+/*========================================================
+ *------------------- maximal b-partner ------------------
+ *========================================================*/
+
+/*!
+ \brief Creates the maximal b-partner from a CSD automaton (from MP actually).
+
+ */
+void CSD::computeMaxPartner(parsedGraph & graph) {
+	status("computing maximal %i-partner...", graph.bound);
+	pnapi::PetriNet* net = openNet::net;
+
+	std::list<pnapi::Place* > finalplaces;
+
+	// in case there is only one node (the U node) the resulting net is empty
+	if (graph.nodes == 1)
+		return;
+
+	pnapi::Port * port = &net->getInterface().addPort("port");
+
+	pnapi::Condition * condition = new pnapi::Condition;
+	(*condition) = false;
+
+
+	pnapi::Place * places[graph.nodes];
+	pnapi::Label * labels[graph.events];
+
+	for (unsigned int i = 0; i < graph.nodes; ++i) {
+		if (i == graph.U) {
+			continue;
+		}
+		places[i] = &net->createPlace(graph.names[i], 0);
+		if (i == 0)
+			places[i]->setTokenCount(1);
+		// add [Q] to the final markings if lambda(Q) = 2
+		if (graph.lambdas[i] == 2)
+			finalplaces.push_back(places[i]);
+	}
+
+	for (Label_ID edge = 0; edge < graph.events; ++edge) {
+		if ((*graph.is_sending_label)[edge]) {
+			labels[edge] = &net->getInterface().addLabel((*graph.id2name)[edge], pnapi::Label::INPUT, "port");
+		} else {
+			labels[edge] = &net->getInterface().addLabel((*graph.id2name)[edge], pnapi::Label::OUTPUT, "port");
+		}
+	}
+
+	pnapi::Place * duplicate = NULL;
+	pnapi::Transition * tauTrans = NULL;
+	for (unsigned int i = 0; i < graph.nodes; ++i) {
+		if (i == graph.U) {
+			continue;
+		}
+
+		bool has_in_successor = false;
+		for (Label_ID edge = 0; edge < graph.events; ++edge) {
+			// search for a successor reachable with an input label (except U)
+			if (graph.pointer[i][edge] != graph.U && !(*graph.is_sending_label)[edge]) {
+				has_in_successor = true;
+				break;
+			}
+		}
+
+		bool dup_exists = false;
+		if (graph.lambdas[i] != 1 && has_in_successor) {
+			// Q --tau--> Q'
+			duplicate = &net->createPlace(graph.names[i] + "'", 0);
+			tauTrans = &net->createTransition();
+			net->createArc(*places[i], *tauTrans);
+			net->createArc(*tauTrans, *duplicate);
+
+			if (graph.lambdas[i] == 2) {
+				// add [Q'] to the final markings if lambda(Q) = 2
+//				status("adding a place to the final condition");
+				finalplaces.push_back(duplicate);
+			}
+
+			dup_exists = true;
+		}
+
+		for (Label_ID edge = 0; edge < graph.events; ++edge) {
+			if (graph.pointer[i][edge] == graph.U) {
+				continue;
+			}
+
+			// Q --x--> succ(Q)
+			pnapi::Transition * transition = &net->createTransition(); // \todo: name?
+			transition->addLabel(*labels[edge], 1);
+			net->createArc(*places[i], *transition);
+			net->createArc(*transition, *places[graph.pointer[i][edge]]);
+
+			if (dup_exists && (*graph.is_sending_label)[edge]) {
+				// Q' --x--> succ(Q)
+				transition = &net->createTransition(); // \todo: name?
+				transition->addLabel(*labels[edge], 1);
+				net->createArc(*duplicate, *transition);
+				net->createArc(*transition, *places[graph.pointer[i][edge]]);
+			}
+		}
+
+		duplicate = NULL;
+	}
+
+	pnapi::Condition * condition2 = new pnapi::Condition;
+	// iterate through all the memorized places to create the final condition
+	for (std::list<pnapi::Place* >::const_iterator it = finalplaces.begin(); it != finalplaces.end(); ++it) {
+		(*condition2) = (**it == 1);
+		condition2->allOtherPlacesEmpty(*openNet::net);
+		(*condition) = ((condition->getFormula()) || (condition2->getFormula()));
+	}
+	delete condition2;
+
+	net->getFinalCondition() = condition->getFormula();
+	delete condition;
+}

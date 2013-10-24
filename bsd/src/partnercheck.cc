@@ -189,6 +189,11 @@ std::map<Label_ID, Label_ID>* partnercheck::computeMappingBSD(parsedGraph & grap
 }
 
 
+void partnercheck::match(BSDgraph & graph) {
+
+}
+
+
 /*========================================================
  *---------------------- TEST OUTPUT ---------------------
  *========================================================*/

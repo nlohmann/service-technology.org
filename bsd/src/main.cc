@@ -144,9 +144,9 @@ void evaluateParameters(int argc, char** argv) {
 
     // only one option is allowed at one time
     if ((args_info.partnerCheck_flag + args_info.confCheck_flag + args_info.matching_flag
-    		+ args_info.maxPartner_flag + args_info.BSD_flag > 1) ||
+    		+ args_info.maxPartner_flag + args_info.mp_flag + args_info.BSD_flag > 1) ||
     	(args_info.partnerCheck_flag + args_info.confCheck_flag + args_info.matching_flag
-    		+ args_info.maxPartner_flag + args_info.CSD_flag > 1)) {
+    		+ args_info.maxPartner_flag + args_info.mp_flag + args_info.CSD_flag > 1)) {
         abort(4, "the BSD and CSD flags are mutual exclusive to the other basic options");
     }
 
@@ -528,7 +528,7 @@ int main(int argc, char** argv) {
 
 
     // in case of maximal partner computation
-    if (args_info.maxPartner_flag) {
+    if (args_info.maxPartner_flag || args_info.mp_flag) {
 
     	parsedGraph * _parsedGraph;
 
@@ -570,11 +570,14 @@ int main(int argc, char** argv) {
 
     	openNet::initialize();
 
-    	/*-----------------------------------.
-        | 2.2. compute maximal b-partner	 |
-       	`-----------------------------------*/
+    	/*-------------------------------------------.
+        | 2.2. compute maximal b-partner or mp_b	 |
+       	`-------------------------------------------*/
 
-    	CSD::computeMaxPartner(*_parsedGraph);
+    	if (args_info.maxPartner_flag)
+    		CSD::computeMaxPartner(*_parsedGraph, true);
+    	else
+    		CSD::computeMaxPartner(*_parsedGraph, false);
 
     	/*---------------------.
     	| 1.9. OWFN output	   |

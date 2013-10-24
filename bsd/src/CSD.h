@@ -46,7 +46,7 @@ class CSD {
          *------------------- maximal b-partner ------------------
          *========================================================*/
 
-        static void computeMaxPartner(parsedGraph & graph);
+        static void computeMaxPartner(parsedGraph & graph, bool max);
 
     private:
 

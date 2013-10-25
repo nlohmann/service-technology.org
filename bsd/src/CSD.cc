@@ -125,9 +125,9 @@ void CSD::computeMaxPartner(parsedGraph & graph, bool max) {
 	(*condition) = false;
 
 	// store all the "normal" places for future reference...
-	pnapi::Place * places[graph.nodes];
+	pnapi::Place ** places = new pnapi::Place*[graph.nodes];
 	// and the upcoming labels...
-	pnapi::Label * labels[graph.events];
+	pnapi::Label ** labels = new pnapi::Label*[graph.events];
 
 	// iterate through all the graph's nodes
 	for (unsigned int i = 0; i < graph.nodes; ++i) {
@@ -228,6 +228,9 @@ void CSD::computeMaxPartner(parsedGraph & graph, bool max) {
 		// reset duplicate pointer just to be safe
 		duplicate = NULL;
 	}
+
+	delete[] places;
+	delete[] labels;
 
 	// compute the final condition
 	pnapi::Condition * condition2 = new pnapi::Condition;

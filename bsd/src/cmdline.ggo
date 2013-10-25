@@ -53,7 +53,7 @@ option "bound" b
 section "Input/Output"
 sectiondesc="When called without an input file, BSD reads from the standard input stream. When called without an output parameter, BSD creates a DOT/OWFN file based on the chosen options. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.dot'). If the filename `-' is given, BSD will pipe the respective output to the standard output stream.\n"
 
-option "outFile" -
+option "output" -
   "Filename for the output files."
   string
   typestr="FILENAME"

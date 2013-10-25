@@ -399,7 +399,7 @@ int main(int argc, char** argv) {
         	std::stringstream temp (std::stringstream::in | std::stringstream::out);
         	temp << "BSD_" << args_info.bound_arg << "(";
 
-        	std::string dot_filename = args_info.outFile_arg ? args_info.outFile_arg : filepath + temp.str() + filename + ").dot";
+        	std::string dot_filename = args_info.output_arg ? args_info.output_arg : filepath + temp.str() + filename + ").dot";
 
         	Output output(dot_filename, "BSD automaton");
         	output.stream() << pnapi::io::sa;
@@ -410,7 +410,7 @@ int main(int argc, char** argv) {
         	std::stringstream temp (std::stringstream::in | std::stringstream::out);
         	temp << "CSD_" << args_info.bound_arg << "(";
 
-        	std::string dot_filename = args_info.outFile_arg ? args_info.outFile_arg : filepath + temp.str() + filename + ").dot";
+        	std::string dot_filename = args_info.output_arg ? args_info.output_arg : filepath + temp.str() + filename + ").dot";
 
         	Output output(dot_filename, "CSD automaton");
         	output.stream() << pnapi::io::sa;
@@ -572,7 +572,7 @@ int main(int argc, char** argv) {
     	std::stringstream temp (std::stringstream::in | std::stringstream::out);
     	temp << "max_" << _parsedGraph->bound << "(";
 
-    	std::string owfn_filename = args_info.outFile_arg ? args_info.outFile_arg : filepath + temp.str() + filename + ").owfn";
+    	std::string owfn_filename = args_info.output_arg ? args_info.output_arg : filepath + temp.str() + filename + ").owfn";
 
     	Output output(owfn_filename, "OWFN");
     	output.stream() << pnapi::io::owfn << *openNet::net;

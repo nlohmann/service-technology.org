@@ -45,9 +45,16 @@ for var in "${@:4}"; do
    for i in `find $2 -name "*.owfn" | sort`; do
       file=`basename $i | sed -e 's/\.owfn//'`
 
-      # computes BSD for owfn in '$INPUTDIR' to dots in '$OUTDIR'
+      # computes BSD for given owfn
       $1/src/bsd ${i} --bound=${var} --BSD --output=$3/BSD_${var}_${file}.dot --config=$1/src/bsd.conf
-      # computes CSD for owfn in '$INPUTDIR' to dots in '$OUTDIR'
+      
+      # computes CSD for given owfn
       $1/src/bsd ${i} --bound=${var} --CSD --output=$3/CSD_${var}_${file}.dot --config=$1/src/bsd.conf
+
+      # computes mp for previously computed CSD
+      $1/src/bsd $3/CSD_${var}_${file}.dot --bound=${var} --mp --output=$3/mp_${var}_${file}.owfn --config=$1/src/bsd.conf
+
+      # computes max for previously computed CSD
+      $1/src/bsd $3/CSD_${var}_${file}.dot --bound=${var} --max --output=$3/max_${var}_${file}.owfn --config=$1/src/bsd.conf
    done
 done

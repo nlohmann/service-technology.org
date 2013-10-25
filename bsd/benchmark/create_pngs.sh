@@ -22,13 +22,20 @@ if [ ! -d $2 ]; then
    exit 2
 fi
 
+# create the pngs from the dot files
 for i in `find $1 -name "*.dot" | sort`; do
    file=`basename $i | sed -e 's/\.dot//'`
 
-   # convert DOTs in '$INPUTDIR' to PNGs in '$OUTDIR'
-   echo $i " --> " $2/${file}.png
-   dot -Tpng $i -o $2/${file}.png
-
+   # don't process dot with more than 1000 states
+   STATES=`grep -E '  #nodes:            ' ${i} | sed -r "s/  #nodes:            ([0-9]+)/\1/"`
+   if [ "$STATES" -gt "1000" ]; then
+	echo "skipping $i because it is too large"
+	touch $2/${file}.skipped
+   else
+	# convert DOTs in '$INPUTDIR' to PNGs in '$OUTDIR'
+	echo $i " --> " $2/${file}.png
+	dot -Tpng $i -o $2/${file}.png
+   fi
 done
 
 exit 0

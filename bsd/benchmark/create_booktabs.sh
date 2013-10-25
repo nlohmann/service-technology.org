@@ -34,7 +34,7 @@ touch $RESULT
 echo '\begin{table*}[htb]' >> $RESULT
 echo '  \myfloatalign' >> $RESULT
 echo '  \caption{The size of $\BSD$ generated with the bsd tool, including the used memory and time.}\label{tab:TODO}' >> $RESULT
-echo '  \begin{tabular}[b]{lccccccc}' >> $RESULT
+echo '  \begin{tabular}[b]{lrrrrrrr}' >> $RESULT
 echo '  \toprule' >> $RESULT
 echo '  name & $\bb$ & $|\mathcal{Q}|$ & $|\delta|$ & $|\ai|$ & $|\ao|$ & time (s) & memory (KiB) \\' >> $RESULT
 echo '  \midrule' >> $RESULT
@@ -49,11 +49,12 @@ for i in `find $1 -name "BSD*.dot" | sort`; do
    LABELS=`grep -E '  #labels \(total\):   ' ${i} | sed -r "s/  #labels \(total\):   ([0-9]+)/\1/"`
    SLABELS=`grep -E '  #sending labels:   ' ${i} | sed -r "s/  #sending labels:   ([0-9]+)/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
    RLABELS=`grep -E '  #receiving labels: ' ${i} | sed -r "s/  #receiving labels: ([0-9]+)/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
-   STATES=`grep -E '  #nodes:            ' ${i} | sed -r "s/  #nodes:            ([0-9]+)/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
+   STATES=`grep -E '  #nodes:            ' ${i} | sed -r "s/  #nodes:            ([0-9]+)/\1/"`
+   FORMATSTATES=`echo ${STATES} | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
    TRANSITIONS=`echo $((${STATES} * ${LABELS})) | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
    TIME=`grep -E '  computation time:  ' ${i} | sed -r "s/  computation time:  ([0-9]+(.[0-9]+)?) s/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
    MEMORY=`grep -E '  memory consumed:   ' ${i} | sed -r "s/  memory consumed:   ([0-9]+(.[0-9]+)?) KB/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
-   echo "      ${FILE} & ${BOUND} & ${STATES} & ${TRANSITIONS} & ${RLABELS} & ${SLABELS} & ${TIME} & ${MEMORY} \\\\" >> $RESULT
+   echo "      ${FILE} & ${BOUND} & ${FORMATSTATES} & ${TRANSITIONS} & ${RLABELS} & ${SLABELS} & ${TIME} & ${MEMORY} \\\\" >> $RESULT
 done
 
 echo '  \bottomrule' >> $RESULT
@@ -65,7 +66,7 @@ echo '' >> $RESULT
 echo '\begin{table*}[htb]' >> $RESULT
 echo '  \myfloatalign' >> $RESULT
 echo '  \caption{The size of $\CSD$ generated with the bsd tool, including the used memory and time.}\label{tab:TODO}' >> $RESULT
-echo '  \begin{tabular}[b]{lccccccc}' >> $RESULT
+echo '  \begin{tabular}[b]{lrrrrrrr}' >> $RESULT
 echo '  \toprule' >> $RESULT
 echo '  name & $\bb$ & $|\mathcal{Q}|$ & $|\delta|$ & $|\ai|$ & $|\ao|$ & time (s) & memory (KiB) \\' >> $RESULT
 echo '  \midrule' >> $RESULT
@@ -80,11 +81,12 @@ for i in `find $1 -name "CSD*.dot" | sort`; do
    LABELS=`grep -E '  #labels \(total\):   ' ${i} | sed -r "s/  #labels \(total\):   ([0-9]+)/\1/"`
    SLABELS=`grep -E '  #sending labels:   ' ${i} | sed -r "s/  #sending labels:   ([0-9]+)/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
    RLABELS=`grep -E '  #receiving labels: ' ${i} | sed -r "s/  #receiving labels: ([0-9]+)/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
-   STATES=`grep -E '  #nodes:            ' ${i} | sed -r "s/  #nodes:            ([0-9]+)/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
+   STATES=`grep -E '  #nodes:            ' ${i} | sed -r "s/  #nodes:            ([0-9]+)/\1/"`
+   FORMATSTATES=`echo ${STATES} | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
    TRANSITIONS=`echo $((${STATES} * ${LABELS})) | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
    TIME=`grep -E '  computation time:  ' ${i} | sed -r "s/  computation time:  ([0-9]+(.[0-9]+)?) s/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
    MEMORY=`grep -E '  memory consumed:   ' ${i} | sed -r "s/  memory consumed:   ([0-9]+(.[0-9]+)?) KB/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
-   echo "      ${FILE} & ${BOUND} & ${STATES} & ${TRANSITIONS} & ${RLABELS} & ${SLABELS} & ${TIME} & ${MEMORY} \\\\" >> $RESULT
+   echo "      ${FILE} & ${BOUND} & ${FORMATSTATES} & ${TRANSITIONS} & ${RLABELS} & ${SLABELS} & ${TIME} & ${MEMORY} \\\\" >> $RESULT
 done
 
 echo '  \bottomrule' >> $RESULT

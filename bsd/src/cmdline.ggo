@@ -27,7 +27,7 @@ option "confCheck" -
   details="This option checks if a net 'implementation' b-conforms to a net 'specification'. The input files have to be the CSD automata of the two nets in DOT format.\n"
   flag off
   
-option "maxPartner" -
+option "max" -
   "Compute the maximal b-partner max_b(N) of an OWFN N from a given CSD automaton CSD_b(N)."
   details="This option computes the maximal b-partner max_b(N) of an OWFN N from a given CSD automaton CSD_b(N). The input file has to be a DOT file and the output is an OWFN.\n"
   flag off

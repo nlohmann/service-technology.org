@@ -77,13 +77,11 @@ typedef struct _BSDgraph {
 	// mapping of label ids to label names (strings)
 	std::map<Label_ID, std::string> id2name;
 
-	// computation times
-	double BSD_comp_time;
-	double CSD_comp_time;
+	// computation time
+	double comp_time;
 
 	// memory consumptions
-	unsigned int BSD_memory;
-	unsigned int CSD_memory;
+	unsigned int memory_consumption;
 } BSDgraph;
 
 // a parsed node of a BSD or CSD automaton

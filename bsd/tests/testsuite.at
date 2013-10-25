@@ -35,7 +35,7 @@ AT_CLEANUP
 AT_SETUP([Piping to stdout])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([BSD_ myCoffee.owfn --BSD --verbose --bound=1 --dotFile=-],0,stdout,ignore)
+AT_CHECK([BSD_ myCoffee.owfn --BSD --verbose --bound=1 --outFile=-],0,stdout,ignore)
 AT_CHECK([GREP -q "digraph" stdout])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -43,7 +43,7 @@ AT_CLEANUP
 AT_SETUP([Piping from stdin to stdout])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([cat myCoffee.owfn | BSD_ --BSD --verbose --bound=1 --dotFile=-],0,stdout,ignore)
+AT_CHECK([cat myCoffee.owfn | BSD_ --BSD --verbose --bound=1 --outFile=-],0,stdout,ignore)
 AT_CHECK([GREP -q "digraph" stdout])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -85,7 +85,7 @@ AT_CLEANUP
 AT_SETUP([Using given output filename])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([BSD_ myCoffee.owfn --BSD --verbose --bound=1 --dotFile=test.dot],0,ignore,ignore)
+AT_CHECK([BSD_ myCoffee.owfn --BSD --verbose --bound=1 --outFile=test.dot],0,ignore,ignore)
 AT_CHECK([test -f test.dot])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -136,7 +136,7 @@ AT_BANNER([Memory Management])
 AT_SETUP([Checking for memory leaks with Valgrind (OWFN -> DOT)])
 AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK_LOLA
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes BSD_RAW --BSD --CSD myCoffee.owfn --finalize],0,ignore,stderr)
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes BSD_RAW --CSD myCoffee.owfn --finalize],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP

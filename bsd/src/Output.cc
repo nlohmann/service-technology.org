@@ -220,13 +220,8 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 
 	os << "  #nodes:            " << (unsigned int)templist->size() << endl;
 
-	if (CSD) {
-		os << "  computation time:  " << (graph.BSD_comp_time + graph.CSD_comp_time) << " s" << endl
-		   << "  memory consumed:   " << graph.CSD_memory << " KB" << endl;
-	} else {
-		os << "  computation time:  " << (graph.BSD_comp_time) << " s" << endl
-		   << "  memory consumed:   " << graph.BSD_memory << " KB" << endl;
-	}
+	os << "  computation time:  " << (graph.comp_time) << " s" << endl
+	   << "  memory consumed:   " << graph.memory_consumption << " KB" << endl;
 
 	os << "*/" << endl << endl
 	   << "digraph {" << endl;

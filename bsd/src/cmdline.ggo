@@ -51,24 +51,10 @@ option "bound" b
   optional
 
 section "Input/Output"
-sectiondesc="When called without an input file, BSD reads from the standard input stream. When called without an output parameter, BSD creates a DOT file based on the chosen options. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.dot'). If the filename `-' is given, BSD will pipe the respective output to the standard output stream.\n"
+sectiondesc="When called without an input file, BSD reads from the standard input stream. When called without an output parameter, BSD creates a DOT/OWFN file based on the chosen options. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.dot'). If the filename `-' is given, BSD will pipe the respective output to the standard output stream.\n"
 
-option "dotFileBSD" -
-  "Filename for the DOT file in case of CSD automata computation."
-  string
-  typestr="FILENAME"
-  argoptional
-  optional
-  
-option "dotFileCSD" -
-  "Filename for the DOT file in case of CSD automata computation."
-  string
-  typestr="FILENAME"
-  argoptional
-  optional
-  
-option "owfnFile" -
-  "Filename for the OWFN file in case of maximal b-partner computation."
+option "outFile" -
+  "Filename for the output files."
   string
   typestr="FILENAME"
   argoptional

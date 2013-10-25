@@ -143,11 +143,9 @@ void evaluateParameters(int argc, char** argv) {
     }
 
     // only one option is allowed at one time
-    if ((args_info.partnerCheck_flag + args_info.confCheck_flag + args_info.matching_flag
-    		+ args_info.max_flag + args_info.mp_flag + args_info.BSD_flag > 1) ||
-    	(args_info.partnerCheck_flag + args_info.confCheck_flag + args_info.matching_flag
-    		+ args_info.max_flag + args_info.mp_flag + args_info.CSD_flag > 1)) {
-        abort(4, "the BSD and CSD flags are mutual exclusive to the other basic options");
+    if (args_info.partnerCheck_flag + args_info.confCheck_flag + args_info.matching_flag
+    		+ args_info.max_flag + args_info.mp_flag + args_info.BSD_flag + args_info.CSD_flag > 1) {
+        abort(4, "only one basic option is allowed");
     }
 
     if (args_info.bound_arg < 1) {
@@ -201,7 +199,7 @@ void terminationHandler() {
 
 
 int main(int argc, char** argv) {
-    time_t start_time, end_time;
+    time_t start_time, end_time, program_start;
     int returnvalue = EXIT_SUCCESS;
 
     // set the function to call on normal termination
@@ -214,6 +212,7 @@ int main(int argc, char** argv) {
     Output::setTempfileTemplate(args_info.tmpfile_arg);
     Output::setKeepTempfiles(args_info.noClean_flag);
 
+    time(&program_start);
 
     // in case of BSD or CSD computation
     if (args_info.BSD_flag || args_info.CSD_flag) {
@@ -336,24 +335,10 @@ int main(int argc, char** argv) {
     	`---------------------------------*/
 
     	status("starting BSD automaton computation...");
-    	time(&start_time);
 
     	BSD::initialize();
 
     	BSD::computeBSD();
-
-    	time(&end_time);
-    	_BSDgraph.BSD_comp_time = difftime(end_time, start_time);
-    	status("computation is done [%.0f sec]", _BSDgraph.BSD_comp_time);
-
-    	std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
-    	FILE* ps = popen(call.c_str(), "r");
-    	unsigned int memory;
-    	int res = fscanf(ps, "%u", &memory);
-    	assert(res != EOF);
-    	pclose(ps);
-    	_BSDgraph.BSD_memory = memory;
-    	status("BSD memory consumption: %s%u KB %s", _bold_, memory, _c_);
 
     	/*------------------------------------------------------.
        	| 1.6. save the BSD automaton and some important values |
@@ -383,26 +368,27 @@ int main(int argc, char** argv) {
         Label::finalize();
         InnerMarking::finalize();
 
-
         /*-------------------------------.
         | 1.8. create CSD from BSD		 |
         `-------------------------------*/
 
         if (args_info.CSD_flag) {
         	status("starting CSD automaton computation...");
-        	//time(&start_time);
         	CSD::computeCSD(_BSDgraph);
-        	time(&end_time);
-        	_BSDgraph.CSD_comp_time = difftime(end_time, start_time);
-        	status("computation is done [%.0f sec]", _BSDgraph.CSD_comp_time);
-
-        	ps = popen(call.c_str(), "r");
-        	res = fscanf(ps, "%u", &memory);
-        	assert(res != EOF);
-        	pclose(ps);
-        	_BSDgraph.CSD_memory = memory;
-        	status("CSD memory consumption: %s%u KB %s", _bold_, memory, _c_);
         }
+
+        time(&end_time);
+        _BSDgraph.comp_time = difftime(end_time, program_start);
+        status("computation is done [%.0f sec]", _BSDgraph.comp_time);
+
+        std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
+        FILE* ps = popen(call.c_str(), "r");
+        unsigned int memory;
+        int res = fscanf(ps, "%u", &memory);
+        assert(res != EOF);
+        pclose(ps);
+        _BSDgraph.memory_consumption = memory;
+        status("memory consumption: %s%u KB %s", _bold_, memory, _c_);
 
 
         /*---------------------.
@@ -413,7 +399,7 @@ int main(int argc, char** argv) {
         	std::stringstream temp (std::stringstream::in | std::stringstream::out);
         	temp << "BSD_" << args_info.bound_arg << "(";
 
-        	std::string dot_filename = args_info.dotFileBSD_arg ? args_info.dotFileBSD_arg : filepath + temp.str() + filename + ").dot";
+        	std::string dot_filename = args_info.outFile_arg ? args_info.outFile_arg : filepath + temp.str() + filename + ").dot";
 
         	Output output(dot_filename, "BSD automaton");
         	output.stream() << pnapi::io::sa;
@@ -424,7 +410,7 @@ int main(int argc, char** argv) {
         	std::stringstream temp (std::stringstream::in | std::stringstream::out);
         	temp << "CSD_" << args_info.bound_arg << "(";
 
-        	std::string dot_filename = args_info.dotFileCSD_arg ? args_info.dotFileCSD_arg : filepath + temp.str() + filename + ").dot";
+        	std::string dot_filename = args_info.outFile_arg ? args_info.outFile_arg : filepath + temp.str() + filename + ").dot";
 
         	Output output(dot_filename, "CSD automaton");
         	output.stream() << pnapi::io::sa;
@@ -586,12 +572,10 @@ int main(int argc, char** argv) {
     	std::stringstream temp (std::stringstream::in | std::stringstream::out);
     	temp << "max_" << _parsedGraph->bound << "(";
 
-    	std::string owfn_filename = args_info.owfnFile_arg ? args_info.owfnFile_arg : filepath + temp.str() + filename + ").owfn";
+    	std::string owfn_filename = args_info.outFile_arg ? args_info.outFile_arg : filepath + temp.str() + filename + ").owfn";
 
     	Output output(owfn_filename, "OWFN");
-    	output.stream() << pnapi::io::owfn;
-    	//Output::owfnoutput(output.stream(), *openNet::net, filename);
-    	output.stream() << *openNet::net;
+    	output.stream() << pnapi::io::owfn << *openNet::net;
 
     	/*---------------.
         | 2.4. tidy up	 |
@@ -740,19 +724,6 @@ int main(int argc, char** argv) {
 
     	BSD::computeBSD();
 
-    	time(&end_time);
-    	_BSDgraph.BSD_comp_time = difftime(end_time, start_time);
-    	status("computation is done [%.0f sec]", _BSDgraph.BSD_comp_time);
-
-    	std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
-    	FILE* ps = popen(call.c_str(), "r");
-    	unsigned int memory;
-    	int res = fscanf(ps, "%u", &memory);
-    	assert(res != EOF);
-    	pclose(ps);
-    	_BSDgraph.BSD_memory = memory;
-    	status("BSD memory consumption: %s%u KB %s", _bold_, memory, _c_);
-
     	/*------------------------------------------------------.
         | 1.6. save the BSD automaton and some important values |
      	`------------------------------------------------------*/
@@ -787,18 +758,20 @@ int main(int argc, char** argv) {
         `-------------------------------*/
 
     	status("starting CSD automaton computation...");
-    	time(&start_time);
     	CSD::computeCSD(_BSDgraph);
-    	time(&end_time);
-    	_BSDgraph.CSD_comp_time = difftime(end_time, start_time);
-    	status("computation is done [%.0f sec]", _BSDgraph.CSD_comp_time);
 
-    	ps = popen(call.c_str(), "r");
-    	res = fscanf(ps, "%u", &memory);
+    	time(&end_time);
+    	_BSDgraph.comp_time = difftime(end_time, program_start);
+    	status("computation is done [%.0f sec]", _BSDgraph.comp_time);
+
+    	std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
+    	FILE* ps = popen(call.c_str(), "r");
+    	unsigned int memory;
+    	int res = fscanf(ps, "%u", &memory);
     	assert(res != EOF);
     	pclose(ps);
-    	_BSDgraph.CSD_memory = memory;
-    	status("CSD memory consumption: %s%u KB %s", _bold_, memory, _c_);
+    	_BSDgraph.memory_consumption = memory;
+    	status("memory consumption: %s%u KB %s", _bold_, memory, _c_);
 
 
     	//\todo: got the first CSD automaton. now do stuff here i guess...

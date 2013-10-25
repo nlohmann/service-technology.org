@@ -137,7 +137,7 @@ void CSD::computeMaxPartner(parsedGraph & graph, bool max) {
 		}
 
 		// create a place for the node
-		places[i] = &net->createPlace(graph.names[i], 0);
+		places[i] = &net->createPlace("", 0);
 		// set the initial marking for the first node in the graph
 		if (i == 0)
 			places[i]->setTokenCount(1);
@@ -184,7 +184,7 @@ void CSD::computeMaxPartner(parsedGraph & graph, bool max) {
 			if (graph.lambdas[i] != 1 && has_in_successor) {
 				// add Q' and a tau-transition:
 				// Q --tau--> Q'
-				duplicate = &net->createPlace(graph.names[i] + "'", 0);
+				duplicate = &net->createPlace(places[i]->getName() + "'", 0);
 				tauTrans = &net->createTransition();
 				net->createArc(*places[i], *tauTrans);
 				net->createArc(*tauTrans, *duplicate);

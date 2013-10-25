@@ -89,10 +89,6 @@ class Output {
 
         static std::string dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset, bool CSD);
 
-        /// owfn output
-        static std::ostream & owfnoutput(std::ostream &, pnapi::PetriNet &, std::string & filename);
-
-
         /*!
          * \brief write vector elements, seperated by given delimeter, to stream
          */

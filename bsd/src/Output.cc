@@ -324,16 +324,3 @@ std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset, b
 	return temp.str();
 }
 
-
-/*************************************************************************
- ***** DOT output
- *************************************************************************/
-
-/*!
- * \brief dot output
- */
-std::ostream & Output::owfnoutput(std::ostream & os, pnapi::PetriNet & net, std::string & filename)
-{
-	os << net;
-	return os;
-}

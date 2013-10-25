@@ -46,8 +46,8 @@ for var in "${@:4}"; do
       file=`basename $i | sed -e 's/\.owfn//'`
 
       # computes BSD for owfn in '$INPUTDIR' to dots in '$OUTDIR'
-      $1/src/bsd ${i} --bound=${var} --BSD --outFile=$3/BSD_${var}_${file}.dot --config=$1/src/bsd.conf
+      $1/src/bsd ${i} --bound=${var} --BSD --output=$3/BSD_${var}_${file}.dot --config=$1/src/bsd.conf
       # computes CSD for owfn in '$INPUTDIR' to dots in '$OUTDIR'
-      $1/src/bsd ${i} --bound=${var} --CSD --outFile=$3/CSD_${var}_${file}.dot --config=$1/src/bsd.conf
+      $1/src/bsd ${i} --bound=${var} --CSD --output=$3/CSD_${var}_${file}.dot --config=$1/src/bsd.conf
    done
 done

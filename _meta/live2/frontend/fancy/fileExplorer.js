@@ -5,6 +5,7 @@ FILE_EXPLORER = (function(){
 // var files;
 // var fileNames = [];
 var filesByFilename = {};
+var links = {};
 var onchangeFunctions = [];
 
 // a form, where the file inputs are
@@ -49,6 +50,18 @@ function select_dropdown(callback) {
     for(var i in filesByFilename) {
         var li = $('<li><span class="btn btn-link">' + i +'</span></li>');
         li.children('span.btn').click(function(){callback($(this).text());});
+        li.appendTo(ddUl);
+    } 
+    // now all known links
+    for(var l in links) {
+        var lRead = l;
+        if(l.length > 30) {
+            lRead = l.slice(0,15) + ' [...] ' + l.slice(l.length-15, l.length);
+        }
+        var text = '<span class="btn btn-link">' + lRead +'</span>';
+        var link = '<a class="btn btn-link btn-mini" style="display:inline;" href="' + l + '" target="_blank"><i class="icon-globe"></i></a>';
+        var li = $('<li>' + text + link + '</li>');
+        li.children('span.btn').click(function(){callback($(this).next().attr('href'));});
         li.appendTo(ddUl);
     } 
     $(this).dropdown();
@@ -106,9 +119,24 @@ function getFiles() {
     return filesByFilename;
 }
 
+// here the links can be accessed, for request
+function getLinks() {
+    var usedLinks = [];
+    for(var i in links) {
+        if(links[i]) {
+            usedLinks.push(i);
+        }
+    }
+    return usedLinks;
+}
+
 function validateInputs(inputs) {
     return function() {
         var iLen = inputs.length;
+
+        for(var curLink in links) {
+            links[curLink] = false;
+        }
 
         // all existing alerts should fade out and then be removed
         var alrtContainer = $('#alertContainer').empty();
@@ -121,10 +149,21 @@ function validateInputs(inputs) {
             var controlGroup = curInput.closest('.control-group').removeClass('warning');
             controlGroup.attr('title', '');
             controlGroup.tooltip('destroy');
+            controlGroup.find('.fileInputLinkButton').remove();
 
-            // check, if we have such a file
             var curVal = cur.getValue();
-            if(curVal && !filesByFilename[curVal] && !curVal.match(/(^https?\:)|(^s?ftp\:)|(^svn\:)/i)) {
+
+            // check if link
+            if(typeof curVal == 'string' && curVal.match(/(^https?\:)|(^s?ftp\:)|(^svn\:)/i)) {
+                // the provided value is a link
+                var linkBtn = $('<a target="_blank" title="open link" href="' + curVal + '"><i class="icon-globe"></i></a>');
+                linkBtn.addClass("btn btn-mini btn-link fileInputLinkButton");
+                linkBtn.insertAfter(curInput.next());
+
+                links[curVal] = true;
+            }
+            // check, if we have such a file, if no link
+            else if(curVal && !filesByFilename[curVal]) {
                 // put a red box around
                 var param = curInput.attr('data-stlive-argname');
                 if(!param) param = 'File Input';
@@ -152,6 +191,7 @@ return {
     add: add,
     select_dropdown: select_dropdown,
     getFiles: getFiles,
+    getLinks: getLinks,
     onchange: onchange,
     validateInputs: validateInputs,
     dropFile: dropFile

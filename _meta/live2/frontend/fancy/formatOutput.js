@@ -25,8 +25,9 @@ function beforeHandler() {
 }
 
 function completeHandler(r) {
+    console.log('server response: ' + r);
     if(noSent != this.number) {
-        console.log('received request number '+noRec+', but number '+noSent+' was already sent');
+        console.log('received request number ' + noRec + ', but number ' + noSent + ' was already sent');
     }
     var stdout = r.result.output.stdout.join('\n') || '(empty)';
     var stderr = r.result.output.stderr.join('\n') || '(empty)';
@@ -34,9 +35,9 @@ function completeHandler(r) {
     delete r.result.output;
     var meta = dumpObject(r.meta);
     var formatOut = dumpObject(r);
-    $('#stdout').html(stdout);
-    $('#stderr').html(stderr);
-    $('#meta').html(meta);
+    $('#stdout').text(stdout);
+    $('#stderr').text(stderr);
+    $('#meta').text(meta);
 
     var timeDiff = r.result.time.end - r.result.time.begin;
     var code = r.result.exit.code;
@@ -63,7 +64,8 @@ function completeHandler(r) {
             ' href="data:Application/octet-stream,' + encodeURIComponent(t) + '"' +
             '>download ' + h + '</a>';
         // document.location = 'data:Application/octet-stream,' + encodeURIComponent(t);
-        f += '<h2>'+h+'</h2>' + a + '<pre>'+t+'</pre>';
+        var encodedT = $('<div/>').text(t).html();
+        f += '<h2>'+h+'</h2>' + a + '<pre>'+ encodedT +'</pre>';
     }
 
     $('#files_output_container').html(f);
@@ -78,15 +80,22 @@ function progressHandlingFunction(s) {
 
 $('#outForm').submit(function(){
 
-    // get the file inputs to this form
-    //$(this).find('input[type=file]').remove();
-    //FILE_EXPLORER.collectFileInputs().clone().appendTo(this);
-
     var files = FILE_EXPLORER.getFiles();
     var formData = new FormData(this);
-    for(var i in files) {
+    for (var i in files) {
         formData.append(i, files[i]);
     }
+
+/*
+    var links = FILE_EXPLORER.getLinks();
+    var links_length = links.length;
+    for (i = 0; i < links_length; ++i) {
+        console.log('external link no: ' + i + '  --> ' + links[i]);
+        formData.append('external_links[' + i + ']', links[i]);
+    }
+*/
+
+    console.log(formData);
     $.ajax({
         url: this.action,  //server script to process data
         type: 'POST',

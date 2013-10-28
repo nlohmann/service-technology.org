@@ -252,42 +252,41 @@ InputSetManager.prototype.update = function(params) {
 
         params[i] = params[i] + '';
         // this a value without a key (standard file input)
-        if(params[i].match(/^[^\-][^\=]+$/gi)) { // stupid special case
+        if(params[i].match(/^[^\-]/gi)) { // stupid special case
             if(!paramsByArgname.$) {
                 paramsByArgname.$ = params[i];
             } else {
                 this.unmatchedParams.push(params[i]);
             }
             continue;
-        }
-
-        var c = params[i].replace(/^\-+/, '');
-        var argName;
-        var argVal;
-        var fstEq = c.indexOf('=');
-        var fstSp = c.indexOf(' ');
-
-        // split at first equal
-        if(fstEq >= 0 && (fstEq > fstSp | fstSp < 0)) {
-            argName = c.slice(0,fstEq);
-            argVal = c.slice(fstEq+1, c.length);
-        // split at first space
-        } else if (fstSp >= 0 && (fstSp > fstEq | fstEq < 0)) {
-            argName = c.slice(0,fstSp);
-            argVal = c.slice(fstSp+1, c.length);
-        // no param/value
         } else {
-            argName = c;
-            argVal = true;
-        }
-        if(!paramsByArgname[argName]) {
-            paramsByArgname[argName] = argVal;
-            unmatchedParamsByArgname[argName] = params[i];
-        } else {
-            this.unmatchedParams.push(params[i]);
+            var c = params[i].replace(/^\-+/, '');
+            var argName;
+            var argVal;
+            var fstEq = c.indexOf('=');
+            var fstSp = c.indexOf(' ');
+
+            // split at first equal
+            if(fstEq >= 0 && (fstEq > fstSp | fstSp < 0)) {
+                argName = c.slice(0,fstEq);
+                argVal = c.slice(fstEq+1, c.length);
+            // split at first space
+            } else if (fstSp >= 0 && (fstSp > fstEq | fstEq < 0)) {
+                argName = c.slice(0,fstSp);
+                argVal = c.slice(fstSp+1, c.length);
+            // no param/value
+            } else {
+                argName = c;
+                argVal = true;
+            }
+            if(!paramsByArgname[argName]) {
+                paramsByArgname[argName] = argVal;
+                unmatchedParamsByArgname[argName] = params[i];
+            } else {
+                this.unmatchedParams.push(params[i]);
+            }
         }
     }
-    console.log(paramsByArgname);
 
     // iterate through all inputs
     var iLen = this.inputs.length;

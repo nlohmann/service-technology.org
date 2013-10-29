@@ -93,6 +93,44 @@ echo '  \bottomrule' >> $RESULT
 echo '  \end{tabular}' >> $RESULT
 echo '\end{table*}' >> $RESULT
 
+# fill in mp table
+# number of final markings?
+echo '' >> $RESULT
+echo '\begin{table*}[htb]' >> $RESULT
+echo '  \myfloatalign' >> $RESULT
+echo '  \caption{The size of $\mp$ generated with the bsd tool, including the used memory and time.}\label{tab:TODO}' >> $RESULT
+echo '  \begin{tabular}[b]{lrrrrrrrr}' >> $RESULT
+echo '  \toprule' >> $RESULT
+echo '  name & $\bb$ & $|P|$ & $|T|$ & $|F|$ & $|I|$ & $|O|$ & time (s) & memory (KiB) \\' >> $RESULT
+echo '  \midrule' >> $RESULT
+
+echo "$0: parsing CSD files in '$1'"
+for i in `find $1 -name "CSD*.dot" | sort`; do
+   file=`basename $i | sed -e 's/\.dot//'`
+   location=`dirname $i`
+
+# TODO
+   FILE=`grep -E '  input file:  ' ${i} | sed -r "s/  input file:  ([[:print:]]+)/\1/" | sed -e 's/\.owfn//'`
+   BOUND=`grep -E '  bound:             ' ${i} | sed -r "s/  bound:             ([0-9]+)/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
+   LABELS=`grep -E '  #labels \(total\):   ' ${i} | sed -r "s/  #labels \(total\):   ([0-9]+)/\1/"`
+   SLABELS=`grep -E '  #sending labels:   ' ${i} | sed -r "s/  #sending labels:   ([0-9]+)/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
+   RLABELS=`grep -E '  #receiving labels: ' ${i} | sed -r "s/  #receiving labels: ([0-9]+)/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
+   STATES=`grep -E '  #nodes:            ' ${i} | sed -r "s/  #nodes:            ([0-9]+)/\1/"`
+   FORMATSTATES=`echo ${STATES} | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
+   TRANSITIONS=`echo $((${STATES} * ${LABELS})) | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
+   TIME=`grep -E '  computation time:  ' ${i} | sed -r "s/  computation time:  ([0-9]+(.[0-9]+)?) s/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
+   MEMORY=`grep -E '  memory consumed:   ' ${i} | sed -r "s/  memory consumed:   ([0-9]+(.[0-9]+)?) KB/\1/" | sed -r ':L;s=\b([0-9]+)([0-9]{3})\b=\1,\2=g;t L'`
+   echo "      ${FILE} & ${BOUND} & ${FORMATSTATES} & ${TRANSITIONS} & ${RLABELS} & ${SLABELS} & ${TIME} & ${MEMORY} \\\\" >> $RESULT
+done
+
+echo '  \bottomrule' >> $RESULT
+echo '  \end{tabular}' >> $RESULT
+echo '\end{table*}' >> $RESULT
+
+
+# fill in max table
+
+# TODO
 
 
 echo "$0: Created result file ${RESULT}."

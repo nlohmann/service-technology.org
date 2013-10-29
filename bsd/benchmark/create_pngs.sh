@@ -62,7 +62,8 @@ for i in `find $2 -name "*.owfn" | sort`; do
 	then
 		echo "File '${pngfile}' already exists."
 	else
-		$1/petri -v --removePorts --input=owfn --output=png --config=$1/petri.conf $i
+		#$1/petri -v --input=owfn --output=png $i
+		$1/petri -v --input=owfn --output=png --config=$1/petri.conf $i
 	fi
 done
 

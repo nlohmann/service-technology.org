@@ -59,7 +59,7 @@ function completeHandler(r) {
     for(var i=0, c=null; c = files[i]; ++i) {
         var h = c.filename;
         var t = $.base64.decode(c.content);
-        a = '<a ' +
+        var a = '<a ' +
             ' download="'+h+'"' +
             ' href="data:Application/octet-stream,' + encodeURIComponent(t) + '"' +
             '>download ' + h + '</a>';

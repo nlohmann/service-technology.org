@@ -34,7 +34,7 @@ function onchange(callback) {
  * must be run on html-object scope, where the drop-down should appear
  */
 function select_dropdown(callback) {
-    $this = $(this);
+    var $this = $(this);
     // remove old dropdowns
     $(this).parent().children('ul').remove();
     // dropdown unordered list

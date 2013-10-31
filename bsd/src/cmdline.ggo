@@ -37,9 +37,9 @@ option "mp" -
   details="This option computes the open net mp_b(N) of an OWFN N from a given CSD automaton CSD_b(N). The input file has to be a DOT file and the output is an OWFN.\n"
   flag off
   
-option "matching" -
-  "Check for a given OWFN N1 if it is matching with a list of given OWFNs N2,...,Nn."
-  details="This option checks with matching to which of the OWFNs N2,...,Nn the OWFN N1 is a b-partner. The input is a list of OWFNs N1,N2,...,Nn.\n"
+option "og" -
+  "Compute an OG for a given OWFN N."
+  details="This option computes an operating guideline for a given OWFN N based on the MP automaton computation.\n"
   flag off
   
 option "bound" b
@@ -51,7 +51,7 @@ option "bound" b
   optional
 
 section "Input/Output"
-sectiondesc="When called without an input file, BSD reads from the standard input stream. When called without an output parameter, BSD creates a DOT/OWFN file based on the chosen options. If no filename is given for one of the options below, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `.dot'). If the filename `-' is given, BSD will pipe the respective output to the standard output stream.\n"
+sectiondesc="When called without an input file, BSD reads from the standard input stream. When called without an output parameter, BSD creates a DOT/OWFN/OG file based on the chosen options. If no filename is given for one of the options below, the input filename's suffix (e.g., `.owfn') is replaced by the name of the respective option (e.g., `.dot'). If the filename `-' is given, BSD will pipe the respective output to the standard output stream.\n"
 
 option "output" -
   "Filename for the output files."

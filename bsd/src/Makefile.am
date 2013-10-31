@@ -6,6 +6,7 @@ bsd_SOURCES = cmdline.c cmdline.h \
                 InnerMarking.h InnerMarking.cc \
                 BSD.cc BSD.h \
                 CSD.cc CSD.h \
+		  MP.cc MP.h \
                 partnercheck.cc partnercheck.h \
                 confcheck.cc confcheck.h \
                 parser.cc parser.h \

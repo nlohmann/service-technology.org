@@ -49,11 +49,11 @@ class BSD {
 		 *-------------------- BSD computation -------------------
 		 *========================================================*/
 
-        static void computeBSD();
+        static void computeBSD(int og_flag);
 
-        static void computeSuccessor(BSDNode &node, Label_ID label);
+        static void computeSuccessor(BSDNode &node, Label_ID label, int og_flag);
 
-        static BSDNode* setup(std::list<MarkingList> &SCCs);
+        static BSDNode* setup(std::list<MarkingList> &SCCs, int og_flag);
 
         static std::list<MarkingList>* computeClosureTarjan(InnerMarking_ID id);
 

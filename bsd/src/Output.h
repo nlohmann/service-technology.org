@@ -89,6 +89,13 @@ class Output {
 
         static std::string dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset, bool CSD);
 
+        /// og output
+        static std::ostream & ogoutput(std::ostream &, BSDgraph & graph, std::string & filename, int bound);
+
+        static void printOGnode(std::ostream & os, BSDgraph & graph, BSDNode & node);
+
+        static void printFormula(std::ostream & os, BSDgraph & graph, BSDNode & node);
+
         /*!
          * \brief write vector elements, seperated by given delimeter, to stream
          */

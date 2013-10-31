@@ -42,14 +42,18 @@ typedef std::list<InnerMarking_ID> MarkingList;
 
 // a node of a BSD (or CSD) automaton
 typedef struct _BSDNode {
-	// is this node actually the U node? (for computation of CSD automata)
+	// is this node actually the U node? (for computation of CSD and MP automata)
 	bool isU;
 	// list of markings in the closure
 	MarkingList list;
+	// list of SCCs in the closure (may be empty?!)
+	std::list<MarkingList> SCCs;
 	// pointers to other BSD nodes (ordered and accessible by label id)
 	struct _BSDNode** pointer;
 	// lambda value of the node (see paper for more information)
 	uint8_t lambda;
+	// formula (if existing): conjunction of disjunctions
+	std::list<std::list<Label_ID> > formula;
 } BSDNode;
 
 // representation of a BSD (or/and a CSD) automaton with needed values for computations

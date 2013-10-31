@@ -1,3 +1,9 @@
+@heading Version 1.2-unreleased
+@itemize
+@item generate mp_b(N) and maximal b-partner of an OWFN N from CSD_b(N)
+@item generate an og from an OWFN N via the MP automaton for subsequent matching
+@end itemize
+
 @heading Version 1.1
 @itemize
 @item generate CSD automata from OWFN input

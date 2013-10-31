@@ -1,4 +1,4 @@
-AC_INIT([BSD], 1.1, bsd@service-technology.org, bsd, http://service-technology.org/bsd)
+AC_INIT([BSD], 1.2-unreleased, bsd@service-technology.org, bsd, http://service-technology.org/bsd)
 
 AC_MSG_NOTICE([ ____   ____ ____])
 AC_MSG_NOTICE([|  _  \\/ ___|  _ \\])

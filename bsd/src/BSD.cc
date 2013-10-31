@@ -86,7 +86,7 @@ void BSD::finalize() {
  \brief Creates the BSD automaton based on the given reachability graph.
 
  */
-void BSD::computeBSD() {
+void BSD::computeBSD(int og_flag) {
 	// clear existing graph
 	graph->clear();
 
@@ -121,7 +121,7 @@ void BSD::computeBSD() {
 		return;
 	}
 
-	setup(*SCCs);
+	setup(*SCCs, og_flag);
 	delete SCCs;
 
 	// iterate through the graph (start with the initial)
@@ -131,7 +131,7 @@ void BSD::computeBSD() {
 		// iterate through all the labels (except of \tau=0 and bound_broken=1)
 		for (Label_ID id = 2/*sic!*/; id <= Label::events; ++id) {
 			// compute the successor node after taking a step with current label
-			computeSuccessor(**it, id);
+			computeSuccessor(**it, id, og_flag);
 		}
 		++it;
 	}
@@ -150,7 +150,7 @@ void BSD::computeBSD() {
 
  \return pointer to computed BSD node or NULL if the bound was broken or if no step was possible
  */
-void BSD::computeSuccessor(BSDNode &node, Label_ID label) {
+void BSD::computeSuccessor(BSDNode &node, Label_ID label, int og_flag) {
 	status("computing closure of BSD node %x after step with label %s", &node, Label::id2name[label].c_str());
 	std::list<MarkingList> resultlist;
 	// iterate through all marking ids in the BSD node
@@ -186,7 +186,7 @@ void BSD::computeSuccessor(BSDNode &node, Label_ID label) {
 	}
 
 	// else test if the node already exists and add a pointer from this node to the inserted (or existing) node
-	node.pointer[label] = setup(resultlist);
+	node.pointer[label] = setup(resultlist, og_flag);
 }
 
 
@@ -198,7 +198,7 @@ void BSD::computeSuccessor(BSDNode &node, Label_ID label) {
 
  \return boolean value showing if the bound was broken
  */
-BSDNode* BSD::setup(std::list<MarkingList> &SCCs) {
+BSDNode* BSD::setup(std::list<MarkingList> &SCCs, int og_flag) {
 	MarkingList list;
 	for (std::list<MarkingList>::const_iterator it = SCCs.begin(); it != SCCs.end(); ++it) {
 		list.insert(list.end(), it->begin(), it->end());
@@ -235,6 +235,11 @@ BSDNode* BSD::setup(std::list<MarkingList> &SCCs) {
 		p->pointer = new BSDNode*[Label::events+1];
 
 		assignLambda(p, SCCs);
+
+		// remember the SCCs in case of formula computation
+		if (og_flag) {
+			p->SCCs = SCCs;
+		}
 	}
 
 	return p;

@@ -28,19 +28,22 @@
 
 
 /*!
- \brief CSD automata generation
+ \brief MP automata generation
 
- Contains all functions needed to generate CSD automata from BSD automata.
+ Contains all functions dealing with the MP automaton like computing the mp automata and maximal partners.
+ Also the OG computation related functions are formulated here.
 */
-class CSD {
+class MP {
 
     public:
 
         /*========================================================
-         *-------------------- CSD computation -------------------
+         *------------------- maximal b-partner ------------------
          *========================================================*/
 
-        static void computeCSD(BSDgraph & graph);
+        static void computeMaxPartner(parsedGraph & graph, bool max);
+
+        static void computeFormulas(BSDgraph & graph);
 
     private:
 

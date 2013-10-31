@@ -85,6 +85,8 @@ void BSD::finalize() {
 /*!
  \brief Creates the BSD automaton based on the given reachability graph.
 
+ \param[in] og_flag indicates whether an og shall be computed later on
+
  */
 void BSD::computeBSD(int og_flag) {
 	// clear existing graph
@@ -147,6 +149,7 @@ void BSD::computeBSD(int og_flag) {
 
  \param[in]	node	the current node of the BSD automaton
  \param[in]	label	the label id
+ \param[in] og_flag indicates whether an og shall be computed later on
 
  \return pointer to computed BSD node or NULL if the bound was broken or if no step was possible
  */
@@ -195,6 +198,7 @@ void BSD::computeSuccessor(BSDNode &node, Label_ID label, int og_flag) {
  	 	 it creates a new node and assigns a lambda value to it. It also sets up the other needed structures.
 
  \param[in]	SCCs	list of marking lists (SCCs)
+ \param[in] og_flag indicates whether an og shall be computed later on
 
  \return boolean value showing if the bound was broken
  */

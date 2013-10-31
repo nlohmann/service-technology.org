@@ -8,14 +8,12 @@
 
 
 
-Version 1.1
+Version 1.2-unreleased
 ======================
 
-* generate CSD automata from OWFN input
+* generate mp_b(N) and maximal b-partner of an OWFN N from CSD_b(N)
 
-* test: does input net A b-conform to input net B?
-
-* parsing of BSD and CSD automata given as dot files
+* generate an og from an OWFN N via the MP automaton for subsequent matching
 
 
 See file ChangeLog <http://service-technology.org/files/bsd/ChangeLog> for

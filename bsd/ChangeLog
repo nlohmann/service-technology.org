@@ -8,8 +8,15 @@
 
 
 
-Version 1.1
+Version 1.2-unreleased
 ======================
+
+* generate mp_b(N) and maximal b-partner of an OWFN N from CSD_b(N)
+
+* generate an og from an OWFN N via the MP automaton for subsequent matching
+
+Version 1.1
+===========
 
 * generate CSD automata from OWFN input
 

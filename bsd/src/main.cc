@@ -397,9 +397,9 @@ int main(int argc, char** argv) {
 
         if (args_info.BSD_flag) {
         	std::stringstream temp (std::stringstream::in | std::stringstream::out);
-        	temp << "BSD_" << args_info.bound_arg << "(";
+        	temp << "BSD_" << args_info.bound_arg << "_";
 
-        	std::string dot_filename = args_info.output_arg ? args_info.output_arg : filepath + temp.str() + filename + ").dot";
+        	std::string dot_filename = args_info.output_arg ? args_info.output_arg : filepath + temp.str() + filename + ".dot";
 
         	Output output(dot_filename, "BSD automaton");
         	output.stream() << pnapi::io::sa;
@@ -408,9 +408,9 @@ int main(int argc, char** argv) {
 
         if (args_info.CSD_flag) {
         	std::stringstream temp (std::stringstream::in | std::stringstream::out);
-        	temp << "CSD_" << args_info.bound_arg << "(";
+        	temp << "CSD_" << args_info.bound_arg << "_";
 
-        	std::string dot_filename = args_info.output_arg ? args_info.output_arg : filepath + temp.str() + filename + ").dot";
+        	std::string dot_filename = args_info.output_arg ? args_info.output_arg : filepath + temp.str() + filename + ".dot";
 
         	Output output(dot_filename, "CSD automaton");
         	output.stream() << pnapi::io::sa;
@@ -544,6 +544,8 @@ int main(int argc, char** argv) {
     		// parse into _parsedGraph
     		_parsedGraph = parser::dot2graph_parse(inputStream);
 
+    		inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0]);
+
     		if (args_info.verbose_flag) {
     			status("parsed graph:");
     			parser::printParsedGraph(*_parsedGraph);
@@ -570,11 +572,15 @@ int main(int argc, char** argv) {
         `---------------------*/
 
     	std::stringstream temp (std::stringstream::in | std::stringstream::out);
-    	temp << "max_" << _parsedGraph->bound << "(";
+    	if (args_info.max_flag)
+    		temp << "max_" << _parsedGraph->bound << "_";
+    	else
+    		temp << "mp_" << _parsedGraph->bound << "_";
 
-    	std::string owfn_filename = args_info.output_arg ? args_info.output_arg : filepath + temp.str() + filename + ").owfn";
+    	std::string owfn_filename = args_info.output_arg ? args_info.output_arg : filepath + temp.str() + filename + ".owfn";
 
     	Output output(owfn_filename, "OWFN");
+    	//Output::owfnoutput(output.stream(), *openNet::net, filename);
     	output.stream() << pnapi::io::owfn << *openNet::net;
 
     	/*---------------.

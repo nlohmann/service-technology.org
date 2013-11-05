@@ -9,9 +9,9 @@
  *
  * \since   2009/10/06
  *
- * \date    $Date: 2012-06-22 14:47:01 +0200 (Fr, 22. Jun 2012) $
+ * \date    $Date: 2013-11-05 14:47:01 +0200 (Di, 5. Nov 2013) $
  *
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.14 $
  */
 
 #ifndef PATHFINDER_H
@@ -87,10 +87,11 @@ public:
 		myNode();
 		~myNode();
 		void reset();
+		void reinit();
 		vector<int> nodes; // successor nodes
 		Transition* t;
-		int index, low;
-		bool instack;
+		int index, low, count;
+		bool instack, enabled;
 	};
 
 	// some thread functions need to access private elements in PathFinder
@@ -151,6 +152,9 @@ private:
 
 	/// Calculate the conflicts and dependencies for a given transition
 	void conflictTable(SThread*, Transition*);
+
+	/// Calculate the conflicts and dependencies for a given transition incrementally
+	void adaptConflictGraph(SThread*, Transition*);
 
 	/// Calculate one place that is a reason for nonfirability of a transition
 	Place* hinderingPlace(SThread*, Transition&);

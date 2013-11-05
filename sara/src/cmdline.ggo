@@ -224,6 +224,11 @@ option "maxdepth" M
   int
   optional
   
+option "incremental" I
+  "Makes the construction of conflict and dependency graphs incremental."
+  details="Data structures for stubborn set construction are modified and not rebuilt during recursion. Good for nets with high token count."
+  flag off
+  
 section "Debugging"
 
 option "break" b

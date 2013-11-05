@@ -9,9 +9,9 @@
  *
  * \since   2012/04/20
  *
- * \date    $Date: 2012-06-12 12:00:00 +0200 (Di, 12. Jun 2012) $
+ * \date    $Date: 2013-11-05 12:00:00 +0200 (Di, 5. Nov 2013) $
  *
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.14 $
  */
 
 #include <pthread.h>
@@ -394,6 +394,8 @@ void initPathFinderThread(unsigned int rtnr, PartialSolution* ps, Marking& m, ma
 	threaddata[rtnr]->tsets.reserve(pf.im.pMaxPreset());
 	threaddata[rtnr]->tseti.reserve(pf.im.numTransitions());
 	threaddata[rtnr]->tbool.reserve(pf.im.numTransitions());
+	threaddata[rtnr]->tboolb.reserve(pf.im.numTransitions());
+	threaddata[rtnr]->tboola.reserve(pf.im.numTransitions());
 	threaddata[rtnr]->pseta.reserve(pf.im.numPlaces());
 	threaddata[rtnr]->psetb.reserve(pf.im.numPlaces());
 	threaddata[rtnr]->psets.reserve(pf.im.numPlaces());
@@ -503,6 +505,8 @@ bool PathFinder::assignPathFinderHelper(unsigned int tid) {
 	help->tsets.reserve(me->pf->im.pMaxPreset());
 	help->tseti.reserve(me->pf->im.numTransitions());
 	help->tbool.reserve(me->pf->im.numTransitions());
+	help->tboola.reserve(me->pf->im.numTransitions());
+	help->tboolb.reserve(me->pf->im.numTransitions());
 	help->pseta.reserve(me->pf->im.numPlaces());
 	help->psetb.reserve(me->pf->im.numPlaces());
 	help->psets.reserve(me->pf->im.numPlaces());

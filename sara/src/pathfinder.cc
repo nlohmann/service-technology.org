@@ -9,9 +9,9 @@
  *
  * \since   2009/10/14
  *
- * \date    $Date: 2012-06-22 12:00:00 +0200 (Fr, 22. Jun 2012) $
+ * \date    $Date: 2013-11-05 12:00:00 +0200 (Di, 5. Nov 2013) $
  *
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.14 $
  */
 
 #ifndef PNAPI_PNAPI_H
@@ -58,7 +58,7 @@ extern vector<Place*> placeorder;
 extern map<Place*,int> revporder; 
 
 // command line switches
-extern bool flag_lookup, flag_verbose, flag_output, flag_treemaxjob, flag_forceprint, flag_continue, flag_scapegoat, flag_parallel_tree;
+extern bool flag_lookup, flag_verbose, flag_output, flag_treemaxjob, flag_forceprint, flag_continue, flag_scapegoat, flag_parallel_tree, flag_incremental;
 // command line values
 extern int val_lookup, val_treemaxjob;
 
@@ -84,14 +84,16 @@ extern bool multithreaded;
 namespace sara {
 
 /** Constructor for transition nodes for stubborn set analysis. */
-PathFinder::myNode::myNode() : t(NULL),index(-2),low(-1),instack(false) {}
+PathFinder::myNode::myNode() : t(NULL),index(-2),low(-1),count(0),instack(false),enabled(false) {}
 
 /** Destructor. */
 PathFinder::myNode::~myNode() {}
 
 /** Reset for reusability. Reaches the same state as the constructor. */
-void PathFinder::myNode::reset() { index=-2; low=-1; instack=false; nodes.clear(); }
+void PathFinder::myNode::reset() { index=-2; low=-1; count=0; instack=false; nodes.clear(); }
 
+/** Reinitialises the graph before reusing it. */ 
+void PathFinder::myNode::reinit() { low=-1; instack=false; if (index>=0) index=-1; }
 
 	/*************************************
 	* Implementation of class PathFinder *
@@ -252,45 +254,48 @@ bool PathFinder::recurse(unsigned int tid) {
 		return (flag_continue?false:terminate); // surpress termination if -C flag is given
 	}
 
-	// clear tton (conflict graph) for stubborn set construction
-	for(unsigned int i=0; i<thr->tton.size(); ++i)
-		thr->tton[i]->reset();
+	if (flag_incremental) adaptConflictGraph(thr,tstart);
+	else {
+		// clear tton (conflict graph) for stubborn set construction
+		for(unsigned int i=0; i<thr->tton.size(); ++i)
+			thr->tton[i]->reset();
 
-	// Initialise tton(entries for conflict graph) and todo-list with the first transition
-	thr->tton[revtorder[tstart]]->index = -1;
+		// Initialise tton(entries for conflict graph) and todo-list with the first transition
+		thr->tton[revtorder[tstart]]->index = -1;
 
-	// calculate all dynamic conflicts and dependencies with resp. 
-	// to the active marking and the chosen transition
-	conflictTable(thr,tstart);
+		// calculate all dynamic conflicts and dependencies with resp. 
+		// to the active marking and the chosen transition
+		conflictTable(thr,tstart);
 
-	// iterate through a todo-list of non-visited transitions (new ones may be added meanwhile)
-	vector<int>& todo(thr->tseti); // get a "new" vector (already allocated)
-	todo.clear(); // and empty it 
-	todo.push_back(revtorder[tstart]); // tstart is the first element that needs to be "done"
-	unsigned int todoptr(0); // pointer to the active element in todo
+		// iterate through a todo-list of non-visited transitions (new ones may be added meanwhile)
+		vector<int>& todo(thr->tseti); // get a "new" vector (already allocated)
+		todo.clear(); // and empty it 
+		todo.push_back(revtorder[tstart]); // tstart is the first element that needs to be "done"
+		unsigned int todoptr(0); // pointer to the active element in todo
 
-	// now go through the list until all elements in it are done
-	while (todoptr<todo.size()) {
-		int npos(todo[todoptr]); // get the number of the transition to work upon
-
-		// create stubborn set conflict&dependency graph for "npos" transition
-		if (!thr->cftab[npos].empty()) { // check if there are conflicts/dependencies at all
-			for(unsigned int i=0; i<thr->cftab[npos].size(); ++i) // then walk the list if not empty
-			{
-				// get the number of a transition in conflict with or dependent on "npos"
-				int cpos(revtorder[thr->cftab[npos][i]]);
-
-				// new depending or conflicting transitions are added to the todo-list recursively (but once only)
-				if (thr->tton[cpos]->index==-2) todo.push_back(cpos);
-
-				// the c&d graph is built (arcs)
-				thr->tton[npos]->nodes.push_back(cpos);
-
-				// the new transition is marked as "has been in the todo-list", so it won't be added twice 
-				thr->tton[cpos]->index = -1;
+		// now go through the list until all elements in it are done
+		while (todoptr<todo.size()) {
+			int npos(todo[todoptr]); // get the number of the transition to work upon
+	
+			// create stubborn set conflict&dependency graph for "npos" transition
+			if (!thr->cftab[npos].empty()) { // check if there are conflicts/dependencies at all
+				for(unsigned int i=0; i<thr->cftab[npos].size(); ++i) // then walk the list if not empty
+				{
+					// get the number of a transition in conflict with or dependent on "npos"
+					int cpos(revtorder[thr->cftab[npos][i]]);
+	
+					// new depending or conflicting transitions are added to the todo-list recursively (but once only)
+					if (thr->tton[cpos]->index==-2) todo.push_back(cpos);
+	
+					// the c&d graph is built (arcs)
+					thr->tton[npos]->nodes.push_back(cpos);
+	
+					// the new transition is marked as "has been in the todo-list", so it won't be added twice 
+					thr->tton[cpos]->index = -1;
+				}
 			}
+			++todoptr; // we are done with this transition, go to the next one
 		}
-		++todoptr; // we are done with this transition, go to the next one
 	}
 	} // end scope
 
@@ -360,6 +365,7 @@ bool PathFinder::recurse(unsigned int tid) {
 		// the transition we just tried does not lead to a success, revert all side effects:
 		im.predecessor(*(thr->m),*(tord[o])); // calculate predecessor marking
 		++(thr->tv[tord[o]]); // add the instance of the transition to the remaining transitions
+		if (flag_incremental) adaptConflictGraph(thr,NULL); // revert changes to the conflict graph
 		thr->fseq.pop_back(); // remove it from the firing sequence
 
 		// activate the diamond check for this transition for the next recursion loop
@@ -488,6 +494,206 @@ void PathFinder::conflictTable(SThread* thr, Transition* tstart) {
 		}
 		++tsetptr; // we are done with this transition
 	}
+}
+
+/** Calculates which transitions a given transition may depend on
+	or be in conflict with, recursively.
+	@param thr The thread calculating this c&d relation.
+	@param tstart An arbitrary transition as first element of the stubborn set.
+*/
+void PathFinder::adaptConflictGraph(SThread* thr, Transition* tstart) {
+
+	unsigned int tstnr(tstart==NULL ? 0 : revtorder[tstart]);
+
+	// reinit tton (conflict graph) for stubborn set construction
+	for(unsigned int i=0; i<thr->tton.size(); ++i)
+		thr->tton[i]->reinit();
+
+	// obtain a marker for "has been done" and clear it
+	vector<bool>& marker(thr->tbool);
+	marker.assign(im.numTransitions(),false);
+
+	// create a todo-list (memory was allocated previously, just clear it)
+	vector<Transition*>& tset(thr->tsetb);
+	tset.clear();
+
+	// begin with the start transitions (tstart or the previously fired transition)
+	if (!thr->fseq.empty()) {
+		tset.push_back(thr->fseq.back());
+		marker[revtorder[thr->fseq.back()]] = true;
+
+		map<Place*,int>& opost(im.getPostset(*(thr->fseq.back())));
+		for(map<Place*,int>::iterator oit=opost.begin(); oit!=opost.end(); ++oit)
+		{
+			map<Transition*,int>& ppost(im.getPostset(*(oit->first)));
+			for(map<Transition*,int>::iterator qit=ppost.begin(); qit!=ppost.end(); ++qit)
+				if (!marker[revtorder[qit->first]]) {
+					tset.push_back(qit->first);
+					marker[revtorder[qit->first]] = true;
+				}
+		}
+	}
+	if (tstart && thr->tton[tstnr]->index==-2) {
+		if (!marker[tstnr]) {
+			tset.push_back(tstart);
+			marker[tstnr] = true;
+		}
+		thr->tton[tstnr]->index = -1;
+	}
+
+	// nodes for which a test for zero successors should be made (recursion start)
+	vector<bool>& ntbool(thr->tboolb);
+	ntbool.assign(im.numTransitions(),false);
+	vector<int>& nulltest(thr->tseti);
+	nulltest.clear();
+
+	// point to the active element in tset
+	unsigned int tsetptr(0);
+
+	// as long as there is a new transition in tset ...
+	while (tsetptr<tset.size())
+	{
+		// get such a transition and its number
+		Transition* t(tset[tsetptr]);
+		unsigned int tnr(revtorder[t]);
+		myNode* node(thr->tton[tnr]);
+		if (!node->count && !ntbool[tnr]) { nulltest.push_back(tnr); ntbool[tnr]=true; }
+
+		// if the transition is newly enabled, look for conflicting transitions
+		if (thr->m->activates(*t) && !node->enabled) {
+			// remove all enabling transitions
+			for(int j=0; j<node->nodes.size(); ++j)
+				if (!(--thr->tton[node->nodes[j]]->count) && !ntbool[node->nodes[j]])
+				{	
+					nulltest.push_back(node->nodes[j]);
+					ntbool[node->nodes[j]] = true;
+				}
+			node->nodes.clear();
+			node->enabled = true;
+			// so we know which transitions have already been added as conflicting:
+			vector<bool>& added(thr->tboola);
+			added.assign(im.numTransitions(),false);
+
+			// put all conflicting transitions (via preset) into the stubborn set
+			map<Place*,int>& tpre(im.getPreset(*t));
+			map<Place*,int>& tpost(im.getPostset(*t));
+			for(map<Place*,int>::iterator ppit=tpre.begin(); ppit!=tpre.end(); ++ppit)
+			{ // go through the preset
+				Place* p(ppit->first); // a place in the preset
+				
+				// check if the place has a loop with our transition
+				map<Place*,int>::iterator ppit2(tpost.find(p));
+				int itprod((ppit2==tpost.end() ? 0 : ppit2->second));
+
+				// places on which we effectively produce tokens do not lead to conflicts 
+				// where the other transition must fire first
+				if (ppit->second<=itprod) continue;
+
+				// get the place's postset and run through its transitions
+				map<Transition*,int>& ppost(im.getPostset(*p));
+				map<Transition*,int>& ppre(im.getPreset(*p));
+				for(map<Transition*,int>::iterator tpit=ppost.begin(); tpit!=ppost.end(); ++tpit)
+				{
+					// found a conflicting transition
+					Transition* cft(tpit->first);
+
+					// if it is the same transition or shouldn't fire anyway, we don't need it
+					if (cft==t || thr->tv[cft]==0) continue;
+
+					// check if the conflicting transition has a loop with p
+					map<Transition*,int>::iterator tpit2(ppre.find(cft));
+					int cftprod((tpit2==ppre.end() ? 0 : tpit2->second));
+					int cftcons(tpit->second);
+					// check if there is a conflict at all
+					// if we produce enough to let t live, and t cannot enable us, we are not in conflict
+					if (itprod>=cftcons && cftprod-cftcons<=0) continue; 
+
+					// mark cft as conflicting, i.e. cft possibly has priority
+					if (!added[revtorder[cft]]) {
+						node->nodes.push_back(revtorder[cft]);
+						thr->tton[revtorder[cft]]->count++;
+						added[revtorder[cft]] = true;
+					}
+
+					// if we haven't worked on it yet, insert it into the todo-list
+					if (!marker[revtorder[cft]]) { tset.push_back(cft); marker[revtorder[cft]]=true; }
+				}
+			}
+		// if t is newly disabled, look for predecessor transitions that could enable it
+		} else if (!thr->m->activates(*t) && (node->enabled || node->index==-2)) {
+			// remove all conflicting transitions
+			for(int j=0; j<node->nodes.size(); ++j)
+			{
+				if (!marker[node->nodes[j]]) {
+					tset.push_back(transitionorder[node->nodes[j]]);
+					marker[node->nodes[j]] = true;
+				}
+				if (!(--thr->tton[node->nodes[j]]->count) && !ntbool[node->nodes[j]])
+				{
+					nulltest.push_back(node->nodes[j]);
+					ntbool[node->nodes[j]] = true;
+				}
+			}
+			node->nodes.clear();
+			node->enabled = false;
+
+			// get a place with not enough tokens to fire t
+			Place* hp(hinderingPlace(thr,*t));
+
+			// get the transitions that produce tokens on that place
+			requiredTransitions(thr,*hp); // side effect: result vector is tsets
+
+			// walk through these transitions
+			for(unsigned int rtit=0; rtit<thr->tsets.size(); ++rtit)
+			{
+				// get one of the transitions
+				Transition* rt(thr->tsets[rtit]);
+
+				// do not put t into the list of token-producing transitions, it cannot fire anyway
+				if (rt==t) continue;
+
+				// mark it as having priority, as it produces necessary tokens
+				node->nodes.push_back(revtorder[rt]);
+				thr->tton[revtorder[rt]]->count++;
+
+				// if we haven't worked on it yet, insert it into the todo-list
+				if (!marker[revtorder[rt]]) { tset.push_back(rt); marker[revtorder[rt]]=true; }
+			}
+		} else if (!thr->fseq.empty() && tsetptr==0) {
+			// check all conflicting transitions too
+			for(int j=0; j<node->nodes.size(); ++j)
+			{
+				if (!marker[node->nodes[j]]) {
+					tset.push_back(transitionorder[node->nodes[j]]);				
+					marker[node->nodes[j]] = true;
+				}
+			}
+		}
+
+		node->index = -1;
+		++tsetptr; // we are done with this transition
+	}
+
+	// make recursive nulltests (remove nodes without predecessors except tstart)
+	if (tstart) ++thr->tton[tstnr]->count;
+	tsetptr = 0;
+	while (tsetptr < nulltest.size()) {
+		int tnr(nulltest[tsetptr++]);
+		myNode* node(thr->tton[tnr]);
+		if (node->count>0) continue;
+		node->index = -2;
+		node->enabled = false;
+		for(int j=0; j<node->nodes.size(); ++j)
+			if (!(--thr->tton[node->nodes[j]]->count) && !ntbool[node->nodes[j]])
+			{
+				nulltest.push_back(node->nodes[j]);
+				ntbool[node->nodes[j]] = true;
+			}
+		node->nodes.clear();
+	}
+	if (tstart) --thr->tton[tstnr]->count;
+
+//	printConflictGraph(thr,tstart);
 }
 
 /** Calculates a place with insufficient tokens to activate a given transition.

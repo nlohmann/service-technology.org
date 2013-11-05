@@ -94,7 +94,8 @@ while (cin >> in)
 		Problem pbl;
 		pbl.setFilename(filename);
 		int nettype(Problem::PNML);
-		if (strstr(filename,"llnet") || strstr(filename,"LLNET")) nettype=Problem::LOLA;
+		if (strstr(filename,"llnet") || strstr(filename,"LLNET")
+			|| strstr(filename, "lola") || strstr(filename,"LOLA")) nettype=Problem::LOLA;
 		if (strstr(filename,"owfn") || strstr(filename,"OWFN")) nettype=Problem::OWFN;
 		pbl.setNetType(nettype);
 		PetriNet* pn(pbl.getPetriNet());

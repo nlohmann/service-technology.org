@@ -9,9 +9,9 @@
  *
  * \since   2010/02/26
  *
- * \date    $Date: 2012-06-13 12:00:00 +0100 (Mi, 13. Jun 2012) $
+ * \date    $Date: 2013-11-05 12:00:00 +0100 (Di, 5. Nov 2013) $
  *
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.14 $
  */
 
 #include "jobqueue.h"
@@ -533,21 +533,23 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr, JSON& json) {
 										tset.insert(tmxit->first);
 									}
 					}
-					else if (diff==0) { // recalculate places if the constraint was not helpful
+					else { // recalculate places if the constraint was not helpful
 						pmap.clear();
 						for(tit=tset.begin(); tit!=tset.end(); ++tit)
 							for(mit=im.getPreset(**tit).begin(); mit!=im.getPreset(**tit).end(); ++mit)
 								if (ps->getMarking()[*(mit->first)]<(unsigned int)(mit->second))
 									pmap[mit->first] = mit->second-ps->getMarking()[*(mit->first)];						
 					}
-					diff=-1;
-					for(tit=tset.begin(); tit!=tset.end(); ++tit)
-					{
-						int miss=0;
-						for(mit=pmap.begin(); mit!=pmap.end(); ++mit)
-							if (ps->getMarking()[*(mit->first)]<(unsigned int)(im.getPreset(**tit)[mit->first]))
-								miss += im.getPreset(**tit)[mit->first]-ps->getMarking()[*(mit->first)];
-						if (diff<0 || miss<diff) diff=miss;
+					if (diff==0) {
+						diff=-1;
+						for(tit=tset.begin(); tit!=tset.end(); ++tit)
+						{
+							int miss=0;
+							for(mit=pmap.begin(); mit!=pmap.end(); ++mit)
+								if (ps->getMarking()[*(mit->first)]<(unsigned int)(im.getPreset(**tit)[mit->first]))
+									miss += im.getPreset(**tit)[mit->first]-ps->getMarking()[*(mit->first)];
+							if (diff<0 || miss<diff) diff=miss;
+						}
 					}
 				}
 				JSON tmp2;

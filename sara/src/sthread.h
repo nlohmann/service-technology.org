@@ -9,9 +9,9 @@
  *
  * \since   2012/04/20
  *
- * \date    $Date: 2012-06-22 12:00:00 +0200 (Fr, 22. Jun 2012) $
+ * \date    $Date: 2013-11-05 12:00:00 +0200 (Di, 5. Nov 2013) $
  *
- * \version $Revision: 1.10 $
+ * \version $Revision: 1.14 $
  */
 
 #ifndef STHREAD_H
@@ -126,6 +126,12 @@ struct SThread {
 
 	// General purpose vector (for memory allocation)
 	vector<bool> tbool;
+
+	// General purpose vector (for memory allocation)
+	vector<bool> tboola;
+
+	// General purpose vector (for memory allocation)
+	vector<bool> tboolb;
 
 	// General purpose vector (for memory allocation)
 	vector<int> pseta;

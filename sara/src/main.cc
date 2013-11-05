@@ -85,6 +85,7 @@ bool flag_witness(false);
 bool flag_joborder(false);
 bool flag_yesno(false);
 int val_maxdepth(0);
+bool flag_incremental(false);
 
 } // end of namespace sara
 
@@ -249,7 +250,7 @@ int main(int argc, char** argv) {
 	flag_joborder = args_info.joborder_given;
 	flag_yesno = args_info.yesno_given;
 	if (args_info.maxdepth_given) val_maxdepth = args_info.maxdepth_arg;
-
+	flag_incremental = args_info.incremental_given;
 
 /****************
 * NO ARGS GIVEN *

@@ -365,6 +365,13 @@ AT_CHECK([GREP -q "unrecognized option" stderr])
 AT_KEYWORDS(options)
 AT_CLEANUP
 
+AT_SETUP([Incremental Stubborn Sets])
+AT_CHECK([cp TESTFILES/test8_3.sara TESTFILES/test8_3.owfn .])
+AT_CHECK([SARA -i test8_3.sara -v -I],0,stdout,stderr)
+AT_CHECK([GREP -q "1 Solution produced" stdout])
+AT_KEYWORDS(options)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Creating Problems])
 ############################################################################

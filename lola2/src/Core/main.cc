@@ -134,6 +134,10 @@ void evaluateParameters(int argc, char** argv)
         rep = new ReporterSocket((u_short)args_info.outputport_arg, args_info.address_arg, args_info.verbose_given);
         rep->message("pid = %d", getpid());
         break;
+    
+        case reporter__NULL: {
+            /* no reporter */
+        }
     }
 
     IO::setReporter(rep);

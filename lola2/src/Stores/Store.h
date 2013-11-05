@@ -71,6 +71,10 @@ public:
     /// @param number_of_threads maximum number of threads that may work with this Store concurrently.
     Store(uint32_t number_of_threads);
 
+    /// silence the reporter thread (public, because it is used by the
+    /// CycleStore)
+    void silence();
+
     /// destructor; frees all memory used for auxiliary data structures
     virtual ~Store();
 

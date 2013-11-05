@@ -12,6 +12,8 @@ Place.* and Transition.*
 #pragma once
 #include <Core/Dimensions.h>
 
+class Matrix;
+
 /*!
 \brief collection of information related to nodes
 
@@ -65,6 +67,9 @@ struct Net
 
     /// assumes that raw net is read and places, transitions and the edges in-between are set properly. Computes additional net information used to speed up the simulation.
     static void preprocess();
+
+    /// calculates the incidence matrix of the net
+    static Matrix getIncidenceMatrix(node_t line_type = PL);
 
 private:
     // calculates DeltaT and DeltaHash for each transition

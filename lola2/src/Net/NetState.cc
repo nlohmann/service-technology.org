@@ -138,9 +138,6 @@ NetState* NetState::createNetStateFromInitial()
         }
     }
     
-    // initialize depth
-    ns->depth = 0;
-
     return ns;
 }
 
@@ -275,9 +272,6 @@ NetState::NetState(const NetState &ons)
             Disabled[i][j] = ons.Disabled[i][j];
         }
     }
-
-	// copy current depth
-	depth = ons.depth;
 }
 
 NetState &NetState::operator=(const NetState &ns)

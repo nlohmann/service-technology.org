@@ -15,10 +15,9 @@
 #include <Stores/VectorStores/VBloomStore.h>
 #include <Stores/PluginStore.h>
 #include <Stores/EmptyStore.h>
+#include <Stores/CycleStore.h>
 #include <Stores/CompareStore.h>
 #include <Stores/Store.h>
-#include <Invariants/InvStore.h>
-#include <Invariants/Invariants.h>
 
 class StatePredicate;
 class CTLFormula;
@@ -37,53 +36,85 @@ class StoreCreator
 public:
 	/// creates a new store based on the specified template and the command line arguments
 	static Store<T>* createStore(int number_of_threads) {
-	      NetStateEncoder* enc = 0;
-	      switch (args_info.encoder_arg) {
-	      case encoder_arg_bit:
-	          enc = new BitEncoder(number_of_threads);
-	          break;
-	      case encoder_arg_copy:
-	          enc = new CopyEncoder(number_of_threads);
-	          break;
-	      case encoder_arg_simplecompressed:
-	          enc = new SimpleCompressedEncoder(number_of_threads);
-	          break;
-	      case encoder_arg_fullcopy:
-	          enc = new FullCopyEncoder(number_of_threads);
-	          break;
-	      }	   
-		if(args_info.cycle_given) {
-			//TODO
-			TransitionInv *tinv = new TransitionInv();
-			if(args_info.cycleheuristic_given) {
-				tinv->using_k = true;
-				tinv->k = args_info.cycleheuristic_arg;
-			}
-			return new TInvStore<T>(tinv, enc, new PrefixTreeStore<T>(), number_of_threads);
-		}
-		else {
-		    switch (args_info.store_arg)
-		    {
-		    case store_arg_comp:
-		   		return new CompareStore<T>(
-		       		new PluginStore<T>(enc, new PrefixTreeStore<T>(), number_of_threads),
-		       		new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads),
-		       		number_of_threads
-		       		);
-		    case store_arg_prefix:
-		        if(args_info.bucketing_given)
-		          return new PluginStore<T>(enc, new HashingWrapperStore<T>(new NullaryVectorStoreCreator<T,PrefixTreeStore<T> >()), number_of_threads);
-		        else
-		       	  return new PluginStore<T>(enc, new PrefixTreeStore<T>(), number_of_threads);
-		    case store_arg_stl:
-		        if(args_info.bucketing_given)
-		          return new PluginStore<T>(enc, new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
-		        else
-		       	  return new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads);
-		    default:
-		    	return createSpecializedStore(number_of_threads);
-		    }
-		}
+
+        // create an encode according --encoder
+        NetStateEncoder* enc = NULL;
+        switch (args_info.encoder_arg) {
+            case encoder_arg_bit: {
+                rep->status("using a bit-perfect encoder (%s)", rep->markup(MARKUP_PARAMETER, "--encoder").str());
+                enc = new BitEncoder(number_of_threads);
+                break;
+            }
+            
+            case encoder_arg_copy: {
+                rep->status("using a copy encoder (%s)", rep->markup(MARKUP_PARAMETER, "--encoder").str());
+                enc = new CopyEncoder(number_of_threads);
+                break;
+            }
+            
+            case encoder_arg_simplecompressed: {
+                rep->status("using a simple compression encoder (%s)", rep->markup(MARKUP_PARAMETER, "--encoder").str());
+                enc = new SimpleCompressedEncoder(number_of_threads);
+                break;
+            }
+            
+            case encoder_arg_fullcopy: {
+                rep->status("using a full copy encoder (%s)", rep->markup(MARKUP_PARAMETER, "--encoder").str());
+                enc = new FullCopyEncoder(number_of_threads);
+                break;
+            }
+            
+            case encoder__NULL: {
+                rep->status("not using an encoder (%s)", rep->markup(MARKUP_PARAMETER, "--encoder").str());
+                break;
+            }
+        }
+
+        // create a store according to --store
+        Store<T>* st = NULL;
+        switch (args_info.store_arg) {
+            case store_arg_comp: {
+                rep->status("using a compare store (%s)", rep->markup(MARKUP_PARAMETER, "--store").str());
+                st = new CompareStore<T>(
+                    new PluginStore<T>(enc, new PrefixTreeStore<T>(), number_of_threads),
+                    new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads),
+                    number_of_threads);
+                break;
+            }
+
+            case store_arg_prefix: {
+                rep->status("using a prefix store (%s)", rep->markup(MARKUP_PARAMETER, "--store").str());
+                if(args_info.bucketing_given)
+                    st = new PluginStore<T>(enc, new HashingWrapperStore<T>(new NullaryVectorStoreCreator<T,PrefixTreeStore<T> >()), number_of_threads);
+                else
+                    st = new PluginStore<T>(enc, new PrefixTreeStore<T>(), number_of_threads);
+                break;
+            }
+
+            case store_arg_stl: {
+                rep->status("using an STL store (%s)", rep->markup(MARKUP_PARAMETER, "--store").str());
+                if(args_info.bucketing_given)
+                    st = new PluginStore<T>(enc, new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
+                else
+                    st = new PluginStore<T>(enc, new VSTLStore<T>(number_of_threads), number_of_threads);
+                break;
+            }
+
+            default: {
+                rep->status("using a specialized store (%s)", rep->markup(MARKUP_PARAMETER, "--store").str());
+                st = createSpecializedStore(number_of_threads);
+                break;
+            }
+        }
+
+        // cycle reduction: wrap created store
+        if (args_info.cycle_given) {
+            rep->status("using the cycle reduction (%s)", rep->markup(MARKUP_PARAMETER, "--cycle").str());
+            // wrap current store in CycleStore object
+            st = new CycleStore<T>(number_of_threads, st, args_info.cycleheuristic_arg);
+        }
+
+        return st;
 	}
 
 private:

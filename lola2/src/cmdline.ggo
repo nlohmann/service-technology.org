@@ -114,13 +114,14 @@ option "sweeplinespread" -
   hidden
   
 option "cycle" -
-  "Using transition invariant based analysis."
+  "Using transition invariant based reduction."
   flag off
 
 option "cycleheuristic" -
   "Heuristical parameter for transition invariant based analysis."
   int
   typestr="K"
+  default="-1"
   optional
   hidden
 

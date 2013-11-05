@@ -105,6 +105,8 @@ Store<void>* StoreCreator<void>::createSpecializedStore(int number_of_threads) {
     case encoder_arg_fullcopy:
         enc = new FullCopyEncoder(number_of_threads);
         break;
+    case encoder__NULL:
+        break;
     }
     
     switch (args_info.store_arg)
@@ -574,6 +576,9 @@ void Task::setProperty()
 				fl = new FirelistStubbornStatePredicate(spFormula);
     	}
         break;
+        
+        case check__NULL: break;
+        case check_arg_none: break;
     }
 
 
@@ -598,6 +603,9 @@ void Task::setProperty()
 			}
     	}
         break;
+
+        case check__NULL: break;
+        case check_arg_none: break;
     }
 }
 
@@ -682,6 +690,10 @@ void Task::interpreteResult(bool* result)
                 final_result = TRINARY_UNKNOWN;
             }
             break;
+
+        case check__NULL: break;
+        case check_arg_none: break;
+        case check_arg_full: break;
         }
     }
 

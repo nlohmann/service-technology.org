@@ -1,6 +1,6 @@
 /*!
 \author Niels
-\author Max Görner
+\author Max GÃ¶rner
 \author Christian Koch
 \file Store.inc
 \status new
@@ -80,7 +80,7 @@ Store<T>::Store(uint32_t _number_of_threads) : markings(0), calls(0), number_of_
 }
 
 template <typename T>
-Store<T>::~Store()
+void Store<T>::silence()
 {
     void* void_pointer;
     int ret = pthread_cancel(reporter_thread);
@@ -89,6 +89,12 @@ Store<T>::~Store()
     {
         rep->status("killed reporter thread");
     }
+}
+
+template <typename T>
+Store<T>::~Store()
+{
+    silence();
     free(calls);
     free(markings);
 }

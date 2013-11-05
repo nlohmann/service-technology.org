@@ -1,0 +1,219 @@
+PLACE
+	ea.1,
+	ea.2,
+	ea.3,
+	ea.4,
+	ea.5,
+	ea.6,
+	ea.7,
+	hl.1,
+	fo.1,
+	hl.2,
+	fo.2,
+	hl.3,
+	fo.3,
+	hl.4,
+	fo.4,
+	hl.5,
+	fo.5,
+	hl.6,
+	fo.6,
+	hr.1,
+	hl.7,
+	fo.7,
+	hr.2,
+	hr.3,
+	th.1,
+	hr.4,
+	th.2,
+	hr.5,
+	th.3,
+	hr.6,
+	th.4,
+	hr.7,
+	th.5,
+	th.6,
+	th.7;
+MARKING
+	fo.1 : 1,
+	fo.2 : 1,
+	fo.3 : 1,
+	fo.4 : 1,
+	fo.5 : 1,
+	fo.6 : 1,
+	fo.7 : 1,
+	th.1 : 1,
+	th.2 : 1,
+	th.3 : 1,
+	th.4 : 1,
+	th.5 : 1,
+	th.6 : 1,
+	th.7 : 1;
+TRANSITION rl.[y=1]
+	CONSUME
+		ea.1 : 1;
+	PRODUCE
+		fo.1 : 1,
+		hr.1 : 1;
+TRANSITION rl.[y=2]
+	CONSUME
+		ea.2 : 1;
+	PRODUCE
+		fo.2 : 1,
+		hr.2 : 1;
+TRANSITION rl.[y=3]
+	CONSUME
+		ea.3 : 1;
+	PRODUCE
+		fo.3 : 1,
+		hr.3 : 1;
+TRANSITION tl.[y=1]
+	CONSUME
+		fo.1 : 1,
+		th.1 : 1;
+	PRODUCE
+		hl.1 : 1;
+TRANSITION rl.[y=4]
+	CONSUME
+		ea.4 : 1;
+	PRODUCE
+		fo.4 : 1,
+		hr.4 : 1;
+TRANSITION tl.[y=2]
+	CONSUME
+		fo.2 : 1,
+		th.2 : 1;
+	PRODUCE
+		hl.2 : 1;
+TRANSITION rl.[y=5]
+	CONSUME
+		ea.5 : 1;
+	PRODUCE
+		fo.5 : 1,
+		hr.5 : 1;
+TRANSITION tl.[y=3]
+	CONSUME
+		fo.3 : 1,
+		th.3 : 1;
+	PRODUCE
+		hl.3 : 1;
+TRANSITION rl.[y=6]
+	CONSUME
+		ea.6 : 1;
+	PRODUCE
+		fo.6 : 1,
+		hr.6 : 1;
+TRANSITION tl.[y=4]
+	CONSUME
+		fo.4 : 1,
+		th.4 : 1;
+	PRODUCE
+		hl.4 : 1;
+TRANSITION rr.[y=1]
+	CONSUME
+		hr.1 : 1;
+	PRODUCE
+		fo.2 : 1,
+		th.1 : 1;
+TRANSITION rl.[y=7]
+	CONSUME
+		ea.7 : 1;
+	PRODUCE
+		fo.7 : 1,
+		hr.7 : 1;
+TRANSITION tl.[y=5]
+	CONSUME
+		fo.5 : 1,
+		th.5 : 1;
+	PRODUCE
+		hl.5 : 1;
+TRANSITION rr.[y=2]
+	CONSUME
+		hr.2 : 1;
+	PRODUCE
+		fo.3 : 1,
+		th.2 : 1;
+TRANSITION tl.[y=6]
+	CONSUME
+		fo.6 : 1,
+		th.6 : 1;
+	PRODUCE
+		hl.6 : 1;
+TRANSITION rr.[y=3]
+	CONSUME
+		hr.3 : 1;
+	PRODUCE
+		fo.4 : 1,
+		th.3 : 1;
+TRANSITION tr.[y=1]
+	CONSUME
+		fo.2 : 1,
+		hl.1 : 1;
+	PRODUCE
+		ea.1 : 1;
+TRANSITION tl.[y=7]
+	CONSUME
+		fo.7 : 1,
+		th.7 : 1;
+	PRODUCE
+		hl.7 : 1;
+TRANSITION rr.[y=4]
+	CONSUME
+		hr.4 : 1;
+	PRODUCE
+		fo.5 : 1,
+		th.4 : 1;
+TRANSITION tr.[y=2]
+	CONSUME
+		fo.3 : 1,
+		hl.2 : 1;
+	PRODUCE
+		ea.2 : 1;
+TRANSITION rr.[y=5]
+	CONSUME
+		hr.5 : 1;
+	PRODUCE
+		fo.6 : 1,
+		th.5 : 1;
+TRANSITION tr.[y=3]
+	CONSUME
+		fo.4 : 1,
+		hl.3 : 1;
+	PRODUCE
+		ea.3 : 1;
+TRANSITION rr.[y=6]
+	CONSUME
+		hr.6 : 1;
+	PRODUCE
+		fo.7 : 1,
+		th.6 : 1;
+TRANSITION tr.[y=4]
+	CONSUME
+		fo.5 : 1,
+		hl.4 : 1;
+	PRODUCE
+		ea.4 : 1;
+TRANSITION rr.[y=7]
+	CONSUME
+		hr.7 : 1;
+	PRODUCE
+		fo.1 : 1,
+		th.7 : 1;
+TRANSITION tr.[y=5]
+	CONSUME
+		fo.6 : 1,
+		hl.5 : 1;
+	PRODUCE
+		ea.5 : 1;
+TRANSITION tr.[y=6]
+	CONSUME
+		fo.7 : 1,
+		hl.6 : 1;
+	PRODUCE
+		ea.6 : 1;
+TRANSITION tr.[y=7]
+	CONSUME
+		fo.1 : 1,
+		hl.7 : 1;
+	PRODUCE
+		ea.7 : 1;

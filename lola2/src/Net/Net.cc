@@ -216,7 +216,7 @@ void Net::print()
 
     for (index_t i = 0; i < Net::Card[PL]; i++)
     {
-        printf("Place %u :%s, %u tokens hash %ld capacity %u bits %u\n", i, Net::Name[PL][i], Marking::Initial[i], Place::Hash[i], Place::Capacity[i], Place::CardBits[i]);
+        printf("Place %u :%s, %u tokens hash %lld capacity %u bits %u\n", i, Net::Name[PL][i], Marking::Initial[i], Place::Hash[i], Place::Capacity[i], Place::CardBits[i]);
         printf("From (%u):\n", Net::CardArcs[PL][PRE][i]);
         for (index_t j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
         {
@@ -553,6 +553,47 @@ void createTransitionEquation(index_t transition, index_t* variables, int64_t* c
     }
 }
 
+Matrix Net::getIncidenceMatrix(node_t line_type)
+{
+    // the row type is the dual to the line type
+    const node_t row_type = (line_type == PL) ? TR : PL;
+
+    // cet the cardinalities of lines and rows (the dimensions of the matrix)
+    const index_t line_card = Net::Card[line_type];
+    const index_t row_card = Net::Card[row_type];
+
+    // arcs must be sorted
+    assert(Net::DEBUG__checkArcOrdering());
+
+    // request memory for one full row
+    index_t* newVar = (index_t*) calloc(line_card, SIZEOF_INDEX_T);
+    int64_t* newCoef = (int64_t*) calloc(line_card, SIZEOF_INT64_T);
+    index_t newSize;
+
+    // create new matrix
+    Matrix m(line_card);
+
+    // load rows into matrix
+    // for each transition t
+    for (index_t t = 0; t < row_card; ++t)
+    {
+        // create equation for current transition
+        createTransitionEquation(t, newVar, newCoef, newSize, (line_type == TR));
+        // save current arrays as new row
+        m.addRow(newSize, newVar, newCoef);
+
+        // clear used memory
+        memset(newVar, 0, newSize * SIZEOF_INDEX_T);    // necessary?
+        memset(newCoef, 0, newSize * SIZEOF_INT64_T);
+    }
+
+    // free memory
+    free(newVar);
+    free(newCoef);
+    
+    return m;
+}
+
 /// Calculates all signficant places and sorts them to the front of the place array
 void Net::setSignificantPlaces()
 {
@@ -569,31 +610,8 @@ void Net::setSignificantPlaces()
         return;
     }
 
-    // request memory for one full row
-    index_t* newVar = (index_t*) calloc(cardPL, SIZEOF_INDEX_T);
-    int64_t* newCoef = (int64_t*) calloc(cardPL, SIZEOF_INT64_T);
-    index_t newSize;
-
-    // create new matrix
-    Matrix m(cardPL);
-
-    // load rows into matrix
-    // for each transition t
-    for (index_t t = 0; t < Net::Card[TR]; ++t)
-    {
-        // create equation for current transition
-        createTransitionEquation(t, newVar, newCoef, newSize);
-        // save current arrays as new row
-        m.addRow(newSize, newVar, newCoef);
-
-        // clear used memory
-        memset(newVar, 0, newSize * SIZEOF_INDEX_T);    // necessary?
-        memset(newCoef, 0, newSize * SIZEOF_INT64_T);
-    }
-
-    // free memory
-    free(newVar);
-    free(newCoef);
+    // get incidence matrix (places are lines)
+    Matrix m = getIncidenceMatrix(PL);
 
     // reduce matrix
     m.reduce();
@@ -632,42 +650,16 @@ void Net::setProgressMeasure()
     // arcs must be sorted
     assert(Net::DEBUG__checkArcOrdering());
 
+    // get incidence matrix (places are lines)
+    Matrix m = getIncidenceMatrix(TR);
+
+    // reduce matrix
+    m.diagonalise();
+
     // save number of places
     const index_t cardPL = Net::Card[PL];
     // save number of transitions
     const index_t cardTR = Net::Card[TR];
-
-    /// \todo: handle special cases (only a few places/transitions)
-
-    // request memory for one full row
-    index_t* newVar = (index_t*) calloc(cardTR + 1, SIZEOF_INDEX_T);
-    int64_t* newCoef = (int64_t*) calloc(cardTR + 1, SIZEOF_INT64_T);
-    index_t newSize;
-
-    // create new matrix
-    Matrix m(cardTR);
-
-    // load rows into matrix
-    // for each place p
-    for (index_t p = 0; p < Net::Card[PL]; ++p)
-    {
-        // create equation for current transition
-        createTransitionEquation(p, newVar, newCoef, newSize, true);
-
-        // save current arrays as new row
-        m.addRow(newSize, newVar, newCoef, p);
-
-        // clear used memory
-        memset(newVar, 0, newSize * SIZEOF_INDEX_T);    // necessary?
-        memset(newCoef, 0, newSize * SIZEOF_INT64_T);
-    }
-
-    // free memory
-    free(newVar);
-    free(newCoef);
-
-    // reduce matrix
-    m.diagonalise();
 
     // calculate progress measure
     int64_t* progressMeasure = (int64_t*) calloc(cardTR, SIZEOF_INT64_T);
@@ -1375,7 +1367,10 @@ void Net::preprocess() {
     * 6. Set progress measure *
     **************************/
     /// \todo: move to another place?
-    Net::setProgressMeasure();
+    if (args_info.search_arg == search_arg_sweepline)
+    {
+        Net::setProgressMeasure();
+    }
 
     /*******************************
     * 7. Initial enabledness check *

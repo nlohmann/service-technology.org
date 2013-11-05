@@ -88,6 +88,7 @@ lola_SOURCES = \
                 Stores/Store.h Stores/Store.inc \
                 Stores/EmptyStore.h \
                 Stores/CompareStore.h Stores/CompareStore.inc \
+                Stores/CycleStore.h \
                 Stores/PluginStore.h Stores/PluginStore.inc \
                 Stores/NetStateEncoder/NetStateEncoder.h Stores/NetStateEncoder/NetStateEncoder.cc \
                 Stores/NetStateEncoder/BitEncoder.cc Stores/NetStateEncoder/BitEncoder.h \
@@ -105,10 +106,7 @@ lola_SOURCES = \
                 SweepLine/SweepListStore.h SweepLine/SweepListStore.inc \
                 SweepLine/SweepEmptyStore.h SweepLine/SweepEmptyStore.cc \
                 \
-                Witness/Event.h Witness/Event.cc Witness/Condition.h Witness/Condition.cc \
-                \
-                Invariants/Invariants.h Invariants/Invariants.cc \
-                Invariants/InvStore.h Invariants/InvStore.inc
+                Witness/Event.h Witness/Event.cc Witness/Condition.h Witness/Condition.cc
 
 ###
 

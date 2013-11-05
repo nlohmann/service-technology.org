@@ -28,7 +28,7 @@ public:
     /// @return false, if store was already empty
     virtual bool popState(NetState &ns);
 
-protected:
+private:
     /// used NetStateEncoder (given in constructor)
     NetStateEncoder* netStateEncoder;
     /// used VectorStore (given in constructor)

@@ -266,9 +266,6 @@ void Transition::fire(NetState &ns, index_t t)
         ns.HashCurrent += SIZEOF_MARKINGTABLE;
         // LCOV_EXCL_STOP
     }
-    
-    // increase depth value
-    ns.depth++;
 }
 
 
@@ -342,9 +339,6 @@ void Transition::backfire(NetState &ns, index_t t)
     {
         ns.HashCurrent += SIZEOF_MARKINGTABLE;
     }
-
-	// decrease depth value
-	ns.depth--;
 }
 
 /// update enabledness after having backfired a transition

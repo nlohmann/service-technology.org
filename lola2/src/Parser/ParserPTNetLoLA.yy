@@ -276,7 +276,7 @@ ParserPTNet* ParserPTNetLoLA()
 }
 
 /// display a parser error and exit
-__attribute__((noreturn)) void yyerrors(char* token, const char* format, ...) {
+void yyerrors(char* token, const char* format, ...) __attribute__((noreturn)) {
     va_list args;
     va_start(args, format);
     char* errormessage = NULL;
@@ -293,6 +293,6 @@ __attribute__((noreturn)) void yyerrors(char* token, const char* format, ...) {
 }
 
 /// display a parser error and exit
-__attribute__((noreturn)) void ptnetlola_error(char const* mess) {
+void ptnetlola_error(char const* mess) __attribute__((noreturn)) {
     yyerrors(ptnetlola_text, mess);
 }

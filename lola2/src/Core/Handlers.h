@@ -27,7 +27,7 @@ private:
     static void *remoteTerminationHandler(void *);
 
     /// signal termination handler
-    static __attribute__((noreturn)) void signalTerminationHandler(int);
+    static void signalTerminationHandler(int) __attribute__((noreturn));
 
     /// exit handler
     static void exitHandler();

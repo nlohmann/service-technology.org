@@ -56,8 +56,9 @@ public:
     virtual void status(const char *, ...) const = 0;
 
     /// display error message and abort program
-    __attribute__((noreturn)) virtual void abort(errorcode_t) const = 0;
+    virtual void abort(errorcode_t) const __attribute__((noreturn)) = 0;
 };
+
 
 /*!
 \brief Realization of Reporter class to write to Berkeley sockets
@@ -82,11 +83,12 @@ public:
     void status(const char *, ...) const;
 
     /// display error message and abort program
-    __attribute__((noreturn)) void abort(errorcode_t) const;
+    void abort(errorcode_t) const __attribute__((noreturn));
 
     /// markup a string
     String markup(markup_t, const char *, ...) const;
 };
+
 
 /*!
 \brief Realization of Reporter class to write to standard error
@@ -168,6 +170,5 @@ public:
     String markup(markup_t, const char *, ...) const;
 };
 
-// the reporter thread should be declared globally, so that each class can write messages without declaring it itself
-// the reporter thread is defined in main.cc
+/// a global reporter
 extern Reporter *rep;

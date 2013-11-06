@@ -14,6 +14,7 @@
 #include <Core/Dimensions.h>
 #include <InputOutput/Reporter.h>
 
+Reporter *rep = NULL;
 
 // initialize error messages
 const char *Reporter::error_messages[] =
@@ -75,7 +76,7 @@ void ReporterSocket::status(const char *format, ...) const
 \param format  the error message formatted as printf string
 \todo Handle premature termination with signals.
 */
-__attribute__((noreturn)) void ReporterSocket::abort(errorcode_t code) const
+void ReporterSocket::abort(errorcode_t code) const
 {
     char buffer[UDP_BUFFER_SIZE];
     sprintf(buffer, "%s: %s -- aborting [#%02d]", PACKAGE, error_messages[code], code);
@@ -202,7 +203,7 @@ void ReporterStream::status(const char *format, ...) const
 \param code    the error code
 \todo Handle premature termination with signals.
 */
-__attribute__((noreturn)) void ReporterStream::abort(errorcode_t code) const
+void ReporterStream::abort(errorcode_t code) const
 {
     fprintf(stderr, "%s: %s%s%s%s -- aborting [#%02d]%s\n",
             markup(MARKUP_TOOL, PACKAGE).str(), _cR_, error_messages[code], _c_, _bold_, code, _c_);

@@ -13,9 +13,10 @@
 #include <InputOutput/Reporter.h>
 
 /// the reporter
-Reporter *rep = new ReporterStream();
+extern Reporter *rep;
 
-__attribute__((noreturn)) void signal_callback_handler(int signum)
+void signal_callback_handler(int signum) __attribute__((noreturn));
+void signal_callback_handler(int signum)
 {
     rep->message("caught signal: '%s'\n", strsignal(signum));
     exit(EXIT_SUCCESS);
@@ -34,6 +35,8 @@ int main(int argc, char **argv)
         printf("No version\n");
         return EXIT_SUCCESS;
     }
+    
+    rep = new ReporterStream();
 
     const int port = 5555;
     signal(SIGTERM, signal_callback_handler);

@@ -40,22 +40,30 @@
 
 #include <Stores/Store.h>
 
-//#include <Symmetry/GeneratingSystem.h>
-
-
+// a net parser
 extern ParserPTNet *ParserPTNetLoLA();
 
-/// the command line parameters
-gengetopt_args_info args_info;
-
-// input files
+// the input file for Flex
 extern FILE *ptnetlola_in;
 
-/// the reporter
-Reporter *rep = NULL;
+// a cleanup function from Flex
+extern int ptnetlola_lex_destroy();
 
-ParserPTNet *symbolTables;
-SymbolTable *buechiStateTable;
+// the reporter
+extern Reporter *rep;
+
+
+/*!
+\brief the command line parameters
+\note variable is initialized by function evaluateParameters()
+*/
+gengetopt_args_info args_info;
+
+/// symbol tables for the parsed net
+ParserPTNet *symbolTables = NULL;
+
+/// symbol table for a given Büchi automaton
+SymbolTable *buechiStateTable = NULL;
 
 /*!
 \brief variable to manage multiple files
@@ -65,13 +73,18 @@ SymbolTable *buechiStateTable;
 otherwise: index in args_info.inputs
 */
 int currentFile = -1;
-Input *netFile;
+
+/*!
+\brief the current file to read a Petri net from
+\note is changed by ptnetlola_wrap()
+*/
+Input *netFile = NULL;
 
 
-// the parsers
-extern int ptnetlola_parse();
-extern int ptnetlola_lex_destroy();
-
+/*!
+\brief send the used configuration to a logging server
+\note can be switched off with the command line option `--nolog`
+*/
 void callHome(int argc, char **argv)
 {
     std::string json = "";
@@ -110,7 +123,13 @@ void callHome(int argc, char **argv)
     et.send(json.c_str());
 }
 
-/// evaluate the command line parameters
+
+/*!
+\brief evaluate the command line parameters
+\post global variable args_info is usable
+
+\todo What does IO::setReporter(rep) do?
+*/
 void evaluateParameters(int argc, char **argv)
 {
     // initialize the parameters structure
@@ -124,6 +143,7 @@ void evaluateParameters(int argc, char **argv)
         rep.abort(ERROR_COMMANDLINE);
     }
 
+    // select a report according to the --reporter option
     switch (args_info.reporter_arg)
     {
     case reporter_arg_stream:
@@ -141,13 +161,27 @@ void evaluateParameters(int argc, char **argv)
         break;
     }
 
+    // register the reporter
     IO::setReporter(rep);
 
     free(params);
 }
 
+
+/*!
+\brief the main workflow of LoLA
+
+\todo use MARKUP_FILE for all concepts
+\todo What does --testStateForeach do?
+\todo Check if task.printDot() should have the same checks as task.printWitness()
+\todo numMarkings and numEdges should be provided by the Task class
+*/
 int main(int argc, char **argv)
 {
+    //=================
+    // (1) set up LoLA 
+    //=================
+    
     // install exit handler for ordered exit()
     Handlers::installExitHandler();
 
@@ -160,10 +194,16 @@ int main(int argc, char **argv)
     // install new handler
     std::set_new_handler(Handlers::newHandler);
 
+    // call home unless option --nolog is used
     if (not args_info.nolog_given)
     {
         callHome(argc, argv);
     }
+
+
+    //===================
+    // (2) process input 
+    //===================
 
     if (args_info.buechi_given)
     {
@@ -173,22 +213,26 @@ int main(int argc, char **argv)
     // file input
     if (args_info.compressed_given)
     {
+        rep->status("input: compressed net (%s)", rep->markup(MARKUP_PARAMETER, "--compressed").str());
+
         // read from stdin
         if (args_info.inputs_num == 0)
         {
             Input in("compressed net");
             ReadNetFile(in);
+            rep->status("no name file given");
         }
         if (args_info.inputs_num == 1)
         {
             Input in("compressed net", args_info.inputs[0]);
             ReadNetFile(in);
+            rep->status("no name file given");
         }
         if (args_info.inputs_num == 2)
         {
             Input netfile("compressed net", args_info.inputs[0]);
             ReadNetFile(netfile);
-            Input namefile("compress net", args_info.inputs[1]);
+            Input namefile("names", args_info.inputs[1]);
             symbolTables = new ParserPTNet();
             // initializes a symbol table that is rudimentary filled such that mapping name->id is possible
             ReadNameFile(namefile, symbolTables);
@@ -233,25 +277,32 @@ int main(int argc, char **argv)
                     SymbolTable::collisions);
     }
 
+    // create a task object to process
     Task task;
 
     delete symbolTables;
+    rep->status("finished preprocessing");
+
+
+    //===========================
+    // (3) miscellaneous options
+    //===========================
 
     if (args_info.randomWalk_given)
     {
-        rep->status("random walk");
+        rep->status("debug function: randomly firing transitions (%s)", rep->markup(MARKUP_PARAMETER, "--randomWalk").str());
         randomWalk(*task.getNetState(), args_info.randomWalk_arg);
     }
 
     if (args_info.printNet_given)
     {
-        rep->status("print net");
+        rep->status("debug function: print net (%s)", rep->markup(MARKUP_PARAMETER, "--printNet").str());
         Net::print();
     }
 
     if (args_info.writeCompressed_given)
     {
-        rep->status("print compressed net");
+        rep->status("output: compressed net (%s)", rep->markup(MARKUP_PARAMETER, "--writeCompressed").str());
 
         Output netfile("compressed net",
                        std::string(args_info.writeCompressed_arg) + ".net");
@@ -262,8 +313,14 @@ int main(int argc, char **argv)
         WriteNameFile(namefile);
     }
 
+
+    //=====================
+    // (4) excecute checks
+    //=====================
+
     if (args_info.check_given and args_info.check_arg != check_arg_none)
     {
+        // prepare task
         task.setStore();
         task.setProperty();
 
@@ -273,25 +330,40 @@ int main(int argc, char **argv)
             GeneratingSystem::create();
         }*/
 
+        //======================
+        // (5) the actual check
+        //======================
+
         bool result = task.getResult();
         task.interpreteResult(& result);
+
+        //============
+        // (6) output
+        //============
 
         // print current marking
         if (result and args_info.state_given)
         {
+            rep->status("print witness state (%s)", rep->markup(MARKUP_PARAMETER, "--state").str());
             task.printMarking();
         }
 
         // print witness path
         if (args_info.path_given and task.hasWitness(result))
         {
+            rep->status("print witness path (%s)", rep->markup(MARKUP_PARAMETER, "--path").str());
             task.printWitness();
         }
 
         if (result and args_info.run_given)
         {
+            rep->status("print distributed run (%s)", rep->markup(MARKUP_PARAMETER, "--run").str());
             task.printDot();
         }
+
+        //================
+        // (7) statistics
+        //================
 
         if (args_info.search_arg != search_arg_findpath)
         {
@@ -331,6 +403,7 @@ int main(int argc, char **argv)
         // print statistics
         if (args_info.stats_flag)
         {
+            rep->status("print statistics (%s)", rep->markup(MARKUP_PARAMETER, "--stats").str());
             Handlers::statistics();
         }
 

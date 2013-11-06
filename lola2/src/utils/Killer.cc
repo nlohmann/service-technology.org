@@ -7,7 +7,7 @@
 #include <InputOutput/Reporter.h>
 
 /// the reporter
-Reporter *rep = new ReporterStream();
+extern Reporter *rep;
 
 int main(int argc, char **argv)
 {
@@ -22,6 +22,8 @@ int main(int argc, char **argv)
         printf("No version\n");
         return EXIT_SUCCESS;
     }
+
+    rep = new ReporterStream();
 
     const int port = 5556;
     const char *hostname = "localhost";

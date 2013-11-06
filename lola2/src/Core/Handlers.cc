@@ -37,7 +37,7 @@ time_t Handlers::start_time;
 \note This function is only called for those signals that have been registered
       by calling signal() first - see Handlers::installTerminationHandlers().
 */
-__attribute__((noreturn)) void Handlers::signalTerminationHandler(int signum)
+void Handlers::signalTerminationHandler(int signum)
 {
     rep->message("caught termination signal: '%s'", strsignal(signum));
     exit(EXIT_TERMINATION);
@@ -78,6 +78,12 @@ void *Handlers::remoteTerminationHandler(void *)
 }
 
 
+/*!
+Determine memory and time consumption. For the former, `ps` is called.
+
+\todo If concurrent processes of the same binary run, the process id should be
+used to find the process rather than the name.
+*/
 void Handlers::statistics()
 {
     std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " +
@@ -126,6 +132,10 @@ void Handlers::exitHandler()
 }
 
 
+/*!
+This function is a pure wrapper of the atexit function. It also tracks the
+start time of LoLA for later time statistics.
+*/
 void Handlers::installExitHandler()
 {
     // set the function to call on normal termination
@@ -135,6 +145,11 @@ void Handlers::installExitHandler()
 }
 
 
+/*!
+Installs handlers for the signals SIGTERM, SIGINT, SIGUSR1, and SIGUSR2. It
+further sets up a remote termination thread in case the `--remoteTermination`
+flag is used.
+*/
 void Handlers::installTerminationHandlers()
 {
     // listen to software termination signal (kill)
@@ -149,6 +164,7 @@ void Handlers::installTerminationHandlers()
     // start up listener thread
     if (args_info.remoteTermination_given)
     {
+        rep->status("enabling remote termination (%s)", rep->markup(MARKUP_PARAMETER, "--remoteTermination").str());
         rep->status("setting up listener socket at port %s - secret is %s",
                     rep->markup(MARKUP_FILE, "%d", args_info.inputport_arg).str(),
                     rep->markup(MARKUP_IMPORTANT, args_info.remoteTermination_arg).str());

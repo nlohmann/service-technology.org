@@ -235,7 +235,7 @@ term:
 %%
 
 /// display a parser error and exit
-__attribute__((noreturn)) void ptbuechi_yyerrors(char* token, const char* format, ...) {
+void ptbuechi_yyerrors(char* token, const char* format, ...) __attribute__((noreturn)) {
     va_list args;
     va_start(args, format);
     char* errormessage = NULL;
@@ -253,6 +253,6 @@ __attribute__((noreturn)) void ptbuechi_yyerrors(char* token, const char* format
 }
 
 /// display a parser error and exit
-__attribute__((noreturn)) void ptbuechi_error(char const* mess) {
+void ptbuechi_error(char const* mess) __attribute__((noreturn)) {
     ptbuechi_yyerrors(ptbuechi_text, mess);
 }

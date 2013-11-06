@@ -13,8 +13,6 @@ should be independent from the format (LoLA / PNML / ...)
 
 class ParserPTNet
 {
-private:
-
 public:
     SymbolTable *PlaceTable;
     SymbolTable *TransitionTable;

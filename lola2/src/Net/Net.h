@@ -80,7 +80,8 @@ private:
 
     // moves all elements in the range [first1,last1), that are also in [first2,last2), to result.
     // returns the number of elements moved.
-    static index_t set_moveall (index_t *first1, index_t *last1, index_t *first2, index_t *last2,
+    static index_t set_moveall (index_t *first1, index_t *last1,
+                                index_t *first2, index_t *last2,
                                 index_t *result);
 
     /// calculates all significant places and changes order of places(!)

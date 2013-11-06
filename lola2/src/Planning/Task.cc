@@ -176,20 +176,19 @@ void Task::setNet()
 }
 
 
-
-StatePredicate *buildPropertyFromList(int *pos,
-                                      int *neg) /* prints the content of a set for spin */
+/* prints the content of a set for spin */
+StatePredicate *buildPropertyFromList(int *pos, int *neg)
 {
     int i, j, start = 1;
-    std::vector<StatePredicate * > subForms;
+    std::vector<StatePredicate *> subForms;
     // bad hack from library
     int mod = 8 * sizeof(int);
     for (i = 0; i < sym_size; i++)
         for (j = 0; j < mod; j++)
         {
             if (pos[i] & (1 << j))
-                if (atoi(sym_table[mod * i + j]) >
-                        1) // the compiler doens't have a clue whcih function i mean, so tell him
+                // the compiler doens't have a clue whcih function i mean, so tell him
+                if (atoi(sym_table[mod * i + j]) > 1)
                 {
                     subForms.push_back(
                         predicateMap[atoi(sym_table[mod * i + j])]->StatePredicate::copy());
@@ -204,8 +203,7 @@ StatePredicate *buildPropertyFromList(int *pos,
     {
         return new TruePredicate();
     }
-    ConjunctionStatePredicate *result = new ConjunctionStatePredicate(
-        subForms.size());
+    ConjunctionStatePredicate *result = new ConjunctionStatePredicate(subForms.size());
     for (int i = 0 ; i < subForms.size(); i++)
     {
         result->addSub(i, subForms[i]);
@@ -228,8 +226,7 @@ void Task::setFormula()
     FILE *file;
     if ((file = fopen(args_info.formula_arg, "r")) == NULL and errno == ENOENT)
     {
-        YY_BUFFER_STATE my_string_buffer = ptformula__scan_string(
-                                               args_info.formula_arg);
+        YY_BUFFER_STATE my_string_buffer = ptformula__scan_string(args_info.formula_arg);
     }
     else
     {
@@ -430,6 +427,7 @@ void Task::setFormula()
                 disjunctionproperty.push_back(buildPropertyFromList(t->pos, t->neg));
                 BTrans *t1;
                 for (t1 = t; t1->nxt != s->trans; )
+                {
                     if (t1->nxt->to->id == t->to->id && t1->nxt->to->final == t->to->final)
                     {
                         disjunctionproperty.push_back(buildPropertyFromList(t1->nxt->pos,
@@ -440,6 +438,7 @@ void Task::setFormula()
                     {
                         t1 = t1->nxt;
                     }
+                }
 
                 if (disjunctionproperty.size() == 1)
                 {
@@ -566,8 +565,8 @@ void Task::setBuechiAutomata()
     // copy restructured formula into internal data structures
     TheBuechi->unparse(myprinter, kc::buechi);
     bauto = TheBuechi->automata;
-    TheBuechi->free(
-        true); // XXX: this _must_ work according to the kimwitu docu, but it does not, kimwitu produces memory leaks!
+    // XXX: this _must_ work according to the kimwitu docu, but it does not, kimwitu produces memory leaks!
+    TheBuechi->free(true);
     //delete TheBuechi;
     delete buechiStateTable;
 
@@ -620,9 +619,6 @@ void Task::setProperty()
     // choose a simple property
     switch (args_info.check_arg)
     {
-        //        case check_arg_none:
-        //            return EXIT_SUCCESS;
-
     case check_arg_full:
         p = new SimpleProperty();
         fl = new Firelist();
@@ -823,13 +819,9 @@ bool Task::hasWitness(bool result)
     {
         return ctlExploration->witness.size();
     }
-    if (bauto)
+    if (bauto and args_info.formula_given)
     {
-        if (args_info.formula_given)
-        {
-            return !result;
-        }
-        return result;
+        return !result;
     }
     return result;
 }

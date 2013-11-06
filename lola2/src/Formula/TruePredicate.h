@@ -1,4 +1,3 @@
-
 /*!
 \file TruePredicate.h
 \author Karsten

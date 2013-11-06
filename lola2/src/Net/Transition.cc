@@ -285,11 +285,13 @@ bool Transition::isCycle(NetState &ns, index_t t)
         delta_value[Transition::DeltaT[PRE][t][i]] = Transition::MultDeltaT[PRE][t][i];
     }
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
+    {
         if (delta_value[Transition::DeltaT[POST][t][i]] != Transition::MultDeltaT[POST][t][i])
         {
             free(delta_value);
             return false;
         }
+    }
 
     free(delta_value);
     return true;
@@ -312,7 +314,8 @@ void Transition::updateEnabled(NetState &ns, index_t t)
     // 2. check those transitions where the scapegoat received additional tokens
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
     {
-        const index_t p = Transition::DeltaT[POST][t][i]; // one place that got new tokens
+        // one place that got new tokens
+        const index_t p = Transition::DeltaT[POST][t][i]; 
         for (index_t j = 0; j < ns.CardDisabled[p]; /* tricky increment handling */)
         {
             const index_t tt = ns.Disabled[p][j];

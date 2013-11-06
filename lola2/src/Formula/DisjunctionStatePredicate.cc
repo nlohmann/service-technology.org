@@ -11,22 +11,21 @@
 #include <Formula/DisjunctionStatePredicate.h>
 #include <Net/Net.h>
 
-DisjunctionStatePredicate::DisjunctionStatePredicate(index_t n)
+DisjunctionStatePredicate::DisjunctionStatePredicate(index_t n) :
+    sub(new StatePredicate*[n]), cardSub(n)
 {
     //printf("+ %p->DisjunctionStatePredicate(n=%d)\n", this, n);
 
     parent = NULL;
-    sub = (StatePredicate **) malloc(n * SIZEOF_VOIDP);
-    cardSub = n;
 }
 
 DisjunctionStatePredicate::~DisjunctionStatePredicate()
 {
     for (index_t i = 0; i < cardSub; i++)
     {
-        delete(sub[i]);
+        delete sub[i];
     }
-    free(sub);
+    delete[] sub;
 }
 
 void DisjunctionStatePredicate::addSub(index_t i, StatePredicate *f)

@@ -137,9 +137,8 @@ void evaluateParameters(int argc, char **argv)
         break;
 
     case reporter__NULL:
-    {
         /* no reporter */
-    }
+        break;
     }
 
     IO::setReporter(rep);

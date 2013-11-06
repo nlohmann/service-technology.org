@@ -11,10 +11,10 @@
 template <typename T>
 PrefixTreeStore<T>::PrefixTreeStore(index_t _number_of_threads)
 {
-	number_of_threads = _number_of_threads;
+    number_of_threads = _number_of_threads;
     branch = NULL;
     firstvector = NULL;
-	popVectorCache = (vectordata_t**) calloc(SIZEOF_VOIDP, number_of_threads);
+    popVectorCache = (vectordata_t **) calloc(SIZEOF_VOIDP, number_of_threads);
 
     pthread_rwlock_init(&rwlock, NULL);
 }
@@ -37,40 +37,50 @@ PrefixTreeStore<T>::~PrefixTreeStore()
         free(firstvector);
     }
 
-	for(index_t i=0; i<number_of_threads; ++i)
-		if(popVectorCache[i])
-	        free(popVectorCache[i]);
-	free(popVectorCache);
+    for (index_t i = 0; i < number_of_threads; ++i)
+        if (popVectorCache[i])
+        {
+            free(popVectorCache[i]);
+        }
+    free(popVectorCache);
 
     pthread_rwlock_destroy(&rwlock);
 }
 
 /// create a new branch in the decision tree at depth b.
 template <typename T>
-PrefixTreeStore<T>::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL), vector(NULL)
+PrefixTreeStore<T>::Decision::Decision(bitindex_t b) : bit(b) , nextold(NULL), nextnew(NULL),
+    vector(NULL)
 {
 }
 
 template <typename T>
 PrefixTreeStore<T>::Decision::~Decision()
 {
-    if(vector)
-    	free(vector);
+    if (vector)
+    {
+        free(vector);
+    }
     if (nextnew)
+    {
         delete nextnew;
+    }
     if (nextold)
+    {
         delete nextold;
+    }
 }
 
 /// search for an input vector in the suffix tree and insert it, if it is not present
 template <typename T>
-bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex, bool noinsert)
+bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t *in, bitindex_t bitlen, hash_t hash,
+        T **payload, index_t threadIndex, bool noinsert)
 {
     /// If a new decision record is inserted, * anchor must point to it
-    Decision** anchor;
+    Decision **anchor;
 
     /// the place where the new vector goes to
-    vectordata_t** newvector;
+    vectordata_t **newvector;
 
     /// the input word we are currently dealing with
     index_t input_index = 0;
@@ -79,50 +89,60 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
     index_t max_input_index = (bitlen - 1) / VECTOR_WIDTH;
 
     /// the number of significant bits in the last input word (aligned at msb)
-    index_t max_input_numbits = bitlen%VECTOR_WIDTH;
-    if(!max_input_numbits) max_input_numbits = VECTOR_WIDTH;
+    index_t max_input_numbits = bitlen % VECTOR_WIDTH;
+    if (!max_input_numbits)
+    {
+        max_input_numbits = VECTOR_WIDTH;
+    }
 
     /// the bits of the current input word we have NOT dealt with so far
     bitindex_t input_bitstogo = VECTOR_WIDTH; // indicates start with msb
 
     // pointer to the current input word
-    const vectordata_t* pInput = in;
+    const vectordata_t *pInput = in;
 
 
     /// the starting address of the current vector. In each vector, the payload is loacted before the marking data.
-    vectordata_t* pPayload;
+    vectordata_t *pPayload;
 
     /// the vector word we are currently investigating
-    vectordata_t* pVector;
+    vectordata_t *pVector;
 
     /// the bits of the current vector word we have NOT dealt with so far
     bitindex_t vector_bitstogo = VECTOR_WIDTH; // indicates start with msb
 
     /// the number of bits processed since reaching the current branch
     bitindex_t position = 0;
-    
+
     size_t payloadSize = getPayloadSize();
 
     // lock the current bucket to ensure thread safety
-    if (noinsert) pthread_rwlock_rdlock(&rwlock);
-	else pthread_rwlock_wrlock(&rwlock);
-    
+    if (noinsert)
+    {
+        pthread_rwlock_rdlock(&rwlock);
+    }
+    else
+    {
+        pthread_rwlock_wrlock(&rwlock);
+    }
+
     // Is hash bucket empty? If so, assign to currentvector
     if (!(pPayload = firstvector))
     {
-		if (noinsert) {
-			pthread_rwlock_unlock(&rwlock);
-			return false;
-		}
+        if (noinsert)
+        {
+            pthread_rwlock_unlock(&rwlock);
+            return false;
+        }
 
         // Indeed, hash bucket is empty --> just insert vector, no branch yet.
         newvector = &firstvector;
     }
     else
     {
-    	// skip payload. Cast to char* is done to ensure skipping exaclty the right amount of bytes.
-    	pVector = (vectordata_t*)(((char*)pPayload) + payloadSize);
-    
+        // skip payload. Cast to char* is done to ensure skipping exaclty the right amount of bytes.
+        pVector = (vectordata_t *)(((char *)pPayload) + payloadSize);
+
         // Here, hash bucket is not empty.
         anchor = &branch;
 
@@ -136,47 +156,57 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
 
 
             // test for good alignment
-            if(input_bitstogo == vector_bitstogo) {
+            if (input_bitstogo == vector_bitstogo)
+            {
                 // good alignment, can use memcmp
-                if(!memcmp(pInput,pVector,vectorlen*sizeof(vectordata_t))) {
+                if (!memcmp(pInput, pVector, vectorlen * sizeof(vectordata_t)))
+                {
                     // match found, we're done
                     pthread_rwlock_unlock(&rwlock);
-                    
-                    if(payload)
-                        *payload = (T*) pPayload;
+
+                    if (payload)
+                    {
+                        *payload = (T *) pPayload;
+                    }
                     return true;
                 }
                 // difference found, skip to first differing word.
-                while(*pInput == *pVector) // reaching end of input is impossible
+                while (*pInput == *pVector) // reaching end of input is impossible
                 {
-                    position+=VECTOR_WIDTH, pVector++;
+                    position += VECTOR_WIDTH, pVector++;
                     input_index++, ++pInput;
                 }
                 comparebits = VECTOR_WIDTH >> 1; // initialize binary search for differing bit
             }
             else // bad alignment; input_bitstogo < vector_bitstogo, since vector_bitstogo is always VECTOR_WIDTH at this point
             {
-                while(true) { // vector_bitstogo == VECTOR_WIDTH == VECTOR_WIDTH
+                while (true)  // vector_bitstogo == VECTOR_WIDTH == VECTOR_WIDTH
+                {
                     // compare remaining input bits with msb bits of current vector
                     if ((vectordata_t(*pInput << (VECTOR_WIDTH - input_bitstogo)))
                             ==
                             (vectordata_t((*pVector >> (VECTOR_WIDTH - input_bitstogo)) << (VECTOR_WIDTH - input_bitstogo))))
                     {
                         // they're equal, input word done. Test for EOI
-                        if(++input_index <= max_input_index) {
+                        if (++input_index <= max_input_index)
+                        {
                             // compare msb of next input word with the remaining bits of the current vector word
                             if ((vectordata_t(*(++pInput) >> input_bitstogo) << input_bitstogo)
                                     ==
                                     (vectordata_t(*pVector << input_bitstogo)))
                             {
                                 // they're equal, vector word done. Test for EOV and repeat with next vector word.
-                                if(--vectorlen) {
+                                if (--vectorlen)
+                                {
                                     position += VECTOR_WIDTH, pVector++;
                                 }
-                                else {
+                                else
+                                {
                                     pthread_rwlock_unlock(&rwlock);
-                                    if(payload)
-                                        *payload = (T*) pPayload;
+                                    if (payload)
+                                    {
+                                        *payload = (T *) pPayload;
+                                    }
                                     return true;
                                 }
                             }
@@ -188,10 +218,14 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
                                 comparebits = vector_bitstogo >> 1;
                                 break;
                             }
-                        } else {
+                        }
+                        else
+                        {
                             pthread_rwlock_unlock(&rwlock);
-                            if(payload)
-                                *payload = (T*) pPayload;
+                            if (payload)
+                            {
+                                *payload = (T *) pPayload;
+                            }
                             return true;
                         }
                     }
@@ -241,7 +275,7 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
             {
                 // Indeed, there is. Switch to that branch and repeat with new suffix tree vector
                 pPayload = (* anchor) -> vector;
-    	        pVector = (vectordata_t*)(((char*)pPayload) + payloadSize);
+                pVector = (vectordata_t *)(((char *)pPayload) + payloadSize);
                 anchor = &((* anchor) -> nextnew);
 
                 position += (VECTOR_WIDTH - vector_bitstogo) + 1;
@@ -249,10 +283,13 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
 
                 // skip the differing bit. We don't need to store it since its value is determined by the old vector and the branch position.
                 input_bitstogo--;
-                if(input_index == max_input_index && input_bitstogo + max_input_numbits <= VECTOR_WIDTH) {
+                if (input_index == max_input_index && input_bitstogo + max_input_numbits <= VECTOR_WIDTH)
+                {
                     pthread_rwlock_unlock(&rwlock);
-                    if(payload)
-                        *payload = (T*) pPayload;
+                    if (payload)
+                    {
+                        *payload = (T *) pPayload;
+                    }
                     return true;
                 }
                 if (!input_bitstogo)
@@ -267,14 +304,15 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
             }
         }
 
-		// in case we do not want to insert the state, stop right now
-		if (noinsert) {
-			pthread_rwlock_unlock(&rwlock);
-			return false;
-		}
+        // in case we do not want to insert the state, stop right now
+        if (noinsert)
+        {
+            pthread_rwlock_unlock(&rwlock);
+            return false;
+        }
 
         // state not found --> prepare for insertion
-        Decision* newdecision = new Decision(position + (VECTOR_WIDTH - vector_bitstogo));
+        Decision *newdecision = new Decision(position + (VECTOR_WIDTH - vector_bitstogo));
         newdecision -> nextold = * anchor;
         * anchor = newdecision;
         newdecision -> nextnew = NULL;
@@ -285,16 +323,20 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
 
         input_bitstogo--;
         // difference occurred in the very last bit of the input string
-        if(input_index == max_input_index && input_bitstogo + max_input_numbits == VECTOR_WIDTH) {
+        if (input_index == max_input_index && input_bitstogo + max_input_numbits == VECTOR_WIDTH)
+        {
             // allocate space for payload if necessary
-            if(payloadSize) {
-	            *newvector = (vectordata_t*) calloc(payloadSize, 1);
-	            pPayload = *newvector;
-	        }
-            
+            if (payloadSize)
+            {
+                *newvector = (vectordata_t *) calloc(payloadSize, 1);
+                pPayload = *newvector;
+            }
+
             pthread_rwlock_unlock(&rwlock);
-            if(payload)
-                *payload = (T*) pPayload;
+            if (payload)
+            {
+                *payload = (T *) pPayload;
+            }
             return false;
         }
         if (!input_bitstogo)
@@ -306,33 +348,42 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
     assert(bitlen >= position);
     // vector_bitstogo is always VECTOR_WIDTH here
     int newvectorlen = ((bitlen - position) + (VECTOR_WIDTH - 1)) / VECTOR_WIDTH;
-    *newvector = (vectordata_t*) calloc(payloadSize + newvectorlen*sizeof(vectordata_t), 1);
+    *newvector = (vectordata_t *) calloc(payloadSize + newvectorlen * sizeof(vectordata_t), 1);
     pPayload = *newvector;
-    pVector = (vectordata_t*)(((char*)pPayload) + payloadSize);
+    pVector = (vectordata_t *)(((char *)pPayload) + payloadSize);
 
 
     // test for good alignment
-    if(input_bitstogo == VECTOR_WIDTH)
+    if (input_bitstogo == VECTOR_WIDTH)
     {
         // good alignment, use memcpy
-        memcpy(pVector,pInput,newvectorlen*sizeof(vectordata_t));
+        memcpy(pVector, pInput, newvectorlen * sizeof(vectordata_t));
         pthread_rwlock_unlock(&rwlock);
-        if(payload)
-            *payload = (T*) pPayload;
+        if (payload)
+        {
+            *payload = (T *) pPayload;
+        }
         return false;
-    } else {
+    }
+    else
+    {
         // bad alignment, copy contents manually
-        while(newvectorlen--) {
+        while (newvectorlen--)
+        {
             *pVector |= vectordata_t(*pInput << (VECTOR_WIDTH - input_bitstogo));
             pInput++;
-            if(++input_index > max_input_index)
+            if (++input_index > max_input_index)
+            {
                 break;
+            }
             *pVector |= vectordata_t(*pInput >> input_bitstogo);
             pVector++;
         }
         pthread_rwlock_unlock(&rwlock);
-        if(payload)
-            *payload = (T*) pPayload;
+        if (payload)
+        {
+            *payload = (T *) pPayload;
+        }
         return false;
     }
 }
@@ -341,100 +392,100 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t* in, bitindex_t bitl
  * \brief  gets and removes a vector from the store
  */
 template <typename T>
-bool PrefixTreeStore<T>::popVector(vectordata_t * & out, index_t threadIndex)
+bool PrefixTreeStore<T>::popVector(vectordata_t *&out, index_t threadIndex)
 {
-  /// size of resulting vector
-  index_t vectorlen = SIZEOF_CAPACITY_T * Net::Card[PL];
-  // create intermediate vector
-  if(!(popVectorCache[threadIndex]))
-  {
-    popVectorCache[threadIndex] = (vectordata_t *) malloc(vectorlen);
-  }
-  
-  // vector currently viewed
-  vectordata_t * pPayload = NULL;
-  vectordata_t * pVector = NULL;
-  // anchor to a decision node
-  Decision * anchor = NULL;
-  Decision ** pAnchor = NULL;
-
-  // lock the current bucket to ensure thread safety
-  pthread_rwlock_wrlock(&rwlock);
-  
-  if(!(pPayload = firstvector))
-  {
-      pthread_rwlock_unlock(&rwlock);
-      return false;
-  }
-  // skip payload data
-  pVector = (vectordata_t*)(((char*)pPayload) + getPayloadSize());
-
-  // copy "first" vector to return it later
-  memcpy(popVectorCache[threadIndex], pVector, vectorlen);
-  out = popVectorCache[threadIndex];
-  
-  if(!(anchor = branch))
-  {
-    // no further markings in this bucket
-    free(pPayload);
-    firstvector = NULL;
-    pthread_rwlock_unlock(&rwlock);
-    return true;
-  }
-    
-  // we start with the root of the decision tree
-  pAnchor = &branch;
-  // and search for the decision node differing as last from the "first" vector
-  while(anchor->nextold)
-   {
-      pAnchor = &(anchor->nextold);
-      anchor = anchor-> nextold;
+    /// size of resulting vector
+    index_t vectorlen = SIZEOF_CAPACITY_T * Net::Card[PL];
+    // create intermediate vector
+    if (!(popVectorCache[threadIndex]))
+    {
+        popVectorCache[threadIndex] = (vectordata_t *) malloc(vectorlen);
     }
-    
+
+    // vector currently viewed
+    vectordata_t *pPayload = NULL;
+    vectordata_t *pVector = NULL;
+    // anchor to a decision node
+    Decision *anchor = NULL;
+    Decision **pAnchor = NULL;
+
+    // lock the current bucket to ensure thread safety
+    pthread_rwlock_wrlock(&rwlock);
+
+    if (!(pPayload = firstvector))
+    {
+        pthread_rwlock_unlock(&rwlock);
+        return false;
+    }
+    // skip payload data
+    pVector = (vectordata_t *)(((char *)pPayload) + getPayloadSize());
+
+    // copy "first" vector to return it later
+    memcpy(popVectorCache[threadIndex], pVector, vectorlen);
+    out = popVectorCache[threadIndex];
+
+    if (!(anchor = branch))
+    {
+        // no further markings in this bucket
+        free(pPayload);
+        firstvector = NULL;
+        pthread_rwlock_unlock(&rwlock);
+        return true;
+    }
+
+    // we start with the root of the decision tree
+    pAnchor = &branch;
+    // and search for the decision node differing as last from the "first" vector
+    while (anchor->nextold)
+    {
+        pAnchor = &(anchor->nextold);
+        anchor = anchor-> nextold;
+    }
+
     // alignment of both vectors (i.e. relative position of first bit of anchor->vector)
     bitindex_t shift = (anchor->bit + 1) % VECTOR_WIDTH;
     // remaining words to copy
-    bitindex_t remaining = (vectorlen*8 - anchor->bit - 1) / VECTOR_WIDTH;
-    
+    bitindex_t remaining = (vectorlen * 8 - anchor->bit - 1) / VECTOR_WIDTH;
+
     // go to position of first differing bit
     pVector += (anchor->bit / VECTOR_WIDTH);
-    // toggle bit 
+    // toggle bit
     *pVector ^= 1 << (VECTOR_WIDTH - (anchor->bit % VECTOR_WIDTH) - 1);
-    
+
     // vector to be copied from
-    vectordata_t * source = anchor->vector;
-    
+    vectordata_t *source = anchor->vector;
+
     // test for good alignment
-    if(shift == 0)
+    if (shift == 0)
     {
-      // good alignment, use memcpy
-      memcpy(++pVector, source, remaining * SIZEOF_VECTORDATA_T);
+        // good alignment, use memcpy
+        memcpy(++pVector, source, remaining * SIZEOF_VECTORDATA_T);
     }
     else
     {
-      // bad alignment, copy manually
-      // initially clear recent word
-      *pVector = ((*pVector >> (VECTOR_WIDTH-shift)) << (VECTOR_WIDTH-shift));
-      
-      while(true)
-      {
-        // copy lower half
-        *(pVector++) |= *source >> shift;
-        if(remaining-- == 0)
+        // bad alignment, copy manually
+        // initially clear recent word
+        *pVector = ((*pVector >> (VECTOR_WIDTH - shift)) << (VECTOR_WIDTH - shift));
+
+        while (true)
         {
-          // finished copying
-          break;
+            // copy lower half
+            *(pVector++) |= *source >> shift;
+            if (remaining-- == 0)
+            {
+                // finished copying
+                break;
+            }
+            // copy upper half
+            *pVector = *(source++) << (VECTOR_WIDTH - shift);
         }
-        // copy upper half
-        *pVector = *(source++) << (VECTOR_WIDTH-shift);
-      }
     }
-    
+
     // remove node
     *pAnchor = anchor->nextnew;
     anchor->nextnew = NULL; // prevent it from being deleted when calling the destructor
     delete anchor;
-    
+
     // return result
     pthread_rwlock_unlock(&rwlock);
     return true;
@@ -448,6 +499,6 @@ bool PrefixTreeStore<T>::popVector(vectordata_t * & out, index_t threadIndex)
 template <typename T>
 bool PrefixTreeStore<T>::empty()
 {
-	return !firstvector;
+    return !firstvector;
 }
 

@@ -14,7 +14,7 @@
 using namespace std;
 
 // LCOV_EXCL_START
-#include <iostream>
+
 /// writes current row on cout
 void Matrix::Row::DEBUG__printRow() const
 {
@@ -34,6 +34,7 @@ void Matrix::Row::DEBUG__printRow() const
     std::cout << std::endl;
     */
 }
+
 /// writes current matrix on cout
 void Matrix::DEBUG__printMatrix() const
 {

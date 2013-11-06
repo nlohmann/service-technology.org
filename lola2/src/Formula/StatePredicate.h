@@ -67,5 +67,4 @@ public:
     virtual index_t getSubs(const StatePredicate *const **subs) const = 0;
     virtual bool isOrNode() const;
     virtual index_t countUnsatisfied() const; // for and-nodes only!
-
 };

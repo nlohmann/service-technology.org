@@ -15,7 +15,8 @@
 
 
 template<typename T>
-CompareStore<T>::CompareStore(Store<T>* correct, Store<T>* test,uint32_t _number_of_threads) : Store<T>(_number_of_threads)
+CompareStore<T>::CompareStore(Store<T> *correct, Store<T> *test,
+                              uint32_t _number_of_threads) : Store<T>(_number_of_threads)
 {
     correctStore = correct;
     testStore = test;
@@ -29,25 +30,29 @@ CompareStore<T>::~CompareStore()
 }
 
 template<typename T>
-bool CompareStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex, bool noinsert)
+bool CompareStore<T>::searchAndInsert(NetState &ns, T **payload, uint32_t threadIndex,
+                                      bool noinsert)
 {
-   bool correctResult = correctStore->searchAndInsert(ns, payload, threadIndex);
-   
-   bool testResult = testStore->searchAndInsert(ns,payload,threadIndex);
-   
-   if (correctResult == testResult)
-   	return correctResult;
-   
-   assert(false);
+    bool correctResult = correctStore->searchAndInsert(ns, payload, threadIndex);
+
+    bool testResult = testStore->searchAndInsert(ns, payload, threadIndex);
+
+    if (correctResult == testResult)
+    {
+        return correctResult;
+    }
+
+    assert(false);
 }
 
 /*!
  * \brief gets and removes a state from the store
  * \param ns NetState where the removed state will be written to
  * \return false, if store was already empty
- */  
+ */
 template<typename T>
-bool CompareStore<T>::popState(NetState &ns) {
-  testStore->popState(ns);
-  return correctStore->popState(ns);
+bool CompareStore<T>::popState(NetState &ns)
+{
+    testStore->popState(ns);
+    return correctStore->popState(ns);
 }

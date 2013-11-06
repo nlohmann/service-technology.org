@@ -40,8 +40,9 @@ CycleStore<T>::~CycleStore()
 }
 
 template <typename T>
-CycleStore<T>::CycleStore(uint32_t number_of_threads, Store<T> *actualStore,
-                          int k) : Store<T>(number_of_threads), actualStore(actualStore), u(new bool[Net::Card[TR]]), k(k)
+CycleStore<T>::CycleStore(uint32_t number_of_threads, Store<T> *actualStore, int k) :
+    Store<T>(number_of_threads), actualStore(actualStore),
+    u(new bool[Net::Card[TR]]), k(k)
 {
     // required to avoid an assertion error (TODO: Why?)
     Net::sortAllArcs();

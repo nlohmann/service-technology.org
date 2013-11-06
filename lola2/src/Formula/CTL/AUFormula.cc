@@ -1,4 +1,3 @@
-
 #include <Formula/CTL/AUFormula.h>
 #include <Exploration/SearchStack.h>
 #include <Net/Transition.h>
@@ -7,7 +6,6 @@
 bool AUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
                       std::vector<int> *witness)
 {
-
     void **pInitialPayload;
     if (!s.searchAndInsert(ns, &pInitialPayload, 0))
     {

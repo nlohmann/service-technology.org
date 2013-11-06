@@ -47,4 +47,3 @@ StatePredicate *TruePredicate::negate()
 {
     return new FalsePredicate();
 }
-

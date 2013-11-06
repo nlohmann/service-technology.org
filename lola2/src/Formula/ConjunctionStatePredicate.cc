@@ -10,13 +10,12 @@
 #include <cstdio>
 #include <Formula/ConjunctionStatePredicate.h>
 
-ConjunctionStatePredicate::ConjunctionStatePredicate(index_t n)
+ConjunctionStatePredicate::ConjunctionStatePredicate(index_t n) :
+    sub(new StatePredicate*[n]), cardSub(n)
 {
     //printf("+ %p->ConjunctionStatePredicate(n=%d)\n", this, n);
 
     parent = NULL;
-    sub = (StatePredicate **) malloc(n * SIZEOF_VOIDP);
-    cardSub = n;
 }
 
 ConjunctionStatePredicate::~ConjunctionStatePredicate()
@@ -25,7 +24,7 @@ ConjunctionStatePredicate::~ConjunctionStatePredicate()
     {
         delete sub[i];
     }
-    free(sub);
+    delete[] sub;
 }
 
 void ConjunctionStatePredicate::addSub(index_t i, StatePredicate *f)
@@ -224,4 +223,3 @@ index_t ConjunctionStatePredicate::countUnsatisfied() const
 {
     return cardSub - cardSat;
 }
-

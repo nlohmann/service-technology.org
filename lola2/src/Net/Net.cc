@@ -128,9 +128,12 @@ void Net::sortArcs(index_t *arcs, mult_t *mults, const index_t from, const index
         return;    // less than 2 elements are always sorted
     }
 
-    index_t blue = from; // points to first index where element is not known < pivot
-    index_t white = from + 1; // points to first index where element is not know <= pivot
-    index_t red = to; // points to last index (+1) where element is not know to be  pivot
+    // points to first index where element is not known < pivot
+    index_t blue = from;
+    // points to first index where element is not know <= pivot
+    index_t white = from + 1;
+    // points to last index (+1) where element is not know to be  pivot
+    index_t red = to;
     const index_t pivot = arcs[from];
 
     assert(from < to);
@@ -139,7 +142,7 @@ void Net::sortArcs(index_t *arcs, mult_t *mults, const index_t from, const index
     {
         if (arcs[white] < pivot)
         {
-            // swap white <->blue
+            // swap white <-> blue
             const index_t tmp_index = arcs[blue];
             const mult_t tmp_mult = mults[blue];
             arcs[blue] = arcs[white];
@@ -152,7 +155,7 @@ void Net::sortArcs(index_t *arcs, mult_t *mults, const index_t from, const index
             // there are no duplicates in arc list
             assert(arcs[white] > pivot);
 
-            // swap white <->red
+            // swap white <-> red
             const index_t tmp_index = arcs[--red];
             const mult_t tmp_mult = mults[red];
             arcs[red] = arcs[white];
@@ -918,17 +921,18 @@ void Net::setProgressMeasure()
 // calculates DeltaT and DeltaHash for each transition
 void Net::preprocess_organizeDeltas()
 {
-
     const index_t cardPL = Net::Card[PL];
     const index_t cardTR = Net::Card[TR];
 
-    index_t *delta_pre = (index_t *) calloc(cardPL,
-                                            SIZEOF_INDEX_T);  // temporarily collect places where a transition has negative token balance
-    index_t *delta_post = (index_t *) calloc(cardPL,
-                          SIZEOF_INDEX_T); // temporarily collect places where a transition has positive token balance.
+    // temporarily collect places where a transition has negative token balance
+    index_t *delta_pre = (index_t *) calloc(cardPL, SIZEOF_INDEX_T);
+    // temporarily collect places where a transition has positive token balance.
+    index_t *delta_post = (index_t *) calloc(cardPL, SIZEOF_INDEX_T);
 
-    mult_t *mult_pre = (mult_t *) malloc(cardPL * SIZEOF_MULT_T);  // same for multiplicities
-    mult_t *mult_post = (mult_t *) malloc(cardPL * SIZEOF_MULT_T);  // same for multiplicities
+    // same for multiplicities
+    mult_t *mult_pre = (mult_t *) malloc(cardPL * SIZEOF_MULT_T); 
+    // same for multiplicities 
+    mult_t *mult_post = (mult_t *) malloc(cardPL * SIZEOF_MULT_T);
 
     for (index_t t = 0; t < cardTR; t++)
     {
@@ -938,8 +942,8 @@ void Net::preprocess_organizeDeltas()
         Net::sortArcs(Net::Arc[TR][PRE][t], Net::Mult[TR][PRE][t], 0, Net::CardArcs[TR][PRE][t]);
         Net::sortArcs(Net::Arc[TR][POST][t], Net::Mult[TR][POST][t], 0, Net::CardArcs[TR][POST][t]);
 
-        index_t i; // parallel iteration through sorted pre and post arc sets
-        index_t j;
+        // parallel iteration through sorted pre and post arc sets
+        index_t i, j;
         for (i = 0, j = 0; (i < Net::CardArcs[TR][PRE][t])
                 && (j < Net::CardArcs[TR][POST][t]); /* tricky increment */)
         {
@@ -954,13 +958,13 @@ void Net::preprocess_organizeDeltas()
                 {
                     if (Net::Mult[TR][PRE][t][i] < Net::Mult[TR][POST][t][j])
                     {
-                        // positive impact -->goes to delta post
+                        // positive impact --> goes to delta post
                         delta_post[card_delta_post] = Net::Arc[TR][POST][t][j];
                         mult_post[card_delta_post++] = (mult_t)(Net::Mult[TR][POST][t][j] - Net::Mult[TR][PRE][t][i]);
                     }
                     else
                     {
-                        // negative impact -->goes to delta pre
+                        // negative impact --> goes to delta pre
                         delta_pre[card_delta_pre] = Net::Arc[TR][PRE][t][i];
                         mult_pre[card_delta_pre++] = (mult_t)(Net::Mult[TR][PRE][t][i] - Net::Mult[TR][POST][t][j]);
                     }
@@ -1173,8 +1177,9 @@ void Net::preprocess_organizeConflictingTransitions()
 
 // moves all elements in the range [first1,last1), that are also in [first2,last2), to result.
 // returns the number of elements moved.
-index_t Net::set_moveall (index_t *first1, index_t *last1, index_t *first2, index_t *last2,
-                          index_t *result)
+index_t Net::set_moveall(index_t *first1, index_t *last1,
+                         index_t *first2, index_t *last2,
+                         index_t *result)
 {
     index_t *res = result;
     index_t *retain = first1;
@@ -1201,7 +1206,6 @@ index_t Net::set_moveall (index_t *first1, index_t *last1, index_t *first2, inde
 /// calculates the set of conflicting transitions for each transition
 void Net::preprocess_organizeConflictingTransitions()
 {
-
     const index_t cardPL = Net::Card[PL];
     const index_t cardTR = Net::Card[TR];
 
@@ -1215,13 +1219,13 @@ void Net::preprocess_organizeConflictingTransitions()
     index_t *stack_place_used = (index_t *) malloc(cardPL * SIZEOF_INDEX_T);
 
     // stack_conflictset[i] stores the current conflict set at stack position i
-    index_t **stack_conflictset = (index_t **) calloc((cardPL + 1),
-                                  SIZEOF_VOIDP); // calloc: null-pointer tests to dynamically allocate new segments
+    // calloc: null-pointer tests to dynamically allocate new segments
+    index_t **stack_conflictset = (index_t **) calloc((cardPL + 1), SIZEOF_VOIDP); 
     index_t *stack_card_conflictset = (index_t *) calloc((cardPL + 1), SIZEOF_INDEX_T);
 
     // stack_transitions[i] stores all transitions the conflict set at stack position i applies to. Every transition appears exactly once.
-    index_t **stack_transitions = (index_t **) calloc((cardPL + 1),
-                                  SIZEOF_VOIDP); // calloc: null-pointer tests to dynamically allocate new segments
+    // calloc: null-pointer tests to dynamically allocate new segments
+    index_t **stack_transitions = (index_t **) calloc((cardPL + 1), SIZEOF_VOIDP); 
     index_t *stack_card_transitions = (index_t *) calloc((cardPL + 1), SIZEOF_INDEX_T);
     // index of the current transition for each stack position
     index_t *stack_transitions_index = (index_t *) calloc((cardPL + 1), SIZEOF_INDEX_T);
@@ -1462,17 +1466,15 @@ void Net::preprocess_organizeConflictingTransitions()
     }
     delete[] conflictcache;
     for (index_t i = 0; i <= cardPL; i++)
-        if (stack_conflictset[i])
-        {
-            free(stack_conflictset[i]);
-        }
+    {
+        free(stack_conflictset[i]);
+    }
     free(stack_conflictset);
     free(stack_card_conflictset);
     for (index_t i = 0; i <= cardPL; i++)
-        if (stack_transitions[i])
-        {
-            free(stack_transitions[i]);
-        }
+    {
+        free(stack_transitions[i]);
+    }
     free(stack_transitions);
     free(stack_card_transitions);
     free(stack_transitions_index);
@@ -1516,13 +1518,13 @@ void Net::preprocess()
     /*********************
     * 3. Organize Deltas *
     *********************/
-    Transition::DeltaHash = (hash_t *) calloc(cardTR ,
-                            SIZEOF_HASH_T); // calloc: delta hash must be initially 0
+    // calloc: delta hash must be initially 0
+    Transition::DeltaHash = (hash_t *) calloc(cardTR, SIZEOF_HASH_T); 
     // allocate memory for deltas
     for (int direction = PRE; direction <= POST; direction++)
     {
-        Transition::CardDeltaT[direction] = (index_t *) calloc(cardTR,
-                                            SIZEOF_INDEX_T); // calloc: no arcs there yet
+        // calloc: no arcs there yet
+        Transition::CardDeltaT[direction] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T); 
         Transition::DeltaT[direction] = (index_t **) malloc(cardTR * SIZEOF_VOIDP);
         Transition::MultDeltaT[direction] = (mult_t **) malloc(cardTR * SIZEOF_VOIDP);
     }
@@ -1548,8 +1550,8 @@ void Net::preprocess()
     {
         Net::setSignificantPlaces();
     }
-    rep->status("%d places, %d transitions, %d significant places", Net::Card[PL], Net::Card[TR],
-                Place::CardSignificant);
+    rep->status("%d places, %d transitions, %d significant places",
+                Net::Card[PL], Net::Card[TR], Place::CardSignificant);
 
     // sort all arcs. Needs to be done before enabledness check in order to not mess up the disabled lists and scapegoats, but after determining the significant places since it swaps places and destroys any arc ordering.
     Net::sortAllArcs();
@@ -1566,8 +1568,8 @@ void Net::preprocess()
     /*******************************
     * 7. Initial enabledness check *
     *******************************/
-    Place::CardDisabled = (index_t *) calloc(cardPL ,
-                          SIZEOF_INDEX_T); // use calloc: initial assumption: no transition is disabled
+    // use calloc: initial assumption: no transition is disabled
+    Place::CardDisabled = (index_t *) calloc(cardPL, SIZEOF_INDEX_T);
     Place::Disabled = (index_t **) malloc(cardPL * SIZEOF_VOIDP);
     for (index_t p = 0; p < cardPL; p++)
     {
@@ -1577,7 +1579,8 @@ void Net::preprocess()
     }
     Transition::PositionScapegoat = (index_t *) malloc(cardTR * SIZEOF_INDEX_T);
     Transition::Enabled = (bool *) malloc(cardTR * SIZEOF_BOOL);
-    Transition::CardEnabled = cardTR; // start with assumption that all transitions are enabled
+    // start with assumption that all transitions are enabled
+    Transition::CardEnabled = cardTR;
     for (index_t t = 0; t < cardTR; t++)
     {
         Transition::Enabled[t] = true;

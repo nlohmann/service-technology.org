@@ -15,7 +15,8 @@
 
 
 template<typename T>
-PluginStore<T>::PluginStore(NetStateEncoder* _netStateEncoder, VectorStore<T>* _vectorStore, uint32_t _number_of_threads) : Store<T>(_number_of_threads)
+PluginStore<T>::PluginStore(NetStateEncoder *_netStateEncoder, VectorStore<T> *_vectorStore,
+                            uint32_t _number_of_threads) : Store<T>(_number_of_threads)
 {
     netStateEncoder = _netStateEncoder;
     vectorStore = _vectorStore;
@@ -29,18 +30,19 @@ PluginStore<T>::~PluginStore()
 }
 
 template<typename T>
-bool PluginStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex, bool noinsert)
+bool PluginStore<T>::searchAndInsert(NetState &ns, T **payload, uint32_t threadIndex, bool noinsert)
 {
     // count calls
     ++(this->calls[threadIndex]);
 
     // fetch input vector
     bitindex_t bitlen;
-    vectordata_t* input = netStateEncoder->encodeNetState(ns, bitlen, threadIndex);
+    vectordata_t *input = netStateEncoder->encodeNetState(ns, bitlen, threadIndex);
 
     // check input vector in vector store
     bool ret = vectorStore->searchAndInsert(input, bitlen, ns.HashCurrent, payload, threadIndex);
-    if (!ret) {
+    if (!ret)
+    {
         ++(this->markings[threadIndex]);
     }
     return ret;
@@ -50,18 +52,19 @@ bool PluginStore<T>::searchAndInsert(NetState &ns, T** payload, uint32_t threadI
  * \brief gets and removes a state from the store
  * \param ns NetState where the removed state will be written to
  * \return false, if store was already empty
- */  
+ */
 template<typename T>
-bool PluginStore<T>::popState(NetState &ns) {
-  // pointer to be set to popped vector
-  vectordata_t * vec = NULL;
-  
-  // try to get a vector from the store
-  bool result = vectorStore->popVector(vec);
-  if(result)
-  {
-    // decode vector to state and write to ns
-    netStateEncoder->decodeNetState(ns, vec);
-  }
-  return result;
+bool PluginStore<T>::popState(NetState &ns)
+{
+    // pointer to be set to popped vector
+    vectordata_t *vec = NULL;
+
+    // try to get a vector from the store
+    bool result = vectorStore->popVector(vec);
+    if (result)
+    {
+        // decode vector to state and write to ns
+        netStateEncoder->decodeNetState(ns, vec);
+    }
+    return result;
 }

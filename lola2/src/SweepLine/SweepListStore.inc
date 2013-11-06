@@ -6,7 +6,7 @@
 \brief List of Stores for persistent markings in the SweepLine method
 
 This class realizes one store in a list of stores, sorted by progress
-measure and containing known persistent markings, either old or new ones. 
+measure and containing known persistent markings, either old or new ones.
 */
 
 #include <cstdlib>
@@ -15,27 +15,28 @@ measure and containing known persistent markings, either old or new ones.
 #include <Planning/Task.h>
 
 extern gengetopt_args_info args_info;
-extern Reporter* rep;
+extern Reporter *rep;
 
-/*! 
+/*!
  * \brief Constructor for one store in a list of stores
  */
 template <class T>
-SweepListStore<T>::SweepListStore(index_t _nr_of_threads, hash_t _nr_of_buckets) 
-: next(NULL), nr_of_threads(_nr_of_threads), nr_of_buckets(_nr_of_buckets)
+SweepListStore<T>::SweepListStore(index_t _nr_of_threads, hash_t _nr_of_buckets)
+    : next(NULL), nr_of_threads(_nr_of_threads), nr_of_buckets(_nr_of_buckets)
 {
-	store = createSweepStore();
+    store = createSweepStore();
 }
 
-/*! 
+/*!
  * \brief Constructor for a list of stores, returns pointer to the first store
  * \param size The number of stores in the list
  */
 template <class T>
-SweepListStore<T>::SweepListStore(index_t _nr_of_threads, hash_t _nr_of_buckets, index_t size) 
-: next(size>0 ? new SweepListStore(_nr_of_threads,_nr_of_buckets,size-1) : NULL), nr_of_threads(_nr_of_threads), nr_of_buckets(_nr_of_buckets)
+SweepListStore<T>::SweepListStore(index_t _nr_of_threads, hash_t _nr_of_buckets, index_t size)
+    : next(size > 0 ? new SweepListStore(_nr_of_threads, _nr_of_buckets, size - 1) : NULL),
+      nr_of_threads(_nr_of_threads), nr_of_buckets(_nr_of_buckets)
 {
-	store = createSweepStore();
+    store = createSweepStore();
 }
 
 /*!
@@ -44,8 +45,8 @@ SweepListStore<T>::SweepListStore(index_t _nr_of_threads, hash_t _nr_of_buckets,
 template <class T>
 SweepListStore<T>::~SweepListStore()
 {
-	delete store;
-	delete next;
+    delete store;
+    delete next;
 }
 
 /*!
@@ -53,9 +54,9 @@ SweepListStore<T>::~SweepListStore()
  * \return The next store if it exists, NULL otherwise
  */
 template <class T>
-SweepListStore<T>* SweepListStore<T>::checkNext()
+SweepListStore<T> *SweepListStore<T>::checkNext()
 {
-	return next;
+    return next;
 }
 
 /*!
@@ -64,10 +65,13 @@ SweepListStore<T>* SweepListStore<T>::checkNext()
  * \return The next store in the list, possibly just created
  */
 template <class T>
-SweepListStore<T>* SweepListStore<T>::getNext()
+SweepListStore<T> *SweepListStore<T>::getNext()
 {
-	if (!next) next = new SweepListStore<T>(nr_of_threads, nr_of_buckets);
-	return next;
+    if (!next)
+    {
+        next = new SweepListStore<T>(nr_of_threads, nr_of_buckets);
+    }
+    return next;
 }
 
 /*!
@@ -75,32 +79,37 @@ SweepListStore<T>* SweepListStore<T>::getNext()
  * \param sls The store that should be the next after this one
  */
 template <class T>
-void SweepListStore<T>::setNext(SweepListStore<T>* sls)
+void SweepListStore<T>::setNext(SweepListStore<T> *sls)
 {
-	next = sls;
+    next = sls;
 }
 
 template <class T>
-VectorStore<T>* SweepListStore<T>::createSweepStore()
+VectorStore<T> *SweepListStore<T>::createSweepStore()
 {
     switch (args_info.store_arg)
     {
-        case store_arg_prefix:
-            if (nr_of_buckets>1)
-				return new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,PrefixTreeStore<T>,index_t>(nr_of_threads),nr_of_buckets,nr_of_threads);
-            else
-				return new PrefixTreeStore<T>(nr_of_threads);
-        case store_arg_stl:
-/*
-            if (nr_of_buckets>1)
-				return new PluginStore<T>(enc, new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
-            else
-*/
-				return new VSTLStore<T>(nr_of_threads);
-        default:
-			rep->message(rep->markup(MARKUP_BAD,"specified store does not fit the given task").str());
-			rep->abort(ERROR_COMMANDLINE);
-			return NULL;
+    case store_arg_prefix:
+        if (nr_of_buckets > 1)
+        {
+            return new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T, PrefixTreeStore<T>, index_t>
+                                              (nr_of_threads), nr_of_buckets, nr_of_threads);
+        }
+        else
+        {
+            return new PrefixTreeStore<T>(nr_of_threads);
+        }
+    case store_arg_stl:
+        /*
+                    if (nr_of_buckets>1)
+        				return new PluginStore<T>(enc, new HashingWrapperStore<T>(new UnaryVectorStoreCreator<T,VSTLStore<T>,index_t>(number_of_threads)), number_of_threads);
+                    else
+        */
+        return new VSTLStore<T>(nr_of_threads);
+    default:
+        rep->message(rep->markup(MARKUP_BAD, "specified store does not fit the given task").str());
+        rep->abort(ERROR_COMMANDLINE);
+        return NULL;
     }
 }
 

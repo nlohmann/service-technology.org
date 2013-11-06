@@ -61,7 +61,6 @@ typedef uint32_t index_t;
 typedef uint32_t statenumber_t;
 
 /// Type for bitvector indices, should be large enough for card(places) * log maxcapacity
-
 typedef uint32_t bitindex_t;
 
 /// Type for multiplicities, limits the max. multiplicity at any arc
@@ -132,10 +131,7 @@ typedef enum
 #define REPORT_FREQUENCY 5
 
 /// the size of the bloom filter (2 GB)
-//#define BLOOM_FILTER_SIZE 0x400000000
-
-/// the size of the bloom filter (800 MB for the model checking contest)
-#define BLOOM_FILTER_SIZE 0x190000000
+#define BLOOM_FILTER_SIZE 0x400000000
 
 
 /////////////

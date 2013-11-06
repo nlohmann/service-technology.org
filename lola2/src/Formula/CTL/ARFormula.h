@@ -47,7 +47,7 @@ public:
     // LCOV_EXCL_START
     void DEBUG_print()
     {
-        printf("[%u,%u,%lu]A(", index, dfsindex, payloadsize);
+        printf("[%u,%u,%zu]A(", index, dfsindex, payloadsize);
         phi->DEBUG_print();
         printf(")R(");
         psi->DEBUG_print();

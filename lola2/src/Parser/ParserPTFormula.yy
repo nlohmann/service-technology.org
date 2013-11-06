@@ -188,7 +188,8 @@ term:
 %%
 
 /// display a parser error and exit
-void ptformula_yyerrors(char* token, const char* format, ...) __attribute__((noreturn)) {
+void ptformula_yyerrors(char* token, const char* format, ...) __attribute__((noreturn));
+void ptformula_yyerrors(char* token, const char* format, ...) {
     va_list args;
     va_start(args, format);
     char* errormessage = NULL;
@@ -206,6 +207,7 @@ void ptformula_yyerrors(char* token, const char* format, ...) __attribute__((nor
 }
 
 /// display a parser error and exit
-void ptformula_error(char const* mess) __attribute__((noreturn)) {
+void ptformula_error(char const* mess) __attribute__((noreturn));
+void ptformula_error(char const* mess) {
     ptformula_yyerrors(ptformula_text, mess);
 }

@@ -182,17 +182,20 @@ class Task
 private:
     StatePredicate *spFormula;
     CTLFormula *ctlFormula;
+    BuechiAutomata *bauto;
+
     NetState *ns;
     ChooseTransition *choose;
     enum_search search;
     Firelist *fl;
     SimpleProperty *p;
-    BuechiAutomata *bauto;
     DFSExploration *exploration;
     LTLExploration *ltlExploration;
     CTLExploration *ctlExploration;
+
     int number_of_threads;
     formula_t formulaType;
+
     void setNet();
     void setFormula();
     void setBuechiAutomata();

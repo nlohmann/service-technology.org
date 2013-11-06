@@ -1,7 +1,6 @@
 #include <errno.h>
-
 #include <iostream>
-
+#include <sstream>
 #include <map>
 #include <list>
 #include <set>
@@ -214,11 +213,6 @@ StatePredicate *buildPropertyFromList(int *pos, int *neg)
 
 void Task::setFormula()
 {
-    if (not args_info.formula_given)
-    {
-        return;
-    }
-
     Input *formulaFile = NULL;
 
     // Check if the paramter of --formula is a file that we can open: if that
@@ -305,207 +299,212 @@ void Task::setFormula()
     // TheFormula->print();
     // TheFormula->unparse(myprinter, kc::out);
 
-    if ((formulaType == FORMULA_REACHABLE or
-            formulaType == FORMULA_INVARIANT or
-            formulaType == FORMULA_IMPOSSIBLE or
-            formulaType == FORMULA_INITIAL))
+    switch (formulaType)
     {
-        // copy restructured formula into internal data structures
-        TheFormula->unparse(myprinter, kc::internal);
-        StatePredicate *result = TheFormula->formula;
-
-        assert(result);
-        rep->status("processed formula with %d atomic propositions",
-                    result->countAtomic());
-
-        spFormula = result;
-    }
-    else if (formulaType == FORMULA_CTL)
-    {
-        //TheFormula->unparse(myprinter, kc::out);
-        TheFormula->unparse(myprinter, kc::ctl);
-        ctlFormula = TheFormula->ctl_formula;
-
-        // debug output
-        //printf("Formula: ");
-        //ctlFormula->DEBUG_print();
-        //printf("\n");
-
-        assert(ctlFormula);
-    }
-    else if (formulaType == FORMULA_LTL)
-    {
-        rep->message("transforming LTL-Formula into an Büchi-Automaton");
-        // print the formula
-        TheFormula->unparse(myprinter, kc::out);
-        // extract the Node*
-        TheFormula->unparse(myprinter, kc::ltl);
-
-        tl_Node *n = TheFormula->ltl_tree;
-        //n = bin_simpler(n);
-        assert(n);
-        tl_out = stdout;
-        trans(n);
-        // build the buechi-automation structure needed for LTL model checking
-        // put the state predicates
-        bauto = new BuechiAutomata();
-
-        // extract the states from the ltl2ba data structures
-        if (bstates->nxt == bstates)
+    case FORMULA_REACHABLE:
+    case FORMULA_INVARIANT:
+    case FORMULA_INITIAL:
         {
-            // TODO the search result is FALSE!
-            rep->message("Not yet implemented, result FALSE");
-            rep->abort(ERROR_COMMANDLINE);
+            // copy restructured formula into internal data structures
+            TheFormula->unparse(myprinter, kc::internal);
+            StatePredicate *result = TheFormula->formula;
+
+            assert(result);
+            rep->status("processed formula with %d atomic propositions",
+                        result->countAtomic());
+
+            spFormula = result;
+            break;
         }
 
-        if (bstates->nxt->nxt == bstates && bstates->nxt->id == 0)
+    case FORMULA_CTL:
         {
-            // TODO the search result is TRUE!
-            rep->message("Not yet implemented, result TRUE");
-            rep->abort(ERROR_COMMANDLINE);
+            //TheFormula->unparse(myprinter, kc::out);
+            TheFormula->unparse(myprinter, kc::ctl);
+            ctlFormula = TheFormula->ctl_formula;
+
+            // debug output
+            //printf("Formula: ");
+            //ctlFormula->DEBUG_print();
+            //printf("\n");
+
+            assert(ctlFormula);
+            break;
         }
 
-        bauto->cardStates = 0;
-        // map-> final,id
-        std::map<int, std::map<int, int > > state_id;
-        BState *s;
-        BTrans *t;
-        for (s = bstates->prv; s != bstates; s = s->prv)
+    case FORMULA_LTL:
         {
-            state_id[s->final][s->id] = bauto->cardStates;
-            bauto->cardStates++;
-        }
+            rep->message("transforming LTL-Formula into an Büchi-Automaton");
+            // print the formula
+            TheFormula->unparse(myprinter, kc::out);
+            // extract the Node*
+            TheFormula->unparse(myprinter, kc::ltl);
 
-        //rep->message("Buechi-automaton has %d states", bauto->cardStates);
-        // now i do know the number of states
-        bauto->cardTransitions = (uint32_t *)calloc(bauto->cardStates,
-                                 sizeof(uint32_t));
-        bauto->transitions = (uint32_t ** *)calloc(bauto->cardStates,
-                             sizeof(uint32_t **));
-        bauto->cardEnabled = (index_t *)calloc(bauto->cardStates, SIZEOF_INDEX_T);
-        bauto->isStateAccepting = (bool *) calloc(bauto->cardStates, SIZEOF_BOOL);
+            tl_Node *n = TheFormula->ltl_tree;
+            //n = bin_simpler(n);
+            assert(n);
+            tl_out = stdout;
+            trans(n);
+            // build the buechi-automation structure needed for LTL model checking
+            // put the state predicates
+            bauto = new BuechiAutomata();
 
-        std::vector<StatePredicate *> neededProperties;
-        std::map<StatePredicate *, int> neededProperties_backmap;
-
-        // read out the datastructure
-        int curState = -1;
-        int curProperty = 0;
-        for (s = bstates->prv; s != bstates; s = s->prv)
-        {
-            curState++;
-            if (s->id == 0)
+            // extract the states from the ltl2ba data structures
+            if (bstates->nxt == bstates)
             {
-                // build a TRUE-loop
-                bauto->isStateAccepting[curState] = true;
-                bauto->cardTransitions[curState] = 1;
-                bauto->transitions[curState] = (uint32_t **)calloc(1, sizeof(uint32_t *));
-                bauto->transitions[curState][0] = (uint32_t *)calloc(2, sizeof(uint32_t));
-                bauto->transitions[curState][0][0] = neededProperties.size();
-                bauto->transitions[curState][0][1] = curState;
-                curProperty++;
-                neededProperties.push_back(new TruePredicate());
-                neededProperties_backmap[neededProperties.back()] = curState;
-                continue;
-            }
-            if (s->final == accepting_state)
-            {
-                bauto->isStateAccepting[curState] = true;
+                // TODO the search result is FALSE!
+                rep->message("Not yet implemented, result FALSE");
+                rep->abort(ERROR_COMMANDLINE);
             }
 
-
-
-
-
-
-            // build the successor list
-            bauto->cardTransitions[curState] = 0;
-            for (t = s->trans->nxt; t != s->trans; t = t->nxt)
+            if (bstates->nxt->nxt == bstates && bstates->nxt->id == 0)
             {
-                // now build the property
-                std::vector<StatePredicate *> disjunctionproperty;
-                disjunctionproperty.push_back(buildPropertyFromList(t->pos, t->neg));
-                BTrans *t1;
-                for (t1 = t; t1->nxt != s->trans; )
+                // TODO the search result is TRUE!
+                rep->message("Not yet implemented, result TRUE");
+                rep->abort(ERROR_COMMANDLINE);
+            }
+
+            bauto->cardStates = 0;
+            // map-> final,id
+            std::map<int, std::map<int, int > > state_id;
+            BState *s;
+            BTrans *t;
+            for (s = bstates->prv; s != bstates; s = s->prv)
+            {
+                state_id[s->final][s->id] = bauto->cardStates;
+                bauto->cardStates++;
+            }
+
+            //rep->message("Buechi-automaton has %d states", bauto->cardStates);
+            // now i do know the number of states
+            bauto->cardTransitions = (uint32_t *)calloc(bauto->cardStates,
+                                     sizeof(uint32_t));
+            bauto->transitions = (uint32_t ** *)calloc(bauto->cardStates,
+                                 sizeof(uint32_t **));
+            bauto->cardEnabled = (index_t *)calloc(bauto->cardStates, SIZEOF_INDEX_T);
+            bauto->isStateAccepting = (bool *) calloc(bauto->cardStates, SIZEOF_BOOL);
+
+            std::vector<StatePredicate *> neededProperties;
+            std::map<StatePredicate *, int> neededProperties_backmap;
+
+            // read out the datastructure
+            int curState = -1;
+            int curProperty = 0;
+            for (s = bstates->prv; s != bstates; s = s->prv)
+            {
+                curState++;
+                if (s->id == 0)
                 {
-                    if (t1->nxt->to->id == t->to->id && t1->nxt->to->final == t->to->final)
+                    // build a TRUE-loop
+                    bauto->isStateAccepting[curState] = true;
+                    bauto->cardTransitions[curState] = 1;
+                    bauto->transitions[curState] = (uint32_t **)calloc(1, sizeof(uint32_t *));
+                    bauto->transitions[curState][0] = (uint32_t *)calloc(2, sizeof(uint32_t));
+                    bauto->transitions[curState][0][0] = neededProperties.size();
+                    bauto->transitions[curState][0][1] = curState;
+                    curProperty++;
+                    neededProperties.push_back(new TruePredicate());
+                    neededProperties_backmap[neededProperties.back()] = curState;
+                    continue;
+                }
+                if (s->final == accepting_state)
+                {
+                    bauto->isStateAccepting[curState] = true;
+                }
+
+
+
+
+
+
+                // build the successor list
+                bauto->cardTransitions[curState] = 0;
+                for (t = s->trans->nxt; t != s->trans; t = t->nxt)
+                {
+                    // now build the property
+                    std::vector<StatePredicate *> disjunctionproperty;
+                    disjunctionproperty.push_back(buildPropertyFromList(t->pos, t->neg));
+                    BTrans *t1;
+                    for (t1 = t; t1->nxt != s->trans; )
                     {
-                        disjunctionproperty.push_back(buildPropertyFromList(t1->nxt->pos,
-                                                      t1->nxt->neg));
-                        t1->nxt = t1->nxt->nxt;
+                        if (t1->nxt->to->id == t->to->id && t1->nxt->to->final == t->to->final)
+                        {
+                            disjunctionproperty.push_back(buildPropertyFromList(t1->nxt->pos,
+                                                          t1->nxt->neg));
+                            t1->nxt = t1->nxt->nxt;
+                        }
+                        else
+                        {
+                            t1 = t1->nxt;
+                        }
+                    }
+
+                    if (disjunctionproperty.size() == 1)
+                    {
+                        neededProperties.push_back(disjunctionproperty[0]);
                     }
                     else
                     {
-                        t1 = t1->nxt;
+                        DisjunctionStatePredicate *disjucntion = new DisjunctionStatePredicate(
+                            disjunctionproperty.size());
+                        for (int i = 0; i < disjunctionproperty.size(); i++)
+                        {
+                            disjucntion->addSub(i, disjunctionproperty[i]);
+                        }
+                        neededProperties.push_back(disjucntion);
                     }
+                    //rep->message("CREATE %d -> %d", neededProperties.size(), curState);
+                    neededProperties_backmap[neededProperties.back()] = curState;
+
+                    // increment number of transitions
+                    bauto->cardTransitions[curState]++;
                 }
 
-                if (disjunctionproperty.size() == 1)
+                bauto->transitions[curState] = (uint32_t **)calloc(
+                                                   bauto->cardTransitions[curState], SIZEOF_VOIDP);
+                int current_on_trans = -1;
+                for (t = s->trans->nxt; t != s->trans; t = t->nxt)
                 {
-                    neededProperties.push_back(disjunctionproperty[0]);
+                    // bauto data structures
+                    current_on_trans++;
+                    bauto->transitions[curState][current_on_trans] = (uint32_t *)calloc(2,
+                            sizeof(uint32_t));
+                    //rep->message("Transition %d -> %d", curState, state_id[t->to->final][t->to->id]);
+                    bauto->transitions[curState][current_on_trans][0] = curProperty++;
+                    bauto->transitions[curState][current_on_trans][1] =
+                        state_id[t->to->final][t->to->id];
+                    //rep->message("FROM TO %d %d", curState, state_id[t->to->final][t->to->id]);
                 }
-                else
-                {
-                    DisjunctionStatePredicate *disjucntion = new DisjunctionStatePredicate(
-                        disjunctionproperty.size());
-                    for (int i = 0; i < disjunctionproperty.size(); i++)
-                    {
-                        disjucntion->addSub(i, disjunctionproperty[i]);
-                    }
-                    neededProperties.push_back(disjucntion);
-                }
-                //rep->message("CREATE %d -> %d", neededProperties.size(), curState);
-                neededProperties_backmap[neededProperties.back()] = curState;
-
-                // increment number of transitions
-                bauto->cardTransitions[curState]++;
             }
 
-            bauto->transitions[curState] = (uint32_t **)calloc(
-                                               bauto->cardTransitions[curState], SIZEOF_VOIDP);
-            int current_on_trans = -1;
-            for (t = s->trans->nxt; t != s->trans; t = t->nxt)
+            //
+            // build a list of all needed propositions
+            //
+
+            // if the automata contains an all-accepting state
+            bauto->cardAtomicPropositions = neededProperties.size();
+            bauto->atomicPropositions = (StatePredicateProperty **)calloc(
+                                            bauto->cardAtomicPropositions, sizeof(StatePredicateProperty *));
+            bauto->atomicPropotions_backlist = (index_t *)calloc(
+                                                   bauto->cardAtomicPropositions, SIZEOF_INDEX_T);
+            for (int i = 0; i < neededProperties.size(); i++)
             {
-                // bauto data structures
-                current_on_trans++;
-                bauto->transitions[curState][current_on_trans] = (uint32_t *)calloc(2,
-                        sizeof(uint32_t));
-                //rep->message("Transition %d -> %d", curState, state_id[t->to->final][t->to->id]);
-                bauto->transitions[curState][current_on_trans][0] = curProperty++;
-                bauto->transitions[curState][current_on_trans][1] =
-                    state_id[t->to->final][t->to->id];
-                //rep->message("FROM TO %d %d", curState, state_id[t->to->final][t->to->id]);
+                bauto->atomicPropositions[i] = new StatePredicateProperty(neededProperties[i]);
+                //rep->message("BL %d %d", i, neededProperties_backmap[neededProperties[i]]);
+                bauto->atomicPropotions_backlist[i] =
+                    neededProperties_backmap[neededProperties[i]];
             }
+            break;
         }
-
-        //
-        // build a list of all needed propositions
-        //
-
-        // if the automata contains an all-accepting state
-        bauto->cardAtomicPropositions = neededProperties.size();
-        bauto->atomicPropositions = (StatePredicateProperty **)calloc(
-                                        bauto->cardAtomicPropositions, sizeof(StatePredicateProperty *));
-        bauto->atomicPropotions_backlist = (index_t *)calloc(
-                                               bauto->cardAtomicPropositions, SIZEOF_INDEX_T);
-        for (int i = 0; i < neededProperties.size(); i++)
-        {
-            bauto->atomicPropositions[i] = new StatePredicateProperty(neededProperties[i]);
-            //rep->message("BL %d %d", i, neededProperties_backmap[neededProperties[i]]);
-            bauto->atomicPropotions_backlist[i] =
-                neededProperties_backmap[neededProperties[i]];
-        }
-
-    }
-    else
-    {
+    
+    default:
         rep->message("check not yet implemented");
         rep->abort(ERROR_COMMANDLINE);
     }
 
-
     // tidy parser
     ptformula_lex_destroy();
+
     //delete TheFormula;
 
     if (args_info.formula_given)
@@ -941,7 +940,6 @@ void Task::printDot()
 }
 
 
-#include <sstream>
 /*!
  * \brief this method is only to test Store::popState() until its use case is implemented
  * \todo  remove me!

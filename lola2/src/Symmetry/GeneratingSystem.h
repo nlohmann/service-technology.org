@@ -4,8 +4,8 @@
 
 class GeneratingSystem
 {
- private:
-  
- public:
-  static void create();
+private:
+
+public:
+    static void create();
 };

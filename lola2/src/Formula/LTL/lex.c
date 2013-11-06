@@ -34,51 +34,60 @@
 #include <ctype.h>
 #include "ltl2ba.h"
 
-static tl_Symbol	*symtab[Nhash+1];
+static tl_Symbol	*symtab[Nhash + 1];
 static int	tl_lex(void);
 
 #define Token(y)        tl_yylval = tl_nn(y,ZN,ZN); return y
 
 int
 isalnum_(int c)
-{       return (isalnum(c) || c == '_');
+{
+    return (isalnum(c) || c == '_');
 }
 
 int
 hash(char *s)
-{       int h=0;
+{
+    int h = 0;
 
-        while (*s)
-        {       h += *s++;
-                h <<= 1;
-                if (h&(Nhash+1))
-                        h |= 1;
+    while (*s)
+    {
+        h += *s++;
+        h <<= 1;
+        if (h & (Nhash + 1))
+        {
+            h |= 1;
         }
-        return h&Nhash;
+    }
+    return h & Nhash;
 }
 
 tl_Symbol *
 tl_lookup(char *s)
-{	tl_Symbol *sp;
-	int h = hash(s);
+{
+    tl_Symbol *sp;
+    int h = hash(s);
 
-	for (sp = symtab[h]; sp; sp = sp->next)
-		if (strcmp(sp->name, s) == 0)
-			return sp;
+    for (sp = symtab[h]; sp; sp = sp->next)
+        if (strcmp(sp->name, s) == 0)
+        {
+            return sp;
+        }
 
-	sp = (tl_Symbol *) tl_emalloc(sizeof(tl_Symbol));
-	sp->name = (char *) tl_emalloc(strlen(s) + 1);
-	strcpy(sp->name, s);
-	sp->next = symtab[h];
-	symtab[h] = sp;
+    sp = (tl_Symbol *) tl_emalloc(sizeof(tl_Symbol));
+    sp->name = (char *) tl_emalloc(strlen(s) + 1);
+    strcpy(sp->name, s);
+    sp->next = symtab[h];
+    symtab[h] = sp;
 
-	return sp;
+    return sp;
 }
 
 tl_Symbol *
 getsym(tl_Symbol *s)
-{	tl_Symbol *n = (tl_Symbol *) tl_emalloc(sizeof(tl_Symbol));
+{
+    tl_Symbol *n = (tl_Symbol *) tl_emalloc(sizeof(tl_Symbol));
 
-	n->name = s->name;
-	return n;
+    n->name = s->name;
+    return n;
 }

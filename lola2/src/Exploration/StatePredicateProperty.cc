@@ -16,14 +16,14 @@
 #include <stdlib.h>
 #include <Net/Marking.h>
 
-StatePredicateProperty::StatePredicateProperty(StatePredicate* f)
+StatePredicateProperty::StatePredicateProperty(StatePredicate *f)
 {
     // set formula
     predicate = f;
     f->top = f;
 
     index_t cardAtomic = f->countAtomic();
-    AtomicStatePredicate** atomic = (AtomicStatePredicate**) malloc(
+    AtomicStatePredicate **atomic = (AtomicStatePredicate **) malloc(
                                         cardAtomic * SIZEOF_VOIDP);
     f->collectAtomic(atomic);
 
@@ -33,15 +33,15 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate* f)
         atomic[i]->setUpSet();
     }
 
-    cardChanged = (index_t*) calloc(Net::Card[TR], SIZEOF_INDEX_T);
-    changedPredicate = (AtomicStatePredicate***) malloc(
+    cardChanged = (index_t *) calloc(Net::Card[TR], SIZEOF_INDEX_T);
+    changedPredicate = (AtomicStatePredicate ** *) malloc(
                            SIZEOF_VOIDP * Net::Card[TR]);
-    changedSum = (int**) malloc(SIZEOF_VOIDP * Net::Card[TR]);
+    changedSum = (int **) malloc(SIZEOF_VOIDP * Net::Card[TR]);
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
-        changedPredicate[t] = (AtomicStatePredicate**) malloc(
+        changedPredicate[t] = (AtomicStatePredicate **) malloc(
                                   SIZEOF_VOIDP * cardAtomic);
-        changedSum[t] = (int*) malloc(SIZEOF_INDEX_T * cardAtomic);
+        changedSum[t] = (int *) malloc(SIZEOF_INDEX_T * cardAtomic);
         for (index_t i = 0; i < cardAtomic; i++)
         {
             int s = 0;
@@ -100,10 +100,10 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate* f)
                 changedSum[t][cardChanged[t]++] = s;
             }
         }
-        changedPredicate[t] = (AtomicStatePredicate**) realloc(
+        changedPredicate[t] = (AtomicStatePredicate **) realloc(
                                   changedPredicate[t], SIZEOF_VOIDP * cardChanged[t]);
-        changedSum[t] = (int*) realloc(changedSum[t],
-                                       SIZEOF_INDEX_T * cardChanged[t]);
+        changedSum[t] = (int *) realloc(changedSum[t],
+                                        SIZEOF_INDEX_T * cardChanged[t]);
     }
     free(atomic);
 }
@@ -150,9 +150,9 @@ bool StatePredicateProperty::updateProperty(NetState &ns, index_t t)
 }
 
 
-SimpleProperty* StatePredicateProperty::copy()
+SimpleProperty *StatePredicateProperty::copy()
 {
-    StatePredicateProperty* spp = new StatePredicateProperty(predicate->copy());
+    StatePredicateProperty *spp = new StatePredicateProperty(predicate->copy());
     spp->stack = stack;
     spp->value = value;
     return spp;

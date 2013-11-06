@@ -14,7 +14,7 @@
 
 
 /// Generate and initialize a symbol
-TransitionSymbol::TransitionSymbol(char* k, fairnessAssumption_t f, ArcList* pr, ArcList* po)
+TransitionSymbol::TransitionSymbol(char *k, fairnessAssumption_t f, ArcList *pr, ArcList *po)
     :
     Symbol(k),
     fairness(f),
@@ -24,14 +24,14 @@ TransitionSymbol::TransitionSymbol(char* k, fairnessAssumption_t f, ArcList* pr,
     Pre(pr)
 {
     // count incoming arcs at transition and at places
-    for (ArcList* a = Pre; a; a = a -> getNext())
+    for (ArcList *a = Pre; a; a = a -> getNext())
     {
         ++cardPre;
         a -> getPlace() -> notifyPost();
     }
 
     // count outgoing arcs
-    for (ArcList* a = Post; a; a = a -> getNext())
+    for (ArcList *a = Post; a; a = a -> getNext())
     {
         ++cardPost;
         a -> getPlace() -> notifyPre();
@@ -51,13 +51,13 @@ unsigned int TransitionSymbol::getCardPost() const
 }
 
 /// Getter for incoming arcs
-ArcList* TransitionSymbol::getPre() const
+ArcList *TransitionSymbol::getPre() const
 {
     return Pre;
 }
 
 /// Getter for number of post-places
-ArcList* TransitionSymbol::getPost() const
+ArcList *TransitionSymbol::getPost() const
 {
     return Post;
 }
@@ -73,13 +73,13 @@ TransitionSymbol::~TransitionSymbol()
 {
     while (Pre)
     {
-        ArcList* tmp = Pre;
+        ArcList *tmp = Pre;
         Pre = Pre -> getNext();
         delete tmp;
     }
     while (Post)
     {
-        ArcList* tmp = Post;
+        ArcList *tmp = Post;
         Post = Post -> getNext();
         delete tmp;
     }

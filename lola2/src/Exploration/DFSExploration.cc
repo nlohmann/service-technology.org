@@ -23,10 +23,11 @@ Actual property is a parameter of the constructor
 #include <cmdline.h>
 
 extern gengetopt_args_info args_info;
-extern Reporter* rep;
+extern Reporter *rep;
 
 
-bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<void> &myStore, Firelist &myFirelist, int threadNumber)
+bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<void> &myStore,
+                                 Firelist &myFirelist, int threadNumber)
 {
     //// copy initial marking into current marking
     //Marking::init();
@@ -43,10 +44,10 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<v
     // add initial marking to store
     // we do not care about return value since we know that store is empty
 
-    myStore.searchAndInsert(ns,0,0);
+    myStore.searchAndInsert(ns, 0, 0);
 
     // get first firelist
-    index_t* currentFirelist;
+    index_t *currentFirelist;
     index_t currentEntry = myFirelist.getFirelist(ns, &currentFirelist);
 
     while (true) // exit when trying to pop from empty stack
@@ -58,7 +59,7 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<v
             // fire this transition to produce new Marking::Current
             Transition::fire(ns, currentFirelist[currentEntry]);
 
-            if (myStore.searchAndInsert(ns,0,0))
+            if (myStore.searchAndInsert(ns, 0, 0))
             {
                 // State exists! -->backtracking to previous state
                 Transition::backfire(ns, currentFirelist[currentEntry]);
@@ -76,13 +77,13 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<v
                     // this way, the stack contains ALL transitions
                     // of witness path
                     SimpleStackEntry *stack = property.stack.push();
-                    stack = new ((void *) stack) SimpleStackEntry(currentFirelist,currentEntry);
+                    stack = new ((void *) stack) SimpleStackEntry(currentFirelist, currentEntry);
                     return true;
                 }
 
                 // Here: current marking does not satisfy property --> continue search
                 SimpleStackEntry *stack = property.stack.push();
-                stack = new (stack) SimpleStackEntry(currentFirelist,currentEntry);
+                stack = new (stack) SimpleStackEntry(currentFirelist, currentEntry);
                 currentEntry = myFirelist.getFirelist(ns, &currentFirelist);
             } // end else branch for "if state exists"
         }
@@ -95,7 +96,7 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<v
                 // have completely processed initial marking --> state not found
                 return false;
             }
-            SimpleStackEntry & stack = property.stack.top();
+            SimpleStackEntry &stack = property.stack.top();
             currentEntry = stack.current;
             currentFirelist = stack.fl;
             stack.fl = NULL;
@@ -108,7 +109,8 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<v
     }
 }
 
-bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned int attempts, unsigned int maxdepth, Firelist &myFirelist, EmptyStore<void> &s, ChooseTransition &c)
+bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned int attempts,
+                               unsigned int maxdepth, Firelist &myFirelist, EmptyStore<void> &s, ChooseTransition &c)
 {
     // this table counts hits for various hash buckets. This is used for steering
     // search into less frequently entered areas of the state space.
@@ -116,7 +118,7 @@ bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned 
     unsigned int currentattempt = 0;
 
     // get memory for path info
-    index_t* path = (index_t*) malloc(SIZEOF_INDEX_T * maxdepth);
+    index_t *path = (index_t *) malloc(SIZEOF_INDEX_T * maxdepth);
     //    // copy initial marking into current marking
     //    Marking::init();
     //
@@ -176,10 +178,10 @@ bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned 
         for (index_t depth = 0; depth < maxdepth; ++depth)
         {
             // register this transition's firing
-            s.searchAndInsert(ns,0,0);
+            s.searchAndInsert(ns, 0, 0);
 
             // get firelist
-            index_t* currentFirelist;
+            index_t *currentFirelist;
             index_t cardFirelist = myFirelist.getFirelist(ns, &currentFirelist);
             if (!cardFirelist)
             {
@@ -207,9 +209,10 @@ bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned 
     return false;
 }
 
-bool DFSExploration::sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore, Firelist &myFirelist, int frontNumber, int threadNumber)
+bool DFSExploration::sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore,
+                               Firelist &myFirelist, int frontNumber, int threadNumber)
 {
-	Sweep<void> s(property, ns, myStore, myFirelist, frontNumber, threadNumber);
-	return s.run();
+    Sweep<void> s(property, ns, myStore, myFirelist, frontNumber, threadNumber);
+    return s.run();
 }
 

@@ -26,12 +26,12 @@ String::String(const String &other) : s(strdup(other.s))
       freed by the constructor. DO NOT use this constructor with const char*,
       string literals, or anything that should live longer than this object
 */
-String::String(char* s) : s(s)
+String::String(char *s) : s(s)
 {
     assert(s);
 }
 
-String::String(char* st, bool) : s(strdup(st))
+String::String(char *st, bool) : s(strdup(st))
 {
     assert(st);
     assert(s);
@@ -46,7 +46,7 @@ String::~String()
     free(s);
 }
 
-char* String::str() const
+char *String::str() const
 {
     return s;
 }

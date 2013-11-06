@@ -25,7 +25,7 @@
 #include <InputOutput/Reporter.h>
 #include <InputOutput/SimpleString.h>
 
-extern Reporter* rep;
+extern Reporter *rep;
 extern gengetopt_args_info args_info;
 
 pthread_t Handlers::terminationHandler_thread;
@@ -62,12 +62,14 @@ secret via socket. Once the message is received, LoLA's execution is
 terminated by calling sending the SIGUSR1/SIGUSR2 signals which are processed
 in Handlers::signalTerminationHandler().
 */
-void* Handlers::remoteTerminationHandler(void*)
+void *Handlers::remoteTerminationHandler(void *)
 {
     Socket listener_socket(args_info.inputport_arg);
-    char* sender = listener_socket.waitFor(args_info.remoteTermination_arg);
+    char *sender = listener_socket.waitFor(args_info.remoteTermination_arg);
     assert(sender);
-    rep->message("received %s packet (%s) from %s - shutting down", rep->markup(MARKUP_BAD, "KILL").str(), rep->markup(MARKUP_IMPORTANT, args_info.remoteTermination_arg).str(), rep->markup(MARKUP_FILE, sender).str());
+    rep->message("received %s packet (%s) from %s - shutting down",
+                 rep->markup(MARKUP_BAD, "KILL").str(), rep->markup(MARKUP_IMPORTANT,
+                         args_info.remoteTermination_arg).str(), rep->markup(MARKUP_FILE, sender).str());
     free(sender);
 
     // abort LoLA by sending SIGUSR1 signal
@@ -78,8 +80,10 @@ void* Handlers::remoteTerminationHandler(void*)
 
 void Handlers::statistics()
 {
-    std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
-    FILE* ps = popen(call.c_str(), "r");
+    std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " +
+                       PACKAGE + " | " + TOOL_AWK +
+                       " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
+    FILE *ps = popen(call.c_str(), "r");
     unsigned int memory;
     int res = fscanf(ps, "%u", &memory);
     assert(res != EOF);
@@ -145,9 +149,12 @@ void Handlers::installTerminationHandlers()
     // start up listener thread
     if (args_info.remoteTermination_given)
     {
-        rep->status("setting up listener socket at port %s - secret is %s", rep->markup(MARKUP_FILE, "%d", args_info.inputport_arg).str(), rep->markup(MARKUP_IMPORTANT, args_info.remoteTermination_arg).str());
+        rep->status("setting up listener socket at port %s - secret is %s",
+                    rep->markup(MARKUP_FILE, "%d", args_info.inputport_arg).str(),
+                    rep->markup(MARKUP_IMPORTANT, args_info.remoteTermination_arg).str());
 
-        const int ret = pthread_create(&terminationHandler_thread, NULL, remoteTerminationHandler, NULL);
+        const int ret = pthread_create(&terminationHandler_thread, NULL,
+                                       remoteTerminationHandler, NULL);
         if (UNLIKELY(ret != 0))
         {
             rep->status("thread could not be created");

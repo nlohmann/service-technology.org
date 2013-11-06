@@ -29,16 +29,16 @@ public:
 public:
     /// If symbol with same key is in table: return false
     /// If symbol with same key is not in table: return true and insert it
-    bool insert(Symbol*);
+    bool insert(Symbol *);
 
     /// If key is in table: return corresponding symbol
     /// If key is not in table: return NULL
-    Symbol* lookup(const char*) const;
+    Symbol *lookup(const char *) const;
 
     /// Initialize iteration; return NULL if table empty
-    Symbol* first();
+    Symbol *first();
     /// Continue iteration; return NULL if there is none
-    Symbol* next();
+    Symbol *next();
 
     /// Generate and initialize a symbol table
     SymbolTable();
@@ -53,14 +53,14 @@ public:
 
 private:
     /// The actual symbol table. It gets pointers as we use lists for collisions.
-    Symbol** table;
+    Symbol **table;
 
     /// The hash function to be used
-    unsigned int hash(const char*) const;
+    unsigned int hash(const char *) const;
 
     /// The index of the current element in iteration
     unsigned int currentIndex;
 
     /// Points to the current element in iteration
-    Symbol* currentSymbol;
+    Symbol *currentSymbol;
 };

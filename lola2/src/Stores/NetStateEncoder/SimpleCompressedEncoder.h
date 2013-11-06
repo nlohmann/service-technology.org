@@ -37,13 +37,14 @@ public:
     /// destructor; frees all memory used for auxiliary data structure (namely "inputs").
     ~SimpleCompressedEncoder();
 
-    vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex);
+    vectordata_t *encodeNetState(NetState &ns, bitindex_t &bitlen, index_t threadIndex);
 private:
     /// adds the numbits least significant bits of val to the input vector
-    void addToInput(capacity_t val, bitindex_t numbits, vectordata_t*& pInput, bitindex_t& input_bitstogo);
+    void addToInput(capacity_t val, bitindex_t numbits, vectordata_t *&pInput,
+                    bitindex_t &input_bitstogo);
 
     /// vector of input vectors that are returned from encodeNetState. Each thread has its own vector to avoid conflicts.
-    vectordata_t** inputs;
+    vectordata_t **inputs;
 
     /// maximum number of words necessary in input vector (fixed for all threads)
     index_t insize;

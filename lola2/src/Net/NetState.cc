@@ -13,12 +13,12 @@
 #include <cstdlib>
 #include <algorithm>
 
-NetState* NetState::createNetStateFromInitial()
+NetState *NetState::createNetStateFromInitial()
 {
-    NetState* ns = new NetState();
+    NetState *ns = new NetState();
     ns->membersInitialized = true;
     // copy the current marking at its hash
-    ns->Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
+    ns->Current = (capacity_t *) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
     for (int i = 0; i < Net::Card[PL]; i++)
     {
         ns->Current[i] = Marking::Initial[i];
@@ -26,7 +26,7 @@ NetState* NetState::createNetStateFromInitial()
     ns->HashCurrent = Marking::HashInitial;
 
     // copy the currently enabled transitions
-    ns->Enabled = (bool*) malloc(Net::Card[TR] * SIZEOF_BOOL);
+    ns->Enabled = (bool *) malloc(Net::Card[TR] * SIZEOF_BOOL);
     for (int i = 0; i < Net::Card[TR]; i++)
     {
         ns->Enabled[i] = Transition::Enabled[i];
@@ -34,7 +34,7 @@ NetState* NetState::createNetStateFromInitial()
     ns->CardEnabled = Transition::CardEnabled;
 
     // copy current scapegoats
-    ns->PositionScapegoat = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    ns->PositionScapegoat = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
     for (int i = 0; i < Net::Card[TR]; i++)
     {
         ns->PositionScapegoat[i] = Transition::PositionScapegoat[i];
@@ -45,9 +45,9 @@ NetState* NetState::createNetStateFromInitial()
     {
         for (int direction = PRE; direction <= POST; direction++)
         {
-            ns->Arc[type][direction] = (index_t**) malloc(
+            ns->Arc[type][direction] = (index_t **) malloc(
                                            Net::Card[type] * SIZEOF_VOIDP);
-            ns->Mult[type][direction] = (mult_t**) malloc(
+            ns->Mult[type][direction] = (mult_t **) malloc(
                                             Net::Card[type] * SIZEOF_VOIDP);
         }
     }
@@ -57,14 +57,14 @@ NetState* NetState::createNetStateFromInitial()
     {
         // allocate memory for place's arcs (is copied later with transitions)
         // pre-Zone
-        ns->Arc[PL][PRE][i] = (index_t*) malloc(
+        ns->Arc[PL][PRE][i] = (index_t *) malloc(
                                   Net::CardArcs[PL][PRE][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
         {
             ns->Arc[PL][PRE][i][j] = Net::Arc[PL][PRE][i][j];
         }
 
-        ns->Mult[PL][PRE][i] = (mult_t*) malloc(
+        ns->Mult[PL][PRE][i] = (mult_t *) malloc(
                                    Net::CardArcs[PL][PRE][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
         {
@@ -73,14 +73,14 @@ NetState* NetState::createNetStateFromInitial()
 
 
         // post-Zone
-        ns->Arc[PL][POST][i] = (index_t*) malloc(
+        ns->Arc[PL][POST][i] = (index_t *) malloc(
                                    Net::CardArcs[PL][POST][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
         {
             ns->Arc[PL][POST][i][j] = Net::Arc[PL][POST][i][j];
         }
 
-        ns->Mult[PL][POST][i] = (mult_t*) malloc(
+        ns->Mult[PL][POST][i] = (mult_t *) malloc(
                                     Net::CardArcs[PL][POST][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
         {
@@ -93,14 +93,14 @@ NetState* NetState::createNetStateFromInitial()
     {
         // allocate memory for place's arcs (is copied later with transitions)
         // pre-Zone
-        ns->Arc[TR][PRE][i] = (index_t*) malloc(
+        ns->Arc[TR][PRE][i] = (index_t *) malloc(
                                   Net::CardArcs[TR][PRE][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[TR][PRE][i]; j++)
         {
             ns->Arc[TR][PRE][i][j] = Net::Arc[TR][PRE][i][j];
         }
 
-        ns->Mult[TR][PRE][i] = (mult_t*) malloc(
+        ns->Mult[TR][PRE][i] = (mult_t *) malloc(
                                    Net::CardArcs[TR][PRE][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[TR][PRE][i]; j++)
         {
@@ -109,14 +109,14 @@ NetState* NetState::createNetStateFromInitial()
 
 
         // post-Zone
-        ns->Arc[TR][POST][i] = (index_t*) malloc(
+        ns->Arc[TR][POST][i] = (index_t *) malloc(
                                    Net::CardArcs[TR][POST][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[TR][POST][i]; j++)
         {
             ns->Arc[TR][POST][i][j] = Net::Arc[TR][POST][i][j];
         }
 
-        ns->Mult[TR][POST][i] = (mult_t*) malloc(
+        ns->Mult[TR][POST][i] = (mult_t *) malloc(
                                     Net::CardArcs[TR][POST][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[TR][POST][i]; j++)
         {
@@ -126,18 +126,18 @@ NetState* NetState::createNetStateFromInitial()
 
 
     // copy currently disabled
-    ns->CardDisabled = (index_t*) calloc(Net::Card[PL] , SIZEOF_INDEX_T);
-    ns->Disabled = (index_t**) malloc(Net::Card[PL] * SIZEOF_VOIDP);
+    ns->CardDisabled = (index_t *) calloc(Net::Card[PL] , SIZEOF_INDEX_T);
+    ns->Disabled = (index_t **) malloc(Net::Card[PL] * SIZEOF_VOIDP);
     for (int i = 0; i < Net::Card[PL]; i++)
     {
         ns->CardDisabled[i] = Place::CardDisabled[i];
-        ns->Disabled[i] = (index_t*) malloc(Net::CardArcs[PL][POST][i] * SIZEOF_INDEX_T);
+        ns->Disabled[i] = (index_t *) malloc(Net::CardArcs[PL][POST][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
         {
             ns->Disabled[i][j] = Place::Disabled[i][j];
         }
     }
-    
+
     return ns;
 }
 
@@ -153,7 +153,7 @@ NetState::NetState(const NetState &ons)
 {
     membersInitialized = true;
     // copy the current marking at its hash
-    Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
+    Current = (capacity_t *) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
     for (int i = 0; i < Net::Card[PL]; i++)
     {
         Current[i] = ons.Current[i];
@@ -161,7 +161,7 @@ NetState::NetState(const NetState &ons)
     HashCurrent = ons.HashCurrent;
 
     // copy the currently enabled transitions
-    Enabled = (bool*) malloc(Net::Card[TR] * SIZEOF_BOOL);
+    Enabled = (bool *) malloc(Net::Card[TR] * SIZEOF_BOOL);
     for (int i = 0; i < Net::Card[TR]; i++)
     {
         Enabled[i] = ons.Enabled[i];
@@ -169,7 +169,7 @@ NetState::NetState(const NetState &ons)
     CardEnabled = ons.CardEnabled;
 
     // copy current scapegoats
-    PositionScapegoat = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    PositionScapegoat = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
     for (int i = 0; i < Net::Card[TR]; i++)
     {
         PositionScapegoat[i] = ons.PositionScapegoat[i];
@@ -180,9 +180,9 @@ NetState::NetState(const NetState &ons)
     {
         for (int direction = PRE; direction <= POST; direction++)
         {
-            Arc[type][direction] = (index_t**) malloc(
+            Arc[type][direction] = (index_t **) malloc(
                                        Net::Card[type] * SIZEOF_VOIDP);
-            Mult[type][direction] = (mult_t**) malloc(
+            Mult[type][direction] = (mult_t **) malloc(
                                         Net::Card[type] * SIZEOF_VOIDP);
         }
     }
@@ -192,14 +192,14 @@ NetState::NetState(const NetState &ons)
     {
         // allocate memory for place's arcs (is copied later with transitions)
         // pre-Zone
-        Arc[PL][PRE][i] = (index_t*) malloc(
+        Arc[PL][PRE][i] = (index_t *) malloc(
                               Net::CardArcs[PL][PRE][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
         {
             Arc[PL][PRE][i][j] = ons.Arc[PL][PRE][i][j];
         }
 
-        Mult[PL][PRE][i] = (mult_t*) malloc(
+        Mult[PL][PRE][i] = (mult_t *) malloc(
                                Net::CardArcs[PL][PRE][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
         {
@@ -208,14 +208,14 @@ NetState::NetState(const NetState &ons)
 
 
         // post-Zone
-        Arc[PL][POST][i] = (index_t*) malloc(
+        Arc[PL][POST][i] = (index_t *) malloc(
                                Net::CardArcs[PL][POST][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
         {
             Arc[PL][POST][i][j] = ons.Arc[PL][POST][i][j];
         }
 
-        Mult[PL][POST][i] = (mult_t*) malloc(
+        Mult[PL][POST][i] = (mult_t *) malloc(
                                 Net::CardArcs[PL][POST][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
         {
@@ -228,14 +228,14 @@ NetState::NetState(const NetState &ons)
     {
         // allocate memory for place's arcs (is copied later with transitions)
         // pre-Zone
-        Arc[TR][PRE][i] = (index_t*) malloc(
+        Arc[TR][PRE][i] = (index_t *) malloc(
                               Net::CardArcs[TR][PRE][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[TR][PRE][i]; j++)
         {
             Arc[TR][PRE][i][j] = ons.Arc[TR][PRE][i][j];
         }
 
-        Mult[TR][PRE][i] = (mult_t*) malloc(
+        Mult[TR][PRE][i] = (mult_t *) malloc(
                                Net::CardArcs[TR][PRE][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[TR][PRE][i]; j++)
         {
@@ -244,14 +244,14 @@ NetState::NetState(const NetState &ons)
 
 
         // post-Zone
-        Arc[TR][POST][i] = (index_t*) malloc(
+        Arc[TR][POST][i] = (index_t *) malloc(
                                Net::CardArcs[TR][POST][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[TR][POST][i]; j++)
         {
             Arc[TR][POST][i][j] = ons.Arc[TR][POST][i][j];
         }
 
-        Mult[TR][POST][i] = (mult_t*) malloc(
+        Mult[TR][POST][i] = (mult_t *) malloc(
                                 Net::CardArcs[TR][POST][i] * SIZEOF_MULT_T);
         for (int j = 0; j < Net::CardArcs[TR][POST][i]; j++)
         {
@@ -261,12 +261,12 @@ NetState::NetState(const NetState &ons)
 
 
     // copy currently disabled
-    CardDisabled = (index_t*) calloc(Net::Card[PL] , SIZEOF_INDEX_T);
-    Disabled = (index_t**) malloc(Net::Card[PL] * SIZEOF_VOIDP);
+    CardDisabled = (index_t *) calloc(Net::Card[PL] , SIZEOF_INDEX_T);
+    Disabled = (index_t **) malloc(Net::Card[PL] * SIZEOF_VOIDP);
     for (int i = 0; i < Net::Card[PL]; i++)
     {
         CardDisabled[i] = ons.CardDisabled[i];
-        Disabled[i] = (index_t*) malloc(Net::CardArcs[PL][POST][i] * SIZEOF_INDEX_T);
+        Disabled[i] = (index_t *) malloc(Net::CardArcs[PL][POST][i] * SIZEOF_INDEX_T);
         for (int j = 0; j < Net::CardArcs[PL][POST][i]; j++)
         {
             Disabled[i][j] = ons.Disabled[i][j];
@@ -276,8 +276,8 @@ NetState::NetState(const NetState &ons)
 
 NetState &NetState::operator=(const NetState &ns)
 {
-	NetState tmp(ns); // copy and swap
-	swap(tmp);
+    NetState tmp(ns); // copy and swap
+    swap(tmp);
     return *this;
 }
 
@@ -307,7 +307,9 @@ void NetState::swap(NetState &ns)
 void NetState::deleteAllMembers()
 {
     if (!membersInitialized)
+    {
         return;
+    }
 
     free(Current);
     free(Enabled);

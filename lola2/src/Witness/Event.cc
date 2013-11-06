@@ -3,8 +3,8 @@
 #include <Witness/Condition.h>
 #include <Net/Net.h>
 
-std::map<index_t, Event*> Event::current;
-std::vector<Event*> Event::events;
+std::map<index_t, Event *> Event::current;
+std::vector<Event *> Event::events;
 
 Event::Event(index_t t) : transition(t), target(false)
 {
@@ -26,19 +26,21 @@ Event::Event(index_t t) : transition(t), target(false)
     }
 }
 
-void Event::dot(FILE* o)
+void Event::dot(FILE *o)
 {
     assert(o);
 
-    for (std::vector<Event*>::iterator e = events.begin(); e != events.end(); ++e)
+    for (std::vector<Event *>::iterator e = events.begin(); e != events.end(); ++e)
     {
         if ((*e)->target)
         {
-            fprintf(o, "  e%p [label=\"%s\" shape=box width=.5 fixedsize=true color=green]\n", (void*)*e, Net::Name[TR][(*e)->transition]);
+            fprintf(o, "  e%p [label=\"%s\" shape=box width=.5 fixedsize=true color=green]\n", (void *)*e,
+                    Net::Name[TR][(*e)->transition]);
         }
         else
         {
-            fprintf(o, "  e%p [label=\"%s\" shape=box width=.5 fixedsize=true]\n", (void*)*e, Net::Name[TR][(*e)->transition]);
+            fprintf(o, "  e%p [label=\"%s\" shape=box width=.5 fixedsize=true]\n", (void *)*e,
+                    Net::Name[TR][(*e)->transition]);
         }
     }
 }

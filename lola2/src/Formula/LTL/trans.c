@@ -35,135 +35,185 @@
 extern int tl_verbose, tl_terse, tl_errs;
 extern FILE	*tl_out;
 
-int	Stack_mx=0, Max_Red=0, Total=0;
+int	Stack_mx = 0, Max_Red = 0, Total = 0;
 static char	dumpbuf[2048];
 
 int
 only_nxt(tl_Node *n)
 {
-        switch (n->ntyp) {
-        case NEXT:
-                return 1;
-        case OR:
-        case AND:
-                return only_nxt(n->rgt) && only_nxt(n->lft);
-        default:
-                return 0;
-        }
+    switch (n->ntyp)
+    {
+    case NEXT:
+        return 1;
+    case OR:
+    case AND:
+        return only_nxt(n->rgt) && only_nxt(n->lft);
+    default:
+        return 0;
+    }
 }
 
 int
 dump_cond(tl_Node *pp, tl_Node *r, int first)
-{       tl_Node *q;
-        int frst = first;
+{
+    tl_Node *q;
+    int frst = first;
 
-        if (!pp) return frst;
+    if (!pp)
+    {
+        return frst;
+    }
 
-        q = dupnode(pp);
-        q = rewrite(q);
+    q = dupnode(pp);
+    q = rewrite(q);
 
-        if (q->ntyp == PREDICATE
-        ||  q->ntyp == NOT
+    if (q->ntyp == PREDICATE
+            ||  q->ntyp == NOT
 #ifndef NXT
-        ||  q->ntyp == OR
+            ||  q->ntyp == OR
 #endif
-        ||  q->ntyp == FALSE)
-        {       if (!frst) fprintf(tl_out, " && ");
-                dump(q);
-                frst = 0;
-        } else if (q->ntyp == OR)
-        {       if (!frst) fprintf(tl_out, " && ");
-                fprintf(tl_out, "((");
-                frst = dump_cond(q->lft, r, 1);
-
-                if (!frst)
-                        fprintf(tl_out, ") || (");
-                else
-                {       if (only_nxt(q->lft))
-                        {       fprintf(tl_out, "1))");
-                                return 0;
-                        }
-                }
-
-                frst = dump_cond(q->rgt, r, 1);
-
-                if (frst)
-                {       if (only_nxt(q->rgt))
-                                fprintf(tl_out, "1");
-                        else
-                                fprintf(tl_out, "0");
-                        frst = 0;
-                }
-
-                fprintf(tl_out, "))");
-        } else  if (q->ntyp == V_OPER
-                && !anywhere(AND, q->rgt, r))
-        {       frst = dump_cond(q->rgt, r, frst);
-        } else  if (q->ntyp == AND)
+            ||  q->ntyp == FALSE)
+    {
+        if (!frst)
         {
-                frst = dump_cond(q->lft, r, frst);
-                frst = dump_cond(q->rgt, r, frst);
+            fprintf(tl_out, " && ");
+        }
+        dump(q);
+        frst = 0;
+    }
+    else if (q->ntyp == OR)
+    {
+        if (!frst)
+        {
+            fprintf(tl_out, " && ");
+        }
+        fprintf(tl_out, "((");
+        frst = dump_cond(q->lft, r, 1);
+
+        if (!frst)
+        {
+            fprintf(tl_out, ") || (");
+        }
+        else
+        {
+            if (only_nxt(q->lft))
+            {
+                fprintf(tl_out, "1))");
+                return 0;
+            }
         }
 
-        return frst;
+        frst = dump_cond(q->rgt, r, 1);
+
+        if (frst)
+        {
+            if (only_nxt(q->rgt))
+            {
+                fprintf(tl_out, "1");
+            }
+            else
+            {
+                fprintf(tl_out, "0");
+            }
+            frst = 0;
+        }
+
+        fprintf(tl_out, "))");
+    }
+    else  if (q->ntyp == V_OPER
+              && !anywhere(AND, q->rgt, r))
+    {
+        frst = dump_cond(q->rgt, r, frst);
+    }
+    else  if (q->ntyp == AND)
+    {
+        frst = dump_cond(q->lft, r, frst);
+        frst = dump_cond(q->rgt, r, frst);
+    }
+
+    return frst;
 }
 
 static void
 sdump(tl_Node *n)
 {
-	switch (n->ntyp) {
-	case PREDICATE:	strcat(dumpbuf, n->sym->name);
-			break;
-	case U_OPER:	strcat(dumpbuf, "U");
-			goto common2;
-	case V_OPER:	strcat(dumpbuf, "V");
-			goto common2;
-	case OR:	strcat(dumpbuf, "|");
-			goto common2;
-	case AND:	strcat(dumpbuf, "&");
-common2:		sdump(n->rgt);
-common1:		sdump(n->lft);
-			break;
-	case NEXT:	strcat(dumpbuf, "X");
-			goto common1;
-	case NOT:	strcat(dumpbuf, "!");
-			goto common1;
-	case TRUE:	strcat(dumpbuf, "T");
-			break;
-	case FALSE:	strcat(dumpbuf, "F");
-			break;
-	default:	strcat(dumpbuf, "?");
-			break;
-	}
+    switch (n->ntyp)
+    {
+    case PREDICATE:
+        strcat(dumpbuf, n->sym->name);
+        break;
+    case U_OPER:
+        strcat(dumpbuf, "U");
+        goto common2;
+    case V_OPER:
+        strcat(dumpbuf, "V");
+        goto common2;
+    case OR:
+        strcat(dumpbuf, "|");
+        goto common2;
+    case AND:
+        strcat(dumpbuf, "&");
+common2:
+        sdump(n->rgt);
+common1:
+        sdump(n->lft);
+        break;
+    case NEXT:
+        strcat(dumpbuf, "X");
+        goto common1;
+    case NOT:
+        strcat(dumpbuf, "!");
+        goto common1;
+    case TRUE:
+        strcat(dumpbuf, "T");
+        break;
+    case FALSE:
+        strcat(dumpbuf, "F");
+        break;
+    default:
+        strcat(dumpbuf, "?");
+        break;
+    }
 }
 
 tl_Symbol *
 DoDump(tl_Node *n)
 {
-	if (!n) return ZS;
+    if (!n)
+    {
+        return ZS;
+    }
 
-	if (n->ntyp == PREDICATE)
-		return n->sym;
+    if (n->ntyp == PREDICATE)
+    {
+        return n->sym;
+    }
 
-	dumpbuf[0] = '\0';
-	sdump(n);
-	return tl_lookup(dumpbuf);
+    dumpbuf[0] = '\0';
+    sdump(n);
+    return tl_lookup(dumpbuf);
 }
 
 void trans(tl_Node *p)
-{	
-  if (!p || tl_errs) return;
-  
-  if (tl_verbose || tl_terse) {	
-    fprintf(tl_out, "\t/* Normlzd: ");
-    dump(p);
-    fprintf(tl_out, " */\n");
-  }
-  if (tl_terse)
-    return;
+{
+    if (!p || tl_errs)
+    {
+        return;
+    }
 
-  mk_alternating(p);
-  mk_generalized();
-  mk_buchi();
+    if (tl_verbose || tl_terse)
+    {
+        fprintf(tl_out, "\t/* Normlzd: ");
+        dump(p);
+        fprintf(tl_out, " */\n");
+    }
+    if (tl_terse)
+    {
+        return;
+    }
+
+    mk_alternating(p);
+    mk_generalized();
+    mk_buchi();
 }
 

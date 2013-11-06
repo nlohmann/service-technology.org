@@ -28,7 +28,7 @@ ASCII file where data are separated by spaces and newlines
 #include <Net/Transition.h>
 
 
-void WriteNameFile(FILE* f)
+void WriteNameFile(FILE *f)
 {
     // 1. Number of places
     fprintf(f, "%u\n", Net::Card[PL]);
@@ -54,7 +54,7 @@ void WriteNameFile(FILE* f)
 
 \todo Scanf mit Maximalbreite nutzen um cppcheck-Fehler zu umgehen.
 */
-void ReadNameFile(FILE* f, ParserPTNet* symboltables)
+void ReadNameFile(FILE *f, ParserPTNet *symboltables)
 {
     assert(Net::Name[PL]);
     assert(Net::Name[TR]);
@@ -71,7 +71,7 @@ void ReadNameFile(FILE* f, ParserPTNet* symboltables)
     {
         fscanf(f, "%s", buffer);
         Net::Name[PL][p] = strdup(buffer);
-        PlaceSymbol* ps = new PlaceSymbol(Net::Name[PL][p], Place::Capacity[p]);
+        PlaceSymbol *ps = new PlaceSymbol(Net::Name[PL][p], Place::Capacity[p]);
         ps -> setIndex(p);
         symboltables->PlaceTable->insert(ps);
     }
@@ -85,13 +85,13 @@ void ReadNameFile(FILE* f, ParserPTNet* symboltables)
     {
         fscanf(f, "%s", buffer);
         Net::Name[TR][t] = strdup(buffer);
-        TransitionSymbol* ts = new TransitionSymbol(Net::Name[TR][t], Transition::Fairness[t], NULL, NULL);
+        TransitionSymbol *ts = new TransitionSymbol(Net::Name[TR][t], Transition::Fairness[t], NULL, NULL);
         ts -> setIndex(t);
         symboltables->TransitionTable->insert(ts);
     }
 }
 
-void WriteNetFile(FILE* f)
+void WriteNetFile(FILE *f)
 {
     // 1. Number of places and significant places
     fprintf(f, "%u %u", Net::Card[PL], Place::CardSignificant);
@@ -155,7 +155,7 @@ void WriteNetFile(FILE* f)
 /*!
 \todo Collapse fscanf calls when possible
 */
-void ReadNetFile(FILE* f)
+void ReadNetFile(FILE *f)
 {
     // read number of places
     unsigned int tmp1, tmp2;
@@ -165,17 +165,17 @@ void ReadNetFile(FILE* f)
 
     // allocate place arrays
     // we set place names to NULL right now
-    Net::Name[PL] = (char**) calloc(Net::Card[PL] , SIZEOF_VOIDP);
+    Net::Name[PL] = (char **) calloc(Net::Card[PL] , SIZEOF_VOIDP);
     for (int direction = PRE; direction <= POST; direction ++)
     {
-        Net::CardArcs[PL][direction] = (index_t*) malloc(Net::Card[PL] * SIZEOF_INDEX_T);
-        Net::Arc[PL][direction] = (index_t**) malloc(Net::Card[PL] * SIZEOF_VOIDP);
-        Net::Mult[PL][direction] = (mult_t**) malloc(Net::Card[PL] * SIZEOF_VOIDP);
+        Net::CardArcs[PL][direction] = (index_t *) malloc(Net::Card[PL] * SIZEOF_INDEX_T);
+        Net::Arc[PL][direction] = (index_t **) malloc(Net::Card[PL] * SIZEOF_VOIDP);
+        Net::Mult[PL][direction] = (mult_t **) malloc(Net::Card[PL] * SIZEOF_VOIDP);
     }
 
-    Place::Capacity = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
-    Marking::Initial = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
-    Marking::Current = (capacity_t*) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
+    Place::Capacity = (capacity_t *) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
+    Marking::Initial = (capacity_t *) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
+    Marking::Current = (capacity_t *) malloc(Net::Card[PL] * SIZEOF_CAPACITY_T);
 
     // fill all information that is locally available in symbols, allocate node specific arrays
     for (index_t p = 0; p < Net::Card[PL]; p++)
@@ -192,8 +192,8 @@ void ReadNetFile(FILE* f)
         // read number of prearcs
         fscanf(f, "%u", &tmp1);
         Net::CardArcs[PL][PRE][p] = (index_t) tmp1;
-        Net::Arc[PL][PRE][p] = (index_t*) malloc(Net::CardArcs[PL][PRE][p] * SIZEOF_INDEX_T);
-        Net::Mult[PL][PRE][p] = (mult_t*) malloc(Net::CardArcs[PL][PRE][p] * SIZEOF_MULT_T);
+        Net::Arc[PL][PRE][p] = (index_t *) malloc(Net::CardArcs[PL][PRE][p] * SIZEOF_INDEX_T);
+        Net::Mult[PL][PRE][p] = (mult_t *) malloc(Net::CardArcs[PL][PRE][p] * SIZEOF_MULT_T);
 
         // read prearcs
         for (index_t i = 0; i < Net::CardArcs[PL][PRE][p]; i++)
@@ -206,8 +206,8 @@ void ReadNetFile(FILE* f)
         // read number of postarcs
         fscanf(f, "%u", &tmp1);
         Net::CardArcs[PL][POST][p] = (index_t) tmp1;
-        Net::Arc[PL][POST][p] = (index_t*) malloc(Net::CardArcs[PL][POST][p] * SIZEOF_INDEX_T);
-        Net::Mult[PL][POST][p] = (mult_t*) malloc(Net::CardArcs[PL][POST][p] * SIZEOF_MULT_T);
+        Net::Arc[PL][POST][p] = (index_t *) malloc(Net::CardArcs[PL][POST][p] * SIZEOF_INDEX_T);
+        Net::Mult[PL][POST][p] = (mult_t *) malloc(Net::CardArcs[PL][POST][p] * SIZEOF_MULT_T);
 
         // read postarcs
         for (index_t i = 0; i < Net::CardArcs[PL][POST][p]; i++)
@@ -224,15 +224,15 @@ void ReadNetFile(FILE* f)
     Net::Card[TR] = (index_t) tmp1;
 
     // transition names are set to NULL here
-    Net::Name[TR] = (char**) calloc(Net::Card[TR], SIZEOF_VOIDP);
+    Net::Name[TR] = (char **) calloc(Net::Card[TR], SIZEOF_VOIDP);
     for (int direction = PRE; direction <= POST; direction ++)
     {
-        Net::CardArcs[TR][direction] = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-        Net::Arc[TR][direction] = (index_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
-        Net::Mult[TR][direction] = (mult_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
+        Net::CardArcs[TR][direction] = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+        Net::Arc[TR][direction] = (index_t **) malloc(Net::Card[TR] * SIZEOF_VOIDP);
+        Net::Mult[TR][direction] = (mult_t **) malloc(Net::Card[TR] * SIZEOF_VOIDP);
     }
 
-    Transition::Fairness = (fairnessAssumption_t*) malloc(Net::Card[TR] * SIZEOF_FAIRNESSASSUMPTION_T);
+    Transition::Fairness = (fairnessAssumption_t *) malloc(Net::Card[TR] * SIZEOF_FAIRNESSASSUMPTION_T);
 
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
@@ -243,8 +243,8 @@ void ReadNetFile(FILE* f)
         // read number of prearcs
         fscanf(f, "%u", &tmp1);
         Net::CardArcs[TR][PRE][t] = (index_t) tmp1;
-        Net::Arc[TR][PRE][t] = (index_t*) malloc(Net::CardArcs[TR][PRE][t] * SIZEOF_INDEX_T);
-        Net::Mult[TR][PRE][t] = (mult_t*) malloc(Net::CardArcs[TR][PRE][t] * SIZEOF_MULT_T);
+        Net::Arc[TR][PRE][t] = (index_t *) malloc(Net::CardArcs[TR][PRE][t] * SIZEOF_INDEX_T);
+        Net::Mult[TR][PRE][t] = (mult_t *) malloc(Net::CardArcs[TR][PRE][t] * SIZEOF_MULT_T);
 
         // read prearcs
         for (index_t i = 0; i < Net::CardArcs[TR][PRE][t]; i++)
@@ -257,8 +257,8 @@ void ReadNetFile(FILE* f)
         // read number of postarcs
         fscanf(f, "%u", &tmp1);
         Net::CardArcs[TR][POST][t] = (index_t) tmp1;
-        Net::Arc[TR][POST][t] = (index_t*) malloc(Net::CardArcs[TR][POST][t] * SIZEOF_INDEX_T);
-        Net::Mult[TR][POST][t] = (mult_t*) malloc(Net::CardArcs[TR][POST][t] * SIZEOF_MULT_T);
+        Net::Arc[TR][POST][t] = (index_t *) malloc(Net::CardArcs[TR][POST][t] * SIZEOF_INDEX_T);
+        Net::Mult[TR][POST][t] = (mult_t *) malloc(Net::CardArcs[TR][POST][t] * SIZEOF_MULT_T);
 
         // read postarcs
         for (index_t i = 0; i < Net::CardArcs[TR][POST][t]; i++)

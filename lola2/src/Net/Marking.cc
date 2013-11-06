@@ -16,11 +16,11 @@ All data that describe attributes of markings can be found here.
 #include <Net/Net.h>
 
 
-capacity_t* Marking::Initial = NULL;
+capacity_t *Marking::Initial = NULL;
 hash_t Marking::HashInitial = 0;
-capacity_t* Marking::Current = NULL;
+capacity_t *Marking::Current = NULL;
 hash_t Marking::HashCurrent = 0;
-capacity_t* Marking::Target = NULL;
+capacity_t *Marking::Target = NULL;
 hash_t Marking::HashTarget = 0;
 
 /// init for the behavioral part of the net
@@ -43,7 +43,7 @@ void Marking::deleteMarkings()
 }
 
 // LCOV_EXCL_START
-void Marking::DEBUG__printMarking(capacity_t* marking)
+void Marking::DEBUG__printMarking(capacity_t *marking)
 {
     return;
     printf("PRINTING MARKING %lx:\n", (unsigned long) marking);

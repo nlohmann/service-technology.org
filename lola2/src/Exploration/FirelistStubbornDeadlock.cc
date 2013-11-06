@@ -16,14 +16,14 @@
 
 FirelistStubbornDeadlock::FirelistStubbornDeadlock()
 {
-    dfsStack = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    dfs = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    lowlink = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    currentIndex = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    TarjanStack = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    mustBeIncluded = (index_t**) malloc(Net::Card[TR] * SIZEOF_VOIDP);
-    visited = (uint32_t*) calloc(Net::Card[TR] , sizeof(uint32_t));
-    onTarjanStack = (uint32_t*) calloc(Net::Card[TR] , sizeof(uint32_t));
+    dfsStack = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    dfs = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    lowlink = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    currentIndex = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    TarjanStack = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    mustBeIncluded = (index_t **) malloc(Net::Card[TR] * SIZEOF_VOIDP);
+    visited = (uint32_t *) calloc(Net::Card[TR] , sizeof(uint32_t));
+    onTarjanStack = (uint32_t *) calloc(Net::Card[TR] , sizeof(uint32_t));
     stamp = 0;
 }
 
@@ -57,7 +57,7 @@ void FirelistStubbornDeadlock::newStamp()
     }
 }
 
-index_t FirelistStubbornDeadlock::getFirelist(NetState &ns, index_t** result)
+index_t FirelistStubbornDeadlock::getFirelist(NetState &ns, index_t **result)
 {
     index_t nextDfs = 1;
     index_t stackpointer = 0;
@@ -174,7 +174,7 @@ index_t FirelistStubbornDeadlock::getFirelist(NetState &ns, index_t** result)
                         (*result)[--resultindex] = currenttransition;
                     }
                     assert(resultindex == 0);
-                    return(CardStubborn);
+                    return (CardStubborn);
                 }
                 else
                 {
@@ -206,7 +206,7 @@ index_t FirelistStubbornDeadlock::getFirelist(NetState &ns, index_t** result)
     }
 }
 
-Firelist* FirelistStubbornDeadlock::createNewFireList(SimpleProperty *property)
+Firelist *FirelistStubbornDeadlock::createNewFireList(SimpleProperty *property)
 {
     return new FirelistStubbornDeadlock();
 }

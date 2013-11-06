@@ -26,7 +26,7 @@ class PlaceSymbol: public Symbol
 {
 public:
     /// Generate and initialize a symbol
-    PlaceSymbol(char*, unsigned int);
+    PlaceSymbol(char *, unsigned int);
 
     /// Getter for capacity
     capacity_t getCapacity() const;

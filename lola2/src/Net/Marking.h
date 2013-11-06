@@ -18,19 +18,19 @@ struct Marking
 {
 public:
     /// initial marking
-    static capacity_t* Initial;
+    static capacity_t *Initial;
 
     /// hash value of initial marking
     static hash_t HashInitial;
 
     /// current  marking
-    static capacity_t* Current;
+    static capacity_t *Current;
 
     /// hash value of initial marking
     static hash_t HashCurrent;
 
     /// target marking
-    static capacity_t* Target;
+    static capacity_t *Target;
 
     /// hash value of target marking
     static hash_t HashTarget;
@@ -41,5 +41,5 @@ public:
     /// Aufräumen der Knoten - Service für valgrind
     static void deleteMarkings();
 
-    static void DEBUG__printMarking(capacity_t* marking);
+    static void DEBUG__printMarking(capacity_t *marking);
 };

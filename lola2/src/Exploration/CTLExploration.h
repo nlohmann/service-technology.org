@@ -8,10 +8,11 @@
 #include <Exploration/Firelist.h>
 #include <Net/NetState.h>
 
-class CTLExploration {
+class CTLExploration
+{
 public:
-	std::vector<int> witness;
+    std::vector<int> witness;
 
-	bool checkProperty(CTLFormula* formula, Store<void*> &store,
-			Firelist &firelist, NetState &ns);
+    bool checkProperty(CTLFormula *formula, Store<void *> &store,
+                       Firelist &firelist, NetState &ns);
 };

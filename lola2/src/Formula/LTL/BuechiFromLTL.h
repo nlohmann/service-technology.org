@@ -33,119 +33,132 @@
 
 #pragma once
 
-typedef struct tl_Symbol {
-char		*name;
-	struct tl_Symbol	*next;	/* linked list, symbol table */
+typedef struct tl_Symbol
+{
+    char		*name;
+    struct tl_Symbol	*next;	/* linked list, symbol table */
 } tl_Symbol;
 
-typedef struct tl_Node {
-	short		ntyp;	/* node type */
-	struct tl_Symbol	*sym;
-	struct tl_Node	*lft;	/* tree */
-	struct tl_Node	*rgt;	/* tree */
-	struct tl_Node	*nxt;	/* if linked list */
+typedef struct tl_Node
+{
+    short		ntyp;	/* node type */
+    struct tl_Symbol	*sym;
+    struct tl_Node	*lft;	/* tree */
+    struct tl_Node	*rgt;	/* tree */
+    struct tl_Node	*nxt;	/* if linked list */
 } tl_Node;
 
-typedef struct Graph {
-	tl_Symbol		*name;
-	tl_Symbol		*incoming;
-	tl_Symbol		*outgoing;
-	tl_Symbol		*oldstring;
-	tl_Symbol		*nxtstring;
-	tl_Node		*New;
-	tl_Node		*Old;
-	tl_Node		*Other;
-	tl_Node		*Next;
-	unsigned char	isred[64], isgrn[64];
-	unsigned char	redcnt, grncnt;
-	unsigned char	reachable;
-	struct Graph	*nxt;
+typedef struct Graph
+{
+    tl_Symbol		*name;
+    tl_Symbol		*incoming;
+    tl_Symbol		*outgoing;
+    tl_Symbol		*oldstring;
+    tl_Symbol		*nxtstring;
+    tl_Node		*New;
+    tl_Node		*Old;
+    tl_Node		*Other;
+    tl_Node		*Next;
+    unsigned char	isred[64], isgrn[64];
+    unsigned char	redcnt, grncnt;
+    unsigned char	reachable;
+    struct Graph	*nxt;
 } Graph;
 
-typedef struct Mapping {
-	char	*from;
-	Graph	*to;
-	struct Mapping	*nxt;
+typedef struct Mapping
+{
+    char	*from;
+    Graph	*to;
+    struct Mapping	*nxt;
 } Mapping;
 
-typedef struct ATrans {
-  int *to;
-  int *pos;
-  int *neg;
-  struct ATrans *nxt;
+typedef struct ATrans
+{
+    int *to;
+    int *pos;
+    int *neg;
+    struct ATrans *nxt;
 } ATrans;
 
-typedef struct AProd {
-  int astate;
-  struct ATrans *prod;
-  struct ATrans *trans;
-  struct AProd *nxt;
-  struct AProd *prv;
+typedef struct AProd
+{
+    int astate;
+    struct ATrans *prod;
+    struct ATrans *trans;
+    struct AProd *nxt;
+    struct AProd *prv;
 } AProd;
 
 
-typedef struct GTrans {
-  int *pos;
-  int *neg;
-  struct GState *to;
-  int *final;
-  struct GTrans *nxt;
+typedef struct GTrans
+{
+    int *pos;
+    int *neg;
+    struct GState *to;
+    int *final;
+    struct GTrans *nxt;
 } GTrans;
 
-typedef struct GState {
-  int id;
-  int incoming;
-  int *nodes_set;
-  struct GTrans *trans;
-  struct GState *nxt;
-  struct GState *prv;
+typedef struct GState
+{
+    int id;
+    int incoming;
+    int *nodes_set;
+    struct GTrans *trans;
+    struct GState *nxt;
+    struct GState *prv;
 } GState;
 
-typedef struct BTrans {
-  struct BState *to;
-  int *pos;
-  int *neg;
-  struct BTrans *nxt;
+typedef struct BTrans
+{
+    struct BState *to;
+    int *pos;
+    int *neg;
+    struct BTrans *nxt;
 } BTrans;
 
-typedef struct BState {
-  struct GState *gstate;
-  int id;
-  int incoming;
-  int final;
-  struct BTrans *trans;
-  struct BState *nxt;
-  struct BState *prv;
+typedef struct BState
+{
+    struct GState *gstate;
+    int id;
+    int incoming;
+    int final;
+    struct BTrans *trans;
+    struct BState *nxt;
+    struct BState *prv;
 } BState;
 
-typedef struct GScc {
-  struct GState *gstate;
-  int rank;
-  int theta;
-  struct GScc *nxt;
+typedef struct GScc
+{
+    struct GState *gstate;
+    int rank;
+    int theta;
+    struct GScc *nxt;
 } GScc;
 
-typedef struct BScc {
-  struct BState *bstate;
-  int rank;
-  int theta;
-  struct BScc *nxt;
+typedef struct BScc
+{
+    struct BState *bstate;
+    int rank;
+    int theta;
+    struct BScc *nxt;
 } BScc;
 
-enum {
-	ALWAYS=257,
-	AND,		/* 258 */
-	EQUIV,		/* 259 */
-	EVENTUALLY,	/* 260 */
-	FALSE,		/* 261 */
-	IMPLIES,	/* 262 */
-	NOT,		/* 263 */
-	OR,		/* 264 */
-	PREDICATE,	/* 265 */
-	TRUE,		/* 266 */
-	U_OPER,		/* 267 */
-	V_OPER		/* 268 */
-	, NEXT		/* 269 */
+enum
+{
+    ALWAYS = 257,
+    AND,		/* 258 */
+    EQUIV,		/* 259 */
+    EVENTUALLY,	/* 260 */
+    FALSE,		/* 261 */
+    IMPLIES,	/* 262 */
+    NOT,		/* 263 */
+    OR,		/* 264 */
+    PREDICATE,	/* 265 */
+    TRUE,		/* 266 */
+    U_OPER,		/* 267 */
+    V_OPER		/* 268 */
+    , NEXT		/* 269 */
 };
 
 #ifdef __cplusplus
@@ -156,14 +169,14 @@ extern "C" {
 tl_Node	*tl_nn(int, tl_Node *, tl_Node *);
 tl_Symbol	*tl_lookup(char *);
 void	trans(tl_Node *);
-tl_Node * bin_simpler(tl_Node *ptr);
+tl_Node *bin_simpler(tl_Node *ptr);
 
 extern BState *bstates;
 extern int accepting_state;
 extern char **sym_table;
 extern int sym_size;
 
-tl_Node * push_negation(tl_Node *n);
+tl_Node *push_negation(tl_Node *n);
 
 #ifdef __cplusplus
 }

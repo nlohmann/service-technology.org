@@ -13,46 +13,55 @@
 /// A VectorStoreCreator encapsulates a method that, when invoked, creates a new VectorStore.
 /// It is used by the HashingWrapperStore to create VectorStores for new hash buckets on demand.
 template<typename P>
-class VectorStoreCreator {
+class VectorStoreCreator
+{
 public:
-  virtual VectorStore<P>* operator() ( void ) const  = 0;
+    virtual VectorStore<P> *operator() ( void ) const  = 0;
 };
 
 /// VectorStoreCreator implementation template for VectorStores with zero constructor arguments
-template<typename P,typename T>
-class NullaryVectorStoreCreator : public VectorStoreCreator<P> {
+template<typename P, typename T>
+class NullaryVectorStoreCreator : public VectorStoreCreator<P>
+{
 public:
-	VectorStore<P>* operator() ( void ) const {
-    return new T();
-  }
+    VectorStore<P> *operator() ( void ) const
+    {
+        return new T();
+    }
 };
 
 /// VectorStoreCreator implementation template for VectorStores with one constructor argument
-template<typename P,typename T,typename A1>
-class UnaryVectorStoreCreator : public VectorStoreCreator<P> {
-  A1 arg1;
+template<typename P, typename T, typename A1>
+class UnaryVectorStoreCreator : public VectorStoreCreator<P>
+{
+    A1 arg1;
 public:
-  UnaryVectorStoreCreator(A1 _arg1) {
-    arg1 = _arg1;
-  }
-  VectorStore<P>* operator() ( void ) const {
-    return new T(arg1);
-  }
+    UnaryVectorStoreCreator(A1 _arg1)
+    {
+        arg1 = _arg1;
+    }
+    VectorStore<P> *operator() ( void ) const
+    {
+        return new T(arg1);
+    }
 };
 
 /// VectorStoreCreator implementation template for VectorStores with two constructor arguments
-template<typename P,typename T,typename A1,typename A2>
-class BinaryVectorStoreCreator : public VectorStoreCreator<P> {
-	  A1 arg1;
-	  A2 arg2;
+template<typename P, typename T, typename A1, typename A2>
+class BinaryVectorStoreCreator : public VectorStoreCreator<P>
+{
+    A1 arg1;
+    A2 arg2;
 public:
-	  BinaryVectorStoreCreator(A1 _arg1,A2 _arg2) {
-    arg1 = _arg1;
-    arg2 = _arg2;
-  }
-  VectorStore<P>* operator() ( void ) const {
-    return new T(arg1,arg2);
-  }
+    BinaryVectorStoreCreator(A1 _arg1, A2 _arg2)
+    {
+        arg1 = _arg1;
+        arg2 = _arg2;
+    }
+    VectorStore<P> *operator() ( void ) const
+    {
+        return new T(arg1, arg2);
+    }
 };
 
 
@@ -63,7 +72,8 @@ class HashingWrapperStore : public VectorStore<T>
 {
 public:
     /// constructor (optional parameter _number_of_threads necessary if elements should be retrievable by popVector())
-	HashingWrapperStore(VectorStoreCreator<T>* _storeCreator, index_t _number_of_buckets = SIZEOF_MARKINGTABLE, index_t _number_of_threads = 1);
+    HashingWrapperStore(VectorStoreCreator<T> *_storeCreator,
+                        index_t _number_of_buckets = SIZEOF_MARKINGTABLE, index_t _number_of_threads = 1);
     /// destructor
     virtual ~HashingWrapperStore();
 
@@ -73,33 +83,34 @@ public:
     /// @param hash of current NetState
     /// @param payload pointer to be set to the place where the payload of this state will be held
     /// @param threadIndex the index of the thread that requests this call. Values will range from 0 to (number_of_threads - 1). Used to allow using thread-local auxiliary data structures without locking any variables.
-	/// @param noinsert if set to true only a search is done
+    /// @param noinsert if set to true only a search is done
     /// @return true, if the marking was found in the store, otherwise false.
-    virtual bool searchAndInsert(const vectordata_t* in, bitindex_t bitlen, hash_t hash, T** payload, index_t threadIndex, bool noinsert = false);
+    virtual bool searchAndInsert(const vectordata_t *in, bitindex_t bitlen, hash_t hash, T **payload,
+                                 index_t threadIndex, bool noinsert = false);
 
     /// gets and removes a vector from the store
     /// @param out place where the returned vector will be written to
     /// @return false, if the store was already empty, otherwise true
-    virtual bool popVector(vectordata_t * & out, index_t threadIndex = 0);
+    virtual bool popVector(vectordata_t *&out, index_t threadIndex = 0);
 
-	/// check if the store is empty
-	/// @return true, if the store is empty
-	virtual bool empty();
+    /// check if the store is empty
+    /// @return true, if the store is empty
+    virtual bool empty();
 
-	/// return the hash value of the last marking returned by popVector()
-	virtual hash_t getLastHash(index_t threadIndex = 0);
+    /// return the hash value of the last marking returned by popVector()
+    virtual hash_t getLastHash(index_t threadIndex = 0);
 private:
 
     //VectorStoreCreator<T>* storeCreator;
 
-    VectorStore<T>** buckets;
+    VectorStore<T> **buckets;
 
     // the read-write mutexes
     // pthread_rwlock_t* rwlocks;
 
-    index_t* currentPopBucket;
+    index_t *currentPopBucket;
 
-	index_t number_of_buckets;
+    index_t number_of_buckets;
 };
 
 #include <Stores/VectorStores/HashingWrapperStore.inc>

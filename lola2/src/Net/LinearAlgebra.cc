@@ -21,8 +21,8 @@ void Matrix::Row::DEBUG__printRow() const
     for (index_t i = 0; i < varCount; ++i)
     {
         std::cout << coefficients[i] << "*" << variables[i] << " ";
-//        if (variables[i]<Net::Card[PL]) std::cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
-//		std::cout << coefficients[i] << "*" << Net::Name[TR][variables[i]] << " ";
+        //        if (variables[i]<Net::Card[PL]) std::cout << coefficients[i] << "*" << Net::Name[PL][variables[i]] << " ";
+        //		std::cout << coefficients[i] << "*" << Net::Name[TR][variables[i]] << " ";
     }
     std::cout << "[" << Net::Name[PL][reference] << "]";
     std::cout << std::endl;
@@ -40,7 +40,7 @@ void Matrix::DEBUG__printMatrix() const
     for (index_t c = 0; c < colCount; ++c)
     {
         std::cout << "column " << c << endl;
-        Row* curRow = matrix[c];
+        Row *curRow = matrix[c];
         while (curRow != NULL)
         {
             curRow->DEBUG__printRow();
@@ -89,12 +89,13 @@ Matrix::Row::~Row()
 }
 
 /// creates a new row based on LinearAlgebra.h types
-Matrix::Row::Row(index_t length, const index_t* var, const int64_t* coef, index_t ref) : varCount(length), next(NULL), reference(ref)
+Matrix::Row::Row(index_t length, const index_t *var, const int64_t *coef,
+                 index_t ref) : varCount(length), next(NULL), reference(ref)
 {
     // request memory for new row
-    variables = (index_t*) malloc(length * SIZEOF_INDEX_T);
+    variables = (index_t *) malloc(length * SIZEOF_INDEX_T);
     // coefficients are stored as int64_t
-    coefficients = (int64_t*) malloc(length * SIZEOF_INT64_T);
+    coefficients = (int64_t *) malloc(length * SIZEOF_INT64_T);
 
     // memcpy is used because given and new memory has the same types
     memcpy(variables, var, length * SIZEOF_INDEX_T);
@@ -106,37 +107,42 @@ Matrix::Row::Row(index_t length, const index_t* var, const int64_t* coef, index_
 /// eleminates the first variable on the second row of the first variable
 void Matrix::Row::apply(Matrix &matrix, index_t rowToChange)
 {
-	if (rowToChange == INDEX_T_MAX)
-	{
-	    // the variable to be eliminated should be the same
-	    assert(variables[0] == next->variables[0]);
-	    assert(this != next);
-	} else {
+    if (rowToChange == INDEX_T_MAX)
+    {
+        // the variable to be eliminated should be the same
+        assert(variables[0] == next->variables[0]);
+        assert(this != next);
+    }
+    else
+    {
         // the second row must exist and be singular and start with a lower variable
         assert(matrix.matrix[rowToChange]);
         assert(matrix.matrix[rowToChange]->next == NULL);
         assert(variables[0] > matrix.matrix[rowToChange]->variables[0]);
     }
 
-	const Row* realNext(rowToChange==INDEX_T_MAX ? next : matrix.matrix[rowToChange]);
-//DEBUG__printRow();
-//realNext->DEBUG__printRow();
+    const Row *realNext(rowToChange == INDEX_T_MAX ? next : matrix.matrix[rowToChange]);
+    //DEBUG__printRow();
+    //realNext->DEBUG__printRow();
     // determine the index of the variable to eliminate in the second row
-	int64_t ggtFactor; 
-	index_t useVar(INDEX_T_MAX);
-	for(index_t i=0; i<realNext->varCount; ++i)
-        if (variables[0]==realNext->variables[i])
-	    {
+    int64_t ggtFactor;
+    index_t useVar(INDEX_T_MAX);
+    for (index_t i = 0; i < realNext->varCount; ++i)
+        if (variables[0] == realNext->variables[i])
+        {
             useVar = i;
-//std::cout << "v0=" << variables[0] << " c0=" << coefficients[0] << " 2v0=" << realNext->variables[i] << " 2c0=" << realNext->coefficients[i] << std::endl;
+            //std::cout << "v0=" << variables[0] << " c0=" << coefficients[0] << " 2v0=" << realNext->variables[i] << " 2c0=" << realNext->coefficients[i] << std::endl;
             ggtFactor = ggt(coefficients[0], realNext->coefficients[i]);
-//std::cout << "ggt=" << ggtFactor << std::endl;
+            //std::cout << "ggt=" << ggtFactor << std::endl;
             break;
-	    }
-//std::cout << "endvar" << std::endl;
+        }
+    //std::cout << "endvar" << std::endl;
     // do nothing if the variable does not exist in this row
-	if (useVar==INDEX_T_MAX) return;
-//std::cout << "ggt=" << ggtFactor << std::endl;
+    if (useVar == INDEX_T_MAX)
+    {
+        return;
+    }
+    //std::cout << "ggt=" << ggtFactor << std::endl;
     // calculate corrective factors
     const int64_t firstRowFactor = realNext->coefficients[useVar] / ggtFactor;
     const int64_t secondRowFactor = coefficients[0] / ggtFactor;
@@ -144,8 +150,8 @@ void Matrix::Row::apply(Matrix &matrix, index_t rowToChange)
     // get some space for the new row (secondRow - firstRow)
     // at most |firstRow| + |secondRow| elements are neccessary
     // one less is also suitable
-    index_t* newVar = (index_t*) calloc((varCount + realNext->varCount), SIZEOF_INDEX_T);
-    int64_t* newCoef = (int64_t*) calloc((varCount + realNext->varCount), SIZEOF_INT64_T);
+    index_t *newVar = (index_t *) calloc((varCount + realNext->varCount), SIZEOF_INDEX_T);
+    int64_t *newCoef = (int64_t *) calloc((varCount + realNext->varCount), SIZEOF_INT64_T);
     index_t newSize = 0;
 
     // start with the first element, because the first one is not necessarily ruled out
@@ -241,17 +247,23 @@ void Matrix::Row::apply(Matrix &matrix, index_t rowToChange)
     const index_t curReference = realNext->reference;
     // delete second row
     if (rowToChange == INDEX_T_MAX)
-	    matrix.deleteRow(this);
-	else {
+    {
+        matrix.deleteRow(this);
+    }
+    else
+    {
         delete matrix.matrix[rowToChange];
         --matrix.rowCount;
         matrix.matrix[rowToChange] = NULL;
-	}
+    }
 
     // create new row based on new arrays
     if (newSize != 0)
     {
-        if (rowToChange == INDEX_T_MAX) assert(newVar[0] > variables[0]);
+        if (rowToChange == INDEX_T_MAX)
+        {
+            assert(newVar[0] > variables[0]);
+        }
         matrix.addRow(newSize, newVar, newCoef, curReference);
     }
     // free memory of the new row (data is already processed)
@@ -264,11 +276,11 @@ Matrix::~Matrix()
 {
     for (index_t c = 0; c < colCount; ++c)
     {
-        Row* curRow = matrix[c];
+        Row *curRow = matrix[c];
         while (curRow != NULL)
         {
             // save current row
-            Row* toDelete = curRow;
+            Row *toDelete = curRow;
             // set next row (successor of current row)
             curRow = curRow->next;
             // delete current row
@@ -294,7 +306,7 @@ Matrix::Matrix(index_t size) : rowCount(0), colCount(size), significantColCount(
 }
 
 /// adds a row to the current matrix
-void Matrix::addRow(index_t length, const index_t* var, const int64_t* coef, index_t ref)
+void Matrix::addRow(index_t length, const index_t *var, const int64_t *coef, index_t ref)
 {
     // if new row contains no variables, do nothing
     if (length == 0)
@@ -303,7 +315,7 @@ void Matrix::addRow(index_t length, const index_t* var, const int64_t* coef, ind
     }
 
     // create new row based on given data
-    Row* row = new Row(length, var, coef, ref);
+    Row *row = new Row(length, var, coef, ref);
 
     // insert new row at right position
     row->next = matrix[row->variables[0]];
@@ -314,7 +326,7 @@ void Matrix::addRow(index_t length, const index_t* var, const int64_t* coef, ind
 }
 
 /// deletes the successor ot the given row in the current matrix
-void Matrix::deleteRow(Row* row)
+void Matrix::deleteRow(Row *row)
 {
     // if row or its successor is NULL, do nothing
     if (row == NULL or row->next == NULL)
@@ -323,7 +335,7 @@ void Matrix::deleteRow(Row* row)
     }
 
     // set successor to successors sucessor
-    Row* tmp = row->next;
+    Row *tmp = row->next;
     row->next = row->next->next;
 
     // delete successor
@@ -376,13 +388,17 @@ void Matrix::diagonalise()
     for (index_t i = 0; i < colCount; ++i)
         if (matrix[i] != NULL)
         {
-            for(index_t j = i+1; j < colCount; ++j)
+            for (index_t j = i + 1; j < colCount; ++j)
                 if (matrix[j] != NULL)
+                {
                     matrix[j]->apply(*this, i);
+                }
             // make diagonal entry positive (by multiplying row with -1)
-            if (matrix[i]->coefficients[0]<0)
-                for(index_t v=0; v<matrix[i]->varCount; ++v)
+            if (matrix[i]->coefficients[0] < 0)
+                for (index_t v = 0; v < matrix[i]->varCount; ++v)
+                {
                     matrix[i]->coefficients[v] *= -1;
+                }
         }
 }
 
@@ -407,7 +423,7 @@ index_t Matrix::getReference(index_t column) const
 }
 
 /// Returns row of the first row with given index
-Matrix::Row* Matrix::getRow(index_t column) const
+Matrix::Row *Matrix::getRow(index_t column) const
 {
     assert(column < colCount);
     return matrix[column];

@@ -5,28 +5,28 @@
 
 extern gengetopt_args_info args_info;
 
-std::map<index_t, Condition*> Condition::current;
-std::vector<Condition*> Condition::conditions;
+std::map<index_t, Condition *> Condition::current;
+std::vector<Condition *> Condition::conditions;
 
-Condition::Condition(index_t p, Event* e) : place(p), in(e), out(NULL)
+Condition::Condition(index_t p, Event *e) : place(p), in(e), out(NULL)
 {
     current[p] = this;
     conditions.push_back(this);
 }
 
-void Condition::dot(FILE* o)
+void Condition::dot(FILE *o)
 {
     assert(o);
     extern std::set<index_t> target_place;
 
-    for (std::vector<Condition*>::iterator b = conditions.begin(); b != conditions.end(); ++b)
+    for (std::vector<Condition *>::iterator b = conditions.begin(); b != conditions.end(); ++b)
     {
         // event structure
         if (args_info.eventstructure_flag)
         {
             if ((*b)->in != NULL)
             {
-                fprintf(o, "  e%p -> e%p\n", (void*)(*b)->in, (void*)(*b)->out);
+                fprintf(o, "  e%p -> e%p\n", (void *)(*b)->in, (void *)(*b)->out);
             }
             continue;
         }
@@ -54,28 +54,31 @@ void Condition::dot(FILE* o)
 
         if (target)
         {
-            fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true color=green]\n", (void*)*b, Net::Name[PL][(*b)->place]);
+            fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true color=green]\n", (void *)*b,
+                    Net::Name[PL][(*b)->place]);
         }
         else
         {
             if (initial)
             {
-                fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true color=blue]\n", (void*)*b, Net::Name[PL][(*b)->place]);
+                fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true color=blue]\n", (void *)*b,
+                        Net::Name[PL][(*b)->place]);
             }
             else
             {
-                fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true]\n", (void*)*b, Net::Name[PL][(*b)->place]);
+                fprintf(o, "  c%p [label=\"%s\" shape=circle width=.5 fixedsize=true]\n", (void *)*b,
+                        Net::Name[PL][(*b)->place]);
             }
         }
 
         if ((*b)->in != NULL)
         {
-            fprintf(o, "  e%p -> c%p\n", (void*)(*b)->in, (void*)*b);
+            fprintf(o, "  e%p -> c%p\n", (void *)(*b)->in, (void *)*b);
         }
 
         if ((*b)->out != NULL)
         {
-            fprintf(o, "  c%p -> e%p\n", (void*)*b, (void*)(*b)->out);
+            fprintf(o, "  c%p -> e%p\n", (void *)*b, (void *)(*b)->out);
         }
     }
 }

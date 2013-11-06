@@ -21,47 +21,47 @@ struct Transition
 {
 public:
     /// fairness specification
-    static fairnessAssumption_t* Fairness;
+    static fairnessAssumption_t *Fairness;
 
     /// Activation status
-    static bool* Enabled;
+    static bool *Enabled;
 
     /// number of enabled transitions
     static index_t CardEnabled;
 
     /// When transition i fires from m to m', DeltaHash[i] is hash(m') - hash(m). This value is independent of m and m'
-    static hash_t* DeltaHash;
+    static hash_t *DeltaHash;
 
     /// That many places need to be changed when transition i fires CardDeltaT[PRE] for places that lose tokens, CardDeltaT[POST] for those that gain tokens
-    static index_t* CardDeltaT[2];
+    static index_t *CardDeltaT[2];
 
     /// These are the places that change their marking when transition i fires DeltaT[PRE] for places that lose tokens, DeltaT[POST] for those that gain tokens
-    static index_t** DeltaT[2];
+    static index_t **DeltaT[2];
 
     /// This is the amount of change
-    static mult_t** MultDeltaT[2];
+    static mult_t **MultDeltaT[2];
 
     /// After firing transition i, that many transitions must be checked for enabledness if they have been enabled before: \f$card(DeltaT[PRE]^\bullet)\f$
-    static index_t* CardConflicting;
+    static index_t *CardConflicting;
 
     /// After firing transition i, these transitions must be checked for enabledness if they have been enabled before: \f$(DeltaT[PRE]^\bullet)\f$
-    static index_t** Conflicting;
+    static index_t **Conflicting;
     /// Determines whether a conflicting set is an original or just a reference to some other (identical) set. Important to avoid double-freeing the memory.
-    static bool* ConflictingIsOriginal;
+    static bool *ConflictingIsOriginal;
 
     /// After reverse firing transition i, that many transitions must be checked for enabledness if they have been enabled before: \f$card(DeltaT[POST]^\bullet)\f$
-    static index_t* CardBackConflicting;
+    static index_t *CardBackConflicting;
 
     /// After reverse firing transition i, these transitions must be checked for enabledness if they have been enabled before: \f$(DeltaT[POST]^\bullet)\f$
-    static index_t** BackConflicting;
+    static index_t **BackConflicting;
     /// Determines whether a conflicting set is an original or just a reference to some other (identical) set. Important to avoid double-freeing the memory.
-    static bool* BackConflictingIsOriginal;
+    static bool *BackConflictingIsOriginal;
 
     /// If transition i is disabled, this is its position in its scapegpat's Disabled list
-    static index_t* PositionScapegoat;
+    static index_t *PositionScapegoat;
 
     /// The progress measure for the sweep line method
-    static int32_t* ProgressMeasure;
+    static int32_t *ProgressMeasure;
 
     /// Check transition for activation
     static void checkEnabled(NetState &ns, index_t t);

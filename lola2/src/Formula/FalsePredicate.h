@@ -23,7 +23,7 @@ public:
     /// getUpSet can be called only if the predicate is not satisfied. The returned set of transitions has the
     /// property that it is impossible to turn the predicate true without firing one of the transitions.
     /// The return value is the size of the returned up set.
-    virtual index_t getUpSet(index_t* stack, bool* onstack);
+    virtual index_t getUpSet(index_t *stack, bool *onstack);
 
 
     /// updates value of predicate upon change of value in subformula (TF = true to false, FT = false to true).
@@ -44,17 +44,17 @@ public:
 
     /// collects atomic subformulas; array must be malloced beforehand
     /// result is number of inserted elements
-    virtual index_t collectAtomic(AtomicStatePredicate**);
+    virtual index_t collectAtomic(AtomicStatePredicate **);
     virtual bool DEBUG__consistency(NetState &ns)
     {
         return true;
     }
 
     // copy function
-    virtual StatePredicate* copy(StatePredicate* parent);
+    virtual StatePredicate *copy(StatePredicate *parent);
 
-	/// for direct read access for the deletion algorithm
-	virtual index_t getSubs(const StatePredicate* const** subs) const;
+    /// for direct read access for the deletion algorithm
+    virtual index_t getSubs(const StatePredicate *const **subs) const;
 
-	virtual StatePredicate* negate();
+    virtual StatePredicate *negate();
 };

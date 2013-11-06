@@ -19,10 +19,10 @@ public:
     /// destructor; frees all memory used for auxiliary data structure (namely "inputs").
     ~BitEncoder();
 
-    vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex);
+    vectordata_t *encodeNetState(NetState &ns, bitindex_t &bitlen, index_t threadIndex);
 private:
     /// vector of input vectors that are returned from encodeNetState. Each thread has its own vector to avoid conflicts.
-    vectordata_t** inputs;
+    vectordata_t **inputs;
 
     /// number of words in input vector (fixed for all threads)
     index_t insize;

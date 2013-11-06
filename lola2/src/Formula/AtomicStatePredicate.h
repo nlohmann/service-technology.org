@@ -29,7 +29,7 @@ public:
     /// adds a place (arg2) with negative factor (arg3) at position arg1
     void addNeg(index_t, index_t, capacity_t);
 
-    virtual index_t getUpSet(index_t* stack, bool* onstack);
+    virtual index_t getUpSet(index_t *stack, bool *onstack);
 
     /// These will only be called for non-atomic formulas.
     // LCOV_EXCL_START
@@ -51,16 +51,16 @@ public:
     void setUpSet();
 
     /// lists place p_i indices that occur with positive multiplicity k_i
-    index_t* posPlaces;
+    index_t *posPlaces;
 
     /// lists place p_i indices that occur with negative multiplicity k_i
-    index_t* negPlaces;
+    index_t *negPlaces;
 
     /// lists multiplicities  k_i of places in posPlaces
-    capacity_t* posMult;
+    capacity_t *posMult;
 
     /// lists multiplicities  k_i of places in negPlaces
-    capacity_t* negMult;
+    capacity_t *negMult;
 
     /// the number of pos entries
     index_t cardPos;
@@ -75,7 +75,7 @@ public:
     int sum;
 
     /// The up set of this formula
-    index_t* up;
+    index_t *up;
 
     /// The size of the up set
     index_t cardUp;
@@ -88,18 +88,18 @@ public:
 
     /// collects atomic subformulas; array must be malloced beforehand
     /// result is number of inserted elements
-    virtual index_t collectAtomic(AtomicStatePredicate**);
+    virtual index_t collectAtomic(AtomicStatePredicate **);
     virtual bool DEBUG__consistency(NetState &ns);
 
     // copy function
-    virtual StatePredicate* copy(StatePredicate* parent);
+    virtual StatePredicate *copy(StatePredicate *parent);
 
-	/// direct read access for the deletion algorithm
-	virtual index_t getSubs(const StatePredicate* const** subs) const;
+    /// direct read access for the deletion algorithm
+    virtual index_t getSubs(const StatePredicate *const **subs) const;
 
-	/// returns the negated version of this property, but leaves the current one untouched
-	virtual StatePredicate* negate();
+    /// returns the negated version of this property, but leaves the current one untouched
+    virtual StatePredicate *negate();
 
 protected:
-	AtomicStatePredicate(){};
+    AtomicStatePredicate() {};
 };

@@ -41,7 +41,7 @@
 \post The socket #sock is created. If we are receiving (server), the it is
       also bound.
 */
-Socket::Socket(u_short port, const char* hostname, bool failonerror) :
+Socket::Socket(u_short port, const char *hostname, bool failonerror) :
     sock(socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)),
     listening((hostname == NULL)),
     failonerror(failonerror)
@@ -51,9 +51,12 @@ Socket::Socket(u_short port, const char* hostname, bool failonerror) :
     {
         ReporterStream rep(true);
         rep.message("could not initialize socket at port %s", rep.markup(MARKUP_FILE, "%d", port).str());
-        if (failonerror) {
+        if (failonerror)
+        {
             rep.abort(ERROR_NETWORK);
-        } else {
+        }
+        else
+        {
             return;
         }
     }
@@ -70,14 +73,17 @@ Socket::Socket(u_short port, const char* hostname, bool failonerror) :
 
         // bind the socket sock to the address specified in address
         // LCOV_EXCL_START
-        if (UNLIKELY(bind(sock, (struct sockaddr*)&address, SIZEOF_SOCKADDR_IN) == -1))
+        if (UNLIKELY(bind(sock, (struct sockaddr *)&address, SIZEOF_SOCKADDR_IN) == -1))
         {
             close(sock);
             ReporterStream rep(true);
             rep.message("could not bind socket at port %s", rep.markup(MARKUP_FILE, "%d", port).str());
-            if (failonerror) {
+            if (failonerror)
+            {
                 rep.abort(ERROR_NETWORK);
-            } else {
+            }
+            else
+            {
                 return;
             }
         }
@@ -86,22 +92,25 @@ Socket::Socket(u_short port, const char* hostname, bool failonerror) :
     else
     {
         // resolve the hostname
-        const hostent* record = gethostbyname(hostname);
+        const hostent *record = gethostbyname(hostname);
 
         // LCOV_EXCL_START
         if (UNLIKELY(record == NULL))
         {
             ReporterStream rep(true);
             rep.message("host %s is not available", rep.markup(MARKUP_FILE, "%s", hostname).str());
-            if (failonerror) {
+            if (failonerror)
+            {
                 rep.abort(ERROR_NETWORK);
-            } else {
+            }
+            else
+            {
                 return;
             }
         }
         // LCOV_EXCL_STOP
 
-        const in_addr* resolved_address = (in_addr*)record->h_addr;
+        const in_addr *resolved_address = (in_addr *)record->h_addr;
         address.sin_addr.s_addr = inet_addr(inet_ntoa(* resolved_address));
     }
 }
@@ -137,15 +146,19 @@ void Socket::receive() const
         // receive data from the socket sock, stores it into buffer with
         // length UDP_BUFFER_SIZE, sets no flags, receives from address
         // specified in sa with length fromlen
-        const ssize_t recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
+        const ssize_t recsize = recvfrom(sock, reinterpret_cast<void *>(buffer), UDP_BUFFER_SIZE, 0,
+                                         (struct sockaddr *)&address, &addressLength);
 
         // LCOV_EXCL_START
         if (UNLIKELY(recsize < 0))
         {
             rep.message("could not receive message");
-            if (failonerror) {
+            if (failonerror)
+            {
                 rep.abort(ERROR_NETWORK);
-            } else {
+            }
+            else
+            {
                 return;
             }
         }
@@ -158,9 +171,10 @@ void Socket::receive() const
         // get time
         time_t now;
         time(&now);
-        struct tm* current = localtime(&now);
+        struct tm *current = localtime(&now);
 
-        rep.message("%s: %.*s", rep.markup(MARKUP_UNIMPORTANT, "%s @ %02i:%02i:%02i", display, current->tm_hour, current->tm_min, current->tm_sec).str(), static_cast<int>(recsize), buffer);
+        rep.message("%s: %.*s", rep.markup(MARKUP_UNIMPORTANT, "%s @ %02i:%02i:%02i", display,
+                                           current->tm_hour, current->tm_min, current->tm_sec).str(), static_cast<int>(recsize), buffer);
     }
 }
 
@@ -172,18 +186,22 @@ void Socket::receive() const
 \post The given message is sent to the socket #sock. As we are using UDP
       datagrams it is not guaranteed whether the message is actually received.
 */
-void Socket::send(const char* message) const
+void Socket::send(const char *message) const
 {
-    const ssize_t bytes_sent = sendto(sock, message, strlen(message), 0, (const struct sockaddr*)&address, SIZEOF_SOCKADDR_IN);
+    const ssize_t bytes_sent = sendto(sock, message, strlen(message), 0,
+                                      (const struct sockaddr *)&address, SIZEOF_SOCKADDR_IN);
 
     // LCOV_EXCL_START
     if (UNLIKELY(bytes_sent < 0))
     {
         ReporterStream rep(true);
         rep.message("could not send message '%s'", message);
-        if (failonerror) {
+        if (failonerror)
+        {
             rep.abort(ERROR_NETWORK);
-        } else {
+        }
+        else
+        {
             return;
         }
     }
@@ -197,7 +215,7 @@ void Socket::send(const char* message) const
         message
 \post Memory for return value needs to be freed by caller.
 */
-char* Socket::waitFor(const char* message) const
+char *Socket::waitFor(const char *message) const
 {
     assert(listening);
 
@@ -212,22 +230,26 @@ char* Socket::waitFor(const char* message) const
         // receive data from the socket sock, stores it into buffer with
         // length UDP_BUFFER_SIZE, sets no flags, receives from address
         // specified in sa with length fromlen
-        const ssize_t recsize = recvfrom(sock, reinterpret_cast<void*>(buffer), UDP_BUFFER_SIZE, 0, (struct sockaddr*)&address, &addressLength);
+        const ssize_t recsize = recvfrom(sock, reinterpret_cast<void *>(buffer), UDP_BUFFER_SIZE, 0,
+                                         (struct sockaddr *)&address, &addressLength);
 
         // LCOV_EXCL_START
         if (UNLIKELY(recsize < 0))
         {
             ReporterStream rep(true);
             rep.message("could not receive message");
-            if (failonerror) {
+            if (failonerror)
+            {
                 rep.abort(ERROR_NETWORK);
-            } else {
+            }
+            else
+            {
                 return NULL;
             }
         }
         // LCOV_EXCL_STOP
 
-        char* received = NULL;
+        char *received = NULL;
         const int bytes = asprintf(&received, "%.*s", static_cast<int>(recsize), buffer);
         assert(bytes != -1);
         assert(received);
@@ -236,7 +258,7 @@ char* Socket::waitFor(const char* message) const
         if (!strcmp(received, message))
         {
             // get sender IP
-            char* senderaddress = (char*)malloc(INET_ADDRSTRLEN * SIZEOF_CHAR);
+            char *senderaddress = (char *)malloc(INET_ADDRSTRLEN * SIZEOF_CHAR);
             inet_ntop(AF_INET, &address.sin_addr.s_addr, senderaddress, INET_ADDRSTRLEN);
             return senderaddress;
         }

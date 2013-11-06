@@ -17,10 +17,10 @@ class Chunk
 {
 public:
     /// previous chunk
-    Chunk * prev;
+    Chunk *prev;
 
     /// the content-array of the chunk
-    T * content;
+    T *content;
 
     /// default constructor
     Chunk();
@@ -47,19 +47,19 @@ template<class T>
 class SearchStack
 {
 public:
-	/*!
-	\brief returns a new stack frame; result is a default-constructed object that takes the payload
+    /*!
+    \brief returns a new stack frame; result is a default-constructed object that takes the payload
 
-	This function will return the pointer to the place for the new top element of the stack.
-	The entry itself has to be copied manually to the location of the pointer.
+    This function will return the pointer to the place for the new top element of the stack.
+    The entry itself has to be copied manually to the location of the pointer.
 
-	The  following code fragment gives an example how to place a new `StackElement` in general.
+    The  following code fragment gives an example how to place a new `StackElement` in general.
 
-		StackEntry * entry = stack.push();
-		entry = new (entry) StackEntry(...);
-	It might be noticed that this function will not always allocate new memory. As the implementation uses chunks, the memory may already be allocated.
-	*/
-    T* push();
+    	StackEntry * entry = stack.push();
+    	entry = new (entry) StackEntry(...);
+    It might be noticed that this function will not always allocate new memory. As the implementation uses chunks, the memory may already be allocated.
+    */
+    T *push();
     /*!
      \brief release a stack frame, destructor to payload object might be called
 
@@ -73,7 +73,7 @@ public:
 
      Returns a reference to the current top element of the stack frame.
      */
-    T& top() const;
+    T &top() const;
 
     SearchStack();
     SearchStack(const SearchStack &);
@@ -101,7 +101,7 @@ public:
     unsigned int StackPointer;
 
 private:
-    Chunk<T>* currentchunk;
+    Chunk<T> *currentchunk;
 };
 
 #include <cstdlib>
@@ -110,39 +110,51 @@ private:
 #include <Exploration/SearchStack.h>
 
 template<class T>
-Chunk<T>::Chunk(const Chunk<T>* chunk, unsigned int numElements)
+Chunk<T>::Chunk(const Chunk<T> *chunk, unsigned int numElements)
 {
-    content = (T*) calloc(sizeof(T),SIZEOF_STACKCHUNK);
-    for(int i=0;i<numElements;i++)
-    	new (content+i) T(chunk->content[i]);
-    if(chunk->prev)
-    	prev = new Chunk<T>(chunk->prev,SIZEOF_STACKCHUNK);
+    content = (T *) calloc(sizeof(T), SIZEOF_STACKCHUNK);
+    for (int i = 0; i < numElements; i++)
+    {
+        new (content + i) T(chunk->content[i]);
+    }
+    if (chunk->prev)
+    {
+        prev = new Chunk<T>(chunk->prev, SIZEOF_STACKCHUNK);
+    }
     else
-    	prev = NULL;
+    {
+        prev = NULL;
+    }
 }
 
 template<class T>
 Chunk<T>::Chunk()
 {
     prev = NULL;
-    content = (T*) calloc(sizeof(T),SIZEOF_STACKCHUNK);
+    content = (T *) calloc(sizeof(T), SIZEOF_STACKCHUNK);
 }
 
 template<class T>
-Chunk<T>::~Chunk() {
+Chunk<T>::~Chunk()
+{
     free(content);
 }
 
 
 template<class T>
-void Chunk<T>::delete_all_prev_chunks() {
+void Chunk<T>::delete_all_prev_chunks()
+{
     if (!prev)
+    {
         return;
+    }
     prev->delete_all_prev_chunks();
     // if we want to delete all the prev chunks, we have to delete all its lists,
     // as no one will pop them in the future
-	for(unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
-		prev -> content[i].~T();
+    for (unsigned int i = 0; i < SIZEOF_STACKCHUNK; i++)
+    {
+        prev -> content[i].~T();
+    }
     delete prev;
 
     prev = NULL;
@@ -159,28 +171,33 @@ template<class T>
 SearchStack<T>::~SearchStack()
 {
     if (!currentchunk)
+    {
         return;
+    }
     currentchunk->delete_all_prev_chunks();
-	do
-	{
-		currentchunk->content[--StackPointer % SIZEOF_STACKCHUNK].~T();
-	}
-	while((StackPointer % SIZEOF_STACKCHUNK) != 0);
+    do
+    {
+        currentchunk->content[--StackPointer % SIZEOF_STACKCHUNK].~T();
+    }
+    while ((StackPointer % SIZEOF_STACKCHUNK) != 0);
     delete currentchunk;
 }
 
 template<class T>
-T* SearchStack<T>::push()
+T *SearchStack<T>::push()
 {
     if ((StackPointer % SIZEOF_STACKCHUNK) == 0)
     {
         // need new chunk
-        Chunk<T>* newchunk = new Chunk<T>;
-        if (StackPointer == 0) assert(!currentchunk);
+        Chunk<T> *newchunk = new Chunk<T>;
+        if (StackPointer == 0)
+        {
+            assert(!currentchunk);
+        }
         newchunk->prev = currentchunk;
         currentchunk = newchunk;
     }
-    return(currentchunk->content + (StackPointer++ % SIZEOF_STACKCHUNK));
+    return (currentchunk->content + (StackPointer++ % SIZEOF_STACKCHUNK));
 }
 
 template<class T>
@@ -190,38 +207,43 @@ void SearchStack<T>::pop()
     if ((StackPointer % SIZEOF_STACKCHUNK) == 0)
     {
         // need to jump to previous chunk
-        Chunk<T>* tempchunk = currentchunk;
+        Chunk<T> *tempchunk = currentchunk;
         currentchunk = currentchunk->prev;
         delete tempchunk;
     }
 }
 
 template<class T>
-T& SearchStack<T>::top() const
+T &SearchStack<T>::top() const
 {
-    return currentchunk->content[(StackPointer - 1)% SIZEOF_STACKCHUNK];
+    return currentchunk->content[(StackPointer - 1) % SIZEOF_STACKCHUNK];
 }
 
 template<class T>
-void SearchStack<T>::swap(SearchStack<T> &s) {
-	std::swap(currentchunk, s.currentchunk);
-	std::swap(StackPointer, s.StackPointer);
+void SearchStack<T>::swap(SearchStack<T> &s)
+{
+    std::swap(currentchunk, s.currentchunk);
+    std::swap(StackPointer, s.StackPointer);
 }
 
 template<class T>
 SearchStack<T>::SearchStack(const SearchStack<T> &stack)
 {
-	StackPointer = stack.StackPointer;
-	if(stack.currentchunk)
-		currentchunk = new Chunk<T>(stack.currentchunk, (stack.StackPointer-1)%SIZEOF_STACKCHUNK + 1);
-	else
-		currentchunk = NULL;
+    StackPointer = stack.StackPointer;
+    if (stack.currentchunk)
+    {
+        currentchunk = new Chunk<T>(stack.currentchunk, (stack.StackPointer - 1) % SIZEOF_STACKCHUNK + 1);
+    }
+    else
+    {
+        currentchunk = NULL;
+    }
 }
 
 template<class T>
 SearchStack<T> &SearchStack<T>::operator=(const SearchStack<T> &stack)
 {
-	SearchStack<T> tmp(stack); // copy and swap
-	swap(tmp);
+    SearchStack<T> tmp(stack); // copy and swap
+    swap(tmp);
     return *this;
 }

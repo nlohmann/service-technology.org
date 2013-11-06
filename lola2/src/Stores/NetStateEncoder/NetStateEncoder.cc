@@ -5,8 +5,8 @@
 #include <cstdlib>
 #include <InputOutput/Reporter.h>
 
-void NetStateEncoder::decodeNetState(NetState& ns, vectordata_t* data)
+void NetStateEncoder::decodeNetState(NetState &ns, vectordata_t *data)
 {
-  rep->status("this encoder can not decode states");
-  rep->abort(ERROR_COMMANDLINE);
+    rep->status("this encoder can not decode states");
+    rep->abort(ERROR_COMMANDLINE);
 }

@@ -21,9 +21,9 @@ public:
     virtual ~ConjunctionStatePredicate();
 
     /// adds i-th subformula
-    void addSub(index_t i, StatePredicate* f);
+    void addSub(index_t i, StatePredicate *f);
 
-    virtual index_t getUpSet(index_t* stack, bool* onstack);
+    virtual index_t getUpSet(index_t *stack, bool *onstack);
 
     /// If value of this changes, the parent formula is
     /// triggered for updating. This means that updating is started at the leafs of the formula tree.
@@ -39,13 +39,13 @@ public:
 
     virtual bool DEBUG__consistency(NetState &ns);
 
-	// direct read access for the deletion algorithm
-	virtual index_t getSubs(const StatePredicate* const** subs) const;
-	index_t countUnsatisfied() const;
+    // direct read access for the deletion algorithm
+    virtual index_t getSubs(const StatePredicate *const **subs) const;
+    index_t countUnsatisfied() const;
 
 private:
     /// the list of subformulas
-    StatePredicate** sub;
+    StatePredicate **sub;
 
     /// The number of subformulas;
     index_t cardSub;
@@ -58,8 +58,8 @@ private:
 
     /// collects atomic subformulas; array must be malloced beforehand
     /// result is number of inserted elements
-    virtual index_t collectAtomic(AtomicStatePredicate**);
+    virtual index_t collectAtomic(AtomicStatePredicate **);
 
     // copy function
-    virtual StatePredicate* copy(StatePredicate* parent);
+    virtual StatePredicate *copy(StatePredicate *parent);
 };

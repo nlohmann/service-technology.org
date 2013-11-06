@@ -34,7 +34,7 @@ private:
     }
 
     /// copy contructor for use in parallel evaluation
-    virtual SimpleProperty* copy()
+    virtual SimpleProperty *copy()
     {
         return new Deadlock();
     }

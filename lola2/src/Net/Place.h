@@ -23,22 +23,22 @@ public:
     static index_t CardSignificant;
 
     /// The hash factor for a place. We compute hash values for places as \f$\sum_{p \in P} m(p)\cdot hash(p)\f$
-    static hash_t* Hash;
+    static hash_t *Hash;
 
     /// The maximum number of tokens that, according to input specification, can ever be present on this place.
-    static capacity_t* Capacity;
+    static capacity_t *Capacity;
 
     /// The number of bits needed for representing the numbers 0 .. Capacity[i]
-    static cardbit_t* CardBits;
+    static cardbit_t *CardBits;
 
     /// The sum of the CardBits of all places
     static index_t SizeOfBitVector;
 
     /// Number of transitions for which this place is the distinguished insufficiently marked Pre-place (scapegoat)
-    static index_t* CardDisabled;
+    static index_t *CardDisabled;
 
     /// These are the transitions for which this place is the scapegoat.
-    static index_t** Disabled;
+    static index_t **Disabled;
 
     /// Aufräumen der Knoten - Service für valgrind
     static void deletePlaces();

@@ -16,7 +16,7 @@
 
 
 // initialize error messages
-const char* Reporter::error_messages[] =
+const char *Reporter::error_messages[] =
 {
     "syntax error",
     "command line error",
@@ -33,7 +33,7 @@ const char* Reporter::error_messages[] =
 \param[in] ip   the target IP address
 \param verbose  whether to display verbose messages
 */
-ReporterSocket::ReporterSocket(u_short port, const char* ip, bool verbose)
+ReporterSocket::ReporterSocket(u_short port, const char *ip, bool verbose)
     : verbose(verbose), mySocket(Socket(port, ip))
 {
 }
@@ -41,7 +41,7 @@ ReporterSocket::ReporterSocket(u_short port, const char* ip, bool verbose)
 /*!
 \param[in] format  the status message formatted as printf string
 */
-void ReporterSocket::message(const char* format, ...) const
+void ReporterSocket::message(const char *format, ...) const
 {
     char buffer[UDP_BUFFER_SIZE];
     va_list args;
@@ -55,7 +55,7 @@ void ReporterSocket::message(const char* format, ...) const
 \param[in] format  the status message formatted as printf string
 \post The message is not printed unless the #verbose member is true.
 */
-void ReporterSocket::status(const char* format, ...) const
+void ReporterSocket::status(const char *format, ...) const
 {
     if (not verbose)
     {
@@ -102,11 +102,11 @@ ReporterSocket::~ReporterSocket()
 \post Passed string format is formatted according to markup.
 \note Memory for res is released by Reporter::~String().
 */
-String ReporterSocket::markup(markup_t markup, const char* format, ...) const
+String ReporterSocket::markup(markup_t markup, const char *format, ...) const
 {
     va_list args;
     va_start(args, format);
-    char* res = NULL;
+    char *res = NULL;
     const int r = vasprintf(&res, format, args);
     assert(r != -1);
     va_end(args);
@@ -123,7 +123,7 @@ String ReporterSocket::markup(markup_t markup, const char* format, ...) const
 ReporterStream::ReporterStream(bool verbose) :
     verbose(verbose),
 #if !defined(__MINGW32__)
-    useColor(isatty(fileno(stderr)) && (
+    useColor(isatty(fileno(stderr))  &&(
                  !strcmp(getenv("TERM"), "linux") ||
                  !strcmp(getenv("TERM"), "cygwin") ||
                  !strcmp(getenv("TERM"), "xterm") ||
@@ -163,7 +163,7 @@ ReporterStream::ReporterStream(bool verbose) :
 /*!
 \param[in] format  the status message formatted as printf string
 */
-void ReporterStream::message(const char* format, ...) const
+void ReporterStream::message(const char *format, ...) const
 {
     fprintf(stderr, "%s: ", markup(MARKUP_TOOL, PACKAGE).str());
 
@@ -180,7 +180,7 @@ void ReporterStream::message(const char* format, ...) const
 \param[in] format  the status message formatted as printf string
 \post The message is not printed unless the #verbose member is true.
 */
-void ReporterStream::status(const char* format, ...) const
+void ReporterStream::status(const char *format, ...) const
 {
     if (not verbose)
     {
@@ -223,16 +223,16 @@ __attribute__((noreturn)) void ReporterStream::abort(errorcode_t code) const
 \post Passed string format is formatted according to markup.
 \note Memory for res is released by ~String::String().
 */
-String ReporterStream::markup(markup_t markup, const char* format, ...) const
+String ReporterStream::markup(markup_t markup, const char *format, ...) const
 {
     va_list args;
     va_start(args, format);
-    char* message = NULL;
+    char *message = NULL;
     const int r = vasprintf(&message, format, args);
     assert(r != -1);
     va_end(args);
 
-    char* res = NULL;
+    char *res = NULL;
     int bytes = -1;
 
     switch (markup)

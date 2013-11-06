@@ -14,12 +14,12 @@ template <typename T> class CompareStore : public Store<T>
 {
 public:
     /// creates new Compare-Store using the two given Stores
-	CompareStore(Store<T>* correct, Store<T>* test,uint32_t _number_of_threads);
+    CompareStore(Store<T> *correct, Store<T> *test, uint32_t _number_of_threads);
 
     /// frees both components
     ~CompareStore();
 
-    bool searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex, bool noinsert=false);
+    bool searchAndInsert(NetState &ns, T **payload, uint32_t threadIndex, bool noinsert = false);
 
     /// gets and removes a state from the store
     /// @param ns NetState where the removed state will be written to
@@ -28,9 +28,9 @@ public:
 
 private:
     /// correct store
-    Store<T>* correctStore;
+    Store<T> *correctStore;
     /// store to be tested
-    Store<T>* testStore;
+    Store<T> *testStore;
 };
 
 #include <Stores/CompareStore.inc>

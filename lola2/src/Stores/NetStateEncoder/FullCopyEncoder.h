@@ -23,12 +23,12 @@ public:
     /// @param bitlen output: reference to length of input vector (in bits). Will be filled by the method.
     /// @param threadIndex input: the index of the thread that requests this call. Values will range from 0 to (numThreads - 1). Used to allow using thread-local auxiliary data structures without locking any variables.
     /// @return the final input vector.
-    vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex);
+    vectordata_t *encodeNetState(NetState &ns, bitindex_t &bitlen, index_t threadIndex);
 
     /// decodes a given encoded state and sets the netstate appropriately
     /// @param ns NetState the decoded state will be written to
     /// @param data vector to be decoded
-    virtual void decodeNetState(NetState& ns, vectordata_t* data);
+    virtual void decodeNetState(NetState &ns, vectordata_t *data);
 private:
 
     /// number of words in input vector
@@ -44,6 +44,6 @@ private:
     bool nocopy;
 
     /// vector of input vectors that are returned from encodeNetState. Each thread has its own vector to avoid conflicts. Only needed if memcpy is actually used.
-    vectordata_t** inputs;
+    vectordata_t **inputs;
 #endif
 };

@@ -16,8 +16,8 @@ class ParserPTNet
 private:
 
 public:
-    SymbolTable* PlaceTable;
-    SymbolTable* TransitionTable;
+    SymbolTable *PlaceTable;
+    SymbolTable *TransitionTable;
 
     /// translation into main net structures Node, Place, Transition, and Marking
     void symboltable2net();

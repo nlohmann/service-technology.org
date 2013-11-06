@@ -45,7 +45,7 @@ private:
 
 public:
     /// create a socket - port is mandatory, destination address optional
-    Socket(u_short port, const char* destination = NULL, bool failonerror = true);
+    Socket(u_short port, const char *destination = NULL, bool failonerror = true);
 
     /// close the socket
     ~Socket();
@@ -54,8 +54,8 @@ public:
     void receive() const;
 
     /// wait for a specific message
-    char* waitFor(const char* message) const;
+    char *waitFor(const char *message) const;
 
     /// send a message
-    void send(const char* message) const;
+    void send(const char *message) const;
 };

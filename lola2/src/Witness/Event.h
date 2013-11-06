@@ -8,8 +8,8 @@
 class Event
 {
 private:
-    static std::map<index_t, Event*> current;
-    static std::vector<Event*> events;
+    static std::map<index_t, Event *> current;
+    static std::vector<Event *> events;
 
     index_t transition;
 

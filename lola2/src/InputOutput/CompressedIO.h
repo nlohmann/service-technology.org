@@ -14,7 +14,7 @@ ASCII file where data are separated by spaces and newlines.
 #include <cstdio>
 #include"Parser/ParserPTNet.h"
 
-void WriteNameFile(FILE*);
-void WriteNetFile(FILE*);
-void ReadNameFile(FILE*, ParserPTNet*);
-void ReadNetFile(FILE*);
+void WriteNameFile(FILE *);
+void WriteNetFile(FILE *);
+void ReadNameFile(FILE *, ParserPTNet *);
+void ReadNetFile(FILE *);

@@ -15,7 +15,7 @@ public:
     CopyEncoder(int numThreads);
     ~CopyEncoder();
 
-    vectordata_t* encodeNetState(NetState& ns, bitindex_t& bitlen, index_t threadIndex);
+    vectordata_t *encodeNetState(NetState &ns, bitindex_t &bitlen, index_t threadIndex);
 private:
 
     /// number of words in input vector
@@ -33,7 +33,7 @@ private:
     bool nocopy;
 
     /// vector of input vectors that are returned from encodeNetState. Each thread has its own vector to avoid conflicts. Only needed if memcpy is actually used.
-    vectordata_t** inputs;
+    vectordata_t **inputs;
 #endif
 };
 

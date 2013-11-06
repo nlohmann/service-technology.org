@@ -16,12 +16,13 @@ template <typename T> class PluginStore : public Store<T>
 {
 public:
     /// creates new Store using the specified components. The given components are assumed to be used exclusively and are freed once the PluginStore gets destructed.
-    PluginStore(NetStateEncoder* _netStateEncoder, VectorStore<T>* _vectorStore, uint32_t _number_of_threads);
+    PluginStore(NetStateEncoder *_netStateEncoder, VectorStore<T> *_vectorStore,
+                uint32_t _number_of_threads);
 
     /// frees both components
     ~PluginStore();
 
-    bool searchAndInsert(NetState &ns, T** payload, uint32_t threadIndex, bool noinsert=false);
+    bool searchAndInsert(NetState &ns, T **payload, uint32_t threadIndex, bool noinsert = false);
 
     /// gets and removes a state from the store
     /// @param ns NetState where the removed state will be written to
@@ -30,9 +31,9 @@ public:
 
 private:
     /// used NetStateEncoder (given in constructor)
-    NetStateEncoder* netStateEncoder;
+    NetStateEncoder *netStateEncoder;
     /// used VectorStore (given in constructor)
-    VectorStore<T>* vectorStore;
+    VectorStore<T> *vectorStore;
 };
 
 #include <Stores/PluginStore.inc>

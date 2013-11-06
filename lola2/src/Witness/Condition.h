@@ -10,15 +10,15 @@ class Event;
 class Condition
 {
 public:
-    static std::vector<Condition*> conditions;
+    static std::vector<Condition *> conditions;
     index_t place;
 
-    static std::map<index_t, Condition*> current;
+    static std::map<index_t, Condition *> current;
 
-    Event* in;
-    Event* out;
+    Event *in;
+    Event *out;
 
-    Condition(index_t, Event* = NULL);
+    Condition(index_t, Event * = NULL);
 
     static void dot(FILE * = stdout);
 };

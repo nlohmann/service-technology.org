@@ -12,7 +12,7 @@ class String
 {
 private:
     /// payload - is freed in destructor
-    char* s;
+    char *s;
 
 public:
     /// constructor for empty string
@@ -22,14 +22,14 @@ public:
     String(const String &);
 
     /// constructor (does only copy pointer, not content)
-    explicit String(char* s);
+    explicit String(char *s);
 
     /// constructor (actually copying content)
-    String(char* s, bool);
+    String(char *s, bool);
 
     /// destructor - frees payload
     ~String();
 
     /// getter for s
-    char* str() const;
+    char *str() const;
 };

@@ -38,10 +38,10 @@ private:
     pthread_t reporter_thread;
 
     /// the reporter function
-    void* reporter_internal(void);
+    void *reporter_internal(void);
 
     /// a helper function to start the reporter thread
-    static void* reporter_helper(void* context);
+    static void *reporter_helper(void *context);
 
 protected:
     /// the maximum number of threads this store has to work with.
@@ -49,10 +49,10 @@ protected:
     const uint32_t number_of_threads;
 
     /// the number of stored markings. It is stored as an array of integers, one value per thread, to avoid lost updates when counting concurrently. The sum of all values is the actual total number of markings found.
-    uint64_t* markings;
+    uint64_t *markings;
 
     /// the number of calls to searchAndInsert(). It is stored as an array of integers, one value per thread, to avoid lost updates when counting concurrently. The sum of all values is the actual total number of calls made.
-    uint64_t* calls;
+    uint64_t *calls;
 
 public:
     /// retrieves the current total number of markings stored.
@@ -82,9 +82,9 @@ public:
     /// @param ns NetState that needs to be checked
     /// @param payload reference to address of payload data. If the marking is found, the address is set to the (already existing) payload entry of that marking, if a new marking was added the address will be set to a newly allocated payload entry.
     /// @param thread the index of the thread that requests this call. Values will range from 0 to (number_of_threads - 1). Used to allow using thread-local auxiliary data structures without locking any variables.
-	/// @param noinsert if set to true only a search is done
-	/// @return true, if the marking was found in the store, otherwise false.
-    virtual bool searchAndInsert(NetState &ns, T** payload, index_t thread, bool noinsert = false) = 0;
+    /// @param noinsert if set to true only a search is done
+    /// @return true, if the marking was found in the store, otherwise false.
+    virtual bool searchAndInsert(NetState &ns, T **payload, index_t thread, bool noinsert = false) = 0;
 
     /// gets and removes a state from the store
     /// @param ns NetState where the removed state will be written to

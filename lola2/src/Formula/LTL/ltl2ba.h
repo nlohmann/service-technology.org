@@ -53,7 +53,7 @@ tl_Node	*right_linked(tl_Node *);
 tl_Symbol	*getsym(tl_Symbol *);
 tl_Symbol	*DoDump(tl_Node *);
 
-char	*emalloc(int);	
+char	*emalloc(int);
 
 int	anywhere(int, tl_Node *, tl_Node *);
 int	dump_cond(tl_Node *, tl_Node *, int);
@@ -101,7 +101,7 @@ void do_merge_sets(int *, int *, int *, int);
 int  *intersect_sets(int *, int *, int);
 void add_set(int *, int);
 void rem_set(int *, int);
-void spin_print_set(int *, int*);
+void spin_print_set(int *, int *);
 void print_set(int *, int);
 int  empty_set(int *, int);
 int  empty_intersect_sets(int *, int *, int);
@@ -114,7 +114,7 @@ int timeval_subtract (struct timeval *, struct timeval *, struct timeval *);
 
 #define ZN	(tl_Node *)0
 #define ZS	(tl_Symbol *)0
-#define Nhash	255    	
+#define Nhash	255
 #define True	tl_nn(TRUE,  ZN, ZN)
 #define False	tl_nn(FALSE, ZN, ZN)
 #define Not(a)	push_negation(tl_nn(NOT, a, ZN))
@@ -129,5 +129,5 @@ typedef tl_Node	*Nodeptr;
 #define Explain(x)	{ if (tl_verbose) tl_explain(x); }
 
 #define Assert(x, y)	{ if (!(x)) { tl_explain(y); \
-			  Fatal(": assertion failed\n",(char *)0); } }
+            Fatal(": assertion failed\n",(char *)0); } }
 #define min(x,y)        ((x<y)?x:y)

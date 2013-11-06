@@ -15,7 +15,7 @@ FalsePredicate::FalsePredicate()
     value = false;
 }
 
-index_t FalsePredicate::getUpSet(index_t* stack, bool* onstack)
+index_t FalsePredicate::getUpSet(index_t *stack, bool *onstack)
 {
     return 0;
 }
@@ -25,25 +25,26 @@ index_t FalsePredicate::countAtomic() const
     return 0;
 }
 
-index_t FalsePredicate::collectAtomic(AtomicStatePredicate**)
+index_t FalsePredicate::collectAtomic(AtomicStatePredicate **)
 {
     return 0;
 }
 
-StatePredicate* FalsePredicate::copy(StatePredicate* parent)
+StatePredicate *FalsePredicate::copy(StatePredicate *parent)
 {
-    StatePredicate* p = new FalsePredicate();
+    StatePredicate *p = new FalsePredicate();
     p->parent = parent;
     p->position = position;
     return p;
 }
 
-index_t FalsePredicate::getSubs(const StatePredicate* const** subs) const
+index_t FalsePredicate::getSubs(const StatePredicate *const **subs) const
 {
-	return 0;
+    return 0;
 }
 
-StatePredicate* FalsePredicate::negate(){
-	return new TruePredicate();
+StatePredicate *FalsePredicate::negate()
+{
+    return new TruePredicate();
 }
 

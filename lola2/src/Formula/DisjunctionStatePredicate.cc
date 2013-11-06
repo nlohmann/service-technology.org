@@ -16,7 +16,7 @@ DisjunctionStatePredicate::DisjunctionStatePredicate(index_t n)
     //printf("+ %p->DisjunctionStatePredicate(n=%d)\n", this, n);
 
     parent = NULL;
-    sub = (StatePredicate**) malloc(n * SIZEOF_VOIDP);
+    sub = (StatePredicate **) malloc(n * SIZEOF_VOIDP);
     cardSub = n;
 }
 
@@ -29,7 +29,7 @@ DisjunctionStatePredicate::~DisjunctionStatePredicate()
     free(sub);
 }
 
-void DisjunctionStatePredicate::addSub(index_t i, StatePredicate* f)
+void DisjunctionStatePredicate::addSub(index_t i, StatePredicate *f)
 {
     //printf("+ %p->addSub(i=%d, f=%p)\n", this, i, f);
 
@@ -39,7 +39,7 @@ void DisjunctionStatePredicate::addSub(index_t i, StatePredicate* f)
     sub[i]-> parent = this;
 }
 
-index_t DisjunctionStatePredicate::getUpSet(index_t* stack, bool* onstack)
+index_t DisjunctionStatePredicate::getUpSet(index_t *stack, bool *onstack)
 {
     // call only if this formula is false
     assert(cardSat == 0);
@@ -67,7 +67,7 @@ void DisjunctionStatePredicate::updateTF(index_t i)
         }
     }
 
-    StatePredicate* tmp = sub[cardSat];
+    StatePredicate *tmp = sub[cardSat];
     sub[cardSat] = sub[i];
     sub[i] = tmp;
     sub[i] -> position = i;
@@ -79,7 +79,7 @@ void DisjunctionStatePredicate::updateFT(index_t i)
     // assumption: satisfied left, unsatisfied right
 
     // --> sub[cardSat] is first satisfied
-    StatePredicate* tmp = sub[cardSat];
+    StatePredicate *tmp = sub[cardSat];
     sub[cardSat] = sub[i];
     sub[i] = tmp;
     sub[i] -> position = i;
@@ -126,7 +126,7 @@ void DisjunctionStatePredicate::evaluate(NetState &ns)
         assert(left < cardSub);
         assert(right > 0);
         assert(right <= cardSub);
-        StatePredicate* tmp = sub[left];
+        StatePredicate *tmp = sub[left];
         sub[left++] = sub[--right];
         sub[right] = tmp;
     }
@@ -152,7 +152,7 @@ index_t DisjunctionStatePredicate::countAtomic() const
     return result;
 }
 
-index_t DisjunctionStatePredicate::collectAtomic(AtomicStatePredicate** p)
+index_t DisjunctionStatePredicate::collectAtomic(AtomicStatePredicate **p)
 {
     index_t offset = 0;
     for (index_t i = 0; i < cardSub; i++)
@@ -206,9 +206,9 @@ bool DisjunctionStatePredicate::DEBUG__consistency(NetState &ns)
 // LCOV_EXCL_STOP
 
 
-StatePredicate* DisjunctionStatePredicate::copy(StatePredicate* parent)
+StatePredicate *DisjunctionStatePredicate::copy(StatePredicate *parent)
 {
-    DisjunctionStatePredicate* dsp = new DisjunctionStatePredicate(cardSub);
+    DisjunctionStatePredicate *dsp = new DisjunctionStatePredicate(cardSub);
     dsp->cardSub = cardSub;
     dsp->cardSat = cardSat;
     dsp->value = value;
@@ -222,14 +222,14 @@ StatePredicate* DisjunctionStatePredicate::copy(StatePredicate* parent)
     return dsp;
 }
 
-index_t DisjunctionStatePredicate::getSubs(const StatePredicate* const** subs) const
+index_t DisjunctionStatePredicate::getSubs(const StatePredicate *const **subs) const
 {
-	*subs = sub;
-	return cardSub;
+    *subs = sub;
+    return cardSub;
 }
 
 bool DisjunctionStatePredicate::isOrNode() const
 {
-	return true;
+    return true;
 }
 

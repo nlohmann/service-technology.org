@@ -15,7 +15,7 @@ class IO
 {
 protected:
     /// a reporter for status messages
-    static Reporter* r;
+    static Reporter *r;
 
     /// the filename (or empty in case of stdin/stdout)
     std::string filename;
@@ -24,19 +24,19 @@ protected:
     std::string kind;
 
     /// the filepointer
-    FILE* fp;
+    FILE *fp;
 
 public:
-    static void setReporter(Reporter*);
+    static void setReporter(Reporter *);
 
     /// implicit cast to FILE* (return fp)
-    operator FILE* ();
+    operator FILE *();
 
     /// return filename
-    const char* getFilename();
+    const char *getFilename();
 
     /// default constructor
-    IO(FILE*, std::string, std::string);
+    IO(FILE *, std::string, std::string);
 
     /// destructor
     ~IO();

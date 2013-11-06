@@ -22,11 +22,11 @@ A firelist may contain not all enabled transtitions, but must not contain transi
 class Firelist
 {
 public:
-	/*!
+    /*!
     \brief return value contains number of elements in fire list, argument is reference parameter for actual list
     \param ns the net-state for which the firelist should be determined.
     */
-    virtual index_t getFirelist(NetState &ns, index_t**);
+    virtual index_t getFirelist(NetState &ns, index_t **);
     virtual ~Firelist() {}
 
     /*!
@@ -38,5 +38,5 @@ public:
      This function is essential for the parallel exploration of the state space.
      Each thread will have its own firelist with the current simple property.
      */
-    virtual Firelist* createNewFireList(SimpleProperty *property);
+    virtual Firelist *createNewFireList(SimpleProperty *property);
 };

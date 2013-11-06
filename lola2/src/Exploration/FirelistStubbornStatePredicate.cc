@@ -15,11 +15,11 @@
 #include <Exploration/FirelistStubbornStatePredicate.h>
 #include <Exploration/StatePredicateProperty.h>
 
-FirelistStubbornStatePredicate::FirelistStubbornStatePredicate(StatePredicate* p)
+FirelistStubbornStatePredicate::FirelistStubbornStatePredicate(StatePredicate *p)
 {
     predicate = p;
-    dfsStack = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    onStack = (bool*) calloc(Net::Card[TR] , sizeof(bool));
+    dfsStack = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    onStack = (bool *) calloc(Net::Card[TR] , sizeof(bool));
 }
 
 FirelistStubbornStatePredicate::~FirelistStubbornStatePredicate()
@@ -28,7 +28,7 @@ FirelistStubbornStatePredicate::~FirelistStubbornStatePredicate()
     free(onStack);
 }
 
-index_t FirelistStubbornStatePredicate::getFirelist(NetState &ns, index_t** result)
+index_t FirelistStubbornStatePredicate::getFirelist(NetState &ns, index_t **result)
 {
     if (ns.CardEnabled == 0)
     {
@@ -44,7 +44,7 @@ index_t FirelistStubbornStatePredicate::getFirelist(NetState &ns, index_t** resu
     for (index_t firstunprocessed = 0; firstunprocessed < stackpointer; ++firstunprocessed)
     {
         index_t currenttransition = dfsStack[firstunprocessed];
-        index_t* mustbeincluded;
+        index_t *mustbeincluded;
         index_t  cardmustbeincluded;
         if (ns.Enabled[currenttransition])
         {
@@ -83,7 +83,7 @@ index_t FirelistStubbornStatePredicate::getFirelist(NetState &ns, index_t** resu
     return size;
 }
 
-Firelist* FirelistStubbornStatePredicate::createNewFireList(SimpleProperty *property)
+Firelist *FirelistStubbornStatePredicate::createNewFireList(SimpleProperty *property)
 {
-    return new FirelistStubbornStatePredicate(((StatePredicateProperty*)property)->getPredicate());
+    return new FirelistStubbornStatePredicate(((StatePredicateProperty *)property)->getPredicate());
 }

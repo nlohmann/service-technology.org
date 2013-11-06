@@ -24,11 +24,11 @@ distributed over many SweepRingStores.
 class SweepEmptyStore : public EmptyStore<void>
 {
 public:
-	SweepEmptyStore();
+    SweepEmptyStore();
 
-	void incrementMarkings();
-	void incrementCalls();
-	void setMarkings(int64_t count);
-	void setCalls(int64_t count);
+    void incrementMarkings();
+    void incrementCalls();
+    void setMarkings(int64_t count);
+    void setCalls(int64_t count);
 };
 

@@ -27,7 +27,7 @@ class StatePredicateProperty: public SimpleProperty
 {
 
 public:
-    StatePredicateProperty(StatePredicate*);
+    StatePredicateProperty(StatePredicate *);
     virtual ~StatePredicateProperty();
     StatePredicateProperty() {}
     /// prepare for search
@@ -40,22 +40,25 @@ public:
     virtual bool updateProperty(NetState &ns, index_t);
 
     /// return the predicate used to evaluate the property
-    StatePredicate* getPredicate(){return predicate;}
+    StatePredicate *getPredicate()
+    {
+        return predicate;
+    }
 
 private:
 
     /// the actual formula to be verified;
-    StatePredicate* predicate;
+    StatePredicate *predicate;
 
     /// for each transition t, number of state predicates that need to be checked when t is fired
-    index_t* cardChanged;
+    index_t *cardChanged;
 
     /// for each transition t, an array with all state predicates that need to be checked when t is fired
-    AtomicStatePredicate*** changedPredicate;
+    AtomicStatePredicate ** *changedPredicate;
 
     /// changedSum[t][i] is the difference that t causes in the formal sum of state predicate changedPredicate[t][i]
-    int** changedSum;
+    int **changedSum;
 
     /// create a copy of the property, needed in parallel exploration
-    virtual SimpleProperty* copy();
+    virtual SimpleProperty *copy();
 };

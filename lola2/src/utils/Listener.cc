@@ -13,7 +13,7 @@
 #include <InputOutput/Reporter.h>
 
 /// the reporter
-Reporter* rep = new ReporterStream();
+Reporter *rep = new ReporterStream();
 
 __attribute__((noreturn)) void signal_callback_handler(int signum)
 {
@@ -21,7 +21,7 @@ __attribute__((noreturn)) void signal_callback_handler(int signum)
     exit(EXIT_SUCCESS);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     if (UNLIKELY(argc == 2 and !strcmp(argv[1], "--help")))
     {

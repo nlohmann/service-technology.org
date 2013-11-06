@@ -9,7 +9,7 @@
 #include <Parser/PlaceSymbol.h>
 
 /// Constructor. Capacity available in context, the other ingredients are not
-PlaceSymbol::PlaceSymbol(char* k, capacity_t cap)
+PlaceSymbol::PlaceSymbol(char *k, capacity_t cap)
     :
     Symbol(k),
     capacity(cap),

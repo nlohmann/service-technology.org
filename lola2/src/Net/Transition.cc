@@ -19,28 +19,28 @@ information for a transition in its role as a node, ar contained in Node.*
 #include <Net/Marking.h>
 #include <InputOutput/Reporter.h>
 
-extern Reporter* rep;
+extern Reporter *rep;
 
-fairnessAssumption_t* Transition::Fairness = NULL;
-bool* Transition::Enabled = NULL;
+fairnessAssumption_t *Transition::Fairness = NULL;
+bool *Transition::Enabled = NULL;
 index_t Transition::CardEnabled = 0;
-hash_t* Transition::DeltaHash = NULL;
-index_t* Transition::CardDeltaT[2] = {NULL};
-index_t** Transition::DeltaT[2] = {NULL};
-mult_t** Transition::MultDeltaT[2] = {NULL};
-index_t* Transition::CardConflicting = NULL;
-bool* Transition::ConflictingIsOriginal = NULL;
-index_t** Transition::Conflicting = NULL;
-index_t* Transition::CardBackConflicting = NULL;
-index_t** Transition::BackConflicting = NULL;
-bool* Transition::BackConflictingIsOriginal = NULL;
-int32_t* Transition::ProgressMeasure = NULL;
+hash_t *Transition::DeltaHash = NULL;
+index_t *Transition::CardDeltaT[2] = {NULL};
+index_t **Transition::DeltaT[2] = {NULL};
+mult_t **Transition::MultDeltaT[2] = {NULL};
+index_t *Transition::CardConflicting = NULL;
+bool *Transition::ConflictingIsOriginal = NULL;
+index_t **Transition::Conflicting = NULL;
+index_t *Transition::CardBackConflicting = NULL;
+index_t **Transition::BackConflicting = NULL;
+bool *Transition::BackConflictingIsOriginal = NULL;
+int32_t *Transition::ProgressMeasure = NULL;
 
 /*!
 Whenever t gets disabled, we sort its Pre list such that the scapegoat is the
 first entry there.
 */
-index_t* Transition::PositionScapegoat = NULL;
+index_t *Transition::PositionScapegoat = NULL;
 
 /*!
 \brief clean up transitions for valgrind
@@ -65,10 +65,14 @@ void Transition::deleteTransitions()
     free(Transition::CardBackConflicting);
     for (index_t i = 0; i < Net::Card[TR]; i++)
     {
-        if(Transition::ConflictingIsOriginal[i])
+        if (Transition::ConflictingIsOriginal[i])
+        {
             free(Transition::Conflicting[i]);
-        if(Transition::BackConflictingIsOriginal[i])
+        }
+        if (Transition::BackConflictingIsOriginal[i])
+        {
             free(Transition::BackConflicting[i]);
+        }
     }
     free(Transition::Conflicting);
     free(Transition::BackConflicting);
@@ -233,13 +237,15 @@ void Transition::checkEnabled_Initial(index_t t)
 /// fire a transition and
 void Transition::fire(NetState &ns, index_t t)
 {
-	//rep->message("F %d",t);
+    //rep->message("F %d",t);
 
-	if (!ns.Enabled[t]){
-		rep->message("=================ERRROR==================");
-		rep->message("TRY TO FIRE %s",Net::Name[TR][t]);
-		rep->message("current marking %s:%d %s:%d %s:%d %s:%d",Net::Name[PL][0],ns.Current[0],Net::Name[PL][1],ns.Current[1],Net::Name[PL][2],ns.Current[2],Net::Name[PL][3],ns.Current[3]);
-	}
+    if (!ns.Enabled[t])
+    {
+        rep->message("=================ERRROR==================");
+        rep->message("TRY TO FIRE %s", Net::Name[TR][t]);
+        rep->message("current marking %s:%d %s:%d %s:%d %s:%d", Net::Name[PL][0], ns.Current[0],
+                     Net::Name[PL][1], ns.Current[1], Net::Name[PL][2], ns.Current[2], Net::Name[PL][3], ns.Current[3]);
+    }
 
     //  Don't even think about firing a disabled transition!
     assert(ns.Enabled[t]);
@@ -269,17 +275,21 @@ void Transition::fire(NetState &ns, index_t t)
 }
 
 
-bool Transition::isCycle(NetState &ns, index_t t){
+bool Transition::isCycle(NetState &ns, index_t t)
+{
 
-    index_t* delta_value = (index_t*) calloc(Net::Card[PL],SIZEOF_INDEX_T);
+    index_t *delta_value = (index_t *) calloc(Net::Card[PL], SIZEOF_INDEX_T);
 
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
+    {
         delta_value[Transition::DeltaT[PRE][t][i]] = Transition::MultDeltaT[PRE][t][i];
+    }
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
-    	if (delta_value[Transition::DeltaT[POST][t][i]] != Transition::MultDeltaT[POST][t][i]){
-    		free(delta_value);
-    		return false;
-    	}
+        if (delta_value[Transition::DeltaT[POST][t][i]] != Transition::MultDeltaT[POST][t][i])
+        {
+            free(delta_value);
+            return false;
+        }
 
     free(delta_value);
     return true;
@@ -288,7 +298,7 @@ bool Transition::isCycle(NetState &ns, index_t t){
 /// update enabledness information after having fired a transition
 void Transition::updateEnabled(NetState &ns, index_t t)
 {
-	//rep->message("UE %d",t);
+    //rep->message("UE %d",t);
     // 1. check conflicting enabled transitions (tt) for enabledness
     for (index_t i = 0; i < Transition::CardConflicting[t]; i++)
     {
@@ -319,7 +329,7 @@ void Transition::updateEnabled(NetState &ns, index_t t)
 /// fire a transition in reverse direction (for backtracking) and update enabledness of all transitions
 void Transition::backfire(NetState &ns, index_t t)
 {
-	//rep->message("B %d",t);
+    //rep->message("B %d",t);
     // 1. Update current marking
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {
@@ -344,7 +354,7 @@ void Transition::backfire(NetState &ns, index_t t)
 /// update enabledness after having backfired a transition
 void Transition::revertEnabled(NetState &ns, index_t t)
 {
-	//rep->message("RE %d",t);
+    //rep->message("RE %d",t);
     // 1. check backward conflicting enabled transitions for enabledness
     for (index_t i = 0; i < Transition::CardBackConflicting[t]; i++)
     {

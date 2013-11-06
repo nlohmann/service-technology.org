@@ -4,35 +4,43 @@
 
 #include <Formula/CTL/CTLFormula.h>
 
-struct NotFormula : public CTLFormula {
-	CTLFormula* inner;
+struct NotFormula : public CTLFormula
+{
+    CTLFormula *inner;
 
-	void initAtomics(NetState& ns) {
-		inner->initAtomics(ns);
-	}
-	void updateAtomics(NetState& ns, index_t t) {
-		inner->updateAtomics(ns,t);
-	}
-	void revertAtomics(NetState& ns, index_t t) {
-		inner->revertAtomics(ns,t);
-	}
+    void initAtomics(NetState &ns)
+    {
+        inner->initAtomics(ns);
+    }
+    void updateAtomics(NetState &ns, index_t t)
+    {
+        inner->updateAtomics(ns, t);
+    }
+    void revertAtomics(NetState &ns, index_t t)
+    {
+        inner->revertAtomics(ns, t);
+    }
 
-	bool check(Store<void*>& s, NetState& ns, Firelist& firelist, std::vector<int>* witness) {
-		return !inner->check(s,ns,firelist, witness);
-	}
+    bool check(Store<void *> &s, NetState &ns, Firelist &firelist, std::vector<int> *witness)
+    {
+        return !inner->check(s, ns, firelist, witness);
+    }
 
-	// LCOV_EXCL_START
-	void DEBUG_print() {
-		printf("NOT(");
-		inner->DEBUG_print();
-		printf(")");
-	}
-	// LCOV_EXCL_STOP
+    // LCOV_EXCL_START
+    void DEBUG_print()
+    {
+        printf("NOT(");
+        inner->DEBUG_print();
+        printf(")");
+    }
+    // LCOV_EXCL_STOP
 
-	void gatherPayloadInformation(index_t* numDFS, index_t* numCachedResults) {
-		inner->gatherPayloadInformation(numDFS,numCachedResults);
-	}
-	void setPayloadInformation(index_t cachedResultOffset, size_t payloadSize) {
-		inner->setPayloadInformation(cachedResultOffset,payloadSize);
-	}
+    void gatherPayloadInformation(index_t *numDFS, index_t *numCachedResults)
+    {
+        inner->gatherPayloadInformation(numDFS, numCachedResults);
+    }
+    void setPayloadInformation(index_t cachedResultOffset, size_t payloadSize)
+    {
+        inner->setPayloadInformation(cachedResultOffset, payloadSize);
+    }
 };

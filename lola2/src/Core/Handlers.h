@@ -24,7 +24,7 @@ private:
     static pthread_t terminationHandler_thread;
 
     /// remote termination handler
-    static void* remoteTerminationHandler(void*);
+    static void *remoteTerminationHandler(void *);
 
     /// signal termination handler
     static __attribute__((noreturn)) void signalTerminationHandler(int);

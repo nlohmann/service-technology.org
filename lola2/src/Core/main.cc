@@ -43,19 +43,19 @@
 //#include <Symmetry/GeneratingSystem.h>
 
 
-extern ParserPTNet* ParserPTNetLoLA();
+extern ParserPTNet *ParserPTNetLoLA();
 
 /// the command line parameters
 gengetopt_args_info args_info;
 
 // input files
-extern FILE* ptnetlola_in;
+extern FILE *ptnetlola_in;
 
 /// the reporter
-Reporter* rep = NULL;
+Reporter *rep = NULL;
 
-ParserPTNet* symbolTables;
-SymbolTable* buechiStateTable;
+ParserPTNet *symbolTables;
+SymbolTable *buechiStateTable;
 
 /*!
 \brief variable to manage multiple files
@@ -65,14 +65,14 @@ SymbolTable* buechiStateTable;
 otherwise: index in args_info.inputs
 */
 int currentFile = -1;
-Input* netFile;
+Input *netFile;
 
 
 // the parsers
 extern int ptnetlola_parse();
 extern int ptnetlola_lex_destroy();
 
-void callHome(int argc, char** argv)
+void callHome(int argc, char **argv)
 {
     std::string json = "";
 
@@ -111,10 +111,10 @@ void callHome(int argc, char** argv)
 }
 
 /// evaluate the command line parameters
-void evaluateParameters(int argc, char** argv)
+void evaluateParameters(int argc, char **argv)
 {
     // initialize the parameters structure
-    struct cmdline_parser_params* params = cmdline_parser_params_create();
+    struct cmdline_parser_params *params = cmdline_parser_params_create();
 
     // call the cmdline parser
     if (UNLIKELY(cmdline_parser(argc, argv, &args_info) != 0))
@@ -131,13 +131,15 @@ void evaluateParameters(int argc, char** argv)
         break;
 
     case reporter_arg_socket:
-        rep = new ReporterSocket((u_short)args_info.outputport_arg, args_info.address_arg, args_info.verbose_given);
+        rep = new ReporterSocket((u_short)args_info.outputport_arg,
+                                 args_info.address_arg, args_info.verbose_given);
         rep->message("pid = %d", getpid());
         break;
-    
-        case reporter__NULL: {
-            /* no reporter */
-        }
+
+    case reporter__NULL:
+    {
+        /* no reporter */
+    }
     }
 
     IO::setReporter(rep);
@@ -145,7 +147,7 @@ void evaluateParameters(int argc, char** argv)
     free(params);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     // install exit handler for ordered exit()
     Handlers::installExitHandler();
@@ -165,7 +167,9 @@ int main(int argc, char** argv)
     }
 
     if (args_info.buechi_given)
-    	buechiStateTable = new SymbolTable();
+    {
+        buechiStateTable = new SymbolTable();
+    }
 
     // file input
     if (args_info.compressed_given)
@@ -186,7 +190,8 @@ int main(int argc, char** argv)
             Input netfile("compressed net", args_info.inputs[0]);
             ReadNetFile(netfile);
             Input namefile("compress net", args_info.inputs[1]);
-            symbolTables = new ParserPTNet(); // initializes a symbol table that is rudimentary filled such that mapping name->id is possible
+            symbolTables = new ParserPTNet();
+            // initializes a symbol table that is rudimentary filled such that mapping name->id is possible
             ReadNameFile(namefile, symbolTables);
         }
     }
@@ -224,7 +229,9 @@ int main(int argc, char** argv)
         symbolTables->symboltable2net();
 
         // report hash table usage (size would be SIZEOF_SYMBOLTABLE)
-        rep->status("%d symbol table entries, %d collisions", symbolTables->PlaceTable->card + symbolTables->TransitionTable->card, SymbolTable::collisions);
+        rep->status("%d symbol table entries, %d collisions",
+                    symbolTables->PlaceTable->card + symbolTables->TransitionTable->card,
+                    SymbolTable::collisions);
     }
 
     Task task;
@@ -247,10 +254,12 @@ int main(int argc, char** argv)
     {
         rep->status("print compressed net");
 
-        Output netfile("compressed net", std::string(args_info.writeCompressed_arg) + ".net");
+        Output netfile("compressed net",
+                       std::string(args_info.writeCompressed_arg) + ".net");
         WriteNetFile(netfile);
 
-        Output namefile("compressed net", std::string(args_info.writeCompressed_arg) + ".names");
+        Output namefile("compressed net",
+                        std::string(args_info.writeCompressed_arg) + ".names");
         WriteNameFile(namefile);
     }
 
@@ -258,13 +267,13 @@ int main(int argc, char** argv)
     {
         task.setStore();
         task.setProperty();
-        
+
         /*if (args_info.symmetry_given)
         {
             // TODO: Move this to a more appropriate place.
             GeneratingSystem::create();
-	}*/
-        
+        }*/
+
         bool result = task.getResult();
         task.interpreteResult(& result);
 
@@ -287,22 +296,36 @@ int main(int argc, char** argv)
 
         if (args_info.search_arg != search_arg_findpath)
         {
-        	uint64_t numMarkings = 0;
-        	if(task.store)
-        		numMarkings = task.store->get_number_of_markings();
-        	else if(task.ltlStore)
-        		numMarkings = task.ltlStore->get_number_of_markings();
-        	else if(task.ctlStore)
-        		numMarkings = task.ctlStore->get_number_of_markings();
-        	uint64_t numEdges = 0;
-        	if(task.store)
-        		numEdges = task.store->get_number_of_calls();
-        	else if(task.ltlStore)
-        		numEdges = task.ltlStore->get_number_of_calls();
-        	else if(task.ctlStore)
-        		numEdges = task.ctlStore->get_number_of_calls();
-        	if(numEdges)
-        		numEdges--;
+            uint64_t numMarkings = 0;
+            if (task.store)
+            {
+                numMarkings = task.store->get_number_of_markings();
+            }
+            else if (task.ltlStore)
+            {
+                numMarkings = task.ltlStore->get_number_of_markings();
+            }
+            else if (task.ctlStore)
+            {
+                numMarkings = task.ctlStore->get_number_of_markings();
+            }
+            uint64_t numEdges = 0;
+            if (task.store)
+            {
+                numEdges = task.store->get_number_of_calls();
+            }
+            else if (task.ltlStore)
+            {
+                numEdges = task.ltlStore->get_number_of_calls();
+            }
+            else if (task.ctlStore)
+            {
+                numEdges = task.ctlStore->get_number_of_calls();
+            }
+            if (numEdges)
+            {
+                numEdges--;
+            }
             rep->message("%llu markings, %llu edges", numMarkings, numEdges);
         }
 
@@ -316,7 +339,7 @@ int main(int argc, char** argv)
         // TODO: remove this when actual use case is implemented
         if (args_info.testStateForeach_flag)
         {
-          task.testPopState();
+            task.testPopState();
         }
     }
 

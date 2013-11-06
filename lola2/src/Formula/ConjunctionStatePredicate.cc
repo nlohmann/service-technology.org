@@ -15,7 +15,7 @@ ConjunctionStatePredicate::ConjunctionStatePredicate(index_t n)
     //printf("+ %p->ConjunctionStatePredicate(n=%d)\n", this, n);
 
     parent = NULL;
-    sub = (StatePredicate**) malloc(n * SIZEOF_VOIDP);
+    sub = (StatePredicate **) malloc(n * SIZEOF_VOIDP);
     cardSub = n;
 }
 
@@ -28,7 +28,7 @@ ConjunctionStatePredicate::~ConjunctionStatePredicate()
     free(sub);
 }
 
-void ConjunctionStatePredicate::addSub(index_t i, StatePredicate* f)
+void ConjunctionStatePredicate::addSub(index_t i, StatePredicate *f)
 {
     //printf("+ %p->addSub(i=%d, f=%p)\n", this, i, f);
 
@@ -38,7 +38,7 @@ void ConjunctionStatePredicate::addSub(index_t i, StatePredicate* f)
     sub[i]-> parent = this;
 }
 
-index_t ConjunctionStatePredicate::getUpSet(index_t* stack, bool* onstack)
+index_t ConjunctionStatePredicate::getUpSet(index_t *stack, bool *onstack)
 {
     // call only if this formula is false (and we don't leave the memory)
     assert(cardSat < cardSub);
@@ -59,7 +59,7 @@ void ConjunctionStatePredicate::updateTF(index_t i)
         }
     }
 
-    StatePredicate* tmp = sub[cardSat];
+    StatePredicate *tmp = sub[cardSat];
     sub[cardSat] = sub[i];
     sub[i] = tmp;
     sub[i] -> position = i;
@@ -71,7 +71,7 @@ void ConjunctionStatePredicate::updateFT(index_t i)
     // assumption: satisfied left, unsatisfied right
 
     // --> sub[cardSat] is first unsatisfied
-    StatePredicate* tmp = sub[cardSat];
+    StatePredicate *tmp = sub[cardSat];
     sub[cardSat] = sub[i];
     sub[i] = tmp;
     sub[i] -> position = i;
@@ -118,7 +118,7 @@ void ConjunctionStatePredicate::evaluate(NetState &ns)
         assert(left < cardSub);
         assert(right > 0);
         assert(right <= cardSub);
-        StatePredicate* tmp = sub[left];
+        StatePredicate *tmp = sub[left];
         sub[left++] = sub[--right];
         sub[right] = tmp;
     }
@@ -144,7 +144,7 @@ index_t ConjunctionStatePredicate::countAtomic() const
     return result;
 }
 
-index_t ConjunctionStatePredicate::collectAtomic(AtomicStatePredicate** p)
+index_t ConjunctionStatePredicate::collectAtomic(AtomicStatePredicate **p)
 {
     index_t offset = 0;
     for (index_t i = 0; i < cardSub; i++)
@@ -197,9 +197,9 @@ bool ConjunctionStatePredicate::DEBUG__consistency(NetState &ns)
 // LCOV_EXCL_STOP
 
 
-StatePredicate* ConjunctionStatePredicate::copy(StatePredicate* parent)
+StatePredicate *ConjunctionStatePredicate::copy(StatePredicate *parent)
 {
-    ConjunctionStatePredicate* csp = new ConjunctionStatePredicate(cardSub);
+    ConjunctionStatePredicate *csp = new ConjunctionStatePredicate(cardSub);
     csp->cardSub = cardSub;
     csp->cardSat = cardSat;
     csp->value = value;
@@ -216,12 +216,12 @@ StatePredicate* ConjunctionStatePredicate::copy(StatePredicate* parent)
 
 index_t ConjunctionStatePredicate::getSubs(StatePredicate const *const **subs) const
 {
-	*subs = sub;
-	return cardSub;
+    *subs = sub;
+    return cardSub;
 }
 
 index_t ConjunctionStatePredicate::countUnsatisfied() const
 {
-	return cardSub - cardSat;
+    return cardSub - cardSat;
 }
 

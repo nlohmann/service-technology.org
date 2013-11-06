@@ -21,7 +21,7 @@ unsigned int SymbolTable::collisions = 0;
 /// Intialization amounts to setting all entries to NULL
 SymbolTable::SymbolTable()
     : card(0),
-      table(reinterpret_cast<Symbol**>(calloc(SIZEOF_SYMBOLTABLE, SIZEOF_VOIDP))),
+      table(reinterpret_cast<Symbol **>(calloc(SIZEOF_SYMBOLTABLE, SIZEOF_VOIDP))),
       currentIndex(0),
       currentSymbol(NULL)
 {
@@ -34,7 +34,7 @@ SymbolTable::~SymbolTable()
     {
         while (table[i])
         {
-            Symbol* tmp = table[i];
+            Symbol *tmp = table[i];
             table[i] = table[i]->getNext();
             delete tmp;
         }
@@ -43,7 +43,7 @@ SymbolTable::~SymbolTable()
 }
 
 /// sdbm hashing algorithm
-unsigned int SymbolTable::hash(const char* s) const
+unsigned int SymbolTable::hash(const char *s) const
 {
     // SDBM Algorithm from
     // http://www.ntecs.de/projects/guugelhupf/doc/html/x435.html
@@ -65,9 +65,9 @@ if input is correct, lookup is used for existing symbols
 \return NULL is returned if key is not present which typically
         indicates a syntax error "double definition"
 */
-Symbol* SymbolTable::lookup(const char* str) const
+Symbol *SymbolTable::lookup(const char *str) const
 {
-    for (Symbol* sym = table[hash(str)]; sym; sym = sym->getNext())
+    for (Symbol *sym = table[hash(str)]; sym; sym = sym->getNext())
     {
         if (!strcmp(sym->getKey(), str))
         {
@@ -85,7 +85,7 @@ if input is correct, insert is used when key is not yet present
 \return If input is present, false is returned.
         This typically indicates a syntax error "used but not defined
 */
-bool SymbolTable::insert(Symbol* sym)
+bool SymbolTable::insert(Symbol *sym)
 {
     const unsigned int index = hash(sym->getKey());
 
@@ -94,7 +94,7 @@ bool SymbolTable::insert(Symbol* sym)
         ++collisions;
     }
 
-    for (Symbol* othersym = table[index]; othersym; othersym = othersym->getNext())
+    for (Symbol *othersym = table[index]; othersym; othersym = othersym->getNext())
     {
         if (!strcmp(othersym->getKey(), sym->getKey()))
         {
@@ -110,25 +110,25 @@ bool SymbolTable::insert(Symbol* sym)
 }
 
 /// \return pointer to first element in symbol table
-Symbol* SymbolTable::first()
+Symbol *SymbolTable::first()
 {
     for (currentIndex = 0; currentIndex < SIZEOF_SYMBOLTABLE; currentIndex++)
     {
         if (table[currentIndex])
         {
-            return(currentSymbol = table[currentIndex]);
+            return (currentSymbol = table[currentIndex]);
         }
     }
     return NULL;
 }
 
 /// \return pointer to next element in symbol table
-Symbol* SymbolTable::next()
+Symbol *SymbolTable::next()
 {
     if (currentSymbol->getNext())
     {
         // there is another element in the same hash bucket
-        return(currentSymbol = currentSymbol->getNext());
+        return (currentSymbol = currentSymbol->getNext());
     }
     else
     {
@@ -137,7 +137,7 @@ Symbol* SymbolTable::next()
         {
             if (table[currentIndex])
             {
-                return(currentSymbol = table[currentIndex]);
+                return (currentSymbol = table[currentIndex]);
             }
         }
         return NULL;

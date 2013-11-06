@@ -15,7 +15,7 @@
 #include <cstdio>
 #include <InputOutput/Reporter.h>
 
-extern Reporter* rep;
+extern Reporter *rep;
 
 /*!
 \brief creates a state predicate with a formal sum of #p places with positive factor,
@@ -33,10 +33,10 @@ AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k)
     //printf("+ %p->AtomicStatePredicate(p=%d, n=%d, k=%d)\n", this, p, n, k);
 
     parent = NULL;
-    posPlaces = (index_t*) malloc(p * SIZEOF_INDEX_T);
-    negPlaces = (index_t*) malloc(n * SIZEOF_INDEX_T);
-    posMult = (capacity_t*) malloc(p * SIZEOF_CAPACITY_T);
-    negMult = (capacity_t*) malloc(n * SIZEOF_CAPACITY_T);
+    posPlaces = (index_t *) malloc(p * SIZEOF_INDEX_T);
+    negPlaces = (index_t *) malloc(n * SIZEOF_INDEX_T);
+    posMult = (capacity_t *) malloc(p * SIZEOF_CAPACITY_T);
+    negMult = (capacity_t *) malloc(n * SIZEOF_CAPACITY_T);
     cardPos = p;
     cardNeg = n;
     threshold = k;
@@ -45,7 +45,10 @@ AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k)
 
 AtomicStatePredicate::~AtomicStatePredicate()
 {
-	if (!original) return;
+    if (!original)
+    {
+        return;
+    }
     free(posPlaces);
     free(negPlaces);
     free(posMult);
@@ -71,7 +74,7 @@ void AtomicStatePredicate::addNeg(index_t i, index_t p, capacity_t m)
     negMult[i] = m;
 }
 
-index_t AtomicStatePredicate::getUpSet(index_t* stack, bool* onstack)
+index_t AtomicStatePredicate::getUpSet(index_t *stack, bool *onstack)
 {
     assert(onstack);
     index_t stackpointer = 0;
@@ -131,7 +134,7 @@ index_t AtomicStatePredicate::countAtomic() const
     return 1;
 }
 
-index_t AtomicStatePredicate::collectAtomic(AtomicStatePredicate** c)
+index_t AtomicStatePredicate::collectAtomic(AtomicStatePredicate **c)
 {
     c[0] = this;
     return 1;
@@ -139,8 +142,8 @@ index_t AtomicStatePredicate::collectAtomic(AtomicStatePredicate** c)
 
 void AtomicStatePredicate::setUpSet()
 {
-    index_t* up1 = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    index_t* up2 = (index_t*) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    index_t *up1 = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    index_t *up2 = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
     cardUp = 0;
 
     // idea: for each p: merge up1 and post places of pos / pre places of neg into up2
@@ -177,7 +180,7 @@ void AtomicStatePredicate::setUpSet()
         {
             up2[c++] = Net::Arc[PL][POST][p][b];
         }
-        index_t* tmp = up1;
+        index_t *tmp = up1;
         up1 = up2;
         up2 = tmp;
         cardUp = c;
@@ -215,12 +218,12 @@ void AtomicStatePredicate::setUpSet()
         {
             up2[c++] = Net::Arc[PL][PRE][p][b];
         }
-        index_t* tmp = up1;
+        index_t *tmp = up1;
         up1 = up2;
         up2 = tmp;
         cardUp = c;
     }
-    up = (index_t*) realloc(up1, cardUp * SIZEOF_INDEX_T);
+    up = (index_t *) realloc(up1, cardUp * SIZEOF_INDEX_T);
     free(up2);
 }
 
@@ -255,9 +258,9 @@ bool AtomicStatePredicate::DEBUG__consistency(NetState &ns)
 // LCOV_EXCL_STOP
 
 
-StatePredicate* AtomicStatePredicate::copy(StatePredicate* parent)
+StatePredicate *AtomicStatePredicate::copy(StatePredicate *parent)
 {
-    AtomicStatePredicate* af = new AtomicStatePredicate(0, 0, 0);
+    AtomicStatePredicate *af = new AtomicStatePredicate(0, 0, 0);
     af->value = value;
     af->position = position;
     af->parent = parent;
@@ -276,17 +279,22 @@ StatePredicate* AtomicStatePredicate::copy(StatePredicate* parent)
     return af;
 }
 
-index_t AtomicStatePredicate::getSubs(const StatePredicate* const** subs) const
+index_t AtomicStatePredicate::getSubs(const StatePredicate *const **subs) const
 {
-	return 0;
+    return 0;
 }
 
 
-StatePredicate* AtomicStatePredicate::negate(){
-	AtomicStatePredicate* af = new AtomicStatePredicate(cardNeg, cardPos, - threshold - 1);
-	for (index_t i = 0; i < cardPos; i++)
-		af->addNeg(i,posPlaces[i],posMult[i]);
-	for (index_t i = 0; i < cardNeg; i++)
-		af->addPos(i,negPlaces[i],negMult[i]);
-	return af;
+StatePredicate *AtomicStatePredicate::negate()
+{
+    AtomicStatePredicate *af = new AtomicStatePredicate(cardNeg, cardPos, - threshold - 1);
+    for (index_t i = 0; i < cardPos; i++)
+    {
+        af->addNeg(i, posPlaces[i], posMult[i]);
+    }
+    for (index_t i = 0; i < cardNeg; i++)
+    {
+        af->addPos(i, negPlaces[i], negMult[i]);
+    }
+    return af;
 }

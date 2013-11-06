@@ -4,7 +4,7 @@
 \status new
 \brief Global data for SweepLine method
 
-All general data used in the SweepLine method can be found here. 
+All general data used in the SweepLine method can be found here.
 */
 
 #pragma once
@@ -20,173 +20,178 @@ All general data used in the SweepLine method can be found here.
 /*!
 \brief Collection of information related SweepLine method
 
-All general data used in the SweepLine method can be found here. 
+All general data used in the SweepLine method can be found here.
 */
 template <class T>
 class Sweep
 {
 public:
-	/// Constructor
-	Sweep(SimpleProperty& property, NetState& ns, SweepEmptyStore& st, Firelist& firelist, index_t number_of_fronts, index_t number_of_threads);
+    /// Constructor
+    Sweep(SimpleProperty &property, NetState &ns, SweepEmptyStore &st, Firelist &firelist,
+          index_t number_of_fronts, index_t number_of_threads);
 
-	/// Destructor
-	~Sweep();
+    /// Destructor
+    ~Sweep();
 
-	/// Run sweepline method
-	bool run();
+    /// Run sweepline method
+    bool run();
 
-	/// Run sweepline method multithreaded
-	bool runThreads();
+    /// Run sweepline method multithreaded
+    bool runThreads();
 
 private:
-/// transfer struct for the start of a parallel search front
-struct tpSweepArguments {
-	/// the initial or current net state
-	NetState* ns;
-	/// flag indicating whether this thread is the front thread
-	bool* frontrunner;
-	/// mutex for the frontrunner flag (for the predecessor front)
-	pthread_mutex_t* frontMutex;
-	/// mutex for the frontrunner flag (for the successor front)
-	pthread_mutex_t* backMutex;
-	/// mutex condition (for the predecessor front)
-	pthread_cond_t* frontCond;
-	/// mutex condition (for the successor front)
-	pthread_cond_t* backCond;
-	/// semaphore value (for the predecessor front)
-    index_t* frontSemaphore;
-	/// semaphore value (for the successor front)
-    index_t* backSemaphore;
-	/// the ID number of the front the current thread belongs to
-	int frontID;
-	/// the global ID of the current thread
-	int globalThreadID; 
-	/// number of transient states in the local store
-	int64_t* transient_count;
-	/// number of persistent states added by the local store
-	int64_t* persistent_count;
-	/// number of calls to the local store (edges)
-	int64_t* call_count;
-	/// the SweepLine object with further parameters
-	Sweep<T>* sweep;
-};
+    /// transfer struct for the start of a parallel search front
+    struct tpSweepArguments
+    {
+        /// the initial or current net state
+        NetState *ns;
+        /// flag indicating whether this thread is the front thread
+        bool *frontrunner;
+        /// mutex for the frontrunner flag (for the predecessor front)
+        pthread_mutex_t *frontMutex;
+        /// mutex for the frontrunner flag (for the successor front)
+        pthread_mutex_t *backMutex;
+        /// mutex condition (for the predecessor front)
+        pthread_cond_t *frontCond;
+        /// mutex condition (for the successor front)
+        pthread_cond_t *backCond;
+        /// semaphore value (for the predecessor front)
+        index_t *frontSemaphore;
+        /// semaphore value (for the successor front)
+        index_t *backSemaphore;
+        /// the ID number of the front the current thread belongs to
+        int frontID;
+        /// the global ID of the current thread
+        int globalThreadID;
+        /// number of transient states in the local store
+        int64_t *transient_count;
+        /// number of persistent states added by the local store
+        int64_t *persistent_count;
+        /// number of calls to the local store (edges)
+        int64_t *call_count;
+        /// the SweepLine object with further parameters
+        Sweep<T> *sweep;
+    };
 
-	/// starting point for the sweepline method (single- or multithreaded)
-	static void* frontSweep(void* container);
+    /// starting point for the sweepline method (single- or multithreaded)
+    static void *frontSweep(void *container);
 
-	/// starting point for a helper thread of the sweepline method (multithreaded only)
-	static void* threadSweep(void* container);
+    /// starting point for a helper thread of the sweepline method (multithreaded only)
+    static void *threadSweep(void *container);
 
-	/// initialise the sweepline front for a thread
-	bool initFront(tpSweepArguments& args, SweepRingStore<T>& store, int32_t& back_progress, int32_t& sem_countdown);
+    /// initialise the sweepline front for a thread
+    bool initFront(tpSweepArguments &args, SweepRingStore<T> &store, int32_t &back_progress,
+                   int32_t &sem_countdown);
 
-	/// run the front until the end, return a state fulfilling the property or NULL if none
-	NetState* runFront(SweepRingStore<T>& store, Firelist& fl, SimpleProperty& sp, tpSweepArguments& args, int32_t& bp, int32_t& semcnt);
+    /// run the front until the end, return a state fulfilling the property or NULL if none
+    NetState *runFront(SweepRingStore<T> &store, Firelist &fl, SimpleProperty &sp,
+                       tpSweepArguments &args, int32_t &bp, int32_t &semcnt);
 
-	/// finalise the front
-	void deinitFront(SweepRingStore<T>& store, tpSweepArguments& args);
+    /// finalise the front
+    void deinitFront(SweepRingStore<T> &store, tpSweepArguments &args);
 
-	/// check all states with the current progress measure and calculate their successors
-	bool checkStates(SweepRingStore<T>& store, Firelist& fl, SimpleProperty& sp, tpSweepArguments& args);
+    /// check all states with the current progress measure and calculate their successors
+    bool checkStates(SweepRingStore<T> &store, Firelist &fl, SimpleProperty &sp,
+                     tpSweepArguments &args);
 
-	/// extend the lists of persistent states to before the minimal progress measure
-	void extendLeft(int32_t& bp);
+    /// extend the lists of persistent states to before the minimal progress measure
+    void extendLeft(int32_t &bp);
 
-	/// update enabledness information for the current state if the marking has been replaced
-	static void updateState(NetState& ns);
+    /// update enabledness information for the current state if the marking has been replaced
+    static void updateState(NetState &ns);
 
-	/// forward the state count to the dummy store for later printing
-	void forwardStateCount(bool show = false);
+    /// forward the state count to the dummy store for later printing
+    void forwardStateCount(bool show = false);
 
-	void initThreadMutex(pthread_mutex_t* mutex, pthread_cond_t* cond, index_t threadID);
-	void terminateThreadMutex(pthread_mutex_t* mutex, pthread_cond_t* cond);
-	void checkCall(tpSweepArguments& args, bool draw = false);
+    void initThreadMutex(pthread_mutex_t *mutex, pthread_cond_t *cond, index_t threadID);
+    void terminateThreadMutex(pthread_mutex_t *mutex, pthread_cond_t *cond);
+    void checkCall(tpSweepArguments &args, bool draw = false);
 
-	/// the number of fronts running over the search space
-	index_t nr_of_fronts;
+    /// the number of fronts running over the search space
+    index_t nr_of_fronts;
 
-	/// the total number of threads running over the search space
-	index_t nr_of_threads;
+    /// the total number of threads running over the search space
+    index_t nr_of_threads;
 
-	/// the number of threads per front
-	index_t threads_per_front;
+    /// the number of threads per front
+    index_t threads_per_front;
 
-	/// the number of hash values (buckets per progress value and store type)
-	hash_t nr_of_buckets;
+    /// the number of hash values (buckets per progress value and store type)
+    hash_t nr_of_buckets;
 
-	/// the property to check for
-	SimpleProperty& prop;
+    /// the property to check for
+    SimpleProperty &prop;
 
-	/// the initial state of the net
-	NetState& start;
+    /// the initial state of the net
+    NetState &start;
 
-	/// the firelist for the property
-	Firelist& fl;
+    /// the firelist for the property
+    Firelist &fl;
 
-	/// Dummy store for counting markings and calls
-	SweepEmptyStore& count_store;
+    /// Dummy store for counting markings and calls
+    SweepEmptyStore &count_store;
 
-	/// the list of new persistent states (starting point, minimal progress measure)
-	SweepListStore<T>* start_new_persistent;
+    /// the list of new persistent states (starting point, minimal progress measure)
+    SweepListStore<T> *start_new_persistent;
 
-	/// the list of old persistent states (starting point, minimal progress measure)
-	SweepListStore<T>* start_old_persistent;
+    /// the list of old persistent states (starting point, minimal progress measure)
+    SweepListStore<T> *start_old_persistent;
 
-	/// counters for persistent states
-	int64_t*** persistent_count;
+    /// counters for persistent states
+    int64_t ** *persistent_count;
 
-	/// counters for transient states
-	int64_t*** transient_count;
+    /// counters for transient states
+    int64_t ** *transient_count;
 
-	/// counters for edges (calls)
-	int64_t*** call_count;
+    /// counters for edges (calls)
+    int64_t ** *call_count;
 
-	/// maximal number of transient states
-	int64_t max_transient_count;
+    /// maximal number of transient states
+    int64_t max_transient_count;
 
-	/// the number of buckets the store for transient states must contain
-	index_t store_size;
+    /// the number of buckets the store for transient states must contain
+    index_t store_size;
 
-	/// the maximal progress measure of a single transition
-	index_t front_offset;
+    /// the maximal progress measure of a single transition
+    index_t front_offset;
 
-	/// the negative progress measure offset at which transient states are forgotten
-	index_t transient_offset;
+    /// the negative progress measure offset at which transient states are forgotten
+    index_t transient_offset;
 
-	/// pointers to the stores of all fronts
-	SweepRingStore<T>** store;
+    /// pointers to the stores of all fronts
+    SweepRingStore<T> **store;
 
-	/// mutex used in case a thread becomes idle
-	pthread_mutex_t** idleMutex;
+    /// mutex used in case a thread becomes idle
+    pthread_mutex_t **idleMutex;
 
-	/// mutex to lock on if a thread becomes idle
-	pthread_cond_t** idleCond;
+    /// mutex to lock on if a thread becomes idle
+    pthread_cond_t **idleCond;
 
-	/// flag if a thread is idle, not lock-protected
-	bool** idle;
+    /// flag if a thread is idle, not lock-protected
+    bool **idle;
 
-	/// the front a helper works for at this time, not lock-protected
-	index_t** frontptr;
+    /// the front a helper works for at this time, not lock-protected
+    index_t **frontptr;
 
-	/// flag if a thread should return to its own front, not lock-protected
-	bool** call;
+    /// flag if a thread should return to its own front, not lock-protected
+    bool **call;
 
-	/// number of helpers active at a given front
-	index_t** helpers;
+    /// number of helpers active at a given front
+    index_t **helpers;
 
-	/// number of threads that request termination
-	index_t running;
-	index_t terminating;
-	pthread_mutex_t runMutex;
-	pthread_cond_t runCond;
+    /// number of threads that request termination
+    index_t running;
+    index_t terminating;
+    pthread_mutex_t runMutex;
+    pthread_cond_t runCond;
 
-	/// encoder for all transient and new persistent states
-	FullCopyEncoder* fullencoder;
-	/// encoder for old persistent states
-	NetStateEncoder* sigpencoder;
+    /// encoder for all transient and new persistent states
+    FullCopyEncoder *fullencoder;
+    /// encoder for old persistent states
+    NetStateEncoder *sigpencoder;
 
-	/// a flag telling all threads to terminate
-	bool exit;
+    /// a flag telling all threads to terminate
+    bool exit;
 };
 
 #include <SweepLine/Sweep.inc>

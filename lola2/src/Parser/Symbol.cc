@@ -17,19 +17,19 @@ index_t Symbol::getIndex() const
 }
 
 /// Getter for key
-char* Symbol::getKey() const
+char *Symbol::getKey() const
 {
     return key;
 }
 
 /// Getter for next
-Symbol* Symbol::getNext() const
+Symbol *Symbol::getNext() const
 {
     return next;
 }
 
 /// Setter for next
-void Symbol::setNext(Symbol* sym)
+void Symbol::setNext(Symbol *sym)
 {
     next = sym;
 }
@@ -44,9 +44,9 @@ void Symbol::setIndex(index_t i)
 
 /// Generate and initialize a symbol
 /// Argument is the key.
-Symbol::Symbol(const char* k)
+Symbol::Symbol(const char *k)
     :
-    key(const_cast<char*>(k)),
+    key(const_cast<char *>(k)),
     next(NULL)
 {
 }

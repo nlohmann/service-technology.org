@@ -13,7 +13,7 @@
 
 
 /// Getter for place
-PlaceSymbol* ArcList::getPlace() const
+PlaceSymbol *ArcList::getPlace() const
 {
     return place;
 }
@@ -25,7 +25,7 @@ mult_t ArcList::getMultiplicity() const
 }
 
 /// Getter for next
-ArcList* ArcList::getNext() const
+ArcList *ArcList::getNext() const
 {
     return next;
 }
@@ -37,13 +37,13 @@ void ArcList::addMultiplicity(mult_t i)
 }
 
 /// Setter for next
-void ArcList::setNext(Symbol* n)
+void ArcList::setNext(Symbol *n)
 {
-    next = reinterpret_cast<ArcList*>(n);
+    next = reinterpret_cast<ArcList *>(n);
 }
 
 /// Generate and initialize a list element
-ArcList::ArcList(PlaceSymbol* p, mult_t m)
+ArcList::ArcList(PlaceSymbol *p, mult_t m)
     :
     place(p),
     next(NULL),

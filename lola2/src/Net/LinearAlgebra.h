@@ -61,7 +61,7 @@ public:
 
     public:
         /// Generate and initialize a row based on Net.h types
-        Row(index_t, const index_t*, const int64_t*, index_t = 0);
+        Row(index_t, const index_t *, const int64_t *, index_t = 0);
         /// Delete a row
         ~Row();
 
@@ -78,19 +78,19 @@ public:
         /// Number of variables in current row with non zero coefficients
         index_t varCount;
         /// Array of variable indizes in current row with non zero coefficients
-        index_t* variables;
+        index_t *variables;
         /// Array of non zero coefficients in current row (same order as variables)
-        int64_t* coefficients;
+        int64_t *coefficients;
 
         /// Reference number of current row
         index_t reference;
 
         /// Pointer to successor row with same first variable (NULL if none present)
-        Row* next;
+        Row *next;
     };
 private:
     /// Array of rows for number of varibales (columns)
-    Row** matrix;
+    Row **matrix;
     /// Number of stored rows in current matrix
     index_t rowCount;
     /// Number of stored columns in current matrix
@@ -107,10 +107,10 @@ public:
     ~Matrix();
 
     /// Add a new row to the matrix
-    void addRow(index_t, const index_t*, const int64_t*, index_t = 0);
+    void addRow(index_t, const index_t *, const int64_t *, index_t = 0);
 
     /// Delete the successor of a row in the matrix
-    void deleteRow(Row*);
+    void deleteRow(Row *);
 
     /// Generate the triangular form of the matrix (original one gets lost)
     void reduce();
@@ -125,7 +125,7 @@ public:
     index_t getReference(index_t) const;
 
     /// Returns row of the first row with given index
-    Row* getRow(index_t) const;
+    Row *getRow(index_t) const;
 
     /// Returns number of rows
     index_t getRowCount() const;

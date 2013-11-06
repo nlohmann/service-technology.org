@@ -30,25 +30,31 @@ A simple stack entry contains two elements
 class SimpleStackEntry
 {
 public:
-	/// ordinary constructor for entry
-    SimpleStackEntry(index_t * f,index_t c) {
+    /// ordinary constructor for entry
+    SimpleStackEntry(index_t *f, index_t c)
+    {
         assert(f);    //firelist, first processed in firelist
         current = c;
         fl = f;
     }
     /// copy constructor used by the search stack
-    SimpleStackEntry(SimpleStackEntry& src) {
+    SimpleStackEntry(SimpleStackEntry &src)
+    {
         current = src.current;
-        fl = new index_t[current+1];
+        fl = new index_t[current + 1];
         assert(fl);
         assert(src.fl);
-        memcpy(fl,src.fl,(current+1)*SIZEOF_INDEX_T);
+        memcpy(fl, src.fl, (current + 1)*SIZEOF_INDEX_T);
     }
-    ~SimpleStackEntry() {
-        if (fl) delete[] fl;
+    ~SimpleStackEntry()
+    {
+        if (fl)
+        {
+            delete[] fl;
+        }
         fl = NULL;
     }
-    index_t * fl; // array to take a firelist
+    index_t *fl;  // array to take a firelist
     index_t current; // index of first processed element of fl
 };
 
@@ -90,7 +96,7 @@ public:
     }
 
     /// create a new simple property exactly as the current one
-    virtual SimpleProperty* copy()
+    virtual SimpleProperty *copy()
     {
         return new SimpleProperty();
     }

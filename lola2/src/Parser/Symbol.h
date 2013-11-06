@@ -20,16 +20,16 @@ class Symbol
 {
 public:
     /// Getter for key
-    char* getKey() const;
+    char *getKey() const;
 
     /// Getter for next
-    Symbol* getNext() const;
+    Symbol *getNext() const;
 
     /// Setter for next
-    void setNext(Symbol*);
+    void setNext(Symbol *);
 
     /// Generate and initialize a symbol
-    explicit Symbol(const char*);
+    explicit Symbol(const char *);
 
     /// Delete a symbol
     virtual ~Symbol() {}
@@ -42,10 +42,10 @@ public:
 
 private:
     /// The key. Used for insertion in symbol table
-    char* key;
+    char *key;
 
     /// Symbols with same hash value are organized as lists.
-    Symbol* next;
+    Symbol *next;
 
     /// Index in net data structure. Set during transformation symbols --> net
     index_t index;

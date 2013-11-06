@@ -32,14 +32,14 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-extern Reporter* rep;
+extern Reporter *rep;
 extern gengetopt_args_info args_info;
 
 index_t Net::Card[2] = {0, 0};
-index_t* Net::CardArcs[2][2] = {{NULL, NULL}, {NULL, NULL}};
-index_t** Net::Arc[2][2] = {{NULL, NULL}, {NULL, NULL}};
-mult_t** Net::Mult[2][2] = {{NULL, NULL}, {NULL, NULL}};
-char** Net::Name[2] = {NULL, NULL};
+index_t *Net::CardArcs[2][2] = {{NULL, NULL}, {NULL, NULL}};
+index_t **Net::Arc[2][2] = {{NULL, NULL}, {NULL, NULL}};
+mult_t **Net::Mult[2][2] = {{NULL, NULL}, {NULL, NULL}};
+char **Net::Name[2] = {NULL, NULL};
 
 // LCOV_EXCL_START
 bool Net::DEBUG__checkConsistency()
@@ -79,41 +79,41 @@ bool Net::DEBUG__checkArcOrdering()
     index_t curElem;
     for (index_t t = 0; t < Net::Card[TR]; ++t)
     {
-    	if(Net::CardArcs[TR][PRE][t])
-    	{
-			curElem = Net::Arc[TR][PRE][t][0];
-			for (index_t p = 1; p < Net::CardArcs[TR][PRE][t]; ++p)
-			{
-				assert(curElem < Net::Arc[TR][PRE][t][p]);
-			}
-    	}
-    	if(Net::CardArcs[TR][POST][t])
-    	{
-			curElem = Net::Arc[TR][POST][t][0];
-			for (index_t p = 1; p < Net::CardArcs[TR][POST][t]; ++p)
-			{
-				assert(curElem < Net::Arc[TR][POST][t][p]);
-			}
-    	}
+        if (Net::CardArcs[TR][PRE][t])
+        {
+            curElem = Net::Arc[TR][PRE][t][0];
+            for (index_t p = 1; p < Net::CardArcs[TR][PRE][t]; ++p)
+            {
+                assert(curElem < Net::Arc[TR][PRE][t][p]);
+            }
+        }
+        if (Net::CardArcs[TR][POST][t])
+        {
+            curElem = Net::Arc[TR][POST][t][0];
+            for (index_t p = 1; p < Net::CardArcs[TR][POST][t]; ++p)
+            {
+                assert(curElem < Net::Arc[TR][POST][t][p]);
+            }
+        }
     }
     for (index_t p = 0; p < Net::Card[PL]; ++p)
     {
-    	if(Net::CardArcs[PL][PRE][p])
-    	{
+        if (Net::CardArcs[PL][PRE][p])
+        {
             curElem = Net::Arc[PL][PRE][p][0];
             for (index_t t = 1; t < Net::CardArcs[PL][PRE][p]; ++t)
             {
                 assert(curElem < Net::Arc[PL][PRE][p][t]);
             }
-    	}
-    	if(Net::CardArcs[PL][POST][p])
-    	{
-			curElem = Net::Arc[PL][POST][p][0];
-			for (index_t t = 1; t < Net::CardArcs[PL][POST][p]; ++t)
-			{
-				assert(curElem < Net::Arc[PL][POST][p][t]);
-			}
-    	}
+        }
+        if (Net::CardArcs[PL][POST][p])
+        {
+            curElem = Net::Arc[PL][POST][p][0];
+            for (index_t t = 1; t < Net::CardArcs[PL][POST][p]; ++t)
+            {
+                assert(curElem < Net::Arc[PL][POST][p][t]);
+            }
+        }
     }
     return true;
 }
@@ -121,7 +121,7 @@ bool Net::DEBUG__checkArcOrdering()
 
 /// sorts array of arc (= node id) plus corresponding array of multiplicities
 /// in the range of from to to (not including to)
-void Net::sortArcs(index_t* arcs, mult_t* mults, const index_t from, const index_t to)
+void Net::sortArcs(index_t *arcs, mult_t *mults, const index_t from, const index_t to)
 {
     if ((to - from) < 2)
     {
@@ -177,7 +177,8 @@ void Net::sortAllArcs()
         {
             for (index_t n = 0; n < Net::Card[type] ; n ++)
             {
-                sortArcs(Net::Arc[type][direction][n], Net::Mult[type][direction][n], 0, CardArcs[type][direction][n]);
+                sortArcs(Net::Arc[type][direction][n], Net::Mult[type][direction][n], 0,
+                         CardArcs[type][direction][n]);
             }
         }
     }
@@ -216,7 +217,8 @@ void Net::print()
 
     for (index_t i = 0; i < Net::Card[PL]; i++)
     {
-        printf("Place %u :%s, %u tokens hash %lld capacity %u bits %u\n", i, Net::Name[PL][i], Marking::Initial[i], Place::Hash[i], Place::Capacity[i], Place::CardBits[i]);
+        printf("Place %u :%s, %u tokens hash %lld capacity %u bits %u\n", i, Net::Name[PL][i],
+               Marking::Initial[i], Place::Hash[i], Place::Capacity[i], Place::CardBits[i]);
         printf("From (%u):\n", Net::CardArcs[PL][PRE][i]);
         for (index_t j = 0; j < Net::CardArcs[PL][PRE][i]; j++)
         {
@@ -284,7 +286,7 @@ void Net::print()
     printf("done\n");
 }
 
-extern ParserPTNet* symbolTables;
+extern ParserPTNet *symbolTables;
 
 /*!
 \todo remove TargetMarking ?
@@ -293,12 +295,13 @@ void Net::swapPlaces(index_t left, index_t right)
 {
     // 1. Net data structures
 
-	int ixdLeft = symbolTables->PlaceTable->lookup(Net::Name[PL][left])->getIndex();
-	symbolTables->PlaceTable->lookup(Net::Name[PL][left])->setIndex(symbolTables->PlaceTable->lookup(Net::Name[PL][right])->getIndex());
-	symbolTables->PlaceTable->lookup(Net::Name[PL][right])->setIndex(ixdLeft);
+    int ixdLeft = symbolTables->PlaceTable->lookup(Net::Name[PL][left])->getIndex();
+    symbolTables->PlaceTable->lookup(Net::Name[PL][left])->setIndex(symbolTables->PlaceTable->lookup(
+                Net::Name[PL][right])->getIndex());
+    symbolTables->PlaceTable->lookup(Net::Name[PL][right])->setIndex(ixdLeft);
 
 
-	char* tempname = Net::Name[PL][left];
+    char *tempname = Net::Name[PL][left];
     Net::Name[PL][left] = Net::Name[PL][right];
     Net::Name[PL][right] = tempname;
 
@@ -312,11 +315,11 @@ void Net::swapPlaces(index_t left, index_t right)
         Net::CardArcs[PL][direction][left] = Net::CardArcs[PL][direction][right];
         Net::CardArcs[PL][direction][right] = tempindex;
 
-        index_t* tempindexpointer = Net::Arc[PL][direction][left];
+        index_t *tempindexpointer = Net::Arc[PL][direction][left];
         Net::Arc[PL][direction][left] = Net::Arc[PL][direction][right];
         Net::Arc[PL][direction][right] = tempindexpointer;
 
-        mult_t* tempmultpointer = Net::Mult[PL][direction][left];
+        mult_t *tempmultpointer = Net::Mult[PL][direction][left];
         Net::Mult[PL][direction][left] = Net::Mult[PL][direction][right];
         Net::Mult[PL][direction][right] = tempmultpointer;
     }
@@ -486,10 +489,11 @@ void Net::swapPlaces(index_t left, index_t right)
 }
 
 /// Creates an equation for the given transition (index) in the provided memory
-void createTransitionEquation(index_t transition, index_t* variables, int64_t* coefficients, index_t &size, bool dual = false)
+void createTransitionEquation(index_t transition, index_t *variables, int64_t *coefficients,
+                              index_t &size, bool dual = false)
 {
-	// check if we have transition or places rows
-	index_t ND(dual ? PL : TR);
+    // check if we have transition or places rows
+    index_t ND(dual ? PL : TR);
 
     // index in new row
     size = 0;
@@ -529,8 +533,10 @@ void createTransitionEquation(index_t transition, index_t* variables, int64_t* c
             if (coefficients[possiblePosition] == 0)
             {
                 // erase possiblePosition entry (possiblePosition) in both array
-                memmove(&variables[possiblePosition], &variables[possiblePosition + 1], (size - possiblePosition) * SIZEOF_INDEX_T);
-                memmove(&coefficients[possiblePosition], &coefficients[possiblePosition + 1], (size - possiblePosition) * SIZEOF_INT64_T);
+                memmove(&variables[possiblePosition], &variables[possiblePosition + 1],
+                        (size - possiblePosition) * SIZEOF_INDEX_T);
+                memmove(&coefficients[possiblePosition], &coefficients[possiblePosition + 1],
+                        (size - possiblePosition) * SIZEOF_INT64_T);
                 // assumption: decreasing 0 will lead to maxInt but
                 //              upcoming increase will result in 0 again
                 --size;
@@ -540,8 +546,10 @@ void createTransitionEquation(index_t transition, index_t* variables, int64_t* c
         {
             // p is not in new row, so add it
             // may be it is necessary to insert in between existing entrys
-            memmove(&variables[possiblePosition + 1], &variables[possiblePosition], (size - possiblePosition) * SIZEOF_INDEX_T);
-            memmove(&coefficients[possiblePosition + 1], &coefficients[possiblePosition], (size - possiblePosition) * SIZEOF_INT64_T);
+            memmove(&variables[possiblePosition + 1], &variables[possiblePosition],
+                    (size - possiblePosition) * SIZEOF_INDEX_T);
+            memmove(&coefficients[possiblePosition + 1], &coefficients[possiblePosition],
+                    (size - possiblePosition) * SIZEOF_INT64_T);
             // store place index
             variables[possiblePosition] = pID;
             // store the multiplicity (from transition to p)
@@ -566,8 +574,8 @@ Matrix Net::getIncidenceMatrix(node_t line_type)
     assert(Net::DEBUG__checkArcOrdering());
 
     // request memory for one full row
-    index_t* newVar = (index_t*) calloc(line_card, SIZEOF_INDEX_T);
-    int64_t* newCoef = (int64_t*) calloc(line_card, SIZEOF_INT64_T);
+    index_t *newVar = (index_t *) calloc(line_card, SIZEOF_INDEX_T);
+    int64_t *newCoef = (int64_t *) calloc(line_card, SIZEOF_INT64_T);
     index_t newSize;
 
     // create new matrix
@@ -590,7 +598,7 @@ Matrix Net::getIncidenceMatrix(node_t line_type)
     // free memory
     free(newVar);
     free(newCoef);
-    
+
     return m;
 }
 
@@ -662,157 +670,242 @@ void Net::setProgressMeasure()
     const index_t cardTR = Net::Card[TR];
 
     // calculate progress measure
-    int64_t* progressMeasure = (int64_t*) calloc(cardTR, SIZEOF_INT64_T);
-    for(index_t t=0; t<cardTR; ++t)
+    int64_t *progressMeasure = (int64_t *) calloc(cardTR, SIZEOF_INT64_T);
+    for (index_t t = 0; t < cardTR; ++t)
         if (m.isSignificant(t))
         {
-            const Matrix::Row* curRow = m.getRow(t);
+            const Matrix::Row *curRow = m.getRow(t);
             progressMeasure[curRow->variables[0]] = curRow->coefficients[0];
-            for(index_t v=1; v<curRow->varCount; ++v)
+            for (index_t v = 1; v < curRow->varCount; ++v)
                 if (!m.isSignificant(curRow->variables[v]))
+                {
                     progressMeasure[curRow->variables[v]] += curRow->coefficients[v];
+                }
         }
 
     // try for a local optimisation (reduce number of transitions with negative progress)
-    while (true) {
+    while (true)
+    {
         index_t tindex(INDEX_T_MAX);
         int32_t changes(-1), ctmp;
 
-        for(index_t t=0; t<cardTR; ++t)
+        for (index_t t = 0; t < cardTR; ++t)
             if (m.isSignificant(t))
             {
                 ctmp = 0;
-                const Matrix::Row* curRow = m.getRow(t);
-                for(index_t v=0; v<curRow->varCount; ++v)
-                    if (curRow->coefficients[v] < 0 && progressMeasure[curRow->variables[v]] < 0) {
-                        if (2*curRow->coefficients[v] <= progressMeasure[curRow->variables[v]]) ++ctmp;
-                    } else if (curRow->coefficients[v] > 0 && progressMeasure[curRow->variables[v]] > 0)
-                        if (2*curRow->coefficients[v] > progressMeasure[curRow->variables[v]]) --ctmp;
-                if (ctmp>changes) { 
-                    if (ctmp>0 || curRow->coefficients[0]>0)
-                    { changes=ctmp; tindex=t; } 
+                const Matrix::Row *curRow = m.getRow(t);
+                for (index_t v = 0; v < curRow->varCount; ++v)
+                    if (curRow->coefficients[v] < 0 && progressMeasure[curRow->variables[v]] < 0)
+                    {
+                        if (2 * curRow->coefficients[v] <= progressMeasure[curRow->variables[v]])
+                        {
+                            ++ctmp;
+                        }
+                    }
+                    else if (curRow->coefficients[v] > 0 && progressMeasure[curRow->variables[v]] > 0)
+                        if (2 * curRow->coefficients[v] > progressMeasure[curRow->variables[v]])
+                        {
+                            --ctmp;
+                        }
+                if (ctmp > changes)
+                {
+                    if (ctmp > 0 || curRow->coefficients[0] > 0)
+                    {
+                        changes = ctmp;
+                        tindex = t;
+                    }
                 }
             }
-        if (tindex == INDEX_T_MAX) break;
-
-        const Matrix::Row* curRow = m.getRow(tindex);
-        for(index_t v=0; v<curRow->varCount; ++v)
+        if (tindex == INDEX_T_MAX)
         {
-            progressMeasure[curRow->variables[v]] -= 2*curRow->coefficients[v];
+            break;
+        }
+
+        const Matrix::Row *curRow = m.getRow(tindex);
+        for (index_t v = 0; v < curRow->varCount; ++v)
+        {
+            progressMeasure[curRow->variables[v]] -= 2 * curRow->coefficients[v];
             curRow->coefficients[v] -= curRow->coefficients[v];
         }
     }
 
-if (args_info.sweeplinespread_arg>1) {
-    // try for another local optimisation (spread progress values better)
-	// first, save the progress measures so far
-    int64_t* progressCopy = (int64_t*) malloc(cardTR * SIZEOF_INT64_T);
-	memcpy(progressCopy, progressMeasure, cardTR * SIZEOF_INT64_T);
+    if (args_info.sweeplinespread_arg > 1)
+    {
+        // try for another local optimisation (spread progress values better)
+        // first, save the progress measures so far
+        int64_t *progressCopy = (int64_t *) malloc(cardTR * SIZEOF_INT64_T);
+        memcpy(progressCopy, progressMeasure, cardTR * SIZEOF_INT64_T);
 
-	index_t threads(args_info.threads_arg), tries(cardTR), fullbucket(cardTR/threads+1), maxbucket(cardTR);
-	std::set<index_t> done;
-	while (--tries>0) {
-		std::map<int64_t,index_t> pbuckets;
-		index_t highbucket(1);
-		for(index_t t=0; t<cardTR; ++t)
-			if (++pbuckets[progressMeasure[t]] > highbucket) ++highbucket;
-		if (fullbucket * fullbucket > cardTR) --fullbucket;
-		if (highbucket <= maxbucket) maxbucket = highbucket-1;
-		if (maxbucket <= fullbucket) break;
-		std::set<int64_t> tryvalues;
-		for(std::map<int64_t,index_t>::iterator it=pbuckets.begin(); it!=pbuckets.end(); ++it)
-			if (it->second > maxbucket)
-				tryvalues.insert(it->first);
-/*
-		cout << "progress values with too many transitions(" << maxbucket << "," << fullbucket << "): ";
-		for(std::set<int64_t>::iterator it=tryvalues.begin(); it!=tryvalues.end(); ++it)
-			cout << *it << "(" << pbuckets[*it] << ") ";
-		cout << endl;
-*/
-		index_t t;
-        for(t=0; t<cardTR; ++t)
-            if (m.isSignificant(t))
+        index_t threads(args_info.threads_arg), tries(cardTR), fullbucket(cardTR / threads + 1),
+                maxbucket(cardTR);
+        std::set<index_t> done;
+        while (--tries > 0)
+        {
+            std::map<int64_t, index_t> pbuckets;
+            index_t highbucket(1);
+            for (index_t t = 0; t < cardTR; ++t)
+                if (++pbuckets[progressMeasure[t]] > highbucket)
+                {
+                    ++highbucket;
+                }
+            if (fullbucket * fullbucket > cardTR)
             {
-				if (done.find(t)!=done.end()) continue;
-                const Matrix::Row* curRow = m.getRow(t);
-				if (tryvalues.find(curRow->coefficients[0]) == tryvalues.end()) continue;
-
-				int64_t mult;
-				for(mult=2; mult<=args_info.sweeplinespread_arg; ++mult)
-				{
-	                int32_t ctmp = 0;
-	                for(index_t v=0; v<curRow->varCount; ++v)
-	                    if (curRow->coefficients[v] > 0 && progressMeasure[curRow->variables[v]] < 0) {
-	                        if (progressMeasure[curRow->variables[v]] + (mult-1)*curRow->coefficients[v] >= 0) ++ctmp;
-	                    } else if (curRow->coefficients[v] < 0 && progressMeasure[curRow->variables[v]] > 0)
-	                        if (progressMeasure[curRow->variables[v]] + (mult-1)*curRow->coefficients[v] < 0) --ctmp;
-					if (ctmp<0) continue;
-
-					int64_t toofull(0);
-					for(index_t v=0; v<curRow->varCount; ++v)
-					{
-						if (pbuckets[progressMeasure[curRow->variables[v]]] > fullbucket) --toofull;
-						if (pbuckets[progressMeasure[curRow->variables[v]]+(mult-1)*curRow->coefficients[v]] > fullbucket) ++toofull;
-					}
-					if (toofull >= 0) continue;
-
-//					cout << "row t=" << Net::Name[TR][t] << " mult=" << mult << endl;
-					done.insert(t);
-
-			        for(index_t v=0; v<curRow->varCount; ++v)
-			        {
-        			    progressMeasure[curRow->variables[v]] += (mult-1)*curRow->coefficients[v];
-        			    curRow->coefficients[v] *= mult;
-        			}
-
-					break;
-				}
-				if (mult <= args_info.sweeplinespread_arg) break;
+                --fullbucket;
             }
-        if (t == cardTR) ++fullbucket;
-	}
+            if (highbucket <= maxbucket)
+            {
+                maxbucket = highbucket - 1;
+            }
+            if (maxbucket <= fullbucket)
+            {
+                break;
+            }
+            std::set<int64_t> tryvalues;
+            for (std::map<int64_t, index_t>::iterator it = pbuckets.begin(); it != pbuckets.end(); ++it)
+                if (it->second > maxbucket)
+                {
+                    tryvalues.insert(it->first);
+                }
+            /*
+            		cout << "progress values with too many transitions(" << maxbucket << "," << fullbucket << "): ";
+            		for(std::set<int64_t>::iterator it=tryvalues.begin(); it!=tryvalues.end(); ++it)
+            			cout << *it << "(" << pbuckets[*it] << ") ";
+            		cout << endl;
+            */
+            index_t t;
+            for (t = 0; t < cardTR; ++t)
+                if (m.isSignificant(t))
+                {
+                    if (done.find(t) != done.end())
+                    {
+                        continue;
+                    }
+                    const Matrix::Row *curRow = m.getRow(t);
+                    if (tryvalues.find(curRow->coefficients[0]) == tryvalues.end())
+                    {
+                        continue;
+                    }
 
-	// check if the optimisation uses the buckets in a better way (especially more buckets)
-	std::set<int64_t> oldcnt, newcnt;
-	for(index_t t=0; t<cardTR; ++t)
-	{
-		oldcnt.insert(progressCopy[t]);
-		newcnt.insert(progressMeasure[t]);
-	}
-	if (newcnt.size() <= oldcnt.size())
-		memcpy(progressMeasure, progressCopy, cardTR * SIZEOF_INT64_T);
-	else {
-		float oldrange, newrange, oldsize, newsize;
-		oldrange = (float)(*(oldcnt.rbegin()) - *(oldcnt.begin()) + 1);
-		newrange = (float)(*(newcnt.rbegin()) - *(newcnt.begin()) + 1);
-		oldsize = (float)(oldcnt.size());
-		newsize = (float)(newcnt.size());
-//cout << "oldrange=" << oldrange << " newrange=" << newrange << " oldsize=" << oldsize << " newsize=" << newsize << endl;
-		if (newrange/oldrange >= newsize*newsize/(oldsize*oldsize))
-			memcpy(progressMeasure, progressCopy, cardTR * SIZEOF_INT64_T);
-		else cout << "progress adapted" << endl;
-	}
+                    int64_t mult;
+                    for (mult = 2; mult <= args_info.sweeplinespread_arg; ++mult)
+                    {
+                        int32_t ctmp = 0;
+                        for (index_t v = 0; v < curRow->varCount; ++v)
+                            if (curRow->coefficients[v] > 0 && progressMeasure[curRow->variables[v]] < 0)
+                            {
+                                if (progressMeasure[curRow->variables[v]] + (mult - 1)*curRow->coefficients[v] >= 0)
+                                {
+                                    ++ctmp;
+                                }
+                            }
+                            else if (curRow->coefficients[v] < 0 && progressMeasure[curRow->variables[v]] > 0)
+                                if (progressMeasure[curRow->variables[v]] + (mult - 1)*curRow->coefficients[v] < 0)
+                                {
+                                    --ctmp;
+                                }
+                        if (ctmp < 0)
+                        {
+                            continue;
+                        }
 
-	free(progressCopy);
-}
+                        int64_t toofull(0);
+                        for (index_t v = 0; v < curRow->varCount; ++v)
+                        {
+                            if (pbuckets[progressMeasure[curRow->variables[v]]] > fullbucket)
+                            {
+                                --toofull;
+                            }
+                            if (pbuckets[progressMeasure[curRow->variables[v]] + (mult - 1)*curRow->coefficients[v]] >
+                                    fullbucket)
+                            {
+                                ++toofull;
+                            }
+                        }
+                        if (toofull >= 0)
+                        {
+                            continue;
+                        }
+
+                        //					cout << "row t=" << Net::Name[TR][t] << " mult=" << mult << endl;
+                        done.insert(t);
+
+                        for (index_t v = 0; v < curRow->varCount; ++v)
+                        {
+                            progressMeasure[curRow->variables[v]] += (mult - 1) * curRow->coefficients[v];
+                            curRow->coefficients[v] *= mult;
+                        }
+
+                        break;
+                    }
+                    if (mult <= args_info.sweeplinespread_arg)
+                    {
+                        break;
+                    }
+                }
+            if (t == cardTR)
+            {
+                ++fullbucket;
+            }
+        }
+
+        // check if the optimisation uses the buckets in a better way (especially more buckets)
+        std::set<int64_t> oldcnt, newcnt;
+        for (index_t t = 0; t < cardTR; ++t)
+        {
+            oldcnt.insert(progressCopy[t]);
+            newcnt.insert(progressMeasure[t]);
+        }
+        if (newcnt.size() <= oldcnt.size())
+        {
+            memcpy(progressMeasure, progressCopy, cardTR * SIZEOF_INT64_T);
+        }
+        else
+        {
+            float oldrange, newrange, oldsize, newsize;
+            oldrange = (float)(*(oldcnt.rbegin()) - * (oldcnt.begin()) + 1);
+            newrange = (float)(*(newcnt.rbegin()) - * (newcnt.begin()) + 1);
+            oldsize = (float)(oldcnt.size());
+            newsize = (float)(newcnt.size());
+            //cout << "oldrange=" << oldrange << " newrange=" << newrange << " oldsize=" << oldsize << " newsize=" << newsize << endl;
+            if (newrange / oldrange >= newsize * newsize / (oldsize * oldsize))
+            {
+                memcpy(progressMeasure, progressCopy, cardTR * SIZEOF_INT64_T);
+            }
+            else
+            {
+                cout << "progress adapted" << endl;
+            }
+        }
+
+        free(progressCopy);
+    }
 
     // remove gcd from progress values
     int64_t gcd(0);
     for (index_t t = 0; t < cardTR; ++t)
-        if (gcd==0) 
+        if (gcd == 0)
+        {
             gcd = progressMeasure[t];
-        else if (progressMeasure[t]!=0)
+        }
+        else if (progressMeasure[t] != 0)
+        {
             gcd = ggt(gcd, progressMeasure[t]);
-	if (gcd<0) gcd = -gcd;
-    if (gcd!=0)
+        }
+    if (gcd < 0)
+    {
+        gcd = -gcd;
+    }
+    if (gcd != 0)
         for (index_t t = 0; t < cardTR; ++t)
+        {
             progressMeasure[t] /= gcd;
+        }
 
-//    for(index_t t=0; t<cardTR; ++t)
-//        rep->status("progress[%s]=%lld", Net::Name[TR][t], progressMeasure[t]);
+    //    for(index_t t=0; t<cardTR; ++t)
+    //        rep->status("progress[%s]=%lld", Net::Name[TR][t], progressMeasure[t]);
 
     // cast progress measures to 32bit
-    Transition::ProgressMeasure = (int32_t*) calloc(cardTR, SIZEOF_INT);
+    Transition::ProgressMeasure = (int32_t *) calloc(cardTR, SIZEOF_INT);
     for (index_t t = 0; t < cardTR; ++t)
     {
         Transition::ProgressMeasure[t] = (int32_t) progressMeasure[t];
@@ -823,16 +916,19 @@ if (args_info.sweeplinespread_arg>1) {
 }
 
 // calculates DeltaT and DeltaHash for each transition
-void Net::preprocess_organizeDeltas() {
+void Net::preprocess_organizeDeltas()
+{
 
     const index_t cardPL = Net::Card[PL];
     const index_t cardTR = Net::Card[TR];
 
-    index_t* delta_pre = (index_t*) calloc(cardPL, SIZEOF_INDEX_T);   // temporarily collect places where a transition has negative token balance
-    index_t* delta_post = (index_t*) calloc(cardPL, SIZEOF_INDEX_T); // temporarily collect places where a transition has positive token balance.
+    index_t *delta_pre = (index_t *) calloc(cardPL,
+                                            SIZEOF_INDEX_T);  // temporarily collect places where a transition has negative token balance
+    index_t *delta_post = (index_t *) calloc(cardPL,
+                          SIZEOF_INDEX_T); // temporarily collect places where a transition has positive token balance.
 
-    mult_t* mult_pre = (mult_t*) malloc(cardPL * SIZEOF_MULT_T);   // same for multiplicities
-    mult_t* mult_post = (mult_t*) malloc(cardPL * SIZEOF_MULT_T);   // same for multiplicities
+    mult_t *mult_pre = (mult_t *) malloc(cardPL * SIZEOF_MULT_T);  // same for multiplicities
+    mult_t *mult_post = (mult_t *) malloc(cardPL * SIZEOF_MULT_T);  // same for multiplicities
 
     for (index_t t = 0; t < cardTR; t++)
     {
@@ -844,7 +940,8 @@ void Net::preprocess_organizeDeltas() {
 
         index_t i; // parallel iteration through sorted pre and post arc sets
         index_t j;
-        for (i = 0, j = 0; (i < Net::CardArcs[TR][PRE][t]) && (j < Net::CardArcs[TR][POST][t]); /* tricky increment */)
+        for (i = 0, j = 0; (i < Net::CardArcs[TR][PRE][t])
+                && (j < Net::CardArcs[TR][POST][t]); /* tricky increment */)
         {
             if (Net::Arc[TR][PRE][t][i] == Net::Arc[TR][POST][t][j])
             {
@@ -910,10 +1007,10 @@ void Net::preprocess_organizeDeltas() {
         // allocate memory for deltas
         Transition::CardDeltaT[PRE][t] = card_delta_pre;
         Transition::CardDeltaT[POST][t] = card_delta_post;
-        Transition::DeltaT[PRE][t] = (index_t*) malloc(card_delta_pre * SIZEOF_INDEX_T);
-        Transition::DeltaT[POST][t] = (index_t*) malloc(card_delta_post * SIZEOF_INDEX_T);
-        Transition::MultDeltaT[PRE][t] = (mult_t*) malloc(card_delta_pre * SIZEOF_MULT_T);
-        Transition::MultDeltaT[POST][t] = (mult_t*) malloc(card_delta_post * SIZEOF_MULT_T);
+        Transition::DeltaT[PRE][t] = (index_t *) malloc(card_delta_pre * SIZEOF_INDEX_T);
+        Transition::DeltaT[POST][t] = (index_t *) malloc(card_delta_post * SIZEOF_INDEX_T);
+        Transition::MultDeltaT[PRE][t] = (mult_t *) malloc(card_delta_pre * SIZEOF_MULT_T);
+        Transition::MultDeltaT[POST][t] = (mult_t *) malloc(card_delta_post * SIZEOF_MULT_T);
 
         // copy information on deltas
         memcpy(Transition::DeltaT[PRE][t], delta_pre, card_delta_pre * SIZEOF_INDEX_T);
@@ -948,40 +1045,47 @@ void Net::preprocess_organizeDeltas() {
 
 
 /// auxiliary comparator object needed for efficient conflict set caching
-struct conflictset_comparator {
-    conflictset_comparator(index_t _len):len(_len) {};
+struct conflictset_comparator
+{
+    conflictset_comparator(index_t _len): len(_len) {};
     index_t len;
-    bool operator () (index_t* const& a, index_t* const& b) const {
-        return (memcmp(a,b,len*SIZEOF_INDEX_T) < 0);
+    bool operator () (index_t *const &a, index_t *const &b) const
+    {
+        return (memcmp(a, b, len * SIZEOF_INDEX_T) < 0);
     }
 };
 
 
 // old version without much magic improvements. Can be deleted once the new version (below) proves to work.
 #if 0
-void Net::preprocess_organizeConflictingTransitions() {
+void Net::preprocess_organizeConflictingTransitions()
+{
 
     const index_t cardPL = Net::Card[PL];
     const index_t cardTR = Net::Card[TR];
 
     // initialize Conflicting arrays
-    index_t* conflicting = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
-    index_t* new_conflicting = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
+    index_t *conflicting = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
+    index_t *new_conflicting = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
 
     // initialize conflict cache array. There is a set for every possible size of the conflict set.
-    std::set<index_t*,conflictset_comparator>** conflictcache = new std::set<index_t*,conflictset_comparator>*[cardTR+1];
-    for(index_t i = 0; i <= cardTR; i++)
-        conflictcache[i] = new std::set<index_t*,conflictset_comparator>(conflictset_comparator(i));
+    std::set<index_t *, conflictset_comparator> **conflictcache = new
+    std::set<index_t *, conflictset_comparator> *[cardTR + 1];
+    for (index_t i = 0; i <= cardTR; i++)
+    {
+        conflictcache[i] = new std::set<index_t *, conflictset_comparator>(conflictset_comparator(i));
+    }
     index_t num_different_conflicts = 0;
     // iterator used to temporarily store the result of a find() operation. It will point either to the cache element or the end() of the conflictcache
-    std::set<index_t*,conflictset_comparator>::iterator it;
+    std::set<index_t *, conflictset_comparator>::iterator it;
 
     ///\todo make search for conflicting transitions a function to avoid code duplication
     for (index_t t = 0; t < cardTR; t++)
     {
         if (t > 0 and t % 10000 == 0)
         {
-            rep->status("processed %d of %d transitions (%d conflict sets found so far)", t, cardTR, num_different_conflicts);
+            rep->status("processed %d of %d transitions (%d conflict sets found so far)", t, cardTR,
+                        num_different_conflicts);
         }
 
         // 8.1 conflicting transitions
@@ -992,19 +1096,25 @@ void Net::preprocess_organizeConflictingTransitions() {
         {
             // p is a pre-place
             const index_t p = Net::Arc[TR][PRE][t][i];
-            card_conflicting = std::set_union(conflicting,conflicting+card_conflicting,Net::Arc[PL][POST][p],Net::Arc[PL][POST][p]+Net::CardArcs[PL][POST][p],new_conflicting) - new_conflicting;
-            std::swap(new_conflicting,conflicting);
+            card_conflicting = std::set_union(conflicting, conflicting + card_conflicting,
+                                              Net::Arc[PL][POST][p], Net::Arc[PL][POST][p] + Net::CardArcs[PL][POST][p],
+                                              new_conflicting) - new_conflicting;
+            std::swap(new_conflicting, conflicting);
         }
 
         Transition::CardConflicting[t] = card_conflicting;
         // try to find conflict set in cache
-        if(conflictcache[card_conflicting]->end() != (it=conflictcache[card_conflicting]->find(conflicting))) {
+        if (conflictcache[card_conflicting]->end() != (it = conflictcache[card_conflicting]->find(
+                    conflicting)))
+        {
             // success! use cached set
             Transition::Conflicting[t] = *it;
             Transition::ConflictingIsOriginal[t] = false;
-        } else {
+        }
+        else
+        {
             // failure! allocate memory for new conflict set and add it to the cache
-            Transition::Conflicting[t] = (index_t*) malloc(card_conflicting * SIZEOF_INDEX_T);
+            Transition::Conflicting[t] = (index_t *) malloc(card_conflicting * SIZEOF_INDEX_T);
             memcpy(Transition::Conflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
             conflictcache[card_conflicting]->insert(Transition::Conflicting[t]);
             Transition::ConflictingIsOriginal[t] = true;
@@ -1021,19 +1131,25 @@ void Net::preprocess_organizeConflictingTransitions() {
         {
             // p is a post-place
             const index_t p = Net::Arc[TR][POST][t][i];
-            card_conflicting = std::set_union(conflicting,conflicting+card_conflicting,Net::Arc[PL][POST][p],Net::Arc[PL][POST][p]+Net::CardArcs[PL][POST][p],new_conflicting) - new_conflicting;
-            std::swap(new_conflicting,conflicting);
+            card_conflicting = std::set_union(conflicting, conflicting + card_conflicting,
+                                              Net::Arc[PL][POST][p], Net::Arc[PL][POST][p] + Net::CardArcs[PL][POST][p],
+                                              new_conflicting) - new_conflicting;
+            std::swap(new_conflicting, conflicting);
         }
 
         Transition::CardBackConflicting[t] = card_conflicting;
         // try to find conflict set in cache
-        if(conflictcache[card_conflicting]->end() != (it=conflictcache[card_conflicting]->find(conflicting))) {
+        if (conflictcache[card_conflicting]->end() != (it = conflictcache[card_conflicting]->find(
+                    conflicting)))
+        {
             // success! use cached set
             Transition::BackConflicting[t] = *it;
             Transition::BackConflictingIsOriginal[t] = false;
-        } else {
+        }
+        else
+        {
             // failure! allocate memory for new conflict set and add it to the cache
-            Transition::BackConflicting[t] = (index_t*) malloc(card_conflicting * SIZEOF_INDEX_T);
+            Transition::BackConflicting[t] = (index_t *) malloc(card_conflicting * SIZEOF_INDEX_T);
             memcpy(Transition::BackConflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
             conflictcache[card_conflicting]->insert(Transition::BackConflicting[t]);
             Transition::BackConflictingIsOriginal[t] = true;
@@ -1043,8 +1159,10 @@ void Net::preprocess_organizeConflictingTransitions() {
 
     free(conflicting);
     free(new_conflicting);
-    for(index_t i = 0; i <= cardTR; i++)
+    for (index_t i = 0; i <= cardTR; i++)
+    {
         delete conflictcache[i];
+    }
     delete conflictcache;
 
 
@@ -1055,29 +1173,34 @@ void Net::preprocess_organizeConflictingTransitions() {
 
 // moves all elements in the range [first1,last1), that are also in [first2,last2), to result.
 // returns the number of elements moved.
-index_t Net::set_moveall (index_t* first1, index_t* last1, index_t* first2, index_t* last2, index_t* result)
+index_t Net::set_moveall (index_t *first1, index_t *last1, index_t *first2, index_t *last2,
+                          index_t *result)
 {
-    index_t* res = result;
-    index_t* retain = first1;
-    index_t* lb = first1;
-    while (first1!=last1 && first2!=last2)
+    index_t *res = result;
+    index_t *retain = first1;
+    index_t *lb = first1;
+    while (first1 != last1 && first2 != last2)
     {
-        lb = std::lower_bound(lb,last1,*first2);
-        if(lb == last1)
+        lb = std::lower_bound(lb, last1, *first2);
+        if (lb == last1)
+        {
             break;
-        if(*lb == *first2++) {
-            memmove(retain,first1,(lb-first1)*SIZEOF_INDEX_T);
-            retain += lb-first1;
+        }
+        if (*lb == *first2++)
+        {
+            memmove(retain, first1, (lb - first1)*SIZEOF_INDEX_T);
+            retain += lb - first1;
             *res++ = *lb++;
             first1 = lb;
         }
     }
-    memmove(retain,first1,(last1-first1)*SIZEOF_INDEX_T);
+    memmove(retain, first1, (last1 - first1)*SIZEOF_INDEX_T);
     return res - result;
 }
 
 /// calculates the set of conflicting transitions for each transition
-void Net::preprocess_organizeConflictingTransitions() {
+void Net::preprocess_organizeConflictingTransitions()
+{
 
     const index_t cardPL = Net::Card[PL];
     const index_t cardTR = Net::Card[TR];
@@ -1087,30 +1210,35 @@ void Net::preprocess_organizeConflictingTransitions() {
     ////
 
     // stackpos_place_done[p] states whether place p is already included in the current conflict set (the one at the current stack position)
-    bool* stackpos_place_done = (bool*) calloc(cardPL, SIZEOF_BOOL);
+    bool *stackpos_place_done = (bool *) calloc(cardPL, SIZEOF_BOOL);
     // stack_place_used[i] states which place has been processed at stack position i. Needed to keep stackpos_place_done updated.
-    index_t* stack_place_used = (index_t*) malloc(cardPL * SIZEOF_INDEX_T);
+    index_t *stack_place_used = (index_t *) malloc(cardPL * SIZEOF_INDEX_T);
 
     // stack_conflictset[i] stores the current conflict set at stack position i
-    index_t** stack_conflictset = (index_t**) calloc((cardPL + 1), SIZEOF_VOIDP); // calloc: null-pointer tests to dynamically allocate new segments
-    index_t* stack_card_conflictset = (index_t*) calloc((cardPL + 1), SIZEOF_INDEX_T);
+    index_t **stack_conflictset = (index_t **) calloc((cardPL + 1),
+                                  SIZEOF_VOIDP); // calloc: null-pointer tests to dynamically allocate new segments
+    index_t *stack_card_conflictset = (index_t *) calloc((cardPL + 1), SIZEOF_INDEX_T);
 
     // stack_transitions[i] stores all transitions the conflict set at stack position i applies to. Every transition appears exactly once.
-    index_t** stack_transitions = (index_t**) calloc((cardPL + 1), SIZEOF_VOIDP); // calloc: null-pointer tests to dynamically allocate new segments
-    index_t* stack_card_transitions = (index_t*) calloc((cardPL + 1), SIZEOF_INDEX_T);
+    index_t **stack_transitions = (index_t **) calloc((cardPL + 1),
+                                  SIZEOF_VOIDP); // calloc: null-pointer tests to dynamically allocate new segments
+    index_t *stack_card_transitions = (index_t *) calloc((cardPL + 1), SIZEOF_INDEX_T);
     // index of the current transition for each stack position
-    index_t* stack_transitions_index = (index_t*) calloc((cardPL + 1), SIZEOF_INDEX_T);
+    index_t *stack_transitions_index = (index_t *) calloc((cardPL + 1), SIZEOF_INDEX_T);
 
     // temporary array needed to do pseudo-"in-place" operations.
-    index_t* tmp_array = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
+    index_t *tmp_array = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
 
     // initialize conflict cache array. There is a set for every possible size of the conflict set.
-    std::set<index_t*,conflictset_comparator>** conflictcache = new std::set<index_t*,conflictset_comparator>*[cardTR+1];
-    for(index_t i = 0; i <= cardTR; i++)
-        conflictcache[i] = new std::set<index_t*,conflictset_comparator>(conflictset_comparator(i));
+    std::set<index_t *, conflictset_comparator> **conflictcache = new
+    std::set<index_t *, conflictset_comparator> *[cardTR + 1];
+    for (index_t i = 0; i <= cardTR; i++)
+    {
+        conflictcache[i] = new std::set<index_t *, conflictset_comparator>(conflictset_comparator(i));
+    }
     index_t num_different_conflicts = 0;
     // iterator used to temporarily store the result of a find() operation. It will point either to the cache element or the end() of the conflictcache
-    std::set<index_t*,conflictset_comparator>::iterator it;
+    std::set<index_t *, conflictset_comparator>::iterator it;
 
     ////
     // compute (forward-)conflicting sets
@@ -1120,23 +1248,29 @@ void Net::preprocess_organizeConflictingTransitions() {
     index_t num_finished_transitions = 0;
 
     /// init stack
-    stack_conflictset[0] = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
-    stack_transitions[0] = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
+    stack_conflictset[0] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
+    stack_transitions[0] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
     index_t stack_index = 0;
     stack_card_transitions[0] = cardTR;
 
     // all transitions start at stack position 0
-    for(index_t i = 0; i<cardTR; i++)
+    for (index_t i = 0; i < cardTR; i++)
+    {
         stack_transitions[0][i] = i;
-    while(true) {
+    }
+    while (true)
+    {
         /// check if there are still transitions left the current stack position
-        if(stack_transitions_index[stack_index] >= stack_card_transitions[stack_index]) {
+        if (stack_transitions_index[stack_index] >= stack_card_transitions[stack_index])
+        {
             /// all transitions are done, pop current position from stack
             // reset stack position
             stack_transitions_index[stack_index] = 0;
             // check if already at bottom of stack
-            if(stack_index <= 0)
+            if (stack_index <= 0)
+            {
                 break;
+            }
             stack_index--;
             stackpos_place_done[stack_place_used[stack_index]] = false;
             continue;
@@ -1146,23 +1280,32 @@ void Net::preprocess_organizeConflictingTransitions() {
         index_t active_transition = stack_transitions[stack_index][stack_transitions_index[stack_index]];
 
         /// iterate over all its unprocessed pre-places p
-        for(index_t i=0; i<Net::CardArcs[TR][PRE][active_transition]; i++) {
+        for (index_t i = 0; i < Net::CardArcs[TR][PRE][active_transition]; i++)
+        {
             const index_t p = Net::Arc[TR][PRE][active_transition][i];
-            if(stackpos_place_done[p])
+            if (stackpos_place_done[p])
+            {
                 continue;
+            }
 
             // allocate next stack segment if not already done
-            if(!stack_conflictset[stack_index+1]) {
-                stack_conflictset[stack_index+1] = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
-                stack_transitions[stack_index+1] = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
+            if (!stack_conflictset[stack_index + 1])
+            {
+                stack_conflictset[stack_index + 1] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
+                stack_transitions[stack_index + 1] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
             }
 
             // compute new conflict set
-            stack_card_conflictset[stack_index+1] = std::set_union(stack_conflictset[stack_index],stack_conflictset[stack_index]+stack_card_conflictset[stack_index],Net::Arc[PL][POST][p],Net::Arc[PL][POST][p]+Net::CardArcs[PL][POST][p],stack_conflictset[stack_index+1]) - stack_conflictset[stack_index+1];
+            stack_card_conflictset[stack_index + 1] = std::set_union(stack_conflictset[stack_index],
+                    stack_conflictset[stack_index] + stack_card_conflictset[stack_index], Net::Arc[PL][POST][p],
+                    Net::Arc[PL][POST][p] + Net::CardArcs[PL][POST][p],
+                    stack_conflictset[stack_index + 1]) - stack_conflictset[stack_index + 1];
 
             // compute all remaining transitions at the new stack position
-            stack_card_transitions[stack_index+1] = set_moveall(stack_transitions[stack_index],stack_transitions[stack_index]+stack_card_transitions[stack_index],Net::Arc[PL][POST][p],Net::Arc[PL][POST][p]+Net::CardArcs[PL][POST][p],stack_transitions[stack_index+1]);
-            stack_card_transitions[stack_index] -= stack_card_transitions[stack_index+1];
+            stack_card_transitions[stack_index + 1] = set_moveall(stack_transitions[stack_index],
+                    stack_transitions[stack_index] + stack_card_transitions[stack_index], Net::Arc[PL][POST][p],
+                    Net::Arc[PL][POST][p] + Net::CardArcs[PL][POST][p], stack_transitions[stack_index + 1]);
+            stack_card_transitions[stack_index] -= stack_card_transitions[stack_index + 1];
 
             // mark p as used
             stack_place_used[stack_index] = p;
@@ -1173,22 +1316,31 @@ void Net::preprocess_organizeConflictingTransitions() {
         }
 
         // status output
-        if(++num_finished_transitions % 10000 == 0) {
-            rep->status("processed %d of %d transitions, pass 1/2 (%d conflict sets)", num_finished_transitions, cardTR, num_different_conflicts);
+        if (++num_finished_transitions % 10000 == 0)
+        {
+            rep->status("processed %d of %d transitions, pass 1/2 (%d conflict sets)", num_finished_transitions,
+                        cardTR, num_different_conflicts);
         }
 
         // all pre-places of active_transition are now done, the current stack position holds the resulting conflict set
         Transition::CardConflicting[active_transition] = stack_card_conflictset[stack_index];
         // try to find conflict set in cache
-        if(conflictcache[stack_card_conflictset[stack_index]]->end() != (it=conflictcache[stack_card_conflictset[stack_index]]->find(stack_conflictset[stack_index]))) {
+        if (conflictcache[stack_card_conflictset[stack_index]]->end() != (it =
+                    conflictcache[stack_card_conflictset[stack_index]]->find(stack_conflictset[stack_index])))
+        {
             // success! use cached set
             Transition::Conflicting[active_transition] = *it;
             Transition::ConflictingIsOriginal[active_transition] = false;
-        } else {
+        }
+        else
+        {
             // failure! allocate memory for new conflict set and add it to the cache
-            Transition::Conflicting[active_transition] = (index_t*) malloc(stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
-            memcpy(Transition::Conflicting[active_transition], stack_conflictset[stack_index], stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
-            conflictcache[stack_card_conflictset[stack_index]]->insert(Transition::Conflicting[active_transition]);
+            Transition::Conflicting[active_transition] = (index_t *) malloc(stack_card_conflictset[stack_index]
+                    * SIZEOF_INDEX_T);
+            memcpy(Transition::Conflicting[active_transition], stack_conflictset[stack_index],
+                   stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
+            conflictcache[stack_card_conflictset[stack_index]]->insert(
+                Transition::Conflicting[active_transition]);
             Transition::ConflictingIsOriginal[active_transition] = true;
             num_different_conflicts++;
         }
@@ -1203,19 +1355,25 @@ void Net::preprocess_organizeConflictingTransitions() {
     num_finished_transitions = 0;
 
     // re-init stack
-    stack_index=0;
+    stack_index = 0;
     stack_card_transitions[0] = cardTR;
-    for(index_t i = 0; i<cardTR; i++)
+    for (index_t i = 0; i < cardTR; i++)
+    {
         stack_transitions[0][i] = i;
-    while(true) {
+    }
+    while (true)
+    {
         /// check if there are still transitions left the current stack position
-        if(stack_transitions_index[stack_index] >= stack_card_transitions[stack_index]) {
+        if (stack_transitions_index[stack_index] >= stack_card_transitions[stack_index])
+        {
             /// all transitions are done, pop current position from stack
             // reset stack position
             stack_transitions_index[stack_index] = 0;
             // check if already at bottom of stack
-            if(stack_index <= 0)
+            if (stack_index <= 0)
+            {
                 break;
+            }
             stack_index--;
             stackpos_place_done[stack_place_used[stack_index]] = false;
             continue;
@@ -1225,23 +1383,32 @@ void Net::preprocess_organizeConflictingTransitions() {
         index_t active_transition = stack_transitions[stack_index][stack_transitions_index[stack_index]];
 
         /// iterate over all its unprocessed post-places p
-        for(index_t i=0; i<Net::CardArcs[TR][POST][active_transition]; i++) {
+        for (index_t i = 0; i < Net::CardArcs[TR][POST][active_transition]; i++)
+        {
             const index_t p = Net::Arc[TR][POST][active_transition][i];
-            if(stackpos_place_done[p])
+            if (stackpos_place_done[p])
+            {
                 continue;
+            }
 
             // allocate next stack segment if not already done
-            if(!stack_conflictset[stack_index+1]) {
-                stack_conflictset[stack_index+1] = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
-                stack_transitions[stack_index+1] = (index_t*) calloc(cardTR, SIZEOF_INDEX_T);
+            if (!stack_conflictset[stack_index + 1])
+            {
+                stack_conflictset[stack_index + 1] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
+                stack_transitions[stack_index + 1] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
             }
 
             // compute new conflict set
-            stack_card_conflictset[stack_index+1] = std::set_union(stack_conflictset[stack_index],stack_conflictset[stack_index]+stack_card_conflictset[stack_index],Net::Arc[PL][POST][p],Net::Arc[PL][POST][p]+Net::CardArcs[PL][POST][p],stack_conflictset[stack_index+1]) - stack_conflictset[stack_index+1];
+            stack_card_conflictset[stack_index + 1] = std::set_union(stack_conflictset[stack_index],
+                    stack_conflictset[stack_index] + stack_card_conflictset[stack_index], Net::Arc[PL][POST][p],
+                    Net::Arc[PL][POST][p] + Net::CardArcs[PL][POST][p],
+                    stack_conflictset[stack_index + 1]) - stack_conflictset[stack_index + 1];
 
             // compute all remaining transitions at the new stack position
-            stack_card_transitions[stack_index+1] = set_moveall(stack_transitions[stack_index],stack_transitions[stack_index]+stack_card_transitions[stack_index],Net::Arc[PL][PRE][p],Net::Arc[PL][PRE][p]+Net::CardArcs[PL][PRE][p],stack_transitions[stack_index+1]);
-            stack_card_transitions[stack_index] -= stack_card_transitions[stack_index+1];
+            stack_card_transitions[stack_index + 1] = set_moveall(stack_transitions[stack_index],
+                    stack_transitions[stack_index] + stack_card_transitions[stack_index], Net::Arc[PL][PRE][p],
+                    Net::Arc[PL][PRE][p] + Net::CardArcs[PL][PRE][p], stack_transitions[stack_index + 1]);
+            stack_card_transitions[stack_index] -= stack_card_transitions[stack_index + 1];
 
             // mark p as used
             stack_place_used[stack_index] = p;
@@ -1252,22 +1419,31 @@ void Net::preprocess_organizeConflictingTransitions() {
         }
 
         // status output
-        if(++num_finished_transitions % 10000 == 0) {
-            rep->status("processed %d of %d transitions, pass 2/2 (%d conflict sets)", num_finished_transitions, cardTR, num_different_conflicts);
+        if (++num_finished_transitions % 10000 == 0)
+        {
+            rep->status("processed %d of %d transitions, pass 2/2 (%d conflict sets)", num_finished_transitions,
+                        cardTR, num_different_conflicts);
         }
 
         // all post-places of active_transition are now done, the current stack position holds the resulting conflict set
         Transition::CardBackConflicting[active_transition] = stack_card_conflictset[stack_index];
         // try to find conflict set in cache
-        if(conflictcache[stack_card_conflictset[stack_index]]->end() != (it=conflictcache[stack_card_conflictset[stack_index]]->find(stack_conflictset[stack_index]))) {
+        if (conflictcache[stack_card_conflictset[stack_index]]->end() != (it =
+                    conflictcache[stack_card_conflictset[stack_index]]->find(stack_conflictset[stack_index])))
+        {
             // success! use cached set
             Transition::BackConflicting[active_transition] = *it;
             Transition::BackConflictingIsOriginal[active_transition] = false;
-        } else {
+        }
+        else
+        {
             // failure! allocate memory for new conflict set and add it to the cache
-            Transition::BackConflicting[active_transition] = (index_t*) malloc(stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
-            memcpy(Transition::BackConflicting[active_transition], stack_conflictset[stack_index], stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
-            conflictcache[stack_card_conflictset[stack_index]]->insert(Transition::BackConflicting[active_transition]);
+            Transition::BackConflicting[active_transition] = (index_t *) malloc(
+                        stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
+            memcpy(Transition::BackConflicting[active_transition], stack_conflictset[stack_index],
+                   stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
+            conflictcache[stack_card_conflictset[stack_index]]->insert(
+                Transition::BackConflicting[active_transition]);
             Transition::BackConflictingIsOriginal[active_transition] = true;
             num_different_conflicts++;
         }
@@ -1280,17 +1456,23 @@ void Net::preprocess_organizeConflictingTransitions() {
     ////
 
     free(tmp_array);
-    for(index_t i = 0; i <= cardTR; i++)
+    for (index_t i = 0; i <= cardTR; i++)
+    {
         delete conflictcache[i];
+    }
     delete[] conflictcache;
-    for(index_t i = 0; i <= cardPL; i++)
-        if(stack_conflictset[i])
+    for (index_t i = 0; i <= cardPL; i++)
+        if (stack_conflictset[i])
+        {
             free(stack_conflictset[i]);
+        }
     free(stack_conflictset);
     free(stack_card_conflictset);
-    for(index_t i = 0; i <= cardPL; i++)
-        if(stack_transitions[i])
+    for (index_t i = 0; i <= cardPL; i++)
+        if (stack_transitions[i])
+        {
             free(stack_transitions[i]);
+        }
     free(stack_transitions);
     free(stack_card_transitions);
     free(stack_transitions_index);
@@ -1301,16 +1483,18 @@ void Net::preprocess_organizeConflictingTransitions() {
 }
 
 /// assumes that raw net is read and places, transitions and the edges in-between are set properly. Computes additional net information used to speed up the simulation.
-void Net::preprocess() {
+void Net::preprocess()
+{
     const index_t cardPL = Net::Card[PL];
     const index_t cardTR = Net::Card[TR];
 
     /************************************
     * 1. Compute bits needed for places *
     ************************************/
-    Place::CardBits = (cardbit_t*) malloc(cardPL * SIZEOF_CARDBIT_T);
+    Place::CardBits = (cardbit_t *) malloc(cardPL * SIZEOF_CARDBIT_T);
     Place::SizeOfBitVector = 0;
-    for(index_t p = 0; p < cardPL; p++) {
+    for (index_t p = 0; p < cardPL; p++)
+    {
         Place::SizeOfBitVector +=
             (Place::CardBits[p] = Place::Capacity2Bits(Place::Capacity[p]));
     }
@@ -1318,11 +1502,13 @@ void Net::preprocess() {
     /********************
     * 2. Compute Hashes *
     ********************/
-    Place::Hash = (hash_t*) malloc(cardPL * SIZEOF_HASH_T);
+    Place::Hash = (hash_t *) malloc(cardPL * SIZEOF_HASH_T);
     Marking::HashInitial = 0;
-    for(index_t p = 0; p < cardPL; p++) {
+    for (index_t p = 0; p < cardPL; p++)
+    {
         Place::Hash[p] = rand() % MAX_HASH;
-        Marking::HashInitial = (Marking::HashInitial + Place::Hash[p] * Marking::Initial[p]) % SIZEOF_MARKINGTABLE;
+        Marking::HashInitial = (Marking::HashInitial + Place::Hash[p] * Marking::Initial[p]) %
+                               SIZEOF_MARKINGTABLE;
     }
     // set hash value for initial marking
     Marking::HashCurrent = Marking::HashInitial;
@@ -1330,25 +1516,27 @@ void Net::preprocess() {
     /*********************
     * 3. Organize Deltas *
     *********************/
-    Transition::DeltaHash = (hash_t*) calloc(cardTR , SIZEOF_HASH_T); // calloc: delta hash must be initially 0
+    Transition::DeltaHash = (hash_t *) calloc(cardTR ,
+                            SIZEOF_HASH_T); // calloc: delta hash must be initially 0
     // allocate memory for deltas
     for (int direction = PRE; direction <= POST; direction++)
     {
-        Transition::CardDeltaT[direction] = (index_t*) calloc(cardTR, SIZEOF_INDEX_T); // calloc: no arcs there yet
-        Transition::DeltaT[direction] = (index_t**) malloc(cardTR * SIZEOF_VOIDP);
-        Transition::MultDeltaT[direction] = (mult_t**) malloc(cardTR * SIZEOF_VOIDP);
+        Transition::CardDeltaT[direction] = (index_t *) calloc(cardTR,
+                                            SIZEOF_INDEX_T); // calloc: no arcs there yet
+        Transition::DeltaT[direction] = (index_t **) malloc(cardTR * SIZEOF_VOIDP);
+        Transition::MultDeltaT[direction] = (mult_t **) malloc(cardTR * SIZEOF_VOIDP);
     }
     Net::preprocess_organizeDeltas();
 
     /**************************************
     * 4. Organize conflicting transitions *
     **************************************/
-    Transition::CardConflicting = (index_t*) malloc(cardTR * SIZEOF_INDEX_T);
-    Transition::Conflicting = (index_t**) malloc(cardTR * SIZEOF_VOIDP);
-    Transition::ConflictingIsOriginal = (bool*) malloc(cardTR * SIZEOF_BOOL);
-    Transition::CardBackConflicting = (index_t*) malloc(cardTR * SIZEOF_INDEX_T);
-    Transition::BackConflicting = (index_t**) malloc(cardTR * SIZEOF_VOIDP);
-    Transition::BackConflictingIsOriginal = (bool*) malloc(cardTR * SIZEOF_BOOL);
+    Transition::CardConflicting = (index_t *) malloc(cardTR * SIZEOF_INDEX_T);
+    Transition::Conflicting = (index_t **) malloc(cardTR * SIZEOF_VOIDP);
+    Transition::ConflictingIsOriginal = (bool *) malloc(cardTR * SIZEOF_BOOL);
+    Transition::CardBackConflicting = (index_t *) malloc(cardTR * SIZEOF_INDEX_T);
+    Transition::BackConflicting = (index_t **) malloc(cardTR * SIZEOF_VOIDP);
+    Transition::BackConflictingIsOriginal = (bool *) malloc(cardTR * SIZEOF_BOOL);
 
     Net::preprocess_organizeConflictingTransitions();
 
@@ -1356,9 +1544,12 @@ void Net::preprocess() {
     * 5. Set significant places *
     *****************************/
     // test whether computation actually needed
-    if(Place::CardSignificant == -1)
+    if (Place::CardSignificant == -1)
+    {
         Net::setSignificantPlaces();
-    rep->status("%d places, %d transitions, %d significant places", Net::Card[PL], Net::Card[TR], Place::CardSignificant);
+    }
+    rep->status("%d places, %d transitions, %d significant places", Net::Card[PL], Net::Card[TR],
+                Place::CardSignificant);
 
     // sort all arcs. Needs to be done before enabledness check in order to not mess up the disabled lists and scapegoats, but after determining the significant places since it swaps places and destroys any arc ordering.
     Net::sortAllArcs();
@@ -1375,18 +1566,19 @@ void Net::preprocess() {
     /*******************************
     * 7. Initial enabledness check *
     *******************************/
-    Place::CardDisabled = (index_t*) calloc(cardPL , SIZEOF_INDEX_T); // use calloc: initial assumption: no transition is disabled
-    Place::Disabled = (index_t**) malloc(cardPL * SIZEOF_VOIDP);
-    for(index_t p = 0; p < cardPL; p++)
+    Place::CardDisabled = (index_t *) calloc(cardPL ,
+                          SIZEOF_INDEX_T); // use calloc: initial assumption: no transition is disabled
+    Place::Disabled = (index_t **) malloc(cardPL * SIZEOF_VOIDP);
+    for (index_t p = 0; p < cardPL; p++)
     {
         // initially: no disabled transistions (through CardDisabled = 0)
         // correct values will be achieved by initial checkEnabled...
-        Place::Disabled[p] = (index_t*) malloc(Net::CardArcs[PL][POST][p] * SIZEOF_INDEX_T);
+        Place::Disabled[p] = (index_t *) malloc(Net::CardArcs[PL][POST][p] * SIZEOF_INDEX_T);
     }
-    Transition::PositionScapegoat = (index_t*) malloc(cardTR * SIZEOF_INDEX_T);
-    Transition::Enabled = (bool*) malloc(cardTR * SIZEOF_BOOL);
+    Transition::PositionScapegoat = (index_t *) malloc(cardTR * SIZEOF_INDEX_T);
+    Transition::Enabled = (bool *) malloc(cardTR * SIZEOF_BOOL);
     Transition::CardEnabled = cardTR; // start with assumption that all transitions are enabled
-    for(index_t t = 0; t < cardTR; t++)
+    for (index_t t = 0; t < cardTR; t++)
     {
         Transition::Enabled[t] = true;
     }

@@ -1,19 +1,31 @@
-style=ansi
+# braces begin on the next line
+--style=allman
 
-indent=spaces=4
+# indentation is 4 spaces
+--indent=spaces=4
 
-indent-classes
-indent-switches
-indent-namespaces
-indent-preprocessor
+# line comments are indented
+--indent-col1-comments
 
-indent-col1-comments
+# pad operators with spaces
+--pad-oper
 
-max-instatement-indent=75
-pad-oper
-unpad-paren
-convert-tabs
-add-brackets
-align-pointer=type
-align-reference=name
-pad-header
+# add a space between if/for/while and the paren
+--pad-header
+
+# preprocessor defines are indented
+#--indent-preproc-define
+--indent-preprocessor
+
+# pointer and references go to the name
+--align-pointer=name
+--align-reference=name
+
+# add brackets to one line conditionals (if, for, while)
+--add-brackets
+
+# try to shorten lines to 100 characters
+--max-code-length=100
+
+# use \n as line ending
+--lineend=linux

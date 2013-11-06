@@ -28,19 +28,19 @@ using addPos and addNeg
 
 \todo Schleifen behandeln - können evtl. rausgenommen werden
 */
-AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k)
+AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k) :
+    posPlaces(new index_t[p]),
+    negPlaces(new index_t[n]),
+    posMult(new capacity_t[p]),
+    negMult(new capacity_t[n]),
+    cardPos(p),
+    cardNeg(n),
+    threshold(k),
+    original(true)
 {
     //printf("+ %p->AtomicStatePredicate(p=%d, n=%d, k=%d)\n", this, p, n, k);
 
     parent = NULL;
-    posPlaces = (index_t *) malloc(p * SIZEOF_INDEX_T);
-    negPlaces = (index_t *) malloc(n * SIZEOF_INDEX_T);
-    posMult = (capacity_t *) malloc(p * SIZEOF_CAPACITY_T);
-    negMult = (capacity_t *) malloc(n * SIZEOF_CAPACITY_T);
-    cardPos = p;
-    cardNeg = n;
-    threshold = k;
-    original = true;
 }
 
 AtomicStatePredicate::~AtomicStatePredicate()
@@ -49,10 +49,10 @@ AtomicStatePredicate::~AtomicStatePredicate()
     {
         return;
     }
-    free(posPlaces);
-    free(negPlaces);
-    free(posMult);
-    free(negMult);
+    delete[] posPlaces;
+    delete[] negPlaces;
+    delete[] posMult;
+    delete[] negMult;
     //free(up);
 }
 

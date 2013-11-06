@@ -157,33 +157,15 @@ Task::Task() : spFormula(NULL), ctlFormula(NULL), bauto(NULL), ns(NULL),
 Task::~Task()
 {
     delete ns;
-    if (store)
-    {
-        delete store;
-    }
-    if (ltlStore)
-    {
-        delete ltlStore;
-    }
-    if (ctlStore)
-    {
-        delete ctlStore;
-    }
+    delete store;
+    delete ltlStore;
+    delete ctlStore;
     delete p;
     delete spFormula;
     delete fl;
-    if (exploration)
-    {
-        delete exploration;
-    }
-    if (ltlExploration)
-    {
-        delete ltlExploration;
-    }
-    if (ctlExploration)
-    {
-        delete ctlExploration;
-    }
+    delete exploration;
+    delete ltlExploration;
+    delete ctlExploration;
     delete bauto;
 }
 
@@ -682,7 +664,6 @@ void Task::setProperty()
         break;
 
     case check__NULL:
-        break;
     case check_arg_none:
         break;
     }
@@ -716,7 +697,6 @@ void Task::setProperty()
         break;
 
     case check__NULL:
-        break;
     case check_arg_none:
         break;
     }
@@ -817,9 +797,7 @@ void Task::interpreteResult(bool *result)
             break;
 
         case check__NULL:
-            break;
         case check_arg_none:
-            break;
         case check_arg_full:
             break;
         }

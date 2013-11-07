@@ -201,12 +201,12 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
     // fairness datastructures
     // weak
     index_t card_fulfilled_weak = 0;
-    bool *fulfilled_weak = (bool *) calloc(assumptions.card_weak, SIZEOF_BOOL);
-    bool *fulfilled_strong = (bool *) calloc(assumptions.card_strong, SIZEOF_BOOL);
-    bool *enabled_strong = (bool *) calloc(assumptions.card_strong, SIZEOF_BOOL);
+    bool *fulfilled_weak = new bool[assumptions.card_weak]();
+    bool *fulfilled_strong = new bool[assumptions.card_strong]();
+    bool *enabled_strong = new bool[assumptions.card_strong]();
 
     // fairness check for initial
-    bool *__enabled_weak = (bool *) calloc(assumptions.card_weak, SIZEOF_BOOL);
+    bool *__enabled_weak = new bool[assumptions.card_weak]();
     for (index_t i = 0; i <= currentFirelistEntry; i++)
     {
         if (assumptions.weak_backlist[currentFirelist[i]] != -1)
@@ -312,24 +312,24 @@ index_t LTLExploration::checkFairness(BuechiAutomata &automata,
                 if (card_fulfilled_weak != assumptions.card_weak
                         || !buechi_accepting_state)
                 {
-                    free(fulfilled_strong);
-                    free(fulfilled_weak);
-                    free(enabled_strong);
-                    free(__enabled_weak);
+                    delete[] fulfilled_strong;
+                    delete[] fulfilled_weak;
+                    delete[] enabled_strong;
+                    delete[] __enabled_weak;
                     return -2;
                 }
                 for (index_t i = 0; i < assumptions.card_strong; i++)
                     if (enabled_strong[i] && !fulfilled_strong[i])
                     {
-                        free(fulfilled_strong);
-                        free(fulfilled_weak);
-                        free(enabled_strong);
-                        free(__enabled_weak);
+                        delete[] fulfilled_strong;
+                        delete[] fulfilled_weak;
+                        delete[] enabled_strong;
+                        delete[] __enabled_weak;
                         return i;
                     }
-                free(fulfilled_strong);
-                free(fulfilled_weak);
-                free(__enabled_weak);
+                delete[] fulfilled_strong;
+                delete[] fulfilled_weak;
+                delete[] __enabled_weak;
                 // return the set of enabled strong transitions to main routine, so that we can search for a path on which all these lie
                 *enabledStrongTransitions = enabled_strong;
                 // all fairness assumptions are fulfilled
@@ -612,7 +612,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
                 }
                 else
                 {
-                    *searchResult = (AutomataTree *) malloc(automata.getNumberOfStates() * FLAT_ENTRY_SIZE);
+                    *searchResult = new AutomataTree[automata.getNumberOfStates()];
                     for (index_t i = 0; i < automata.getNumberOfStates(); i++)
                     {
                         ((AutomataTree *) *searchResult)[i].state = i;
@@ -760,8 +760,8 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
                     if (checkResult == -1)
                     {
                         // prepare data-structures for finding a witness path
-                        bool *fulfilledWeak = (bool *) calloc(assumptions.card_weak, SIZEOF_BOOL);
-                        bool *fulfilledStrong = (bool *) calloc(assumptions.card_strong, SIZEOF_BOOL);
+                        bool *fulfilledWeak = new bool[assumptions.card_weak]();
+                        bool *fulfilledStrong = new bool[assumptions.card_strong]();
                         index_t fulfilled_conditions = 0;
                         for (index_t i = 0; i < assumptions.card_strong; i++)
                             if (!enabled_strong_fair[i])
@@ -773,7 +773,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
                             fulfilled_conditions++;
                         }
                         // update weak conditions
-                        bool *__enabled_weak = (bool *) calloc(assumptions.card_weak, SIZEOF_BOOL);
+                        bool *__enabled_weak = new bool[assumptions.card_weak]();
                         for (index_t i = 0; i < ns.CardEnabled; i++)
                             if (assumptions.weak_backlist[ns.Enabled[i]] != -1)
                             {
@@ -798,8 +798,8 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
                                            automata.isAcceptingState(currentAutomataState), currentStateEntry);
 
                         // free needed datastructures
-                        free(fulfilledWeak);
-                        free(fulfilledStrong);
+                        delete[] fulfilledWeak;
+                        delete[] fulfilledStrong;
                         //delete[] currentFirelist;
                         delete[] currentStateList;
                         // add path from the initial marking to the SCC
@@ -932,8 +932,8 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
         {
             assumptions.card_strong++;
         }
-    assumptions.strong_fairness = (index_t *) calloc(assumptions.card_strong, SIZEOF_INDEX_T);
-    assumptions.strong_backlist = (index_t *) calloc(Net::Card[TR], SIZEOF_INDEX_T);
+    assumptions.strong_fairness = new index_t[assumptions.card_strong]();
+    assumptions.strong_backlist = new index_t[Net::Card[TR]]();
     // put all strong fair transitions into an array
     index_t __card_on_sf = 0;
     for (index_t i = 0; i < Net::Card[TR]; i++)
@@ -956,8 +956,8 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
         {
             assumptions.card_weak++;
         }
-    assumptions.weak_fairness = (index_t *) calloc(assumptions.card_weak, SIZEOF_INDEX_T);
-    assumptions.weak_backlist = (index_t *) calloc(Net::Card[TR], SIZEOF_INDEX_T);
+    assumptions.weak_fairness = new index_t[assumptions.card_weak]();
+    assumptions.weak_backlist = new index_t[Net::Card[TR]]();
     index_t __card_on_wf = 0;
     for (index_t i = 0; i < Net::Card[TR]; i++)
     {
@@ -973,7 +973,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
     }
 
     // prepare forbidden transtitions
-    forbidden_transitions = (index_t *) calloc(assumptions.card_strong, SIZEOF_INDEX_T);
+    forbidden_transitions = new index_t[assumptions.card_strong]();
     ////rep->message("FORB %x",forbidden_transtitions);
     card_forbidden_transitions = 0;
 
@@ -1001,7 +1001,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
     }
     else
     {
-        *currentStateEntry = (AutomataTree *)malloc(automata.getNumberOfStates() * FLAT_ENTRY_SIZE);
+        *currentStateEntry = new AutomataTree[automata.getNumberOfStates()];
         for (index_t i = 0; i < automata.getNumberOfStates(); i++)
         {
             ((AutomataTree *) *currentStateEntry)[i].dfs = DFS_INITIAL_INVALID_NUMBER;
@@ -1017,11 +1017,11 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
                         currentNextDepth - DFS_NUMBERS_PER_PNUELI, currentNextDFSNumber);
 
     // cleanup
-    free(assumptions.strong_backlist);
-    free(assumptions.strong_fairness);
-    free(assumptions.weak_backlist);
-    free(assumptions.weak_fairness);
-    free(forbidden_transitions);
+    delete[] assumptions.strong_backlist;
+    delete[] assumptions.strong_fairness;
+    delete[] assumptions.weak_backlist;
+    delete[] assumptions.weak_fairness;
+    delete[] forbidden_transitions;
 
     return result;
 }
@@ -1113,7 +1113,7 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
                 }
 
                 // check for possible new assumptions to be fulfilled
-                bool *__enabled_weak = (bool *) calloc(assumptions.card_weak, SIZEOF_BOOL);
+                bool *__enabled_weak = new bool[assumptions.card_weak]();
                 for (index_t i = 0; i <= currentFirelistEntry; i++)
                     if (assumptions.weak_backlist[currentFirelist[i]] != -1)
                     {
@@ -1127,7 +1127,7 @@ void LTLExploration::produceWitness(BuechiAutomata &automata,
                         fulfilled_conditions++;
                         newly_fulfilled = true;
                     }
-                free(__enabled_weak);
+                delete[] __enabled_weak;
                 if (automata.isAcceptingState(currentStateList[currentStateListEntry]) && !acceptingStateFound)
                 {
                     acceptingStateFound = true;

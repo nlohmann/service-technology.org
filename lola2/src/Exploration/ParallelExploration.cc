@@ -265,7 +265,7 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
 {
 
     // allocate space for threads
-    threads = (pthread_t *) calloc(_number_of_threads, sizeof(pthread_t));
+    threads = new pthread_t[_number_of_threads]();
 
     global_property = &property;
     global_store = &myStore;
@@ -273,8 +273,7 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     number_of_threads = _number_of_threads;
 
     // allocate space for thread arguments
-    tpDFSArguments *args = (tpDFSArguments *) calloc(number_of_threads,
-                           sizeof(tpDFSArguments));
+    tpDFSArguments *args = new tpDFSArguments[number_of_threads]();
     for (int i = 0; i < number_of_threads; i++)
     {
         args[i].threadNumber = i;
@@ -417,12 +416,12 @@ bool ParallelExploration::depth_first(SimpleProperty &property, NetState &ns,
     delete[] thread_stack;
 
     // clean up thread arguments
-    free(args);
+    delete[] args;
 
     // free the allocated memory
     delete[] restartSemaphoreName;
     delete[] restartSemaphore;
-    free(threads);
+    delete[] threads;
 
     return property.value;
 }

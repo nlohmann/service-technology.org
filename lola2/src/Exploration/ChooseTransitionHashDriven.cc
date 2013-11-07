@@ -15,14 +15,13 @@ a priority imposed on the fire list
 #include "Net/Place.h"
 #include "Net/Transition.h"
 
-ChooseTransitionHashDriven::ChooseTransitionHashDriven() : table((unsigned long int *) calloc(
-                sizeof(unsigned long int), SIZEOF_MARKINGTABLE))
+ChooseTransitionHashDriven::ChooseTransitionHashDriven() : table(new unsigned long int[SIZEOF_MARKINGTABLE])
 {
 }
 
 ChooseTransitionHashDriven::~ChooseTransitionHashDriven()
 {
-    free(table);
+    delete[] table;
 }
 
 index_t ChooseTransitionHashDriven::choose(NetState &ns, index_t cardfirelist, index_t *firelist)

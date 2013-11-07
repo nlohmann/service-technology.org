@@ -14,29 +14,30 @@
 #include <Net/Transition.h>
 #include <Exploration/FirelistStubbornDeadlock.h>
 
+/// \todo move initialization to initializer list
 FirelistStubbornDeadlock::FirelistStubbornDeadlock()
 {
-    dfsStack = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    dfs = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    lowlink = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    currentIndex = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    TarjanStack = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    mustBeIncluded = (index_t **) malloc(Net::Card[TR] * SIZEOF_VOIDP);
-    visited = (uint32_t *) calloc(Net::Card[TR] , sizeof(uint32_t));
-    onTarjanStack = (uint32_t *) calloc(Net::Card[TR] , sizeof(uint32_t));
+    dfsStack = new index_t[Net::Card[TR]];
+    dfs = new index_t[Net::Card[TR]];
+    lowlink = new index_t[Net::Card[TR]];
+    currentIndex = new index_t[Net::Card[TR]];
+    TarjanStack = new index_t[Net::Card[TR]];
+    mustBeIncluded = new index_t *[Net::Card[TR]];
+    visited = new uint32_t[Net::Card[TR] ]();
+    onTarjanStack = new uint32_t[Net::Card[TR] ]();
     stamp = 0;
 }
 
 FirelistStubbornDeadlock::~FirelistStubbornDeadlock()
 {
-    free(dfsStack);
-    free(dfs);
-    free(lowlink);
-    free(currentIndex);
-    free(TarjanStack);
-    free(mustBeIncluded);
-    free(visited);
-    free(onTarjanStack);
+    delete[] dfsStack;
+    delete[] dfs;
+    delete[] lowlink;
+    delete[] currentIndex;
+    delete[] TarjanStack;
+    delete[] mustBeIncluded;
+    delete[] visited;
+    delete[] onTarjanStack;
 }
 
 void FirelistStubbornDeadlock::newStamp()

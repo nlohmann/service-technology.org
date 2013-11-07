@@ -16,7 +16,7 @@ HashingWrapperStore<T>::HashingWrapperStore(VectorStoreCreator<T> *storeCreator,
     //storeCreator = _storeCreator;
     number_of_buckets = _number_of_buckets;
 
-    buckets = (VectorStore<T> **) calloc(SIZEOF_VOIDP, number_of_buckets);
+    buckets = new VectorStore<T> *[number_of_buckets]();
     //rwlocks =(pthread_rwlock_t*) calloc(sizeof(pthread_rwlock_t), number_of_buckets);
 
     for (hash_t i = 0; i < number_of_buckets; i++)
@@ -25,7 +25,7 @@ HashingWrapperStore<T>::HashingWrapperStore(VectorStoreCreator<T> *storeCreator,
         //pthread_rwlock_init(rwlocks+i, NULL);
     }
 
-    currentPopBucket = (index_t *) calloc(SIZEOF_INDEX_T, _number_of_threads);
+    currentPopBucket = new index_t[_number_of_threads]();
 
     // all initialization done, delete the given creator (for comfortable one-line creation)
     delete storeCreator;
@@ -36,18 +36,15 @@ HashingWrapperStore<T>::~HashingWrapperStore()
 {
     for (hash_t i = 0; i < number_of_buckets; i++)
     {
-        //if (buckets[i])
-        //{
         delete buckets[i];
-        //}
     }
-    free(buckets);
+    delete[] buckets;
 
     //for (hash_t i = 0; i < number_of_buckets; i++)
     //    pthread_rwlock_destroy(rwlocks+i);
     //free(rwlocks);
 
-    free(currentPopBucket);
+    delete[] currentPopBucket;
 }
 
 /// search for an input vector in the suffix tree and insert it, if it is not present

@@ -178,7 +178,7 @@ void Task::setNet()
 /* prints the content of a set for spin */
 StatePredicate *buildPropertyFromList(int *pos, int *neg)
 {
-    int i, j, start = 1;
+    int i, j = 1;
     std::vector<StatePredicate *> subForms;
     // bad hack from library
     int mod = 8 * sizeof(int);
@@ -377,12 +377,10 @@ void Task::setFormula()
 
         //rep->message("Buechi-automaton has %d states", bauto->cardStates);
         // now i do know the number of states
-        bauto->cardTransitions = (uint32_t *)calloc(bauto->cardStates,
-                                 sizeof(uint32_t));
-        bauto->transitions = (uint32_t ** *)calloc(bauto->cardStates,
-                             sizeof(uint32_t **));
-        bauto->cardEnabled = (index_t *)calloc(bauto->cardStates, SIZEOF_INDEX_T);
-        bauto->isStateAccepting = (bool *) calloc(bauto->cardStates, SIZEOF_BOOL);
+        bauto->cardTransitions = new uint32_t[bauto->cardStates]();
+        bauto->transitions = new uint32_t **[bauto->cardStates]();
+        bauto->cardEnabled = new index_t[bauto->cardStates]();
+        bauto->isStateAccepting = new bool[bauto->cardStates]();
 
         std::vector<StatePredicate *> neededProperties;
         std::map<StatePredicate *, int> neededProperties_backmap;
@@ -398,8 +396,8 @@ void Task::setFormula()
                 // build a TRUE-loop
                 bauto->isStateAccepting[curState] = true;
                 bauto->cardTransitions[curState] = 1;
-                bauto->transitions[curState] = (uint32_t **)calloc(1, sizeof(uint32_t *));
-                bauto->transitions[curState][0] = (uint32_t *)calloc(2, sizeof(uint32_t));
+                bauto->transitions[curState] = new uint32_t *[1]();
+                bauto->transitions[curState][0] = new uint32_t[2]();
                 bauto->transitions[curState][0][0] = neededProperties.size();
                 bauto->transitions[curState][0][1] = curState;
                 curProperty++;
@@ -460,15 +458,13 @@ void Task::setFormula()
                 bauto->cardTransitions[curState]++;
             }
 
-            bauto->transitions[curState] = (uint32_t **)calloc(
-                                               bauto->cardTransitions[curState], SIZEOF_VOIDP);
+            bauto->transitions[curState] = new uint32_t *[bauto->cardTransitions[curState]]();
             int current_on_trans = -1;
             for (t = s->trans->nxt; t != s->trans; t = t->nxt)
             {
                 // bauto data structures
                 current_on_trans++;
-                bauto->transitions[curState][current_on_trans] = (uint32_t *)calloc(2,
-                        sizeof(uint32_t));
+                bauto->transitions[curState][current_on_trans] = new uint32_t[2]();
                 //rep->message("Transition %d -> %d", curState, state_id[t->to->final][t->to->id]);
                 bauto->transitions[curState][current_on_trans][0] = curProperty++;
                 bauto->transitions[curState][current_on_trans][1] =
@@ -483,10 +479,8 @@ void Task::setFormula()
 
         // if the automata contains an all-accepting state
         bauto->cardAtomicPropositions = neededProperties.size();
-        bauto->atomicPropositions = (StatePredicateProperty **)calloc(
-                                        bauto->cardAtomicPropositions, sizeof(StatePredicateProperty *));
-        bauto->atomicPropotions_backlist = (index_t *)calloc(
-                                               bauto->cardAtomicPropositions, SIZEOF_INDEX_T);
+        bauto->atomicPropositions = new StatePredicateProperty *[bauto->cardAtomicPropositions]();
+        bauto->atomicPropotions_backlist = new index_t[bauto->cardAtomicPropositions]();
         for (int i = 0; i < neededProperties.size(); i++)
         {
             bauto->atomicPropositions[i] = new StatePredicateProperty(neededProperties[i]);
@@ -833,7 +827,7 @@ void Task::printWitness()
     if (ctlFormula)
     {
         for (std::vector<int>::iterator it = ctlExploration->witness.begin();
-                it != ctlExploration->witness.end(); it++)
+                it != ctlExploration->witness.end(); ++it)
         {
             if (*it == -1)
             {
@@ -908,7 +902,6 @@ void Task::printDot()
     // process the witness path
     std::list<index_t> path;
     index_t c;
-    index_t *f;
     while (p->stack.StackPointer > 0)
     {
         SimpleStackEntry &s = p->stack.top();

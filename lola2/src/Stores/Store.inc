@@ -73,8 +73,8 @@ template <typename T>
 Store<T>::Store(uint32_t _number_of_threads) : markings(0), calls(0),
     number_of_threads(_number_of_threads)
 {
-    calls = (uint64_t *) calloc(number_of_threads, sizeof(uint64_t));
-    markings = (uint64_t *) calloc(number_of_threads, sizeof(uint64_t));
+    calls = new uint64_t[number_of_threads]();
+    markings = new uint64_t[number_of_threads]();
     const int ret = pthread_create(&reporter_thread, NULL, reporter_helper, this);
     if (UNLIKELY(ret != 0))
     {
@@ -99,8 +99,8 @@ template <typename T>
 Store<T>::~Store()
 {
     silence();
-    free(calls);
-    free(markings);
+    delete[] calls;
+    delete[] markings;
 }
 
 template <typename T>

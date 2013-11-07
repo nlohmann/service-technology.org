@@ -72,6 +72,4 @@ public:
 private:
     /// marker variable, whether we have to delete some of the arrays ourself
     bool membersInitialized;
-    /// delete all members
-    void deleteAllMembers();
 };

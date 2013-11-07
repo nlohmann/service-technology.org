@@ -108,7 +108,7 @@ inline bool CycleStore<T>::searchAndInsert(NetState &ns, T **payload, index_t th
         ++(this->markings[thread]);
     }
 
-    delete enabled;
+    delete[] enabled;
 
     return ret;
 }

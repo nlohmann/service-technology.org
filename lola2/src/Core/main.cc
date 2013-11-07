@@ -127,8 +127,6 @@ void callHome(int argc, char **argv)
 /*!
 \brief evaluate the command line parameters
 \post global variable args_info is usable
-
-\todo What does IO::setReporter(rep) do?
 */
 void evaluateParameters(int argc, char **argv)
 {
@@ -161,7 +159,7 @@ void evaluateParameters(int argc, char **argv)
         break;
     }
 
-    // register the reporter
+    // register the reporter to used it for file status messages
     IO::setReporter(rep);
 
     free(params);

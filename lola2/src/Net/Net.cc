@@ -1339,8 +1339,7 @@ void Net::preprocess_organizeConflictingTransitions()
         else
         {
             // failure! allocate memory for new conflict set and add it to the cache
-            Transition::Conflicting[active_transition] = (index_t *) malloc(stack_card_conflictset[stack_index]
-                    * SIZEOF_INDEX_T);
+            Transition::Conflicting[active_transition] = (index_t *) malloc(stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
             memcpy(Transition::Conflicting[active_transition], stack_conflictset[stack_index],
                    stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
             conflictcache[stack_card_conflictset[stack_index]]->insert(
@@ -1442,10 +1441,8 @@ void Net::preprocess_organizeConflictingTransitions()
         else
         {
             // failure! allocate memory for new conflict set and add it to the cache
-            Transition::BackConflicting[active_transition] = (index_t *) malloc(
-                        stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
-            memcpy(Transition::BackConflicting[active_transition], stack_conflictset[stack_index],
-                   stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
+            Transition::BackConflicting[active_transition] = (index_t *) malloc(stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
+            memcpy(Transition::BackConflicting[active_transition], stack_conflictset[stack_index], stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
             conflictcache[stack_card_conflictset[stack_index]]->insert(
                 Transition::BackConflicting[active_transition]);
             Transition::BackConflictingIsOriginal[active_transition] = true;

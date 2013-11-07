@@ -66,12 +66,12 @@ void ParserPTNet::symboltable2net()
     // 1.2 allocate arrays for node (places and transitions) names, arcs, and multiplicities
     for (int type = PL; type <= TR; type ++)
     {
-        Net::Name[type] = (char **) malloc(Net::Card[type] * SIZEOF_VOIDP);
+        Net::Name[type] = new char*[Net::Card[type]];
         for (int direction = PRE; direction <= POST; direction ++)
         {
-            Net::CardArcs[type][direction] = (index_t *) malloc(Net::Card[type] * SIZEOF_INDEX_T);
-            Net::Arc[type][direction] = (index_t **) malloc(Net::Card[type] * SIZEOF_VOIDP);
-            Net::Mult[type][direction] = (mult_t **) malloc(Net::Card[type] * SIZEOF_VOIDP);
+            Net::CardArcs[type][direction] = new index_t[Net::Card[type]];
+            Net::Arc[type][direction] = new index_t *[Net::Card[type]];
+            Net::Mult[type][direction] = new mult_t *[Net::Card[type]];
         }
     }
 
@@ -80,15 +80,15 @@ void ParserPTNet::symboltable2net()
     * 2. Allocate memory for places *
     *********************************/
 
-    Place::Capacity = (capacity_t *) malloc(cardPL * SIZEOF_CAPACITY_T);
+    Place::Capacity = new capacity_t[cardPL];
 
 
     /**********************************
     * 3. Allocate memory for markings *
     ***********************************/
 
-    Marking::Initial = (capacity_t *) malloc(cardPL * SIZEOF_CAPACITY_T);
-    Marking::Current = (capacity_t *) malloc(cardPL * SIZEOF_CAPACITY_T);
+    Marking::Initial = new capacity_t[cardPL];
+    Marking::Current = new capacity_t[cardPL];
 
 
     /***********************************************
@@ -111,10 +111,10 @@ void ParserPTNet::symboltable2net()
         ps->setIndex(i);
 
         // allocate memory for place's arcs (is copied later with transitions)
-        Net::Arc[PL][PRE][i] = (index_t *) malloc(tempCardPre * SIZEOF_INDEX_T);
-        Net::Arc[PL][POST][i] = (index_t *) malloc(tempCardPost * SIZEOF_INDEX_T);
-        Net::Mult[PL][PRE][i] = (mult_t *) malloc(tempCardPre * SIZEOF_MULT_T);
-        Net::Mult[PL][POST][i] = (mult_t *) malloc(tempCardPost * SIZEOF_MULT_T);
+        Net::Arc[PL][PRE][i] = new index_t[tempCardPre];
+        Net::Arc[PL][POST][i] = new index_t[tempCardPost];
+        Net::Mult[PL][PRE][i] = new mult_t[tempCardPre];
+        Net::Mult[PL][POST][i] = new mult_t[tempCardPost];
 
         // capacity
         Place::Capacity[i] = ps->getCapacity();
@@ -128,7 +128,7 @@ void ParserPTNet::symboltable2net()
     **************************************/
 
     // allocate memory for static data
-    Transition::Fairness = (fairnessAssumption_t *) malloc(cardTR * SIZEOF_FAIRNESSASSUMPTION_T);
+    Transition::Fairness = new fairnessAssumption_t[cardTR];
 
 
     /****************************************************
@@ -136,8 +136,9 @@ void ParserPTNet::symboltable2net()
     *****************************************************/
 
     // current_arc is used for filling in arcs and multiplicities of places
-    index_t *current_arc_post = (index_t *) calloc(cardPL, SIZEOF_INDEX_T); // calloc: no arcs there yet
-    index_t *current_arc_pre = (index_t *) calloc(cardPL, SIZEOF_INDEX_T); // calloc: no arcs there yet
+    // calloc: no arcs there yet
+    index_t *current_arc_post = new index_t[cardPL]();
+    index_t *current_arc_pre = new index_t[cardPL]();
 
     TransitionSymbol *ts;
     for (ts = reinterpret_cast<TransitionSymbol *>(TransitionTable->first()), i = 0; ts;
@@ -153,10 +154,10 @@ void ParserPTNet::symboltable2net()
         ts->setIndex(i);
 
         // allocate memory for transition's arcs
-        Net::Arc[TR][PRE][i] = (index_t *) malloc(tempCardPre * SIZEOF_INDEX_T);
-        Net::Arc[TR][POST][i] = (index_t *) malloc(tempCardPost * SIZEOF_INDEX_T);
-        Net::Mult[TR][PRE][i] = (mult_t *) malloc(tempCardPre * SIZEOF_MULT_T);
-        Net::Mult[TR][POST][i] = (mult_t *) malloc(tempCardPost * SIZEOF_MULT_T);
+        Net::Arc[TR][PRE][i] = new index_t[tempCardPre];
+        Net::Arc[TR][POST][i] = new index_t[tempCardPost];
+        Net::Mult[TR][PRE][i] = new mult_t[tempCardPre];
+        Net::Mult[TR][POST][i] = new mult_t[tempCardPost];
 
         Transition::Fairness[i] = ts->getFairness();
 

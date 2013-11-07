@@ -816,6 +816,7 @@ bool LTLExploration::searchFair(BuechiAutomata &automata,
                             delete[] stack.top().dfs->firelist;
                             stack.pop();
                         }
+                        /// \bug Make sure memory for __enabled_weak is deallocated.
                         return true;
                     }
                     if (checkResult != -2)

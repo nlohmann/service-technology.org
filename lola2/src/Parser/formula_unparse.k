@@ -427,23 +427,23 @@ b=BuechiAutomaton(trans,accept) -> [buechi:
 		//rep->message("transfer predicates");
     	// transfer all state predicates
     	b->automata->cardAtomicPropositions = predicates.size();
-    	b->automata->atomicPropositions = (StatePredicateProperty**)calloc(predicates.size(), sizeof(StatePredicateProperty*));
-    	b->automata->atomicPropotions_backlist = (index_t*)calloc(predicates.size(), SIZEOF_INDEX_T);
+    	b->automata->atomicPropositions = new StatePredicateProperty*[predicates.size()]();
+    	b->automata->atomicPropotions_backlist = new index_t[predicates.size()]();
     	for (uint32_t i = 0; i < predicates.size(); i++)
     		b->automata->atomicPropositions[i] = new StatePredicateProperty(predicates[i]);	
     	
     	
     	//rep->message("transfer transitions");
     	// build the transition-data-structure
-    	b->automata->cardTransitions = (uint32_t*)calloc(number_of_states, sizeof(uint32_t));
-    	b->automata->transitions = (uint32_t***)calloc(number_of_states, sizeof(uint32_t**));
-    	b->automata->cardEnabled = (index_t*)calloc(number_of_states, SIZEOF_INDEX_T);
+    	b->automata->cardTransitions = new uint32_t[number_of_states]();
+    	b->automata->transitions = new uint32_t**[number_of_states]();
+    	b->automata->cardEnabled = new index_t[number_of_states]();
     	for (uint32_t i = 0; i < number_of_states; i++){
     		b->automata->cardTransitions[i] = transitions[i].size();
-    		b->automata->transitions[i] = (uint32_t**)calloc(transitions[i].size(), sizeof(uint32_t*));
+    		b->automata->transitions[i] = new uint32_t*[transitions[i].size()]();
     		for (uint32_t j = 0; j < transitions[i].size(); j++){
     			//rep->message("TRANSITION %d %d %d", i,j,transitions[i][j].second);
-    			b->automata->transitions[i][j] = (uint32_t*)calloc(2, sizeof(uint32_t));
+    			b->automata->transitions[i][j] = new uint32_t[2]();
     			b->automata->transitions[i][j][0] = transitions[i][j].first;
     			b->automata->transitions[i][j][1] = transitions[i][j].second;
     			b->automata->atomicPropotions_backlist[transitions[i][j].first] = i;
@@ -452,7 +452,7 @@ b=BuechiAutomaton(trans,accept) -> [buechi:
     	
     	//rep->message("transfer accepting states");
         // produce a list for the accepting states
-        b->automata->isStateAccepting = (bool*) calloc(number_of_states, sizeof(bool));
+        b->automata->isStateAccepting = new bool[number_of_states]();
         for (__typeof__(acceptingset.begin()) i = acceptingset.begin(); i != acceptingset.end(); i++)
         	b->automata->isStateAccepting[*i] = true;
     }
@@ -614,7 +614,7 @@ f=Conjunction(a,b) provided (f->containsTemporal) -> [ctl:
         ctl_id_stack.pop();
 
         ConjunctionFormula *cf = new ConjunctionFormula();
-        cf->subs = ((CTLFormula**) calloc(ctl_formulas[myId].size(), sizeof(CTLFormula_p)));
+        cf->subs = new CTLFormula*[ctl_formulas[myId].size()]();
         for (size_t i = 0; i < ctl_formulas[myId].size(); ++i)
         {
             //printf("conjunction %d: added a subformula to index %d\n", myId, i);
@@ -642,7 +642,7 @@ f=Disjunction(a,b) provided (f->containsTemporal) -> [ctl:
         ctl_id_stack.pop();
 
         DisjunctionFormula *df = new DisjunctionFormula();
-        df->subs = ((CTLFormula**) calloc(ctl_formulas[myId].size(), sizeof(CTLFormula_p)));
+        df->subs = new CTLFormula*[ctl_formulas[myId].size()]();
         for (size_t i = 0; i < ctl_formulas[myId].size(); ++i)
         {
             //printf("disjunction %d: added a subformula to index %d\n", myId, i);
@@ -1047,4 +1047,4 @@ Equivalence(x, y) -> [ltl:
 		ltlstack.pop_back();
 		ltlstack.push_back(bin_simpler(tl_nn(EQUIV,a,b)));
 	}
-];
+]

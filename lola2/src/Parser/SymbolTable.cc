@@ -21,7 +21,7 @@ unsigned int SymbolTable::collisions = 0;
 /// Intialization amounts to setting all entries to NULL
 SymbolTable::SymbolTable()
     : card(0),
-      table(reinterpret_cast<Symbol **>(calloc(SIZEOF_SYMBOLTABLE, SIZEOF_VOIDP))),
+      table(new Symbol *[SIZEOF_SYMBOLTABLE]()),
       currentIndex(0),
       currentSymbol(NULL)
 {
@@ -39,7 +39,7 @@ SymbolTable::~SymbolTable()
             delete tmp;
         }
     }
-    free(table);
+    delete[] table;
 }
 
 /// sdbm hashing algorithm

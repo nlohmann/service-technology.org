@@ -142,6 +142,7 @@ index_t AtomicStatePredicate::collectAtomic(AtomicStatePredicate **c)
 
 void AtomicStatePredicate::setUpSet()
 {
+    // up1 cannot be allocated with new[], because of a later realloc
     index_t *up1 = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
     index_t *up2 = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
     cardUp = 0;

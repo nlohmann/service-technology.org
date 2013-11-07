@@ -9,7 +9,8 @@ bool AUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
     void **pInitialPayload;
     if (!s.searchAndInsert(ns, &pInitialPayload, 0))
     {
-        *pInitialPayload = calloc(payloadsize, 1);    // all-zeros is starting state for all values
+        // all-zeros is starting state for all values
+        *pInitialPayload = calloc(payloadsize, 1);
     }
     void *payload = *pInitialPayload;
 
@@ -58,8 +59,8 @@ bool AUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
         {
             fairness.card_strong++;
         }
-    fairness.strong_fairness = (index_t *) calloc(fairness.card_strong, SIZEOF_INDEX_T);
-    fairness.strong_backlist = (index_t *) calloc(Net::Card[TR], SIZEOF_INDEX_T);
+    fairness.strong_fairness = new index_t[fairness.card_strong]();
+    fairness.strong_backlist = new index_t[Net::Card[TR]]();
     // put all strong fair transitions into an array
     index_t __card_on_sf = 0;
     for (index_t i = 0; i < Net::Card[TR]; i++)
@@ -82,8 +83,8 @@ bool AUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
         {
             fairness.card_weak++;
         }
-    fairness.weak_fairness = (index_t *) calloc(fairness.card_weak, SIZEOF_INDEX_T);
-    fairness.weak_backlist = (index_t *) calloc(Net::Card[TR], SIZEOF_INDEX_T);
+    fairness.weak_fairness = new index_t[fairness.card_weak]();
+    fairness.weak_backlist = new index_t[Net::Card[TR]]();
     // put all weak fair transitions into an array
     index_t __card_on_wf = 0;
     for (index_t i = 0; i < Net::Card[TR]; i++)
@@ -98,7 +99,7 @@ bool AUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
             fairness.weak_backlist[i] = -1;
         }
     }
-    fairness.forbidden_transitions = (index_t *) calloc(fairness.card_strong, SIZEOF_INDEX_T);
+    fairness.forbidden_transitions = new index_t[fairness.card_strong]();
     fairness.card_forbidden_transitions = 0;
 
 
@@ -147,7 +148,8 @@ bool AUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
             void **pNewPayload;
             if (!s.searchAndInsert(ns, &pNewPayload, 0))
             {
-                *pNewPayload = calloc(payloadsize, 1);    // all-zeros is starting state for all values
+                // all-zeros is starting state for all values
+                *pNewPayload = calloc(payloadsize, 1);
             }
             void *newpayload = *pNewPayload;
 
@@ -302,11 +304,11 @@ bool AUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
                 // no (negative) witness path found
                 witness->clear();
 
-                free(fairness.strong_backlist);
-                free(fairness.strong_fairness);
-                free(fairness.weak_backlist);
-                free(fairness.weak_fairness);
-                free(fairness.forbidden_transitions);
+                delete[] fairness.strong_backlist;
+                delete[] fairness.strong_fairness;
+                delete[] fairness.weak_backlist;
+                delete[] fairness.weak_fairness;
+                delete[] fairness.forbidden_transitions;
 
 
                 //rep->status("AU proven TRUE at %x",ns.HashCurrent);
@@ -409,12 +411,11 @@ bool AUFormula::getFairWitness(Store<void *> &s, NetState &ns,
     index_t currentFirelistIndex = firelist.getFirelist(ns, &currentFirelist);
 
     // flags which weak fairness assumptions are met
-    bool *fulfilled_weak = (bool *) calloc(fairness.card_weak, SIZEOF_BOOL);
+    bool *fulfilled_weak = new bool[fairness.card_weak]();
     // flags which strong fairness assumptions are met
-    bool *fulfilled_strong = (bool *) calloc(fairness.card_strong,
-                             SIZEOF_BOOL);
+    bool *fulfilled_strong = new bool[fairness.card_strong]();
     // flags which strong fair transitions were enabled in at least one of the SCC states
-    bool *enabled_strong = (bool *) calloc(fairness.card_strong, SIZEOF_BOOL);
+    bool *enabled_strong = new bool[fairness.card_strong]();
 
     // check for weak fairness enabledness (not enabled -> fulfilled)
     for (int t = 0; t < fairness.card_weak; t++)
@@ -566,9 +567,9 @@ bool AUFormula::getFairWitness(Store<void *> &s, NetState &ns,
     }
 
     // clean up
-    free(fulfilled_weak);
-    free(fulfilled_strong);
-    free(enabled_strong);
+    delete[] fulfilled_weak;
+    delete[] fulfilled_strong;
+    delete[] enabled_strong;
 
     if (!weakFair)
     {
@@ -597,8 +598,8 @@ void AUFormula::constructWitness(Store<void *> &s, NetState &ns,
 
     //rep->status("constructWitness init at %x (pPayload: %lx, payload: %lx)",ns.HashCurrent,pPayload,*pPayload);
 
-    bool *fulfilled_weak = (bool *) calloc(fairness.card_weak, SIZEOF_BOOL);
-    bool *fulfilled_strong = (bool *) calloc(fairness.card_strong, SIZEOF_BOOL);
+    bool *fulfilled_weak = new bool[fairness.card_weak]();
+    bool *fulfilled_strong = new bool[fairness.card_strong]();
 
     index_t fulfilled_conditions = 0;
 
@@ -623,8 +624,8 @@ void AUFormula::constructWitness(Store<void *> &s, NetState &ns,
 
     witness->push_back(-1); // mark begin of cycle
 
-    free(fulfilled_weak);
-    free(fulfilled_strong);
+    delete[] fulfilled_weak;
+    delete[] fulfilled_strong;
 }
 
 void AUFormula::produceWitness(Store<void *> &s, NetState &ns,

@@ -277,8 +277,7 @@ void Transition::fire(NetState &ns, index_t t)
 
 bool Transition::isCycle(NetState &ns, index_t t)
 {
-
-    index_t *delta_value = (index_t *) calloc(Net::Card[PL], SIZEOF_INDEX_T);
+    index_t *delta_value = new index_t[Net::Card[PL]]();
 
     for (index_t i = 0; i < Transition::CardDeltaT[PRE][t]; i++)
     {
@@ -288,12 +287,12 @@ bool Transition::isCycle(NetState &ns, index_t t)
     {
         if (delta_value[Transition::DeltaT[POST][t][i]] != Transition::MultDeltaT[POST][t][i])
         {
-            free(delta_value);
+            delete[] delta_value;
             return false;
         }
     }
 
-    free(delta_value);
+    delete[] delta_value;
     return true;
 }
 

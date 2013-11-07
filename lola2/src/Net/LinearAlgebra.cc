@@ -85,8 +85,8 @@ bool Matrix::Row::DEBUG__checkRow() const
 /// frees memory of current row
 Matrix::Row::~Row()
 {
-    free(variables);
-    free(coefficients);
+    delete[] variables;
+    delete[] coefficients;
 }
 
 /// creates a new row based on LinearAlgebra.h types
@@ -94,9 +94,9 @@ Matrix::Row::Row(index_t length, const index_t *var, const int64_t *coef,
                  index_t ref) : varCount(length), next(NULL), reference(ref)
 {
     // request memory for new row
-    variables = (index_t *) malloc(length * SIZEOF_INDEX_T);
+    variables = new index_t[length];
     // coefficients are stored as int64_t
-    coefficients = (int64_t *) malloc(length * SIZEOF_INT64_T);
+    coefficients = new int64_t[length];
 
     // memcpy is used because given and new memory has the same types
     memcpy(variables, var, length * SIZEOF_INDEX_T);
@@ -151,8 +151,8 @@ void Matrix::Row::apply(Matrix &matrix, index_t rowToChange)
     // get some space for the new row (secondRow - firstRow)
     // at most |firstRow| + |secondRow| elements are neccessary
     // one less is also suitable
-    index_t *newVar = (index_t *) calloc((varCount + realNext->varCount), SIZEOF_INDEX_T);
-    int64_t *newCoef = (int64_t *) calloc((varCount + realNext->varCount), SIZEOF_INT64_T);
+    index_t *newVar = new index_t[(varCount + realNext->varCount)]();
+    int64_t *newCoef = new int64_t[(varCount + realNext->varCount)]();
     index_t newSize = 0;
 
     // start with the first element, because the first one is not necessarily ruled out
@@ -268,8 +268,8 @@ void Matrix::Row::apply(Matrix &matrix, index_t rowToChange)
         matrix.addRow(newSize, newVar, newCoef, curReference);
     }
     // free memory of the new row (data is already processed)
-    free(newVar);
-    free(newCoef);
+    delete[] newVar;
+    delete[] newCoef;
 }
 
 /// frees memory of current matrix

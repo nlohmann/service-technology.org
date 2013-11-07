@@ -1047,4 +1047,4 @@ Equivalence(x, y) -> [ltl:
 		ltlstack.pop_back();
 		ltlstack.push_back(bin_simpler(tl_nn(EQUIV,a,b)));
 	}
-]
+];

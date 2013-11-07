@@ -189,6 +189,7 @@ void Net::sortAllArcs()
 }
 
 /// Free all allocated memory
+/// \note memory is allocated in ParserPTNet.cc, ParserPTNet::symboltable2net()
 void Net::deleteNodes()
 {
     for (int type = PL; type <= TR; ++type)
@@ -197,18 +198,18 @@ void Net::deleteNodes()
         {
             for (index_t i = 0; i < Net::Card[type]; i++)
             {
-                free(Net::Arc[type][direction][i]);
-                free(Net::Mult[type][direction][i]);
+                delete[] Net::Arc[type][direction][i];
+                delete[] Net::Mult[type][direction][i];
             }
-            free(Net::CardArcs[type][direction]);
-            free(Net::Arc[type][direction]);
-            free(Net::Mult[type][direction]);
+            delete[] Net::CardArcs[type][direction];
+            delete[] Net::Arc[type][direction];
+            delete[] Net::Mult[type][direction];
         }
         for (index_t i = 0; i < Net::Card[type]; i++)
         {
-            free(Net::Name[type][i]);
+            delete[] Net::Name[type][i];
         }
-        free(Net::Name[type]);
+        delete[] Net::Name[type];
     }
 }
 
@@ -577,8 +578,8 @@ Matrix Net::getIncidenceMatrix(node_t line_type)
     assert(Net::DEBUG__checkArcOrdering());
 
     // request memory for one full row
-    index_t *newVar = (index_t *) calloc(line_card, SIZEOF_INDEX_T);
-    int64_t *newCoef = (int64_t *) calloc(line_card, SIZEOF_INT64_T);
+    index_t *newVar = new index_t[line_card]();
+    int64_t *newCoef = new int64_t[line_card]();
     index_t newSize;
 
     // create new matrix
@@ -599,8 +600,8 @@ Matrix Net::getIncidenceMatrix(node_t line_type)
     }
 
     // free memory
-    free(newVar);
-    free(newCoef);
+    delete[] newVar;
+    delete[] newCoef;
 
     return m;
 }
@@ -673,7 +674,7 @@ void Net::setProgressMeasure()
     const index_t cardTR = Net::Card[TR];
 
     // calculate progress measure
-    int64_t *progressMeasure = (int64_t *) calloc(cardTR, SIZEOF_INT64_T);
+    int64_t *progressMeasure = new int64_t[cardTR]();
     for (index_t t = 0; t < cardTR; ++t)
         if (m.isSignificant(t))
         {
@@ -736,7 +737,7 @@ void Net::setProgressMeasure()
     {
         // try for another local optimisation (spread progress values better)
         // first, save the progress measures so far
-        int64_t *progressCopy = (int64_t *) malloc(cardTR * SIZEOF_INT64_T);
+        int64_t *progressCopy = new int64_t[cardTR];
         memcpy(progressCopy, progressMeasure, cardTR * SIZEOF_INT64_T);
 
         index_t threads(args_info.threads_arg), tries(cardTR), fullbucket(cardTR / threads + 1),
@@ -880,7 +881,7 @@ void Net::setProgressMeasure()
             }
         }
 
-        free(progressCopy);
+        delete[] progressCopy;
     }
 
     // remove gcd from progress values
@@ -908,14 +909,14 @@ void Net::setProgressMeasure()
     //        rep->status("progress[%s]=%lld", Net::Name[TR][t], progressMeasure[t]);
 
     // cast progress measures to 32bit
-    Transition::ProgressMeasure = (int32_t *) calloc(cardTR, SIZEOF_INT);
+    Transition::ProgressMeasure = new int32_t[cardTR]();
     for (index_t t = 0; t < cardTR; ++t)
     {
         Transition::ProgressMeasure[t] = (int32_t) progressMeasure[t];
     }
 
     // free memory
-    free(progressMeasure);
+    delete[] progressMeasure;
 }
 
 // calculates DeltaT and DeltaHash for each transition
@@ -925,14 +926,14 @@ void Net::preprocess_organizeDeltas()
     const index_t cardTR = Net::Card[TR];
 
     // temporarily collect places where a transition has negative token balance
-    index_t *delta_pre = (index_t *) calloc(cardPL, SIZEOF_INDEX_T);
+    index_t *delta_pre = new index_t[cardPL]();
     // temporarily collect places where a transition has positive token balance.
-    index_t *delta_post = (index_t *) calloc(cardPL, SIZEOF_INDEX_T);
+    index_t *delta_post = new index_t[cardPL]();
 
     // same for multiplicities
-    mult_t *mult_pre = (mult_t *) malloc(cardPL * SIZEOF_MULT_T); 
+    mult_t *mult_pre = new mult_t[cardPL];
     // same for multiplicities 
-    mult_t *mult_post = (mult_t *) malloc(cardPL * SIZEOF_MULT_T);
+    mult_t *mult_post = new mult_t[cardPL];
 
     for (index_t t = 0; t < cardTR; t++)
     {
@@ -1011,10 +1012,10 @@ void Net::preprocess_organizeDeltas()
         // allocate memory for deltas
         Transition::CardDeltaT[PRE][t] = card_delta_pre;
         Transition::CardDeltaT[POST][t] = card_delta_post;
-        Transition::DeltaT[PRE][t] = (index_t *) malloc(card_delta_pre * SIZEOF_INDEX_T);
-        Transition::DeltaT[POST][t] = (index_t *) malloc(card_delta_post * SIZEOF_INDEX_T);
-        Transition::MultDeltaT[PRE][t] = (mult_t *) malloc(card_delta_pre * SIZEOF_MULT_T);
-        Transition::MultDeltaT[POST][t] = (mult_t *) malloc(card_delta_post * SIZEOF_MULT_T);
+        Transition::DeltaT[PRE][t] = new index_t[card_delta_pre];
+        Transition::DeltaT[POST][t] = new index_t[card_delta_post];
+        Transition::MultDeltaT[PRE][t] = new mult_t[card_delta_pre];
+        Transition::MultDeltaT[POST][t] = new mult_t[card_delta_post];
 
         // copy information on deltas
         memcpy(Transition::DeltaT[PRE][t], delta_pre, card_delta_pre * SIZEOF_INDEX_T);
@@ -1023,10 +1024,10 @@ void Net::preprocess_organizeDeltas()
         memcpy(Transition::MultDeltaT[POST][t], mult_post, card_delta_post * SIZEOF_MULT_T);
     }
 
-    free(delta_pre);
-    free(delta_post);
-    free(mult_pre);
-    free(mult_post);
+    delete[] delta_pre;
+    delete[] delta_post;
+    delete[] mult_pre;
+    delete[] mult_post;
 
     /*********************
     * 7b. Set DeltaHash *
@@ -1069,8 +1070,8 @@ void Net::preprocess_organizeConflictingTransitions()
     const index_t cardTR = Net::Card[TR];
 
     // initialize Conflicting arrays
-    index_t *conflicting = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
-    index_t *new_conflicting = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
+    index_t *conflicting = new index_t[cardTR]();
+    index_t *new_conflicting = new index_t[cardTR]();
 
     // initialize conflict cache array. There is a set for every possible size of the conflict set.
     std::set<index_t *, conflictset_comparator> **conflictcache = new
@@ -1118,7 +1119,7 @@ void Net::preprocess_organizeConflictingTransitions()
         else
         {
             // failure! allocate memory for new conflict set and add it to the cache
-            Transition::Conflicting[t] = (index_t *) malloc(card_conflicting * SIZEOF_INDEX_T);
+            Transition::Conflicting[t] = new index_t[card_conflicting];
             memcpy(Transition::Conflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
             conflictcache[card_conflicting]->insert(Transition::Conflicting[t]);
             Transition::ConflictingIsOriginal[t] = true;
@@ -1153,7 +1154,7 @@ void Net::preprocess_organizeConflictingTransitions()
         else
         {
             // failure! allocate memory for new conflict set and add it to the cache
-            Transition::BackConflicting[t] = (index_t *) malloc(card_conflicting * SIZEOF_INDEX_T);
+            Transition::BackConflicting[t] = new index_t[card_conflicting];
             memcpy(Transition::BackConflicting[t], conflicting, card_conflicting * SIZEOF_INDEX_T);
             conflictcache[card_conflicting]->insert(Transition::BackConflicting[t]);
             Transition::BackConflictingIsOriginal[t] = true;
@@ -1214,28 +1215,27 @@ void Net::preprocess_organizeConflictingTransitions()
     ////
 
     // stackpos_place_done[p] states whether place p is already included in the current conflict set (the one at the current stack position)
-    bool *stackpos_place_done = (bool *) calloc(cardPL, SIZEOF_BOOL);
+    bool *stackpos_place_done = new bool[cardPL]();
     // stack_place_used[i] states which place has been processed at stack position i. Needed to keep stackpos_place_done updated.
-    index_t *stack_place_used = (index_t *) malloc(cardPL * SIZEOF_INDEX_T);
+    index_t *stack_place_used = new index_t[cardPL];
 
     // stack_conflictset[i] stores the current conflict set at stack position i
     // calloc: null-pointer tests to dynamically allocate new segments
-    index_t **stack_conflictset = (index_t **) calloc((cardPL + 1), SIZEOF_VOIDP); 
-    index_t *stack_card_conflictset = (index_t *) calloc((cardPL + 1), SIZEOF_INDEX_T);
+    index_t **stack_conflictset = new index_t *[(cardPL + 1)]();
+    index_t *stack_card_conflictset = new index_t[(cardPL + 1)]();
 
     // stack_transitions[i] stores all transitions the conflict set at stack position i applies to. Every transition appears exactly once.
     // calloc: null-pointer tests to dynamically allocate new segments
-    index_t **stack_transitions = (index_t **) calloc((cardPL + 1), SIZEOF_VOIDP); 
-    index_t *stack_card_transitions = (index_t *) calloc((cardPL + 1), SIZEOF_INDEX_T);
+    index_t **stack_transitions = new index_t *[(cardPL + 1)]();
+    index_t *stack_card_transitions = new index_t[(cardPL + 1)]();
     // index of the current transition for each stack position
-    index_t *stack_transitions_index = (index_t *) calloc((cardPL + 1), SIZEOF_INDEX_T);
+    index_t *stack_transitions_index = new index_t[(cardPL + 1)]();
 
     // temporary array needed to do pseudo-"in-place" operations.
-    index_t *tmp_array = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
+    index_t *tmp_array = new index_t[cardTR]();
 
     // initialize conflict cache array. There is a set for every possible size of the conflict set.
-    std::set<index_t *, conflictset_comparator> **conflictcache = new
-    std::set<index_t *, conflictset_comparator> *[cardTR + 1];
+    std::set<index_t *, conflictset_comparator> **conflictcache = new std::set<index_t *, conflictset_comparator> *[cardTR + 1];
     for (index_t i = 0; i <= cardTR; i++)
     {
         conflictcache[i] = new std::set<index_t *, conflictset_comparator>(conflictset_comparator(i));
@@ -1252,8 +1252,8 @@ void Net::preprocess_organizeConflictingTransitions()
     index_t num_finished_transitions = 0;
 
     /// init stack
-    stack_conflictset[0] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
-    stack_transitions[0] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
+    stack_conflictset[0] = new index_t[cardTR]();
+    stack_transitions[0] = new index_t[cardTR]();
     index_t stack_index = 0;
     stack_card_transitions[0] = cardTR;
 
@@ -1295,8 +1295,8 @@ void Net::preprocess_organizeConflictingTransitions()
             // allocate next stack segment if not already done
             if (!stack_conflictset[stack_index + 1])
             {
-                stack_conflictset[stack_index + 1] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
-                stack_transitions[stack_index + 1] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
+                stack_conflictset[stack_index + 1] = new index_t[cardTR]();
+                stack_transitions[stack_index + 1] = new index_t[cardTR]();
             }
 
             // compute new conflict set
@@ -1339,7 +1339,7 @@ void Net::preprocess_organizeConflictingTransitions()
         else
         {
             // failure! allocate memory for new conflict set and add it to the cache
-            Transition::Conflicting[active_transition] = (index_t *) malloc(stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
+            Transition::Conflicting[active_transition] = new index_t[stack_card_conflictset[stack_index]];
             memcpy(Transition::Conflicting[active_transition], stack_conflictset[stack_index],
                    stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
             conflictcache[stack_card_conflictset[stack_index]]->insert(
@@ -1397,8 +1397,8 @@ void Net::preprocess_organizeConflictingTransitions()
             // allocate next stack segment if not already done
             if (!stack_conflictset[stack_index + 1])
             {
-                stack_conflictset[stack_index + 1] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
-                stack_transitions[stack_index + 1] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T);
+                stack_conflictset[stack_index + 1] = new index_t[cardTR]();
+                stack_transitions[stack_index + 1] = new index_t[cardTR]();
             }
 
             // compute new conflict set
@@ -1441,7 +1441,7 @@ void Net::preprocess_organizeConflictingTransitions()
         else
         {
             // failure! allocate memory for new conflict set and add it to the cache
-            Transition::BackConflicting[active_transition] = (index_t *) malloc(stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
+            Transition::BackConflicting[active_transition] = new index_t[stack_card_conflictset[stack_index]];
             memcpy(Transition::BackConflicting[active_transition], stack_conflictset[stack_index], stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
             conflictcache[stack_card_conflictset[stack_index]]->insert(
                 Transition::BackConflicting[active_transition]);
@@ -1456,7 +1456,7 @@ void Net::preprocess_organizeConflictingTransitions()
     // cleanup: free temporary arrays
     ////
 
-    free(tmp_array);
+    delete[] tmp_array;
     for (index_t i = 0; i <= cardTR; i++)
     {
         delete conflictcache[i];
@@ -1464,19 +1464,19 @@ void Net::preprocess_organizeConflictingTransitions()
     delete[] conflictcache;
     for (index_t i = 0; i <= cardPL; i++)
     {
-        free(stack_conflictset[i]);
+        delete[] stack_conflictset[i];
     }
-    free(stack_conflictset);
-    free(stack_card_conflictset);
+    delete[] stack_conflictset;
+    delete[] stack_card_conflictset;
     for (index_t i = 0; i <= cardPL; i++)
     {
-        free(stack_transitions[i]);
+        delete[] stack_transitions[i];
     }
-    free(stack_transitions);
-    free(stack_card_transitions);
-    free(stack_transitions_index);
-    free(stackpos_place_done);
-    free(stack_place_used);
+    delete[] stack_transitions;
+    delete[] stack_card_transitions;
+    delete[] stack_transitions_index;
+    delete[] stackpos_place_done;
+    delete[] stack_place_used;
 
     rep->status("%d transition conflict sets", num_different_conflicts);
 }
@@ -1490,7 +1490,7 @@ void Net::preprocess()
     /************************************
     * 1. Compute bits needed for places *
     ************************************/
-    Place::CardBits = (cardbit_t *) malloc(cardPL * SIZEOF_CARDBIT_T);
+    Place::CardBits = new cardbit_t[cardPL];
     Place::SizeOfBitVector = 0;
     for (index_t p = 0; p < cardPL; p++)
     {
@@ -1501,7 +1501,7 @@ void Net::preprocess()
     /********************
     * 2. Compute Hashes *
     ********************/
-    Place::Hash = (hash_t *) malloc(cardPL * SIZEOF_HASH_T);
+    Place::Hash = new hash_t[cardPL];
     Marking::HashInitial = 0;
     for (index_t p = 0; p < cardPL; p++)
     {
@@ -1516,26 +1516,26 @@ void Net::preprocess()
     * 3. Organize Deltas *
     *********************/
     // calloc: delta hash must be initially 0
-    Transition::DeltaHash = (hash_t *) calloc(cardTR, SIZEOF_HASH_T); 
+    Transition::DeltaHash = new hash_t[cardTR]();
     // allocate memory for deltas
     for (int direction = PRE; direction <= POST; direction++)
     {
         // calloc: no arcs there yet
-        Transition::CardDeltaT[direction] = (index_t *) calloc(cardTR, SIZEOF_INDEX_T); 
-        Transition::DeltaT[direction] = (index_t **) malloc(cardTR * SIZEOF_VOIDP);
-        Transition::MultDeltaT[direction] = (mult_t **) malloc(cardTR * SIZEOF_VOIDP);
+        Transition::CardDeltaT[direction] = new index_t[cardTR]();
+        Transition::DeltaT[direction] = new index_t *[cardTR];
+        Transition::MultDeltaT[direction] = new mult_t *[cardTR];
     }
     Net::preprocess_organizeDeltas();
 
     /**************************************
     * 4. Organize conflicting transitions *
     **************************************/
-    Transition::CardConflicting = (index_t *) malloc(cardTR * SIZEOF_INDEX_T);
-    Transition::Conflicting = (index_t **) malloc(cardTR * SIZEOF_VOIDP);
-    Transition::ConflictingIsOriginal = (bool *) malloc(cardTR * SIZEOF_BOOL);
-    Transition::CardBackConflicting = (index_t *) malloc(cardTR * SIZEOF_INDEX_T);
-    Transition::BackConflicting = (index_t **) malloc(cardTR * SIZEOF_VOIDP);
-    Transition::BackConflictingIsOriginal = (bool *) malloc(cardTR * SIZEOF_BOOL);
+    Transition::CardConflicting = new index_t[cardTR];
+    Transition::Conflicting = new index_t *[cardTR];
+    Transition::ConflictingIsOriginal = new bool[cardTR];
+    Transition::CardBackConflicting = new index_t[cardTR];
+    Transition::BackConflicting = new index_t *[cardTR];
+    Transition::BackConflictingIsOriginal = new bool[cardTR];
 
     Net::preprocess_organizeConflictingTransitions();
 
@@ -1566,16 +1566,16 @@ void Net::preprocess()
     * 7. Initial enabledness check *
     *******************************/
     // use calloc: initial assumption: no transition is disabled
-    Place::CardDisabled = (index_t *) calloc(cardPL, SIZEOF_INDEX_T);
-    Place::Disabled = (index_t **) malloc(cardPL * SIZEOF_VOIDP);
+    Place::CardDisabled = new index_t[cardPL]();
+    Place::Disabled = new index_t *[cardPL];
     for (index_t p = 0; p < cardPL; p++)
     {
         // initially: no disabled transistions (through CardDisabled = 0)
         // correct values will be achieved by initial checkEnabled...
-        Place::Disabled[p] = (index_t *) malloc(Net::CardArcs[PL][POST][p] * SIZEOF_INDEX_T);
+        Place::Disabled[p] = new index_t[Net::CardArcs[PL][POST][p]];
     }
-    Transition::PositionScapegoat = (index_t *) malloc(cardTR * SIZEOF_INDEX_T);
-    Transition::Enabled = (bool *) malloc(cardTR * SIZEOF_BOOL);
+    Transition::PositionScapegoat = new index_t[cardTR];
+    Transition::Enabled = new bool[cardTR];
     // start with assumption that all transitions are enabled
     Transition::CardEnabled = cardTR;
     for (index_t t = 0; t < cardTR; t++)

@@ -25,10 +25,10 @@ BitEncoder::BitEncoder(int numThreads) : NetStateEncoder(numThreads)
                 insize * VECTOR_WIDTH - Place::SizeOfBitVector);
 
     // allocate auxiliary input vectors
-    inputs = (vectordata_t **) malloc(numThreads * SIZEOF_VOIDP);
+    inputs = new vectordata_t *[numThreads];
     for (int i = 0; i < numThreads; i++)
     {
-        inputs[i] = (vectordata_t *) malloc(insize * sizeof(vectordata_t));
+        inputs[i] = new vectordata_t[insize];
     }
 
     // determine the number of leading places suitable for memcpying (see declaration of memcpylen for details)
@@ -46,9 +46,9 @@ BitEncoder::~BitEncoder()
     // free all auxiliary input vectors
     for (int i = 0; i < numThreads; i++)
     {
-        free(inputs[i]);
+        delete[] inputs[i];
     }
-    free(inputs);
+    delete[] inputs;
 }
 
 vectordata_t *BitEncoder::encodeNetState(NetState &ns, bitindex_t &bitlen, index_t threadIndex)

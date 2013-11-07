@@ -22,10 +22,10 @@ SimpleCompressedEncoder::SimpleCompressedEncoder(int numThreads) : NetStateEncod
                  vectordata_t);
 
     // allocate auxiliary input vectors.
-    inputs = (vectordata_t **) malloc(numThreads * SIZEOF_VOIDP);
+    inputs = new vectordata_t *[numThreads];
     for (int i = 0; i < numThreads; i++)
     {
-        inputs[i] = (vectordata_t *) malloc(insize);
+        inputs[i] = new vectordata_t[insize];
     }
 }
 
@@ -34,9 +34,9 @@ SimpleCompressedEncoder::~SimpleCompressedEncoder()
     // free auxiliary input vectors.
     for (int i = 0; i < numThreads; i++)
     {
-        free(inputs[i]);
+        delete[] inputs[i];
     }
-    free(inputs);
+    delete[] inputs;
 }
 
 void SimpleCompressedEncoder::addToInput(capacity_t val, bitindex_t numbits, vectordata_t *&pInput,

@@ -40,10 +40,10 @@ CopyEncoder::CopyEncoder(int numThreads) : NetStateEncoder(numThreads)
         // neither condition is met, memcpy is required.
         nocopy = false;
         // initialize auxiliary vectors that hold the memcpy result (one for each thread)
-        inputs = (vectordata_t **) malloc(numThreads * SIZEOF_VOIDP);
+        inputs = new vectordata_t *[numThreads];
         for (int i = 0; i < numThreads; i++)
         {
-            inputs[i] = (vectordata_t *) malloc(insize * SIZEOF_VECTORDATA_T);
+            inputs[i] = new vectordata_t[insize];
         }
     }
 #endif
@@ -59,9 +59,9 @@ CopyEncoder::~CopyEncoder()
     {
         for (int i = 0; i < numThreads; i++)
         {
-            free(inputs[i]);
+            delete[] inputs[i];
         }
-        free(inputs);
+        delete[] inputs;
     }
 #endif
 }

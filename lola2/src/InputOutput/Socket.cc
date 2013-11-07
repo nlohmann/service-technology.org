@@ -258,7 +258,7 @@ char *Socket::waitFor(const char *message) const
         if (!strcmp(received, message))
         {
             // get sender IP
-            char *senderaddress = (char *)malloc(INET_ADDRSTRLEN * SIZEOF_CHAR);
+            char *senderaddress = new char[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, &address.sin_addr.s_addr, senderaddress, INET_ADDRSTRLEN);
             return senderaddress;
         }

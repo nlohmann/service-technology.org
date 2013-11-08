@@ -41,9 +41,9 @@ SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t 
     fullencoder = fce;
     sigpencoder = nse;
     // obtain space for counters
-    count = (int64_t *) calloc(SIZEOF_INT64_T, size);
+    count = new int64_t[SIZEOF_INT64_T]();
     // obtain store ring for transient states
-    store = (VectorStore<T> **) malloc(sizeof(VectorStore<T> **)*size);
+    store = new VectorStore<T> *[size];
     for (index_t i = 0; i < size; ++i)
     {
         store[i] = createSweepStore();
@@ -51,9 +51,9 @@ SweepRingStore<T>::SweepRingStore(index_t _size, index_t _front_offset, index_t 
     // obtain swap space for current progress measure
     samevalue = createSweepStore();
     // obtain space for pointers to old and new persistent states
-    newpersistent = (SweepListStore<T> **) calloc(sizeof(SweepListStore<T> **), size);
-    oldpersistent = (SweepListStore<T> **) calloc(sizeof(SweepListStore<T> **), size);
-    inserted_persistent = (bool *) malloc(SIZEOF_BOOL * nr_of_threads);
+    newpersistent = new SweepListStore<T> *[sizeof(SweepListStore<T> **)]();
+    oldpersistent = new SweepListStore<T> *[sizeof(SweepListStore<T> **)]();
+    inserted_persistent = new bool[SIZEOF_BOOL];
     deleted_store_size = 0;
 }
 
@@ -68,11 +68,11 @@ SweepRingStore<T>::~SweepRingStore()
         delete store[i];
     }
     free(store);
-    free(count);
+    delete[] count;
     delete samevalue;
-    free(newpersistent);
-    free(oldpersistent);
-    free(inserted_persistent);
+    delete[] newpersistent;
+    delete[] oldpersistent;
+    delete[] inserted_persistent;
 }
 
 /*!

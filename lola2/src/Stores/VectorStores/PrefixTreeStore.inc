@@ -348,6 +348,7 @@ bool PrefixTreeStore<T>::searchAndInsert(const vectordata_t *in, bitindex_t bitl
     assert(bitlen >= position);
     // vector_bitstogo is always VECTOR_WIDTH here
     int newvectorlen = ((bitlen - position) + (VECTOR_WIDTH - 1)) / VECTOR_WIDTH;
+    // \TODO: Understand this construct and how it can be translated to a new
     *newvector = (vectordata_t *) calloc(payloadSize + newvectorlen * sizeof(vectordata_t), 1);
     pPayload = *newvector;
     pVector = (vectordata_t *)(((char *)pPayload) + payloadSize);

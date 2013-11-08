@@ -109,20 +109,20 @@ Sweep<T>::Sweep(SimpleProperty &property, NetState &ns, SweepEmptyStore &st, Fir
     start_old_persistent = new SweepListStore<T>(nr_of_threads, nr_of_buckets, store_size);
 
     // reserve memory for counting states and edges for all threads/fronts
-    persistent_count = (int64_t ** *) calloc(SIZEOF_INT64_T, nr_of_threads);
-    transient_count = (int64_t ** *) calloc(SIZEOF_INT64_T, nr_of_threads);
-    call_count = (int64_t ** *) calloc(SIZEOF_INT64_T, nr_of_threads);
+    persistent_count = new int64_t **[nr_of_threads]();
+    transient_count = new int64_t **[nr_of_threads]();
+    call_count = new int64_t **[nr_of_threads]();
 
     // reserve memory for thread-local mutexes for the idle state / front change
-    idleMutex = (pthread_mutex_t **) malloc(nr_of_threads * SIZEOF_VOIDP);
-    idleCond = (pthread_cond_t **) malloc(nr_of_threads * SIZEOF_VOIDP);
-    idle = (bool **) calloc(SIZEOF_VOIDP, nr_of_threads);
-    frontptr = (index_t **) malloc(nr_of_threads * SIZEOF_VOIDP);
-    call = (bool **) malloc(nr_of_threads * SIZEOF_VOIDP);
-    helpers = (index_t **) malloc(nr_of_fronts * SIZEOF_VOIDP);
+    idleMutex = new pthread_mutex_t *[nr_of_threads];
+    idleCond = new pthread_cond_t *[nr_of_threads];
+    idle = new bool *[nr_of_threads]();
+    frontptr = new index_t *[nr_of_threads];
+    call = new bool *[nr_of_threads];
+    helpers = new index_t *[nr_of_fronts];
 
     // reserve memory for pointers to the stores
-    store = (SweepRingStore<T> **) malloc(nr_of_fronts * SIZEOF_VOIDP);
+    store = new SweepRingStore<T> *[nr_of_fronts];
 
     // get encoders
     fullencoder = new FullCopyEncoder(nr_of_threads);
@@ -152,16 +152,16 @@ Sweep<T>::Sweep(SimpleProperty &property, NetState &ns, SweepEmptyStore &st, Fir
 template <class T>
 Sweep<T>::~Sweep()
 {
-    free(store);
-    free(idleMutex);
-    free(idleCond);
-    free(idle);
-    free(frontptr);
-    free(call);
-    free(helpers);
-    free(call_count);
-    free(transient_count);
-    free(persistent_count);
+    delete[] store;
+    delete[] idleMutex;
+    delete[] idleCond;
+    delete[] idle;
+    delete[] frontptr;
+    delete[] call;
+    delete[] helpers;
+    delete[] call_count;
+    delete[] transient_count;
+    delete[] persistent_count;
     delete start_new_persistent;
     delete start_old_persistent;
     delete fullencoder;
@@ -234,9 +234,9 @@ bool Sweep<T>::run()
     // make a final calculation of states and edges
     forwardStateCount();
 
-    free(args.persistent_count);
-    free(args.transient_count);
-    free(args.call_count);
+    delete[] args.persistent_count;
+    delete[] args.transient_count;
+    delete[] args.call_count;
     return prop.value;
 }
 
@@ -264,16 +264,16 @@ bool Sweep<T>::runThreads()
     // LCOV_EXCL_STOP
 
     // flag for the most advanced front
-    bool *frontrunner = (bool *) calloc(sizeof(bool), nr_of_fronts);
+    bool *frontrunner = new bool[nr_of_fronts]();
     // semaphore values controlled by the following mutex
-    index_t *semval = (index_t *) calloc(sizeof(index_t), nr_of_fronts);
+    index_t *semval = new index_t[nr_of_fronts]();
     // mutex controlling false->true change for frontrunner flag and semaphore values
-    pthread_mutex_t *mutex = (pthread_mutex_t *) calloc(sizeof(pthread_mutex_t), nr_of_fronts);
-    pthread_cond_t *cond = (pthread_cond_t *) calloc(sizeof(pthread_cond_t), nr_of_fronts);
+    pthread_mutex_t *mutex = new pthread_mutex_t[nr_of_fronts]();
+    pthread_cond_t *cond = new pthread_cond_t[nr_of_fronts]();
     // a thread for each front/helper thread
-    pthread_t *runner_thread = (pthread_t *) calloc(sizeof(pthread_t), nr_of_threads);
+    pthread_t *runner_thread = new pthread_t[nr_of_threads]();
     // arguments for each front/thread
-    tpSweepArguments *args = (tpSweepArguments *) calloc(sizeof(tpSweepArguments), nr_of_threads);
+    tpSweepArguments *args = new tpSweepArguments[nr_of_threads]();
     // the first front gets the start state and is also the most advanced front
     args[0].ns = &start;
     frontrunner[0] = true;
@@ -385,19 +385,19 @@ bool Sweep<T>::runThreads()
     forwardStateCount();
 
     // free the allocated memory
-    free(runner_thread);
-    free(frontrunner);
+    delete[] runner_thread;
+    delete[] frontrunner;
     for (index_t i = 0; i < nr_of_threads; ++i)
     {
-        free(args[i].persistent_count);
-        free(args[i].transient_count);
-        free(args[i].call_count);
+        delete[] args[i].persistent_count;
+        delete[] args[i].transient_count;
+        delete[] args[i].call_count;
         delete args[i].ns;
     }
-    free(args);
-    free(mutex);
-    free(cond);
-    free(semval);
+    delete[] args;
+    delete[] mutex;
+    delete[] cond;
+    delete[] semval;
 
     return prop.value;
 }
@@ -415,9 +415,9 @@ void *Sweep<T>::frontSweep(void *container)
     index_t threadID(arguments->globalThreadID);
 
     // allocate memory for state and edge counters and such
-    arguments->persistent_count = (int64_t *) calloc(SIZEOF_INT64_T, 1);
-    arguments->transient_count = (int64_t *) calloc(SIZEOF_INT64_T, 1);
-    arguments->call_count = (int64_t *) calloc(SIZEOF_INT64_T, 1);
+    arguments->persistent_count = new int64_t[1]();
+    arguments->transient_count = new int64_t[1]();
+    arguments->call_count = new int64_t[1]();
 
     // for idle checks by helpers and the front itself
     index_t helpers(0);
@@ -520,9 +520,9 @@ void *Sweep<T>::threadSweep(void *container)
     Sweep<T> *sweep(arguments->sweep);
 
     // allocate memory for state and edge counters
-    arguments->persistent_count = (int64_t *) calloc(SIZEOF_INT64_T, 1);
-    arguments->transient_count = (int64_t *) calloc(SIZEOF_INT64_T, 1);
-    arguments->call_count = (int64_t *) calloc(SIZEOF_INT64_T, 1);
+    arguments->persistent_count = new int64_t[1]();
+    arguments->transient_count = new int64_t[1]();
+    arguments->call_count = new int64_t[1]();
 
     index_t threadID(arguments->globalThreadID);
     index_t frontptr(arguments->frontID);

@@ -18,14 +18,14 @@
 FirelistStubbornStatePredicate::FirelistStubbornStatePredicate(StatePredicate *p)
 {
     predicate = p;
-    dfsStack = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    onStack = (bool *) calloc(Net::Card[TR] , sizeof(bool));
+    dfsStack = new index_t[Net::Card[TR]];
+    onStack = new bool[Net::Card[TR]]();
 }
 
 FirelistStubbornStatePredicate::~FirelistStubbornStatePredicate()
 {
-    free(dfsStack);
-    free(onStack);
+    delete[] dfsStack;
+    delete[] onStack;
 }
 
 index_t FirelistStubbornStatePredicate::getFirelist(NetState &ns, index_t **result)

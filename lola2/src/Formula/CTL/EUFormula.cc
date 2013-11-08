@@ -13,7 +13,9 @@ bool EUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
     if (!s.searchAndInsert(ns, &pInitialPayload, 0))
     {
         // all-zeros is starting state for all values
-        *pInitialPayload = calloc(payloadsize, 1);
+        // memset is required to mimick a calloc on a void* in C++
+        *pInitialPayload = ::operator new(payloadsize);
+        memset(*pInitialPayload, 0, payloadsize);
     }
     void *payload = *pInitialPayload;
 
@@ -75,7 +77,9 @@ bool EUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
             if (!s.searchAndInsert(ns, &pNewPayload, 0))
             {
                 // all-zeros is starting state for all values
-                *pNewPayload = calloc(payloadsize, 1);
+                // memset is required to mimick a calloc on a void* in C++
+                *pNewPayload = ::operator new(payloadsize);
+                memset(*pNewPayload, 0, payloadsize);
             }
             void *newpayload = *pNewPayload;
 

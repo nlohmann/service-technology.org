@@ -164,7 +164,8 @@ void Handlers::installTerminationHandlers()
     // start up listener thread
     if (args_info.remoteTermination_given)
     {
-        rep->status("enabling remote termination (%s)", rep->markup(MARKUP_PARAMETER, "--remoteTermination").str());
+        rep->status("enabling remote termination (%s)", rep->markup(MARKUP_PARAMETER,
+                    "--remoteTermination").str());
         rep->status("setting up listener socket at port %s - secret is %s",
                     rep->markup(MARKUP_FILE, "%d", args_info.inputport_arg).str(),
                     rep->markup(MARKUP_IMPORTANT, args_info.remoteTermination_arg).str());

@@ -932,7 +932,7 @@ void Net::preprocess_organizeDeltas()
 
     // same for multiplicities
     mult_t *mult_pre = new mult_t[cardPL];
-    // same for multiplicities 
+    // same for multiplicities
     mult_t *mult_post = new mult_t[cardPL];
 
     for (index_t t = 0; t < cardTR; t++)
@@ -1235,7 +1235,8 @@ void Net::preprocess_organizeConflictingTransitions()
     index_t *tmp_array = new index_t[cardTR]();
 
     // initialize conflict cache array. There is a set for every possible size of the conflict set.
-    std::set<index_t *, conflictset_comparator> **conflictcache = new std::set<index_t *, conflictset_comparator> *[cardTR + 1];
+    std::set<index_t *, conflictset_comparator> **conflictcache = new
+    std::set<index_t *, conflictset_comparator> *[cardTR + 1];
     for (index_t i = 0; i <= cardTR; i++)
     {
         conflictcache[i] = new std::set<index_t *, conflictset_comparator>(conflictset_comparator(i));
@@ -1442,7 +1443,8 @@ void Net::preprocess_organizeConflictingTransitions()
         {
             // failure! allocate memory for new conflict set and add it to the cache
             Transition::BackConflicting[active_transition] = new index_t[stack_card_conflictset[stack_index]];
-            memcpy(Transition::BackConflicting[active_transition], stack_conflictset[stack_index], stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
+            memcpy(Transition::BackConflicting[active_transition], stack_conflictset[stack_index],
+                   stack_card_conflictset[stack_index] * SIZEOF_INDEX_T);
             conflictcache[stack_card_conflictset[stack_index]]->insert(
                 Transition::BackConflicting[active_transition]);
             Transition::BackConflictingIsOriginal[active_transition] = true;

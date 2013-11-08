@@ -132,8 +132,8 @@ typedef enum
 
 /// the size of the bloom filter (2 GB)
 //#define BLOOM_FILTER_SIZE 0x400000000
-	 
-/// the size of the bloom filter (800 MB for the model checking contest)	 
+
+/// the size of the bloom filter (800 MB for the model checking contest)
 #define BLOOM_FILTER_SIZE 0x190000000
 
 /////////////

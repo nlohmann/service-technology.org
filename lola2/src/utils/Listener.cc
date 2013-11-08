@@ -35,7 +35,7 @@ int main(int argc, char **argv)
         printf("No version\n");
         return EXIT_SUCCESS;
     }
-    
+
     rep = new ReporterStream();
 
     const int port = 5555;

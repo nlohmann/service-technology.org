@@ -177,9 +177,9 @@ void evaluateParameters(int argc, char **argv)
 int main(int argc, char **argv)
 {
     //=================
-    // (1) set up LoLA 
+    // (1) set up LoLA
     //=================
-    
+
     // install exit handler for ordered exit()
     Handlers::installExitHandler();
 
@@ -200,7 +200,7 @@ int main(int argc, char **argv)
 
 
     //===================
-    // (2) process input 
+    // (2) process input
     //===================
 
     if (args_info.buechi_given)
@@ -288,7 +288,8 @@ int main(int argc, char **argv)
 
     if (args_info.randomWalk_given)
     {
-        rep->status("debug function: randomly firing transitions (%s)", rep->markup(MARKUP_PARAMETER, "--randomWalk").str());
+        rep->status("debug function: randomly firing transitions (%s)", rep->markup(MARKUP_PARAMETER,
+                    "--randomWalk").str());
         randomWalk(*task.getNetState(), args_info.randomWalk_arg);
     }
 
@@ -300,7 +301,8 @@ int main(int argc, char **argv)
 
     if (args_info.writeCompressed_given)
     {
-        rep->status("output: compressed net (%s)", rep->markup(MARKUP_PARAMETER, "--writeCompressed").str());
+        rep->status("output: compressed net (%s)", rep->markup(MARKUP_PARAMETER,
+                    "--writeCompressed").str());
 
         Output netfile("compressed net",
                        std::string(args_info.writeCompressed_arg) + ".net");

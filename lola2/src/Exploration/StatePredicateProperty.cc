@@ -99,7 +99,8 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate *f)
                 changedSum[t][cardChanged[t]++] = s;
             }
         }
-        changedPredicate[t] = (AtomicStatePredicate **) realloc(changedPredicate[t], cardChanged[t] * SIZEOF_VOIDP);
+        changedPredicate[t] = (AtomicStatePredicate **) realloc(changedPredicate[t],
+                              cardChanged[t] * SIZEOF_VOIDP);
         changedSum[t] = (int *) realloc(changedSum[t], cardChanged[t] * SIZEOF_INDEX_T);
     }
     delete[] atomic;

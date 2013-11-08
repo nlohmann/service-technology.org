@@ -314,7 +314,7 @@ void Transition::updateEnabled(NetState &ns, index_t t)
     for (index_t i = 0; i < Transition::CardDeltaT[POST][t]; i++)
     {
         // one place that got new tokens
-        const index_t p = Transition::DeltaT[POST][t][i]; 
+        const index_t p = Transition::DeltaT[POST][t][i];
         for (index_t j = 0; j < ns.CardDisabled[p]; /* tricky increment handling */)
         {
             const index_t tt = ns.Disabled[p][j];

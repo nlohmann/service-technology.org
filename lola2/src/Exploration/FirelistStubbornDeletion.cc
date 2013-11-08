@@ -116,7 +116,7 @@ FirelistStubbornDeletion::FirelistStubbornDeletion(StatePredicate *sp)
         for (index_t i = 0; i < it->second.size(); ++i)
         {
             index_t ptr(it->second[i] + formula_offset);
-            predecessor[ptr] = (index_t *) malloc(SIZEOF_INDEX_T);
+            predecessor[ptr] = new index_t[1];
             predecessor[ptr][predcnt[ptr]++] = it->first + formula_offset;
         }
 
@@ -126,7 +126,7 @@ FirelistStubbornDeletion::FirelistStubbornDeletion(StatePredicate *sp)
         for (index_t i = 0; i < it->second.size(); ++i)
         {
             index_t ptr(it->second[i] + formula_offset);
-            predecessor[ptr] = (index_t *) malloc(SIZEOF_INDEX_T);
+            predecessor[ptr] = new index_t[1];
             predecessor[ptr][predcnt[ptr]++] = it->first + formula_offset;
             andor[ptr] = true;
         }
@@ -138,24 +138,24 @@ FirelistStubbornDeletion::FirelistStubbornDeletion(StatePredicate *sp)
  */
 FirelistStubbornDeletion::~FirelistStubbornDeletion()
 {
-    free(enabled);
-    free(counter);
-    free(maxcounter);
-    free(andor);
-    free(color);
-    free(root);
-    free(protect);
+    delete[] enabled;
+    delete[] counter;
+    delete[] maxcounter;
+    delete[] andor;
+    delete[] color;
+    delete[] root;
+    delete[] protect;
     delete[] consumer;
     delete[] consumption;
     delete[] producer;
-    free(transition);
-    free(offset);
+    delete[] transition;
+    delete[] offset;
     for (index_t i = 0; i < size; ++i)
     {
-        free(predecessor[i]);
+        delete[] predecessor[i];
     }
-    free(predecessor);
-    free(predcnt);
+    delete[] predecessor;
+    delete[] predcnt;
 }
 
 /*!
@@ -168,21 +168,21 @@ void FirelistStubbornDeletion::buildStaticGraph()
     // otherwise memory leaks or errors will occur
 
     // allocate memory for the graph structure
-    predecessor = (index_t **) malloc(size * SIZEOF_VOIDP);
+    predecessor = new index_t *[size];
     // we count how many predecessors each node has:
-    predcnt = (index_t *) calloc(SIZEOF_INDEX_T, size);
+    predcnt = new index_t[size]();
     // allocate memory for flags/counters in the deletion algorithm
-    protect = (unsigned char *) malloc(Net::Card[TR] * SIZEOF_CHAR);
-    root = (unsigned char *) malloc(Net::Card[TR] * SIZEOF_CHAR);
-    color = (unsigned char *) malloc(size * SIZEOF_CHAR);
-    andor = (unsigned char *) calloc(SIZEOF_CHAR, size);
-    counter = (index_t *) malloc(size * SIZEOF_INDEX_T);
-    maxcounter = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
-    enabled = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    protect = new unsigned char[Net::Card[TR]];
+    root = new unsigned char[Net::Card[TR]];
+    color = new unsigned char[size];
+    andor = new unsigned char[size]();
+    counter = new index_t[size];
+    maxcounter = new index_t[Net::Card[TR]];
+    enabled = new index_t[Net::Card[TR]];
 
     // determine for each transition t the offset of the first <t,s>-pair (if it exists)
     // the number of such pairs is Transition::CardDeltaT[PRE][t]
-    offset = (index_t *) malloc(Net::Card[TR] * SIZEOF_INDEX_T);
+    offset = new index_t[Net::Card[TR]];
     offset[0] = Net::Card[TR] + Net::Card[PL];
     for (index_t t = 1; t < Net::Card[TR]; ++t)
     {
@@ -190,7 +190,7 @@ void FirelistStubbornDeletion::buildStaticGraph()
     }
 
     // create a shortcut from each <t,s>-pair to its transition t
-    transition = (index_t *) malloc(size * SIZEOF_INDEX_T);
+    transition = new index_t[size];
     for (index_t i = offset[0] + fieldsize - 1, t = Net::Card[TR] - 1; i >= offset[0]; --i)
     {
         transition[i] = t;
@@ -236,28 +236,28 @@ void FirelistStubbornDeletion::buildStaticGraph()
         {
             count += consumer[Net::Arc[TR][POST][i][j]].size();
         }
-        predecessor[i] = (index_t *) malloc(count * SIZEOF_INDEX_T);
+        predecessor[i] = new index_t[count];
     }
     for (; i < offset[0]; ++i)
     {
-        predecessor[i] = (index_t *) malloc(Net::CardArcs[PL][POST][i - Net::Card[TR]] * SIZEOF_INDEX_T);
+        predecessor[i] = new index_t[Net::CardArcs[PL][POST][i - Net::Card[TR]]];
     }
     for (; i < offset[0] + fieldsize; ++i)
     {
-        predecessor[i] = (index_t *) malloc(SIZEOF_INDEX_T);
+        predecessor[i] = new index_t[1];
         predcnt[i] = 1;
         predecessor[i][0] = transition[i];
         andor[i] = true; // or-node!
     }
     for (; i < offset[0] + 2 * fieldsize; ++i)
     {
-        predecessor[i] = (index_t *) malloc(SIZEOF_INDEX_T);
+        predecessor[i] = new index_t[1];
         predcnt[i] = 1;
         predecessor[i][0] = i - fieldsize;
     }
     for (; i < offset[0] + 3 * fieldsize; ++i)
     {
-        predecessor[i] = (index_t *) malloc(SIZEOF_INDEX_T);
+        predecessor[i] = new index_t[1];
         predcnt[i] = 1;
         predecessor[i][0] = i - 2 * fieldsize;
     }
@@ -450,7 +450,7 @@ index_t FirelistStubbornDeletion::deletion(NetState &ns, index_t **result)
     cnstr(ns, NULL, 0);
 
     // reserve space for the result
-    *result = (index_t *) malloc(ns.CardEnabled * SIZEOF_INDEX_T);
+    *result = new index_t[ns.CardEnabled];
 
     // check if all enabled transitions are white or only one white transition is enabled
     index_t rescnt(0); // counter for elements in *result

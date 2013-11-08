@@ -4,6 +4,8 @@
 \status new
 
 \brief Organizes the search stack for dfs or bfs.
+
+\todo Replace calloc by new - currently, this does not work due to this error message: "error: no matching constructor for initialization of 'LTLFairnessStackEntry'"
 */
 
 #pragma once

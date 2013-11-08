@@ -116,7 +116,7 @@ char *produce_next_string(int *val)
 {
     current_next_string_index_number++;
     int length = log10(current_next_string_index_number) + 2;
-    char *buf = (char *) calloc(length, sizeof(char));
+    char *buf = new char[length]();
     sprintf(buf, "%d", current_next_string_index_number);
     *val = current_next_string_index_number;
     return buf;

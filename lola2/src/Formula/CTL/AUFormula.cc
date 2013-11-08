@@ -10,7 +10,7 @@ bool AUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
     if (!s.searchAndInsert(ns, &pInitialPayload, 0))
     {
         // all-zeros is starting state for all values
-        *pInitialPayload = calloc(payloadsize, 1);
+        *pInitialPayload = ::operator new(payloadsize);
     }
     void *payload = *pInitialPayload;
 
@@ -149,7 +149,7 @@ bool AUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
             if (!s.searchAndInsert(ns, &pNewPayload, 0))
             {
                 // all-zeros is starting state for all values
-                *pNewPayload = calloc(payloadsize, 1);
+                *pNewPayload = ::operator new(payloadsize);
             }
             void *newpayload = *pNewPayload;
 
@@ -370,11 +370,11 @@ bool AUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
     }
     // (negative) witness found
 
-    free(fairness.strong_backlist);
-    free(fairness.strong_fairness);
-    free(fairness.weak_backlist);
-    free(fairness.weak_fairness);
-    free(fairness.forbidden_transitions);
+    delete[] fairness.strong_backlist;
+    delete[] fairness.strong_fairness;
+    delete[] fairness.weak_backlist;
+    delete[] fairness.weak_fairness;
+    delete[] fairness.forbidden_transitions;
 
     //rep->status("AU proven FALSE at %x",ns.HashCurrent);
 

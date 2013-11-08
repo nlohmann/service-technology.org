@@ -121,7 +121,7 @@ bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned 
     unsigned int currentattempt = 0;
 
     // get memory for path info
-    index_t *path = (index_t *) malloc(SIZEOF_INDEX_T * maxdepth);
+    index_t *path = new index_t[maxdepth];
     //    // copy initial marking into current marking
     //    Marking::init();
     //

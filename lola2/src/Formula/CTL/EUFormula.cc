@@ -13,7 +13,7 @@ bool EUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
     if (!s.searchAndInsert(ns, &pInitialPayload, 0))
     {
         // all-zeros is starting state for all values
-        *pInitialPayload = ::operator new(payloadsize);
+        *pInitialPayload = calloc(payloadsize, 1);
     }
     void *payload = *pInitialPayload;
 
@@ -75,7 +75,7 @@ bool EUFormula::check(Store<void *> &s, NetState &ns, Firelist &firelist,
             if (!s.searchAndInsert(ns, &pNewPayload, 0))
             {
                 // all-zeros is starting state for all values
-                *pNewPayload = ::operator new(payloadsize);
+                *pNewPayload = calloc(payloadsize, 1);
             }
             void *newpayload = *pNewPayload;
 

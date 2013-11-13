@@ -203,11 +203,6 @@ int main(int argc, char **argv)
     // (2) process input
     //===================
 
-    if (args_info.buechi_given)
-    {
-        buechiStateTable = new SymbolTable();
-    }
-
     // file input
     if (args_info.compressed_given)
     {
@@ -263,8 +258,6 @@ int main(int argc, char **argv)
 
         // tidy parser
         ptnetlola_lex_destroy();
-
-        rep->status("translate net into internal format");
 
         // translate into general net structures
         symbolTables->symboltable2net();
@@ -331,12 +324,6 @@ int main(int argc, char **argv)
         task.setStore();
         task.setProperty();
 
-        /*if (args_info.symmetry_given)
-        {
-            // TODO: Move this to a more appropriate place.
-            GeneratingSystem::create();
-        }*/
-
         //======================
         // (5) the actual check
         //======================
@@ -374,37 +361,7 @@ int main(int argc, char **argv)
 
         if (args_info.search_arg != search_arg_findpath)
         {
-            uint64_t numMarkings = 0;
-            if (task.store)
-            {
-                numMarkings = task.store->get_number_of_markings();
-            }
-            else if (task.ltlStore)
-            {
-                numMarkings = task.ltlStore->get_number_of_markings();
-            }
-            else if (task.ctlStore)
-            {
-                numMarkings = task.ctlStore->get_number_of_markings();
-            }
-            uint64_t numEdges = 0;
-            if (task.store)
-            {
-                numEdges = task.store->get_number_of_calls();
-            }
-            else if (task.ltlStore)
-            {
-                numEdges = task.ltlStore->get_number_of_calls();
-            }
-            else if (task.ctlStore)
-            {
-                numEdges = task.ctlStore->get_number_of_calls();
-            }
-            if (numEdges)
-            {
-                numEdges--;
-            }
-            rep->message("%llu markings, %llu edges", numMarkings, numEdges);
+            rep->message("%llu markings, %llu edges", task.getMarkingCount(), task.getEdgeCount());
         }
 
         // print statistics
@@ -414,10 +371,10 @@ int main(int argc, char **argv)
             Handlers::statistics();
         }
 
-        // test popState()
         // TODO: remove this when actual use case is implemented
         if (args_info.testStateForeach_flag)
         {
+            rep->status("debug function: print states (%s)", rep->markup(MARKUP_PARAMETER, "--testStateForeach").str());
             task.testPopState();
         }
     }

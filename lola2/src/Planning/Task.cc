@@ -511,12 +511,8 @@ void Task::setFormula()
 
 void Task::setBuechiAutomata()
 {
-    if (not args_info.buechi_given)
-    {
-        return;
-    }
-
     Input *buechiFile = NULL;
+    buechiStateTable = new SymbolTable();
 
     // Check if the paramter of --buechi is a file that we can open: if that
     // works, parse the file. If not, parse the string.
@@ -960,4 +956,43 @@ void Task::testPopState()
 
     rep->message("%s", rep->markup(MARKUP_IMPORTANT, "states collected: %u",
                                    counter).str());
+}
+
+uint64_t Task::getMarkingCount() const
+{
+    if (store)
+    {
+        return store->get_number_of_markings();
+    }
+    else if (ltlStore)
+    {
+        return ltlStore->get_number_of_markings();
+    }
+    else if (ctlStore)
+    {
+        return ctlStore->get_number_of_markings();
+    }
+    return 0;
+}
+
+uint64_t Task::getEdgeCount() const
+{
+    uint64_t result = 0;
+    if (store)
+    {
+        result = store->get_number_of_calls();
+    }
+    else if (ltlStore)
+    {
+        result = ltlStore->get_number_of_calls();
+    }
+    else if (ctlStore)
+    {
+        result = ctlStore->get_number_of_calls();
+    }
+    if (result)
+    {
+        result--;
+    }
+    return result;
 }

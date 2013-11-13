@@ -218,6 +218,11 @@ public:
     void printWitness();
     void printMarking();
 
+    /// return the number of stored markings
+    uint64_t getMarkingCount() const;
+    /// return the number of fired transitions
+    uint64_t getEdgeCount() const;
+
     void printDot();
 
     // this function is needed to allow the random walk in the main function

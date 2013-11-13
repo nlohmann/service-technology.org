@@ -183,12 +183,4 @@ void ParserPTNet::symboltable2net()
     //rep->message("Names %s %s %s %s", Net::Name[PL][0],Net::Name[PL][1],Net::Name[PL][2],Net::Name[PL][3]);
     delete[] current_arc_pre;
     delete[] current_arc_post;
-
-
-    /**********************
-    * 6. Do preprocessing *
-    **********************/
-
-    // net is read completely now, time to preprocess
-    Net::preprocess();
 }

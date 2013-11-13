@@ -93,16 +93,19 @@ placelists:
 
 
 capacity:
-  /* empty */            /* empty capacity = unlimited capacity */
+  /* empty */
     {
+        /* empty capacity = unlimited capacity */
         TheCapacity = (capacity_t)MAX_CAPACITY;
     }
-| _SAFE_ _colon_       /* SAFE without number = 1-SAFE */
+| _SAFE_ _colon_
     {
+        /* SAFE without number = 1-SAFE */
         TheCapacity = 1;
     }
-| _SAFE_ NUMBER _colon_ /* at most k tokens expected on these places */
+| _SAFE_ NUMBER _colon_
     {
+        /* at most k tokens expected on these places */
         TheCapacity = (capacity_t)atoi($2);
         free($2);
     }
@@ -189,8 +192,9 @@ transition:
 ;
 
 fairness:
-    /* empty */    /* empty = may be treated unfair */
+    /* empty */
     {
+        /* empty = may be treated unfair */
         $$ = NO_FAIRNESS;
     }
 | _WEAK_ _FAIR_

@@ -29,7 +29,6 @@ Mainly copied from LoLA1
 
 extern int currentFile;
 extern gengetopt_args_info args_info;
-extern Reporter* rep;
 extern Input *netFile;
 
 void setlval();

@@ -264,19 +264,23 @@ int main(int argc, char **argv)
         // tidy parser
         ptnetlola_lex_destroy();
 
-        rep->status("preprocessing net");
+        rep->status("translate net into internal format");
 
         // translate into general net structures
         symbolTables->symboltable2net();
+    }
 
-        // report hash table usage (size would be SIZEOF_SYMBOLTABLE)
+    // report hash table usage (size would be SIZEOF_SYMBOLTABLE)
+    if (symbolTables)
+    {
         rep->status("%d symbol table entries, %d collisions",
                     symbolTables->PlaceTable->card + symbolTables->TransitionTable->card,
                     SymbolTable::collisions);
     }
 
-    // create a task object to process
-    Task task;
+    // net is read completely now, time to preprocess
+    rep->status("preprocessing net");
+    Net::preprocess();
 
     delete symbolTables;
     rep->status("finished preprocessing");
@@ -290,7 +294,7 @@ int main(int argc, char **argv)
     {
         rep->status("debug function: randomly firing transitions (%s)", rep->markup(MARKUP_PARAMETER,
                     "--randomWalk").str());
-        randomWalk(*task.getNetState(), args_info.randomWalk_arg);
+        randomWalk(*NetState::createNetStateFromInitial(), args_info.randomWalk_arg);
     }
 
     if (args_info.printNet_given)
@@ -308,7 +312,7 @@ int main(int argc, char **argv)
                        std::string(args_info.writeCompressed_arg) + ".net");
         WriteNetFile(netfile);
 
-        Output namefile("compressed net",
+        Output namefile("compressed net names",
                         std::string(args_info.writeCompressed_arg) + ".names");
         WriteNameFile(namefile);
     }
@@ -320,6 +324,9 @@ int main(int argc, char **argv)
 
     if (args_info.check_given and args_info.check_arg != check_arg_none)
     {
+        // create a task object to process
+        Task task;
+
         // prepare task
         task.setStore();
         task.setProperty();

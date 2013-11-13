@@ -268,7 +268,4 @@ void ReadNetFile(FILE *f)
             Net::Mult[TR][POST][t][i] = (mult_t) tmp2;
         }
     }
-
-    // net is read completely now, time to preprocess
-    Net::preprocess();
 }

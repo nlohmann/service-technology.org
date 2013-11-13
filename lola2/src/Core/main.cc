@@ -320,10 +320,6 @@ int main(int argc, char **argv)
         // create a task object to process
         Task task;
 
-        // prepare task
-        task.setStore();
-        task.setProperty();
-
         //======================
         // (5) the actual check
         //======================

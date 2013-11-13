@@ -276,7 +276,7 @@ ParserPTNet* ParserPTNetLoLA()
 {
     TheResult = new ParserPTNet();
     ptnetlola_parse();
-    return(TheResult);
+    return TheResult;
 }
 
 /// display a parser error and exit

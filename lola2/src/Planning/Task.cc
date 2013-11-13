@@ -151,6 +151,10 @@ Task::Task() : spFormula(NULL), ctlFormula(NULL), bauto(NULL), ns(NULL),
         setBuechiAutomata();
     }
     setNet();
+
+    // prepare task
+    setStore();
+    setProperty();
 }
 
 Task::~Task()

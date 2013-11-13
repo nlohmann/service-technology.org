@@ -275,6 +275,9 @@ int main(int argc, char **argv)
     rep->status("preprocessing net");
     Net::preprocess();
 
+    // create a task object to process (we need to do this before we delete the symbolTables, because the Büchi parser uses them)
+    Task task;
+
     delete symbolTables;
     rep->status("finished preprocessing");
 
@@ -317,9 +320,6 @@ int main(int argc, char **argv)
 
     if (args_info.check_given and args_info.check_arg != check_arg_none)
     {
-        // create a task object to process
-        Task task;
-
         //======================
         // (5) the actual check
         //======================

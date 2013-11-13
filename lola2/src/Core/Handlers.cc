@@ -70,7 +70,7 @@ void *Handlers::remoteTerminationHandler(void *)
     rep->message("received %s packet (%s) from %s - shutting down",
                  rep->markup(MARKUP_BAD, "KILL").str(), rep->markup(MARKUP_IMPORTANT,
                          args_info.remoteTermination_arg).str(), rep->markup(MARKUP_FILE, sender).str());
-    free(sender);
+    delete[] sender;
 
     // abort LoLA by sending SIGUSR1 signal
     kill(getpid(), SIGUSR1);

@@ -124,12 +124,12 @@ String ReporterSocket::markup(markup_t markup, const char *format, ...) const
 ReporterStream::ReporterStream(bool verbose) :
     verbose(verbose),
 #if !defined(__MINGW32__)
-    useColor(isatty(fileno(stderr))  &&(
-                 !strcmp(getenv("TERM"), "linux") ||
-                 !strcmp(getenv("TERM"), "cygwin") ||
-                 !strcmp(getenv("TERM"), "xterm") ||
-                 !strcmp(getenv("TERM"), "xterm-color") ||
-                 !strcmp(getenv("TERM"), "xterm-256color"))),
+    useColor(isatty(fileno(stderr)) && (
+             !strcmp(getenv("TERM"), "linux") ||
+             !strcmp(getenv("TERM"), "cygwin") ||
+             !strcmp(getenv("TERM"), "xterm") ||
+             !strcmp(getenv("TERM"), "xterm-color") ||
+             !strcmp(getenv("TERM"), "xterm-256color"))),
 #else
     useColor(false),
 #endif
@@ -277,6 +277,8 @@ String ReporterStream::markup(markup_t markup, const char *format, ...) const
 
     assert(bytes != -1);
     assert(res);
+    
+    // vasprintf uses malloc
     free(message);
 
     return String(res);

@@ -20,8 +20,6 @@ capacity_t *Marking::Initial = NULL;
 hash_t Marking::HashInitial = 0;
 capacity_t *Marking::Current = NULL;
 hash_t Marking::HashCurrent = 0;
-capacity_t *Marking::Target = NULL;
-hash_t Marking::HashTarget = 0;
 
 /// init for the behavioral part of the net
 /* not needed anymore, this is done with NetStates now
@@ -37,9 +35,9 @@ void Marking::init()
 /// collection of information related to markings
 void Marking::deleteMarkings()
 {
-    free(Marking::Initial);
-    free(Marking::Current);
-    free(Marking::Target);
+    // memory for initial and current marking is allocated in ParserPTNet::symboltable2net()
+    delete[] Marking::Initial;
+    delete[] Marking::Current;
 }
 
 // LCOV_EXCL_START

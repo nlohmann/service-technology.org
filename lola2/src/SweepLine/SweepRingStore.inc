@@ -67,7 +67,7 @@ SweepRingStore<T>::~SweepRingStore()
     {
         delete store[i];
     }
-    free(store);
+    delete[] store;
     delete[] count;
     delete samevalue;
     delete[] newpersistent;

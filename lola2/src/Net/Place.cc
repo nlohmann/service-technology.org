@@ -44,15 +44,20 @@ index_t **Place::Disabled = NULL;
 /// aufräumen für valgrind
 void Place::deletePlaces()
 {
-    free(Place::Hash);
-    free(Place::Capacity);
-    free(Place::CardBits);
+    // allocated in Net::preprocess()
+    delete[] Place::Hash;
+    delete[] Place::CardBits;
+    delete[] Place::CardDisabled;
+
+    // allocated in ReadNetFile(FILE *f) and ParserPTNet::symboltable2net()
+    delete[] Place::Capacity;
+
+    // allocated in Net::preprocess()
     for (index_t i = 0; i < Net::Card[PL]; i++)
     {
-        free(Place::Disabled[i]);
+        delete[] Place::Disabled[i];
     }
-    free(Place::Disabled);
-    free(Place::CardDisabled);
+    delete[] Place::Disabled;
 }
 
 /// Berechne CardBits aus Capacity

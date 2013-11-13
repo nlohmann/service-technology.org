@@ -47,39 +47,48 @@ index_t *Transition::PositionScapegoat = NULL;
 */
 void Transition::deleteTransitions()
 {
-    free(Transition::Fairness);
-    free(Transition::Enabled);
-    free(Transition::DeltaHash);
+    // allocated in ParserPTNet::symboltable2net()
+    delete[] Transition::Fairness;
+
+    // allocated in Net::preprocess()
+    delete[] Transition::Enabled;
+    delete[] Transition::DeltaHash;
+
+    // allocated in Net::preprocess_organizeDeltas()
     for (int direction = PRE; direction <= POST; direction++)
     {
         for (index_t i = 0; i < Net::Card[TR]; i++)
         {
-            free(Transition::MultDeltaT[direction][i]);
-            free(Transition::DeltaT[direction][i]);
+            delete[] Transition::MultDeltaT[direction][i];
+            delete[] Transition::DeltaT[direction][i];
         }
-        free(Transition::CardDeltaT[direction]);
-        free(Transition::DeltaT[direction]);
-        free(Transition::MultDeltaT[direction]);
+        delete[] Transition::DeltaT[direction];
+        delete[] Transition::MultDeltaT[direction];
+        // allocated in Net::preprocess()
+        delete[] Transition::CardDeltaT[direction];
     }
-    free(Transition::CardConflicting);
-    free(Transition::CardBackConflicting);
+
+    // allocated in Net::preprocess()
+    delete[] Transition::CardConflicting;
     for (index_t i = 0; i < Net::Card[TR]; i++)
     {
         if (Transition::ConflictingIsOriginal[i])
         {
-            free(Transition::Conflicting[i]);
+            delete[] Transition::Conflicting[i];
         }
         if (Transition::BackConflictingIsOriginal[i])
         {
-            free(Transition::BackConflicting[i]);
+            delete[] Transition::BackConflicting[i];
         }
     }
-    free(Transition::Conflicting);
-    free(Transition::BackConflicting);
-    free(Transition::ConflictingIsOriginal);
-    free(Transition::BackConflictingIsOriginal);
-    free(Transition::PositionScapegoat);
-    free(Transition::ProgressMeasure);
+    delete[] Transition::Conflicting;
+    delete[] Transition::BackConflicting;
+    delete[] Transition::ConflictingIsOriginal;
+    delete[] Transition::BackConflictingIsOriginal;
+    delete[] Transition::PositionScapegoat;
+
+    // allocated in Net::setProgressMeasure()
+    delete[] Transition::ProgressMeasure;
 }
 
 void Transition::checkTransitions(NetState &ns)

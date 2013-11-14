@@ -154,6 +154,7 @@ atomic_proposition:
         }
         $$ = Fireable(mkinteger(t->getIndex()));
         target_transition.insert(t->getIndex());
+        free($3);
     }
 | _DEADLOCK_
     { $$ = aDeadlock(); }
@@ -173,6 +174,7 @@ term:
         }
         $$ = Node(mkinteger(p->getIndex()));
         target_place.insert(p->getIndex());
+        free($1);
     }
 | NUMBER
     { $$ = Number($1); }

@@ -214,19 +214,19 @@ public:
     void setStore();
     void setProperty();
 
-    bool hasWitness(bool result);
-    void printWitness();
-    void printMarking();
+    bool hasWitness(bool result) const;
+    void printWitness() const;
+    void printMarking() const;
 
     /// return the number of stored markings
     uint64_t getMarkingCount() const;
     /// return the number of fired transitions
     uint64_t getEdgeCount() const;
 
-    void printDot();
+    void printDot() const;
 
     // this function is needed to allow the random walk in the main function
-    NetState *getNetState();
+    NetState *getNetState() const;
 
     // this method is only to test Store::popState() until its use case is implemented
     void testPopState();

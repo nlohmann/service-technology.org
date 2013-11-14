@@ -806,7 +806,7 @@ void Task::interpreteResult(bool *result)
     }
 }
 
-bool Task::hasWitness(bool result)
+bool Task::hasWitness(bool result) const
 {
     if (ctlFormula)
     {
@@ -819,7 +819,7 @@ bool Task::hasWitness(bool result)
     return result;
 }
 
-void Task::printWitness()
+void Task::printWitness() const
 {
 
     rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness path:").str());
@@ -867,7 +867,7 @@ void Task::printWitness()
     }
 }
 
-void Task::printMarking()
+void Task::printMarking() const
 {
     rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness state:").str());
     for (index_t p = 0; p < Net::Card[PL]; ++p)
@@ -880,13 +880,13 @@ void Task::printMarking()
 }
 
 
-NetState *Task::getNetState()
+NetState *Task::getNetState() const
 {
     return ns;
 }
 
 
-void Task::printDot()
+void Task::printDot() const
 {
     FILE *o = stdout;
 

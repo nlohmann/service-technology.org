@@ -655,8 +655,6 @@ void Net::setProgressMeasure()
     // reduce matrix
     m.diagonalise();
 
-    // save number of places
-    const index_t cardPL = Net::Card[PL];
     // save number of transitions
     const index_t cardTR = Net::Card[TR];
 
@@ -1546,7 +1544,11 @@ void Net::preprocess()
     * 6. Set progress measure *
     **************************/
     // we always calcuate a progress measure as it is reasonably cheap and beside the sweep line algorithm, also the deletion algorithm uses it
-    Net::setProgressMeasure();
+    if (args_info.search_arg == search_arg_sweepline or args_info.stubborn_arg == stubborn_arg_deletion)
+    {
+        rep->status("calculating the progress measure");
+        Net::setProgressMeasure();
+    }
 
     /*******************************
     * 7. Initial enabledness check *

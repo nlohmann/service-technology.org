@@ -73,7 +73,6 @@ void ReporterSocket::status(const char *format, ...) const
 
 /*!
 \param code    the error code
-\param format  the error message formatted as printf string
 \todo Handle premature termination with signals.
 */
 void ReporterSocket::abort(errorcode_t code) const
@@ -222,7 +221,7 @@ void ReporterStream::abort(errorcode_t code) const
 \param markup  how to markup the string
 \param[in] format  the string to format
 \post Passed string format is formatted according to markup.
-\note Memory for res is released by ~String::String().
+\note Memory for res is released by String::~String().
 */
 String ReporterStream::markup(markup_t markup, const char *format, ...) const
 {

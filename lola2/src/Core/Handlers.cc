@@ -91,7 +91,7 @@ void Handlers::statistics()
                        " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
     FILE *ps = popen(call.c_str(), "r");
     unsigned int memory;
-    int res = fscanf(ps, "%u", &memory);
+    int res = fscanf(ps, "%20u", &memory);
     assert(res != EOF);
     pclose(ps);
     rep->message("memory consumption: %u KB", memory);

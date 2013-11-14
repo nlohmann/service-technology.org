@@ -35,6 +35,7 @@
 \param[in] hostname  If the socket should be used to send messages (client)
            then this parameter should hold an a hostname or an IPv4 address in
            the standard format "xxx.xxx.xxx.xxx". It defaults to NULL (server).
+\param[in] failonerror  Whether errors lead to program abortion (true).
 
 \post The member #listening is set according to whether we are sending
       (client) or receiving messages (server).

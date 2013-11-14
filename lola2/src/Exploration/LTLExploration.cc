@@ -1012,9 +1012,7 @@ bool LTLExploration::checkProperty(BuechiAutomata &automata,
     // set dfs number
     (*currentStateEntry)->dfs = currentNextDFSNumber;
 
-    bool result = false;
-    result = searchFair(automata, store, firelist, ns, currentAutomataState, *currentStateEntry,
-                        currentNextDepth - DFS_NUMBERS_PER_PNUELI, currentNextDFSNumber);
+    bool result = searchFair(automata, store, firelist, ns, currentAutomataState, *currentStateEntry, currentNextDepth - DFS_NUMBERS_PER_PNUELI, currentNextDFSNumber);
 
     // cleanup
     delete[] assumptions.strong_backlist;

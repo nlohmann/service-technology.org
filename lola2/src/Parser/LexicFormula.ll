@@ -1,5 +1,4 @@
 /*!
-\file Lexic.ll
 \author Karsten
 \status approved 25.01.2012
 

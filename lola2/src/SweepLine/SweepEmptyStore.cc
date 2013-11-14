@@ -36,7 +36,7 @@ void SweepEmptyStore::incrementCalls()
 
 /*!
  * \brief Set the total number of markings
- * \param The number of markings
+ * \param count  The number of markings
  */
 void SweepEmptyStore::setMarkings(int64_t count)
 {
@@ -45,7 +45,7 @@ void SweepEmptyStore::setMarkings(int64_t count)
 
 /*!
  * \brief Set the total number of calls
- * \param The number of calls
+ * \param count  The number of calls
  */
 void SweepEmptyStore::setCalls(int64_t count)
 {

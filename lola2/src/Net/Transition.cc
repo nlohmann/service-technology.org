@@ -83,6 +83,7 @@ void Transition::deleteTransitions()
     }
     delete[] Transition::Conflicting;
     delete[] Transition::BackConflicting;
+    delete[] Transition::CardBackConflicting;
     delete[] Transition::ConflictingIsOriginal;
     delete[] Transition::BackConflictingIsOriginal;
     delete[] Transition::PositionScapegoat;

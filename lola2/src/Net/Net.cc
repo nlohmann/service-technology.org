@@ -1545,11 +1545,8 @@ void Net::preprocess()
     /**************************
     * 6. Set progress measure *
     **************************/
-    /// \todo: move to another place?
-    if (args_info.search_arg == search_arg_sweepline)
-    {
-        Net::setProgressMeasure();
-    }
+    // we always calcuate a progress measure as it is reasonably cheap and beside the sweep line algorithm, also the deletion algorithm uses it
+    Net::setProgressMeasure();
 
     /*******************************
     * 7. Initial enabledness check *

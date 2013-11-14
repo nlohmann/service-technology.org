@@ -94,7 +94,7 @@ BuechiAutomata::~BuechiAutomata()
     }
 
     // allocated in Task::setFormula()
-    delete atomicPropositions;
+    delete[] atomicPropositions;
 
     for (index_t i = 0; i < cardStates; i++)
     {

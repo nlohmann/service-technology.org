@@ -170,7 +170,6 @@ Task::~Task()
     delete ltlExploration;
     delete ctlExploration;
     delete bauto;
-    delete TheFormula;
 }
 
 void Task::setNet()
@@ -504,7 +503,7 @@ void Task::setFormula()
     // tidy parser
     ptformula_lex_destroy();
 
-    //delete TheFormula;
+    delete TheFormula;
 
     if (args_info.formula_given)
     {

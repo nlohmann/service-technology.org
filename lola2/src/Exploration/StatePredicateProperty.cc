@@ -40,7 +40,7 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate *f)
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
         changedPredicate[t] = (AtomicStatePredicate **) malloc(cardAtomic * SIZEOF_VOIDP);
-        changedSum[t] = new int[cardAtomic];
+        changedSum[t] = (int *) malloc(cardAtomic * SIZEOF_INT);
         for (index_t i = 0; i < cardAtomic; i++)
         {
             int s = 0;

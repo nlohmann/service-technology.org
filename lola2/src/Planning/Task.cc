@@ -170,6 +170,7 @@ Task::~Task()
     delete ltlExploration;
     delete ctlExploration;
     delete bauto;
+    delete TheFormula;
 }
 
 void Task::setNet()

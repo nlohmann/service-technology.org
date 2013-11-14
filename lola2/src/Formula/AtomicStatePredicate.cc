@@ -36,7 +36,8 @@ AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k) :
     cardPos(p),
     cardNeg(n),
     threshold(k),
-    original(true)
+    original(true),
+    up(NULL)
 {
     //printf("+ %p->AtomicStatePredicate(p=%d, n=%d, k=%d)\n", this, p, n, k);
 

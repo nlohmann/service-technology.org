@@ -207,7 +207,8 @@ void Net::deleteNodes()
         }
         for (index_t i = 0; i < Net::Card[type]; i++)
         {
-            delete[] Net::Name[type][i];
+            // names are allocated via strdup
+            free(Net::Name[type][i]);
         }
         delete[] Net::Name[type];
     }

@@ -832,7 +832,6 @@ AT_KEYWORDS(formula)
 AT_CLEANUP
 
 AT_SETUP([Language constructs: TRUE])
-AT_SKIP_IF([true]) # skipped due to unexplainable error (see http://jenkins.service-technology.org/job/lola2/94)
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([LOLA garavel.lola --formula='"FORMULA TRUE;"' --verbose],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: processed formula with 0 atomic propositions" stderr])
@@ -840,7 +839,6 @@ AT_KEYWORDS(formula)
 AT_CLEANUP
 
 AT_SETUP([Language constructs: FALSE])
-AT_SKIP_IF([true]) # skipped due to unexplainable error (see http://jenkins.service-technology.org/job/lola2/94)
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([LOLA garavel.lola --formula='"FORMULA FALSE;"' --verbose],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: processed formula with 0 atomic propositions" stderr])
@@ -975,7 +973,6 @@ AT_CLEANUP
 
 
 AT_SETUP([Tautologies: NOT TRUE])
-AT_SKIP_IF([true]) # skipped due to unexplainable error (see http://jenkins.service-technology.org/job/lola2/94)
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([LOLA garavel.lola --formula='"FORMULA NOT TRUE;"' --verbose],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: processed formula with 0 atomic propositions" stderr])
@@ -983,7 +980,6 @@ AT_KEYWORDS(formula)
 AT_CLEANUP
 
 AT_SETUP([Tautologies: NOT FALSE])
-AT_SKIP_IF([true]) # skipped due to unexplainable error (see http://jenkins.service-technology.org/job/lola2/94)
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([LOLA garavel.lola --formula='"FORMULA NOT FALSE;"' --verbose],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: processed formula with 0 atomic propositions" stderr])
@@ -1700,7 +1696,6 @@ AT_KEYWORDS(findpath)
 AT_CLEANUP
 
 AT_SETUP([TRUE])
-AT_SKIP_IF([true]) # skipped due to unexplainable error (see http://jenkins.service-technology.org/job/lola2/78)
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_DATA(formula.task,[FORMULA TRUE;
 ])
@@ -1727,7 +1722,6 @@ AT_KEYWORDS(findpath parallel)
 AT_CLEANUP
 
 AT_SETUP([TRUE (parallel)])
-AT_SKIP_IF([true]) # skipped due to unexplainable error (see http://jenkins.service-technology.org/job/lola2/78)
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_DATA(formula.task,[FORMULA TRUE;
 ])
@@ -1758,7 +1752,6 @@ AT_KEYWORDS(findpath)
 AT_CLEANUP
 
 AT_SETUP([FALSE])
-AT_SKIP_IF([true]) # skipped due to unexplainable error (see http://jenkins.service-technology.org/job/lola2/78)
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_DATA(formula.task,[FORMULA FALSE;
 ])
@@ -1785,7 +1778,6 @@ AT_KEYWORDS(findpath parallel)
 AT_CLEANUP
 
 AT_SETUP([FALSE (parallel)])
-AT_SKIP_IF([true]) # skipped due to unexplainable error (see http://jenkins.service-technology.org/job/lola2/78)
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_DATA(formula.task,[FORMULA FALSE;
 ])
@@ -1814,7 +1806,6 @@ AT_KEYWORDS(stubborn parallel)
 AT_CLEANUP
 
 AT_SETUP([deletion algorithm (Phils 10)])
-AT_SKIP_IF([true]) # skipped due to unexplainable error (see http://jenkins.service-technology.org/job/lola2/78)
 AT_CHECK([cp TESTFILES/phils10.lola .])
 AT_CHECK([LOLA phils10.lola --check=deadlock -v --state --path --stubborn=deletion],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])
@@ -1827,7 +1818,6 @@ AT_KEYWORDS(stubborn)
 AT_CLEANUP
 
 AT_SETUP([deletion algorithm (Kanban5)])
-AT_SKIP_IF([true]) # skipped due to unexplainable error (see http://jenkins.service-technology.org/job/lola2/78)
 AT_CHECK([cp TESTFILES/Kanban5.pnml.lola .])
 AT_CHECK([LOLA Kanban5.pnml.lola --check=deadlock -v --state --path --stubborn=deletion],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: no" stderr])
@@ -1838,7 +1828,6 @@ AT_KEYWORDS(stubborn)
 AT_CLEANUP
 
 AT_SETUP([deletion algorithm (positive formula)])
-AT_SKIP_IF([true]) # skipped due to unexplainable error (see http://jenkins.service-technology.org/job/lola2/78)
 AT_CHECK([cp TESTFILES/phils5.lola TESTFILES/philpos.task .])
 AT_CHECK([LOLA phils5.lola --formula=philpos.task --check=modelchecking -v --stubborn=deletion],0,stdout,stderr)
 AT_CHECK([GREP -q "lola: result: yes" stderr])

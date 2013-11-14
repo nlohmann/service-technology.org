@@ -163,17 +163,11 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 
 				// collect the labels and also all options
 				std::string labels = "";
-				std::string options = "";
-				bool nextAreLabels = false;
-				while (it != tokens.end()) {
-					options += *it;
-					if (nextAreLabels)
-						labels = *it;
-					if (it->find("label") != std::string::npos)
-						nextAreLabels = true;
-					else
-						nextAreLabels = false;
-					++it;
+				if (line.find("label=") != std::string::npos) {
+					labels = line.substr(line.find("label=") + 7, line.length());
+					// Find first "non-delimiter".
+					std::string::size_type end = labels.find_first_of("\"", 0);
+					labels = labels.substr(0, end);
 				}
 				// status("labels: %s", labels.c_str());
 
@@ -246,17 +240,17 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 				Tokenize(labels, tokens, ", ");
 				it = tokens.begin();
 				while (it != tokens.end()) {
-					// status("found label: %s", it->c_str());
 					// save the parsed label and set a new id if it has not yet been processed
 					if (graph->name2id->find(*it) == graph->name2id->end()) {
+						status("found new label: %s", it->c_str());
 						if (idcounter >= graph->events)
 							abort(12, "Parsed parameter doesn't match parsed labels' count.");
 						(*graph->name2id)[*it] = idcounter;
 						(*graph->id2name)[idcounter] = *it;
 
-						if (options.find("/*sending*/") != std::string::npos) {
+						if (line.find("/*sending*/") != std::string::npos) {
 							(*graph->is_sending_label)[idcounter] = true;
-						} else if (options.find("/*receiving*/") != std::string::npos) {
+						} else if (line.find("/*receiving*/") != std::string::npos) {
 							(*graph->is_sending_label)[idcounter] = false;
 						} else {
 							abort(10, "couldn't parse graph. /*sending*/ or /*receiving*/ missing");

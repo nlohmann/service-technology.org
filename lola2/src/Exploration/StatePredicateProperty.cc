@@ -39,7 +39,7 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate *f)
     changedSum = (int **) malloc(Net::Card[TR] * SIZEOF_VOIDP);
     for (index_t t = 0; t < Net::Card[TR]; t++)
     {
-        changedPredicate[t] = new AtomicStatePredicate *[cardAtomic];
+        changedPredicate[t] = (AtomicStatePredicate **) malloc(cardAtomic * SIZEOF_VOIDP);
         changedSum[t] = new int[cardAtomic];
         for (index_t i = 0; i < cardAtomic; i++)
         {
@@ -99,8 +99,7 @@ StatePredicateProperty::StatePredicateProperty(StatePredicate *f)
                 changedSum[t][cardChanged[t]++] = s;
             }
         }
-        changedPredicate[t] = (AtomicStatePredicate **) realloc(changedPredicate[t],
-                              cardChanged[t] * SIZEOF_VOIDP);
+        changedPredicate[t] = (AtomicStatePredicate **) realloc(changedPredicate[t], cardChanged[t] * SIZEOF_VOIDP);
         changedSum[t] = (int *) realloc(changedSum[t], cardChanged[t] * SIZEOF_INDEX_T);
     }
     delete[] atomic;

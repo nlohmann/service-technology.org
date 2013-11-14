@@ -92,21 +92,23 @@ BuechiAutomata::~BuechiAutomata()
         delete atomicPropositions[i]->getPredicate();
         delete atomicPropositions[i];
     }
-    free(atomicPropositions);
+
+    // allocated in Task::setFormula()
+    delete atomicPropositions;
 
     for (index_t i = 0; i < cardStates; i++)
     {
         for (index_t j = 0; j < cardTransitions[i]; j++)
         {
-            free(transitions[i][j]);
+            delete[] transitions[i][j];
         }
-        free(transitions[i]);
+        delete[] transitions[i];
     }
-    free(transitions);
 
-    free(cardTransitions);
-    free(isStateAccepting);
-    free(atomicPropotions_backlist);
+    delete[] transitions;
+    delete[] cardTransitions;
+    delete[] isStateAccepting;
+    delete[] atomicPropotions_backlist;
 }
 
 

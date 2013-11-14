@@ -101,5 +101,5 @@ public:
     virtual StatePredicate *negate();
 
 protected:
-    AtomicStatePredicate() {};
+    AtomicStatePredicate();
 };

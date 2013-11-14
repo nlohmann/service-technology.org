@@ -44,6 +44,16 @@ AtomicStatePredicate::AtomicStatePredicate(index_t p, index_t n, int k) :
     parent = NULL;
 }
 
+AtomicStatePredicate::AtomicStatePredicate() : 
+    posPlaces(NULL),
+    negPlaces(NULL),
+    posMult(NULL),
+    negMult(NULL),
+    original(true),
+    up(NULL)
+{}
+
+
 AtomicStatePredicate::~AtomicStatePredicate()
 {
     if (!original)

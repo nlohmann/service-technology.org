@@ -2,19 +2,28 @@
 \file CompressedIO.h
 \author Karsten
 \status approved 21.02.2012
+\ingroup g_reporting
 
 \brief Input and outout from/to a file in compressed format. We generate two
 separate files that can be read in arbitrary order. In this version, we use an
 ASCII file where data are separated by spaces and newlines.
 
-\todo Das hier eine Klasse zuordnen - irgendwo müssen wir uns um Dateien kümmern.
+\todo These functions should be moved into a struct -- maybe even Net.
 */
 
 #pragma once
-#include <cstdio>
-#include"Parser/ParserPTNet.h"
 
+#include <cstdio>
+#include "Parser/ParserPTNet.h"
+
+/// write names to file
 void WriteNameFile(FILE *);
+
+/// write compressed net structure to file
 void WriteNetFile(FILE *);
+
+/// read names from file and annotated parsed net
 void ReadNameFile(FILE *, ParserPTNet *);
+
+/// read compressed net structure from file
 void ReadNetFile(FILE *);

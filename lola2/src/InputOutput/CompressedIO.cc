@@ -2,10 +2,11 @@
 \file CompressedIO.cc
 \author Karsten
 \status approved 21.02.2012
+\ingroup g_frontend
 
 \brief Input and outout from/to a file in compressed format. We generate two
 separate files that can be read in arbitrary order. In this version, we use an
-ASCII file where data are separated by spaces and newlines
+ASCII file where data are separated by spaces and newlines.
 */
 
 #include <config.h>
@@ -28,8 +29,17 @@ ASCII file where data are separated by spaces and newlines
 #include <Net/Transition.h>
 
 
+/*!
+\param[out] f  output file
+
+\pre The net is properly preprocessed and the structure Net is filled.
+\pre File f is already open to write.
+\post Names are written to file f, but f is not yet closed.
+*/
 void WriteNameFile(FILE *f)
 {
+    assert(f);
+
     // 1. Number of places
     fprintf(f, "%u\n", Net::Card[PL]);
 
@@ -49,13 +59,29 @@ void WriteNameFile(FILE *f)
     }
 }
 
+
 /*!
-\pre Memory of Name[TR] and Name[PL] is already allocated.
+\param[out] f  output file
+\param[in,out] symboltables  the symbol tables to write the names to
+
+\pre File f is already open to read.
+\pre Memory of Net::Name[TR] and Net::Name[PL] is already allocated.
+\post Read names are written to the provided symbol tables and Net::Name.
+\post Memory for symbols is allocated.
+
+\note We assume no syntax errors. If the input file does not follow the assumed
+format, this function may leave the symbol tables in an undefined state.
 
 \todo Scanf mit Maximalbreite nutzen um cppcheck-Fehler zu umgehen.
+\todo Get rid of the magic number `10000` - move to Dimensions.h.
+\todo Memory allocation for symbols should be moved into the SymbolTable class;
+that is, wrapped into the insert function. This simplifies this code and makes
+memory allocation local to the SymbolTable class.
 */
 void ReadNameFile(FILE *f, ParserPTNet *symboltables)
 {
+    assert(f);
+    assert(symboltables);
     assert(Net::Name[PL]);
     assert(Net::Name[TR]);
 
@@ -91,8 +117,18 @@ void ReadNameFile(FILE *f, ParserPTNet *symboltables)
     }
 }
 
+
+/*!
+\param[out] f  output file
+
+\pre The net is properly preprocessed and the structure Net is filled.
+\pre File f is already open to write.
+\post The net structure is written to file f, but f is not yet closed.
+*/
 void WriteNetFile(FILE *f)
 {
+    assert(f);
+
     // 1. Number of places and significant places
     fprintf(f, "%u %u", Net::Card[PL], Place::CardSignificant);
 
@@ -151,12 +187,22 @@ void WriteNetFile(FILE *f)
 }
 
 
-
 /*!
-\todo Collapse fscanf calls when possible
+\param[out] f  output file
+
+\pre File f is already open to read.
+\post Read net structure is written to the Net structure.
+\post Memory for the Net structure is allocated.
+
+\note We assume no syntax errors. If the input file does not follow the assumed
+format, this function may leave the symbol tables in an undefined state.
+
+\todo Scanf mit Maximalbreite nutzen um cppcheck-Fehler zu umgehen.
 */
 void ReadNetFile(FILE *f)
 {
+    assert(f);
+
     // read number of places
     unsigned int tmp1, tmp2;
     fscanf(f, "%u %u", &tmp1, &tmp2);

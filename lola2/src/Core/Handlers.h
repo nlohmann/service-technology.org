@@ -37,7 +37,7 @@ public:
     static void statistics();
 
     /// handler for new
-    static void newHandler();
+    static void newHandler() __attribute__((noreturn));
 
     /// install the exit handler
     static void installExitHandler();

@@ -48,7 +48,7 @@ CFLAGS="$CFLAGS $OPENMP_CFLAGS"
 CXXFLAGS="$CXXFLAGS $OPENMP_CXXFLAGS"
 
 # search for optional tools needed by "make check"
-AC_PATH_PROG(VALGRIND,    [valgrind], not found)
+AC_PATH_PROG(VALGRIND, [valgrind], not found)
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

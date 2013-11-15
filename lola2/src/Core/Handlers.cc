@@ -36,6 +36,8 @@ time_t Handlers::start_time;
 \param signum The signal to react to.
 \note This function is only called for those signals that have been registered
       by calling signal() first - see Handlers::installTerminationHandlers().
+
+\post LoLA is exited with exit code EXIT_TERMINATION.
 */
 void Handlers::signalTerminationHandler(int signum)
 {
@@ -48,6 +50,8 @@ void Handlers::signalTerminationHandler(int signum)
 The new handler is called in case memory allocation using "new" or "malloc"
 fails. This function has little possibility to fix the problem, but can at
 least end LoLA systematically.
+
+\post LoLA is exited with exit code EXIT_TERMINATION.
 */
 void Handlers::newHandler()
 {
@@ -59,8 +63,13 @@ void Handlers::newHandler()
 /*!
 The termination handler allows to terminate LoLA by sending a predefined
 secret via socket. Once the message is received, LoLA's execution is
-terminated by calling sending the SIGUSR1/SIGUSR2 signals which are processed
-in Handlers::signalTerminationHandler().
+terminated by calling sending the SIGUSR1 signals which are processed in
+Handlers::signalTerminationHandler().
+
+\return Always returns NULL - This function is only of type void* to be
+        callable by pthread_create.
+
+\post LoLA will eventually exit as the SIGUSR1 signal is sent.
 */
 void *Handlers::remoteTerminationHandler(void *)
 {
@@ -69,7 +78,7 @@ void *Handlers::remoteTerminationHandler(void *)
     assert(sender);
     rep->message("received %s packet (%s) from %s - shutting down",
                  rep->markup(MARKUP_BAD, "KILL").str(), rep->markup(MARKUP_IMPORTANT,
-                         args_info.remoteTermination_arg).str(), rep->markup(MARKUP_FILE, sender).str());
+                 args_info.remoteTermination_arg).str(), rep->markup(MARKUP_FILE, sender).str());
     delete[] sender;
 
     // abort LoLA by sending SIGUSR1 signal
@@ -81,8 +90,11 @@ void *Handlers::remoteTerminationHandler(void *)
 /*!
 Determine memory and time consumption. For the former, `ps` is called.
 
+\note We assume `ps` to be callable by LoLA.
+
 \todo If concurrent processes of the same binary run, the process id should be
 used to find the process rather than the name.
+\todo The configure script should check if the `ps` tool is present.
 */
 void Handlers::statistics()
 {
@@ -105,6 +117,8 @@ void Handlers::statistics()
 /*!
 The exit handler allows to organize the termination of LoLA. This includes
 closing files, reporting exit, and releasing memory.
+
+\post Upcon completion, no other function is called.
 */
 void Handlers::exitHandler()
 {
@@ -135,6 +149,8 @@ void Handlers::exitHandler()
 /*!
 This function is a pure wrapper of the atexit function. It also tracks the
 start time of LoLA for later time statistics.
+
+\post Installs exitHandler as exit handler.
 */
 void Handlers::installExitHandler()
 {
@@ -149,6 +165,9 @@ void Handlers::installExitHandler()
 Installs handlers for the signals SIGTERM, SIGINT, SIGUSR1, and SIGUSR2. It
 further sets up a remote termination thread in case the `--remoteTermination`
 flag is used.
+
+\post Installs signal handlers for SIGTERM, SIGINT, SIGUSR1, and SIGUSR2.
+\post Starts a remote termination thread if `--remoteTermination` is given.
 */
 void Handlers::installTerminationHandlers()
 {

@@ -3,6 +3,8 @@
 
 \author Niels
 \status new
+
+\ingroup g_runtime
 */
 
 #pragma once
@@ -13,6 +15,8 @@
 \brief Collection of event handlers
 
 This struct encapsulates functionality to process events while running LoLA.
+
+\ingroup g_runtime
 */
 struct Handlers
 {

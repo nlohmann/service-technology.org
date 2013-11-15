@@ -1,4 +1,7 @@
-.PHONY : _cppcheck _style
+.PHONY : _cppcheck _style doxygen
+
+doxygen:
+	doxygen
 
 _style:
 	for FILE in `ls -R -1 ../src/*/*.{cc,c,h} ../src/*/*/*.{cc,c,h}`; do astyle --options=astylerc $$FILE; done

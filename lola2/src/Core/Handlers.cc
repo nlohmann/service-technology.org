@@ -3,6 +3,8 @@
 \author Niels
 \status new
 
+\ingroup g_runtime
+
 \brief Implementation of exit and termination handlers.
 */
 
@@ -150,7 +152,7 @@ void Handlers::exitHandler()
 This function is a pure wrapper of the atexit function. It also tracks the
 start time of LoLA for later time statistics.
 
-\post Installs exitHandler as exit handler.
+\post Installs Handlers::exitHandler as exit handler.
 */
 void Handlers::installExitHandler()
 {

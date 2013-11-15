@@ -25,6 +25,12 @@
 
 \defgroup g_frontend Front End
 
-\defgroup g_reporting Reporting
+\defgroup g_reporting Reporting and logging
 
+This module collects all aspects to communicate with the caller of LoLA.
+
+\defgroup g_runtime Runtime organization
+
+This module collects all aspects that are not directly part of the verification
+task, but rather of the organization.
 */

@@ -84,13 +84,13 @@ extern bool multithreaded;
 namespace sara {
 
 /** Constructor for transition nodes for stubborn set analysis. */
-PathFinder::myNode::myNode() : t(NULL),index(-2),low(-1),count(0),instack(false),enabled(false) {}
+PathFinder::myNode::myNode() : t(NULL),index(-2),low(-1),count(0),instack(false),enabled(false),scapegoat(NULL) {}
 
 /** Destructor. */
 PathFinder::myNode::~myNode() {}
 
 /** Reset for reusability. Reaches the same state as the constructor. */
-void PathFinder::myNode::reset() { index=-2; low=-1; count=0; instack=false; nodes.clear(); }
+void PathFinder::myNode::reset() { index=-2; low=-1; count=0; instack=false; scapegoat=NULL; nodes.clear(); }
 
 /** Reinitialises the graph before reusing it. */ 
 void PathFinder::myNode::reinit() { low=-1; instack=false; if (index>=0) index=-1; }
@@ -620,44 +620,58 @@ void PathFinder::adaptConflictGraph(SThread* thr, Transition* tstart) {
 				}
 			}
 		// if t is newly disabled, look for predecessor transitions that could enable it
-		} else if (!thr->m->activates(*t) && (node->enabled || node->index==-2)) {
-			// remove all conflicting transitions
-			for(int j=0; j<node->nodes.size(); ++j)
-			{
-				if (!marker[node->nodes[j]]) {
-					tset.push_back(transitionorder[node->nodes[j]]);
-					marker[node->nodes[j]] = true;
-				}
-				if (!(--thr->tton[node->nodes[j]]->count) && !ntbool[node->nodes[j]])
-				{
-					nulltest.push_back(node->nodes[j]);
-					ntbool[node->nodes[j]] = true;
-				}
+		// if t remains disabled, check if the scapegoat is still allowed
+		} else if (!thr->m->activates(*t)) {
+			bool goon(true);
+
+			// first the case where the transition remains disabled
+			if (!node->enabled && node->index!=-2) {
+				pnapi::Arc* a(t->getPetriNet().findArc(*(node->scapegoat),*t));
+				if (!a) abort(11,"error: no scapegoat for stubborn set method");
+				// check if scapegoat is still available
+				if (a->getWeight() > (*(thr->m))[*(node->scapegoat)]) goon = false;
 			}
-			node->nodes.clear();
-			node->enabled = false;
 
-			// get a place with not enough tokens to fire t
-			Place* hp(hinderingPlace(thr,*t));
-
-			// get the transitions that produce tokens on that place
-			requiredTransitions(thr,*hp); // side effect: result vector is tsets
-
-			// walk through these transitions
-			for(unsigned int rtit=0; rtit<thr->tsets.size(); ++rtit)
-			{
-				// get one of the transitions
-				Transition* rt(thr->tsets[rtit]);
-
-				// do not put t into the list of token-producing transitions, it cannot fire anyway
-				if (rt==t) continue;
-
-				// mark it as having priority, as it produces necessary tokens
-				node->nodes.push_back(revtorder[rt]);
-				thr->tton[revtorder[rt]]->count++;
-
-				// if we haven't worked on it yet, insert it into the todo-list
-				if (!marker[revtorder[rt]]) { tset.push_back(rt); marker[revtorder[rt]]=true; }
+			// if the transition is newly disabled or the scapegoat must change
+			if (goon) {
+				// remove all conflicting transitions
+				for(int j=0; j<node->nodes.size(); ++j)
+				{
+					if (!marker[node->nodes[j]]) {
+						tset.push_back(transitionorder[node->nodes[j]]);
+						marker[node->nodes[j]] = true;
+					}
+					if (!(--thr->tton[node->nodes[j]]->count) && !ntbool[node->nodes[j]])
+					{
+						nulltest.push_back(node->nodes[j]);
+						ntbool[node->nodes[j]] = true;
+					}
+				}
+				node->nodes.clear();
+				node->enabled = false;
+	
+				// get a place with not enough tokens to fire t
+				node->scapegoat = hinderingPlace(thr,*t);
+	
+				// get the transitions that produce tokens on that place
+				requiredTransitions(thr,*(node->scapegoat)); // side effect: result vector is tsets
+	
+				// walk through these transitions
+				for(unsigned int rtit=0; rtit<thr->tsets.size(); ++rtit)
+				{
+					// get one of the transitions
+					Transition* rt(thr->tsets[rtit]);
+	
+					// do not put t into the list of token-producing transitions, it cannot fire anyway
+					if (rt==t) continue;
+	
+					// mark it as having priority, as it produces necessary tokens
+					node->nodes.push_back(revtorder[rt]);
+					thr->tton[revtorder[rt]]->count++;
+	
+					// if we haven't worked on it yet, insert it into the todo-list
+					if (!marker[revtorder[rt]]) { tset.push_back(rt); marker[revtorder[rt]]=true; }
+				}
 			}
 		} else if (!thr->fseq.empty() && tsetptr==0) {
 			// check all conflicting transitions too

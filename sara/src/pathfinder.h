@@ -92,6 +92,7 @@ public:
 		Transition* t;
 		int index, low, count;
 		bool instack, enabled;
+		Place* scapegoat;
 	};
 
 	// some thread functions need to access private elements in PathFinder

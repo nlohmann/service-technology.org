@@ -18,8 +18,8 @@
 extern Reporter *rep;
 
 /*!
-\brief creates a state predicate with a formal sum of #p places with positive factor,
-#n places with negative factor, and constant #k particular places are added
+\brief creates a state predicate with a formal sum of p places with positive factor,
+n places with negative factor, and constant k particular places are added
 using addPos and addNeg
 
 \param p  number of places with positive factor

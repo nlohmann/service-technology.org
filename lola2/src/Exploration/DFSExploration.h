@@ -99,8 +99,8 @@ public:
            In the parallel execution mode this number indicates the number of threads to be used for the search
     \return if the state was found
     */
-    bool sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore, Firelist &firelist,
-                   int number_of_fronts, int number_of_threads);
+    bool sweepline(SimpleProperty &property, NetState &ns, SweepEmptyStore &myStore,
+                   Firelist &myFirelist, int number_of_fronts, int number_of_threads);
 
     virtual ~DFSExploration() {}
 };

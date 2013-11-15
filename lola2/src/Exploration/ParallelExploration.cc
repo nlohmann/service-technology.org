@@ -40,7 +40,7 @@ struct tpDFSArguments
 
 void *ParallelExploration::threadPrivateDFS(void *container)
 {
-    tpDFSArguments *arguments = (tpDFSArguments *) container;
+    tpDFSArguments *arguments = static_cast<tpDFSArguments *>(container);
 
     return arguments->pexploration->threadedExploration(arguments->threadNumber);
 }

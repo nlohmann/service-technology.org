@@ -111,6 +111,7 @@ bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<v
 
 /*!
 \bug Memory for variable path is not deallocated.
+\todo Return witness path to caller.
 */
 bool DFSExploration::find_path(SimpleProperty &property, NetState &ns, unsigned int attempts,
                                unsigned int maxdepth, Firelist &myFirelist, EmptyStore<void> &s, ChooseTransition &c)

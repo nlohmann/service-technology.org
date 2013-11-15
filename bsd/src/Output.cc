@@ -221,6 +221,20 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 		templist = graph.graph;
 	}
 
+	// map the nodes to IDs
+	std::map<BSDNode *, int> nodeIDs;
+	unsigned int counter = 0;
+	for (std::list<BSDNode *>::const_iterator it = templist->begin(); it != templist->end(); ++it) {
+		if (*it != graph.U && *it != graph.emptyset && (!CSD || !(*it)->isU)) {
+			nodeIDs[*it] = counter;
+			++counter;
+		} else if (*it == graph.U || (CSD && (*it)->isU)) {
+			nodeIDs[*it] = -1;
+		} else if (*it == graph.emptyset) {
+			nodeIDs[*it] = -2;
+		}
+	}
+
 	os << "  #nodes:            " << (unsigned int)templist->size() << endl;
 
 	os << "  computation time:  " << (graph.comp_time) << " s" << endl
@@ -229,24 +243,20 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 	os << "*/" << endl << endl
 	   << "digraph {" << endl;
 
+	os << "\tnode [shape=record,style=rounded];" << endl;
+
 	// define a fake initial node... (is there a better way?) \todo
 	os << "\tinitialNode [shape=point,label=\"\",style=invis,weight=100];" << endl;
 	// an arrow to the 'real' initial node
-	os << "\tinitialNode -> " << dotnodeName(**(templist->begin()), graph.U, graph.emptyset, CSD) << ";" << endl;
+	os << "\tinitialNode -> " << nodeIDs[*(templist->begin())] << ";" << endl;
 
 	for (std::list<BSDNode *>::const_iterator it = templist->begin(); it != templist->end(); ++it) {
-		if ((**it).lambda == 1) {
-			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " [style=dashed];" << endl;
-		} else if (*it == graph.U) {
-			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " [shape=plaintext];" << endl;
-		} else if (*it == graph.emptyset) {
-			os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " [shape=plaintext];" << endl;
-		}
+		// new format
+		os << "\t" << nodeIDs[*it]  << " [label=<" << dotnodeName(*it, nodeIDs, graph.U, graph.emptyset, CSD) << ">];" << endl;
 
 		if (*it == graph.U || *it == graph.emptyset) {
 			if ((unsigned int)graph.last_receive - (unsigned int)graph.first_receive >= 0) {
-				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " -> " << dotnodeName(**it, graph.U, graph.emptyset, CSD)
-											<< " [label=\"";
+				os << "\t" << nodeIDs[*it] << " -> " << nodeIDs[*it] << " [label=\"";
 				for (unsigned int id = graph.first_receive; id < graph.last_receive; ++id) {
 					os << graph.id2name[id] << ",";
 				}
@@ -254,21 +264,20 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 			}
 
 			if ((unsigned int)graph.last_send - (unsigned int)graph.first_send >= 0) {
-				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " -> " << dotnodeName(**it, graph.U, graph.emptyset, CSD)
-																<< " [label=\"";
+				os << "\t" << nodeIDs[*it] << " -> " << nodeIDs[*it] << " [label=\"";
 				for (unsigned int id = graph.first_send; id < graph.last_send; ++id) {
 					os << graph.id2name[id] << ",";
 				}
-				os << graph.id2name[(unsigned int)graph.last_send] << "\",color=green];  /*receiving*/" << endl;
+				os << graph.id2name[(unsigned int)graph.last_send] << "\",color=blue];  /*receiving*/" << endl;
 			}
 		} else {
 			for (unsigned int id = 2; id <= graph.events; ++id) {
-				os << "\t" << dotnodeName(**it, graph.U, graph.emptyset, CSD) << " -> " << dotnodeName(*((*it)->pointer[id]), graph.U, graph.emptyset, CSD)
+				os << "\t" << nodeIDs[*it] << " -> " << nodeIDs[(*it)->pointer[id]]
 					   << " [label=\"" << graph.id2name[id] << "\"";
 				if (id >= graph.first_receive && id <= graph.last_receive) {
 					os << ",color=red]; /*sending*/";
 				} else {
-					os << ",color=green]; /*receiving*/";
+					os << ",color=blue]; /*receiving*/";
 				}
 				os << endl;
 			}
@@ -278,7 +287,7 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 	if (CSD)
 		delete templist;
 
-	os << "\tfootnote [shape=box,label=\"red: sending labels\\ngreen: receiving labels\"];" << endl;
+	os << "\tfootnote [shape=box,label=<red: &Sigma;<SUP>out</SUP>,  blue: &Sigma;<SUP>in</SUP>>];" << endl;
 
 	return os << "}" << endl;
 }
@@ -302,30 +311,21 @@ void Output::traverse(BSDNode* node) {
 	}
 }
 
-std::string Output::dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset, bool CSD) {
+std::string Output::dotnodeName(BSDNode * node, std::map<BSDNode *, int> & IDs, BSDNode* U, BSDNode* emptyset, bool CSD) {
 	std::stringstream temp (std::stringstream::in | std::stringstream::out);
-	if (&node == U || (CSD && node.isU)) {
-		temp << "\"U";
-	} else if (&node == emptyset) {
-		temp << "\"empty";
+	if (node == U || (CSD && node->isU)) {
+		temp << "U";
+	} else if (node == emptyset) {
+		temp << "Q<SUB>&empty;</SUB>";
 	} else {
-		temp << "\"(";
-		for (MarkingList::const_iterator itlist = node.list.begin(); itlist != node.list.end();) {
-			temp << *itlist;
-			if (++itlist != node.list.end()) {
-				temp << ",";
-			}
-		}
-		temp << ")";
+		temp << "Q<SUB>" << IDs[node] << "</SUB>";
 	}
 
-	if (CSD && node.isU) {
-		temp << "." << (unsigned int)U->lambda << "\"";
-	} else {
-		temp << "." << (unsigned int)node.lambda << "\"";
-	}
+	temp << "|" << (unsigned int)node->lambda;
+
 	return temp.str();
 }
+
 
 /*************************************************************************
  ***** OG output
@@ -390,6 +390,7 @@ std::ostream & Output::ogoutput(std::ostream & os, BSDgraph & graph, std::string
 //	            os << "    " << Label::id2name[l]  << " -> 0\n";
 //	        }
 //	    }
+	    return os;
 }
 
 void Output::printOGnode(std::ostream & os, BSDgraph & graph, BSDNode & node) {

@@ -87,7 +87,7 @@ class Output {
 
         static void traverse(BSDNode * node);
 
-        static std::string dotnodeName(BSDNode & node, BSDNode* U, BSDNode* emptyset, bool CSD);
+        static std::string dotnodeName(BSDNode * node, std::map<BSDNode *, int> & IDs, BSDNode* U, BSDNode* emptyset, bool CSD);
 
         /// og output
         static std::ostream & ogoutput(std::ostream &, BSDgraph & graph, std::string & filename, int bound);

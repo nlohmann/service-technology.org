@@ -272,8 +272,14 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 			}
 		} else {
 			for (unsigned int id = 2; id <= graph.events; ++id) {
-				os << "\t" << nodeIDs[*it] << " -> " << nodeIDs[(*it)->pointer[id]]
-					   << " [label=\"" << graph.id2name[id] << "\"";
+				os << "\t" << nodeIDs[*it] << " -> ";
+				// the target node may be not in the node id map if it is a U node
+				if ((*it)->pointer[id]->isU) {
+					os << nodeIDs[graph.U];
+				} else {
+					os << nodeIDs[(*it)->pointer[id]];
+				}
+				os << " [label=\"" << graph.id2name[id] << "\"";
 				if (id >= graph.first_receive && id <= graph.last_receive) {
 					os << ",color=red]; /*sending*/";
 				} else {

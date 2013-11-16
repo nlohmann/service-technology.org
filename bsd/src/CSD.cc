@@ -80,13 +80,16 @@ void CSD::computeCSD(BSDgraph & graph) {
 				}
 			}
 
-			// iterate through the sending labels (receiving for the environment)
-			for (unsigned int id = graph.first_receive; id <= graph.last_receive; ++id) {
-				// if a successor is the U node then stop the iteration...
-				if ((*it)->pointer[id]->isU) {
-					(*it)->isU = true;
-					graphChanged = true;
-					break;
+			// if the current node isn't already the U node...
+			if (!(*it)->isU) {
+				// iterate through the sending labels (receiving for the environment)
+				for (unsigned int id = graph.first_receive; id <= graph.last_receive; ++id) {
+					// if a successor is the U node then stop the iteration...
+					if ((*it)->pointer[id]->isU) {
+						(*it)->isU = true;
+						graphChanged = true;
+						break;
+					}
 				}
 			}
 

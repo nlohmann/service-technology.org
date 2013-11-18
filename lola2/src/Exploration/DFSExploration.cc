@@ -23,7 +23,6 @@ Actual property is a parameter of the constructor
 #include <cmdline.h>
 
 extern gengetopt_args_info args_info;
-extern Reporter *rep;
 
 
 bool DFSExploration::depth_first(SimpleProperty &property, NetState &ns, Store<void> &myStore,

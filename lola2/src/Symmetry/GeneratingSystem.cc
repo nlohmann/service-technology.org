@@ -20,8 +20,6 @@
 #include <Symmetry/PartitionRefinement.h>
 #include <Symmetry/Refiners.h>
 
-extern Reporter *rep;
-
 void GeneratingSystem::create()
 {
     rep->status("Determine symmetry group");

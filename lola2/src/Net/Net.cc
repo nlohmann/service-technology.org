@@ -32,7 +32,6 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-extern Reporter *rep;
 extern gengetopt_args_info args_info;
 
 index_t Net::Card[2] = {0, 0};

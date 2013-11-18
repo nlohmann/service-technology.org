@@ -26,7 +26,6 @@ Parses a place transition net in LoLA syntax.
 #include <InputOutput/InputOutput.h>
 
 extern int currentFile;
-extern Reporter* rep;
 extern Input* netFile;
 
 /// the current token text from Flex

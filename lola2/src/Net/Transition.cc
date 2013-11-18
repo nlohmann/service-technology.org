@@ -19,8 +19,6 @@ information for a transition in its role as a node, ar contained in Node.*
 #include <Net/Marking.h>
 #include <InputOutput/Reporter.h>
 
-extern Reporter *rep;
-
 fairnessAssumption_t *Transition::Fairness = NULL;
 bool *Transition::Enabled = NULL;
 index_t Transition::CardEnabled = 0;

@@ -14,8 +14,6 @@
 #include <Stores/NetStateEncoder/CopyEncoder.h>
 #include <InputOutput/Reporter.h>
 
-extern Reporter *rep;
-
 
 CopyEncoder::CopyEncoder(int numThreads) : NetStateEncoder(numThreads)
 {

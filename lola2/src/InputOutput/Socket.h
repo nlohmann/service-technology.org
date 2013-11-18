@@ -1,10 +1,9 @@
 /*!
-\file Socket.h
+\file
+\brief declaration of class Socket
 \author Niels
 \status approved 25.01.2012
 \ingroup g_reporting
-
-\brief Socket class definition
 */
 
 #pragma once
@@ -41,7 +40,7 @@ private:
     const unsigned listening : 1;
 
     /// whether to fail if an error occurs
-    bool failonerror;
+    const bool failonerror;
 
 public:
     /// create a socket - port is mandatory, destination address optional

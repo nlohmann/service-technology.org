@@ -15,7 +15,6 @@ measure and containing known persistent markings, either old or new ones.
 #include <Planning/Task.h>
 
 extern gengetopt_args_info args_info;
-extern Reporter *rep;
 
 /*!
  * \brief Constructor for one store in a list of stores

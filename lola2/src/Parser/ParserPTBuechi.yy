@@ -30,8 +30,6 @@ using namespace kc;
 /// the current token text from Flex
 extern char* ptbuechi_text;
 
-extern Reporter* rep;
-
 void ptbuechi_error(char const*);
 void ptbuechi_yyerrors(char* token, const char* format, ...);
 %}

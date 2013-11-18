@@ -6,9 +6,6 @@
 #include <InputOutput/Reporter.h>
 
 
-extern Reporter *rep;
-
-
 template<size_t SIZE>
 VBloomStore<SIZE>::VBloomStore(index_t num_threads, size_t hashes) : hash_functions(hashes),
     filter(new std::bitset<SIZE>())

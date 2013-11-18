@@ -28,7 +28,6 @@ using std::cout;
 using std::endl;
 
 extern gengetopt_args_info args_info;
-extern Reporter *rep;
 
 /*!
  * \brief Constructor for the sweepline method

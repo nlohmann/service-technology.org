@@ -14,7 +14,7 @@
 #include <stdint.h>
 #endif
 
-#include "Net/NetState.h"
+#include <Net/NetState.h>
 
 /*!
 \example

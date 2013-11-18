@@ -50,7 +50,6 @@
 #include <Formula/LTL/BuechiFromLTL.h>
 
 extern gengetopt_args_info args_info;
-extern Reporter *rep;
 
 // the parsers
 extern int ptformula_parse();

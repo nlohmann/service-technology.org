@@ -49,9 +49,6 @@ extern FILE *ptnetlola_in;
 // a cleanup function from Flex
 extern int ptnetlola_lex_destroy();
 
-// the reporter
-extern Reporter *rep;
-
 
 /*!
 \brief the command line parameters

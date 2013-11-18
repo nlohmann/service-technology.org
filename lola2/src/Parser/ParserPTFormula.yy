@@ -29,8 +29,6 @@ using namespace kc;
 /// the current token text from Flex
 extern char* ptformula_text;
 
-extern Reporter* rep;
-
 void ptformula_error(char const*);
 void ptformula_yyerrors(char* token, const char* format, ...);
 %}

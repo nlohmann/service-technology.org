@@ -4,12 +4,12 @@
  \status unknown
  */
 
-#include "Core/Dimensions.h"
-#include "Net/NetState.h"
-#include "Net/Net.h"
-#include "Net/Place.h"
-#include "Net/Transition.h"
-#include "Net/Marking.h"
+#include <Core/Dimensions.h>
+#include <Net/NetState.h>
+#include <Net/Net.h>
+#include <Net/Place.h>
+#include <Net/Transition.h>
+#include <Net/Marking.h>
 #include <cstdlib>
 #include <algorithm>
 

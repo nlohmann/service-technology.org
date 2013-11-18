@@ -1,7 +1,9 @@
 /*!
-\file Reporter.cc
+\file
+\brief implementation of class Reporter, ReporterSocket, and ReporterStream
 \author Niels
 \status approved 25.01.2012
+\ingroup g_reporting
 */
 
 #include <config.h>

@@ -33,4 +33,8 @@ This module collects all aspects to communicate with the caller of LoLA.
 
 This module collects all aspects that are not directly part of the verification
 task, but rather of the organization.
+
+\defgroup g_io Input and output
+
+\defgroup g_globals Global variables
 */

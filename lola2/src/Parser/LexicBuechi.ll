@@ -35,7 +35,6 @@ using namespace kc;
 
 extern int currentFile;
 extern gengetopt_args_info args_info;
-extern Reporter* rep;
 extern Input *netFile;
 
 void ptbuechi_setcol();

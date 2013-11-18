@@ -27,7 +27,6 @@
 #include <InputOutput/Reporter.h>
 #include <InputOutput/SimpleString.h>
 
-extern Reporter *rep;
 extern gengetopt_args_info args_info;
 
 pthread_t Handlers::terminationHandler_thread;

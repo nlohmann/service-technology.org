@@ -1,7 +1,9 @@
 /*!
-\file Reporter.h
+\file
+\brief declaration of class Reporter, ReporterSocket, and ReporterStream
 \author Niels
 \status approved 25.01.2012
+\ingroup g_reporting
 */
 
 #pragma once
@@ -9,7 +11,17 @@
 #include <InputOutput/Socket.h>
 
 
-/// error codes for the Reporter::abort() function
+/*!
+\brief error codes for the Reporter::abort function
+
+These values are used to differentiate errors signaled with Reporter::abort.
+The code is *not* used as exit code. In case of an error, EXIT_ERROR is always
+used. Howerver, the error codes can be used as a reference to a more detailed
+documentation of the error.
+
+\note Can be used as index for array Reporter::error_messages.
+\ingroup g_reporting
+*/
 typedef enum
 {
     ERROR_SYNTAX,       ///< syntax error
@@ -19,7 +31,11 @@ typedef enum
     ERROR_THREADING     ///< thread-related error
 } errorcode_t;
 
-/// markup types for Reporter::markup() function
+
+/*!
+\brief markup types for Reporter::markup function
+\ingroup g_reporting
+*/
 typedef enum
 {
     MARKUP_TOOL,        ///< markup the name of a tool
@@ -36,6 +52,7 @@ typedef enum
 
 /*!
 \brief Class to implement reporting functionality
+\ingroup g_reporting
 */
 class Reporter
 {
@@ -62,12 +79,13 @@ public:
 
 /*!
 \brief Realization of Reporter class to write to Berkeley sockets
+\ingroup g_reporting
 */
 class ReporterSocket : public Reporter
 {
 private:
     /// whether verbose reports are desired
-    const unsigned verbose : 1;
+    bool verbose;
 
     /// socket for this reporter
     Socket mySocket;
@@ -92,15 +110,16 @@ public:
 
 /*!
 \brief Realization of Reporter class to write to standard error
+\ingroup g_reporting
 */
 class ReporterStream : public Reporter
 {
 private:
     /// whether verbose reports are desired
-    const unsigned verbose : 1;
+    bool verbose;
 
     /// whether to use colored output
-    const unsigned useColor : 1;
+    bool useColor;
 
     /// set foreground color to red
     const char *_cr_;
@@ -170,5 +189,14 @@ public:
     String markup(markup_t, const char *, ...) const;
 };
 
-/// a global reporter
+/*!
+\brief a global reporter
+
+This reporter will be initialized by evaluateParameters() and used throughout
+the execution of LoLA. Furthermore, it is set by IO::setReporter to be used to
+report opening and closing of files.
+
+\ingroup g_reporting
+\ingroup g_globals
+*/
 extern Reporter *rep;

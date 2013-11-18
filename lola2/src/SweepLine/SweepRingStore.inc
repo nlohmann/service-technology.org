@@ -20,7 +20,6 @@
 #include <Net/NetState.h>
 
 extern gengetopt_args_info args_info;
-extern Reporter *rep;
 
 using std::cout;
 using std::endl;

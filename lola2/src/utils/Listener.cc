@@ -12,9 +12,6 @@
 #include <InputOutput/Socket.h>
 #include <InputOutput/Reporter.h>
 
-/// the reporter
-extern Reporter *rep;
-
 void signal_callback_handler(int signum) __attribute__((noreturn));
 void signal_callback_handler(int signum)
 {

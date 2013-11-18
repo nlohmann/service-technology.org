@@ -1,10 +1,9 @@
 /*!
-\file Socket.cc
+\file
+\brief implementation of class Socket
 \author Niels
 \status approved 25.01.2012
 \ingroup g_reporting
-
-\brief Socket class implementation
 */
 
 #include <config.h>
@@ -48,6 +47,7 @@ Socket::Socket(u_short port, const char *hostname, bool failonerror) :
     failonerror(failonerror)
 {
     // LCOV_EXCL_START
+    // socket fails with -1
     if (UNLIKELY(sock == -1))
     {
         ReporterStream rep(true);
@@ -175,7 +175,7 @@ void Socket::receive() const
         struct tm *current = localtime(&now);
 
         rep.message("%s: %.*s", rep.markup(MARKUP_UNIMPORTANT, "%s @ %02i:%02i:%02i", display,
-                                           current->tm_hour, current->tm_min, current->tm_sec).str(), static_cast<int>(recsize), buffer);
+                    current->tm_hour, current->tm_min, current->tm_sec).str(), static_cast<int>(recsize), buffer);
     }
 }
 

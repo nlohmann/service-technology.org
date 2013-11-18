@@ -25,9 +25,6 @@
 #include <cmdline.h>
 
 
-extern Reporter *rep;
-
-
 /// transfer struct for the start of a parallel search thread
 struct tpDFSArguments
 {

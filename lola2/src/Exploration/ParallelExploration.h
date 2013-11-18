@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "Exploration/SearchStack.h"
-#include "Exploration/DFSExploration.h"
+#include <Exploration/SearchStack.h>
+#include <Exploration/DFSExploration.h>
 #include <semaphore.h>
 #include <Net/NetState.h>
 #include <Stores/Store.h>

@@ -31,7 +31,6 @@ should be independent from the format (LoLA / PNML / ...)
 #include <InputOutput/Reporter.h>
 
 extern gengetopt_args_info args_info;
-extern Reporter *rep;
 
 ParserPTNet::ParserPTNet()
 {

@@ -15,7 +15,6 @@
 #include <cstdio>
 #include <InputOutput/Reporter.h>
 
-extern Reporter *rep;
 
 /*!
 \brief creates a state predicate with a formal sum of p places with positive factor,

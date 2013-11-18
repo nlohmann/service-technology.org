@@ -6,9 +6,6 @@
 #include <InputOutput/Socket.h>
 #include <InputOutput/Reporter.h>
 
-/// the reporter
-extern Reporter *rep;
-
 int main(int argc, char **argv)
 {
     if (UNLIKELY(argc == 2 and !strcmp(argv[1], "--help")))

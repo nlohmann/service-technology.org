@@ -30,7 +30,7 @@
 /* Some of the code in this file was taken from the Spin software         */
 /* Written by Gerard J. Holzmann, Bell Laboratories, U.S.A.               */
 
-#include "Formula/LTL/ltl2ba.h"
+#include <Formula/LTL/ltl2ba.h>
 
 extern int tl_verbose, tl_terse, tl_errs;
 extern FILE	*tl_out;

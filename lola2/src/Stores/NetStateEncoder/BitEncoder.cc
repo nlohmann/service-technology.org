@@ -14,7 +14,6 @@
 #include <Stores/NetStateEncoder/BitEncoder.h>
 #include <InputOutput/Reporter.h>
 
-extern Reporter *rep;
 
 BitEncoder::BitEncoder(int numThreads) : NetStateEncoder(numThreads)
 {

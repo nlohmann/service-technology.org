@@ -1,9 +1,9 @@
 /*!
-\author Karsten
-\file Dimensions.h
-\status approved 27.01.2012
-
+\file
 \brief collection of arbitrarily chosen but fixed constants
+\author Karsten
+\status approved 27.01.2012
+\ingroup g_runtime
 */
 
 #pragma once

@@ -9,11 +9,11 @@ a priority imposed on the fire list
 
 #include <cstdlib>
 #include <cstdio>
-#include "Exploration/ChooseTransitionHashDriven.h"
-#include "Net/Net.h"
-#include "Net/Marking.h"
-#include "Net/Place.h"
-#include "Net/Transition.h"
+#include <Exploration/ChooseTransitionHashDriven.h>
+#include <Net/Net.h>
+#include <Net/Marking.h>
+#include <Net/Place.h>
+#include <Net/Transition.h>
 
 ChooseTransitionHashDriven::ChooseTransitionHashDriven() : table(new unsigned long
             int[SIZEOF_MARKINGTABLE])

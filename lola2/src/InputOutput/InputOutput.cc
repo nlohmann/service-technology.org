@@ -100,30 +100,18 @@ IO::IO(FILE *fp, std::string kind, std::string filename) :
 
 
 /*!
-\param kind  the kind of the file (used in verbose output)
-
-\pre the reporter was set using IO::setReporter
-\post stdout is used as output file
-\note errors are handled by the IO constructor
-*/
-Output::Output(std::string kind) : IO(stdout, kind, "")
-{
-    assert(r);
-    r->status("writing %s to %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),
-              r->markup(MARKUP_FILE, "stdout").str());
-}
-
-
-/*!
-\param kind  the kind of the file (used in verbose output)
-\param filename  the name of the output file to open
+\param _kind  the kind of the file (used in verbose output)
+\param _filename  the name of the output file to open; if no filename or "-" is
+given, the file written to the standard output
 
 \pre the reporter was set using IO::setReporter
 \post the file given with the file name is opened to write
 \note errors are handled by the IO constructor
 */
-Output::Output(std::string kind, std::string filename) :
-    IO(fopen(filename.c_str(), "w"), kind, filename)
+Output::Output(std::string _kind, std::string _filename) :
+    IO(_filename == "-" ? stdout : fopen(_filename.c_str(), "w"),
+       _kind,
+       _filename == "-" ? "stdout" : _filename)
 {
     assert(r);
     r->status("writing %s to %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),
@@ -132,30 +120,18 @@ Output::Output(std::string kind, std::string filename) :
 
 
 /*!
-\param kind  the kind of the file (used in verbose output)
-
-\pre the reporter was set using IO::setReporter
-\post stdin is used as input file
-\note errors are handled by the IO constructor
-*/
-Input::Input(std::string kind) : IO(stdin, kind, "")
-{
-    assert(r);
-    r->status("reading %s from %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),
-              r->markup(MARKUP_FILE, "stdin").str());
-}
-
-
-/*!
-\param kind  the kind of the file (used in verbose output)
-\param filename  the name of the input file to open
+\param _kind  the kind of the file (used in verbose output)
+\param _filename  the name of the input file to open; if no filename or "-" is
+given, the file read from the standard input
 
 \pre the reporter was set using IO::setReporter
 \post the file given with the file name is opened to read
 \note errors are handled by the IO constructor
 */
-Input::Input(std::string kind, std::string filename) :
-    IO(fopen(filename.c_str(), "r"), kind, filename)
+Input::Input(std::string _kind, std::string _filename) :
+    IO(_filename == "-" ? stdin : fopen(_filename.c_str(), "r"),
+       _kind,
+       _filename == "-" ? "stdin" : _filename)
 {
     assert(r);
     r->status("reading %s from %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),

@@ -63,11 +63,8 @@ public:
 class Output : public IO
 {
 public:
-    /// output to stdout (given kind)
-    Output(std::string);
-
-    /// output to file (given kind and filename)
-    Output(std::string, std::string);
+    /// output to file (given kind and optional filename)
+    Output(std::string, std::string = "-");
 };
 
 
@@ -78,9 +75,6 @@ public:
 class Input : public IO
 {
 public:
-    /// input from stdin (given kind)
-    Input(std::string);
-
-    /// input from file (given filename)
-    Input(std::string, std::string);
+    /// input from file (given kind and optional filename)
+    Input(std::string, std::string = "-");
 };

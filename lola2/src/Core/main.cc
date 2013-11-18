@@ -53,13 +53,20 @@ extern int ptnetlola_lex_destroy();
 /*!
 \brief the command line parameters
 \note variable is initialized by function evaluateParameters()
+\ingroup g_globals
 */
 gengetopt_args_info args_info;
 
-/// symbol tables for the parsed net
+/*!
+\brief symbol tables for the parsed net
+\ingroup g_globals
+*/
 ParserPTNet *symbolTables = NULL;
 
-/// symbol table for a given Büchi automaton
+/*!
+\brief symbol table for a given Büchi automaton
+\ingroup g_globals
+*/
 SymbolTable *buechiStateTable = NULL;
 
 /*!
@@ -68,12 +75,15 @@ SymbolTable *buechiStateTable = NULL;
 
 -1: stdin
 otherwise: index in args_info.inputs
+
+\ingroup g_globals
 */
 int currentFile = -1;
 
 /*!
 \brief the current file to read a Petri net from
 \note is changed by ptnetlola_wrap()
+\ingroup g_globals
 */
 Input *netFile = NULL;
 
@@ -203,7 +213,8 @@ int main(int argc, char **argv)
     // file input
     if (args_info.compressed_given)
     {
-        rep->status("input: compressed net (%s)", rep->markup(MARKUP_PARAMETER, "--compressed").str());
+        rep->status("input: compressed net (%s)",
+                    rep->markup(MARKUP_PARAMETER, "--compressed").str());
 
         // read from stdin
         if (args_info.inputs_num == 0)
@@ -285,21 +296,22 @@ int main(int argc, char **argv)
 
     if (args_info.randomWalk_given)
     {
-        rep->status("debug function: randomly firing transitions (%s)", rep->markup(MARKUP_PARAMETER,
-                    "--randomWalk").str());
+        rep->status("debug function: randomly firing transitions (%s)",
+                    rep->markup(MARKUP_PARAMETER, "--randomWalk").str());
         randomWalk(*NetState::createNetStateFromInitial(), args_info.randomWalk_arg);
     }
 
     if (args_info.printNet_given)
     {
-        rep->status("debug function: print net (%s)", rep->markup(MARKUP_PARAMETER, "--printNet").str());
+        rep->status("debug function: print net (%s)",
+                    rep->markup(MARKUP_PARAMETER, "--printNet").str());
         Net::print();
     }
 
     if (args_info.writeCompressed_given)
     {
-        rep->status("output: compressed net (%s)", rep->markup(MARKUP_PARAMETER,
-                    "--writeCompressed").str());
+        rep->status("output: compressed net (%s)",
+                    rep->markup(MARKUP_PARAMETER, "--writeCompressed").str());
 
         Output netfile("compressed net",
                        std::string(args_info.writeCompressed_arg) + ".net");
@@ -331,20 +343,23 @@ int main(int argc, char **argv)
         // print current marking
         if (result and args_info.state_given)
         {
-            rep->status("print witness state (%s)", rep->markup(MARKUP_PARAMETER, "--state").str());
+            rep->status("print witness state (%s)",
+                        rep->markup(MARKUP_PARAMETER, "--state").str());
             task.printMarking();
         }
 
         // print witness path
         if (args_info.path_given and task.hasWitness(result))
         {
-            rep->status("print witness path (%s)", rep->markup(MARKUP_PARAMETER, "--path").str());
+            rep->status("print witness path (%s)",
+                        rep->markup(MARKUP_PARAMETER, "--path").str());
             task.printWitness();
         }
 
         if (result and args_info.run_given)
         {
-            rep->status("print distributed run (%s)", rep->markup(MARKUP_PARAMETER, "--run").str());
+            rep->status("print distributed run (%s)",
+                        rep->markup(MARKUP_PARAMETER, "--run").str());
             task.printDot();
         }
 
@@ -354,20 +369,23 @@ int main(int argc, char **argv)
 
         if (args_info.search_arg != search_arg_findpath)
         {
-            rep->message("%llu markings, %llu edges", task.getMarkingCount(), task.getEdgeCount());
+            rep->message("%llu markings, %llu edges",
+                         task.getMarkingCount(), task.getEdgeCount());
         }
 
         // print statistics
         if (args_info.stats_flag)
         {
-            rep->status("print statistics (%s)", rep->markup(MARKUP_PARAMETER, "--stats").str());
+            rep->status("print statistics (%s)",
+                        rep->markup(MARKUP_PARAMETER, "--stats").str());
             Handlers::statistics();
         }
 
         // TODO: remove this when actual use case is implemented
         if (args_info.testStateForeach_flag)
         {
-            rep->status("debug function: print states (%s)", rep->markup(MARKUP_PARAMETER, "--testStateForeach").str());
+            rep->status("debug function: print states (%s)",
+                        rep->markup(MARKUP_PARAMETER, "--testStateForeach").str());
             task.testPopState();
         }
     }

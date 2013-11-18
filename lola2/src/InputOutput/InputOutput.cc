@@ -50,6 +50,7 @@ const char *IO::getFilename() const
 }
 
 
+
 /*!
 \pre the reporter was set using IO::setReporter
 \post closes file and errors with ERROR_FILE if this fails
@@ -57,19 +58,21 @@ const char *IO::getFilename() const
 IO::~IO()
 {
     assert(r);
+    r->status("closed %s file %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),
+              r->markup(MARKUP_FILE, filename.c_str()).str());
 
-    // fclose returns EOF on error
+    // try to close file
     const int ret = fclose(fp);
-    if (UNLIKELY(ret == EOF))
+
+    // fclose returns 0 on success
+    if (UNLIKELY(ret != 0))
     {
         r->status("could not close %s file %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),
                   r->markup(MARKUP_FILE, filename.c_str()).str());
         r->abort(ERROR_FILE);
     }
-
-    r->status("closed %s file %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),
-              r->markup(MARKUP_FILE, filename.c_str()).str());
 }
+
 
 /*!
 \param fp  the FILE* to wrap
@@ -135,8 +138,7 @@ Output::Output(std::string kind, std::string filename) :
 \post stdin is used as input file
 \note errors are handled by the IO constructor
 */
-Input::Input(std::string kind) :
-    IO(stdin, kind, "")
+Input::Input(std::string kind) : IO(stdin, kind, "")
 {
     assert(r);
     r->status("reading %s from %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),

@@ -1,0 +1,40 @@
+{ test }
+
+PLACE
+INTERNAL
+  p0;
+INPUT 
+  a;
+OUTPUT
+  b;
+
+INITIALMARKING
+  p0:	1
+ ;
+
+FINALMARKING
+  p0:	1
+ ;
+
+TRANSITION t1	 { ?a }
+CONSUME
+  a:   1,
+  p0:	1;	 
+PRODUCE
+  p0:	1;
+
+TRANSITION t2	 { !b }
+CONSUME
+  p0:	1;
+PRODUCE
+  p0:	1,
+  b:   1;
+
+TRANSITION t3	 { tau }
+CONSUME
+  p0:	1;
+PRODUCE
+  p0:	1;
+
+
+{ END OF FILE }

@@ -75,8 +75,10 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 	graph->name2id = new std::map<std::string, Label_ID>;
 	graph->is_sending_label = new std::map<Label_ID, bool>;
 
+	int linecounter = 0;
 	status("parsing...");
 	while (std::getline(is, line)) {
+		++linecounter;
 		if (state < 4) {
 			// search for the bound
 			if (line.find("bound:") != std::string::npos) {
@@ -123,43 +125,66 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 
 		} else {
 
-			// we are only interested in parsing the edges (which also have labels assigned)
-			if (line.find("->") != std::string::npos && line.find("label") != std::string::npos) {
-				// (should be) form of the lines: "(node).lambda" -> "(node).lambda" [...,label="...",...];
-				std::list<std::string> tokens;
-				// tokenize the current line
-				Tokenize(line, tokens, "(). \"->\t");
+			if (line.find("label") != std::string::npos && line.find("lambda") != std::string::npos) {
+				// we are parsing the nodes
+				// (should be) form of the lines: nodeID [label=<...>]; /*lambda=X*/
+				++currentnode;
 
-				// iterate through the tokens and set node names and lambda values accordingly
+				std::string::size_type start = line.find_first_not_of(" \t", 0);
+				std::string::size_type end = line.find_first_of(" \t", start);
+				int nodeID = atoi(line.substr(start, end - start).c_str());
+
+				if (nodeID >= ((int)graph->nodes - 2) && graph->nodes > 1)
+					abort(10, "Error in dot file in line %i. Parsed node id (%i) is too high.", linecounter, nodeID);
+
+				// if this is the U node or the empty node then move it to the back of the array
+				if (nodeID == -1)
+					nodeID = graph->nodes - 1;
+				if (nodeID == -2)
+					nodeID = graph->nodes - 2;
+
+				graph->names[nodeID] = line.substr(line.find("label=") + 6, line.length());
+				// Find first "non-delimiter".
+				end = graph->names[nodeID].find_first_of("]", 0);
+				graph->names[nodeID] = graph->names[nodeID].substr(0, end);
+
+				graph->lambdas[nodeID] = atoi(line.substr(line.find("lambda=") + 7, 1).c_str());
+			} else if (line.find("->") != std::string::npos && line.find("label") != std::string::npos) {
+				// we are parsing the edges (which also have labels assigned)
+				// (should be) form of the lines: nodeID_1 -> nodeID_2 [label="...",...]; /*...*/
+				std::list<std::string> tokens;
+				// tokenize the current line (should produce: 'nodeID_1' '->' 'nodeID_2' ...)
+				Tokenize(line, tokens, " \t");
+
+				unsigned int id_node1;
+				unsigned int id_node2;
+				// iterate through the tokens and set node ids accordingly
 				std::list<std::string>::const_iterator it = tokens.begin();
 				std::string node1 = "";
 				if (it != tokens.end()) {
-					node1 = *it;
-					// status("node 1: %s", node1.c_str());
+					id_node1 = atoi((*it).c_str());
+					// if this is the U node or the empty node then move it to the back of the array
+					if (id_node1 == -1)
+						id_node1 = graph->nodes - 1;
+					if (id_node1 == -2)
+						id_node1 = graph->nodes - 2;
 					++it;
 				} else
-					continue;
-				std::string lambda1 = "";
+					abort(10, "error in dot file in line %i", linecounter);
 				if (it != tokens.end()) {
-					lambda1 = *it;
-					// status("lambda 1: %s", lambda1.c_str());
 					++it;
 				} else
-					continue;
-				std::string node2 = "";
+					abort(10, "error in dot file in line %i", linecounter);
 				if (it != tokens.end()) {
-					node2 = *it;
-					// status("node 2: %s", node2.c_str());
+					id_node2 = atoi((*it).c_str());
+					// if this is the U node or the empty node then move it to the back of the array
+					if (id_node2 == -1)
+						id_node2 = graph->nodes - 1;
+					if (id_node2 == -2)
+						id_node2 = graph->nodes - 2;
 					++it;
 				} else
-					continue;
-				std::string lambda2 = "";
-				if (it != tokens.end()) {
-					lambda2 = *it;
-					// status("lambda 2: %s", lambda2.c_str());
-					++it;
-				} else
-					continue;
+					abort(10, "error in dot file in line %i", linecounter);
 
 				// collect the labels and also all options
 				std::string labels = "";
@@ -171,70 +196,6 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 				}
 				// status("labels: %s", labels.c_str());
 
-				unsigned int p_node1 = -1;
-				unsigned int p_node2 = -1;
-				// iterate through the already parsed nodes and search for the two current parsed nodes
-				for (unsigned int i = 0; i < currentnode; ++i) {
-					// status("searching...");
-					if (p_node1 == -1 && graph->names[i] == node1) {
-						p_node1 = i;
-					}
-					if (p_node2 == -1 && graph->names[i] == node2) {
-						p_node2 = i;
-					}
-					// stop searching if both nodes were found
-					if (p_node1 != -1 && p_node2 != -1) {
-						break;
-					}
-				}
-
-
-				// if node 1 was not found then insert it into the graph
-				if (p_node1 == -1) {
-					if (currentnode >= graph->nodes)
-						abort(11, "Parsed parameter doesn't match parsed nodes' count.");
-					graph->names[currentnode] = node1;
-					graph->lambdas[currentnode] = atoi(lambda1.c_str());
-
-					// if the node is the U or empty node then set the pointers accordingly
-					if (node1 == "U") {
-						status("U node index: %u", currentnode);
-						graph->U = currentnode;
-					} else if (node1 == "empty") {
-						status("empty node index: %u", currentnode);
-						graph->emptyset = currentnode;
-					}
-
-					p_node1 = currentnode;
-					++currentnode;
-				}
-
-				// in case of loops with (yet) unknown nodes
-				if (node1 == node2) {
-					p_node2 = p_node1;
-				}
-
-				// if node 2 was not found then insert it into the graph
-				if (p_node2 == -1) {
-					if (currentnode >= graph->nodes)
-						abort(11, "Parsed parameter doesn't match parsed nodes' count.");
-					graph->names[currentnode] = node2;
-					graph->lambdas[currentnode] = atoi(lambda2.c_str());
-
-					// if the node is the U or empty node then set the pointers accordingly
-					if (node2 == "U") {
-						status("U node index: %u", currentnode);
-						graph->U = currentnode;
-					} else if (node2 == "empty") {
-						status("empty node index: %u", currentnode);
-						graph->emptyset = currentnode;
-					}
-
-					p_node2 = currentnode;
-					++currentnode;
-				}
-
-
 				// tokenize the label string (might be several labels on one edge)
 				tokens.clear();
 				Tokenize(labels, tokens, ", ");
@@ -244,7 +205,7 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 					if (graph->name2id->find(*it) == graph->name2id->end()) {
 						status("found new label: %s", it->c_str());
 						if (idcounter >= graph->events)
-							abort(12, "Parsed parameter doesn't match parsed labels' count.");
+							abort(10, "Error in dot file in line %i. Parsed label count is higher than parsed parameter.", linecounter);
 						(*graph->name2id)[*it] = idcounter;
 						(*graph->id2name)[idcounter] = *it;
 
@@ -253,15 +214,15 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 						} else if (line.find("/*receiving*/") != std::string::npos) {
 							(*graph->is_sending_label)[idcounter] = false;
 						} else {
-							abort(10, "couldn't parse graph. /*sending*/ or /*receiving*/ missing");
+							abort(10, "Error in dot file in line %i. /*sending*/ or /*receiving*/ missing.", linecounter);
 						}
 
 						// increase the label id counter
 						++idcounter;
 					}
 					// set the pointer accordingly
-					// status("set the pointer from node %u with label %u to node %u", p_node1, ((*graph->name2id)[*it]), p_node2);
-					graph->pointer[p_node1][((*graph->name2id)[*it])] = p_node2;
+					// status("set the pointer from node %u with label %u to node %u", id_node1, ((*graph->name2id)[*it]), id_node2);
+					graph->pointer[id_node1][((*graph->name2id)[*it])] = id_node2;
 					++it;
 				}
 			}
@@ -269,14 +230,22 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 	}
 
 	if (state < 4) {
-		abort(10, "Input file misses bound, nodes and/or events attributes.");
+		abort(10, "Error in dot file. Input file misses bound, nodes and/or events attributes.");
 	}
 
 	// the cases when there are less parsed nodes or labels than given in the attributes
 	if (currentnode < graph->nodes)
-		abort(11, "Parsed parameter doesn't match parsed nodes' count.");
+		abort(10, "Error in dot file. Parsed node count is lower than parsed parameter.");
 	if (idcounter < graph->events)
-		abort(12, "Parsed parameter doesn't match parsed labels' count.");
+		abort(10, "Error in dot file. Parsed label count is lower than parsed parameter.");
+
+	// due to the offset of 2 the ids of the U node and empty node are 1 and 0 respectively
+	if (graph->nodes >= 2) {
+		graph->U = graph->nodes - 1;
+		graph->emptyset = graph->nodes - 2;
+	} else {
+		graph->U = graph->nodes - 1;
+	}
 
 	return graph;
 }

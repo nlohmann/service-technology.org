@@ -252,7 +252,8 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 
 	for (std::list<BSDNode *>::const_iterator it = templist->begin(); it != templist->end(); ++it) {
 		// new format
-		os << "\t" << nodeIDs[*it]  << " [label=<" << dotnodeName(*it, nodeIDs, graph.U, graph.emptyset, CSD) << ">];" << endl;
+		os << "\t" << nodeIDs[*it]  << " [label=<" << dotnodeName(*it, nodeIDs, graph.U, graph.emptyset, CSD) << ">];"
+				<< " /*lambda=" << (unsigned int)(*it)->lambda << "*/" << endl;
 
 		if (*it == graph.U || *it == graph.emptyset) {
 			if ((unsigned int)graph.last_receive - (unsigned int)graph.first_receive >= 0) {

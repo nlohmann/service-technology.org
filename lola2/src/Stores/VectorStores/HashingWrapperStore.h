@@ -17,6 +17,7 @@ class VectorStoreCreator
 {
 public:
     virtual VectorStore<P> *operator() ( void ) const  = 0;
+    virtual ~VectorStoreCreator() {};
 };
 
 /// VectorStoreCreator implementation template for VectorStores with zero constructor arguments

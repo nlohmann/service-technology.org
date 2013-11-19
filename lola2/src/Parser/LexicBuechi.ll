@@ -1,9 +1,8 @@
 /*!
+\file
+\brief lexic for Büchi automata
 \author Erik
 \status not approved
-
-Joint lexic for all inputs to LoLA
-Mainly copied from LoLA1
 
 \todo Herausfinden, ob es Probleme bei zu langen Kommentaren/Bezeichnern gibt. Idee: Maximallänge angeben.
 \todo Präfix hinzufügen?

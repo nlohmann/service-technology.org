@@ -1,6 +1,7 @@
 /*!
+\file
+\brief net syntax
 \author Karsten
-\file ParserPTNetLoLA.yy
 \status approved 25.01.2012
 
 \todo Detaillierte Dateifehlermeldungen abschaltbar.

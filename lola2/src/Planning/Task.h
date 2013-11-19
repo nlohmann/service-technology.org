@@ -19,6 +19,7 @@
 #include <Stores/CompareStore.h>
 #include <Stores/Store.h>
 
+// forward declarations
 class StatePredicate;
 class CTLFormula;
 class SimpleProperty;
@@ -176,58 +177,88 @@ template<>
 Store<void> *StoreCreator<void>::createSpecializedStore(int number_of_threads);
 
 
+/*!
+\brief the verification task
 
+This class encapsulates all information that is used to verify the task given
+by the used in form of a net, an optional formula, and command-line parameters.
+It is configured and evaluated in the main() method.
+*/
 class Task
 {
-private:
-    StatePredicate *spFormula;
-    CTLFormula *ctlFormula;
-    BuechiAutomata *bauto;
-
-    NetState *ns;
-    ChooseTransition *choose;
-    enum_search search;
-    Firelist *fl;
-    SimpleProperty *p;
-    DFSExploration *exploration;
-    LTLExploration *ltlExploration;
-    CTLExploration *ctlExploration;
-
-    int number_of_threads;
-    formula_t formulaType;
-
-    void setNet();
-    void setFormula();
-    void setBuechiAutomata();
-
 public:
-    Store<void> *store;
-    Store<AutomataTree *> *ltlStore;
-    Store<void *> *ctlStore;
-
     Task();
     ~Task();
 
+    /// start the state space exploration
     bool getResult();
-    void interpreteResult(bool *);
+    /// interprete and display the result
+    void interpreteResult(bool);
 
-    void setStore();
-    void setProperty();
-
+    /// whether a witness path exists
     bool hasWitness(bool result) const;
-    void printWitness() const;
+
+    /// print the witness path
+    void printWitnessPath() const;
+    /// print the target marking
     void printMarking() const;
+    /// print the witness path as distributed run
+    void printRun() const;
 
     /// return the number of stored markings
     uint64_t getMarkingCount() const;
     /// return the number of fired transitions
     uint64_t getEdgeCount() const;
 
-    void printDot() const;
-
-    // this function is needed to allow the random walk in the main function
-    NetState *getNetState() const;
-
-    // this method is only to test Store::popState() until its use case is implemented
+    // debug function
     void testPopState();
+
+private:
+    /// the type of the parsed formula
+    formula_t formulaType;
+
+    /// a state predicate (formula without temporal operators)
+    StatePredicate *spFormula;
+    /// a CTL formula
+    CTLFormula *ctlFormula;
+    /// a Büchi automaton (can be created from an LTL formula)
+    BuechiAutomata *bauto;
+
+    /// a simple property (deadlock, state predicate)
+    SimpleProperty *p;
+
+    /// a firelist (the used stubborn sets)
+    Firelist *fl;
+
+    /// depth first search as exploration (can be parallel)
+    DFSExploration *exploration;
+    /// LTL exploration
+    LTLExploration *ltlExploration;
+    /// CTL exploration
+    CTLExploration *ctlExploration;
+
+    /// a net state
+    NetState *ns;
+
+    /// the store for findpath, sweepline, and everything but LTL and CTL
+    Store<void> *store;
+    /// the store for LTL
+    Store<AutomataTree *> *ltlStore;
+    /// the store for CTL
+    Store<void *> *ctlStore;
+
+    /// the number of threads to use as given by `--thread`
+    int number_of_threads;
+
+    /// set the formula from `--formula`
+    void setFormula();
+
+    /// set the Büchi automaton from `--buchi`
+    void setBuechiAutomata();
+
+    /// set the store
+    void setStore();
+
+    /// set the property, firelist, and exploration
+    void setProperty();
 };

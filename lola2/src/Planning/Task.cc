@@ -54,13 +54,11 @@ extern gengetopt_args_info args_info;
 // the parsers
 extern int ptformula_parse();
 extern int ptformula_lex_destroy();
-// the parsers II
 extern int ptbuechi_parse();
 extern int ptbuechi_lex_destroy();
 
-// input file
+// input files
 extern FILE *ptformula_in;
-// input file
 extern FILE *ptbuechi_in;
 
 // code to parse from a string
@@ -68,23 +66,38 @@ struct yy_buffer_state;
 typedef yy_buffer_state *YY_BUFFER_STATE;
 extern YY_BUFFER_STATE ptformula__scan_string(const char *yy_str);
 extern void ptformula__delete_buffer(YY_BUFFER_STATE);
-
-// code to parse from a string
 extern YY_BUFFER_STATE ptbuechi__scan_string(const char *yy_str);
 extern void ptbuechi__delete_buffer(YY_BUFFER_STATE);
 
 extern SymbolTable *buechiStateTable;
-
-std::map<int, AtomicStatePredicate *> predicateMap;
 extern FILE	*tl_out;
 
-/// printer-function for Kimiwtu's output on stdout
+// Kimwitu++ objects
+extern kc::tFormula TheFormula;
+extern kc::tBuechiAutomata TheBuechi;
+
+
+/*!
+\ingroup g_globals
+\todo Is this mapping actually needed or was it this just added for debugging
+purposes.
+*/
+std::map<int, AtomicStatePredicate *> predicateMap;
+
+
 // LCOV_EXCL_START
+/*!
+\brief printer-function for Kimiwtu's output on stdout
+
+To use an unparser in Kimwitu++, a function with this signature needs to be
+passed to the unparse() function.
+*/
 void myprinter(const char *s, kc::uview v)
 {
     printf("%s", s);
 }
 // LCOV_EXCL_STOP
+
 
 /// special store creation for stores without payload support (e.g. BloomStore)
 template<>
@@ -132,14 +145,11 @@ Store<void> *StoreCreator<void>::createSpecializedStore(int number_of_threads)
     }
 }
 
-extern kc::tFormula TheFormula;
-extern kc::tBuechiAutomata TheBuechi;
 
 Task::Task() : spFormula(NULL), ctlFormula(NULL), bauto(NULL), ns(NULL),
     p(NULL), store(NULL), ctlStore(NULL), ltlStore(NULL), fl(NULL),
-    exploration(NULL), ctlExploration(NULL), ltlExploration(NULL), choose(NULL),
-    search(args_info.search_arg), number_of_threads(args_info.threads_arg),
-    formulaType(FORMULA_REACHABLE)
+    exploration(NULL), ctlExploration(NULL), ltlExploration(NULL),
+    number_of_threads(args_info.threads_arg), formulaType(FORMULA_REACHABLE)
 {
     if (args_info.formula_given)
     {
@@ -149,13 +159,20 @@ Task::Task() : spFormula(NULL), ctlFormula(NULL), bauto(NULL), ns(NULL),
     {
         setBuechiAutomata();
     }
-    setNet();
+
+    // set the net
+    ns = NetState::createNetStateFromInitial();
+    Transition::checkTransitions(*ns);
 
     // prepare task
     setStore();
     setProperty();
 }
 
+
+/*!
+\post memory for all members is deallocated
+*/
 Task::~Task()
 {
     delete ns;
@@ -169,12 +186,6 @@ Task::~Task()
     delete ltlExploration;
     delete ctlExploration;
     delete bauto;
-}
-
-void Task::setNet()
-{
-    ns = NetState::createNetStateFromInitial();
-    Transition::checkTransitions(*ns);
 }
 
 
@@ -214,6 +225,13 @@ StatePredicate *buildPropertyFromList(int *pos, int *neg)
 }
 
 
+/*
+Initialize the members Task::spFormula, Task::ctlFormula, or Task::bauto from a
+formula given via the `--formula` command line parameter.
+
+\post Members Task::spFormula, Task::ctlFormula, or Task::bauto are initialized;
+they are deallocated by the destructor.
+*/
 void Task::setFormula()
 {
     Input *formulaFile = NULL;
@@ -511,7 +529,12 @@ void Task::setFormula()
 }
 
 
+/*!
+Initialize the member Task::bauto from a Büchi automaton given via the `--buchi`
+command line parameter.
 
+\post Member Task::bauto is initialized; it is deallocated by the destructor.
+*/
 void Task::setBuechiAutomata()
 {
     Input *buechiFile = NULL;
@@ -577,6 +600,19 @@ void Task::setBuechiAutomata()
     assert(bauto);
 }
 
+
+/*!
+Sets the store for the state exploration. It uses StoreCreator::createStore and
+the command-line parameters to choose the store and whether it is assigned to
+the member Task::store, Task::ctlStore, or Task::ltlStore
+
+\post a Store object is allocated for member Task::store, Task::ctlStore, or
+Task::ltlStore using StoreCreator::createStore according to the command-line
+parameters; it is deallocated by the destructor.
+
+\todo The members Task::store, Task::ctlStore, or Task::ltlStore should be
+combined.
+*/
 void Task::setStore()
 {
     if (args_info.search_arg == search_arg_findpath)
@@ -606,6 +642,19 @@ void Task::setStore()
     }
 }
 
+
+/*!
+Sets the property (simple property, deadlock, or state predicate), firelist
+(used stubborn sets) and exploration method (depth first, CTL, LTL, or parallel
+exploration).
+
+\post Members Task::p, Task::fl, Task::exploration, Task::ctlExploration, and
+Task::ltlExploration are initialized; memory is deallocated by the destructor.
+
+\todo DFSExploration, LTLExploration, and CTLExploration should have a common
+parent class "Exploration". This would avoid multiple members Task::exploration,
+Task::ctlExploration, and Task::ltlExploration.
+*/
 void Task::setProperty()
 {
     // choose a simple property
@@ -690,6 +739,14 @@ void Task::setProperty()
     }
 }
 
+
+/*!
+This method starts the actual state space exploration and returns the raw
+result.
+
+\return the result of the state exploration
+\note This result needs to be interpreted by Task::interpreteResult.
+*/
 bool Task::getResult()
 {
     assert(ns);
@@ -736,10 +793,13 @@ bool Task::getResult()
                                 args_info.depthlimit_arg);
                 }
 
-                choose = new ChooseTransitionHashDriven();
-                result = exploration->find_path(*p, *ns, args_info.retrylimit_arg,
-                                                args_info.depthlimit_arg, *fl, *((EmptyStore<void> *)store), *choose);
-                delete choose;
+                // added a scope to allow a local definition of choose
+                {
+                    ChooseTransition *choose = new ChooseTransitionHashDriven();
+                    result = exploration->find_path(*p, *ns, args_info.retrylimit_arg,
+                                args_info.depthlimit_arg, *fl, *((EmptyStore<void> *)store), *choose);
+                    delete choose;
+                }
                 break;
 
             case search_arg_sweepline:
@@ -758,18 +818,27 @@ bool Task::getResult()
     return result;
 }
 
-void Task::interpreteResult(bool *result)
+
+/*!
+\post The result is interpreted and printed using Reporter::message
+\warning This method must not be called more than once.
+
+\todo This method should be internal and automatically be called by
+Task::getResult after the result was calculated. Then, a member of type
+trinary_t can be displayed.
+*/
+void Task::interpreteResult(bool result)
 {
     // in case AG is used, the result needs to be negated
     if (args_info.formula_given)
         if (formulaType == FORMULA_INVARIANT or formulaType == FORMULA_IMPOSSIBLE
                 or formulaType == FORMULA_LTL)
         {
-            *result = not * result;
+            result = not result;
         }
 
     // make result three-valued
-    trinary_t final_result = *result ? TRINARY_TRUE : TRINARY_FALSE;
+    trinary_t final_result = result ? TRINARY_TRUE : TRINARY_FALSE;
 
     // if the Bloom store did not find anything, the result is unknown
     if (args_info.store_arg == store_arg_bloom)
@@ -778,7 +847,7 @@ void Task::interpreteResult(bool *result)
         {
         case (check_arg_deadlock):
         case (check_arg_modelchecking):
-            if (not * result)
+            if (not result)
             {
                 final_result = TRINARY_UNKNOWN;
             }
@@ -805,6 +874,11 @@ void Task::interpreteResult(bool *result)
     }
 }
 
+
+/*!
+\return whether a witness path exists
+\todo check if this works with findpath
+*/
 bool Task::hasWitness(bool result) const
 {
     if (ctlFormula)
@@ -818,9 +892,13 @@ bool Task::hasWitness(bool result) const
     return result;
 }
 
-void Task::printWitness() const
-{
 
+/*!
+\todo integrate the witness of findpath
+\todo use a file as output rather than rep->message
+*/
+void Task::printWitnessPath() const
+{
     rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness path:").str());
 
     if (ctlFormula)
@@ -866,6 +944,11 @@ void Task::printWitness() const
     }
 }
 
+
+/*!
+\todo check of this works with findpath
+\todo use a file as output rather than rep->message
+*/
 void Task::printMarking() const
 {
     rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness state:").str());
@@ -879,13 +962,11 @@ void Task::printMarking() const
 }
 
 
-NetState *Task::getNetState() const
-{
-    return ns;
-}
-
-
-void Task::printDot() const
+/*!
+\todo check and document with which properties this works (CTL, LTL, ...)
+\todo use a proper IO object rather than just a fprintf to stdout
+*/
+void Task::printRun() const
 {
     FILE *o = stdout;
 
@@ -933,6 +1014,57 @@ void Task::printDot() const
 
 
 /*!
+\return the number of stored markings (viz. nodes in the reachability graph)
+\todo Check if this works for findpath.
+*/
+uint64_t Task::getMarkingCount() const
+{
+    if (store)
+    {
+        return store->get_number_of_markings();
+    }
+    else if (ltlStore)
+    {
+        return ltlStore->get_number_of_markings();
+    }
+    else if (ctlStore)
+    {
+        return ctlStore->get_number_of_markings();
+    }
+    return 0;
+}
+
+
+/*!
+\return the number of fired transitions (viz. edges in the reachability graph)
+
+\todo Check if this works for findpath.
+\todo Check whether `result--` is needed and if it is correct.
+*/
+uint64_t Task::getEdgeCount() const
+{
+    uint64_t result = 0;
+    if (store)
+    {
+        result = store->get_number_of_calls();
+    }
+    else if (ltlStore)
+    {
+        result = ltlStore->get_number_of_calls();
+    }
+    else if (ctlStore)
+    {
+        result = ctlStore->get_number_of_calls();
+    }
+    if (result)
+    {
+        result--;
+    }
+    return result;
+}
+
+
+/*!
  * \brief this method is only to test Store::popState() until its use case is implemented
  * \todo  remove me!
  */
@@ -959,43 +1091,4 @@ void Task::testPopState()
 
     rep->message("%s", rep->markup(MARKUP_IMPORTANT, "states collected: %u",
                                    counter).str());
-}
-
-uint64_t Task::getMarkingCount() const
-{
-    if (store)
-    {
-        return store->get_number_of_markings();
-    }
-    else if (ltlStore)
-    {
-        return ltlStore->get_number_of_markings();
-    }
-    else if (ctlStore)
-    {
-        return ctlStore->get_number_of_markings();
-    }
-    return 0;
-}
-
-uint64_t Task::getEdgeCount() const
-{
-    uint64_t result = 0;
-    if (store)
-    {
-        result = store->get_number_of_calls();
-    }
-    else if (ltlStore)
-    {
-        result = ltlStore->get_number_of_calls();
-    }
-    else if (ctlStore)
-    {
-        result = ctlStore->get_number_of_calls();
-    }
-    if (result)
-    {
-        result--;
-    }
-    return result;
 }

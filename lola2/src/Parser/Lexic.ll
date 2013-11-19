@@ -1,8 +1,9 @@
 /*!
+\file
+\brief joint lexic for all inputs to LoLA
 \author Karsten
 \status approved 25.01.2012
 
-Joint lexic for all inputs to LoLA
 Mainly copied from LoLA1
 
 \todo Herausfinden, ob es Probleme bei zu langen Kommentaren/Bezeichnern gibt. Idee: Maximallänge angeben.
@@ -86,6 +87,19 @@ inline void setcol()
     ptnetlola_colno += ptnetlola_leng;
 }
 
+
+/*!
+\brief handler for EOF
+
+When the scanner receives an end-of-file indication from YY_INPUT, it then
+checks the `yywrap()' function. If `yywrap()' returns false (zero), then it
+is assumed that the function has gone ahead and set up yyin to point to another
+input file, and scanning continues. If it returns true (non-zero), then the
+scanner terminates, returning 0 to its caller. Note that in either case, the
+start condition remains unchanged; it does not revert to INITIAL.
+
+\return 0 (a new file was opened and parsing continues) or 1 (parsing complete)
+*/
 int ptnetlola_wrap()
 {
     if (currentFile == (int)args_info.inputs_num-1 or currentFile == -1)

@@ -178,7 +178,7 @@ void evaluateParameters(int argc, char **argv)
 
 \todo use MARKUP_FILE for all concepts
 \todo What does --testStateForeach do?
-\todo Check if task.printDot() should have the same checks as task.printWitness()
+\todo Check if task.printRun() should have the same checks as task.printWitnessPath()
 \todo numMarkings and numEdges should be provided by the Task class
 */
 int main(int argc, char **argv)
@@ -334,7 +334,7 @@ int main(int argc, char **argv)
         //======================
 
         bool result = task.getResult();
-        task.interpreteResult(& result);
+        task.interpreteResult(result);
 
         //============
         // (6) output
@@ -353,14 +353,14 @@ int main(int argc, char **argv)
         {
             rep->status("print witness path (%s)",
                         rep->markup(MARKUP_PARAMETER, "--path").str());
-            task.printWitness();
+            task.printWitnessPath();
         }
 
         if (result and args_info.run_given)
         {
             rep->status("print distributed run (%s)",
                         rep->markup(MARKUP_PARAMETER, "--run").str());
-            task.printDot();
+            task.printRun();
         }
 
         //================

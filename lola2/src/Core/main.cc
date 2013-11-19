@@ -349,14 +349,14 @@ int main(int argc, char **argv)
         }
 
         // print witness path
-        if (args_info.path_given and task.hasWitness(result))
+        if (args_info.path_given)
         {
             rep->status("print witness path (%s)",
                         rep->markup(MARKUP_PARAMETER, "--path").str());
             task.printWitnessPath();
         }
 
-        if (result and args_info.run_given)
+        if (args_info.run_given)
         {
             rep->status("print distributed run (%s)",
                         rep->markup(MARKUP_PARAMETER, "--run").str());

@@ -95,7 +95,7 @@ AT_CHECK([BSD_ --partnerCheck test2_BSD.dot test2_MAX_BSD_neg-4.dot --verbose],1
 AT_CHECK([GREP -q "NOT" stderr])
 AT_CHECK([BSD_ --partnerCheck test2_BSD.dot test2_BSD.dot --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "NOT" stderr])
-AT_KEYWORDS(infrastructure)
+AT_KEYWORDS(error)
 AT_CLEANUP
 
 AT_SETUP([b-conformance check])
@@ -121,7 +121,7 @@ AT_CHECK([BSD_ --confCheck test2_MAX_MP_CSD.dot test2_CSD_neg-4.dot --verbose],1
 AT_CHECK([GREP -q "NOT" stderr])
 AT_CHECK([BSD_ --confCheck test2_MAX_MP_CSD.dot test2_CSD_neg-5.dot --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "NOT" stderr])
-AT_KEYWORDS(infrastructure)
+AT_KEYWORDS(error)
 AT_CLEANUP
 
 AT_SETUP([mp computation])

@@ -50,9 +50,9 @@ AT_CLEANUP
 
 AT_SETUP([DOT output (BSD)])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/test2_MAX.owfn .])
-AT_CHECK([BSD_ test2_MAX.owfn --verbose --bound=1 --BSD],0,ignore,ignore)
-AT_CHECK([test -f BSD_1_test2_MAX.dot])
+AT_CHECK([cp TESTFILES/C_MAX.owfn .])
+AT_CHECK([BSD_ C_MAX.owfn --verbose --bound=1 --BSD],0,ignore,ignore)
+AT_CHECK([test -f BSD_1_C_MAX.dot])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 

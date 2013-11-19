@@ -19,7 +19,7 @@
 # 2. Add the files you need for the test to the `testfile' directory.
 # 3. Add these files (without path) to the `TESTFILES' list.
 # 4. Add the file to the SVN repository.
-TESTFILES = myCoffee.owfn test2_MAX.owfn test2_MAX_MAX.owfn testunbounded.owfn \
+TESTFILES = myCoffee.owfn test2_MAX.owfn test2_MAX_MAX.owfn testunbounded.owfn C_MAX.owfn \
 		test2_BSD.dot test2_CSD.dot test2_MAX_BSD.dot test2_MAX_MP_CSD.dot \
 		error02.owfn error03.owfn error04-1.owfn error04-2.owfn \
 		error06.owfn error08.owfn \

@@ -60,6 +60,9 @@ void *Store<T>::reporter_internal(void)
             kill(getpid(), SIGUSR2);
         }
     }
+
+    // line is never reached, but silences the compiler
+    return NULL;
 }
 
 template <typename T>

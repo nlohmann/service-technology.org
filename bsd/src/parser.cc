@@ -160,7 +160,6 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 				unsigned int id_node2;
 				// iterate through the tokens and set node ids accordingly
 				std::list<std::string>::const_iterator it = tokens.begin();
-				std::string node1 = "";
 				if (it != tokens.end()) {
 					id_node1 = atoi((*it).c_str());
 					// if this is the U node or the empty node then move it to the back of the array
@@ -239,12 +238,10 @@ parsedGraph * parser::dot2graph_parse(std::istream & is) {
 	if (idcounter < graph->events)
 		abort(10, "Error in dot file. Parsed label count is lower than parsed parameter.");
 
-	// due to the offset of 2 the ids of the U node and empty node are 1 and 0 respectively
+	// the ids of the U node and empty node are placed at the end of the id array
+	graph->U = graph->nodes - 1;
 	if (graph->nodes >= 2) {
-		graph->U = graph->nodes - 1;
 		graph->emptyset = graph->nodes - 2;
-	} else {
-		graph->U = graph->nodes - 1;
 	}
 
 	return graph;

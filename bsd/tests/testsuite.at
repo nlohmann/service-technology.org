@@ -76,8 +76,25 @@ AT_SETUP([b-partner check])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test2_BSD.dot .])
 AT_CHECK([cp TESTFILES/test2_MAX_BSD.dot .])
-AT_CHECK([BSD_ --partnerCheck test2_BSD.dot test2_MAX_BSD.dot --verbose --bound=1],0,ignore,stderr)
+AT_CHECK([BSD_ --partnerCheck test2_BSD.dot test2_MAX_BSD.dot --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "partner" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([b-partner check (negative case)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/test2_BSD.dot .])
+AT_CHECK([cp TESTFILES/test2_MAX_BSD_neg* .])
+AT_CHECK([BSD_ --partnerCheck test2_BSD.dot test2_MAX_BSD_neg-1.dot --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "NOT" stderr])
+AT_CHECK([BSD_ --partnerCheck test2_BSD.dot test2_MAX_BSD_neg-2.dot --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "NOT" stderr])
+AT_CHECK([BSD_ --partnerCheck test2_BSD.dot test2_MAX_BSD_neg-3.dot --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "NOT" stderr])
+AT_CHECK([BSD_ --partnerCheck test2_BSD.dot test2_MAX_BSD_neg-4.dot --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "NOT" stderr])
+AT_CHECK([BSD_ --partnerCheck test2_BSD.dot test2_BSD.dot --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "NOT" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -85,8 +102,25 @@ AT_SETUP([b-conformance check])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/test2_MAX_MP_CSD.dot .])
 AT_CHECK([cp TESTFILES/test2_CSD.dot .])
-AT_CHECK([BSD_ --confCheck test2_MAX_MP_CSD.dot test2_CSD.dot --verbose --bound=2],0,ignore,stderr)
+AT_CHECK([BSD_ --confCheck test2_MAX_MP_CSD.dot test2_CSD.dot --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "conform" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([b-conformance check (negative case)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/test2_MAX_MP_CSD.dot .])
+AT_CHECK([cp TESTFILES/test2_CSD_neg* .])
+AT_CHECK([BSD_ --confCheck test2_MAX_MP_CSD.dot test2_CSD_neg-1.dot --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "NOT" stderr])
+AT_CHECK([BSD_ --confCheck test2_MAX_MP_CSD.dot test2_CSD_neg-2.dot --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "NOT" stderr])
+AT_CHECK([BSD_ --confCheck test2_MAX_MP_CSD.dot test2_CSD_neg-3.dot --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "NOT" stderr])
+AT_CHECK([BSD_ --confCheck test2_MAX_MP_CSD.dot test2_CSD_neg-4.dot --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "NOT" stderr])
+AT_CHECK([BSD_ --confCheck test2_MAX_MP_CSD.dot test2_CSD_neg-5.dot --verbose],1,ignore,stderr)
+AT_CHECK([GREP -q "NOT" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -290,6 +324,8 @@ AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
 AT_CHECK([BSD_ --mp error10-1-2.dot],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
 AT_CHECK([BSD_ --mp error10-1-3.dot],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
+AT_CHECK([BSD_ --mp error10-1-4.dot],1,ignore,stderr)
 AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP

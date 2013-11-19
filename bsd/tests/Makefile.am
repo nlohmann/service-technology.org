@@ -23,9 +23,13 @@ TESTFILES = myCoffee.owfn test2_MAX.owfn test2_MAX_MAX.owfn testunbounded.owfn \
 		test2_BSD.dot test2_CSD.dot test2_MAX_BSD.dot test2_MAX_MP_CSD.dot \
 		error02.owfn error03.owfn error04-1.owfn error04-2.owfn \
 		error06.owfn error08.owfn \
-		error10-1-1.dot error10-1-2.dot error10-1-3.dot \
+		error10-1-1.dot error10-1-2.dot error10-1-3.dot error10-1-4.dot \
 		error10-2-1.dot error10-2-2.dot error10-3.dot \
-		error10-4-1.dot error10-4-2.dot
+		error10-4-1.dot error10-4-2.dot \
+		test2_CSD_neg-1.dot test2_CSD_neg-2.dot test2_CSD_neg-3.dot \
+		test2_CSD_neg-4.dot test2_CSD_neg-5.dot \
+		test2_MAX_BSD_neg-1.dot test2_MAX_BSD_neg-2.dot \
+		test2_MAX_BSD_neg-3.dot test2_MAX_BSD_neg-4.dot
 
 
 #-----------------------------------------#

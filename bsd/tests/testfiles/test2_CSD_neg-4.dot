@@ -1,0 +1,33 @@
+/*
+  -- Don't delete or change the comment section. Parsing depends on several attributes in here. --
+  generator:   BSD 1.2-unreleased
+  input file:  test2.owfn
+  invocation:   bsd ./testneu/test2.owfn --bound=1 --CSD --output=testneu_BSD_20131118_200357/test2_CSD.dot
+  type:        CSD
+  bound:             1
+  #labels (total):   2
+  #sending labels:   1
+  #receiving labels: 1
+  #nodes:            4
+  computation time:  0 s
+  memory consumed:   1788 KB
+*/
+
+digraph {
+	node [shape=record,style=rounded];
+	initialNode [shape=point,label="",style=invis,weight=100];
+	initialNode -> 0;
+	0 [label=<Q<SUB>0</SUB>|3>]; /*lambda=3*/
+	0 -> -2 [label="b",color=red]; /*sending*/
+	0 -> 1 [label="a",color=blue]; /*receiving*/
+	-2 [label=<Q<SUB>&empty;</SUB>|4>]; /*lambda=4*/
+	-2 -> -2 [label="b",color=red];  /*sending*/
+	-2 -> -2 [label="a",color=blue];  /*receiving*/
+	1 [label=<Q<SUB>1</SUB>|3>]; /*lambda=3*/
+	1 -> 0 [label="b",color=red]; /*sending*/
+	1 -> -1 [label="a",color=blue]; /*receiving*/
+	-1 [label=<U|0>]; /*lambda=0*/
+	-1 -> -1 [label="b",color=red];  /*sending*/
+	-1 -> -1 [label="a",color=blue];  /*receiving*/
+	footnote [shape=box,label=<red: &Sigma;<SUP>out</SUP>,  blue: &Sigma;<SUP>in</SUP>>];
+}

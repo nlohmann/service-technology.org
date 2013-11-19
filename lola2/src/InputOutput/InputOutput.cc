@@ -66,11 +66,13 @@ IO::~IO()
 
     // fclose returns 0 on success
     if (UNLIKELY(ret != 0))
+    // LCOV_EXCL_START
     {
         r->status("could not close %s file %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),
                   r->markup(MARKUP_FILE, filename.c_str()).str());
         r->abort(ERROR_FILE);
     }
+    // LCOV_EXCL_STOP
 }
 
 
@@ -90,12 +92,14 @@ IO::IO(FILE *fp, std::string kind, std::string filename) :
     assert(r);
 
     // fopen returns NULL on error
+    // LCOV_EXCL_START
     if (UNLIKELY(fp == NULL))
     {
         r->status("could not open %s file %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),
                   r->markup(MARKUP_FILE, filename.c_str()).str());
         r->abort(ERROR_FILE);
     }
+    // LCOV_EXCL_STOP
 }
 
 

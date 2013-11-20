@@ -590,6 +590,21 @@ AT_CHECK([GREP -q "lola: invalid command-line parameter(s)" stderr])
 AT_KEYWORDS(commandline)
 AT_CLEANUP
 
+AT_SETUP([Output of distributed run])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola -v --check=deadlock --run=runfile],0,ignore,ignore)
+AT_CHECK([GREP -q "digraph" runfile])
+AT_KEYWORDS(commandline)
+AT_CLEANUP
+
+AT_SETUP([Output statistics])
+AT_CHECK([cp TESTFILES/phils5.lola .])
+AT_CHECK([LOLA phils5.lola -v --check=deadlock --stats],0,ignore,stderr)
+AT_CHECK([GREP -q "lola: memory consumption" stderr])
+AT_CHECK([GREP -q "lola: time consumption" stderr])
+AT_KEYWORDS(commandline)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([File input/output])

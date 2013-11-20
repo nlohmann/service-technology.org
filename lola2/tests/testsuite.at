@@ -820,7 +820,7 @@ AT_BANNER([Formula Input])
 AT_SETUP([Syntax error: unknown operator])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([LOLA garavel.lola --formula=foo --verbose],2,stdout,stderr)
-AT_CHECK([GREP -q "lola: syntax error, unexpected IDENTIFIER, expecting _FORMULA_" stderr])
+AT_CHECK([GREP -q "lola: syntax error, unexpected identifier, expecting keyword FORMULA" stderr])
 AT_KEYWORDS(formula)
 AT_CLEANUP
 

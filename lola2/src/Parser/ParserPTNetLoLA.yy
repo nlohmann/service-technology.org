@@ -67,7 +67,7 @@ void yyerrors(char* token, const char* format, ...);
 %token _colon_      "colon"
 %token _comma_      "comma"
 %token _semicolon_  "semicolon"
-
+%token END 0        "end of file"
 
 %{
 extern YYSTYPE ptnetlola_lval;

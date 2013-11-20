@@ -81,6 +81,7 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %token _FALSE_             "Boolean FALSE"
 %token _FIREABLE_          "keyword FIREABLE"
 %token _DEADLOCK_          "keyword DEADLOCK"
+%token END 0               "end of file"
 
 // precedences (lowest written first, e.g. PLUS/MINUS) and precedences
 %left _OR_ _XOR_

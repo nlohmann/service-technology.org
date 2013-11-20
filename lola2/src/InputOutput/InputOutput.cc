@@ -62,17 +62,20 @@ IO::~IO()
               r->markup(MARKUP_FILE, filename.c_str()).str());
 
     // try to close file
-    const int ret = fclose(fp);
-
-    // fclose returns 0 on success
-    if (UNLIKELY(ret != 0))
-    // LCOV_EXCL_START
+    if (fp != stdout)
     {
-        r->status("could not close %s file %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),
-                  r->markup(MARKUP_FILE, filename.c_str()).str());
-        r->abort(ERROR_FILE);
+        const int ret = fclose(fp);
+
+        // fclose returns 0 on success
+        if (UNLIKELY(ret != 0))
+        // LCOV_EXCL_START
+        {
+            r->status("could not close %s file %s", r->markup(MARKUP_OUTPUT, kind.c_str()).str(),
+                      r->markup(MARKUP_FILE, filename.c_str()).str());
+            r->abort(ERROR_FILE);
+        }
+        // LCOV_EXCL_STOP
     }
-    // LCOV_EXCL_STOP
 }
 
 

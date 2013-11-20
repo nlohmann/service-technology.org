@@ -895,11 +895,10 @@ bool Task::hasWitness(bool result) const
 
 /*!
 \todo integrate the witness of findpath
-\todo use a file as output rather than rep->message
 */
 void Task::printWitnessPath() const
 {
-    rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness path:").str());
+    Output o("witness path", args_info.path_arg);
 
     if (ctlFormula)
     {
@@ -908,11 +907,11 @@ void Task::printWitnessPath() const
         {
             if (*it == -1)
             {
-                rep->message("===begin of cycle===");
+                fprintf(o, "===begin of cycle===\n");
             }
             else
             {
-                rep->message("%s", Net::Name[TR][*it]);
+                fprintf(o, "%s\n", Net::Name[TR][*it]);
             }
         }
         ctlExploration->witness.clear();
@@ -924,11 +923,11 @@ void Task::printWitnessPath() const
             index_t &s = ltlExploration->witness.top();
             if (s == -1)
             {
-                rep->message("===begin of cycle===");
+                fprintf(o, "===begin of cycle===\n");
             }
             else
             {
-                rep->message("%s", Net::Name[TR][s]);
+                fprintf(o, "%s\n", Net::Name[TR][s]);
             }
             ltlExploration->witness.pop();
         }
@@ -938,7 +937,7 @@ void Task::printWitnessPath() const
         while (p->stack.StackPointer > 0)
         {
             SimpleStackEntry &s = p->stack.top();
-            rep->message("%s", Net::Name[TR][s.fl[s.current]]);
+            fprintf(o, "%s\n", Net::Name[TR][s.fl[s.current]]);
             p->stack.pop();
         }
     }
@@ -947,16 +946,16 @@ void Task::printWitnessPath() const
 
 /*!
 \todo check of this works with findpath
-\todo use a file as output rather than rep->message
 */
 void Task::printMarking() const
 {
-    rep->message("%s", rep->markup(MARKUP_IMPORTANT, "witness state:").str());
+    Output o("witness state", args_info.state_arg);
+
     for (index_t p = 0; p < Net::Card[PL]; ++p)
     {
         if (ns->Current[p] > 0)
         {
-            rep->message("%s : %d", Net::Name[PL][p], ns->Current[p]);
+            fprintf(o, "%s : %d\n", Net::Name[PL][p], ns->Current[p]);
         }
     }
 }
@@ -964,11 +963,10 @@ void Task::printMarking() const
 
 /*!
 \todo check and document with which properties this works (CTL, LTL, ...)
-\todo use a proper IO object rather than just a fprintf to stdout
 */
 void Task::printRun() const
 {
-    FILE *o = stdout;
+    Output o("distributed run", args_info.run_arg);
 
     // add conditions for initial marking
     for (index_t i = 0; i < Net::Card[PL]; ++i)

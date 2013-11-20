@@ -54,28 +54,6 @@ option "ltlmode" -
   default="tree"
   optional
 
-option "path" p
-  "Print witness path"
-  flag off
-
-option "run" -
-  "Print witness path as partially ordered run"
-  flag off
-
-option "nofilterrun" -
-  "Only print relevant parts of the partially ordered run"
-  flag off
-  hidden
-
-option "eventstructure" -
-  "Print an event structure instead of a partially ordered run"
-  flag off
-  hidden
-
-option "state" s
-  "Print witness state"
-  flag off
-
 option "stubborn" -
   "Which algorithm to use to construct stubborn sets"
   values="tarjan","deletion" enum
@@ -151,6 +129,40 @@ option "buechi" b
   "A buechi-automata to check against, read from file"
   string
   optional
+
+option "path" p
+  "Print witness path"
+  string
+  typestr="FILE"
+  optional
+  default="-"
+  argoptional
+
+option "run" -
+  "Print witness path as partially ordered run"
+  string
+  typestr="FILE"
+  optional
+  default="-"
+  argoptional
+
+option "nofilterrun" -
+  "Only print relevant parts of the partially ordered run"
+  flag off
+  hidden
+
+option "eventstructure" -
+  "Print an event structure instead of a partially ordered run"
+  flag off
+  hidden
+
+option "state" s
+  "Print witness state"
+  string
+  typestr="FILE"
+  optional
+  default="-"
+  argoptional
 
 option "nolog" -
   "Do not send logging information"

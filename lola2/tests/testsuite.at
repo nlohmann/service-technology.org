@@ -1051,6 +1051,12 @@ AT_CLEANUP
 AT_BANNER([Reporter])
 ############################################################################
 
+AT_SETUP([Logging])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([LOLA_LOG garavel.lola --verbose],0,stdout,stderr)
+AT_KEYWORDS(reporter)
+AT_CLEANUP
+
 AT_SETUP([ReporterStream: stdout])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([LOLA garavel.lola --reporter=stream --verbose],0,stdout,stderr)

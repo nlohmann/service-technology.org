@@ -75,6 +75,9 @@ m4_define([KILLER],     [cover.sh @abs_top_builddir@/src/killer])
 # the main executable, directly called to allow for analysis
 m4_define([LOLA_RAW],  [@abs_top_builddir@/src/lola --nolog])
 
+# a LoLA call to check the logging functionality
+m4_define([LOLA_LOG],  [cover.sh @abs_top_builddir@/src/lola])
+
 
 #---------------------------------------------#
 # Part 3: Optional and Mandatory Helper Tools #

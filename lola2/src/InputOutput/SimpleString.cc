@@ -14,23 +14,6 @@
 
 
 /*!
-\post Memory for s is allocated using strdup.
-*/
-String::String() : s(strdup(""))
-{
-    assert(s);
-}
-
-/*!
-\param other  String object to copy from
-\post Memory for s is allocated using strdup.
-*/
-String::String(const String &other) : s(strdup(other.s))
-{
-    assert(s);
-}
-
-/*!
 \param s  Pointer to NULL-terminated string to store.
 \note The given string is NOT copied! Only the pointer is stored and it will be
       freed by the constructor. DO NOT use this constructor with const char*,

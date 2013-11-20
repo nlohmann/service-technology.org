@@ -162,7 +162,7 @@ void evaluateParameters(int argc, char **argv)
         break;
 
     case reporter__NULL:
-        /* no reporter */
+        assert(false);
         break;
     }
 

@@ -27,12 +27,6 @@ private:
     char *s;
 
 public:
-    /// constructor for empty string
-    String();
-
-    /// copy constructor
-    String(const String &);
-
     /// constructor (does only copy pointer, not content)
     explicit String(char *s);
 

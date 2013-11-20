@@ -161,9 +161,8 @@ void evaluateParameters(int argc, char **argv)
         rep->message("pid = %d", getpid());
         break;
 
-    case reporter__NULL:
+    default:
         assert(false);
-        break;
     }
 
     // register the reporter to used it for file status messages

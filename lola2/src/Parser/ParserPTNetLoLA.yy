@@ -53,7 +53,20 @@ void yyerrors(char* token, const char* format, ...);
 %type <attributeString> NUMBER
 %type <attributeString> IDENTIFIER
 
-%token IDENTIFIER NUMBER _CONSUME_ _FAIR_ _PLACE_ _MARKING_ _PRODUCE_ _SAFE_ _STRONG_ _TRANSITION_ _WEAK_ _colon_ _comma_ _semicolon_
+%token IDENTIFIER   "identifier"
+%token NUMBER       "number"
+%token _CONSUME_    "keyword CONSUME"
+%token _FAIR_       "keyword FAIR"
+%token _PLACE_      "keyword PLACE"
+%token _MARKING_    "keyword MARKING"
+%token _PRODUCE_    "keyword PRODUCE"
+%token _SAFE_       "keyword SAFE"
+%token _STRONG_     "keyword STRONG"
+%token _TRANSITION_ "keyword TRANSITION"
+%token _WEAK_       "keyword WEAK"
+%token _colon_      "colon"
+%token _comma_      "comma"
+%token _semicolon_  "semicolon"
 
 
 %{

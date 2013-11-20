@@ -50,9 +50,39 @@ void ptbuechi_yyerrors(char* token, const char* format, ...);
 %type <yt_tAtomicProposition> atomic_proposition
 %type <yt_tTerm> term
 
-%token IDENTIFIER NUMBER
-%token _accept_ _buechi_ _braceleft_ _braceright_ _comma_ _then_ _colon_
-%token _INITIAL_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_ _FIREABLE_ _DEADLOCK_
+%token IDENTIFIER          "identifier"
+%token NUMBER              "number"
+%token _accept_            "keyword accept"
+%token _buechi_            "keyword buechi"
+%token _braceleft_         "opening brace"
+%token _braceright_        "closing brace"        
+%token _comma_             "comma"
+%token _then_              "transition =>"
+%token _colon_             "colon"
+%token _INITIAL_           "keyword INITIAL"
+%token _AND_               "Boolean conjuction"
+%token _NOT_               "Boolean negation"
+%token _OR_                "Boolean disjunction"
+%token _XOR_               "Boolean exclusive disjunction"
+%token _iff_               "Boolean iff"
+%token _notequal_          "not-equals sign"
+%token _implies_           "Boolean implication"
+%token _equals_            "equals sign"
+%token _plus_              "plus sign"
+%token _minus_             "minus sign"
+%token _times_             "multiplication sign"
+%token _leftparenthesis_   "opening parenthesis"
+%token _rightparenthesis_  "closing parenthesis"
+%token _greaterthan_       "greater-than sign"
+%token _lessthan_          "less-than sign"
+%token _greaterorequal_    "greater-than-or-equal sign"
+%token _lessorequal_       "less-than-or-equal sign"
+%token _semicolon_         "semicolon"
+%token _TRUE_              "Boolean TRUE"
+%token _FALSE_             "Boolean FALSE"
+%token _FIREABLE_          "keyword FIREABLE"
+%token _DEADLOCK_          "keyword DEADLOCK"
+
 
 // precedences (lowest written first, e.g. PLUS/MINUS) and precedences
 %left _OR_ _XOR_

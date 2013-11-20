@@ -45,8 +45,42 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %type <yt_tAtomicProposition> atomic_proposition
 %type <yt_tTerm> term
 
-%token IDENTIFIER NUMBER
-%token _RELEASE_ _NEXTSTATE_ _INITIAL_ _FORMULA_ _AND_ _NOT_ _OR_ _XOR_ _iff_ _ALLPATH_ _ALWAYS_ _EVENTUALLY_ _EXPATH_ _UNTIL_ _REACHABLE_ _INVARIANT_ _IMPOSSIBLE_ _notequal_ _implies_ _equals_ _plus_ _minus_ _times_ _leftparenthesis_ _rightparenthesis_ _greaterthan_ _lessthan_ _greaterorequal_ _lessorequal_ _semicolon_ _TRUE_ _FALSE_ _FIREABLE_ _DEADLOCK_
+%token IDENTIFIER          "identifier"
+%token NUMBER              "number"
+%token _RELEASE_           "temporal operator RELEASE"
+%token _NEXTSTATE_         "temporal operator NEXTSTATE"
+%token _INITIAL_           "keyword INITIAL"
+%token _FORMULA_           "keyword FORMULA"
+%token _AND_               "Boolean conjuction"
+%token _NOT_               "Boolean negation"
+%token _OR_                "Boolean disjunction"
+%token _XOR_               "Boolean exclusive disjunction"
+%token _iff_               "Boolean iff"
+%token _ALLPATH_           "path quantifier ALLPATH"
+%token _ALWAYS_            "temporal operator ALWAYS"
+%token _EVENTUALLY_        "temporal operator EVENTUALLY"
+%token _EXPATH_            "path quantifier EXPATH"
+%token _UNTIL_             "temporal operator UNTIL"
+%token _REACHABLE_         "keyword REACHABLE"
+%token _INVARIANT_         "keyword INVARIANT"
+%token _IMPOSSIBLE_        "keyword IMPOSSIBLE"
+%token _notequal_          "not-equals sign"
+%token _implies_           "Boolean implication"
+%token _equals_            "equals sign"
+%token _plus_              "plus sign"
+%token _minus_             "minus sign"
+%token _times_             "multiplication sign"
+%token _leftparenthesis_   "opening parenthesis"
+%token _rightparenthesis_  "closing parenthesis"
+%token _greaterthan_       "greater-than sign"
+%token _lessthan_          "less-than sign"
+%token _greaterorequal_    "greater-than-or-equal sign"
+%token _lessorequal_       "less-than-or-equal sign"
+%token _semicolon_         "semicolon"
+%token _TRUE_              "Boolean TRUE"
+%token _FALSE_             "Boolean FALSE"
+%token _FIREABLE_          "keyword FIREABLE"
+%token _DEADLOCK_          "keyword DEADLOCK"
 
 // precedences (lowest written first, e.g. PLUS/MINUS) and precedences
 %left _OR_ _XOR_

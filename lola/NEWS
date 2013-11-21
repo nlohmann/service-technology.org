@@ -6,22 +6,18 @@
                      http://service-technology.org/lola
 
 
-Version 1.17
+Version 1.18
 ============
 
-* small bugfixes
+* You can now define USECAPACITY if you want LoLA to stop at a marking 
+  if state space construction reaches a state with more tokens on a place 
+  than specified. The state is then marked with 'BAD: 1' in the output. This 
+  has only been tested with the same settings as lola-statespace. Other 
+  options may be harmed by setting USECAPACITY so be aware. NOTE: The 
+  capacity can be set via the command-line (--capacity=...)
 
-* code refactoring
-
-* added script `utils/newlola.sh' to generate a LoLA binary given a
-  `userconfig.h' file
-
-* added files from the SUMo 2011 Model Checking Contest
-  (`http://sumo.lip6.fr/Model_Checking_Contest.html') as test cases
-
-* fixed bug bug #17421 (`https://gna.org/bugs/?17421'): CTL model checking
-  (`MODELCHECKING') and the liveness check (`LIVEPROP') yielded different
-  results
+* Added a configuration which uses the above functionality. The created 
+  binary is called 'lola-boundedgraph'.
 
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for

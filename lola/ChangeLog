@@ -6,6 +6,19 @@
                      http://service-technology.org/lola
 
 
+Version 1.18
+============
+
+* You can now define USECAPACITY if you want LoLA to stop at a marking 
+  if state space construction reaches a state with more tokens on a place 
+  than specified. The state is then marked with 'BAD: 1' in the output. This 
+  has only been tested with the same settings as lola-statespace. Other 
+  options may be harmed by setting USECAPACITY so be aware. NOTE: The 
+  capacity can be set via the command-line (--capacity=...)
+
+* Added a configuration which uses the above functionality. The created 
+  binary is called 'lola-boundedgraph'.
+
 Version 1.17
 ============
 

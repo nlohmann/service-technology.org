@@ -37,7 +37,12 @@ class Transition: public Node {
         Transition** ImproveDisabling;  ///< list of transitions where disabledness
         ///< must be checked again after firing this transition
         void initialize(); ///< Set arrays, list, enabled etc. for this transition
+#ifdef USECAPACITY
         bool fire(); ///< replace current marking by successor marking, force
+#endif
+#ifndef USECAPACITY
+        void fire(); ///< replace current marking by successor marking, force
+#endif
         ///< enabling test where necessary
         void backfire(); ///< fire transition backwards to replace original state,
         ///< force enabling tests where necessary, used in backtracking
@@ -297,8 +302,14 @@ inline void Transition::initialize() {
     set_hashchange();
 }
 
+#ifdef USECAPACITY
 /// fire this transition on Globals::CurrentMarking, re-evaluate enabledness
 inline bool Transition::fire() {
+#endif
+#ifndef USECAPACITY
+	/// fire this transition on Globals::CurrentMarking, re-evaluate enabledness
+	inline void Transition::fire() {
+#endif
     unsigned int* p;
     Transition** t;
     unsigned int* i;

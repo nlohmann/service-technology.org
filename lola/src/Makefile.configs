@@ -1,4 +1,10 @@
-EXTRA_PROGRAMS = bin-lola-boundednet bin-lola-boundednetsymm bin-lola-boundedplace bin-lola-bpm-liveprop bin-lola-bpm-liveprop1 bin-lola-bpm-modelchecking bin-lola-bpm-modelchecking-naiv bin-lola-bpm-modelchecking1 bin-lola-bpm-modelchecking1-naiv bin-lola-bpm-statepredicate bin-lola-bpm-statepredicate-naiv bin-lola-bpm-statepredicate1 bin-lola-bpm-statepredicate1-naiv bin-lola-coverstatepredicate bin-lola-deadlock bin-lola-deadlock1 bin-lola-deadtransition bin-lola-eventuallyprop bin-lola-fairprop bin-lola-findpath bin-lola-full bin-lola-full1 bin-lola-fullcover bin-lola-fulllimited bin-lola-home bin-lola-liveprop bin-lola-liveprop1 bin-lola-modelchecking bin-lola-none bin-lola-prom-boundednet bin-lola-prom-deadlock bin-lola-prom-home bin-lola-prom-reversibility bin-lola-reachability bin-lola-reversibility bin-lola-statepredicate bin-lola-statepredicate1 bin-lola-statespace bin-lola-statespace1 bin-lola-sumo-statepredicate 
+EXTRA_PROGRAMS = bin-lola-boundedgraph bin-lola-boundednet bin-lola-boundednetsymm bin-lola-boundedplace bin-lola-bpm-liveprop bin-lola-bpm-liveprop1 bin-lola-bpm-modelchecking bin-lola-bpm-modelchecking-naiv bin-lola-bpm-modelchecking1 bin-lola-bpm-modelchecking1-naiv bin-lola-bpm-statepredicate bin-lola-bpm-statepredicate-naiv bin-lola-bpm-statepredicate1 bin-lola-bpm-statepredicate1-naiv bin-lola-coverstatepredicate bin-lola-deadlock bin-lola-deadlock1 bin-lola-deadtransition bin-lola-eventuallyprop bin-lola-fairprop bin-lola-findpath bin-lola-full bin-lola-full1 bin-lola-fullcover bin-lola-fulllimited bin-lola-home bin-lola-liveprop bin-lola-liveprop1 bin-lola-modelchecking bin-lola-none bin-lola-prom-boundednet bin-lola-prom-deadlock bin-lola-prom-home bin-lola-prom-reversibility bin-lola-reachability bin-lola-reversibility bin-lola-statepredicate bin-lola-statepredicate1 bin-lola-statespace bin-lola-statespace1 bin-lola-sumo-statepredicate 
+
+bin_lola_boundedgraph_SOURCES = $(lola_SOURCES)
+bin_lola_boundedgraph_CPPFLAGS = $(AM_CPPFLAGS)
+lola-boundedgraph:
+	$(AM_V_at)$(MAKE) bin-lola-boundedgraph$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/boundedgraph $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-boundedgraph$(EXEEXT) $(builddir)/lola-boundedgraph$(EXEEXT)
 
 bin_lola_boundednet_SOURCES = $(lola_SOURCES)
 bin_lola_boundednet_CPPFLAGS = $(AM_CPPFLAGS)

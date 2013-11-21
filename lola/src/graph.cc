@@ -3381,7 +3381,12 @@ unsigned int compute_scc() {
             if (!(Edges % REPORTFREQUENCY)) {
                 report_statistics();
             }
+#ifndef USECAPACITY
+            CurrentState->firelist[CurrentState->current]->fire();
+#endif
+#ifdef USECAPACITY
             boundbroken = CurrentState->firelist[CurrentState->current]->fire();
+#endif
             if ((NewState = SEARCHPROC())) {
                 // State exists! (or, at least, I am not responsible for it (in the moment))
                 CurrentState->firelist[CurrentState->current]->backfire();

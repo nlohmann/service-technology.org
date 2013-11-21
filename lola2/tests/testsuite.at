@@ -605,6 +605,25 @@ AT_CHECK([GREP -q "lola: time consumption" stderr])
 AT_KEYWORDS(commandline)
 AT_CLEANUP
 
+AT_SETUP([Remote termination (dry run)])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([LOLA garavel.lola -v --remoteTermination=goodbye],0,ignore,stderr)
+AT_CHECK([GREP -q "enabling remote termination (--remoteTermination)" stderr])
+AT_KEYWORDS(commandline)
+AT_CLEANUP
+
+AT_SETUP([Remote termination (startup)])
+AT_CHECK([cp TESTFILES/garavel.lola .])
+AT_CHECK([nohup LOLA garavel.lola -v --check=deadlock --search=findpath --remoteTermination=goodbye &],0,ignore,stderr)
+AT_KEYWORDS(commandline)
+AT_CLEANUP
+
+AT_SETUP([Remote termination (killer)])
+AT_CHECK([KILLER],0,ignore,stderr)
+AT_CHECK([GREP -q "lola: sending KILL packet (goodbye)" stderr])
+AT_KEYWORDS(commandline)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([File input/output])

@@ -192,10 +192,12 @@ void Handlers::installTerminationHandlers()
 
         const int ret = pthread_create(&terminationHandler_thread, NULL,
                                        remoteTerminationHandler, NULL);
+        // LCOV_EXCL_START
         if (UNLIKELY(ret != 0))
         {
             rep->status("thread could not be created");
             rep->abort(ERROR_THREADING);
         }
+        // LCOV_EXCL_STOP
     }
 }

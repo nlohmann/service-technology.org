@@ -35,3 +35,6 @@ bool Globals::pflg = false;
 bool Globals::gmflg = false;
 bool Globals::cflg = false;
 char Globals::graphformat = '\0';
+
+bool Globals::capflg = false;
+int Globals::capacity = -1;

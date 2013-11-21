@@ -58,7 +58,8 @@ DISTCLEANFILES += $(CONFIGS)$(EXEEXT)
 
 check_binaries = lola-deadlock lola-fulllimited lola-modelchecking \
                  lola-statepredicate1 lola-liveprop lola-boundednet \
-                 lola-statespace lola-statepredicate lola-boundedplace
+                 lola-statespace lola-statepredicate lola-boundedplace \
+		 lola-boundedgraph
 
 check-local: $(check_binaries)
 

@@ -3369,6 +3369,10 @@ unsigned int compute_scc() {
     CurrentState->nexttar = CurrentState->prevtar = CurrentState;
     TarStack = CurrentState;
 
+#ifdef USECAPACITY
+    bool boundbroken = false;
+#endif
+
     // process marking until returning from initial state
     while (CurrentState) {
         if (CurrentState->firelist[CurrentState->current]) {
@@ -3377,7 +3381,7 @@ unsigned int compute_scc() {
             if (!(Edges % REPORTFREQUENCY)) {
                 report_statistics();
             }
-            CurrentState->firelist[CurrentState->current]->fire();
+            boundbroken = CurrentState->firelist[CurrentState->current]->fire();
             if ((NewState = SEARCHPROC())) {
                 // State exists! (or, at least, I am not responsible for it (in the moment))
                 CurrentState->firelist[CurrentState->current]->backfire();
@@ -3388,7 +3392,19 @@ unsigned int compute_scc() {
                 (CurrentState->current) ++;
             } else {
                 NewState = INSERTPROC();
+#ifndef USECAPACITY
                 NewState->firelist = FIRELIST();
+#endif
+#ifdef USECAPACITY
+                if (!boundbroken) {
+                	NewState->firelist = FIRELIST();
+                } else {
+                	Transition** tl = new Transition * [1];
+                	tl[0] = NULL;
+                	NewState->firelist = tl;
+                	NewState->boundbroken = true;
+                }
+#endif
                 NewState->dfs = NewState->min = NrOfStates++;
                 NewState->prevtar = TarStack;
                 NewState->nexttar = TarStack->nexttar;
@@ -3405,6 +3421,13 @@ unsigned int compute_scc() {
 
             if (Globals::gmflg || Globals::GMflg) {
                 (*graphstream) << "STATE " << CurrentState->dfs;
+#ifdef USECAPACITY
+                (*graphstream) << " BAD: ";
+                if (CurrentState->boundbroken)
+                	(*graphstream) << "1";
+                else
+                	(*graphstream) << "0";
+#endif
                 (*graphstream) << " Lowlink: " << CurrentState->min;
             }
 

@@ -125,13 +125,14 @@ option "verbose" v
   flag off
 
 
-#section "Other Options"
-#
-#option "capacity" C
-#  "Set the default number of tokens per place. Can be overridden by specifying #'SAFE' statements in the net input file.\n"
-#  int
-#  typestr="NUMBER"
-#  optional
+section "Other Options"
+
+option "capacity" C
+  "Set the default number of tokens per place. Can be overridden by specifying #'SAFE' statements in the net input file.\n"
+  int
+  typestr="NUMBER"
+  default="-1"
+  optional
 
 
 text "

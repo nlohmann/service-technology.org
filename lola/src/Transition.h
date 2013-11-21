@@ -37,7 +37,7 @@ class Transition: public Node {
         Transition** ImproveDisabling;  ///< list of transitions where disabledness
         ///< must be checked again after firing this transition
         void initialize(); ///< Set arrays, list, enabled etc. for this transition
-        void fire(); ///< replace current marking by successor marking, force
+        bool fire(); ///< replace current marking by successor marking, force
         ///< enabling test where necessary
         void backfire(); ///< fire transition backwards to replace original state,
         ///< force enabling tests where necessary, used in backtracking
@@ -298,7 +298,7 @@ inline void Transition::initialize() {
 }
 
 /// fire this transition on Globals::CurrentMarking, re-evaluate enabledness
-inline void Transition::fire() {
+inline bool Transition::fire() {
     unsigned int* p;
     Transition** t;
     unsigned int* i;
@@ -310,6 +310,17 @@ inline void Transition::fire() {
     lastfired = currentdfsnum;
 #endif
 #endif
+
+#ifdef USECAPACITY
+    bool capacityexceeded = false;
+    int capacity = 1;
+    if (Globals::capflg) {
+    	capacity = Globals::capacity;
+    } else {
+    	capacity = CAPACITY;
+    }
+#endif
+
     for (p = IncrPlaces, i = Incr; *p < UINT_MAX; p++, i++) {
 #ifdef COVER
         if (Globals::Places[(*p)]-> bounded) {
@@ -326,10 +337,27 @@ inline void Transition::fire() {
                     fprintf(Globals::resultfile, "capacity: {\n  exceeded = true;\n  capacity = %d;\n  place = \"%s\";\n  marking = %d;\n};\n", Globals::Places[*p]->capacity, Globals::Places[*p]->name, Globals::CurrentMarking[*p]);
                 }
 
-
                 exit(4);
             }
 #endif
+
+#ifdef USECAPACITY
+            if (capacity != -1 && Globals::CurrentMarking[*p] > capacity) {
+            	//message("capacity of place '%s' exceeded", _cimportant_(Globals::Places[*p]->name));
+//            	message("marking(%s)=%d > capacity(%s)=%d",
+//            			_cimportant_(Globals::Places[*p]->name), Globals::Globals::CurrentMarking[*p],
+//            			_cimportant_(Globals::Places[*p]->name), capacity);
+
+            	if (Globals::resultfile) {
+            		fprintf(Globals::resultfile, "capacity: {\n  exceeded = true;\n  capacity = %d;\n  place = \"%s\";\n  marking = %d;\n};\n", capacity, Globals::Places[*p]->name, Globals::Globals::CurrentMarking[*p]);
+            	}
+
+            	capacityexceeded = true;
+
+            	// return capacityexceeded; //?
+            }
+#endif
+
 #ifdef COVER
 #ifndef SWEEP
             Globals::Places[0]->hash_value += (*i) * Globals::Places[*p]->hash_factor;
@@ -353,22 +381,41 @@ inline void Transition::fire() {
     }
 
 
+
 #ifndef COVER
 #ifndef SWEEP
     Globals::Places[0]->hash_value += hash_change;
     Globals::Places[0]->hash_value %= HASHSIZE;
 #endif
 #endif
+#ifndef USECAPACITY
     for (t = ImproveEnabling; *t; t++) {
-        if (!((*t) -> enabled)) {
-            (*t)->check_enabled();
-        }
+    	if (!((*t) -> enabled)) {
+    		(*t)->check_enabled();
+    	}
     }
     for (t = ImproveDisabling; *t; t++) {
-        if ((*t)->enabled) {
-            (*t)->check_enabled();
-        }
+    	if ((*t)->enabled) {
+    		(*t)->check_enabled();
+    	}
     }
+#endif
+#ifdef USECAPACITY
+//    if (!capacityexceeded) { // added by Simon
+    	for (t = ImproveEnabling; *t; t++) {
+    		if (!((*t) -> enabled)) {
+    			(*t)->check_enabled();
+    		}
+    	}
+    	for (t = ImproveDisabling; *t; t++) {
+    		if ((*t)->enabled) {
+    			(*t)->check_enabled();
+    		}
+    	}
+//    }
+    return capacityexceeded;
+#endif
+    return false;
 }
 
 /// undo effect of firing transition (used for backtracking)

@@ -97,6 +97,9 @@ class State {
         unsigned int ddfs, mmin;
 
 #endif
+#ifdef USECAPACITY
+        bool boundbroken;
+#endif
 
 };
 
@@ -138,6 +141,9 @@ inline State::State() {
 #ifdef FULLTARJAN
     expired = false;
     tarlevel = 0;
+#endif
+#ifdef USECAPACITY
+     boundbroken = false;
 #endif
 }
 

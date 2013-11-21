@@ -170,6 +170,16 @@ void processCommandLine(int argc, char** argv) {
     Globals::gmflg = args_info.graph_given + args_info.marking_given;
     Globals::cflg = args_info.Master_given;
 
+    Globals::capflg = args_info.capacity_given;
+
+    if (args_info.capacity_given) {
+#ifdef CAPACITY
+#undef CAPACITY
+#endif
+#define CAPACITY args_info.capacity_arg;
+    	Globals::capacity = args_info.capacity_arg;
+    }
+
     // set graph format
     if (args_info.Graph_given || args_info.graph_given) {
         Globals::graphformat = 'g';

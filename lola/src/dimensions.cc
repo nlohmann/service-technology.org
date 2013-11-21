@@ -220,6 +220,9 @@ void reportconfiguration() {
     cout << "  STATESPACE: compute a graph with information about" << endl;
     cout << "              strongly connected components" << endl;
 #endif
+#ifdef USECAPACITY
+    cout << "  USECAPACITY: check a given capacity and..." << endl;
+#endif
 #ifdef NONE
     cout << "  NONE: do not compute any graph" << endl;
 #endif
@@ -382,6 +385,9 @@ void createUserconfigFile(char* suffix) {
         fprintf(userconfig, "#define CAPACITY %u\n", CAPACITY);
 #ifdef CHECKCAPACITY
         fprintf(userconfig, "#define CHECKCAPACITY\n");
+#endif
+#ifdef USECAPACITY
+        fprintf(userconfig, "#define USECAPACITY\n");
 #endif
     }
 #endif

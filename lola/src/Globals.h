@@ -82,6 +82,9 @@ class Globals {
         static bool gmflg;
         static bool cflg;
 
+        static bool capflg;
+        static int capacity;
+
         /// command line option (verbatim) for controlling reachability graph output format
         static char graphformat;
 };

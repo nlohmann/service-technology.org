@@ -36,6 +36,15 @@
 //#define CHECKCAPACITY
 //#define CAPACITY 1
 
+// set USECAPACITY if you want LoLA to stop at a marking if state
+// space construction reaches a state with more tokens on a place
+// than specified. The state is then marked with 'BAD: 1' in the output.
+// This has only been tested with the same settings as lola-statespace.
+// Other options may be harmed by setting USECAPACITY.
+// NOTE: The capacity can be set via the command-line (--capacity=...) 
+
+//#define USECAPACITY
+
 // REPORTFREQUENCY controls the output of progress messages to the
 // terminal (to be precise: to the standard error stream).
 // Progress messages are written during graph generation

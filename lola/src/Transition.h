@@ -426,7 +426,6 @@ inline bool Transition::fire() {
 //    }
     return capacityexceeded;
 #endif
-    return false;
 }
 
 /// undo effect of firing transition (used for backtracking)

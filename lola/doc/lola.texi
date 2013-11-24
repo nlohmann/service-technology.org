@@ -290,6 +290,7 @@ This executable is compiled in the following configuration:
 Alternatively, you can compile one of the preconfigured versions of LoLA. These versions already cover a lot of scenarios. The following preconfigured versions are available:
 @multitable @columnfractions .25 .75
 @headitem Name @tab Description
+@item @code{lola-boundedgraph} @tab generate the state space of the net with a given capacity on the places
 @item @code{lola-boundednet} @tab check for boundedness of the net
 @item @code{lola-boundedplace} @tab check for boundedness of a given place
 @item @code{lola-deadlock} @tab check for deadlock freedom of the net
@@ -964,8 +965,8 @@ Using LoLA, you can verify various properties, including properties of
 @itemize
 @item the whole net
 @item a marking
-@item a places
-@item a transitions
+@item a place
+@item a transition
 @item a state predicate
 @item a @acronym{CTL}-formula
 @end itemize
@@ -1213,6 +1214,45 @@ The following reduction techniques may be applied:
 
 Both depth first search and breadth first search are available. Breadth first search is only recommended if you are interested in a shortest witness path to a deadlock. Choose the search strategy by selecting (commenting or uncommenting) the appropriate lines in the file @file{userconfig.h}.
 
+
+@subsection Checking Nothing (with bounded capacity)
+@cindex @code{BOUNDEDGRAPH} analysis task
+@cindex @code{lola-boundedgraph} preconfigured binary
+
+LoLA can generate the state space of a net with a given bound on the capacity of the net's places. This feature is useful for obtaining (and post-processing) the state space of a possible unbounded net. 
+
+Edit file @file{userconfig.h} and select the option @samp{BOUNDEDGRAPH} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-boundedgraph} to create a preconfigured binary @file{lola-boundedgraph}. Call that file with your net specification and a capacity. 
+
+@cartouche
+@b{Example for an unbounded net:}
+@example
+$ lola-boundedgraph unbounded.lola --capacity=1
+lola: 4 significant places
+@end example
+@end cartouche
+
+If the '-M', '-m', '-G' or the '-g' parameter is set then states in which the capacity was broken will have the annotation 'BAD: 1' in the output and otherwise 'BAD: 0'.
+
+@cartouche
+@b{With the '-M' option:}
+@example
+$ lola-boundedgraph unbounded.lola --capacity=1 -M
+lola: 4 significant places
+STATE 3 BAD: 1 Lowlink: 3
+a : 2,
+c : 1,
+p2 : 1
+
+
+STATE 2 BAD: 0 Lowlink: 2
+a : 1,
+c : 1,
+p1 : 1
+
+t1 -> 3
+...
+@end example
+@end cartouche
 
 @subsection Not Checking
 @cindex @code{NONE} analysis task

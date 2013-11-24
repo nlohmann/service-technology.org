@@ -200,6 +200,18 @@ AT_CLEANUP
 
 
 ############################################################################
+AT_BANNER([Bounded Capacity (lola-boundedgraph)])
+############################################################################
+
+AT_SETUP([Unbounded Net])
+AT_CHECK([cp TESTFILES/unbounded.lola .])
+AT_CHECK([LOLA_BOUNDEDGRAPH unbounded.lola -M --capacity=2],0,stdout,ignore)
+AT_CHECK([GREP -q "BAD: 1" stdout],0)
+AT_KEYWORDS(boundedgraph)
+AT_CLEANUP
+
+
+############################################################################
 AT_BANNER([State Predicate (lola-statepredicate1)])
 ############################################################################
 

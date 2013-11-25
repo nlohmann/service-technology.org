@@ -1221,7 +1221,9 @@ Both depth first search and breadth first search are available. Breadth first se
 
 LoLA can generate the state space of a net with a given bound on the capacity of the net's places. This feature is useful for obtaining (and post-processing) the state space of a possible unbounded net. 
 
-Edit file @file{userconfig.h} and select the option @samp{BOUNDEDGRAPH} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-boundedgraph} to create a preconfigured binary @file{lola-boundedgraph}. Call that file with your net specification and a capacity. 
+Edit file @file{userconfig.h} and select the option @samp{BOUNDEDGRAPH} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-boundedgraph} to create a preconfigured binary @file{lola-boundedgraph}. Call that file with your net specification and a capacity.
+
+If 'CAPACITY' is defined then this serves as a maximal capacity which can be set at build-time.
 
 @cartouche
 @b{Example for an unbounded net:}

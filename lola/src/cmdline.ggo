@@ -128,7 +128,7 @@ option "verbose" v
 section "Other Options"
 
 option "capacity" C
-  "Set the default number of tokens per place. Can be overridden by specifying #'SAFE' statements in the net input file.\n"
+  "Set the default number of tokens per place.\n"
   int
   typestr="NUMBER"
   default="-1"

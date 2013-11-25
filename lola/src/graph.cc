@@ -3369,7 +3369,7 @@ unsigned int compute_scc() {
     CurrentState->nexttar = CurrentState->prevtar = CurrentState;
     TarStack = CurrentState;
 
-#ifdef USECAPACITY
+#ifdef LIMITCAPACITY
     bool boundbroken = false;
 #endif
 
@@ -3381,12 +3381,11 @@ unsigned int compute_scc() {
             if (!(Edges % REPORTFREQUENCY)) {
                 report_statistics();
             }
-#ifndef USECAPACITY
+
+#ifdef LIMITCAPACITY
+            boundbroken =
+#endif
             CurrentState->firelist[CurrentState->current]->fire();
-#endif
-#ifdef USECAPACITY
-            boundbroken = CurrentState->firelist[CurrentState->current]->fire();
-#endif
             if ((NewState = SEARCHPROC())) {
                 // State exists! (or, at least, I am not responsible for it (in the moment))
                 CurrentState->firelist[CurrentState->current]->backfire();
@@ -3397,13 +3396,14 @@ unsigned int compute_scc() {
                 (CurrentState->current) ++;
             } else {
                 NewState = INSERTPROC();
-#ifndef USECAPACITY
+#ifndef LIMITCAPACITY
                 NewState->firelist = FIRELIST();
 #endif
-#ifdef USECAPACITY
+#ifdef LIMITCAPACITY
                 if (!boundbroken) {
                 	NewState->firelist = FIRELIST();
                 } else {
+                	// if the capacity was broken then mark the state as bad and add an empty firelist
                 	Transition** tl = new Transition * [1];
                 	tl[0] = NULL;
                 	NewState->firelist = tl;
@@ -3426,7 +3426,7 @@ unsigned int compute_scc() {
 
             if (Globals::gmflg || Globals::GMflg) {
                 (*graphstream) << "STATE " << CurrentState->dfs;
-#ifdef USECAPACITY
+#ifdef LIMITCAPACITY
                 (*graphstream) << " BAD: ";
                 if (CurrentState->boundbroken)
                 	(*graphstream) << "1";

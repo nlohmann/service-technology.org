@@ -37,10 +37,10 @@ class Transition: public Node {
         Transition** ImproveDisabling;  ///< list of transitions where disabledness
         ///< must be checked again after firing this transition
         void initialize(); ///< Set arrays, list, enabled etc. for this transition
-#ifdef USECAPACITY
+#ifdef LIMITCAPACITY
         bool fire(); ///< replace current marking by successor marking, force
 #endif
-#ifndef USECAPACITY
+#ifndef LIMITCAPACITY
         void fire(); ///< replace current marking by successor marking, force
 #endif
         ///< enabling test where necessary
@@ -302,11 +302,11 @@ inline void Transition::initialize() {
     set_hashchange();
 }
 
-#ifdef USECAPACITY
-/// fire this transition on Globals::CurrentMarking, re-evaluate enabledness
-inline bool Transition::fire() {
+#ifdef LIMITCAPACITY
+	/// fire this transition on Globals::CurrentMarking, re-evaluate enabledness
+	inline bool Transition::fire() {
 #endif
-#ifndef USECAPACITY
+#ifndef LIMITCAPACITY
 	/// fire this transition on Globals::CurrentMarking, re-evaluate enabledness
 	inline void Transition::fire() {
 #endif
@@ -322,14 +322,8 @@ inline bool Transition::fire() {
 #endif
 #endif
 
-#ifdef USECAPACITY
+#ifdef LIMITCAPACITY
     bool capacityexceeded = false;
-    int capacity = 1;
-    if (Globals::capflg) {
-    	capacity = Globals::capacity;
-    } else {
-    	capacity = CAPACITY;
-    }
 #endif
 
     for (p = IncrPlaces, i = Incr; *p < UINT_MAX; p++, i++) {
@@ -352,20 +346,18 @@ inline bool Transition::fire() {
             }
 #endif
 
-#ifdef USECAPACITY
-            if (capacity != -1 && Globals::CurrentMarking[*p] > capacity) {
+#ifdef LIMITCAPACITY
+            if (Globals::capacity != -1 && Globals::CurrentMarking[*p] > Globals::capacity) {
             	//message("capacity of place '%s' exceeded", _cimportant_(Globals::Places[*p]->name));
 //            	message("marking(%s)=%d > capacity(%s)=%d",
 //            			_cimportant_(Globals::Places[*p]->name), Globals::Globals::CurrentMarking[*p],
 //            			_cimportant_(Globals::Places[*p]->name), capacity);
 
             	if (Globals::resultfile) {
-            		fprintf(Globals::resultfile, "capacity: {\n  exceeded = true;\n  capacity = %d;\n  place = \"%s\";\n  marking = %d;\n};\n", capacity, Globals::Places[*p]->name, Globals::Globals::CurrentMarking[*p]);
+            		fprintf(Globals::resultfile, "capacity: {\n  exceeded = true;\n  capacity = %d;\n  place = \"%s\";\n  marking = %d;\n};\n", Globals::capacity, Globals::Places[*p]->name, Globals::Globals::CurrentMarking[*p]);
             	}
 
             	capacityexceeded = true;
-
-            	// return capacityexceeded; //?
             }
 #endif
 
@@ -399,7 +391,7 @@ inline bool Transition::fire() {
     Globals::Places[0]->hash_value %= HASHSIZE;
 #endif
 #endif
-#ifndef USECAPACITY
+#ifndef LIMITCAPACITY
     for (t = ImproveEnabling; *t; t++) {
     	if (!((*t) -> enabled)) {
     		(*t)->check_enabled();
@@ -411,7 +403,7 @@ inline bool Transition::fire() {
     	}
     }
 #endif
-#ifdef USECAPACITY
+#ifdef LIMITCAPACITY
 //    if (!capacityexceeded) { // added by Simon
     	for (t = ImproveEnabling; *t; t++) {
     		if (!((*t) -> enabled)) {

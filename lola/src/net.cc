@@ -170,15 +170,39 @@ void processCommandLine(int argc, char** argv) {
     Globals::gmflg = args_info.graph_given + args_info.marking_given;
     Globals::cflg = args_info.Master_given;
 
+#ifdef LIMITCAPACITY
     Globals::capflg = args_info.capacity_given;
 
-    if (args_info.capacity_given) {
 #ifdef CAPACITY
-#undef CAPACITY
-#endif
-#define CAPACITY args_info.capacity_arg;
-    	Globals::capacity = args_info.capacity_arg;
+    if (CAPACITY != -1) {
+    	if (args_info.capacity_given) {
+    		if (args_info.capacity_arg > CAPACITY) {
+    			message("The given '--capacity' parameter has to be less or equal than the defined 'CAPACITY'.");
+    			exit(2);
+    		} else {
+    			Globals::capacity = args_info.capacity_arg;
+    		}
+    	} else {
+    		Globals::capacity = CAPACITY;
+    	}
+    } else {
+    	if (args_info.capacity_given) {
+    		Globals::capacity = args_info.capacity_arg;
+    	} else {
+    		message("No capacity was given. It can be set by specifying the '--capacity' parameter or alternatively by defining 'CAPACITY'.");
+    		exit(2);
+    	}
     }
+#endif
+#ifndef CAPACITY
+    if (args_info.capacity_given) {
+    	Globals::capacity = args_info.capacity_arg;
+    } else {
+    	message("No capacity was given. It can be set by specifying the '--capacity' parameter or alternatively by defining 'CAPACITY'.");
+    	exit(2);
+    }
+#endif
+#endif
 
     // set graph format
     if (args_info.Graph_given || args_info.graph_given) {

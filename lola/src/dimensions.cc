@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <string>
 #include "dimensions.h"
+#include "Globals.h"
 #include "verbose.h"
 
 using std::cout;
@@ -220,8 +221,9 @@ void reportconfiguration() {
     cout << "  STATESPACE: compute a graph with information about" << endl;
     cout << "              strongly connected components" << endl;
 #endif
-#ifdef USECAPACITY
-    cout << "  USECAPACITY: check a given capacity and..." << endl;
+#ifdef LIMITCAPACITY
+    cout << "  LIMITCAPACITY: limit the computation of the reachability" << endl;
+    cout << "                 graph by a given capacity on the places" << endl;
 #endif
 #ifdef NONE
     cout << "  NONE: do not compute any graph" << endl;
@@ -323,8 +325,13 @@ void reportconfiguration() {
     cout << endl << "* Values of numerical parameters: " << endl;
     cout << "  HASHSIZE        : " << HASHSIZE << " entries in hash table." << endl;
     cout << "  REPORTFREQUENCY : status report every " << REPORTFREQUENCY << " transitions fired." << endl;
+#ifdef LIMITCAPACITY
+    cout << "  CAPACITY        : at most " << Globals::capacity << " tokens on any place." << endl;
+#endif
+#ifndef LIMITCAPACITY
 #ifdef CAPACITY
     cout << "  CAPACITY        : at most " << CAPACITY << " tokens on any place." << endl;
+#endif
 #endif
 #ifdef FINDPATH
     cout << "  MAXPATH         : reset to initial state after " << MAXPATH << " transition occurrences." << endl;
@@ -386,8 +393,8 @@ void createUserconfigFile(char* suffix) {
 #ifdef CHECKCAPACITY
         fprintf(userconfig, "#define CHECKCAPACITY\n");
 #endif
-#ifdef USECAPACITY
-        fprintf(userconfig, "#define USECAPACITY\n");
+#ifdef LIMITCAPACITY
+        fprintf(userconfig, "#define LIMITCAPACITY\n");
 #endif
     }
 #endif

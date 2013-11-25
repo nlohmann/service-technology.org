@@ -36,14 +36,16 @@
 //#define CHECKCAPACITY
 //#define CAPACITY 1
 
-// set USECAPACITY if you want LoLA to stop at a marking if state
+// set LIMITCAPACITY if you want LoLA to stop at a marking if state
 // space construction reaches a state with more tokens on a place
 // than specified. The state is then marked with 'BAD: 1' in the output.
 // This has only been tested with the same settings as lola-statespace.
-// Other options may be harmed by setting USECAPACITY.
+// Other options may be harmed by setting LIMITCAPACITY.
 // NOTE: The capacity can be set via the command-line (--capacity=...) 
+// NOTE 2: A maximal capacity can be defined at build-time by defining
+//         the 'CAPACITY' (#define CAPACITY xy)
 
-//#define USECAPACITY
+//#define LIMITCAPACITY
 
 // REPORTFREQUENCY controls the output of progress messages to the
 // terminal (to be precise: to the standard error stream).
@@ -135,6 +137,8 @@
 // REACHABILITY searches for a given state
 // REVERSIBILITY verifies reversibility of the net
 // HOME checks for home states
+// BOUNDEDGRAPH computes the state space of the net bounded by a given
+// capacity (given by the '--capacity' parameter or by defining 'CAPACITY')
 // BOUNDEDNET decides boundedness of the net
 // BOUNDEDPLACE decides boundedness of a given place
 // DEADTRANSITION verifies whether a given transition is dead
@@ -153,6 +157,7 @@
 
 //#define REACHABILITY
 //#define MODELCHECKING
+//#define BOUNDEDGRAPH
 //#define BOUNDEDPLACE
 //#define BOUNDEDNET
 //#define DEADTRANSITION

@@ -97,7 +97,7 @@ class State {
         unsigned int ddfs, mmin;
 
 #endif
-#ifdef USECAPACITY
+#ifdef LIMITCAPACITY
         bool boundbroken;
 #endif
 
@@ -142,7 +142,7 @@ inline State::State() {
     expired = false;
     tarlevel = 0;
 #endif
-#ifdef USECAPACITY
+#ifdef LIMITCAPACITY
      boundbroken = false;
 #endif
 }

@@ -1,0 +1,47 @@
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  p_conc,
+  p2;
+INPUT
+  i, j;
+OUTPUT
+  o;
+
+INITIALMARKING
+  p0:	1,
+  p_conc: 1
+ ;
+
+FINALCONDITION
+  p2 >= 1 AND p_conc = 0
+ ;
+
+TRANSITION t1	 { !o }
+CONSUME
+  p0:	1;
+PRODUCE
+   o:   1,
+  p1:	1;
+
+TRANSITION t2	 { ?i }
+CONSUME
+  i:	1,
+  p1: 1;
+PRODUCE
+  p0:	1;
+
+TRANSITION t_conc  { ?j }
+CONSUME
+  j: 1,
+  p_conc: 1;
+PRODUCE;
+
+TRANSITION t3
+CONSUME
+  p0:	1;
+PRODUCE
+  p2:	1;
+
+{ END OF FILE }

@@ -1,0 +1,43 @@
+{minimal usecase for net with unbounded costs}
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  p2;
+INPUT
+  b,
+  c;
+OUTPUT
+  a;
+
+INITIALMARKING
+  p0:	1
+ ;
+
+FINALMARKING
+  p2:	1
+ ;
+
+TRANSITION t1	 { !a }
+CONSUME
+  p0:	1;
+PRODUCE
+  a:    1,
+  p1:	1;
+
+TRANSITION t2	 { ?b }
+CONSUME
+  b:	1,
+  p1: 1;
+PRODUCE
+  p2:	1;
+
+TRANSITION t3	 { ?c }
+CONSUME
+  c:  1,
+  p1: 1;
+PRODUCE
+  p2:	1;
+ 
+{ END OF FILE }

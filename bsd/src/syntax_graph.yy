@@ -18,7 +18,7 @@
 \*****************************************************************************/
 
 
-%token KW_STATE KW_LOWLINK KW_SCC COLON COMMA ARROW NUMBER NAME
+%token KW_STATE KW_LOWLINK KW_SCC COLON COMMA ARROW NUMBER NAME KW_BAD
 
 %expect 0
 %defines
@@ -82,10 +82,10 @@ states:
 ;
 
 state:
-  KW_STATE NUMBER lowlink scc markings_or_transitions
+  KW_STATE NUMBER KW_BAD NUMBER lowlink scc markings_or_transitions
     {
         InnerMarking::markingMap[$2] = new InnerMarking($2, currentLabels, currentSuccessors,
-                                           openNet::net->getFinalCondition().isSatisfied(pnapi::Marking(marking, openNet::net)));
+                                           openNet::net->getFinalCondition().isSatisfied(pnapi::Marking(marking, openNet::net)), $4);
                                            
         /* ================================================================================= */
         /* calculate strongly connected components and do some evaluation on its members     */

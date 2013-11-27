@@ -31,7 +31,6 @@
  ******************/
 
 std::map<InnerMarking_ID, InnerMarking*> InnerMarking::markingMap;
-std::map<InnerMarking_ID, bool> InnerMarking::finalMarkingReachableMap;
 bool InnerMarking::is_acyclic = true;
 InnerMarking** InnerMarking::inner_markings = NULL;
 std::map<Label_ID, std::set<InnerMarking_ID> > InnerMarking::receivers;
@@ -60,9 +59,6 @@ void InnerMarking::initialize() {
         assert(markingMap[i]);
 
         inner_markings[i] = markingMap[i];
-        inner_markings[i]->is_bad = (inner_markings[i]->is_bad or
-                                     (finalMarkingReachableMap.find(i) != finalMarkingReachableMap.end()
-                                      and finalMarkingReachableMap[i] == false));
 
         // register markings that may become activated by sending a message
         // to them, by receiving a message or by synchronization
@@ -83,10 +79,9 @@ void InnerMarking::initialize() {
 
     // destroy temporary STL mappings
     markingMap.clear();
-    finalMarkingReachableMap.clear();
 
-    status("stored %d inner markings (%d final, %d bad, %d inevitable deadlocks)",
-           stats.markings, stats.final_markings, stats.bad_states, stats.inevitable_deadlocks);
+    status("stored %d inner markings (%d final, %d bad)",
+           stats.markings, stats.final_markings, stats.bad_states);
 
     if (stats.final_markings == 0) {
         message("%s: %s", _cimportant_("warning"), _cwarning_("no final marking found"));
@@ -104,7 +99,6 @@ void InnerMarking::finalize() {
     stats.bad_states = 0;
     stats.final_markings = 0;
     stats.markings = 0;
-    stats.inevitable_deadlocks = 0;
 }
 
 
@@ -115,8 +109,9 @@ void InnerMarking::finalize() {
 InnerMarking::InnerMarking(const InnerMarking_ID& myId,
                            const std::vector<Label_ID>& _labels,
                            const std::vector<InnerMarking_ID>& _successors,
-                           const bool& _is_final)
-    : is_final(_is_final), is_waitstate(0), is_bad(0),
+                           const bool& _is_final,
+                           const bool& is_bad)
+    : is_final(_is_final), is_bad(is_bad),
       out_degree(_successors.size()), successors(new InnerMarking_ID[out_degree]),
       labels(new Label_ID[out_degree]) {
     assert(_labels.size() == out_degree);
@@ -146,79 +141,24 @@ InnerMarking::~InnerMarking() {
  ******************/
 
 /*!
- The type is determined by checking the labels of the leaving transitions as
- well as the fact whether this marking is a final marking. For the further
+ The type is determined by checking if the marking exceeded the capacity and
+ whether this marking is a final marking. For the further
  processing, it is sufficient to distinguish three types:
 
- - the marking is a bad state (is_bad) -- then a knowledge containing
-   this inner marking can immediately be considered insane
+ - the marking is a bad state (is_bad) -- the capacity has been broken in
+   this marking
  - the marking is a final marking (is_final) -- this is needed to distinguish
    deadlocks from final markings
- - the marking is a waitstate (is_waitstate) -- a waitstate is a marking of
-   the inner of the net that can only be left by firing a transition that is
-   connected to an input place
 
- This function also implements the detection of inevitable deadlocks. A
- marking is an inevitable deadlock, if it is a deadlock or all its successor
- markings are inevitable deadlocks. The detection exploits the way LoLA
- returns the reachability graph: when a marking is returned, we know that
- the only successors we have not considered yet (i.e. those markings where
- successors[i] == NULL) are also predecessors of this marking and cannot be
- a reason for this marking to be a deadlock. Hence, this marking is an
- inevitable deadlock if all known successors are deadlocks.
-
- \note except is_final, all types are initialized with 0, so it is sufficient
-       to only set values to 1
  */
 void InnerMarking::determineType(const InnerMarking_ID& myId) {
-    bool is_transient = false;
-
-    // deadlock: no successor markings and not final
-    if (out_degree == 0 and not is_final) {
+    // bound broken
+    if (is_bad) {
         ++stats.bad_states;
-        is_bad = 1;
     }
 
     if (is_final) {
         ++stats.final_markings;
-    }
-
-    // when only deadlocks are considered, we don't care about final markings
-    finalMarkingReachableMap[myId] = true;
-
-    // variable to detect whether this marking has only deadlocking successors
-    // standard: "true", otherwise evaluate noDeadlockDetection flag
-    bool deadlock_inevitable = true;
-    for (uint8_t i = 0; i < out_degree; ++i) {
-        // if a single successor is not a deadlock, everything is OK
-        if (markingMap[successors[i]] != NULL and
-                deadlock_inevitable and
-                not markingMap[successors[i]]->is_bad) {
-            deadlock_inevitable = false;
-        }
-
-        // if we have not seen a successor yet, we can't be a deadlock
-        if (markingMap[successors[i]] == NULL) {
-            deadlock_inevitable = false;
-        }
-
-        // a tau or sending (sic!) transition makes this marking transient
-        if (SILENT(labels[i]) or RECEIVING(labels[i])) {
-            is_transient = true;
-        }
-    }
-
-    // deadlock cannot be avoided any more -- treat this marking as deadlock
-    if (not is_final and
-            not is_bad and
-            deadlock_inevitable) {
-        is_bad = 1;
-        ++stats.inevitable_deadlocks;
-    }
-
-    // draw some last conclusions
-    if (not(is_transient or is_bad)) {
-        is_waitstate = 1;
     }
 }
 

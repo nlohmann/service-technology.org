@@ -1,4 +1,4 @@
-AC_INIT([BSD], 1.2-unreleased, bsd@service-technology.org, bsd, http://service-technology.org/bsd)
+AC_INIT([BSD], 1.3-unreleased, bsd@service-technology.org, bsd, http://service-technology.org/bsd)
 
 AC_MSG_NOTICE([ ____   ____ ____])
 AC_MSG_NOTICE([|  _  \\/ ___|  _ \\])
@@ -16,7 +16,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 
 # use the service-technology.org macros
 AC_ST_BASIC
-AC_ST_LOLA([1.14])
+AC_ST_LOLA([1.18])
 AC_ST_AUTOTEST
 AC_ST_PNAPI([4.02])
 AC_ST_VERBOSE

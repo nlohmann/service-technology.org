@@ -40,6 +40,7 @@ number    [0-9][0-9]*
 "Formula with\n"{number}" subformula(s)." { /* skip */ }
 
 "STATE"      { return KW_STATE; }
+"BAD:"      { return KW_BAD; }
 "Lowlink:"   { return KW_LOWLINK; }
 "SCC:"       { return KW_SCC; }
 ":"          { return COLON; }

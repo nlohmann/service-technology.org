@@ -14,21 +14,21 @@ Runtime
 -------
 
    * LoLA (`http://service-technology.org/lola'), compiled with the
-     `STATESPACE' option. A suitable LoLA (version 1.14 or above) binary can
+     `BOUNDEDGRAPH' option. A suitable LoLA (version 1.18 or above) binary can
      be created as follows:
        1. download `http://service-technology.org/files/lola/lola.tar.gz'
 
        2. untar `lola.tar.gz', configure
 
-       3. call `make lola-statespace'
+       3. call `make lola-boundedgraph'
 
-       4. copy the binary `src/lola-statespace' to a directory of your path
+       4. copy the binary `src/lola-boundedgraph' to a directory of your path
           (e.g., `/usr/local/bin') or call `make install'
 
      If LoLA is not installed before bsd is configured, a source release of
      LoLA is automatically downloaded and compiled.
 
-bsd's configure script checks whether LoLA (with binary `lola-statespace') is
+bsd's configure script checks whether LoLA (with binary `lola-boundedgraph') is
 found in the path and adjusts the configuration file `src/bsd.conf'
 accordingly.
 

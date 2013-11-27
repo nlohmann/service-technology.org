@@ -52,9 +52,6 @@ class InnerMarking {
         /// a temporary storage used during parsing of the reachability graph
         static std::map<InnerMarking_ID, InnerMarking*> markingMap;
 
-        /// a temporary storage used to detect internal livelocks
-        static std::map<InnerMarking_ID, bool> finalMarkingReachableMap;
-
         /// an array of the inner markings
         static InnerMarking** inner_markings;
 
@@ -79,9 +76,6 @@ class InnerMarking {
             /// the number of internal bad states
             unsigned int bad_states;
 
-            /// the number of markings that will reach a deadlock
-            unsigned int inevitable_deadlocks;
-
             /// the number of final markings
             unsigned int final_markings;
         } stats;
@@ -89,7 +83,7 @@ class InnerMarking {
     public: /* member functions */
         /// constructor
         InnerMarking(const InnerMarking_ID&, const std::vector<Label_ID>&,
-                     const std::vector<InnerMarking_ID>&, const bool&);
+                     const std::vector<InnerMarking_ID>&, const bool&, const bool&);
 
         /// destructor
         ~InnerMarking();
@@ -101,9 +95,6 @@ class InnerMarking {
     public: /* member attributes */
         /// whether this marking is final
         unsigned is_final : 1;
-
-        /// whether this marking needs an external event to proceed
-        unsigned is_waitstate : 1;
 
         /// whether this marking is an internal deadlock or livelock
         unsigned is_bad : 1;

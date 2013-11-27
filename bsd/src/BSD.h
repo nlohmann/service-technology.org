@@ -78,4 +78,3 @@ class BSD {
 };
 
 #define TAU 0
-#define BOUND 1

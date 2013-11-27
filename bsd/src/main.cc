@@ -210,6 +210,99 @@ int main(int argc, char** argv) {
 
     time(&program_start);
 
+//    if (args_info.lola_given) {
+//
+//            // set standard filenames
+//            std::string filename;
+//            std::string filepath;
+//            filename = std::string(PACKAGE) + "_output";
+//            filepath = "./";
+//
+//        	openNet::initialize();
+//
+//        	/*------------------------.
+//        	| 1.0. parse the open net |
+//        	`------------------------*/
+//        	try {
+//        		// parse either from standard input or from a given file
+//        		if (args_info.inputs_num == 0) {
+//        			status("reading from stdin...");
+//        			std::cin >> pnapi::io::owfn >> *openNet::net;
+//        		} else {
+//        			// strip suffix from input filename
+//        			filename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
+//        			filepath = std::string(args_info.inputs[0]).substr(0, filename.find_last_of("/")+1);
+//        			filename = filename.substr(filename.find_last_of("/")+1, filename.length());
+//
+//        			std::ifstream inputStream(args_info.inputs[0]);
+//        			if (!inputStream) {
+//        				abort(1, "could not open file '%s'", args_info.inputs[0]);
+//        			}
+//
+//        			inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
+//        						>> pnapi::io::owfn >> *openNet::net;
+//        		}
+//        		if (args_info.verbose_flag) {
+//        			std::ostringstream s;
+//        			s << pnapi::io::stat << *openNet::net;
+//        			status("read net: %s", s.str().c_str());
+//        		}
+//        	} catch (const pnapi::exception::InputError& error) {
+//        		std::ostringstream s;
+//        		s << error;
+//        		abort(2, "\b%s", s.str().c_str());
+//        	}
+//
+//
+//        	// "fix" the net in order to avoid parse errors from LoLA (see bug #14166)
+//        	if (openNet::net->getTransitions().empty()) {
+//        		status("net has no transitions -- adding dead dummy transition");
+//        		openNet::net->createArc(openNet::net->createPlace(), openNet::net->createTransition());
+//        	}
+//
+//        	// only normal nets are supported so far
+//        	if (not openNet::net->isNormal()) {
+//        		abort(3, "the input open net must be normal");
+//        	}
+//
+//        	/*===================================..
+//        	|| OWFN -> BSD automaton             ||
+//        	``===================================*/
+//
+//        	openNet::changeView(openNet::net);
+//
+//        	/*---------------------.
+//        	| 1.9. lola output 1   |
+//            `---------------------*/
+//
+//        	std::string lola_filename = args_info.output_arg ? (std::string)args_info.output_arg + "_normal.lola"
+//        													 : filepath + filename + "_normal.lola";
+//
+//        	Output output1(lola_filename, "LoLa");
+//        	//Output::owfnoutput(output.stream(), *openNet::net, filename);
+//        	output1.stream() << pnapi::io::lola << *openNet::net;
+//
+//
+//
+//        	openNet::addBoundsAndComplementPlaces(openNet::net, args_info.bound_arg);
+//
+//        	/*---------------------.
+//        	| 1.9. lola output 2   |
+//            `---------------------*/
+//
+//        	std::stringstream temp (std::stringstream::in | std::stringstream::out);
+//        	temp << args_info.bound_arg;
+//
+//        	lola_filename = args_info.output_arg ? (std::string)args_info.output_arg + "_" + temp.str() + "_comp.lola"
+//        										 : filepath + filename + "_" + temp.str() + "_comp.lola";
+//
+//        	Output output2(lola_filename, "LoLa");
+//        	//Output::owfnoutput(output.stream(), *openNet::net, filename);
+//        	output2.stream() << pnapi::io::lola << *openNet::net;
+//
+//        	return 0;
+//    }
+
     // in case of BSD or CSD computation or og output for matching
     if (args_info.BSD_flag || args_info.CSD_flag || args_info.og_flag) {
 
@@ -274,7 +367,8 @@ int main(int argc, char** argv) {
     	|| OWFN -> BSD automaton             ||
     	``===================================*/
 
-    	openNet::changeView(openNet::net, args_info.bound_arg);
+    	openNet::changeView(openNet::net);
+
 
     	/*----------------------------------------------.
     	| 1.1. initialize labels and interface markings |
@@ -292,7 +386,8 @@ int main(int argc, char** argv) {
 
     	temp->stream() << lola_net << std::endl;
 
-    	status("%s", lola_net.c_str());
+    	std::stringstream tempstr (std::stringstream::in | std::stringstream::out);
+    	tempstr << " --capacity=" << args_info.bound_arg;
 
 
     	/*--------------------------------------------.
@@ -301,9 +396,9 @@ int main(int argc, char** argv) {
     	// select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
     	//    // MinGW does not understand pathnames with "/", so we use the basename
-    	const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
+    	const std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + tempstr.str() + (args_info.verbose_flag ? "" : " 2> nul");
 #else
-    	const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
+    	const std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + tempstr.str() + (args_info.verbose_flag ? "" : " 2> /dev/null");
 #endif
 
     	// call LoLA

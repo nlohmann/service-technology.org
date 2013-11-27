@@ -38,7 +38,7 @@ class openNet {
 		static void initialize();
 
 		/// change the viewpoint to the environment
-        static void changeView(pnapi::PetriNet* net, const int b);
+        static void changeView(pnapi::PetriNet* net);
 
     public: /* static attributes */
         /// the open net

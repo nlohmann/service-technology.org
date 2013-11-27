@@ -1,3 +1,9 @@
+@heading Version 1.3-unreleased
+@itemize
+@item added support for lola version 1.18
+@item more efficient BSD computation
+@end itemize
+
 @heading Version 1.2-unreleased
 @itemize
 @item generate mp_b(N) and maximal b-partner of an OWFN N from CSD_b(N)

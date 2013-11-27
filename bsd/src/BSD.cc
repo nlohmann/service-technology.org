@@ -295,18 +295,17 @@ std::list<MarkingList>* BSD::tarjanClosure(InnerMarking_ID markingID) {
 	S->push(markingID);					// push v on top of stack
 	(*inStack)[markingID] = true;		// set to true (v is in stack)
 
+	// if the given bound is broken return NULL
+	if (InnerMarking::inner_markings[markingID]->is_bad) {
+		status("\tbound broken from marking %u", markingID);
+		return NULL;
+	}
+
 	std::list<MarkingList>* result = new std::list<MarkingList>;
 
 	// iterate through neighbour markings v' of v
 	status("\titerating through successors of marking %u:", markingID);
 	for (uint8_t i = 0; i < InnerMarking::inner_markings[markingID]->out_degree; ++i) {
-		// if the given bound is broken return true
-		if (InnerMarking::inner_markings[markingID]->labels[i] == BOUND) {
-			status("\tbound broken from marking %u", markingID);
-			delete result;
-			return NULL;
-		}
-
 		InnerMarking_ID idNeighbour = InnerMarking::inner_markings[markingID]->successors[i];
 		// only consider \tau-steps (other steps don't matter for the closures)
 		if (InnerMarking::inner_markings[markingID]->labels[i] == TAU) {
@@ -318,6 +317,7 @@ std::list<MarkingList>* BSD::tarjanClosure(InnerMarking_ID markingID) {
 				if (*it == idNeighbour) {
 					status("marking already visited");
 					visited = true;
+					//abort(1337,"hit the mark");
 					break;
 				}
 			}

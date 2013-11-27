@@ -48,14 +48,10 @@ void openNet::initialize() {
 
  For each interface place (or label), add a real place (interface places are only implicit) and
  a transition which represents the actions of the environment.
- Add an additional complement place for each interface transition with 'b' tokens which restricts
- the input and output transitions from unbounded firing to a maximum of 'b' tokens lying on the
- interface places.
 
  \param[in]	net	the petri net on which the function is used on
- \param[in]	b	bound b
  */
-void openNet::changeView(pnapi::PetriNet* net, const int b) {
+void openNet::changeView(pnapi::PetriNet* net) {
 	status("changing viewpoint to asynchronous environment...");
 
 //	// create a place which represents the maximal count of messages to be sent...
@@ -137,53 +133,7 @@ void openNet::changeView(pnapi::PetriNet* net, const int b) {
 
 	net->getFinalCondition() = ((net->getFinalCondition().getFormula()) && (condition->getFormula()));
 	delete condition;
-
-	// made bound_broken a sync label just for better recognition... \todo
-	pnapi::Label *label = &net->getInterface().addSynchronousLabel("bound_broken", "");
-
-	// create the complement places for all places
-	set<pnapi::Place *> places = net->getPlaces();
-	PNAPI_FOREACH(place, places)
-	{
-		// create a complement place with intial marking 'bound + 1 - init(place)'
-		pnapi::Place *compPlace = &net->createPlace((*place)->getName() + "_comp", b+1-(*place)->getTokenCount());
-
-		set<pnapi::Arc *> postset = (*place)->getPostsetArcs();
-		PNAPI_FOREACH(arc, postset) {
-			// add an arc from the transition to the complement place
-			net->createArc((*arc)->getTargetNode(), *compPlace, 1);
-		}
-
-		set<pnapi::Arc *> preset = (*place)->getPresetArcs();
-		PNAPI_FOREACH(arc, preset) {
-			// add an arc from the complement place to the transition
-			net->createArc(*compPlace, (*arc)->getSourceNode(), 1);
-
-//			// if an arc weight is greater than the added markings of place and complement place minus the bound
-//			// then it might be the case that a transition cannot fire because there are not enough tokens on a complement place
-//			// but the number of tokens on the corresponding place isn't breaking the bound
-//			if ((*arc)->getWeight() > (*place)->getTokenCount() + compPlace->getTokenCount() - b) {
-//				compPlace->setTokenCount(b + (*arc)->getWeight() - (*place)->getTokenCount());
-//			}
-		}
-
-//		// if place isn't a complement place!
-//		if ((*place)->getName().find("_comp") == std::string::npos) {
-
-		// create a new transition which can only fire if the bound is broken on this place
-		pnapi::Transition *t = &net->createTransition();
-		// add label
-		// \TODO: weight????!!!
-		t->addLabel(*label, b+1);
-
-		// add arcs with weight bound+1
-		net->createArc(*t, **place, b+1);
-		net->createArc(**place, *t, b+1);
-
-//		}
-	}
 }
-
 
 
 

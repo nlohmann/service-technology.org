@@ -8,12 +8,13 @@ Tackling non-functional properties for stateful services
           http://service-technology.org/tara
 
 
+
 Version 0.3
 ===========
 
 * support of usecase-cost model
 * support of risk-minimization
-* support of reset-transitions 
+* support of reset-transitions
 
 Version 0.2
 ===========

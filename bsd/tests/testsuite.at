@@ -59,8 +59,8 @@ AT_CLEANUP
 AT_SETUP([BSD consisting of single U node])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/testunbounded.owfn .])
-AT_CHECK([BSD_ testunbounded.owfn --verbose --bound=5 --BSD],0,ignore,ignore)
-AT_CHECK([test -f BSD_5_testunbounded.dot])
+AT_CHECK([BSD_ testunbounded.owfn --verbose --bound=3 --BSD],0,ignore,ignore)
+AT_CHECK([test -f BSD_3_testunbounded.dot])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 

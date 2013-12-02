@@ -71,9 +71,6 @@ void InnerMarking::initialize() {
             if (RECEIVING(inner_markings[i]->labels[j])) {
                 senders[inner_markings[i]->labels[j]].insert(i);
             }
-            if (SYNC(inner_markings[i]->labels[j])) {
-                synchs[inner_markings[i]->labels[j]].insert(i);
-            }
         }
     }
 

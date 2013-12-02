@@ -39,11 +39,8 @@ Label_ID Label::first_receive = 2;  //sic! (0 is the id for tau, 1 is the id for
 Label_ID Label::last_receive = 0;
 Label_ID Label::first_send = 0;
 Label_ID Label::last_send = 0;
-Label_ID Label::first_sync = 0;
-Label_ID Label::last_sync = 0;
 Label_ID Label::send_events = 0;
 Label_ID Label::receive_events = 0;
-Label_ID Label::sync_events = 0;
 Label_ID Label::events = 1; // (sic!)
 std::string Label::visible_transitions = "";
 
@@ -57,19 +54,16 @@ std::map<string, Label_ID> Label::name2id;
 
 /*!
  This function traverses the Petri net nodes and extracts the labels of the
- communication events (asynchronous send and receive events as well as
- synchronous events). Each event then gets a unique identifier.
+ communication events (asynchronous send and receive events).
+ Each event then gets a unique identifier.
  */
 void Label::initialize() {
-	first_receive = 2;  //sic! (0 is the id for tau, 1 is the id for bound_broken-transition)
+	first_receive = 2;  //sic! (0 is the id for tau, 1 was used in an older version)
 	last_receive = 0;
 	first_send = 0;
 	last_send = 0;
-	first_sync = 0;
-	last_sync = 0;
 	send_events = 0;
 	receive_events = 0;
-	sync_events = 0;
 	events = 1; // (sic!)
 	visible_transitions = "";
 
@@ -109,35 +103,6 @@ void Label::initialize() {
     }
 
     last_send = events;
-
-
-    // SYNCHRONOUS EVENTS (#-step for us)
-    first_sync = events + 1;
-
-    // collect the labels
-    const set<pnapi::Label*> sync_label_names(openNet::net->getInterface().getSynchronousLabels());
-
-    for (set<pnapi::Label*>::const_iterator l = sync_label_names.begin(); l != sync_label_names.end(); ++l, ++sync_events) {
-    	if ((**l).getName() != "bound_broken") {
-    		id2name[events] = (**l).getName();
-
-    		const set<Transition*> trans((**l).getTransitions());
-    		FOREACH(t, trans) {
-    			visible_transitions += (visible_transitions.empty() ? "" : " OR ") + (**t).getName();
-    			name2id[(**t).getName()] = events;
-    		}
-    	} else {
-    		id2name[1] = (**l).getName();
-
-    		const set<Transition*> trans((**l).getTransitions());
-    		FOREACH(t, trans) {
-    			visible_transitions += (visible_transitions.empty() ? "" : " OR ") + (**t).getName();
-    			name2id[(**t).getName()] = 1;
-    		}
-    	}
-    }
-
-    last_sync = events;
 }
 
 void Label::finalize() {

@@ -29,7 +29,7 @@ void printExcerpt(int first_line, int first_column, int last_line, int last_colu
     fprintf(stderr, "%3d  ", first_line);
 
     // print error line
-    for (int i = 0; i < strlen(line); ++i) {
+    for (size_t i = 0; i < strlen(line); ++i) {
         // replace tabs by spaces
         if (line[i] == '\t') {
             fprintf(stderr, " ");
@@ -46,7 +46,7 @@ void printExcerpt(int first_line, int first_column, int last_line, int last_colu
 
     fprintf(stderr, "     ");
     // print arrow indicating the error
-    for (int i = 0; i < strlen(line); ++i) {
+    for (size_t i = 0; i < strlen(line); ++i) {
         // the beginning
         if (i == first_column - 1) {
             fprintf(stderr, "%s", "^");

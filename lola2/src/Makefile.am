@@ -14,6 +14,7 @@ lola_SOURCES = \
                 Core/main.cc \
                 \
                 Parser/ArcList.cc Parser/ArcList.h \
+                Parser/Diagnosis.cc Parser/Diagnosis.h \
                 Parser/FairnessAssumptions.h \
                 Parser/ParserPTNet.h Parser/ParserPTNet.cc \
                 Parser/ParserPTNetLoLA.yy Parser/Lexic.ll \

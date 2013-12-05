@@ -35,6 +35,21 @@ void setlval();
 void setcol();
 extern void ptnetlola_error(char const* mess);
 int ptnetlola_colno = 1;
+
+/*!
+\brief This macro is executed prior to the matched rule's action.
+
+We use this macro to set set #ptnetlola_lloc to the positions of #ptnetlola_text. It further
+manages the current column number #ptnetlola_colno. See Flex's manual
+http://flex.sourceforge.net/manual/Misc-Macros.html for more information on
+the macro.
+*/
+#define YY_USER_ACTION \
+  ptnetlola_lloc.first_line = ptnetlola_lloc.last_line = ptnetlola_lineno; \
+  ptnetlola_lloc.first_column = ptnetlola_colno; \
+  ptnetlola_lloc.last_column = ptnetlola_colno+ptnetlola_leng-1; \
+  ptnetlola_colno += ptnetlola_leng;
+
 %}
 
 %s IN_COMMENT
@@ -42,37 +57,37 @@ int ptnetlola_colno = 1;
 %%
 
  /* from http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html */
-"/*"                                     { setcol(); BEGIN(IN_COMMENT); }
-<IN_COMMENT>"*/"                         { setcol(); BEGIN(INITIAL); }
-<IN_COMMENT>[^*\n\r]+                    { setcol(); /* comments */ }
-<IN_COMMENT>"*"                          { setcol(); /* comments */ }
-<IN_COMMENT>[\n\r]                       { setcol(); /* comments */ }
+"/*"                                     { BEGIN(IN_COMMENT); }
+<IN_COMMENT>"*/"                         { BEGIN(INITIAL); }
+<IN_COMMENT>[^*\n\r]+                    { /* comments */ }
+<IN_COMMENT>"*"                          { /* comments */ }
+<IN_COMMENT>[\n\r]                       { /* comments */ }
 
-CONSUME                                  { setcol(); return _CONSUME_; }
-FAIR                                     { setcol(); return _FAIR_; }
-MARKING                                  { setcol(); return _MARKING_; }
-PLACE                                    { setcol(); return _PLACE_; }
-PRODUCE                                  { setcol(); return _PRODUCE_; }
-SAFE                                     { setcol(); return _SAFE_; }
-STRONG                                   { setcol(); return _STRONG_; }
-TRANSITION                               { setcol(); return _TRANSITION_; }
-WEAK                                     { setcol(); return _WEAK_; }
+CONSUME                                  { return _CONSUME_; }
+FAIR                                     { return _FAIR_; }
+MARKING                                  { return _MARKING_; }
+PLACE                                    { return _PLACE_; }
+PRODUCE                                  { return _PRODUCE_; }
+SAFE                                     { return _SAFE_; }
+STRONG                                   { return _STRONG_; }
+TRANSITION                               { return _TRANSITION_; }
+WEAK                                     { return _WEAK_; }
 
-\:                                       { setcol(); return _colon_; }
-,                                        { setcol(); return _comma_; }
-\;                                       { setcol(); return _semicolon_; }
+\:                                       { return _colon_; }
+,                                        { return _comma_; }
+\;                                       { return _semicolon_; }
 
 [\n\r]                                   { ptnetlola_colno = 1; /* whitespace */ }
-[\t ]                                    { setcol();  /* whitespace */ }
+[\t ]                                    {  /* whitespace */ }
 
-[0-9]+                                   { setcol(); setlval(); return NUMBER; }
+[0-9]+                                   { setlval(); return NUMBER; }
 
-"{"[^\n\r]*"}"                           { setcol(); /* comments */ }
+"{"[^\n\r]*"}"                           { /* comments */ }
 
 
-[^,;:()\t \n\r\{\}]+                     { setcol(); setlval(); return IDENTIFIER; }
+[^,;:()\t \n\r\{\}]+                     { setlval(); return IDENTIFIER; }
 
-.                                        { setcol(); ptnetlola_error("lexical error"); }
+.                                        { ptnetlola_error("lexical error"); }
 
 %%
 
@@ -81,12 +96,6 @@ inline void setlval()
 {
     ptnetlola_lval.attributeString = strdup(ptnetlola_text);
 }
-
-inline void setcol()
-{
-    ptnetlola_colno += ptnetlola_leng;
-}
-
 
 /*!
 \brief handler for EOF

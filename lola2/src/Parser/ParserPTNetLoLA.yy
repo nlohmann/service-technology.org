@@ -23,6 +23,7 @@ Parses a place transition net in LoLA syntax.
 #include <Parser/ParserPTNet.h>
 #include <Parser/FairnessAssumptions.h>
 #include <Parser/ArcList.h>
+#include <Parser/Diagnosis.h>
 #include <InputOutput/Reporter.h>
 #include <InputOutput/InputOutput.h>
 
@@ -31,9 +32,6 @@ extern Input* netFile;
 
 /// the current token text from Flex
 extern char* ptnetlola_text;
-
-void ptnetlola_error(char const*);
-void yyerrors(char* token, const char* format, ...);
 %}
 
 %union {
@@ -45,6 +43,7 @@ void yyerrors(char* token, const char* format, ...);
 %error-verbose /* more verbose and specific error message string */
 %defines       /* write an output file containing macro definitions for the token types */
 %name-prefix="ptnetlola_"
+%locations
 
 %type <attributeString> nodeident
 %type <attributeFairness> fairness
@@ -75,6 +74,9 @@ extern int ptnetlola_lex();
 extern FILE* ptnetlola_in;
 extern int ptnetlola_lineno;
 extern int ptnetlola_colno;
+
+void ptnetlola_error(char const*);
+void yyerrors(char* token, YYLTYPE, const char* format, ...);
 %}
 
 %{
@@ -131,7 +133,7 @@ placelist:
         PlaceSymbol *p = new PlaceSymbol($3, TheCapacity);
         if (UNLIKELY (! TheResult->PlaceTable->insert(p)))
         {
-            yyerrors($3, "place '%s' name used twice", $3);
+            yyerrors($3, @3, "place '%s' name used twice", $3);
         }
     }
 | nodeident
@@ -166,7 +168,7 @@ marking:
         PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable->lookup($1));
         if (UNLIKELY (!p))
         {
-            yyerrors($1, "place '%s' does not exist", $1);
+            yyerrors($1, @1, "place '%s' does not exist", $1);
         }
         p->addInitialMarking((capacity_t)atoi($3));
         free($3);
@@ -177,7 +179,7 @@ marking:
         PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable->lookup($1));
         if (UNLIKELY (!p))
         {
-            yyerrors($1, "place '%s' does not exist", $1);
+            yyerrors($1, @1, "place '%s' does not exist", $1);
         }
         p->addInitialMarking(1);
         free($1);
@@ -199,7 +201,7 @@ transition:
         TransitionSymbol* t = new TransitionSymbol($2, $3, $5, $8);
         if (UNLIKELY (! TheResult->TransitionTable->insert(t)))
         {
-            yyerrors($2, "transition name '%s' used twice", $2);
+            yyerrors($2, @2, "transition name '%s' used twice", $2);
         }
     }
 ;
@@ -264,7 +266,7 @@ arc:
         PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable->lookup($1));
         if (UNLIKELY (!p))
         {
-            yyerrors($1, "place '%s' does not exist", $1);
+            yyerrors($1, @1, "place '%s' does not exist", $1);
         }
         $$ = new ArcList(p, (mult_t)atoi($3));
         free($3);
@@ -275,7 +277,7 @@ arc:
         PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable->lookup($1));
         if (UNLIKELY (!p))
         {
-            yyerrors($1, "place '%s' does not exist", $1);
+            yyerrors($1, @1, "place '%s' does not exist", $1);
         }
         $$ = new ArcList(p, 1);
         free($1);
@@ -293,8 +295,8 @@ ParserPTNet* ParserPTNetLoLA()
 }
 
 /// display a parser error and exit
-void yyerrors(char* token, const char* format, ...) __attribute__((noreturn));
-void yyerrors(char* token, const char* format, ...) {
+void yyerrors(char* token, YYLTYPE loc, const char* format, ...) __attribute__((noreturn));
+void yyerrors(char* token, YYLTYPE loc, const char* format, ...) {
     va_list args;
     va_start(args, format);
     char* errormessage = NULL;
@@ -304,7 +306,12 @@ void yyerrors(char* token, const char* format, ...) {
     free(errormessage);
     va_end(args);
 
-    rep->status("%s:%d:%d - error near '%s'", rep->markup(MARKUP_FILE, basename((char*)netFile->getFilename())).str(), ptnetlola_lineno, ptnetlola_colno, token);
+    rep->status("%s:%d:%d - error near '%s'",
+        rep->markup(MARKUP_FILE, basename((char*)netFile->getFilename())).str(),
+        loc.first_line, loc.first_column, token);
+
+    printExcerpt(loc.first_line, loc.first_column,
+                 loc.last_line, loc.last_column);
 
     rep->abort(ERROR_SYNTAX);
     exit(EXIT_ERROR); // needed to corrently recognize noreturn since rep->abort is virtual
@@ -313,5 +320,5 @@ void yyerrors(char* token, const char* format, ...) {
 /// display a parser error and exit
 void ptnetlola_error(char const* mess) __attribute__((noreturn));
 void ptnetlola_error(char const* mess) {
-    yyerrors(ptnetlola_text, mess);
+    yyerrors(ptnetlola_text, ptnetlola_lloc, mess);
 }

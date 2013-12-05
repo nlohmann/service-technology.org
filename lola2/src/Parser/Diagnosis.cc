@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstring>
 #include <Parser/Diagnosis.h>
 #include <InputOutput/InputOutput.h>
 

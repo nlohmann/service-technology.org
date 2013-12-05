@@ -1,7 +1,10 @@
 #include <cstdlib>
 #include <cstring>
+#include <sstream>
+#include <string>
 #include <Parser/Diagnosis.h>
 #include <InputOutput/InputOutput.h>
+#include <InputOutput/Reporter.h>
 
 extern Input *netFile;
 
@@ -37,8 +40,9 @@ void printExcerpt(int first_line, int first_column, int last_line, int last_colu
         }
 
         if (i >= first_column - 1 && i <= last_column - 1) {
-            // error - needs to be highlighted later
-            fprintf(stderr, "%c", line[i]);
+            std::stringstream ss;
+            ss << line[i];            
+            fprintf(stderr, "%s", rep->markup(MARKUP_BAD, ss.str().c_str()).str());
         } else {
             fprintf(stderr, "%c", line[i]);
         }
@@ -49,11 +53,11 @@ void printExcerpt(int first_line, int first_column, int last_line, int last_colu
     for (size_t i = 0; i < strlen(line); ++i) {
         // the beginning
         if (i == first_column - 1) {
-            fprintf(stderr, "%s", "^");
+            fprintf(stderr, "%s", rep->markup(MARKUP_GOOD, "^").str());
         } else {
             // following error characters
             if (i > first_column - 1 && i <= last_column - 1) {
-                fprintf(stderr, "%s", "~");
+                fprintf(stderr, "%s", rep->markup(MARKUP_GOOD, "~").str());
             } else {
                 fprintf(stderr, " ");
             }

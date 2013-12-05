@@ -24,7 +24,6 @@ void *Store<T>::reporter_internal(void)
 {
     static unsigned int intervals = 0;
     uint64_t last_markings = 0;
-    uint64_t benchmark = 0;
 
     while (true)
     {

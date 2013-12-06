@@ -1,9 +1,9 @@
 /*!
 \author Karsten
-\file PlaceSymbol.h
+\file
 \status approved 25.01.2012
-
-\brief class definition for a symbol with payload for place
+\ingroup g_symboltable
+\brief definition of class PlaceSymbol
 */
 
 #pragma once
@@ -12,47 +12,52 @@
 
 
 /*!
-Place symbols carry name as key, and
-- capacity
-- initial marking
-as payload. While capacity is in the context of place declaration (thus, part
+\brief a symbol table entry for a place
+
+Place symbols carry their name as key and capacity and an initial marking as
+payload. While capacity is in the context of place declaration (thus, part
 of constructor), initial marking is specified separately (thus, setter).
 Additional information is number of pre-transitions and number of
 post-transitions. This information is updated while parsing transitions.
+
+\note The members cardPost and cardPre are used for later data structures for
+arcs.
+\note The capacity UINT_MAX denotes the absence of a capacity.
+\note This class does not allocated dynamic memory.
+
+\ingroup g_symboltable
 
 \todo Dopplungen behandeln.
 */
 class PlaceSymbol: public Symbol
 {
 public:
-    /// Generate and initialize a symbol
+    /// generate and initialize a symbol
     PlaceSymbol(char *, unsigned int);
 
-    /// Getter for capacity
+    /// getter for capacity
     capacity_t getCapacity() const;
-    /// Getter for initial marking
+    /// getter for initial marking
     capacity_t getInitialMarking() const;
-    /// Getter for number of pre-transitions
+    /// getter for number of pre-transitions
     index_t getCardPre() const;
-    /// Getter for number of post-transitions
+    /// getter for number of post-transitions
     index_t getCardPost() const;
-    /// Adder for initial marking. If several marking specifications
-    /// mention this place, tokens are added.
+
+    /// adder for initial marking
     void addInitialMarking(capacity_t);
-    /// Incrementor for number of post-transitions
+    /// incrementor for number of post-transitions
     void notifyPost();
-    /// Incrementor for number of pre-transitions
+    /// incrementor for number of pre-transitions
     void notifyPre();
 
 private:
-    /// The maximum number of tokens that must be representable for this place; UINT_MAX for absence of capacity
+    /// the maximum number of tokens that must be representable for this place
     capacity_t capacity;
-    /// The initial number of tokens on this place
+    /// the initial number of tokens on this place
     capacity_t initialMarking;
-    /// The number of transitions that consume from this place
-    /// Used for creating arc data structures
+    /// the number of transitions that consume from this place
     index_t cardPost;
-    /// The number of transitions that produce on this place
-    /// used for creating arc data structures
+    /// the number of transitions that produce on this place
     index_t cardPre;
 };

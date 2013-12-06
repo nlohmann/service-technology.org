@@ -164,3 +164,16 @@ typedef enum
     CMP_EQ = 1,
     CMP_GT = 2
 } cmp_t;
+
+/*!
+This is just a type definition for the possible fairness assumptions that can
+be specified for each transition. We consider weak and strong fairness as well
+as the absence of fairness.
+*/
+typedef enum
+{
+    NO_FAIRNESS     = 0,  ///< no fairness
+    WEAK_FAIRNESS   = 1,  ///< weak fairness
+    STRONG_FAIRNESS = 2   ///< strong fairness
+}
+fairnessAssumption_t;

@@ -1,24 +1,25 @@
 /*!
 \author Karsten
-\file SymbolTable.h
+\file
 \status approved 25.01.2012
-\ingroup g_frontend g_symboltable
+\ingroup g_symboltable
 \todo Eventuell ein FOREACH Makro (basierend auf first() und next()) bauen
-
-\brief class definition for a symbol table
+\brief definition of class SymbolTable
 */
 
 #pragma once
 
+// forward declaration
 class Symbol;
 
-
 /*!
-\brief Symbol table
+\brief A symbol table for places and transitions.
 
 The table has strings as keys. Payload is not explicitly represented. It can
 be attached by deriving from class symbol. Collissions are handled as linked
 lists.
+
+\ingroup g_symboltable
 */
 class SymbolTable
 {
@@ -35,32 +36,32 @@ public:
     /// If key is not in table: return NULL
     Symbol *lookup(const char *) const;
 
-    /// Initialize iteration; return NULL if table empty
+    /// initialize iteration; return NULL if table empty
     Symbol *first();
-    /// Continue iteration; return NULL if there is none
+    /// continue iteration; return NULL if there is none
     Symbol *next();
 
-    /// Generate and initialize a symbol table
+    /// generate and initialize a symbol table
     SymbolTable();
-    /// Close SymbolTable
+    /// close SymbolTable
     ~SymbolTable();
 
-    /// Get number of entries in table
+    /// get number of entries in table
     unsigned int getCard() const;
 
-    /// The number of entries in table
+private:
+    /// the number of entries in table
     unsigned int card;
 
-private:
-    /// The actual symbol table. It gets pointers as we use lists for collisions.
+    /// the actual symbol table. It gets pointers as we use lists for collisions.
     Symbol **table;
 
-    /// The hash function to be used
-    unsigned int hash(const char *) const;
-
-    /// The index of the current element in iteration
+    /// the index of the current element in iteration
     unsigned int currentIndex;
 
-    /// Points to the current element in iteration
+    /// points to the current element in iteration
     Symbol *currentSymbol;
+
+    /// the hash function to be used
+    unsigned int hash(const char *) const;
 };

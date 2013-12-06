@@ -3,6 +3,7 @@
 \brief lexic for formulas
 \author Karsten
 \status approved 25.01.2012
+\ingroup g_frontend
 
 \todo Herausfinden, ob es Probleme bei zu langen Kommentaren/Bezeichnern gibt. Idee: Maximallänge angeben.
 \todo Präfix hinzufügen?
@@ -18,13 +19,9 @@
 %option prefix="ptformula_"
 
 %{
-#include <Parser/ast-system-k.h>
-#include <Parser/ast-system-yystype.h>
-#include <Parser/ArcList.h>
-#include <Parser/FairnessAssumptions.h>
+#include <Parser/ast-system-k.h>       // for kc namespace
+#include <Parser/ast-system-yystype.h> // for YYSTYPE
 #include <Parser/ParserPTFormula.hh>
-#include <InputOutput/Reporter.h>
-#include <InputOutput/InputOutput.h>
 
 extern void ptformula_error(char const* mess);
 unsigned int ptformula_colno = 1;

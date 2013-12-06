@@ -84,7 +84,7 @@ AC_CHECK_SIZEOF(cardbit_t,, [#define _CONFIGURING
 AC_CHECK_SIZEOF(hash_t,, [#define _CONFIGURING
 #include "$srcdir/src/Core/Dimensions.h"])
 AC_CHECK_SIZEOF(fairnessAssumption_t,, [#define _CONFIGURING
-#include "$srcdir/src/Parser/FairnessAssumptions.h"])
+#include "$srcdir/src/Core/Dimensions.h"])
 AC_CHECK_SIZEOF(vectordata_t,, [#define _CONFIGURING
 #include "$srcdir/src/Core/Dimensions.h"])
 AC_CHECK_SIZEOF(sockaddr_in,, [#include <sys/types.h>

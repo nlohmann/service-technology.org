@@ -15,7 +15,6 @@ lola_SOURCES = \
                 \
 				Parser/error.cc Parser/error.h \
                 Parser/ArcList.cc Parser/ArcList.h \
-                Parser/FairnessAssumptions.h \
                 Parser/ParserPTNet.h Parser/ParserPTNet.cc \
                 Parser/ParserPTNetLoLA.yy Parser/Lexic.ll \
                 Parser/ParserPTFormula.yy Parser/LexicFormula.ll \

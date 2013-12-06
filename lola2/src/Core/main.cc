@@ -260,7 +260,7 @@ int main(int argc, char **argv)
     if (symbolTables)
     {
         rep->status("%d symbol table entries, %d collisions",
-                    symbolTables->PlaceTable->card + symbolTables->TransitionTable->card,
+                    symbolTables->PlaceTable->getCard() + symbolTables->TransitionTable->getCard(),
                     SymbolTable::collisions);
     }
 

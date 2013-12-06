@@ -1,8 +1,8 @@
 /*!
 \author Karsten
-\file ArcList.h
+\file
 \status approved 25.01.2012
-\ingroup g_frontend g_symboltable
+\ingroup g_symboltable
 
 \brief class definition for a symbol for a list of arcs
 */
@@ -10,37 +10,48 @@
 #pragma once
 #include <Core/Dimensions.h>
 
+// forward declarations
 class Symbol;
 class PlaceSymbol;
 
-
 /*!
+\brief arc list (intermediate representation)
+
 This class is used as an intermediate storage between parser and the actual
 Petri net data structures. It collects arcs connected in the same dircetion
 from/to the same transtion.
+
+\ingroup g_symboltable
+\todo Make next and place const?
 */
 class ArcList
 {
 public:
-    /// Getter for place
+    /// getter for place
     PlaceSymbol *getPlace() const;
-    /// Getter for multiplicity
+
+    /// getter for multiplicity
     mult_t getMultiplicity() const;
-    /// Getter for next
+
+    /// getter for next
     ArcList *getNext() const;
-    /// Setter for next
+
+    /// setter for next
     void setNext(Symbol *);
-    /// Adding some tokens to multplicity
+
+    /// adding some tokens to multplicity
     void addMultiplicity(mult_t);
 
-    /// Generate and initialize a list element
+    /// generate and initialize a list element
     ArcList(PlaceSymbol *, mult_t);
 
 private:
-    ///The place at the other end of arc (transition implicilty given)
+    /// the place at the other end of arc (transition implicilty given)
     PlaceSymbol *place;
-    /// Arcs are organized as lists.
+
+    /// arcs are organized as lists
     ArcList *next;
-    /// Multiplicity
+
+    /// multiplicity
     mult_t multiplicity;
 };

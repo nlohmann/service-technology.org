@@ -3,7 +3,6 @@
 \brief formula syntax
 \author <unknown>
 \status new
-
 \ingroup g_frontend
 
 Parses a formula in LoLA syntax.
@@ -21,7 +20,6 @@ Parses a formula in LoLA syntax.
 #include <Parser/TransitionSymbol.h>
 #include <Parser/SymbolTable.h>
 #include <Parser/ParserPTNet.h>
-#include <Parser/FairnessAssumptions.h>
 #include <Parser/ArcList.h>
 #include <Parser/error.h>
 #include <Net/Net.h>

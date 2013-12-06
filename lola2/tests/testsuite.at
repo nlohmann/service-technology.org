@@ -861,7 +861,7 @@ AT_CLEANUP
 AT_SETUP([Syntax error: unknown place])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([LOLA garavel.lola --formula='"FORMULA foo > 1;"' --verbose],2,stdout,stderr)
-AT_CHECK([GREP -q "lola: place foo unknown" stderr])
+AT_CHECK([GREP -q "lola: place 'foo' unknown" stderr])
 AT_KEYWORDS(formula)
 AT_CLEANUP
 

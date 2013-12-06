@@ -1,86 +1,86 @@
 /*!
 \author Karsten
-\file TransitionSymbol.cc
+\file
 \status approved 25.01.2012
 \ingroup g_frontend g_symboltable
-
-\brief class implementation for a symbol with payload for transition
+\brief implementation of class TransitionSymbol
 */
 
 #include <Parser/TransitionSymbol.h>
 #include <Parser/ArcList.h>
 #include <Parser/PlaceSymbol.h>
-#include <Parser/FairnessAssumptions.h>
 
+/*!
+When transitions this constructor is called, all arcs of this transition are
+known. As places are parsed earlier, we now update their information on ingoing
+and outgoing arcs.
 
-/// Generate and initialize a symbol
-TransitionSymbol::TransitionSymbol(char *k, fairnessAssumption_t f, ArcList *pr, ArcList *po)
-    :
+\param[in] k   the name of the transition
+\param[in] f   the fairness assumption for the transition
+\param[in] pr  the arcs to preplaces
+\param[in] po  the arcs to postplaces
+*/
+TransitionSymbol::TransitionSymbol(char *k, fairnessAssumption_t f,
+                                   ArcList *pr, ArcList *po) :
     Symbol(k),
     fairness(f),
-    cardPost(0),
-    cardPre(0),
+    cardPost(0), // temporary initialization until constructor finishes
+    cardPre(0),  // temporary initialization until constructor finishes
     Post(po),
     Pre(pr)
 {
     // count incoming arcs at transition and at places
-    for (ArcList *a = Pre; a; a = a -> getNext())
+    for (ArcList *a = Pre; a; a = a->getNext())
     {
         ++cardPre;
-        a -> getPlace() -> notifyPost();
+        a->getPlace()->notifyPost();
     }
 
-    // count outgoing arcs
-    for (ArcList *a = Post; a; a = a -> getNext())
+    // count outgoing arcs at transition and at places
+    for (ArcList *a = Post; a; a = a->getNext())
     {
         ++cardPost;
-        a -> getPlace() -> notifyPre();
+        a->getPlace()->notifyPre();
     }
 }
 
-/// Getter for number of incoming arcs
 unsigned int TransitionSymbol::getCardPre() const
 {
     return cardPre;
 }
 
-/// Getter for number of outgoing arcs
 unsigned int TransitionSymbol::getCardPost() const
 {
     return cardPost;
 }
 
-/// Getter for incoming arcs
 ArcList *TransitionSymbol::getPre() const
 {
     return Pre;
 }
 
-/// Getter for number of post-places
 ArcList *TransitionSymbol::getPost() const
 {
     return Post;
 }
 
-/// Getter for fairness assumption
 fairnessAssumption_t TransitionSymbol::getFairness() const
 {
     return fairness;
 }
 
-/// Delete TransitionSymbol
 TransitionSymbol::~TransitionSymbol()
 {
     while (Pre)
     {
         ArcList *tmp = Pre;
-        Pre = Pre -> getNext();
+        Pre = Pre->getNext();
         delete tmp;
     }
     while (Post)
     {
         ArcList *tmp = Post;
-        Post = Post -> getNext();
+        Post = Post->getNext();
         delete tmp;
     }
 }

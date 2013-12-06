@@ -3,7 +3,6 @@
 \brief Büchi automaton syntax
 \author <unknown>
 \status new
-
 \ingroup g_frontend
 
 Parses a Büchi automaton in LoLA syntax.
@@ -17,16 +16,13 @@ Parses a Büchi automaton in LoLA syntax.
 #include <cstdio>
 #include <cstdlib>
 #include <set>
-#include <Core/Dimensions.h>
 #include <Parser/PlaceSymbol.h>
 #include <Parser/TransitionSymbol.h>
 #include <Parser/SymbolTable.h>
 #include <Parser/ParserPTNet.h>
-#include <Parser/FairnessAssumptions.h>
-#include <Parser/ArcList.h>
 #include <Parser/error.h>
-#include <Parser/ast-system-k.h>
-#include <Parser/ast-system-yystype.h>
+#include <Parser/ast-system-k.h>       // for kc namespace
+#include <Parser/ast-system-yystype.h> // for YYSTYPE
 
 extern ParserPTNet* symbolTables;
 extern SymbolTable* buechiStateTable;

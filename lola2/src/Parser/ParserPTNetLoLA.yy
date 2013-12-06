@@ -3,11 +3,10 @@
 \brief net syntax
 \author Karsten
 \status approved 25.01.2012
+\ingroup g_frontend
 
 \todo Detaillierte Dateifehlermeldungen abschaltbar.
 \todo TheResult und TheCapacity in einen Namespace "parser::" packen
-
-\ingroup g_frontend
 
 Parses a place transition net in LoLA syntax.
 */
@@ -23,7 +22,6 @@ Parses a place transition net in LoLA syntax.
 #include <Parser/TransitionSymbol.h>
 #include <Parser/SymbolTable.h>
 #include <Parser/ParserPTNet.h>
-#include <Parser/FairnessAssumptions.h>
 #include <Parser/ArcList.h>
 #include <Parser/error.h>
 

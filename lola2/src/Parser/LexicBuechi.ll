@@ -3,6 +3,7 @@
 \brief lexic for Büchi automata
 \author Erik
 \status not approved
+\ingroup g_frontend
 
 \todo Herausfinden, ob es Probleme bei zu langen Kommentaren/Bezeichnern gibt. Idee: Maximallänge angeben.
 \todo Präfix hinzufügen?
@@ -20,11 +21,7 @@
 %{
 #include <Parser/ast-system-k.h>
 #include <Parser/ast-system-yystype.h>
-#include <Parser/ArcList.h>
-#include <Parser/FairnessAssumptions.h>
 #include <Parser/ParserPTBuechi.hh>
-#include <InputOutput/Reporter.h>
-#include <InputOutput/InputOutput.h>
 
 extern void ptbuechi_error(char const* mess);
 unsigned int ptbuechi_colno = 1;

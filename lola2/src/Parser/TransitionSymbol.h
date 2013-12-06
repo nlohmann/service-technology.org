@@ -1,66 +1,65 @@
 /*!
 \author Karsten
-\file TransitionSymbol.h
+\file
 \status approved 25.01.2012
-\ingroup g_frontend g_symboltable
-
-\brief class definition for a symbol with payload for transition
+\ingroup g_symboltable
+\brief definition of class TransitionSymbol
 */
 
 #pragma once
+#include <Core/Dimensions.h>
 #include <Parser/Symbol.h>
-#include <Parser/FairnessAssumptions.h>
 
+// forward declaration
 class ArcList;
 
 
 /*!
-Transition symbols carry name as key, and
-- list of incoming arcs
-- list of outgoing arcs
-- a fairness assumption
-as payload.
-All information is available in the context of transition definition, thus all
-information is provided in constructor
+\brief a symbol table entry for a transition
 
-\todo Doppelte Plätze behandeln.
+Transition symbols carry name as key and a list of incoming arcs, a list of
+outgoing arcs, and a fairness assumption as payload. All information is
+available in the context of transition definition, thus all information is
+provided in the constructor
+
+\note The members cardPost and cardPre, Post, and Pre are used for later data
+structures for arcs.
+\note All dynamic memory allocated by this class is deallocated in the
+destructor.
+
+\ingroup g_symboltable
+
+\todo Dopplungen behandeln.
 */
 class TransitionSymbol: public Symbol
 {
 public:
-    /// Generate and initialize a symbol
+    /// generate and initialize a transition symbol
     TransitionSymbol(char *, fairnessAssumption_t, ArcList *, ArcList *);
-    /// Delete Transition symbol
+    /// delete transition symbol
     ~TransitionSymbol();
 
-    /// Getter for number of incoming arcs
+    /// getter for number of incoming arcs
     unsigned int getCardPre() const;
-    /// Getter for number of outgoing arcs
+    /// getter for number of outgoing arcs
     unsigned int getCardPost() const;
-    /// Getter for incoming arcs
+    /// getter for incoming arcs
     ArcList *getPre() const;
-    /// Getter for number of post-places
+    /// getter for number of post-places
     ArcList *getPost() const;
-    /// Getter for fairness assumption
+    /// getter for fairness assumption
     fairnessAssumption_t getFairness() const;
 
 private:
-    /// The fairness assumption specified for this tarnsition
+    /// the fairness assumption specified for this tarnsition
     fairnessAssumption_t fairness;
 
-    /// The number of transitions that consume from this place
-    /// Used for creating arc data structures
+    /// the number of places that this transition produces to
     unsigned int cardPost;
-
-    /// The number of transitions that produce on this place
-    /// used for creating arc data structures
+    /// the number of places that this transition consumes from
     unsigned int cardPre;
-
-    /// The number of transitions that consume from this place
-    /// Used for creating arc data structures
+    /// the outgoing arcs of this transition
     ArcList *Post;
-
-    /// The number of transitions that produce on this place
-    /// used for creating arc data structures
+    /// the ingoing arcs of this transition
     ArcList *Pre;
 };

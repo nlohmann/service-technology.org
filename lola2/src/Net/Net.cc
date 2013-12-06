@@ -21,7 +21,6 @@
 #include <Net/Marking.h>
 #include <Net/Place.h>
 #include <Net/Transition.h>
-#include <Parser/FairnessAssumptions.h>
 #include <Parser/ParserPTNet.h>
 #include <InputOutput/Reporter.h>
 #include <Parser/Symbol.h>

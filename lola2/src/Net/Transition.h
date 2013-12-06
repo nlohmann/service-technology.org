@@ -11,7 +11,6 @@
 
 #pragma once
 #include <Core/Dimensions.h>
-#include <Parser/FairnessAssumptions.h>
 #include <Net/NetState.h>
 
 /*!

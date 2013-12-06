@@ -1,10 +1,10 @@
 /*!
 \author Karsten
-\file ParserPTNet.h
+\file
 \status approved 21.02.2012
+\ingroup g_frontend g_symboltable
 
-Class definition for the result of the parsing of a low level net. This result
-should be independent from the format (LoLA / PNML / ...)
+\brief implementation of class ParserPTNet
 
 \todo Mal den new-Operator in Bezug auf Exceptions ansehen.
 */
@@ -16,14 +16,12 @@ should be independent from the format (LoLA / PNML / ...)
 
 #include <cstring>
 #include <cstdlib>
-
 #include <cmdline.h>
 #include <Net/Net.h>
 #include <Net/Place.h>
 #include <Net/Transition.h>
 #include <Net/Marking.h>
 #include <Parser/ArcList.h>
-#include <Parser/SymbolTable.h>
 #include <Parser/ParserPTNet.h>
 #include <Parser/PlaceSymbol.h>
 #include <Parser/TransitionSymbol.h>
@@ -32,18 +30,23 @@ should be independent from the format (LoLA / PNML / ...)
 
 extern gengetopt_args_info args_info;
 
-ParserPTNet::ParserPTNet()
+/*!
+\post Memory is allocated for the symbol tables. It is released by the
+destructor.
+*/
+ParserPTNet::ParserPTNet() :
+    PlaceTable(new SymbolTable()), TransitionTable(new SymbolTable())
 {
-    PlaceTable = new SymbolTable();
-    TransitionTable = new SymbolTable();
 }
 
+/*!
+\post Memory of the symbol tables is deallocated.
+*/
 ParserPTNet::~ParserPTNet()
 {
     delete PlaceTable;
     delete TransitionTable;
 }
-
 
 /*!
 \todo comment me

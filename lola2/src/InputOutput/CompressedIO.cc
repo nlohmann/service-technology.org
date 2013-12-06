@@ -19,11 +19,11 @@ ASCII file where data are separated by spaces and newlines.
 #include <stdint.h>
 #endif
 
+#include <Core/Dimensions.h>
 #include <InputOutput/CompressedIO.h>
 #include <Parser/ParserPTNet.h>
 #include <Parser/PlaceSymbol.h>
 #include <Parser/TransitionSymbol.h>
-#include <Parser/FairnessAssumptions.h>
 #include <Net/Net.h>
 #include <Net/Marking.h>
 #include <Net/Place.h>

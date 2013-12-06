@@ -1,52 +1,48 @@
 /*!
 \author Karsten
-\file Symbol.cc
+\file
 \status approved 25.01.2012
-\ingroup g_frontend g_symboltable
-
-\brief class implementation for a symbol
+\ingroup g_symboltable
+\brief implementation of class Symbol
 */
 
 #include <cstdlib>
 #include <Parser/Symbol.h>
 
-/// Getter for index
 index_t Symbol::getIndex() const
 {
     return index;
 }
 
-/// Getter for key
 char *Symbol::getKey() const
 {
     return key;
 }
 
-/// Getter for next
 Symbol *Symbol::getNext() const
 {
     return next;
 }
 
-/// Setter for next
 void Symbol::setNext(Symbol *sym)
 {
     next = sym;
 }
 
-#include <cstdio>
-
-/// Setter for index
 void Symbol::setIndex(index_t i)
 {
     index = i;
 }
 
-/// Generate and initialize a symbol
-/// Argument is the key.
-Symbol::Symbol(const char *k)
-    :
+/*!
+\param[in] k  the name of the symbol
+
+\note The pointer next is lated set by SymbolTable::insert.
+\note The index is later changed by ParserPTNet::symboltable2net.
+*/
+Symbol::Symbol(const char *k) :
     key(const_cast<char *>(k)),
-    next(NULL)
+    next(NULL),  // intermediate initialization
+    index(0)     // intermediate initialization
 {
 }

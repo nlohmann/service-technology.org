@@ -1,10 +1,9 @@
 /*!
 \author Karsten
-\file SymbolTable.cc
+\file
 \status approved 25.01.2012
-\ingroup g_frontend g_symboltable
-
-\brief class implementation for a symbol table
+\ingroup g_symboltable
+\brief implementation of class SymbolTable
 */
 
 #include <config.h>
@@ -15,15 +14,15 @@
 #include <Parser/Symbol.h>
 #include <Parser/SymbolTable.h>
 
-
+// initialization of static members
 unsigned int SymbolTable::collisions = 0;
 
 /// Intialization amounts to setting all entries to NULL
-SymbolTable::SymbolTable()
-    : card(0),
-      table(new Symbol *[SIZEOF_SYMBOLTABLE]()),
-      currentIndex(0),
-      currentSymbol(NULL)
+SymbolTable::SymbolTable() :
+    card(0),
+    table(new Symbol *[SIZEOF_SYMBOLTABLE]()),
+    currentIndex(0),
+    currentSymbol(NULL)
 {
 }
 
@@ -42,7 +41,7 @@ SymbolTable::~SymbolTable()
     delete[] table;
 }
 
-/// sdbm hashing algorithm
+/// SDBM hashing algorithm
 unsigned int SymbolTable::hash(const char *s) const
 {
     // SDBM Algorithm from
@@ -83,7 +82,7 @@ Symbol *SymbolTable::lookup(const char *str) const
 if input is correct, insert is used when key is not yet present
 
 \return If input is present, false is returned.
-        This typically indicates a syntax error "used but not defined
+        This typically indicates a syntax error "used but not defined"
 */
 bool SymbolTable::insert(Symbol *sym)
 {

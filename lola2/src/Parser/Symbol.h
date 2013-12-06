@@ -1,37 +1,38 @@
 /*!
 \author Karsten
-\file Symbol.h
+\file
 \status approved 25.01.2012
-\ingroup g_frontend g_symboltable
-
-\brief class definition for a symbol
+\ingroup g_symboltable
+\brief definition of class Symbol
 */
 
 #pragma once
 #include <Core/Dimensions.h>
 
-
 /*!
 A symbol is an entry in a symbol table (class SymbolTable). It has a string as
 key. For dealing with collissions in the symbol table, symbols can be lnked as
 lists. Payload can be added by deriving subclasses.
+
+\ingroup g_symboltable
+\todo Make key const?
 */
 class Symbol
 {
 public:
-    /// Getter for key
+    /// getter for key
     char *getKey() const;
 
-    /// Getter for next
+    /// getter for next
     Symbol *getNext() const;
 
-    /// Setter for next
+    /// setter for next
     void setNext(Symbol *);
 
-    /// Generate and initialize a symbol
+    /// generate and initialize a symbol
     explicit Symbol(const char *);
 
-    /// Delete a symbol
+    /// delete a symbol
     virtual ~Symbol() {}
 
     /// get index of symbol in net data structures
@@ -41,12 +42,12 @@ public:
     void setIndex(index_t);
 
 private:
-    /// The key. Used for insertion in symbol table
+    /// the name of the symbol; used for insertion in symbol table
     char *key;
 
-    /// Symbols with same hash value are organized as lists.
+    /// symbols with same hash value are organized as lists
     Symbol *next;
 
-    /// Index in net data structure. Set during transformation symbols --> net
+    /// index in net data structure; set during transformation symbols --> net
     index_t index;
 };

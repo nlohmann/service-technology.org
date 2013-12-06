@@ -77,4 +77,8 @@ class Input : public IO
 public:
     /// input from file (given kind and optional filename)
     Input(std::string, std::string = "-");
+
+    /// given the location of some text prints an excerpt of the file
+    void printExcerpt(int first_line, int first_column,
+                      int last_line, int last_column) const;
 };

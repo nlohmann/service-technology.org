@@ -1,3 +1,14 @@
+/*!
+\file
+\brief formula syntax
+\author <unknown>
+\status new
+
+\ingroup g_frontend
+
+Parses a formula in LoLA syntax.
+*/
+
 %{
 #include <config.h>
 #include <limits.h>
@@ -5,7 +16,6 @@
 #include <cstdarg>
 #include <cstdio>
 #include <set>
-#include <cmdline.h>
 #include <Core/Dimensions.h>
 #include <Parser/PlaceSymbol.h>
 #include <Parser/TransitionSymbol.h>
@@ -13,37 +23,26 @@
 #include <Parser/ParserPTNet.h>
 #include <Parser/FairnessAssumptions.h>
 #include <Parser/ArcList.h>
-#include <InputOutput/Reporter.h>
-#include <InputOutput/InputOutput.h>
+#include <Parser/error.h>
 #include <Net/Net.h>
 
 #include <Parser/ast-system-k.h>
 #include <Parser/ast-system-yystype.h>
 
 extern ParserPTNet* symbolTables;
-
-extern gengetopt_args_info args_info;
-
-using namespace kc;
-
-/// the current token text from Flex
-extern char* ptformula_text;
-
-void ptformula_error(char const*);
-void ptformula_yyerrors(char* token, const char* format, ...);
 %}
 
 %error-verbose /* more verbose and specific error message string */
 %defines       /* write an output file containing macro definitions for the token types */
 %name-prefix="ptformula_"
-
-%type <yt_integer> NUMBER
-%type <yt_casestring> IDENTIFIER
+%locations     /* we want to use token locations for better error messages */
 
 %type <yt_tFormula> formula
 %type <yt_tStatePredicate> statepredicate
 %type <yt_tAtomicProposition> atomic_proposition
 %type <yt_tTerm> term
+%type <yt_integer> NUMBER
+%type <yt_casestring> IDENTIFIER
 
 %token IDENTIFIER          "identifier"
 %token NUMBER              "number"
@@ -98,13 +97,12 @@ void ptformula_yyerrors(char* token, const char* format, ...);
 %right _ALLPATH_ _EXPATH_
 %right _REACHABLE_ _INVARIANT_ _IMPOSSIBLE_
 
-
 %{
-extern YYSTYPE ptformula_lval;
+// parser essentials
 extern int ptformula_lex();
-extern FILE* ptformula_in;
-extern int ptformula_lineno;
-extern int ptformula_colno;
+void ptformula_error(char const*);
+
+extern YYSTYPE ptformula_lval;
 
 std::set<index_t> target_place;
 std::set<index_t> target_transition;
@@ -181,9 +179,9 @@ atomic_proposition:
 | _FIREABLE_ _leftparenthesis_ IDENTIFIER _rightparenthesis_
     {
         Symbol *t = symbolTables->TransitionTable->lookup($3->name);
-        if (t == NULL)
+        if (UNLIKELY(t == NULL))
         {
-            ptformula_yyerrors(ptformula_text, "transition %s unknown", $3->name);
+            yyerrors($3->name, @3, "transition '%s' unknown", $3->name);
         }
         $$ = Fireable(mkinteger(t->getIndex()));
         target_transition.insert(t->getIndex());
@@ -200,9 +198,9 @@ term:
 | IDENTIFIER
     {
         Symbol *p = symbolTables->PlaceTable->lookup($1->name);
-        if (p == NULL)
+        if (UNLIKELY(p == NULL))
         {
-            ptformula_yyerrors(ptformula_text, "place %s unknown", $1->name);
+            yyerrors($1->name, @1, "place '%s' unknown", $1->name);
         }
         $$ = Node(mkinteger(p->getIndex()));
         target_place.insert(p->getIndex());
@@ -217,30 +215,11 @@ term:
     { $$ = Product($1, $3); }
 ;
 
-
 %%
-
-/// display a parser error and exit
-void ptformula_yyerrors(char* token, const char* format, ...) __attribute__((noreturn));
-void ptformula_yyerrors(char* token, const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    char* errormessage = NULL;
-    const int res = vasprintf(&errormessage, format, args);
-    assert(res != -1);
-    rep->status(errormessage);
-    free(errormessage);
-    va_end(args);
-
-    rep->status("%s:%d:%d - error near '%s'", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str(), ptformula_lineno, ptformula_colno, token);
-//    rep->status("%d:%d - error near '%s'", ptformula_lineno, ptformula_colno, token);
-
-    rep->abort(ERROR_SYNTAX);
-    exit(EXIT_ERROR); // needed to corrently recognize noreturn since rep->abort is virtual
-}
 
 /// display a parser error and exit
 void ptformula_error(char const* mess) __attribute__((noreturn));
 void ptformula_error(char const* mess) {
-    ptformula_yyerrors(ptformula_text, mess);
+    extern char* ptformula_text;  ///< the current token text from Flex
+    yyerrors(ptformula_text, ptformula_lloc, mess);
 }

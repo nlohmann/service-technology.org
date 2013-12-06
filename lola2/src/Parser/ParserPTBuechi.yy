@@ -1,3 +1,14 @@
+/*!
+\file
+\brief Büchi automaton syntax
+\author <unknown>
+\status new
+
+\ingroup g_frontend
+
+Parses a Büchi automaton in LoLA syntax.
+*/
+
 %{
 #include <config.h>
 #include <limits.h>
@@ -6,7 +17,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <set>
-#include <cmdline.h>
 #include <Core/Dimensions.h>
 #include <Parser/PlaceSymbol.h>
 #include <Parser/TransitionSymbol.h>
@@ -14,32 +24,18 @@
 #include <Parser/ParserPTNet.h>
 #include <Parser/FairnessAssumptions.h>
 #include <Parser/ArcList.h>
-#include <InputOutput/Reporter.h>
-#include <InputOutput/InputOutput.h>
-
+#include <Parser/error.h>
 #include <Parser/ast-system-k.h>
 #include <Parser/ast-system-yystype.h>
 
 extern ParserPTNet* symbolTables;
 extern SymbolTable* buechiStateTable;
-
-extern gengetopt_args_info args_info;
-
-using namespace kc;
-
-/// the current token text from Flex
-extern char* ptbuechi_text;
-
-void ptbuechi_error(char const*);
-void ptbuechi_yyerrors(char* token, const char* format, ...);
 %}
 
 %error-verbose /* more verbose and specific error message string */
 %defines       /* write an output file containing macro definitions for the token types */
 %name-prefix="ptbuechi_"
-
-%type <yt_integer> NUMBER
-%type <yt_casestring> IDENTIFIER
+%locations     /* we want to use token locations for better error messages */
 
 %type <yt_tBuechiAutomata> buechiAutomata
 %type <yt_tBuechiRules> buechiRule
@@ -49,6 +45,8 @@ void ptbuechi_yyerrors(char* token, const char* format, ...);
 %type <yt_tStatePredicate> statepredicate
 %type <yt_tAtomicProposition> atomic_proposition
 %type <yt_tTerm> term
+%type <yt_integer> NUMBER
+%type <yt_casestring> IDENTIFIER
 
 %token IDENTIFIER          "identifier"
 %token NUMBER              "number"
@@ -99,17 +97,12 @@ void ptbuechi_yyerrors(char* token, const char* format, ...);
 %right _ALLPATH_ _EXPATH_
 %right _REACHABLE_ _INVARIANT_ _IMPOSSIBLE_
 
-
 %{
-extern YYSTYPE ptbuechi_lval;
+// parser essentials
 extern int ptbuechi_lex();
-extern FILE* ptbuechi_in;
-extern int ptbuechi_lineno;
-extern int ptbuechi_colno;
+void ptbuechi_error(char const*);
 
 int currentNextIndex = 0;
-//std::set<index_t> target_place;
-//std::set<index_t> target_transition;
 %}
 
 %{
@@ -121,63 +114,72 @@ uint32_t currentState;
 %%
 
 buechiAutomata:
-  _buechi_ _braceleft_ buechiRules _braceright_  _accept_ _braceleft_ acceptingsets _braceright_ _semicolon_
+  _buechi_ _braceleft_ buechiRules _braceright_
+  _accept_ _braceleft_ acceptingsets _braceright_ _semicolon_
     { TheBuechi = BuechiAutomaton($3,$7); }
 ;
 
 buechiRules:
-  /* empty */                     { $$ = EmptyBuechiRules(); }
-| buechiRule                      { $$ = $1; }
-| buechiRule _comma_ buechiRules  { $$ = BuechiRules($1,$3); }
+  /* empty */
+    { $$ = EmptyBuechiRules(); }
+| buechiRule
+    { $$ = $1; }
+| buechiRule _comma_ buechiRules
+    { $$ = BuechiRules($1,$3); }
 ;
 
 buechiRule:
-  IDENTIFIER {
-  	Symbol *t = buechiStateTable->lookup($1->name);
-  	if (t == NULL){
-  		t = new Symbol($1->name);
-  		buechiStateTable->insert(t);
-  		t->setIndex(currentNextIndex++);
-  	}
-  }
-   _colon_ transitionRules { Symbol *t = buechiStateTable->lookup($1->name); $$ = BuechiRule((mkinteger(t->getIndex())),$4); $1->free(true);}
+  IDENTIFIER
+      {
+  	      Symbol *t = buechiStateTable->lookup($1->name);
+  	      if (t == NULL)
+          {
+  		      t = new Symbol($1->name);
+  		      buechiStateTable->insert(t);
+  		      t->setIndex(currentNextIndex++);
+  	      }
+      }
+  _colon_ transitionRules
+      {
+          Symbol *t = buechiStateTable->lookup($1->name);
+          $$ = BuechiRule((mkinteger(t->getIndex())),$4); $1->free(true);
+      }
 ;
 
 transitionRules:
-  /* empty */   { $$ = EmptyTransitionRules(); }
+  /* empty */
+    { $$ = EmptyTransitionRules(); }
 | statepredicate _then_ IDENTIFIER transitionRules
     {
         Symbol *t = buechiStateTable->lookup($3->name);
-	  	if (t == NULL){
+	  	if (UNLIKELY(t == NULL)){
 	  		buechiStateTable->insert(new Symbol($3->name));
 	  		t = buechiStateTable->lookup($3->name);
 	  		t->setIndex(currentNextIndex++);
 	  	}
-	  	//$3->free(true);
         $$ = TransitionRules(TransitionRule(StatePredicateFormula($1),mkinteger(t->getIndex())),$4);
     }
 ;
 
 acceptingsets:
-  /* empty */     { $$ = EmptyAcceptingSet(); }
+  /* empty */
+    { $$ = EmptyAcceptingSet(); }
 | IDENTIFIER
     {
         Symbol *t = buechiStateTable->lookup($1->name);
-        if (t == NULL)
+        if (UNLIKELY(t == NULL))
         {
-            ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $1->name);
+            yyerrors($1->name, @1, "state '%s' unknown", $1->name);
         }
-        //$1->free(free);
         $$ = AcceptingState(mkinteger(t->getIndex()));
     }
 | IDENTIFIER _comma_ acceptingsets
     {
         Symbol *t = buechiStateTable->lookup($1->name);
-        if (t == NULL)
+        if (UNLIKELY(t == NULL))
         {
-            ptbuechi_yyerrors(ptbuechi_text, "state %s unknown", $1->name);
+            yyerrors($1->name, @1, "state '%s' unknown", $1->name);
         }
-        //$1->free(true);
         $$ = AcceptingSet(AcceptingState(mkinteger(t->getIndex())),$3);
     }
 ;
@@ -221,13 +223,11 @@ atomic_proposition:
 | _FIREABLE_ _leftparenthesis_ IDENTIFIER _rightparenthesis_
     {
         Symbol *t = symbolTables->TransitionTable->lookup($3->name);
-        if (t == NULL)
+        if (UNLIKELY(t == NULL))
         {
-            ptbuechi_yyerrors(ptbuechi_text, "transition %s unknown", $3->name);
+            yyerrors($3->name, @3, "transition '%s' unknown", $3->name);
         }
-        //$3->free(true);
         $$ = Fireable(mkinteger(t->getIndex()));
-        //target_transition.insert(t->getIndex());
     }
 | _DEADLOCK_
     { $$ = aDeadlock(); }
@@ -241,13 +241,11 @@ term:
 | IDENTIFIER
     {
         Symbol *p = symbolTables->PlaceTable->lookup($1->name);
-        if (p == NULL)
+        if (UNLIKELY(p == NULL))
         {
-            ptbuechi_yyerrors(ptbuechi_text, "place %s unknown", $1->name);
+            yyerrors($1->name, @1, "place '%s' unknown", $1->name);
         }
-        //$1->free(true);
         $$ = Node(mkinteger(p->getIndex()));
-      	//target_place.insert(p->getIndex());
     }
 | NUMBER
     { $$ = Number($1); }
@@ -259,30 +257,11 @@ term:
     { $$ = Product($1, $3); }
 ;
 
-
 %%
-
-/// display a parser error and exit
-void ptbuechi_yyerrors(char* token, const char* format, ...) __attribute__((noreturn));
-void ptbuechi_yyerrors(char* token, const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    char* errormessage = NULL;
-    const int res = vasprintf(&errormessage, format, args);
-    assert(res != -1);
-    rep->message(errormessage);
-    free(errormessage);
-    va_end(args);
-
-    rep->message("%s:%d:%d - error near '%s'", rep->markup(MARKUP_FILE, basename((char*)args_info.formula_arg)).str(), ptbuechi_lineno, ptbuechi_colno, token);
-//    rep->status("%d:%d - error near '%s'", ptbuechi_lineno, ptbuechi_colno, token);
-
-    rep->abort(ERROR_SYNTAX);
-    exit(EXIT_ERROR); // needed to corrently recognize noreturn since rep->abort is virtual
-}
 
 /// display a parser error and exit
 void ptbuechi_error(char const* mess) __attribute__((noreturn));
 void ptbuechi_error(char const* mess) {
-    ptbuechi_yyerrors(ptbuechi_text, mess);
+    extern char* ptbuechi_text; ///< the current token text from Flex
+    yyerrors(ptbuechi_text, ptbuechi_lloc, mess);
 }

@@ -8,37 +8,40 @@
 \todo Präfix hinzufügen?
 */
 
-/* we want line numbering */
-%option yylineno  
-/* we don't neet yyunput() */
+/* yylineno: we want line numbering
+   nounput: we don't need yyunput()
+   noyywrap: we don't support multiple formula files */
+%option yylineno
 %option nounput
 %option noyywrap
-
 %option outfile="lex.yy.c"
 %option prefix="ptformula_"
 
-
 %{
-#include <cmdline.h>
-
 #include <Parser/ast-system-k.h>
 #include <Parser/ast-system-yystype.h>
-
 #include <Parser/ArcList.h>
 #include <Parser/FairnessAssumptions.h>
 #include <Parser/ParserPTFormula.hh>
 #include <InputOutput/Reporter.h>
 #include <InputOutput/InputOutput.h>
 
-using namespace kc;
-
-extern int currentFile;
-extern gengetopt_args_info args_info;
-extern Input *netFile;
-
-void ptformula_setcol();
 extern void ptformula_error(char const* mess);
-int ptformula_colno = 1;
+unsigned int ptformula_colno = 1;
+
+/*!
+\brief This macro is executed prior to the matched rule's action.
+
+We use this macro to set set #ptformula_lloc to the positions of #ptformula_text. It further
+manages the current column number #ptformula_colno. See Flex's manual
+http://flex.sourceforge.net/manual/Misc-Macros.html for more information on
+the macro.
+*/
+#define YY_USER_ACTION \
+  ptformula_lloc.first_line = ptformula_lloc.last_line = ptformula_lineno; \
+  ptformula_lloc.first_column = ptformula_colno; \
+  ptformula_lloc.last_column = ptformula_colno+ptformula_leng-1; \
+  ptformula_colno += ptformula_leng;
 %}
 
 %s IN_COMMENT
@@ -46,70 +49,60 @@ int ptformula_colno = 1;
 %%
 
  /* from http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html */
-"/*"                                     { ptformula_setcol(); BEGIN(IN_COMMENT); }
-<IN_COMMENT>"*/"                         { ptformula_setcol(); BEGIN(INITIAL); }
-<IN_COMMENT>[^*\n\r]+                    { ptformula_setcol(); /* comments */ }
-<IN_COMMENT>"*"                          { ptformula_setcol(); /* comments */ }
-<IN_COMMENT>[\n\r]                       { ptformula_setcol(); /* comments */ }
+"/*"                   { BEGIN(IN_COMMENT); }
+<IN_COMMENT>"*/"       { BEGIN(INITIAL); }
+<IN_COMMENT>[^*\n\r]+  { /* comments */ }
+<IN_COMMENT>"*"        { /* comments */ }
+<IN_COMMENT>[\n\r]     { /* comments */ }
 
-FIREABLE                                 { ptformula_setcol(); return _FIREABLE_; }
-DEADLOCK                                 { ptformula_setcol(); return _DEADLOCK_; }
-INITIAL                                  { ptformula_setcol(); return _INITIAL_; }
+"{"[^\n\r]*"}"         { /* comments */ }
 
-FORMULA                                  { ptformula_setcol(); return _FORMULA_; }
-AND                                      { ptformula_setcol(); return _AND_; }
-NOT                                      { ptformula_setcol(); return _NOT_; }
-OR                                       { ptformula_setcol(); return _OR_; }
-XOR                                      { ptformula_setcol(); return _XOR_; }
-TRUE                                     { ptformula_setcol(); return _TRUE_; }
-FALSE                                    { ptformula_setcol(); return _FALSE_; }
+FIREABLE               { return _FIREABLE_; }
+DEADLOCK               { return _DEADLOCK_; }
+INITIAL                { return _INITIAL_; }
 
-ALLPATH                                  { ptformula_setcol(); return _ALLPATH_; }
-EXPATH                                   { ptformula_setcol(); return _EXPATH_; }
+FORMULA                { return _FORMULA_; }
+AND                    { return _AND_; }
+NOT                    { return _NOT_; }
+OR                     { return _OR_; }
+XOR                    { return _XOR_; }
+TRUE                   { return _TRUE_; }
+FALSE                  { return _FALSE_; }
 
-ALWAYS                                   { ptformula_setcol(); return _ALWAYS_; }
-EVENTUALLY                               { ptformula_setcol(); return _EVENTUALLY_; }
-UNTIL                                    { ptformula_setcol(); return _UNTIL_; }
-NEXTSTATE                                { ptformula_setcol(); return _NEXTSTATE_; }
-RELEASE                                  { ptformula_setcol(); return _RELEASE_; }
+ALLPATH                { return _ALLPATH_; }
+EXPATH                 { return _EXPATH_; }
 
-REACHABLE                                { ptformula_setcol(); return _REACHABLE_; }
-INVARIANT                                { ptformula_setcol(); return _INVARIANT_; }
-IMPOSSIBLE                               { ptformula_setcol(); return _IMPOSSIBLE_; }
+ALWAYS                 { return _ALWAYS_; }
+EVENTUALLY             { return _EVENTUALLY_; }
+UNTIL                  { return _UNTIL_; }
+NEXTSTATE              { return _NEXTSTATE_; }
+RELEASE                { return _RELEASE_; }
 
-\;                                       { ptformula_setcol(); return _semicolon_; }
-\<\-\>                                   { ptformula_setcol(); return _iff_; }
-!=                                       { ptformula_setcol(); return _notequal_; }
-\<\>                                     { ptformula_setcol(); return _notequal_; }
-\-\>                                     { ptformula_setcol(); return _implies_; }
-=                                        { ptformula_setcol(); return _equals_; }
-\+                                       { ptformula_setcol(); return _plus_; }
-\-                                       { ptformula_setcol(); return _minus_; }
-\*                                       { ptformula_setcol(); return _times_; }
-\(                                       { ptformula_setcol(); return _leftparenthesis_; }
-\)                                       { ptformula_setcol(); return _rightparenthesis_; }
-[>]                                      { ptformula_setcol(); return _greaterthan_; }
-[<]                                      { ptformula_setcol(); return _lessthan_; }
-[#]                                      { ptformula_setcol(); return _notequal_; }
-[>]=                                     { ptformula_setcol(); return _greaterorequal_; }
-[<]=                                     { ptformula_setcol(); return _lessorequal_; }
+REACHABLE              { return _REACHABLE_; }
+INVARIANT              { return _INVARIANT_; }
+IMPOSSIBLE             { return _IMPOSSIBLE_; }
 
+\;                     { return _semicolon_; }
+\<\-\>                 { return _iff_; }
+!=                     { return _notequal_; }
+\<\>                   { return _notequal_; }
+\-\>                   { return _implies_; }
+=                      { return _equals_; }
+\+                     { return _plus_; }
+\-                     { return _minus_; }
+\*                     { return _times_; }
+\(                     { return _leftparenthesis_; }
+\)                     { return _rightparenthesis_; }
+[>]                    { return _greaterthan_; }
+[<]                    { return _lessthan_; }
+[#]                    { return _notequal_; }
+[>]=                   { return _greaterorequal_; }
+[<]=                   { return _lessorequal_; }
 
-[\n\r]                                   { ptformula_colno = 1; /* whitespace */ }
-[\t ]                                    { ptformula_setcol();  /* whitespace */ }
+[\n\r]                 { ptformula_colno = 1; /* whitespace */ }
+[\t ]                  {  /* whitespace */ }
 
-"-"?[0-9]+                               { ptformula_setcol(); ptformula_lval.yt_integer = kc::mkinteger(atoi(ptformula_text)); return NUMBER; }
+"-"?[0-9]+             { ptformula_lval.yt_integer = kc::mkinteger(atoi(ptformula_text)); return NUMBER; }
+[^,;:()\t \n\r\{\}]+   { ptformula_lval.yt_casestring = kc::mkcasestring(ptformula_text); return IDENTIFIER; }
 
-"{"[^\n\r]*"}"                           { ptformula_setcol(); /* comments */ }
-
-
-[^,;:()\t \n\r\{\}]+                     { ptformula_setcol(); ptformula_lval.yt_casestring = kc::mkcasestring(ptformula_text); return IDENTIFIER; }
-
-.                                        { ptformula_setcol(); ptformula_error("lexical error"); }
-
-%%
-
-inline void ptformula_setcol()
-{
-    ptformula_colno += ptformula_leng;
-}
+.                      { ptformula_error("lexical error"); }

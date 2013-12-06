@@ -13,8 +13,8 @@ lola_SOURCES = \
                 Core/Handlers.cc Core/Handlers.h \
                 Core/main.cc \
                 \
+				Parser/error.cc Parser/error.h \
                 Parser/ArcList.cc Parser/ArcList.h \
-                Parser/Diagnosis.cc Parser/Diagnosis.h \
                 Parser/FairnessAssumptions.h \
                 Parser/ParserPTNet.h Parser/ParserPTNet.cc \
                 Parser/ParserPTNetLoLA.yy Parser/Lexic.ll \

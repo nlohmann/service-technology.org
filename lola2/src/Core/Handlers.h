@@ -5,6 +5,8 @@
 \status new
 
 \ingroup g_runtime
+
+\brief Definition of exit and termination handlers.
 */
 
 #pragma once

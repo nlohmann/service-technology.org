@@ -98,14 +98,15 @@ Socket::Socket(u_short port, const char *hostname, bool failonerror) :
         // LCOV_EXCL_START
         if (UNLIKELY(record == NULL))
         {
-            ReporterStream rep(true);
-            rep.message("host %s is not available", rep.markup(MARKUP_FILE, "%s", hostname).str());
             if (failonerror)
             {
+                ReporterStream rep(true);
+                rep.message("host %s is not available", rep.markup(MARKUP_FILE, "%s", hostname).str());
                 rep.abort(ERROR_NETWORK);
             }
             else
             {
+                rep->status("host %s is not available", rep->markup(MARKUP_FILE, "%s", hostname).str());
                 return;
             }
         }

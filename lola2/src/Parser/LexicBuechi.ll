@@ -8,37 +8,40 @@
 \todo Präfix hinzufügen?
 */
 
-/* we want line numbering */
-%option yylineno  
-/* we don't neet yyunput() */
+/* yylineno: we want line numbering
+   nounput: we don't need yyunput()
+   noyywrap: we don't support multiple formula files */
+%option yylineno
 %option nounput
 %option noyywrap
-
 %option outfile="lex.yy.c"
 %option prefix="ptbuechi_"
 
-
 %{
-#include <cmdline.h>
-
 #include <Parser/ast-system-k.h>
 #include <Parser/ast-system-yystype.h>
-
 #include <Parser/ArcList.h>
 #include <Parser/FairnessAssumptions.h>
 #include <Parser/ParserPTBuechi.hh>
 #include <InputOutput/Reporter.h>
 #include <InputOutput/InputOutput.h>
 
-using namespace kc;
-
-extern int currentFile;
-extern gengetopt_args_info args_info;
-extern Input *netFile;
-
-void ptbuechi_setcol();
 extern void ptbuechi_error(char const* mess);
-int ptbuechi_colno = 1;
+unsigned int ptbuechi_colno = 1;
+
+/*!
+\brief This macro is executed prior to the matched rule's action.
+
+We use this macro to set set #ptbuechi_lloc to the positions of #ptbuechi_text. It further
+manages the current column number #ptbuechi_colno. See Flex's manual
+http://flex.sourceforge.net/manual/Misc-Macros.html for more information on
+the macro.
+*/
+#define YY_USER_ACTION \
+  ptbuechi_lloc.first_line = ptbuechi_lloc.last_line = ptbuechi_lineno; \
+  ptbuechi_lloc.first_column = ptbuechi_colno; \
+  ptbuechi_lloc.last_column = ptbuechi_colno+ptbuechi_leng-1; \
+  ptbuechi_colno += ptbuechi_leng;
 %}
 
 %s IN_COMMENT
@@ -46,59 +49,49 @@ int ptbuechi_colno = 1;
 %%
 
  /* from http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html */
-"/*"                                     { ptbuechi_setcol(); BEGIN(IN_COMMENT); }
-<IN_COMMENT>"*/"                         { ptbuechi_setcol(); BEGIN(INITIAL); }
-<IN_COMMENT>[^*\n\r]+                    { ptbuechi_setcol(); /* comments */ }
-<IN_COMMENT>"*"                          { ptbuechi_setcol(); /* comments */ }
-<IN_COMMENT>[\n\r]                       { ptbuechi_setcol(); /* comments */ }
+"/*"                   { BEGIN(IN_COMMENT); }
+<IN_COMMENT>"*/"       { BEGIN(INITIAL); }
+<IN_COMMENT>[^*\n\r]+  { /* comments */ }
+<IN_COMMENT>"*"        { /* comments */ }
+<IN_COMMENT>[\n\r]     { /* comments */ }
 
-FIREABLE                                 { ptbuechi_setcol(); return _FIREABLE_; }
-DEADLOCK                                 { ptbuechi_setcol(); return _DEADLOCK_; }
-INITIAL                                  { ptbuechi_setcol(); return _INITIAL_; }
+FIREABLE               { return _FIREABLE_; }
+DEADLOCK               { return _DEADLOCK_; }
+INITIAL                { return _INITIAL_; }
 
-buechi                                   { ptbuechi_setcol(); return _buechi_; }
-accept                                   { ptbuechi_setcol(); return _accept_; }
-AND                                      { ptbuechi_setcol(); return _AND_; }
-NOT                                      { ptbuechi_setcol(); return _NOT_; }
-OR                                       { ptbuechi_setcol(); return _OR_; }
-XOR                                      { ptbuechi_setcol(); return _XOR_; }
-TRUE                                     { ptbuechi_setcol(); return _TRUE_; }
-FALSE                                    { ptbuechi_setcol(); return _FALSE_; }
+buechi                 { return _buechi_; }
+accept                 { return _accept_; }
+AND                    { return _AND_; }
+NOT                    { return _NOT_; }
+OR                     { return _OR_; }
+XOR                    { return _XOR_; }
+TRUE                   { return _TRUE_; }
+FALSE                  { return _FALSE_; }
 
-\:                                       { ptbuechi_setcol(); return _colon_; }
-\,                                       { ptbuechi_setcol(); return _comma_; }
-=\>                                      { ptbuechi_setcol(); return _then_; }
-\;                                       { ptbuechi_setcol(); return _semicolon_; }
-\<\-\>                                   { ptbuechi_setcol(); return _iff_; }
-!=                                       { ptbuechi_setcol(); return _notequal_; }
-\<\>                                     { ptbuechi_setcol(); return _notequal_; }
-\-\>                                     { ptbuechi_setcol(); return _implies_; }
-=                                        { ptbuechi_setcol(); return _equals_; }
-\+                                       { ptbuechi_setcol(); return _plus_; }
-\-                                       { ptbuechi_setcol(); return _minus_; }
-\*                                       { ptbuechi_setcol(); return _times_; }
-\(                                       { ptbuechi_setcol(); return _leftparenthesis_; }
-\)                                       { ptbuechi_setcol(); return _rightparenthesis_; }
-\{                                       { ptbuechi_setcol(); return _braceleft_; }
-\}                                       { ptbuechi_setcol(); return _braceright_; }
-[>]                                      { ptbuechi_setcol(); return _greaterthan_; }
-[<]                                      { ptbuechi_setcol(); return _lessthan_; }
-[#]                                      { ptbuechi_setcol(); return _notequal_; }
-[>]=                                     { ptbuechi_setcol(); return _greaterorequal_; }
-[<]=                                     { ptbuechi_setcol(); return _lessorequal_; }
+\:                     { return _colon_; }
+\,                     { return _comma_; }
+=\>                    { return _then_; }
+\;                     { return _semicolon_; }
+\<\-\>                 { return _iff_; }
+!=                     { return _notequal_; }
+\<\>                   { return _notequal_; }
+\-\>                   { return _implies_; }
+=                      { return _equals_; }
+\+                     { return _plus_; }
+\-                     { return _minus_; }
+\*                     { return _times_; }
+\(                     { return _leftparenthesis_; }
+\)                     { return _rightparenthesis_; }
+\{                     { return _braceleft_; }
+\}                     { return _braceright_; }
+[>]                    { return _greaterthan_; }
+[<]                    { return _lessthan_; }
+[#]                    { return _notequal_; }
+[>]=                   { return _greaterorequal_; }
+[<]=                   { return _lessorequal_; }
 
+[\n\r]                 { ptbuechi_colno = 1; /* whitespace */ }
+[\t ]                  {  /* whitespace */ }
 
-[\n\r]                                   { ptbuechi_colno = 1; /* whitespace */ }
-[\t ]                                    { ptbuechi_setcol();  /* whitespace */ }
-
-[0-9]+                                   { ptbuechi_setcol(); ptbuechi_lval.yt_integer = kc::mkinteger(atoi(ptbuechi_text)); return NUMBER; }
-
-
-[^,;:()\t \n\r\{\}]+                     { ptbuechi_setcol(); ptbuechi_lval.yt_casestring = kc::mkcasestring(ptbuechi_text); return IDENTIFIER; }
-
-%%
-
-inline void ptbuechi_setcol()
-{
-    ptbuechi_colno += ptbuechi_leng;
-}
+[0-9]+                 { ptbuechi_lval.yt_integer = kc::mkinteger(atoi(ptbuechi_text)); return NUMBER; }
+[^,;:()\t \n\r\{\}]+   { ptbuechi_lval.yt_casestring = kc::mkcasestring(ptbuechi_text); return IDENTIFIER; }

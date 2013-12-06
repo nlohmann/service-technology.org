@@ -1,6 +1,6 @@
 /*!
 \file
-\brief joint lexic for all inputs to LoLA
+\brief lexic for LoLA low-level Petri nets
 \author Karsten
 \status approved 25.01.2012
 
@@ -10,14 +10,12 @@ Mainly copied from LoLA1
 \todo Präfix hinzufügen?
 */
 
-/* we want line numbering */
-%option yylineno  
-/* we don't neet yyunput() */
+/* yylineno: we want line numbering
+   nounput: we don't need yyunput() */
+%option yylineno
 %option nounput
-
 %option outfile="lex.yy.c"
 %option prefix="ptnetlola_"
-
 
 %{
 #include <cmdline.h>
@@ -27,14 +25,8 @@ Mainly copied from LoLA1
 #include <InputOutput/Reporter.h>
 #include <InputOutput/InputOutput.h>
 
-extern int currentFile;
-extern gengetopt_args_info args_info;
-extern Input *netFile;
-
-void setlval();
-void setcol();
 extern void ptnetlola_error(char const* mess);
-int ptnetlola_colno = 1;
+unsigned int ptnetlola_colno = 1;
 
 /*!
 \brief This macro is executed prior to the matched rule's action.
@@ -57,45 +49,37 @@ the macro.
 %%
 
  /* from http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html */
-"/*"                                     { BEGIN(IN_COMMENT); }
-<IN_COMMENT>"*/"                         { BEGIN(INITIAL); }
-<IN_COMMENT>[^*\n\r]+                    { /* comments */ }
-<IN_COMMENT>"*"                          { /* comments */ }
-<IN_COMMENT>[\n\r]                       { /* comments */ }
+"/*"                   { BEGIN(IN_COMMENT); }
+<IN_COMMENT>"*/"       { BEGIN(INITIAL); }
+<IN_COMMENT>[^*\n\r]+  { /* comments */ }
+<IN_COMMENT>"*"        { /* comments */ }
+<IN_COMMENT>[\n\r]     { /* comments */ }
 
-CONSUME                                  { return _CONSUME_; }
-FAIR                                     { return _FAIR_; }
-MARKING                                  { return _MARKING_; }
-PLACE                                    { return _PLACE_; }
-PRODUCE                                  { return _PRODUCE_; }
-SAFE                                     { return _SAFE_; }
-STRONG                                   { return _STRONG_; }
-TRANSITION                               { return _TRANSITION_; }
-WEAK                                     { return _WEAK_; }
+"{"[^\n\r]*"}"         { /* comments */ }
 
-\:                                       { return _colon_; }
-,                                        { return _comma_; }
-\;                                       { return _semicolon_; }
+CONSUME                { return _CONSUME_; }
+FAIR                   { return _FAIR_; }
+MARKING                { return _MARKING_; }
+PLACE                  { return _PLACE_; }
+PRODUCE                { return _PRODUCE_; }
+SAFE                   { return _SAFE_; }
+STRONG                 { return _STRONG_; }
+TRANSITION             { return _TRANSITION_; }
+WEAK                   { return _WEAK_; }
 
-[\n\r]                                   { ptnetlola_colno = 1; /* whitespace */ }
-[\t ]                                    {  /* whitespace */ }
+\:                     { return _colon_; }
+,                      { return _comma_; }
+\;                     { return _semicolon_; }
 
-[0-9]+                                   { setlval(); return NUMBER; }
+[\n\r]                 { ptnetlola_colno = 1; /* whitespace */ }
+[\t ]                  { /* whitespace */ }
 
-"{"[^\n\r]*"}"                           { /* comments */ }
+[0-9]+                 { ptnetlola_lval.attributeString = strdup(ptnetlola_text); return NUMBER; }
+[^,;:()\t \n\r\{\}]+   { ptnetlola_lval.attributeString = strdup(ptnetlola_text); return IDENTIFIER; }
 
-
-[^,;:()\t \n\r\{\}]+                     { setlval(); return IDENTIFIER; }
-
-.                                        { ptnetlola_error("lexical error"); }
+.                      { ptnetlola_error("lexical error"); }
 
 %%
-
-/*! pass token string as attribute to bison */
-inline void setlval()
-{
-    ptnetlola_lval.attributeString = strdup(ptnetlola_text);
-}
 
 /*!
 \brief handler for EOF
@@ -111,6 +95,10 @@ start condition remains unchanged; it does not revert to INITIAL.
 */
 int ptnetlola_wrap()
 {
+    extern Input *netFile;
+    extern gengetopt_args_info args_info;
+    extern int currentFile;
+
     if (currentFile == (int)args_info.inputs_num-1 or currentFile == -1)
     {
         // last or only file parsed - done parsing

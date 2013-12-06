@@ -7,6 +7,8 @@
 \todo Detaillierte Dateifehlermeldungen abschaltbar.
 \todo TheResult und TheCapacity in einen Namespace "parser::" packen
 
+\ingroup g_frontend
+
 Parses a place transition net in LoLA syntax.
 */
 
@@ -23,15 +25,8 @@ Parses a place transition net in LoLA syntax.
 #include <Parser/ParserPTNet.h>
 #include <Parser/FairnessAssumptions.h>
 #include <Parser/ArcList.h>
-#include <Parser/Diagnosis.h>
-#include <InputOutput/Reporter.h>
-#include <InputOutput/InputOutput.h>
+#include <Parser/error.h>
 
-extern int currentFile;
-extern Input* netFile;
-
-/// the current token text from Flex
-extern char* ptnetlola_text;
 %}
 
 %union {
@@ -43,7 +38,7 @@ extern char* ptnetlola_text;
 %error-verbose /* more verbose and specific error message string */
 %defines       /* write an output file containing macro definitions for the token types */
 %name-prefix="ptnetlola_"
-%locations
+%locations     /* we want to use token locations for better error messages */
 
 %type <attributeString> nodeident
 %type <attributeFairness> fairness
@@ -69,14 +64,11 @@ extern char* ptnetlola_text;
 %token END 0        "end of file"
 
 %{
-extern YYSTYPE ptnetlola_lval;
+// parser essentials
 extern int ptnetlola_lex();
-extern FILE* ptnetlola_in;
-extern int ptnetlola_lineno;
-extern int ptnetlola_colno;
-
 void ptnetlola_error(char const*);
-void yyerrors(char* token, YYLTYPE, const char* format, ...);
+
+extern YYSTYPE ptnetlola_lval;
 %}
 
 %{
@@ -87,7 +79,7 @@ void yyerrors(char* token, YYLTYPE, const char* format, ...);
 // their values become meaningless.
 
 /// The object containing the final outcome of the parsing process
-ParserPTNet*  TheResult;
+ParserPTNet* TheResult;
 /// The value of the currently active capacity statement
 capacity_t TheCapacity;
 %}
@@ -209,7 +201,7 @@ transition:
 fairness:
     /* empty */
     {
-        /* empty = may be treated unfair */
+        /* no fairness given */
         $$ = NO_FAIRNESS;
     }
 | _WEAK_ _FAIR_
@@ -295,30 +287,9 @@ ParserPTNet* ParserPTNetLoLA()
 }
 
 /// display a parser error and exit
-void yyerrors(char* token, YYLTYPE loc, const char* format, ...) __attribute__((noreturn));
-void yyerrors(char* token, YYLTYPE loc, const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    char* errormessage = NULL;
-    const int res = vasprintf(&errormessage, format, args);
-    assert(res != -1);
-    rep->status(errormessage);
-    free(errormessage);
-    va_end(args);
-
-    rep->status("%s:%d:%d - error near '%s'",
-        rep->markup(MARKUP_FILE, basename((char*)netFile->getFilename())).str(),
-        loc.first_line, loc.first_column, token);
-
-    printExcerpt(loc.first_line, loc.first_column,
-                 loc.last_line, loc.last_column);
-
-    rep->abort(ERROR_SYNTAX);
-    exit(EXIT_ERROR); // needed to corrently recognize noreturn since rep->abort is virtual
-}
-
-/// display a parser error and exit
 void ptnetlola_error(char const* mess) __attribute__((noreturn));
-void ptnetlola_error(char const* mess) {
+void ptnetlola_error(char const* mess)
+{
+    extern char* ptnetlola_text;  ///< the current token text from Flex
     yyerrors(ptnetlola_text, ptnetlola_lloc, mess);
 }

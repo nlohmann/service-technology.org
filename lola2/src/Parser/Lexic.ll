@@ -95,7 +95,7 @@ start condition remains unchanged; it does not revert to INITIAL.
 */
 int ptnetlola_wrap()
 {
-    extern Input *netFile;
+    extern Input *currentInputFile;
     extern gengetopt_args_info args_info;
     extern int currentFile;
 
@@ -107,8 +107,8 @@ int ptnetlola_wrap()
     else
     {
         // open next file
-        delete netFile;
-        netFile = new Input("net", args_info.inputs[++currentFile]);
+        delete currentInputFile;
+        currentInputFile = new Input("net", args_info.inputs[++currentFile]);
 
         ptnetlola_colno = 1;
         ptnetlola_lineno = 1;

@@ -12,11 +12,10 @@
 #include <libgen.h>
 #include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
 #include <Parser/error.h>
 #include <InputOutput/Reporter.h>
 #include <InputOutput/InputOutput.h>
-
-extern Input* netFile;
 
 /*!
 This generic error reporting function is used in all lexers and parsers. It
@@ -28,9 +27,9 @@ help the user locate and better understand the error message.
 \param[in] loc     The location of the read token in the error file.
 \param[in] format  An error message in printf format.
 
-\note Assumes that #netFile is the file that causes this error. If #netFile is
-NULL, the parser was called from a string (command-line parameter) and no
-detailed error location can be printed.
+\note Assumes that #currentInputFile is the file that causes this error. If
+#currentInputFile is NULL, the parser was called from a string (command-line
+parameter) and no detailed error location can be printed.
 \post Errors with EXIT_ERROR.
 
 \ingroup g_frontend
@@ -38,6 +37,8 @@ detailed error location can be printed.
 void yyerrors(const char* token, YYLTYPE loc, const char* format, ...) __attribute__((noreturn));
 void yyerrors(const char* token, YYLTYPE loc, const char* format, ...)
 {
+    extern Input* currentInputFile;
+
     va_list args;
     va_start(args, format);
     char* errormessage = NULL;
@@ -48,14 +49,14 @@ void yyerrors(const char* token, YYLTYPE loc, const char* format, ...)
     va_end(args);
 
     // only print filename and excerpt if we read from a file/stdin
-    if (netFile)
+    if (currentInputFile)
     {
         rep->status("%s:%d:%d - error near '%s'",
-            rep->markup(MARKUP_FILE, basename((char*)netFile->getFilename())).str(),
+            rep->markup(MARKUP_FILE, basename((char*)currentInputFile->getFilename())).str(),
             loc.first_line, loc.first_column, token);
 
-        netFile->printExcerpt(loc.first_line, loc.first_column,
-                              loc.last_line, loc.last_column);
+        currentInputFile->printExcerpt(loc.first_line, loc.first_column,
+                                       loc.last_line, loc.last_column);
     }
     else
     {

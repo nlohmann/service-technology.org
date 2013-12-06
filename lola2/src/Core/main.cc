@@ -5,7 +5,6 @@
 
 \brief Main entry point for LoLA.
 
-\todo ParserPTNetLoLA() exportieren
 \todo Parser/Lexer-Kram in h-Datei (yyin, ...)
 */
 
@@ -20,35 +19,18 @@
 #include <string>
 
 #include <cmdline.h>
-
 #include <Core/Handlers.h>
-
 #include <Parser/ParserPTNet.h>
 #include <Parser/ast-system-k.h>
-
 #include <Net/Net.h>
 #include <Net/Marking.h>
-
 #include <InputOutput/Reporter.h>
 #include <InputOutput/CompressedIO.h>
 #include <InputOutput/InputOutput.h>
-
 #include <Exploration/RandomWalk.h>
 #include <Exploration/SimpleProperty.h>
-
 #include <Planning/Task.h>
-
 #include <Stores/Store.h>
-
-// a net parser
-extern ParserPTNet *ParserPTNetLoLA();
-
-// the input file for Flex
-extern FILE *ptnetlola_in;
-
-// a cleanup function from Flex
-extern int ptnetlola_lex_destroy();
-
 
 /*!
 \brief the command line parameters
@@ -82,10 +64,10 @@ int currentFile = -1;
 
 /*!
 \brief the current file to read a Petri net from
-\note is changed by ptnetlola_wrap()
+\note is changed by ptnetlola_wrap() and members of class Task
 \ingroup g_globals
 */
-Input *netFile = NULL;
+Input *currentInputFile = NULL;
 
 
 /*!
@@ -230,8 +212,8 @@ int main(int argc, char **argv)
         }
         if (args_info.inputs_num == 2)
         {
-            Input netfile("compressed net", args_info.inputs[0]);
-            ReadNetFile(netfile);
+            Input currentInputFile("compressed net", args_info.inputs[0]);
+            ReadNetFile(currentInputFile);
             Input namefile("names", args_info.inputs[1]);
             symbolTables = new ParserPTNet();
             // initializes a symbol table that is rudimentary filled such that mapping name->id is possible
@@ -244,26 +226,30 @@ int main(int argc, char **argv)
         if (args_info.inputs_num == 0)
         {
             // read from stdin
-            netFile = new Input("net");
+            currentInputFile = new Input("net");
         }
         else
         {
             currentFile = 0;
-            netFile = new Input("net", args_info.inputs[currentFile]);
+            currentInputFile = new Input("net", args_info.inputs[currentFile]);
         }
 
         // pass the opened file pointer to flex via FILE *yyin
-        ptnetlola_in = *netFile;
+        extern FILE *ptnetlola_in;
+        ptnetlola_in = *currentInputFile;
 
         // read the input file(s)
+        extern ParserPTNet *ParserPTNetLoLA();
         symbolTables = ParserPTNetLoLA();
 
         rep->status("finished parsing");
 
         // close net file
-        delete netFile;
+        delete currentInputFile;
+        currentInputFile = NULL;
 
         // tidy parser
+        extern int ptnetlola_lex_destroy();
         ptnetlola_lex_destroy();
 
         // translate into general net structures

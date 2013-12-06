@@ -50,7 +50,7 @@
 #include <Formula/LTL/BuechiFromLTL.h>
 
 extern gengetopt_args_info args_info;
-extern Input* netFile; // used as formula here; should be renamed
+extern Input* currentInputFile;
 
 // the parsers
 extern int ptformula_parse();
@@ -235,7 +235,7 @@ they are deallocated by the destructor.
 */
 void Task::setFormula()
 {
-    netFile = NULL;
+    currentInputFile = NULL;
 
     // Check if the paramter of --formula is a file that we can open: if that
     // works, parse the file. If not, parse the string.
@@ -247,8 +247,8 @@ void Task::setFormula()
     else
     {
         fclose(file);
-        netFile = new Input("formula", args_info.formula_arg);
-        ptformula_in = *netFile;
+        currentInputFile = new Input("formula", args_info.formula_arg);
+        ptformula_in = *currentInputFile;
     }
 
     // parse the formula
@@ -525,7 +525,8 @@ void Task::setFormula()
 
     if (args_info.formula_given)
     {
-        delete netFile;
+        delete currentInputFile;
+        currentInputFile = NULL;
     }
 }
 
@@ -538,7 +539,7 @@ command line parameter.
 */
 void Task::setBuechiAutomata()
 {
-    netFile = NULL;
+    currentInputFile = NULL;
     buechiStateTable = new SymbolTable();
 
     // Check if the paramter of --buechi is a file that we can open: if that
@@ -551,8 +552,8 @@ void Task::setBuechiAutomata()
     else
     {
         fclose(file);
-        netFile = new Input("Buechi", args_info.buechi_arg);
-        ptbuechi_in = *netFile;
+        currentInputFile = new Input("Buechi", args_info.buechi_arg);
+        ptbuechi_in = *currentInputFile;
     }
 
     //rep->message("Parsing Büchi-Automaton");
@@ -594,7 +595,8 @@ void Task::setBuechiAutomata()
 
     if (args_info.buechi_given)
     {
-        delete netFile;
+        delete currentInputFile;
+        currentInputFile = NULL;
     }
 
     // reading the buechi automata

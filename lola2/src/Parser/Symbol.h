@@ -10,9 +10,10 @@
 #include <Core/Dimensions.h>
 
 /*!
-A symbol is an entry in a symbol table (class SymbolTable). It has a string as
-key. For dealing with collissions in the symbol table, symbols can be lnked as
-lists. Payload can be added by deriving subclasses.
+\brief a symbol is an entry in a symbol table (class SymbolTable)
+
+It has a string as key. For dealing with collissions in the symbol table,
+symbols can be lnked as lists. Payload can be added by deriving subclasses.
 
 \ingroup g_symboltable
 \todo Make key const?
@@ -20,6 +21,12 @@ lists. Payload can be added by deriving subclasses.
 class Symbol
 {
 public:
+    /// generate and initialize a symbol
+    explicit Symbol(const char *);
+
+    /// delete a symbol
+    virtual ~Symbol() {}
+
     /// getter for key
     char *getKey() const;
 
@@ -28,12 +35,6 @@ public:
 
     /// setter for next
     void setNext(Symbol *);
-
-    /// generate and initialize a symbol
-    explicit Symbol(const char *);
-
-    /// delete a symbol
-    virtual ~Symbol() {}
 
     /// get index of symbol in net data structures
     index_t getIndex() const;

@@ -27,6 +27,8 @@ from/to the same transtion.
 class ArcList
 {
 public:
+    ArcList(PlaceSymbol *, mult_t);
+
     /// getter for place
     PlaceSymbol *getPlace() const;
 
@@ -41,9 +43,6 @@ public:
 
     /// adding some tokens to multplicity
     void addMultiplicity(mult_t);
-
-    /// generate and initialize a list element
-    ArcList(PlaceSymbol *, mult_t);
 
 private:
     /// the place at the other end of arc (transition implicilty given)

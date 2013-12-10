@@ -1,0 +1,43 @@
+net      ::= 'PLACE' placelists ';' 'MARKING' markinglist ';' transitionlist
+
+placelists
+         ::= capacity placelist
+           | placelists ';' capacity placelist
+
+capacity ::=
+           | 'SAFE' ':'
+           | 'SAFE' 'NUMBER' ':'
+
+placelist
+         ::= placelist ',' nodeident
+           | nodeident
+
+nodeident
+         ::= 'IDENTIFIER'
+           | 'NUMBER'
+
+markinglist
+         ::=
+           | marking
+           | markinglist ',' marking
+
+marking  ::= nodeident ':' 'NUMBER'
+           | nodeident
+
+transitionlist
+         ::= transition
+           | transitionlist transition
+
+transition
+         ::= 'TRANSITION' nodeident fairness 'CONSUME' arclist ';' 'PRODUCE' arclist ';'
+
+fairness ::=
+           | 'WEAK' 'FAIR'
+           | 'STRONG' 'FAIR'
+
+arclist  ::=
+           | arc
+           | arc ',' arclist
+
+arc      ::= nodeident ':' 'NUMBER'
+           | nodeident

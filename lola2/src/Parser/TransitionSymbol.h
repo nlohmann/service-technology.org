@@ -13,7 +13,6 @@
 // forward declaration
 class ArcList;
 
-
 /*!
 \brief a symbol table entry for a transition
 
@@ -34,9 +33,7 @@ destructor.
 class TransitionSymbol: public Symbol
 {
 public:
-    /// generate and initialize a transition symbol
     TransitionSymbol(const char *, fairnessAssumption_t, ArcList *, ArcList *);
-    /// delete transition symbol
     ~TransitionSymbol();
 
     /// getter for number of incoming arcs

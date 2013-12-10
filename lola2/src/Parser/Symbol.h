@@ -20,10 +20,7 @@ symbols can be lnked as lists. Payload can be added by deriving subclasses.
 class Symbol
 {
 public:
-    /// generate and initialize a symbol
     explicit Symbol(const char * const);
-
-    /// delete a symbol
     virtual ~Symbol() {}
 
     /// getter for key
@@ -32,11 +29,11 @@ public:
     /// getter for next
     Symbol *getNext() const;
 
-    /// setter for next
-    void setNext(Symbol *);
-
     /// get index of symbol in net data structures
     index_t getIndex() const;
+
+    /// setter for next
+    void setNext(Symbol *);
 
     /// set index of symbol in net date structures
     void setIndex(index_t);

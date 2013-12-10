@@ -10,7 +10,6 @@
 #include <Core/Dimensions.h>
 #include <Parser/Symbol.h>
 
-
 /*!
 \brief a symbol table entry for a place
 
@@ -32,7 +31,6 @@ arcs.
 class PlaceSymbol: public Symbol
 {
 public:
-    /// generate and initialize a symbol
     PlaceSymbol(const char *, unsigned int);
 
     /// getter for capacity

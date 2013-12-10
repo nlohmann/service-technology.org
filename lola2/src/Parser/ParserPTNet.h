@@ -8,7 +8,6 @@
 */
 
 #pragma once
-
 #include <Core/Dimensions.h>
 #include <Parser/SymbolTable.h>
 
@@ -23,6 +22,9 @@ PNML, ...).
 class ParserPTNet
 {
 public:
+    ParserPTNet();
+    ~ParserPTNet();
+
     /// a symbol table for places
     SymbolTable *PlaceTable;
     /// a symbol table for transitions
@@ -30,10 +32,4 @@ public:
 
     /// translation into main net structures Node, Place, Transition, and Marking
     void symboltable2net();
-
-    /// constructor
-    ParserPTNet();
-
-    /// destructor
-    ~ParserPTNet();
 };

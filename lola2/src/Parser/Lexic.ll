@@ -57,19 +57,19 @@ the macro.
 
 "{"[^\n\r]*"}"         { /* comments */ }
 
-CONSUME                { return _CONSUME_; }
-FAIR                   { return _FAIR_; }
-MARKING                { return _MARKING_; }
-PLACE                  { return _PLACE_; }
-PRODUCE                { return _PRODUCE_; }
-SAFE                   { return _SAFE_; }
-STRONG                 { return _STRONG_; }
-TRANSITION             { return _TRANSITION_; }
-WEAK                   { return _WEAK_; }
+CONSUME                { return KEY_CONSUME; }
+FAIR                   { return KEY_FAIR; }
+MARKING                { return KEY_MARKING; }
+PLACE                  { return KEY_PLACE; }
+PRODUCE                { return KEY_PRODUCE; }
+SAFE                   { return KEY_SAFE; }
+STRONG                 { return KEY_STRONG; }
+TRANSITION             { return KEY_TRANSITION; }
+WEAK                   { return KEY_WEAK; }
 
-\:                     { return _colon_; }
-,                      { return _comma_; }
-\;                     { return _semicolon_; }
+\:                     { return COLON; }
+,                      { return COMMA; }
+\;                     { return SEMICOLON; }
 
 [\n\r]                 { ptnetlola_colno = 1; /* whitespace */ }
 [\t ]                  { /* whitespace */ }

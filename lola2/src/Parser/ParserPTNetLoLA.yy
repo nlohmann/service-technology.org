@@ -45,21 +45,21 @@ Parses a place transition net in LoLA syntax.
 %type <attributeString> NUMBER
 %type <attributeString> IDENTIFIER
 
-%token IDENTIFIER   "identifier"
-%token NUMBER       "number"
-%token _CONSUME_    "keyword CONSUME"
-%token _FAIR_       "keyword FAIR"
-%token _PLACE_      "keyword PLACE"
-%token _MARKING_    "keyword MARKING"
-%token _PRODUCE_    "keyword PRODUCE"
-%token _SAFE_       "keyword SAFE"
-%token _STRONG_     "keyword STRONG"
-%token _TRANSITION_ "keyword TRANSITION"
-%token _WEAK_       "keyword WEAK"
-%token _colon_      "colon"
-%token _comma_      "comma"
-%token _semicolon_  "semicolon"
-%token END 0        "end of file"
+%token IDENTIFIER     "identifier"
+%token NUMBER         "number"
+%token KEY_CONSUME    "keyword CONSUME"
+%token KEY_FAIR       "keyword FAIR"
+%token KEY_PLACE      "keyword PLACE"
+%token KEY_MARKING    "keyword MARKING"
+%token KEY_PRODUCE    "keyword PRODUCE"
+%token KEY_SAFE       "keyword SAFE"
+%token KEY_STRONG     "keyword STRONG"
+%token KEY_TRANSITION "keyword TRANSITION"
+%token KEY_WEAK       "keyword WEAK"
+%token COLON          "colon"
+%token COMMA          "comma"
+%token SEMICOLON      "semicolon"
+%token END 0          "end of file"
 
 %{
 // parser essentials
@@ -85,17 +85,15 @@ capacity_t TheCapacity;
 %%
 
 net:
-  _PLACE_ placelists _semicolon_    /* declare places */
-  _MARKING_ markinglist _semicolon_ /* specify initial marking */
+  KEY_PLACE placelists SEMICOLON    /* declare places */
+  KEY_MARKING markinglist SEMICOLON /* specify initial marking */
   transitionlist                    /* define transitions & arcs */
 ;
 
-
 placelists:
   capacity placelist    /* several places may share unqiue capacity */
-| placelists _semicolon_ capacity placelist
+| placelists SEMICOLON capacity placelist
 ;
-
 
 capacity:
   /* empty */
@@ -103,12 +101,12 @@ capacity:
         /* empty capacity = unlimited capacity */
         TheCapacity = (capacity_t)MAX_CAPACITY;
     }
-| _SAFE_ _colon_
+| KEY_SAFE COLON
     {
         /* SAFE without number = 1-SAFE */
         TheCapacity = 1;
     }
-| _SAFE_ NUMBER _colon_
+| KEY_SAFE NUMBER COLON
     {
         /* at most k tokens expected on these places */
         TheCapacity = (capacity_t)atoi($2);
@@ -116,9 +114,8 @@ capacity:
     }
 ;
 
-
 placelist:
-  placelist _comma_ nodeident
+  placelist COMMA nodeident
     {
         PlaceSymbol *p = new PlaceSymbol($3, TheCapacity);
         if (UNLIKELY (! TheResult->PlaceTable->insert(p)))
@@ -144,16 +141,14 @@ nodeident:  /* for places and transitions, names may be idents or numbers */
     }
 ;
 
-
 markinglist:
   /* empty */
 | marking
-| markinglist _comma_ marking
+| markinglist COMMA marking
 ;
 
-
 marking:
-  nodeident _colon_ NUMBER
+  nodeident COLON NUMBER
     {
         PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable->lookup($1));
         if (UNLIKELY (!p))
@@ -176,17 +171,15 @@ marking:
     }
 ;
 
-
 transitionlist:
   transition
 | transitionlist transition
 ;
 
-
 transition:
-  _TRANSITION_ nodeident fairness
-  _CONSUME_ arclist _semicolon_
-  _PRODUCE_ arclist _semicolon_
+  KEY_TRANSITION nodeident fairness
+  KEY_CONSUME arclist SEMICOLON
+  KEY_PRODUCE arclist SEMICOLON
     {
         TransitionSymbol* t = new TransitionSymbol($2, $3, $5, $8);
         if (UNLIKELY (! TheResult->TransitionTable->insert(t)))
@@ -202,16 +195,15 @@ fairness:
         /* no fairness given */
         $$ = NO_FAIRNESS;
     }
-| _WEAK_ _FAIR_
+| KEY_WEAK KEY_FAIR
     {
         $$ = WEAK_FAIRNESS;
     }
-| _STRONG_ _FAIR_
+| KEY_STRONG KEY_FAIR
     {
         $$ = STRONG_FAIRNESS;
     }
 ;
-
 
 arclist:
   /* empty */
@@ -222,7 +214,7 @@ arclist:
     {
         $$ = $1;
     }
-| arc _comma_ arclist
+| arc COMMA arclist
     {
         // check for duplicate
         ArcList * al;
@@ -249,9 +241,8 @@ arclist:
     }
 ;
 
-
 arc:
-  nodeident _colon_ NUMBER
+  nodeident COLON NUMBER
     {
         PlaceSymbol* p = reinterpret_cast<PlaceSymbol*>(TheResult->PlaceTable->lookup($1));
         if (UNLIKELY (!p))

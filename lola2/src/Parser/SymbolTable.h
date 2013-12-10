@@ -28,6 +28,9 @@ public:
     static unsigned int collisions;
 
 public:
+    SymbolTable();
+    ~SymbolTable();
+
     /// If symbol with same key is in table: return false
     /// If symbol with same key is not in table: return true and insert it
     bool insert(Symbol *);
@@ -40,11 +43,6 @@ public:
     Symbol *first();
     /// continue iteration; return NULL if there is none
     Symbol *next();
-
-    /// generate and initialize a symbol table
-    SymbolTable();
-    /// close SymbolTable
-    ~SymbolTable();
 
     /// get number of entries in table
     unsigned int getCard() const;

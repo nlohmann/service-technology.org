@@ -109,6 +109,7 @@ int ptnetlola_wrap()
         // open next file
         delete currentInputFile;
         currentInputFile = new Input("net", args_info.inputs[++currentFile]);
+        ptnetlola_in = *currentInputFile;
 
         ptnetlola_colno = 1;
         ptnetlola_lineno = 1;

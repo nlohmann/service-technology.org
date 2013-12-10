@@ -33,7 +33,7 @@ class PlaceSymbol: public Symbol
 {
 public:
     /// generate and initialize a symbol
-    PlaceSymbol(char *, unsigned int);
+    PlaceSymbol(const char *, unsigned int);
 
     /// getter for capacity
     capacity_t getCapacity() const;

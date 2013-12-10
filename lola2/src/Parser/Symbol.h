@@ -16,19 +16,18 @@ It has a string as key. For dealing with collissions in the symbol table,
 symbols can be lnked as lists. Payload can be added by deriving subclasses.
 
 \ingroup g_symboltable
-\todo Make key const?
 */
 class Symbol
 {
 public:
     /// generate and initialize a symbol
-    explicit Symbol(const char *);
+    explicit Symbol(const char * const);
 
     /// delete a symbol
     virtual ~Symbol() {}
 
     /// getter for key
-    char *getKey() const;
+    const char * const getKey() const;
 
     /// getter for next
     Symbol *getNext() const;
@@ -44,7 +43,7 @@ public:
 
 private:
     /// the name of the symbol; used for insertion in symbol table
-    char *key;
+    const char * const key;
 
     /// symbols with same hash value are organized as lists
     Symbol *next;

@@ -212,7 +212,7 @@ void ReadNetFile(FILE *f)
 
     // allocate place arrays
     // we set place names to NULL right now
-    Net::Name[PL] = new char *[Net::Card[PL]]();
+    Net::Name[PL] = new const char *[Net::Card[PL]]();
     for (int direction = PRE; direction <= POST; direction ++)
     {
         Net::CardArcs[PL][direction] = new index_t[Net::Card[PL]];
@@ -271,7 +271,7 @@ void ReadNetFile(FILE *f)
     Net::Card[TR] = (index_t) tmp1;
 
     // transition names are set to NULL here
-    Net::Name[TR] = new char *[Net::Card[TR]]();
+    Net::Name[TR] = new const char *[Net::Card[TR]]();
     for (int direction = PRE; direction <= POST; direction ++)
     {
         Net::CardArcs[TR][direction] = new index_t[Net::Card[TR]];

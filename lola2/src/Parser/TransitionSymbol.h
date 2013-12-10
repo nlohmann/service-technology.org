@@ -35,7 +35,7 @@ class TransitionSymbol: public Symbol
 {
 public:
     /// generate and initialize a transition symbol
-    TransitionSymbol(char *, fairnessAssumption_t, ArcList *, ArcList *);
+    TransitionSymbol(const char *, fairnessAssumption_t, ArcList *, ArcList *);
     /// delete transition symbol
     ~TransitionSymbol();
 

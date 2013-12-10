@@ -37,7 +37,7 @@ index_t Net::Card[2] = {0, 0};
 index_t *Net::CardArcs[2][2] = {{NULL, NULL}, {NULL, NULL}};
 index_t **Net::Arc[2][2] = {{NULL, NULL}, {NULL, NULL}};
 mult_t **Net::Mult[2][2] = {{NULL, NULL}, {NULL, NULL}};
-char **Net::Name[2] = {NULL, NULL};
+const char **Net::Name[2] = {NULL, NULL};
 
 // LCOV_EXCL_START
 bool Net::DEBUG__checkConsistency()
@@ -206,7 +206,7 @@ void Net::deleteNodes()
         for (index_t i = 0; i < Net::Card[type]; i++)
         {
             // names are allocated via strdup
-            free(Net::Name[type][i]);
+            free(const_cast<char *>(Net::Name[type][i]));
         }
         delete[] Net::Name[type];
     }
@@ -301,7 +301,7 @@ void Net::swapPlaces(index_t left, index_t right)
     symbolTables->PlaceTable->lookup(Net::Name[PL][right])->setIndex(ixdLeft);
 
 
-    char *tempname = Net::Name[PL][left];
+    const char *tempname = Net::Name[PL][left];
     Net::Name[PL][left] = Net::Name[PL][right];
     Net::Name[PL][right] = tempname;
 

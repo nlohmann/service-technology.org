@@ -16,7 +16,7 @@ TransitionSymbol::TransitionSymbol.
 \param[in] k    the name of the place
 \param[in] cap  the capacity of this place (UINTMAX denotes no capacity)
 */
-PlaceSymbol::PlaceSymbol(char *k, capacity_t cap) :
+PlaceSymbol::PlaceSymbol(const char *k, capacity_t cap) :
     Symbol(k),
     capacity(cap),
     initialMarking(0), // temporary initialization

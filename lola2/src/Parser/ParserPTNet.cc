@@ -68,7 +68,7 @@ void ParserPTNet::symboltable2net()
     // 1.2 allocate arrays for node (places and transitions) names, arcs, and multiplicities
     for (int type = PL; type <= TR; type ++)
     {
-        Net::Name[type] = new char*[Net::Card[type]];
+        Net::Name[type] = new const char*[Net::Card[type]];
         for (int direction = PRE; direction <= POST; direction ++)
         {
             Net::CardArcs[type][direction] = new index_t[Net::Card[type]];

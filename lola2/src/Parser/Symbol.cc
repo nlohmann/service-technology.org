@@ -14,7 +14,7 @@ index_t Symbol::getIndex() const
     return index;
 }
 
-char *Symbol::getKey() const
+const char * const Symbol::getKey() const
 {
     return key;
 }
@@ -40,8 +40,8 @@ void Symbol::setIndex(index_t i)
 \note The pointer next is lated set by SymbolTable::insert.
 \note The index is later changed by ParserPTNet::symboltable2net.
 */
-Symbol::Symbol(const char *k) :
-    key(const_cast<char *>(k)),
+Symbol::Symbol(const char * const k) :
+    key(k),
     next(NULL),  // intermediate initialization
     index(0)     // intermediate initialization
 {

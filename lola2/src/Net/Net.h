@@ -39,7 +39,7 @@ struct Net
 
     /// names of the nodes
     /// Name[TR][15] is the name of transition 15.
-    static char **Name[2];
+    static const char **Name[2];
 
     /// free all allocated memory
     static void deleteNodes();

@@ -20,7 +20,7 @@ and outgoing arcs.
 \param[in] pr  the arcs to preplaces
 \param[in] po  the arcs to postplaces
 */
-TransitionSymbol::TransitionSymbol(char *k, fairnessAssumption_t f,
+TransitionSymbol::TransitionSymbol(const char *k, fairnessAssumption_t f,
                                    ArcList *pr, ArcList *po) :
     Symbol(k),
     fairness(f),

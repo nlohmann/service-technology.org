@@ -425,21 +425,25 @@ void Output::printOGnode(std::ostream & os, BSDgraph & graph, BSDNode & node) {
 }
 
 void Output::printFormula(std::ostream & os, BSDgraph & graph, BSDNode & node) {
-	// iterate over the disjunctions
-	for (std::list<std::list<Label_ID> >::const_iterator it = node.formula.begin(); it != node.formula.end();) {
-		os << "(";
-		// iterate over all labels in the disjunction
-		for (std::list<Label_ID>::const_iterator label = it->begin(); label != it->end();) {
-			if (*label == 0) {
-				os << "final";
-			} else {
-				os << graph.id2name[*label];
+	if (node.formula.empty()) {
+		os << "true";
+	} else {
+		// iterate over the disjunctions
+		for (std::list<std::list<Label_ID> >::const_iterator it = node.formula.begin(); it != node.formula.end();) {
+			os << "(";
+			// iterate over all labels in the disjunction
+			for (std::list<Label_ID>::const_iterator label = it->begin(); label != it->end();) {
+				if (*label == 0) {
+					os << "final";
+				} else {
+					os << graph.id2name[*label];
+				}
+				if (++label != it->end())
+					os << " + ";
 			}
-			if (++label != it->end())
-				os << " + ";
+			os << ")";
+			if (++it != node.formula.end())
+				os << " * ";
 		}
-		os << ")";
-		if (++it != node.formula.end())
-			os << " * ";
 	}
 }

@@ -459,7 +459,7 @@ void PathFinder::conflictTable(SThread* thr, Transition* tstart) {
 					int cftcons(tpit->second);
 					// check if there is a conflict at all
 					// if we produce enough to let t live, and t cannot enable us, we are not in conflict
-					if (itprod>=cftcons && cftprod-cftcons<=0) continue; 
+					if (itprod>=cftcons+(thr->tv[cft]-1)*(cftcons-cftprod) && cftprod-cftcons<=0) continue; 
 
 					// mark cft as conflicting, i.e. cft possibly has priority
 					thr->cftab[tnr].push_back(cft);
@@ -606,7 +606,7 @@ void PathFinder::adaptConflictGraph(SThread* thr, Transition* tstart) {
 					int cftcons(tpit->second);
 					// check if there is a conflict at all
 					// if we produce enough to let t live, and t cannot enable us, we are not in conflict
-					if (itprod>=cftcons && cftprod-cftcons<=0) continue; 
+					if (itprod>=cftcons+(thr->tv[cft]-1)*(cftcons-cftprod) && cftprod-cftcons<=0) continue; 
 
 					// mark cft as conflicting, i.e. cft possibly has priority
 					if (!added[revtorder[cft]]) {

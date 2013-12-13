@@ -183,7 +183,7 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << (filename.empty() ? "" : " generated from " + filename) << "\\n"
   << "&Omega;=" << net.getFinalCondition() << "\"]\n"
   
-  << " node [fontname=\"Helvetica\" fixedsize width=\".3\""
+  << " node [fontname=\"Helvetica\" fixedsize=\"true\" width=\".3\""
   << " height=\".3\" label=\"\" style=filled]\n"
   << " edge [fontname=\"Helvetica\" color=white arrowhead=none"
   << " weight=\"20.0\"]\n\n"

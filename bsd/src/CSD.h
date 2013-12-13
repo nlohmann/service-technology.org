@@ -42,8 +42,11 @@ class CSD {
 
         static void computeCSD(BSDgraph & graph);
 
+        static void recursiveCSD(BSDgraph & graph, BSDNode * node);
+
     private:
 
+        static std::map<BSDNode*, bool>* visited;
 
 };
 

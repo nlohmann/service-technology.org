@@ -215,7 +215,7 @@ void MP::computeFormulas(BSDgraph & graph) {
 				for (uint8_t i = 0; i < InnerMarking::inner_markings[*itlist]->out_degree; ++i) {
 					if (InnerMarking::inner_markings[*itlist]->labels[i] != TAU) {
 						// skip labels that lead to the U node (we are in MP)
-						if ((*it)->pointer[InnerMarking::inner_markings[*itlist]->labels[i]]->isU) {
+						if ((*it)->successors[InnerMarking::inner_markings[*itlist]->labels[i]]->isU) {
 							continue;
 						}
 						Label_ID currentLabel = InnerMarking::inner_markings[*itlist]->labels[i];

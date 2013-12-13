@@ -48,8 +48,12 @@ typedef struct _BSDNode {
 	MarkingList list;
 	// list of SCCs in the closure (may be empty?!)
 	std::list<MarkingList> SCCs;
-	// pointers to other BSD nodes (ordered and accessible by label id)
-	struct _BSDNode** pointer;
+	// pointers to successing BSD nodes (ordered and accessible by label id)
+	struct _BSDNode** successors;
+	// pointers to predecessing BSD nodes
+	std::list<std::pair<Label_ID, struct _BSDNode *> >* predecessors;
+	// number of successors that are the U node
+	uint8_t Ucount;
 	// lambda value of the node (see paper for more information)
 	uint8_t lambda;
 	// formula (if existing): conjunction of disjunctions

@@ -96,20 +96,22 @@ void BSD::computeBSD(int og_flag) {
 
 	// the U node
 	U = new BSDNode;
-	U->pointer = new BSDNode*[Label::events+1];
+	U->successors = new BSDNode*[Label::events+1];
+	U->predecessors = new std::list<std::pair<Label_ID, BSDNode*> >;
 	U->isU = true;
 	assignLambda(U, tempSCC);
 
 	// the empty node
 	emptyset = new BSDNode;
-	emptyset->pointer = new BSDNode*[Label::events+1];
+	emptyset->successors = new BSDNode*[Label::events+1];
+	emptyset->predecessors = new std::list<std::pair<Label_ID, BSDNode*> >;
 	emptyset->isU = false;
 	assignLambda(emptyset, tempSCC);
 
-	// set up the pointers ( which are all loops to the same nodes )
+	// set up the pointers to successors ( which are all loops to the same nodes )
 	for (Label_ID id = 2; id <= Label::events; ++id) {
-		U->pointer[id] = U;
-		emptyset->pointer[id] = emptyset;
+		U->successors[id] = U;
+		emptyset->successors[id] = emptyset;
 	}
 
 	// start with the initial marking
@@ -168,7 +170,9 @@ void BSD::computeSuccessor(BSDNode &node, Label_ID label, int og_flag) {
 				// if the bound was broken by taking a step with the current label then add a pointer from this node
 				// to the U node with the current label and abort the computation
 				if (SCCs == NULL) {
-					node.pointer[label] = U;
+					node.successors[label] = U;
+					// add this node and the current label as a predecessor
+					U->predecessors->push_back(std::make_pair(label, &node));
 					return;
 				}
 
@@ -184,12 +188,16 @@ void BSD::computeSuccessor(BSDNode &node, Label_ID label, int og_flag) {
 
 	// if no step was possible then add a pointer from this node to the empty node with the current label
 	if (resultlist.empty()) {
-		node.pointer[label] = emptyset;
+		node.successors[label] = emptyset;
+		// add this node and the current label as a predecessor
+		emptyset->predecessors->push_back(std::make_pair(label, &node));
 		return;
 	}
 
 	// else test if the node already exists and add a pointer from this node to the inserted (or existing) node
-	node.pointer[label] = setup(resultlist, og_flag);
+	node.successors[label] = setup(resultlist, og_flag);
+	// add this node and the current label as a predecessor
+	node.successors[label]->predecessors->push_back(std::make_pair(label, &node));
 }
 
 
@@ -236,7 +244,9 @@ BSDNode* BSD::setup(std::list<MarkingList> &SCCs, int og_flag) {
 		p = graph->back();
 		p->list = list;
 		p->isU = false;
-		p->pointer = new BSDNode*[Label::events+1];
+		p->successors = new BSDNode*[Label::events+1];
+		p->predecessors = new std::list<std::pair<Label_ID, BSDNode*> >;
+		p->Ucount = 0;
 
 		assignLambda(p, SCCs);
 
@@ -449,7 +459,7 @@ void BSD::assignLambda(BSDNode *node, std::list<MarkingList> &SCCs) {
 
 	// iterate through all SCCs
 	for (std::list<MarkingList>::const_iterator itSCC = SCCs.begin(); itSCC != SCCs.end(); ++itSCC) {
-		// is there a transition that leads out of the SCC (\tau or sending label)
+		// is there a transition that leads out of the SCC? (\tau or sending label)
 		bool found_outlabel = false;
 		// iterate through the markings of the SCC
 		for (MarkingList::const_iterator itlist = itSCC->begin(); itlist != itSCC->end(); ++itlist) {

@@ -275,10 +275,10 @@ std::ostream & Output::dotoutput(std::ostream & os, BSDgraph & graph, std::strin
 			for (unsigned int id = 2; id <= graph.events; ++id) {
 				os << "\t" << nodeIDs[*it] << " -> ";
 				// the target node may be not in the node id map if it is a U node
-				if ((*it)->pointer[id]->isU) {
+				if ((*it)->successors[id]->isU) {
 					os << nodeIDs[graph.U];
 				} else {
-					os << nodeIDs[(*it)->pointer[id]];
+					os << nodeIDs[(*it)->successors[id]];
 				}
 				os << " [label=\"" << graph.id2name[id] << "\"";
 				if (id >= graph.first_receive && id <= graph.last_receive) {
@@ -314,7 +314,7 @@ void Output::traverse(BSDNode* node) {
 	templist->push_back(node);
 
 	for (unsigned int id = 2; id <= Label::events; ++id) {
-		traverse(node->pointer[id]);
+		traverse(node->successors[id]);
 	}
 }
 
@@ -416,11 +416,11 @@ void Output::printOGnode(std::ostream & os, BSDgraph & graph, BSDNode & node) {
     // iterate through all successors of the node
     for (unsigned int id = graph.first_receive; id <= graph.last_send; ++id) {
     	// skip U node successors (not existing in MP)
-    	if (node.pointer[id]->isU) {
+    	if (node.successors[id]->isU) {
     		continue;
     	}
 
-    	os << "    " << graph.id2name[id] << " -> " << reinterpret_cast<size_t>(node.pointer[id]) << endl;
+    	os << "    " << graph.id2name[id] << " -> " << reinterpret_cast<size_t>(node.successors[id]) << endl;
     }
 }
 

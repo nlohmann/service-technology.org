@@ -23,6 +23,7 @@
 #include <sstream>
 #include "CSD.h"
 #include "openNet.h"
+#include "Label.h"
 
 #include "verbose.h"
 
@@ -34,6 +35,7 @@ using std::vector;
  * STATIC MEMBERS *
  ******************/
 
+std::map<BSDNode*, bool>* CSD::visited = NULL;
 
 /******************
  * STATIC METHODS *
@@ -48,52 +50,34 @@ using std::vector;
 
  */
 void CSD::computeCSD(BSDgraph & graph) {
-	bool graphChanged = true;
+	visited = new std::map<BSDNode*, bool>;
+	recursiveCSD(graph, graph.U);
+	delete visited;
+}
 
-	// repeat while graph changes
-	while (graphChanged) {
-		// assume the graph doesn't change
-		graphChanged = false;
-
-		// iterate through all nodes
-		for (std::list<BSDNode *>::const_iterator it = graph.graph->begin(); it != graph.graph->end(); ++it) {
-			// ignore the current node if the node is the U node
-			if ((*it)->isU || *it == graph.emptyset)
-				continue;
-
-			if ((*it)->lambda == 1) {
-				// iterate through the receiving labels (sending for the environment)
-				bool allSuccAreU = true;
-				for (unsigned int id = graph.first_send; id <= graph.last_send; ++id) {
-					// if a successor is not the U node then stop the iteration, nothing to do here...
-					if (!(*it)->pointer[id]->isU) {
-						allSuccAreU = false;
-						break;
-					}
+void CSD::recursiveCSD(BSDgraph & graph, BSDNode * node) {
+	// only proceed if the node hasn't already been touched
+	if (!(*visited)[node]) {
+		// set the node to "visited"
+		(*visited)[node] = true;
+		// iterate through all predecessors of the node
+		for (std::list<std::pair<Label_ID, struct _BSDNode *> >::const_iterator it = node->predecessors->begin();
+				it != node->predecessors->end(); ++it) {
+			if (SENDING(it->first) && it->second->lambda == 1) {
+				// count the number of sending events (only releveant for nodes with lamda value 1)
+				// if all sending events of a node with lamda value 1 lead to the U node
+				// then the node becomes the U node
+				if (++it->second->Ucount == graph.send_events) {
+					it->second->isU = true;
+					recursiveCSD(graph, it->second);
 				}
-
-				// if all sending labels successors are the U node then change the current node to the U node
-				// and prepare for another round of computation (graph has changed)
-				if (allSuccAreU) {
-					(*it)->isU = true;
-					graphChanged = true;
-				}
+			} else if (RECEIVING(it->first)) {
+				// if a receiving event leads to the U node then the predecessor is also the U node
+				it->second->isU = true;
+				recursiveCSD(graph, it->second);
 			}
-
-			// if the current node isn't already the U node...
-			if (!(*it)->isU) {
-				// iterate through the sending labels (receiving for the environment)
-				for (unsigned int id = graph.first_receive; id <= graph.last_receive; ++id) {
-					// if a successor is the U node then stop the iteration...
-					if ((*it)->pointer[id]->isU) {
-						(*it)->isU = true;
-						graphChanged = true;
-						break;
-					}
-				}
-			}
-
+			// if an event is a sending event and the lambda value of the preceeding node isn't equal to 1
+			// then we don't have to call the function again
 		}
-
 	}
 }

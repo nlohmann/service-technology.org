@@ -47,8 +47,6 @@ class partnercheck {
 
         static std::map<Label_ID, Label_ID>* computeMappingBSD(parsedGraph & graph1, parsedGraph & graph2);
 
-        static void match(BSDgraph & graph);
-
         /*========================================================
          *---------------------- TEST OUTPUT ---------------------
          *========================================================*/

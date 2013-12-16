@@ -7,7 +7,7 @@
 */
 
 #include <cstdlib>
-#include <Parser/Symbol.h>
+#include <Parser/SymbolTable/Symbol.h>
 
 index_t Symbol::getIndex() const
 {

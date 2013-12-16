@@ -3,13 +3,12 @@
 \file
 \status approved 25.01.2012
 \ingroup g_symboltable
-
 \brief class implementation for a symbol for a list of arcs
 */
 
 #include <cstdlib>
-#include <Parser/ArcList.h>
-#include <Parser/PlaceSymbol.h>
+#include <Parser/SymbolTable/ArcList.h>
+#include <Parser/SymbolTable/PlaceSymbol.h>
 
 PlaceSymbol *ArcList::getPlace() const
 {

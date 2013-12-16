@@ -3,7 +3,6 @@
 \file
 \status approved 25.01.2012
 \ingroup g_symboltable
-
 \brief class definition for a symbol for a list of arcs
 */
 

@@ -19,9 +19,9 @@
 %option prefix="ptformula_"
 
 %{
-#include <Parser/ast-system-k.h>       // for kc namespace
-#include <Parser/ast-system-yystype.h> // for YYSTYPE
-#include <Parser/ParserPTFormula.hh>
+#include <Parser/Parser/ast-system-k.h>       // for kc namespace
+#include <Parser/Parser/ast-system-yystype.h> // for YYSTYPE
+#include <Parser/Parser/ParserPTFormula.hh>
 
 extern void ptformula_error(char const* mess);
 unsigned int ptformula_colno = 1;

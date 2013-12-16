@@ -9,7 +9,7 @@
 
 #pragma once
 #include <Core/Dimensions.h>
-#include <Parser/SymbolTable.h>
+#include <Parser/SymbolTable/SymbolTable.h>
 
 /*!
 symbol tables for a low-level net

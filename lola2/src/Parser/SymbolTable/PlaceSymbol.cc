@@ -6,7 +6,7 @@
 \brief implementation of class PlaceSymbol
 */
 
-#include <Parser/PlaceSymbol.h>
+#include <Parser/SymbolTable/PlaceSymbol.h>
 
 /*!
 The capacity is available in context, whereas the other ingredients are not

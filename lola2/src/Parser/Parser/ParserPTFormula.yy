@@ -1,11 +1,11 @@
 /*!
 \file
-\brief Büchi automaton syntax
+\brief formula syntax
 \author <unknown>
 \status new
 \ingroup g_frontend
 
-Parses a Büchi automaton in LoLA syntax.
+Parses a formula in LoLA syntax.
 */
 
 %{
@@ -14,30 +14,28 @@ Parses a Büchi automaton in LoLA syntax.
 #include <libgen.h>
 #include <cstdarg>
 #include <cstdio>
-#include <cstdlib>
 #include <set>
-#include <Parser/PlaceSymbol.h>
-#include <Parser/TransitionSymbol.h>
-#include <Parser/SymbolTable.h>
-#include <Parser/ParserPTNet.h>
-#include <Parser/error.h>
-#include <Parser/ast-system-k.h>       // for kc namespace
-#include <Parser/ast-system-yystype.h> // for YYSTYPE
+#include <Core/Dimensions.h>
+#include <Parser/SymbolTable/ArcList.h>
+#include <Parser/SymbolTable/PlaceSymbol.h>
+#include <Parser/SymbolTable/TransitionSymbol.h>
+#include <Parser/SymbolTable/SymbolTable.h>
+#include <Parser/Parser/ParserPTNet.h>
+#include <Parser/Parser/error.h>
+#include <Parser/Parser/ast-system-k.h>
+#include <Parser/Parser/ast-system-yystype.h>
+#include <Net/Net.h>
+
 
 extern ParserPTNet* symbolTables;
-extern SymbolTable* buechiStateTable;
 %}
 
 %error-verbose /* more verbose and specific error message string */
 %defines       /* write an output file containing macro definitions for the token types */
-%name-prefix="ptbuechi_"
+%name-prefix="ptformula_"
 %locations     /* we want to use token locations for better error messages */
 
-%type <yt_tBuechiAutomata> buechiAutomata
-%type <yt_tBuechiRules> buechiRule
-%type <yt_tBuechiRules> buechiRules
-%type <yt_tTransitionRules> transitionRules
-%type <yt_tAcceptingSet> acceptingsets
+%type <yt_tFormula> formula
 %type <yt_tStatePredicate> statepredicate
 %type <yt_tAtomicProposition> atomic_proposition
 %type <yt_tTerm> term
@@ -46,19 +44,23 @@ extern SymbolTable* buechiStateTable;
 
 %token IDENTIFIER          "identifier"
 %token NUMBER              "number"
-%token _accept_            "keyword accept"
-%token _buechi_            "keyword buechi"
-%token _braceleft_         "opening brace"
-%token _braceright_        "closing brace"        
-%token _comma_             "comma"
-%token _then_              "transition =>"
-%token _colon_             "colon"
+%token _RELEASE_           "temporal operator RELEASE"
+%token _NEXTSTATE_         "temporal operator NEXTSTATE"
 %token _INITIAL_           "keyword INITIAL"
+%token _FORMULA_           "keyword FORMULA"
 %token _AND_               "Boolean conjuction"
 %token _NOT_               "Boolean negation"
 %token _OR_                "Boolean disjunction"
 %token _XOR_               "Boolean exclusive disjunction"
 %token _iff_               "Boolean iff"
+%token _ALLPATH_           "path quantifier ALLPATH"
+%token _ALWAYS_            "temporal operator ALWAYS"
+%token _EVENTUALLY_        "temporal operator EVENTUALLY"
+%token _EXPATH_            "path quantifier EXPATH"
+%token _UNTIL_             "temporal operator UNTIL"
+%token _REACHABLE_         "keyword REACHABLE"
+%token _INVARIANT_         "keyword INVARIANT"
+%token _IMPOSSIBLE_        "keyword IMPOSSIBLE"
 %token _notequal_          "not-equals sign"
 %token _implies_           "Boolean implication"
 %token _equals_            "equals sign"
@@ -95,89 +97,25 @@ extern SymbolTable* buechiStateTable;
 
 %{
 // parser essentials
-extern int ptbuechi_lex();
-void ptbuechi_error(char const*);
+extern int ptformula_lex();
+void ptformula_error(char const*);
 
-int currentNextIndex = 0;
+extern YYSTYPE ptformula_lval;
+
+std::set<index_t> target_place;
+std::set<index_t> target_transition;
 %}
 
 %{
 /* globals */
-tBuechiAutomata TheBuechi;
-uint32_t currentState;
+tFormula TheFormula;
 %}
 
 %%
 
-buechiAutomata:
-  _buechi_ _braceleft_ buechiRules _braceright_
-  _accept_ _braceleft_ acceptingsets _braceright_ _semicolon_
-    { TheBuechi = BuechiAutomaton($3,$7); }
-;
-
-buechiRules:
-  /* empty */
-    { $$ = EmptyBuechiRules(); }
-| buechiRule
-    { $$ = $1; }
-| buechiRule _comma_ buechiRules
-    { $$ = BuechiRules($1,$3); }
-;
-
-buechiRule:
-  IDENTIFIER
-      {
-  	      Symbol *t = buechiStateTable->lookup($1->name);
-  	      if (t == NULL)
-          {
-  		      t = new Symbol($1->name);
-  		      buechiStateTable->insert(t);
-  		      t->setIndex(currentNextIndex++);
-  	      }
-      }
-  _colon_ transitionRules
-      {
-          Symbol *t = buechiStateTable->lookup($1->name);
-          $$ = BuechiRule((mkinteger(t->getIndex())),$4); $1->free(true);
-      }
-;
-
-transitionRules:
-  /* empty */
-    { $$ = EmptyTransitionRules(); }
-| statepredicate _then_ IDENTIFIER transitionRules
-    {
-        Symbol *t = buechiStateTable->lookup($3->name);
-	  	if (UNLIKELY(t == NULL)){
-	  		buechiStateTable->insert(new Symbol($3->name));
-	  		t = buechiStateTable->lookup($3->name);
-	  		t->setIndex(currentNextIndex++);
-	  	}
-        $$ = TransitionRules(TransitionRule(StatePredicateFormula($1),mkinteger(t->getIndex())),$4);
-    }
-;
-
-acceptingsets:
-  /* empty */
-    { $$ = EmptyAcceptingSet(); }
-| IDENTIFIER
-    {
-        Symbol *t = buechiStateTable->lookup($1->name);
-        if (UNLIKELY(t == NULL))
-        {
-            yyerrors($1->name, @1, "state '%s' unknown", $1->name);
-        }
-        $$ = AcceptingState(mkinteger(t->getIndex()));
-    }
-| IDENTIFIER _comma_ acceptingsets
-    {
-        Symbol *t = buechiStateTable->lookup($1->name);
-        if (UNLIKELY(t == NULL))
-        {
-            yyerrors($1->name, @1, "state '%s' unknown", $1->name);
-        }
-        $$ = AcceptingSet(AcceptingState(mkinteger(t->getIndex())),$3);
-    }
+formula:
+  _FORMULA_ statepredicate _semicolon_
+    { TheFormula = $$ = StatePredicateFormula($2); }
 ;
 
 statepredicate:
@@ -197,6 +135,26 @@ statepredicate:
     { $$ = Implication($1, $3); }
 | statepredicate _iff_ statepredicate
     { $$ = Equivalence($1, $3); }
+| _ALLPATH_ statepredicate
+    { $$ = AllPath($2); }
+| _EXPATH_ statepredicate
+    { $$ = ExPath($2); }
+| _ALWAYS_ statepredicate
+    { $$ = Always($2); }
+| _EVENTUALLY_ statepredicate
+    { $$ = Eventually($2); }
+| _leftparenthesis_ statepredicate _UNTIL_ statepredicate _rightparenthesis_
+    { $$ = Until($2, $4); }
+| _leftparenthesis_ statepredicate _RELEASE_ statepredicate _rightparenthesis_
+    { $$ = Release($2, $4); }
+| _NEXTSTATE_ statepredicate
+    { $$ = NextState($2); }
+| _REACHABLE_ statepredicate
+    { $$ = ExPath(Eventually($2)); }
+| _INVARIANT_ statepredicate
+    { $$ = AllPath(Always($2)); }
+| _IMPOSSIBLE_ statepredicate
+    { $$ = AllPath(Always(Negation($2))); }
 ;
 
 atomic_proposition:
@@ -224,6 +182,7 @@ atomic_proposition:
             yyerrors($3->name, @3, "transition '%s' unknown", $3->name);
         }
         $$ = Fireable(mkinteger(t->getIndex()));
+        target_transition.insert(t->getIndex());
     }
 | _DEADLOCK_
     { $$ = aDeadlock(); }
@@ -242,6 +201,7 @@ term:
             yyerrors($1->name, @1, "place '%s' unknown", $1->name);
         }
         $$ = Node(mkinteger(p->getIndex()));
+        target_place.insert(p->getIndex());
     }
 | NUMBER
     { $$ = Number($1); }
@@ -256,8 +216,8 @@ term:
 %%
 
 /// display a parser error and exit
-void ptbuechi_error(char const* mess) __attribute__((noreturn));
-void ptbuechi_error(char const* mess) {
-    extern char* ptbuechi_text; ///< the current token text from Flex
-    yyerrors(ptbuechi_text, ptbuechi_lloc, mess);
+void ptformula_error(char const* mess) __attribute__((noreturn));
+void ptformula_error(char const* mess) {
+    extern char* ptformula_text;  ///< the current token text from Flex
+    yyerrors(ptformula_text, ptformula_lloc, mess);
 }

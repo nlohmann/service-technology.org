@@ -21,11 +21,11 @@
 #include <Net/Place.h>
 #include <Net/Transition.h>
 #include <Net/Marking.h>
-#include <Parser/ArcList.h>
-#include <Parser/ParserPTNet.h>
-#include <Parser/PlaceSymbol.h>
-#include <Parser/TransitionSymbol.h>
-#include <Parser/Symbol.h>
+#include <Parser/Parser/ParserPTNet.h>
+#include <Parser/SymbolTable/ArcList.h>
+#include <Parser/SymbolTable/PlaceSymbol.h>
+#include <Parser/SymbolTable/TransitionSymbol.h>
+#include <Parser/SymbolTable/Symbol.h>
 #include <InputOutput/Reporter.h>
 
 extern gengetopt_args_info args_info;

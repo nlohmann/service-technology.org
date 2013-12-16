@@ -21,8 +21,8 @@ Mainly copied from LoLA1
 %{
 #include <cmdline.h>
 #include <Core/Dimensions.h>            // for yylval union
-#include <Parser/ArcList.h>             // for yylval union
-#include <Parser/ParserPTNetLoLA.hh>
+#include <Parser/SymbolTable/ArcList.h> // for yylval union
+#include <Parser/Parser/ParserPTNetLoLA.hh>
 #include <InputOutput/InputOutput.h>
 
 extern void ptnetlola_error(char const* mess);

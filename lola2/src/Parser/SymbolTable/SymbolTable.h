@@ -3,8 +3,9 @@
 \file
 \status approved 25.01.2012
 \ingroup g_symboltable
-\todo Eventuell ein FOREACH Makro (basierend auf first() und next()) bauen
 \brief definition of class SymbolTable
+
+\todo Eventuell ein FOREACH Makro (basierend auf first() und next()) bauen
 */
 
 #pragma once

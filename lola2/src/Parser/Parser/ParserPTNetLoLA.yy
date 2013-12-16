@@ -18,12 +18,12 @@ Parses a place transition net in LoLA syntax.
 #include <cstdarg>
 #include <cstdio>
 #include <Core/Dimensions.h>
-#include <Parser/PlaceSymbol.h>
-#include <Parser/TransitionSymbol.h>
-#include <Parser/SymbolTable.h>
-#include <Parser/ParserPTNet.h>
-#include <Parser/ArcList.h>
-#include <Parser/error.h>
+#include <Parser/SymbolTable/ArcList.h>
+#include <Parser/SymbolTable/PlaceSymbol.h>
+#include <Parser/SymbolTable/TransitionSymbol.h>
+#include <Parser/SymbolTable/SymbolTable.h>
+#include <Parser/Parser/ParserPTNet.h>
+#include <Parser/Parser/error.h>
 
 %}
 

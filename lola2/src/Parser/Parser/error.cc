@@ -13,7 +13,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
-#include <Parser/error.h>
+#include <Parser/Parser/error.h>
 #include <InputOutput/Reporter.h>
 #include <InputOutput/InputOutput.h>
 

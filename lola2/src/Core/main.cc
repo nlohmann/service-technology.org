@@ -20,8 +20,8 @@
 
 #include <cmdline.h>
 #include <Core/Handlers.h>
-#include <Parser/ParserPTNet.h>
-#include <Parser/ast-system-k.h>
+#include <Parser/Parser/ParserPTNet.h>
+#include <Parser/Parser/ast-system-k.h>
 #include <Net/Net.h>
 #include <Net/Marking.h>
 #include <InputOutput/Reporter.h>

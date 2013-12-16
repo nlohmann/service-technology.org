@@ -19,9 +19,9 @@
 %option prefix="ptbuechi_"
 
 %{
-#include <Parser/ast-system-k.h>
-#include <Parser/ast-system-yystype.h>
-#include <Parser/ParserPTBuechi.hh>
+#include <Parser/Parser/ast-system-k.h>
+#include <Parser/Parser/ast-system-yystype.h>
+#include <Parser/Parser/ParserPTBuechi.hh>
 
 extern void ptbuechi_error(char const* mess);
 unsigned int ptbuechi_colno = 1;

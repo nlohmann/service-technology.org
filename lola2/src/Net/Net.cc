@@ -21,9 +21,9 @@
 #include <Net/Marking.h>
 #include <Net/Place.h>
 #include <Net/Transition.h>
-#include <Parser/ParserPTNet.h>
+#include <Parser/Parser/ParserPTNet.h>
 #include <InputOutput/Reporter.h>
-#include <Parser/Symbol.h>
+#include <Parser/SymbolTable/Symbol.h>
 
 using std::set;
 using std::map;

@@ -21,8 +21,8 @@ ASCII file where data are separated by spaces and newlines.
 
 #include <Core/Dimensions.h>
 #include <InputOutput/CompressedIO.h>
-#include <Parser/SymbolTable/PlaceSymbol.h>
-#include <Parser/SymbolTable/TransitionSymbol.h>
+#include <Frontend/SymbolTable/PlaceSymbol.h>
+#include <Frontend/SymbolTable/TransitionSymbol.h>
 #include <Net/Net.h>
 #include <Net/Marking.h>
 #include <Net/Place.h>

@@ -16,13 +16,13 @@ Parses a Büchi automaton in LoLA syntax.
 #include <cstdio>
 #include <cstdlib>
 #include <set>
-#include <Parser/SymbolTable/PlaceSymbol.h>
-#include <Parser/SymbolTable/TransitionSymbol.h>
-#include <Parser/SymbolTable/SymbolTable.h>
-#include <Parser/Parser/ParserPTNet.h>
-#include <Parser/Parser/error.h>
-#include <Parser/Parser/ast-system-k.h>       // for kc namespace
-#include <Parser/Parser/ast-system-yystype.h> // for YYSTYPE
+#include <Frontend/SymbolTable/PlaceSymbol.h>
+#include <Frontend/SymbolTable/TransitionSymbol.h>
+#include <Frontend/SymbolTable/SymbolTable.h>
+#include <Frontend/Parser/ParserPTNet.h>
+#include <Frontend/Parser/error.h>
+#include <Frontend/Parser/ast-system-k.h>       // for kc namespace
+#include <Frontend/Parser/ast-system-yystype.h> // for YYSTYPE
 
 extern ParserPTNet* symbolTables;
 extern SymbolTable* buechiStateTable;

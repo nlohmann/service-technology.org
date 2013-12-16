@@ -10,10 +10,10 @@
 #include <Planning/Task.h>
 #include <cmdline.h>
 
-#include <Parser/Parser/ast-system-k.h>
-#include <Parser/Parser/ast-system-rk.h>
-#include <Parser/Parser/ast-system-unpk.h>
-#include <Parser/SymbolTable/SymbolTable.h>
+#include <Frontend/Parser/ast-system-k.h>
+#include <Frontend/Parser/ast-system-rk.h>
+#include <Frontend/Parser/ast-system-unpk.h>
+#include <Frontend/SymbolTable/SymbolTable.h>
 
 #include <Net/Net.h>
 #include <Net/Marking.h>

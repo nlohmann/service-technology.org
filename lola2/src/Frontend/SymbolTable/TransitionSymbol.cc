@@ -6,9 +6,9 @@
 \brief implementation of class TransitionSymbol
 */
 
-#include <Parser/SymbolTable/TransitionSymbol.h>
-#include <Parser/SymbolTable/ArcList.h>
-#include <Parser/SymbolTable/PlaceSymbol.h>
+#include <Frontend/SymbolTable/TransitionSymbol.h>
+#include <Frontend/SymbolTable/ArcList.h>
+#include <Frontend/SymbolTable/PlaceSymbol.h>
 
 /*!
 When transitions this constructor is called, all arcs of this transition are

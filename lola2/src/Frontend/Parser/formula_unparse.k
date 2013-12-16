@@ -930,7 +930,7 @@ Initial() -> [ctl: { assert(false); } ];
 %uview ltl;
 %{ KC_UNPARSE
 //#include <Formula/LTL/BuechiFromLTL.h>
-#include <Parser/Parser/ast-system-rk.h>
+#include <Frontend/Parser/ast-system-rk.h>
 
 #include <vector>
 

@@ -15,7 +15,7 @@ ASCII file where data are separated by spaces and newlines.
 #pragma once
 
 #include <cstdio>
-#include <Parser/Parser/ParserPTNet.h>
+#include <Frontend/Parser/ParserPTNet.h>
 
 /// write names to file
 void WriteNameFile(FILE *);

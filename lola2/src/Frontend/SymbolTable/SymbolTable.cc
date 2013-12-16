@@ -11,8 +11,8 @@
 #include <cstring>
 #include <cstdlib>
 #include <Core/Dimensions.h>
-#include <Parser/SymbolTable/Symbol.h>
-#include <Parser/SymbolTable/SymbolTable.h>
+#include <Frontend/SymbolTable/Symbol.h>
+#include <Frontend/SymbolTable/SymbolTable.h>
 
 // initialization of static members
 unsigned int SymbolTable::collisions = 0;

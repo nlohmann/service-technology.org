@@ -8,7 +8,7 @@
 
 #pragma once
 #include <Core/Dimensions.h>
-#include <Parser/SymbolTable/Symbol.h>
+#include <Frontend/SymbolTable/Symbol.h>
 
 // forward declaration
 class ArcList;

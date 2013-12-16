@@ -7,8 +7,8 @@
 */
 
 #include <cstdlib>
-#include <Parser/SymbolTable/ArcList.h>
-#include <Parser/SymbolTable/PlaceSymbol.h>
+#include <Frontend/SymbolTable/ArcList.h>
+#include <Frontend/SymbolTable/PlaceSymbol.h>
 
 PlaceSymbol *ArcList::getPlace() const
 {

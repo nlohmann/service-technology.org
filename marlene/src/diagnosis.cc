@@ -33,6 +33,7 @@
 #include "helper.h"
 #include "macros.h"
 #include "Output.h"
+#include "diagnosis.h"
 
 #include "diagnosis.h"
 bool Diagnosis::DiagnosisInformation::operator==(
@@ -120,7 +121,7 @@ bool Diagnosis::DiagnosisInformation::operator()(
 Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
         unsigned int messageBound) :
     dgraph(new DGraph), mi(pmi), live(args_info.live_arg,
-            "Info file for live"), messageBound(messageBound), superfluous(
+            "Info file for live"), messageBound(messageBound), noOfMPP(0), superfluous(
             false) //  messageBound
 {
 
@@ -208,6 +209,8 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
             for (int j = 0; j < states[i]["internalDeadlocks"].getLength(); ++j) {
                 node->deadlockMarkings.push_back(mi.getIDForMarking(
                         states[i]["internalDeadlocks"][j]));
+                node->markings.push_back(mi.getIDForMarking(
+                        states[i]["internalDeadlocks"][j]));
 //                status("node %d has deadlock in marking %d", node->getID(),
 //                        (int) (states[i]["internalDeadlocks"][j]));
             }
@@ -225,6 +228,8 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
                         < states[i]["internalLivelocks"][j].getLength(); ++k) {
                     node->livelockMarkings.push_back(mi.getIDForMarking(
                             states[i]["internalLivelocks"][j][k]));
+                    node->markings.push_back(mi.getIDForMarking(
+                            states[i]["internalLivelocks"][j][k]));
                 }
             }
 
@@ -239,6 +244,8 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
             for (int j = 0; j
                     < states[i]["unresolvableWaitstates"].getLength(); ++j) {
                 node->waitstateMarkings.push_back(mi.getIDForMarking(
+                        states[i]["unresolvableWaitstates"][j]));
+                node->markings.push_back(mi.getIDForMarking(
                         states[i]["unresolvableWaitstates"][j]));
             }
         } catch (const libconfig::SettingNotFoundException & ex) {
@@ -262,298 +269,303 @@ Diagnosis::~Diagnosis() {
     FUNCOUT
 }
 
+void Diagnosis::parseAutomatonFile(const std::string& filename, DGraph& mpp,std::map<std::string, bool>& inInterface) {
+
+    try {
+        libconfig::Config diagInfo;
+        // try to open file or print parse error
+        try {
+            diagInfo.readFile(filename.c_str());
+        } catch (const libconfig::ParseException & pex) {
+            message(
+                    "Parse error `%s' in diagnosis file `%s' in line %d.",
+                    pex.getError(), pex.getFile(), pex.getLine());
+        }
+
+        // look up number of inner markings and nodes
+        int innermarkings = 0;
+        int nodes = 0;
+
+        diagInfo.lookupValue("statistics.inner_markings", innermarkings);
+        diagInfo.lookupValue("statistics.nodes", nodes);
+
+        // setting the initial node
+        int initialNode;
+        diagInfo.lookupValue("sa.initial_states.[0]", initialNode);
+        mpp.initialNode = mpp.getIDForName(initialNode);
+
+        // getting all interface names
+        libconfig::Setting & ch_in = diagInfo.lookup(
+                "sa.channels_input");
+        for (int i = 0; i < ch_in.getLength(); ++i) {
+            inInterface[ch_in[i]] = true;
+        }
+        libconfig::Setting & ch_out = diagInfo.lookup(
+                "sa.channels_output");
+        for (int i = 0; i < ch_out.getLength(); ++i) {
+            inInterface[ch_out[i]] = true;
+        }
+        libconfig::Setting & ch_sync = diagInfo.lookup(
+                "sa.channels_synchronous");
+        for (int i = 0; i < ch_sync.getLength(); ++i) {
+            inInterface[ch_sync[i]] = true;
+        }
+
+        // parsing all nodes
+        libconfig::Setting & states = diagInfo.lookup("sa.states");
+
+        for (int i = 0; i < states.getLength(); ++i) {
+            DNode::Initializer init;
+
+            // id of a node
+            int id = 0;
+            states[i].lookupValue("id", id);
+
+            init.id = mpp.getIDForName(id);
+
+            // get all successors of the node
+            try {
+                // iterate over all successors
+                for (int j = 0; j < states[i]["successors"].getLength(); ++j) {
+                    // get label of transition
+                    std::string labelName =
+                            states[i]["successors"][j][0];
+                    unsigned int lid = mpp.getIDForLabel(labelName);
+                    // get successor ID
+                    int nodeId = states[i]["successors"][j][1];
+                    unsigned int nid = mpp.getIDForName(nodeId);
+
+                    // remember the successor for the current node
+                    init.successors.push_back(std::make_pair(lid, nid));
+
+                    // node nid has one more predecessor
+                    mpp.noOfPredecessors[nid] += 1;
+                }
+            } catch (const libconfig::SettingNotFoundException & ex) {
+                status("Exception: Path = %s, what = %s", ex.getPath(),
+                        ex.what());
+                message("Malformed diagnosis file?");
+                exit(1);
+            }
+
+            // add node
+            DNode::DNode_ptr node(new DNode(init));
+            mpp.nodeMap[init.id] = node;
+
+            mpp.nodes.push_back(node);
+
+        }
+    } catch (const libconfig::SettingNotFoundException & ex) {
+        status("Exception: Path = %s, what = %s", ex.getPath(),
+                ex.what());
+        exit(1);
+    }
+
+}
+
 void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
 
+    noOfMPP = resultfiles.size();
     for (unsigned int i = 0; i < resultfiles.size(); ++i) {
         DGraph mpp;
         std::map<std::string, bool> inInterface;
-        try {
-            libconfig::Config diagInfo;
-            // try to open file or print parse error
-            try {
-                diagInfo.readFile(resultfiles[i].c_str());
-            } catch (const libconfig::ParseException & pex) {
-                message(
-                        "Parse error `%s' in diagnosis file `%s' in line %d.",
-                        pex.getError(), pex.getFile(), pex.getLine());
-            }
+        parseAutomatonFile(resultfiles[i].c_str(), mpp, inInterface);
 
-            // look up number of inner markings and nodes
-            int innermarkings = 0;
-            int nodes = 0;
+        // evaluate, which events can be reached by forward tau steps
+        bool changed = false;
 
-            diagInfo.lookupValue("statistics.inner_markings", innermarkings);
-            diagInfo.lookupValue("statistics.nodes", nodes);
-
-            // setting the initial node
-            int initialNode;
-            diagInfo.lookupValue("sa.initial_states.[0]", initialNode);
-            mpp.initialNode = mpp.getIDForName(initialNode);
-
-            // getting all interface names
-            libconfig::Setting & ch_in = diagInfo.lookup(
-                    "sa.channels_input");
-            for (int i = 0; i < ch_in.getLength(); ++i) {
-                inInterface[ch_in[i]] = true;
-            }
-            libconfig::Setting & ch_out = diagInfo.lookup(
-                    "sa.channels_output");
-            for (int i = 0; i < ch_out.getLength(); ++i) {
-                inInterface[ch_out[i]] = true;
-            }
-            libconfig::Setting & ch_sync = diagInfo.lookup(
-                    "sa.channels_synchronous");
-            for (int i = 0; i < ch_sync.getLength(); ++i) {
-                inInterface[ch_sync[i]] = true;
-            }
-
-            // parsing all nodes
-            libconfig::Setting & states = diagInfo.lookup("sa.states");
-
-            for (int i = 0; i < states.getLength(); ++i) {
-                DNode::Initializer init;
-
-                // id of a node
-                int id = 0;
-                states[i].lookupValue("id", id);
-
-                init.id = mpp.getIDForName(id);
-
-                // get all successors of the node
-                try {
-                    // iterate over all successors
-                    for (int j = 0; j < states[i]["successors"].getLength(); ++j) {
-                        // get label of transition
-                        std::string labelName =
-                                states[i]["successors"][j][0];
-                        unsigned int lid = mpp.getIDForLabel(labelName);
-                        // get successor ID
-                        int nodeId = states[i]["successors"][j][1];
-                        unsigned int nid = mpp.getIDForName(nodeId);
-
-                        // remember the successor for the current node
-                        init.successors.push_back(std::make_pair(lid, nid));
-
-                        // node nid has one more predecessor
-                        mpp.noOfPredecessors[nid] += 1;
-                    }
-                } catch (const libconfig::SettingNotFoundException & ex) {
-                    status("Exception: Path = %s, what = %s", ex.getPath(),
-                            ex.what());
-                    message("Malformed diagnosis file?");
-                    exit(1);
-                }
-
-                // add node
-                DNode::DNode_ptr node(new DNode(init));
-                mpp.nodeMap[init.id] = node;
-
-                mpp.nodes.push_back(node);
-
-            }
-        } catch (const libconfig::SettingNotFoundException & ex) {
-            status("Exception: Path = %s, what = %s", ex.getPath(),
-                    ex.what());
-            exit(1);
-        }
-
-        // simulation relation to Diagnosis Information
-        DNode::DNode_ptr diNode(dgraph->nodeMap[dgraph->initialNode]);
-        DNode::DNode_ptr mppNode(mpp.nodeMap[mpp.initialNode]);
-        std::list<std::pair<DNode::DNode_ptr, DNode::DNode_ptr> > stack;
-        stack.push_front(std::make_pair(diNode, mppNode));
-        std::map<std::pair<DNode::DNode_ptr, DNode::DNode_ptr>, bool>
-                nodePairSeen;
+        std::map<DNode::DNode_ptr, std::set<std::string> > reachableLabels;
 
         do {
-            nodePairSeen[stack.front()] = true;
-            diNode = stack.front().first;
-            mppNode = stack.front().second;
-            stack.pop_front();
-            //            status("Nodes %d and %d are related", dgraph->getNameForID(
-            //                    diNode->getID()), mpp.getNameForID(mppNode->getID()));
-            std::map<unsigned int, bool> hasSuccessor;
-            for (unsigned int x = 0; x < diNode->successors.size(); ++x) {
-                for (unsigned int y = 0; y < mppNode->successors.size(); ++y) {
-                    unsigned int diLid = diNode->successors[x].first;
-                    unsigned int diNid = diNode->successors[x].second;
-                    unsigned int mppLid = mppNode->successors[y].first;
-                    unsigned int mppNid = mppNode->successors[y].second;
+             changed = annotateReachableLabels(dgraph->nodeMap[dgraph->initialNode], reachableLabels, inInterface);
 
-                    hasSuccessor[mppLid] = hasSuccessor[mppLid] && true;
+        } while (changed);
 
-                    std::string diLabel = dgraph->getLabelForID(diLid);
-                    std::string mppLabel = mpp.getLabelForID(mppLid);
-
-                    //                    status("May be related edges %s and %s?", diLabel.c_str(), mppLabel.c_str());
-
-                    std::string::size_type k = diLabel.find(
-                            "sync_t_receive_");
-                    if (k == 0 && k != std::string::npos) {
-                        diLabel = diLabel.substr(std::string(
-                                "sync_t_receive_").size());
-                    }
-                    std::string::size_type l = diLabel.find("sync_t_send_");
-                    if (l == 0 && l != std::string::npos) {
-                        diLabel = diLabel.substr(
-                                std::string("sync_t_send_").size());
-                    }
-
-                    //                    status(" ... stripped %s and %s?", diLabel.c_str(),
-                    //                            mppLabel.c_str());
-                    std::pair<DNode::DNode_ptr, DNode::DNode_ptr>
-                            newNodePair;
-                    bool putOnStack = false;
-                    if (diLabel == mppLabel) {
-                        newNodePair
-                                = std::make_pair(dgraph->nodeMap[diNid],
-                                        mpp.nodeMap[mppNid]);
-                        putOnStack = true;
-                        hasSuccessor[mppLid] = true;
-                    } else if (diLabel.find("sync_rule_") == 0
-                            || not inInterface[diLabel]) {
-                        putOnStack = true;
-                        newNodePair = std::make_pair(
-                                dgraph->nodeMap[diNid], mppNode);
-                    }
-                    if (putOnStack and not nodePairSeen[newNodePair]) {
-                        stack.push_front(newNodePair);
-                    }
-                }
-            }
-            // check whether there was an unused label (in MPP but not in Diagnosis Information)
-            for (std::map<unsigned int, bool>::iterator iter =
-                    hasSuccessor.begin(); iter != hasSuccessor.end(); ++iter) {
-                if (not iter->second) {
-                    diNode->missedAlternatives.insert(mpp.getLabelForID(
-                            iter->first));
-                    dgraph->alternativeNodes.insert(diNode);
-                }
-            }
-        } while (stack.size() > 0);
-
+        simulateMPP(mpp, reachableLabels, inInterface);
     }
 }
 
-void Diagnosis::evaluateDeadlocks(std::vector<PetriNet_ptr> & nets,
-        pnapi::PetriNet & engine) {
-    FUNCIN
-    if (superfluous) {
-        FUNCOUT
-        return;
-    }
+void Diagnosis::simulateMPP(DGraph & mpp, std::map<DNode::DNode_ptr, std::set<std::string> > & reachableLabels, std::map<std::string, bool>& inInterface) {
 
-    // prefix of the engine
-    std::string prefix = "engine.";
+    // simulation relation to Diagnosis Information
+    DNode::DNode_ptr diNode(dgraph->nodeMap[dgraph->initialNode]);
+    DNode::DNode_ptr mppNode(mpp.nodeMap[mpp.initialNode]);
+    std::list<std::pair<DNode::DNode_ptr, DNode::DNode_ptr> > stack;
+    stack.push_front(std::make_pair(diNode, mppNode));
+    std::map<std::pair<DNode::DNode_ptr, DNode::DNode_ptr>, bool>
+            nodePairSeen;
 
-    // iterate over all nodes containing deadlocks
-    for (unsigned int i = 0; i < dgraph->deadlockNodes.size(); ++i) {
-        DNode::DNode_ptr node(dgraph->deadlockNodes[i]);
-        {
+    do {
+        nodePairSeen[stack.front()] = true;
+        diNode = stack.front().first;
+        mppNode = stack.front().second;
+        stack.pop_front();
+        // status("Nodes %d and %d are related", diNode->getID(), mppNode->getID());
 
-//            status("Deadlock %d (node %d)", i + 1, node->getID());
-            for (unsigned int j = 0; j < node->deadlockMarkings.size(); ++j) {
-                DiagnosisInformation dI;
-                dI.type = "DL";
+        /*
+        // remember, whether we have seen a successor for a certain label in most-permissive partner
+        std::map<unsigned int, bool> hasSuccessor;
+        // initialize to false
+        for (unsigned int y = 0; y < mppNode->successors.size(); ++y) {
+            unsigned int mppLid = mppNode->successors[y].first;
+            hasSuccessor[mppLid] = false;
+        }
+        */
+        for (unsigned int x = 0; x < diNode->successors.size(); ++x) {
+            for (unsigned int y = 0; y < mppNode->successors.size(); ++y) {
+                // label and node id for diagnosis information node
+                unsigned int diLid = diNode->successors[x].first;
+                unsigned int diNid = diNode->successors[x].second;
+                // label and node id for most-permissive partner
+                unsigned int mppLid = mppNode->successors[y].first;
+                unsigned int mppNid = mppNode->successors[y].second;
 
-                Marking & m = *(mi.markings[node->deadlockMarkings[j]]);
-                dI.pendingMessages = m.getPendingMessages(engine, prefix,
-                        messageBound);
-                sort(dI.pendingMessages.begin(), dI.pendingMessages.end());
+                // TODO Why anding with true ... cannot we be sure, that the is one?
+//                    hasSuccessor[mppLid] = hasSuccessor[mppLid] && true;
 
-                for (unsigned int net = 0; net < nets.size(); ++net) {
-                    std::string prefix = "net" + toString(net + 1) + ".";
-                    std::vector<std::string> required =
-                            m.getRequiredMessages(*(nets[net]), prefix);
-                    std::string isFinal = required.back();
-                    required.pop_back();
-                    dI.requiredMessages.insert(dI.requiredMessages.end(),
-                            required.begin(), required.end());
+                // what are the actual labels behind the ids
+                std::string diLabel = dgraph->getLabelForID(diLid);
+                std::string mppLabel = mpp.getLabelForID(mppLid);
 
-                    if ("yes" == isFinal) {
-                        dI.netsInFinalState.insert(net + 1);
-                    }
+                // status("May be related edges %s and %s?", diLabel.c_str(), mppLabel.c_str());
+
+                // either it is a sending or receiving label, then we need the rest of the string
+                std::string::size_type k = diLabel.find(
+                        "sync_t_receive_");
+                if (k == 0 && k != std::string::npos) {
+                    diLabel = diLabel.substr(std::string(
+                            "sync_t_receive_").size());
                 }
-                sort(dI.requiredMessages.begin(), dI.requiredMessages.end());
-
-                dI.previouslyAppliedRules = node->rulesApplied;
-
-                // only insert if deadlock is not caused by message bound violation,
-                // sufficient condition, pending and required messages
-                bool isIntersected = false;
-                for (int index = 0; index < dI.pendingMessages.size()
-                        and not isIntersected; ++index) {
-                    if (find(dI.requiredMessages.begin(),
-                            dI.requiredMessages.end(),
-                            dI.pendingMessages[index])
-                            != dI.requiredMessages.end()) {
-                        isIntersected = true;
-                    }
+                std::string::size_type l = diLabel.find("sync_t_send_");
+                if (l == 0 && l != std::string::npos) {
+                    diLabel = diLabel.substr(
+                            std::string("sync_t_send_").size());
                 }
-                if (not isIntersected) {
-                    diagnosisInformation.insert(dI);
-                }
-//                status("deadlockInformation: %s", dI.getLive().c_str());
-//                status("size of diagnosis information: %d",
-//                        diagnosisInformation.size());
 
+                // status(" ... stripped %s and %s?", diLabel.c_str(),
+                //        mppLabel.c_str());
+                std::pair<DNode::DNode_ptr, DNode::DNode_ptr>
+                        newNodePair;
+                bool putOnStack = false;
+                // if same label, the do a step together
+                if (diLabel == mppLabel) {
+                    newNodePair
+                            = std::make_pair(dgraph->nodeMap[diNid],
+                                    mpp.nodeMap[mppNid]);
+                    putOnStack = true;
+                    //hasSuccessor[mppLid] = true;
+                    // status("step together.");
+                } else if (diLabel.find("sync_rule_") == 0
+                        || not inInterface[diLabel]) {
+                    putOnStack = true;
+                    newNodePair = std::make_pair(
+                            dgraph->nodeMap[diNid], mppNode);
+                    // status("tau step.");
+                }
+                if (putOnStack and not nodePairSeen[newNodePair]) {
+                    stack.push_front(newNodePair);
+                }
             }
         }
-    }
 
-    FUNCOUT
-}
-
-void Diagnosis::evaluateLivelocks(std::vector<PetriNet_ptr> & nets,
-        pnapi::PetriNet & engine) {
-    FUNCIN
-    if (superfluous) {
-        FUNCOUT
-        return;
-    }
-
-    std::string prefix = "engine.";
-
-    // iterate over all nodes containing livelocks
-    for (unsigned int i = 0; i < dgraph->livelockNodes.size(); ++i) {
-        DNode::DNode_ptr node = dgraph->livelockNodes[i];
-        {
-
-            //            message("Livelock %d (node %d, %d)", i + 1, node->getID(),
-            //                    dgraph->getNameForID(node->getID()));
-            for (unsigned int j = 0; j < node->livelockMarkings.size(); ++j) {
-                DiagnosisInformation dI;
-                dI.type = "LL";
-                Marking & m = *(mi.markings[node->livelockMarkings[j]]);
-                dI.pendingMessages = m.getPendingMessages(engine, prefix,
-                        messageBound);
-                sort(dI.pendingMessages.begin(), dI.pendingMessages.end());
-
-                for (unsigned int net = 0; net < nets.size(); ++net) {
-                    std::string prefix = "net" + toString(net + 1) + ".";
-                    std::vector<std::string> required =
-                            m.getRequiredMessages(*(nets[net]), prefix);
-                    std::string isFinal = required.back();
-                    required.pop_back();
-                    dI.requiredMessages.insert(dI.requiredMessages.end(),
-                            required.begin(), required.end());
-                    //                    std::cerr << "size of required: " << dI->requiredMessages.size() << std::endl;
-
-                    if ("yes" == isFinal) {
-                        dI.netsInFinalState.insert(net + 1);
-                    }
-                }
-                sort(dI.requiredMessages.begin(), dI.requiredMessages.end());
-
-                dI.previouslyAppliedRules = node->rulesApplied;
-                if (dI.requiredMessages.size() > 0)
-                    diagnosisInformation.insert(dI);
+        for (unsigned int y = 0; y < mppNode->successors.size(); ++y) {
+            unsigned int mppLid = mppNode->successors[y].first;
+            std::string mppLabel = mpp.getLabelForID(
+                    mppLid);
+            // if label is not reachable, it is a missed alternative
+            if (reachableLabels[diNode].find(mppLabel) == reachableLabels[diNode].end()) {
+                diNode->missedAlternatives.insert(mppLabel);
+                dgraph->alternativeNodes.insert(diNode);
+                // status("added node %d with label %s ", diNode->getID(), mppLabel.c_str());
             }
         }
-    }
 
-    FUNCOUT
+        /*
+        // check whether there was an unused label (in MPP but not in Diagnosis Information)
+        for (std::map<unsigned int, bool>::iterator iter =
+                hasSuccessor.begin(); iter != hasSuccessor.end(); ++iter) {
+            // TODO only add, if alternative is also not reachable via tau steps
+            if (not iter->second) {
+                diNode->missedAlternatives.insert(mpp.getLabelForID(
+                        iter->first));
+                dgraph->alternativeNodes.insert(diNode);
+                status("added node %d with label %s ", diNode->getID(), mpp.getLabelForID(iter->first).c_str());
+            }
+        }
+        */
+    } while (stack.size() > 0);
+
 }
+
+bool Diagnosis::annotateReachableLabels(const DNode::DNode_ptr diNode, std::map<DNode::DNode_ptr, std::set<std::string> > & reachableLabels, std::map<std::string, bool>& inInterface)
+{
+
+        bool changed = false;
+
+        std::map<DNode::DNode_ptr, bool> nodeSeen;
+        nodeSeen[diNode] = true;
+
+        std::list<DNode::DNode_ptr> searchStack;
+        searchStack.push_front(diNode);
+
+        while (searchStack.size() > 0) {
+            DNode::DNode_ptr node = searchStack.front();
+            searchStack.pop_front();
+            nodeSeen[node] = true;
+
+            bool hasUnseenSuccessor = false;
+
+            for (unsigned int x = 0; x < node->successors.size(); ++x) {
+                // label and node id for diagnosis information node
+                const unsigned int diLid = node->successors[x].first;
+                const unsigned int diNid = node->successors[x].second;
+
+                std::string diLabel = dgraph->getLabelForID(diLid);
+                DNode::DNode_ptr sucNode = dgraph->nodeMap[diNid];
+
+                if (not nodeSeen[sucNode]) {
+                    // process successor first and then current node again
+                    if (not hasUnseenSuccessor) {
+                        hasUnseenSuccessor = true;
+                        searchStack.push_front(node);
+                    }
+                    searchStack.push_front(sucNode);
+                }
+
+                // skip label checking, if at least one successor was not handled before
+                if (hasUnseenSuccessor) continue;
+
+                // either it is a sending or receiving label, then we need the rest of the string
+                std::string::size_type k = diLabel.find(
+                        "sync_t_receive_");
+                if (k == 0 && k != std::string::npos) {
+                    diLabel = diLabel.substr(std::string(
+                            "sync_t_receive_").size());
+                }
+                std::string::size_type l = diLabel.find("sync_t_send_");
+                if (l == 0 && l != std::string::npos) {
+                    diLabel = diLabel.substr(
+                            std::string("sync_t_send_").size());
+                }
+                unsigned int sizeBefore = reachableLabels[node].size();
+                if (inInterface[diLabel]) {
+                    // status("Label %s is reachable from node %d", diLabel.c_str(), node->getID());
+                    reachableLabels[node].insert(diLabel);
+                }
+                else
+                {
+                    // status("Labels from tau step reachable from node %d -> %d", node->getID(),sucNode->getID());
+                    reachableLabels[node].insert(reachableLabels[sucNode].begin(), reachableLabels[sucNode].end());
+                }
+                changed = changed or (reachableLabels[node].size() - sizeBefore) > 0;
+            }
+        }
+
+        return changed;
+
+
+}
+
 
 void Diagnosis::evaluateAlternatives(std::vector<PetriNet_ptr> & nets,
         pnapi::PetriNet & engine) {
@@ -566,28 +578,31 @@ void Diagnosis::evaluateAlternatives(std::vector<PetriNet_ptr> & nets,
     // prefix of the engine
     std::string prefix = "engine.";
 
-    // iterate over all nodes containing deadlocks
+    // iterate over all nodes containing alternatives
     for (std::set<DNode::DNode_ptr>::iterator i =
             dgraph->alternativeNodes.begin(); i
             != dgraph->alternativeNodes.end(); ++i) {
         DNode::DNode_ptr node(*i);
-        if (node->successors.size() > 0) {
-
-            for (unsigned int j = 0; j < node->waitstateMarkings.size(); ++j) {
+            for (unsigned int j = 0; j < node->markings.size(); ++j) {
                 DiagnosisInformation dI;
                 dI.type = "MA";
 
-                Marking & m = *(mi.markings[node->waitstateMarkings[j]]);
+                Marking & m = *(mi.markings[node->markings[j]]);
                 dI.pendingMessages = m.getPendingMessages(engine, prefix,
                         messageBound);
                 sort(dI.pendingMessages.begin(), dI.pendingMessages.end());
 
+
+                for (std::set<std::string>::const_iterator missedAlternative = node->missedAlternatives.begin(); missedAlternative != node->missedAlternatives.end(); ++missedAlternative ) {
+                    dI.requiredMessages.push_back((*missedAlternative));
+                }
                 for (unsigned int net = 0; net < nets.size(); ++net) {
                     std::string prefix = "net" + toString(net + 1) + ".";
                     std::vector<std::string> required =
                             m.getRequiredMessages(*(nets[net]), prefix);
                     std::string isFinal = required.back();
                     required.pop_back();
+                    /*
                     for (unsigned int rm = 0; rm < required.size(); ++rm) {
                         if (node->missedAlternatives.find(required[rm])
                                 != node->missedAlternatives.end()) {
@@ -596,7 +611,7 @@ void Diagnosis::evaluateAlternatives(std::vector<PetriNet_ptr> & nets,
                             dI.requiredMessages.push_back(required[rm]);
                         }
                     }
-
+                    */
                     if ("yes" == isFinal) {
                         dI.netsInFinalState.insert(net + 1);
                     }
@@ -607,7 +622,6 @@ void Diagnosis::evaluateAlternatives(std::vector<PetriNet_ptr> & nets,
 
                 diagnosisInformation.insert(dI);
             }
-        }
     }
 
     FUNCOUT
@@ -631,8 +645,11 @@ void Diagnosis::outputLive() const {
                 covered = true;
             }
         }
+        // if not all nets are final or at least one message is pending, information is relevant
+        if (di->netsInFinalState.size() < noOfMPP or di->pendingMessages.size() > 0) {
         if (not covered) {
             live.stream() << di->getLive();
+        }
         }
     }
     FUNCOUT

@@ -133,15 +133,15 @@ std::vector<std::string> Marking::getPendingMessages(pnapi::PetriNet & net,
             // interface place?
             pnapi::Label * label = net.getInterface().findLabel(name);
 
-            if (label != NULL) {
-                unsigned int token = count(result.begin(), result.end(),
-                        name);
-                // add the appropriate amount of messages
-                for (unsigned int i = 1; i <= marking[k].second and i
-                        <= (messageBound - token); ++i) {
-                    result.push_back(name);
-                }
-            }
+//            if (label != NULL) {
+//                unsigned int token = count(result.begin(), result.end(),
+//                        name);
+//                // add the appropriate amount of messages
+//                for (unsigned int i = 1; i <= marking[k].second and i
+//                        <= (messageBound - token); ++i) {
+//                    result.push_back(name);
+//                }
+//            }
         }
     }
 

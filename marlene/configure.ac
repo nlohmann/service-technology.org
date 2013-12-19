@@ -75,16 +75,6 @@ AC_SUBST(TEMPFOLDER)
 AC_MSG_CHECKING([weather to be sunny])
 AC_MSG_RESULT([better should be])
 
-# check for libconfig
-#AC_LANG([C++])
-#AC_CHECK_LIB(config++, config_init)
-#if test "${ac_cv_lib_configpp_config_init}" == "yes" ; then
-#    LIBCONFIG="1" #AC_DEFINE([LIBCONFIG],[1],[])
-#else
-#    LIBCONFIG="0" #AC_DEFINE([LIBCONFIG],[0],[])
-#fi
-#AC_SUBST(LIBCONFIG)
-
 # Checks for header files.
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([tr1/memory])
@@ -125,11 +115,6 @@ AC_SUBST(builddir)
 # later set compliler flags accordingly. Finally, the result is also written
 # into the configuration header "config.h".
 #############################################################################
-
-# substitute configure Flags in Makefiles
-#AC_SUBST(configured_CXXFLAGS)
-#AC_SUBST(configured_CFLAGS)
-#AC_SUBST(configured_LDFLAGS)
 
 AC_CONFIG_FILES([Makefile
                  libs/pnapi/Makefile

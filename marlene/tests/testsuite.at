@@ -274,33 +274,25 @@ AT_CLEANUP
 AT_BANNER([Diagnosis])
 ############################################################################
 
-AT_SETUP([diagnosis of unadaptability (deadlock)])
+AT_SETUP([diagnosis of unadaptability (1/2)])
 AT_CHECK_WENDY
 AT_CHECK_LIBCONFIG
 AT_CHECK([cp TESTFILES/d1.owfn TESTFILES/d2.owfn TESTFILES/diag0.ar .])
 AT_CHECK([MARLENE d1.owfn d2.owfn --rulefile=diag0.ar --diagnosis --property=livelock --verbose DEFAULTPARAMETERS],0,ignore,ignore)
-AT_CHECK([GREP "DL;1;b2;a1,a2;;" live.txt],0,ignore)
+AT_CHECK([GREP "MA;1;b2;a1,a2,quit;;" live.txt],0,ignore)
 AT_KEYWORDS(diagnosis)
 AT_CLEANUP
 
-AT_SETUP([diagnosis of unadaptability (livelock)])
+AT_SETUP([diagnosis of unadaptability (2/2)])
 AT_CHECK_WENDY
 AT_CHECK_LIBCONFIG
 AT_CHECK([cp TESTFILES/d1.owfn TESTFILES/d2.owfn TESTFILES/diag1.ar .])
 AT_CHECK([MARLENE d1.owfn d2.owfn --rulefile=diag1.ar --diagnosis --property=livelock --verbose DEFAULTPARAMETERS],0,ignore,ignore)
-AT_CHECK([GREP "LL;;;a2;1,2;" live.txt],0,ignore)
-AT_CHECK([GREP "LL;1;;a1,quit;1,2;" live.txt],0,ignore)
-AT_CHECK([GREP "LL;1;a2;a1,a2;1,2;" live.txt],0,ignore)
-AT_CHECK([GREP "LL;1;b1;a1,a2;1,2;" live.txt],0,ignore)
-AT_KEYWORDS(diagnosis)
-AT_CLEANUP
-
-AT_SETUP([diagnosis of unadaptability (unattended choice)])
-AT_CHECK_WENDY
-AT_CHECK_LIBCONFIG
-AT_CHECK([cp TESTFILES/d1.owfn TESTFILES/d2.owfn TESTFILES/diag0.ar .])
-AT_CHECK([MARLENE d1.owfn d2.owfn --rulefile=diag0.ar --diagnosis --property=livelock --verbose DEFAULTPARAMETERS],0,ignore,ignore)
-AT_CHECK([GREP "MA;1;b2;a1;;" live.txt],0,ignore)
+AT_CHECK([GREP "MA;;;quit;1,2;" live.txt],0,ignore)
+AT_CHECK([GREP "MA;1;a1;quit;1,2;" live.txt],0,ignore)
+AT_CHECK([GREP "MA;1;a2;quit;1,2;" live.txt],0,ignore)
+AT_CHECK([GREP "MA;1;b1;quit;1,2;" live.txt],0,ignore)
+AT_CHECK([GREP "MA;1;b2;quit;1,2;" live.txt],0,ignore)
 AT_KEYWORDS(diagnosis)
 AT_CLEANUP
 
@@ -494,7 +486,7 @@ AT_CHECK_WENDY
 AT_CHECK_LIBCONFIG
 AT_CHECK([cp TESTFILES/mbv1.owfn TESTFILES/mbv2.owfn TESTFILES/mbv.ar .])
 AT_CHECK([MARLENE mbv1.owfn mbv2.owfn --rulefile=mbv.ar --diagnosis --property=livelock --verbose DEFAULTPARAMETERS],0,ignore,ignore)
-AT_CHECK([GREP -q "DL;1;a;b;1;" live.txt],0)
+AT_CHECK([GREP -q "MA;1;a;a,b;1;" live.txt],0)
 AT_CHECK([cp TESTFILES/myCoffee.owfn TESTFILES/myCustomer.owfn TESTFILES/coffeebug.ar .])
 AT_CHECK([MARLENE myCoffee.owfn myCustomer.owfn --rulefile=coffeebug.ar --diagnosis --property=livelock --verbose DEFAULTPARAMETERS],0,ignore,ignore)
 AT_CHECK([GREP -q "DL;;MTeaButton;DServedCoffee,MCoffeeButton,MTeaButton;1,2;" live.txt],1)

@@ -53,7 +53,7 @@ class DNode {
 //        bool has_capacity_violation;
 
         std::vector<std::vector<int> > mappingToMPP;
-        std::vector<int> markings;
+//        std::vector<int> markings;
 
     public:
 #ifdef USE_SHARED_PTR
@@ -69,6 +69,7 @@ class DNode {
         }
 
         std::vector<std::pair<unsigned int, unsigned int> > successors;
+        std::vector<int> markings;
         std::vector<unsigned int> deadlockMarkings;
         std::vector<unsigned int> livelockMarkings;
         std::vector<unsigned int> waitstateMarkings;
@@ -146,6 +147,12 @@ class Diagnosis {
 
         unsigned int messageBound;
 
+        unsigned int noOfMPP;
+
+        void parseAutomatonFile(const std::string& filename, DGraph& mpp, std::map<std::string, bool>& inInterface);
+        bool annotateReachableLabels(const DNode::DNode_ptr diNode, std::map<DNode::DNode_ptr, std::set<std::string> > & reachableLabels, std::map<std::string, bool>& inInterface);
+        void simulateMPP(DGraph & mpp, std::map<DNode::DNode_ptr, std::set<std::string> > & reachableLabels, std::map<std::string, bool>& inInterface);
+
     public:
         bool superfluous;
 
@@ -155,10 +162,6 @@ class Diagnosis {
         ~Diagnosis();
 
         void readMPPs(std::vector<std::string> & resultfiles);
-        void evaluateDeadlocks(std::vector<PetriNet_ptr> & nets,
-                pnapi::PetriNet & engine);
-        void evaluateLivelocks(std::vector<PetriNet_ptr> & nets,
-                pnapi::PetriNet & engine);
         void evaluateAlternatives(std::vector<PetriNet_ptr> & nets,
                 pnapi::PetriNet & engine);
         void outputLive() const;

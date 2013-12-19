@@ -663,7 +663,14 @@ Adapter::createRuleTransitions() {
 
             // create arc between this place and rule transition
             // \TODO: Arc multiplicities
+            Arc * arc = _engine->findArc( *place, *trans );
+            if ( arc == NULL ) {
             _engine->createArc( *place, *trans );
+            }
+            else
+            {
+                arc->setWeight(arc->getWeight()+1);
+            }
 
             ++messageIter;
         }
@@ -713,7 +720,7 @@ Adapter::createRuleTransitions() {
         }
 
         // if we have a synchronous interface, create label for transition
-        if ( _contType == SYNCHRONOUS ) {
+        if ( _contType == SYNCHRONOUS && rule.getMode() != RuleSet::AdapterRule::AR_HIDDEN) {
             Label & synclabel = contport.addSynchronousLabel(
                     "sync_" + transName );
             trans->addLabel( synclabel );
@@ -943,14 +950,14 @@ Adapter::diagnose(std::string filename) {
 
     /********* *\
     * diagnosis *
-     \***********/
+    \***********/
     status( "Going into diagnosis mode ..." );
 
     // TODO: debug
-    //std::string png_command = "dot -Tpng -odiag.png < " + diag_filename
-    //        + ".dot";
-    //status("Executing png command: %s", png_command.c_str());
-    //system(png_command.c_str());
+    std::string png_command = "dot -Tpng -odiag.png < " + diag_filename
+            + ".dot";
+    status("Executing png command: %s", png_command.c_str());
+    // system(png_command.c_str());
 
 
     // open MPPs for each net or create them if necessary
@@ -965,10 +972,7 @@ Adapter::diagnose(std::string filename) {
     Diagnosis diag( diag_filename, mi );
     if ( not diag.superfluous ) {
         diag.readMPPs( mpp_files );
-        diag.evaluateDeadlocks( _nets, *_engine );
-        if ( args_info.property_arg == property_arg_livelock ) {
-            diag.evaluateLivelocks( _nets, *_engine );
-        }
+
         diag.evaluateAlternatives( _nets, *_engine );
 
         diag.outputLive();

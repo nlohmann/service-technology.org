@@ -1,0 +1,72 @@
+[
+  { 
+    "type": "text",
+    "required": ["name", "argname"],
+    "html": {
+        "out": "<input data-stlive-argname=\"${argname}\" name=\"${argname}\" id=\"${id}\" class=\"input-large\" type=\"text\" >",
+        "useLabel": true
+    }
+  },
+  { 
+    "type": "title",
+    "required": ["name", "shortDesc"],
+    "html": {
+        "out": " ",
+        "useLabel": false
+    }
+  },
+  {
+    "type": "section",
+    "required": ["name"],
+    "html": {
+        "@COMMENT": "behaviour of sections as tabs is written in InputSetManager.Create()",
+        "out": " ",
+        "useLabel": false
+    }
+  },
+  {
+    "type": "checkbox",
+    "required": ["name", "argname"],
+    "html": {
+        "out": "<input type=\"checkbox\" onchange=\"if(this.getAttribute('data-stlive-dirty')) { this.setAttribute('data-stlive-dirty', ''); this.checked=this.value;return true;} this.value=this.checked?true:'';\" data-stlive-dirty=\"\" data-stlive-argname=\"${argname}\" value=\"\" name=\"${argname}\" id=\"${id}\">",
+       "useLabel": true
+    }
+  },
+  { 
+     "type": "submit",
+     "required": ["name"],
+     "html": {
+         "out": "<hr><input type=\"submit\" class=\"btn btn-primary\" value=\"${name}\"/>",
+         "useLabel": false
+     }
+  },
+  { 
+    "type": "select",
+    "required": ["name", "argname", "options"],
+    "html" : {
+        "options" : "<option value=\"${options}\">${options}</option>",
+        "out" : "<select name=\"${argname}\" id=\"${id}\" data-stlive-argname=\"${argname}\"><option value=\"\">${default}</option>${options}</select>",
+        "useLabel": true
+    }
+  },
+  { 
+    "type": "radio_buttons",
+    "required": ["name", "argname", "options", "default"],
+    "html" : {
+      "@COMMENT": "each optons is a button, need some js to active the changes",
+      "options" : "<button class=\"btn\" onclick=\"$(${id}).val(this.value).change();return false;\" type=\"button\" value=\"${options}\">${options}</button>",
+        "out" : "<input type=\"hidden\" value=\"\" id=\"${id}\" onchange=\"$('#${id}_grp button[value='+this.value+']').button('toggle')\"><div class=\"btn-group\" id=\"${id}_grp\" data-toggle=\"buttons-radio\"><button class=\"btn active\" onclick=\"$(${id}).val('').change();return false;\">${default}</button>${options}</div>",
+    "useLabel": true
+    }
+  },
+  {
+    "type": "file",
+    "required":  ["name", "argname"],
+    "html" : {
+        "out" : 
+          "<div class=\"input-append\"> <span class=\"dropdown\"> <p class=\"btn btn-mini dropdown-toggle\" data-toggle=\"dropdown\" onclick=\"FILE_EXPLORER.select_dropdown.call(this,function(v){$('#${id}').val(v).change();});\"> <i class=\"icon-folder-open\"></i></p> </span> <input id=\"${id}\" data-stlive-argname=\"${argname}\" data-stlive-type=\"file\" type=\"text\" style=\"color:#000;cursor:default;border:none;background-color:transparent;\" class=\"input-medium\" ondragover=\"event.preventDefault()\" ondrop=\"FILE_EXPLORER.dropFile(event, function(v){$('#${id}').val(v).change();});return false;\"> <span class=\"btn btn-mini\" onclick=\"$('#${id}').val('').change()\"><i class=\"icon-remove\"></i></span></div>",
+        "useLabel": true
+    }
+  }
+]
+

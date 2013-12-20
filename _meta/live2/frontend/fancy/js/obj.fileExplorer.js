@@ -154,8 +154,9 @@ function validateInputs(inputs) {
             var curVal = cur.getValue();
 
             // check if link
-            if(typeof curVal == 'string' && curVal.match(/(^https?\:)|(^s?ftp\:)|(^svn\:)/i)) {
+            if(typeof curVal == 'string' && curVal.match(/(^\"?https?\:)|(^\"?s?ftp\:)|(^\"?svn\:)/i)) {
                 // the provided value is a link
+                curVal = curVal.replace(/(^\")|(\"$)/g, '');
                 var linkBtn = $('<a target="_blank" title="open link" href="' + curVal + '"><i class="icon-globe"></i></a>');
                 linkBtn.addClass("btn btn-mini btn-link fileInputLinkButton");
                 linkBtn.insertAfter(curInput.next());

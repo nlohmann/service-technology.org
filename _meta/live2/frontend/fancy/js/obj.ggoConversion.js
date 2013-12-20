@@ -3,7 +3,7 @@ var GGO_CONVERSION = (function(){
 
 /* configure here for paths to ggo-Files */
 function ggoPath(toolName) {
-  return 'ggos/' + toolName + '.ggo';
+  return 'data/ggos/' + toolName + '.ggo';
 }
 
 // the parser object
@@ -20,7 +20,7 @@ function buildParser(input) {
         }
     }
 }
-$.get('ggoGrammar.pegjs', buildParser, "text");
+$.get('data/ggoGrammar.pegjs', buildParser, "text");
 /*$.ajax({
     url: 'ggoGrammar.pegjs',
     success: buildParser,

@@ -1,5 +1,5 @@
 // scope wrapper
-SERVER_CONNECT = function(sucHistory){
+(function(){
 //
 
 var noSent = 0;
@@ -43,10 +43,6 @@ function completeHandler(r) {
     var code = r.result.exit.code;
     var signal = r.result.exit.signal;
 
-    if(code == '0') {
-        sucHistory.addState();
-    }
-
     //now build the info sentence
     var s = 'The tool exited in <b>' + timeDiff + 'ms</b><br>';
         s+= 'with Code : <b>' + code + '</b><br>';
@@ -63,9 +59,13 @@ function completeHandler(r) {
             ' download="'+h+'"' +
             ' href="data:Application/octet-stream,' + encodeURIComponent(t) + '"' +
             '>download ' + h + '</a>';
-        // document.location = 'data:Application/octet-stream,' + encodeURIComponent(t);
+        var viz = '';
+        if(h.match(/\.dot$/i)) {
+            var vizId = VIZ.create(t);
+            viz = ' <a href="javascript:VIZ.show(' + vizId + ')">Show vizualization</a> &nbsp; | &nbsp; ';
+        }
         var encodedT = $('<div/>').text(t).html();
-        f += '<h2>'+h+'</h2>' + a + '<pre>'+ encodedT +'</pre>';
+        f += '<h2>'+h+'</h2>' + viz + a +  '<pre>'+ encodedT +'</pre>';
     }
 
     $('#files_output_container').html(f);
@@ -153,4 +153,4 @@ function dumpObject(obj, indent)
 
 
 // scope wrapper
-};
+})();

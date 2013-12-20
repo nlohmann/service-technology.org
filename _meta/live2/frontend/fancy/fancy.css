@@ -1,0 +1,35 @@
+body {
+    /* 60px to make the container go all the way to the bottom of the topbar */
+    padding-top: 40px;
+    /* 60px to make the container go all the way to the bottom of the topbar */
+    padding-bottom: 20px; 
+    background-color: #ddd;
+  }
+
+  /* a class for the boxes */
+.stBox {
+    border: 2px solid rgb(153, 153, 153);
+    margin:25px 0px;
+    padding:25px;
+    border-radius: 8px 8px 8px 8px; 
+    background-color: #fff;
+}
+
+.stBox .stBox {
+    border: 2px solid rgb(221, 221, 221);
+}
+
+.toolname {
+    color: rgb(0, 136, 204);
+}
+
+.fileHideSafari {
+    visibility:hidden;
+	width:0px;
+    height:0px;
+	margin:0px;
+    padding:0px;
+    position:absolute;
+    left:-200px;
+    top:-200px;
+}

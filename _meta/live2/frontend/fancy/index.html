@@ -8,39 +8,9 @@
     <meta name="author" content="">
 
     <!-- Le styles -->
-    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
-    <style>
-      body {
-        padding-top: 40px; /* 60px to make the container go all the way to the bottom of the topbar */
-        padding-bottom: 20px; /* 60px to make the container go all the way to the bottom of the topbar */
-        background-color: #ddd;
-      }
-      /* a class for the boxes */
-      .stBox {
-        border: 2px solid rgb(153, 153, 153);
-        margin:25px 0px;
-        padding:25px;
-        border-radius: 8px 8px 8px 8px; 
-        background-color: #fff;
-      }
-      .stBox .stBox {
-        border: 2px solid rgb(221, 221, 221);
-      }
-      .toolname {
-        color: rgb(0, 136, 204);
-      }
-      .fileHideSafari {
-        visibility:hidden;
-	width:0px;
-        height:0px;
-	margin:0px;
-        padding:0px;
-        position:absolute;
-        left:-200px;
-        top:-200px;
-      }
-    </style>
-    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="fancy.css" rel="stylesheet">
+    <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="lib/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -48,7 +18,7 @@
     <![endif]-->
 
     <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="bootstrap/ico/favicon.ico">
+    <link rel="shortcut icon" href="lib/bootstrap/ico/favicon.ico">
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="bootstrap/ico/apple-touch-icon-144-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="bootstrap/ico/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="bootstrap/ico/apple-touch-icon-72-precomposed.png">
@@ -98,7 +68,6 @@
     <div class="container">
     <h1 style="text-transform:uppercase;">service-technology.org/live/<span class="toolname"></span><br><small>solutions that make services behave well</small></h1>
 
-
       <div class="row">
         <span class="span12" id="alertContainer"></span>
         <div class="span6">
@@ -140,22 +109,12 @@
 
       <!-- menu -->
       <div class="row" style="text-align:center;">
-          <span class="btn btn-large btn-info disabled" id="undo"><i class="icon-circle-arrow-left"></i> Undo</span>
-          <span class="btn btn-large btn-info disabled" id="redo"><i class="icon-circle-arrow-right"></i> Redo</span>
-          <span class="btn btn-large disabled" id="undoRun"><i class="icon-fast-backward"></i> reset to previous running setup</span>
-          <span class="btn btn-large disabled" id="redoRun"><i class="icon-fast-forward"></i> reset to next running setup</span>
+          <span class="btn btn-large disabled" id="undo"><i class="icon-circle-arrow-left"></i> Undo</span>
+          <span class="btn btn-large disabled" id="redo"><i class="icon-circle-arrow-right"></i> Redo</span>
           <span class="btn btn-large btn-primary submitButton">Submit <i class="icon-play icon-white"></i></span>
       </div>
 
-<!-- file explorer -->
-    <div id="fileExplorer_container" class="modal hide fade" role="dialog">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h3>service technology</h3>
-        </div>
-        <div class="modal-body">
-        </div>
-    </div>
+
 <!-- output modal -->
     <div id="output_container" class="modal hide fade" role="dialog" style="width:700px;" >
         <div class="modal-header">
@@ -181,55 +140,80 @@
             <a href="#" data-dismiss="modal" class="btn">Close</a>
         </div>
     </div>
+
+<!-- viz modal -->
+    <div id="viz_container" class="modal hide fade" role="dialog"
+style="margin:auto;left:3%;top:3%;width:96%;height:96%;" >
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>service technology</h3>
+        </div>
+        <div class="modal-body" style="max-height:none;">
+        </div>
+    </div>
     </div> <!-- /container -->
 
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <!-- extern libraries -->
-    <script src="bootstrap/js/jquery.min.js"></script>
-    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="lib/bootstrap/js/jquery.min.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="lib/jquery.base64.min.js"></script>
+    <script src="lib/peg-0.7.0.min.js"></script>
+    <script src="lib/viz.js"></script>
 
-<script src="fileExplorer.js"></script>
-<script src="inputs.js"></script>
-<script src="inputList.js"></script>
-<script src="jquery.base64.min.js"></script>
-<script src="formatOutput.js"></script>
-<script src="peg-0.7.0.min.js"></script>
-<script src="ggoConversion.js"></script>
-<script src="jsonEdit.js"></script>
-<script src="history.js"></script>
-<script type="text/javascript">
-// thank you chrome+safari#
+    <!-- load js files-->
+    <script src="js/obj.fileExplorer.js"></script>
+    <script src="js/class.inputs.js"></script>
+    <script src="js/class.viz.js"></script>
+    <script src="js/class.inputManager.js"></script>
+    <script src="js/obj.inputList.js"></script>
+    <script src="js/obj.formatOutput.js"></script>
+    <script src="js/obj.ggoConversion.js"></script>
+    <script src="js/obj.jsonEdit.js"></script>
+    <script src="js/obj.history.js"></script>
+
+    <script type="text/javascript">
+// fix for chrome+safari#
 $.fn.prettyVal = function() {
 	var v = this.val();
 	if(typeof v != 'string') return '';
 	return this.val().replace(/^.*[\\\/]/g,'');
 };
 
-
-
 // read the input hash
 // put to global scope
-var search = window.location.search;
-var call = search.replace(/init=([^\&]*)/gi, '');
+var call = location.search.replace(/init=([^\&]*)/gi, '');
 call = decodeURIComponent(call.replace(/^\?/, ''));
 var init = decodeURIComponent(RegExp.$1);
 // no XSS:
 tool = call.replace(/^([a-z0-9_\-]+)($|[^a-z0-9_\-].*$)/gi,'$1');
 call = call.substring(tool.length, call.length);
+// sometimes double decoding necessary
+if(call.match(/^\%20/i)) {
+    call = decodeURIComponent(call);
+}
 
 //replace placeholders of toolname
 $("span.toolname").text(tool);
 
+// redirect the submit to the correct formular
+$('.submitButton').click(function(){
+    $('form#outForm').submit();
+});
+
+// PARSE FROM GGO
+GGO_CONVERSION.initParse(tool, buildForm);
+
 // and now build the form, will be callback function for ggo-parser
-buildForm = function(inputs) {
+function buildForm(inputs) {
 
     // update typeahead with file names, when they change
     FILE_EXPLORER.onchange(JSON_BOX.changeFilenames);
 
     //create graphical inputsetmanager
-    im = new INPUTS.InputSetManager();
+    im = new INPUT_MANAGER();
     im.SetInputs(inputs);
     var b = $('#form_container').hide().empty();
     im.Create(b.get(0));
@@ -240,7 +224,6 @@ buildForm = function(inputs) {
 
     //move file inputs
     $('form#outForm').append(b.find('input[type=file]'));
-    // $('form#outForm').find('input[type=file]').fadeIn();
 
     // create typeahead for json box
     JSON_BOX.createTypeahead($('#json_typeahead'), inputs);
@@ -252,6 +235,8 @@ buildForm = function(inputs) {
     // when json changes, check file for validity
     JSON_BOX.watchJsonBox($('#json-output'), FILE_EXPLORER.validateInputs(im.inputs));
 
+    // GUI and Text Edit is created
+    // now parse the arguments
     var initS = '';
     if(init) {
         try {
@@ -286,24 +271,8 @@ buildForm = function(inputs) {
     jsonHistory.onchange( );
     JSON_BOX.watchJsonBox($('#json-output'), function(){jsonHistory.addState.call(jsonHistory);});
     im.onChange( function(){jsonHistory.addState.call(jsonHistory);});
-
-
-    // successful setups history
-    // TODO: GET THIS WORKING
-    //var sucHist = new HISTORY(getState, setState, $('#undoRun'), $('#redoRun'));
-    var sucHist = new HISTORY(getState, setState, $(), $());
-
-    //prepare for output formatting and submit-to-server
-    SERVER_CONNECT(sucHist);
 };
 
-// PARSE FROM GGO
-GGO_CONVERSION.initParse(tool, buildForm);
-
-// redirect the submit to the correct formular
-$('.submitButton').click(function(){
-    $('form#outForm').submit();
-});
 
 </script>
   </body>
